@@ -752,7 +752,7 @@ namespace Extract.AttributeFinder
             }
 
             var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
-                updateStatus, cancellationToken);
+                updateStatus, cancellationToken, updateAnswerCodes: !testOnly);
 
             // Divide data into training and testing subsets
             if (InputConfig.TrainingSetPercentage > 0)

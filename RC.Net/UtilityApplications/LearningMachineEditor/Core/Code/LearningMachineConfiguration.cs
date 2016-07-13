@@ -263,7 +263,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         }
 
                         // Set current learning machine to be a clone of the saved copy
-                        CurrentLearningMachine = _savedLearningMachine.DeepClone();
+                        CurrentLearningMachine = _savedLearningMachine;
                     }
                 }));
             }
@@ -398,7 +398,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         _previousLearningMachine = null;
                         _fileName = fileNames[0];
                         _valid = true;
-                        CurrentLearningMachine = _savedLearningMachine.DeepClone();
+                        CurrentLearningMachine = _savedLearningMachine;
                     }
                 }
             }
@@ -426,7 +426,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
 
             // If current machine is trained or no previous machine,
-            // then set previous machine to clone of current machine
+            // then set previous machine to current machine
             if (_currentLearningMachine.IsTrained
                 || _currentLearningMachine.Encoder.AreEncodingsComputed
                 || _previousLearningMachine == null)
@@ -441,11 +441,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     toolStripStatusLabel1.Text = _UNTRAINED_STATUS;
                 }
             }
-            // Else, if configurations are the same, set current machine to clone of previous machine
+            // Else, if configurations are the same, set current machine to previous machine
             // (preserves any training or computed features)
             else if (_currentLearningMachine.IsConfigurationEqualTo(_previousLearningMachine))
             {
-                _currentLearningMachine = _previousLearningMachine.DeepClone();
+                _currentLearningMachine = _previousLearningMachine;
                 if (_currentLearningMachine.IsTrained)
                 {
                     toolStripStatusLabel1.Text = _TRAINED_STATUS;
@@ -463,13 +463,13 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 // (they could have the same settings but the new one is not computed or would not have gotten to this point)
                 if (_currentLearningMachine.Encoder.IsConfigurationEqualTo(_previousLearningMachine.Encoder))
                 {
-                    _currentLearningMachine.Encoder = _previousLearningMachine.Encoder.DeepClone();
+                    _currentLearningMachine.Encoder = _previousLearningMachine.Encoder;
 
                     // If classifiers are configured the same, then copy the previous version into the current
                     if (_previousLearningMachine.IsTrained
                         && _currentLearningMachine.Classifier.IsConfigurationEqualTo(_previousLearningMachine.Classifier))
                     {
-                        _currentLearningMachine.Classifier = _previousLearningMachine.DeepClone().Classifier;
+                        _currentLearningMachine.Classifier = _previousLearningMachine.Classifier;
                         toolStripStatusLabel1.Text = "";
                     }
                     else if (_previousLearningMachine.IsTrained)
@@ -630,6 +630,20 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         }
         
         /// <summary>
+        /// Build a new learning machine from UI values
+        /// </summary>
+        private LearningMachine BuildLearningMachine()
+        {
+            var learningMachine = new LearningMachine();
+
+            SetInputConfigValues(learningMachine);
+            SetEncoderValues(learningMachine);
+            SetClassifierValues(learningMachine);
+
+            return learningMachine;
+        }
+
+        /// <summary>
         /// Build a new learning machine. Overwrite <see cref="CurrentLearningMachine"/> if all goes well.
         /// </summary>
         /// <param name="validateOnly">Whether to validate without updating the current machine</param>
@@ -645,13 +659,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 _updatingMachine = true;
                 ClearErrors();
-                var learningMachine = new LearningMachine();
                 _valid = true;
+                var learningMachine = BuildLearningMachine();
 
-                SetInputConfigValues(learningMachine);
-                SetEncoderValues(learningMachine);
-                SetClassifierValues(learningMachine);
-
+                // Building the learning machine from UI after certain UI changes
+                // (e.g., clearing random seed) can cause other changes to occur
                 if (_textValueOrCheckStateChangedSinceCreation)
                 {
                     SyncCorrespondingControls();
@@ -1328,16 +1340,24 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 if (CurrentLearningMachine.Encoder.AreEncodingsComputed)
                 {
-                    var tempLM = CurrentLearningMachine.DeepClone();
-                    using (var win = new EditFeatures(tempLM.Encoder))
+                    LearningMachineDataEncoder tempEncoder = null;
+                    using (new TemporaryWaitCursor())
+                        tempEncoder = CurrentLearningMachine.Encoder.DeepClone();
+
+                    using (var win = new EditFeatures(tempEncoder))
                     {
                         var result = win.ShowDialog();
 
                         if (result == System.Windows.Forms.DialogResult.OK
-                            && !tempLM.Encoder.IsConfigurationEqualTo(CurrentLearningMachine.Encoder))
+                            && !tempEncoder.IsConfigurationEqualTo(CurrentLearningMachine.Encoder))
                         {
-                            // Clear training state
-                            tempLM.Classifier.Clear();
+                            // Create an untrained copy
+                            var tempLM = BuildLearningMachine();
+
+                            // Set encoder to modified encoder
+                            tempLM.Encoder = tempEncoder;
+
+                            // Update current machine
                             CurrentLearningMachine = tempLM;
                         }
                     }
@@ -1394,17 +1414,15 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     return;
                 }
 
-                var machineClone = CurrentLearningMachine.DeepClone();
+                LearningMachine tempLM = BuildLearningMachine();
 
-                // Clear training state
-                machineClone.Classifier.Clear();
-                using (var win = new ComputingFeaturesStatus(machineClone))
+                using (var win = new ComputingFeaturesStatus(tempLM))
                 {
                     var result = win.ShowDialog();
-                    if (result == System.Windows.Forms.DialogResult.OK && machineClone.Encoder.AreEncodingsComputed)
+                    if (result == System.Windows.Forms.DialogResult.OK && tempLM.Encoder.AreEncodingsComputed)
                     {
-                        // Set the current and computed variables to the updated copy
-                        CurrentLearningMachine = machineClone;
+                        // Set the current machine to the updated copy
+                        CurrentLearningMachine = tempLM;
                     }
                 }
             }
@@ -1644,7 +1662,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 _savedLearningMachine = MakeNewMachine();
                 _previousLearningMachine = null;
                 _fileName = _NEW_FILE_NAME;
-                CurrentLearningMachine = _savedLearningMachine.DeepClone();
+                CurrentLearningMachine = _savedLearningMachine;
             }
             catch (Exception ex)
             {
@@ -1682,7 +1700,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         _previousLearningMachine = null;
                         _fileName = openDialog.FileName;
                         _valid = true;
-                        CurrentLearningMachine = _savedLearningMachine.DeepClone();
+                        CurrentLearningMachine = _savedLearningMachine;
                     }
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using Extract.AttributeFinder;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -93,7 +94,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 {
                     _processing = true;
 
-                    LearningMachine tempMachine = _editor.CurrentLearningMachine.DeepClone();
+                    LearningMachine tempMachine = null;
+                    using (new TemporaryWaitCursor())
+                        tempMachine = _editor.CurrentLearningMachine.DeepClone();
                     if (recomputeFeaturesRadioButton.Checked)
                     {
                         tempMachine.Encoder.Clear();
@@ -121,7 +124,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     _processing = true;
                     ExtractException.Assert("ELI39860", "Logic error", _editor.CurrentLearningMachine.IsTrained);
 
-                    LearningMachine tempMachine = _editor.CurrentLearningMachine.DeepClone();
+                    LearningMachine tempMachine = null;
+                    using (new TemporaryWaitCursor())
+                        tempMachine = _editor.CurrentLearningMachine.DeepClone();
                     TrainTestMachine(tempMachine, testOnly: true);
                 }
             }

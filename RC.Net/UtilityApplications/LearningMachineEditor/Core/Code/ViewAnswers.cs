@@ -78,7 +78,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 // Open browser for selecting compare-to file
                 using (var openDialog = new OpenFileDialog())
                 {
-                    openDialog.Filter = "Text files|*.txt|All files|*.*";
+                    openDialog.Filter = "All files|*.*";
                     if (!string.IsNullOrEmpty(_fileName))
                     {
                         openDialog.InitialDirectory = Path.GetDirectoryName(_fileName);

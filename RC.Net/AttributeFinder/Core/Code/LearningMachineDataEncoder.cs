@@ -197,7 +197,7 @@ namespace Extract.AttributeFinder
         // Used for document categorization.
         // Enables low probability classification to result in an 'other' category and allows for categories that are
         // represented in testing data but not in training data.
-        static readonly string _UNKNOWN_CATEGORY = "Unknown_CB588EBE-4861-40FF-A640-BEF6BB42A54A";
+        static readonly string _UNKNOWN_CATEGORY = "Unknown";
 
         /// <summary>
         /// Code reserved to represent an 'other' category that will not be assigned to a real
@@ -647,15 +647,16 @@ namespace Extract.AttributeFinder
         /// <param name="answersOrAnswerFiles">The predictions for each example (if <see cref="MachineUsage"/> is
         /// <see cref="LearningMachineUsage.DocumentCategorization"/>) or the paths to VOA files of predictions
         /// (if <see cref="MachineUsage"/> is <see cref="LearningMachineUsage.Pagination"/></param>
+        /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
         /// <returns>A tuple where the first item is an enumeration of feature vectors and the second
         /// item is an enumeration of answer codes for each example</returns>
         public Tuple<double[][], int[]> GetFeatureVectorAndAnswerCollections
-            (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answersOrAnswerFiles)
+            (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answersOrAnswerFiles, bool updateAnswerCodes = false)
         {
             try
             {
                 return GetFeatureVectorAndAnswerCollections(ussFilePaths, inputVOAFilePaths,
-                    answersOrAnswerFiles, _ => { }, CancellationToken.None);
+                    answersOrAnswerFiles, _ => { }, CancellationToken.None, updateAnswerCodes);
             }
             catch (Exception e)
             {
@@ -673,11 +674,12 @@ namespace Extract.AttributeFinder
         /// (if <see cref="MachineUsage"/> is <see cref="LearningMachineUsage.Pagination"/></param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
         /// <returns>A tuple where the first item is an enumeration of feature vectors and the second
         /// item is an enumeration of answer codes for each example</returns>
         public Tuple<double[][], int[]> GetFeatureVectorAndAnswerCollections
             (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answersOrAnswerFiles,
-                Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+                Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool updateAnswerCodes)
         {
             try
             {
@@ -707,7 +709,7 @@ namespace Extract.AttributeFinder
                 if (MachineUsage == LearningMachineUsage.DocumentCategorization)
                 {
                     return GetDocumentFeatureVectorAndAnswerCollection(ussFilePaths, inputVOAFilePaths,
-                        answersOrAnswerFiles, updateStatus2, cancellationToken);
+                        answersOrAnswerFiles, updateStatus2, cancellationToken, updateAnswerCodes);
                 }
                 else if (MachineUsage == LearningMachineUsage.Pagination)
                 {
@@ -1033,13 +1035,20 @@ namespace Extract.AttributeFinder
         /// <param name="answers">The categories for each input file</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
         /// <returns>A tuple of feature vectors and predictions</returns>
         private Tuple<double[][], int[]> GetDocumentFeatureVectorAndAnswerCollection
             (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answers,
-                Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+                Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool updateAnswerCodes)
         {
             try
             {
+                // Initialize answer code mappings if updating answers (true if training the classifier)
+                if (updateAnswerCodes)
+                {
+                    InitializeAnswerCodeMappings(answers);
+                }
+
                 double[][] featureVectors = new double[ussFilePaths.Length][];
                 int[] answerCodes = new int[ussFilePaths.Length];
                 Parallel.For(0, ussFilePaths.Length, (i, loopState) =>
@@ -1099,6 +1108,36 @@ namespace Extract.AttributeFinder
             {
                 throw e.AsExtract("ELI39705");
             }
+        }
+
+        /// <summary>
+        /// Computes answer code to name mappings
+        /// </summary>
+        /// <param name="answers">The answer names/categories. Can contain repeats</param>
+        private void InitializeAnswerCodeMappings(string[] answers)
+        {
+            AnswerCodeToName.Clear();
+            AnswerNameToCode.Clear();
+
+            // Add an 'other' category
+            AnswerCodeToName.Add(UnknownCategoryCode, _UNKNOWN_CATEGORY);
+            AnswerNameToCode.Add(_UNKNOWN_CATEGORY, UnknownCategoryCode);
+
+            // Add category code for each name seen
+            int nextCategoryCode = 0;
+            foreach (var category in answers.Distinct()
+                .Where(k => !k.Equals(_UNKNOWN_CATEGORY, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(s => s, StringComparer.OrdinalIgnoreCase))
+            {
+                while (AnswerCodeToName.ContainsKey(nextCategoryCode))
+                {
+                    nextCategoryCode++;
+                }
+                AnswerCodeToName.Add(nextCategoryCode, category);
+                AnswerNameToCode.Add(category, nextCategoryCode);
+            }
+
+            ExtractException.Assert("ELI40251", "There must be at least two categories of input", AnswerNameToCode.Count > 1);
         }
 
         /// <summary>
@@ -1245,21 +1284,7 @@ namespace Extract.AttributeFinder
             AttributeFeatureVectorizers = vectorizerMap.Values;
 
             // Add category names and codes
-            // Add an 'other' category
-            AnswerCodeToName.Add(UnknownCategoryCode, _UNKNOWN_CATEGORY);
-            AnswerNameToCode.Add(_UNKNOWN_CATEGORY, UnknownCategoryCode);
-
-            // Add category code for each name seen
-            int nextCategoryCode = 0;
-            foreach (var category in answers.Distinct().OrderBy(s => s, StringComparer.OrdinalIgnoreCase))
-            {
-                while (AnswerCodeToName.ContainsKey(nextCategoryCode))
-                {
-                    nextCategoryCode++;
-                }
-                AnswerCodeToName.Add(nextCategoryCode, category);
-                AnswerNameToCode.Add(category, nextCategoryCode);
-            }
+            InitializeAnswerCodeMappings(answers);
         }
 
         /// <summary>
