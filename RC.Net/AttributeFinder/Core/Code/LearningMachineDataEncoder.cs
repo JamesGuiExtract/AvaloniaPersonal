@@ -692,7 +692,7 @@ namespace Extract.AttributeFinder
                         updateStatus(args);
                     };
 
-                ExtractException.Assert("ELI39691", "Encodings have not been computed", AreEncodingsComputed);
+                ExtractException.Assert("ELI40261", "Encodings have not been computed", AreEncodingsComputed);
 
                 // Null or empty VOA collection is OK. Set to null to simplify code
                 if (inputVOAFilePaths != null && inputVOAFilePaths.Length == 0)

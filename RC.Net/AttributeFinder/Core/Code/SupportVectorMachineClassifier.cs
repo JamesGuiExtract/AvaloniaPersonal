@@ -225,8 +225,8 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                ExtractException.Assert("ELI39717", "No inputs given", inputs != null && inputs.Length > 0);
-                ExtractException.Assert("ELI39718", "Inputs and outputs are different lengths", inputs.Length == outputs.Length);
+                ExtractException.Assert("ELI40262", "No inputs given", inputs != null && inputs.Length > 0);
+                ExtractException.Assert("ELI40263", "Inputs and outputs are different lengths", inputs.Length == outputs.Length);
 
                 // Indent sub-status messages
                 Action<StatusArgs> updateStatus2 = args =>
@@ -236,7 +236,7 @@ namespace Extract.AttributeFinder
                     };
 
                 FeatureVectorLength = inputs[0].Length;
-                ExtractException.Assert("ELI39719", "Inputs are different lengths",
+                ExtractException.Assert("ELI40264", "Inputs are different lengths",
                     inputs.All(vector => vector.Length == FeatureVectorLength));
 
                 NumberOfClasses = outputs.Max() + 1;
@@ -354,7 +354,7 @@ namespace Extract.AttributeFinder
             }
             catch (Exception e)
             {
-                throw e.AsExtract("ELI39722");
+                throw e.AsExtract("ELI40265");
             }
         }
 

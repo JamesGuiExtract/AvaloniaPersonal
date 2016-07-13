@@ -345,7 +345,7 @@ namespace Extract.AttributeFinder
             }
             catch (Exception e)
             {
-                throw e.AsExtract("ELI39755");
+                throw e.AsExtract("ELI40258");
             }
         }
 
@@ -381,7 +381,7 @@ namespace Extract.AttributeFinder
             }
             catch (Exception e)
             {
-                throw e.AsExtract("ELI39807");
+                throw e.AsExtract("ELI40259");
             }
         }
 
@@ -675,7 +675,7 @@ namespace Extract.AttributeFinder
             }
             catch (Exception e)
             {
-                throw e.AsExtract("ELI39810");
+                throw e.AsExtract("ELI40260");
             }
         }
 
