@@ -713,6 +713,12 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                if (0 == index)
+                {
+                    // Nothing was viewed, avoid throwing an exception.
+                    return 0;
+                }
+
                 ExtractException.Assert("ELI39873",
                                         String.Format(CultureInfo.InvariantCulture,
                                                       "Index value: {0}, is out-of-range, maximum: {1}",

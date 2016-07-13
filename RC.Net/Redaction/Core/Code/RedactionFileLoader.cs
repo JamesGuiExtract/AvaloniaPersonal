@@ -353,8 +353,7 @@ namespace Extract.Redaction
         {
             get
             {
-                ReadOnlyCollection<int> visited = new ReadOnlyCollection<int>(_visitedPages);
-                return visited;
+                return new ReadOnlyCollection<int>(_visitedPages.OrderBy(page => page).ToList());
             }
         }
 
@@ -814,51 +813,6 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Visiteds the value.
-        /// </summary>
-        /// <param name="visited">The visited.</param>
-        /// <returns>true if the _Visited attribute value is "true", otherwise false</returns>
-        static bool VisitedValue(ComAttribute visited)
-        {
-            try
-            {
-                if (null == visited)
-                {
-                    return false;
-                }
-
-                ExtractException.Assert("ELI39785",
-                                        String.Format(CultureInfo.InvariantCulture,
-                                                      "Attempt to get the visited state" +
-                                                      " from an attribute named: {0}, should be: {1}",
-                                                      visited.Name,
-                                                      Constants.VisitedItemMetaDataName),
-                                        visited.Name == Constants.VisitedItemMetaDataName);
-
-                string value = visited.Value.String;
-                return String.Equals(value, "Yes", StringComparison.OrdinalIgnoreCase);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39784");
-            }
-        }
-
-        /// <summary>
-        /// Sets the state of the prior verification - was each sensitive item visited?
-        /// </summary>
-        /// <param name="item">The item.</param>
-        static void SetPriorVerificationVisitedState(SensitiveItem item)
-        {
-            ComAttribute itemAttr = item.Attribute.ComAttribute;
-            IUnknownVector subAttrs = itemAttr.SubAttributes;
-
-            ComAttribute visited = AttributeMethods.GetSingleAttributeByName(subAttrs, 
-                                                                             Constants.VisitedItemMetaDataName);
-            item.PriorVerificationVisitedThis = VisitedValue(visited);
-        }
-
-        /// <summary>
         /// Returns the last verification session.
         /// </summary>
         /// <returns>last session attribute</returns>
@@ -883,11 +837,6 @@ namespace Extract.Redaction
         {
             try
             {
-                if (_verificationSessions.Count() == 0)
-                {
-                    return null;
-                }
-
                 foreach (var attribute in _verificationSessions)
                 {
                     var value = attribute.Value.String;
@@ -911,29 +860,35 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Gets the GUIDs string that specifies the selected redaction items.
+        /// Gets the GUIDs string that specifies all of the previously visited redaction items.
         /// </summary>
-        /// <returns>comma-delimited list of GUID strings, or empty if not found</returns>
-        string GetSelectedRedactionItemsAsGUIDs()
+        /// <returns>comma-delimited list of GUID strings for all previously visited sensitive items, 
+        /// or empty if not found</returns>
+        string[] GetVisitedRedactionItemsAsGUIDs()
         {
             try
             {
-                var lastSession = GetLastVerificationSession();
-                if (null == lastSession)
+                HashSet<string> storeOfGuids = new HashSet<string>();
+
+                foreach (var session in _verificationSessions)
                 {
-                    return String.Empty;
+                    var visitedItemsAttr =
+                        AttributeMethods.GetSingleAttributeByName(session.SubAttributes,
+                                                                  Constants.VisitedRedactionItemsMetaDataName);
+                    if (null == visitedItemsAttr)
+                    {
+                        continue;
+                    }
+
+                    string guids = visitedItemsAttr.Value.String;
+                    var arrayOfGuids = guids.Split(',');
+                    foreach (var guid in arrayOfGuids)
+                    {
+                        storeOfGuids.Add(guid.Trim());
+                    }
                 }
 
-                var selectedItemsAttr =
-                    AttributeMethods.GetSingleAttributeByName(lastSession.SubAttributes,
-                                                              Constants.SelectedRedactionItemsMetaDataName);
-                if (null == selectedItemsAttr)
-                {
-                    return String.Empty;
-                }
-
-                string guids = selectedItemsAttr.Value.String;
-                return guids;
+                return storeOfGuids.ToArray();
             }
             catch (Exception ex)
             {
@@ -942,36 +897,28 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Sets the state of the prior verification sensitive items selections.
+        /// Sets the state of all the prior verification visited items.
         /// </summary>
-        /// <param name="item">The item.</param>
-        void SetPriorVerificationSelectedState(SensitiveItem item)
+        void SetPriorVerificationVisitedState()
         {
             try
             {
-                var selectedItemsGuids = GetSelectedRedactionItemsAsGUIDs();
-                if (String.IsNullOrWhiteSpace(selectedItemsGuids))
+                var visitedItemsGuids = GetVisitedRedactionItemsAsGUIDs();
+                foreach (var guid in visitedItemsGuids)
                 {
-                    return;
-                }
-
-                string[] guids = selectedItemsGuids.Split(',');
-                foreach (var guid in guids)
-                {
-                    if (item.GUID == guid.Trim())
+                    SensitiveItem item = _sensitiveItems.Find(i => i.GUID == guid);
+                    if (item != null)
                     {
-                        item.PriorVerificationSelectedThis = true;
-                        return;
-                    }
+                        item.PriorVerificationVisitedThis = true;
+                    }                    
                 }
-
-                item.PriorVerificationSelectedThis = false;
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39782");
             }
         }
+
 
         /// <summary>
         /// Assigns the ID and initial redacted state of the specified sensitive items.
@@ -989,10 +936,9 @@ namespace Extract.Redaction
                     // https://extract.atlassian.net/browse/ISSUE-7569
                     item.Attribute.Redacted = item.Level.Output;
                 }
-
-                SetPriorVerificationVisitedState(item);
-                SetPriorVerificationSelectedState(item);
             }
+
+            SetPriorVerificationVisitedState();
         }
 
         /// <summary>
@@ -1318,53 +1264,6 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Marks the visited status of all redactions.
-        /// </summary>
-        /// <param name="sensitiveItems">The (updated) list of sensitive items</param>
-        /// <param name="visitedItems">The visited redaction items.</param>
-        /// NOTE: By adding a "_visited" subattribute to the sensitive item attribute,
-        /// the subattribute is saved into the VOA file as a side-effect.
-        void MarkVisitedStatusOfAllRedactions(List<SensitiveItem> sensitiveItems, List<int> visitedItems)
-        {
-            try
-            {
-                int index = 0;
-                foreach (var item in sensitiveItems)
-                {
-                    bool visited = visitedItems.IndexOf(index) > -1 || item.Attribute.ComAttribute.Name == "Manual";
-                    string strValue = visited ? "Yes" : "No";
-                    var attr = item.Attribute.ComAttribute;
-                    var subattrs = attr.SubAttributes;
-
-                    var visitedSubattr = GetVisitedSubAttribute(subattrs);
-                    if (visitedSubattr.Size() > 0)
-                    {
-                        // Here when subattribute named "_visited" already exists - 
-                        // overwrite it's current Yes|No value 
-                        var foundAttr = ((UCLID_AFCORELib.Attribute)visitedSubattr.At(0));
-                        SpatialString ss = foundAttr.Value;
-                        ss.CreateNonSpatialString(strValue, ss.SourceDocName);
-                    }
-                    else
-                    {
-                        // Here when _visited subattribute does NOT exist, create it with true|false value
-                        ComAttribute subAttr = _comAttribute.Create(name: Constants.VisitedItemMetaDataName,
-                                                                    value: strValue,
-                                                                    type: _PERSISTED_CONTEXT_TYPE);
-
-                        AttributeMethods.AppendChildren(attr, subAttr);
-                    }
-
-                    ++index;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39769");
-            }
-        }
-
-        /// <summary>
         /// Modifies the VOA file and appends a session metadata COM attribute.
         /// </summary>
         /// <param name="sessionName">The name of the session metadata COM attribute.</param>
@@ -1408,7 +1307,6 @@ namespace Extract.Redaction
             // Append session context entries
             if (null != sessionContext)
             {
-                MarkVisitedStatusOfAllRedactions(sensitiveItems, sessionContext.VisitedRedactions);
                 AppendSessionContext(session, sessionContext, sensitiveItems);
             }
 
@@ -1699,13 +1597,13 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="visitedPages">The visited pages.</param>
         /// <param name="currentPageIndex">Index of the current page.</param>
-        /// <param name="selectedRedactionItems">The selected redaction items.</param>
+        /// <param name="visitedRedactionItems">The visited redaction items.</param>
         /// <param name="sensitiveItems">List of sensitive items, used to retrieve GUID for each
         /// listed sensitive attribute that is currently selected (if any)</param>
         /// <param name="parent">parent attribute to attach subattributes too</param>
         void CreateSessionContextAttribute(List<int> visitedPages,
                                            int currentPageIndex,
-                                           List<int> selectedRedactionItems,
+                                           List<int> visitedRedactionItems,
                                            List<SensitiveItem> sensitiveItems,
                                            ComAttribute parent)
         {
@@ -1720,29 +1618,29 @@ namespace Extract.Redaction
                 ComAttribute currentPage = _comAttribute.Create("_CurrentPage");
                 AddPersistedContext(currentPage, currentPageIndex);
 
-                ComAttribute selectedRedactions = _comAttribute.Create("_SelectedRedactionItems");
-                List<String> selectedSensitiveItemGUIDs = new List<string>();
-                foreach (var index in selectedRedactionItems)
+                ComAttribute visitedRedactions = _comAttribute.Create(Constants.VisitedRedactionItemsMetaDataName);
+                List<String> visitedSensitiveItemGUIDs = new List<string>();
+                foreach (var index in visitedRedactionItems)
                 {
                     ExtractException.Assert("ELI39763",
                                             String.Format(CultureInfo.InvariantCulture,
-                                                          "Index value: {0} from the selectedRedactionItems list exceeds" +
+                                                          "Index value: {0} from the visitedRedactionItems list exceeds" +
                                                           " the sensitive items count: {1}.",
                                                           index,
                                                           sensitiveItems.Count),
                                             index < sensitiveItems.Count);
 
                     string guid = sensitiveItems[index].GUID;
-                    selectedSensitiveItemGUIDs.Add(guid);
+                    visitedSensitiveItemGUIDs.Add(guid);
                 }
 
-                string guidsListed = String.Join(", ", selectedSensitiveItemGUIDs);
-                AddPersistedContext(selectedRedactions, guidsListed);
+                string guidsListed = String.Join(", ", visitedSensitiveItemGUIDs);
+                AddPersistedContext(visitedRedactions, guidsListed);
 
                 AttributeMethods.AppendChildren(parent,
                                                 pages,
                                                 currentPage,
-                                                selectedRedactions);
+                                                visitedRedactions);
             }
             catch (Exception ex)
             {
@@ -1763,7 +1661,7 @@ namespace Extract.Redaction
             {
                 CreateSessionContextAttribute(sessionContext.VisitedPages,
                                               sessionContext.CurrentPageIndex,
-                                              sessionContext.SelectedRedactionItems,
+                                              sessionContext.VisitedRedactions,
                                               sensitiveItems,
                                               parent);
             }
@@ -2128,13 +2026,13 @@ namespace Extract.Redaction
         {
             try
             {
-                if (0 == _verificationSessions.Count() || 0 == _sensitiveItems.Count)
+                if (0 == _verificationSessions.Count())
                 {
                     return false;
                 }
 
                 var itemsVisited = (_sensitiveItems.Where(item => true == item.PriorVerificationVisitedThis)).Count();
-                return itemsVisited > 1 || (_numberOfDocumentPages > 1 && NumberOfVisitedPages() > 1);
+                return itemsVisited > 1 || (_numberOfDocumentPages > 1 && VisitedPages.Count > 1);
             }
             catch (Exception ex)
             {
@@ -2145,7 +2043,9 @@ namespace Extract.Redaction
         /// <summary>
         /// Gets the index of the last visited sensitive item.
         /// </summary>
-        /// <returns>row index value, wrapped in a ReadOnlyCollection of int, for ease-of-use</returns>
+        /// <returns>row index value, wrapped in a ReadOnlyCollection of int, for ease-of-use.
+        /// NOTE that if there are no sensitive items, then index is adjusted to zero so that the 
+        /// collection can be used as-is to safely select a gridview row.</returns>
         public ReadOnlyCollection<int> IndexOfLastVisitedSensitiveItem()
         {
             try

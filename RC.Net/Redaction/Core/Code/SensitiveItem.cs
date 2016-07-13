@@ -28,11 +28,6 @@ namespace Extract.Redaction
         /// </summary>
         bool _previouslyVisited;
 
-        /// <summary>
-        /// Was this instance previously selected in prior verification session?
-        /// </summary>
-        bool _previouslySelected;
-
         #endregion Fields
 
         #region Constructors
@@ -58,7 +53,6 @@ namespace Extract.Redaction
             _level = level;
             _attribute = attribute;
             _previouslyVisited = false;
-            _previouslySelected = false;
         }
 
         #endregion Constructors
@@ -104,24 +98,6 @@ namespace Extract.Redaction
             set
             {
                 _previouslyVisited = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether prior verfication selected this sensitive item.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if prior verfication selected this; otherwise, <c>false</c>.
-        /// </value>
-        public bool PriorVerificationSelectedThis
-        {
-            get
-            {
-                return _previouslySelected;
-            }
-            set
-            {
-                _previouslySelected = value;
             }
         }
 

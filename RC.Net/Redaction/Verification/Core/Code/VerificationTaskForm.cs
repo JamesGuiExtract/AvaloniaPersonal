@@ -2768,10 +2768,10 @@ namespace Extract.Redaction.Verification
                 var selection = _currentVoa.IndexOfLastVisitedSensitiveItem();
                 var rowIndex = selection[0];
 
-                var pageIndex = _redactionGridView.GetLastViewedItemPageNumber(rowIndex);
+                var pageOfIndex = _redactionGridView.GetLastViewedItemPageNumber(rowIndex);
 
                 var lastVisitedPage = _currentVoa.VisitedPages.Last();
-                if (lastVisitedPage > pageIndex)
+                if (lastVisitedPage > pageOfIndex)
                 {
                     _pageSummaryView.GoToPage(lastVisitedPage);
                 }

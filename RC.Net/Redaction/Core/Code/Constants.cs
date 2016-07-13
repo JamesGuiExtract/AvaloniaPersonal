@@ -22,7 +22,7 @@ namespace Extract.Redaction
         /// <summary>
         /// The selected redaction items meta data name.
         /// </summary>
-        public static readonly string SelectedRedactionItemsMetaDataName = "_SelectedRedactionItems";
+        public static readonly string VisitedRedactionItemsMetaDataName = "_VisitedRedactionItems";
 
         /// <summary>
         /// The visited pages meta data name.
