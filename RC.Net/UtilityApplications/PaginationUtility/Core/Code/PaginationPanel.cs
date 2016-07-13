@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
@@ -1237,6 +1238,62 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Resolves name conflicts and then adds the filename associated with argument <see paramref="e"/>
+        /// to the FAM DB with the FileProcessingDB AddFileNoQueue method.</summary>
+        /// <remarks>If the filename already exists on the file system or if the DB add fails because
+        /// the file already exists in the DB, it will add 6 random chars before the extension and
+        /// try to add that filename.</remarks>
+        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance relating to
+        /// the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this call is
+        /// being made.</param>
+        /// <param name="priority">The <see cref="EFilePriority"/> that should be assigned for the
+        /// file.</param>
+        /// <returns>The ID of the newly added filename in the FAMFile table.</returns>
+        public int AddFileWithNameConflictResolve(CreatingOutputDocumentEventArgs e, EFilePriority priority)
+        {
+            // First resolve conflict with file system
+            if (File.Exists(e.OutputFileName))
+            {
+                var pathTags = new SourceDocumentPathTags(e.OutputFileName);
+                e.OutputFileName = pathTags.Expand(
+                    "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
+            }
+
+            int fileID = -1;
+            try
+            {
+                fileID = FileProcessingDB.AddFileNoQueue(
+                    e.OutputFileName, e.FileSize, e.PageCount, priority);
+            }
+            catch (Exception ex)
+            {
+                // Query to see if the e.OutputFileName can be found in the database.
+                string query = string.Format(CultureInfo.InvariantCulture,
+                    "SELECT [ID] FROM [FAMFile] WHERE [FileName] = '{0}'",
+                    e.OutputFileName.Replace("'", "''"));
+
+                var recordset = FileProcessingDB.GetResultsForQuery(query);
+                bool fileExistsInDB = !recordset.EOF;
+                recordset.Close();
+                if (fileExistsInDB)
+                {
+                    var pathTags = new SourceDocumentPathTags(e.OutputFileName);
+                    e.OutputFileName = pathTags.Expand(
+                        "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
+
+                    fileID = FileProcessingDB.AddFileNoQueue(
+                        e.OutputFileName, e.FileSize, e.PageCount, priority);
+                }
+                else
+                {
+                    // The file was not in the database, the call failed for another reason.
+                    throw ex.AsExtract("ELI40107");
+                }
+            }
+
+            return fileID;
+        }
         #endregion Methods
 
         #region IPaginationUtility

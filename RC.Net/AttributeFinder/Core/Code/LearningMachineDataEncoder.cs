@@ -195,9 +195,8 @@ namespace Extract.AttributeFinder
         #region Constants
 
         // Used for document categorization.
-        // Enables low probability classification to result in an 'other' category and allows for categories that are
-        // represented in testing data but not in training data.
-        static readonly string _UNKNOWN_CATEGORY = "Unknown";
+        // Used to represent categories that are in testing data but not in training data.
+        static readonly string _UNKNOWN_CATEGORY = "Unknown_CB588EBE-4861-40FF-A640-BEF6BB42A54A";
 
         /// <summary>
         /// Code reserved to represent an 'other' category that will not be assigned to a real

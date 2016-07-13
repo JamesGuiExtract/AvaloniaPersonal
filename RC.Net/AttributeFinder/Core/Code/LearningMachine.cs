@@ -51,6 +51,9 @@ namespace Extract.AttributeFinder
         /// </summary>
         private static readonly string _DOCUMENT_PLACEHOLDER_TEXT = "N/A";
 
+        // Used for document categorization to represent low probability classification
+        private static readonly string _UNKNOWN_CATEGORY = "Unknown";
+
         #endregion Constants
 
         #region Fields
@@ -415,7 +418,7 @@ namespace Extract.AttributeFinder
                             string category;
                             if (UseUnknownCategory && answerAndScore.Item2 != null && answerAndScore.Item2 < UnknownCategoryCutoff)
                             {
-                                category = "Unknown";
+                                category = _UNKNOWN_CATEGORY;
                             }
                             else
                             {
@@ -492,13 +495,20 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                bool unknownCategoryUsed = false;
                 int[] predictions = inputs.Apply(Classifier.ComputeAnswer)
                     .Select(t =>
                         {
                             if (UseUnknownCategory && t.Item2 != null
                                 && t.Item2 < UnknownCategoryCutoff)
                             {
-                                return LearningMachineDataEncoder.UnknownCategoryCode;
+                                unknownCategoryUsed = true;
+
+                                // Use value beyond any that the classifier would use for unknown
+                                // rather than LearningMachineDataEncoder.UnknownCategoryCode to avoid
+                                // misleading 100% accuracy results
+                                // https://extract.atlassian.net/browse/ISSUE-13894
+                                return Classifier.NumberOfClasses;
                             }
                             else
                             {
@@ -516,7 +526,10 @@ namespace Extract.AttributeFinder
                 }
                 else
                 {
-                    var confusionMatrix = new GeneralConfusionMatrix(Classifier.NumberOfClasses, predictions, outputs);
+                    int numberOfClasses = unknownCategoryUsed
+                        ? Classifier.NumberOfClasses + 1
+                        : Classifier.NumberOfClasses;
+                    var confusionMatrix = new GeneralConfusionMatrix(numberOfClasses, predictions, outputs);
                     accuracyData = new AccuracyData(confusionMatrix);
                 }
 

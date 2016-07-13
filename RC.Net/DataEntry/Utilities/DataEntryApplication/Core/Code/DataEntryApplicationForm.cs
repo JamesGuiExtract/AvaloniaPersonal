@@ -28,7 +28,6 @@ using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_DATAENTRYCUSTOMCOMPONENTSLib;
 using UCLID_FILEPROCESSINGLib;
-using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.DataEntry.Utilities.DataEntryApplication
 {
@@ -3132,6 +3131,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 e.OutputFileName = GetPaginatedDocumentFileName(e);
 
+                // Create directory if it doesn't exist
+                Directory.CreateDirectory(Path.GetDirectoryName(e.OutputFileName));
+
                 bool grabForImmediateVerification =
                     e.SuggestedPaginationAccepted.HasValue && e.SuggestedPaginationAccepted.Value;
 
@@ -3142,7 +3144,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Add the file to the DB and check it out for this process before actually writing
                 // it to outputPath to prevent a running file supplier from grabbing it and another
                 // process from getting it.
-                int fileID = AddFileWithNameConflictResolve(e, priority);
+                int fileID = _paginationPanel.AddFileWithNameConflictResolve(e, priority);
 
                 // Format source page info into an IUnknownVector of StringPairs (filename, page).
                 var sourcePageInfo = e.SourcePageInfo
@@ -5724,55 +5726,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 throw ex.AsExtract("ELI39892");
             }
-        }
-
-        /// <summary>
-        /// Attempts add the filename associates with the argument <see paramref="e"/> to the FAM DB
-        /// with the FileProcessingDB AddFileNoQueue method. If the add fails because
-        /// the file already exists in the DB, it will add 6 random chars before the extension and
-        /// try one more time.</summary>
-        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance relating to
-        /// the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this call is
-        /// being made.</param>
-        /// <param name="priority">The <see cref="EFilePriority"/> that should be assigned for the
-        /// file.</param>
-        /// <returns>The ID of the newly added filename in the FAMFile table.</returns>
-        int AddFileWithNameConflictResolve(CreatingOutputDocumentEventArgs e, EFilePriority priority)
-        {
-            int fileID = -1;
-
-            try
-            {
-                fileID = FileProcessingDB.AddFileNoQueue(
-                    e.OutputFileName, e.FileSize, e.PageCount, priority);
-            }
-            catch (Exception ex)
-            {
-                // Query to see if the e.OutputFileName can be found in the database.
-                string query = string.Format(CultureInfo.InvariantCulture,
-                    "SELECT [ID] FROM [FAMFile] WHERE [FileName] = '{0}'",
-                    e.OutputFileName.Replace("'", "''"));
-
-                var recordset = FileProcessingDB.GetResultsForQuery(query);
-                bool fileExistsInDB = !recordset.EOF;
-                recordset.Close();
-                if (fileExistsInDB)
-                {
-                    var pathTags = new SourceDocumentPathTags(e.OutputFileName);
-                    e.OutputFileName = pathTags.Expand(
-                        "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
-
-                    fileID = FileProcessingDB.AddFileNoQueue(
-                        e.OutputFileName, e.FileSize, e.PageCount, priority);
-                }
-                else
-                {
-                    // The file was not in the database, the call failed for another reason.
-                    throw ex.AsExtract("ELI39890");
-                }
-            }
-
-            return fileID;
         }
 
         /// <summary>
