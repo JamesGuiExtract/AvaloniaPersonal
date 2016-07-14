@@ -5386,8 +5386,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         void LoadPaginationDocumentDataPanel()
         {
-            var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagUtility, "");
-            string dataEntryPanelFileName = pathTags.Expand(
+            string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
                 _activeDataEntryConfig.Config.Settings.DataEntryPanelFileName);
 
             // May be null if the DEP assembly does not define an IPaginationDocumentDataPanel.
