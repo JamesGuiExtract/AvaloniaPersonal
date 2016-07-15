@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using Extract.Drawing;
+using System;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Extract.Drawing;
-using System.Drawing.Drawing2D;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -56,6 +50,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 };
 
                 Rectangle drawRectangle = ClientRectangle;
+                drawRectangle.Offset(0, 1);
+                drawRectangle.Inflate(0, 1);
                 e.Graphics.DrawString("+", Font, brush, drawRectangle, format);
             }
             catch (Exception ex)

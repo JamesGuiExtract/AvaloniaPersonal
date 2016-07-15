@@ -1100,8 +1100,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _tabControl.SelectedTab = _paginationTab;
                         _paginationPanel.PendingChanges = true;
 
-                        _skipProcessingMenuItem.Enabled = true;
-
                         // If pagination has been suggested, don't bother loading the data for the
                         // current document; either the suggestion will be accepted trigger new
                         // files to be loaded or the suggestion will be rejected triggering the
@@ -2094,6 +2092,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         if (_paginationPanel != null && _paginationDocumentDataPanel != null)
                         {
                             PaginationDocumentData documentData = GetAsPaginationDocumentData(attributes);
+                            documentData.DataSharedInVerification = true;
 
                             // The AttributeValueChanged event only needs to be registered in
                             // conjunction with the currently active document in verification in
@@ -3012,6 +3011,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable;
                     _saveMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                    _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _printMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _pageNavigationToolStripMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _pageNavigationImageViewerToolStrip.Enabled = _imageViewer.IsImageAvailable;
@@ -3033,6 +3033,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // The only way to control the enabled state is by changing the ImageViewer property.
                     _selectLayerObjectMenuItem.ImageViewer = _imageViewer;
                     _selectLayerObjectToolStripButton.ImageViewer = _imageViewer;
+                    _printMenuItem.ImageViewer = _imageViewer;
 
                     // Refresh any attributes that were modified in the _paginationDocumentDataPanel
                     // so that it's value stays in sync.
@@ -3065,7 +3066,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _saveAndCommitFileCommand.Enabled = false;
                     _saveMenuItem.Enabled = false;
-                    _printMenuItem.Enabled = false;
+                    
+                    // Skip should always be enabled when on the pagination tab if a document is available
+                    _skipProcessingMenuItem.Enabled = _paginationPanel.SourceDocuments.Any();
+                    
                     _pageNavigationToolStripMenuItem.Enabled = false;
                     _pageNavigationImageViewerToolStrip.Enabled = false;
                     _gotoNextInvalidCommand.Enabled = false;
@@ -3082,10 +3086,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _toggleHighlightCommand.Enabled = false;
                     _toggleShowAllHighlightsCommand.Enabled = false;
 
+                    _imageViewer.CursorTool = CursorTool.None;
+
                     // The select layer object tool becomes available based on the ImageViewer state.
                     // The only way to control the enabled state is by changing the ImageViewer property.
                     _selectLayerObjectMenuItem.ImageViewer = null;
                     _selectLayerObjectToolStripButton.ImageViewer = null;
+                    _printMenuItem.ImageViewer = null;
 
                     _paginationPanel.Resume();
                 }
@@ -3134,12 +3141,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Create directory if it doesn't exist
                 Directory.CreateDirectory(Path.GetDirectoryName(e.OutputFileName));
 
-                bool grabForImmediateVerification =
-                    e.SuggestedPaginationAccepted.HasValue && e.SuggestedPaginationAccepted.Value;
+                bool sendForReprocessing =
+                    (e.DocumentData != null && !e.DocumentData.SendForReprocessing != null)
+                    ? e.DocumentData.SendForReprocessing.Value
+                    : (!e.SuggestedPaginationAccepted.HasValue || !e.SuggestedPaginationAccepted.Value);
 
-                EFilePriority priority = grabForImmediateVerification
-                    ? EFilePriority.kPriorityNormal
-                    : GetPriorityForFile(e);
+                EFilePriority priority = GetPriorityForFile(e);
 
                 // Add the file to the DB and check it out for this process before actually writing
                 // it to outputPath to prevent a running file supplier from grabbing it and another
@@ -3183,11 +3190,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Only grab the file back into the current verification session if suggested
                 // pagination boundaries were accepted (meaning the rules should have already found
                 // everything we would expect them to find for this document).
-                if (grabForImmediateVerification)
-                {
-                    GrabDocumentForVerification(fileID, e, pageMap, newSpatialPageInfos);
-                }
-                else if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
+                if (sendForReprocessing)
                 {
                     // Produce a voa file for the paginated document using the data the rules suggested.
                     var documentData = e.DocumentData as PaginationDocumentData;
@@ -3212,6 +3215,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     FileProcessingDB.SetStatusForFile(fileID,
                         _settings.PaginationSettings.PaginationOutputAction,
                         EActionStatus.kActionPending, false, false, out oldStatus);
+                }
+                else if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
+                {
+                    GrabDocumentForVerification(fileID, e, pageMap, newSpatialPageInfos);                    
                 }
             }
             catch (Exception ex)
@@ -5500,8 +5507,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // If only "Document" attributes exist at the root of the VOA file, there is
                 // rules-suggested pagination.
-                // TODO: If there is only a single document, extract the document data and don't
-                // show suggested pagination.
                 if (rootAttributeNames.Count() == 1 &&
                     rootAttributeNames.Single().Equals("Document", StringComparison.OrdinalIgnoreCase))
                 {

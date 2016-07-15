@@ -123,6 +123,16 @@ namespace Extract.UtilityApplications.PaginationUtility.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap EditGray {
+            get {
+                object obj = ResourceManager.GetObject("EditGray", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Error {
             get {
                 object obj = ResourceManager.GetObject("Error", resourceCulture);
@@ -196,6 +206,16 @@ namespace Extract.UtilityApplications.PaginationUtility.Properties {
         internal static System.Drawing.Bitmap UpArrow {
             get {
                 object obj = ResourceManager.GetObject("UpArrow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap YellowArrow {
+            get {
+                object obj = ResourceManager.GetObject("YellowArrow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

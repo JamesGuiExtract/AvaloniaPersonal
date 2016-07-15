@@ -329,14 +329,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         if (_documentData != null)
                         {
-                            _documentData.ModifiedChanged -= HandleDocumentData_ModifiedChanged;
+                            _documentData.ModifiedChanged -= HandleDocumentData_Changed;
+                            _documentData.SummaryChanged += HandleDocumentData_Changed;
+                            _documentData.SendForReprocessingChanged += HandleDocumentData_Changed;
                         }
 
                         _documentData = value;
 
                         if (_documentData != null)
                         {
-                            _documentData.ModifiedChanged += HandleDocumentData_ModifiedChanged;
+                            _documentData.ModifiedChanged += HandleDocumentData_Changed;
+                            _documentData.SummaryChanged += HandleDocumentData_Changed;
+                            _documentData.SendForReprocessingChanged += HandleDocumentData_Changed;
                         }
 
                         OnDocumentDataChanged();
@@ -370,7 +374,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return (_documentData != null) && _documentData.DataError;
+                return PageControls.Any(c => !c.Deleted) &&
+                    (_documentData != null) && 
+                    _documentData.AllowDataEdit &&
+                    _documentData.DataError;
             }
         }
 
@@ -636,13 +643,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="PaginationDocumentData.ModifiedChanged"/> event for
+        /// Handles the <see cref="PaginationDocumentData.ModifiedChanged"/>,
+        /// <see cref="PaginationDocumentData.SummaryChanged"/> or
+        /// <see cref="PaginationDocumentData.SendForReprocessingChanged"/> events for
         /// <see cref="DocumentData"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleDocumentData_ModifiedChanged(object sender, EventArgs e)
+        void HandleDocumentData_Changed(object sender, EventArgs e)
         {
             try
             {

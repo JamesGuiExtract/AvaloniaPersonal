@@ -406,7 +406,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI39791");
+                throw ex.AsExtract("ELI40255");
             }
         }
 

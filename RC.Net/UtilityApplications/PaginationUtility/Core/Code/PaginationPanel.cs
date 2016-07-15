@@ -267,6 +267,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the indicator to show whether documents will be
+        /// queued for reprocessing should be hidden.
+        /// </summary>
+        /// <value><see langword="true"/> if the reprocessing indicator should be hidden; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool HideReprocessIndicator
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets whether to output expected pagination attributes
         /// </summary>
         public bool OutputExpectedPaginationAttributesFile
@@ -587,12 +600,41 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets the data associated with the specified <see paramref="sourceFileName"/>.
+        /// </summary>
+        /// <param name="sourceFileName">The name of the document for which data should be retrieved.</param>
+        /// <returns>The <see cref="PaginationDocumentData"/> instance associated with
+        /// <see paramref="sourceFileName"/> or <see langword="null"/> if it has no data.</returns>
+        public PaginationDocumentData GetDocumentData(string sourceFileName)
+        {
+            try
+            {
+                var matchingDocuments = _primaryPageLayoutControl.Documents
+                            .Where(doc => doc.InOriginalForm &&
+                                doc.PageControls.First().Page.OriginalDocumentName.Equals(sourceFileName,
+                                    StringComparison.OrdinalIgnoreCase));
+
+                if (matchingDocuments.Count() == 1)
+                {
+                    var document = matchingDocuments.Single();
+                    return document.DocumentData;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40272");
+            }
+        }
+
+        /// <summary>
         /// Updates the data associated with the specified <see paramref="sourceFileName"/>.
         /// <para><b>Note:</b></para>
         /// The document's data can be updated only in the case that the currently represented
         /// pagination does not differ at all with how this document currently exists on disk.
         /// </summary>
-        /// <param name="sourceFileName">The name of the document for</param>
+        /// <param name="sourceFileName">The name of the document for which data should be updated.</param>
         /// <param name="documentData">The data to associate with <see paramref="sourceFileName"/>.
         /// (replaces any previously assigned data)</param>
         /// <returns><see langword="true"/> if the document data was updated,
@@ -1057,13 +1099,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             // If the document's data is open for editing, close the panel.
                             if (_documentWithDataInEdit == outputDocument)
                             {
-                                if (!CloseDataPanel(true))
-                                {
-                                    _primaryPageLayoutControl.SelectDocument(outputDocument);
-
-                                    throw new ExtractException("ELI40211",
-                                        "Failed to save document data");
-                                }
+                                CloseDataPanel(false);
                             }
 
                             int docPosition =
@@ -1234,7 +1270,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI39708");
+                throw ex.AsExtract("ELI40253");
             }
         }
 
@@ -1854,6 +1890,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (!CloseDataPanel(true))
                     {
                         _primaryPageLayoutControl.SelectDocument(_documentWithDataInEdit);
+                        return;
                     }
 
                     _documentWithDataInEdit = e.OutputDocument;
@@ -1912,11 +1949,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var document = (OutputDocument)sender;
-
-                foreach (var pageControl in document.PageControls)
-                {
-                    pageControl.Invalidate();
-                }
 
                 if (document.PaginationSeparator != null)
                 {
@@ -2073,6 +2105,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.ExternalOutputOnly = true;
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
             _primaryPageLayoutControl.CommitOnlySelection = CommitOnlySelection;
+            _primaryPageLayoutControl.HideReprocessIndicator = HideReprocessIndicator;
             _primaryPageLayoutControl.LoadNextDocumentVisible = LoadNextDocumentVisible;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandlePrimaryPageLayoutControl_LoadNextDocumentRequest;
@@ -2220,14 +2253,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (DocumentDataPanel != null)
             {
                 var panelControl = (Control)DocumentDataPanel;
-                if (panelControl.Parent != null)
+                var separator = panelControl.GetAncestors()
+                    .OfType<PaginationSeparator>()
+                    .FirstOrDefault();
+                if (separator != null)
                 {
-                    if (_documentWithDataInEdit == null ||
-                        (DocumentDataPanel.SaveData(_documentWithDataInEdit.DocumentData, validateData) &&
-                         (!validateData || !_documentWithDataInEdit.DataError)))
+                    if (separator.CloseDataPanel(true, validateData))
                     {
-                        panelControl.Parent.Controls.Remove(panelControl);
                         _documentWithDataInEdit = null;
+                        return true;
                     }
                     else
                     {

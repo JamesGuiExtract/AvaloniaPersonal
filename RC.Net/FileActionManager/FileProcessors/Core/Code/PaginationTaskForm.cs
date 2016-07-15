@@ -774,7 +774,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI40094");
+                ex.ExtractDisplay("ELI40252");
             }
             finally
             {
@@ -788,7 +788,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                         // If a new document was loaded in place of the released document(s), document
                         // selection will already have been defaulted. Otherwise, go ahead and default now.
-                        this.SafeBeginInvoke("ELI40141", () =>
+                        this.SafeBeginInvoke("ELI40256", () =>
                         {
                             if (_lastDocumentPosition != -1)
                             {
@@ -799,7 +799,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 catch (Exception ex)
                 {
-                    ex.ExtractDisplay("ELI40168");
+                    ex.ExtractDisplay("ELI40257");
                 }
             }
         }

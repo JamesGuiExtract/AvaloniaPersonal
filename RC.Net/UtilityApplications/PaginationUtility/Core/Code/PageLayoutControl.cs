@@ -286,7 +286,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the PaginationControls to be printed.
         /// </summary>
-        readonly ToolStripMenuItem _printMenuItem = new ToolStripMenuItem("Print selected document(s)...");
+        readonly ToolStripMenuItem _printMenuItem = new ToolStripMenuItem("Print selected page(s)...");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the print operation.
@@ -622,6 +622,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the indicator to show whether documents will be
+        /// queued for reprocessing should be hidden.
+        /// </summary>
+        /// <value><see langword="true"/> if the reprocessing indicator should be hidden; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool HideReprocessIndicator
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the <see cref="LoadNextDocumentButtonControl"/>
         /// is enabled.
         /// </summary>
@@ -849,7 +862,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (lastPageControl == null)
                     {
                         InsertPaginationControl(
-                            new PaginationSeparator(CommitOnlySelection), index: 0);
+                            new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator), index: 0);
                         pageIndex = 1;
                     }
                     // Otherwise, place the separator immediately after the previous document.
@@ -857,7 +870,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         pageIndex = _flowLayoutPanel.Controls.GetChildIndex(lastPageControl) + 1;
                         InsertPaginationControl(
-                            new PaginationSeparator(CommitOnlySelection), index: pageIndex);
+                            new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator), index: pageIndex);
                         pageIndex++;
                     }
                 }
@@ -978,7 +991,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (lastPageControl != null)
                     {
                         InsertPaginationControl(
-                            new PaginationSeparator(CommitOnlySelection), index: -1);
+                            new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator), index: -1);
                     }
 
                     // Create a page control for every page in sourceDocument.
@@ -1446,7 +1459,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI39646");
+                throw ex.AsExtract("ELI40254");
             }
         }
 
@@ -2495,16 +2508,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                var activePage = PrimarySelection as PageThumbnailControl;
-                if (activePage == null || activePage.Document != e.OutputDocument)
-                {
-                    ProcessControlSelection(e.OutputDocument.PageControls
-                        .FirstOrDefault(c => !c.Deleted));
-                }
-
                 OnDocumentDataPanelRequest(e);
 
-                EnableKeyboardPageOperations(false);
+                // If a data panel was provided to be opened...
+                if (e.DocumentDataPanel != null)
+                {
+                    var activePage = PrimarySelection as PageThumbnailControl;
+                    if (activePage == null || activePage.Document != e.OutputDocument)
+                    {
+                        ProcessControlSelection(e.OutputDocument.PageControls
+                            .FirstOrDefault(c => !c.Deleted));
+                    }
+
+                    EnableKeyboardPageOperations(false);
+                }
             }
             catch (Exception ex)
             {
@@ -2688,7 +2705,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var lastControl = _flowLayoutPanel.Controls.OfType<PaginationControl>().LastOrDefault();
                 if (lastControl != null && !(lastControl is PaginationSeparator))
                 {
-                    AddPaginationControl(new PaginationSeparator(CommitOnlySelection));
+                    AddPaginationControl(new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator));
                 }
             }
 
@@ -2697,7 +2714,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // Precede the first page with a separator to serve as a header for the document.
             if (isPageControl && _flowLayoutPanel.Controls.Count == 0)
             {
-                AddPaginationControl(new PaginationSeparator(CommitOnlySelection));
+                AddPaginationControl(new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator));
             }
 
             // A pagination separator is meaningless as the first control.
@@ -3166,15 +3183,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 result = nextControl;
 
-                // The left sides of controls in the same column may not line up due to padding
-                // added to allow for separators, so compare the right side of the controls.
-                if (result.Right == currentControl.Right)
+                // For dragging purposes, page controls will be sized to take up the remainder of a
+                // row.
+                if (down && result.Top > currentControl.Top && result.Left >= currentControl.Left)
+                {
+                    break;
+                }
+                else if (!down && result.Top < currentControl.Top && result.Left <= currentControl.Left)
                 {
                     break;
                 }
             }
 
-            if (result == null || result.Right != currentControl.Right)
+            if (result == null)
             {
                 return null;
             }
@@ -3356,7 +3377,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var asPageThumbnailControl = _commandTargetControl as PageThumbnailControl;
 
                 if (_toggleDocumentSeparatorCommand.Enabled &&
-                    (controlIsSeparator ||
+                    (controlIsSeparator  ||
                         (asPageThumbnailControl != null && asPageThumbnailControl.PageNumber == 1)))
                 {
                     _toggleDocumentSeparatorMenuItem.Text = "Merge with previous document";
@@ -3400,12 +3421,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (enableOperations)
             {
-                Shortcuts[Keys.Control | Keys.X] = HandleCutSelectedControls;
-                Shortcuts[Keys.Control | Keys.C] = HandleCopySelectedControls;
-                Shortcuts[Keys.Control | Keys.V] = HandlePaste;
-                Shortcuts[Keys.Delete] = HandleDeleteSelectedItems;
-                Shortcuts[Keys.Shift | Keys.Delete] = HandleUnDeleteSelectedItems;
-                Shortcuts[Keys.Space] = HandleToggleDocumentSeparator;
+                _cutCommand.Enabled = false;
+                _copyCommand.Enabled = false;
+                _deleteCommand.Enabled = false;
+                _unDeleteCommand.Enabled = false;
+                _printCommand.Enabled = false;
+                _pasteCommand.Enabled = false;
+                _toggleDocumentSeparatorCommand.Enabled = false;
+                _outputDocumentCommand.Enabled = false;
 
                 Shortcuts[Keys.Tab] = HandleSelectNextPage;
                 Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
@@ -3459,6 +3482,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             else
             {
+                // Application commands will be updated if appropriate via UpdateCommandStates.
+
                 Shortcuts[Keys.Control | Keys.X] = null;
                 Shortcuts[Keys.Control | Keys.C] = null;
                 Shortcuts[Keys.Control | Keys.V] = null;
@@ -3672,7 +3697,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // A null page represents a document boundary; insert a separator.
                 if (page.Key == null)
                 {
-                    var separator = new PaginationSeparator(CommitOnlySelection);
+                    var separator = new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator);
                     insertedPaginationControls.Add(separator);
 
                     if (InitializePaginationControl(separator, ref index))
@@ -4518,7 +4543,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             int index = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
                             InitializePaginationControl(
-                                new PaginationSeparator(CommitOnlySelection), ref index);
+                                new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator), ref index);
                         }
                     }
                 }

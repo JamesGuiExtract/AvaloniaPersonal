@@ -352,9 +352,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (value != _deleted)
                     {
                         _deleted = value;
-                        Invalidate();
 
                         OnDeletedStateChanged();
+
+                        Invalidate();
                     }
                 }
                 catch (Exception ex)

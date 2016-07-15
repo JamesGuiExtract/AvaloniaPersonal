@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using Extract.Drawing;
+using System;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
+using System.Drawing.Text;
 using System.Windows.Forms;
-using Extract.Drawing;
-using System.Drawing.Drawing2D;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -45,7 +40,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnPaint(e);
 
-                e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+                e.Graphics.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
 
                 var brush = ExtractBrushes.GetSolidBrush(Color.Red);
 
@@ -58,8 +53,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Hack fix-- The asterisk seems to insist to draw to high (50% above the top of
                 // ClientRectangle).
                 Rectangle drawRectangle = ClientRectangle;
-                drawRectangle.Offset(1, 10);
-                drawRectangle.Inflate(1, 10);
+                drawRectangle.Offset(1, 11);
+                drawRectangle.Inflate(1, 11);
                 e.Graphics.DrawString("*", Font, brush, drawRectangle, format);
             }
             catch (Exception ex)

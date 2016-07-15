@@ -299,6 +299,7 @@
     <None Include="Resources\office_128.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\YellowArrow.png" />
     <None Include="Resources\RevertToSuggestion.png" />
     <None Include="Resources\RevertToDisk.png" />
     <None Include="Resources\Edit.png" />
@@ -308,6 +309,7 @@
     <None Include="Resources\Accept.png" />
     <Content Include="Resources\Edit11.png" />
     <None Include="Resources\Error.png" />
+    <None Include="Resources\EditGray.png" />
     <Content Include="Resources\PaginationUtility.ico" />
   </ItemGroup>
   <ItemGroup>

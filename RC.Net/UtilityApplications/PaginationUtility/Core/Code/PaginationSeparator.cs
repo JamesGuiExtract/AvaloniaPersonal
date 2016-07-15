@@ -58,9 +58,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _clickEventHandledInternally;
 
         /// <summary>
+        /// Indicates whether the visibility of the data editing panel is currently being toggled.
+        /// </summary>
+        bool _changingDataPanelVisiblity;
+
+        /// <summary>
         /// Indicates whether the selection check box should be visible.
         /// </summary>
         bool _showSelectionCheckBox;
+
+        /// <summary>
+        /// Indicates whether the indicator to show whether documents will be
+        /// queued for reprocessing should be hidden.
+        /// </summary>
+        bool _hideReprocessIndicator;
 
         #endregion Fields
 
@@ -71,7 +82,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="showSelectionCheckBox"><see langword="true"/> if the selection check box
         /// should be visible; otherwise, <see langword="false"/>.</param>
-        public PaginationSeparator(bool showSelectionCheckBox)
+        /// <param name="hideReprocessIndicator">indicating whether the indicator to show whether documents will be
+        /// queued for reprocessing should be hidden.</param>
+        public PaginationSeparator(bool showSelectionCheckBox, bool hideReprocessIndicator)
             : base()
         {
             try
@@ -85,9 +98,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // to collapse.
                     _tableLayoutPanel.ColumnStyles[2].Width = 0;
                 }
-
-                _toolTip.SetToolTip(_editedPaginationGlyph, "Manual pagination has been applied");
+                _hideReprocessIndicator = hideReprocessIndicator;
+                if (_hideReprocessIndicator)
+                {
+                    int column = _tableLayoutPanel.GetCellPosition(_reprocessDocumentPictureBox).Column;
+                    _tableLayoutPanel.ColumnStyles[column].Width = 0;
+                }
+                
                 _toolTip.SetToolTip(_newDocumentGlyph, "This is a new document that will be created");
+                _toolTip.SetToolTip(_editedPaginationGlyph, "Manual pagination has been applied");
+                _toolTip.SetToolTip(_reprocessDocumentPictureBox, "This document will be returned to the server");
                 _toolTip.SetToolTip(_editedDataPictureBox, "The data for this document has been modified");
                 _toolTip.SetToolTip(_dataErrorPictureBox, "The data for this document has error(s)");
             }
@@ -116,7 +136,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_uniformSize == null)
                     {
-                        using (var separator = new PaginationSeparator(false))
+                        using (var separator = new PaginationSeparator(false, false))
                         {
                             _uniformSize = new Size(-1, separator.Height);
                         }
@@ -327,9 +347,9 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             try
             {
-                if (Document != null &&
-                    (_documentDataPanelControl == null || 
-                        !_tableLayoutPanel.Controls.Contains(_documentDataPanelControl)))
+                _changingDataPanelVisiblity = true;
+
+                if (Document != null && !IsDataPanelOpen)
                 {
                     var args = new DocumentDataPanelRequestEventArgs(Document);
                     OnDocumentDataPanelRequest(args);
@@ -343,15 +363,33 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 1);
                         _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
                         UpdateSize();
+
+                        _editDocumentDataButton.Checked = true;
+                    }
+                    else
+                    {
+                        // The data panel was not able to be opened.
+                        _editDocumentDataButton.Checked = false;
                     }
                 }
             }
             catch (Exception ex)
             {
+                try
+                {
+                    _editDocumentDataButton.Checked = IsDataPanelOpen;
+                }
+                catch (Exception ex2)
+                {
+                    ex2.ExtractLog("ELI40268");
+                }
+
                 throw ex.AsExtract("ELI40237");
             }
             finally
             {
+                _changingDataPanelVisiblity = false;
+
                 if (locked)
                 {
                     try
@@ -379,25 +417,50 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// data could not be saved and needs to be corrected.</returns>
         public bool CloseDataPanel(bool saveData, bool validateData)
         {
-            if (_documentDataPanelControl != null && _tableLayoutPanel.Controls.Contains(_documentDataPanelControl))
+            try
             {
-                var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
-                if (Document != null && _outputDocument.DocumentData != null)
+                _changingDataPanelVisiblity = true;
+
+                if (IsDataPanelOpen)
                 {
-                    if (saveData && !documentDataPanel.SaveData(_outputDocument.DocumentData, validateData))
+                    var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
+                    if (Document != null && _outputDocument.DocumentData != null)
                     {
-                        return false;
+                        if (saveData && !documentDataPanel.SaveData(_outputDocument.DocumentData, validateData))
+                        {
+                            _editDocumentDataButton.Checked = true;
+                            return false;
+                        }
                     }
+
+                    _tableLayoutPanel.Controls.Remove(_documentDataPanelControl);
+                    _documentDataPanelControl = null;
+                    UpdateSize();
+
+                    OnDocumentDataPanelClosed();
                 }
 
-                _tableLayoutPanel.Controls.Remove(_documentDataPanelControl);
-                _documentDataPanelControl = null;
-                UpdateSize();
+                _editDocumentDataButton.Checked = false;
 
-                OnDocumentDataPanelClosed();
+                return true;
             }
+            catch (Exception ex)
+            {
+                try
+                {
+                    _editDocumentDataButton.Checked = IsDataPanelOpen;
+                }
+                catch (Exception ex2)
+                {
+                    ex2.ExtractLog("ELI40269");
+                }
 
-            return true;
+                throw ex.AsExtract("ELI40267");
+            }
+            finally
+            {
+                _changingDataPanelVisiblity = false;
+            }
         }
 
         #endregion Public Members
@@ -576,25 +639,30 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.Click"/> event of the
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
         /// <see cref="_editDocumentDataButton"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleEditDocumentDataButton_Click(object sender, EventArgs e)
+        void HandleEditDocumentDataButton_CheckedChanged(object sender, EventArgs e)
         {
+            if (_changingDataPanelVisiblity)
+            {
+                return;
+            }
+
             try
             {
                 _clickEventHandledInternally = true;
 
-                if (_documentDataPanelControl != null && _tableLayoutPanel.Controls.Contains(_documentDataPanelControl))
+                if (_editDocumentDataButton.Checked)
                 {
-                    CloseDataPanel(true, true);
+                    OpenDataPanel();
                 }
                 else
                 {
-                    OpenDataPanel();
+                    CloseDataPanel(true, true);
                 }
             }
             catch (Exception ex)
@@ -648,6 +716,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Private Members
 
         /// <summary>
+        /// Gets a value indicating whether this instance's data panel is open.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance's data panel is open; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool IsDataPanelOpen
+        {
+            get
+            {
+                return _documentDataPanelControl != null &&
+                    _tableLayoutPanel.Controls.Contains(_documentDataPanelControl);
+            }
+        }
+
+        /// <summary>
         /// Updates UI indications to reflect the current state of the associated document.
         /// </summary>
         void UpdateControls()
@@ -666,13 +749,26 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _collapseDocumentButton.Image = Document.Collapsed
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;
-                _editDocumentDataButton.Visible = true;
+                _editDocumentDataButton.Visible =
+                    Document.DocumentData != null && Document.DocumentData.AllowDataEdit;
                 _summaryLabel.Text = Document.Summary;
                 int pageCount = Document.PageControls.Count(c => !c.Deleted);
                 _pagesLabel.Text = string.Format(CultureInfo.CurrentCulture,
                     "{0} page{1}", pageCount, (pageCount == 1) ? "" : "s");
                 _newDocumentGlyph.Visible = !Document.InSourceDocForm;
                 _editedPaginationGlyph.Visible = !Document.InOriginalForm;
+                bool dataSharedInVerification = Document.InOriginalForm &&
+                    (Document.DocumentData != null && Document.DocumentData.DataSharedInVerification);
+                bool? sendForReprocessingOverride = (Document.DocumentData == null)
+                    ? null
+                    : Document.DocumentData.SendForReprocessing;
+                _reprocessDocumentPictureBox.Visible =
+                    !_hideReprocessIndicator &&
+                    !dataSharedInVerification && 
+                    Document.PageControls.Any(c => !c.Deleted) &&
+                    (sendForReprocessingOverride.HasValue
+                        ? Document.DocumentData.SendForReprocessing.Value
+                        : !Document.InOriginalForm);
                 _editedDataPictureBox.Visible = Document.DataModified;
                 _dataErrorPictureBox.Visible = Document.DataError;
 
@@ -687,6 +783,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _pagesLabel.Text = "";
                 _newDocumentGlyph.Visible = false;
                 _editedPaginationGlyph.Visible = false;
+                _reprocessDocumentPictureBox.Visible = false;
                 _editedDataPictureBox.Visible = false;
                 _dataErrorPictureBox.Visible = false;
             }

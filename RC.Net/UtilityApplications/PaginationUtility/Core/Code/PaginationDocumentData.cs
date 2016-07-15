@@ -66,6 +66,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<EventArgs> ModifiedChanged;
 
+        /// <summary>
+        /// Raised when the value of <see cref="Summary"/> has changed.
+        /// </summary>
+        public event EventHandler<EventArgs> SummaryChanged;
+
+        /// <summary>
+        /// Raised when the value of <see cref="SendForReprocessing"/> has changed.
+        /// </summary>
+        public event EventHandler<EventArgs> SendForReprocessingChanged;
+
         #endregion Events
 
         #region Public Members
@@ -80,6 +90,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 return _attributes;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the data represented by this instance is shared in an active
+        /// verification control.
+        /// </summary>
+        public bool DataSharedInVerification
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -117,13 +137,41 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// A description of the document.
         /// </summary>
         public virtual string Summary
         {
             get
             {
                 return "";
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether editing of this data is allowed.
+        /// </summary>
+        /// <value><see langword="true"/> if data editing is allowed; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public virtual bool AllowDataEdit
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance wants to override whether the document
+        /// is returned to the server for reprocessing.
+        /// </summary>
+        /// <value><see langword="null"/> to if the decision should not be overridden, otherwise
+        /// a boolean value indicating what the override should be.</value>
+        public virtual bool? SendForReprocessing
+        {
+            get
+            {
+                return null;
             }
         }
 
@@ -328,6 +376,30 @@ namespace Extract.UtilityApplications.PaginationUtility
         protected void OnModifiedChanged()
         {
             var eventHandler = ModifiedChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="SummaryChanged"/> event.
+        /// </summary>
+        protected void OnSummaryChanged()
+        {
+            var eventHandler = SummaryChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="SendForReprocessingChanged"/> event.
+        /// </summary>
+        protected void OnSendForReprocessingChanged()
+        {
+            var eventHandler = SendForReprocessingChanged;
             if (eventHandler != null)
             {
                 eventHandler(this, new EventArgs());
