@@ -13,9 +13,27 @@
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
-                components.Dispose();
+                if (_sourceDocuments != null)
+                {
+                    Extract.Utilities.CollectionMethods.ClearAndDispose(_sourceDocuments);
+                    _sourceDocuments = null;
+                }
+                if (_primaryPageLayoutControl != null)
+                {
+                    _primaryPageLayoutControl.Dispose();
+                    _primaryPageLayoutControl = null;
+                }
+                if (_tableLayoutPanel != null)
+                {
+                    _tableLayoutPanel.Dispose();
+                    _tableLayoutPanel = null;
+                }
+                if (components != null)
+                {
+                    components.Dispose();
+                }
             }
             base.Dispose(disposing);
         }

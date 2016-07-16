@@ -106,6 +106,13 @@ namespace Extract.Imaging.Forms
                     _OBJECT_NAME);
 
                 _reader = _codecs.CreateReader(fileName);
+
+                if (_reader.IsPdf)
+                {
+                    ExtractException.Assert("ELI40273", "PDF capability is required",
+                        LicenseUtilities.IsLicensed(LicenseIdName.PdfReadWriteFeature));
+                }
+
                 _pageCount = _reader.PageCount;
                 _thumbnailSize = thumbnailSize;
                 _thumbnails = new RasterImage[_pageCount];
@@ -116,6 +123,8 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 var ee = new ExtractException("ELI35418", "Unable to create thumbnail image.", ex);
+                // Dispose so that the process doesn't hold onto the image file after failure
+                Dispose();
                 throw ee;
             }
         }

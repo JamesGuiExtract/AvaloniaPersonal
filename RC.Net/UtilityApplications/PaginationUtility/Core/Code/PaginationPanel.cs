@@ -2144,20 +2144,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                         return null;
                     }
 
+                    ThreadingMethods.RunInBackgroundThread("ELI39570", () =>
+                    {
+                        lock (_sourceDocumentLock)
+                        {
+                            if (_sourceDocuments.Contains(sourceDocument))
+                            {
+                                _imageViewer.CacheImage(inputFileName);
+                            }
+                        }
+                    });
+
                     _sourceDocuments.Add(sourceDocument);
                 }
             }
-
-            ThreadingMethods.RunInBackgroundThread("ELI39570", () =>
-            {
-                lock (_sourceDocumentLock)
-                {
-                    if (_sourceDocuments.Contains(sourceDocument))
-                    {
-                        _imageViewer.CacheImage(inputFileName);
-                    }
-                }
-            });
 
             return sourceDocument;
         }

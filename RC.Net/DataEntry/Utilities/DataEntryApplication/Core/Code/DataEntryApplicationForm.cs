@@ -1786,6 +1786,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _imageViewerForm = null;
                     }
 
+                    if (_imageViewer != null)
+                    {
+                        _imageViewer.Dispose();
+                        _imageViewer = null;
+                    }
+
                     if (_magnifierDockableWindow != null)
                     {
                         _magnifierDockableWindow.Dispose();
@@ -1796,6 +1802,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         _thumbnailDockableWindow.Dispose();
                         _thumbnailDockableWindow = null;
+                    }
+
+                    if (_thumbnailViewer != null)
+                    {
+                        _thumbnailViewer.Dispose();
+                        _thumbnailViewer = null;
                     }
 
                     if (components != null)
