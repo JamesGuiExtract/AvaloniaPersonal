@@ -546,6 +546,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         bool _paginating;
 
+        /// <summary>
+        /// Indicates when switching between the data and pagination tab so as to prevent the
+        /// possibility of getting caught in a loop bouncing between the two.
+        /// </summary>
+        bool _changingTab;
+
         #endregion Fields
 
         #region Constructors
@@ -1967,22 +1973,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // When processing a document change, we need to ensure that the data entry
-                // verification tab is again made active so that all events that need to be
-                // processed for a document change in verification are registered.
-                if (_dataTab != null)
-                {
-                    if (!string.IsNullOrEmpty(_fileName) &&
-                        _paginationPanel.SourceDocuments.Contains(_fileName))
-                    {
-                        _paginationPanel.Park();
-                        _paginationPanel.RemoveSourceFile(_fileName);
-                        _paginationPanel.PendingChanges = false;
-                    }
-                    _tabControl.SelectedTab = _dataTab;
-                }
-
-                AbortProcessing(EFileProcessingResult.kProcessingSkipped, true);
+                SkipFile();
             }
             catch (Exception ex)
             {
@@ -2957,7 +2948,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (!_paginating)
+                if (!_paginating && !_changingTab)
                 {
                     if (e.TabPage != _paginationTab && _paginationPanel.PendingChanges)
                     {
@@ -2976,7 +2967,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         // Schedule the tab change to occur once the document has fully loaded.
                         _dataEntryControlHost.ExecuteOnIdle("ELI39750", () =>
-                            _tabControl.SelectedTab = _paginationTab);
+                        {
+                            try
+                            {
+                                _changingTab = true;
+                                _tabControl.SelectedTab = _paginationTab;
+                            }
+                            finally
+                            {
+                                _changingTab = false;
+                            }
+                        });
                     }
                 }
             }
@@ -3215,12 +3216,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         var copyThis = (ICopyableObject)documentData.Attributes;
                         var attributesCopy = (IUnknownVector)copyThis.Clone();
+                        attributesCopy.ReportMemoryUsage();
 
                         AttributeMethods.TranslateAttributesToNewDocument(
                             attributesCopy, e.OutputFileName, pageMap, newSpatialPageInfos);
 
                         attributesCopy.SaveTo(e.OutputFileName + ".voa", false,
                             _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                        attributesCopy.ReportMemoryUsage();
                     }
 
                     EActionStatus oldStatus;
@@ -3644,9 +3647,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException.Assert("ELI37453", "Invalid operation.",
                     !_standAloneMode && _fileProcessingDb != null);
 
-                if (_imageViewer.IsImageAvailable)
+                // When processing a document change, we need to ensure that the data entry
+                // verification tab is again made active so that all events that need to be
+                // processed for a document change in verification are registered.
+                if (_dataTab != null)
                 {
-                    AbortProcessing(EFileProcessingResult.kProcessingSkipped, false);
+                    if (!string.IsNullOrEmpty(_fileName) &&
+                        _paginationPanel.SourceDocuments.Contains(_fileName))
+                    {
+                        _paginationPanel.Park();
+                        _paginationPanel.RemoveSourceFile(_fileName);
+                        _paginationPanel.PendingChanges = false;
+                    }
+                    _tabControl.SelectedTab = _dataTab;
+                }
+
+                if (_fileId != -1)
+                {
+                    AbortProcessing(EFileProcessingResult.kProcessingSkipped, true);
                 }
             }
             catch (Exception ex)
@@ -3855,6 +3873,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         RecordCounts(onLoad: false,
                             attributes: _dataEntryControlHost.MostRecentlySavedAttributes);
                         EndFileTaskSession();
+
+                        _fileId = -1;
+                        _fileName = null;
                     }
 
                     OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
@@ -3998,6 +4019,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Record statistics to database that need to happen when a file is closed.
                 RecordCounts(onLoad: false, attributes: null);
                 EndFileTaskSession();
+
+                _fileId = -1;
+                _fileName = null;
 
                 OnFileComplete(processingResult);
             }
@@ -5768,12 +5792,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     var copyThis = (ICopyableObject)documentData.Attributes;
                     var attributesCopy = (IUnknownVector)copyThis.Clone();
+                    attributesCopy.ReportMemoryUsage();
 
                     AttributeMethods.TranslateAttributesToNewDocument(
                         attributesCopy, e.OutputFileName, pageMap, newSpatialPageInfos);
 
                     attributesCopy.SaveTo(e.OutputFileName + ".voa", false,
                         _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    attributesCopy.ReportMemoryUsage();
+
                     // Though saved out to file, it is this object that will be used for the
                     // newly paginated document; it should not be marked dirty at this point.
                     documentData.SetOriginalForm();

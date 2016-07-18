@@ -1124,6 +1124,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         _sourceDocuments.Remove(sourceDocument);
                         _sourceToOriginalDocuments.Remove(sourceDocument);
+                        _imageViewer.UnloadImage(fileName);
                     }
 
                     ApplyOrderOfLoadedSourceDocuments();
@@ -1224,6 +1225,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         var ussData = new SpatialString();
                         ussData.LoadFrom(sourceFileName + ".uss", false);
+                        ussData.ReportMemoryUsage();
                         return ussData;
                     });
                     
@@ -1265,6 +1267,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 newUSSData.SourceDocName = newDocumentName;
                 newUSSData.SpatialPageInfos = newSpatialPageInfos;
                 newUSSData.SaveTo(newDocumentName + ".uss", true, false);
+                newUSSData.ReportMemoryUsage();
 
                 return newSpatialPageInfos;
             }
@@ -1626,7 +1629,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI39561");
+                // https://extract.atlassian.net/browse/ISSUE-13885
+                // Throw here because this panel will be housed in a parent application that should
+                // have it's own try/catch/display and that will need to know of any errors loading
+                // this panel.
+                throw ex.AsExtract("ELI39561");
             }
         }
 

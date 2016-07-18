@@ -661,6 +661,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                     string dataFileName = e.OutputFileName + ".voa";
                     documentData.Attributes.SaveTo(dataFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    documentData.Attributes.ReportMemoryUsage();
                 }
             }
             catch (Exception ex)
@@ -1140,6 +1141,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                     IUnknownVector attributes = new IUnknownVectorClass();
                     attributes.LoadFrom(dataFilename, false);
+                    attributes.ReportMemoryUsage();
 
                     PaginationDocumentData documentData = GetAsPaginationDocumentData(attributes);
 

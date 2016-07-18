@@ -240,6 +240,14 @@ namespace Extract.DataEntry
                     {
                         namedQuery.ExcludeFromResult = true;
                     }
+
+                    // Since the parent "Declarations" node is not referenced (only its children),
+                    // there is nothing that will trigger it's disposal. Since it is not needed
+                    // except to create its children (which are now registered), dispose of the
+                    // parent node now after first separating it from the children (so as not to
+                    // dispose the needed children).
+                    queryNodeDeclarations.ChildNodes.Clear();
+                    queryNodeDeclarations.Dispose();
                 }
 
                 // Use the XML to generate all queries to be used for this trigger.

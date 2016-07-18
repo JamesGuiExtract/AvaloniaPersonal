@@ -1,6 +1,6 @@
 ﻿using Extract.Licensing;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
@@ -15,6 +15,9 @@ namespace Extract.Utilities
     /// </summary>
     /// <typeparam name="T">The type of <see cref="EventArgs"/> the events use.</typeparam>
     [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
+    // As this class is intended to be used only for static events, there should be no opportunity
+    // to dispose of these instances.
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class ThreadSpecificEventHandler<T> where T : EventArgs
     {
         #region Constants
@@ -29,23 +32,18 @@ namespace Extract.Utilities
         #region Fields
 
         /// <summary>
-        /// Keeps track of the event handlers registered per thread, per target object.
+        /// Keeps track of the registered event handlers for this thread.
         /// </summary>
-        ConcurrentDictionary<int, EventHandler<T>> _eventHandlers =
-            new ConcurrentDictionary<int, EventHandler<T>>();
-
+        ThreadLocal<HashSet<EventHandler<T>>> _eventHandlers =
+            new ThreadLocal<HashSet<EventHandler<T>>>(() => new HashSet<EventHandler<T>>(new EventComparer()));
+        
         /// <summary>
-        /// An ID for the current thread. This ID is specific to this class and is used in place of
-        /// of the windows or .Net thread ID because it can't be re-used in future threads the way
-        /// the windows or .Net thread ID can.
+        /// This class works by having this one real event handler which, in turn, manually
+        /// executes all registered <see cref="_eventHandlers"/>. This prevents performance issues
+        /// for large numbers of registered event handlers.
+        /// https://extract.atlassian.net/browse/ISSUE-13900
         /// </summary>
-        [ThreadStatic]
-        static int _currentThreadID;
-
-        /// <summary>
-        /// The ID used for the last thread's _currentThreadID.
-        /// </summary>
-        static int _lastThreadID;
+        EventHandler<T> _threadEventHandler;
 
         #endregion Fields
 
@@ -83,10 +81,7 @@ namespace Extract.Utilities
             {
                 try
                 {
-                    EventHandler<T> existingEventHandler = null;
-                    _eventHandlers.TryGetValue(CurrentThreadID, out existingEventHandler);
-
-                    return existingEventHandler;
+                    return _threadEventHandler;
                 }
                 catch (Exception ex)
                 {
@@ -107,16 +102,12 @@ namespace Extract.Utilities
         {
             try
             {
-                EventHandler<T> existingEventHandler;
-                _eventHandlers.TryGetValue(CurrentThreadID, out existingEventHandler);
+                if (_threadEventHandler == null)
+                {
+                    _threadEventHandler += HandleThreadEvent;
+                }
 
-                // It is okay if existingEventHandler does not exist (is null). The concatenation
-                // operator will initialize it.
-                existingEventHandler += eventHandler;
-
-                // The += operator creates a new instance rather than updating the original
-                // instance. The dictionary needs to be updated with the new value.
-                _eventHandlers[CurrentThreadID] = existingEventHandler;
+                _eventHandlers.Value.Add(eventHandler);
             }
             catch (Exception ex)
             {
@@ -133,13 +124,7 @@ namespace Extract.Utilities
         {
             try
             {
-                EventHandler<T> existingEventHandler = null;
-                if (_eventHandlers.TryGetValue(CurrentThreadID, out existingEventHandler))
-                {
-                    // The -= operator creates a new instance rather than updating the original
-                    // instance. The dictionary needs to be updated with the new value.
-                    _eventHandlers[CurrentThreadID] = existingEventHandler -= eventHandler;
-                }
+                _eventHandlers.Value.Remove(eventHandler);
             }
             catch (Exception ex)
             {
@@ -152,22 +137,55 @@ namespace Extract.Utilities
         #region Private Members
 
         /// <summary>
-        /// Gets and ID for the current thread. This ID is specific to this class and is used in
-        /// place of the windows or .Net thread ID because it won't be re-used.
+        /// Handles the event for this thread so that the event can be dispatched to all
+        /// subscribed <see cref="_eventHandlers"/>.
         /// </summary>
-        static int CurrentThreadID
+        /// <param name="sender">The sender.</param>
+        /// <param name="eventArgs">The event args.</param>
+        void HandleThreadEvent(object sender, T eventArgs)
         {
-            get
+            foreach (EventHandler<T> eventHandler in _eventHandlers.Value)
             {
-                if (_currentThreadID == 0)
+                if (eventHandler != null)
                 {
-                    _currentThreadID = Interlocked.Increment(ref _lastThreadID);
+                    eventHandler(sender, eventArgs);
                 }
-
-                return _currentThreadID;
             }
         }
 
         #endregion Private Members
+
+        /// <summary>
+        /// An IEqualityComparer for event handlers that allows for efficient hashing for use in a
+        /// dictionary or hash set.
+        /// </summary>
+        class EventComparer : IEqualityComparer<EventHandler<T>>
+        {
+            /// <summary>
+            /// Determines whether the specified objects are equal.
+            /// </summary>
+            /// <param name="x">The first event handler to compare.</param>
+            /// <param name="y">The second event handler to compare.</param>
+            /// <returns>
+            /// true if the specified objects are equal; otherwise, false.
+            /// </returns>
+            public bool Equals(EventHandler<T> x, EventHandler<T> y)
+            {
+                return x == y;
+            }
+
+            /// <summary>
+            /// Returns a hash code for this instance.
+            /// </summary>
+            /// <param name="x">The x.</param>
+            /// <returns>
+            /// A hash code for this instance, suitable for use in hashing algorithms and data
+            /// structures like a hash table. 
+            /// </returns>
+            public int GetHashCode(EventHandler<T> x)
+            {
+                return HashCode.Start.Hash(x.Method).Hash(x.Target);
+            }
+        }
     }
 }
