@@ -1,7 +1,10 @@
 @echo off
 
 REM Start AutoHotkey script
-START VerifyExtractedMemoryLeak1.ahk
+REM START VerifyExtractedMemoryLeak1.ahk
+REM now handled using DataEntryApplication.exe.config 
+
+md .\Source
 
 REM Clean Source folder
 call Clean.bat Test_1
