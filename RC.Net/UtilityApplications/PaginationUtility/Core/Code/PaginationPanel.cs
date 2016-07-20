@@ -280,6 +280,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance should cache images with the
+        /// <see cref="ImageViewer"/> when loading files or <see cref="false"/> if it should not
+        /// (such as if the application is managing caching externally).
+        /// </summary>
+        /// <value><see langword="true"/> if this instance should cache images; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool CacheImages
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets whether to output expected pagination attributes
         /// </summary>
         public bool OutputExpectedPaginationAttributesFile
@@ -559,6 +573,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 FormsMethods.ExecuteInUIThread(this, () =>
                 {
+                    _pendingChangesOverride = null;
+
                     SuspendUIUpdatesForOperation();
 
                     // The OutputDocument doesn't get created directly by this method. Use
@@ -781,8 +797,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         doc => doc, doc => _primaryPageLayoutControl.GetDocumentPosition(doc));
 
                 var sourceDocuments =
-                    outputDocuments.SelectMany(doc => doc.PageControls.Where(c => !c.Deleted))
-                        .Select(c => c.Page.SourceDocument)
+                    outputDocuments.SelectMany(doc => doc.PageControls)
+                        .Select(c => c.Page.SourceDocument.FileName)
                         .Distinct()
                         .ToArray();
 
@@ -798,8 +814,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         // There are no undeleted pages to output; simply remove the document.
                         _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
-                        _pendingDocuments.Remove(outputDocument);
                     }
+
+                    _pendingDocuments.Remove(outputDocument);
                 }
 
                 var disregardedPagination = documentsToCommit
@@ -818,7 +835,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .Where(doc => documentsToCommit.Contains(doc) && doc.InSourceDocForm)
                     .Select(doc => doc.PageControls.First().Page.OriginalDocumentName);
 
-                OnPaginated(sourceDocuments.Select(doc => doc.FileName),
+                OnPaginated(sourceDocuments,
                     disregardedPagination,
                     sourcesWithModifiedData,
                     unmodifiedPagination);
@@ -1086,48 +1103,55 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     lock (_sourceDocumentLock)
                     {
-                        var sourceDocument = _sourceDocuments.Single(doc => doc.FileName == fileName);
-
-                        var documentsToDelete = _pendingDocuments
-                            .Where(doc =>
-                                doc.PageControls.Any(c =>
-                                    c.Page.SourceDocument == sourceDocument))
-                            .ToArray();
-
-                        foreach (var outputDocument in documentsToDelete)
+                        var sourceDocument = _sourceDocuments
+                            .SingleOrDefault(doc => doc.FileName == fileName);
+                        if (sourceDocument != null)
                         {
-                            // If the document's data is open for editing, close the panel.
-                            if (_documentWithDataInEdit == outputDocument)
+                            var documentsToDelete = _pendingDocuments
+                                .Where(doc =>
+                                    doc.PageControls.Any(c =>
+                                        c.Page.SourceDocument == sourceDocument))
+                                .ToArray();
+
+                            foreach (var outputDocument in documentsToDelete)
                             {
-                                CloseDataPanel(false);
+                                // If the document's data is open for editing, close the panel.
+                                if (_documentWithDataInEdit == outputDocument)
+                                {
+                                    CloseDataPanel(false);
+                                }
+
+                                int docPosition =
+                                    _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
+                                if (docPosition != -1)
+                                {
+                                    position = (position == -1)
+                                        ? docPosition
+                                        : Math.Min(position, docPosition);
+                                }
+                                _pendingDocuments.Remove(outputDocument);
                             }
 
-                            int docPosition =
-                                _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
-                            if (docPosition != -1)
+                            var referencedOriginalDocuments = _originalDocuments
+                                .Where(doc => doc.OriginalPages.Any(page => page.OriginalDocumentName == fileName))
+                                .ToArray();
+
+                            foreach (var outputDocument in referencedOriginalDocuments)
                             {
-                                position = (position == -1)
-                                    ? docPosition
-                                    : Math.Min(position, docPosition);
+                                _originalDocuments.Remove(outputDocument);
                             }
-                            _pendingDocuments.Remove(outputDocument);
+
+                            _sourceDocuments.Remove(sourceDocument);
+                            _sourceToOriginalDocuments.Remove(sourceDocument);
+
+                            if (CacheImages)
+                            {
+                                _imageViewer.UnloadImage(fileName);
+                            }
                         }
 
-                        var referencedOriginalDocuments = _originalDocuments
-                            .Where(doc => doc.OriginalPages.Any(page => page.OriginalDocumentName == fileName))
-                            .ToArray();
-
-                        foreach (var outputDocument in referencedOriginalDocuments)
-                        {
-                            _originalDocuments.Remove(outputDocument);
-                        }
-
-                        _sourceDocuments.Remove(sourceDocument);
-                        _sourceToOriginalDocuments.Remove(sourceDocument);
-                        _imageViewer.UnloadImage(fileName);
+                        ApplyOrderOfLoadedSourceDocuments();
                     }
-
-                    ApplyOrderOfLoadedSourceDocuments();
                 });
 
                 // Output expected voa if so configured
@@ -1430,12 +1454,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 document = _sourceDocuments
                     .Where(doc => doc.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase))
                     .SingleOrDefault();
-            }
-
-            // If not, open it as a SourceDocument.
-            if (document == null)
-            {
-                document = OpenDocument(fileName);
             }
 
             // If unable to open then document, don't throw an exception, just act as though
@@ -2063,6 +2081,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 return CommitOnlySelection &&
+                    _pendingDocuments.Any() &&
                     _pendingDocuments.All(doc => doc.PageControls.Count == 0 || doc.Selected);
             }
         }
@@ -2139,6 +2158,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return null;
                 }
 
+                sourceDocument = _sourceDocuments
+                    .SingleOrDefault(doc => doc.FileName == inputFileName);
+                
+                if (sourceDocument != null)
+                {
+                    return sourceDocument;
+                }
+
                 sourceDocument = _sourceDocuments.SingleOrDefault(doc =>
                     doc.FileName.Equals(inputFileName, StringComparison.OrdinalIgnoreCase));
 
@@ -2151,16 +2178,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                         return null;
                     }
 
-                    ThreadingMethods.RunInBackgroundThread("ELI39570", () =>
+                    if (CacheImages)
                     {
-                        lock (_sourceDocumentLock)
+                        ThreadingMethods.RunInBackgroundThread("ELI39570", () =>
                         {
-                            if (_sourceDocuments.Contains(sourceDocument))
+                            lock (_sourceDocumentLock)
                             {
-                                _imageViewer.CacheImage(inputFileName);
+                                if (_sourceDocuments.Contains(sourceDocument))
+                                {
+                                    _imageViewer.CacheImage(inputFileName);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
 
                     _sourceDocuments.Add(sourceDocument);
                 }
@@ -2307,6 +2337,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         : Properties.Resources.Collapse;
                 if (CommitOnlySelection)
                 {
+                    _selectAllToCommitCheckBox.Enabled = _pendingDocuments.Any();
                     _selectAllToCommitCheckBox.Checked = AllDocumentsSelected;
                 }
             }
@@ -2555,7 +2586,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             var eventHandler = Paginated;
             if (eventHandler != null)
             {
-                eventHandler(this, 
+                eventHandler(this,
                     new PaginatedEventArgs(
                         paginatedDocumentSources, disregardedPaginationSources,
                         modifiedDocumentData, unmodifiedPaginationSources));

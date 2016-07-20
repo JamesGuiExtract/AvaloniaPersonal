@@ -1097,10 +1097,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // When jumping straight into pagination, still update the title bar to
                         // reflect the active document.
                         string imageName = Path.GetFileName(fileName);
-                        base.Text = imageName + " - " + base.Text;
+                        base.Text = imageName + " - " + _brandingResources.ApplicationTitle;
                         if (_imageViewerForm != null)
                         {
-                            _imageViewerForm.Text = imageName + " - " + _imageViewerForm.Text;
+                            _imageViewerForm.Text = imageName + " - " +
+                                _brandingResources.ApplicationTitle + " Image Window";
                         }
 
                         _tabControl.SelectedTab = _paginationTab;
@@ -1111,6 +1112,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // files to be loaded or the suggestion will be rejected triggering the
                         // document to be sent back to the rules.
                         return;
+                    }
+                    else
+                    {
+                        _tabControl.SelectedTab = _dataTab;
                     }
                 }
 
@@ -1707,6 +1712,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                     else
                     {
+                        if (_paginationPanel != null)
+                        {
+                            _paginationPanel.RemoveSourceFile(_fileName);
+                        }
+
                         // Record statistics to database that needs to happen when a file is closed.
                         if (!_standAloneMode && _dataEntryDatabaseManager != null)
                         {
@@ -2188,9 +2198,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // Make sure ImageViewer activity in pagination UI doesn't get interpreted as a file
-                // getting closed in verification.
-                if (_paginating)
+                // Make sure ImageViewer activity in pagination UI or switching tabs doesn't get
+                // interpreted as a file getting closed in verification.
+                if (_paginating ||
+                    (_dataEntryControlHost != null && !_dataEntryControlHost.IsDocumentLoaded))
                 {
                     return;
                 }
@@ -2960,8 +2971,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // document is fully loaded can cause exceptions for a null _imageViewer in
                     // FinalizeDocumentLoad. Prevent tab changes until a document fully loaded,
                     // though allow for tab changes for form setup before any files are loaded.                    
-                    else if (_imageViewer.IsImageAvailable && _dataEntryControlHost != null &&
-                        !_dataEntryControlHost.IsDocumentLoaded)
+                    else if (e.TabPage == _paginationTab && _imageViewer.IsImageAvailable &&
+                        _dataEntryControlHost != null && !_dataEntryControlHost.IsDocumentLoaded)
                     {
                         e.Cancel = true;
 
@@ -3008,9 +3019,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // while the data tab has focus.
                     _paginationPanel.Park();
 
-                    // The pagination control may have opened a different document; switch back to
-                    // the document being verified.
-                    if (!_paginating && _imageViewer.ImageFile != _fileName)
+                    // The pagination control may have closed the document; re-open it if necessary.
+                    if (!string.IsNullOrWhiteSpace(_fileName) &&
+                        _imageViewer.ImageFile != _fileName)
                     {
                         _imageViewer.OpenImage(_fileName, false);
                     }
@@ -3617,14 +3628,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         public void SkipFile()
         {
-            // When processing a document change, we need to ensure that the data entry
-            // verification tab is again made active so that all events that need to be
-            // processed for a document change in verification are registered.
-            if (_dataTab != null)
-            {
-                _tabControl.SelectedTab = _dataTab;
-            }
-
             if (InvokeRequired)
             {
                 _invoker.Invoke((MethodInvoker)(() =>
@@ -3652,13 +3655,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // processed for a document change in verification are registered.
                 if (_dataTab != null)
                 {
-                    if (!string.IsNullOrEmpty(_fileName) &&
-                        _paginationPanel.SourceDocuments.Contains(_fileName))
-                    {
-                        _paginationPanel.Park();
-                        _paginationPanel.RemoveSourceFile(_fileName);
-                        _paginationPanel.PendingChanges = false;
-                    }
+                    _paginationPanel.Park();
+                    _paginationPanel.PendingChanges = false;
                     _tabControl.SelectedTab = _dataTab;
                 }
 
@@ -3920,12 +3918,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // https://extract.atlassian.net/browse/ISSUE-13838
                 // Prevent dialog insisting on committing pagination changes if data is not being
                 // committed.
-                if (!commitData &&
-                    !string.IsNullOrEmpty(_fileName) &&
-                    _paginationPanel.SourceDocuments.Contains(_fileName))
+                if (!commitData)
                 {
                     _paginationPanel.Park();
-                    _paginationPanel.RemoveSourceFile(_fileName);
                     _paginationPanel.PendingChanges = false;
                 }
                 _tabControl.SelectedTab = _dataTab;
@@ -4013,6 +4008,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Since data has been saved, prevent any other attempts that might be triggered
                 // by events raised during this process.
                 PreventSaveOfDirtyData = true;
+
+                if (_paginationPanel != null)
+                {
+                    _paginationPanel.RemoveSourceFile(_fileName);
+                }
 
                 _imageViewer.CloseImage();
 

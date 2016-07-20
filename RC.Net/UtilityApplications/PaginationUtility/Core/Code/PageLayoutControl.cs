@@ -1512,7 +1512,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (position >= 0 && position < _flowLayoutPanel.Controls.Count)
                 {
-                    var pageControl = _flowLayoutPanel.Controls[position] as PageThumbnailControl;
+                    var pageControl = _flowLayoutPanel.Controls
+                        .OfType<Control>()
+                        .Skip(position)
+                        .OfType<PageThumbnailControl>()
+                        .FirstOrDefault();
                     if (pageControl != null && pageControl.Document != null)
                     {
                         SelectDocument(pageControl.Document);
@@ -2009,11 +2013,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Controls from within this application
                     e.Effect = DragDropEffects.Move;
                 }
-                else if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                {
-                    // Files from the Windows shell.
-                    e.Effect = DragDropEffects.Copy;
-                }
                 else
                 {
                     // No data or unsupported data type.
@@ -2128,12 +2127,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (sourceLayoutControl != null)
                         {
                             MoveSelectedControls(sourceLayoutControl, _dropLocationIndex);
-                        }
-                        else if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                        {
-                            IEnumerable<KeyValuePair<Page, bool>> pages =
-                                GetPagesFromFileDrop(e.Data);
-                            InsertPages(pages, _dropLocationIndex);
                         }
                     }
                 }
@@ -2632,6 +2625,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // being set to allow shortcuts keys to work even if the control hasn't been
                         // clicked.
                         _commandTargetControl = _primarySelection;
+                    }
+                    else if (ImageViewer.IsImageAvailable)
+                    {
+                        ImageViewer.CloseImage();
                     }
                 }
             }
@@ -3908,13 +3905,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // If we found ClipboardData on the clipboard, convert it to an array of Pages.
                 if (clipboardData != null)
                 {
-                    return clipboardData.GetPages(_paginationUtility);
-                }
-
-                // If we found FileDrop data on the clipboard, convert it to an array of Pages.
-                if (dataObject.GetDataPresent(DataFormats.FileDrop))
-                {
-                    return GetPagesFromFileDrop(dataObject);
+                    var pages = clipboardData.GetPages(_paginationUtility);
+                    if (pages.Any())
+                    {
+                        return pages;
+                    }
+                    else
+                    {
+                        // The pages on the clipboard may no longer be loaded.
+                        _currentClipboardData = null;
+                        return null;
+                    }
                 }
 
                 return null;
@@ -3922,41 +3923,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35516");
-            }
-        }
-
-        /// <summary>
-        /// Retrieves as an enumerable of <see cref="Page"/>s the from the specified
-        /// <see paramref="dataObject"/> using the <see cref="DataFormats.FileDrop"/> format.
-        /// </summary>
-        /// <returns>The pages represented by <see paramref="dataObject"/> where each
-        /// <see cref="Page"/> is paired with a <see langword="bool"/> indicating whether the page
-        /// was copied in a deleted state.
-        /// <see langword="null"/> if there is no such data in <see paramref="dataObject"/>.
-        /// </returns>
-        internal IEnumerable<KeyValuePair<Page, bool>> GetPagesFromFileDrop(IDataObject dataObject)
-        {
-            bool returnedPages = false;
-
-            string[] windowsFileList = dataObject.GetData(DataFormats.FileDrop) as string[];
-            if (windowsFileList != null)
-            {
-                foreach (string fileName in windowsFileList)
-                {
-                    // Return the each page from the document
-                    foreach (var page in _paginationUtility.GetDocumentPages(fileName, null))
-                    {
-                        returnedPages = true;
-                        yield return new KeyValuePair<Page, bool>(page, false);
-                    }
-                }
-            }
-
-            if (returnedPages)
-            {
-                // Return null to insert a document separator after the last page (as long as there
-                // were any pages that were returned.
-                yield return new KeyValuePair<Page, bool>(null, false);
             }
         }
 
@@ -3972,8 +3938,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 IDataObject dataObject = Clipboard.GetDataObject();
                 if (dataObject != null)
                 {
-                    return dataObject.GetDataPresent(_CLIPBOARD_DATA_FORMAT) ||
-                           dataObject.GetDataPresent(DataFormats.FileDrop);
+                    return dataObject.GetDataPresent(_CLIPBOARD_DATA_FORMAT);
                 }
 
                 return false;

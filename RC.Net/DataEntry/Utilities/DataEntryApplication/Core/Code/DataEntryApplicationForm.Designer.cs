@@ -324,7 +324,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationTab.Size = new System.Drawing.Size(176, 484);
             this._paginationTab.TabIndex = 1;
             this._paginationTab.Text = "Pagination";
-            this._paginationPanel.ToolBarVisible = true;
             this._paginationTab.UseVisualStyleBackColor = true;
             // 
             // _paginationPanel
@@ -336,6 +335,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationPanel.Name = "_paginationPanel";
             this._paginationPanel.Size = new System.Drawing.Size(176, 484);
             this._paginationPanel.TabIndex = 0;
+            this._paginationPanel.ToolBarVisible = true;
             this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
             this._paginationPanel.Paginated += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(this.HandlePaginationPanel_Paginated);
             this._paginationPanel.PaginationError += new EventHandler<Extract.ExtractExceptionEventArgs>(this.HandlePaginationPanel_PaginationError);
