@@ -281,7 +281,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance should cache images with the
-        /// <see cref="ImageViewer"/> when loading files or <see cref="false"/> if it should not
+        /// <see cref="ImageViewer"/> when loading files or <see langword="false"/> if it should not
         /// (such as if the application is managing caching externally).
         /// </summary>
         /// <value><see langword="true"/> if this instance should cache images; otherwise,
@@ -1113,33 +1113,33 @@ namespace Extract.UtilityApplications.PaginationUtility
                                         c.Page.SourceDocument == sourceDocument))
                                 .ToArray();
 
-                            foreach (var outputDocument in documentsToDelete)
+                        foreach (var outputDocument in documentsToDelete)
+                        {
+                            // If the document's data is open for editing, close the panel.
+                            if (_documentWithDataInEdit == outputDocument)
                             {
-                                // If the document's data is open for editing, close the panel.
-                                if (_documentWithDataInEdit == outputDocument)
-                                {
-                                    CloseDataPanel(false);
-                                }
-
-                                int docPosition =
-                                    _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
-                                if (docPosition != -1)
-                                {
-                                    position = (position == -1)
-                                        ? docPosition
-                                        : Math.Min(position, docPosition);
-                                }
-                                _pendingDocuments.Remove(outputDocument);
+                                CloseDataPanel(false);
                             }
 
-                            var referencedOriginalDocuments = _originalDocuments
-                                .Where(doc => doc.OriginalPages.Any(page => page.OriginalDocumentName == fileName))
-                                .ToArray();
-
-                            foreach (var outputDocument in referencedOriginalDocuments)
+                            int docPosition =
+                                _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
+                            if (docPosition != -1)
                             {
-                                _originalDocuments.Remove(outputDocument);
+                                position = (position == -1)
+                                    ? docPosition
+                                    : Math.Min(position, docPosition);
                             }
+                            _pendingDocuments.Remove(outputDocument);
+                        }
+
+                        var referencedOriginalDocuments = _originalDocuments
+                            .Where(doc => doc.OriginalPages.Any(page => page.OriginalDocumentName == fileName))
+                            .ToArray();
+
+                        foreach (var outputDocument in referencedOriginalDocuments)
+                        {
+                            _originalDocuments.Remove(outputDocument);
+                        }
 
                             _sourceDocuments.Remove(sourceDocument);
                             _sourceToOriginalDocuments.Remove(sourceDocument);
@@ -1268,10 +1268,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             int sourcePage = pageInfo.Key.Item2;
                             var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
-                            newPageDataArray[destPage - 1] = pageData;
 
+                            // CreateFromSpatialStrings won't accept non-spatial strings
+                            // UpdatePageNumber is only valid for spatial strings
                             if (pageData.HasSpatialInfo())
                             {
+                                newPageDataArray[destPage - 1] = pageData;
                                 pageData.UpdatePageNumber(destPage);
                             }
                             if (oldPageInfos.Contains(sourcePage))
@@ -1285,12 +1287,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var newUSSData = new SpatialString();
                 if (newPageDataArray.Length > 0)
                 {
-                    var newPageData = newPageDataArray.ToIUnknownVector<SpatialString>();
-                    newUSSData.CreateFromSpatialStrings(newPageData);
+                    var newPageData = newPageDataArray
+                        .Where(s => s != null)
+                        .ToIUnknownVector<SpatialString>();
+
+                    if (newPageData.Size() > 0)
+                    {
+                        newUSSData.CreateFromSpatialStrings(newPageData);
+                        newUSSData.SpatialPageInfos = newSpatialPageInfos;
+                    }
                 }
-                newUSSData.SourceDocName = newDocumentName;
-                newUSSData.SpatialPageInfos = newSpatialPageInfos;
-                newUSSData.SaveTo(newDocumentName + ".uss", true, false);
+                if (newUSSData.HasSpatialInfo())
+                {
+                    newUSSData.SourceDocName = newDocumentName;
+                    newUSSData.SaveTo(newDocumentName + ".uss", true, false);
+                }
                 newUSSData.ReportMemoryUsage();
 
                 return newSpatialPageInfos;
@@ -2586,7 +2597,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             var eventHandler = Paginated;
             if (eventHandler != null)
             {
-                eventHandler(this,
+                eventHandler(this, 
                     new PaginatedEventArgs(
                         paginatedDocumentSources, disregardedPaginationSources,
                         modifiedDocumentData, unmodifiedPaginationSources));
