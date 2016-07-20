@@ -994,8 +994,11 @@ static const string gstrSETTING_NAME = "<SettingName>";
 
 // Query for looking for a specific setting
 // To use run replaceVariable to replace <SettingName>
+// https://extract.atlassian.net/browse/ISSUE-13910
+// To allow for the ability to query settings on old DB's where the schema may have changed,
+// get all columns rather than a hard-coded list.
 static const string gstrDBINFO_SETTING_QUERY = 
-	"SELECT [ID], [Name], [Value] FROM DBInfo WHERE [Name] = '" + gstrSETTING_NAME + "'";
+	"SELECT * FROM DBInfo WHERE [Name] = '" + gstrSETTING_NAME + "'";
 
 // Query for getting all DB info settings
 static const string gstrDBINFO_GET_SETTINGS_QUERY =

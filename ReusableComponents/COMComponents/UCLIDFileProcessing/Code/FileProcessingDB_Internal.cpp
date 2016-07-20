@@ -2267,6 +2267,16 @@ void CFileProcessingDB::validateDBSchemaVersion()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLockName)
 {
+	// https://extract.atlassian.net/browse/ISSUE-13910
+	// Since the schema of the LockTable can and has changed over time, we cannot assume this
+	// function will work on an older database. However, since our locking system only really matters
+	// when 2 processes collide and since 2 process should not be allowed when updating the schema,
+	// locking should be disabled during a schema update.
+	if (m_bValidatingOrUpdatingSchema)
+	{
+		return;
+	}
+
 	// https://extract.atlassian.net/browse/ISSUE-12328
 	// If we can see that this thread already has a lock on this thread, throw an exception rather
 	// than allow a deadlock situation to occur.
