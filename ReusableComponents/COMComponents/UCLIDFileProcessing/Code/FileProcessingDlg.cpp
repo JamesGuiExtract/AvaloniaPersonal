@@ -1970,6 +1970,7 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	m_toolBar.GetToolBarCtrl().CheckButton(IDC_BTN_AUTO_SCROLL, asMFCBool(bAutoScroll) );
 	m_propProcessingPage.setAutoScroll(bAutoScroll);
 	m_propQueueLogPage.setAutoScroll(bAutoScroll);
+	m_toolBar.Invalidate();
 
 	// change the menu item label to either "Pause" or "Resume" processing depending upon
 	// the current situation
@@ -2266,12 +2267,7 @@ void FileProcessingDlg::updateUI()
 			bEnableRun = true;
 		}
 
-		// Disable/enable run save and save as button and menu items
-		m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_RUN, asMFCBool(bEnableRun) );
-		m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_OPEN, asMFCBool(!m_bRunning));
-		pMenu->EnableMenuItem(ID_PROCESS_STARTPROCESSING, MF_BYCOMMAND | (bEnableRun ? MF_ENABLED: MF_GRAYED) );
-		pMenu->EnableMenuItem(ID_FILE_NEW, MF_BYCOMMAND | MF_ENABLED );
-		pMenu->EnableMenuItem(ID_FILE_OPEN, MF_BYCOMMAND | MF_ENABLED );
+		updateMenuAndToolbar();
 	}
 
 	updateDBConnectionStatus();
