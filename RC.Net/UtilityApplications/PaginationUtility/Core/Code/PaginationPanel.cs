@@ -1256,29 +1256,33 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var newSpatialPageInfos = new LongToObjectMapClass();
                 int destPageCount = pageMap.Values.SelectMany(value => value).Count();
                 var newPageDataArray = new SpatialString[destPageCount];
+                bool ussFileExists = false;
                 foreach (var pageInfo in pageMap)
                 {
                     string sourceDocName = pageInfo.Key.Item1;
                     SpatialString sourceDocData;
-                    if (sourceUSSData.TryGetValue(sourceDocName, out sourceDocData) &&
-                        sourceDocData.HasSpatialInfo())
+                    if (sourceUSSData.TryGetValue(sourceDocName, out sourceDocData))
                     {
-                        var oldPageInfos = sourceDocData.SpatialPageInfos;
-                        foreach (int destPage in pageInfo.Value)
+                        ussFileExists = true;
+                        if (sourceDocData.HasSpatialInfo())
                         {
-                            int sourcePage = pageInfo.Key.Item2;
-                            var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
+                            var oldPageInfos = sourceDocData.SpatialPageInfos;
+                            foreach (int destPage in pageInfo.Value)
+                            {
+                                int sourcePage = pageInfo.Key.Item2;
+                                var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
 
-                            // CreateFromSpatialStrings won't accept non-spatial strings
-                            // UpdatePageNumber is only valid for spatial strings
-                            if (pageData.HasSpatialInfo())
-                            {
-                                newPageDataArray[destPage - 1] = pageData;
-                                pageData.UpdatePageNumber(destPage);
-                            }
-                            if (oldPageInfos.Contains(sourcePage))
-                            {
-                                newSpatialPageInfos.Set(destPage, oldPageInfos.GetValue(sourcePage));
+                                // CreateFromSpatialStrings won't accept non-spatial strings
+                                // UpdatePageNumber is only valid for spatial strings
+                                if (pageData.HasSpatialInfo())
+                                {
+                                    newPageDataArray[destPage - 1] = pageData;
+                                    pageData.UpdatePageNumber(destPage);
+                                }
+                                if (oldPageInfos.Contains(sourcePage))
+                                {
+                                    newSpatialPageInfos.Set(destPage, oldPageInfos.GetValue(sourcePage));
+                                }
                             }
                         }
                     }
@@ -1297,7 +1301,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         newUSSData.SpatialPageInfos = newSpatialPageInfos;
                     }
                 }
-                if (newUSSData.HasSpatialInfo())
+                if (ussFileExists)
                 {
                     newUSSData.SourceDocName = newDocumentName;
                     newUSSData.SaveTo(newDocumentName + ".uss", true, false);
