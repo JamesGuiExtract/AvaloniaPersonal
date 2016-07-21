@@ -381,7 +381,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                                     });
                                 _statusUpdates.Enqueue(new StatusArgs
                                     {
-                                        StatusMessage = "  Overall Agreement: {0:N4} (Chance Agreement: {1:N4})",
+                                        StatusMessage = "  Overall agreement: {0:N4}\r\n  Chance agreement: {1:N4}",
                                         DoubleValues = new[] { gcm.OverallAgreement, gcm.ChanceAgreement }
                                     });
                             },

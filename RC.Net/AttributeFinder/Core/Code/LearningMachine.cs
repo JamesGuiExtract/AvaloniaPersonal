@@ -736,6 +736,10 @@ namespace Extract.AttributeFinder
             Encoder.PrettyPrint(writer);
             writer.WriteLine("Classifier ({0}):", MachineType);
             Classifier.PrettyPrint(writer);
+            if (UseUnknownCategory)
+            {
+                writer.WriteLine("UnknownCategoryCutoff: {0}", UnknownCategoryCutoff);
+            }
             return baseWriter.ToString().Trim();
         }
 

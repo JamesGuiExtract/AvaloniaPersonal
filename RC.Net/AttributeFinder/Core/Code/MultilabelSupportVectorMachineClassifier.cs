@@ -115,8 +115,9 @@ namespace Extract.AttributeFinder
                 };
 
             var error = teacher.Run(true);
-            updateStatus(new StatusArgs { StatusMessage = "Training error: {0}", DoubleValues = new[] { error } });
+            updateStatus(new StatusArgs { StatusMessage = "Training error: {0:N4}", DoubleValues = new[] { error } });
 
+            double likelihood = 0;
             if (CalibrateMachineToProduceProbabilities)
             {
                 updateStatus(new StatusArgs { StatusMessage = "Calibrating..." });
@@ -126,9 +127,11 @@ namespace Extract.AttributeFinder
                     var machine = classifier.Machines[i];
                     var outputsForMachine = outputs.Apply(y => y == i ? 1 : -1);
                     var calibration = new ProbabilisticOutputCalibration(machine, inputs, outputsForMachine);
-                    calibration.Run();
+                    likelihood += calibration.Run() / inputs.Length;
                 }
-                updateStatus(new StatusArgs { StatusMessage = "Calibrated.", ReplaceLastStatus = true });
+                updateStatus(new StatusArgs { StatusMessage = "Calibrated. Average log-likelihood: {0:N4}",
+                    DoubleValues = new[] { likelihood / classifier.Machines.Length },
+                    ReplaceLastStatus = true });
             }
             Classifier = classifier;
         }

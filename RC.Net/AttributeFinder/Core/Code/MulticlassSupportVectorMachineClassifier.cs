@@ -54,7 +54,7 @@ namespace Extract.AttributeFinder
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            updateStatus(new StatusArgs { StatusMessage = "Training error: {0}", DoubleValues = new[] { error } });
+            updateStatus(new StatusArgs { StatusMessage = "Training error: {0:N4}", DoubleValues = new[] { error } });
             Classifier = classifier;
         }
 

@@ -478,11 +478,11 @@ namespace Extract.AttributeFinder
             var initializer = new NguyenWidrow(ann);
             initializer.Randomize();
             var teacher = new Accord.Neuro.Learning.ParallelResilientBackpropagationLearning(ann);
-
+            int sampleSize = trainOutputs.Length;
             for (int i = 1; i <= MaxTrainingIterations; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                double error = teacher.RunEpoch(trainInputs, trainOutputs);
+                double error = teacher.RunEpoch(trainInputs, trainOutputs) / sampleSize;
                 updateStatus(new StatusArgs
                 {
                     TaskName = "RunEpoch",
@@ -521,14 +521,15 @@ namespace Extract.AttributeFinder
             var teacher = new Accord.Neuro.Learning.ParallelResilientBackpropagationLearning(ann);
 
             var history = new Queue<Tuple<System.IO.MemoryStream, double>>(_WINDOW_SIZE);
+            int trainSize = trainOutputs.Length;
+            int cvSize = cvOutputs.Length;
 
             for (int i = 1; i <= MaxTrainingIterations; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                teacher.RunEpoch(trainInputs, trainOutputs);
-                double trainError = teacher.ComputeError(trainInputs, trainOutputs);
-                double cvError = teacher.ComputeError(cvInputs, cvOutputs);
+                double trainError = teacher.RunEpoch(trainInputs, trainOutputs) / trainSize;;
+                double cvError = teacher.ComputeError(cvInputs, cvOutputs) / cvSize;
                 updateStatus(new StatusArgs
                 {
                     TaskName = "RunEpoch",
