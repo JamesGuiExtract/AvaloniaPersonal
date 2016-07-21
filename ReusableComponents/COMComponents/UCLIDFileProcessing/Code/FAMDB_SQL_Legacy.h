@@ -148,3 +148,20 @@ static const string gstrADD_FAM_SESSION_ACTION_FK_V128 =
 	"REFERENCES [dbo].[Action] ([ID])"
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
+
+// Used for schema versions 138 - 140
+static const string gstrCREATE_PAGINATION_LEGACY =
+	"CREATE TABLE [Pagination] ( "
+	"	[ID] INT IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Pagination] PRIMARY KEY CLUSTERED, "
+	"	[SourceFileID] INT NOT NULL, "
+	"	[SourcePage] INT NOT NULL, "
+	"	[DestFileID] INT NOT NULL, "
+	"	[DestPage] INT NOT NULL, "
+	"	[OriginalFileID] INT NOT NULL, "
+	"	[OriginalPage] INT NOT NULL, "
+	"	[FileTaskSessionID] INT NOT NULL)";
+
+// Used for schema versions 138 - 140
+static const string gstrCREATE_PAGINATION_DESTFILE_INDEX_LEGACY =
+	"CREATE UNIQUE NONCLUSTERED INDEX [IX_Pagination_DestFile] ON "
+	"	[dbo].[Pagination] ([DestFileID], [DestPage])";

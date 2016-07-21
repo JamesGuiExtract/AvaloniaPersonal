@@ -609,21 +609,6 @@ namespace Extract.FileActionManager.FileProcessors
                 // process from getting it.
                 int fileID = _paginationPanel.AddFileWithNameConflictResolve(e, priority);
 
-                // Format source page info into an IUnknownVector of StringPairs (filename, page).
-                var sourcePageInfo = e.SourcePageInfo
-                    .Select(info => new StringPairClass()
-                    {
-                        StringKey = info.DocumentName,
-                        StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
-                    })
-                    .ToIUnknownVector();
-
-                ExtractException.Assert("ELI40090", "FileTaskSession was not started.",
-                    _fileTaskSessionID.HasValue);
-
-                FileProcessingDB.AddPaginationHistory(
-                    e.OutputFileName, sourcePageInfo, _fileTaskSessionID.Value);
-
                 // PaginationSourceAction allows a paginated source to be moved into a
                 // cleanup action even when it is completed for this action without actually
                 // having completed all FAM tasks.
@@ -868,7 +853,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _actionID = actionID;
                 _fileProcessingDB = fileProcessingDB;
                 
-                _fileTaskSessionID = null;
+                _fileTaskSessionID = _paginationPanel.FileTaskSessionID = null;
                 StartFileTaskSession();
 
                 if (!Focused)
@@ -1010,8 +995,9 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                _fileTaskSessionID = FileProcessingDB.StartFileTaskSession(
-                    _PAGINATION_TASK_GUID, _fileID);
+                _fileTaskSessionID = 
+                    _paginationPanel.FileTaskSessionID = FileProcessingDB.StartFileTaskSession(
+                        _PAGINATION_TASK_GUID, _fileID);
             }
             catch (Exception ex)
             {
@@ -1275,14 +1261,14 @@ namespace Extract.FileActionManager.FileProcessors
                 if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
                 {
                     string query = string.Format(CultureInfo.InvariantCulture,
-                        "SELECT COUNT(DISTINCT([DestFileID])) + 1 AS [SubDocIndex] " +
+                        "SELECT COUNT(DISTINCT([DestFileID])) AS [PreviouslyOutput] " +
                         "   FROM [Pagination] " +
                         "   INNER JOIN [FAMFile] ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
                         "   WHERE [FileName] = '{0}'",
                         sourceDocName.Replace("'", "''"));
 
                     var recordset = FileProcessingDB.GetResultsForQuery(query);
-                    int subDocIndex = (int)recordset.Fields["SubDocIndex"].Value;
+                    int subDocIndex = e.SubDocIndex + (int)recordset.Fields["PreviouslyOutput"].Value;
                     recordset.Close();
 
                     pathTags.AddTag(PaginationSettings.SubDocIndexTag,

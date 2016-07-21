@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 140;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 141;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1437,9 +1437,9 @@ int UpdateToSchemaVersion138(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vector<string> vecQueries;
 
-		vecQueries.push_back(gstrCREATE_PAGINATION);
+		vecQueries.push_back(gstrCREATE_PAGINATION_LEGACY);
 		vecQueries.push_back(gstrCREATE_PAGINATION_ORIGINALFILE_INDEX);
-		vecQueries.push_back(gstrCREATE_PAGINATION_DESTFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_PAGINATION_DESTFILE_INDEX_LEGACY);
 		vecQueries.push_back(gstrCREATE_PAGINATION_FILETASKSESSION_INDEX);
 		vecQueries.push_back(gstrADD_PAGINATION_SOURCEFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_PAGINATION_DESTFILE_FAMFILE_FK);
@@ -1498,6 +1498,34 @@ int UpdateToSchemaVersion140(_ConnectionPtr ipConnection,
 		vector<string> vecQueries;
 
 		vecQueries.push_back(gstrINSERT_PAGINATION_TASK_CLASS);
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40057");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion141(_ConnectionPtr ipConnection, 
+							 long* pnNumSteps, 
+							 IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 141;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrALTER_PAGINATION_ALLOW_NULL_DESTFILE);
+		vecQueries.push_back(gstrALTER_PAGINATION_ALLOW_NULL_DESTPAGE);
+		vecQueries.push_back("DROP INDEX [dbo].[Pagination].[IX_Pagination_DestFile]");
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -6643,7 +6671,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 137:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion138);
 				case 138:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion139);
 				case 139:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion140);
-				case 140:	break;
+				case 140:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion141);
+				case 141:	break;
 
 				default:
 					{
@@ -9531,6 +9560,13 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 			IIUnknownVectorPtr ipSourcePageInfo(pSourcePageInfo);
 			ASSERT_ARGUMENT("ELI39683", ipSourcePageInfo != __nullptr);
 
+			string strOutputFile = "NULL";
+			if (bstrOutputFile != __nullptr)
+			{
+				strOutputFile = asString(bstrOutputFile);
+				replaceVariable(strOutputFile, "'", "''");
+			}
+
 			// Compile selection queries that will produce a result set with the corresponding
 			// source and destination pages for all pages in the output document.
 			vector<string> vecPageSelections;
@@ -9547,7 +9583,7 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 				string strPageSelection = gstrSELECT_SINGLE_PAGINATED_PAGE;
 				replaceVariable(strPageSelection, "<SourceFileName>",  strSourceDocName);
 				replaceVariable(strPageSelection, "<SourcePage>",  strPageNum);
-				replaceVariable(strPageSelection, "<DestPage>",  asString(i + 1));
+				replaceVariable(strPageSelection, "<DestPage>",  strOutputFile == "NULL" ? "NULL" : asString(i + 1));
 
 				vecPageSelections.push_back(strPageSelection);
 			}
@@ -9555,8 +9591,6 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 			// Use this data in gstrINSERT_INTO_PAGINATION which will compute the OriginalFileID
 			// and OriginalPage columns for all of the new data.
 			string strSQL = gstrINSERT_INTO_PAGINATION;
-			string strOutputFile = asString(bstrOutputFile);
-			replaceVariable(strOutputFile, "'", "''");
 			replaceVariable(strSQL, "<DestFileName>", strOutputFile);
 			replaceVariable(strSQL, "<SelectPaginations>", asString(vecPageSelections, false, "\r\nUNION\r\n"));
 			replaceVariable(strSQL, "<FAMSessionID>", asString(nFileTaskSessionID));

@@ -412,6 +412,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets/sets the index of this document in relation to the other documents derived from a
+        /// source document. Used to create output document names.
+        /// </summary>
+        public int SubDocIndex
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Methods

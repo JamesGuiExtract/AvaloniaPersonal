@@ -379,8 +379,8 @@ static const string gstrCREATE_PAGINATION =
 	"	[ID] INT IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Pagination] PRIMARY KEY CLUSTERED, "
 	"	[SourceFileID] INT NOT NULL, "
 	"	[SourcePage] INT NOT NULL, "
-	"	[DestFileID] INT NOT NULL, "
-	"	[DestPage] INT NOT NULL, "
+	"	[DestFileID] INT NULL, "
+	"	[DestPage] INT NULL, "
 	"	[OriginalFileID] INT NOT NULL, "
 	"	[OriginalPage] INT NOT NULL, "
 	"	[FileTaskSessionID] INT NOT NULL)";
@@ -478,10 +478,6 @@ static const string gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX =
 static const string gstrCREATE_PAGINATION_ORIGINALFILE_INDEX =
 	"CREATE NONCLUSTERED INDEX [IX_Pagination_OriginalFile] ON "
 	"	[dbo].[Pagination] ([OriginalFileID])";
-
-static const string gstrCREATE_PAGINATION_DESTFILE_INDEX =
-	"CREATE UNIQUE NONCLUSTERED INDEX [IX_Pagination_DestFile] ON "
-	"	[dbo].[Pagination] ([DestFileID], [DestPage])";
 
 static const string gstrCREATE_PAGINATION_FILETASKSESSION_INDEX = 
 	"CREATE NONCLUSTERED INDEX [IX_Pagination_FileTaskSession] ON "
@@ -1598,3 +1594,9 @@ static const string gstrACTIVE_PAGINATION_FILEID =
 	"                         FileTaskSession ON FAMSession.ID = FileTaskSession.FAMSessionID INNER JOIN \r\n"
 	"                         Pagination ON FileTaskSession.ID = Pagination.FileTaskSessionID \r\n"
 	"WHERE        (Pagination.DestFileID = <FileID>) \r\n";
+
+static const string gstrALTER_PAGINATION_ALLOW_NULL_DESTFILE = 
+	"ALTER TABLE [dbo].[Pagination] ALTER COLUMN [DestFileID] INT NULL";
+
+static const string gstrALTER_PAGINATION_ALLOW_NULL_DESTPAGE = 
+	"ALTER TABLE [dbo].[Pagination] ALTER COLUMN [DestPage] INT NULL";

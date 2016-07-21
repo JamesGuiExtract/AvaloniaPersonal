@@ -1065,7 +1065,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 _fileId = fileID;
                 _fileName = fileName;
-                _fileTaskSessionID = null;
+                _fileTaskSessionID = _paginationPanel.FileTaskSessionID = null;
 
                 StartFileTaskSession();
 
@@ -3177,21 +3177,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // process from getting it.
                 int fileID = _paginationPanel.AddFileWithNameConflictResolve(e, priority);
 
-                // Format source page info into an IUnknownVector of StringPairs (filename, page).
-                var sourcePageInfo = e.SourcePageInfo
-                    .Select(info => new StringPairClass()
-                    {
-                        StringKey = info.DocumentName,
-                        StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
-                    })
-                    .ToIUnknownVector();
-
-                ExtractException.Assert("ELI39699", "FileTaskSession was not started.",
-                    _fileTaskSessionID.HasValue);
-
-                FileProcessingDB.AddPaginationHistory(
-                    e.OutputFileName, sourcePageInfo, _fileTaskSessionID.Value);
-
                 // Produce a uss file for the paginated document using the uss data from the
                 // source documents
                 int pageCounter = 1;
@@ -5247,8 +5232,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 _recordedDatabaseData = false;
 
-                _fileTaskSessionID = FileProcessingDB.StartFileTaskSession(
-                    _VERIFICATION_TASK_GUID, _fileId);
+                _fileTaskSessionID = 
+                    _paginationPanel.FileTaskSessionID = FileProcessingDB.StartFileTaskSession(
+                        _VERIFICATION_TASK_GUID, _fileId);
+                
 
                 // If the timer is currently running, its current time will be the overhead time
                 // (time since the previous document was saved. Restart the timer to track the
@@ -5690,14 +5677,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
                 {
                     string query = string.Format(CultureInfo.InvariantCulture,
-                        "SELECT COUNT(DISTINCT([DestFileID])) + 1 AS [SubDocIndex] " +
+                        "SELECT COUNT(DISTINCT([DestFileID])) AS [PreviouslyOutput] " +
                         "   FROM [Pagination] " +
                         "   INNER JOIN [FAMFile] ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
                         "   WHERE [FileName] = '{0}'",
                         sourceDocName.Replace("'", "''"));
 
                     var recordset = FileProcessingDB.GetResultsForQuery(query);
-                    int subDocIndex = (int)recordset.Fields["SubDocIndex"].Value;
+                    int subDocIndex = e.SubDocIndex + (int)recordset.Fields["PreviouslyOutput"].Value;
                     recordset.Close();
 
                     pathTags.AddTag(PaginationSettings.SubDocIndexTag,
