@@ -70,3 +70,11 @@
 
 // Test that match-scoring-queries are supported when a Component is mapped to multiple ESComponents
 <TESTCASE>;Test25.rsd;test25.txt;;test25.eav
+
+// Test that match-scoring-queries come into play in selecting between single-test orders
+// https://extract.atlassian.net/browse/ISSUE-13828
+<TESTCASE>;Test26.rsd;test26.txt;;test26.eav
+
+// Test 'do not perform second pass' option
+// https://extract.atlassian.net/browse/ISSUE-13794
+<TESTCASE>;Test27.rsd;test27.txt;;test27.eav

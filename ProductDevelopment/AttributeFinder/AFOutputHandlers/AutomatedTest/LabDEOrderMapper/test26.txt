@@ -1,0 +1,6 @@
+Test|N/A
+.CollectionDate|02/23/2016
+.CollectionTime|10:55
+.Component|CREATININE
+..Value|1.27
+..Range|0.60-1.30
