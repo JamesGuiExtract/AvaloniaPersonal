@@ -1952,7 +1952,11 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	{
 		if (m_toolBar)
 		{
-			bEnableRun = true;
+			CString zStatusText = getFAMStatus();
+			if (zStatusText == "Ready")
+			{
+				bEnableRun = true;
+			}
 		}
 	}
 
@@ -2256,17 +2260,6 @@ void FileProcessingDlg::updateUI()
 	}
 	else
 	{
-		zStatusText = getFAMStatus();
-
-		bool bEnableRun = false;
-
-		CMenu* pMenu = GetMenu();
-
-		if (zStatusText == "Ready")
-		{
-			bEnableRun = true;
-		}
-
 		updateMenuAndToolbar();
 	}
 
