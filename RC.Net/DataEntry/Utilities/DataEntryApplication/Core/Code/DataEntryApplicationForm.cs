@@ -3222,10 +3222,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         attributesCopy.ReportMemoryUsage();
                     }
 
-                    EActionStatus oldStatus;
-                    FileProcessingDB.SetStatusForFile(fileID,
-                        _settings.PaginationSettings.PaginationOutputAction,
-                        EActionStatus.kActionPending, false, false, out oldStatus);
+                    if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
+                    {
+                        EActionStatus oldStatus;
+                        FileProcessingDB.SetStatusForFile(fileID,
+                            _settings.PaginationSettings.PaginationOutputAction,
+                            EActionStatus.kActionPending, false, false, out oldStatus);
+                    }
                 }
                 else if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
                 {
