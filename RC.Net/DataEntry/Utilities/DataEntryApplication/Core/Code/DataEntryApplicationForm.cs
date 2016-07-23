@@ -1065,7 +1065,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 _fileId = fileID;
                 _fileName = fileName;
-                _fileTaskSessionID = _paginationPanel.FileTaskSessionID = null;
+                _fileTaskSessionID = null;
+                if (_paginationPanel != null)
+                {
+                    _paginationPanel.FileTaskSessionID = null;
+                }
 
                 StartFileTaskSession();
 
@@ -5235,10 +5239,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 _recordedDatabaseData = false;
 
-                _fileTaskSessionID = 
-                    _paginationPanel.FileTaskSessionID = FileProcessingDB.StartFileTaskSession(
-                        _VERIFICATION_TASK_GUID, _fileId);
-                
+                _fileTaskSessionID = FileProcessingDB.StartFileTaskSession(_VERIFICATION_TASK_GUID, _fileId);
+
+                if (_paginationPanel != null)
+                {
+                    _paginationPanel.FileTaskSessionID = _fileTaskSessionID;
+                }
 
                 // If the timer is currently running, its current time will be the overhead time
                 // (time since the previous document was saved. Restart the timer to track the
