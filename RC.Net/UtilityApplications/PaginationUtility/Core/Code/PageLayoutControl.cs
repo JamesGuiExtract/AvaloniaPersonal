@@ -1054,6 +1054,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 DeleteControls(outputDocument.PageControls.ToArray());
                 outputDocument.DocumentOutput -= HandleOutputDocument_DocumentOutput;
 
+                // Remove association with separator when removing from layout
+                // to prevent bad selection state
+                // https://extract.atlassian.net/browse/ISSUE-13916
+                outputDocument.PaginationSeparator = null;
+
                 return docPosition;
             }
             catch (Exception ex)

@@ -497,7 +497,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [Browsable(false)]
-        public bool RevertToOriginalEnabled
+        public bool RevertToSuggestedEnabled
         {
             get;
             private set;
@@ -2466,16 +2466,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _updatingCommandStates = true;
 
                 var nonEmptyDocs = _pendingDocuments.Where(doc =>
+                    doc.PageControls.Any()).ToList();
+                var docsWithNonDeletedPages = nonEmptyDocs.Where(doc =>
                     doc.PageControls.Any(c => !c.Deleted));
-                bool isDocDataEdited = nonEmptyDocs.Any(doc =>
+                bool isDocDataEdited = docsWithNonDeletedPages.Any(doc =>
                     doc.DocumentData != null && doc.DocumentData.Modified);
+                bool documentCopyExists = nonEmptyDocs.Count > _originalDocuments.Count();
 
-                RevertToOriginalEnabled =
-                    nonEmptyDocs.Any(doc => !doc.InOriginalForm || isDocDataEdited);
-                _revertToOriginalToolStripButton.Enabled = RevertToOriginalEnabled;
-                RevertToSourceEnabled =
-                    nonEmptyDocs.Any(doc => !doc.InSourceDocForm || isDocDataEdited);
+                RevertToSuggestedEnabled = nonEmptyDocs.Any(doc => doc.PaginationSuggested)
+                    && nonEmptyDocs.Any(doc => isDocDataEdited || documentCopyExists || !doc.InOriginalForm);
+                _revertToOriginalToolStripButton.Enabled = RevertToSuggestedEnabled;
+
+                RevertToSourceEnabled = isDocDataEdited || documentCopyExists
+                    || nonEmptyDocs.Any(doc => !doc.InSourceDocForm);
                 _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
+
                 _applyToolStripButton.Enabled = CommitEnabled;
                 _collapseAllToolStripButton.Image =
                     AllDocumentsCollapsed

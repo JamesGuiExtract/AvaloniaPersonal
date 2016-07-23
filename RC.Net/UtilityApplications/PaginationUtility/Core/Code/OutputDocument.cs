@@ -89,6 +89,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<EventArgs> DocumentDataChanged;
 
+        /// <summary>
+        /// The <see cref="PaginationSeparator"/> representing this document in the UI.
+        /// </summary>
+        private PaginationSeparator _paginationSeparator;
+
         #endregion Events
 
         #region Properties
@@ -116,8 +121,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public PaginationSeparator PaginationSeparator
         {
-            get;
-            set;
+            get
+            {
+                return _paginationSeparator;
+            }
+            set
+            {
+                if (value != _paginationSeparator)
+                {
+                    _paginationSeparator = value;
+
+                    // Update select state based on separator
+                    // https://extract.atlassian.net/browse/ISSUE-13916
+                    if (_paginationSeparator != null)
+                    {
+                        Selected = _paginationSeparator.DocumentSelectedToCommit;
+                    }
+                }
+            }
         }
 
         /// <summary>
