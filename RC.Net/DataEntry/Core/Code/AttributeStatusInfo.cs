@@ -999,6 +999,8 @@ namespace Extract.DataEntry
                 }
                 _validationTriggers.Clear();
 
+                DataEntryQuery.DisposeDeclarations();
+
                 // _undoManager.ClearHistory() call will release attributes that were deleted by the
                 // user (and thus are no longer in the _attributes hierarchy), so don't call it until
                 // the end of this ResetData.

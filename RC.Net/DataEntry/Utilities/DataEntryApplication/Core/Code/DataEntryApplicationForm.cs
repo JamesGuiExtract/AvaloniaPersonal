@@ -3078,6 +3078,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _paginagionAttributesToRefresh.Clear();
 
                     _dataEntryControlHost.EnsureFieldSelection();
+
+                    // Table controls don't always seem to be drawn correctly after switching tabs.
+                    _dataEntryControlHost.Refresh();
                 }
                 else if (_tabControl.SelectedTab != _dataTab && _dataEntryControlHost.ImageViewer != null)
                 {

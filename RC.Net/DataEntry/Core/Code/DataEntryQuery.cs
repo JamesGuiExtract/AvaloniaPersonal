@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using System.Xml;
 using UCLID_AFCORELib;
 
@@ -26,6 +27,14 @@ namespace Extract.DataEntry
         static DataCache<string, CachedQueryData<string[]>> _performanceCache =
             new DataCache<string, CachedQueryData<string[]>>(
                 26, CachedQueryData<string[]>.GetScore);
+
+        /// <summary>
+        /// If declaration nodes aren't tracked, unreferenced declaration nodes (and the handle used
+        /// for QueryCacheCleared) will leak. This allows the declarations to be deterministically
+        /// disposed.
+        /// </summary>
+        static ThreadLocal<List<DataEntryQuery>> _declarationNodes =
+            new ThreadLocal<List<DataEntryQuery>>(() => new List<DataEntryQuery>());
 
         /// <summary>
         /// Indicates whether this query is a default query.
@@ -241,13 +250,7 @@ namespace Extract.DataEntry
                         namedQuery.ExcludeFromResult = true;
                     }
 
-                    // Since the parent "Declarations" node is not referenced (only its children),
-                    // there is nothing that will trigger it's disposal. Since it is not needed
-                    // except to create its children (which are now registered), dispose of the
-                    // parent node now after first separating it from the children (so as not to
-                    // dispose the needed children).
-                    queryNodeDeclarations.ChildNodes.Clear();
-                    queryNodeDeclarations.Dispose();
+                    _declarationNodes.Value.Add(queryNodeDeclarations);
                 }
 
                 // Use the XML to generate all queries to be used for this trigger.
@@ -415,6 +418,21 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39203");
+            }
+        }
+
+        /// <summary>
+        /// Disposes of all declarations being used in this thread.
+        /// </summary>
+        static public void DisposeDeclarations()
+        {
+            try
+            {
+                CollectionMethods.ClearAndDispose(_declarationNodes.Value);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40275");
             }
         }
 
