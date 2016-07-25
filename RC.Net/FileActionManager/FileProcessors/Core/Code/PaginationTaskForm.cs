@@ -428,6 +428,23 @@ namespace Extract.FileActionManager.FileProcessors
             return true;
         }
 
+        /// <summary>
+        /// Raises the <see cref="Form.FormClosing"/> event in order to give the user an opportunity to save
+        /// data prior to closing the application.
+        /// </summary>
+        /// <param name="e">The event data associated with the event.</param>
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            try
+            {
+                e.Cancel = PreventClose();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40280");
+            }
+        }
+
         /// <overloads>Releases resources used by the <see cref="PaginationTaskForm"/>.</overloads>
         /// <summary>
         /// Releases all unmanaged resources used by the <see cref="PaginationTaskForm"/>.
@@ -1358,6 +1375,39 @@ namespace Extract.FileActionManager.FileProcessors
             _imageViewer.CloseImage();
 
             OnFileComplete(EFileProcessingResult.kProcessingCancelled);
+        }
+
+        /// <summary>
+        /// If there are any manual pagination changes, warns the user about the changes that will
+        /// be lost if the pagination UI is closed.
+        /// </summary>
+        /// <returns><see langword="true"/> if the users doesn't want to lose their changes and the
+        /// task should be kept open; <see langword="false"/> if there are no manual pagination
+        /// changes or the user is okay losing them.</returns>
+        bool PreventClose()
+        {
+            bool paginationModified = false;
+            bool dataModified = false;
+
+            _paginationPanel.CheckForChanges(out paginationModified, out dataModified);
+
+            if (paginationModified || dataModified)
+            {
+                if (DialogResult.No == MessageBox.Show(this,
+                "You have uncommitted changes to " +
+                    ((paginationModified && dataModified)
+                        ? "pagination and data"
+                        : paginationModified ? "pagination" : "data") +
+                " that will be lost.\r\n\r\n" +
+                "Disregard changes?",
+                "Uncommitted changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button2, 0))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

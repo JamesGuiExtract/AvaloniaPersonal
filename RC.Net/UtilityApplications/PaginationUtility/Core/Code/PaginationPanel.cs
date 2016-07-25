@@ -717,17 +717,45 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <returns><see langword="true"/> if the document is unmodified compared to how it exists
         /// on disk; otherwise, <see langword="false"/>.
         /// </returns>
+        public bool IsInSourceDocForm(string sourceFileName)
+        {
+            try
+            {
+                var matchingDocuments = _primaryPageLayoutControl.Documents
+                    .Where(doc => doc.InSourceDocForm &&
+                        doc.PageControls.First().Page.OriginalDocumentName.Equals(sourceFileName,
+                            StringComparison.OrdinalIgnoreCase));
+
+                return (matchingDocuments.Count() == 1) &&
+                    matchingDocuments.Single().InSourceDocForm;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40277");
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the pagination pane depicts the document in the same form as it was
+        /// initially loaded.
+        /// <see paramref="sourceFileName"/>.
+        /// </summary>
+        /// <param name="sourceFileName">Name of the source file to which this query relates.</param>
+        /// <returns><see langword="true"/> if the document is unmodified compared to how it exists
+        /// on disk; otherwise, <see langword="false"/>.
+        /// </returns>
         public bool IsInOriginalForm(string sourceFileName)
         {
             try
             {
                 var matchingDocuments = _primaryPageLayoutControl.Documents
-                    .Where(doc => doc.InOriginalForm &&
-                        doc.PageControls.First().Page.OriginalDocumentName.Equals(sourceFileName,
-                            StringComparison.OrdinalIgnoreCase));
+                    .Where(doc =>
+                        doc.PageControls
+                            .First()
+                            .Page.OriginalDocumentName.Equals(
+                                sourceFileName,StringComparison.OrdinalIgnoreCase));
 
-                return (matchingDocuments.Count() == 1) &&
-                    matchingDocuments.Single().InOriginalForm;
+                return matchingDocuments.All(doc => doc.InOriginalForm);
             }
             catch (Exception ex)
             {
@@ -752,6 +780,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40149");
+            }
+        }
+
+        /// <summary>
+        /// Gets whether there are any manual changes to either pagination or pagination data.
+        /// </summary>
+        /// <param name="paginationModified"><see langword="true"/> if there has been manual changes to pagination.</param>
+        /// <param name="dataModified"><see langword="true"/> if there has been manual changes to data.</param>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "0#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
+        public void CheckForChanges(out bool paginationModified, out bool dataModified)
+        {
+            try 
+            {	        
+	            paginationModified = _pendingDocuments.Any(document =>
+                        !document.InOriginalForm);
+                dataModified = _pendingDocuments.Any(document =>
+                    document.DataModified && !document.DocumentData.DataSharedInVerification);
+            }
+            catch (Exception ex)
+            {
+	            throw ex.AsExtract("ELI40281");
             }
         }
 
@@ -2299,10 +2349,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             lock (_sourceDocumentLock)
             {
-                if (!File.Exists(inputFileName))
-                {
-                    return null;
-                }
+                ExtractException.Assert("ELI40278", "Cannot find file", File.Exists(inputFileName),
+                    "Filename", inputFileName);
 
                 sourceDocument = _sourceDocuments
                     .SingleOrDefault(doc => doc.FileName == inputFileName);

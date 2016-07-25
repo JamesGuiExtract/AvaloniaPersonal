@@ -130,13 +130,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (value != _paginationSeparator)
                 {
                     _paginationSeparator = value;
-
-                    // Update select state based on separator
-                    // https://extract.atlassian.net/browse/ISSUE-13916
-                    if (_paginationSeparator != null)
-                    {
-                        Selected = _paginationSeparator.DocumentSelectedToCommit;
-                    }
                 }
             }
         }

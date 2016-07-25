@@ -2967,8 +2967,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     if (e.TabPage != _paginationTab && _paginationPanel.PendingChanges)
                     {
-                        UtilityMethods.ShowMessageBox("You must apply or revert pagination changes.",
-                            "Uncommitted changes", false);
+                        UtilityMethods.ShowMessageBox(_paginationPanel.IsPaginationSuggested(_fileName)
+                            ? "You must apply desired pagination for this file."
+                            : "You must apply or revert pagination changes.",
+                            "Uncommitted pagination", false);
                         e.Cancel = true;
                     }
                     // Though not easily reproducible, switching to the pagination tab before a
@@ -3645,16 +3647,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException.Assert("ELI37453", "Invalid operation.",
                     !_standAloneMode && _fileProcessingDb != null);
 
-                // When processing a document change, we need to ensure that the data entry
-                // verification tab is again made active so that all events that need to be
-                // processed for a document change in verification are registered.
-                if (_dataTab != null)
-                {
-                    _paginationPanel.Park();
-                    _paginationPanel.PendingChanges = false;
-                    _tabControl.SelectedTab = _dataTab;
-                }
-
                 if (_fileId != -1)
                 {
                     AbortProcessing(EFileProcessingResult.kProcessingSkipped, true);
@@ -3905,6 +3897,30 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 return response;
             }
 
+            if (_paginationTab != null)
+            {
+                bool paginationModified = false;
+                bool dataModified = false;
+
+                _paginationPanel.CheckForChanges(out paginationModified, out dataModified);
+
+                if (paginationModified || dataModified)
+                {
+                    if (DialogResult.No == MessageBox.Show(this,
+                    "You have uncommitted changes to " +
+                        ((paginationModified && dataModified)
+                            ? "pagination and data"
+                            : paginationModified ? "pagination" : "pagination data") +
+                    " that will be lost.\r\n\r\n" +
+                    "Disregard changes?",
+                    "Uncommitted changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button2, 0))
+                    {
+                        return DialogResult.Cancel;
+                    }
+                }
+            }
+
             // When saving a document or processing a document change, we need to ensure that the
             // data entry verification tab is again made active so that all events that need to be
             // processed for a document change in verification are registered.
@@ -3957,8 +3973,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Prompt if the data is not being committed.
                 else
                 {
-                    var buttons = PreventCloseCancel 
-                        ? MessageBoxButtons.YesNo 
+                    var buttons = PreventCloseCancel
+                        ? MessageBoxButtons.YesNo
                         : MessageBoxButtons.YesNoCancel;
 
                     response = MessageBox.Show(this,
@@ -4004,8 +4020,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // by events raised during this process.
                 PreventSaveOfDirtyData = true;
 
+                // When processing a document change, we need to ensure that the data entry
+                // verification tab is again made active so that all events that need to be
+                // processed for a document change in verification are registered.
                 if (_paginationPanel != null)
                 {
+                    _paginationPanel.Park();
+                    _paginationPanel.PendingChanges = false;
+                    _tabControl.SelectedTab = _dataTab;
                     _paginationPanel.RemoveSourceFile(_fileName);
                 }
 

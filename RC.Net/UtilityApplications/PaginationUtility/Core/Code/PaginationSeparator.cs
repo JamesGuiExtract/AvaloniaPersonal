@@ -746,6 +746,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 _collapseDocumentButton.Visible = true;
                 _selectedCheckBox.Visible = _showSelectionCheckBox;
+                _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
                 _collapseDocumentButton.Image = Document.Collapsed
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;

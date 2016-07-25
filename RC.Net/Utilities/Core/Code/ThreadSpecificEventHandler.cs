@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 
 namespace Extract.Utilities
@@ -35,8 +34,8 @@ namespace Extract.Utilities
         /// <summary>
         /// Keeps track of the registered event handlers for this thread.
         /// </summary>
-        ThreadLocal<HashSet<WeakReference>> _eventHandlers =
-            new ThreadLocal<HashSet<WeakReference>>(() => new HashSet<WeakReference>(new EventComparer()));
+        ThreadLocal<HashSet<EventHandler<T>>> _eventHandlers =
+            new ThreadLocal<HashSet<EventHandler<T>>>(() => new HashSet<EventHandler<T>>(new EventComparer()));
         
         /// <summary>
         /// This class works by having this one real event handler which, in turn, manually
@@ -108,7 +107,7 @@ namespace Extract.Utilities
                     _threadEventHandler += HandleThreadEvent;
                 }
 
-                _eventHandlers.Value.Add(new WeakReference(eventHandler));
+                _eventHandlers.Value.Add(eventHandler);
             }
             catch (Exception ex)
             {
@@ -125,7 +124,7 @@ namespace Extract.Utilities
         {
             try
             {
-                _eventHandlers.Value.Remove(new WeakReference(eventHandler));
+                _eventHandlers.Value.Remove(eventHandler);
             }
             catch (Exception ex)
             {
@@ -145,9 +144,8 @@ namespace Extract.Utilities
         /// <param name="eventArgs">The event args.</param>
         void HandleThreadEvent(object sender, T eventArgs)
         {
-            foreach (WeakReference reference in _eventHandlers.Value.ToList())
+            foreach (EventHandler<T> eventHandler in _eventHandlers.Value)
             {
-                EventHandler<T> eventHandler = (EventHandler<T>)reference.Target;
                 if (eventHandler != null)
                 {
                     eventHandler(sender, eventArgs);
@@ -161,7 +159,7 @@ namespace Extract.Utilities
         /// An IEqualityComparer for event handlers that allows for efficient hashing for use in a
         /// dictionary or hash set.
         /// </summary>
-        class EventComparer : IEqualityComparer<WeakReference>
+        class EventComparer : IEqualityComparer<EventHandler<T>>
         {
             /// <summary>
             /// Determines whether the specified objects are equal.
@@ -171,9 +169,9 @@ namespace Extract.Utilities
             /// <returns>
             /// true if the specified objects are equal; otherwise, false.
             /// </returns>
-            public bool Equals(WeakReference x, WeakReference y)
+            public bool Equals(EventHandler<T> x, EventHandler<T> y)
             {
-                return x.Target == y.Target;
+                return x == y;
             }
 
             /// <summary>
@@ -184,15 +182,9 @@ namespace Extract.Utilities
             /// A hash code for this instance, suitable for use in hashing algorithms and data
             /// structures like a hash table. 
             /// </returns>
-            public int GetHashCode(WeakReference x)
+            public int GetHashCode(EventHandler<T> x)
             {
-                var eventHandler = (EventHandler<T>)x.Target;
-                if (eventHandler != null)
-                {
-                    return HashCode.Start.Hash(eventHandler.Method).Hash(eventHandler.Target);
-                }
-
-                return 0;
+                return HashCode.Start.Hash(x.Method).Hash(x.Target);
             }
         }
     }
