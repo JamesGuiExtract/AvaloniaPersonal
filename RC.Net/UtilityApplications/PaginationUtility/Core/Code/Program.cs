@@ -1,4 +1,5 @@
 ﻿using Extract.Licensing;
+using Extract.Utilities.Forms;
 using System;
 using System.Text;
 using System.Windows.Forms;
@@ -14,7 +15,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         static void Main(string[] args)
         {
             try
-            {
+            {                
                 // Load the licenses
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
@@ -22,6 +23,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                 LicenseUtilities.ValidateLicense(LicenseIdName.PaginationUIObject,
                     "ELI35543", "PaginationUtility");
 
+                using (CustomizableMessageBox cmb = new CustomizableMessageBox())
+                {
+                    cmb.Caption = "No longer supported";
+                    cmb.Text = "This application is no longer supported";
+                    cmb.AddStandardButtons(MessageBoxButtons.OK);
+                    cmb.Show();
+
+                    return;
+                }
+                
+                /*
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
@@ -44,6 +56,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 Application.Run(paginationUtilityForm);
+                */
             }
             catch (Exception ex)
             {
