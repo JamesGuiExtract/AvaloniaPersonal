@@ -137,7 +137,7 @@ int UpdateToSchemaVersion5(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		return nNewSchemaVersion;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38665");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40357");
 }
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps, 
@@ -635,10 +635,10 @@ STDMETHODIMP CDataEntryProductDBMgr::Initialize(IFileProcessingDB* pFAMDB)
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI38615", pFAMDB != nullptr);
+		ASSERT_ARGUMENT("ELI40354", pFAMDB != nullptr);
 
 		m_ipFAMDB = pFAMDB;
-		ASSERT_RESOURCE_ALLOCATION("ELI38616", m_ipFAMDB != nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI40355", m_ipFAMDB != nullptr);
 
 		m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
 		

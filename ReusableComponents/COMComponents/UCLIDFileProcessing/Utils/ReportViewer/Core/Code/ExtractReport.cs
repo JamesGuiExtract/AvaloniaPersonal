@@ -162,9 +162,9 @@ namespace Extract.ReportViewer
             try
             {
                 // Ensure that a valid file has been specified
-                ExtractException.Assert("ELI23716", "File name cannot be null or empty!",
+                ExtractException.Assert("ELI40291", "File name cannot be null or empty!",
                     !string.IsNullOrEmpty(fileName));
-                ExtractException.Assert("ELI23717", "File does not exist!",
+                ExtractException.Assert("ELI40292", "File does not exist!",
                     File.Exists(fileName), "Report File Name", fileName);
 
                 _reportFileName = fileName;

@@ -73,7 +73,7 @@ namespace Extract.SqlCompactExporter
             /// <param name="args">The command-line arguments the application was launched with.</param>
             public Settings(string[] args)
             {
-                ExtractException.Assert("ELI27125", "Missing required argument.", args.Length >= 3);
+                ExtractException.Assert("ELI40301", "Missing required argument.", args.Length >= 3);
 
                 // Read the mandatory settings
                 DatabaseFile = args[0];
@@ -86,35 +86,35 @@ namespace Extract.SqlCompactExporter
                     if (args[i].Equals("/rd", StringComparison.OrdinalIgnoreCase))
                     {
                         i++;
-                        ExtractException.Assert("ELI27122", "Missing row delimeter value.", i < args.Length);
+                        ExtractException.Assert("ELI40302", "Missing row delimeter value.", i < args.Length);
 
                         RowDelimiter = ParamUnescape(args[i]);
                     }
                     else if (args[i].Equals("/cd", StringComparison.OrdinalIgnoreCase))
                     {
                         i++;
-                        ExtractException.Assert("ELI27123", "Missing column delimeter value.", i < args.Length);
+                        ExtractException.Assert("ELI40303", "Missing column delimeter value.", i < args.Length);
 
                         ColumnDelimiter = ParamUnescape(args[i]);
                     }
                     else if (args[i].Equals("/fp", StringComparison.OrdinalIgnoreCase))
                     {
                         i++;
-                        ExtractException.Assert("ELI27128", "Missing file prefix value.", i < args.Length);
+                        ExtractException.Assert("ELI40304", "Missing file prefix value.", i < args.Length);
 
                         FilePrefix = ParamUnescape(args[i]);
                     }
                     else if (args[i].Equals("/fs", StringComparison.OrdinalIgnoreCase))
                     {
                         i++;
-                        ExtractException.Assert("ELI27129", "Missing file suffix value.", i < args.Length);
+                        ExtractException.Assert("ELI40305", "Missing file suffix value.", i < args.Length);
 
                         FileSuffix = ParamUnescape(args[i]);
                     }
                     else if (args[i].Equals("/enc", StringComparison.OrdinalIgnoreCase))
                     {
                         i++;
-                        ExtractException.Assert("ELI27729", "Missing code page name.", i < args.Length);
+                        ExtractException.Assert("ELI40306", "Missing code page name.", i < args.Length);
 
                         Encoding = Encoding.GetEncoding(args[i]);
                     }
@@ -124,7 +124,7 @@ namespace Extract.SqlCompactExporter
                     }
                     else
                     {
-                        ExtractException.Assert("ELI27124", "Unrecognized argument: " + args[i], false);
+                        ExtractException.Assert("ELI40307", "Unrecognized argument: " + args[i], false);
                     }
                 }
             }

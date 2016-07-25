@@ -69,7 +69,7 @@ namespace Extract.SqlCompactImporter
                     if (args[i].Equals("/rd", StringComparison.OrdinalIgnoreCase))
                     {
                         i++;
-                        ExtractException.Assert("ELI27132", "Missing row delimeter value.", i < args.Length);
+                        ExtractException.Assert("ELI27132", "Missing row delimiter value.", i < args.Length);
 
                         RowDelimiter = ParamUnescape(args[i]);
                     }
@@ -235,7 +235,7 @@ namespace Extract.SqlCompactImporter
             }
             catch (Exception ex)
             {
-                ExtractException.Log("ELI27127", ex);
+                ExtractException.Log("ELI40311", ex);
 
                 Console.WriteLine(ex.Message);
                 Console.WriteLine("DatabaseFile: " + settings.DatabaseFile);

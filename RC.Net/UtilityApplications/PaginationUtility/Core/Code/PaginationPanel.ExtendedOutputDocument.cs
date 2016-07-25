@@ -82,7 +82,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     catch (Exception ex)
                     {
-                        throw ex.AsExtract("ELI39795");
+                        throw ex.AsExtract("ELI40376");
                     }
                 }
             }
@@ -152,7 +152,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 catch (Exception ex)
                 {
-                    throw ex.AsExtract("ELI39796");
+                    throw ex.AsExtract("ELI40377");
                 }
             }
 

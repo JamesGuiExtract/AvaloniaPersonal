@@ -644,7 +644,7 @@ void CAddRuleDlg::OnBtnSelectOutputHandler()
 			updateOutputHandlerCheckBoxAndEditControl();
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06085")
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI40285")
 }
 //-------------------------------------------------------------------------------------------------
 void CAddRuleDlg::OnClickListRules(NMHDR* pNMHDR, LRESULT* pResult) 

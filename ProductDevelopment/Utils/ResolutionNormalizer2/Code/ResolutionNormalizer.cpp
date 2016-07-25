@@ -442,7 +442,7 @@ void CResolutionNormalizerApp::finalizeAndValidateOutput(const string& strFileNa
 			throw ue;
 		}
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39942");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40379");
 }
 //-------------------------------------------------------------------------------------------------
 void CResolutionNormalizerApp::usage(const string& strError)

@@ -195,7 +195,7 @@ LRESULT CFindFromRSDPP::OnClickedAttributeNameInfo(WORD wNotifyCode, WORD wID, H
    
 		m_infoTip.Show(zText);
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07536");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI40286");
 
 	return 0;
 }

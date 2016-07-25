@@ -173,7 +173,7 @@ void CRuleSetPropertiesPage::OnClickedBtnDeleteCounter()
 	{
 		int nItem = getSelectedItem();
 
-		ASSERT_RUNTIME_CONDITION("ELI38992", nItem != -1, "No counter is selected.");
+		ASSERT_RUNTIME_CONDITION("ELI40364", nItem != -1, "No counter is selected.");
 
 		long nID = m_CounterList.GetItemData(nItem);
 		m_mapCounters.erase(nID);

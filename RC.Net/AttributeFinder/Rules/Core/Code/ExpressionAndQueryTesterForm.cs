@@ -91,7 +91,7 @@ namespace Extract.AttributeFinder.Rules
 
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
-                    LicenseIdName.DataEntryCoreComponents, "ELI34458", _OBJECT_NAME);
+                    LicenseIdName.DataEntryCoreComponents, "ELI40326", _OBJECT_NAME);
 
                 TypeRegistry.RegisterType("Regex", typeof(System.Text.RegularExpressions.Regex));
                 TypeRegistry.RegisterType("StringUtils", typeof(Spring.Util.StringUtils));
@@ -102,7 +102,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI34459");
+                throw ex.AsExtract("ELI40327");
             }
         }
 
@@ -307,7 +307,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI34460");
+                ex.ExtractDisplay("ELI40328");
             }
         }
 
@@ -330,7 +330,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI34466");
+                ex.ExtractDisplay("ELI40334");
             }
         }
 
@@ -348,7 +348,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI34461");
+                ex.ExtractDisplay("ELI40329");
             }
         }
 
@@ -382,7 +382,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 // Load the attribute data from the VOA file.
                 string voaFileName = _voaFileNameTextBox.Text;
-                ExtractException.Assert("ELI34462", "VOA file not found", File.Exists(voaFileName));
+                ExtractException.Assert("ELI40330", "VOA file not found", File.Exists(voaFileName));
 
                 IUnknownVector sourceAttributes = new IUnknownVector();
                 sourceAttributes.LoadFrom(voaFileName, false);
@@ -404,7 +404,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI34464");
+                ex.ExtractDisplay("ELI40333");
             }
         }
 
@@ -438,7 +438,7 @@ namespace Extract.AttributeFinder.Rules
             string targetAttributeQuery = _targetAttributeTextBox.Text;
 
             string rsdFileName = _rsdOrDbFileNameTextBox.Text;
-            ExtractException.Assert("ELI34463", "RSD file not found", File.Exists(rsdFileName));
+            ExtractException.Assert("ELI40331", "RSD file not found", File.Exists(rsdFileName));
 
             // If not blank, limit the attributes tested to the onces selected by targetAttributeQuery.
             if (!string.IsNullOrWhiteSpace(targetAttributeQuery))

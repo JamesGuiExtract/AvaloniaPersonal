@@ -279,7 +279,7 @@ namespace Extract.UtilityApplications.ExpressionAndQueryTester
             string dbFileName = _rsdOrDbFileNameTextBox.Text;
             if (!string.IsNullOrWhiteSpace(dbFileName))
             {
-                ExtractException.Assert("ELI34463", "RSD file not found", File.Exists(dbFileName));
+                ExtractException.Assert("ELI40332", "RSD file not found", File.Exists(dbFileName));
             }
 
             // If not blank, limit make the root attribute for the query be the first attribute

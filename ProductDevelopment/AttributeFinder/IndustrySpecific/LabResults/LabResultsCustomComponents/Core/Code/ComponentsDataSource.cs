@@ -455,7 +455,7 @@ namespace Extract.LabResultsCustomComponents
                 }
                 catch (Exception ex)
                 {
-                    throw ex.AsExtract("ELI39355");
+                    throw ex.AsExtract("ELI40367");
                 }
             }
         }

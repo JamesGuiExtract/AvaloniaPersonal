@@ -28,7 +28,7 @@ namespace Extract.DataEntryPrompt
 
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI35256", "Data entry prompt utility is not licensed.");
+                    "ELI40343", "Data entry prompt utility is not licensed.");
 
                 Application.Run(new DataEntryPromptForm());
             }

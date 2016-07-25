@@ -847,7 +847,7 @@ namespace Extract.FileActionManager.FileProcessors
                 case XmlSchemaValidation.SpecifiedSchema:
                     {
                         string schemaFileName = pathTags.Expand(SchemaFileName);
-                        ExtractException.Assert("ELI38392", "XML schema definition file not found.",
+                        ExtractException.Assert("ELI40345", "XML schema definition file not found.",
                             File.Exists(schemaFileName), "Schema definition filename", schemaFileName);
                         xmlReaderSettings.Schemas.Add(null, schemaFileName);
                     }

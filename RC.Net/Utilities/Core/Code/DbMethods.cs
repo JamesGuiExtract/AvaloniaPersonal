@@ -92,7 +92,7 @@ namespace Extract.Utilities
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI34571");
+                throw ex.AsExtract("ELI40335");
             }
         }
 
@@ -121,7 +121,7 @@ namespace Extract.Utilities
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI34572");
+                throw ex.AsExtract("ELI40336");
             }
         }
 
@@ -143,7 +143,7 @@ namespace Extract.Utilities
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI26758", _OBJECT_NAME);
 
-                ExtractException.Assert("ELI26151", "Null argument exception!", dbCommand != null);
+                ExtractException.Assert("ELI40294", "Null argument exception!", dbCommand != null);
 
                 using (DbDataReader sqlReader = dbCommand.ExecuteReader())
                 {
@@ -195,7 +195,7 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 ExtractException ee =
-                    new ExtractException("ELI26150", "Database query failed.", ex);
+                    new ExtractException("ELI40293", "Database query failed.", ex);
 
                 if (dbCommand != null)
                 {

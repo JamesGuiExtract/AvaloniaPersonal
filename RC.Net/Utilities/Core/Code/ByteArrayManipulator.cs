@@ -265,7 +265,7 @@ namespace Extract.Utilities
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI38836");
+                throw ex.AsExtract("ELI40362");
             }
         }
 
@@ -432,7 +432,7 @@ namespace Extract.Utilities
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI38845");
+                throw ex.AsExtract("ELI40363");
             }
         }
 

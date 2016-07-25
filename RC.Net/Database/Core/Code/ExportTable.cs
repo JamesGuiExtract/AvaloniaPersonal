@@ -338,7 +338,7 @@ namespace Extract.Database
             }
             catch (Exception ex)
             {
-                ExtractException.Log("ELI27323", ex);
+                ExtractException.Log("ELI40317", ex);
                 throw;
             }
         }

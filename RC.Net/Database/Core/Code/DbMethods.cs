@@ -65,11 +65,11 @@ namespace Extract.Database
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
-                    LicenseIdName.ExtractCoreObjects, "ELI26727", _OBJECT_NAME);
+                    LicenseIdName.ExtractCoreObjects, "ELI40295", _OBJECT_NAME);
 
-                ExtractException.Assert("ELI26731", "Null argument exception!",
+                ExtractException.Assert("ELI40296", "Null argument exception!",
                     dbConnection != null);
-                ExtractException.Assert("ELI26732", "Null argument exception!",
+                ExtractException.Assert("ELI40297", "Null argument exception!",
                     !string.IsNullOrEmpty(query));
 
                 DbCommand dbCommand = dbConnection.CreateCommand();
@@ -104,7 +104,7 @@ namespace Extract.Database
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26730", ex);
+                ExtractException ee = ExtractException.AsExtractException("ELI40298", ex);
                 ee.AddDebugData("Query", query, false);
                 throw ee;
             }
@@ -275,7 +275,7 @@ namespace Extract.Database
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
-                    LicenseIdName.DataEntryCoreComponents, "ELI26758", _OBJECT_NAME);
+                    LicenseIdName.DataEntryCoreComponents, "ELI40299", _OBJECT_NAME);
 
                 ExtractException.Assert("ELI26151", "Null argument exception!", dbCommand != null);
 
@@ -315,7 +315,7 @@ namespace Extract.Database
                     }
                     catch (Exception ex2)
                     {
-                        ExtractException.Log("ELI27106", ex2);
+                        ExtractException.Log("ELI40300", ex2);
                     }
                 }
 
@@ -540,7 +540,7 @@ namespace Extract.Database
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
-                    LicenseIdName.ExtractCoreObjects, "ELI39340", _OBJECT_NAME);
+                    LicenseIdName.ExtractCoreObjects, "ELI40366", _OBJECT_NAME);
 
                 int sortedColumnIndex = -1;
                 ListSortDirection sortOrder = ListSortDirection.Ascending;

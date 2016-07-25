@@ -1870,7 +1870,7 @@ CFileProcessingDB::ExecuteCommandReturnLongLongResult( BSTR bstrQuery,
 		}
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27686");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40318");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -319,7 +319,7 @@ namespace Extract.ExtractDebugData
 
                     foreach (ExtractException ee in fileExceptions)
                     {
-                        if (ee.EliCode.Equals("ELI30603", StringComparison.Ordinal))
+                        if (ee.EliCode.Equals("ELI40320", StringComparison.Ordinal))
                         {
                             Console.Write("\r");
                             Console.WriteLine(ee.Message);

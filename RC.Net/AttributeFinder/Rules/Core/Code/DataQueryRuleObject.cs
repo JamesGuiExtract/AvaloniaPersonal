@@ -816,7 +816,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI33869",
+                throw ex.CreateComVisible("ELI40325",
                     "Error checking configuration of '" + _COMPONENT_DESCRIPTION + "'.");
             }
         }

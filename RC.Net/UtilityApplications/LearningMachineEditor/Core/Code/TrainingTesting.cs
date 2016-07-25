@@ -424,7 +424,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         // I don't think there will be more than one inner exception but just in case...
                         foreach (var ex in task.Exception.InnerExceptions)
                         {
-                            ex.ExtractDisplay("ELI39819");
+                            ex.ExtractDisplay("ELI40378");
                         }
                     }
 

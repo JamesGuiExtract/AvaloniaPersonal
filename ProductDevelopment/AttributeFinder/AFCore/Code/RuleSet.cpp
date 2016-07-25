@@ -2497,7 +2497,7 @@ UCLID_AFCORELib::IAttributePtr CRuleSet::createParentAttribute(string strName, I
 IIUnknownVectorPtr CRuleSet::setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 {
 	IIUnknownVectorPtr ipAFDocsToRun(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI39437", ipAFDocsToRun != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI40369", ipAFDocsToRun != __nullptr);
 
 	IMiscUtilsPtr ipMiscUtils = getMiscUtils();
 	ITagUtilityPtr ipTagUtility = ipMiscUtils;

@@ -726,7 +726,7 @@ namespace Extract.AttributeFinder
                 }
                 else
                 {
-                    throw new ExtractException("ELI39537", "Unsupported LearningMachineUsage: " + MachineUsage.ToString());
+                    throw new ExtractException("ELI40372", "Unsupported LearningMachineUsage: " + MachineUsage.ToString());
                 }
             }
             catch (Exception e)

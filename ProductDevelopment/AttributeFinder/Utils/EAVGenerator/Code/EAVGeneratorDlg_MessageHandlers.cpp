@@ -1194,7 +1194,7 @@ void CEAVGeneratorDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 		lpMMI->ptMinTrackSize.y = giEAVGENDLG_MIN_HEIGHT;
 		CDialog::OnGetMinMaxInfo(lpMMI);
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37588");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI40344");
 }
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::OnSize(UINT nType, int cx, int cy)

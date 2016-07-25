@@ -419,8 +419,8 @@ bool CAdvancedReplaceStringPP::storeToBeReplaced(
 	{
 		CComBSTR bstrToBeReplaced;
 		m_editFindString.GetWindowText(bstrToBeReplaced.m_str);
-
-		AFTagManager::validateDynamicFilePath("ELI33658", asString(bstrToBeReplaced));
+		
+		AFTagManager::validateDynamicFilePath("ELI40324", asString(bstrToBeReplaced));
 
 		ipARS->StrToBeReplaced = _bstr_t(bstrToBeReplaced);
 

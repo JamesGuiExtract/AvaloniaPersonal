@@ -105,7 +105,7 @@ namespace Extract.Database
         /// <param name="args">The command-line arguments the application was launched with.</param>
         public ImportSettings(string[] args)
         {
-            ExtractException.Assert("ELI27131", "Missing required argument.", args.Length >= 3);
+            ExtractException.Assert("ELI40312", "Missing required argument.", args.Length >= 3);
 
             RowDelimiter = Environment.NewLine;
             ColumnDelimiter = "\t";
@@ -122,20 +122,20 @@ namespace Extract.Database
                 if (args[i].Equals("/rd", StringComparison.OrdinalIgnoreCase))
                 {
                     i++;
-                    ExtractException.Assert("ELI27132", "Missing row delimiter value.", i < args.Length);
+                    ExtractException.Assert("ELI40313", "Missing row delimiter value.", i < args.Length);
 
                     RowDelimiter = ParamUnescape(args[i]);
                 }
                 else if (args[i].Equals("/cd", StringComparison.OrdinalIgnoreCase))
                 {
                     i++;
-                    ExtractException.Assert("ELI27133", "Missing column delimiter value.", i < args.Length);
+                    ExtractException.Assert("ELI40314", "Missing column delimiter value.", i < args.Length);
 
                     ColumnDelimiter = ParamUnescape(args[i]);
                 }
                 else
                 {
-                    ExtractException.Assert("ELI27134", "Unrecognized argument: " + args[i], false);
+                    ExtractException.Assert("ELI40315", "Unrecognized argument: " + args[i], false);
                 }
             }
         }
@@ -215,7 +215,7 @@ namespace Extract.Database
                     columnSizes.Add(ci.ColumnSize);
                 }
 
-                ExtractException.Assert("ELI27253",
+                ExtractException.Assert("ELI40316",
                     "Could not get column info for table: " + settings.TableName,
                     columnSizes.Count > 0);
 
@@ -329,7 +329,7 @@ namespace Extract.Database
                     tx.Rollback();
                 }
 
-                throw new ExtractException("ELI27127", "Import operation failed.", ex);
+                throw new ExtractException("ELI40310", "Import operation failed.", ex);
             }
             finally
             {

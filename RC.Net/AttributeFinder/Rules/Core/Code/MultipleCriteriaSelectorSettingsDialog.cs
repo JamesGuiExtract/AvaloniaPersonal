@@ -407,7 +407,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI31740");
+                ex.ExtractDisplay("ELI40321");
             }
         }
 
@@ -435,7 +435,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI31741");
+                ex.ExtractDisplay("ELI40322");
             }
         }
 

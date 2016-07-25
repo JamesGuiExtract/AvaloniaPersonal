@@ -920,7 +920,7 @@ std::string CDocumentClassifier::GetDocumentClassifierFolder()
 	if (!m_documentClassifiersPath.empty())
 	{
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI39996", ipAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI40380", ipAFDoc);
 
 		std::string path = m_ipAFUtility->ExpandTagsAndFunctions(m_documentClassifiersPath.c_str(), ipAFDoc);
 		if (isValidFolder(path))

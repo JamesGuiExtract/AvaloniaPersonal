@@ -132,7 +132,7 @@ void CounterInfo::SetSecureCounter(ISecureCounterPtr ipSecureCounter)
 		// The same name should be used for any given counter ID across any thread.
 		if (_strcmpi(ms_mapCounterNames[m_nID].c_str(), m_strName.c_str()) != 0)
 		{
-			UCLIDException ue("ELI39012", "Counter discrepancy encountered.");
+			UCLIDException ue("ELI40365", "Counter discrepancy encountered.");
 			ue.addDebugInfo("Expected counter name", m_strName);
 			ue.addDebugInfo("Counter Name", ms_mapCounterNames[m_nID]);
 			throw ue;

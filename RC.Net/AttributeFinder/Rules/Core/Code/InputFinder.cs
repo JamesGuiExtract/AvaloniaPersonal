@@ -73,7 +73,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI34723");
+                throw ex.AsExtract("ELI40337");
             }
         }
 
@@ -91,7 +91,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI34724");
+                throw ex.AsExtract("ELI40338");
             }
         }
 
@@ -153,7 +153,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI34790",
+                throw ex.CreateComVisible("ELI40339",
                     "Failed to clone '" + _COMPONENT_DESCRIPTION + "' object.");
             }
         }
@@ -175,7 +175,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI34791",
+                throw ex.CreateComVisible("ELI40340",
                     "Failed to copy '" + _COMPONENT_DESCRIPTION + "' object.");
             }
         }
@@ -251,7 +251,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI34792",
+                throw ex.CreateComVisible("ELI40341",
                     "Failed to load '" + _COMPONENT_DESCRIPTION + "'.");
             }
         }
@@ -284,7 +284,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI34793",
+                throw ex.CreateComVisible("ELI40342",
                     "Failed to save '" + _COMPONENT_DESCRIPTION + "'.");
             }
         }

@@ -1387,7 +1387,7 @@ STDMETHODIMP CAttribute::SetGUID(const GUID* pGuid)
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38460")
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40352")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1427,7 +1427,7 @@ STDMETHODIMP CAttribute::raw_CopyFromIdentifiableObject(IUnknown *pObject)
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38470")
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40353")
 }
 
 //-------------------------------------------------------------------------------------------------

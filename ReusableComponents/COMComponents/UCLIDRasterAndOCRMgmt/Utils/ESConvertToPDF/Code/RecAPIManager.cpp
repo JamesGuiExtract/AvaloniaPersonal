@@ -87,7 +87,7 @@ CRecAPIManager::~CRecAPIManager()
 
 				if (rc != REC_OK)
 				{
-					UCLIDException ue("ELI18593",
+					UCLIDException ue("ELI40289",
 						"Application trace: Unable to close image file. Possible memory leak.");
 					loadScansoftRecErrInfo(ue, rc);
 					ue.log();
@@ -96,7 +96,7 @@ CRecAPIManager::~CRecAPIManager()
 				rc = RecQuitPlus();
 				if(rc != REC_OK)
 				{
-					UCLIDException ue("ELI18604", 
+					UCLIDException ue("ELI40290", 
 						"Application trace: Unable to free OCR engine resources. Possible memory leak.");
 					loadScansoftRecErrInfo(ue, rc);
 					ue.log();

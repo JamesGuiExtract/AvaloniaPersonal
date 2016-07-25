@@ -1367,7 +1367,7 @@ void CIUnknownVector::clear()
 void CIUnknownVector::copyFrom(UCLID_COMUTILSLib::IIUnknownVectorPtr ipSource, bool bWithCloneIdentifiableObject)
 {
 	// Ensure that the object is a Vector
-	ASSERT_ARGUMENT("ELI08207", ipSource != __nullptr);
+	ASSERT_ARGUMENT("ELI40287", ipSource != __nullptr);
 	
 	// Clear this vector
 	clear();

@@ -1154,7 +1154,7 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string s
 		{
 			// Get the fields pointer
 			FieldsPtr ipFields = result->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI15701", ipFields != __nullptr );
+			ASSERT_RESOURCE_ALLOCATION("ELI40288", ipFields != __nullptr );
 
 			strCreateDate = getStringField(ipFields, "create_date");
 			strLastRestoreDate = getStringField(ipFields, "restore_date");

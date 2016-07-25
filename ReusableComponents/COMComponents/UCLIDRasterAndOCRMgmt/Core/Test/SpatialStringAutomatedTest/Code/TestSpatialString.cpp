@@ -2915,7 +2915,7 @@ void CTestSpatialString::runTestCase26()
 
 		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI39679", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI40373", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CTestSpatialString::testCase26Helper(string strExpectedPagesFile, IIUnknownVectorPtr ipPages)

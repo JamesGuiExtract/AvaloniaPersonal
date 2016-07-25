@@ -1545,7 +1545,7 @@ namespace Extract.LabResultsCustomComponents
                 LabOrder labOrder;
                 if (!labOrders.TryGetValue(orderCode, out labOrder))
                 {
-                    ExtractException ee = new ExtractException("ELI29075",
+                    ExtractException ee = new ExtractException("ELI40319",
                         "Order code was not found in the collection.");
                     ee.AddDebugData("Order Code", orderCode, false);
                     throw ee;

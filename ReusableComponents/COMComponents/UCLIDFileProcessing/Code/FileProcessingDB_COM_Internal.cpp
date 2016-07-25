@@ -1124,7 +1124,7 @@ int UpdateToSchemaVersion128(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		return nNewSchemaVersion;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33184");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40323");
 }
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion129(_ConnectionPtr ipConnection, long* pnNumSteps, 
@@ -1217,7 +1217,7 @@ int UpdateToSchemaVersion131(_ConnectionPtr ipConnection,
 
 		return nNewSchemaVersion;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38716");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40358");
 }
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion132(_ConnectionPtr ipConnection, long* pnNumSteps, 
@@ -1262,7 +1262,7 @@ int UpdateToSchemaVersion132(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		return nNewSchemaVersion;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38716");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40359");
 }
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion133(_ConnectionPtr ipConnection, long* pnNumSteps, 
@@ -1532,7 +1532,7 @@ int UpdateToSchemaVersion141(_ConnectionPtr ipConnection,
 
 		return nNewSchemaVersion;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40057");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40381");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -9247,7 +9247,7 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 						// Check new counter value and possibly add item to exception log
 						if (((lOldValue - 1) / gnLOG_FREQUENCY) != ((dbCounter.m_nValue - 1)/ gnLOG_FREQUENCY))
 						{
-							UCLIDException ue("ELI15935", "Application trace: debug information");
+							UCLIDException ue("ELI40383", "Application trace: debug information");
 							ue.addDebugInfo("Item 1", dbCounter.m_nID, true );
 							ue.addDebugInfo("Item 2", dbCounter.m_strName, true);
 							ue.addDebugInfo("Item 3", dbCounter.m_nValue, true );

@@ -988,7 +988,7 @@ void CAttributeDBMgr::SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownV
 			throw ue;
 		}
 
-		FieldsPtr ipFields = AssignComPtr( ipASFF->Fields, "ELI38764" );
+		FieldsPtr ipFields = AssignComPtr( ipASFF->Fields, "ELI40361" );
 
 		// Now prepare the VOA for save
 		string storageManagerIID = asString(CLSID_AttributeStorageManager);
@@ -1351,7 +1351,7 @@ STDMETHODIMP CAttributeDBMgr::GetAllAttributeSetNames(IStrToStrMap** ippNames)
 		ADODB::_RecordsetPtr pRecords = m_ipFAMDB->GetResultsForQuery( query.c_str() );
 		while ( RecordsInSet(pRecords) )
 		{
-			FieldsPtr pFields = AssignComPtr( pRecords->Fields, "ELI38622" );
+			FieldsPtr pFields = AssignComPtr( pRecords->Fields, "ELI40356" );
 
 			std::string description = getStringField( pFields, "Description" );
 			long long Id = getLongLongField( pFields, "ID" );
