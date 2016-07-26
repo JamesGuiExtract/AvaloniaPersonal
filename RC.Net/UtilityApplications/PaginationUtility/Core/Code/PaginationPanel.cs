@@ -1304,59 +1304,56 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return position;
                 }
 
-                FormsMethods.ExecuteInUIThread(this, () =>
+                lock (_sourceDocumentLock)
                 {
-                    lock (_sourceDocumentLock)
+                    var sourceDocument = _sourceDocuments
+                        .SingleOrDefault(doc => doc.FileName == fileName);
+                    if (sourceDocument != null)
                     {
-                        var sourceDocument = _sourceDocuments
-                            .SingleOrDefault(doc => doc.FileName == fileName);
-                        if (sourceDocument != null)
-                        {
-                            var documentsToDelete = _pendingDocuments
-                                .Where(doc =>
-                                    doc.PageControls.Any(c =>
-                                        c.Page.SourceDocument == sourceDocument))
-                                .ToArray();
-
-                        foreach (var outputDocument in documentsToDelete)
-                        {
-                            // If the document's data is open for editing, close the panel.
-                            if (_documentWithDataInEdit == outputDocument)
-                            {
-                                CloseDataPanel(false);
-                            }
-                            int docPosition =
-                                _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
-                            if (docPosition != -1)
-                            {
-                                position = (position == -1)
-                                    ? docPosition
-                                    : Math.Min(position, docPosition);
-                            }
-                            _pendingDocuments.Remove(outputDocument);
-                        }
-
-                        var referencedOriginalDocuments = _originalDocuments
-                            .Where(doc => doc.OriginalPages.Any(page => page.OriginalDocumentName == fileName))
+                        var documentsToDelete = _pendingDocuments
+                            .Where(doc =>
+                                doc.PageControls.Any(c =>
+                                    c.Page.SourceDocument == sourceDocument))
                             .ToArray();
 
-                        foreach (var outputDocument in referencedOriginalDocuments)
+                    foreach (var outputDocument in documentsToDelete)
+                    {
+                        // If the document's data is open for editing, close the panel.
+                        if (_documentWithDataInEdit == outputDocument)
                         {
-                            _originalDocuments.Remove(outputDocument);
+                            CloseDataPanel(false);
                         }
-
-                            _sourceDocuments.Remove(sourceDocument);
-                            _sourceToOriginalDocuments.Remove(sourceDocument);
-
-                            if (CacheImages)
-                            {
-                                _imageViewer.UnloadImage(fileName);
-                            }
+                        int docPosition =
+                            _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
+                        if (docPosition != -1)
+                        {
+                            position = (position == -1)
+                                ? docPosition
+                                : Math.Min(position, docPosition);
                         }
-
-                        ApplyOrderOfLoadedSourceDocuments();
+                        _pendingDocuments.Remove(outputDocument);
                     }
-                });
+
+                    var referencedOriginalDocuments = _originalDocuments
+                        .Where(doc => doc.OriginalPages.Any(page => page.OriginalDocumentName == fileName))
+                        .ToArray();
+
+                    foreach (var outputDocument in referencedOriginalDocuments)
+                    {
+                        _originalDocuments.Remove(outputDocument);
+                    }
+
+                        _sourceDocuments.Remove(sourceDocument);
+                        _sourceToOriginalDocuments.Remove(sourceDocument);
+
+                        if (CacheImages)
+                        {
+                            _imageViewer.UnloadImage(fileName);
+                        }
+                    }
+
+                    ApplyOrderOfLoadedSourceDocuments();
+                }
 
                 return position;
             }

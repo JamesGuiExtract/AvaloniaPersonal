@@ -76,7 +76,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(327, 153);
+            this._okButton.Location = new System.Drawing.Point(327, 144);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 10;
@@ -87,7 +87,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(408, 153);
+            this._cancelButton.Location = new System.Drawing.Point(408, 144);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 11;
@@ -171,7 +171,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(495, 188);
+            this.ClientSize = new System.Drawing.Size(495, 179);
             this.ControlBox = false;
             this.Controls.Add(this._paginationSettingsButton);
             this.Controls.Add(this._paginationCheckBox);
@@ -185,7 +185,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this.Controls.Add(this._fileBrowseButton);
             this.Controls.Add(this._configFileNameTextBox);
             this.Controls.Add(this._label1);
-            this.MinimumSize = new System.Drawing.Size(511, 227);
+            this.MinimumSize = new System.Drawing.Size(511, 217);
             this.Name = "ConfigurationForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

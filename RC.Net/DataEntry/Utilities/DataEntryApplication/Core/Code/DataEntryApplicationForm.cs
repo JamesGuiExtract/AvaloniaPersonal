@@ -546,12 +546,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         bool _paginating;
 
-        /// <summary>
-        /// Indicates when switching between the data and pagination tab so as to prevent the
-        /// possibility of getting caught in a loop bouncing between the two.
-        /// </summary>
-        bool _changingTab;
-
         #endregion Fields
 
         #region Constructors
@@ -1543,8 +1537,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _magnifierDockableWindow.Close();
                     _thumbnailDockableWindow.Close();
-                    
-                    _sandDockManager.LoadLayout();
+
+                    try
+                    {
+                        _sandDockManager.LoadLayout();
+                    }
+                    catch (Exception ex)
+                    {
+                        // In the case of an error loading the layout, save the layout to replace
+                        // the bad configuration with the default configuration.
+                        _sandDockManager.SaveLayout();
+
+                        ex.ExtractLog("ELI40391");
+                    }
 
                     // If pagination is available, the thumbnail pane is redundant and does not
                     // currently play well with the pagination panel. Disallow use of the thumbnail
@@ -1740,7 +1745,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _dataEntryControlHost.ClearData();
                 }
 
-                if (!_invisible)
+                if (_isLoaded && !_invisible)
                 {
                     _sandDockManager.SaveLayout();
                 }
@@ -2965,7 +2970,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (!_paginating && !_changingTab)
+                if (!_paginating)
                 {
                     if (e.TabPage != _paginationTab && _paginationPanel.PendingChanges)
                     {
@@ -2983,20 +2988,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _dataEntryControlHost != null && !_dataEntryControlHost.IsDocumentLoaded)
                     {
                         e.Cancel = true;
-
-                        // Schedule the tab change to occur once the document has fully loaded.
-                        _dataEntryControlHost.ExecuteOnIdle("ELI39750", () =>
-                        {
-                            try
-                            {
-                                _changingTab = true;
-                                _tabControl.SelectedTab = _paginationTab;
-                            }
-                            finally
-                            {
-                                _changingTab = false;
-                            }
-                        });
                     }
                 }
             }
@@ -3222,7 +3213,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         if (e.SourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
                         {
-                            DataEntryControlHost.PruneNonPersistingAttributes(attributesCopy);
+                            DataEntryControlHost.PruneNonPersistingAttributes(documentData.Attributes);
                         }
 
                         AttributeMethods.TranslateAttributesToNewDocument(

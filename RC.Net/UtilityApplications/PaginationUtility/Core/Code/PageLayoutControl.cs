@@ -3146,22 +3146,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             NavigablePaginationControl result = null;
 
             // Iterate from currentControl until the next page control is encountered.
-            if (currentControl != null)
+            currentControl = forward
+                ? currentControl.NextControl
+                : currentControl.PreviousControl;
+
+            result = currentControl as NavigablePaginationControl;
+            while ((currentControl != null) && result == null)
             {
                 currentControl = forward
                     ? currentControl.NextControl
                     : currentControl.PreviousControl;
-
-                result = currentControl as NavigablePaginationControl;
-                while ((currentControl != null) && result == null)
+                if (currentControl != null && currentControl.Visible)
                 {
-                    currentControl = forward
-                        ? currentControl.NextControl
-                        : currentControl.PreviousControl;
-                    if (currentControl != null && currentControl.Visible)
-                    {
-                        result = currentControl as NavigablePaginationControl;
-                    }
+                    result = currentControl as NavigablePaginationControl;
                 }
             }
 
