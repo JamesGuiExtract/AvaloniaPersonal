@@ -107,6 +107,11 @@ namespace Extract.FileActionManager.FileProcessors
         ITagUtility _tagUtility;
 
         /// <summary>
+        /// Keeps track of the last file ID loaded; for use with the load next document button.
+        /// </summary>
+        int _lastFileIDLoaded = -1;
+
+        /// <summary>
         /// Used to invoke methods on this control.
         /// </summary>
         readonly ControlInvoker _invoker;
@@ -380,6 +385,24 @@ namespace Extract.FileActionManager.FileProcessors
                 _imageViewer.Shortcuts[Keys.R | Keys.Control] = _imageViewer.SelectRotateClockwise;
                 _imageViewer.Shortcuts[Keys.R | Keys.Control | Keys.Shift] = _imageViewer.SelectRotateCounterclockwise;
 
+                if (!string.IsNullOrWhiteSpace(_settings.SourceAction))
+                {
+                    int sourceActionID = FileProcessingDB.GetActionID(_settings.SourceAction);
+
+                    ExtractException.Assert("ELI40385",
+                        "Cannot set pagination sources back to pending in same action",
+                        sourceActionID != _actionID);
+                }
+
+                if (!string.IsNullOrWhiteSpace(_settings.OutputAction))
+                {
+                    int outputActionID = FileProcessingDB.GetActionID(_settings.OutputAction);
+
+                    ExtractException.Assert("ELI40386",
+                        "Cannot set pagination output back to pending in same action",
+                        outputActionID != _actionID);
+                }
+
                 _paginationPanel.LoadNextDocument += HandlePaginationPanel_LoadNextDocument;
 
                 // May be null if the an IPaginationDocumentDataPanel is not specified to be used in
@@ -388,6 +411,11 @@ namespace Extract.FileActionManager.FileProcessors
                 if (_paginationDocumentDataPanel != null)
                 {
                     _paginationPanel.DocumentDataRequest += HandlePaginationPanel_DocumentDataRequest;
+                }
+
+                if (_splitContainer.Panel1MinSize < _paginationPanel.MinimumSize.Width)
+                {
+                    _splitContainer.Panel1MinSize = _paginationPanel.MinimumSize.Width;
                 }
 
                 UpdateControls();
@@ -510,11 +538,19 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                int fileID = FileRequestHandler.CheckoutNextFile(false);
+                // https://extract.atlassian.net/browse/ISSUE-13904
+                // First check to see if there is an additional file that has been checked out for
+                // processing that is not yet actively processing in the FAM.
+                int fileID = FileRequestHandler.GetNextCheckedOutFile(_lastFileIDLoaded);
+                // If not, retrieve the next file from the database.
+                if (fileID == -1)
+                {
+                    fileID = FileRequestHandler.CheckoutNextFile(false);
+                }
                 if (fileID > 0)
                 {
                     string fileName = FileProcessingDB.GetFileNameFromFileID(fileID);
-                    LoadDocumentForPagination(fileName);
+                    LoadDocumentForPagination(fileID, fileName, true);
                 }
                 else
                 {
@@ -878,7 +914,8 @@ namespace Extract.FileActionManager.FileProcessors
                     FormsMethods.FlashWindow(this, true, true);
                 }
 
-                LoadDocumentForPagination(fileName);
+                LoadDocumentForPagination(fileID, fileName, false);
+                DefaultDocumentSelection();
             }
             catch (Exception ex)
             {
@@ -904,7 +941,15 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 // This method must be run in the UI thread since it is loading attributes for
                 // use in the UI thread.
-                FormsMethods.ExecuteInUIThread(this, () => LoadDocumentForPagination(fileName));
+                if (InvokeRequired)
+                {
+                    this.Invoke((MethodInvoker)(() =>
+                        Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB)));
+                    return;
+                }
+
+                LoadDocumentForPagination(fileID, fileName, false);
+                DefaultDocumentSelection();
             }
             catch (Exception ex)
             {
@@ -1086,6 +1131,10 @@ namespace Extract.FileActionManager.FileProcessors
                     : Math.Min(docPosition, position);
 
                 int sourceFileID = FileProcessingDB.GetFileID(sourceFileName);
+                if (_lastFileIDLoaded == sourceFileID)
+                {
+                    _lastFileIDLoaded = -1;
+                }
                 var success = FileRequestHandler.SetFallbackStatus(
                     sourceFileID, EActionStatus.kActionCompleted);
                 ExtractException.Assert("ELI40104", "Failed to set fallback status", success,
@@ -1120,8 +1169,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// This method must be run in the UI thread since it is loading attributes for use in the
         /// UI thread.
         /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        void LoadDocumentForPagination(string fileName)
+        /// <param name="fileId">The ID of the file.</param>
+        /// <param name="fileName">The name of the file.</param>
+        /// <param name="selectDocument"><see langword="true"/> to select the first document
+        /// resulting from this source document; otherwise, <see langword="false"/>.</param>
+        void LoadDocumentForPagination(int fileId, string fileName, bool selectDocument)
         {
             try
             {
@@ -1131,6 +1183,8 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     return;
                 }
+
+                _lastFileIDLoaded = fileId;
 
                 // Look in the voa file for rules-suggested pagination.
                 // TODO: Warn if the document was previously paginated.
@@ -1220,24 +1274,22 @@ namespace Extract.FileActionManager.FileProcessors
                             }
 
                             _paginationPanel.LoadFile(fileName, -1, pages, deletedPages,
-                                suggestedPagination.Value, documentData);
+                                suggestedPagination.Value, documentData, selectDocument);
+                            selectDocument = false;
                         }
-
-                        DefaultDocumentSelection();
 
                         return;
                     }
 
                     // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
-                    _paginationPanel.LoadFile(fileName, -1, null, null, false, documentData);
-                    DefaultDocumentSelection();
+                    _paginationPanel.LoadFile(
+                        fileName, -1, null, null, false, documentData, selectDocument);
                     return;
                 }
 
                 // If there was no rules-suggested pagination, go ahead and load the physical document
                 // into the _paginationPanel
-                _paginationPanel.LoadFile(fileName, -1);
-                DefaultDocumentSelection();
+                _paginationPanel.LoadFile(fileName, -1, selectDocument);
             }
             finally
             {

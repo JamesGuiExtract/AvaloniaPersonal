@@ -203,6 +203,7 @@ void FPRecordManager::remove(const std::string& strFileName)
 		{
 			task.m_eStatus = kRecordNone;
 			changeState(task);
+
 			// There should only be one instance of any filename in the queue
 			// if that is not the case we will still only delete one
 			return;
@@ -222,6 +223,7 @@ bool FPRecordManager::remove(const long nFileId)
 		{
 			task.m_eStatus = kRecordNone;
 			changeState(task);
+
 			// There should only be one instance of any filename in the queue
 			// if that is not the case we will still only delete one
 			return true;
@@ -237,6 +239,7 @@ bool FPRecordManager::remove(const long nFileId)
 		{
 			task.m_eStatus = kRecordNone;
 			changeState(task);
+
 			// There should only be one instance of any filename in the queue
 			// if that is not the case we will still only delete one
 			return true;
@@ -253,6 +256,60 @@ bool FPRecordManager::remove(const long nFileId)
 	}
 
 	return false;
+}
+//-------------------------------------------------------------------------------------------------
+long FPRecordManager::peekNext(long nAfterFileId/* = -1*/)
+{
+	CSingleLock lockGuard(&m_objLock, TRUE);
+
+	bool bSpecifiedFileIsInProcessing = false;
+	bool bReturnNext = (nAfterFileId == -1);
+
+	if (!bReturnNext)
+	{
+		// If nAfterFileId is not currently processing, grab the next file as if nAfterFileId was -1.
+		TaskMap::iterator it = m_mapTasks.find(nAfterFileId);
+		bSpecifiedFileIsInProcessing = (it != m_mapTasks.end());
+		bReturnNext = !bSpecifiedFileIsInProcessing;
+	}
+
+	// First search delayed files in reverse as they will fall ahead of in order of logical queue.
+	TaskIdList::reverse_iterator rit;
+	for (rit = m_queDelayedTasks.rbegin(); rit != m_queDelayedTasks.rend(); rit++)
+	{
+		if (bReturnNext)
+		{
+			return *rit;
+		}
+		else if (*rit == nAfterFileId)
+		{
+			bReturnNext = true;
+		}
+	}
+
+	// Search the primary queue of file IDs that have been grabbed for processing.
+	TaskIdList::iterator it;
+	for (it = m_queTaskIds.begin(); it != m_queTaskIds.end(); it++)
+	{
+		if (bReturnNext)
+		{
+			return *it;
+		}
+		else if (*it == nAfterFileId)
+		{
+			bReturnNext = true;
+		}
+	}
+	
+	// If nAfterFileId is actively processing (was not in either queue), then the next file should
+	// simply be the next file in the queue.
+	if (bSpecifiedFileIsInProcessing && !bReturnNext)
+	{
+		return peekNext(-1);
+	}
+
+	// No qualifying queued file was found.
+	return -1;
 }
 //-------------------------------------------------------------------------------------------------
 int FPRecordManager::requeueDelayedTasks()

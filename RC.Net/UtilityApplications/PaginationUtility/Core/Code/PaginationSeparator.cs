@@ -737,12 +737,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (Document != null)
             {
+                bool doLayout = false;
                 if (Document.PaginationSeparator != this)
                 {
                     Document.PaginationSeparator = this;
 
                     // Force a follow-up layout to occur after assigning this separator to a new document.
-                    this.SafeBeginInvoke("ELI40209", () => PerformLayout());
+                    doLayout = true;
                 }
                 _collapseDocumentButton.Visible = true;
                 _selectedCheckBox.Visible = _showSelectionCheckBox;
@@ -772,6 +773,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         : !Document.InOriginalForm);
                 _editedDataPictureBox.Visible = Document.DataModified;
                 _dataErrorPictureBox.Visible = Document.DataError;
+
+                if (doLayout)
+                {
+                    PerformLayout();
+                }
 
                 return;
             }

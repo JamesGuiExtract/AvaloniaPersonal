@@ -1824,15 +1824,18 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var clickedControl = (PaginationControl)sender;
 
-                // [DotNetRCAndUtils:965]
-                // Clicking on page thumbnail controls should always select unless the control key
-                // is the only modifier key.
-                bool select = !clickedControl.Selected || (Control.ModifierKeys & Keys.Control) == 0;
-                ProcessControlSelection(
-                    activeControl: clickedControl,
-                    additionalControls: null,
-                    select: select, 
-                    modifierKeys: Control.ModifierKeys);
+                if (clickedControl != _loadNextDocumentButtonControl)
+                {
+                    // [DotNetRCAndUtils:965]
+                    // Clicking on page thumbnail controls should always select unless the control key
+                    // is the only modifier key.
+                    bool select = !clickedControl.Selected || (Control.ModifierKeys & Keys.Control) == 0;
+                    ProcessControlSelection(
+                        activeControl: clickedControl,
+                        additionalControls: null,
+                        select: select,
+                        modifierKeys: Control.ModifierKeys);
+                }
             }
             catch (Exception ex)
             {
@@ -2458,12 +2461,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 OnLoadNextDocumentRequest();
 
-                // Ensure focus is restored to the load next document button.
-                this.SafeBeginInvoke("ELI35660", () =>
-                {
-                    SelectControl(_loadNextDocumentButtonControl, true, true);
-                    _loadNextDocumentButtonControl.Focus();
-                });
+
+                // I cannot, for the life of me, figure out how to scroll to the bottom of
+                // _flowLayoutPanel here; nothing seems to work.
+//                this.SafeBeginInvoke("ELI35660", () =>
+//                {
+//                    _flowLayoutPanel.ScrollControlIntoViewManual(_loadNextDocumentButtonControl);
+//                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;    
+//                });
             }
             catch (Exception ex)
             {
@@ -3153,7 +3158,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     currentControl = forward
                         ? currentControl.NextControl
                         : currentControl.PreviousControl;
-                    result = currentControl as NavigablePaginationControl;
+                    if (currentControl != null && currentControl.Visible)
+                    {
+                        result = currentControl as NavigablePaginationControl;
+                    }
                 }
             }
 
@@ -3980,7 +3988,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 NavigablePaginationControl navigableControl = GetNextNavigableControl(true);
 
-                if (navigableControl != null)
+                if (navigableControl == null)
+                {
+                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;
+                }
+                else
                 {
                     ProcessControlSelection(navigableControl);
                 }
@@ -4000,7 +4012,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 NavigablePaginationControl navigableControl = GetNextNavigableControl(false);
 
-                if (navigableControl != null)
+                if (navigableControl == null)
+                {
+                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
+                }
+                else
                 {
                     ProcessControlSelection(navigableControl);
                 }
@@ -4110,7 +4126,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 NavigablePaginationControl navigableControl = GetNextRowNavigableControl(true);
 
-                if (navigableControl != null)
+                if (navigableControl == null)
+                {
+                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;
+                }
+                else
                 {
                     ProcessControlSelection(navigableControl);
                 }
@@ -4130,7 +4150,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 NavigablePaginationControl navigableControl = GetNextRowNavigableControl(false);
 
-                if (navigableControl != null)
+                if (navigableControl == null)
+                {
+                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
+                }
+                else
                 {
                     ProcessControlSelection(navigableControl);
                 }

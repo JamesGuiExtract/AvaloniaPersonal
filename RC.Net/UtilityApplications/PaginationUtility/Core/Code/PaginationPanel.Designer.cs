@@ -106,7 +106,7 @@
             this._revertToOriginalToolStripButton});
             this._topToolStrip.Location = new System.Drawing.Point(3, 0);
             this._topToolStrip.Name = "_topToolStrip";
-            this._topToolStrip.Size = new System.Drawing.Size(363, 25);
+            this._topToolStrip.Size = new System.Drawing.Size(332, 25);
             this._topToolStrip.TabIndex = 0;
             // 
             // _collapseAllToolStripButton
@@ -151,6 +151,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this._toolStripContainer);
+            this.MinimumSize = new System.Drawing.Size(454, 0);
             this.Name = "PaginationPanel";
             this.Size = new System.Drawing.Size(454, 306);
             this._toolStripContainer.ContentPanel.ResumeLayout(false);

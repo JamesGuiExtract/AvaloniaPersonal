@@ -74,18 +74,19 @@
             label2.AutoSize = true;
             label2.Location = new System.Drawing.Point(13, 58);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(379, 13);
+            label2.Size = new System.Drawing.Size(411, 13);
             label2.TabIndex = 5;
-            label2.Text = "After committing documents, set original source documents to pending in action";
+            label2.Text = "After committing documents, set the original source document to pending in this a" +
+    "ction";
             // 
             // label3
             // 
             label3.AutoSize = true;
             label3.Location = new System.Drawing.Point(13, 105);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(257, 13);
+            label3.Size = new System.Drawing.Size(276, 13);
             label3.TabIndex = 7;
-            label3.Text = "Set paginated output documents to pending in action";
+            label3.Text = "Set paginated output documents to pending in this action";
             // 
             // label5
             // 
@@ -131,8 +132,6 @@
             // 
             // _sourceActionComboBox
             // 
-            this._sourceActionComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this._sourceActionComboBox.FormattingEnabled = true;
             this._sourceActionComboBox.Location = new System.Drawing.Point(16, 75);
             this._sourceActionComboBox.Name = "_sourceActionComboBox";
@@ -142,8 +141,6 @@
             // 
             // _outputActionComboBox
             // 
-            this._outputActionComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this._outputActionComboBox.FormattingEnabled = true;
             this._outputActionComboBox.Location = new System.Drawing.Point(16, 121);
             this._outputActionComboBox.Name = "_outputActionComboBox";

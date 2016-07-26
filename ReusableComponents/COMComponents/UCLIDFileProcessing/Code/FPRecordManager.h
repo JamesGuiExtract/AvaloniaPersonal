@@ -56,6 +56,13 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Will remove the specified file ID from the queue. Appropriate messages will be sent.
 	bool remove(const long nFileId);
+	//---------------------------------------------------------------------------------------------	
+	// PROMISE: Returns the ID of the next file queued for processing. If nAfterFileId is not -1,
+	//			it will return the ID of any file after nAfterFileId that is queued for processing.
+	//			If nAfterFileId is not -1 but the specified file is not processing, this call will
+	//			behave as if nAfterFileId is -1.
+	//			If no qualifying file is queued for processing, -1 is returned.
+	long peekNext(long nAfterFileId = -1);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Puts any task that was delayed back on the front of the queue (to be processed next).
 	int requeueDelayedTasks();

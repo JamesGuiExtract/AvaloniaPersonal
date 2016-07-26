@@ -550,7 +550,6 @@ STDMETHODIMP CFileProcessingMgmtRole::CheckoutNextFile(VARIANT_BOOL vbAllowQueue
 		ASSERT_ARGUMENT("ELI40153", pnFileID != __nullptr);
 
 		EActionStatus prevStatus;
-
 		// No process currently has the field; request the FPRecordManger to lock it for
 		// processing and add it to the internal queue.
 		*pnFileID = -1;
@@ -560,6 +559,21 @@ STDMETHODIMP CFileProcessingMgmtRole::CheckoutNextFile(VARIANT_BOOL vbAllowQueue
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40152");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::GetNextCheckedOutFile(long nAfterFileID, long* pnFileID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI40308", pnFileID != __nullptr);
+
+		*pnFileID = m_pRecordMgr->peekNext(nAfterFileID);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40309");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingMgmtRole::CheckoutForProcessing(long nFileID,

@@ -171,6 +171,26 @@ namespace Extract.FileActionManager.Forms
                     return;
                 }
 
+                if (!string.IsNullOrWhiteSpace(_sourceActionComboBox.Text) &&
+                    !_sourceActionComboBox.Items.Contains(_sourceActionComboBox.Text))
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "The action to set source files to is not valid.",
+                        "Invalid configuration", true);
+
+                    return;
+                }
+
+                if (!string.IsNullOrWhiteSpace(_outputActionComboBox.Text) &&
+                    !_outputActionComboBox.Items.Contains(_outputActionComboBox.Text))
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "The action to set pagination output files to is not valid.",
+                        "Invalid configuration", true);
+
+                    return;
+                }
+
                 if (_expectedPaginationAttributesCheckBox.Checked
                     && string.IsNullOrWhiteSpace(_expectedPaginationAttributesTextBox.Text))
                 {

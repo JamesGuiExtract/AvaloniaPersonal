@@ -2124,6 +2124,15 @@ library UCLID_FILEPROCESSINGLib
 		//			available file in the queue.
 		[id(7), helpstring("method CheckoutNextFile")] HRESULT CheckoutNextFile(
 			[in] VARIANT_BOOL vbAllowQueuedStatusOverride, [out, retval] long* pnFileID);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Returns the ID of the next file checked out for processing that is not yet
+		//			actively processing in the FAM. If nAfterFileId is not -1, the ID of any file
+		//			after nAfterFileId will be returned; otherwise the first checked out file not
+		//			yet processing will be returned. If nAfterFileId is not -1 but the specified
+		//			file is not processing, this call will behave as if nAfterFileId is -1.
+		//			If no qualifying file is queued for processing, -1 is returned.
+		[id(8), helpstring("method GetNextCheckedOutFile")] HRESULT GetNextCheckedOutFile(
+			[in] long nAfterFileID, [out, retval] long* pnFileID);
 	};
 
 	[

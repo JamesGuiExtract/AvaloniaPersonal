@@ -1236,6 +1236,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (!_standAloneMode && _settings.PaginationEnabled)
                 {
+                    ValidationPaginationActions();
+
                     LoadPaginationDocumentDataPanel();
 
                     // Show pagination tab before showing the data tab to trigger the pagination
@@ -5414,9 +5416,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     horizontalPadding += _dataTab.Margin.Horizontal + _dataTab.Padding.Horizontal;
                 }
 
+                int minPanel1Width = _dataEntryControlHost.MinimumSize.Width;
+                if (_paginationPanel != null)
+                {
+                    minPanel1Width = Math.Max(minPanel1Width, _paginationPanel.MinimumSize.Width);
+                }
+
                 // The splitter should respect the minimum size of the DEP.
-                _splitContainer.Panel1MinSize =
-                    _dataEntryControlHost.MinimumSize.Width + horizontalPadding +
+                _splitContainer.Panel1MinSize = minPanel1Width + horizontalPadding +
                     SystemInformation.VerticalScrollBarWidth;
 
                 // [DataEntry:3770]
@@ -5441,6 +5448,32 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // long. (The scroll pane is sized to allow the full width of the DEP to 
                 // display initially) 
                 _scrollPanel.Controls.Add(_dataEntryControlHost);
+            }
+        }
+
+        /// <summary>
+        /// Validates that the action settings for pagination are valid.
+        /// </summary>
+        void ValidationPaginationActions()
+        {
+            if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationSourceAction))
+            {
+                int sourceActionID = FileProcessingDB.GetActionID(
+                    _settings.PaginationSettings.PaginationSourceAction);
+
+                ExtractException.Assert("ELI40385",
+                    "Cannot set pagination sources back to pending in same action",
+                    sourceActionID != _actionId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
+            {
+                int outputActionID = FileProcessingDB.GetActionID(
+                    _settings.PaginationSettings.PaginationOutputAction);
+
+                ExtractException.Assert("ELI40386",
+                    "Cannot set pagination output back to pending in same action",
+                    outputActionID != _actionId);
             }
         }
 

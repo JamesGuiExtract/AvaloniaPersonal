@@ -549,9 +549,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// the front (top), -1 = load at the end (bottom). Any other value should be a value
         /// passed via <see cref="CreatingOutputDocumentEventArgs"/> and not a value the caller
         /// should expect to be able to calculate.</param>
-        public void LoadFile(string fileName, int position)
+        /// <param name="selectDocument"><see langword="true"/> to select the document; otherwise,
+        /// <see langword="false"/>.</param>
+        public void LoadFile(string fileName, int position, bool selectDocument)
         {
-            LoadFile(fileName, position, null, null, false, null);
+            LoadFile(fileName, position, null, null, false, null, selectDocument);
         }
 
         /// <summary>
@@ -570,45 +572,58 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// suggested for this document; <see langword="false"/> if it has not been.</param>
         /// <param name="documentData">The VOA file data associated with <see paramref="fileName"/>.
         /// </param>
+        /// <param name="selectDocument"><see langword="true"/> to select the document; otherwise,
+        /// <see langword="false"/>.</param>
         public void LoadFile(string fileName, int position, IEnumerable<int> pages,
             IEnumerable<int> deletedPages, bool paginationSuggested,
-            PaginationDocumentData documentData)
+            PaginationDocumentData documentData, bool selectDocument)
         {
             try
             {
-                FormsMethods.ExecuteInUIThread(this, () =>
+                if (InvokeRequired)
                 {
-                    _pendingChangesOverride = null;
+                    this.Invoke((MethodInvoker)(() => LoadFile(
+                        fileName, position, pages, deletedPages, paginationSuggested, documentData, selectDocument)));
+                    return;
+                }
 
-                    SuspendUIUpdatesForOperation();
+                _pendingChangesOverride = null;
 
-                    // The OutputDocument doesn't get created directly by this method. Use
-                    // _documentData to be able to pass this info to when it is needed in
-                    // IPaginationUtility.CreateOutputDocument.
-                    if (paginationSuggested || documentData != null)
+                SuspendUIUpdatesForOperation();
+
+                // The OutputDocument doesn't get created directly by this method. Use
+                // _documentData to be able to pass this info to when it is needed in
+                // IPaginationUtility.CreateOutputDocument.
+                if (paginationSuggested || documentData != null)
+                {
+                    _documentData[fileName] = new Tuple<bool, PaginationDocumentData>(
+                        paginationSuggested, documentData);
+                }
+
+                var sourceDocument = OpenDocument(fileName);
+
+                if (sourceDocument != null)
+                {
+                    // This will call Application.DoEvents in the midst of loading a document to
+                    // keep the UI responsive as pages are loaded. This allows an opportunity
+                    // for there to be multiple calls into LoadNextDocument at the same time.
+                    var outputDocument = _primaryPageLayoutControl.CreateOutputDocument(
+                        sourceDocument, pages, deletedPages, position, true);
+
+                    _originalDocuments.Add(outputDocument);
+                    var setOutputDocs = _sourceToOriginalDocuments.GetOrAdd(
+                        sourceDocument, () => new HashSet<OutputDocument>());
+                    setOutputDocs.Add(outputDocument);
+
+                    _primaryPageLayoutControl.GetDocumentPosition(outputDocument);
+
+                    if (selectDocument)
                     {
-                        _documentData[fileName] = new Tuple<bool, PaginationDocumentData>(
-                            paginationSuggested, documentData);
+                        _primaryPageLayoutControl.SelectDocument(outputDocument);
                     }
+                }
 
-                    var sourceDocument = OpenDocument(fileName);
-
-                    if (sourceDocument != null)
-                    {
-                        // This will call Application.DoEvents in the midst of loading a document to
-                        // keep the UI responsive as pages are loaded. This allows an opportunity
-                        // for there to be multiple calls into LoadNextDocument at the same time.
-                        var outputDocument = _primaryPageLayoutControl.CreateOutputDocument(
-                            sourceDocument, pages, deletedPages, position, true);
-
-                        _originalDocuments.Add(outputDocument);
-                        var setOutputDocs = _sourceToOriginalDocuments.GetOrAdd(
-                            sourceDocument, () => new HashSet<OutputDocument>());
-                        setOutputDocs.Add(outputDocument);
-                    }
-
-                    ApplyOrderOfLoadedSourceDocuments();
-                });
+                ApplyOrderOfLoadedSourceDocuments();
             }
             catch (Exception ex)
             {
@@ -1282,6 +1297,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 int position = -1;
+
+                if (InvokeRequired)
+                {
+                    this.Invoke((MethodInvoker)(() => position = RemoveSourceFile(fileName)));
+                    return position;
+                }
 
                 FormsMethods.ExecuteInUIThread(this, () =>
                 {
@@ -2352,14 +2373,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ExtractException.Assert("ELI40278", "Cannot find file", File.Exists(inputFileName),
                     "Filename", inputFileName);
 
-                sourceDocument = _sourceDocuments
-                    .SingleOrDefault(doc => doc.FileName == inputFileName);
-                
-                if (sourceDocument != null)
-                {
-                    return sourceDocument;
-                }
-
                 sourceDocument = _sourceDocuments.SingleOrDefault(doc =>
                     doc.FileName.Equals(inputFileName, StringComparison.OrdinalIgnoreCase));
 
@@ -2370,6 +2383,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         sourceDocument.Dispose();
                         return null;
+                    }
+
+                    if (sourceDocument.Pages.Count > 1000)
+                    {
+                        var ee = new ExtractException("ELI40384",
+                            "Unable to load more that 1000 pages for pagination.");
+                        ee.AddDebugData("Filename", inputFileName, false);
+                        ee.AddDebugData("Pages", sourceDocument.Pages.Count, false);
+
+                        sourceDocument.Dispose();
+
+                        throw ee;
                     }
 
                     if (CacheImages)
