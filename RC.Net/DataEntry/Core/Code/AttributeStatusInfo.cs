@@ -1837,7 +1837,7 @@ namespace Extract.DataEntry
                 {
                     // [DataEntry:693]
                     // Send a DeletedAttributeMemento to the undo manager even if it is not currently
-                    // tracking operations so that FinalReleaseComObject can be called on the
+                    // tracking operations so that the DataObject can be nulled on the
                     // attribute when the history is cleared in ResetData
                     _undoManager.AddMemento(
                         new DataEntryDeletedAttributeMemento(attribute, parentCollection, index));

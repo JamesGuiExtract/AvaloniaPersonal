@@ -1,3 +1,4 @@
+using Extract.AttributeFinder;
 using Extract.Database;
 using Extract.Drawing;
 using Extract.Imaging;
@@ -16,7 +17,6 @@ using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -1680,7 +1680,7 @@ namespace Extract.DataEntry
                     if (attributes != null)
                     {
                         // [DataEntry:693]
-                        // The attributes need to be released with FinalReleaseComObject to prevent
+                        // The attributes need to be released (by nulling the DataObjects) to prevent
                         // handle leaks.
                         if (_mostRecentlySaveAttributes != null)
                         {
@@ -1874,6 +1874,7 @@ namespace Extract.DataEntry
                 // not be persisted can be removed.
                 ICloneIdentifiableObject copyThis = (ICloneIdentifiableObject)_attributes;
                 _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
+                _mostRecentlySaveAttributes.ReportMemoryUsage();
 
                 PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
@@ -1917,6 +1918,7 @@ namespace Extract.DataEntry
                             // not be persisted can be removed.
                             ICloneIdentifiableObject copyThis = (ICloneIdentifiableObject) _attributes;
                             _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
+                            _mostRecentlySaveAttributes.ReportMemoryUsage();
 
                             PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
@@ -4527,9 +4529,8 @@ namespace Extract.DataEntry
 
                         // [DataEntry:693]
                         // Since these attributes will no longer be accessed by the DataEntry,
-                        // they need to be released with FinalReleaseComObject to prevent handle
-                        // leaks.
-                        Marshal.FinalReleaseComObject(attribute);
+                        // the DataObject needs to be set to null to prevent handle leaks.
+                        attribute.DataObject = null;
                     }
                 }
             }

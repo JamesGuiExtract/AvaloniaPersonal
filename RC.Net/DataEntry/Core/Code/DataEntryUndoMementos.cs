@@ -3,7 +3,6 @@ using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -520,7 +519,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Releases all resources used by the <see cref="DataEntryDeletedAttributeMemento"/> by
-        /// calling FinalReleaseComObject on the affected <see cref="IAttribute"/>.
+        /// nulling the DataObject of the affected <see cref="IAttribute"/>.
         /// </summary>
         public void Dispose()
         {
@@ -536,11 +535,11 @@ namespace Extract.DataEntry
         }
 
         /// <overloads>Releases all resources used by the
-        /// <see cref="DataEntryDeletedAttributeMemento"/> by calling FinalReleaseComObject on the
+        /// <see cref="DataEntryDeletedAttributeMemento"/> by nulling the DataObject of the
         /// affected <see cref="IAttribute"/>.</overloads>
         /// <summary>
         /// Releases all resources used by the <see cref="DataEntryDeletedAttributeMemento"/> by
-        /// calling FinalReleaseComObject on the affected <see cref="IAttribute"/>.
+        /// nulling the DataObject of the affected <see cref="IAttribute"/>.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
@@ -552,9 +551,9 @@ namespace Extract.DataEntry
                 if (AffectedAttribute != null)
                 {
                     // [DataEntry:693]
-                    // Since the attribute will no longer be accessed by the DataEntry, it needs to be
-                    // released with FinalReleaseComObject to prevent handle leaks.
-                    Marshal.FinalReleaseComObject(AffectedAttribute);
+                    // Since the attribute will no longer be accessed by the DataEntry, the DataObject
+                    // needs to be dereferenced to prevent handle leaks.
+                    AffectedAttribute.DataObject = null;
                     AffectedAttribute = null;
                 }
             }

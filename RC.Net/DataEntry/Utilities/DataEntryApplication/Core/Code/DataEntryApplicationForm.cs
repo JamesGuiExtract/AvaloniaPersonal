@@ -3216,14 +3216,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     var documentData = e.DocumentData as PaginationDocumentData;
                     if (documentData != null)
                     {
-                        if (e.SourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
-                        {
-                            DataEntryControlHost.PruneNonPersistingAttributes(documentData.Attributes);
-                        }
-
                         var copyThis = (ICopyableObject)documentData.Attributes;
                         var attributesCopy = (IUnknownVector)copyThis.Clone();
                         attributesCopy.ReportMemoryUsage();
+
+                        if (e.SourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
+                        {
+                            DataEntryControlHost.PruneNonPersistingAttributes(attributesCopy);
+                        }
 
                         AttributeMethods.TranslateAttributesToNewDocument(
                             attributesCopy, e.OutputFileName, pageMap, newSpatialPageInfos);

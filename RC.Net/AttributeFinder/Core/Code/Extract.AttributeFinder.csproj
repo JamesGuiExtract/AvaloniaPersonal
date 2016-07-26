@@ -176,9 +176,7 @@
     <Compile Include="SupportVectorMachineClassifier.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="MemoryManagerExtensionMethods.cs">
-      <DependentUpon>LearningMachine.cs</DependentUpon>
-    </Compile>
+    <Compile Include="MemoryManagerExtensionMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AttributesFile.cs" />
     <Compile Include="StatusArgs.cs" />
