@@ -3213,7 +3213,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         if (e.SourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
                         {
-                            DataEntryControlHost.PruneNonPersistingAttributes(documentData.Attributes);
+                            DataEntryControlHost.PruneNonPersistingAttributes(attributesCopy);
                         }
 
                         AttributeMethods.TranslateAttributesToNewDocument(
