@@ -5666,20 +5666,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         _paginationPanel.LoadFile(
-                            fileName, -1, pages, deletedPages, suggestedPagination.Value, documentData);
+                            fileName, -1, pages, deletedPages, suggestedPagination.Value, documentData, false);
                     }
 
                     return;
                 }
 
                 // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
-                _paginationPanel.LoadFile(fileName, -1, null, null, false, documentData);
+                _paginationPanel.LoadFile(fileName, -1, null, null, false, documentData, false);
                 return;
             }
 
             // If there was no rules-suggested pagination, go ahead and load the physical document
             // into the _paginationPanel
-            _paginationPanel.LoadFile(fileName, -1);
+            _paginationPanel.LoadFile(fileName, -1, false);
         }
 
         /// <summary>
