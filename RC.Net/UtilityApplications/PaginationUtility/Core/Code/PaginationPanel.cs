@@ -131,6 +131,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         ShortcutsManager _shortcuts = new ShortcutsManager();
 
         /// <summary>
+        /// Keeps track of image viewer shortcuts that have been disabled.
+        /// </summary>
+        Dictionary<Keys, ShortcutHandler> _disabledImageViewerShortcuts =
+            new Dictionary<Keys, ShortcutHandler>();
+
+        /// <summary>
         /// A <see cref="CheckBox"/> to set or clear the
         /// <see cref="PaginationSeparator.DocumentSelectedToCommit"/> flag for all documents.
         /// Added via code since toolstrips to not natively support checkboxes.
@@ -1393,6 +1399,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 SaveDocumentData(false, false);
                 EnablePageDisplay = false;
+                ImageViewerPageNavigationEnabled = true;
                 _primaryPageLayoutControl.ClearSelection();
             }
             catch (Exception ex)
@@ -1410,6 +1417,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 EnablePageDisplay = true;
+                ImageViewerPageNavigationEnabled = false;
                 _primaryPageLayoutControl.SelectFirstPage();
             }
             catch (Exception ex)
@@ -1876,7 +1884,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (_shortcuts.ProcessKey(keyData))
+                if (!_primaryPageLayoutControl.IgnoreShortcutKey && _shortcuts.ProcessKey(keyData))
                 {
                     return true;
                 }
@@ -2606,6 +2614,43 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI40226");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether page navigation via ImageViewer shortcuts should be enabled.
+        /// </summary>
+        bool ImageViewerPageNavigationEnabled
+        {
+            get
+            {
+                return _disabledImageViewerShortcuts.Count == 0;
+            }
+
+            set
+            {
+                if (ImageViewerPageNavigationEnabled != value)
+                {
+                    if (value)
+                    {
+                        ImageViewer.Shortcuts[Keys.PageUp] = _disabledImageViewerShortcuts[Keys.PageUp];
+                        ImageViewer.Shortcuts[Keys.PageDown] = _disabledImageViewerShortcuts[Keys.PageDown];
+                        ImageViewer.Shortcuts[Keys.Control | Keys.Home] = _disabledImageViewerShortcuts[Keys.Control | Keys.Home];
+                        ImageViewer.Shortcuts[Keys.Control | Keys.End] = _disabledImageViewerShortcuts[Keys.Control | Keys.End];
+                        _disabledImageViewerShortcuts.Clear();
+                    }
+                    else
+                    {
+                        _disabledImageViewerShortcuts[Keys.PageUp] = ImageViewer.Shortcuts[Keys.PageUp];
+                        _disabledImageViewerShortcuts[Keys.PageDown] = ImageViewer.Shortcuts[Keys.PageDown];
+                        _disabledImageViewerShortcuts[Keys.Control | Keys.Home] = ImageViewer.Shortcuts[Keys.Control | Keys.Home];
+                        _disabledImageViewerShortcuts[Keys.Control | Keys.End] = ImageViewer.Shortcuts[Keys.Control | Keys.End];
+                        ImageViewer.Shortcuts[Keys.PageUp] = null;
+                        ImageViewer.Shortcuts[Keys.PageDown] = null;
+                        ImageViewer.Shortcuts[Keys.Control | Keys.Home] = null;
+                        ImageViewer.Shortcuts[Keys.Control | Keys.End] = null;
+                    }
                 }
             }
         }

@@ -401,6 +401,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _updateCommandStatesInvoked;
 
+        /// <summary>
+        /// The <see cref="IPaginationDocumentDataPanel"/> that is currently open for editing
+        /// or <see langword="null"/> if there is no data panel currently open for editing.
+        /// </summary>
+        Control _documentDataPanelControl;
+
         #endregion Fields
 
         #region Constructors
@@ -790,6 +796,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     throw ex.AsExtract("ELI40220");
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the current keystroke should be ignored as a shortcut key. Used in
+        /// the case that data is being edited.
+        /// </summary>
+        public bool IgnoreShortcutKey
+        {
+            get;
+            set;
         }
 
         #endregion Properties
@@ -1702,14 +1718,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     new Keys[] { Keys.Control | Keys.S }, HandleOutputDocument,
                     null, false, true, false);
 
-                Shortcuts[Keys.Escape] = ClearSelection;
-
-                EnableKeyboardPageOperations(true);
-
-                // Clear shortcuts that don't apply to this application.
-                Shortcuts[Keys.O | Keys.Control] = null;
-                Shortcuts[Keys.Control | Keys.F4] = null;
-                Shortcuts[Keys.Control | Keys.P] = null;
+                InitializeShortcuts();
 
                 ContextMenuStrip = new ContextMenuStrip();
                 ContextMenuStrip.Items.Add(_cutMenuItem);
@@ -1735,6 +1744,38 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35439");
+            }
+        }
+
+        /// <summary>
+        /// Processes a command key.
+        /// </summary>
+        /// <param name="msg">The window message to process.</param>
+        /// <param name="keyData">The key to process.</param>
+        /// <returns><see langword="true"/> if the character was processed by the control; 
+        /// <see langword="false"/> if the character was not processed.</returns>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            try
+            {
+                // If the _documentDataPanelControl has focus, keystrokes shouldn't be treated as
+                // pagination shortcut keys.
+                if (_documentDataPanelControl != null && _documentDataPanelControl.ContainsFocus)
+                {
+                    IgnoreShortcutKey = true;
+                }
+
+                // This key was not processed, bubble it up to the base class.
+                return base.ProcessCmdKey(ref msg, keyData);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI41275", ex);
+                return false;
+            }
+            finally
+            {
+                IgnoreShortcutKey = false;
             }
         }
 
@@ -1819,9 +1860,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                // Ensure clicking on any control restores focus in case focus was lost.
-                Focus();
-
                 var clickedControl = (PaginationControl)sender;
 
                 if (clickedControl != _loadNextDocumentButtonControl)
@@ -1836,6 +1874,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         select: select,
                         modifierKeys: Control.ModifierKeys);
                 }
+
+                clickedControl.Focus();
             }
             catch (Exception ex)
             {
@@ -2523,7 +2563,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             .FirstOrDefault(c => !c.Deleted));
                     }
 
-                    EnableKeyboardPageOperations(false);
+                    _documentDataPanelControl = e.DocumentDataPanel.Control;
                 }
             }
             catch (Exception ex)
@@ -2543,7 +2583,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                EnableKeyboardPageOperations(true);
+                _documentDataPanelControl = null;
             }
             catch (Exception ex)
             {
@@ -3418,134 +3458,75 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Enables or disables the page navigation and operations associated with keystrokes. This
-        /// can be used to prevents page navigation, deletions, etc from occurring when data is
-        /// being edited in a data panel.
+        /// Initializes the page navigation and operations associated with keystrokes.
         /// </summary>
-        /// <param name="enableOperations"><see langword="true"/> to allow page operations and
-        /// navigation; <see langword="false"/> to prevent it.</param>
-        void EnableKeyboardPageOperations(bool enableOperations)
+        void InitializeShortcuts()
         {
-            if (enableOperations)
-            {
-                _cutCommand.Enabled = false;
-                _copyCommand.Enabled = false;
-                _deleteCommand.Enabled = false;
-                _unDeleteCommand.Enabled = false;
-                _printCommand.Enabled = false;
-                _pasteCommand.Enabled = false;
-                _toggleDocumentSeparatorCommand.Enabled = false;
-                _outputDocumentCommand.Enabled = false;
+            _cutCommand.Enabled = false;
+            _copyCommand.Enabled = false;
+            _deleteCommand.Enabled = false;
+            _unDeleteCommand.Enabled = false;
+            _printCommand.Enabled = false;
+            _pasteCommand.Enabled = false;
+            _toggleDocumentSeparatorCommand.Enabled = false;
+            _outputDocumentCommand.Enabled = false;
 
-                Shortcuts[Keys.Tab] = HandleSelectNextPage;
-                Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
-                // [DotNetRCAndUtils:984]
-                // Don't allow the shift key to expand selection when used in conjunction with tab.
-                Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousPageNoShift;
-                Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = HandleSelectPreviousDocument;
+            Shortcuts[Keys.Escape] = ClearSelection;
 
-                Shortcuts[Keys.Left] = HandleSelectPreviousPage;
-                Shortcuts[Keys.Left | Keys.Control] = HandleSelectPreviousPage;
-                Shortcuts[Keys.Left | Keys.Shift] = HandleSelectPreviousPage;
-                Shortcuts[Keys.Left | Keys.Control | Keys.Shift] = HandleSelectPreviousPage;
+            Shortcuts[Keys.Tab] = HandleSelectNextPage;
+            Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
+            // [DotNetRCAndUtils:984]
+            // Don't allow the shift key to expand selection when used in conjunction with tab.
+            Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousPageNoShift;
+            Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = HandleSelectPreviousDocument;
 
-                Shortcuts[Keys.Right] = HandleSelectNextPage;
-                Shortcuts[Keys.Right | Keys.Control] = HandleSelectNextPage;
-                Shortcuts[Keys.Right | Keys.Shift] = HandleSelectNextPage;
-                Shortcuts[Keys.Right | Keys.Control | Keys.Shift] = HandleSelectNextPage;
+            Shortcuts[Keys.Left] = HandleSelectPreviousPage;
+            Shortcuts[Keys.Left | Keys.Control] = HandleSelectPreviousPage;
+            Shortcuts[Keys.Left | Keys.Shift] = HandleSelectPreviousPage;
+            Shortcuts[Keys.Left | Keys.Control | Keys.Shift] = HandleSelectPreviousPage;
 
-                Shortcuts[Keys.PageUp] = HandleSelectPreviousPage;
-                Shortcuts[Keys.PageUp | Keys.Control] = HandleSelectPreviousPage;
-                Shortcuts[Keys.PageUp | Keys.Shift] = HandleSelectPreviousPage;
-                Shortcuts[Keys.PageUp | Keys.Control | Keys.Shift] = HandleSelectPreviousPage;
+            Shortcuts[Keys.Right] = HandleSelectNextPage;
+            Shortcuts[Keys.Right | Keys.Control] = HandleSelectNextPage;
+            Shortcuts[Keys.Right | Keys.Shift] = HandleSelectNextPage;
+            Shortcuts[Keys.Right | Keys.Control | Keys.Shift] = HandleSelectNextPage;
 
-                Shortcuts[Keys.PageDown] = HandleSelectNextPage;
-                Shortcuts[Keys.PageDown | Keys.Control] = HandleSelectNextPage;
-                Shortcuts[Keys.PageDown | Keys.Shift] = HandleSelectNextPage;
-                Shortcuts[Keys.PageDown | Keys.Control | Keys.Shift] = HandleSelectNextPage;
+            Shortcuts[Keys.PageUp] = HandleSelectPreviousPage;
+            Shortcuts[Keys.PageUp | Keys.Control] = HandleSelectPreviousPage;
+            Shortcuts[Keys.PageUp | Keys.Shift] = HandleSelectPreviousPage;
+            Shortcuts[Keys.PageUp | Keys.Control | Keys.Shift] = HandleSelectPreviousPage;
 
-                Shortcuts[Keys.Up] = HandleSelectPreviousRowPage;
-                Shortcuts[Keys.Up | Keys.Control] = HandleSelectPreviousRowPage;
-                Shortcuts[Keys.Up | Keys.Shift] = HandleSelectPreviousRowPage;
-                Shortcuts[Keys.Up | Keys.Control | Keys.Shift] = HandleSelectPreviousRowPage;
+            Shortcuts[Keys.PageDown] = HandleSelectNextPage;
+            Shortcuts[Keys.PageDown | Keys.Control] = HandleSelectNextPage;
+            Shortcuts[Keys.PageDown | Keys.Shift] = HandleSelectNextPage;
+            Shortcuts[Keys.PageDown | Keys.Control | Keys.Shift] = HandleSelectNextPage;
 
-                Shortcuts[Keys.Down] = HandleSelectNextRowPage;
-                Shortcuts[Keys.Down | Keys.Control] = HandleSelectNextRowPage;
-                Shortcuts[Keys.Down | Keys.Shift] = HandleSelectNextRowPage;
-                Shortcuts[Keys.Down | Keys.Control | Keys.Shift] = HandleSelectNextRowPage;
+            Shortcuts[Keys.Up] = HandleSelectPreviousRowPage;
+            Shortcuts[Keys.Up | Keys.Control] = HandleSelectPreviousRowPage;
+            Shortcuts[Keys.Up | Keys.Shift] = HandleSelectPreviousRowPage;
+            Shortcuts[Keys.Up | Keys.Control | Keys.Shift] = HandleSelectPreviousRowPage;
 
-                Shortcuts[Keys.Home] = HandleSelectFirstPage;
-                Shortcuts[Keys.Home | Keys.Control] = HandleSelectFirstPage;
-                Shortcuts[Keys.Home | Keys.Shift] = HandleSelectFirstPage;
-                Shortcuts[Keys.Home | Keys.Control | Keys.Shift] = HandleSelectFirstPage;
+            Shortcuts[Keys.Down] = HandleSelectNextRowPage;
+            Shortcuts[Keys.Down | Keys.Control] = HandleSelectNextRowPage;
+            Shortcuts[Keys.Down | Keys.Shift] = HandleSelectNextRowPage;
+            Shortcuts[Keys.Down | Keys.Control | Keys.Shift] = HandleSelectNextRowPage;
 
-                Shortcuts[Keys.End] = HandleSelectLastPage;
-                Shortcuts[Keys.End | Keys.Control] = HandleSelectLastPage;
-                Shortcuts[Keys.End | Keys.Shift] = HandleSelectLastPage;
-                Shortcuts[Keys.End | Keys.Control | Keys.Shift] = HandleSelectLastPage;
+            Shortcuts[Keys.Home] = HandleSelectFirstPage;
+            Shortcuts[Keys.Home | Keys.Control] = HandleSelectFirstPage;
+            Shortcuts[Keys.Home | Keys.Shift] = HandleSelectFirstPage;
+            Shortcuts[Keys.Home | Keys.Control | Keys.Shift] = HandleSelectFirstPage;
 
-                Shortcuts[Keys.Oemcomma] = HandleSelectPreviousPage;
-                Shortcuts[Keys.OemPeriod] = HandleSelectNextPage;
-            }
-            else
-            {
-                // Application commands will be updated if appropriate via UpdateCommandStates.
+            Shortcuts[Keys.End] = HandleSelectLastPage;
+            Shortcuts[Keys.End | Keys.Control] = HandleSelectLastPage;
+            Shortcuts[Keys.End | Keys.Shift] = HandleSelectLastPage;
+            Shortcuts[Keys.End | Keys.Control | Keys.Shift] = HandleSelectLastPage;
 
-                Shortcuts[Keys.Control | Keys.X] = null;
-                Shortcuts[Keys.Control | Keys.C] = null;
-                Shortcuts[Keys.Control | Keys.V] = null;
-                Shortcuts[Keys.Delete] = null;
-                Shortcuts[Keys.Shift | Keys.Delete] = null;
-                Shortcuts[Keys.Space] = null;
+            Shortcuts[Keys.Oemcomma] = HandleSelectPreviousPage;
+            Shortcuts[Keys.OemPeriod] = HandleSelectNextPage;
 
-                Shortcuts[Keys.Tab] = null;
-                Shortcuts[Keys.Tab | Keys.Control] = null;
-                Shortcuts[Keys.Tab | Keys.Shift] = null;
-                Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = null;
-
-                Shortcuts[Keys.Left] = null;
-                Shortcuts[Keys.Left | Keys.Control] = null;
-                Shortcuts[Keys.Left | Keys.Shift] = null;
-                Shortcuts[Keys.Left | Keys.Control | Keys.Shift] = null;
-
-                Shortcuts[Keys.Right] = null;
-                Shortcuts[Keys.Right | Keys.Control] = null;
-                Shortcuts[Keys.Right | Keys.Shift] = null;
-                Shortcuts[Keys.Right | Keys.Control | Keys.Shift] = null;
-
-                Shortcuts[Keys.PageUp] = null;
-                Shortcuts[Keys.PageUp | Keys.Control] = null;
-                Shortcuts[Keys.PageUp | Keys.Shift] = null;
-                Shortcuts[Keys.PageUp | Keys.Control | Keys.Shift] = null;
-
-                Shortcuts[Keys.PageDown] = null;
-                Shortcuts[Keys.PageDown | Keys.Control] = null;
-                Shortcuts[Keys.PageDown | Keys.Shift] = null;
-                Shortcuts[Keys.PageDown | Keys.Control | Keys.Shift] = null;
-
-                Shortcuts[Keys.Up] = null;
-                Shortcuts[Keys.Up | Keys.Control] = null;
-                Shortcuts[Keys.Up | Keys.Shift] = null;
-                Shortcuts[Keys.Up | Keys.Control | Keys.Shift] = null;
-
-                Shortcuts[Keys.Down] = null;
-                Shortcuts[Keys.Down | Keys.Control] = null;
-                Shortcuts[Keys.Down | Keys.Shift] = null;
-                Shortcuts[Keys.Down | Keys.Control | Keys.Shift] = null;
-
-                Shortcuts[Keys.Home] = null;
-                Shortcuts[Keys.Home | Keys.Control] = null;
-                Shortcuts[Keys.Home | Keys.Shift] = null;
-                Shortcuts[Keys.Home | Keys.Control | Keys.Shift] = null;
-
-                Shortcuts[Keys.End] = null;
-                Shortcuts[Keys.End | Keys.Control] = null;
-                Shortcuts[Keys.End | Keys.Shift] = null;
-                Shortcuts[Keys.End | Keys.Control | Keys.Shift] = null;
-
-                Shortcuts[Keys.Oemcomma] = null;
-                Shortcuts[Keys.OemPeriod] = null;
-            }
+            // Clear shortcuts that don't apply to this application.
+            Shortcuts[Keys.O | Keys.Control] = null;
+            Shortcuts[Keys.Control | Keys.F4] = null;
+            Shortcuts[Keys.Control | Keys.P] = null;
         }
 
         /// <summary>

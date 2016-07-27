@@ -360,6 +360,10 @@ namespace Extract.FileActionManager.FileProcessors
                 _imageViewer.Shortcuts[Keys.Control | Keys.OemPeriod] = null;
                 _imageViewer.Shortcuts[Keys.F3 | Keys.Shift] = null;
                 _imageViewer.Shortcuts[Keys.Control | Keys.Oemcomma] = null;
+                _imageViewer.Shortcuts[Keys.Control | Keys.Home] = null;
+                _imageViewer.Shortcuts[Keys.PageDown] = null;
+                _imageViewer.Shortcuts[Keys.PageUp] = null;
+                _imageViewer.Shortcuts[Keys.Control | Keys.End] = null;
 
                 // Re-map image viewer shortcuts to used require modifier keys. Default shortcuts
                 // that don't use modifier keys are not used so that data entry is not interfered
@@ -370,10 +374,6 @@ namespace Extract.FileActionManager.FileProcessors
                 _imageViewer.Shortcuts[Keys.Alt | Keys.R] = _imageViewer.SelectSelectLayerObjectsTool;
                 _imageViewer.Shortcuts[Keys.Alt | Keys.P] = _imageViewer.ToggleFitToPageMode;
                 _imageViewer.Shortcuts[Keys.Alt | Keys.W] = _imageViewer.ToggleFitToWidthMode;
-                _imageViewer.Shortcuts[Keys.Control | Keys.Home] = _imageViewer.GoToFirstPage;
-                _imageViewer.Shortcuts[Keys.PageDown] = _imageViewer.GoToNextPage;
-                _imageViewer.Shortcuts[Keys.PageUp] = _imageViewer.GoToPreviousPage;
-                _imageViewer.Shortcuts[Keys.Control | Keys.End] = _imageViewer.GoToLastPage;
                 _imageViewer.Shortcuts[Keys.F7] = _imageViewer.SelectZoomIn;
                 _imageViewer.Shortcuts[Keys.Add | Keys.Control] = _imageViewer.SelectZoomIn;
                 _imageViewer.Shortcuts[Keys.Oemplus | Keys.Control] = _imageViewer.SelectZoomIn;

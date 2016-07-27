@@ -3038,6 +3038,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _printMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _pageNavigationToolStripMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _pageNavigationImageViewerToolStrip.Enabled = _imageViewer.IsImageAvailable;
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        // This restores the page number to the page _pageNavigationImageViewerToolStrip.
+                        _imageViewer.PageNumber = _imageViewer.PageNumber;
+                    }
                     _gotoNextInvalidCommand.Enabled = _imageViewer.IsImageAvailable;
                     _gotoNextUnviewedCommand.Enabled = _imageViewer.IsImageAvailable;
                     _fileCommandsToolStrip.Enabled = _imageViewer.IsImageAvailable;
