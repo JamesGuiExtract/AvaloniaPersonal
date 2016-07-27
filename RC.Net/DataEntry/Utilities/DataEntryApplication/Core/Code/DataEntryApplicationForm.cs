@@ -1540,7 +1540,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     try
                     {
-                        _sandDockManager.LoadLayout();
+                        // Commenting this LOC removes a docstyle exception, see JIRA ISSUE-13833
+                        // TODO: look into this after 10.4 release!
+                        //_sandDockManager.LoadLayout();
                     }
                     catch (Exception ex)
                     {
