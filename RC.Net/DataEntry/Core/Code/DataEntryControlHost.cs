@@ -8149,8 +8149,6 @@ namespace Extract.DataEntry
             _highlightAttributes.Clear();
             _displayedAttributeHighlights.Clear();
             _attributeHighlights.Clear();
-            _controlSelectionState.Clear();
-            _controlToolTipAttributes.Clear();
             _hoverAttribute = null;
         }
 
