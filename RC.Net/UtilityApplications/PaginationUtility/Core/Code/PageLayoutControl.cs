@@ -1267,6 +1267,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (previousPageControl != null)
                         {
                             OutputDocument firstDocument = previousPageControl.Document;
+                            firstDocument.Collapsed = false;
                             MovePagesToDocument(firstDocument, nextPageControl);
 
                             OnSelectionChanged();
