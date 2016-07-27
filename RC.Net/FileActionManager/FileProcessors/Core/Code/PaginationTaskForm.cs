@@ -1453,7 +1453,7 @@ namespace Extract.FileActionManager.FileProcessors
                         ? "pagination and data"
                         : paginationModified ? "pagination" : "data") +
                 " that will be lost.\r\n\r\n" +
-                "Disregard changes?",
+                "Discard changes?",
                 "Uncommitted changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question,
                 MessageBoxDefaultButton.Button2, 0))
                 {

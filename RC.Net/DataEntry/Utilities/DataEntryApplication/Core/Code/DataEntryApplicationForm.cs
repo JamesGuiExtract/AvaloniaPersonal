@@ -3910,7 +3910,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             ? "pagination and data"
                             : paginationModified ? "pagination" : "pagination data") +
                     " that will be lost.\r\n\r\n" +
-                    "Disregard changes?",
+                    "Discard changes?",
                     "Uncommitted changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question,
                     MessageBoxDefaultButton.Button2, 0))
                     {
