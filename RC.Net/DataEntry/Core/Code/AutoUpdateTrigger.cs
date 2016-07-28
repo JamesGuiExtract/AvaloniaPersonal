@@ -673,13 +673,21 @@ namespace Extract.DataEntry
                 // https://extract.atlassian.net/browse/ISSUE-13506
                 // Only set LastAppliedStringValue in the case where the owning control did not
                 // properly accept the new query result.
+                var statusInfo = AttributeStatusInfo.GetStatusInfo(_targetAttribute);
                 if (_targetAttribute.Value.String != stringResult)
                 {
                     // Keep track of programmatically applied values, in case the field control isn't
                     // yet prepared to accept the value. (i.e. combo box whose item list has not yet
                     // been updated/initialized)
-                    var statusInfo = AttributeStatusInfo.GetStatusInfo(_targetAttribute);
                     statusInfo.LastAppliedStringValue = stringResult;
+                }
+                else
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-13975
+                    // If the owning control did accept the value, we should not be keeping around
+                    // any previous LastAppliedStringValue as this new value may be intentionally
+                    // updated via an auto-update query.
+                    statusInfo.LastAppliedStringValue = null;
                 }
 
                 return true;
