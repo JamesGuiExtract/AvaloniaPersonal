@@ -586,6 +586,37 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Processes a command key.
+        /// </summary>
+        /// <param name="msg">The window message to process.</param>
+        /// <param name="keyData">The key to process.</param>
+        /// <returns><see langword="true"/> if the character was processed by the control; 
+        /// <see langword="false"/> if the character was not processed.</returns>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            try
+            {
+                if (ActiveControl == _collapseDocumentButton ||
+                    ActiveControl == _selectedCheckBox ||
+                    ActiveControl == _editDocumentDataButton)
+                {
+                    // Prevent confusion that space key is intended to activate this buttons by
+                    // preventing keys from activating these buttons. Instead, send the key event
+                    // on to the parent control so it does what it otherwise should have done.
+                    KeyMethods.SendKeyToControl((int)keyData, false, false, false, Parent);
+                    return false;
+                }
+
+                return base.ProcessCmdKey(ref msg, keyData);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41278");
+                return false;
+            }
+        }
+
         #endregion Overrides
 
         #region Event Handlers

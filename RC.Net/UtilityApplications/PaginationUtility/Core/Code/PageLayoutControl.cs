@@ -3420,8 +3420,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     : (SelectedPageControls.Count() == 1)
                         ? SelectedPageControls.Single().Document
                         : null;
-                _toggleDocumentSeparatorCommand.Enabled = 
-                    (contextMenuControlIndex > 1 && singlySelectedDocument != null);
+                _toggleDocumentSeparatorCommand.Enabled =
+                    (contextMenuControlIndex > 1 &&
+                    singlySelectedDocument != null &&
+                    !singlySelectedDocument.Collapsed);
                 var asPageThumbnailControl = _commandTargetControl as PageThumbnailControl;
 
                 if (_toggleDocumentSeparatorCommand.Enabled &&
