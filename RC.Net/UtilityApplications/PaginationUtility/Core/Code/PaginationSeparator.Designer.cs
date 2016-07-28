@@ -97,7 +97,6 @@
             this._reprocessDocumentPictureBox.Size = new System.Drawing.Size(17, 17);
             this._reprocessDocumentPictureBox.TabIndex = 22;
             this._reprocessDocumentPictureBox.TabStop = false;
-            this._reprocessDocumentPictureBox.Visible = false;
             // 
             // _collapseDocumentButton
             // 
@@ -116,7 +115,6 @@
             this._collapseDocumentButton.TabStop = false;
             this._collapseDocumentButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this._collapseDocumentButton.UseVisualStyleBackColor = false;
-            this._collapseDocumentButton.Visible = false;
             this._collapseDocumentButton.Click += new System.EventHandler(this.HandleCollapseDocumentButton_Click);
             // 
             // _summaryLabel
@@ -154,7 +152,6 @@
             this._newDocumentGlyph.Name = "_newDocumentGlyph";
             this._newDocumentGlyph.Size = new System.Drawing.Size(17, 17);
             this._newDocumentGlyph.TabIndex = 18;
-            this._newDocumentGlyph.Visible = false;
             // 
             // _selectedCheckBox
             // 
@@ -166,7 +163,6 @@
             this._selectedCheckBox.TabIndex = 20;
             this._selectedCheckBox.TabStop = false;
             this._selectedCheckBox.UseVisualStyleBackColor = true;
-            this._selectedCheckBox.Visible = false;
             this._selectedCheckBox.CheckedChanged += new System.EventHandler(this.HandleSelectedCheckBox_CheckedChanged);
             // 
             // _editedPaginationGlyph
@@ -181,7 +177,6 @@
             this._editedPaginationGlyph.Name = "_editedPaginationGlyph";
             this._editedPaginationGlyph.Size = new System.Drawing.Size(17, 17);
             this._editedPaginationGlyph.TabIndex = 19;
-            this._editedPaginationGlyph.Visible = false;
             // 
             // _editedDataPictureBox
             // 
@@ -193,7 +188,6 @@
             this._editedDataPictureBox.Size = new System.Drawing.Size(17, 17);
             this._editedDataPictureBox.TabIndex = 14;
             this._editedDataPictureBox.TabStop = false;
-            this._editedDataPictureBox.Visible = false;
             // 
             // _editDocumentDataButton
             // 
@@ -220,7 +214,6 @@
             this._editDocumentDataButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this._editDocumentDataButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this._editDocumentDataButton.UseVisualStyleBackColor = false;
-            this._editDocumentDataButton.Visible = false;
             this._editDocumentDataButton.CheckedChanged += new System.EventHandler(this.HandleEditDocumentDataButton_CheckedChanged);
             // 
             // _dataErrorPictureBox
@@ -233,7 +226,6 @@
             this._dataErrorPictureBox.Size = new System.Drawing.Size(17, 17);
             this._dataErrorPictureBox.TabIndex = 21;
             this._dataErrorPictureBox.TabStop = false;
-            this._dataErrorPictureBox.Visible = false;
             // 
             // PaginationSeparator
             // 
