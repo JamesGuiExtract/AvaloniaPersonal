@@ -73,7 +73,7 @@ namespace Extract.Redaction.Verification
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this._redactionQaExplanatoryTextBox = new System.Windows.Forms.TextBox();
+            this._redactionQaExplanatoryLabel = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this._redactionVerifyExplanatoryTextLabel = new System.Windows.Forms.Label();
             this._redactionQaComboBox = new System.Windows.Forms.ComboBox();
@@ -260,6 +260,7 @@ namespace Extract.Redaction.Verification
             this._fileActionCheckBox.TabIndex = 0;
             this._fileActionCheckBox.Text = "Set file action status of";
             this._fileActionCheckBox.UseVisualStyleBackColor = true;
+            this._fileActionCheckBox.CheckedChanged += new System.EventHandler(this.HandleFileActionCheckBoxCheckedChanged);
             // 
             // _tagSettingsButton
             // 
@@ -466,7 +467,7 @@ namespace Extract.Redaction.Verification
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this._redactionQaExplanatoryTextBox);
+            this.groupBox1.Controls.Add(this._redactionQaExplanatoryLabel);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this._redactionVerifyExplanatoryTextLabel);
             this.groupBox1.Controls.Add(this._redactionQaComboBox);
@@ -481,15 +482,13 @@ namespace Extract.Redaction.Verification
             // 
             // _redactionQaExplanatoryTextBox
             // 
-            this._redactionQaExplanatoryTextBox.BackColor = System.Drawing.SystemColors.Window;
-            this._redactionQaExplanatoryTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this._redactionQaExplanatoryTextBox.Location = new System.Drawing.Point(27, 114);
-            this._redactionQaExplanatoryTextBox.Multiline = true;
-            this._redactionQaExplanatoryTextBox.Name = "_redactionQaExplanatoryTextBox";
-            this._redactionQaExplanatoryTextBox.ReadOnly = true;
-            this._redactionQaExplanatoryTextBox.Size = new System.Drawing.Size(377, 31);
-            this._redactionQaExplanatoryTextBox.TabIndex = 7;
-            this._redactionQaExplanatoryTextBox.Text = "(You will see viewed status of redaction items and pages as of the time the docum" +
+            this._redactionQaExplanatoryLabel.AutoSize = true;
+            this._redactionQaExplanatoryLabel.MaximumSize = new System.Drawing.Size(382, 0);
+            this._redactionQaExplanatoryLabel.Location = new System.Drawing.Point(22, 114);
+            this._redactionQaExplanatoryLabel.Name = "_redactionQaExplanatoryTextBox";
+            this._redactionQaExplanatoryLabel.Size = new System.Drawing.Size(377, 31);
+            this._redactionQaExplanatoryLabel.TabIndex = 7;
+            this._redactionQaExplanatoryLabel.Text = "(You will see viewed status of redaction items and pages as of the time the docum" +
     "entation most recently verified)";
             // 
             // label5
@@ -504,7 +503,7 @@ namespace Extract.Redaction.Verification
             // _redactionVerifyExplanatoryTextLabel
             // 
             this._redactionVerifyExplanatoryTextLabel.AutoSize = true;
-            this._redactionVerifyExplanatoryTextLabel.Location = new System.Drawing.Point(22, 39);
+            this._redactionVerifyExplanatoryTextLabel.Location = new System.Drawing.Point(20, 39);
             this._redactionVerifyExplanatoryTextLabel.Name = "_redactionVerifyExplanatoryTextLabel";
             this._redactionVerifyExplanatoryTextLabel.Size = new System.Drawing.Size(382, 13);
             this._redactionVerifyExplanatoryTextLabel.TabIndex = 1;
@@ -676,6 +675,6 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.RadioButton _redactionVerificationRadioButton;
         private System.Windows.Forms.Label _redactionVerifyExplanatoryTextLabel;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox _redactionQaExplanatoryTextBox;
+        private System.Windows.Forms.Label _redactionQaExplanatoryLabel;
     }
 }

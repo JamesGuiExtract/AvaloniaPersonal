@@ -382,7 +382,7 @@ namespace Extract.Redaction.Verification
             {
                 _redactionVerificationRadioButton.Checked = true;
                 _redactionQaComboBox.SelectedIndex = 0;
-                _redactionQaExplanatoryTextBox.Visible = false;
+                _redactionQaExplanatoryLabel.Visible = false;
             }
             else
             {
@@ -406,11 +406,11 @@ namespace Extract.Redaction.Verification
                 const int preservedSelectedIndex = 0;
                 if (preservedSelectedIndex == _redactionQaComboBox.SelectedIndex)
                 {
-                    _redactionQaExplanatoryTextBox.Text = _PRESERVED_REDACTION_QA_TEXT;
+                    _redactionQaExplanatoryLabel.Text = _PRESERVED_REDACTION_QA_TEXT;
                 }
                 else
                 {
-                    _redactionQaExplanatoryTextBox.Text = _RESET_REDACTION_QA_TEXT;
+                    _redactionQaExplanatoryLabel.Text = _RESET_REDACTION_QA_TEXT;
                 }
             }
             catch (Exception ex)
@@ -747,7 +747,7 @@ namespace Extract.Redaction.Verification
             {
                 bool checkd = _redactionQaRadioButton.Checked;
 
-                _redactionQaExplanatoryTextBox.Visible = checkd;
+                _redactionQaExplanatoryLabel.Visible = checkd;
                 _redactionQaComboBox.Enabled = checkd;
 
                 if (checkd)
