@@ -788,6 +788,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 int pageCount = Document.PageControls.Count(c => !c.Deleted);
                 _pagesLabel.Text = string.Format(CultureInfo.CurrentCulture,
                     "{0} page{1}", pageCount, (pageCount == 1) ? "" : "s");
+                if (_pagesLabel.Width < _pagesLabel.PreferredWidth)
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-13980
+                    // To fix cases where the width has no updated properly
+                    _pagesLabel.PerformLayout();
+                }
                 _newDocumentGlyph.Visible = !Document.InSourceDocForm;
                 _editedPaginationGlyph.Visible = !Document.InOriginalForm;
                 bool dataSharedInVerification = Document.InOriginalForm &&

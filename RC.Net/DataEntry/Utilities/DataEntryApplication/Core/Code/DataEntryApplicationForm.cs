@@ -3051,8 +3051,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
                     _acceptSpatialInfoCommand.Enabled = _imageViewer.IsImageAvailable;
                     _removeSpatialInfoCommand.Enabled = _imageViewer.IsImageAvailable;
-                    _undoCommand.Enabled = _imageViewer.IsImageAvailable;
-                    _redoCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _undoCommand.Enabled = _imageViewer.IsImageAvailable &&
+                        AttributeStatusInfo.UndoManager.UndoOperationAvailable;
+                    _redoCommand.Enabled = _imageViewer.IsImageAvailable &&
+                        AttributeStatusInfo.UndoManager.RedoOperationAvailable;
                     _selectAngularHighlightCommand.Enabled = _imageViewer.IsImageAvailable;
                     _selectRectangularHighlightCommand.Enabled = _imageViewer.IsImageAvailable;
                     _selectWordHighlightCommand.Enabled = _imageViewer.IsImageAvailable;
@@ -4066,7 +4068,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
         /// the option to continue verification on the next document; <see langword="false"/> if the
         /// error should prevent the possibility of continuing the verification session.</param>
-        void RaiseVerificationException(ExtractException ee, bool canProcessingContinue)
+        public void RaiseVerificationException(ExtractException ee, bool canProcessingContinue)
         {
             if (_standAloneMode)
             {

@@ -5041,6 +5041,18 @@ namespace Extract.DataEntry
             finally
             {
                 ControlUpdateReferenceCount--;
+
+                // https://extract.atlassian.net/browse/ISSUE-13977
+                // If swiping rules execute a data query, it will reset the active AttributeStatusInfo
+                // registration. It was decided this could not be fixed for the 10.4 release, so for
+                // now at least force the file to failed since otherwise it will be in a bad state
+                // that continues to generate exceptions.
+                if (string.IsNullOrWhiteSpace(AttributeStatusInfo.SourceDocName))
+                {
+                    var ee = new ExtractException("ELI41279", "Invalid swiping rule");
+                    ee.AddDebugData("Target", ((Control)_activeDataControl).Name, false);
+                    _dataEntryApp.RaiseVerificationException(ee, true);
+                }
             }
 
             try

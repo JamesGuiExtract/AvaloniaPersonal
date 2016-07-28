@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Extract.Imaging.Forms;
+﻿using Extract.Imaging.Forms;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry
@@ -41,7 +39,7 @@ namespace Extract.DataEntry
     #region IDataEntryApplication
 
     /// <summary>
-    /// Represents application-wide properties and events required by the data enty framework
+    /// Represents application-wide properties and events required by the data entry framework
     /// </summary>
     public interface IDataEntryApplication
     {
@@ -197,6 +195,16 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="fileID">The ID of the file to release.</param>
         void ReleaseFile(int fileID);
+
+        /// <summary>
+        /// Raises the ExceptionGenerated event for handling by VerificationForm.
+        /// </summary>
+        /// <param name="ee">The <see cref="ExtractException"/> that being raised.</param>
+        /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
+        /// the option to continue verification on the next document; <see langword="false"/> if the
+        /// error should prevent the possibility of continuing the verification session.</param>
+        [SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")]
+        void RaiseVerificationException(ExtractException ee, bool canProcessingContinue);
 
         #endregion Methods
 
