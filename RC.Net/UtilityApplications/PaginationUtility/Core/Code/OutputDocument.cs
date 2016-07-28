@@ -164,6 +164,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         _collapsed = value;
 
+                        // Update the separator's state as well
+                        // https://extract.atlassian.net/browse/ISSUE-13974
+                        if (PaginationSeparator != null)
+                        {
+                            PaginationSeparator.Collapsed = value;
+                        }
+
                         Control parentControl = null;
                         if (PageControls.Any())
                         {
