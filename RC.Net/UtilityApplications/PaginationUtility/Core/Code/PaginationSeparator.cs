@@ -316,7 +316,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             if (value)
                             {
-                                if (!CloseDataPanel(true, true))
+                                if (!CloseDataPanel(true, false))
                                 {
                                     return;
                                 }
@@ -693,7 +693,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else
                 {
-                    CloseDataPanel(true, true);
+                    CloseDataPanel(true, false);
                 }
             }
             catch (Exception ex)
