@@ -33,7 +33,6 @@
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label4;
-            System.Windows.Forms.Label label5;
             Extract.Utilities.Forms.InfoTip infoTip5;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PaginationSettingsDialog));
             Extract.Utilities.Forms.InfoTip infoTip1;
@@ -53,7 +52,6 @@
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
-            label5 = new System.Windows.Forms.Label();
             infoTip5 = new Extract.Utilities.Forms.InfoTip();
             infoTip1 = new Extract.Utilities.Forms.InfoTip();
             this.SuspendLayout();
@@ -94,15 +92,6 @@
             label4.TabIndex = 12;
             label4.Text = "For any document returned to processing, set the priority of the output document " +
     "to the document priority or the following action, whichever is greater";
-            // 
-            // label5
-            // 
-            label5.Location = new System.Drawing.Point(13, 270);
-            label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(432, 39);
-            label5.TabIndex = 20;
-            label5.Text = "NOTE: OCR data (uss files) will automatically be generated for all paginated outp" +
-    "ut documents using the OCR data of the source document(s)\r\n";
             // 
             // infoTip5
             // 
@@ -270,7 +259,6 @@
             this.Controls.Add(this._outputPathBrowseButton);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
-            this.Controls.Add(label5);
             this.Controls.Add(this._outputPriorityComboBox);
             this.Controls.Add(label4);
             this.Controls.Add(this._outputActionComboBox);

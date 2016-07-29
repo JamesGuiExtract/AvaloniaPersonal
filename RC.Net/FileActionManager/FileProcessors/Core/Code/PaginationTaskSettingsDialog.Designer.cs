@@ -32,7 +32,6 @@
             System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label3;
-            System.Windows.Forms.Label label5;
             Extract.Utilities.Forms.InfoTip infoTip1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PaginationTaskSettingsDialog));
             System.Windows.Forms.Label label4;
@@ -54,7 +53,6 @@
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
-            label5 = new System.Windows.Forms.Label();
             infoTip1 = new Extract.Utilities.Forms.InfoTip();
             label4 = new System.Windows.Forms.Label();
             infoTip5 = new Extract.Utilities.Forms.InfoTip();
@@ -87,15 +85,6 @@
             label3.Size = new System.Drawing.Size(276, 13);
             label3.TabIndex = 7;
             label3.Text = "Set paginated output documents to pending in this action";
-            // 
-            // label5
-            // 
-            label5.Location = new System.Drawing.Point(13, 253);
-            label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(432, 39);
-            label5.TabIndex = 18;
-            label5.Text = "NOTE: OCR data (uss files) will automatically be generated for all paginated outp" +
-    "ut documents using the OCR data of the source document(s)\r\n";
             // 
             // infoTip1
             // 
@@ -299,7 +288,6 @@
             this.Controls.Add(this._outputPathBrowseButton);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
-            this.Controls.Add(label5);
             this.Controls.Add(this._outputActionComboBox);
             this.Controls.Add(label3);
             this.Controls.Add(this._sourceActionComboBox);

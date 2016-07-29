@@ -735,9 +735,11 @@ namespace Extract.FileActionManager.FileProcessors
                     documentData.SetOriginalForm();
                 }
 
-                ReleaseFiles(
-                    e.PaginatedDocumentSources.Union(
-                    e.UnmodifiedPaginationSources));
+                // SourceAction allows a paginated source to be moved into a cleanup action even
+                // if it not moving forward in the primary workflow.
+                ReleaseFiles(e.PaginatedDocumentSources, _settings.SourceAction);
+                // OutputAction is for documents that should move forward in the primary workflow.
+                ReleaseFiles(e.UnmodifiedPaginationSources, _settings.OutputAction);
             }
             catch (Exception ex)
             {
@@ -785,97 +787,6 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40093");
-            }
-        }
-
-        /// <summary>
-        /// Handles the Click event of the HandleApplyToolStripButton control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandleApplyToolStripButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                _paginationPanel.SuspendLayout();
-                _changingDocuments = true;
-
-                if (_paginationPanel.PendingChanges)
-                {
-                    if (!_paginationPanel.CommitChanges())
-                    {
-                        _changingDocuments = false;
-                        UpdateControls();
-                    }
-                }
-                else
-                {
-                    _lastDocumentPosition = ReleaseFiles(_paginationPanel.FullySelectedSourceDocuments);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI40252");
-            }
-            finally
-            {
-                try
-                {
-                    _paginationPanel.ResumeLayout(true);
-
-                    if (_changingDocuments)
-                    {
-                        _changingDocuments = false;
-
-                        // If a new document was loaded in place of the released document(s), document
-                        // selection will already have been defaulted. Otherwise, go ahead and default now.
-                        this.SafeBeginInvoke("ELI40256", () =>
-                        {
-                            if (_lastDocumentPosition != -1)
-                            {
-                                DefaultDocumentSelection();
-                            }
-                        });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI40257");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Handles the Click event of the _revertToSuggestedToolStripButton control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void RevertToSuggestedToolStripButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                _paginationPanel.RevertPendingChanges(revertToSource: false);
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI40095");
-            }
-        }
-
-        /// <summary>
-        /// Handles the Click event of the _revertToDiskToolStripButton control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void RevertToDiskToolStripButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                _paginationPanel.RevertPendingChanges(revertToSource: true);
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI40096");
             }
         }
 
@@ -1111,9 +1022,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// out for processing. 
         /// </summary>
         /// <param name="sourceFileNames">The names of the files to release.</param>
+        /// <param name="targetAction">The action the source files should be queued to.</param>
         /// <returns>The <see cref="_paginationPanel"/> index at which the first of the removed
         /// pages was at the time of release.</returns>
-        int ReleaseFiles(IEnumerable<string> sourceFileNames)
+        int ReleaseFiles(IEnumerable<string> sourceFileNames, string targetAction)
         {
             int position = -1;
 
@@ -1150,14 +1062,11 @@ namespace Extract.FileActionManager.FileProcessors
                     _fileName = null;
                 }
 
-                // SourceAction allows a paginated source to be moved into a cleanup action even
-                // when it is completed for this action without actually having completed all FAM
-                // tasks.
-                if (!string.IsNullOrWhiteSpace(_settings.SourceAction))
+                if (!string.IsNullOrWhiteSpace(targetAction))
                 {
                     EActionStatus oldStatus;
                     FileProcessingDB.SetStatusForFile(sourceFileID,
-                        _settings.SourceAction, EActionStatus.kActionPending, false, true, out oldStatus);
+                        targetAction, EActionStatus.kActionPending, false, true, out oldStatus);
                 }
             }
 
