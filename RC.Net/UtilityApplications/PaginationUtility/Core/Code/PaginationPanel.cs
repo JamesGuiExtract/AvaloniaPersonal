@@ -859,23 +859,36 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _pendingDocuments.Remove(document);
                 }
 
-                var documentsToCommit = _pendingDocuments
-                    .Where(document => !CommitOnlySelection || document.Selected)
-                    .ToList();
+                var documentsToCommit = new HashSet<OutputDocument>(_pendingDocuments
+                    .Where(document => !CommitOnlySelection || document.Selected));
+                var documentsInSourceForm = new HashSet<OutputDocument>(documentsToCommit
+                    .Where(document => document.InSourceDocForm));
+                var documentsNotInSourceForm = new HashSet<OutputDocument>(documentsToCommit
+                    .Except(documentsInSourceForm));
 
-                var outputDocuments = documentsToCommit
-                    .Where(document => !document.InSourceDocForm)
-                    .ToList();
+                var copies = new HashSet<OutputDocument>(documentsInSourceForm
+                    .GroupBy(doc =>
+                        doc.PageControls.First().Page.OriginalDocumentName)
+                    .SelectMany(g => g.Skip(1)));
+
+                // Remove copies from source form collection since any copy will need to be created
+                documentsInSourceForm.ExceptWith(copies);
+
+                // Documents not in source form and copies of source-form document need to be created
+                var outputDocuments = documentsNotInSourceForm.Union(copies);
 
                 _outputDocumentPositions = outputDocuments
                     .ToDictionary(
                         doc => doc, doc => _primaryPageLayoutControl.GetDocumentPosition(doc));
 
-                var sourceDocuments =
-                    outputDocuments.SelectMany(doc => doc.PageControls)
-                        .Select(c => c.Page.SourceDocument.FileName)
-                        .Distinct()
-                        .ToArray();
+                // Calculate source documents that are only source documents, that are not also expected
+                // to continue through the work-flow unmodified
+                var sourceFormSourceDocuments = new HashSet<string>(
+                    documentsInSourceForm.Select(doc => doc.PageControls.First().Page.OriginalDocumentName));
+                var sourceDocumentsNotOutput = new HashSet<string>(documentsNotInSourceForm
+                    .SelectMany(doc => doc.PageControls)
+                        .Select(c => c.Page.OriginalDocumentName));
+                sourceDocumentsNotOutput.ExceptWith(sourceFormSourceDocuments);
 
                 // Build maps of source document pages to destinations and destination documents
                 // to source documents so that pagination history can be recorded.
@@ -908,23 +921,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
-                var disregardedPagination = documentsToCommit
-                    .Where(doc => documentsToCommit.Contains(doc) && doc.InSourceDocForm &&
-                        doc.PaginationSuggested &&
-                        !doc.InOriginalForm)
+                var disregardedPagination = documentsInSourceForm
+                    .Where(doc => doc.PaginationSuggested)
                     .Select(doc => doc.PageControls.First().Page.OriginalDocumentName);
 
-                var sourcesWithModifiedData = documentsToCommit
-                    .Where(doc => documentsToCommit.Contains(doc) && doc.InSourceDocForm &&
-                        doc.DocumentData != null && doc.DocumentData.Modified)
+                var sourcesWithModifiedData = documentsInSourceForm
+                    .Where(doc => doc.DocumentData != null && doc.DocumentData.Modified)
                     .Select(doc => new KeyValuePair<string, PaginationDocumentData>(
                         doc.PageControls.First().Page.OriginalDocumentName, doc.DocumentData));
 
-                var unmodifiedPagination = documentsToCommit
-                    .Where(doc => documentsToCommit.Contains(doc) && doc.InSourceDocForm)
+                var unmodifiedPagination = documentsInSourceForm
                     .Select(doc => doc.PageControls.First().Page.OriginalDocumentName);
 
-                OnPaginated(sourceDocuments,
+                OnPaginated(sourceDocumentsNotOutput,
                     disregardedPagination,
                     sourcesWithModifiedData,
                     unmodifiedPagination);
