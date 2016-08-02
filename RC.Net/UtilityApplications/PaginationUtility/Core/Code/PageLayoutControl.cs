@@ -1334,9 +1334,13 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         // If this means the first page of the document is now from a different
                         // source document, rename the document based upon the new first page.
-                        if (newPageIndex == 0 && 
-                            (nextPageControl == null ||
-                            newPageControl.Page.SourceDocument != nextPageControl.Page.SourceDocument))
+                        // Note: If newPageIndex == 0 then previousPageControl is null and thus there
+                        // must be a non-null nextPageControl or we wouldn't be here so no need to check
+                        if (newPageIndex == 0
+                            // Don't update if the new page is deleted
+                            // https://extract.atlassian.net/browse/ISSUE-13998
+                            && !newPageControl.Deleted
+                            && newPageControl.Page.SourceDocument != nextPageControl.Page.SourceDocument)
                         {
                             document.FileName =
                                 _paginationUtility.GenerateOutputDocumentName(

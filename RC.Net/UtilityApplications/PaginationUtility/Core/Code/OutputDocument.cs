@@ -274,14 +274,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         return false;
                     }
 
-                    var currentPages = _pageControls
-                        .Where(c => !c.Deleted)
-                        .Select(c => c.Page);
                     var sourceDocPages = pages.First().SourceDocument.Pages;
 
                     // Ensure the same sequence of and orientation of current pages compared to
                     // sourceDocPages.
-                    return Page.PagesAreEqual(currentPages, sourceDocPages);
+                    return Page.PagesAreEqual(pages, sourceDocPages);
                 }
                 catch (Exception ex)
                 {
@@ -300,6 +297,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
+                    if (_originalPages == null)
+                    {
+                        return new ReadOnlyCollection<Page>(new Page[0]);
+                    }
                     return _originalPages.AsReadOnly();
                 }
                 catch (Exception ex)
@@ -319,6 +320,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
+                    if (_originalDeletedPages == null)
+                    {
+                        return new ReadOnlyCollection<Page>(new Page[0]);
+                    }
                     return _originalDeletedPages.ToList().AsReadOnly();
                 }
                 catch (Exception ex)
@@ -431,16 +436,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return DocumentData.Summary;
                 }
             }
-        }
-
-        /// <summary>
-        /// Gets/sets the index of this document in relation to the other documents derived from a
-        /// source document. Used to create output document names.
-        /// </summary>
-        public int SubDocIndex
-        {
-            get;
-            set;
         }
 
         #endregion Properties

@@ -148,11 +148,6 @@ namespace Extract.UtilityApplications.PaginationUtility
     public class CreatingOutputDocumentEventArgs : EventArgs
     {
         /// <summary>
-        /// Occurs when output file name is changed
-        /// </summary>
-        public event EventHandler<EventArgs> OutputFileNameChanged = delegate { };
-
-        /// <summary>
         /// Initializes a new <see cref="CreatingOutputDocumentEventArgs"/> instance.
         /// </summary>
         /// <param name="sourcePageInfo"><see cref="PageInfo"/>s that indicate the source document
@@ -248,27 +243,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets or sets the file name to which the output document will be written.
         /// </summary>
         public string OutputFileName
-        {
-            get
-            {
-                return _outputFileName;
-            }
-            set
-            {
-                if (value != _outputFileName)
-                {
-                    _outputFileName = value;
-                    OutputFileNameChanged(this, EventArgs.Empty);
-                }
-            }
-        }
-        string _outputFileName;
-
-        /// <summary>
-        /// Gets/sets the index of this document in relation to the other documents derived from a
-        /// source document. Used to create output document names.
-        /// </summary>
-        public int SubDocIndex
         {
             get;
             set;

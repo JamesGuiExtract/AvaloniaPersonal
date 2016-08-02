@@ -118,7 +118,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Indicates whether pending pagination changes are in the process of being committed.
         /// </summary>
-        bool _commitingChanges;
+        bool _committingChanges;
 
         /// <summary>
         /// The <see cref="ImageViewer"/> to be used by this instance.
@@ -330,7 +330,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 try
                 {
                     // If in the process of committing changes, don't consider changes as pending.
-                    if (_commitingChanges)
+                    if (_committingChanges)
                     {
                         return false;
                     }
@@ -843,7 +843,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return false;
                 }
 
-                _commitingChanges = true;
+                _committingChanges = true;
 
                 // Prevent the UI from trying to load/close pages in the image viewer as the
                 // operation is taking place.
@@ -868,70 +868,91 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var copies = new HashSet<OutputDocument>(documentsInSourceForm
                     .GroupBy(doc =>
-                        doc.PageControls.First().Page.OriginalDocumentName)
+                        doc.PageControls
+                           // Documents can be in source form even with deleted pages from some other document
+                           .First(c => !c.Deleted)
+                           .Page.OriginalDocumentName)
                     .SelectMany(g => g.Skip(1)));
 
                 // Remove copies from source form collection since any copy will need to be created
                 documentsInSourceForm.ExceptWith(copies);
 
-                // Documents not in source form and copies of source-form document need to be created
+                // Documents not in source form and copies of source-form document will need to be created
                 var outputDocuments = documentsNotInSourceForm.Union(copies);
 
                 _outputDocumentPositions = outputDocuments
                     .ToDictionary(
                         doc => doc, doc => _primaryPageLayoutControl.GetDocumentPosition(doc));
 
-                // Calculate source documents that are only source documents, that are not also expected
+                // Calculate source documents that are only source documents, i.e., that are not also expected
                 // to continue through the work-flow unmodified
-                var sourceFormSourceDocuments = new HashSet<string>(
-                    documentsInSourceForm.Select(doc => doc.PageControls.First().Page.OriginalDocumentName));
+                // These are any sources of documents that are not in source form...
                 var sourceDocumentsNotOutput = new HashSet<string>(documentsNotInSourceForm
                     .SelectMany(doc => doc.PageControls)
-                        .Select(c => c.Page.OriginalDocumentName));
+                    .Select(c => c.Page.OriginalDocumentName));
+
+                // ...plus sources of documents with no pages left
+                // https://extract.atlassian.net/browse/ISSUE-13998
+                sourceDocumentsNotOutput.UnionWith(documentsToRemove
+                    .SelectMany(doc => doc.OriginalPages)
+                    .Select(p => p.OriginalDocumentName));
+
+                // ...minus any sources of documents that are in source form
+                var sourceFormSourceDocuments = new HashSet<string>(
+                    documentsInSourceForm
+                        .Select(doc => doc.PageControls
+                        // Documents can be in source form even with deleted pages from some other document
+                        .First(c => !c.Deleted)
+                        .Page.OriginalDocumentName));
                 sourceDocumentsNotOutput.ExceptWith(sourceFormSourceDocuments);
 
-                // Build maps of source document pages to destinations and destination documents
-                // to source documents so that pagination history can be recorded.
-                // These map needs to be created before any documents are output because outputting destroys
+                // Build map of source document pages to destinations so that pagination history
+                // can be recorded for deleted pages.
+                // This map needs to be created before any documents are output because outputting destroys
                 // their page controls
-                var result = CreateSourceDocumentsToDestinationDocumentsMaps(
+                Dictionary<string, List<Tuple<OutputDocument, int>>[]> sourceDocumentsToDestinationDocuments =
+                    CreateSourceDocumentsToDestinationDocumentsMap(
                         _pendingDocuments.Concat(documentsToRemove),
                         documentsToCommit);
-                Dictionary<string, List<Tuple<OutputDocument, int>>[]> sourceDocumentsToDestinationDocuments = result.Item1;
-                Dictionary<OutputDocument, List<StringPairClass>> destinationDocumentsToSourceDocuments = result.Item2;
+
+                // Write pagination history for deleted pages
+                WritePaginationHistoryForDeletedPages(sourceDocumentsToDestinationDocuments);
 
                 // Generate the paginated output.
-                foreach (var group in outputDocuments.GroupBy(doc => doc.PageControls.First().Page.OriginalDocumentName))
+                foreach (var outputDocument in outputDocuments)
                 {
-                    int subDocIndex = 1;
-                    foreach (var outputDocument in group)
+                    if (outputDocument.PageControls.Any(c => !c.Deleted))
                     {
-                        if (outputDocument.PageControls.Any(c => !c.Deleted))
-                        {
-                            outputDocument.SubDocIndex = subDocIndex++;
-                            outputDocument.Output();
-                        }
-                        else
-                        {
-                            // There are no undeleted pages to output; simply remove the document.
-                            _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
-                        }
-
-                        _pendingDocuments.Remove(outputDocument);
+                        outputDocument.Output();
                     }
+                    else
+                    {
+                        // There are no non-deleted pages to output; simply remove the document.
+                        _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
+                    }
+                    _pendingDocuments.Remove(outputDocument);
                 }
 
                 var disregardedPagination = documentsInSourceForm
                     .Where(doc => doc.PaginationSuggested)
-                    .Select(doc => doc.PageControls.First().Page.OriginalDocumentName);
+                    .Select(doc => doc.PageControls
+                        // Documents can be in source form even with deleted pages from some other document
+                        .First(c => !c.Deleted)
+                        .Page.OriginalDocumentName);
 
                 var sourcesWithModifiedData = documentsInSourceForm
                     .Where(doc => doc.DocumentData != null && doc.DocumentData.Modified)
                     .Select(doc => new KeyValuePair<string, PaginationDocumentData>(
-                        doc.PageControls.First().Page.OriginalDocumentName, doc.DocumentData));
+                        doc.PageControls
+                        // Documents can be in source form even with deleted pages from some other document
+                        .First(c => !c.Deleted)
+                        .Page.OriginalDocumentName, doc.DocumentData));
 
                 var unmodifiedPagination = documentsInSourceForm
-                    .Select(doc => doc.PageControls.First().Page.OriginalDocumentName);
+                    .Select(doc => doc.PageControls
+                        // Documents can be in source form even with deleted pages from some other document
+                        .First(c => !c.Deleted)
+                        .Page.OriginalDocumentName);
 
                 OnPaginated(sourceDocumentsNotOutput,
                     disregardedPagination,
@@ -950,9 +971,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         pageControl.Invalidate();
                     }
                 }
-
-                // Write pagination history
-                WritePaginationHistory(sourceDocumentsToDestinationDocuments, destinationDocumentsToSourceDocuments);
 
                 _pendingChangesOverride = null;
 
@@ -982,7 +1000,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    _commitingChanges = false;
+                    _committingChanges = false;
                     if (_outputDocumentPositions != null)
                     {
                         _outputDocumentPositions.Clear();
@@ -1000,21 +1018,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Creates source documents to destination documents maps to be used to output pagination history
+        /// Creates source documents to destination documents map to be used to output pagination history
         /// </summary>
         /// <param name="pendingDocuments">The documents pending user approval</param>
         /// <param name="modifiedDocuments">The pending documents that are not in source form</param>
-        /// <returns>A dictionary that maps source documents to destinations for each page and
-        /// a dictionary that maps destination documents to source documents</returns>
-        private Tuple<Dictionary<string, List<Tuple<OutputDocument, int>>[]>, Dictionary<OutputDocument, List<StringPairClass>>>
-            CreateSourceDocumentsToDestinationDocumentsMaps(
+        /// <returns>A dictionary that maps source documents to destinations for each page</returns>
+        private Dictionary<string, List<Tuple<OutputDocument, int>>[]>
+            CreateSourceDocumentsToDestinationDocumentsMap(
                 IEnumerable<OutputDocument> pendingDocuments,
                 IEnumerable<OutputDocument> modifiedDocuments)
         {
             var sourceNames = new HashSet<string>(pendingDocuments
                 .Where(document => !CommitOnlySelection || document.Selected)
                 .SelectMany(outputDocument =>
-                    outputDocument.PageControls.Select(p => p.Page.OriginalDocumentName)));
+                    outputDocument.PageControls.Select(p => p.Page.OriginalDocumentName)
+                    // Consider original pages too, since a document may not have any PageControls
+                    // https://extract.atlassian.net/browse/ISSUE-13998
+                    .Concat(outputDocument.OriginalPages.Select(p => p.OriginalDocumentName))));
             var relevantSourceDocuments = _sourceDocuments
                 .Where(doc => sourceNames.Contains(doc.FileName))
                 .Distinct();
@@ -1023,20 +1043,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     doc => doc.FileName,
                     doc => new List<Tuple<OutputDocument, int>>[doc.Pages.Count]);
 
-            var destinationDocumentsToSourceDocuments = new Dictionary<OutputDocument, List<StringPairClass>>();
-
             foreach (var document in modifiedDocuments
-                .Where(doc => doc.PageControls.Any(pageControl => !pageControl.Deleted)))
+                .Where(doc => doc.PageControls.Any(c => !c.Deleted)))
             {
-                var source = destinationDocumentsToSourceDocuments
-                    .GetOrAdd(document, () => new List<StringPairClass>());
-
-                // Update filename for documents that are in source form to be the original name
-                if (!_outputDocumentPositions.ContainsKey(document))
-                {
-                    document.FileName = document.PageControls.First().Page.OriginalDocumentName;
-                }
-
                 foreach (var pageControl in document.PageControls
                     .Where(pageControl => !pageControl.Deleted)
                     .OrderBy(pageControl => pageControl.PageNumber))
@@ -1050,26 +1059,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     destinations[originalPageNumber - 1]
                         .Add(Tuple.Create(document, pageControl.PageNumber));
-
-                    source.Add(new StringPairClass()
-                    {
-                        StringKey = originalDocumentName,
-                        StringValue = originalPageNumber.ToString(CultureInfo.InvariantCulture)
-                    });
                 }
             }
 
-            return Tuple.Create(sourceDocumentsToDestinationDocuments, destinationDocumentsToSourceDocuments);
+            return sourceDocumentsToDestinationDocuments;
         }
 
         /// <summary>
-        /// Writes pagination history to DB and writes expected VOA file, if configured to do so
+        /// Writes pagination history for deleted pages to the FileProcessingDB
         /// </summary>
         /// <param name="sourceDocumentsToDestinationDocuments">Map of source documents to destination documents.</param>
-        /// <param name="destinationDocumentsToSourceDocuments">Map of destination documents to source documents.</param>
-        private void WritePaginationHistory(
-            Dictionary<string, List<Tuple<OutputDocument, int>>[]> sourceDocumentsToDestinationDocuments,
-            Dictionary<OutputDocument, List<StringPairClass>> destinationDocumentsToSourceDocuments)
+        private void WritePaginationHistoryForDeletedPages(
+            Dictionary<string, List<Tuple<OutputDocument, int>>[]> sourceDocumentsToDestinationDocuments)
         {
             ExtractException.Assert("ELI39699", "FileTaskSession was not started.",
                 FileTaskSessionID.HasValue);
@@ -1080,7 +1081,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 string inputDocumentName = inputToDestinations.Key;
                 var sourcePageInfo = Enumerable.Range(1, inputToDestinations.Value.Length)
                     .Where(page => inputToDestinations.Value[page - 1] == null)
-                    .Select(page => new StringPairClass()
+                    .Select(page => new StringPairClass
                     {
                         StringKey = inputDocumentName,
                         StringValue = page.ToString(CultureInfo.InvariantCulture)
@@ -1089,25 +1090,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (sourcePageInfo.Any())
                 {
                     FileProcessingDB.AddPaginationHistory(null, sourcePageInfo.ToIUnknownVector(), FileTaskSessionID.Value);
-                }
-            }
-
-            // Add info for non-deleted pages
-            foreach (var destination in destinationDocumentsToSourceDocuments)
-            {
-                string outputName = destination.Key.FileName;
-                var sourcePageInfo = destination.Value.ToIUnknownVector();
-                FileProcessingDB.AddPaginationHistory(outputName, sourcePageInfo, FileTaskSessionID.Value);
-            }
-
-            // Output expected voa if so configured
-            if (OutputExpectedPaginationAttributesFile)
-            {
-                foreach (var fileName in sourceDocumentsToDestinationDocuments.Keys)
-                {
-                    var pathTags = new SourceDocumentPathTags(fileName);
-                    var outputFileName = pathTags.Expand(ExpectedPaginationAttributesPath);
-                    WriteExpectedAttributes(fileName, outputFileName);
                 }
             }
         }
@@ -1328,12 +1310,35 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             var documentsToDelete = _pendingDocuments
                                 .Where(doc =>
-                                    doc.PageControls.Any(c =>
-                                        c.Page.SourceDocument == sourceDocument))
+                                    doc.PageControls
+                                    .Any(c => c.Page.SourceDocument == sourceDocument))
                                 .ToArray();
+
+                            ExtractException.Assert("ELI41281", "FileTaskSession was not started.",
+                                FileTaskSessionID.HasValue);
 
                             foreach (var outputDocument in documentsToDelete)
                             {
+                                // Build source page info vector while page controls are intact
+                                // (before deleting the output document)
+                                // Only iterating files that are not being output
+                                // (i.e., unchanged source documents) because the rest have been
+                                // already removed from _pendingDocuments in CommitChanges()
+                                var sourceFileName = outputDocument
+                                    .PageControls
+                                    .First(c => !c.Deleted)
+                                    .Page.OriginalDocumentName;
+
+                                var sourcePageInfo = outputDocument
+                                    .PageControls
+                                    .Where(c => !c.Deleted)
+                                    .Select(c => new StringPairClass
+                                    {
+                                        StringKey = c.Page.OriginalDocumentName,
+                                        StringValue = c.Page.OriginalPageNumber.ToString(CultureInfo.InvariantCulture)
+                                    })
+                                    .ToIUnknownVector();
+
                                 // If the document's data is open for editing, close the panel.
                                 if (_documentWithDataInEdit == outputDocument)
                                 {
@@ -1348,6 +1353,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                                         : Math.Min(position, docPosition);
                                 }
                                 _pendingDocuments.Remove(outputDocument);
+
+                                // Add pagination history records to DB if got this far without error
+                                FileProcessingDB.AddPaginationHistory(sourceFileName, sourcePageInfo, FileTaskSessionID.Value);
+                            }
+
+                            // Output expected voa if so configured
+                            if (OutputExpectedPaginationAttributesFile)
+                            {
+                                var pathTags = new SourceDocumentPathTags(fileName);
+                                var outputFileName = pathTags.Expand(ExpectedPaginationAttributesPath);
+                                WriteExpectedAttributes(fileName, outputFileName);
                             }
 
                             var referencedOriginalDocuments = _originalDocuments
@@ -1960,7 +1976,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var sourcePageInfo = outputDocument.PageControls
                     .Where(c => !c.Deleted)
-                    .Select(c => new PageInfo()
+                    .Select(c => new PageInfo
                     {
                         DocumentName = c.Page.OriginalDocumentName,
                         Page = c.Page.OriginalPageNumber
@@ -1983,11 +1999,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var eventArgs = new CreatingOutputDocumentEventArgs(
                     sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted, position,
                     outputDocument.DocumentData);
-                eventArgs.SubDocIndex = outputDocument.SubDocIndex;
 
-                // Track changes to the document name so that pagination history can be written to DB
-                eventArgs.OutputFileNameChanged += ((args, _) =>
-                    outputDocument.FileName = ((CreatingOutputDocumentEventArgs)args).OutputFileName);
 
                 OnCreatingOutputDocument(eventArgs);
                 string outputFileName = eventArgs.OutputFileName;

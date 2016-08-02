@@ -664,6 +664,24 @@ namespace Extract.FileActionManager.FileProcessors
                 // process from getting it.
                 int fileID = _paginationPanel.AddFileWithNameConflictResolve(e, priority);
 
+                // Add pagination history before the image is created so that it does not
+                // get queued by a watching supplier
+                // https://extract.atlassian.net/browse/ISSUE-13760
+                // Format source page info into an IUnknownVector of StringPairs (filename, page).
+                var sourcePageInfo = e.SourcePageInfo
+                    .Select(info => new StringPairClass()
+                    {
+                        StringKey = info.DocumentName,
+                        StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
+                    })
+                    .ToIUnknownVector();
+
+                ExtractException.Assert("ELI40090", "FileTaskSession was not started.",
+                    _fileTaskSessionID.HasValue);
+
+                FileProcessingDB.AddPaginationHistory(
+                    e.OutputFileName, sourcePageInfo, _fileTaskSessionID.Value);
+
                 // PaginationSourceAction allows a paginated source to be moved into a
                 // cleanup action even when it is completed for this action without actually
                 // having completed all FAM tasks.
@@ -1241,14 +1259,14 @@ namespace Extract.FileActionManager.FileProcessors
                 if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
                 {
                     string query = string.Format(CultureInfo.InvariantCulture,
-                        "SELECT COUNT(DISTINCT([DestFileID])) AS [PreviouslyOutput] " +
+                        "SELECT COUNT(DISTINCT([DestFileID])) + 1 AS [SubDocIndex] " +
                         "   FROM [Pagination] " +
                         "   INNER JOIN [FAMFile] ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
                         "   WHERE [FileName] = '{0}'",
                         sourceDocName.Replace("'", "''"));
 
                     var recordset = FileProcessingDB.GetResultsForQuery(query);
-                    int subDocIndex = e.SubDocIndex + (int)recordset.Fields["PreviouslyOutput"].Value;
+                    int subDocIndex = (int)recordset.Fields["SubDocIndex"].Value;
                     recordset.Close();
 
                     pathTags.AddTag(PaginationSettings.SubDocIndexTag,

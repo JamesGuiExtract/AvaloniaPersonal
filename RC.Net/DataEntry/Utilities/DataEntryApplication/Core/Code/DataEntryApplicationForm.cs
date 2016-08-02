@@ -3188,6 +3188,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // process from getting it.
                 int fileID = _paginationPanel.AddFileWithNameConflictResolve(e, priority);
 
+                // Add pagination history before the image is created so that it does not
+                // get queued by a watching supplier
+                // https://extract.atlassian.net/browse/ISSUE-13760
+                // Format source page info into an IUnknownVector of StringPairs (filename, page).
+                var sourcePageInfo = e.SourcePageInfo
+                    .Select(info => new StringPairClass()
+                    {
+                        StringKey = info.DocumentName,
+                        StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
+                    })
+                    .ToIUnknownVector();
+
+                ExtractException.Assert("ELI41280", "FileTaskSession was not started.",
+                    _fileTaskSessionID.HasValue);
+
+                FileProcessingDB.AddPaginationHistory(
+                    e.OutputFileName, sourcePageInfo, _fileTaskSessionID.Value);
+
                 // Produce a uss file for the paginated document using the uss data from the
                 // source documents
                 int pageCounter = 1;
@@ -3283,7 +3301,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // treated as essentially new output that needs to be reprocessed by rules
                 // since what the rules originally found doesn't apply to the source
                 // document as a whole.
-                if (e.DisregardedPaginationSources.SingleOrDefault() == _fileName)
+                // If there is an unmodified source (along with modified versions) then the
+                // unmodified source document needs to follow the same path as the new documents
+                // (and definitely should not be set pending for the source cleanup action)
+                if (e.DisregardedPaginationSources.SingleOrDefault() == _fileName
+                    || e.UnmodifiedPaginationSources.SingleOrDefault() == _fileName)
                 {
                     if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
                     {
@@ -5744,14 +5766,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
                 {
                     string query = string.Format(CultureInfo.InvariantCulture,
-                        "SELECT COUNT(DISTINCT([DestFileID])) AS [PreviouslyOutput] " +
+                        "SELECT COUNT(DISTINCT([DestFileID])) + 1 AS [SubDocIndex] " +
                         "   FROM [Pagination] " +
                         "   INNER JOIN [FAMFile] ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
                         "   WHERE [FileName] = '{0}'",
                         sourceDocName.Replace("'", "''"));
 
                     var recordset = FileProcessingDB.GetResultsForQuery(query);
-                    int subDocIndex = e.SubDocIndex + (int)recordset.Fields["PreviouslyOutput"].Value;
+                    int subDocIndex = (int)recordset.Fields["SubDocIndex"].Value;
                     recordset.Close();
 
                     pathTags.AddTag(PaginationSettings.SubDocIndexTag,
