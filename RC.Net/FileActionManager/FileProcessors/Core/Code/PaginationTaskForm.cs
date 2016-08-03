@@ -465,9 +465,8 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                base.OnFormClosing(e);
-
                 e.Cancel = PreventClose();
+                base.OnFormClosing(e);
             }
             catch (Exception ex)
             {
