@@ -245,7 +245,6 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
-		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\SFHelper.dll</td></row>
 	</table>
@@ -314,26 +313,26 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>AFCoreTest.dll</td><td>{ACD1E282-CEF2-4AAE-A6EA-846C6D6AB632}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>AFCoreTest.dll</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AFDataScorersTest.dll</td><td>{2A5510CB-073F-4151-AAFC-7F04E871B89B}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>AFDataScorersTest.dll</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AFSplittersTest.dll</td><td>{123F4FAD-8B0D-49DA-8851-93B27C72A5D5}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>AFSplittersTest.dll</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AFUtilsTest.dll</td><td>{70BFBBF8-8E3D-4116-B075-6DDD24E8FA80}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>AFUtilsTest.dll</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AFValueFinderTest.dll</td><td>{976D6AF3-A886-472F-A575-5B4D1F2FB2BD}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>AFValueFinderTest.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>BaseUtilsTest.dll</td><td>{799292BB-B8F5-4CD1-BDF4-F31D5E485CC4}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>baseutilstest.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AFCoreTest.dll</td><td>{ACD1E282-CEF2-4AAE-A6EA-846C6D6AB632}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>AFCoreTest.dll</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AFDataScorersTest.dll</td><td>{2A5510CB-073F-4151-AAFC-7F04E871B89B}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>AFDataScorersTest.dll</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AFSplittersTest.dll</td><td>{123F4FAD-8B0D-49DA-8851-93B27C72A5D5}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>AFSplittersTest.dll</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AFUtilsTest.dll</td><td>{70BFBBF8-8E3D-4116-B075-6DDD24E8FA80}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>AFUtilsTest.dll</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AFValueFinderTest.dll</td><td>{976D6AF3-A886-472F-A575-5B4D1F2FB2BD}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>AFValueFinderTest.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>BaseUtilsTest.dll</td><td>{799292BB-B8F5-4CD1-BDF4-F31D5E485CC4}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>baseutilstest.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Binaries</td><td>{8F19E4E8-C671-43BF-A610-541055BFC7C6}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>rdt.rl</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>CountyTester.dll</td><td>{788C1618-1F79-4F4F-81C9-EBD98A8155CD}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>CountyTester.dll</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>CountyTester.dll</td><td>{788C1618-1F79-4F4F-81C9-EBD98A8155CD}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>CountyTester.dll</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.AttributeFinder.Forms.dll</td><td>{68ABFD88-09D1-4F6C-B89E-A08737ACF09E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.attributefinder.form</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISRegistryComponent</td><td>{775BB93C-F45F-4CDA-B0EF-7634480DA491}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>NonSelfRegCommon</td><td>{4CEEF54D-9017-40FC-BB20-28BA50FC1090}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>RasterZoneTester.dll</td><td>{55E680F8-657F-46BD-831C-35ABA107CEBA}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>rasterzonetester.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>SafeNetUtilsTest.dll</td><td>{1944BEC9-8FF3-4B2D-B693-6FDAC5151688}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SafeNetUtilsTest.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>SpatialStringAutomatedTest.dll</td><td>{24B755A3-2AA4-46BF-A0A9-B08B65B610B5}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpatialStringAutomatedTest.d</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>SpatialStringSearcherTest.dll</td><td>{3500F62F-152E-4651-8790-0BC0D880343D}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpatialStringSearcherTest.dl</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>SpotRecIRAutoTest.dll</td><td>{CCE85CA0-04FE-4FBF-AF95-B59F03809DCD}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpotRecIRAutoTest.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>StringPatternMatcherAutoTest.dll</td><td>{1E6802EF-175A-4CED-8005-F1EE56BC261E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>StringPatternMatcherAutoTest</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>TestingFiles</td><td>{C97C3820-7F9D-4F29-82CA-75EB2D334DD2}</td><td>TESTING_FILES</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>VBScriptUtils.dll</td><td>{40C916DB-9296-4317-A747-9D7A0B03D5D7}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>vbscriptutils.dll</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISRegistryComponent</td><td>{775BB93C-F45F-4CDA-B0EF-7634480DA491}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NonSelfRegCommon</td><td>{4CEEF54D-9017-40FC-BB20-28BA50FC1090}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>RasterZoneTester.dll</td><td>{55E680F8-657F-46BD-831C-35ABA107CEBA}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>rasterzonetester.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SafeNetUtilsTest.dll</td><td>{1944BEC9-8FF3-4B2D-B693-6FDAC5151688}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SafeNetUtilsTest.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SpatialStringAutomatedTest.dll</td><td>{24B755A3-2AA4-46BF-A0A9-B08B65B610B5}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpatialStringAutomatedTest.d</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SpatialStringSearcherTest.dll</td><td>{3500F62F-152E-4651-8790-0BC0D880343D}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpatialStringSearcherTest.dl</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SpotRecIRAutoTest.dll</td><td>{CCE85CA0-04FE-4FBF-AF95-B59F03809DCD}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpotRecIRAutoTest.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>StringPatternMatcherAutoTest.dll</td><td>{1E6802EF-175A-4CED-8005-F1EE56BC261E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>StringPatternMatcherAutoTest</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>TestingFiles</td><td>{C97C3820-7F9D-4F29-82CA-75EB2D334DD2}</td><td>TESTING_FILES</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>VBScriptUtils.dll</td><td>{40C916DB-9296-4317-A747-9D7A0B03D5D7}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>vbscriptutils.dll</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -394,12 +393,8 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
-		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td>257</td><td>ISSetupFilesHelper</td><td>SFCleanupEx</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td>257</td><td>ISSetupFilesHelper</td><td>SFStartupEx</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISVerifyScriptingRuntime</td><td>19</td><td/><td>[STANDARD_USE_SETUPEXE]</td><td/><td>Required for installations using InstallScript.</td></row>
 		<row><td>SetARPINSTALLLOCATION</td><td>51</td><td>ARPINSTALLLOCATION</td><td>[INSTALLDIR]</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
@@ -3283,12 +3278,8 @@
 		<row><td>DuplicateFiles</td><td/><td>4210</td><td>DuplicateFiles</td><td/></row>
 		<row><td>FileCost</td><td/><td>900</td><td>FileCost</td><td/></row>
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td/><td>2201</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td/><td>5601</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td/><td>6601</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td/><td>6603</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td/><td>3</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td/><td>2202</td><td/><td/></row>
 		<row><td>InstallFiles</td><td/><td>4000</td><td>InstallFiles</td><td/></row>
 		<row><td>InstallFinalize</td><td/><td>6600</td><td>InstallFinalize</td><td/></row>
 		<row><td>InstallInitialize</td><td/><td>1501</td><td>InstallInitialize</td><td/></row>
