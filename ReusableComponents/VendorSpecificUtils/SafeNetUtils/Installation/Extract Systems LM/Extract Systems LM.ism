@@ -1131,6 +1131,7 @@
 		<col key="yes" def="s72">Component_</col>
 		<row><td>DefaultFeature</td><td>ExtractCommonAppFolder</td></row>
 		<row><td>DefaultFeature</td><td>FieldActivation</td></row>
+		<row><td>DefaultFeature</td><td>NonSelfRegCC</td></row>
 		<row><td>DefaultFeature</td><td>UUsafe32.dll</td></row>
 	</table>
 
