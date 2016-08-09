@@ -614,6 +614,12 @@ namespace Extract.FileActionManager.FileProcessors
                         inputStream.ExtractDecrypt(outputStream, _passwordHash, _label);
                     }
 
+                    // https://extract.atlassian.net/browse/ISSUE-1812
+                    // The output stream needs to release the file in order for it to be accessible
+                    // for copying.
+                    outputStream.Dispose();
+                    outputStream = null;
+
                     // Ensure the directory exists
                     if (!Directory.Exists(Path.GetDirectoryName(destinationFile)))
                     {
