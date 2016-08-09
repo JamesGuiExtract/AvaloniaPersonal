@@ -1283,13 +1283,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see paramref="fileName"/> from the panel.
         /// </summary>
         /// <param name="fileName">The name of the file for which pages should be removed.</param>
+        /// <param name="acceptingPagination">Use <c>true</c> if the file is being committed,
+        /// <c>false</c> if the file is being skipped or if processing is stopping.</param>
         /// <returns>Returns the index at which the document existed.
         /// <para><b>Note</b></para>
         /// This is not a document index. The caller should not try to interpret this value;
         /// it's use should be limited to passing as the position argument of
         /// PaginationPanel.LoadFile or SelectDocumentAtPosition.
         /// </returns>
-        public int RemoveSourceFile(string fileName)
+        public int RemoveSourceFile(string fileName, bool acceptingPagination)
         {
             try
             {
@@ -1319,25 +1321,31 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                             foreach (var outputDocument in documentsToDelete)
                             {
-                                // Build source page info vector while page controls are intact
-                                // (before deleting the output document)
-                                // Only iterating files that are not being output
-                                // (i.e., unchanged source documents) because the rest have been
-                                // already removed from _pendingDocuments in CommitChanges()
-                                var sourceFileName = outputDocument
-                                    .PageControls
-                                    .First(c => !c.Deleted)
-                                    .Page.OriginalDocumentName;
+                                string sourceFileName = null;
+                                IUnknownVector sourcePageInfo = null;
+                                if (acceptingPagination)
+                                {
+                                    // Build source page info vector while page controls are intact
+                                    // (before deleting the output document)
 
-                                var sourcePageInfo = outputDocument
-                                    .PageControls
-                                    .Where(c => !c.Deleted)
-                                    .Select(c => new StringPairClass
-                                    {
-                                        StringKey = c.Page.OriginalDocumentName,
-                                        StringValue = c.Page.OriginalPageNumber.ToString(CultureInfo.InvariantCulture)
-                                    })
-                                    .ToIUnknownVector();
+                                    // If acceptingPagination = true then this is only iterating files that are
+                                    // not being output (i.e., unchanged source documents) because the
+                                    // rest have already been removed from _pendingDocuments in CommitChanges()
+                                    sourceFileName = outputDocument
+                                        .PageControls
+                                        .First(c => !c.Deleted)
+                                        .Page.OriginalDocumentName;
+
+                                    sourcePageInfo = outputDocument
+                                        .PageControls
+                                        .Where(c => !c.Deleted)
+                                        .Select(c => new StringPairClass
+                                        {
+                                            StringKey = c.Page.OriginalDocumentName,
+                                            StringValue = c.Page.OriginalPageNumber.ToString(CultureInfo.InvariantCulture)
+                                        })
+                                        .ToIUnknownVector();
+                                }
 
                                 // If the document's data is open for editing, close the panel.
                                 if (_documentWithDataInEdit == outputDocument)
@@ -1355,11 +1363,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 _pendingDocuments.Remove(outputDocument);
 
                                 // Add pagination history records to DB if got this far without error
-                                FileProcessingDB.AddPaginationHistory(sourceFileName, sourcePageInfo, FileTaskSessionID.Value);
+                                if (acceptingPagination)
+                                {
+                                    FileProcessingDB.AddPaginationHistory(sourceFileName, sourcePageInfo, FileTaskSessionID.Value);
+                                }
                             }
 
                             // Output expected voa if so configured
-                            if (OutputExpectedPaginationAttributesFile)
+                            if (OutputExpectedPaginationAttributesFile && acceptingPagination)
                             {
                                 var pathTags = new SourceDocumentPathTags(fileName);
                                 var outputFileName = pathTags.Expand(ExpectedPaginationAttributesPath);

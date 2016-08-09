@@ -1056,7 +1056,7 @@ namespace Extract.FileActionManager.FileProcessors
                     _voaFileLocks.Remove(sourceFileName);
                 }
 
-                int docPosition = _paginationPanel.RemoveSourceFile(sourceFileName);
+                int docPosition = _paginationPanel.RemoveSourceFile(sourceFileName, acceptingPagination: true);
                 position = (position == -1)
                     ? docPosition
                     : Math.Min(docPosition, position);

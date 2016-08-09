@@ -1727,7 +1727,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         if (_paginationPanel != null)
                         {
-                            _paginationPanel.RemoveSourceFile(_fileName);
+                            _paginationPanel.RemoveSourceFile(_fileName, acceptingPagination: false);
                         }
 
                         // Record statistics to database that needs to happen when a file is closed.
@@ -3330,7 +3330,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // accomplished by the DEP), the data tab must be given back focus.
                 _tabControl.SelectedTab = _dataTab;
 
-                _paginationPanel.RemoveSourceFile(_fileName);
+                _paginationPanel.RemoveSourceFile(_fileName, acceptingPagination: true);
 
                 var success = FileRequestHandler.SetFallbackStatus(
                     _fileId, EActionStatus.kActionCompleted);
@@ -3871,7 +3871,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     if (_paginationPanel != null)
                     {
-                        _paginationPanel.RemoveSourceFile(_fileName);
+                        _paginationPanel.RemoveSourceFile(_fileName, acceptingPagination: true);
                     }
 
                     _imageViewer.CloseImage();
@@ -4052,7 +4052,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _paginationPanel.Park();
                     _paginationPanel.PendingChanges = false;
                     _tabControl.SelectedTab = _dataTab;
-                    _paginationPanel.RemoveSourceFile(_fileName);
+                    _paginationPanel.RemoveSourceFile(_fileName, acceptingPagination: false);
                 }
 
                 _imageViewer.CloseImage();
@@ -4111,7 +4111,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         if (_paginationPanel != null)
                         {
-                            _paginationPanel.RemoveSourceFile(_fileName);
+                            _paginationPanel.RemoveSourceFile(_fileName, acceptingPagination: false);
                         }
 
                         _imageViewer.CloseImage();
