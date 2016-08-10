@@ -96,7 +96,7 @@ namespace Extract.FileActionManager.Database
 
                 RefreshCounterData();
 
-                _emailAlertRecipients.SetError(_manageCountersErrorProvider, String.Empty);
+                _emailAlertRecipients.SetError(String.Empty);
                 _emailAlertRecipients.SetErrorGlyphPosition(_manageCountersErrorProvider);
 	        }
 	        catch (Exception ex)
@@ -372,7 +372,6 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// Handle event so that any existing displayed error state can be cleared if the user 
         /// decides to fix the issue by unchecking the "Enable email alters to:" checkbox.
-        /// Also when checked, if the associated text field is blank (usual case), then add "Required"
         /// </summary>
         private void HandleEnableEmailAlertsTo_CheckStateChanged(object sender, EventArgs e)
         {
@@ -385,20 +384,13 @@ namespace Extract.FileActionManager.Database
 
                 if (!_emailSpecifiedRecipientsCheckBox.Checked)
                 {
-                    _emailAlertRecipients.SetError(_manageCountersErrorProvider, String.Empty);
-                    _emailAlertRecipients.RemoveRequiredMarker();
+                    _emailAlertRecipients.SetError(String.Empty);
                 }
-                else    // [x] Enable email alerts to: is checked
+                // [x] Enable email alerts to: is checked
+                else if (!EmailSettingsAreValid())
                 {
-                    if (EmailSettingsAreValid())
-                    {
-                        _emailAlertRecipients.SetRequiredMarker();
-                    }
-                    else
-                    {
-                        _emailSpecifiedRecipientsCheckBox.Checked = false;
-                        _emailAlertRecipients.Enabled = false;
-                    }
+                    _emailSpecifiedRecipientsCheckBox.Checked = false;
+                    _emailAlertRecipients.Enabled = false;
                 }
             }
             catch (Exception ex)
@@ -416,7 +408,7 @@ namespace Extract.FileActionManager.Database
             try
             {
                 _licenseContactSettings.Settings.SpecifiedAlertRecipients = _emailAlertRecipients.Text;
-                if (!_emailAlertRecipients.EmptyOrRequiredMarkerIsSet())
+                if (!string.IsNullOrWhiteSpace(_emailAlertRecipients.Text))
                 {
                     _emailAlertRecipients.SetError(_manageCountersErrorProvider, String.Empty);
                 }
@@ -469,7 +461,7 @@ namespace Extract.FileActionManager.Database
         bool ApplyAlertSettings()
         {
             if (_emailSpecifiedRecipientsCheckBox.Checked &&
-               _emailAlertRecipients.EmptyOrRequiredMarkerIsSet())
+               string.IsNullOrWhiteSpace(_emailAlertRecipients.Text))
             {
                 _emailSpecifiedRecipientsCheckBox.Checked = false;
             }
@@ -708,11 +700,10 @@ namespace Extract.FileActionManager.Database
             if (!_emailSpecifiedRecipientsCheckBox.Checked)
                 return true;
 
-            if (_emailAlertRecipients.EmptyOrRequiredMarkerIsSet())
+            if (string.IsNullOrWhiteSpace(_emailAlertRecipients.Text))
             {
-                _emailAlertRecipients.SetError(_manageCountersErrorProvider, "Add one or more email addresses to alert");
+                _emailAlertRecipients.SetError("Add one or more email addresses to alert");
 
-                _emailAlertRecipients.RemoveRequiredMarker();
                 _emailAlertRecipients.Focus();
 
                 return false;

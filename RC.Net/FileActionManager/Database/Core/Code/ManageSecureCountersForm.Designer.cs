@@ -41,13 +41,13 @@
             this._counterAlertMultipleColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._emailSupportCheckBox = new System.Windows.Forms.CheckBox();
             this._emailSpecifiedRecipientsCheckBox = new System.Windows.Forms.CheckBox();
-            this._emailAlertRecipients = new System.Windows.Forms.TextBox();
+            this._emailAlertRecipients = new Extract.Utilities.Forms.BetterTextBox();
+            this._manageCountersErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             this._generateRequestButton = new System.Windows.Forms.Button();
             this._applyUpdateCodeButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this._refreshButton = new System.Windows.Forms.Button();
-            this._manageCountersErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             ((System.ComponentModel.ISupportInitialize)(this._counterDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._manageCountersErrorProvider)).BeginInit();
             this.SuspendLayout();
@@ -176,12 +176,18 @@
             this._emailAlertRecipients.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._emailAlertRecipients.Enabled = false;
-            this._manageCountersErrorProvider.SetError(this._emailAlertRecipients, "\"Enable email alerts to\"");
+            this._emailAlertRecipients.ErrorProvider = this._manageCountersErrorProvider;
             this._emailAlertRecipients.Location = new System.Drawing.Point(148, 161);
             this._emailAlertRecipients.Name = "_emailAlertRecipients";
+            this._emailAlertRecipients.Required = false;
             this._emailAlertRecipients.Size = new System.Drawing.Size(514, 20);
             this._emailAlertRecipients.TabIndex = 4;
             this._emailAlertRecipients.TextChanged += new System.EventHandler(this.HandleEmailAlertRecipients_TextChanged);
+            // 
+            // _manageCountersErrorProvider
+            // 
+            this._manageCountersErrorProvider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this._manageCountersErrorProvider.ContainerControl = this;
             // 
             // _generateRequestButton
             // 
@@ -239,11 +245,6 @@
             this._refreshButton.UseVisualStyleBackColor = true;
             this._refreshButton.Click += new System.EventHandler(this.HandleRefreshButton_Click);
             // 
-            // _manageCountersErrorProvider
-            // 
-            this._manageCountersErrorProvider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
-            this._manageCountersErrorProvider.ContainerControl = this;
-            // 
             // ManageSecureCountersForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -279,7 +280,7 @@
         private System.Windows.Forms.DataGridView _counterDataGridView;
         private System.Windows.Forms.CheckBox _emailSupportCheckBox;
         private System.Windows.Forms.CheckBox _emailSpecifiedRecipientsCheckBox;
-        private System.Windows.Forms.TextBox _emailAlertRecipients;
+        private Extract.Utilities.Forms.BetterTextBox _emailAlertRecipients;
         private System.Windows.Forms.Button _generateRequestButton;
         private System.Windows.Forms.Button _applyUpdateCodeButton;
         private System.Windows.Forms.Button _okButton;
