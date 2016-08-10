@@ -85,9 +85,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<EventArgs> Invalidated;
 
         /// <summary>
-        /// Raised when the <see cref="DocumentData"/> for this instance is modified.
+        /// Raised when the <see cref="DocumentData"/> or page states for this instance have been
+        /// modified (currently not raised when pages are added/removed to avoid adding excess
+        /// event handling).
         /// </summary>
-        public event EventHandler<EventArgs> DocumentDataChanged;
+        public event EventHandler<EventArgs> DocumentStateChanged;
 
         /// <summary>
         /// The <see cref="PaginationSeparator"/> representing this document in the UI.
@@ -237,6 +239,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     var currentPages = _pageControls
                         .Where(c => !c.Deleted)
                         .Select(c => c.Page);
+
+                    if (currentPages.Any(page => page.ImageOrientation != 0))
+                    {
+                        return false;
+                    }
+
                     return Page.PagesAreEqual(currentPages,
                         _originalPages.Where(c => !_originalDeletedPages.Contains(c)));
                 }
@@ -270,6 +278,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (pages.Select(page => page.SourceDocument)
                         .Distinct()
                         .Count() != 1)
+                    {
+                        return false;
+                    }
+
+                    if (pages.Any(page => page.ImageOrientation != 0))
                     {
                         return false;
                     }
@@ -369,7 +382,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _documentData.SendForReprocessingChanged += HandleDocumentData_Changed;
                         }
 
-                        OnDocumentDataChanged();
+                        OnDocumentStateChanged();
                     }
                 }
                 catch (Exception ex)
@@ -500,7 +513,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (!_pageControls.Contains(pageControl))
                 {
-                    pageControl.DeletedStateChanged += HandlePageControl_DeletedStateChanged;
+                    pageControl.PageStateChanged += HandlePageControl_PageStateChanged;
                 }
 
                 if (pageIndex < _pageControls.Count)
@@ -524,15 +537,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the DeletedStateChanged event of the pageControl control.
+        /// Handles the PageStateChanged event of the pageControl control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandlePageControl_DeletedStateChanged(object sender, EventArgs e)
+        void HandlePageControl_PageStateChanged(object sender, EventArgs e)
         {
             try
             {
                 Invalidate();
+
+                OnDocumentStateChanged();
             }
             catch (Exception ex)
             {
@@ -552,7 +567,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (_pageControls.Remove(pageControl))
                 {
-                    pageControl.DeletedStateChanged -= HandlePageControl_DeletedStateChanged;
+                    pageControl.PageStateChanged -= HandlePageControl_PageStateChanged;
                 }
 
                 pageControl.Document = null;
@@ -681,7 +696,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                OnDocumentDataChanged();
+                OnDocumentStateChanged();
             }
             catch (Exception ex)
             {
@@ -732,11 +747,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Raises the <see cref="DocumentDataChanged"/> event.
+        /// Raises the <see cref="DocumentStateChanged"/> event.
+        /// <para><b>Note</b></para>
+        /// Currently not raised when pages are added/removed to avoid adding excess event handling.
         /// </summary>
-        void OnDocumentDataChanged()
+        void OnDocumentStateChanged()
         {
-            var eventHandler = DocumentDataChanged;
+            var eventHandler = DocumentStateChanged;
             if (eventHandler != null)
             {
                 eventHandler(this, new EventArgs());

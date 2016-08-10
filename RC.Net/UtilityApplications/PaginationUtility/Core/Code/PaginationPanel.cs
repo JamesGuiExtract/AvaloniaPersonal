@@ -1202,6 +1202,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     sourceDocArray = _sourceDocuments.ToArray();
                 }
 
+                foreach (var page in sourceDocArray.SelectMany(doc => doc.Pages))
+                {
+                    page.ImageOrientation = 0;
+                }
+
                 if (revertToSource)
                 {
                     foreach (SourceDocument sourceDocument in sourceDocArray)
@@ -2200,7 +2205,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     foreach (var newDocument in e.NewItems.Cast<OutputDocument>())
                     {
-                        newDocument.DocumentDataChanged += HandleDocument_DocumentDataChanged;
+                        newDocument.DocumentStateChanged += HandleDocument_DocumentStateChanged;
                     }
                 }
 
@@ -2208,7 +2213,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     foreach (var oldDocument in e.OldItems.Cast<OutputDocument>())
                     {
-                        oldDocument.DocumentDataChanged -= HandleDocument_DocumentDataChanged;
+                        oldDocument.DocumentStateChanged -= HandleDocument_DocumentStateChanged;
                     }
                 }
             }
@@ -2219,13 +2224,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="OutputDocument.DocumentDataChanged"/> event for all
+        /// Handles the <see cref="OutputDocument.DocumentStateChanged"/> event for all
         /// <see cref="_pendingDocuments"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleDocument_DocumentDataChanged(object sender, EventArgs e)
+        void HandleDocument_DocumentStateChanged(object sender, EventArgs e)
         {
             try
             {
@@ -2235,6 +2240,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     document.PaginationSeparator.Invalidate();
                 }
+
+                UpdateCommandStates();
             }
             catch (Exception ex)
             {

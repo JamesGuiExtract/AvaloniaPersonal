@@ -179,9 +179,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Events
 
         /// <summary>
-        /// Raised to indicate the state of <see cref="Deleted"/> has changed.
+        /// Raised to indicate the state of <see cref="Deleted"/> has changed or the page
+        /// orientation has changed.
         /// </summary>
-        public event EventHandler<EventArgs> DeletedStateChanged;
+        public event EventHandler<EventArgs> PageStateChanged;
 
         #endregion Events
 
@@ -353,7 +354,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         _deleted = value;
 
-                        OnDeletedStateChanged();
+                        OnPageStateChanged();
 
                         Invalidate();
                     }
@@ -754,6 +755,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _activeImageViewer != null);
 
                 Page.ImageOrientation = _activeImageViewer.Orientation;
+                OnPageStateChanged();
             }
             catch (Exception ex)
             {
@@ -854,11 +856,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Raises the <see cref="DeletedStateChanged"/> event.
+        /// Raises the <see cref="PageStateChanged"/> event.
         /// </summary>
-        void OnDeletedStateChanged()
+        void OnPageStateChanged()
         {
-            var eventHandler = DeletedStateChanged;
+            var eventHandler = PageStateChanged;
             if (eventHandler != null)
             {
                 eventHandler(this, new EventArgs());
