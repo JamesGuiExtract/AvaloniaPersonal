@@ -31,7 +31,7 @@ void validateLicense()
 void printUsage()
 {
 	cout << endl;
-	cout << "SplitFile <File with file list> <# lines per file> [binary]" << endl;
+	cout << "SplitFile <File with file list> <# lines per file>" << endl;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	try
 	{
-		if (argc < 3)
+		if (argc != 3)
 		{
 			printUsage();
 			return EXIT_FAILURE;
@@ -89,14 +89,7 @@ int main(int argc, char* argv[])
 		}
 
 		// Output the lines to separate files
-		ios_base::openmode mode = ios_base::in;
-		std::string inputMode = argc == 4 ? argv[3] : "";
-		if (0 == _stricmp(inputMode.c_str(), "binary"))
-		{
-			mode = ios_base::binary;
-		}
-
-		ifstream inputFile(strInputFile.c_str(), mode);
+		ifstream inputFile(strInputFile.c_str(), ifstream::binary);
 		int iFileNumber = 0;
 		int iTotalLines = 0;
 		while ( !inputFile.bad() && !inputFile.eof())
