@@ -1393,8 +1393,11 @@ namespace Extract.Redaction.Verification
 
             VerificationMemento thisMemento = GetCurrentDocument();
 
-            thisMemento.FileTaskSessionID =
-                _fileDatabase.StartFileTaskSession(_VERIFY_TASK_GUID, thisMemento.FileId);
+            if (_fileDatabase != null)
+            {
+                thisMemento.FileTaskSessionID =
+                    _fileDatabase.StartFileTaskSession(_VERIFY_TASK_GUID, thisMemento.FileId);
+            }
 
             // If the timer is currently running, its current time will be the overhead time (time
             // since the previous document was saved. Restart the timer to track the screen time of
