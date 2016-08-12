@@ -107,9 +107,9 @@ namespace Extract.FileActionManager.FileProcessors
         ITagUtility _tagUtility;
 
         /// <summary>
-        /// Keeps track of the last file ID loaded; for use with the load next document button.
+        /// Keeps track of the file ID(s) loaded; for use with the load next document button.
         /// </summary>
-        int _lastFileIDLoaded = -1;
+        List<int> _fileIDsLoaded = new List<int>();
 
         /// <summary>
         /// Used to invoke methods on this control.
@@ -542,7 +542,11 @@ namespace Extract.FileActionManager.FileProcessors
                 // https://extract.atlassian.net/browse/ISSUE-13904
                 // First check to see if there is an additional file that has been checked out for
                 // processing that is not yet actively processing in the FAM.
-                int fileID = FileRequestHandler.GetNextCheckedOutFile(_lastFileIDLoaded);
+                int fileID = FileRequestHandler.GetNextCheckedOutFile(
+                    (_fileIDsLoaded.Count == 0) ? -1 : _fileIDsLoaded.Last());
+                ExtractException.Assert("ELI41282", "Unexpected file",
+                    !_fileIDsLoaded.Contains(fileID));
+
                 // If not, retrieve the next file from the database.
                 if (fileID == -1)
                 {
@@ -1062,10 +1066,8 @@ namespace Extract.FileActionManager.FileProcessors
                     : Math.Min(docPosition, position);
 
                 int sourceFileID = FileProcessingDB.GetFileID(sourceFileName);
-                if (_lastFileIDLoaded == sourceFileID)
-                {
-                    _lastFileIDLoaded = -1;
-                }
+                _fileIDsLoaded.Remove(sourceFileID);
+
                 var success = FileRequestHandler.SetFallbackStatus(
                     sourceFileID, EActionStatus.kActionCompleted);
                 ExtractException.Assert("ELI40104", "Failed to set fallback status", success,
@@ -1112,7 +1114,7 @@ namespace Extract.FileActionManager.FileProcessors
                     return;
                 }
 
-                _lastFileIDLoaded = fileId;
+                _fileIDsLoaded.Add(fileId);
 
                 // Look in the voa file for rules-suggested pagination.
                 // TODO: Warn if the document was previously paginated.
