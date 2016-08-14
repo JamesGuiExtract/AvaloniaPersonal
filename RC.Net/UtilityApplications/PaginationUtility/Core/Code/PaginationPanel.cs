@@ -1217,6 +1217,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                             outputDocuments.Count == 1)
                         {
                             var outputDocument = outputDocuments.Single();
+                            outputDocument.Collapsed = false;
+                            outputDocument.Selected = false;
                             _primaryPageLayoutControl.LoadOutputDocument(
                                 outputDocument, outputDocument.OriginalPages, null);
                             if (outputDocument.DocumentData != null)
@@ -1234,6 +1236,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 ((IPaginationUtility)this).CreateOutputDocument(sourceDocument.FileName);
                             outputDocument.SetOriginalForm();
                             outputDocument.PaginationSuggested = true;
+                            outputDocument.Collapsed = false;
+                            outputDocument.Selected = false;
 
                             var args = new DocumentDataRequestEventArgs(sourceDocument.FileName);
                             OnDocumentDataRequest(args);
