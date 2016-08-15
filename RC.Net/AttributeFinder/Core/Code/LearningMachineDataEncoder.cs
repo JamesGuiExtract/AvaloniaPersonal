@@ -1059,7 +1059,7 @@ namespace Extract.AttributeFinder
 
                     string answer = answers[i];
 
-                    ISpatialString spatialString = null;
+                    SpatialString spatialString = null;
                     if (AutoBagOfWords != null)
                     {
                         string uss = ussFilePaths[i];
@@ -1067,6 +1067,7 @@ namespace Extract.AttributeFinder
                         {
                             spatialString = new SpatialStringClass();
                             spatialString.LoadFrom(uss, false);
+                            spatialString.ReportMemoryUsage();
                         }
                         catch (Exception e)
                         {
@@ -1166,7 +1167,7 @@ namespace Extract.AttributeFinder
 
                     string answerFile = answerFiles[i];
 
-                    ISpatialString spatialString = null;
+                    SpatialString spatialString = null;
                     if (AutoBagOfWords != null)
                     {
                         string uss = ussFilePaths[i];
@@ -1174,6 +1175,7 @@ namespace Extract.AttributeFinder
                         {
                             spatialString = new SpatialStringClass();
                             spatialString.LoadFrom(uss, false);
+                            spatialString.ReportMemoryUsage();
                         }
                         catch (Exception e)
                         {

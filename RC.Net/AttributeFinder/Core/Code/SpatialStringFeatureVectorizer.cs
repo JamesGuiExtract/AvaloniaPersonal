@@ -567,6 +567,7 @@ namespace Extract.AttributeFinder
             {
                 var ussObject = new SpatialStringClass();
                 ussObject.LoadFrom(ussPath, false);
+                ussObject.ReportMemoryUsage();
                 return GetDocumentText(ussObject);
             }
             catch (Exception e)
@@ -599,6 +600,7 @@ namespace Extract.AttributeFinder
             {
                 var document = new SpatialStringClass();
                 document.LoadFrom(ussPath, false);
+                document.ReportMemoryUsage();
                 return GetPaginationTexts(document);
             }
             catch (Exception e)
