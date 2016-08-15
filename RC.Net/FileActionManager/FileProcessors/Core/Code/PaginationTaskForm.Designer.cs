@@ -187,19 +187,17 @@ namespace Extract.FileActionManager.FileProcessors
             // 
             // _imageViewer
             // 
-            this._imageViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this._imageViewer.AutoOcr = false;
             this._imageViewer.AutoZoomScale = 0;
             this._imageViewer.ContextMenuStrip = this._imageViewerContextMenu;
             this._imageViewer.DisplayAnnotations = false;
+            this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._imageViewer.InvertColors = false;
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
             this._imageViewer.MinimumAngularHighlightHeight = 4;
             this._imageViewer.Name = "_imageViewer";
             this._imageViewer.OcrTradeoff = Extract.Imaging.OcrTradeoff.Accurate;
-            this._imageViewer.RedactionMode = true;
+            this._imageViewer.RedactionMode = false;
             this._imageViewer.Size = new System.Drawing.Size(1526, 837);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
