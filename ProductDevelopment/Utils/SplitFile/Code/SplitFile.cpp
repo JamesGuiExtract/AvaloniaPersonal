@@ -113,6 +113,10 @@ int main(int argc, char* argv[])
 			{
 				strLine = "";
 				getline( inputFile, strLine );
+				if (!strLine.empty() && strLine[strLine.size() - 1] == '\r')
+				{
+					strLine.erase(strLine.size() - 1);
+				}
 				outputFile << strLine << endl;
 				iTotalLines++;
 			}
