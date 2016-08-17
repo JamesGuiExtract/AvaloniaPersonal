@@ -115,7 +115,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             validateXmlTask.XmlSchemaValidation = XmlSchemaValidation.None;
 
             Assert.That(TestTaskForFailure(validateXmlTask,
-                _testFiles.GetFile(_FLEX_INDEX_BAD_SYNTAX_XML), "ELI40346"));
+                _testFiles.GetFile(_FLEX_INDEX_BAD_SYNTAX_XML), "ELI38394"));
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             _testFiles.GetFile(_LABDE_XSD);
 
             Assert.That(TestTaskForFailure(validateXmlTask,
-                _testFiles.GetFile(_LABDE_INLINE_BAD_SCHEMA), "ELI40347"));
+                _testFiles.GetFile(_LABDE_INLINE_BAD_SCHEMA), "ELI38394"));
         }
 
         /// <summary>
@@ -167,9 +167,9 @@ namespace Extract.FileActionManager.FileProcessors.Test
             validateXmlTask.RequireInlineSchema = true;
 
             _testFiles.GetFile(_LABDE_XSD);
-            
+
             Assert.That(TestTaskForFailure(validateXmlTask,
-                _testFiles.GetFile(_FLEX_INDEX_INLINE_WRONG_SCHEMA), "ELI40348"));
+                _testFiles.GetFile(_FLEX_INDEX_INLINE_WRONG_SCHEMA), "ELI38394"));
         }
 
         /// <summary>
@@ -203,9 +203,9 @@ namespace Extract.FileActionManager.FileProcessors.Test
             validateXmlTask.RequireInlineSchema = true;
 
             _testFiles.GetFile(_FLEX_INDEX_XSD);
-            
+
             Assert.That(TestTaskForFailure(validateXmlTask,
-                _testFiles.GetFile(_FLEX_INDEX_XML), "ELI40349"));
+                _testFiles.GetFile(_FLEX_INDEX_XML), "ELI38394"));
         }
 
         /// <summary>
@@ -237,7 +237,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             validateXmlTask.SchemaFileName = _testFiles.GetFile(_LABDE_XSD);
 
             Assert.That(TestTaskForFailure(validateXmlTask,
-                _testFiles.GetFile(_FLEX_INDEX_XML), "ELI40350"));
+                _testFiles.GetFile(_FLEX_INDEX_XML), "ELI38394"));
         }
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             _testFiles.GetFile(_FLEX_INDEX_XSD);
 
             Assert.That(TestTaskForFailure(validateXmlTask,
-                _testFiles.GetFile(_FLEX_INDEX_XML), "ELI40351"));
+                _testFiles.GetFile(_FLEX_INDEX_XML), "ELI38394"));
         }
 
         #endregion Unit Tests
@@ -310,9 +310,9 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 else
                 {
                     for (ExtractException eeIterator = ee; eeIterator != null;
-                        ee = ee.InnerException as ExtractException)
+                        eeIterator = eeIterator.InnerException as ExtractException)
                     {
-                        if (ee.EliCode == expectedFailureELI)
+                        if (eeIterator.EliCode == expectedFailureELI)
                         {
                             return true;
                         }
