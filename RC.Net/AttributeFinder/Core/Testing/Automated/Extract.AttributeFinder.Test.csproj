@@ -175,6 +175,7 @@
     <EmbeddedResource Include="Resources\ByDocUnderParentSourceDocName.voa" />
     <EmbeddedResource Include="Resources\ByPageUnderParentPageContent.voa" />
     <EmbeddedResource Include="Resources\ByPageUnderParentPageNumber.voa" />
+    <EmbeddedResource Include="Resources\image3-4-6-7.tif" />
     <EmbeddedResource Include="Resources\image3-4-6-7.tif.uss" />
     <EmbeddedResource Include="Resources\RunModeTest.rsd" />
     <EmbeddedResource Include="Resources\RunModeLoadTestFromOld.rsd" />

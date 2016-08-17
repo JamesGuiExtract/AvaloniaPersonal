@@ -37,6 +37,11 @@ namespace Extract.AttributeFinder.Test
         static readonly string _TEST_IMAGE_USS_FILE = "Resources.image3-4-6-7.tif.uss";
 
         /// <summary>
+        /// The embedded resource tif file needed to run rules
+        /// </summary>
+        static readonly string _TEST_IMAGE_FILE = "Resources.image3-4-6-7.tif";
+
+        /// <summary>
         /// The embedded resource voa expected output for RunMode = kRunPerDocument
         /// </summary>
         static readonly string _BY_DOC_VOA = "Resources.ByDoc.voa";
@@ -188,11 +193,16 @@ namespace Extract.AttributeFinder.Test
             expected.LoadFrom(_testFiles.GetFile(_BY_DOC_VOA), false);
 
             // Run the rules
-            IUnknownVector results = 
-                RunRules(rules, GetSourceDocNameFromVector(expected));
+            var sourceDocAndResults = RunRules(rules);
+            string sourceDocName = sourceDocAndResults.Item1;
+            IUnknownVector results = sourceDocAndResults.Item2;
+
+            // Update source doc name of expected to be temp file location
+            UpdateSourceDocName(expected, sourceDocName);
             
             // Verify the results
-            Assert.That(IsEqual(results, expected), "Results do not match expected.");        }
+            Assert.That(IsEqual(results, expected), "Results do not match expected.");
+        }
 
         [Test, Category("RuleSetRunMode")]
         public static void Test06_RunModeByDocumentUnderParentSourceDocName()
@@ -209,8 +219,15 @@ namespace Extract.AttributeFinder.Test
             expected.LoadFrom(_testFiles.GetFile(_BY_DOC_UNDER_PARENT_SOURCE_DOC_NAME_VOA), false);
 
             // Run the rules
-            IUnknownVector results =
-                RunRules(rules, GetSourceDocNameFromVector(expected));
+            var sourceDocAndResults = RunRules(rules);
+            string sourceDocName = sourceDocAndResults.Item1;
+            IUnknownVector results = sourceDocAndResults.Item2;
+
+            // Update source doc name of expected to be temp file location
+            UpdateSourceDocName(expected, sourceDocName);
+
+            // Fix incorrect path in expected top-level node's value
+            ((ComAttribute)expected.At(0)).Value.ReplaceAndDowngradeToNonSpatial(sourceDocName);
 
             // Verify the results
             Assert.That(IsEqual(results, expected), "Results do not match expected.");
@@ -231,8 +248,12 @@ namespace Extract.AttributeFinder.Test
             expected.LoadFrom(_testFiles.GetFile(_BY_DOC_UNDER_PARENT_PAGE_CONTENT_VOA), false);
 
             // Run the rules
-            IUnknownVector results =
-                RunRules(rules, GetSourceDocNameFromVector(expected));
+            var sourceDocAndResults = RunRules(rules);
+            string sourceDocName = sourceDocAndResults.Item1;
+            IUnknownVector results = sourceDocAndResults.Item2;
+
+            // Update source doc name of expected to be temp file location
+            UpdateSourceDocName(expected, sourceDocName);
 
             // Verify the results
             Assert.That(IsEqual(results, expected), "Results do not match expected.");
@@ -253,8 +274,12 @@ namespace Extract.AttributeFinder.Test
             expected.LoadFrom(_testFiles.GetFile(_BY_PAGE_UNDER_PARENT_PAGE_NUMBER_VOA), false);
 
             // Run the rules
-            IUnknownVector results =
-                RunRules(rules, GetSourceDocNameFromVector(expected));
+            var sourceDocAndResults = RunRules(rules);
+            string sourceDocName = sourceDocAndResults.Item1;
+            IUnknownVector results = sourceDocAndResults.Item2;
+
+            // Update source doc name of expected to be temp file location
+            UpdateSourceDocName(expected, sourceDocName);
 
             // Verify the results
             Assert.That(IsEqual(results, expected), "Results do not match expected.");
@@ -275,8 +300,12 @@ namespace Extract.AttributeFinder.Test
             expected.LoadFrom(_testFiles.GetFile(_BY_PAGE_UNDER_PARENT_PAGE_CONTENT_VOA), false);
 
             // Run the rules
-            IUnknownVector results =
-                RunRules(rules, GetSourceDocNameFromVector(expected));
+            var sourceDocAndResults = RunRules(rules);
+            string sourceDocName = sourceDocAndResults.Item1;
+            IUnknownVector results = sourceDocAndResults.Item2;
+
+            // Update source doc name of expected to be temp file location
+            UpdateSourceDocName(expected, sourceDocName);
 
             // Verify the results
             Assert.That(IsEqual(results, expected), "Results do not match expected.");
@@ -295,8 +324,8 @@ namespace Extract.AttributeFinder.Test
             expected.LoadFrom(_testFiles.GetFile(_BY_PAGE_UNDER_PARENT_PAGE_NUMBER_VOA), false);
 
             // Run the rules
-            IUnknownVector results =
-                RunRules(rules, GetSourceDocNameFromVector(expected), expected);
+            var sourceDocAndResults = RunRules(rules, expected);
+            IUnknownVector results = sourceDocAndResults.Item2;
 
             // Verify the results
             Assert.That(IsEqual(results, expected, true), "Results do not match expected.");
@@ -317,12 +346,16 @@ namespace Extract.AttributeFinder.Test
             IUnknownVector expected = new IUnknownVector();
             expected.LoadFrom(_testFiles.GetFile(_BY_PAGE_UNDER_PARENT_PAGE_NUMBER_VOA), false);
 
-            // Get the sourceDocName for the expected results
-            string sourceDocName = GetSourceDocNameFromVector(expected);
-
             // Run the rules
-            IUnknownVector results =
-                RunRules(rules, sourceDocName, expected);
+            var sourceDocAndResults = RunRules(rules, expected);
+            string sourceDocName = sourceDocAndResults.Item1;
+            IUnknownVector results = sourceDocAndResults.Item2;
+
+            // Update source doc name of expected to be temp file location
+            UpdateSourceDocName(expected, sourceDocName);
+
+            // Update source doc name of results (since they are the expected attributes passed through the ruleset)
+            UpdateSourceDocName(results, sourceDocName);
 
             // Results should have only one top level attribute
             Assert.That(results.Size() == 1, "To many top level attributes in results");
@@ -366,8 +399,15 @@ namespace Extract.AttributeFinder.Test
             expected.LoadFrom(_testFiles.GetFile(_BY_PAGE_UNDER_PARENT_PAGE_NUMBER_VOA), false);
 
             // Run the rules
-            IUnknownVector results =
-                RunRules(rules, GetSourceDocNameFromVector(expected), expected);
+            var sourceDocAndResults = RunRules(rules, expected);
+            string sourceDocName = sourceDocAndResults.Item1;
+            IUnknownVector results = sourceDocAndResults.Item2;
+
+            // Update source doc name of expected to be temp file location
+            UpdateSourceDocName(expected, sourceDocName);
+
+            // Update source doc name of results (since they are the expected attributes passed through the ruleset)
+            UpdateSourceDocName(results, sourceDocName);
 
             // Verify the results
             Assert.That(IsEqual(results, expected, false), "Results do not match expected.");
@@ -389,15 +429,19 @@ namespace Extract.AttributeFinder.Test
             IUnknownVector expected = new IUnknownVector();
             expected.LoadFrom(_testFiles.GetFile(_BY_PAGE_UNDER_PARENT_PAGE_NUMBER_VOA), false);
 
-            // Get the sourceDocName for the expected results
-            string sourceDocName = GetSourceDocNameFromVector(expected);
-
             // Run the rules
-            IUnknownVector results =
-                RunRules(rules, sourceDocName, expected);
+            var sourceDocAndResults = RunRules(rules, expected);
+            string sourceDocName = sourceDocAndResults.Item1;
+            IUnknownVector results = sourceDocAndResults.Item2;
+
+            // Update source doc name of expected to be temp file location
+            UpdateSourceDocName(expected, sourceDocName);
+
+            // Update source doc name of results (since they are the expected attributes passed through the ruleset)
+            UpdateSourceDocName(results, sourceDocName);
 
             // Results should have only one top level attribute
-            Assert.That(results.Size() == 1, "To many top level attributes in results");
+            Assert.That(results.Size() == 1, "Too many top level attributes in results");
 
             // Create the expected parent attribute
             AttributeCreator attributeCreator = new AttributeCreator(sourceDocName);
@@ -444,22 +488,23 @@ namespace Extract.AttributeFinder.Test
 
         static AFDocument GetTestInput()
         {
+            // Get the image so that page count can be obtained
+            string filename = _testFiles.GetFile(_TEST_IMAGE_FILE);
+
             SpatialString docText = new SpatialString();
-            docText.LoadFrom(_testFiles.GetFile(_TEST_IMAGE_USS_FILE), false);
+            docText.LoadFrom(_testFiles.GetFile(_TEST_IMAGE_USS_FILE, filename + ".uss"), false);
 
             AFDocument doc = new AFDocument();
             doc.Text = docText;
             return doc;
         }
 
-        static IUnknownVector RunRules(RuleSet rules, string sourceDocName, 
+        static Tuple<string, IUnknownVector> RunRules(RuleSet rules,
             IUnknownVector attributesToPassIn = null)
         {
             StrToObjectMap attributes = rules.AttributeNameToInfoMap;
             AFDocument afDoc = GetTestInput();
-
-            // Set the SourceDocName for the AFDocument text to the expected sourceDocName
-            afDoc.Text.SourceDocName = sourceDocName;
+            string sourceDocName = afDoc.Text.SourceDocName;
 
             if (attributesToPassIn != null)
             {
@@ -469,38 +514,28 @@ namespace Extract.AttributeFinder.Test
             }
 
             // Run the rules
-            return rules.ExecuteRulesOnText(afDoc, attributes.GetKeys(), null, null);
+            var result = rules.ExecuteRulesOnText(afDoc, attributes.GetKeys(), null, null);
+            return Tuple.Create(sourceDocName, result);
         }
 
-        static string GetSourceDocNameFromVector(IUnknownVector expected)
+        static void UpdateSourceDocName(IUnknownVector voa, string sourceDocName)
         {
-            string sourceDocName = "";
-            
-            // the expected is null nothing to do
-            if (expected == null)
+            // the voa is null nothing to do
+            if (voa == null)
             {
-                return sourceDocName;
+                return;
             }
             
-            // Search the results for the first attribute with Source doc name set
-            for (int i = 0; i < expected.Size(); i++)
+            // Update source doc name for each attribute
+            for (int i = 0; i < voa.Size(); i++)
             {
-                ComAttribute a = (ComAttribute)expected.At(i);
-                if (a.Value.HasSpatialInfo())
-                {
-                    sourceDocName = a.Value.SourceDocName;
-                }
-                else
-                {
-                    // Call recursively on subattributes
-                    sourceDocName = GetSourceDocNameFromVector(a.SubAttributes);
-                }
-                if (!String.IsNullOrWhiteSpace(sourceDocName))
-                {
-                    return sourceDocName;
-                }
+                ComAttribute a = (ComAttribute)voa.At(i);
+                if (!string.IsNullOrEmpty(a.Value.SourceDocName))
+                    a.Value.SourceDocName = sourceDocName;
+
+                // Call recursively on subattributes
+                UpdateSourceDocName(a.SubAttributes, sourceDocName);
             }
-            return sourceDocName;
         }
 
         static bool IsEqual(IUnknownVector a1, IUnknownVector a2, bool guidsMatch = false)
