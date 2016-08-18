@@ -90,6 +90,10 @@ namespace Extract.FileActionManager.FileProcessors
             this._rotateCounterclockwiseToolStripButton = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton();
             this._rotateClockwiseToolStripButton = new Extract.Imaging.Forms.RotateClockwiseToolStripButton();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
+            this._highlightToolsToolStrip = new System.Windows.Forms.ToolStrip();
+            this._rectangularHighlightToolStripButton = new Extract.Imaging.Forms.RectangularHighlightToolStripButton();
+            this._angularHighlightToolStripButton = new Extract.Imaging.Forms.AngularHighlightToolStripButton();
+            this._wordHighlightToolStripButton = new Extract.Imaging.Forms.WordHighlightToolStripButton();
             imageViewerToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
@@ -110,6 +114,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._menuStrip.SuspendLayout();
             this._basicImageViewerToolStrip.SuspendLayout();
             this._viewCommandsToolStrip.SuspendLayout();
+            this._highlightToolsToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // imageViewerToolStripContainer
@@ -135,6 +140,7 @@ namespace Extract.FileActionManager.FileProcessors
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._menuStrip);
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._basicImageViewerToolStrip);
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsToolStrip);
+            imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._highlightToolsToolStrip);
             // 
             // _imageViewerStatusStrip
             // 
@@ -169,19 +175,23 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.CacheImages = false;
             this._paginationPanel.CommitOnlySelection = true;
             this._paginationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._paginationPanel.ExpectedPaginationAttributesPath = null;
             this._paginationPanel.HideReprocessIndicator = true;
             this._paginationPanel.ImageViewer = null;
             this._paginationPanel.LoadNextDocumentVisible = true;
             this._paginationPanel.Location = new System.Drawing.Point(0, 0);
             this._paginationPanel.Margin = new System.Windows.Forms.Padding(0);
+            this._paginationPanel.MinimumSize = new System.Drawing.Size(454, 0);
             this._paginationPanel.Name = "_paginationPanel";
+            this._paginationPanel.OutputExpectedPaginationAttributesFile = false;
             this._paginationPanel.Size = new System.Drawing.Size(528, 839);
+            this._paginationPanel.SuspendUIUpdates = false;
             this._paginationPanel.TabIndex = 1;
             this._paginationPanel.ToolBarVisible = true;
             this._paginationPanel.DocumentDataRequest += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.DocumentDataRequestEventArgs>(this.HandlePaginationPanel_DocumentDataRequest);
             this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
             this._paginationPanel.Paginated += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(this.HandlePaginationPanel_Paginated);
-            this._paginationPanel.PaginationError += new EventHandler<Extract.ExtractExceptionEventArgs>(this.HandlePaginationPanel_PaginationError);
+            this._paginationPanel.PaginationError += new System.EventHandler<Extract.ExtractExceptionEventArgs>(this.HandlePaginationPanel_PaginationError);
             this._paginationPanel.StateChanged += new System.EventHandler<System.EventArgs>(this.HandlePaginationPanel_StateChanged);
             this._paginationPanel.CommittingChanges += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CommittingChangesEventArgs>(this.HandlePaginationPanel_CommittingChanges);
             // 
@@ -198,7 +208,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._imageViewer.Name = "_imageViewer";
             this._imageViewer.OcrTradeoff = Extract.Imaging.OcrTradeoff.Accurate;
             this._imageViewer.RedactionMode = false;
-            this._imageViewer.Size = new System.Drawing.Size(1526, 837);
+            this._imageViewer.Size = new System.Drawing.Size(1060, 839);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
             this._imageViewer.WordHighlightToolEnabled = true;
@@ -423,7 +433,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._zoomPreviousToolStripMenuItem,
             this._zoomNextToolStripMenuItem});
             this._zoomToolStripMenuItem.Name = "_zoomToolStripMenuItem";
-            this._zoomToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this._zoomToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this._zoomToolStripMenuItem.Text = "&Zoom";
             // 
             // _fitToPageToolStripMenuItem
@@ -514,7 +524,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem,
             this._rotateAllDocumentPagesClockwiseToolStripMenuItem});
             this._rotateToolStripMenuItem.Name = "_rotateToolStripMenuItem";
-            this._rotateToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this._rotateToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this._rotateToolStripMenuItem.Text = "&Rotate";
             // 
             // _rotateCounterclockwiseToolStripMenuItem
@@ -568,7 +578,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._nextPageToolStripMenuItem,
             this._lastPageToolStripMenuItem});
             this._gotoPageToolStripMenuItem.Name = "_gotoPageToolStripMenuItem";
-            this._gotoPageToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this._gotoPageToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this._gotoPageToolStripMenuItem.Text = "&Goto page";
             // 
             // _firstPageToolStripMenuItem
@@ -849,6 +859,49 @@ namespace Extract.FileActionManager.FileProcessors
             this._thumbnailViewer.Size = new System.Drawing.Size(225, 400);
             this._thumbnailViewer.TabIndex = 0;
             // 
+            // _highlightToolsToolStrip
+            // 
+            this._highlightToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._highlightToolsToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._highlightToolsToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._rectangularHighlightToolStripButton,
+            this._angularHighlightToolStripButton,
+            this._wordHighlightToolStripButton});
+            this._highlightToolsToolStrip.Location = new System.Drawing.Point(477, 24);
+            this._highlightToolsToolStrip.Name = "_highlightToolsToolStrip";
+            this._highlightToolsToolStrip.Size = new System.Drawing.Size(120, 39);
+            this._highlightToolsToolStrip.TabIndex = 4;
+            // 
+            // _rectangularHighlightToolStripButton
+            // 
+            this._rectangularHighlightToolStripButton.BaseToolTipText = "Swipe text in rectangular zone";
+            this._rectangularHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._rectangularHighlightToolStripButton.Enabled = false;
+            this._rectangularHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._rectangularHighlightToolStripButton.ImageViewer = null;
+            this._rectangularHighlightToolStripButton.Name = "_rectangularHighlightToolStripButton";
+            this._rectangularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
+            // 
+            // _angularHighlightToolStripButton
+            // 
+            this._angularHighlightToolStripButton.BaseToolTipText = "Swipe text in angular zone";
+            this._angularHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._angularHighlightToolStripButton.Enabled = false;
+            this._angularHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._angularHighlightToolStripButton.ImageViewer = null;
+            this._angularHighlightToolStripButton.Name = "_angularHighlightToolStripButton";
+            this._angularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
+            // 
+            // _wordHighlightToolStripButton
+            // 
+            this._wordHighlightToolStripButton.BaseToolTipText = "Swipe words(s)";
+            this._wordHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._wordHighlightToolStripButton.Enabled = false;
+            this._wordHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._wordHighlightToolStripButton.ImageViewer = null;
+            this._wordHighlightToolStripButton.Name = "_wordHighlightToolStripButton";
+            this._wordHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
+            // 
             // PaginationTaskForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -878,6 +931,8 @@ namespace Extract.FileActionManager.FileProcessors
             this._basicImageViewerToolStrip.PerformLayout();
             this._viewCommandsToolStrip.ResumeLayout(false);
             this._viewCommandsToolStrip.PerformLayout();
+            this._highlightToolsToolStrip.ResumeLayout(false);
+            this._highlightToolsToolStrip.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -947,5 +1002,9 @@ namespace Extract.FileActionManager.FileProcessors
         private Imaging.Forms.PanToolStripMenuItem _panToolStripMenuItem;
         private System.Windows.Forms.SplitContainer _splitContainer;
         private UtilityApplications.PaginationUtility.PaginationPanel _paginationPanel;
+        private System.Windows.Forms.ToolStrip _highlightToolsToolStrip;
+        private Imaging.Forms.RectangularHighlightToolStripButton _rectangularHighlightToolStripButton;
+        private Imaging.Forms.AngularHighlightToolStripButton _angularHighlightToolStripButton;
+        private Imaging.Forms.WordHighlightToolStripButton _wordHighlightToolStripButton;
     }
 }
