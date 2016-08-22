@@ -151,7 +151,7 @@ static const string gstrADD_FAM_SESSION_ACTION_FK_V128 =
 
 // Used for schema versions 138 - 140
 static const string gstrCREATE_PAGINATION_LEGACY =
-	"CREATE TABLE [Pagination] ( "
+	"CREATE TABLE [dbo].[Pagination] ( "
 	"	[ID] INT IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Pagination] PRIMARY KEY CLUSTERED, "
 	"	[SourceFileID] INT NOT NULL, "
 	"	[SourcePage] INT NOT NULL, "

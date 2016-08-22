@@ -375,7 +375,7 @@ static const string gstrCREATE_SECURE_COUNTER_VALUE_CHANGE =
 	"  Comment nvarchar(max)) ";
 
 static const string gstrCREATE_PAGINATION =
-	"CREATE TABLE [Pagination] ( "
+	"CREATE TABLE [dbo].[Pagination] ( "
 	"	[ID] INT IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Pagination] PRIMARY KEY CLUSTERED, "
 	"	[SourceFileID] INT NOT NULL, "
 	"	[SourcePage] INT NOT NULL, "
