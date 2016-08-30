@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extract.NetDMSCustomComponents</RootNamespace>
     <AssemblyName>Extract.NetDMSCustomComponents</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
@@ -18,6 +18,7 @@
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +32,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DocumentationFile>..\..\..\..\..\..\binaries\debug\Extract.NetDMSCustomComponents.xml</DocumentationFile>
     <RegisterForComInterop>true</RegisterForComInterop>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,6 +46,7 @@
     <DocumentationFile>..\..\..\..\..\..\binaries\release\Extract.NetDMSCustomComponents.xml</DocumentationFile>
     <RegisterForComInterop>true</RegisterForComInterop>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
@@ -212,15 +215,15 @@
     <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>call echo "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" /out:"Interop.Weak.UCLID_COMLMLib.dll"
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" /out:"Interop.Weak.UCLID_COMLMLib.dll"
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" /out:"Interop.Weak.UCLID_COMUTILSLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" /out:"Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" /out:"Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" /out:"Interop.Weak.UCLID_INPUTFUNNELLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb" /out:"Interop.Weak.UCLID_FILEPROCESSINGLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\AttributeFinder\AFCore\Code\AFCore.tlb" /out:"Interop.Weak.UCLID_AFCORELib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\AttributeFinder\AFUtils\Code\AFUtils.tlb" /out:"Interop.Weak.UCLID_AFUTILSLib.dll"  /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll /reference:Interop.Weak.UCLID_AFCORELib.dll</PreBuildEvent>
+    <PreBuildEvent>call echo "$(FrameworkSDKRoot)Bin\NETFX 4.6 Tools\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" /out:"Interop.Weak.UCLID_COMLMLib.dll"
+call "$(FrameworkSDKRoot)Bin\NETFX 4.6 Tools\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" /out:"Interop.Weak.UCLID_COMLMLib.dll"
+call "$(FrameworkSDKRoot)Bin\NETFX 4.6 Tools\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" /out:"Interop.Weak.UCLID_COMUTILSLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll
+call "$(FrameworkSDKRoot)Bin\NETFX 4.6 Tools\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" /out:"Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll
+call "$(FrameworkSDKRoot)Bin\NETFX 4.6 Tools\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" /out:"Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll
+call "$(FrameworkSDKRoot)Bin\NETFX 4.6 Tools\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" /out:"Interop.Weak.UCLID_INPUTFUNNELLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll
+call "$(FrameworkSDKRoot)Bin\NETFX 4.6 Tools\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb" /out:"Interop.Weak.UCLID_FILEPROCESSINGLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll
+call "$(FrameworkSDKRoot)Bin\NETFX 4.6 Tools\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\AttributeFinder\AFCore\Code\AFCore.tlb" /out:"Interop.Weak.UCLID_AFCORELib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll
+call "$(FrameworkSDKRoot)Bin\NETFX 4.6 Tools\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\AttributeFinder\AFUtils\Code\AFUtils.tlb" /out:"Interop.Weak.UCLID_AFUTILSLib.dll"  /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll /reference:Interop.Weak.UCLID_AFCORELib.dll</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

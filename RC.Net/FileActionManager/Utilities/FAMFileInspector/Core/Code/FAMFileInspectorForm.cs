@@ -662,6 +662,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Gets the custom columns currently present in the FFI.
         /// </summary>
+        [CLSCompliant(false)]
         public IEnumerable<IFAMFileInspectorColumn> CustomColumns
         {
             get

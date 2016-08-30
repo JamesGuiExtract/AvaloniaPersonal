@@ -57,7 +57,7 @@ namespace Extract.Interop
         #region Fields
 
         /// <summary>
-        /// The <see cref="Stream"/> being wrapped as an <see cref="IStream"/> implmentation.
+        /// The <see cref="Stream"/> being wrapped as an <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> implmentation.
         /// </summary>
         Stream _stream;
 

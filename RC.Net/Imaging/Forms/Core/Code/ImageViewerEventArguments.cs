@@ -440,7 +440,7 @@ namespace Extract.Imaging.Forms
 
         /// <summary>
         /// Gets a clone of the extracted image.  The caller of this method is
-        /// responsible for disposing <see cref="RasterImage.Dispose"/> of
+        /// responsible for disposing <see cref="RasterImage.Dispose(bool)"/> of
         /// the image object.
         /// </summary>
         /// <returns>A clone of the extracted image.</returns>

@@ -9,7 +9,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 namespace Extract.Interop
 {
     /// <summary>
-    /// Represents a writer that writes data to an <see cref="IStream"/> object.
+    /// Represents a writer that writes data to an <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
     /// </summary>
     public class IStreamWriter : IDisposable
     {
@@ -23,7 +23,7 @@ namespace Extract.Interop
 
         /// <summary>
         /// A <see cref="MemoryStream"/> to which all data is written before it is committed to
-        /// the <see cref="IStream"/>
+        /// the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/>
         /// </summary>
         MemoryStream _stream = new MemoryStream();
 
@@ -110,7 +110,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Writes a <see cref="String"/> to the <see cref="IStream"/> object.
+        /// Writes a <see cref="String"/> to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <param name="value">The <see cref="String"/> to write.</param>
         public void Write(string value)
@@ -136,7 +136,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Writes an array of strings to the <see cref="IStream"/> object.
+        /// Writes an array of strings to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <param name="value">The array of strings to write.</param>
         public void Write(string[] value)
@@ -166,7 +166,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Writes an array of boolean to the <see cref="IStream"/> object.
+        /// Writes an array of boolean to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <param name="value">The array of booleans to write.</param>
         public void Write(bool[] value)
@@ -196,7 +196,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Writes an array of <typeparamref name="T"/> to the <see cref="IStream"/> object.
+        /// Writes an array of <typeparamref name="T"/> to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <param name="value">The array of <typeparamref name="T"/> to write.</param>
         public void Write<T>(T[] value) where T : struct, ISerializable
@@ -226,7 +226,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Writes a <see cref="Boolean"/> to the <see cref="IStream"/> object.
+        /// Writes a <see cref="Boolean"/> to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <param name="value">The <see cref="Boolean"/> to write.</param>
         public void Write(bool value)
@@ -245,7 +245,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Writes a <see cref="Int32"/> to the <see cref="IStream"/> object.
+        /// Writes a <see cref="Int32"/> to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <param name="value">The <see cref="Int32"/> to write.</param>
         public void Write(int value)
@@ -264,7 +264,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Writes a <see cref="Int64"/> to the <see cref="IStream"/> object.
+        /// Writes a <see cref="Int64"/> to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <param name="value">The <see cref="Int64"/> to write.</param>
         public void Write(long value)
@@ -283,7 +283,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Writes a <see cref="Single"/> to the <see cref="IStream"/> object.
+        /// Writes a <see cref="Single"/> to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <param name="value">The <see cref="Single"/> to write.</param>
         public void Write(float value)
@@ -302,7 +302,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Writes a <see cref="Double"/> to the <see cref="IStream"/> object.
+        /// Writes a <see cref="Double"/> to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <param name="value">The <see cref="Double"/> to write.</param>
         public void Write(double value)
@@ -344,7 +344,7 @@ namespace Extract.Interop
 
         /// <summary>
         /// Writes the contents of the <see cref="IStreamWriter"/> to the specified 
-        /// <see cref="IStream"/>.
+        /// <see cref="System.Runtime.InteropServices.ComTypes.IStream"/>.
         /// </summary>
         /// <param name="stream">The stream into which the data should be written.</param>
         public void WriteTo(IStream stream)

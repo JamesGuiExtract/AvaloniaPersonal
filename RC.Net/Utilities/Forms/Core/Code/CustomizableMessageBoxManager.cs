@@ -127,7 +127,7 @@ namespace Extract.Utilities.Forms
 
 		/// <summary>
 		/// Deletes the <see cref="CustomizableMessageBox"/> with the specified name and
-        /// calls its <see cref="CustomizableMessageBox.Dispose"/> method.
+        /// calls its <see cref="CustomizableMessageBox.Dispose()"/> method.
         /// <para><b>Note:</b></para>
         /// This will also remove the saved response (if any) for the specified
         /// <see cref="CustomizableMessageBox"/>.
@@ -162,7 +162,7 @@ namespace Extract.Utilities.Forms
 
         /// <summary>
         /// Deletes all saved <see cref="CustomizableMessageBox"/> objects, calling
-        /// <see cref="CustomizableMessageBox.Dispose"/> for each one.
+        /// <see cref="CustomizableMessageBox.Dispose()"/> for each one.
         /// <para><b>Note:</b></para>
         /// This will also clear all of the saved responses.
         /// </summary>

@@ -518,9 +518,9 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Initializes an object from the <see cref="IStream"/> where it was previously saved.
+        /// Initializes an object from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> where it was previously saved.
         /// </summary>
-        /// <param name="stream"><see cref="IStream"/> from which the object should be loaded.
+        /// <param name="stream"><see cref="System.Runtime.InteropServices.ComTypes.IStream"/> from which the object should be loaded.
         /// </param>
         public void Load(IStream stream)
         {
@@ -543,10 +543,10 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Saves an object into the specified <see cref="IStream"/> and indicates whether the 
+        /// Saves an object into the specified <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> and indicates whether the 
         /// object should reset its dirty flag.
         /// </summary>
-        /// <param name="stream"><see cref="IStream"/> into which the object should be saved.
+        /// <param name="stream"><see cref="System.Runtime.InteropServices.ComTypes.IStream"/> into which the object should be saved.
         /// </param>
         /// <param name="clearDirty">Value that indicates whether to clear the dirty flag after the
         /// save is complete. If <see langword="true"/>, the flag should be cleared. If 

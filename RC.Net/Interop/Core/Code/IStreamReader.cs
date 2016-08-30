@@ -9,7 +9,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 namespace Extract.Interop
 {
     /// <summary>
-    /// Represents a reader that reads data from an <see cref="IStream"/> object.
+    /// Represents a reader that reads data from an <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
     /// </summary>
     public class IStreamReader : IDisposable
     {
@@ -32,7 +32,7 @@ namespace Extract.Interop
         readonly BinaryFormatter _formatter = new BinaryFormatter();
 
         /// <summary>
-        /// The version of the <see cref="IStream"/> object being read.
+        /// The version of the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object being read.
         /// </summary>
         readonly int _version;
 
@@ -43,7 +43,7 @@ namespace Extract.Interop
         /// <summary>
 	    /// Initializes a new instance of the <see cref="IStreamReader"/> class.
 	    /// </summary>
-        /// <param name="stream">The <see cref="IStream"/> from which data should be read.</param>
+        /// <param name="stream">The <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> from which data should be read.</param>
         /// <param name="version">The highest recognized version number.</param>
 	    public IStreamReader(IStream stream, int version)
         {
@@ -89,9 +89,9 @@ namespace Extract.Interop
         #region Properties
 
         /// <summary>
-        /// Gets the version number of the <see cref="IStream"/> object being read.
+        /// Gets the version number of the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object being read.
         /// </summary>
-        /// <returns>The version number of the <see cref="IStream"/> object being read.</returns>
+        /// <returns>The version number of the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object being read.</returns>
         public int Version
         {
             get
@@ -105,7 +105,7 @@ namespace Extract.Interop
         #region Methods
 
         /// <summary>
-        /// Reads a {T} from the <see cref="IStream"/> object.
+        /// Reads a {T} from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <typeparam name="T">The type of object to read from the stream.</typeparam>
         /// <returns>The serialized object or <see langword="null"/> if the original
@@ -136,7 +136,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Reads a {T} from the <see cref="IStream"/> object.
+        /// Reads a {T} from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <typeparam name="T">The type of struct to read from the stream.</typeparam>
         /// <returns>The serialized struct.</returns>
@@ -155,7 +155,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Reads a <see cref="String"/> from the <see cref="IStream"/> object.
+        /// Reads a <see cref="String"/> from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <returns>A <see cref="String"/>.</returns>
         public string ReadString()
@@ -179,7 +179,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Reads an array of strings from the <see cref="IStream"/> object.
+        /// Reads an array of strings from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <returns>An array of strings.</returns>
         public string[] ReadStringArray()
@@ -213,7 +213,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Reads an array of booleans from the <see cref="IStream"/> object.
+        /// Reads an array of booleans from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <returns>An array of booleans.</returns>
         public bool[] ReadBooleanArray()
@@ -247,7 +247,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Reads an array of <typeparamref name="T"/> from the <see cref="IStream"/> object.
+        /// Reads an array of <typeparamref name="T"/> from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <returns>An array of <typeparamref name="T"/></returns>
         public T[] ReadStructArray<T>() where T : struct, ISerializable
@@ -281,7 +281,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Reads a <see cref="Boolean"/> from the <see cref="IStream"/> object.
+        /// Reads a <see cref="Boolean"/> from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <returns>A <see cref="Boolean"/>.</returns>
         public bool ReadBoolean()
@@ -298,7 +298,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Reads a <see cref="Int32"/> from the <see cref="IStream"/> object.
+        /// Reads a <see cref="Int32"/> from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <returns>A <see cref="Int32"/>.</returns>
         public int ReadInt32()
@@ -315,7 +315,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Reads a <see cref="Int64"/> from the <see cref="IStream"/> object.
+        /// Reads a <see cref="Int64"/> from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <returns>A <see cref="Int64"/>.</returns>
         public long ReadInt64()
@@ -331,7 +331,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Reads a <see cref="Single"/> from the <see cref="IStream"/> object.
+        /// Reads a <see cref="Single"/> from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <returns>A <see cref="Single"/>.</returns>
         public float ReadSingle()
@@ -347,7 +347,7 @@ namespace Extract.Interop
         }
 
         /// <summary>
-        /// Reads a <see cref="Double"/> from the <see cref="IStream"/> object.
+        /// Reads a <see cref="Double"/> from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <returns>A <see cref="Double"/>.</returns>
         public double ReadDouble()

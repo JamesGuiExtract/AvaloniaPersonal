@@ -32,6 +32,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="attributeDBManager">The <see cref="AttributeDBMgr"/> to use to create new
         /// attribute set names.</param>
+        [CLSCompliant(false)]
         public AddAttributeSetDialog(AttributeDBMgr attributeDBManager)
         {
             try
