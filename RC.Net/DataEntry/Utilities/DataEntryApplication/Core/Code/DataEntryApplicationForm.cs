@@ -4090,7 +4090,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
         /// the option to continue verification on the next document; <see langword="false"/> if the
         /// error should prevent the possibility of continuing the verification session.</param>
-        public void RaiseVerificationException(ExtractException ee, bool canProcessingContinue)
+        void RaiseVerificationException(ExtractException ee, bool canProcessingContinue)
         {
             if (_standAloneMode)
             {

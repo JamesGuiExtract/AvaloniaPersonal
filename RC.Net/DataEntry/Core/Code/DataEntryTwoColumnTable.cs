@@ -58,11 +58,6 @@ namespace Extract.DataEntry
         string _tableFormattingRuleFileName;
 
         /// <summary>
-        /// The formatting rule to be used when processing text imaging swipes for the entire table.
-        /// </summary>
-        IRuleSet _tableFormattingRule;
-
-        /// <summary>
         /// The domain of attributes to which this control's attribute(s) belong.
         /// </summary>
         IUnknownVector _sourceAttributes;
@@ -231,19 +226,7 @@ namespace Extract.DataEntry
 
             set
             {
-                try
-                {
-                    if (value != _tableFormattingRuleFileName)
-                    {
-                        _tableFormattingRule = null;
-                    }
-
-                    _tableFormattingRuleFileName = value;
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI24326", ex);
-                }
+                _tableFormattingRuleFileName = value;
             }
         }
 
@@ -390,7 +373,7 @@ namespace Extract.DataEntry
                 {
                     ExtractException.Assert("ELI24375",
                         "Table swiping is enabled, but no table formatting rule was specified!",
-                        !this.TableSwipingEnabled || TableFormattingRule != null);
+                        !this.TableSwipingEnabled || !string.IsNullOrWhiteSpace(TableFormattingRuleFile));
                 }
 
                 InitializeColumn();
@@ -790,42 +773,7 @@ namespace Extract.DataEntry
         #region Private Members
 
         /// <summary>
-        /// Gets the <see cref="IRuleSet"/> that should be used to reformat or
-        /// split <see cref="SpatialString"/> content passed into <see cref="ProcessSwipedText"/>
-        /// for this table.
-        /// </summary>
-        /// <returns>The <see cref="IRuleSet"/> that should be used. Can be <see langword="null"/>
-        /// if no formatting rule has been specified.</returns>
-        IRuleSet TableFormattingRule
-        {
-            get
-            {
-                try
-                {
-                    // If not in design mode and a formatting rule is specified, attempt to load an
-                    // attribute finding rule.
-                    if (!InDesignMode && _tableFormattingRule == null &&
-                        !string.IsNullOrEmpty(_tableFormattingRuleFileName))
-                    {
-                        _tableFormattingRule = (IRuleSet)new RuleSetClass();
-                        _tableFormattingRule.LoadFrom(
-                            DataEntryMethods.ResolvePath(_tableFormattingRuleFileName), false);
-                    }
-
-                    return _tableFormattingRule;
-                }
-                catch (Exception ex)
-                {
-                    // If we failed to load the rule, don't attempt to load it again.
-                    _tableFormattingRuleFileName = null;
-
-                    throw ex.AsExtract("ELI35375");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Uses the specied table formatting rule to apply the swiped text to all rows in the 
+        /// Uses the specified table formatting rule to apply the swiped text to all rows in the 
         /// table.
         /// </summary>
         /// <param name="swipedText">The OCR'd text from the image swipe.</param>
@@ -835,7 +783,7 @@ namespace Extract.DataEntry
                 _sourceAttributes != null && _attribute != null);
 
             IAttribute newAttribute = DataEntryMethods.RunFormattingRule(
-                TableFormattingRule, swipedText, base.AttributeName, _multipleMatchSelectionMode);
+                TableFormattingRuleFile, swipedText, base.AttributeName, _multipleMatchSelectionMode);
 
             // If a qualifying attribute was found in the rule's results, apply it.
             if (newAttribute != null)
@@ -901,7 +849,7 @@ namespace Extract.DataEntry
             IDataEntryTableCell selectedDataEntryCell = (IDataEntryTableCell)base.CurrentCell;
 
             // Process the swiped text with a formatting rule (if available).
-            if (selectedRow.FormattingRule != null)
+            if (!string.IsNullOrWhiteSpace(selectedRow.FormattingRuleFile))
             {
                 // Select the attribute name to look for from the rule results. (Could be based on
                 // a sub-attribute name or the name of the table's primary attribute).
@@ -909,7 +857,7 @@ namespace Extract.DataEntry
                     ? base.AttributeName : selectedRow.AttributeName;
 
                 IAttribute attribute = DataEntryMethods.RunFormattingRule(
-                    selectedRow.FormattingRule, swipedText, attributeName,
+                    selectedRow.FormattingRuleFile, swipedText, attributeName,
                     selectedRow.MultipleMatchSelectionMode);
 
                 // Use the value of the found attribute only if the found attribute has a non-empty

@@ -196,16 +196,6 @@ namespace Extract.DataEntry
         /// <param name="fileID">The ID of the file to release.</param>
         void ReleaseFile(int fileID);
 
-        /// <summary>
-        /// Raises the ExceptionGenerated event for handling by VerificationForm.
-        /// </summary>
-        /// <param name="ee">The <see cref="ExtractException"/> that being raised.</param>
-        /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
-        /// the option to continue verification on the next document; <see langword="false"/> if the
-        /// error should prevent the possibility of continuing the verification session.</param>
-        [SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")]
-        void RaiseVerificationException(ExtractException ee, bool canProcessingContinue);
-
         #endregion Methods
 
         #region Events

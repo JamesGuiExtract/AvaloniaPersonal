@@ -1333,11 +1333,11 @@ namespace Extract.DataEntry
                     return false;
                 }
 
-                if (FormattingRule != null)
+                if (!string.IsNullOrWhiteSpace(FormattingRuleFile))
                 {
                     // Find the appropriate attribute (if there is one) from the rule's output.
                     IAttribute attribute = DataEntryMethods.RunFormattingRule(
-                        FormattingRule, swipedText, _attributeName, _multipleMatchSelectionMode);
+                        FormattingRuleFile, swipedText, _attributeName, _multipleMatchSelectionMode);
 
                     if (attribute != null && !string.IsNullOrEmpty(attribute.Value.String))
                     {

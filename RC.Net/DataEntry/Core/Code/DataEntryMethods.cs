@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
@@ -667,7 +668,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Creates an <see cref="IAttribute"/> using the supplied text and formatting rule.
         /// </summary>
-        /// <param name="rule">The <see cref="IRuleSet"/> to use to process the supplied text.
+        /// <param name="rulesPath">The path to the ruleset to use to process the supplied text.
         /// Must not be <see langword="null"/>.
         /// </param>
         /// <param name="inputText">The <see cref="SpatialString"/> to process with the supplied
@@ -682,16 +683,16 @@ namespace Extract.DataEntry
         /// <see langword="null"/> if no <see cref="IAttribute"/> meeting the qualifications was
         /// found.
         /// </returns>
-        internal static IAttribute RunFormattingRule(IRuleSet rule, SpatialString inputText,
+        internal static IAttribute RunFormattingRule(string rulesPath, SpatialString inputText,
             string attributeName, MultipleMatchSelectionMode selectionMode)
         {
             try
             {
-                ExtractException.Assert("ELI26765", "Rule was not specified!", rule != null);
+                ExtractException.Assert("ELI26765", "Rule was not specified!", !string.IsNullOrWhiteSpace(rulesPath));
                 ExtractException.Assert("ELI26766", "Invalid selection mode!",
                     selectionMode != MultipleMatchSelectionMode.All);
 
-                IUnknownVector results = RunFormattingRule(rule, inputText, attributeName);
+                IUnknownVector results = RunFormattingRule(rulesPath, inputText, attributeName);
 
                 // Choose the appropriate resulting attribute based on selectionMode
                 int resultsCount = results.Size();
@@ -725,7 +726,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Processes the supplied text with the supplied formatting rule.
         /// </summary>
-        /// <param name="rule">The <see cref="IRuleSet"/> to use to process the supplied text.
+        /// <param name="rulesPath">The path to the ruleset to use to process the supplied text.
         /// Must not be <see langword="null"/>.
         /// </param>
         /// <param name="inputText">The <see cref="SpatialString"/> to process with the supplied
@@ -735,29 +736,65 @@ namespace Extract.DataEntry
         /// </param>
         /// <returns>The result of running the formatting rule on the supplied text. 
         /// </returns>
-        internal static IUnknownVector RunFormattingRule(IRuleSet rule, SpatialString inputText,
+        internal static IUnknownVector RunFormattingRule(string rulesPath, SpatialString inputText,
             string attributeName)
         {
             try
             {
-                ExtractException.Assert("ELI24322", "Rule was not specified!", rule != null);
+                ExtractException.Assert("ELI24322", "Rule was not specified!", !string.IsNullOrWhiteSpace(rulesPath));
 
-                // If a formatting rule is specified, use the text to create document a document
-                // to be processed by the rule.
-                AFDocumentClass afDoc = new AFDocumentClass();
-                afDoc.Text = inputText;
-
-                // Prepare a variant vector to specify the desired attribute name.
-                VariantVector attributeNames = null;
-                if (!string.IsNullOrEmpty(attributeName))
+                var miscUtils = new MiscUtils();
+                string inputTextByteStream = miscUtils.GetObjectAsStringizedByteStream(inputText);
+                string resultsTextByteStream = null;
+                Exception error = null;
+                var handle = new ManualResetEvent(false);
+                ThreadPool.QueueUserWorkItem(delegate
                 {
-                    attributeNames = (VariantVector)new VariantVectorClass();
-                    attributeNames.PushBack(attributeName);
+                    try
+                    {
+                        var rule = (IRuleSet)new RuleSetClass();
+                        rule.LoadFrom(DataEntryMethods.ResolvePath(rulesPath), false);
+
+                        var ruleExecutionThreadMiscUtils = new MiscUtils();
+                        var ruleExecutionThreadInputText = (SpatialString)
+                            ruleExecutionThreadMiscUtils.GetObjectFromStringizedByteStream(inputTextByteStream);
+
+                        // Use the text to create a document to be processed by the rule.
+                        AFDocumentClass afDoc = new AFDocumentClass();
+                        afDoc.Text = ruleExecutionThreadInputText;
+
+                        // Prepare a variant vector to specify the desired attribute name.
+                        VariantVector attributeNames = null;
+                        if (!string.IsNullOrEmpty(attributeName))
+                        {
+                            attributeNames = (VariantVector)new VariantVectorClass();
+                            attributeNames.PushBack(attributeName);
+                        }
+
+                        // Format the data into attribute(s) using the rule.
+                        IUnknownVector ruleExecutionThreadResults =
+                            rule.ExecuteRulesOnText(afDoc, attributeNames, AlternateComponentDataDir, null);
+                        resultsTextByteStream = ruleExecutionThreadMiscUtils.GetObjectAsStringizedByteStream(ruleExecutionThreadResults);
+                    }
+                    catch (Exception ex)
+                    {
+                        error = ex;
+                    }
+                    finally
+                    {
+                        handle.Set();
+                    }
+                });
+
+                handle.WaitOne();
+
+                if (error != null)
+                {
+                    throw error;
                 }
 
-                // Format the data into attribute(s) using the rule.
-                IUnknownVector results =
-                    rule.ExecuteRulesOnText(afDoc, attributeNames, AlternateComponentDataDir, null);
+                IUnknownVector results = (IUnknownVector)
+                        miscUtils.GetObjectFromStringizedByteStream(resultsTextByteStream);
 
                 if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.FormattingRuleResult))
                 {

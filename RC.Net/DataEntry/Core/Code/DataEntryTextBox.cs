@@ -95,11 +95,6 @@ namespace Extract.DataEntry
         string _formattingRuleFileName;
 
         /// <summary>
-        /// The formatting rule to be used when processing text from image swipes.
-        /// </summary>
-        IRuleSet _formattingRule;
-
-        /// <summary>
         /// The template object to be used as a model for per-attribute validation objects.
         /// </summary>
         DataEntryValidator _validatorTemplate = new DataEntryValidator();
@@ -316,19 +311,7 @@ namespace Extract.DataEntry
 
             set
             {
-                try
-                {
-                    if (value != _formattingRuleFileName)
-                    {
-                        _formattingRule = null;        
-                    }
-                    
-                    _formattingRuleFileName = value;
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI24111", ex);
-                }
+                _formattingRuleFileName = value;
             }
         }
 
@@ -1387,11 +1370,11 @@ namespace Extract.DataEntry
                     return false;
                 }
 
-                if (FormattingRule != null)
+                if (!string.IsNullOrWhiteSpace(FormattingRuleFile))
                 {
                     // Find the appropriate attribute (if there is one) from the rule's output.
                     IAttribute attribute = DataEntryMethods.RunFormattingRule(
-                        FormattingRule, swipedText, _attributeName, _multipleMatchSelectionMode);
+                        FormattingRuleFile, swipedText, _attributeName, _multipleMatchSelectionMode);
 
                     if (attribute != null && !string.IsNullOrEmpty(attribute.Value.String))
                     {
@@ -1550,41 +1533,6 @@ namespace Extract.DataEntry
         #endregion IRequiresErrorProvider Members
 
         #region Private Members
-
-        /// <summary>
-        /// Gets the <see cref="IRuleSet"/> that should be used to reformat or
-        /// split <see cref="SpatialString"/> content passed into 
-        /// <see cref="IDataEntryControl.ProcessSwipedText"/> for this control.
-        /// </summary>
-        /// <returns>The <see cref="IRuleSet"/> that should be used. Can be <see langword="null"/>
-        /// if no formatting rule has been specified.</returns>
-        IRuleSet FormattingRule
-        {
-            get
-            {
-                try
-                {
-                    // If not in design mode and a formatting rule is specified, attempt to load an
-                    // attribute finding rule.
-                    if (!_inDesignMode && _formattingRule == null &&
-                        !string.IsNullOrEmpty(_formattingRuleFileName))
-                    {
-                        _formattingRule = (IRuleSet)new RuleSetClass();
-                        _formattingRule.LoadFrom(
-                            DataEntryMethods.ResolvePath(_formattingRuleFileName), false);
-                    }
-
-                    return _formattingRule;
-                }
-                catch (Exception ex)
-                {
-                    // If we failed to load the rule, don't attempt to load it again.
-                    _formattingRuleFileName = null;
-
-                    throw ex.AsExtract("ELI35372");
-                }
-            }
-        }
 
         /// <summary>
         /// Updates the text value of this control and raise the events that need to be raised

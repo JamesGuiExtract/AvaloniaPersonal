@@ -52,12 +52,6 @@ namespace Extract.DataEntry
         string _rowFormattingRuleFileName;
 
         /// <summary>
-        /// The formatting rule to be used when processing text from imaging swipes for a row at a 
-        /// time.
-        /// </summary>
-        IRuleSet _rowFormattingRule;
-
-        /// <summary>
         /// Specifies the minimum number of rows a DataEntryTable must have.  If the specified
         /// number of attributes are not found, new, blank ones are created as necessary.
         /// </summary>
@@ -289,19 +283,7 @@ namespace Extract.DataEntry
 
             set
             {
-                try
-                {
-                    if (value != _rowFormattingRuleFileName)
-                    {
-                        _rowFormattingRule = null;
-                    }
-
-                    _rowFormattingRuleFileName = value;
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI24237", ex);
-                }
+                _rowFormattingRuleFileName = value;
             }
         }
 
@@ -532,7 +514,7 @@ namespace Extract.DataEntry
 
                     ExtractException.Assert("ELI24249",
                         "Row swiping is enabled, but no row formatting rule was specified!",
-                        !RowSwipingEnabled || RowFormattingRule != null);
+                        !RowSwipingEnabled || !string.IsNullOrWhiteSpace(RowFormattingRuleFile));
 
                     // Create a context menu for the table
                     base.ContextMenuStrip = new ContextMenuStrip();
@@ -2440,41 +2422,6 @@ namespace Extract.DataEntry
         #region Private Members
 
         /// <summary>
-        /// Gets the <see cref="IRuleSet"/> that should be used to reformat or
-        /// split <see cref="SpatialString"/> content passed into <see cref="ProcessSwipedText"/>
-        /// for this table.
-        /// </summary>
-        /// <returns>The <see cref="IRuleSet"/> that should be used. Can be <see langword="null"/>
-        /// if no formatting rule has been specified.</returns>
-        IRuleSet RowFormattingRule
-        {
-            get
-            {
-                try
-                {
-                    // If not in design mode and a formatting rule is specified, attempt to load an
-                    // attribute finding rule.
-                    if (!InDesignMode && _rowFormattingRule == null &&
-                        !string.IsNullOrEmpty(_rowFormattingRuleFileName))
-                    {
-                        _rowFormattingRule = (IRuleSet)new RuleSetClass();
-                        _rowFormattingRule.LoadFrom(
-                            DataEntryMethods.ResolvePath(_rowFormattingRuleFileName), false);
-                    }
-
-                    return _rowFormattingRule;
-                }
-                catch (Exception ex)
-                {
-                    // If we failed to load the rule, don't attempt to load it again.
-                    _rowFormattingRuleFileName = null;
-
-                    throw ex.AsExtract("ELI35376");
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets the name of a <see cref="DataFormats.Format"/> value for placing items on the
         /// clipboard or into a <see cref="DataObject"/> class.
         /// </summary>
@@ -2540,7 +2487,8 @@ namespace Extract.DataEntry
                 }
 
                 // Check for string data that can be processed with the row formatting rule.
-                if (RowFormattingRule != null && dataObject.GetDataPresent("System.String"))
+                if (!string.IsNullOrWhiteSpace(RowFormattingRuleFile)
+                    && dataObject.GetDataPresent("System.String"))
                 {
                     return "System.String";
                 }
@@ -3029,7 +2977,7 @@ namespace Extract.DataEntry
         {
             // Row selection mode. The swipe can only be applied via the results of
             // a row formatting rule.
-            IUnknownVector formattedData = DataEntryMethods.RunFormattingRule(RowFormattingRule,
+            IUnknownVector formattedData = DataEntryMethods.RunFormattingRule(RowFormattingRuleFile,
                 swipedText, AttributeName);
 
             // Find all attributes which apply to this control.
@@ -3083,7 +3031,7 @@ namespace Extract.DataEntry
                     ? AttributeName : dataEntryColumn.AttributeName;
 
                 IAttribute attribute = DataEntryMethods.RunFormattingRule(
-                    dataEntryColumn.FormattingRule, swipedText, attributeName,
+                    dataEntryColumn.FormattingRuleFile, swipedText, attributeName,
                     dataEntryColumn.MultipleMatchSelectionMode);
                 
                 // Use the value of the found attribute only if the found attribute has a non-empty
@@ -3447,7 +3395,7 @@ namespace Extract.DataEntry
 
                 // If the data on the clipboard is a string, use the row formatting rule to parse the
                 // text into the row.
-                if (RowFormattingRule != null && dataType == "System.String")
+                if (!string.IsNullOrWhiteSpace(RowFormattingRuleFile) && dataType == "System.String")
                 {
                     SpatialString spatialString = new SpatialStringClass();
                     spatialString.CreateNonSpatialString((string)dataObject.GetData(dataType), "");
