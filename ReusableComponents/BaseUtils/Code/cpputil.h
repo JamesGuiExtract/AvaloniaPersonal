@@ -1021,17 +1021,17 @@ EXPORT_BaseUtils VectorOfString Split( const std::string& source, const char del
 //-------------------------------------------------------------------------------------------------
 inline bool asCppBool(VARIANT_BOOL bValue)
 {
-    return (bValue == VARIANT_TRUE);
+    return (bValue != VARIANT_FALSE);
 }
 //-------------------------------------------------------------------------------------------------
 inline bool asCppBool(BOOL bValue)
 {
-    return (bValue == TRUE);
+    return (bValue != FALSE);
 }
 //-------------------------------------------------------------------------------------------------
 inline BOOL asMFCBool(VARIANT_BOOL bValue)
 {
-    return (bValue == VARIANT_TRUE) ? TRUE : FALSE;
+    return (bValue != VARIANT_FALSE) ? TRUE : FALSE;
 }
 //-------------------------------------------------------------------------------------------------
 inline BOOL asMFCBool(bool bValue)
@@ -1046,12 +1046,12 @@ inline int asBSTChecked(bool bValue)
 //-------------------------------------------------------------------------------------------------
 inline int asBSTChecked(VARIANT_BOOL bValue)
 {
-    return (bValue == VARIANT_TRUE) ? BST_CHECKED: BST_UNCHECKED;
+    return (bValue != VARIANT_FALSE) ? BST_CHECKED: BST_UNCHECKED;
 }
 //-------------------------------------------------------------------------------------------------
 inline VARIANT_BOOL asVariantBool(BOOL bValue)
 {
-    return (bValue == TRUE) ? VARIANT_TRUE : VARIANT_FALSE;
+    return (bValue != FALSE) ? VARIANT_TRUE : VARIANT_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
 inline VARIANT_BOOL asVariantBool(bool bValue)
