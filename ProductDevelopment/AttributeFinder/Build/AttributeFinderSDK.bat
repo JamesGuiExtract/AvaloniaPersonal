@@ -120,6 +120,8 @@ REM remove the drive mappings
 net use P: /DELETE
 net use R: /DELETE
 
+subst /d z:
+
 PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%~1' '%BUILD_STATUS%'"
 
 SET BUILD_STATUS=
