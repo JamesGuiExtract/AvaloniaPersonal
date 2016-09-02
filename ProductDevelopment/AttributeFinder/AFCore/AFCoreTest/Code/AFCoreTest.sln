@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFConditions", "..\..\..\AFConditions\Code\AFConditions.vcxproj", "{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
@@ -117,6 +119,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SafeNetUtils", "..\..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code\SafeNetUtils.vcxproj", "{3EDFA52F-F37C-4417-A818-EF4D254796FE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SafeNetUtilsTest", "..\..\..\..\..\REUSABLECOMPONENTS\VENDORSPECIFICUTILS\SAFENETUTILS\AutomatedTest\Code\SafeNetUtilsTest.vcxproj", "{71141D5B-9F4F-4811-8016-E071435FC5BB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpatialStringAutomatedTest", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringAutomatedTest\Code\SpatialStringAutomatedTest.vcxproj", "{89B5C475-5F6A-4818-96A4-7E68D90FD8C4}"
 EndProject
@@ -3953,9 +3958,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{BE903913-8853-4966-A333-93B29D64E7E4} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{A24D4168-C496-4543-9C99-DE2E07FF71BF} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{135A1E4D-B8B4-468E-A01F-34B6238EAB64} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
-		{BE903913-8853-4966-A333-93B29D64E7E4} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{139729CD-0F06-48E8-9F4A-08E78BB6575F} = {4CAFD9CC-640F-4836-B388-D370B6219488}
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA} = {4CAFD9CC-640F-4836-B388-D370B6219488}
 		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31} = {4CAFD9CC-640F-4836-B388-D370B6219488}
