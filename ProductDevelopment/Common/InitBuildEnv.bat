@@ -19,7 +19,7 @@ net use i: \\fnp2\internal
 
 net use m: \\engsvr\internal
 
-subst z: %BUILD_VSS_ROOT%\Engineering
+subst z: %BUILD_VSS_ROOT%
 
 REM p: should be mapped to the base location that the files will be placed for Install shield to build the install
 REM r: should be mapped to the base location that the install will be moved after it is completed
