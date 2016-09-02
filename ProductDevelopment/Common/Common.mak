@@ -23,7 +23,7 @@
 # M A K E F I L E   V A R I A B L E S
 #
 BuildRootDirectory=$(BUILD_DRIVE)$(BUILD_DIRECTORY)\$(ProductRootDirName)
-EngineeringRootDirectory=z:
+EngineeringRootDirectory=z:\Engineering
 ReusableComponentsRootDirectory=$(EngineeringRootDirectory)\ReusableComponents
 CommonDirectory=$(EngineeringRootDirectory)\ProductDevelopment\Common
 FXCopAppDirectory=$(FX_COP)
