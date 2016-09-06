@@ -34,7 +34,7 @@ RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
 FLEXCustomerRDTInstallProjectRoot=$(EngineeringRootDirectory)\ProductDevelopment\AttributeFinder\Installation\FlexIndexCustomerRDT
 FLEXCustomerRDTMediaDir=$(FLEXCustomerRDTInstallProjectRoot)\Media\CD-ROM\DiskImages\Disk1
 
-IDSInstallProjectDirectory=$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldCustomerRDT
+IDSInstallProjectDirectory=$(PDRootDir)\Installation\IDShieldCustomerRDT
 IDSRDTInstallMediaDir=$(IDSInstallProjectDirectory)\Media\CD-ROM\DiskImages\Disk1
 
 RDTReleaseBleedingEdgeDir=S:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT
