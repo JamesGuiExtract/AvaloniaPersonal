@@ -45,7 +45,7 @@ VOAClientInstallMediaDir=$(VOAClientInstallRootDir)\Media\CD-ROM\DiskImages\DISK
 ExtractLMInstallRootDir=$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\Installation\Extract Systems LM
 ExtractLMInstallMediaDir=$(ExtractLMInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
 
-IDShieldInstallRootDir=$(PDRootDir)\AttributeFinder\IndustrySpecific\Redaction\Installation\IDShield
+IDShieldInstallRootDir=$(PDRootDir)\Installation\IDShield
 IDShieldInstallMediaDir=$(IDShieldInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
 
 InternalUseBuildFilesArchive=M:\ProductDevelopment\AttributeFinder\Archive\InternalUseBuildFiles\InternalBuilds\$(FlexIndexVersion)
