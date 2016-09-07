@@ -135,6 +135,7 @@
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Debug/EncryptTextFile.bsc</OutputFile>
+      <PreserveSBR>true</PreserveSBR>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>

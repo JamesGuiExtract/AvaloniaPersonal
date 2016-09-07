@@ -140,6 +140,7 @@
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Debug/CreateMultiPageImage.bsc</OutputFile>
+      <PreserveSBR>true</PreserveSBR>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -161,6 +161,7 @@
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Debug/UCLIDRasterAndOCRMgmt.bsc</OutputFile>
+      <PreserveSBR>true</PreserveSBR>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>

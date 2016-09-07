@@ -65,6 +65,7 @@
       <PrecompiledHeaderOutputFile>.\..\debug\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>KernelAPI.lib;RecAPIPlus.lib;recpdf.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -78,6 +79,7 @@
     </Link>
     <Bscmake>
       <OutputFile>.\..\debug\$(ProjectName).bsc</OutputFile>
+      <PreserveSBR>true</PreserveSBR>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
