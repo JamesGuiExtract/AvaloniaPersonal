@@ -30,7 +30,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>..\..\..\..\..\..\Binaries\Debug\ModifyPdfFile.XML</DocumentationFile>
+   
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -43,7 +43,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>..\..\..\..\..\..\Binaries\release\ModifyPdfFile.XML</DocumentationFile>
+   
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
@@ -59,7 +59,7 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\..\..\..\..\Binaries\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
-    <DocumentationFile>..\..\..\..\..\..\Binaries\Debug\ModifyPdfFile.XML</DocumentationFile>
+   
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -72,7 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>..\..\..\..\..\..\Binaries\release\</OutputPath>
     <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
-    <DocumentationFile>..\..\..\..\..\..\Binaries\release\ModifyPdfFile.XML</DocumentationFile>
+   
     <Optimize>true</Optimize>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>

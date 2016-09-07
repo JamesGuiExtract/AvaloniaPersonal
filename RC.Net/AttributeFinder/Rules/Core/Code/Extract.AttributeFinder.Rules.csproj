@@ -31,7 +31,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RegisterForComInterop>true</RegisterForComInterop>
-    <DocumentationFile>..\..\..\..\..\binaries\debug\Extract.AttributeFinder.Rules.XML</DocumentationFile>
+   
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -45,7 +45,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RegisterForComInterop>true</RegisterForComInterop>
-    <DocumentationFile>..\..\..\..\..\binaries\release\Extract.AttributeFinder.Rules.XML</DocumentationFile>
+   
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>

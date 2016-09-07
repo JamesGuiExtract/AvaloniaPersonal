@@ -27,7 +27,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\..\..\Binaries\Debug\Extract.SharePoint.Redaction.Utilities.XML</DocumentationFile>
+   
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,7 +38,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\..\..\Binaries\Release\Extract.SharePoint.Redaction.Utilities.XML</DocumentationFile>
+   
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
