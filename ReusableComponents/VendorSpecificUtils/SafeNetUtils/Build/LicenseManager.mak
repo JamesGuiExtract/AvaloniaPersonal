@@ -25,7 +25,7 @@ PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 
 LMInstallFilesRootDir=P:\LicenseManager\Files
 
-ExtractLMInstallRootDir=$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\Installation\Extract Systems LM
+ExtractLMInstallRootDir=$(PDRootDir)\Installation\Extract Systems LM
 ExtractLMInstallMediaDir=$(ExtractLMInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
 
 # determine the name of the release output directory based upon the build
