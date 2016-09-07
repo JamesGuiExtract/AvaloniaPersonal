@@ -1609,7 +1609,7 @@
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
 		<row><td>PATH_TO_FIELDACTIVATION_FILES</td><td>P:\LicenseManager\Files\FieldActivation</td><td/><td>2</td></row>
-		<row><td>PATH_TO_INSTALLSCRIPTS_FILES</td><td>&lt;ISProjectFolder&gt;\..\..\Common\InstallScripts</td><td/><td>2</td></row>
+		<row><td>PATH_TO_INSTALLSCRIPTS_FILES</td><td>&lt;ISProjectFolder&gt;\..\..\..\..\..\ProductDevelopment\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCC_FILES</td><td>P:\LicenseManager\Files\NonSelfRegCC</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
