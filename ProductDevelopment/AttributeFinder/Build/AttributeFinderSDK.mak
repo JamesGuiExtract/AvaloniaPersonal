@@ -224,10 +224,10 @@ CopySilentInstallsDir:
 	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(OtherSetupFiles)\SilentInstalls"
 	
 CreateSharepointInstall:
-	@Echo Creating Sharepoint Installs...
-	@CD $(PDRootDir)\AFIntegrations\Sharepoint\Build
-	@nmake /F FlexIDSSP.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" BuildAfterAF
-	@CD \Engineering\ProductDevelopment\AttributeFinder\Build
+#@Echo Creating Sharepoint Installs...
+#@CD $(PDRootDir)\AFIntegrations\Sharepoint\Build
+#@nmake /F FlexIDSSP.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" BuildAfterAF
+#@CD \Engineering\ProductDevelopment\AttributeFinder\Build
 	
 UpdateLicenseFiles:
 	@IF "$(Branch)"=="" (
@@ -256,7 +256,7 @@ CopyFilesToInternalUse:
 	@COPY  "$(BinariesFolder)\*.dll" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\*.xml" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CopyIDShieldSilentInstall CreateFLEXIndexDSInstall CopyFLEXIndexSilentInstall CreateLabDEInstall CreateNetDMSInstall CopySilentInstallsDir CreateSharepointInstall CopyFilesToInternalUse
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CopyIDShieldSilentInstall CreateFLEXIndexDSInstall CopyFLEXIndexSilentInstall CreateLabDEInstall CreateNetDMSInstall CopySilentInstallsDir CopyFilesToInternalUse
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
