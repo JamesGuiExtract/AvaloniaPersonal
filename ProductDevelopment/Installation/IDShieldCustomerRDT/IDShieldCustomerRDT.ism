@@ -1625,7 +1625,7 @@
 		<row><td>PATH_TO_NONSELFREGCOMMO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\NonSelfRegCommonComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMPO_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\NonSelfRegComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGRDTCO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\NonSelfRegRDTComponents</td><td/><td>2</td></row>
-		<row><td>PATH_TO_RELEASE</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\..\..\Binaries\Release</td><td/><td>2</td></row>
+		<row><td>PATH_TO_RELEASE</td><td>&lt;ISPROJECTDIR&gt;..\..\..\Binaries\Release</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGCOMMONCO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegCommonComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGRDTCOMPO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegRDTComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGRDTNETCO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegRDTNetCommon</td><td/><td>2</td></row>
