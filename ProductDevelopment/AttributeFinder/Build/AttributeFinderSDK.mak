@@ -177,10 +177,10 @@ CreateIDShieldInstallCD: BuildIDShieldInstall
     @DeleteFiles "$(IDShieldInstallFiles)\vssver.scc"
 	@IF NOT EXIST "$(IDShieldInstallDir)" MKDIR "$(IDShieldInstallDir)"
 	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(IDShieldInstallDir)" /v /s /e /y
-	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\Launch.ini" "$(IDShieldInstallDir)"
-	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\IDShieldInstall.dbd" "$(IDShieldInstallDir)"
-	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\IDShield.ico" "$(IDShieldInstallDir)"
-	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\autorun.inf" "$(IDShieldSetupFiles)"
+	@COPY "$(PDRootDir)\Installation\IDShieldInstall\Launch.ini" "$(IDShieldInstallDir)"
+	@COPY "$(PDRootDir)\Installation\IDShieldInstall\IDShieldInstall.dbd" "$(IDShieldInstallDir)"
+	@COPY "$(PDRootDir)\Installation\IDShieldInstall\IDShield.ico" "$(IDShieldInstallDir)"
+	@COPY "$(PDRootDir)\Installation\IDShieldInstall\autorun.inf" "$(IDShieldSetupFiles)"
 	@COPY "$(IDShieldInstallFilesRootDir)\InstallHelp\*.*" "$(IDShieldInstallFiles)"
 	@COPY "$(IDShieldInstallRootDir)\Support Files\license.txt" "$(IDShieldSetupFiles)\Readme.txt"
 	$(IDShieldLinkShared)
