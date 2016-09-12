@@ -188,11 +188,14 @@ static const string gstrPORT_DATAENTRYDATA_TO_FILETASKSESSION =
 //		-- 2) Is a match for the user, machine and date time stamp.
 //		-- 3) Is the one and only matching row. If multiple possible sessions are found,
 //		-- we won't attempt to pick one; a dummy FAM session will be created instead.
+//		-- ADDED a "AND (ActionID IS NULL OR ActionID = @ActionID)" to where clause
+//		-- to fix https://extract.atlassian.net/browse/ISSUE-14121
 "		SELECT @FAMSessionID = MAX([ID]) \r\n"
 "			FROM [FAMSession] \r\n"
 "			WHERE [FAMUserID] = @UserID AND [MachineID] = @MachineID \r\n"
 "				AND ([UPI] IS NOT NULL) \r\n"
 "				AND @DateTimeStamp BETWEEN [StartTime] AND [StopTime] \r\n"
+"				AND (ActionID IS NULL OR ActionID = @ActionID) \r\n"
 "			GROUP BY [FAMUserID] \r\n"
 "			HAVING COUNT(*) = 1 \r\n"
 " \r\n"
