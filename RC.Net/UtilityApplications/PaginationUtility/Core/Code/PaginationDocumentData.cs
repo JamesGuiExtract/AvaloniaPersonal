@@ -90,6 +90,22 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 return _attributes;
             }
+
+            set
+            {
+                try
+                {
+                    if (_attributes != value)
+                    {
+                        _attributes.Clear();
+                        _attributes.Append(value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI41342");
+                }
+            }
         }
 
         /// <summary>

@@ -194,50 +194,6 @@ namespace Extract.DataEntry
     public partial class DataEntryControlHost : UserControl, IImageViewerControl,
         IMessageFilter
     {
-// [DataEntry:1151]
-// Disabled highlight prefetch.
-//        /// <summary>
-//        /// Encapsulates data loaded as part of a <see cref="Prefetch"/> call.
-//        /// </summary>
-//        class PrefetchData
-//        {
-//            /// <summary>
-//            /// Initializes a new instance of the <see cref="PrefetchData"/> class.
-//            /// </summary>
-//            /// <param name="fileName">Name of the image file this data is associated with.</param>
-//            public PrefetchData(string fileName)
-//            {
-//                try
-//                {
-//                    string dataFileName = fileName + ".voa";
-//                    ExtractException.Assert("ELI34537", "Missing data file.",
-//                        File.Exists(dataFileName), "FileName", dataFileName);
-//
-//                    DateTimeStamp = File.GetLastWriteTime(dataFileName);
-//                }
-//                catch (Exception ex)
-//                {
-//                    throw ex.AsExtract("ELI34538");
-//                }
-//            }
-//
-//            /// <summary>
-//            /// The <see cref="DateTime"/> of the data file for which this data is valid.
-//            /// If the data file has a greater modified time that DateTimeStamp at the time the
-//            /// prefetch data is to be used, the prefetch data should be disregarded.
-//            /// </summary>
-//            public DateTime DateTimeStamp;
-//
-//            /// <summary>
-//            /// An ordered list of <see cref="CompositeHighlightLayerObject"/>s for each
-//            /// spatial <see cref="IAttribute"/> in the data file (in the order the attributes
-//            /// exist in the data file). After loading the data file in the UI thread, the
-//            /// the spatial attributes can be assigned highlights by using the highlights at the
-//            /// corresponding index in this list.
-//            /// </summary>
-//            public HighlightList PreCreatedHighlights = new HighlightList();
-//        }
-
         #region Constants
 
         /// <summary>
@@ -266,14 +222,6 @@ namespace Extract.DataEntry
         #endregion Constants
 
         #region Fields
-
-// [DataEntry:1151]
-// Disabled highlight prefetch.
-//        /// <summary>
-//        /// Contains data that has been prefetched for upcoming files.
-//        /// </summary>
-//        static Dictionary<string, PrefetchData> _preFetchData =
-//            new Dictionary<string, PrefetchData>();
 
         /// <summary>
         /// The source of application-wide settings and events.
@@ -873,7 +821,7 @@ namespace Extract.DataEntry
         /// </value>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        internal ConfigSettings<Properties.Settings> Config
+        public ConfigSettings<Properties.Settings> Config
         {
             get;
             set;
@@ -1358,48 +1306,52 @@ namespace Extract.DataEntry
             {
                 return _imageViewer;
             }
+
             set
             {
                 try
                 {
-                    // Unregister from previously subscribed-to events
-                    if (_imageViewer != null && _active)
-                    {
-                        UnregisterForEvents();
-
-                        if (_attributes != null)
+                    if (value != _imageViewer)
+                    { 
+                        // Unregister from previously subscribed-to events
+                        if (_imageViewer != null && _active)
                         {
-                            ClearHighlights();
-                        }
-                    }
-
-                    // Store the new image viewer internally
-                    _imageViewer = value;
-
-                    // Check if an image viewer was specified
-                    if (_imageViewer != null)
-                    {
-                        if (_active)
-                        {
-                            RegisterForEvents();
+                            UnregisterForEvents();
 
                             if (_attributes != null)
                             {
-                                CreateAllAttributeHighlights(_attributes, null);
+                                ClearHighlights();
                             }
                         }
 
-                        _imageViewer.DefaultHighlightColor = _defaultHighlightColor;
-                        _imageViewer.AllowBandedSelection = false;
-                        _changingData = false;
-                    }
-                    else
-                    {
-                        // In the case that the image viewer is being set to null, we may not be
-                        // switching documents, but it may be activating a pagination tab. In this
-                        // case, image viewer events and processing should be prevented just as they
-                        // are when switching documents.
-                        _changingData = true;
+                        // Store the new image viewer internally
+                        _imageViewer = value;
+
+                        // Check if an image viewer was specified
+                        if (_imageViewer != null)
+                        {
+                            if (_active)
+                            {
+                                RegisterForEvents();
+
+                                if (_attributes != null)
+                                {
+                                    CreateAllAttributeHighlights(_attributes, null);
+                                }
+                            }
+
+                            _imageViewer.DefaultHighlightColor = _defaultHighlightColor;
+                            _imageViewer.AllowBandedSelection = false;
+                            _changingData = false;
+                        }
+                        else
+                        {
+                            // In the case that the image viewer is being set to null, we may not be
+                            // switching documents, but it may be activating a pagination tab. In this
+                            // case, image viewer events and processing should be prevented just as they
+                            // are when switching documents.
+                            _changingData = true;
+                        }
                     }
                 }
                 catch (Exception e)
@@ -1569,47 +1521,44 @@ namespace Extract.DataEntry
 
         #region Methods
 
-// [DataEntry:1151]
-// Disabled highlight prefetch.
-//        /// <summary>
-//        /// Pre-loads data to improve the load time of the specified document when it is eventually
-//        /// loaded.
-//        /// <para><b>Note</b></para>
-//        /// This call occurs on a background thread, not the UI thread. Controls or data which cannot
-//        /// be shared between threads cannot be used here.
-//        /// </summary>
-//        /// <param name="fileName">The file for which data should be pre-fetched.</param>
-//        public void Prefetch(string fileName)
-//        {
-//            try
-//            {
-//                
-//                string dataFileName = fileName + ".voa";
-//
-//                if (File.Exists(dataFileName))
-//                {
-//                    IUnknownVector attributes = new IUnknownVector();
-//                    attributes.LoadFrom(dataFileName, false);
-//
-//                    PrefetchData prefetchData = new PrefetchData(fileName);
-//
-//                    // Loop through each attribute and assign the pre-created highlight.
-//                    foreach (IAttribute attribute in
-//                        DataEntryMethods.ToAttributeEnumerable(attributes, true)
-//                        .Where(attribute => attribute.Value.HasSpatialInfo()))
-//                    {
-//                        prefetchData.PreCreatedHighlights.Add(
-//                            CreateAttributeHighlight(attribute, false, false, false, true));
-//                    }
-//
-//                    _preFetchData[fileName] = prefetchData;
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                throw ex.AsExtract("ELI34535");
-//            }
-//        }
+        /// <summary>
+        /// Set the database connection(s) to be used in data validation or auto-update queries.
+        /// </summary>
+        /// <param name="dbConnections">The <see cref="DbConnection"/>(s) to be used; The key is the
+        /// connection name (blank for default connection). (Can be <see langword="null"/> if one is
+        /// not required by the DEP).</param>
+        public void SetDatabaseConnections(Dictionary<string, DbConnection> dbConnections)
+        {
+            try
+            {
+                if (_dbConnections != dbConnections)
+                {
+                    _dbConnections = dbConnections;
+
+                    DbConnection defaultDbConnection = null;
+                    if (_dbConnections != null)
+                    {
+                        _dbConnections.TryGetValue("", out defaultDbConnection);
+                    }
+
+                    if (defaultDbConnection != _defaultDbConnection)
+                    {
+                        _defaultDbConnection = defaultDbConnection;
+
+                        if (_isLoaded)
+                        {
+                            // If the dbconnection is changed, the SmartTagManager needs to be
+                            // updated.
+                            InitializeSmartTagManager();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28879", ex);
+            }
+        }
 
         /// <summary>
         /// Loads the provided data in the <see cref="IDataEntryControl"/>s.
@@ -1694,12 +1643,6 @@ namespace Extract.DataEntry
                         // Notify AttributeStatusInfo of the new attribute hierarchy
                         AttributeStatusInfo.ResetData(_imageViewer.ImageFile, _attributes,
                             _dbConnections, null);
-
-                        // [DataEntry:1151]
-                        // Disabled highlight prefetch.
-//                        // Retrieve pre-created highlights for the attributes if Prefetch has been
-//                        // called for this file.
-//                        preCreatedHighlights = RetrievePreCreatedAttributeHighlights(_attributes);
 
                         // Enable or disable swiping as appropriate.
                         bool swipingEnabled = _activeDataControl != null &&
@@ -2515,7 +2458,7 @@ namespace Extract.DataEntry
                         }
                         else
                         {
-                            _imageViewer.PageNumber = _selectionBounds.Keys.First();
+                            SetImageViewerPageNumber(_selectionBounds.Keys.First());
                         }
                     }
 
@@ -2967,17 +2910,6 @@ namespace Extract.DataEntry
                     _smartTagManager.Dispose();
                     _smartTagManager = null;
                 }
-
-                // [DataEntry:1151]
-                // Disabled highlight prefetch.
-//                foreach (PrefetchData prefetchData in _preFetchData.Values)
-//                {
-//                    foreach (List<CompositeHighlightLayerObject> highlightList in
-//                        prefetchData.PreCreatedHighlights)
-//                    {
-//                        CollectionMethods.ClearAndDispose(highlightList);
-//                    }
-//                }
             }
 
             // Dispose of unmanaged resources
@@ -4465,45 +4397,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Set the database connection(s) to be used in data validation or auto-update queries.
-        /// </summary>
-        /// <param name="dbConnections">The <see cref="DbConnection"/>(s) to be used; The key is the
-        /// connection name (blank for default connection). (Can be <see langword="null"/> if one is
-        /// not required by the DEP).</param>
-        internal void SetDatabaseConnections(Dictionary<string, DbConnection> dbConnections)
-        {
-            try
-            {
-                if (_dbConnections != dbConnections)
-                {
-                    _dbConnections = dbConnections;
-
-                    DbConnection defaultDbConnection = null;
-                    if (_dbConnections != null)
-                    {
-                        _dbConnections.TryGetValue("", out defaultDbConnection);
-                    }
-
-                    if (defaultDbConnection != _defaultDbConnection)
-                    {
-                        _defaultDbConnection = defaultDbConnection;
-
-                        if (_isLoaded)
-                        {
-                            // If the dbconnection is changed, the SmartTagManager needs to be
-                            // updated.
-                            InitializeSmartTagManager();
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI28879", ex);
-            }
-        }
-
-        /// <summary>
         /// Removes all <see cref="IAttribute"/>s not marked as persistable from the provided
         /// attribute hierarchy.
         /// </summary>
@@ -4545,11 +4438,519 @@ namespace Extract.DataEntry
         #region Protected Members
 
         /// <summary>
+        /// Navigates to the specified page, settings _performingProgrammaticZoom in the process to
+        /// avoid handling scroll and zoom events that occur as a result.
+        /// </summary>
+        /// <param name="pageNumber">The page to be displayed</param>
+        protected virtual void SetImageViewerPageNumber(int pageNumber)
+        {
+            try
+            {
+                if (pageNumber != _imageViewer.PageNumber)
+                {
+                    _performingProgrammaticZoom = true;
+                    _lastViewArea = new Rectangle();
+                    _imageViewer.PageNumber = pageNumber;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29105", ex);
+            }
+            finally
+            {
+                _performingProgrammaticZoom = false;
+            }
+        }
+
+        /// <summary>
+        /// Renders the <see cref="CompositeHighlightLayerObject"/>s associated with the 
+        /// <see cref="IDataEntryControl"/>s. 
+        /// </summary>
+        /// <param name="ensureActiveAttributeVisible">If <see langword="true"/>, the portion of
+        /// the document currently in view will be adjusted to ensure all active attribute(s) and
+        /// their associated tooltip is visible.  If <see langword="false"/> the view will be
+        /// unchanged even if the attribute and/or tooltip is not currently in the view.</param>
+        protected virtual void DrawHighlights(bool ensureActiveAttributeVisible)
+        {
+            // To avoid unnecessary drawing, wait until we are done loading a document or a
+            // control is done with an update before attempting to display any layer objects.
+            // Also, ensure against recursive calls.
+            if (_changingData || _drawingHighlights || ControlUpdateReferenceCount > 0)
+            {
+                return;
+            }
+
+            try
+            {
+                _drawingHighlights = true;
+
+                // [DataEntry:1176]
+                // If there was a pending selection to apply, do it now before the highlights are
+                // drawn.
+                if (_pendingSelection != null)
+                {
+                    // Specify to ApplySelection that is should suppress the draw highlights call
+                    // and ItemSelectionChanged event since that event depends on data calculated in
+                    // this method; ItemSelectionChanged will be raised at the end of this method.
+                    ApplySelection(_pendingSelection, true);
+
+                    // As long as the pending selection involves the active control, ensure active
+                    // attributes are visible.
+                    ensureActiveAttributeVisible =
+                        (_pendingSelection.DataControl == _activeDataControl);
+                }
+
+                // Refresh the active control highlights if necessary.
+                if (_refreshActiveControlHighlights)
+                {
+                    RefreshActiveControlHighlights();
+                }
+
+                // Update the viewed state of newly added attributes as appropriate.
+                MarkEmptyAttributesAsViewed(_newlyAddedAttributes);
+                _newlyAddedAttributes.Clear();
+
+                // Will be populated with the set of attributes to be highlighted by the end of this
+                // call.
+                Dictionary<IAttribute, bool> newDisplayedAttributeHighlights =
+                    new Dictionary<IAttribute, bool>();
+
+                // Keep track of the unified bounds of the highlights and any associated tooltip on
+                // each page.
+                _selectionBounds.Clear();
+
+                // Reset the selected attribute counts before iterating the attributes
+                _selectedAttributesWithAcceptedHighlights = 0;
+                _selectedAttributesWithUnacceptedHighlights = 0;
+                _selectedAttributesWithDirectHints = 0;
+                _selectedAttributesWithIndirectHints = 0;
+                _selectedAttributesWithoutHighlights = 0;
+
+                int firstPageOfHighlights = -1;
+                int pageToShow = -1;
+
+                // Obtain the current selection state as well as the list of highlights that need
+                // tooltips.
+                SelectionState selectionState = null;
+                List<IAttribute> activeToolTipAttributes = null;
+                if (_activeDataControl != null)
+                {
+                    _controlSelectionState.TryGetValue(_activeDataControl, out selectionState);
+                    _controlToolTipAttributes.TryGetValue(
+                        _activeDataControl, out activeToolTipAttributes);
+                }
+
+                // Loop through all active attributes to retrieve their highlights.
+                foreach (IAttribute attribute in GetActiveAttributes())
+                {
+                    // Find any highlight CompositeHighlightLayerObject that has been created for
+                    // this data entry control.
+                    List<CompositeHighlightLayerObject> highlightList;
+
+                    _attributeHighlights.TryGetValue(attribute, out highlightList);
+
+                    // If the attribute has no highlights to display, move on
+                    if (highlightList == null || highlightList.Count == 0)
+                    {
+                        _selectedAttributesWithoutHighlights++;
+                        continue;
+                    }
+                    else
+                    {
+                        // Update the selected attribute counts appropriately.
+                        switch (AttributeStatusInfo.GetHintType(attribute))
+                        {
+                            case HintType.None:
+                                {
+                                    if (AttributeStatusInfo.IsAccepted(attribute))
+                                    {
+                                        _selectedAttributesWithAcceptedHighlights++;
+                                    }
+                                    else
+                                    {
+                                        _selectedAttributesWithUnacceptedHighlights++;
+                                    }
+                                }
+                                break;
+
+                            case HintType.Direct:
+                                {
+                                    _selectedAttributesWithDirectHints++;
+                                }
+                                break;
+
+                            case HintType.Indirect:
+                                {
+                                    _selectedAttributesWithIndirectHints++;
+                                }
+                                break;
+                        }
+                    }
+
+                    // If the highlight is an in-direct hint, do not display it unless this is
+                    // the only active attribute.
+                    if (selectionState.Attributes.Count > 1 &&
+                        AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
+                    {
+                        continue;
+                    }
+
+                    // Flag each active attribute to be highlighted
+                    newDisplayedAttributeHighlights[attribute] = true;
+
+                    // If this attribute was previously highlighted, remove it from the
+                    // _displayedAttributeHighlights collection whose contents will be hidden at
+                    // the end of this call.
+                    if (_displayedAttributeHighlights.ContainsKey(attribute))
+                    {
+                        _displayedAttributeHighlights.Remove(attribute);
+                    }
+
+                    // Display the attribute's error icon (if it has one).
+                    ShowErrorIcon(attribute, true);
+
+                    // Display a tooltip if directed to by the control and if possible.
+                    if (!_temporarilyHidingTooltips &&
+                        AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect &&
+                        activeToolTipAttributes.Contains(attribute))
+                    {
+                        ShowAttributeToolTip(attribute);
+                    }
+                    // Otherwise, ensure any previous tooltip for the attribute is removed.
+                    else
+                    {
+                        RemoveAttributeToolTip(attribute);
+                    }
+
+                    // Make each highlight for an active attribute visible.
+                    // Also, display an error icon and tooltip if appropriate, as well as adjust
+                    // the view so the entire attribute is visible. (at least the portion on the
+                    // current page)
+                    foreach (CompositeHighlightLayerObject highlight in highlightList)
+                    {
+                        highlight.Visible = true;
+
+                        // Update firstPageOfHighlights if appropriate
+                        if (firstPageOfHighlights == -1 ||
+                            highlight.PageNumber < firstPageOfHighlights)
+                        {
+                            firstPageOfHighlights = highlight.PageNumber;
+                        }
+
+                        // Update pageToShow if appropriate
+                        if (highlight.PageNumber == _imageViewer.PageNumber)
+                        {
+                            pageToShow = highlight.PageNumber;
+                        }
+
+                        // If there is not yet an entry for this page in unifiedBounds, create a
+                        // new one.
+                        if (!_selectionBounds.ContainsKey(highlight.PageNumber))
+                        {
+                            _selectionBounds[highlight.PageNumber] = highlight.GetBounds();
+                        }
+                        // Otherwise add to the existing entry for this page
+                        else
+                        {
+                            _selectionBounds[highlight.PageNumber] = Rectangle.Union(
+                                _selectionBounds[highlight.PageNumber], highlight.GetBounds());
+                        }
+
+                        // Combine the highlight bounds with the error icon bounds (if present).
+                        ImageLayerObject errorIcon =
+                            GetErrorIconOnPage(attribute, highlight.PageNumber);
+                        if (errorIcon != null)
+                        {
+                            _selectionBounds[highlight.PageNumber] = Rectangle.Union(
+                                _selectionBounds[highlight.PageNumber], errorIcon.GetBounds());
+                        }
+                    }
+                }
+
+                // [DataEntry:1192]
+                // It is possible the _hoverAttribute has had its spatial info removed or has been
+                // deleted since becoming the _hoverAttribute. If so, don't create a tooltip for it
+                // and reset _hoverAttribute to null.
+                if (_hoverAttribute != null &&
+                    !AttributeStatusInfo.HasSpatialInfo(_hoverAttribute, true))
+                {
+                    _hoverAttribute = null;
+                }
+
+                // If there is a hover attribute that is different from the active attribute with
+                // a tooltip displayed, display a tooltip for the hover attribute.
+                if (_hoverAttribute != null &&
+                        (_temporarilyHidingTooltips ||
+                         activeToolTipAttributes == null ||
+                         !activeToolTipAttributes.Contains(_hoverAttribute)))
+                {
+                    newDisplayedAttributeHighlights[_hoverAttribute] = true;
+
+                    // If this highlight was previously displayed, remove it from the
+                    // _displayedHighlights collection whose contents will be hidden at the end
+                    // of this call.
+                    if (_displayedAttributeHighlights.ContainsKey(_hoverAttribute))
+                    {
+                        _displayedAttributeHighlights.Remove(_hoverAttribute);
+                    }
+
+                    // Show the hover attribute's highlight and error icon (if one exists).
+                    ShowAttributeHighlights(_hoverAttribute, true);
+
+                    if (!string.IsNullOrEmpty(_hoverAttribute.Value.String))
+                    {
+                        // The tooltip should also be displayed for the hover attribute, but
+                        // don't position it along with the tooltips for currently selected
+                        // attributes.
+                        RemoveAttributeToolTip(_hoverAttribute);
+                        _hoverToolTip = new DataEntryToolTip(this, _hoverAttribute, true, null);
+
+                        _imageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject, false);
+                    }
+                }
+
+                // Hide all attribute highlights that were previously visible, but should not
+                // visible anymore.
+                foreach (IAttribute attribute in _displayedAttributeHighlights.Keys)
+                {
+                    if (_dataEntryApp.ShowAllHighlights)
+                    {
+                        // If ShowAllHighlights, only indirect hints need to be hidden.
+                        if (AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
+                        {
+                            ShowAttributeHighlights(attribute, false);
+                        }
+
+                        // But remove tooltips for all attributes not currently active
+                        RemoveAttributeToolTip(attribute);
+                    }
+                    else
+                    {
+                        // Hide the highlights and remove any tooltip.
+                        ShowAttributeHighlights(attribute, false);
+                        RemoveAttributeToolTip(attribute);
+                    }
+                }
+
+                // Move the visible error icons to the top of the z-order so that nothing is drawn
+                // on top of them.
+                foreach (List<ImageLayerObject> errorIcons in _attributeErrorIcons.Values)
+                {
+                    foreach (ImageLayerObject errorIcon in errorIcons)
+                    {
+                        if (errorIcon.Visible)
+                        {
+                            _imageViewer.LayerObjects.MoveToTop(errorIcon);
+                        }
+                    }
+                }
+
+                // Move to the appropriate page of the document.
+                if (ensureActiveAttributeVisible &&
+                    (pageToShow != -1 || firstPageOfHighlights != -1))
+                {
+                    if (pageToShow == -1)
+                    {
+                        pageToShow = firstPageOfHighlights;
+                    }
+
+                    SetImageViewerPageNumber(pageToShow);
+                }
+
+                // Create & position tooltips for the currently selected attribute(s).
+                PositionToolTips();
+
+                // Make sure the highlight is in view if ensureActiveAttributeVisible is specified.
+                if (ensureActiveAttributeVisible && pageToShow != -1)
+                {
+                    EnforceAutoZoomSettings(false);
+                }
+
+                // Update _displayedHighlights with the new set of highlights.
+                _displayedAttributeHighlights = newDisplayedAttributeHighlights;
+
+                // If we applied a pending selection change, we need to raise the
+                // ItemSelectionChanged event now.
+                if (_pendingSelection != null)
+                {
+                    OnItemSelectionChanged();
+                    _currentlySelectedGroupAttribute = _pendingSelection.SelectedGroupAttribute;
+                    _pendingSelection = null;
+                }
+
+                _imageViewer.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27268", ex);
+            }
+            finally
+            {
+                _drawingHighlights = false;
+            }
+        }
+
+        /// <summary>
         /// Indicates document data has changed.
         /// </summary>
         protected virtual void OnDataChanged()
         {
             _dirty = true;
+        }
+
+        /// <summary>
+        /// Notify registered listeners that a control has been activated or manipulated in such a 
+        /// way that swiping should be either enabled or disabled.
+        /// </summary>
+        /// <param name="e">A <see cref="SwipingStateChangedEventArgs"/> describing whether or not
+        /// swiping is to be enabled.</param>
+        protected virtual void OnSwipingStateChanged(SwipingStateChangedEventArgs e)
+        {
+            if (e.SwipingEnabled && _imageViewer.CursorTool == CursorTool.None &&
+                _imageViewer.IsImageAvailable)
+            {
+                // If swiping is being re-enabled and the previous active cursor tool was one of
+                // the highlight tools, re-enable it so a user does not need to manually
+                // re-active the highlight tool after tabbing past controls which don't support
+                // swiping.
+
+                if (_lastCursorTool == CursorTool.AngularHighlight)
+                {
+                    _imageViewer.CursorTool = CursorTool.AngularHighlight;
+                }
+                else if (_lastCursorTool == CursorTool.RectangularHighlight)
+                {
+                    _imageViewer.CursorTool = CursorTool.RectangularHighlight;
+                }
+                else if (_lastCursorTool == CursorTool.WordHighlight)
+                {
+                    _imageViewer.CursorTool = CursorTool.WordHighlight;
+                }
+            }
+
+            // Raise the event for registered listeners
+            if (SwipingStateChanged != null)
+            {
+                SwipingStateChanged(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ItemSelectionChanged"/> event.
+        /// </summary>
+        protected virtual void OnItemSelectionChanged()
+        {
+            if (!_changingData && AttributeStatusInfo.IsLoggingEnabled(LogCategories.Focus))
+            {
+                // While this is a good place to guarantee all focus changes are logged, it often
+                // results in multiple calls relating to the same focus change. Prevent logging the
+                // same focus change multiple times.
+                IAttribute focusedAttribute = GetActiveAttribute(null);
+                Control focusedControl = _activeDataControl as Control;
+
+                if (focusedAttribute != _lastLoggedFocusAttribute ||
+                    focusedControl != _lastLoggedFocusControl)
+                {
+                    AttributeStatusInfo.Logger.LogEvent(LogCategories.Focus, focusedAttribute,
+                        focusedControl, "");
+
+                    _lastLoggedFocusAttribute = focusedAttribute;
+                    _lastLoggedFocusControl = focusedControl;
+                }
+            }
+
+            if (ItemSelectionChanged != null)
+            {
+                ItemSelectionChanged(this, new ItemSelectionChangedEventArgs(
+                    _selectedAttributesWithAcceptedHighlights,
+                    _selectedAttributesWithUnacceptedHighlights,
+                    _selectedAttributesWithDirectHints, _selectedAttributesWithIndirectHints,
+                    _selectedAttributesWithoutHighlights));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="UnviewedItemsFound"/> event.
+        /// </summary>
+        /// <param name="unviewedItemsFound"><see langword="true"/> if unviewed 
+        /// <see cref="IAttribute"/>s are now known to exist, <see langword="false"/> if it is
+        /// now known that all <see cref="IAttribute"/>s have been viewed.</param>
+        protected virtual void OnUnviewedItemsFound(bool unviewedItemsFound)
+        {
+            if (UnviewedItemsFound != null)
+            {
+                UnviewedItemsFound(this, new UnviewedItemsFoundEventArgs(unviewedItemsFound));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="InvalidItemsFound"/> event.
+        /// </summary>
+        /// <param name="invalidItemsFound"><see langword="true"/> if <see cref="IAttribute"/>s
+        /// with invalid data are now known to exist, <see langword="false"/> if it is
+        /// now known that all <see cref="IAttribute"/>s contain valid data.</param>
+        protected virtual void OnInvalidItemsFound(bool invalidItemsFound)
+        {
+            if (InvalidItemsFound != null)
+            {
+                InvalidItemsFound(this, new InvalidItemsFoundEventArgs(invalidItemsFound));
+            }
+        }
+        /// <summary>
+        /// Raises the <see cref="MessageHandled"/> event.
+        /// </summary>
+        /// <param name="e">The data associated with the event.</param>
+        void OnMessageHandled(MessageHandledEventArgs e)
+        {
+            try
+            {
+                if (MessageHandled != null)
+                {
+                    MessageHandled(this, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI29134", ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="UpdateEnded"/> event.
+        /// </summary>
+        /// <param name="e"></param>
+        void OnUpdateEnded(EventArgs e)
+        {
+            try
+            {
+                if (UpdateEnded != null)
+                {
+                    UpdateEnded(this, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI30114", ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DataSaved"/> event.
+        /// </summary>
+        void OnDataSaved()
+        {
+            try
+            {
+                if (DataSaved != null)
+                {
+                    DataSaved(this, new EventArgs());
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI38427", ex);
+            }
         }
 
         #endregion Protected Members
@@ -5065,433 +5466,6 @@ namespace Extract.DataEntry
             _refreshActiveControlHighlights = true;
 
             DrawHighlights(true);
-        }
-
-        /// <summary>
-        /// Notify registered listeners that a control has been activated or manipulated in such a 
-        /// way that swiping should be either enabled or disabled.
-        /// </summary>
-        /// <param name="e">A <see cref="SwipingStateChangedEventArgs"/> describing whether or not
-        /// swiping is to be enabled.</param>
-        void OnSwipingStateChanged(SwipingStateChangedEventArgs e)
-        {
-            if (e.SwipingEnabled && _imageViewer.CursorTool == CursorTool.None && 
-                _imageViewer.IsImageAvailable)
-            {
-                // If swiping is being re-enabled and the previous active cursor tool was one of
-                // the highlight tools, re-enable it so a user does not need to manually
-                // re-active the highlight tool after tabbing past controls which don't support
-                // swiping.
-
-                if (_lastCursorTool == CursorTool.AngularHighlight)
-                {
-                    _imageViewer.CursorTool = CursorTool.AngularHighlight;
-                }
-                else if (_lastCursorTool == CursorTool.RectangularHighlight)
-                {
-                    _imageViewer.CursorTool = CursorTool.RectangularHighlight;
-                }
-                else if (_lastCursorTool == CursorTool.WordHighlight)
-                {
-                    _imageViewer.CursorTool = CursorTool.WordHighlight;
-                }
-            }
-
-            // Raise the event for registered listeners
-            if (SwipingStateChanged != null)
-            {
-                SwipingStateChanged(this, e);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="ItemSelectionChanged"/> event.
-        /// </summary>
-        void OnItemSelectionChanged()
-        {
-            if (!_changingData && AttributeStatusInfo.IsLoggingEnabled(LogCategories.Focus))
-            {
-                // While this is a good place to guarantee all focus changes are logged, it often
-                // results in multiple calls relating to the same focus change. Prevent logging the
-                // same focus change multiple times.
-                IAttribute focusedAttribute = GetActiveAttribute(null);
-                Control focusedControl = _activeDataControl as Control;
-
-                if (focusedAttribute != _lastLoggedFocusAttribute ||
-                    focusedControl != _lastLoggedFocusControl)
-                {
-                    AttributeStatusInfo.Logger.LogEvent(LogCategories.Focus, focusedAttribute,
-                        focusedControl, "");
-
-                    _lastLoggedFocusAttribute = focusedAttribute;
-                    _lastLoggedFocusControl = focusedControl;
-                }
-            }
-
-            if (ItemSelectionChanged != null)
-            {
-                ItemSelectionChanged(this, new ItemSelectionChangedEventArgs(
-                    _selectedAttributesWithAcceptedHighlights,
-                    _selectedAttributesWithUnacceptedHighlights, 
-                    _selectedAttributesWithDirectHints,_selectedAttributesWithIndirectHints,
-                    _selectedAttributesWithoutHighlights));
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="UnviewedItemsFound"/> event.
-        /// </summary>
-        /// <param name="unviewedItemsFound"><see langword="true"/> if unviewed 
-        /// <see cref="IAttribute"/>s are now known to exist, <see langword="false"/> if it is
-        /// now known that all <see cref="IAttribute"/>s have been viewed.</param>
-        void OnUnviewedItemsFound(bool unviewedItemsFound)
-        {
-            if (UnviewedItemsFound != null)
-            {
-                UnviewedItemsFound(this, new UnviewedItemsFoundEventArgs(unviewedItemsFound));
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="InvalidItemsFound"/> event.
-        /// </summary>
-        /// <param name="invalidItemsFound"><see langword="true"/> if <see cref="IAttribute"/>s
-        /// with invalid data are now known to exist, <see langword="false"/> if it is
-        /// now known that all <see cref="IAttribute"/>s contain valid data.</param>
-        void OnInvalidItemsFound(bool invalidItemsFound)
-        {
-            if (InvalidItemsFound != null)
-            {
-                InvalidItemsFound(this, new InvalidItemsFoundEventArgs(invalidItemsFound));
-            }
-        }
-
-        /// <summary>
-        /// Renders the <see cref="CompositeHighlightLayerObject"/>s associated with the 
-        /// <see cref="IDataEntryControl"/>s. 
-        /// </summary>
-        /// <param name="ensureActiveAttributeVisible">If <see langword="true"/>, the portion of
-        /// the document currently in view will be adjusted to ensure all active attribute(s) and
-        /// their associated tooltip is visible.  If <see langword="false"/> the view will be
-        /// unchanged even if the attribute and/or tooltip is not currently in the view.</param>
-        void DrawHighlights(bool ensureActiveAttributeVisible)
-        {
-            // To avoid unnecessary drawing, wait until we are done loading a document or a
-            // control is done with an update before attempting to display any layer objects.
-            // Also, ensure against recursive calls.
-            if (_changingData || _drawingHighlights || ControlUpdateReferenceCount > 0)
-            {
-                return;
-            }
-
-            try
-            {
-                _drawingHighlights = true;
-
-                // [DataEntry:1176]
-                // If there was a pending selection to apply, do it now before the highlights are
-                // drawn.
-                if (_pendingSelection != null)
-                {
-                    // Specify to ApplySelection that is should suppress the draw highlights call
-                    // and ItemSelectionChanged event since that event depends on data calculated in
-                    // this method; ItemSelectionChanged will be raised at the end of this method.
-                    ApplySelection(_pendingSelection, true);
-
-                    // As long as the pending selection involves the active control, ensure active
-                    // attributes are visible.
-                    ensureActiveAttributeVisible =
-                        (_pendingSelection.DataControl == _activeDataControl);
-                }
-
-                // Refresh the active control highlights if necessary.
-                if (_refreshActiveControlHighlights)
-                {
-                    RefreshActiveControlHighlights();
-                }
-
-                // Update the viewed state of newly added attributes as appropriate.
-                MarkEmptyAttributesAsViewed(_newlyAddedAttributes);
-                _newlyAddedAttributes.Clear();
-
-                // Will be populated with the set of attributes to be highlighted by the end of this
-                // call.
-                Dictionary<IAttribute, bool> newDisplayedAttributeHighlights =
-                    new Dictionary<IAttribute, bool>();
-
-                // Keep track of the unified bounds of the highlights and any associated tooltip on
-                // each page.
-                _selectionBounds.Clear();
-
-                // Reset the selected attribute counts before iterating the attributes
-                _selectedAttributesWithAcceptedHighlights = 0;
-                _selectedAttributesWithUnacceptedHighlights = 0;
-                _selectedAttributesWithDirectHints = 0;
-                _selectedAttributesWithIndirectHints = 0;
-                _selectedAttributesWithoutHighlights = 0;
-
-                int firstPageOfHighlights = -1;
-                int pageToShow = -1;
-
-                // Obtain the current selection state as well as the list of highlights that need
-                // tooltips.
-                SelectionState selectionState = null;                
-                List<IAttribute> activeToolTipAttributes = null;
-                if (_activeDataControl != null)
-                {
-                    _controlSelectionState.TryGetValue(_activeDataControl, out selectionState);
-                    _controlToolTipAttributes.TryGetValue(
-                        _activeDataControl, out activeToolTipAttributes);
-                }
-
-                // Loop through all active attributes to retrieve their highlights.
-                foreach (IAttribute attribute in GetActiveAttributes())
-                {
-                    // Find any highlight CompositeHighlightLayerObject that has been created for
-                    // this data entry control.
-                    List<CompositeHighlightLayerObject> highlightList;
-
-                    _attributeHighlights.TryGetValue(attribute, out highlightList);
-
-                    // If the attribute has no highlights to display, move on
-                    if (highlightList == null || highlightList.Count == 0)
-                    {
-                        _selectedAttributesWithoutHighlights++;
-                        continue;
-                    }
-                    else
-                    {
-                        // Update the selected attribute counts appropriately.
-                        switch (AttributeStatusInfo.GetHintType(attribute))
-                        {
-                            case HintType.None:
-                                {
-                                    if (AttributeStatusInfo.IsAccepted(attribute))
-                                    {
-                                        _selectedAttributesWithAcceptedHighlights++;
-                                    }
-                                    else
-                                    {
-                                        _selectedAttributesWithUnacceptedHighlights++;
-                                    }
-                                }
-                                break;
-
-                            case HintType.Direct:
-                                {
-                                    _selectedAttributesWithDirectHints++;
-                                }
-                                break;
-
-                            case HintType.Indirect:
-                                {
-                                    _selectedAttributesWithIndirectHints++;
-                                }
-                                break;
-                        }
-                    }
-
-                    // If the highlight is an in-direct hint, do not display it unless this is
-                    // the only active attribute.
-                    if (selectionState.Attributes.Count > 1 &&
-                        AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
-                    {
-                        continue;
-                    }
-
-                    // Flag each active attribute to be highlighted
-                    newDisplayedAttributeHighlights[attribute] = true;
-
-                    // If this attribute was previously highlighted, remove it from the
-                    // _displayedAttributeHighlights collection whose contents will be hidden at
-                    // the end of this call.
-                    if (_displayedAttributeHighlights.ContainsKey(attribute))
-                    {
-                        _displayedAttributeHighlights.Remove(attribute);
-                    }
-
-                    // Display the attribute's error icon (if it has one).
-                    ShowErrorIcon(attribute, true);
-
-                    // Display a tooltip if directed to by the control and if possible.
-                    if (!_temporarilyHidingTooltips &&
-                        AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect &&
-                        activeToolTipAttributes.Contains(attribute))
-                    {
-                        ShowAttributeToolTip(attribute);
-                    }
-                    // Otherwise, ensure any previous tooltip for the attribute is removed.
-                    else
-                    {
-                        RemoveAttributeToolTip(attribute);
-                    }
-
-                    // Make each highlight for an active attribute visible.
-                    // Also, display an error icon and tooltip if appropriate, as well as adjust
-                    // the view so the entire attribute is visible. (at least the portion on the
-                    // current page)
-                    foreach (CompositeHighlightLayerObject highlight in highlightList)
-                    {
-                        highlight.Visible = true;
-
-                        // Update firstPageOfHighlights if appropriate
-                        if (firstPageOfHighlights == -1 ||
-                            highlight.PageNumber < firstPageOfHighlights)
-                        {
-                            firstPageOfHighlights = highlight.PageNumber;
-                        }
-
-                        // Update pageToShow if appropriate
-                        if (highlight.PageNumber == _imageViewer.PageNumber)
-                        {
-                            pageToShow = highlight.PageNumber;
-                        }
-
-                        // If there is not yet an entry for this page in unifiedBounds, create a
-                        // new one.
-                        if (!_selectionBounds.ContainsKey(highlight.PageNumber))
-                        {
-                            _selectionBounds[highlight.PageNumber] = highlight.GetBounds();
-                        }
-                        // Otherwise add to the existing entry for this page
-                        else
-                        {
-                            _selectionBounds[highlight.PageNumber] = Rectangle.Union(
-                                _selectionBounds[highlight.PageNumber], highlight.GetBounds());
-                        }
-
-                        // Combine the highlight bounds with the error icon bounds (if present).
-                        ImageLayerObject errorIcon =
-                            GetErrorIconOnPage(attribute, highlight.PageNumber);
-                        if (errorIcon != null)
-                        {
-                            _selectionBounds[highlight.PageNumber] = Rectangle.Union(
-                                _selectionBounds[highlight.PageNumber], errorIcon.GetBounds());
-                        }
-                    }
-                }
-
-                // [DataEntry:1192]
-                // It is possible the _hoverAttribute has had its spatial info removed or has been
-                // deleted since becoming the _hoverAttribute. If so, don't create a tooltip for it
-                // and reset _hoverAttribute to null.
-                if (_hoverAttribute != null && 
-                    !AttributeStatusInfo.HasSpatialInfo(_hoverAttribute, true))
-                {
-                    _hoverAttribute = null;
-                }
-
-                // If there is a hover attribute that is different from the active attribute with
-                // a tooltip displayed, display a tooltip for the hover attribute.
-                if (_hoverAttribute != null &&
-                        (_temporarilyHidingTooltips ||
-                         activeToolTipAttributes == null ||
-                         !activeToolTipAttributes.Contains(_hoverAttribute)))
-                {
-                    newDisplayedAttributeHighlights[_hoverAttribute] = true;
-
-                    // If this highlight was previously displayed, remove it from the
-                    // _displayedHighlights collection whose contents will be hidden at the end
-                    // of this call.
-                    if (_displayedAttributeHighlights.ContainsKey(_hoverAttribute))
-                    {
-                        _displayedAttributeHighlights.Remove(_hoverAttribute);
-                    }
-
-                    // Show the hover attribute's highlight and error icon (if one exists).
-                    ShowAttributeHighlights(_hoverAttribute, true);
-
-                    if (!string.IsNullOrEmpty(_hoverAttribute.Value.String))
-                    {
-                        // The tooltip should also be displayed for the hover attribute, but
-                        // don't position it along with the tooltips for currently selected
-                        // attributes.
-                        RemoveAttributeToolTip(_hoverAttribute);
-                        _hoverToolTip = new DataEntryToolTip(this, _hoverAttribute, true, null);
-
-                        _imageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject, false);
-                    }
-                }
-
-                // Hide all attribute highlights that were previously visible, but should not
-                // visible anymore.
-                foreach (IAttribute attribute in _displayedAttributeHighlights.Keys)
-                {
-                    if (_dataEntryApp.ShowAllHighlights)
-                    {
-                        // If ShowAllHighlights, only indirect hints need to be hidden.
-                        if (AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
-                        {
-                            ShowAttributeHighlights(attribute, false);
-                        }
-
-                        // But remove tooltips for all attributes not currently active
-                        RemoveAttributeToolTip(attribute);
-                    }
-                    else
-                    {
-                        // Hide the highlights and remove any tooltip.
-                        ShowAttributeHighlights(attribute, false);
-                        RemoveAttributeToolTip(attribute);
-                    }
-                }
-
-                // Move the visible error icons to the top of the z-order so that nothing is drawn
-                // on top of them.
-                foreach (List<ImageLayerObject> errorIcons in _attributeErrorIcons.Values)
-                {
-                    foreach (ImageLayerObject errorIcon in errorIcons)
-                    {
-                        if (errorIcon.Visible)
-                        {
-                            _imageViewer.LayerObjects.MoveToTop(errorIcon);
-                        }
-                    }
-                }
-
-                // Move to the appropriate page of the document.
-                if (ensureActiveAttributeVisible &&
-                    (pageToShow != -1 || firstPageOfHighlights != -1))
-                {
-                    if (pageToShow == -1)
-                    {
-                        pageToShow = firstPageOfHighlights;
-                    }
-
-                    SetImageViewerPageNumber(pageToShow);
-                }
-
-                // Create & position tooltips for the currently selected attribute(s).
-                PositionToolTips();
-
-                // Make sure the highlight is in view if ensureActiveAttributeVisible is specified.
-                if (ensureActiveAttributeVisible && pageToShow != -1)
-                {
-                    EnforceAutoZoomSettings(false);
-                }
-
-                // Update _displayedHighlights with the new set of highlights.
-                _displayedAttributeHighlights = newDisplayedAttributeHighlights;
-
-                // If we applied a pending selection change, we need to raise the
-                // ItemSelectionChanged event now.
-                if (_pendingSelection != null)
-                {
-                    OnItemSelectionChanged();
-                    _currentlySelectedGroupAttribute = _pendingSelection.SelectedGroupAttribute;
-                    _pendingSelection = null;
-                }
-
-                _imageViewer.Invalidate();
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI27268", ex);
-            }
-            finally
-            {
-                _drawingHighlights = false;
-            }
         }
 
         /// <summary>
@@ -6519,7 +6493,7 @@ namespace Extract.DataEntry
             bool isAccepted = AttributeStatusInfo.IsAccepted(attribute);
 
             foreach (var highlight in
-                CreateAttributeHighlight(attribute, makeVisible, isHint, isAccepted, false))
+                CreateAttributeHighlight(attribute, makeVisible, isHint, isAccepted))
             {
                 _attributeHighlights[attribute].Add(highlight);
                 _highlightAttributes[highlight] = attribute;
@@ -6541,20 +6515,11 @@ namespace Extract.DataEntry
         /// otherwise <see langword="false"/>.</param>
         /// <param name="isAccepted"><see langword="true"/> if the highlight should be accepted,
         /// otherwise <see langword="false"/>.</param>
-        /// <param name="prefetching"><see langword="true"/> if the attribute highlight is being
-        /// created for the purposes of prefetching; otherwise, <see langword="false"/>.</param>
         /// <returns>The <see cref="CompositeHighlightLayerObject"/>s for the specified
         /// <see paramref="attribute"/></returns>
         List<CompositeHighlightLayerObject> CreateAttributeHighlight(IAttribute attribute,
-            bool makeVisible, bool isHint, bool isAccepted, bool prefetching)
+            bool makeVisible, bool isHint, bool isAccepted)
         {
-            // [DataEntry:1178]
-            // Never create highlights for un-viewable attributes.
-            if (!prefetching && !AttributeStatusInfo.IsViewable(attribute))
-            {
-                return new List<CompositeHighlightLayerObject>();
-            }
-
             List<CompositeHighlightLayerObject> attributeHighlights =
                 new List<CompositeHighlightLayerObject>();
 
@@ -7163,51 +7128,6 @@ namespace Extract.DataEntry
             return anchorPoint[0];
 
         }
-
-// [DataEntry:1151]
-// Disabled highlight prefetch.
-//        /// <summary>
-//        /// Retrieves and assigns <see cref="CompositeHighlightLayerObject"/> objects that were
-//        /// created for this file during a call to <see cref="Prefetch"/>.
-//        /// </summary>
-//        /// <param name="attributes">The <see cref="IAttribute"/>s for which the pre-created
-//        /// highlights are to be retrieved.</param>
-//        /// <returns>A <see cref="HighlightDictionary"/> that maps the <see paramref="attributes"/>
-//        /// to their pre-created <see cref="CompositeHighlightLayerObject"/>s.</returns>
-//        HighlightDictionary RetrievePreCreatedAttributeHighlights(IUnknownVector attributes)
-//        {
-//            ExtractException.Assert("ELI34536", "Null argument exception!", attributes != null);
-//
-//            HighlightDictionary preCreatedHighlights = null;
-//
-//            // Attempt to retrieve prefetch data for this file.
-//            PrefetchData preFetchData = null;
-//            if (_preFetchData.TryGetValue(_imageViewer.ImageFile, out preFetchData))
-//            {
-//                _preFetchData.Remove(_imageViewer.ImageFile);
-//
-//                string dataFileName = _imageViewer.ImageFile + ".voa";
-//
-//                // Don't use the prefetched data if the data file has been modified since the
-//                // data was loaded.
-//                if (File.GetLastWriteTime(dataFileName) == preFetchData.DateTimeStamp)
-//                {
-//                    preCreatedHighlights = new HighlightDictionary();
-//
-//                    int index = 0;
-//
-//                    // Loop through each attribute and compile the raster zones from each.
-//                    foreach (IAttribute attribute in
-//                        DataEntryMethods.ToAttributeEnumerable(attributes, true)
-//                        .Where(attribute => attribute.Value.HasSpatialInfo()))
-//                    {
-//                        preCreatedHighlights[attribute] = preFetchData.PreCreatedHighlights[index++];
-//                    }
-//                }
-//            }
-//
-//            return preCreatedHighlights;
-//        }
 
         /// <summary>
         /// Creates highlights for all <see cref="IAttribute"/>s in the provided 
@@ -7919,32 +7839,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Navigates to the specified page, settings _performingProgrammaticZoom in the process to
-        /// avoid handling scroll and zoom events that occur as a result.
-        /// </summary>
-        /// <param name="pageNumber">The page to be displayed</param>
-        void SetImageViewerPageNumber(int pageNumber)
-        {
-            try
-            {
-                if (pageNumber != _imageViewer.PageNumber)
-                {
-                    _performingProgrammaticZoom = true;
-                    _lastViewArea = new Rectangle();
-                    _imageViewer.PageNumber = pageNumber;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI29105", ex);
-            }
-            finally
-            {
-                _performingProgrammaticZoom = false;
-            }
-        }
-
-        /// <summary>
         /// Registers for events.
         /// </summary>
         void RegisterForEvents()
@@ -7989,62 +7883,6 @@ namespace Extract.DataEntry
                     _imageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
                     _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="MessageHandled"/> event.
-        /// </summary>
-        /// <param name="e">The data associated with the event.</param>
-        void OnMessageHandled(MessageHandledEventArgs e)
-        {
-            try
-            {
-                if (MessageHandled != null)
-                {
-                    MessageHandled(this, e);
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Log("ELI29134", ex);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="UpdateEnded"/> event.
-        /// </summary>
-        /// <param name="e"></param>
-        void OnUpdateEnded(EventArgs e)
-        {
-            try
-            {
-                if (UpdateEnded != null)
-                {
-                    UpdateEnded(this, e);
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Log("ELI30114", ex);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="DataSaved"/> event.
-        /// </summary>
-        void OnDataSaved()
-        {
-            try
-            {
-                if (DataSaved != null)
-                {
-                    DataSaved(this, new EventArgs());
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Log("ELI38427", ex);
             }
         }
 

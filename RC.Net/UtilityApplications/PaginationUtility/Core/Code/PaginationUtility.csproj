@@ -31,7 +31,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-   
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -44,7 +43,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-   
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -91,6 +89,10 @@
     </Compile>
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataEntryPaginationDocumentData.cs" />
+    <Compile Include="DataEntryDocumentDataPanel.cs">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="NewDocumentGlyph.cs">
       <SubType>UserControl</SubType>
@@ -255,6 +257,10 @@
       <Name>Extract</Name>
       <Private>True</Private>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\DataEntry\Core\Code\Extract.DataEntry.csproj">
+      <Project>{55c4fa3a-26c9-4cc0-9f11-a7e607e6acd2}</Project>
+      <Name>Extract.DataEntry</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
       <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>

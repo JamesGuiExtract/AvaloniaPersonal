@@ -425,7 +425,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (value != _documentDataPanel)
                     {
+                        if (_documentDataPanel != null)
+                        {
+                            _documentDataPanel.PageLoadRequest -= HandleDocumentDataPanel_PageLoadRequest;
+                        }
+
                         _documentDataPanel = value;
+
+                        if (_documentDataPanel != null)
+                        {
+                            _documentDataPanel.PageLoadRequest += HandleDocumentDataPanel_PageLoadRequest;
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -544,6 +554,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         #endregion Runtime Properties
+
+        #region Internal Properties
+        
+        #endregion Internal Properties
 
         #region Methods
 
@@ -774,7 +788,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         doc.PageControls
                             .First()
                             .Page.OriginalDocumentName.Equals(
-                                sourceFileName,StringComparison.OrdinalIgnoreCase));
+                                sourceFileName, StringComparison.OrdinalIgnoreCase));
 
                 return matchingDocuments.All(doc => doc.InOriginalForm);
             }
@@ -813,16 +827,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
         public void CheckForChanges(out bool paginationModified, out bool dataModified)
         {
-            try 
-            {	        
-	            paginationModified = _pendingDocuments.Any(document =>
+            try
+            {
+                paginationModified = _pendingDocuments.Any(document =>
                         !document.InOriginalForm);
                 dataModified = _pendingDocuments.Any(document =>
                     document.DataModified && !document.DocumentData.DataSharedInVerification);
             }
             catch (Exception ex)
             {
-	            throw ex.AsExtract("ELI40281");
+                throw ex.AsExtract("ELI40281");
             }
         }
 
@@ -1136,11 +1150,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .SelectMany(doc => doc.PageControls
                         .Select(c => c.Page.OriginalDocumentName)));
 
-            var unIncludedPagesControls = 
+            var unIncludedPagesControls =
                 _pendingDocuments
                     .Where(doc => !doc.Selected)
                     .SelectMany(doc => doc.PageControls
-                        .Where(c => 
+                        .Where(c =>
                             affectedSourceDocuments.Contains(c.Page.OriginalDocumentName)));
 
             if (unIncludedPagesControls.Any())
@@ -1500,7 +1514,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         ussData.ReportMemoryUsage();
                         return ussData;
                     });
-                    
+
                 var newSpatialPageInfos = new LongToObjectMapClass();
                 int destPageCount = pageMap.Values.SelectMany(value => value).Count();
                 var newPageDataArray = new SpatialString[destPageCount];
@@ -1870,7 +1884,27 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             set
             {
-                _imageViewer = value;
+                try
+                {
+                    if (value != _imageViewer)
+                    {
+                        if (_imageViewer != null)
+                        {
+                            _imageViewer.ImageFileClosing -= HandleImageViewer_ImageFileClosing;
+                        }
+
+                        _imageViewer = value;
+
+                        if (_imageViewer != null)
+                        {
+                            _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI41359");
+                }
             }
         }
 
@@ -2011,7 +2045,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 long fileSize = new FileInfo(tempFile.FileName).Length;
 
                 bool? suggestedPaginationAccepted = outputDocument.PaginationSuggested
-                    ? (bool ?)(outputDocument.InOriginalForm ? true : false)
+                    ? (bool?)(outputDocument.InOriginalForm ? true : false)
                     : null;
 
                 int position = _outputDocumentPositions[outputDocument];
@@ -2183,8 +2217,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         return;
                     }
 
+                    // Data is not loaded into the panel until PaginationSeparator.OpenDataPanel
+                    // so that the control handles are instantiated first.
                     _documentWithDataInEdit = e.OutputDocument;
-                    DocumentDataPanel.LoadData(_documentWithDataInEdit.DocumentData);
                     e.DocumentDataPanel = DocumentDataPanel;
                 }
             }
@@ -2298,6 +2333,47 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40217");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IPaginationDocumentDataPanel.PageLoadRequest"/> event of the
+        /// <see cref="_documentDataPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleDocumentDataPanel_PageLoadRequest(object sender, PageLoadRequestEventArgs e)
+        {
+            var pageToSelect =
+                (_documentWithDataInEdit?.PageControls ?? _primaryPageLayoutControl.PageControls)
+                    .FirstOrDefault(c => e.PageNumber == c.Page.OriginalPageNumber &&
+                        c.Page.OriginalDocumentName
+                            .Equals(e.SourceDocName, StringComparison.OrdinalIgnoreCase));
+
+            if (pageToSelect != null)
+            {
+                _primaryPageLayoutControl.SelectPage(pageToSelect);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ImageViewer.ImageFileClosing"/> event of the
+        /// <see cref="ImageViewer"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleImageViewer_ImageFileClosing(object sender, ImageFileClosingEventArgs e)
+        {
+            try
+            {
+                // Whenever a DEP is closed, ensure the swiping tools are disabled until another
+                // DEP specifically enables them.
+                ImageViewer.AllowHighlight = false;
+                ImageViewer.CursorTool = CursorTool.None;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41341");
             }
         }
 
@@ -2507,7 +2583,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </returns>
         bool SaveDocumentData(bool onlyIfSelected, bool validateData)
         {
-            if (_documentWithDataInEdit == null || 
+            if (_documentWithDataInEdit == null ||
                 (onlyIfSelected && CommitOnlySelection && !_documentWithDataInEdit.Selected) ||
                 CloseDataPanel(validateData))
             {
@@ -2894,7 +2970,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             var eventHandler = Paginated;
             if (eventHandler != null)
             {
-                eventHandler(this, 
+                eventHandler(this,
                     new PaginatedEventArgs(
                         paginatedDocumentSources, disregardedPaginationSources,
                         modifiedDocumentData, unmodifiedPaginationSources));

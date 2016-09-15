@@ -1,4 +1,5 @@
 using Extract.AttributeFinder;
+using Extract.DataEntry;
 using Extract.FileActionManager.Forms;
 using Extract.Imaging;
 using Extract.Licensing;
@@ -22,7 +23,7 @@ namespace Extract.FileActionManager.FileProcessors
     /// Represents a task that displays a form allowing the user to paginate files.
     /// </summary>
     [CLSCompliant(false)]
-    public sealed partial class PaginationTaskForm : Form, IVerificationForm
+    public sealed partial class PaginationTaskForm : Form, IVerificationForm, IDataEntryApplication
     {
         #region Constants
 
@@ -327,6 +328,166 @@ namespace Extract.FileActionManager.FileProcessors
 
         #endregion Properties
 
+        #region IDataEntryApplication
+
+        /// <summary>
+        /// This event indicates the value of <see cref="P:Extract.DataEntry.IDataEntryApplication.ShowAllHighlights" /> has
+        /// changed.
+        /// </summary>
+        event EventHandler<EventArgs> IDataEntryApplication.ShowAllHighlightsChanged
+        {
+            add { }
+            remove { }
+        }
+
+        /// <summary>
+        /// Saves the data currently displayed to disk.
+        /// </summary>
+        /// <param name="validateData"><see langword="true" /> to ensure the data is conforms to the
+        /// DataEntryControlHost InvalidDataSaveMode before saving, <see langword="false" /> to save
+        /// data without validating.</param>
+        /// <returns>
+        /// <see langword="true" /> if the data was saved, <see langword="false" /> if it was
+        /// not.
+        /// </returns>
+        public bool SaveData(bool validateData)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Skips processing for the current file. This is the same as pressing the skip button in
+        /// the UI.
+        /// <para><b>Note</b></para>
+        /// If there are changes in the currently loaded document, they will be disregarded. To
+        /// check for changes and save, use the <see cref="P:Extract.DataEntry.IDataEntryApplication.Dirty" /> and <see cref="M:Extract.DataEntry.IDataEntryApplication.SaveData(System.Boolean)" />
+        /// members first.
+        /// </summary>
+        public void SkipFile()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Requests the specified <see paramref="fileID" /> to be the next file displayed. The file
+        /// should be allowed to jump ahead of any other files currently "processing" in the
+        /// verification task on other threads (prefetch).
+        /// <para><b>Note</b></para>
+        /// The requested file will not be shown until the currently displayed file is closed. If
+        /// the requested file needs to replace the currently displayed file immediately,
+        /// <see cref="M:Extract.DataEntry.IDataEntryApplication.DelayFile" /> should be called after RequestFile.
+        /// </summary>
+        /// <param name="fileID">The file ID.</param>
+        /// <returns>
+        /// <see langword="true" /> if the file is currently processing in the verification
+        /// task and confirmed to be available,<see langword="false" /> if the task is not currently
+        /// holding the file; the requested file will be expected to the next file in the queue or
+        /// an exception will result.
+        /// </returns>
+        public bool RequestFile(int fileID)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// The title of the current DataEntry application.
+        /// </summary>
+        public string ApplicationTitle
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Specifies how the image viewer zoom/view is adjusted when new fields are selected.
+        /// </summary>
+        public AutoZoomMode AutoZoomMode
+        {
+            get
+            {
+                return AutoZoomMode.NoZoom;             
+            }
+        }
+
+        /// <summary>
+        /// The page space (context) that should be shown around an object selected when AutoZoom
+        /// mode is active. 0 indicates no context space should be shown around the current
+        /// selection where 1 indicates the maximum context space should be shown.
+        /// </summary>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public double AutoZoomContext
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether tabbing should allow groups (rows) of attributes to be selected at a
+        /// time for controls in which group tabbing is enabled.
+        /// </summary>
+        public bool AllowTabbingByGroup
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Get whether highlights for all data mapped to an <see cref="T:Extract.DataEntry.IDataEntryControl" /> should
+        /// be displayed in the <see cref="T:Extract.Imaging.Forms.ImageViewer" /> or whether only highlights relating to the
+        /// currently selected fields should be displayed.
+        /// </summary>
+        public bool ShowAllHighlights
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the action in <see cref="P:Extract.DataEntry.FileProcessingDB" /> that the
+        /// <see cref="T:Extract.DataEntry.IDataEntryApplication" /> is currently being run against.
+        /// </summary>
+        public string DatabaseActionName
+        {
+            get
+            {
+                return FileProcessingDB.GetActionName(_actionID);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the comment for the current file that is stored in the file processing
+        /// database.
+        /// </summary>
+        public string DatabaseComment
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the currently loaded document is dirty.
+        /// </summary>
+        /// <value>
+        /// <see langword="true" /> if dirty; otherwise, <see langword="false" />.
+        /// </value>
+        public bool Dirty
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        #endregion IDataEntryApplication
+
         #region Overrides
 
         /// <summary>
@@ -579,7 +740,11 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                e.DocumentData = GetAsPaginationDocumentData(new IUnknownVector());
+                string dataSourceDocName = 
+                    (e.SourceDocNames.Count() == 1) 
+                        ? e.SourceDocNames.Single()
+                        : null;
+                e.DocumentData = GetAsPaginationDocumentData(new IUnknownVector(), dataSourceDocName);
             }
             catch (Exception ex)
             {
@@ -1130,7 +1295,7 @@ namespace Extract.FileActionManager.FileProcessors
                     attributes.LoadFrom(dataFilename, false);
                     attributes.ReportMemoryUsage();
 
-                    PaginationDocumentData documentData = GetAsPaginationDocumentData(attributes);
+                    PaginationDocumentData documentData = GetAsPaginationDocumentData(attributes, fileName);
 
                     var attributeArray = attributes
                         .ToIEnumerable<IAttribute>()
@@ -1188,7 +1353,7 @@ namespace Extract.FileActionManager.FileProcessors
                                 .Select(data => data.SubAttributes)
                                 .SingleOrDefault() ?? new IUnknownVector();
 
-                            documentData = GetAsPaginationDocumentData(documentAttributes);
+                            documentData = GetAsPaginationDocumentData(documentAttributes, fileName);
 
                             if (!suggestedPagination.HasValue)
                             {
@@ -1233,13 +1398,16 @@ namespace Extract.FileActionManager.FileProcessors
         /// available.
         /// </summary>
         /// <param name="attributes">The attributes.</param>
+        /// <param name="sourceDocName">The source document name to be associated the data is
+        /// associated with or <see langword="null"/> if the data is not associated with a
+        /// particular source document.</param>
         /// <returns>The <see cref="PaginationDocumentData"/> instance or <see langword="null"/> if
         /// the <see cref="_paginationDocumentDataPanel"/> is not available.</returns>
-        PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes)
+        PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes, string sourceDocName)
         {
             return (_paginationDocumentDataPanel != null)
                 ? _paginationDocumentDataPanel.GetDocumentData(
-                    attributes, FileProcessingDB, _imageViewer)
+                    attributes, sourceDocName, FileProcessingDB, _imageViewer)
                 : null;
         }
 

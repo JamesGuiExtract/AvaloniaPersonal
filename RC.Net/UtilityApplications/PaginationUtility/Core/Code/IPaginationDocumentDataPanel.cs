@@ -1,4 +1,5 @@
 ﻿using Extract.Imaging.Forms;
+using System;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -14,6 +15,11 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// </summary>
     public interface IPaginationDocumentDataPanel
     {
+        /// <summary>
+        /// Raised to indicate the panel is requesting a specific image page to be loaded.
+        /// </summary>
+        event EventHandler<PageLoadRequestEventArgs> PageLoadRequest;
+
         /// <summary>
         /// The <see cref="UserControl"/> to be displayed for viewing/editing of document data.
         /// </summary>
@@ -48,10 +54,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="attributes">The VOA data for while a <see cref="PaginationDocumentData"/>
         /// instance is needed.</param>
+        /// <param name="sourceDocName">The name of the source document for which data is being
+        /// loaded.</param>
         /// <param name="fileProcessingDB"></param>
         /// <param name="imageViewer"></param>
         /// <returns>The <see cref="PaginationDocumentData"/> instance.</returns>
-        PaginationDocumentData GetDocumentData(IUnknownVector attributes,
+        PaginationDocumentData GetDocumentData(IUnknownVector attributes, string sourceDocName,
             FileProcessingDB fileProcessingDB, ImageViewer imageViewer);
 
         /// <summary>

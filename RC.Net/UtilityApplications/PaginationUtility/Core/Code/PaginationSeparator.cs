@@ -359,10 +359,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                         FormsMethods.LockControlUpdate(this, true);
                         locked = true;
                         _documentDataPanelControl = (Control)args.DocumentDataPanel;
+                        // Reset the colors to prevent the DEP from incorporating the special colors
+                        // applied to this separator window.
+                        _documentDataPanelControl.ForeColor = Control.DefaultForeColor;
+                        _documentDataPanelControl.BackColor = Control.DefaultBackColor;
                         _documentDataPanelControl.Width = _tableLayoutPanel.Width;
                         _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 1);
                         _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
                         UpdateSize();
+
+                        args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData);
 
                         _editDocumentDataButton.Checked = true;
                     }

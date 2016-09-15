@@ -237,6 +237,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         PaginationControl _commandTargetControl;
 
         /// <summary>
+        /// Indicates whether an operation is in progress that might otherwise cause a document to
+        /// be closed and re-opened. A value of <see langword="true"/> will prevent the otherwise
+        /// unnecessary close from occurring.
+        /// </summary>
+        bool _preventTransientDocumentClose;
+
+        /// <summary>
         /// Indicates whether the <see cref="PrimarySelection"/> should update the displayed page in
         /// the <see cref="ImageViewer"/>.
         /// </summary>
@@ -1457,31 +1464,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Selects the specified <see paramref="pageControls"/>.
         /// </summary>
-        /// <param name="pageControls">The <see cref="PageThumbnailControl"/>s to select.</param>
-        /// <param name="expandSelection"><see langword="true"/> to add to any current selection;
-        /// <see langword="false"/> to reset the selection to <see paramref="pageControls"/> only.
-        /// </param>
-        public void SelectPages(IEnumerable<PageThumbnailControl> pageControls,
-            bool expandSelection)
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to select.</param>
+        public void SelectPage(PageThumbnailControl pageControl)
         {
             try
             {
-                var firstPage = PrimarySelection as PageThumbnailControl;
-                if (firstPage == null)
+                if (pageControl != PrimarySelection)
                 {
-                    firstPage = pageControls.FirstOrDefault();
+                    ProcessControlSelection(pageControl);
                 }
-
-                if (!expandSelection)
-                {
-                    ClearSelection();
-                }
-
-                ProcessControlSelection(
-                    activeControl: firstPage,
-                    additionalControls: pageControls,
-                    select: true,
-                    modifierKeys: expandSelection? Keys.Control : Keys.None);
             }
             catch (Exception ex)
             {
@@ -1494,7 +1485,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="outputDocument">The <see cref="OutputDocument"/> whose pages are to be
         /// selected.</param>
-        public void SelectDocument(OutputDocument outputDocument)
+        /// <param name="pageIndex">The page number of <see paramref="outputDocument"/> to load
+        /// or <see langword="null"/> to load the first page.</param>
+        public void SelectDocument(OutputDocument outputDocument, int? pageNumber = null)
         {
             try
             {
@@ -1510,6 +1503,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         selectedControls.Add(separator);
                     }
+
+                    firstControl = (pageNumber == null || pageNumber > outputDocument.PageControls.Count)
+                        ? firstControl
+                        : outputDocument.PageControls[pageNumber.Value - 1];
 
                     ProcessControlSelection(
                         activeControl: firstControl,
@@ -2681,7 +2678,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // clicked.
                         _commandTargetControl = _primarySelection;
                     }
-                    else if (ImageViewer.IsImageAvailable)
+                    else if (!_preventTransientDocumentClose && ImageViewer.IsImageAvailable)
                     {
                         ImageViewer.CloseImage();
                     }
@@ -2967,89 +2964,112 @@ namespace Extract.UtilityApplications.PaginationUtility
         void ProcessControlSelection(PaginationControl activeControl,
             IEnumerable<PaginationControl> additionalControls, bool select, Keys modifierKeys)
         {
-             PaginationControl lastSelectedControl = _lastSelectedControl;
-
-            // Clear any currently selected controls first unless the control key is down.
-            if ((modifierKeys & Keys.Control) == 0)
+            try
             {
-                ClearSelection((modifierKeys & Keys.Shift) == 0);
-            }
+                PaginationControl lastSelectedControl = _lastSelectedControl;
 
-            // If a document separator is selected, all related document pages should also be
-            // selected.
-            additionalControls = additionalControls ?? new PaginationControl[0];
-            var includedDocumentPages = new[] { activeControl }
-                .Union(additionalControls)
-                .OfType<PaginationSeparator>()
-                .SelectMany(c => (c.Document ?? new OutputDocument("")).PageControls);
-            var additionalControlSet = (additionalControls == null)
-                ? new HashSet<PaginationControl>()
-                : new HashSet<PaginationControl>(additionalControls.Concat(includedDocumentPages));
-
-            // If the shift key is down and activeControl is not the same as the lastSelectedControl,
-            // select all controls between activeControl and lastSelectedControl.
-            if ((modifierKeys & Keys.Shift) == Keys.Shift &&
-                lastSelectedControl != null && activeControl != null &&
-                activeControl != lastSelectedControl)
-            {
-                // Loop through all controls until we are to the end of the selection range.
-                bool inSelectionRange = false;
-                foreach (var control in _flowLayoutPanel.Controls.OfType<PaginationControl>())
+                // Clear any currently selected controls first unless the control key is down.
+                if ((modifierKeys & Keys.Control) == 0)
                 {
-                    if (inSelectionRange)
-                    {
-                        // If currently in the selected range, add this control
-                        additionalControlSet.Add(control);
+                    // In most cases, the image close that will occur as a result of the cleared
+                    // selection here will be immediately followed by re-opening the same image as
+                    // the new selection is applied. Avoid this unnecessary close/re-open.
+                    _preventTransientDocumentClose = true;
 
-                        // If we are at the end of the range, break out of the loop.
-                        if (control == activeControl || control == lastSelectedControl)
+                    ClearSelection((modifierKeys & Keys.Shift) == 0);
+                }
+
+                // If a document separator is selected, all related document pages should also be
+                // selected.
+                additionalControls = additionalControls ?? new PaginationControl[0];
+                var includedDocumentPages = new[] { activeControl }
+                    .Union(additionalControls)
+                    .OfType<PaginationSeparator>()
+                    .SelectMany(c => (c.Document ?? new OutputDocument("")).PageControls);
+                var additionalControlSet = (additionalControls == null)
+                    ? new HashSet<PaginationControl>()
+                    : new HashSet<PaginationControl>(additionalControls.Concat(includedDocumentPages));
+
+                // If the shift key is down and activeControl is not the same as the lastSelectedControl,
+                // select all controls between activeControl and lastSelectedControl.
+                if ((modifierKeys & Keys.Shift) == Keys.Shift &&
+                    lastSelectedControl != null && activeControl != null &&
+                    activeControl != lastSelectedControl)
+                {
+                    // Loop through all controls until we are to the end of the selection range.
+                    bool inSelectionRange = false;
+                    foreach (var control in _flowLayoutPanel.Controls.OfType<PaginationControl>())
+                    {
+                        if (inSelectionRange)
                         {
-                            break;
+                            // If currently in the selected range, add this control
+                            additionalControlSet.Add(control);
+
+                            // If we are at the end of the range, break out of the loop.
+                            if (control == activeControl || control == lastSelectedControl)
+                            {
+                                break;
+                            }
+                        }
+                        else if (control == activeControl || control == lastSelectedControl)
+                        {
+                            // If we were not in the range, but we have now reached activeControl or
+                            // lastSelectedControl, we are now in the range.
+                            inSelectionRange = true;
+
+                            additionalControlSet.Add(control);
                         }
                     }
-                    else if (control == activeControl || control == lastSelectedControl)
-                    {
-                        // If we were not in the range, but we have now reached activeControl or
-                        // lastSelectedControl, we are now in the range.
-                        inSelectionRange = true;
-
-                        additionalControlSet.Add(control);
-                    }
                 }
-            }
 
-            // Set the selection state for all controls except activeControl first.
-            foreach (var control in additionalControlSet.Except(new[] { activeControl }))
-            {
-                SetSelected(control, select, true);
-            }
-
-            // Ensure all document pages are selected along with a document separator
-            if (select)
-            {
-                foreach (var separator in _flowLayoutPanel.Controls.OfType<PaginationSeparator>())
+                // Set the selection state for all controls except activeControl first.
+                foreach (var control in additionalControlSet.Except(new[] { activeControl }))
                 {
-                    if (separator.Document != null)
+                    SetSelected(control, select, true);
+                }
+
+                // Ensure all document pages are selected along with a document separator
+                if (select)
+                {
+                    foreach (var separator in _flowLayoutPanel.Controls.OfType<PaginationSeparator>())
                     {
-                        if (separator.Selected)
+                        if (separator.Document != null)
                         {
-                            foreach (var control in separator.Document.PageControls.
-                                Where(c => !c.Selected))
+                            if (separator.Selected)
                             {
-                                SetSelected(control, select: true, resetLastSelected: true);
+                                foreach (var control in separator.Document.PageControls.
+                                    Where(c => !c.Selected))
+                                {
+                                    SetSelected(control, select: true, resetLastSelected: true);
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            // Then select activeControl, making it the new active control if necessary.
-            if (activeControl != null)
+                // Then select activeControl, making it the new active control if necessary.
+                if (activeControl != null)
+                {
+                    // Allow _lastSelectedControl to become activeControl unless the shift modifier key
+                    // is down.
+                    bool resetLastSelected = ((modifierKeys & Keys.Shift) == 0);
+                    SelectControl(activeControl, select, resetLastSelected);
+                }
+            }
+            catch (Exception ex)
             {
-                // Allow _lastSelectedControl to become activeControl unless the shift modifier key
-                // is down.
-                bool resetLastSelected = ((modifierKeys & Keys.Shift) == 0);
-                SelectControl(activeControl, select, resetLastSelected);
+                throw ex.AsExtract("ELI41343");
+            }
+            finally
+            {
+                _preventTransientDocumentClose = false;
+
+                // If after completing the selection change there isn't a page thumbnail selected,
+                // we can now close the image knowing it is not about to be immediately re-opened.
+                if (!(PrimarySelection is PageThumbnailControl) && ImageViewer.IsImageAvailable)
+                {
+                    ImageViewer.CloseImage();
+                }
             }
         }
 
@@ -3153,7 +3173,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 navigableControl.Highlighted = highlight;
 
                 var pageControl = control as PageThumbnailControl;
-                if (pageControl != null)
+                if (pageControl != null && (highlight || !_preventTransientDocumentClose))
                 {
                     pageControl.DisplayPage(ImageViewer, highlight);
                 }

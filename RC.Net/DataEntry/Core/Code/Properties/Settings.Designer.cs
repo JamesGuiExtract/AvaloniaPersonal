@@ -9,20 +9,36 @@
 //------------------------------------------------------------------------------
 
 namespace Extract.DataEntry.Properties {
-    
-    
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="System.Configuration.ApplicationSettingsBase" />
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+    public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-        
+
+        /// <summary>
+        /// Gets the default.
+        /// </summary>
+        /// <value>
+        /// The default.
+        /// </value>
         public static Settings Default {
             get {
                 return defaultInstance;
             }
         }
-        
+
+        /// <summary>
+        /// Gets the name of the data entry panel file.
+        /// </summary>
+        /// <value>
+        /// The name of the data entry panel file.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -31,7 +47,13 @@ namespace Extract.DataEntry.Properties {
                 return ((string)(this["DataEntryPanelFileName"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the highlight confidence boundary.
+        /// </summary>
+        /// <value>
+        /// The highlight confidence boundary.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -40,7 +62,13 @@ namespace Extract.DataEntry.Properties {
                 return ((string)(this["HighlightConfidenceBoundary"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the type of the database.
+        /// </summary>
+        /// <value>
+        /// The type of the database.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("System.Data.SqlServerCe.SqlCeConnection, System.Data.SqlServerCe, Version=3.5.1.0" +
@@ -50,7 +78,13 @@ namespace Extract.DataEntry.Properties {
                 return ((string)(this["DatabaseType"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the local data source.
+        /// </summary>
+        /// <value>
+        /// The local data source.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -59,7 +93,13 @@ namespace Extract.DataEntry.Properties {
                 return ((string)(this["LocalDataSource"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the database connection string.
+        /// </summary>
+        /// <value>
+        /// The database connection string.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -68,7 +108,13 @@ namespace Extract.DataEntry.Properties {
                 return ((string)(this["DatabaseConnectionString"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the disabled controls.
+        /// </summary>
+        /// <value>
+        /// The disabled controls.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -77,7 +123,13 @@ namespace Extract.DataEntry.Properties {
                 return ((string)(this["DisabledControls"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the disabled validation controls.
+        /// </summary>
+        /// <value>
+        /// The disabled validation controls.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -86,7 +138,13 @@ namespace Extract.DataEntry.Properties {
                 return ((string)(this["DisabledValidationControls"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the skip validation if document tagged as.
+        /// </summary>
+        /// <value>
+        /// The skip validation if document tagged as.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -95,7 +153,13 @@ namespace Extract.DataEntry.Properties {
                 return ((string)(this["SkipValidationIfDocTaggedAs"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets a value indicating whether [prevent save].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [prevent save]; otherwise, <c>false</c>.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
@@ -104,7 +168,13 @@ namespace Extract.DataEntry.Properties {
                 return ((bool)(this["PreventSave"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the gc frequency.
+        /// </summary>
+        /// <value>
+        /// The gc frequency.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
@@ -113,7 +183,13 @@ namespace Extract.DataEntry.Properties {
                 return ((uint)(this["GCFrequency"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the font family.
+        /// </summary>
+        /// <value>
+        /// The font family.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Verdana")]
@@ -122,7 +198,13 @@ namespace Extract.DataEntry.Properties {
                 return ((string)(this["FontFamily"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the size of the control font.
+        /// </summary>
+        /// <value>
+        /// The size of the control font.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
@@ -131,7 +213,13 @@ namespace Extract.DataEntry.Properties {
                 return ((float)(this["ControlFontSize"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the size of the tooltip font.
+        /// </summary>
+        /// <value>
+        /// The size of the tooltip font.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("13")]
@@ -140,7 +228,13 @@ namespace Extract.DataEntry.Properties {
                 return ((float)(this["TooltipFontSize"]));
             }
         }
-        
+
+        /// <summary>
+        /// Gets a value indicating whether [performance testing].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [performance testing]; otherwise, <c>false</c>.
+        /// </value>
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]

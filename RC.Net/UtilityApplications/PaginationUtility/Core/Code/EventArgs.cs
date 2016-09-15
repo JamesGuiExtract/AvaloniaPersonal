@@ -450,4 +450,47 @@ namespace Extract.UtilityApplications.PaginationUtility
             set;
         }
     }
+
+    /// <summary>
+    /// The event arguments for the <see cref="PageLayoutControl.PageDeleted"/> event.
+    /// </summary>
+    public class PageLoadRequestEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PageLoadRequestEventArgs"/> class.
+        /// </summary>
+        /// <param name="pageNumber">The name of the souce document to be opened.</param>
+        /// <param name="sourceDocName">The names of the source document(s) to which the document
+        /// data would pertain.</param>
+        public PageLoadRequestEventArgs(string sourceDocName, int pageNumber)
+        {
+            try
+            {
+                SourceDocName = sourceDocName;
+                PageNumber = pageNumber;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI41338", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the souce document to be opened.
+        /// </summary>
+        public string SourceDocName
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Page"/> that was deleted.
+        /// </summary>
+        public int PageNumber
+        {
+            get;
+            private set;
+        }
+    }
 }

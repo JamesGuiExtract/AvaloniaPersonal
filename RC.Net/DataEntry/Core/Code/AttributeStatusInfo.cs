@@ -3064,7 +3064,7 @@ namespace Extract.DataEntry
                 // document regardless of calls into ForgetLastAppliedStringValues.
                 // _undoManager.TrackOperations will be false during document load, so it can be
                 // used as an indication of a loading document.
-                if (!_undoManager.TrackOperations)
+                if (!UndoManager.TrackOperations)
                 {
                     return;
                 }

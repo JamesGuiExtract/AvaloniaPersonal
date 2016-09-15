@@ -9,7 +9,6 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Extract.UtilityApplications.PaginationUtility;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
@@ -84,93 +83,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             typeof(AttributeStorageManagerClass).GUID.ToString("B");
 
         #endregion Constants
-
-        #region DataEntryConfiguration
-
-        /// <summary>
-        /// Represents a data entry configuration used to display document data.
-        /// </summary>
-        class DataEntryConfiguration : IDisposable
-        {
-            /// <summary>
-            /// The configuration settings specified via config file.
-            /// </summary>
-            ConfigSettings<Extract.DataEntry.Properties.Settings> _config;
-
-            /// <summary>
-            /// The <see cref="DataEntryControlHost"/> instance associated with the configuration.
-            /// </summary>
-            DataEntryControlHost _dataEntryControlHost;
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="config">The configuration settings specified via config file.</param>
-            /// <param name="dataEntryControlHost">The <see cref="DataEntryControlHost"/> instance
-            /// associated with the configuration.</param>
-            public DataEntryConfiguration(
-                ConfigSettings<Extract.DataEntry.Properties.Settings> config,
-                DataEntryControlHost dataEntryControlHost)
-            {
-                _config = config;
-                _dataEntryControlHost = dataEntryControlHost;
-            }
-
-            /// <summary>
-            /// The configuration settings specified via config file.
-            /// </summary>
-            public ConfigSettings<Extract.DataEntry.Properties.Settings> Config
-            {
-                get
-                {
-                    return _config;
-                }
-            }
-
-            /// <summary>
-            /// The <see cref="DataEntryControlHost"/> instance associated with the configuration.
-            /// </summary>
-            public DataEntryControlHost DataEntryControlHost
-            {
-                get
-                {
-                    return _dataEntryControlHost;
-                }
-            }
-
-            /// <overloads>Releases resources used by the <see cref="DataEntryConfiguration"/>.
-            /// </overloads>
-            /// <summary>
-            /// Releases all resources used by the <see cref="DataEntryConfiguration"/>.
-            /// </summary>
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            /// <summary>
-            /// Releases all unmanaged resources used by the <see cref="DataEntryConfiguration"/>.
-            /// </summary>
-            /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
-            /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-            void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    // Dispose of managed resources
-                    if (_dataEntryControlHost != null)
-                    {
-                        _dataEntryControlHost.Dispose();
-                        _dataEntryControlHost = null;
-                    }
-                }
-
-                // Dispose of unmanaged resources
-            }
-        }
-
-        #endregion DataEntryConfiguration
 
         #region Fields
 
@@ -2117,7 +2029,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // hierarchy with the DEP (rather than a separately loaded copy).
                         if (_paginationPanel != null && _paginationDocumentDataPanel != null)
                         {
-                            PaginationDocumentData documentData = GetAsPaginationDocumentData(attributes);
+                            PaginationDocumentData documentData =
+                                GetAsPaginationDocumentData(attributes);
                             documentData.DataSharedInVerification = true;
 
                             // The AttributeValueChanged event only needs to be registered in
@@ -5716,7 +5629,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             return (_paginationDocumentDataPanel != null)
                 ? _paginationDocumentDataPanel.GetDocumentData(
-                    attributes, FileProcessingDB, _imageViewer)
+                    attributes, _fileName, FileProcessingDB, _imageViewer)
                 : null;
         }
 
