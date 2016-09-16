@@ -58,21 +58,21 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 // IProductSpecificDBMgr Methods
-	STDMETHOD(raw_AddProductSpecificSchema)(IFileProcessingDB *pDB, 
+	STDMETHOD(raw_AddProductSpecificSchema)(IFileProcessingDB *pDB,
 											VARIANT_BOOL bOnlyTables,
 											VARIANT_BOOL bAddUserTables);
 	STDMETHOD(raw_AddProductSpecificSchema80)(IFileProcessingDB *pDB);
 	STDMETHOD(raw_RemoveProductSpecificSchema)(IFileProcessingDB *pDB,
-											   VARIANT_BOOL bOnlyTables, 
-											   VARIANT_BOOL bRetainUserTables, 
+											   VARIANT_BOOL bOnlyTables,
+											   VARIANT_BOOL bRetainUserTables,
 											   VARIANT_BOOL *pbSchemaExists);
 	STDMETHOD(raw_ValidateSchema)(IFileProcessingDB* pDB);
 	STDMETHOD(raw_GetDBInfoRows)(IVariantVector** ppDBInfoRows);
 	STDMETHOD(raw_GetTables)(IVariantVector** ppTables);
-	STDMETHOD(raw_UpdateSchemaForFAMDBVersion)(IFileProcessingDB* pDB, 
+	STDMETHOD(raw_UpdateSchemaForFAMDBVersion)(IFileProcessingDB* pDB,
 											   _Connection* pConnection,
-											   long nFAMDBSchemaVersion, 
-											   long* pnProdSchemaVersion, 
+											   long nFAMDBSchemaVersion,
+											   long* pnProdSchemaVersion,
 											   long* pnNumSteps,
 											   IProgressStatus* pProgressStatus);
 // IAttributeDBMgr Methods
@@ -88,21 +88,21 @@ public:
 	// decrement most recent value to get next most recent (-2)
 	// increment oldest value to get next oldest (2)
 	// Zero is an illegal relativeIndex value.
-	STDMETHOD(GetAttributeSetForFile)(long nFileID, 
+	STDMETHOD(GetAttributeSetForFile)(long nFileID,
 									  BSTR bstrAttributeSetName,
 									  long nRelativeIndex,
-									  IIUnknownVector** pAttributes);		
+									  IIUnknownVector** pAttributes);
 
-	STDMETHOD(CreateNewAttributeSetName)(BSTR name, 
+	STDMETHOD(CreateNewAttributeSetName)(BSTR name,
 										 long long* pllAttributeSetNameID);
 
-	STDMETHOD(RenameAttributeSetName)(BSTR bstrAttributeSetName, 
+	STDMETHOD(RenameAttributeSetName)(BSTR bstrAttributeSetName,
 									  BSTR bstrNewName);
 
 	STDMETHOD(DeleteAttributeSetName)(BSTR bstrAttributeSetName);
 
 	STDMETHOD(GetAllAttributeSetNames)(IStrToStrMap** ppNames);
-	
+
 private:
 
 	//////////////
@@ -113,20 +113,20 @@ private:
 	IFileProcessingDBPtr m_ipFAMDB;
 
 	// This it the pointer to the database connection
-	ADODB::_ConnectionPtr m_ipDBConnection; 
+	ADODB::_ConnectionPtr m_ipDBConnection;
 
 	// Contains the number of times an attempt to reconnect. Each time the reconnect attempt times
 	// out an exception will be logged.
 	long m_nNumberOfRetries;
 
-	// Contains the time in seconds to keep retrying.  
+	// Contains the time in seconds to keep retrying.
 	double m_dRetryTimeout;
 
 	//////////////
 	// Methods
 	//////////////
 
-	// Returns the m_ipDBConnection value, if it is NULL it is created using the 
+	// Returns the m_ipDBConnection value, if it is NULL it is created using the
 	// DatabaseServer and DatabaseName from the m_ipFAMDB
 	// if bReset is true the current connection in m_ipDBConnection is set to NULL and recreated
 	// and make the default false
@@ -147,21 +147,19 @@ private:
 	void SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownVector* pAttributes,
 		long long llRootASFF_ID );
 
-	// This method performs the insert of Attribute rows, handling
-	// both parent (top-level, or root) and child attributes.
-	long long SaveAttribute( _ConnectionPtr ipConnection,
-							 IAttributePtr ipAttribute, 
-							 bool bStoreRasterZone,
-							 const std::string& insert );
-
 	// Stores the discrete data for the specified vector of attributes (including all descendants).
-	// llParentAttrID == 0 for root attributes.
 	void storeAttributeData(_ConnectionPtr ipConnection,
-							IIUnknownVectorPtr ipAttributes, 
+							IIUnknownVectorPtr ipAttributes,
 							bool bStoreRasterZone,
 							bool bStoreEmptyAttributes,
-							long long llRootASFF_ID, 
-							long long llParentAttrID = 0);
+							long long llRootASFF_ID);
+
+	// Recursively builds the query to store discrete data for the specified vector of attributes
+	std::string buildStoreAttributeDataQuery(_ConnectionPtr ipConnection,
+											IIUnknownVectorPtr ipAttributes,
+											bool bStoreRasterZone,
+											bool bStoreEmptyAttributes,
+											long long llRootASFF_ID);
 
 	bool CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 												long nFileTaskSessionID,
@@ -170,8 +168,8 @@ private:
   												VARIANT_BOOL vbStoreRasterZone,
   												VARIANT_BOOL vbStoreEmptyAttributes );
 
-	bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked, 
-													       long fileID, 
+	bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
+													       long fileID,
 													       BSTR attributeSetName,
 													       long relativeIndex,
 														   IIUnknownVector** ppAttributes);

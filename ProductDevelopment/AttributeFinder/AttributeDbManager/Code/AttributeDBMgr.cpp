@@ -63,7 +63,7 @@ namespace
 	VectorOfString GetTables_v1( bool bAddUserTables )
 	{
 		VectorOfString tables;
-	
+
 		if ( bAddUserTables )
 		{
 			tables.push_back(gstrCREATE_ATTRIBUTE_SET_NAME_TABLE_v1);
@@ -108,16 +108,16 @@ namespace
 
 	std::string GetVersionInsertStatement( long schemaVersion )
 	{
-		return "INSERT INTO [DBInfo] ([Name], [Value]) VALUES ('" + 
+		return "INSERT INTO [DBInfo] ([Name], [Value]) VALUES ('" +
 				gstrSCHEMA_VERSION_NAME + "', '" + asString(schemaVersion) + "' )";
 	}
 
 	std::string GetVersionUpdateStatement(long schemaVersion )
 	{
 		char buffer[255];
-		_snprintf_s( buffer, 
-					 sizeof(buffer), 
-					 sizeof(buffer) - 1, 
+		_snprintf_s( buffer,
+					 sizeof(buffer),
+					 sizeof(buffer) - 1,
 					 "UPDATE [DBInfo] SET Value='%d' where Name='AttributeCollectionSchemaVersion';",
 					 schemaVersion );
 
@@ -153,7 +153,7 @@ namespace
 		return GetSchema_v2( bAddUserTables );
 	}
 
-	
+
 	//-------------------------------------------------------------------------------------------------
 	// Schema update functions
 	//-------------------------------------------------------------------------------------------------
@@ -162,17 +162,17 @@ namespace
 		try
 		{
 			const int nNewSchemaVersion = 1;
-	
+
 			if (pnNumSteps != nullptr)
 			{
 				*pnNumSteps += 3;
 				return nNewSchemaVersion;
 			}
-	
+
 			vector<string> queries = GetSchema_v1( true );
 			queries.emplace_back( GetVersionInsertStatement( nNewSchemaVersion ) );
 			executeVectorOfSQL(ipConnection, queries);
-	
+
 			return nNewSchemaVersion;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38511");
@@ -189,12 +189,12 @@ namespace
 				*pnNumSteps += 3;
 				return nNewSchemaVersion;
 			}
-	
+
 			vector<string> queries;
 			queries.push_back( gstrADD_ATTRIBUTE_SET_FOR_FILE_VOA_COLUMN );
 			queries.emplace_back( GetVersionUpdateStatement( nNewSchemaVersion ) );
 			executeVectorOfSQL(ipConnection, queries);
-	
+
 			return nNewSchemaVersion;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38888");
@@ -207,7 +207,7 @@ namespace
 //-------------------------------------------------------------------------------------------------
 // CAttributeDBMgr
 //-------------------------------------------------------------------------------------------------
-CAttributeDBMgr::CAttributeDBMgr()	
+CAttributeDBMgr::CAttributeDBMgr()
 : m_ipFAMDB(nullptr)
 , m_ipDBConnection(nullptr)
 , m_nNumberOfRetries(0)
@@ -246,7 +246,7 @@ void CAttributeDBMgr::FinalRelease()
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeDBMgr::InterfaceSupportsErrorInfo(REFIID riid)
 {
-	static const IID* arr[] = 
+	static const IID* arr[] =
 	{
 		&IID_IAttributeDBMgr,
 		&__uuidof(IProductSpecificDBMgr),
@@ -274,7 +274,7 @@ STDMETHODIMP CAttributeDBMgr::raw_GetComponentDescription(BSTR* pstrComponentDes
 		ASSERT_ARGUMENT("ELI38518", pstrComponentDescription != nullptr);
 
 		*pstrComponentDescription = _bstr_t(gstrDESCRIPTION.c_str()).Detach();
-	
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38519");
@@ -347,7 +347,7 @@ STDMETHODIMP CAttributeDBMgr::raw_AddProductSpecificSchema( IFileProcessingDB* p
 			std::string schemaVersionName = iterDBInfoValues->first;
 			std::string schemaVersion = iterDBInfoValues->second;
 			ipDB->SetDBInfoSetting( schemaVersionName.c_str(),
-									schemaVersion.c_str(), 
+									schemaVersion.c_str(),
 									setIfExists,
 									VARIANT_FALSE);
 		}
@@ -378,7 +378,7 @@ STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( IFileProcessingDB
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI38526", ipDB != nullptr);
 
-		auto value = asString( ipDB->GetDBInfoSetting( gstrSCHEMA_VERSION_NAME.c_str(), 
+		auto value = asString( ipDB->GetDBInfoSetting( gstrSCHEMA_VERSION_NAME.c_str(),
 													   VARIANT_FALSE) );
 		if ( value.empty() )
 		{
@@ -393,12 +393,12 @@ STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( IFileProcessingDB
 		// Create the connection object
 		ADODB::_ConnectionPtr ipDBConnection( __uuidof( Connection ) );
 		ASSERT_RESOURCE_ALLOCATION( "ELI38527", ipDBConnection != nullptr );
-		
+
 		string strDatabaseServer = asString(ipDB->DatabaseServer);
 		string strDatabaseName = asString(ipDB->DatabaseName);
 
 		// create the connection string
-		string strConnectionString = createConnectionString( strDatabaseServer, 
+		string strConnectionString = createConnectionString( strDatabaseServer,
 															 strDatabaseName );
 		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
 
@@ -420,7 +420,7 @@ STDMETHODIMP CAttributeDBMgr::raw_ValidateSchema( IFileProcessingDB* pDB )
 		{
 			m_ipFAMDB = pDB;
 			m_ipFAMDB->GetConnectionRetrySettings( &m_nNumberOfRetries, &m_dRetryTimeout );
-		
+
 			// Reset the database connection
 			m_ipDBConnection = nullptr;
 		}
@@ -429,7 +429,7 @@ STDMETHODIMP CAttributeDBMgr::raw_ValidateSchema( IFileProcessingDB* pDB )
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR( "ELI38529" );	
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR( "ELI38529" );
 }
 //-------------------------------------------------------------------------------------------------
 // WARNING: If any DBInfo row is removed, this code needs to be modified so that it does not treat
@@ -481,11 +481,11 @@ STDMETHODIMP CAttributeDBMgr::raw_GetTables(IVariantVector** ppTables)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38533");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP 
+STDMETHODIMP
 CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
-												  _Connection* pConnection, 
-												  long nFAMDBSchemaVersion, 
-												  long* pnProdSchemaVersion, 
+												  _Connection* pConnection,
+												  long nFAMDBSchemaVersion,
+												  long* pnProdSchemaVersion,
 												  long* pnNumSteps,
 												  IProgressStatus* /*pProgressStatus*/)
 {
@@ -567,7 +567,7 @@ STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 		{
 			m_ipFAMDB = newVal;
 			m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
-		
+
 			// Reset the database connection
 			m_ipDBConnection = nullptr;
 		}
@@ -614,7 +614,7 @@ namespace
 
 	std::string GetInsertRootASFFStatement( longlong llSetNameID, long fileTaskSessionID )
 	{
-		std::string insert = 
+		std::string insert =
 			"SET NOCOUNT ON \n"
 			"DECLARE @AttributeSetName_ID AS BIGINT;\n"
 			"DECLARE @AttributeSetForFile_ID AS BIGINT;\n"
@@ -625,7 +625,7 @@ namespace
 								"SELECT @FileTaskSessionID=%ld;\n",
 								llSetNameID,
 								fileTaskSessionID );
-		insert += 
+		insert +=
 			"\n"
 			"BEGIN TRY\n"
 			"	INSERT INTO [AttributeSetForFile] ([FileTaskSessionID], [AttributeSetNameID])\n"
@@ -650,8 +650,24 @@ namespace
 			return insert;
 	}
 
+	std::string insertAttributeQueryPreamble =
+		"DECLARE @AttributeName_Name AS NVARCHAR(255); \n"
+		"DECLARE @AttributeType_Type AS NVARCHAR(255); \n"
+		"DECLARE @Attribute_Value AS NVARCHAR(MAX); \n"
+		"DECLARE @Attribute_GUID AS UNIQUEIDENTIFIER; \n"
+		"DECLARE @ParentAttribute_ID AS BIGINT; \n"
+		"DECLARE @AttributeSetForFile_ID AS BIGINT; \n"
+		"DECLARE @AttributeName_ID AS BIGINT; \n"
+		"DECLARE @AttributeType_ID AS BIGINT; \n"
+		"DECLARE @Attribute_ID AS BIGINT; \n"
+		"DECLARE @TypeTable table(idx int IDENTITY(1,1), TypeName NVARCHAR(255)); \n"
+		"DECLARE @ErrorMessage NVARCHAR(4000); \n"
+		"DECLARE @ErrorSeverity INT; \n"
+		"DECLARE @ErrorState INT; \n"
+		"DECLARE @AttributeIDs TABLE (AttributeID BIGINT); \n";
+
+
 	std::string GetInsertAttributeQuery( IAttributePtr ipAttribute,
-										 longlong parentAttributeID,
 										 longlong owningAttributeSetForFileID )
 	{
 		ISpatialStringPtr ipValue = ipAttribute->GetValue();
@@ -660,107 +676,96 @@ namespace
 		std::string attributeType = SqlSanitizeInput(asString(ipAttribute->GetType()));
 
 		IIdentifiableObjectPtr ipIdentifiable(ipAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI38642", nullptr != ipIdentifiable);			
+		ASSERT_RESOURCE_ALLOCATION("ELI38642", nullptr != ipIdentifiable);
 		std::string guid = asString(ipIdentifiable->InstanceGUID);
 
-		std::string insert = 
-						  "SET NOCOUNT ON \n"
-						  "DECLARE  @AttributeName_Name AS NVARCHAR(255); \n"
-						  "DECLARE  @AttributeType_Type AS NVARCHAR(255); \n"
-						  "DECLARE  @Attribute_Value AS NVARCHAR(MAX); \n"
-						  "DECLARE  @Attribute_GUID AS UNIQUEIDENTIFIER; \n"
-						  "DECLARE  @Attribute_ParentAttributeID AS BIGINT; \n"
-						  
-						  "DECLARE @AttributeSetForFile_ID AS BIGINT; \n"
-						  "DECLARE @AttributeName_ID AS BIGINT; \n"
-						  "DECLARE @AttributeType_ID AS BIGINT; \n"
-						  "DECLARE @Attribute_ID AS BIGINT; \n"
-						  "DECLARE @TypeTable table(idx int IDENTITY(1,1), TypeName NVARCHAR(255)) \n";
-
+		std::string insert;
 		VectorOfString typeNames = Split( attributeType, '+' );
 		for ( size_t i = 0; i < typeNames.size(); ++i )
 		{
 			std::string insertToTable =
-						  Util::Format( "INSERT INTO @TypeTable (TypeName) VALUES ('%s') \n", 
+						  Util::Format( "INSERT INTO @TypeTable (TypeName) VALUES ('%s'); \n",
 										typeNames[i].c_str() );
 
 			insert += insertToTable;
 		}
 
-		std::string parentID = parentAttributeID <= 0 ? "null" : Util::Format("%lld", parentAttributeID );
-		std::string args = 
+		std::string args =
 			Util::Format( "SELECT @AttributeName_Name='%s'; \n"
 						  "SELECT @AttributeType_Type='%s'; \n"
 						  "SELECT @Attribute_Value='%s'; \n"
 						  "SELECT @Attribute_GUID='%s'; \n"
-						  "SELECT @Attribute_ParentAttributeID=%s; \n"
 						  "SELECT @AttributeSetForFile_ID=%ld \n",
 						  attributeName.c_str(),
 						  attributeType.c_str(),
 						  value.c_str(),
 						  guid.c_str(),
-						  parentID.c_str(),
 						  owningAttributeSetForFileID );
 
 		insert += args;
-		insert += 		  "SELECT @AttributeName_ID=null; \n"
-						  "SELECT @AttributeType_ID=null; \n"
+		insert +=
+			  "SELECT @AttributeName_ID=null; \n"
+			  "SELECT @AttributeType_ID=null; \n"
+			  "SELECT @ParentAttribute_ID=null; \n"
 
-						  "BEGIN TRY \n"
-						  // AttributeName
-						  "SELECT @AttributeName_ID = (SELECT TOP 1 [ID] FROM [dbo].[AttributeName] WHERE [Name]=@AttributeName_Name)\n"
-						  "if @AttributeName_ID IS NULL\n"
-						  "BEGIN \n"
-						  "    INSERT INTO [dbo].[AttributeName] ([Name]) VALUES (@AttributeName_Name);\n"
-						  "    SELECT @AttributeName_ID = SCOPE_IDENTITY()\n"
-						  "END \n"
-						  "\n"
-						  // Attribute
-  						  "INSERT INTO [dbo].[Attribute] ([AttributeSetForFileID], [AttributeNameID], [Value], [ParentAttributeID], [GUID]) \n"
-						  "VALUES (@AttributeSetForFile_ID, @AttributeName_ID, @Attribute_Value, @Attribute_ParentAttributeID, @Attribute_GUID);\n"
-						  "SELECT @Attribute_ID = SCOPE_IDENTITY()\n"
-						  "\n"
-						  "WHILE EXISTS (SELECT * FROM @TypeTable) \n"
-						  "BEGIN \n"
-						  "  SELECT @AttributeType_Type = MIN(TypeName) FROM @TypeTable \n"
-							// AttributeType
-							"SELECT @AttributeType_ID = (SELECT TOP 1 [ID] from [dbo].[AttributeType] WHERE [Type]=@AttributeType_Type) \n"
-							"if @AttributeType_ID IS NULL AND @AttributeType_Type <> '' \n"
-							"BEGIN \n"
-							"    INSERT INTO [dbo].[AttributeType] ([Type]) VALUES (@AttributeType_Type);\n"
-							"    SELECT @AttributeType_ID = SCOPE_IDENTITY()\n"
-							"END \n"
-							"\n"	
-							// AttributeInstanceType
-							"if @AttributeType_ID IS NOT NULL AND not exists (SELECT * FROM [dbo].[AttributeInstanceType] WHERE [AttributeID]=@Attribute_ID AND [AttributeTypeID]=@AttributeType_ID)\n"
-							"BEGIN \n"
-							"    INSERT INTO [dbo].[AttributeInstanceType] ([AttributeID], [AttributeTypeID]) VALUES (@Attribute_ID, @AttributeType_ID)\n"
-							"END \n"
-							"\n"
-							"DELETE FROM @TypeTable WHERE TypeName=@AttributeType_Type \n"
-						  "END \n"
-						  "\n"	
-						  "SELECT AttributeID=@Attribute_ID\n"
-						  "SET NOCOUNT OFF\n"
-						  "END TRY \n"
-						  "BEGIN CATCH \n"
-						  	"SET NOCOUNT OFF \n"
-						  	"DECLARE @ErrorMessage NVARCHAR(4000); \n"
-						  	"DECLARE @ErrorSeverity INT; \n"
-						  	"DECLARE @ErrorState INT; \n"
-						  	"SELECT \n"
-						  		"@ErrorMessage = ERROR_MESSAGE(), \n"
-						  		"@ErrorSeverity = ERROR_SEVERITY(), \n"
-						  		"@ErrorState = ERROR_STATE(); \n"
-						  	"RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState) \n"
-						  "END CATCH \n";
-
+			  "BEGIN TRY \n"
+				  // AttributeName
+				  "SELECT @AttributeName_ID = (SELECT TOP 1 [ID] FROM [dbo].[AttributeName] WHERE [Name]=@AttributeName_Name)\n"
+				  "if @AttributeName_ID IS NULL\n"
+				  "BEGIN \n"
+				  "    INSERT INTO [dbo].[AttributeName] ([Name]) VALUES (@AttributeName_Name);\n"
+				  "    SELECT @AttributeName_ID = SCOPE_IDENTITY()\n"
+				  "END \n"
+				  "\n"
+				  // Attribute
+				  "SELECT TOP 1 @ParentAttribute_ID=AttributeID FROM @AttributeIDs ORDER BY AttributeID DESC; \n"
+				  "INSERT INTO [dbo].[Attribute] ([AttributeSetForFileID], [AttributeNameID], [Value], [ParentAttributeID], [GUID]) \n"
+				  "VALUES (@AttributeSetForFile_ID, @AttributeName_ID, @Attribute_Value, @ParentAttribute_ID, @Attribute_GUID);\n"
+				  "SELECT @Attribute_ID = SCOPE_IDENTITY()\n"
+				  "\n"
+				  "WHILE EXISTS (SELECT * FROM @TypeTable) \n"
+				  "BEGIN \n"
+				  "  SELECT @AttributeType_Type = MIN(TypeName) FROM @TypeTable \n"
+					// AttributeType
+					"SELECT @AttributeType_ID = (SELECT TOP 1 [ID] from [dbo].[AttributeType] WHERE [Type]=@AttributeType_Type) \n"
+					"if @AttributeType_ID IS NULL AND @AttributeType_Type <> '' \n"
+					"BEGIN \n"
+					"    INSERT INTO [dbo].[AttributeType] ([Type]) VALUES (@AttributeType_Type);\n"
+					"    SELECT @AttributeType_ID = SCOPE_IDENTITY()\n"
+					"END \n"
+					"\n"
+					// AttributeInstanceType
+					"if @AttributeType_ID IS NOT NULL AND not exists (SELECT * FROM [dbo].[AttributeInstanceType] WHERE [AttributeID]=@Attribute_ID AND [AttributeTypeID]=@AttributeType_ID)\n"
+					"BEGIN \n"
+					"    INSERT INTO [dbo].[AttributeInstanceType] ([AttributeID], [AttributeTypeID]) VALUES (@Attribute_ID, @AttributeType_ID)\n"
+					"END \n"
+					"\n"
+					"DELETE FROM @TypeTable WHERE TypeName=@AttributeType_Type \n"
+				  "END \n"
+				  "\n"
+				  "INSERT INTO @AttributeIDs VALUES(@Attribute_ID)\n"
+			  "END TRY \n"
+			  "BEGIN CATCH \n"
+				"SELECT \n"
+					"@ErrorMessage = ERROR_MESSAGE(), \n"
+					"@ErrorSeverity = ERROR_SEVERITY(), \n"
+					"@ErrorState = ERROR_STATE(); \n"
+				"RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState) \n"
+			  "END CATCH \n";
 		return insert;
 	}
 
+	std::string popParentAttributeID =
+		"SELECT TOP 1 @ParentAttribute_ID=AttributeID FROM @AttributeIDs ORDER BY AttributeID DESC; \n"
+		"DELETE @AttributeIDs WHERE AttributeID = @ParentAttribute_ID; \n";
 
-	std::string GetInsertRasterZoneStatement( const std::string& attributeID,
-											  IRasterZonePtr ipZone )
+	std::string insertRasterZonePreamble =
+		"INSERT INTO [dbo].[RasterZone] "
+		"([AttributeID], [Top], [Left], [Bottom], [Right], "
+		"[StartX], [StartY], [EndX], [EndY], [PageNumber], [Height]) "
+		"VALUES ";
+
+	std::string GetInsertRasterZoneStatement( IRasterZonePtr ipZone )
 	{
 		ILongRectanglePtr ipRect = ipZone->GetRectangularBounds( nullptr );
 		int top = ipRect->Top;
@@ -774,11 +779,7 @@ namespace
 		int pageNumber = ipZone->PageNumber;
 		int height = ipZone->Height;
 
-		std::string insert = Util::Format( "INSERT INTO [dbo].[RasterZone] "
-										   "([AttributeID], [Top], [Left], [Bottom], [Right], "
-										   "[StartX], [StartY], [EndX], [EndY], [PageNumber], [Height]) "
-										   "VALUES (%s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d);",
-										   attributeID.c_str(),
+		std::string insert = Util::Format( "(@Attribute_ID, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
 										   top,
 										   left,
 										   bottom,
@@ -794,11 +795,11 @@ namespace
 	}
 
 	// This query gets one top-level attribute.
-	std::string GetQueryForAttributeSetForFile( long fileID, 
-												BSTR attributeSetName, 
+	std::string GetQueryForAttributeSetForFile( long fileID,
+												BSTR attributeSetName,
 												long relativeIndex )
 	{
-		std::string query = 
+		std::string query =
 			Util::Format( "WITH attrSets AS ( \n"
 						  "SELECT [asff].[VOA], "
 						  "ROW_NUMBER() OVER (ORDER BY [asff].[ID] %s) AS \"RowNumber\" "
@@ -862,7 +863,7 @@ namespace
 	{
 		TPtr pT(clsId);
 		ASSERT_RESOURCE_ALLOCATION( eliCode, nullptr != pT );
-		
+
 		return pT;
 	}
 
@@ -910,10 +911,10 @@ namespace
 	}
 
 	// Definition of empty:
-	// the attribute Value is empty, the attribute Type is empty, 
+	// the attribute Value is empty, the attribute Type is empty,
 	// (iff true == storeRasterZones) RasterZones are NOT present, AND
 	// all subattributes are similarly empty.
-	bool AttributeIsEmpty( IAttributePtr ipAttribute, 
+	bool AttributeIsEmpty( IAttributePtr ipAttribute,
 						   bool bStoreRasterZones,
    						   bool bStoreEmptyAttributes )
 	{
@@ -975,10 +976,10 @@ void CAttributeDBMgr::SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownV
 		ASSERT_RESOURCE_ALLOCATION( "ELI38804", nullptr != ipASFF );
 
 		auto connectParam = _variant_t( (IDispatch*)ipConnection, true );
-		ipASFF->Open( query.c_str(), 
-					  connectParam, 
-					  adOpenDynamic, 
-					  adLockOptimistic, 
+		ipASFF->Open( query.c_str(),
+					  connectParam,
+					  adOpenDynamic,
+					  adLockOptimistic,
 					  adCmdText );
 
 		if (!RecordsInSet(ipASFF))
@@ -1015,53 +1016,37 @@ void CAttributeDBMgr::SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownV
 	catch (...)
 	{
 		UCLIDException ue;
-		std::string message( 
+		std::string message(
 			Util::Format("ADO exception while saving VOA to AttributeSetForFile, "
 						 "ID: %lld", llRootASFF_ID ) );
 		ue.asString( message );
 		throw ue;
 	}
 }
-// ------------------------------------------------------------------------------------------------
-long long CAttributeDBMgr::SaveAttribute( _ConnectionPtr ipConnection,
-										  IAttributePtr ipAttribute, 
-										  bool bStoreRasterZone,
-										  const std::string& strInsert )
-{
-	ADODB::_RecordsetPtr ipRS = ExecuteCmd( strInsert.c_str(), ipConnection );
-	ASSERT_RESOURCE_ALLOCATION(	"ELI38670", VARIANT_FALSE == ipRS->adoEOF );
-
-	FieldsPtr ipFields = AssignComPtr( ipRS->Fields, "ELI38631" );
-	long long llParentID = getLongLongField( ipFields, "AttributeID" );
-
-	ipRS->Close();
-
-	ISpatialStringPtr ipValue = AssignComPtr( ipAttribute->GetValue(), "ELI38714" );
-	bool bHasSpatialInfo = asCppBool( ipValue->HasSpatialInfo() );
-	if ( bHasSpatialInfo && true == bStoreRasterZone )
-	{
-		IIUnknownVectorPtr ipZones = ipValue->GetOriginalImageRasterZones();	// NOTE: can't return nullptr, throws
-		for ( long index = 0; index < ipZones->Size(); ++index )
-		{
-			IRasterZonePtr ipZone = AssignComPtr( ipZones->At(index), "ELI38669" );
-
-			const std::string parentAttrID( Util::Format( "%lld", llParentID ) );
-			std::string zoneInsert = GetInsertRasterZoneStatement( parentAttrID, ipZone );
-
-			ExecuteCmd( zoneInsert.c_str(), ipConnection );
-		}
-	}
-
-	return llParentID;
-}
 //-------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::storeAttributeData( _ConnectionPtr ipConnection,
-										  IIUnknownVectorPtr ipAttributes, 
+										  IIUnknownVectorPtr ipAttributes,
 										  bool bStoreRasterZone,
 										  bool bStoreEmptyAttributes,
-										  long long llRootASFF_ID, 
-										  long long llParentAttrID/* = 0*/ )
+										  long long llRootASFF_ID )
 {
+	std::string strInsertQuery = insertAttributeQueryPreamble
+		+ buildStoreAttributeDataQuery( ipConnection,
+										ipAttributes,
+										bStoreRasterZone,
+										bStoreEmptyAttributes,
+										llRootASFF_ID);
+
+	ExecuteCmd( strInsertQuery.c_str(), ipConnection );
+}
+
+std::string CAttributeDBMgr::buildStoreAttributeDataQuery( _ConnectionPtr ipConnection,
+														   IIUnknownVectorPtr ipAttributes,
+														   bool bStoreRasterZone,
+														   bool bStoreEmptyAttributes,
+														   long long llRootASFF_ID )
+{
+	std::string strInsertQuery;
 	for ( long i = 0; i < ipAttributes->Size(); ++i )
 	{
 		IAttributePtr ipAttribute = AssignComPtr( ipAttributes->At(i), "ELI38693" );
@@ -1070,20 +1055,34 @@ void CAttributeDBMgr::storeAttributeData( _ConnectionPtr ipConnection,
 			continue;
 		}
 
-		std::string strInsertQuery = GetInsertAttributeQuery( ipAttribute, 
-															  llParentAttrID,
-															  llRootASFF_ID);
-		long long llAttrID = SaveAttribute( ipConnection,
-											ipAttribute, 
-											bStoreRasterZone,
-											strInsertQuery );
+		strInsertQuery += GetInsertAttributeQuery( ipAttribute,
+												   llRootASFF_ID);
+		ISpatialStringPtr ipValue = AssignComPtr( ipAttribute->GetValue(), "ELI38714" );
+		bool bHasSpatialInfo = asCppBool( ipValue->HasSpatialInfo() );
+		if ( bHasSpatialInfo && true == bStoreRasterZone )
+		{
+			strInsertQuery += insertRasterZonePreamble;
+			IIUnknownVectorPtr ipZones = ipValue->GetOriginalImageRasterZones();	// NOTE: can't return nullptr, throws
+			for ( long index = 0; index < ipZones->Size(); ++index )
+			{
+				IRasterZonePtr ipZone = AssignComPtr( ipZones->At(index), "ELI38669" );
 
-		IIUnknownVectorPtr ipSubAttrs = ipAttribute->GetSubAttributes();
-		storeAttributeData(ipConnection, ipSubAttrs, bStoreRasterZone, bStoreEmptyAttributes,
-			llRootASFF_ID, llAttrID);
+				if (index != 0)
+				{
+					strInsertQuery += ",";
+				}
+				strInsertQuery += GetInsertRasterZoneStatement( ipZone );
+			}
+		}
+		strInsertQuery += buildStoreAttributeDataQuery( ipConnection,
+														ipAttribute->SubAttributes,
+														bStoreRasterZone,
+														bStoreEmptyAttributes,
+														llRootASFF_ID);
+		strInsertQuery += popParentAttributeID;
 	}
+	return strInsertQuery;
 }
-
 
 bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 															 long nFileTaskSessionID,
@@ -1119,9 +1118,9 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 			SaveVoaDataInASFF( ipConnection, ipAttributes, llRootASFF_ID );
 
 			storeAttributeData( ipConnection,
-								ipAttributes, 
-								asCppBool(vbStoreRasterZone), 
-								asCppBool(vbStoreEmptyAttributes), 
+								ipAttributes,
+								asCppBool(vbStoreRasterZone),
+								asCppBool(vbStoreEmptyAttributes),
 								llRootASFF_ID );
 
 			tg.CommitTrans();
@@ -1153,7 +1152,7 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessio
 	try
 	{
 		const bool bDbNotLocked = false;
-		auto bRet = CreateNewAttributeSetForFile_Internal( bDbNotLocked, 
+		auto bRet = CreateNewAttributeSetForFile_Internal( bDbNotLocked,
 														   nFileTaskSessionID,
 														   bstrAttributeSetName,
 														   pAttributes,
@@ -1161,10 +1160,10 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessio
 														   vbStoreEmptyAttributes );
 		if ( !bRet )
 		{
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dbLock( m_ipFAMDB, 
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dbLock( m_ipFAMDB,
 																			 gstrMAIN_DB_LOCK );
 			const bool bDbIsLocked = true;
-			CreateNewAttributeSetForFile_Internal( bDbIsLocked, 
+			CreateNewAttributeSetForFile_Internal( bDbIsLocked,
 												   nFileTaskSessionID,
 												   bstrAttributeSetName,
 												   pAttributes,
@@ -1178,7 +1177,7 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessio
 }
 
 bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
-													   long fileID, 
+													   long fileID,
 													   BSTR attributeSetName,
 													   long relativeIndex,
 													   IIUnknownVector** ppAttributes)
@@ -1200,13 +1199,13 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 
 			auto strQuery( GetQueryForAttributeSetForFile( fileID, attributeSetName, relativeIndex ) );
 
-#ifdef UNCOMPRESSED_STREAM	
+#ifdef UNCOMPRESSED_STREAM
 			FieldsPtr ipFields = GetFieldsForQuery( strQuery, ipConnection );
 			IIUnknownVectorPtr ipAttributes = getIPersistObjFromField( ipFields, "VOA" );
 			ASSERT_RESOURCE_ALLOCATION("ELI39173", ipAttributes != nullptr);
 
 			*ppAttributes = ipAttributes.Detach();
-#endif		
+#endif
 
 #ifdef COMPRESSED_STREAM
 			FieldsPtr ipFields = GetFieldsForQuery( strQuery, ipConnection );
@@ -1246,7 +1245,7 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 // decrement most recent value to get next most recent (-2)
 // increment oldest value to get next oldest (2)
 // Zero is an illegal relativeIndex value.
-STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(long fileID, 
+STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(long fileID,
 													 BSTR attributeSetName,
 													 long relativeIndex,
 													 IIUnknownVector** ppAttributes)
@@ -1254,19 +1253,19 @@ STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(long fileID,
 	try
 	{
 		const bool bDbNotLocked = false;
-		auto bRet = GetAttributeSetForFile_Internal( bDbNotLocked, 
-													 fileID, 
-													 attributeSetName, 
+		auto bRet = GetAttributeSetForFile_Internal( bDbNotLocked,
+													 fileID,
+													 attributeSetName,
 													 relativeIndex,
 													 ppAttributes);
 		if ( !bRet )
 		{
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dbLock( m_ipFAMDB, 
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dbLock( m_ipFAMDB,
 																			 gstrMAIN_DB_LOCK );
 			const bool bDbIsLocked = true;
-			GetAttributeSetForFile_Internal( bDbIsLocked, 
-											 fileID, 
-											 attributeSetName, 
+			GetAttributeSetForFile_Internal( bDbIsLocked,
+											 fileID,
+											 attributeSetName,
 											 relativeIndex,
 											 ppAttributes);
 		}
@@ -1276,7 +1275,7 @@ STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(long fileID,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38619");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR name, 
+STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR name,
 														long long* pAttributeSetNameID)
 {
 	try
@@ -1289,7 +1288,7 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR name,
 									   "(Description) OUTPUT INSERTED.ID VALUES ('%s');",
 									   newName.c_str() ) );
 
-		m_ipFAMDB->ExecuteCommandReturnLongLongResult( cmd.c_str(), 
+		m_ipFAMDB->ExecuteCommandReturnLongLongResult( cmd.c_str(),
 		 											   "ID",
 													   pAttributeSetNameID );
 		return S_OK;
@@ -1297,7 +1296,7 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR name,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38629");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAttributeDBMgr::RenameAttributeSetName(BSTR attributeSetName, 
+STDMETHODIMP CAttributeDBMgr::RenameAttributeSetName(BSTR attributeSetName,
 													 BSTR newName)
 {
 	try
@@ -1330,7 +1329,7 @@ STDMETHODIMP CAttributeDBMgr::DeleteAttributeSetName(BSTR attributeSetName)
 		ASSERT_ARGUMENT( "ELI38625", !name.empty() );
 
 		std::string cmd( Util::Format( "DELETE FROM  [dbo].[AttributeSetName] "
-									   "WHERE Description='%s';", 
+									   "WHERE Description='%s';",
 									   name.c_str() ) );
 
 		m_ipFAMDB->ExecuteCommandQuery( cmd.c_str() );
@@ -1358,7 +1357,7 @@ STDMETHODIMP CAttributeDBMgr::GetAllAttributeSetNames(IStrToStrMap** ippNames)
 
 			std::string ID = Util::Format( "%lld", Id );
 			ipAttributeSetNames->Set( description.c_str(), ID.c_str() );
-			
+
 			pRecords->MoveNext();
 		}
 
@@ -1416,11 +1415,11 @@ ADODB::_ConnectionPtr CAttributeDBMgr::getDBConnection(bool bReset)
 			m_ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified);
 
 			// Get the command timeout from the FAMDB DBInfo table
-			m_ipDBConnection->CommandTimeout = 
+			m_ipDBConnection->CommandTimeout =
 				asLong(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
 		}
 	}
-	
+
 	return m_ipDBConnection;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1434,7 +1433,7 @@ void CAttributeDBMgr::validateSchemaVersion()
 	ASSERT_RESOURCE_ALLOCATION("ELI38545", m_ipFAMDB != nullptr);
 
 	// Get the Version from the FAMDB DBInfo table
-	auto value = asString( m_ipFAMDB->GetDBInfoSetting( gstrSCHEMA_VERSION_NAME.c_str(), 
+	auto value = asString( m_ipFAMDB->GetDBInfoSetting( gstrSCHEMA_VERSION_NAME.c_str(),
 													    asVariantBool(false) ) );
 	// Check against expected version
 	long versionNumber = value.empty() ? 0L : asLong(value);
