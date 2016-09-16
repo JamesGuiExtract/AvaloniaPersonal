@@ -501,8 +501,6 @@ BuildDataEntryMergeModule: BuildAFCoreMergeModule
     @TIME /T
     @ECHO.
 
-GetAllFiles: GetEngineering
-
 MakeMergeModules: CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule 
 
 DoBuilds: SetupBuildEnv BuildPDUtils BuildFKBUpdateIfRequired
@@ -515,7 +513,7 @@ DoEverythingNoGet: DoBuilds MakeMergeModules RegisterClearImage_7_0 CopyCommonFi
     @ECHO Attribute Finder Core Build process completed.
     @ECHO.
   
-DoEverything: SetupBuildEnv GetAllFiles DoEverythingNoGet
+DoEverything: SetupBuildEnv DoEverythingNoGet
     @ECHO.
     @DATE /T
     @TIME /T

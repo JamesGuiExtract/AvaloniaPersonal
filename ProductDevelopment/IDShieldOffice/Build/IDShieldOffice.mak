@@ -126,7 +126,6 @@ CopyInstall:BuildIDShieldOfficeInstall
 	@COPY /V "$(IDShieldOfficeDir)\Installation\IDShieldOffice\Support Files\license.txt" "$(IDShieldOfficeBleedingEdgeDir)\readme.txt" 
 	@COPY /V "$(IDShieldOfficeDir)\Installation\IDShieldOffice\Support Files\autorun.inf" "$(IDShieldOfficeBleedingEdgeDir)" 
 
-GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetIDShieldOfficeFiles
 
 DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildIDShieldOffice  CopyInstall
     @ECHO.
@@ -136,7 +135,7 @@ DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildIDShieldOffice  CopyInsta
     @ECHO IDShieldOffice Build process completed.
     @ECHO.
 
-DoEverything:DisplayTimeStamp SetupBuildEnv GetAllFiles DoEverythingNoGet
+DoEverything:DisplayTimeStamp SetupBuildEnv DoEverythingNoGet
     @ECHO.
     @DATE /T
     @TIME /T

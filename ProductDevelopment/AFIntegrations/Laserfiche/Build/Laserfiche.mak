@@ -88,8 +88,6 @@ CreateLaserficheInstallCD: BuildLaserficheInstall
 
 DoNecessaryBuilds: SetupBuildEnv BuildAttributeSDKandRDT
 
-GetAllFiles: GetEngineering
-
 DoEverythingNoGet: DisplayTimeStamp DoNecessaryBuilds CreateLaserficheInstallCD
     @ECHO.
     @DATE /T
@@ -98,7 +96,7 @@ DoEverythingNoGet: DisplayTimeStamp DoNecessaryBuilds CreateLaserficheInstallCD
     @ECHO Laserfiche Build process completed.
     @ECHO.
 	
-DoEverything: DisplayTimeStamp GetAllFiles DoNecessaryBuilds CreateLaserficheInstallCD
+DoEverything: DisplayTimeStamp DoNecessaryBuilds CreateLaserficheInstallCD
     @ECHO.
     @DATE /T
     @TIME /T

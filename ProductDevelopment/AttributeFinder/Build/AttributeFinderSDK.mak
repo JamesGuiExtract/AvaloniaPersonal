@@ -260,8 +260,6 @@ CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtrac
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
-GetAllFiles: GetEngineering
-
 DoBuilds: DisplayTimeStamp SetupBuildEnv BuildAttributeFinderCore
 
 DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos UpdateLicenseFiles
@@ -272,7 +270,7 @@ DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos Upda
     @ECHO Attribute Finder SDK Build process completed.
     @ECHO.
   
-DoEverything: DisplayTimeStamp SetupBuildEnv GetAllFiles DoEverythingNoGet
+DoEverything: DisplayTimeStamp SetupBuildEnv DoEverythingNoGet
     @ECHO.
     @DATE /T
     @TIME /T

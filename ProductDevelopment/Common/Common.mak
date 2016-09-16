@@ -98,11 +98,21 @@ LabDECorePointLink=$(LinkShared) "& '$(MakeSymLink)' 'EngSvr' '$(LabDESetupFiles
 OtherSetupFiles=$(BleedingEdgeVersionDir)\Other
 IntegrationsSetupFiles=$(OtherSetupFiles)\Integrations
 
-!IF "$(BUILD_FROM_SVN)" == "YES"
-!include GetFromSVN.mak
-!ELSE
-!include GetFromVault.mak
-!ENDIF
+#Git tags converted from label
+GitTagFlexIndexVersion=$(FlexIndexVersion:v.=)
+GitTagFlexIndexVersion=$(GitTagFlexIndexVersion:/=)
+GitTagFlexIndexVersion=$(GitTagFlexIndexVersion:Ver. =)
+GitTagFlexIndexVersion=$(GitTagFlexIndexVersion: =/)
+GitTagFlexIndexVersion=$(GitTagFlexIndexVersion:.=/)
+GitTagFlexIndexVersion=$(GitTagFlexIndexVersion:-=/)
+
+GitTagFKBVersion=$(FKBVersion:v.=)
+GitTagFKBVersion=$(GitTagFKBVersion:/=)
+GitTagFKBVersion=$(GitTagFKBVersion:Ver. =)
+GitTagFKBVersion=$(GitTagFKBVersion: =/)
+GitTagFKBVersion=$(GitTagFKBVersion:.=/)
+GitTagFKBVersion=$(GitTagFKBVersion:-=/)
+
 
 #############################################################################
 # C O M M O N   T A R G E T S
