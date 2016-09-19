@@ -2,16 +2,19 @@ CALL InitUserEnv.Bat
 CALL InitBuildEnv.Bat
 
 
-SET BUILD_STATUS="Started"
-
-PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%VersionToBuild%' '%BUILD_STATUS%'"
-
-CALL %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common\TagLatest.bat
+CALL %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common\TagLatest.bat %~1
 IF %ERRORLEVEL% NEQ 0 (
 	Echo Vault exited with error.
 	Echo.
 	goto ExitWithError
 )
+
+:: Get the version to build from the LatestComponentVersion.mak files
+for /F "tokens=2 delims==" %%i in ( 'findstr FlexIndex LatestComponentVersions.mak') do set VersionToBuild=%%i
+
+SET BUILD_STATUS="Started"
+
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%VersionToBuild%' '%BUILD_STATUS%'"
 
 cd "%~p0"
 

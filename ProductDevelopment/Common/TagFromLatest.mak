@@ -19,11 +19,11 @@ GitPath="C:\Program Files\Git\bin\git.exe"
 
 TagRepos:
 	cd %BUILD_VSS_ROOT%\Engineering
-	$(GitPath) -a $(GitTagFlexIndexVersion) -m "$(GitTagFlexIndexVersion)"
+	$(GitPath) tag $(GitTagFlexIndexVersion) -m "$(FlexIndexVersion)"
 	cd %BUILD_VSS_ROOT%\Engineering\RC.Net\APIs
-	$(GitPath) -a $(GitTagFlexIndexVersion) -m "$(GitTagFlexIndexVersion)"
+	$(GitPath) tag $(GitTagFlexIndexVersion) -m "$(FlexIndexVersion)"
 	cd %BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs
-	$(GitPath) -a $(GitTagFlexIndexVersion) -m "$(GitTagFlexIndexVersion)"
+	$(GitPath) tag $(GitTagFlexIndexVersion) -m "$(FlexIndexVersion)"
 	cd %BUILD_VSS_ROOT%\Engineering\Rules
-	$(GitPath) -a $(GitTagFlexIndexVersion) -m "$(GitTagFlexIndexVersion)"
-	$(GitPath) -a $(GitTagFKBVersion) -m "$(GitTagFKBVersion)"
+	$(GitPath) tag $(GitTagFlexIndexVersion) -m "$(FlexIndexVersion)"
+	$(GitPath) tag $(GitTagFKBVersion) -m "$(FKBVersion)"

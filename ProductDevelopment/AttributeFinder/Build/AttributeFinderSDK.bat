@@ -4,7 +4,16 @@ SET Branch=
 
 IF "%~1"=="" GOTO missing_version_number_error
 
+GOTO no_get_build
 
+:missing_version_number_error
+ECHO.
+ECHO ***** ERROR *****
+ECHO Please provide version number of product to build as the first argument!
+ECHO.
+GOTO exit_script
+
+:: All builds are not get since changing to git - the working folder will be assumed to be set to appropriate branch
 :no_get_build
 ECHO Initiating a build without get
 SET BuildScriptTarget=DoEverythingNoGet
