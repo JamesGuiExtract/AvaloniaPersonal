@@ -435,8 +435,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_documentDataPanel != null)
                         {
                             _documentDataPanel.PageLoadRequest += HandleDocumentDataPanel_PageLoadRequest;
-                        }
                     }
+                }
                 }
                 catch (Exception ex)
                 {
@@ -788,7 +788,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         doc.PageControls
                             .First()
                             .Page.OriginalDocumentName.Equals(
-                                sourceFileName, StringComparison.OrdinalIgnoreCase));
+                                sourceFileName,StringComparison.OrdinalIgnoreCase));
 
                 return matchingDocuments.All(doc => doc.InOriginalForm);
             }
@@ -827,8 +827,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
         public void CheckForChanges(out bool paginationModified, out bool dataModified)
         {
-            try
-            {
+            try 
+            {	        
                 paginationModified = _pendingDocuments.Any(document =>
                         !document.InOriginalForm);
                 dataModified = _pendingDocuments.Any(document =>
@@ -1150,11 +1150,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .SelectMany(doc => doc.PageControls
                         .Select(c => c.Page.OriginalDocumentName)));
 
-            var unIncludedPagesControls =
+            var unIncludedPagesControls = 
                 _pendingDocuments
                     .Where(doc => !doc.Selected)
                     .SelectMany(doc => doc.PageControls
-                        .Where(c =>
+                        .Where(c => 
                             affectedSourceDocuments.Contains(c.Page.OriginalDocumentName)));
 
             if (unIncludedPagesControls.Any())
@@ -1495,11 +1495,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
         /// number while the value represents the new page number(s) in 
         /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="rotatedPages">collection of PageAndRotation; original page number, and
+        /// rotation in degrees relative to the original page orientation (= 0 degrees,
+        /// so any non-zero amount indicates a rotation)</param>
         /// <returns>The spatial page info map for the output document</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
         public static LongToObjectMap CreateUSSForPaginatedDocument(string newDocumentName,
-            Dictionary<Tuple<string, int>, List<int>> pageMap)
+            Dictionary<Tuple<string, int>, List<int>> pageMap, 
+            ReadOnlyCollection<PageAndRotation> rotatedPages)
         {
             try
             {
@@ -1514,7 +1518,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         ussData.ReportMemoryUsage();
                         return ussData;
                     });
-
+                    
                 var newSpatialPageInfos = new LongToObjectMapClass();
                 int destPageCount = pageMap.Values.SelectMany(value => value).Count();
                 var newPageDataArray = new SpatialString[destPageCount];
@@ -1522,13 +1526,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 foreach (var pageInfo in pageMap)
                 {
                     string sourceDocName = pageInfo.Key.Item1;
+
                     SpatialString sourceDocData;
                     if (sourceUSSData.TryGetValue(sourceDocName, out sourceDocData))
                     {
                         ussFileExists = true;
                         if (sourceDocData.HasSpatialInfo())
                         {
-                            var oldPageInfos = sourceDocData.SpatialPageInfos;
+                            // Make a modifyable copy of the page info, necessary if a page has been rotated.
+                            var oldPageInfos = (LongToObjectMap)((IShallowCopyable)sourceDocData.SpatialPageInfos).ShallowCopy();
                             foreach (int destPage in pageInfo.Value)
                             {
                                 int sourcePage = pageInfo.Key.Item2;
@@ -1538,8 +1544,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 // UpdatePageNumber is only valid for spatial strings
                                 if (pageData.HasSpatialInfo())
                                 {
+                                    var oldSpatialPageInfo = pageData.GetPageInfo(sourcePage);
                                     newPageDataArray[destPage - 1] = pageData;
                                     pageData.UpdatePageNumber(destPage);
+
+                                    var pageInfoCollection = rotatedPages
+                                        .Where(info => info.Page == sourcePage &&
+                                        info.DocumentName == pageData.SourceDocName);
+                                    if (pageInfoCollection.Count() > 0)
+                                    {
+                                        var pageRotationInfo = pageInfoCollection.First();
+                                        RotatePage(sourcePage,
+                                                   pageRotationInfo,
+                                                   oldPageInfos,
+                                                   oldSpatialPageInfo);
+                                    }
                                 }
                                 if (oldPageInfos.Contains(sourcePage))
                                 {
@@ -1575,6 +1594,88 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40253");
+            }
+        }
+
+        /// <summary>
+        /// Rotate the specified page by the specified amount
+        /// </summary>
+        /// <param name="pageData">The page to rotate</param>
+        /// <param name="originalPageNumber">the original page number</param>
+        /// <param name="pageNumber">the page number in the new document</param>
+        /// <param name="pageInfo">page and rotation information - original document name, original page number,
+        /// and the rotation amount in degrees, offset from zero</param>
+        /// <param name="oldPageInfos">the spatial page info associated with the page (spatial string)</param>
+        /// NOTE: This function modifies the oldPageInfos, which effects the spatial string collection that
+        /// is accumulated and written into the .uss file. It ALSO effects the downstream creation of the .voa
+        /// file.
+        static void RotatePage(int originalPageNumber,
+                               PageAndRotation pageInfo,
+                               LongToObjectMap oldPageInfos,
+                               SpatialPageInfo oldSpatialPageInfo)
+        {
+            try
+            {
+                int rotation = pageInfo.Rotation;
+                var orientation = ConvertDegreesToOrientation(rotation);
+
+                var newSpatialPageInfo = new SpatialPageInfo();
+
+                // If the page has been rotated 90 degrees right or left, then the 
+                // height and width need to be swapped.
+                int height = oldSpatialPageInfo.Height;
+                int width = oldSpatialPageInfo.Width;
+                if (rotation != 0 && rotation != 180)
+                {
+                    height = width;
+                    width = oldSpatialPageInfo.Height;
+                }
+
+                newSpatialPageInfo.Initialize(width,
+                                              height,
+                                              orientation,
+                                              oldSpatialPageInfo.Deskew);
+
+                oldPageInfos.Set(originalPageNumber, newSpatialPageInfo);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41339");
+            }
+        }
+
+        /// <summary>
+        /// Converts degrees to an orientation enumeration value.
+        /// </summary>
+        /// <param name="degrees">must be 0, 90, 180, or 270.</param>
+        /// <returns>the appropriate EOrientation value</returns>
+        static EOrientation ConvertDegreesToOrientation(int degrees)
+        {
+            switch (degrees)
+            {
+                case 0:
+                case -360:
+                    return EOrientation.kRotNone;
+
+                case 90:
+                case -270:
+                    return EOrientation.kRotLeft;
+
+                case 180:
+                case -180:
+                    return EOrientation.kRotDown;
+
+                case 270:
+                case -90:
+                    return EOrientation.kRotRight;
+
+                default:
+                    {
+                        ExtractException ee = new ExtractException("ELI41321", "Invalid parameter");
+                        ee.AddDebugData("Orientation degrees", degrees, encrypt: false);
+                        ee.AddDebugData("The problem is", " rotation must be in + or - 90 degree increments", encrypt: false);
+                        throw ee;
+                    }
             }
         }
 
@@ -1893,13 +1994,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _imageViewer.ImageFileClosing -= HandleImageViewer_ImageFileClosing;
                         }
 
-                        _imageViewer = value;
+                _imageViewer = value;
 
                         if (_imageViewer != null)
                         {
                             _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
-                        }
-                    }
+            }
+        }
                 }
                 catch (Exception ex)
                 {
@@ -2045,14 +2146,27 @@ namespace Extract.UtilityApplications.PaginationUtility
                 long fileSize = new FileInfo(tempFile.FileName).Length;
 
                 bool? suggestedPaginationAccepted = outputDocument.PaginationSuggested
-                    ? (bool?)(outputDocument.InOriginalForm ? true : false)
+                    ? (bool ?)(outputDocument.InOriginalForm ? true : false)
                     : null;
 
                 int position = _outputDocumentPositions[outputDocument];
 
+                var sourcePages = outputDocument.PageControls
+                    .Where(c => !c.Deleted)
+                    .Select(c => new PageAndRotation(c.Page.OriginalDocumentName,
+                                                     c.Page.OriginalPageNumber,
+                                                     c.Page.ImageOrientation));
+                var rotatedPages = sourcePages
+                                    .Where(page => page.Rotation != 0)
+                                    .Select(page => 
+                                        new PageAndRotation(page.DocumentName, 
+                                                            page.Page, 
+                                                            page.Rotation))
+                                    .ToList<PageAndRotation>().AsReadOnly();
+
                 var eventArgs = new CreatingOutputDocumentEventArgs(
                     sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted, position,
-                    outputDocument.DocumentData);
+                    outputDocument.DocumentData, rotatedPages);
 
 
                 OnCreatingOutputDocument(eventArgs);
@@ -2583,7 +2697,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </returns>
         bool SaveDocumentData(bool onlyIfSelected, bool validateData)
         {
-            if (_documentWithDataInEdit == null ||
+            if (_documentWithDataInEdit == null || 
                 (onlyIfSelected && CommitOnlySelection && !_documentWithDataInEdit.Selected) ||
                 CloseDataPanel(validateData))
             {
@@ -2970,7 +3084,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             var eventHandler = Paginated;
             if (eventHandler != null)
             {
-                eventHandler(this,
+                eventHandler(this, 
                     new PaginatedEventArgs(
                         paginatedDocumentSources, disregardedPaginationSources,
                         modifiedDocumentData, unmodifiedPaginationSources));

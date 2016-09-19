@@ -142,6 +142,39 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
     }
 
+
+    /// <summary>
+    /// A simple carrier class for page and associated rotation arguments; primarily provides easier-to-read
+    /// notation compared to a Tuple of int, int.
+    /// </summary>
+    public class PageAndRotation
+    {
+        public PageAndRotation(string documentName, int page, int rotation)
+        {
+			DocumentName = documentName;
+            Page = page;
+            Rotation = rotation;
+        }
+
+        public int Page
+        {
+            get;
+            private set;
+        }
+
+        public int Rotation
+        {
+            get;
+            private set;
+        }
+
+		public string DocumentName
+		{
+			get;
+			private set;
+		}
+    }
+
     /// <summary>
     /// Event args for a <see cref="PaginationPanel.CreatingOutputDocument"/> event.
     /// </summary>
@@ -164,9 +197,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// PaginationPanel.LoadFile.
         /// </param>
         /// <param name="documentData">Data that has been associated with the document.</param>
+        /// <param name="rotatedPages">collection of original page number that has been rotated, AND associated 
+        /// rotation amount in degrees from original orientation.
         public CreatingOutputDocumentEventArgs(IEnumerable<PageInfo> sourcePageInfo,
             int pageCount, long fileSize, bool? suggestedPaginationAccepted, int position,
-            PaginationDocumentData documentData)
+            PaginationDocumentData documentData, ReadOnlyCollection<PageAndRotation> rotatedPages)
             : base()
         {
             SourcePageInfo = sourcePageInfo.ToList().AsReadOnly();
@@ -175,6 +210,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             SuggestedPaginationAccepted = suggestedPaginationAccepted;
             Position = position;
             DocumentData = documentData;
+			RotatedPages = rotatedPages;
         }
 
         /// <summary>
@@ -247,6 +283,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             get;
             set;
         }
+
+        public ReadOnlyCollection<PageAndRotation> RotatedPages
+        {
+            get;
+            private set;
+        }
     }
 
     /// <summary>
@@ -273,10 +315,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
     }
 
-    /// <summary>
-    /// Event args for a <see cref="PaginationPanel.Paginated"/> event.
-    /// </summary>
-    public class PaginatedEventArgs : EventArgs
+	/// <summary>
+	/// Event args for a <see cref="PaginationPanel.Paginated"/> event.
+	/// </summary>
+	public class PaginatedEventArgs : EventArgs
     {
         /// <summary>
         /// Initializes a new <see cref="PaginatedEventArgs"/> instance.

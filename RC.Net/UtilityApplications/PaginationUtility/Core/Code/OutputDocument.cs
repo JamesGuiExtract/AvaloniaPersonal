@@ -254,7 +254,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
             }
         }
-
         /// <summary>
         /// Gets or sets a value indicating whether the document has changed compared to the input
         /// the source documents as they currently exist on disk.
@@ -369,8 +368,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_documentData != null)
                         {
                             _documentData.ModifiedChanged -= HandleDocumentData_Changed;
-                            _documentData.SummaryChanged += HandleDocumentData_Changed;
-                            _documentData.SendForReprocessingChanged += HandleDocumentData_Changed;
+                            _documentData.SummaryChanged -= HandleDocumentData_Changed;
+                            _documentData.SendForReprocessingChanged -= HandleDocumentData_Changed;
                         }
 
                         _documentData = value;
@@ -414,7 +413,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 return PageControls.Any(c => !c.Deleted) &&
-                    (_documentData != null) && 
+                    (_documentData != null) &&
                     _documentData.AllowDataEdit &&
                     _documentData.DataError;
             }
@@ -630,7 +629,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 if (copyOriginalDocument)
-                {
+                {                    
                     // If the document has not been changed from its original form, it can simply be
                     // copied to _fileName rather than require it to be re-assembled.
                     File.Copy(firstPage.OriginalDocumentName, FileName);
@@ -760,6 +759,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+
         #endregion Private Members
     }
+        
 }

@@ -198,6 +198,17 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Gets the GUID associated with the specified Attribute, as a string value.
+        /// </summary>
+        /// <param name="attribute">The attribute.</param>
+        /// <returns>GUID as string</returns>
+        public static string AttributeGuidAsString(ComAttribute attribute)
+        {
+            string guid = ((IIdentifiableObject)attribute).InstanceGUID.ToString();
+            return guid;
+        }
+
         #endregion Public Methods
 
         #region Private Methods
@@ -354,17 +365,6 @@ namespace Extract.AttributeFinder
                 }
             }
             return sourceDocName;
-        }
-
-        /// <summary>
-        /// Gets the GUID associated with the specified Attribute, as a string value.
-        /// </summary>
-        /// <param name="attribute">The attribute.</param>
-        /// <returns>GUID as string</returns>
-        public static string AttributeGuidAsString(ComAttribute attribute)
-        {
-            string guid = ((IIdentifiableObject)attribute).InstanceGUID.ToString();
-            return guid;
         }
 
         #endregion Private Methods
