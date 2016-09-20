@@ -3,7 +3,6 @@ using Extract.DataEntry;
 using Extract.Imaging.Forms;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
@@ -68,6 +67,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                ExtractException.Assert("ELI41360", "Panel not properly initialized.", _imageViewer != null);
+
                 base.ImageViewer = _imageViewer;
 
                 LoadData(data.Attributes);
@@ -77,8 +78,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _documentData = data as DataEntryPaginationDocumentData;
                 _sourceDocName = _documentData.SourceDocName;
 
-                _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
                 _imageViewer.ImageFileChanged += HandleImageViewer_ImageFileChanged;
+                _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
                 _imageViewer.PageChanged += HandleImageViewer_PageChanged;
 
                 Active = true;
@@ -105,6 +106,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                ExtractException.Assert("ELI41361", "Panel not properly initialized.", _imageViewer != null);
+
                 _documentData = null;
                 _sourceDocName = null;
 
@@ -117,8 +120,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 base.ImageViewer = null;
 
-                _imageViewer.ImageFileClosing -= HandleImageViewer_ImageFileClosing;
                 _imageViewer.ImageFileChanged -= HandleImageViewer_ImageFileChanged;
+                _imageViewer.ImageFileClosing -= HandleImageViewer_ImageFileClosing;
                 _imageViewer.PageChanged -= HandleImageViewer_PageChanged;
 
                 UpdateSwipingState();
@@ -171,23 +174,30 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Overrides
 
         /// <summary>
-        /// 
+        /// Navigates to the specified page, settings _performingProgrammaticZoom in the process to
+        /// avoid handling scroll and zoom events that occur as a result.
         /// </summary>
-        /// <param name="pageNumber"></param>
+        /// <param name="pageNumber">The page to be displayed</param>
         protected override void SetImageViewerPageNumber(int pageNumber)
         {
             try
             {
                 base.SetImageViewerPageNumber(pageNumber);
 
-                var flowLayoutPanel = this.GetAncestors()
-                            .OfType<PaginationFlowLayoutPanel>()
-                            .Single();
-                int scrollPos = flowLayoutPanel.VerticalScroll.Value;
-                OnPageLoadRequest(pageNumber);
-                flowLayoutPanel.VerticalScroll.Value = scrollPos;
-                base.ImageViewer = _imageViewer;
-                DrawHighlights(true);
+                // Special logic applies only if the panel is not being used in the pagination
+                // context.
+                if (InPaginationPanel)
+                {
+                    var flowLayoutPanel = this.GetAncestors()
+                        .OfType<PaginationFlowLayoutPanel>()
+                        .Single();
+
+                    int scrollPos = flowLayoutPanel.VerticalScroll.Value;
+                    OnPageLoadRequest(pageNumber);
+                    flowLayoutPanel.VerticalScroll.Value = scrollPos;
+                    base.ImageViewer = _imageViewer;
+                    DrawHighlights(true);
+                }
             }
             catch (Exception ex)
             {
@@ -196,18 +206,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Raises the <see cref="SwipingStateChanged"/> event.
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="e">An <see cref="SwipingStateChangedEventArgs"/> that contains the event
+        /// data.</param>
         protected override void OnSwipingStateChanged(SwipingStateChangedEventArgs e)
         {
             try
             {
                 base.OnSwipingStateChanged(e);
 
-                _swipingEnabled = e.SwipingEnabled;
+                // Special logic applies only if the panel is not being used in the pagination
+                // context.
+                if (InPaginationPanel)
+                {
+                    _swipingEnabled = e.SwipingEnabled;
 
-                UpdateSwipingState();
+                    UpdateSwipingState();
+                }
             }
             catch (Exception ex)
             {
@@ -218,30 +234,35 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Raises the <see cref="Control.Enter"/> event.
         /// </summary>
-        /// <param name="e">An <see cref="EventArgs "/>that contains the event data.</param>
+        /// <param name="e">An <see cref="EventArgs "/> that contains the event data.</param>
         protected override void OnEnter(EventArgs e)
         {
             try
             {
-                if (_imageViewer.ImageFile.Equals(_sourceDocName, StringComparison.OrdinalIgnoreCase))
+                // Special logic applies only if the panel is not being used in the pagination
+                // context.
+                if (InPaginationPanel)
                 {
-                    if (base.ImageViewer == null && !string.IsNullOrWhiteSpace(_sourceDocName))
+                    if (_imageViewer.ImageFile.Equals(_sourceDocName, StringComparison.OrdinalIgnoreCase))
                     {
-                        base.ImageViewer = _imageViewer;
-                    }
+                        if (base.ImageViewer == null && !string.IsNullOrWhiteSpace(_sourceDocName))
+                        {
+                            base.ImageViewer = _imageViewer;
+                        }
 
-                    DrawHighlights(true);
-                }
-                else if (!string.IsNullOrWhiteSpace(_sourceDocName))
-                {
-                    var flowLayoutPanel = this.GetAncestors()
-                        .OfType<PaginationFlowLayoutPanel>()
-                        .Single();
-                    int scrollPos = flowLayoutPanel.VerticalScroll.Value;
-                    OnPageLoadRequest(1);
-                    flowLayoutPanel.VerticalScroll.Value = scrollPos;
-                    base.ImageViewer = _imageViewer;
-                    DrawHighlights(true);
+                        DrawHighlights(true);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(_sourceDocName))
+                    {
+                        var flowLayoutPanel = this.GetAncestors()
+                            .OfType<PaginationFlowLayoutPanel>()
+                            .Single();
+                        int scrollPos = flowLayoutPanel.VerticalScroll.Value;
+                        OnPageLoadRequest(1);
+                        flowLayoutPanel.VerticalScroll.Value = scrollPos;
+                        base.ImageViewer = _imageViewer;
+                        DrawHighlights(true);
+                    }
                 }
 
                 base.OnEnter(e);
@@ -257,10 +278,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Event Handlers
 
         /// <summary>
-        /// 
+        /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The <see cref="ImageFileChangedEventArgs"/> that contains the event data.</param>
         void HandleImageViewer_ImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
@@ -278,10 +299,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Handles the <see cref="ImageViewer.ImageFileClosing"/> event.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The <see cref="ImageFileClosingEventArgs"/> that contains the event data.</param>
         void HandleImageViewer_ImageFileClosing(object sender, ImageFileClosingEventArgs e)
         {
             try
@@ -295,10 +316,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Handles the <see cref="ImageViewer.PageChanged"/> event.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The <see cref="PageChangedEventArgs"/> that contains the event data.</param>
         void HandleImageViewer_PageChanged(object sender, PageChangedEventArgs e)
         {
             try
@@ -319,7 +340,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Private Members
 
         /// <summary>
-        /// 
+        /// Gets whether this DEP is currently displayed in <see cref="PaginationPanel"/>.
+        /// <returns><see langword="true"/> if this DEP is currently displayed in
+        /// a <see langword="PaginationPanel"/>; otherwise, <see langword="false"/>.</returns>
+        /// </summary>
+        bool InPaginationPanel
+        {
+            get
+            {
+                return _imageViewer != null;
+            }
+        }
+
+        /// <summary>
+        /// Updates the enabled state of the swiping tools based on the current state of the DEP.
         /// </summary>
         void UpdateSwipingState()
         {
@@ -327,9 +361,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Raises the <see cref="PageLoadRequest"/>
         /// </summary>
-        /// <param name="pageNum"></param>
+        /// <param name="pageNum">The page number that needs to be loaded in <see cref="_sourceDocName"/>.
+        /// </param>
         void OnPageLoadRequest(int pageNum)
         {
             var eventHandler = PageLoadRequest;
