@@ -24,6 +24,7 @@
 #
 BuildRootDirectory=$(BUILD_DRIVE)$(BUILD_DIRECTORY)\$(ProductRootDirName)
 EngineeringRootDirectory=z:\Engineering
+PDUtilsRootDir=$(EngineeringRootDirectory)\ProductDevelopment\Utils
 ReusableComponentsRootDirectory=$(EngineeringRootDirectory)\ReusableComponents
 CommonDirectory=$(EngineeringRootDirectory)\ProductDevelopment\Common
 FXCopAppDirectory=$(FX_COP)

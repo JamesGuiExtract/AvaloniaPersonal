@@ -10,7 +10,9 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 :: Get the version to build from the LatestComponentVersion.mak files
+pushd "%~p0..\..\Common"
 for /F "tokens=2 delims==" %%i in ( 'findstr FlexIndex LatestComponentVersions.mak') do set VersionToBuild=%%i
+popd
 
 SET BUILD_STATUS="Started"
 
