@@ -364,12 +364,12 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Gets the feature vector using <see cref="NameToProtoFeaturesMap"/>s
         /// </summary>
-        /// <param name="pagesOfProtoFeatures">The collection of <see cref="ComAttribute"/>s to search for
-        /// Pages of sub-attribute protoFeatures of this <see cref="AttributeFeatureVectorizer"/>
-        /// (Page sub-attributes with names that matches the name of this instance)</param>
+        /// <param name="protoFeatureGroups">The collection of <see cref="NameToProtoFeaturesMap"/>s to search for
+        /// groups of sub-attribute protoFeatures of this <see cref="AttributeFeatureVectorizer"/>
+        /// (sub-attributes with names that matches the name of this instance)</param>
         /// <returns>If <see cref="Enabled"/>, then an enumeration of feature vectors that has a length equal to
-        /// that of <see paramref="pagesOfProtoFeatures"/>. Else, an empty enumeration.</returns>
-        internal IEnumerable<double[]> GetPaginationFeatureVectors(IEnumerable<NameToProtoFeaturesMap> pagesOfProtoFeatures)
+        /// that of <see paramref="protoFeatureGroups"/>. Else, an empty enumeration.</returns>
+        internal IEnumerable<double[]> GetFeatureVectorsForEachGroup(IEnumerable<NameToProtoFeaturesMap> protoFeatureGroups)
         {
             try
             {
@@ -378,7 +378,7 @@ namespace Extract.AttributeFinder
                     return Enumerable.Empty<double[]>();
                 }
 
-                return pagesOfProtoFeatures.Select(GetDocumentFeatureVector);
+                return protoFeatureGroups.Select(GetDocumentFeatureVector);
             }
             catch (Exception e)
             {

@@ -159,9 +159,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 // Stack panels
                 paginationInputPanel.Location
+                    = attributeCategorizationInputPanel.Location
                     = documentCategorizationFolderInputPanel.Location
                     = documentCategorizationCsvInputPanel.Location;
                 paginationInputPanel.Size
+                    = attributeCategorizationInputPanel.Size
                     = documentCategorizationFolderInputPanel.Size
                     = documentCategorizationCsvInputPanel.Size;
                 multiclassSvmPanel.Location = neuralNetPanel.Location;
@@ -173,6 +175,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 paginationAnswerVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
                 documentCategorizationFolderAnswerPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
                 documentCategorizationFolderFeatureVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
+                attributeCategorizationCandidateVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
 
                 if (!string.IsNullOrWhiteSpace(learningMachinePath))
                 {
@@ -205,6 +208,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 // Anchor stacked controls
                 paginationInputPanel.Anchor
+                    = attributeCategorizationInputPanel.Anchor
                     = documentCategorizationFolderInputPanel.Anchor
                     = documentCategorizationCsvInputPanel.Anchor
                     = System.Windows.Forms.AnchorStyles.Top
@@ -415,6 +419,23 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         }
         #endregion Overrides
 
+        #region Internal Methods
+
+        /// <summary>
+        /// Clears the training log. Sets saved machine to null so that dirty flag will be computed properly.
+        /// </summary>
+        internal void ClearTrainingLog()
+        {
+            if (!String.IsNullOrEmpty(CurrentLearningMachine.TrainingLog))
+            {
+                _savedLearningMachine = null;
+                CurrentLearningMachine.TrainingLog = "";
+                Dirty = true;
+            }
+        }
+
+        #endregion Internal Methods
+
         #region Private Methods
 
         private void AfterCurrentLearningMachineChanged()
@@ -557,6 +578,15 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     paginationAnswerVoaTextBox.Text = inputConfig.AnswerPath ?? "";
                     paginationTrainingPercentageTextBox.Text = inputConfig.TrainingSetPercentage.ToString(CultureInfo.CurrentCulture);
                     paginationRandomNumberSeedTextBox.Text = CurrentLearningMachine.RandomNumberSeed.ToString(CultureInfo.CurrentCulture);
+                }
+                else if (CurrentLearningMachine.Usage == LearningMachineUsage.AttributeCategorization)
+                {
+                    attributeCategorizationRadioButton.Checked = true;
+                    textFileOrCsvRadioButton.Checked = inputConfig.InputPathType == InputType.TextFileOrCsv;
+                    attributeCategorizationFileListOrFolderTextBox.Text = inputConfig.InputPath ?? "";
+                    attributeCategorizationCandidateVoaTextBox.Text = inputConfig.AttributesPath ?? "";
+                    attributeCategorizationTrainingPercentageTextBox.Text = inputConfig.TrainingSetPercentage.ToString(CultureInfo.CurrentCulture);
+                    attributeCategorizationRandomNumberSeedTextBox.Text = CurrentLearningMachine.RandomNumberSeed.ToString(CultureInfo.CurrentCulture);
                 }
                 else
                 {
@@ -738,7 +768,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     randomSeedTextBox = documentCategorizationFolderRandomNumberSeedTextBox;
                 }
             }
-            else // LearningMachineUsage.Pagination
+            else if (paginationRadioButton.Checked)
             {
                 inputConfig.InputPathType = textFileOrCsvRadioButton.Checked
                     ? InputType.TextFileOrCsv
@@ -748,6 +778,16 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 answerPathTextBox = paginationAnswerVoaTextBox;
                 trainingPercentageTextBox = paginationTrainingPercentageTextBox;
                 randomSeedTextBox = paginationRandomNumberSeedTextBox;
+            }
+            else // LearningMachineUsage.AttributeCategorization
+            {
+                inputConfig.InputPathType = textFileOrCsvRadioButton.Checked
+                    ? InputType.TextFileOrCsv
+                    : InputType.Folder;
+                inputPathTextBox = attributeCategorizationFileListOrFolderTextBox;
+                attributesPathTextBox = attributeCategorizationCandidateVoaTextBox;
+                trainingPercentageTextBox = attributeCategorizationTrainingPercentageTextBox;
+                randomSeedTextBox = attributeCategorizationRandomNumberSeedTextBox;
             }
 
             // Set input path
@@ -820,7 +860,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         {
             var usage = documentCategorizationRadioButton.Checked
                 ? LearningMachineUsage.DocumentCategorization
-                : LearningMachineUsage.Pagination;
+                : paginationRadioButton.Checked
+                    ? LearningMachineUsage.Pagination
+                    : LearningMachineUsage.AttributeCategorization;
 
             SpatialStringFeatureVectorizer autoBoW = null;
             if (useAutoBagOfWordsCheckBox.Checked)
@@ -1022,6 +1064,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             if (documentCategorizationRadioButton.Checked)
             {
                 paginationInputPanel.Visible = false;
+                attributeCategorizationInputPanel.Visible = false;
                 documentCategorizationCsvInputPanel.Visible = textFileOrCsvRadioButton.Checked;
                 documentCategorizationFolderInputPanel.Visible = folderSearchRadioButton.Checked;
                 specifiedPagesCheckBox.Enabled = true;
@@ -1032,23 +1075,50 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     useAutoBagOfWordsCheckBox.Checked = true;
                 }
             }
-            else
+            else if (paginationRadioButton.Checked)
             {
                 paginationInputPanel.Visible = true;
                 documentCategorizationCsvInputPanel.Visible = false;
                 documentCategorizationFolderInputPanel.Visible = false;
+                attributeCategorizationInputPanel.Visible = false;
                 specifiedPagesCheckBox.Enabled = false;
 
                 // Adjust labels and browse buttons for pagination panel
                 if (textFileOrCsvRadioButton.Checked)
                 {
                     paginationFileListOrFolderLabel.Text = "Train/testing file list";
-                    paginationFileListBrowseButton.FolderBrowser = false;
+                    paginationFileListOrFolderBrowseButton.FolderBrowser = false;
                 }
                 else
                 {
                     paginationFileListOrFolderLabel.Text = "Train/testing file folder";
-                    paginationFileListBrowseButton.FolderBrowser = true;
+                    paginationFileListOrFolderBrowseButton.FolderBrowser = true;
+                }
+
+                // Set default state for auto-bow
+                if (!_textValueOrCheckStateChangedSinceCreation)
+                {
+                    useAutoBagOfWordsCheckBox.Checked = false;
+                }
+            }
+            else
+            {
+                attributeCategorizationInputPanel.Visible = true;
+                documentCategorizationCsvInputPanel.Visible = false;
+                documentCategorizationFolderInputPanel.Visible = false;
+                paginationInputPanel.Visible = false;
+                specifiedPagesCheckBox.Enabled = false;
+
+                // Adjust labels and browse buttons for attribute categorization panel
+                if (textFileOrCsvRadioButton.Checked)
+                {
+                    attributeCategorizationFileListOrFolderLabel.Text = "Train/testing file list";
+                    attributeCategorizationFileListOrFolderBrowseButton.FolderBrowser = false;
+                }
+                else
+                {
+                    attributeCategorizationFileListOrFolderLabel.Text = "Train/testing file folder";
+                    attributeCategorizationFileListOrFolderBrowseButton.FolderBrowser = true;
                 }
 
                 // Set default state for auto-bow
@@ -1194,7 +1264,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 SyncControls(
                     paginationFileListOrFolderTextBox,
                     documentCategorizationInputFolderTextBox,
-                    documentCategorizationCsvTextBox
+                    documentCategorizationCsvTextBox,
+                    attributeCategorizationFileListOrFolderTextBox
                 );
 
                 // Answer paths
@@ -1207,7 +1278,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 SyncControls(
                     documentCategorizationCsvRandomNumberSeedTextBox,
                     documentCategorizationFolderRandomNumberSeedTextBox,
-                    paginationRandomNumberSeedTextBox
+                    paginationRandomNumberSeedTextBox,
+                    attributeCategorizationRandomNumberSeedTextBox
                 );
 
                 // Automatically pick SVM Complexity
@@ -1226,14 +1298,16 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 SyncControls(
                     documentCategorizationCsvTrainingPercentageTextBox,
                     documentCategorizationFolderTrainingPercentageTextBox,
-                    paginationTrainingPercentageTextBox
+                    paginationTrainingPercentageTextBox,
+                    attributeCategorizationTrainingPercentageTextBox
                 );
 
                 // Feature VOA location
                 SyncControls(
                     documentCategorizationCsvFeatureVoaTextBox,
                     documentCategorizationFolderFeatureVoaTextBox,
-                    paginationFeatureVoaTextBox
+                    paginationFeatureVoaTextBox,
+                    attributeCategorizationCandidateVoaTextBox
                 );
             }
             finally
@@ -1280,6 +1354,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 paginationFileListOrFolderTextBox.Text = _DEFAULT_INPUT_LOCATION;
                 paginationRandomNumberSeedTextBox.Text = "0";
                 paginationTrainingPercentageTextBox.Text = "80";
+                attributeCategorizationCandidateVoaTextBox.Text = "<SourceDocName>.labeled.voa";
+                attributeCategorizationFileListOrFolderTextBox.Text = _DEFAULT_INPUT_LOCATION;
+                attributeCategorizationRandomNumberSeedTextBox.Text = "0";
+                attributeCategorizationTrainingPercentageTextBox.Text = "80";
                 sigmoidAlphaTextBox.Text = "2.0";
                 sizeOfHiddenLayersTextBox.Text = "25";
                 specifiedPagesTextBox.Text = "";
@@ -1387,10 +1465,6 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 using (var win = new TrainingTesting(this))
                 {
                     win.ShowDialog();
-                    if (string.CompareOrdinal(CurrentLearningMachine.TrainingLog, _savedLearningMachine.TrainingLog) != 0)
-                    {
-                        Dirty = true;
-                    }
                 }
             }
             catch (Exception ex)

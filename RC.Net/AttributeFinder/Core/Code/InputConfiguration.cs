@@ -135,7 +135,7 @@ namespace Extract.AttributeFinder
         {
             get
             {
-                return !(string.IsNullOrEmpty(InputPath) || InputPathType == InputType.Folder && string.IsNullOrEmpty(AnswerPath));
+                return !string.IsNullOrEmpty(InputPath);
             }
         }
 

@@ -29,14 +29,19 @@ namespace Extract.AttributeFinder
         Unknown = 0,
 
         /// <summary>
-        /// MachineUsage will be predicting the category of an input document
+        /// Predicting the category of an input document
         /// </summary>
         DocumentCategorization = 1,
 
         /// <summary>
-        /// MachineUsage will be predicting where document boundaries should be created
+        /// Predicting where document boundaries should be created
         /// </summary>
         Pagination = 2,
+
+        /// <summary>
+        /// Predicting the category of a collection of <see cref="ComAttribute"/>s
+        /// </summary>
+        AttributeCategorization = 3
     }
 
     /// <summary>
@@ -202,7 +207,7 @@ namespace Extract.AttributeFinder
         /// Code reserved to represent an 'other' category that will not be assigned to a real
         /// category when usage is <see cref="LearningMachineUsage.DocumentCategorization"/>
         /// </summary>
-        public static readonly int UnknownCategoryCode = 0;
+        public static readonly int UnknownOrNegativeCategoryCode = 0;
 
         /// <summary>
         /// Code used to represent the prediction that a page pair encloses a document break
@@ -519,11 +524,11 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> that will be used as input to the
         /// <see cref="AutoBagOfWords"/></param>
-        /// <param name="protoFeaturesOrPagesOfProtoFeatures">The <see cref="IUnknownVector"/> of
+        /// <param name="protoFeaturesOrGroupsOfProtoFeatures">The <see cref="IUnknownVector"/> of
         /// <see cref="ComAttribute"/>s that will be used with the <see cref="AttributeFeatureVectorizer"/>s</param>
         /// <returns>An enumeration of feature vectors</returns>
         public IEnumerable<double[]> GetFeatureVectors(ISpatialString document,
-            IUnknownVector protoFeaturesOrPagesOfProtoFeatures)
+            IUnknownVector protoFeaturesOrGroupsOfProtoFeatures)
         {
             try
             {
@@ -531,11 +536,15 @@ namespace Extract.AttributeFinder
 
                 if (MachineUsage == LearningMachineUsage.DocumentCategorization)
                 {
-                    return Enumerable.Repeat(GetDocumentFeatureVector(document, protoFeaturesOrPagesOfProtoFeatures), 1);
+                    return Enumerable.Repeat(GetDocumentFeatureVector(document, protoFeaturesOrGroupsOfProtoFeatures), 1);
                 }
                 else if (MachineUsage == LearningMachineUsage.Pagination)
                 {
-                    return GetPaginationFeatureVectors(document, protoFeaturesOrPagesOfProtoFeatures);
+                    return GetPaginationFeatureVectors(document, protoFeaturesOrGroupsOfProtoFeatures);
+                }
+                else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
+                {
+                    return GetAttributesFeatureVectors(document, protoFeaturesOrGroupsOfProtoFeatures);
                 }
                 else
                 {
@@ -611,6 +620,10 @@ namespace Extract.AttributeFinder
                 else if (MachineUsage == LearningMachineUsage.Pagination)
                 {
                     ComputePaginationEncodings(ussFilePaths, inputVOAFilePaths, answersOrAnswerFiles, updateStatus, cancellationToken);
+                }
+                else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
+                {
+                    ComputeAttributesEncodings(ussFilePaths, inputVOAFilePaths, updateStatus, cancellationToken);
                 }
                 else
                 {
@@ -714,6 +727,20 @@ namespace Extract.AttributeFinder
                 {
                     var results = GetPaginationFeatureVectorAndAnswerCollection(ussFilePaths, inputVOAFilePaths,
                         answersOrAnswerFiles, updateStatus2, cancellationToken);
+
+                    double[][] featureVectors = new double[results.Length][];
+                    int[] answers = new int[results.Length];
+                    for (int i = 0; i < results.Length; i++)
+                    {
+                        featureVectors[i] = results[i].Item1;
+                        answers[i] = results[i].Item2;
+                    }
+                    return Tuple.Create(featureVectors.ToArray(), answers.ToArray());
+                }
+                else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
+                {
+                    var results = GetAttributesFeatureVectorAndAnswerCollection(ussFilePaths, inputVOAFilePaths,
+                        updateStatus2, cancellationToken);
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answers = new int[results.Length];
@@ -926,6 +953,40 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Gets an enumeration of <see cref="NameToProtoFeaturesMap"/>s for attribute categorization from a vector of
+        /// <see cref="ComAttribute"/>s
+        /// </summary>
+        /// <param name="attributes">The vector of <see cref="ComAttribute"/>s from which to get protofeatures</param>
+        /// <returns>An enumeration of <see cref="NameToProtoFeaturesMap"/>s for attribute categorization</returns>
+        private IEnumerable<NameToProtoFeaturesMap> GetAttributesProtoFeatures(IUnknownVector attributes)
+        {
+            return attributes
+                .ToIEnumerable<ComAttribute>()
+                .Select(attr => GetFilteredMapOfNamesToValues(attr.SubAttributes));
+        }
+
+        /// <summary>
+        /// Gets an enumeration of <see cref="NameToProtoFeaturesMap"/>s for attribute categorization from a VOA file
+        /// </summary>
+        /// <param name="attributesFilePath">The path to the VOA or EAV file</param>
+        /// <returns>An enumeration of <see cref="NameToProtoFeaturesMap"/>s for attribute categorization</returns>
+        private IEnumerable<NameToProtoFeaturesMap> GetAttributesProtoFeatures(string attributesFilePath)
+        {
+            try
+            {
+                var attributes = _afUtility.Value.GetAttributesFromFile(attributesFilePath);
+                attributes.ReportMemoryUsage();
+                return GetAttributesProtoFeatures(attributes);
+            }
+            catch (Exception e)
+            {
+                var ue = e.AsExtract("ELI41400");
+                ue.AddDebugData("Attributes file path", attributesFilePath, false);
+                throw ue;
+            }
+        }
+
+        /// <summary>
         /// Gets a feature vector from a <see cref="ISpatialString"/> and vector of <see cref="ComAttribute"/>s
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> to use for auto-bag-of-words features.</param>
@@ -990,7 +1051,8 @@ namespace Extract.AttributeFinder
 
                 // NOTE: vectorizers return an empty enumerable if not enabled
                 attributeFeatures = AttributeFeatureVectorizers
-                    .Select(vectorizer => vectorizer.GetPaginationFeatureVectors(protoFeatureGroups).ToList());
+                    .Select(vectorizer => vectorizer.GetFeatureVectorsForEachGroup(protoFeatureGroups)
+                    .ToList());
             }
             else
             {
@@ -1018,6 +1080,49 @@ namespace Extract.AttributeFinder
                 for (int i = 0; i < numberOfExamples; i++)
                 {
                     yield return shingleFeatures[i].Concat(attributeFeatures
+                        .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
+                        .SelectMany(v => v[i]))
+                        .ToArray();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets zero or more feature vectors from a <see cref="ISpatialString"/> and vector of <see cref="ComAttribute"/>s
+        /// </summary>
+        /// <param name="document">The <see cref="ISpatialString"/> to use for auto-bag-of-words features.</param>
+        /// <param name="attributes">The vector of <see cref="ComAttribute"/>s containing attributes to be classified
+        /// <returns>The feature vectors computed from the input arguments.</returns>
+        private IEnumerable<double[]> GetAttributesFeatureVectors(ISpatialString document, IUnknownVector attributes)
+        {
+            ExtractException.Assert("ELI41405", "Attributes to be classified cannot be null", attributes != null);
+
+            var attributeFeatures = Enumerable.Empty<List<double[]>>();
+            int numberOfExamples = attributes.Size();
+
+            var protoFeatureGroups = GetAttributesProtoFeatures(attributes);
+
+            // NOTE: vectorizers return an empty enumerable if not enabled
+            attributeFeatures = AttributeFeatureVectorizers
+                .Select(vectorizer => vectorizer.GetFeatureVectorsForEachGroup(protoFeatureGroups).ToList());
+
+            if (AutoBagOfWords == null || !AutoBagOfWords.Enabled)
+            {
+                // Transpose from <# vectorizers> X <# candidate attributes> to <# candidate attributes> X <# vectorizers>
+                for (int i = 0; i < numberOfExamples; i++)
+                {
+                    yield return attributeFeatures
+                        .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
+                        .SelectMany(v => v[i])
+                        .ToArray();
+                }
+            }
+            else
+            {
+                var shingleFeatures = AutoBagOfWords.GetDocumentFeatureVector(document);
+                for (int i = 0; i < numberOfExamples; i++)
+                {
+                    yield return shingleFeatures.Concat(attributeFeatures
                         .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
                         .SelectMany(v => v[i]))
                         .ToArray();
@@ -1091,7 +1196,7 @@ namespace Extract.AttributeFinder
                     int answerCode;
                     if (!AnswerNameToCode.TryGetValue(answer, out answerCode))
                     {
-                        answerCode = UnknownCategoryCode;
+                        answerCode = UnknownOrNegativeCategoryCode;
                     }
 
                     featureVectors[i] = featureVector;
@@ -1114,19 +1219,23 @@ namespace Extract.AttributeFinder
         /// Computes answer code to name mappings
         /// </summary>
         /// <param name="answers">The answer names/categories. Can contain repeats</param>
-        private void InitializeAnswerCodeMappings(string[] answers)
+        /// <param name="negativeCategory">The value to be used for the negative category if there
+        /// are only two categories total</param>
+        private void InitializeAnswerCodeMappings(IEnumerable<string> answers, string negativeCategory = null)
         {
             AnswerCodeToName.Clear();
             AnswerNameToCode.Clear();
 
-            // Add an 'other' category
-            AnswerCodeToName.Add(UnknownCategoryCode, _UNKNOWN_CATEGORY);
-            AnswerNameToCode.Add(_UNKNOWN_CATEGORY, UnknownCategoryCode);
+            // Add the negative category or an 'other' category
+            string otherCategory = negativeCategory ?? _UNKNOWN_CATEGORY;
+
+            AnswerCodeToName.Add(UnknownOrNegativeCategoryCode, otherCategory);
+            AnswerNameToCode.Add(otherCategory, UnknownOrNegativeCategoryCode);
 
             // Add category code for each name seen
             int nextCategoryCode = 0;
             foreach (var category in answers.Distinct()
-                .Where(k => !k.Equals(_UNKNOWN_CATEGORY, StringComparison.OrdinalIgnoreCase))
+                .Where(k => !k.Equals(otherCategory, StringComparison.OrdinalIgnoreCase))
                 .OrderBy(s => s, StringComparer.OrdinalIgnoreCase))
             {
                 while (AnswerCodeToName.ContainsKey(nextCategoryCode))
@@ -1228,6 +1337,93 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39713");
+            }
+        }
+
+        /// <summary>
+        /// Builds a collection of feature vector and answer code tuples. Assumes that this
+        /// object has been configured with <see cref="ComputeAttributesEncodings"/>
+        /// </summary>
+        /// <param name="ussFilePaths">The uss paths of each input file</param>
+        /// <param name="inputVOAFilePaths">The input VOA paths corresponding to each uss file</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <returns>An array of feature vector to answer tuples</returns>
+        private Tuple<double[], int>[] GetAttributesFeatureVectorAndAnswerCollection
+            (string[] ussFilePaths, string[] inputVOAFilePaths,
+                Action<StatusArgs> updateStatus,
+                CancellationToken cancellationToken)
+        {
+            try
+            {
+                var results = new Tuple<double[], int>[ussFilePaths.Length][];
+                Parallel.For(0, ussFilePaths.Length, (i, loopState) =>
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        loopState.Stop();
+                    }
+
+                    SpatialString spatialString = null;
+                    if (AutoBagOfWords != null)
+                    {
+                        string uss = ussFilePaths[i];
+                        try
+                        {
+                            spatialString = new SpatialStringClass();
+                            spatialString.LoadFrom(uss, false);
+                            spatialString.ReportMemoryUsage();
+                        }
+                        catch (Exception e)
+                        {
+                            var ue = e.AsExtract("ELI41401");
+                            ue.AddDebugData("USS path", uss, false);
+                            throw ue;
+                        }
+                    }
+
+                    IUnknownVector attributes = null;
+                    if (AttributeFeatureVectorizers.Any() && inputVOAFilePaths != null)
+                    {
+                        string voa = inputVOAFilePaths[i];
+                        ExtractException.Assert("ELI41402", "Input VOA file doesn't exist", File.Exists(voa),
+                            "Filename", voa);
+                        attributes = _afUtility.Value.GetAttributesFromFile(voa);
+                        attributes.ReportMemoryUsage();
+                    }
+
+                    List<double[]> featureVectors = GetAttributesFeatureVectors(spatialString, attributes).ToList();
+
+                    var answerCodes = attributes.ToIEnumerable<ComAttribute>().Select(attribute =>
+                    {
+                        string categoryName = attribute.Type;
+                        int code;
+                        if (!AnswerNameToCode.TryGetValue(categoryName, out code))
+                        {
+                            var ex = new ExtractException("ELI41403",
+                                "Unknown attribute category/label encountered, treating as if unlabeled (as if empty type)");
+                            ex.AddDebugData("Unknown category name", categoryName, false);
+                            ex.Log();
+                            code = UnknownOrNegativeCategoryCode;
+                        }
+                        return code;
+                    }).ToList();
+
+                    results[i] = new Tuple<double[], int>[featureVectors.Count];
+                    for (int j = 0; j < featureVectors.Count; j++)
+                    {
+                        results[i][j] = (Tuple.Create(featureVectors[j], answerCodes[j]));
+                    }
+
+                    updateStatus(new StatusArgs { StatusMessage = "Files processed: {0:N0}", Int32Value = 1 });
+                });
+
+                cancellationToken.ThrowIfCancellationRequested();
+                return results.SelectMany(a => a).ToArray();
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI41404");
             }
         }
 
@@ -1345,6 +1541,99 @@ namespace Extract.AttributeFinder
             AnswerNameToCode.Add(_NOT_FIRST_PAGE_CATEGORY, _NOT_FIRST_PAGE_CATEGORY_CODE);
             AnswerCodeToName.Add(FirstPageCategoryCode, _FIRST_PAGE_CATEGORY);
             AnswerNameToCode.Add(_FIRST_PAGE_CATEGORY, FirstPageCategoryCode);
+        }
+
+        /// <summary>
+        /// Uses the training data to automatically configure the <see cref="AutoBagOfWords"/> and
+        /// <see cref="AttributeFeatureVectorizers"/> collection so that feature vectors can be
+        /// generated with this instance.
+        /// </summary>
+        /// <param name="ussFilePaths">The paths to the USS files to be used to configure this object</param>
+        /// <param name="labeledCandidateAttributesFiles">The paths to the candidate VOA files to be used to
+        /// configure this object</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        private void ComputeAttributesEncodings(string[] ussFilePaths, string[] labeledCandidateAttributesFiles,
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        {
+            ExtractException.Assert("ELI41408", "Candidate attribute collection cannot be empty",
+                labeledCandidateAttributesFiles.Length > 0);
+
+            // Indent sub-status messages
+            Action<StatusArgs> updateStatus2 = args =>
+                {
+                    args.Indent++;
+                    updateStatus(args);
+                };
+
+            // Configure SpatialStringFeatureVectorizer
+            List<string> answers = null;
+            if (AutoBagOfWords != null)
+            {
+                updateStatus(new StatusArgs { StatusMessage = "Computing auto-bag-of-words encodings:" });
+                answers = AutoBagOfWords.ComputeEncodingsFromAttributesTrainingData
+                    (ussFilePaths, labeledCandidateAttributesFiles, updateStatus2, cancellationToken)
+                    .ToList();
+            }
+            else
+            {
+                answers = labeledCandidateAttributesFiles
+                    .SelectMany(CollectLabelsFromLabeledCandidateAttributesFile)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+            }
+
+            if (labeledCandidateAttributesFiles.Length > 0)
+            {
+                updateStatus(new StatusArgs { StatusMessage = "Computing attribute feature encodings:" });
+            }
+
+            // Configure AttributeFeatureVectorizer collection
+            IEnumerable<NameToProtoFeaturesMap> protoFeatures =
+                labeledCandidateAttributesFiles.SelectMany(GetAttributesProtoFeatures);
+
+            Dictionary<string, AttributeFeatureVectorizer> vectorizerMap
+                = new Dictionary<string, AttributeFeatureVectorizer>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var example in protoFeatures)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                updateStatus2(new StatusArgs { StatusMessage = "Attributes processed: {0:N0}", Int32Value = 1 });
+
+                foreach (var group in example)
+                {
+                    string name = group.Key;
+                    var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
+                    vectorizer.ComputeEncodingsFromTrainingData(group.Value);
+                }
+            }
+            AttributeFeatureVectorizers = vectorizerMap.Values;
+
+            // Add category names and codes
+            InitializeAnswerCodeMappings(answers, negativeCategory:String.Empty);
+        }
+
+        /// <summary>
+        /// Collects the labels (types) from a candidate attributes file
+        /// </summary>
+        /// <param name="attributesFilePath">The attributes file path</param>
+        /// <returns>A collection of labels for each candidate attribute</returns>
+        static internal IEnumerable<string> CollectLabelsFromLabeledCandidateAttributesFile(string attributesFilePath)
+        {
+            try
+            {
+                var attributes = _afUtility.Value.GetAttributesFromFile(attributesFilePath);
+                attributes.ReportMemoryUsage();
+                return attributes
+                    .ToIEnumerable<ComAttribute>()
+                    .Select(attr => attr.Type);
+            }
+            catch (Exception e)
+            {
+                var ue = e.AsExtract("ELI41399");
+                ue.AddDebugData("Attributes file path", attributesFilePath, false);
+                throw ue;
+            }
         }
 
         /// <summary>

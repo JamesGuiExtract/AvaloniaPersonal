@@ -221,7 +221,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void HandleClearLogToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            textBox1.Text = _editor.CurrentLearningMachine.TrainingLog = "";
+            textBox1.Text = "";
+            _editor.ClearTrainingLog();
         }
 
         /// <summary>
@@ -387,6 +388,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             },
                             cm =>
                             {
+                                var positiveCategoryCodes = learningMachine.Encoder.AnswerCodeToName.Keys
+                                    .Where(key => key != LearningMachineDataEncoder.UnknownOrNegativeCategoryCode);
+                                ExtractException.Assert("ELI41410", "Internal logic exception: There should be exactly one postive category in order to use a confusion matrix",
+                                    positiveCategoryCodes.Count() == 1);
+                                string positiveCategory = learningMachine.Encoder.AnswerCodeToName[positiveCategoryCodes.First()];
+
                                 _statusUpdates.Enqueue(new StatusArgs
                                     {
                                         StatusMessage = "  Number of samples: {0:N0}",
@@ -396,7 +403,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                                     {
                                         StatusMessage = "  F1 Score: {0:N4}" +
                                         "\r\n  Precision: {1:N4}, Recall: {2:N4}" +
-                                        "\r\n  (IsFirstPage = positive case)",
+                                        "\r\n  (" + positiveCategory +" = positive case)",
                                         DoubleValues = new[] { cm.FScore, cm.Precision, cm.Recall }
                                     });
                             });

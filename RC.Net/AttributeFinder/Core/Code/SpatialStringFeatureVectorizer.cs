@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using UCLID_RASTERANDOCRMGMTLib;
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder
 {
@@ -295,33 +296,9 @@ namespace Extract.AttributeFinder
             try
             {
                 var inputTexts = ussFiles.Select(GetDocumentText);
-                var textAndCategory = inputTexts.Zip(answers, (example, answer) => Tuple.Create(example, answer));
+                var textsAndCategories = inputTexts.Zip(answers, (example, answer) => Tuple.Create(example, answer));
 
-                string tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                DirectoryInfo tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
-                try
-                {
-                    using (var directory = FSDirectory.Open(tempDirectory))
-                    {
-                        // Create a Lucene inverted index out of the input texts
-                        WriteTermsToIndex(directory, textAndCategory, updateStatus, cancellationToken);
-
-                        // Use the index to score the terms and pick the top scoring
-                        string[] topScoringTerms = GetTopScoringTerms(directory, updateStatus, cancellationToken);
-
-                        // Create the bag-of-words object
-                        _bagOfWords = new Accord.MachineLearning.BagOfWords(topScoringTerms);
-                    }
-                }
-                finally
-                {
-                    // Delete index
-                    foreach (var file in System.IO.Directory.GetFiles(tempDirectoryPath))
-                    {
-                        FileSystemMethods.DeleteFile(file);
-                    }
-                    System.IO.Directory.Delete(tempDirectoryPath, true);
-                }
+                SetBagOfWords(textsAndCategories, updateStatus, cancellationToken);
             }
             catch (Exception e)
             {
@@ -347,42 +324,58 @@ namespace Extract.AttributeFinder
                 var inputTextsCollection = ussFiles.Select(GetPaginationTexts);
 
                 // Pass the page count of each image along so that missing pages in the answer VOA can be filled in
-                var textAndCategory = inputTextsCollection.Zip(answerFiles, (examples, answerFile) =>
+                var textsAndCategories = inputTextsCollection.Zip(answerFiles, (examples, answerFile) =>
                     {
                         var answers = LearningMachineDataEncoder.ExpandPaginationAnswerVOA(answerFile, examples.Count() + 1);
                         return examples.Zip(answers, (example, answer) => Tuple.Create(example, answer));
                     })
                     .SelectMany(answersForFile => answersForFile);
 
-                string tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                DirectoryInfo tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
-                try
-                {
-                    using (var directory = FSDirectory.Open(tempDirectory))
-                    {
-                        // Create a Lucene inverted index out of the input texts
-                        WriteTermsToIndex(directory, textAndCategory, updateStatus, cancellationToken);
-
-                        // Use the index to score the terms and pick the top scoring
-                        string[] topScoringTerms = GetTopScoringTerms(directory, updateStatus, cancellationToken);
-
-                        // Create the bag-of-words object
-                        _bagOfWords = new Accord.MachineLearning.BagOfWords(topScoringTerms);
-                    }
-                }
-                finally
-                {
-                    // Delete index
-                    foreach (var file in System.IO.Directory.GetFiles(tempDirectoryPath))
-                    {
-                        FileSystemMethods.DeleteFile(file);
-                    }
-                    System.IO.Directory.Delete(tempDirectoryPath, true);
-                }
+                SetBagOfWords(textsAndCategories, updateStatus, cancellationToken);
             }
             catch (Exception e)
             {
                 throw e.AsExtract("ELI40371");
+            }
+        }
+
+        /// <summary>
+        /// Configures this instance for attribute categorization by examining all <see paramref="ussFiles" />.
+        /// After this method has been run, this object will be ready to produce feature vectors.
+        /// </summary>
+        /// <param name="ussFiles">Paths to the spatial string files from which to collect terms for the bag-of-words
+        /// vocabulary.</param>
+        /// <param name="labeledAttributesFiles">The paths to the VOA files that contain the labeled candidate
+        /// <see cref="ComAttribute"/>s (the <see cref="ComAttribute.Type"/> is the label).
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <returns>A collection of all the distinct category names found in the <paramref name="labeledAttributesFiles"/></returns>
+        internal IEnumerable<string> ComputeEncodingsFromAttributesTrainingData(string[] ussFiles, string[] labeledAttributesFiles,
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var inputTextsCollection = ussFiles.Select(GetDocumentText);
+
+                // Associate each category with the text of each document it appears with
+                var textsAndCategories = inputTextsCollection.Zip(labeledAttributesFiles, (text, attributeFile) =>
+                    {
+                        var answers = LearningMachineDataEncoder
+                            .CollectLabelsFromLabeledCandidateAttributesFile(attributeFile)
+                            .Distinct(StringComparer.OrdinalIgnoreCase);
+                        return answers.Select(answer => Tuple.Create(text, answer));
+                    })
+                    .SelectMany(answersForFile => answersForFile);
+
+                SetBagOfWords(textsAndCategories, updateStatus, cancellationToken);
+
+                return textsAndCategories
+                    .Select(textAndCategory => textAndCategory.Item2)
+                    .Distinct(StringComparer.OrdinalIgnoreCase);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI41407");
             }
         }
 
@@ -606,6 +599,46 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39535");
+            }
+        }
+
+        /// <summary>
+        /// Creates the bag of words object from a collection of categorized strings.
+        /// </summary>
+        /// <param name="textsAndCategories">Collection of categorized strings</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        private void SetBagOfWords(IEnumerable<Tuple<string, string>> textsAndCategories,
+            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+        {
+            string tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            DirectoryInfo tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
+            try
+            {
+                using (var directory = FSDirectory.Open(tempDirectory))
+                {
+                    // Create a Lucene inverted index out of the input texts
+                    WriteTermsToIndex(directory, textsAndCategories, updateStatus, cancellationToken);
+
+                    // Use the index to score the terms and pick the top scoring
+                    string[] topScoringTerms = GetTopScoringTerms(directory, updateStatus, cancellationToken);
+
+                    // Create the bag-of-words object
+                    _bagOfWords = new Accord.MachineLearning.BagOfWords(topScoringTerms);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI41409");
+            }
+            finally
+            {
+                // Delete index
+                foreach (var file in System.IO.Directory.GetFiles(tempDirectoryPath))
+                {
+                    FileSystemMethods.DeleteFile(file);
+                }
+                System.IO.Directory.Delete(tempDirectoryPath, true);
             }
         }
 

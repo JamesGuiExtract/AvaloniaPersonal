@@ -250,6 +250,13 @@
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.protofeatures.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.protofeatures.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.labeled.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.labeled.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.labeled.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.labeled.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.labeled.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.labeled.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.labeled.voa" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif" />

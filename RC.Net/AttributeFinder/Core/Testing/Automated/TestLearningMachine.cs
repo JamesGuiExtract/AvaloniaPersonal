@@ -327,6 +327,27 @@ namespace Extract.AttributeFinder.Test
         }
 
         [Test, Category("LearningMachine")]
+        public static void TrainMachineAttributeCategorizationDOB()
+        {
+            SetPaginationFiles();
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                    {
+                        InputPath = _inputFolder.Last(),
+                        InputPathType = InputType.Folder,
+                        AttributesPath = "<SourceDocName>.labeled.voa",
+                        TrainingSetPercentage = 80
+                    },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var results = lm.TrainMachine();
+            Assert.AreEqual(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 1.0);
+            Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.85);
+        }
+
+        [Test, Category("LearningMachine")]
         public static void TrainMachineFromCsvWithHeader()
         {
             SetDocumentCategorizationFiles();
@@ -736,27 +757,6 @@ namespace Extract.AttributeFinder.Test
             Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
         }
 
-        [Test, Category("Extended")]
-        public static void ZTrainMachineFromLargeFolder()
-        {
-            var lm = new LearningMachine
-            {
-                InputConfig = new InputConfiguration
-                    {
-                        InputPath = @"K:\Common\Engineering\Sample Files\AtPac\CA - Amador\Set003\Images",
-                        InputPathType = InputType.Folder,
-                        AttributesPath = "",
-                        AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
-                        TrainingSetPercentage = 80
-                    },
-                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
-                Classifier = new MulticlassSupportVectorMachineClassifier()
-            };
-            var results = lm.TrainMachine();
-            Assert.Greater(results.Item1.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
-            Assert.Greater(results.Item2.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.93);
-        }
-
         #endregion Tests
 
         #region Helper Methods
@@ -784,12 +784,15 @@ namespace Extract.AttributeFinder.Test
                 path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
 
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".labeled.voa");
+                path = Path.Combine(_inputFolder.Last(), resourceName);
+                _testFiles.GetFile(resourceName, path);
+
                 resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".eav");
                 path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
             }
         }
-
 
         // Helper method to create file lists for document categorization testing
         // These files are from Demo_FlexIndex

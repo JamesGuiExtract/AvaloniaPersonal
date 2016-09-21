@@ -35,9 +35,22 @@
             this.configurationTabControl = new System.Windows.Forms.TabControl();
             this.inputConfigurationTabPage = new System.Windows.Forms.TabPage();
             this.machineUsageGroupBox = new System.Windows.Forms.GroupBox();
+            this.attributeCategorizationRadioButton = new System.Windows.Forms.RadioButton();
             this.paginationRadioButton = new System.Windows.Forms.RadioButton();
             this.documentCategorizationRadioButton = new System.Windows.Forms.RadioButton();
             this.inputConfigurationGroupBox = new System.Windows.Forms.GroupBox();
+            this.attributeCategorizationInputPanel = new System.Windows.Forms.Panel();
+            this.attributeCategorizationCreateCandidateVoaButton = new System.Windows.Forms.Button();
+            this.attributeCategorizationRandomNumberSeedLabel = new System.Windows.Forms.Label();
+            this.attributeCategorizationRandomNumberSeedTextBox = new System.Windows.Forms.TextBox();
+            this.attributeCategorizationTrainingPercentageLabel = new System.Windows.Forms.Label();
+            this.attributeCategorizationTrainingPercentageTextBox = new System.Windows.Forms.TextBox();
+            this.attributeCategorizationCandidateVoaLabel = new System.Windows.Forms.Label();
+            this.attributeCategorizationCandidateVoaPathTagButton = new Extract.Utilities.Forms.PathTagsButton();
+            this.attributeCategorizationCandidateVoaTextBox = new System.Windows.Forms.TextBox();
+            this.attributeCategorizationFileListOrFolderLabel = new System.Windows.Forms.Label();
+            this.attributeCategorizationFileListOrFolderBrowseButton = new Extract.Utilities.Forms.BrowseButton();
+            this.attributeCategorizationFileListOrFolderTextBox = new System.Windows.Forms.TextBox();
             this.documentCategorizationFolderInputPanel = new System.Windows.Forms.Panel();
             this.documentCategorizationFolderFeatureVoaLabel = new System.Windows.Forms.Label();
             this.documentCategorizationFolderFeatureVoaPathTagButton = new Extract.Utilities.Forms.PathTagsButton();
@@ -65,7 +78,7 @@
             this.paginationFeatureVoaPathTagButton = new Extract.Utilities.Forms.PathTagsButton();
             this.paginationFeatureVoaTextBox = new System.Windows.Forms.TextBox();
             this.paginationFileListOrFolderLabel = new System.Windows.Forms.Label();
-            this.paginationFileListBrowseButton = new Extract.Utilities.Forms.BrowseButton();
+            this.paginationFileListOrFolderBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this.paginationFileListOrFolderTextBox = new System.Windows.Forms.TextBox();
             this.textFileOrCsvRadioButton = new System.Windows.Forms.RadioButton();
             this.documentCategorizationCsvInputPanel = new System.Windows.Forms.Panel();
@@ -131,6 +144,7 @@
             this.inputConfigurationTabPage.SuspendLayout();
             this.machineUsageGroupBox.SuspendLayout();
             this.inputConfigurationGroupBox.SuspendLayout();
+            this.attributeCategorizationInputPanel.SuspendLayout();
             this.documentCategorizationFolderInputPanel.SuspendLayout();
             this.paginationInputPanel.SuspendLayout();
             this.documentCategorizationCsvInputPanel.SuspendLayout();
@@ -149,7 +163,7 @@
             this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 711);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1109, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1840, 22);
             this.statusStrip1.TabIndex = 3;
             // 
             // toolStripStatusLabel1
@@ -169,7 +183,7 @@
             this.configurationTabControl.Location = new System.Drawing.Point(0, 5);
             this.configurationTabControl.Name = "configurationTabControl";
             this.configurationTabControl.SelectedIndex = 0;
-            this.configurationTabControl.Size = new System.Drawing.Size(1109, 674);
+            this.configurationTabControl.Size = new System.Drawing.Size(1840, 674);
             this.configurationTabControl.TabIndex = 0;
             this.configurationTabControl.SelectedIndexChanged += new System.EventHandler(this.HandleConfigurationTabControl_SelectedIndexChanged);
             // 
@@ -180,7 +194,7 @@
             this.inputConfigurationTabPage.Location = new System.Drawing.Point(4, 22);
             this.inputConfigurationTabPage.Name = "inputConfigurationTabPage";
             this.inputConfigurationTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.inputConfigurationTabPage.Size = new System.Drawing.Size(1101, 648);
+            this.inputConfigurationTabPage.Size = new System.Drawing.Size(1832, 648);
             this.inputConfigurationTabPage.TabIndex = 0;
             this.inputConfigurationTabPage.Text = "Input configuration";
             this.inputConfigurationTabPage.UseVisualStyleBackColor = true;
@@ -189,14 +203,26 @@
             // 
             this.machineUsageGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.machineUsageGroupBox.Controls.Add(this.attributeCategorizationRadioButton);
             this.machineUsageGroupBox.Controls.Add(this.paginationRadioButton);
             this.machineUsageGroupBox.Controls.Add(this.documentCategorizationRadioButton);
             this.machineUsageGroupBox.Location = new System.Drawing.Point(3, 6);
             this.machineUsageGroupBox.Name = "machineUsageGroupBox";
-            this.machineUsageGroupBox.Size = new System.Drawing.Size(1093, 68);
+            this.machineUsageGroupBox.Size = new System.Drawing.Size(1824, 90);
             this.machineUsageGroupBox.TabIndex = 0;
             this.machineUsageGroupBox.TabStop = false;
             this.machineUsageGroupBox.Text = "Machine learning engine usage";
+            // 
+            // attributeCategorizationRadioButton
+            // 
+            this.attributeCategorizationRadioButton.AutoSize = true;
+            this.attributeCategorizationRadioButton.Location = new System.Drawing.Point(16, 65);
+            this.attributeCategorizationRadioButton.Name = "attributeCategorizationRadioButton";
+            this.attributeCategorizationRadioButton.Size = new System.Drawing.Size(133, 17);
+            this.attributeCategorizationRadioButton.TabIndex = 2;
+            this.attributeCategorizationRadioButton.Text = "Attribute categorization";
+            this.attributeCategorizationRadioButton.UseVisualStyleBackColor = true;
+            this.attributeCategorizationRadioButton.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
             // paginationRadioButton
             // 
@@ -207,6 +233,7 @@
             this.paginationRadioButton.TabIndex = 1;
             this.paginationRadioButton.Text = "Pagination (document boundary detection)";
             this.paginationRadioButton.UseVisualStyleBackColor = true;
+            this.paginationRadioButton.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
             // documentCategorizationRadioButton
             // 
@@ -227,17 +254,151 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.inputConfigurationGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.inputConfigurationGroupBox.Controls.Add(this.attributeCategorizationInputPanel);
             this.inputConfigurationGroupBox.Controls.Add(this.documentCategorizationFolderInputPanel);
             this.inputConfigurationGroupBox.Controls.Add(this.folderSearchRadioButton);
             this.inputConfigurationGroupBox.Controls.Add(this.paginationInputPanel);
             this.inputConfigurationGroupBox.Controls.Add(this.textFileOrCsvRadioButton);
             this.inputConfigurationGroupBox.Controls.Add(this.documentCategorizationCsvInputPanel);
-            this.inputConfigurationGroupBox.Location = new System.Drawing.Point(3, 76);
+            this.inputConfigurationGroupBox.Location = new System.Drawing.Point(3, 98);
             this.inputConfigurationGroupBox.Name = "inputConfigurationGroupBox";
-            this.inputConfigurationGroupBox.Size = new System.Drawing.Size(1093, 569);
+            this.inputConfigurationGroupBox.Size = new System.Drawing.Size(1824, 544);
             this.inputConfigurationGroupBox.TabIndex = 1;
             this.inputConfigurationGroupBox.TabStop = false;
             this.inputConfigurationGroupBox.Text = "Training/testing files";
+            // 
+            // attributeCategorizationInputPanel
+            // 
+            this.attributeCategorizationInputPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationCreateCandidateVoaButton);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationRandomNumberSeedLabel);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationRandomNumberSeedTextBox);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationTrainingPercentageLabel);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationTrainingPercentageTextBox);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationCandidateVoaLabel);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationCandidateVoaPathTagButton);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationCandidateVoaTextBox);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationFileListOrFolderLabel);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationFileListOrFolderBrowseButton);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationFileListOrFolderTextBox);
+            this.attributeCategorizationInputPanel.Location = new System.Drawing.Point(1094, 22);
+            this.attributeCategorizationInputPanel.Name = "attributeCategorizationInputPanel";
+            this.attributeCategorizationInputPanel.Size = new System.Drawing.Size(536, 244);
+            this.attributeCategorizationInputPanel.TabIndex = 5;
+            this.attributeCategorizationInputPanel.Visible = false;
+            // 
+            // attributeCategorizationCreateCandidateVoaButton
+            // 
+            this.attributeCategorizationCreateCandidateVoaButton.Location = new System.Drawing.Point(10, 107);
+            this.attributeCategorizationCreateCandidateVoaButton.Name = "attributeCategorizationCreateCandidateVoaButton";
+            this.attributeCategorizationCreateCandidateVoaButton.Size = new System.Drawing.Size(213, 23);
+            this.attributeCategorizationCreateCandidateVoaButton.TabIndex = 13;
+            this.attributeCategorizationCreateCandidateVoaButton.Text = "Create labeled candidate attribute files...";
+            this.attributeCategorizationCreateCandidateVoaButton.UseVisualStyleBackColor = true;
+            this.attributeCategorizationCreateCandidateVoaButton.Enabled = false;
+            // 
+            // attributeCategorizationRandomNumberSeedLabel
+            // 
+            this.attributeCategorizationRandomNumberSeedLabel.AutoSize = true;
+            this.attributeCategorizationRandomNumberSeedLabel.Location = new System.Drawing.Point(8, 185);
+            this.attributeCategorizationRandomNumberSeedLabel.Name = "attributeCategorizationRandomNumberSeedLabel";
+            this.attributeCategorizationRandomNumberSeedLabel.Size = new System.Drawing.Size(111, 13);
+            this.attributeCategorizationRandomNumberSeedLabel.TabIndex = 11;
+            this.attributeCategorizationRandomNumberSeedLabel.Text = "Random number seed";
+            // 
+            // attributeCategorizationRandomNumberSeedTextBox
+            // 
+            this.attributeCategorizationRandomNumberSeedTextBox.Location = new System.Drawing.Point(10, 203);
+            this.attributeCategorizationRandomNumberSeedTextBox.Name = "attributeCategorizationRandomNumberSeedTextBox";
+            this.attributeCategorizationRandomNumberSeedTextBox.Size = new System.Drawing.Size(71, 20);
+            this.attributeCategorizationRandomNumberSeedTextBox.TabIndex = 12;
+            this.attributeCategorizationRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.attributeCategorizationRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.attributeCategorizationRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            // 
+            // attributeCategorizationTrainingPercentageLabel
+            // 
+            this.attributeCategorizationTrainingPercentageLabel.AutoSize = true;
+            this.attributeCategorizationTrainingPercentageLabel.Location = new System.Drawing.Point(8, 140);
+            this.attributeCategorizationTrainingPercentageLabel.Name = "attributeCategorizationTrainingPercentageLabel";
+            this.attributeCategorizationTrainingPercentageLabel.Size = new System.Drawing.Size(73, 13);
+            this.attributeCategorizationTrainingPercentageLabel.TabIndex = 9;
+            this.attributeCategorizationTrainingPercentageLabel.Text = "Training set %";
+            // 
+            // attributeCategorizationTrainingPercentageTextBox
+            // 
+            this.attributeCategorizationTrainingPercentageTextBox.Location = new System.Drawing.Point(10, 158);
+            this.attributeCategorizationTrainingPercentageTextBox.Name = "attributeCategorizationTrainingPercentageTextBox";
+            this.attributeCategorizationTrainingPercentageTextBox.Size = new System.Drawing.Size(24, 20);
+            this.attributeCategorizationTrainingPercentageTextBox.TabIndex = 10;
+            this.attributeCategorizationTrainingPercentageTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.attributeCategorizationTrainingPercentageTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.attributeCategorizationTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            // 
+            // attributeCategorizationCandidateVoaLabel
+            // 
+            this.attributeCategorizationCandidateVoaLabel.AutoSize = true;
+            this.attributeCategorizationCandidateVoaLabel.Location = new System.Drawing.Point(8, 59);
+            this.attributeCategorizationCandidateVoaLabel.Name = "attributeCategorizationCandidateVoaLabel";
+            this.attributeCategorizationCandidateVoaLabel.Size = new System.Drawing.Size(452, 13);
+            this.attributeCategorizationCandidateVoaLabel.TabIndex = 3;
+            this.attributeCategorizationCandidateVoaLabel.Text = "Labeled candidate attribute files (relative path to VOA or EAV file for each <Sou" +
+    "rceDocName>)";
+            // 
+            // attributeCategorizationCandidateVoaPathTagButton
+            // 
+            this.attributeCategorizationCandidateVoaPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.attributeCategorizationCandidateVoaPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("attributeCategorizationCandidateVoaPathTagButton.Image")));
+            this.attributeCategorizationCandidateVoaPathTagButton.Location = new System.Drawing.Point(501, 75);
+            this.attributeCategorizationCandidateVoaPathTagButton.Name = "attributeCategorizationCandidateVoaPathTagButton";
+            this.attributeCategorizationCandidateVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
+            this.attributeCategorizationCandidateVoaPathTagButton.Size = new System.Drawing.Size(24, 24);
+            this.attributeCategorizationCandidateVoaPathTagButton.TabIndex = 5;
+            this.attributeCategorizationCandidateVoaPathTagButton.TextControl = this.attributeCategorizationCandidateVoaTextBox;
+            this.attributeCategorizationCandidateVoaPathTagButton.UseVisualStyleBackColor = true;
+            // 
+            // attributeCategorizationCandidateVoaTextBox
+            // 
+            this.attributeCategorizationCandidateVoaTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.attributeCategorizationCandidateVoaTextBox.Location = new System.Drawing.Point(10, 77);
+            this.attributeCategorizationCandidateVoaTextBox.Name = "attributeCategorizationCandidateVoaTextBox";
+            this.attributeCategorizationCandidateVoaTextBox.Size = new System.Drawing.Size(485, 20);
+            this.attributeCategorizationCandidateVoaTextBox.TabIndex = 4;
+            this.attributeCategorizationCandidateVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.attributeCategorizationCandidateVoaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            // 
+            // attributeCategorizationFileListOrFolderLabel
+            // 
+            this.attributeCategorizationFileListOrFolderLabel.AutoSize = true;
+            this.attributeCategorizationFileListOrFolderLabel.Location = new System.Drawing.Point(8, 13);
+            this.attributeCategorizationFileListOrFolderLabel.Name = "attributeCategorizationFileListOrFolderLabel";
+            this.attributeCategorizationFileListOrFolderLabel.Size = new System.Drawing.Size(98, 13);
+            this.attributeCategorizationFileListOrFolderLabel.TabIndex = 0;
+            this.attributeCategorizationFileListOrFolderLabel.Text = "Train/testing file list";
+            // 
+            // attributeCategorizationFileListOrFolderBrowseButton
+            // 
+            this.attributeCategorizationFileListOrFolderBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.attributeCategorizationFileListOrFolderBrowseButton.Location = new System.Drawing.Point(501, 30);
+            this.attributeCategorizationFileListOrFolderBrowseButton.Name = "attributeCategorizationFileListOrFolderBrowseButton";
+            this.attributeCategorizationFileListOrFolderBrowseButton.Size = new System.Drawing.Size(24, 24);
+            this.attributeCategorizationFileListOrFolderBrowseButton.TabIndex = 2;
+            this.attributeCategorizationFileListOrFolderBrowseButton.Text = "...";
+            this.attributeCategorizationFileListOrFolderBrowseButton.TextControl = this.attributeCategorizationFileListOrFolderTextBox;
+            this.attributeCategorizationFileListOrFolderBrowseButton.UseVisualStyleBackColor = true;
+            // 
+            // attributeCategorizationFileListOrFolderTextBox
+            // 
+            this.attributeCategorizationFileListOrFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.attributeCategorizationFileListOrFolderTextBox.Location = new System.Drawing.Point(10, 32);
+            this.attributeCategorizationFileListOrFolderTextBox.Name = "attributeCategorizationFileListOrFolderTextBox";
+            this.attributeCategorizationFileListOrFolderTextBox.Size = new System.Drawing.Size(485, 20);
+            this.attributeCategorizationFileListOrFolderTextBox.TabIndex = 1;
+            this.attributeCategorizationFileListOrFolderTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.attributeCategorizationFileListOrFolderTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // documentCategorizationFolderInputPanel
             // 
@@ -258,7 +419,7 @@
             this.documentCategorizationFolderInputPanel.Controls.Add(this.documentCategorizationInputFolderTextBox);
             this.documentCategorizationFolderInputPanel.Location = new System.Drawing.Point(550, 272);
             this.documentCategorizationFolderInputPanel.Name = "documentCategorizationFolderInputPanel";
-            this.documentCategorizationFolderInputPanel.Size = new System.Drawing.Size(535, 274);
+            this.documentCategorizationFolderInputPanel.Size = new System.Drawing.Size(535, 246);
             this.documentCategorizationFolderInputPanel.TabIndex = 4;
             this.documentCategorizationFolderInputPanel.Visible = false;
             // 
@@ -293,7 +454,7 @@
             this.documentCategorizationFolderFeatureVoaTextBox.Size = new System.Drawing.Size(483, 20);
             this.documentCategorizationFolderFeatureVoaTextBox.TabIndex = 4;
             this.documentCategorizationFolderFeatureVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationFolderFeatureVoaTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationFolderFeatureVoaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // documentCategorizationFolderRandomNumberSeedLabel
             // 
@@ -312,7 +473,7 @@
             this.documentCategorizationFolderRandomNumberSeedTextBox.TabIndex = 12;
             this.documentCategorizationFolderRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.documentCategorizationFolderRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationFolderRandomNumberSeedTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationFolderRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // documentCategorizationFolderTrainingPercentageLabel
             // 
@@ -331,7 +492,7 @@
             this.documentCategorizationFolderTrainingPercentageTextBox.TabIndex = 10;
             this.documentCategorizationFolderTrainingPercentageTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.documentCategorizationFolderTrainingPercentageTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationFolderTrainingPercentageTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationFolderTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // documentCategorizationFolderAnswerLabel
             // 
@@ -363,7 +524,7 @@
             this.documentCategorizationFolderAnswerTextBox.Size = new System.Drawing.Size(483, 20);
             this.documentCategorizationFolderAnswerTextBox.TabIndex = 7;
             this.documentCategorizationFolderAnswerTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationFolderAnswerTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationFolderAnswerTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // documentCategorizationInputFolderLabel
             // 
@@ -396,7 +557,7 @@
             this.documentCategorizationInputFolderTextBox.Size = new System.Drawing.Size(483, 20);
             this.documentCategorizationInputFolderTextBox.TabIndex = 1;
             this.documentCategorizationInputFolderTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationInputFolderTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationInputFolderTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // folderSearchRadioButton
             // 
@@ -425,7 +586,7 @@
             this.paginationInputPanel.Controls.Add(this.paginationFeatureVoaPathTagButton);
             this.paginationInputPanel.Controls.Add(this.paginationFeatureVoaTextBox);
             this.paginationInputPanel.Controls.Add(this.paginationFileListOrFolderLabel);
-            this.paginationInputPanel.Controls.Add(this.paginationFileListBrowseButton);
+            this.paginationInputPanel.Controls.Add(this.paginationFileListOrFolderBrowseButton);
             this.paginationInputPanel.Controls.Add(this.paginationFileListOrFolderTextBox);
             this.paginationInputPanel.Location = new System.Drawing.Point(548, 22);
             this.paginationInputPanel.Name = "paginationInputPanel";
@@ -463,7 +624,7 @@
             this.paginationAnswerVoaTextBox.Size = new System.Drawing.Size(485, 20);
             this.paginationAnswerVoaTextBox.TabIndex = 7;
             this.paginationAnswerVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.paginationAnswerVoaTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.paginationAnswerVoaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // paginationRandomNumberSeedLabel
             // 
@@ -482,7 +643,7 @@
             this.paginationRandomNumberSeedTextBox.TabIndex = 12;
             this.paginationRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.paginationRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.paginationRandomNumberSeedTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.paginationRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // paginationTrainingPercentageLabel
             // 
@@ -501,7 +662,7 @@
             this.paginationTrainingPercentageTextBox.TabIndex = 10;
             this.paginationTrainingPercentageTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.paginationTrainingPercentageTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.paginationTrainingPercentageTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.paginationTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // paginationFeatureVoaLabel
             // 
@@ -534,7 +695,7 @@
             this.paginationFeatureVoaTextBox.Size = new System.Drawing.Size(485, 20);
             this.paginationFeatureVoaTextBox.TabIndex = 4;
             this.paginationFeatureVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.paginationFeatureVoaTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.paginationFeatureVoaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // paginationFileListOrFolderLabel
             // 
@@ -545,17 +706,17 @@
             this.paginationFileListOrFolderLabel.TabIndex = 0;
             this.paginationFileListOrFolderLabel.Text = "Train/testing file list";
             // 
-            // paginationFileListBrowseButton
+            // paginationFileListOrFolderBrowseButton
             // 
-            this.paginationFileListBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.paginationFileListBrowseButton.Location = new System.Drawing.Point(501, 30);
-            this.paginationFileListBrowseButton.Name = "paginationFileListBrowseButton";
-            this.paginationFileListBrowseButton.Size = new System.Drawing.Size(24, 24);
-            this.paginationFileListBrowseButton.TabIndex = 2;
-            this.paginationFileListBrowseButton.Text = "...";
-            this.paginationFileListBrowseButton.TextControl = this.paginationFileListOrFolderTextBox;
-            this.paginationFileListBrowseButton.UseVisualStyleBackColor = true;
-            this.paginationFileListBrowseButton.Click += new System.EventHandler(this.HandleBrowseButtonClick);
+            this.paginationFileListOrFolderBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.paginationFileListOrFolderBrowseButton.Location = new System.Drawing.Point(501, 30);
+            this.paginationFileListOrFolderBrowseButton.Name = "paginationFileListOrFolderBrowseButton";
+            this.paginationFileListOrFolderBrowseButton.Size = new System.Drawing.Size(24, 24);
+            this.paginationFileListOrFolderBrowseButton.TabIndex = 2;
+            this.paginationFileListOrFolderBrowseButton.Text = "...";
+            this.paginationFileListOrFolderBrowseButton.TextControl = this.paginationFileListOrFolderTextBox;
+            this.paginationFileListOrFolderBrowseButton.UseVisualStyleBackColor = true;
+            this.paginationFileListOrFolderBrowseButton.Click += new System.EventHandler(this.HandleBrowseButtonClick);
             // 
             // paginationFileListOrFolderTextBox
             // 
@@ -566,7 +727,7 @@
             this.paginationFileListOrFolderTextBox.Size = new System.Drawing.Size(485, 20);
             this.paginationFileListOrFolderTextBox.TabIndex = 1;
             this.paginationFileListOrFolderTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.paginationFileListOrFolderTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.paginationFileListOrFolderTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // textFileOrCsvRadioButton
             // 
@@ -595,7 +756,7 @@
             this.documentCategorizationCsvInputPanel.Controls.Add(this.documentCategorizationCsvTextBox);
             this.documentCategorizationCsvInputPanel.Location = new System.Drawing.Point(6, 67);
             this.documentCategorizationCsvInputPanel.Name = "documentCategorizationCsvInputPanel";
-            this.documentCategorizationCsvInputPanel.Size = new System.Drawing.Size(532, 496);
+            this.documentCategorizationCsvInputPanel.Size = new System.Drawing.Size(532, 477);
             this.documentCategorizationCsvInputPanel.TabIndex = 2;
             // 
             // documentCategorizationCsvFeatureVoaLabel
@@ -629,7 +790,7 @@
             this.documentCategorizationCsvFeatureVoaTextBox.Size = new System.Drawing.Size(481, 20);
             this.documentCategorizationCsvFeatureVoaTextBox.TabIndex = 4;
             this.documentCategorizationCsvFeatureVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationCsvFeatureVoaTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationCsvFeatureVoaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // documentCategorizationCsvRandomNumberSeedLabel
             // 
@@ -648,7 +809,7 @@
             this.documentCategorizationCsvRandomNumberSeedTextBox.TabIndex = 9;
             this.documentCategorizationCsvRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.documentCategorizationCsvRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationCsvRandomNumberSeedTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationCsvRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // documentCategorizationCsvBrowseButton
             // 
@@ -671,7 +832,7 @@
             this.documentCategorizationCsvTextBox.Size = new System.Drawing.Size(481, 20);
             this.documentCategorizationCsvTextBox.TabIndex = 1;
             this.documentCategorizationCsvTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationCsvTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationCsvTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // trainingPercentageLabel
             // 
@@ -690,7 +851,7 @@
             this.documentCategorizationCsvTrainingPercentageTextBox.TabIndex = 7;
             this.documentCategorizationCsvTrainingPercentageTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.documentCategorizationCsvTrainingPercentageTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationCsvTrainingPercentageTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationCsvTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // documentCategorizationCsvLabel
             // 
@@ -714,7 +875,7 @@
             this.featureConfigurationTabPage.Location = new System.Drawing.Point(4, 22);
             this.featureConfigurationTabPage.Name = "featureConfigurationTabPage";
             this.featureConfigurationTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.featureConfigurationTabPage.Size = new System.Drawing.Size(1101, 648);
+            this.featureConfigurationTabPage.Size = new System.Drawing.Size(1832, 648);
             this.featureConfigurationTabPage.TabIndex = 1;
             this.featureConfigurationTabPage.Text = "Feature configuration";
             this.featureConfigurationTabPage.UseVisualStyleBackColor = true;
@@ -745,10 +906,10 @@
             this.attributeFeatureFilterTextBox.Location = new System.Drawing.Point(3, 125);
             this.attributeFeatureFilterTextBox.Multiline = true;
             this.attributeFeatureFilterTextBox.Name = "attributeFeatureFilterTextBox";
-            this.attributeFeatureFilterTextBox.Size = new System.Drawing.Size(1093, 44);
+            this.attributeFeatureFilterTextBox.Size = new System.Drawing.Size(1824, 44);
             this.attributeFeatureFilterTextBox.TabIndex = 4;
             this.attributeFeatureFilterTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.attributeFeatureFilterTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.attributeFeatureFilterTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // useAttributeFeatureFilterCheckBox
             // 
@@ -767,7 +928,7 @@
             // 
             this.viewAnswerListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.viewAnswerListButton.Enabled = false;
-            this.viewAnswerListButton.Location = new System.Drawing.Point(992, 184);
+            this.viewAnswerListButton.Location = new System.Drawing.Point(1723, 184);
             this.viewAnswerListButton.Name = "viewAnswerListButton";
             this.viewAnswerListButton.Size = new System.Drawing.Size(101, 23);
             this.viewAnswerListButton.TabIndex = 7;
@@ -789,7 +950,7 @@
             // 
             this.editFeaturesButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.editFeaturesButton.Enabled = false;
-            this.editFeaturesButton.Location = new System.Drawing.Point(885, 184);
+            this.editFeaturesButton.Location = new System.Drawing.Point(1616, 184);
             this.editFeaturesButton.Name = "editFeaturesButton";
             this.editFeaturesButton.Size = new System.Drawing.Size(101, 23);
             this.editFeaturesButton.TabIndex = 6;
@@ -810,7 +971,7 @@
             this.autoBagOfWordsGroupBox.Controls.Add(this.useAutoBagOfWordsCheckBox);
             this.autoBagOfWordsGroupBox.Location = new System.Drawing.Point(3, 6);
             this.autoBagOfWordsGroupBox.Name = "autoBagOfWordsGroupBox";
-            this.autoBagOfWordsGroupBox.Size = new System.Drawing.Size(1093, 90);
+            this.autoBagOfWordsGroupBox.Size = new System.Drawing.Size(1824, 90);
             this.autoBagOfWordsGroupBox.TabIndex = 0;
             this.autoBagOfWordsGroupBox.TabStop = false;
             this.autoBagOfWordsGroupBox.Text = "Auto-BoW";
@@ -823,7 +984,7 @@
             this.specifiedPagesTextBox.Size = new System.Drawing.Size(171, 20);
             this.specifiedPagesTextBox.TabIndex = 2;
             this.specifiedPagesTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.specifiedPagesTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.specifiedPagesTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // specifiedPagesCheckBox
             // 
@@ -845,7 +1006,7 @@
             this.maxFeaturesTextBox.TabIndex = 6;
             this.maxFeaturesTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.maxFeaturesTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.maxFeaturesTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.maxFeaturesTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // maxFeaturesLabel
             // 
@@ -864,7 +1025,7 @@
             this.maxShingleSizeTextBox.TabIndex = 4;
             this.maxShingleSizeTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.maxShingleSizeTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.maxShingleSizeTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.maxShingleSizeTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // maxShingleSizeLabel
             // 
@@ -899,7 +1060,7 @@
             this.machineConfigurationTabPage.Location = new System.Drawing.Point(4, 22);
             this.machineConfigurationTabPage.Name = "machineConfigurationTabPage";
             this.machineConfigurationTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.machineConfigurationTabPage.Size = new System.Drawing.Size(1101, 648);
+            this.machineConfigurationTabPage.Size = new System.Drawing.Size(1832, 648);
             this.machineConfigurationTabPage.TabIndex = 2;
             this.machineConfigurationTabPage.Text = "Machine configuration";
             this.machineConfigurationTabPage.UseVisualStyleBackColor = true;
@@ -926,7 +1087,7 @@
             this.multilabelSvmUnknownCutoffTextBox.TabIndex = 6;
             this.multilabelSvmUnknownCutoffTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.multilabelSvmUnknownCutoffTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multilabelSvmUnknownCutoffTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.multilabelSvmUnknownCutoffTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // multilabelSvmUseUnknownCheckBox
             // 
@@ -988,7 +1149,7 @@
             this.multilabelSvmComplexityTextBox.TabIndex = 1;
             this.multilabelSvmComplexityTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.multilabelSvmComplexityTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multilabelSvmComplexityTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.multilabelSvmComplexityTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // multilabelSvmComplexityLabel
             // 
@@ -1031,7 +1192,7 @@
             this.multiclassSvmComplexityTextBox.TabIndex = 1;
             this.multiclassSvmComplexityTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.multiclassSvmComplexityTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multiclassSvmComplexityTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.multiclassSvmComplexityTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // multiclassSvmComplexityLabel
             // 
@@ -1075,7 +1236,7 @@
             this.numberOfCandidateNetwordsTextBox.TabIndex = 8;
             this.numberOfCandidateNetwordsTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numberOfCandidateNetwordsTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.numberOfCandidateNetwordsTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.numberOfCandidateNetwordsTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // numberOfCandidateNetworksLabel
             // 
@@ -1108,7 +1269,7 @@
             this.maximumTrainingIterationsTextBox.TabIndex = 5;
             this.maximumTrainingIterationsTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.maximumTrainingIterationsTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.maximumTrainingIterationsTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.maximumTrainingIterationsTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // maximumTrainingIterationsLabel
             // 
@@ -1127,7 +1288,7 @@
             this.sigmoidAlphaTextBox.TabIndex = 3;
             this.sigmoidAlphaTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.sigmoidAlphaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.sigmoidAlphaTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.sigmoidAlphaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // sigmoidAlphaLabel
             // 
@@ -1146,7 +1307,7 @@
             this.sizeOfHiddenLayersTextBox.TabIndex = 1;
             this.sizeOfHiddenLayersTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.sizeOfHiddenLayersTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.sizeOfHiddenLayersTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
+            this.sizeOfHiddenLayersTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
             // 
             // sizeOfHiddenLayersLabel
             // 
@@ -1170,7 +1331,7 @@
             // saveMachineAsButton
             // 
             this.saveMachineAsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveMachineAsButton.Location = new System.Drawing.Point(1044, 683);
+            this.saveMachineAsButton.Location = new System.Drawing.Point(1775, 683);
             this.saveMachineAsButton.Name = "saveMachineAsButton";
             this.saveMachineAsButton.Size = new System.Drawing.Size(60, 23);
             this.saveMachineAsButton.TabIndex = 5;
@@ -1197,7 +1358,7 @@
             // openMachineButton
             // 
             this.openMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.openMachineButton.Location = new System.Drawing.Point(912, 683);
+            this.openMachineButton.Location = new System.Drawing.Point(1643, 683);
             this.openMachineButton.Name = "openMachineButton";
             this.openMachineButton.Size = new System.Drawing.Size(60, 23);
             this.openMachineButton.TabIndex = 3;
@@ -1208,7 +1369,7 @@
             // saveMachineButton
             // 
             this.saveMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveMachineButton.Location = new System.Drawing.Point(978, 683);
+            this.saveMachineButton.Location = new System.Drawing.Point(1709, 683);
             this.saveMachineButton.Name = "saveMachineButton";
             this.saveMachineButton.Size = new System.Drawing.Size(60, 23);
             this.saveMachineButton.TabIndex = 4;
@@ -1219,7 +1380,7 @@
             // newMachineButton
             // 
             this.newMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.newMachineButton.Location = new System.Drawing.Point(846, 683);
+            this.newMachineButton.Location = new System.Drawing.Point(1577, 683);
             this.newMachineButton.Name = "newMachineButton";
             this.newMachineButton.Size = new System.Drawing.Size(60, 23);
             this.newMachineButton.TabIndex = 2;
@@ -1233,7 +1394,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1109, 733);
+            this.ClientSize = new System.Drawing.Size(1840, 733);
             this.Controls.Add(this.newMachineButton);
             this.Controls.Add(this.saveMachineButton);
             this.Controls.Add(this.configurationTabControl);
@@ -1254,6 +1415,8 @@
             this.machineUsageGroupBox.PerformLayout();
             this.inputConfigurationGroupBox.ResumeLayout(false);
             this.inputConfigurationGroupBox.PerformLayout();
+            this.attributeCategorizationInputPanel.ResumeLayout(false);
+            this.attributeCategorizationInputPanel.PerformLayout();
             this.documentCategorizationFolderInputPanel.ResumeLayout(false);
             this.documentCategorizationFolderInputPanel.PerformLayout();
             this.paginationInputPanel.ResumeLayout(false);
@@ -1302,7 +1465,7 @@
         private Extract.Utilities.Forms.PathTagsButton paginationFeatureVoaPathTagButton;
         private System.Windows.Forms.TextBox paginationFeatureVoaTextBox;
         private System.Windows.Forms.Label paginationFileListOrFolderLabel;
-        private Extract.Utilities.Forms.BrowseButton paginationFileListBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton paginationFileListOrFolderBrowseButton;
         private System.Windows.Forms.TextBox paginationFileListOrFolderTextBox;
         private System.Windows.Forms.RadioButton textFileOrCsvRadioButton;
         private System.Windows.Forms.Button editFeaturesButton;
@@ -1375,6 +1538,19 @@
         private System.Windows.Forms.Button openMachineButton;
         private System.Windows.Forms.Button saveMachineButton;
         private System.Windows.Forms.Button newMachineButton;
+        private System.Windows.Forms.Panel attributeCategorizationInputPanel;
+        private System.Windows.Forms.Button attributeCategorizationCreateCandidateVoaButton;
+        private System.Windows.Forms.Label attributeCategorizationRandomNumberSeedLabel;
+        private System.Windows.Forms.TextBox attributeCategorizationRandomNumberSeedTextBox;
+        private System.Windows.Forms.Label attributeCategorizationTrainingPercentageLabel;
+        private System.Windows.Forms.TextBox attributeCategorizationTrainingPercentageTextBox;
+        private System.Windows.Forms.Label attributeCategorizationCandidateVoaLabel;
+        private Utilities.Forms.PathTagsButton attributeCategorizationCandidateVoaPathTagButton;
+        private System.Windows.Forms.TextBox attributeCategorizationCandidateVoaTextBox;
+        private System.Windows.Forms.Label attributeCategorizationFileListOrFolderLabel;
+        private Utilities.Forms.BrowseButton attributeCategorizationFileListOrFolderBrowseButton;
+        private System.Windows.Forms.TextBox attributeCategorizationFileListOrFolderTextBox;
+        private System.Windows.Forms.RadioButton attributeCategorizationRadioButton;
     }
 }
 
