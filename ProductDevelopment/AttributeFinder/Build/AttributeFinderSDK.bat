@@ -36,6 +36,10 @@ IF "%BUILD_STATUS%" NEQ "Started" (
 
 	PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%~1' 'Started'"
 )
+
+::Copy the license files from the ProductDevelop path on P:
+copy /Y P:\AttributeFinder\BuildVMLicense\*.* "C:\ProgramData\Extract Systems\LicenseFiles"
+
 IF EXIST "%TEMP%\nmakeErrors" del "%TEMP%\nmakeErrors"
 
 nmake /X "%TEMP%\nmakeErrors" /F AttributeFinderSDK.mak BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
