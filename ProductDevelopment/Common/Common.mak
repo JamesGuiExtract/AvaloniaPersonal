@@ -52,6 +52,7 @@ PerlInterpreter=$(PERL_BIN_DIR)\Perl.exe
 VerifyDir=$(EngineeringRootDirectory)\ProductDevelopment\Common\VerifyDir.bat
 SetProductVerScript=$(CScriptProgram) "$(CommonDirectory)\SetProductVersion.vbs"
 UpdateFileVersion="I:\Common\Engineering\Tools\Utils\UpdateFileVersion\UpdateFileVersion.exe"
+DataEntryBranding=$(RCNETDir)\DataEntry\Utilities\DataEntryApplication\Core\Code\BrandingResources
 
 #Target path for symbolic links to shared installs - must have the ending 
 SharedInstallsPath=$(ENGSVR_INTERNAL_BASE)\ProductReleases\SharedInstalls

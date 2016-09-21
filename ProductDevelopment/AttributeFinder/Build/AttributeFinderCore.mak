@@ -70,8 +70,29 @@ BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 #############################################################################
 # B U I L D    T A R G E T S
 #
-LabelCommonFolder: 
-    $(Label) $$/Engineering/ProductDevelopment/Common -I- -L"$(FlexIndexVersion)" -O
+SetVersions:
+	@ECHO Updating Versions for $(FlexIndexVersion)
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+	@IF NOT EXIST "$(EngineeringRootDirectory)" MKDIR "$(EngineeringRootDirectory)"
+	$(BUILD_DRIVE)
+	@CD "$(EngineeringRootDirectory)"
+    @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
+	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
+	@SendFilesAsArgumentToApplication AssemblyInfo.cpp 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
+	@CD "$(RCNETDir)"
+	$(UpdateFileVersion)  "$(DataEntryBranding)\FlexIndex.resx" "$(FlexIndexVersion)"
+	$(UpdateFileVersion)  "$(DataEntryBranding)\LabDE.resx" "$(FlexIndexVersion)"
+	@CD "$(DataEntryDir)\FlexIndex"
+	@SendFilesAsArgumentToApplication *.resx 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
+	@CD "$(DataEntryDir)\LabDE"
+	@SendFilesAsArgumentToApplication *.resx 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 
 BuildPDUtils: BuildAttributeFinderCore
 	@ECHO Building PD Utils...
@@ -503,7 +524,7 @@ BuildDataEntryMergeModule: BuildAFCoreMergeModule
 
 MakeMergeModules: CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule 
 
-DoBuilds: SetupBuildEnv BuildPDUtils BuildFKBUpdateIfRequired
+DoBuilds: SetupBuildEnv SetVersions BuildPDUtils BuildFKBUpdateIfRequired
 
 DoEverythingNoGet: DoBuilds MakeMergeModules RegisterClearImage_7_0 CopyCommonFiles
     @ECHO.
