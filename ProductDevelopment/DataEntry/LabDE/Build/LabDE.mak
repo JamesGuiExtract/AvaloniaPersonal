@@ -138,8 +138,8 @@ CreateDemo_LabDE: BuildDemoLabDE_DEP
 	@ECHO Updating LabDE demo rules for FKB Version...
 	$(CScriptProgram) "$(PDRootDir)\Utils\Scripts\UpdateFKB.js" -silent "$(RulesDir)\LabDE\Demo_LabDE\Solution" "$(FKBVersion)"
 	@XCOPY "$(LabResultsDir)\Utils\LabDEDemo\Files\*.*" "$(LabDEDemo)\" /v /s /e /y
-	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEDemo)\Input" /v /s /e /y
-	@XCOPY "$(RulesDir)\LabDE\Demo_LabDE\Solution\*.*" "$(LabDEDemo)\Solution" /v /s /e /y	
+	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEDemo)\Input\" /v /s /e /y
+	@XCOPY "$(RulesDir)\LabDE\Demo_LabDE\Solution\*.*" "$(LabDEDemo)\Solution\" /v /s /e /y	
 	@COPY /y "$(Demo_LabDE_DEP)\Bin\$(BuildConfig)\Extract.DataEntry.DEP.Demo_LabDE.dll" "$(LabDEDemo)\Solution\Bin\"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\AlternateTestNameManager.plugin" "$(LabDEDemo)\Solution\Database Files"
 	@ECHO Encrypting LabDE Demo Rules...
