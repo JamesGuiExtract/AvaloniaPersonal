@@ -153,7 +153,7 @@ CreateFlexDataEntryInstallDir:
 	@ECHO Copying the Demo_FlexIndex related files
 	@XCOPY "$(AFRootDirectory)\Utils\FlexDataEntry\Files\*.*" "$(FLEXIndexDemo)" /v /s /e /y
 	$(VerifyDir) "$(AFRootDirectory)\Utils\FlexDataEntry\Files" "$(FLEXIndexDemo)"
-	@XCOPY "$(FlexDataEntryInstallationFilesDir)\Images\*.*" "$(FLEXIndexDemo)\Input" /v /s /e /y
+	@XCOPY "$(FlexDataEntryInstallationFilesDir)\Images\*.*" "$(FLEXIndexDemo)\Input\" /v /s /e /y
 	$(VerifyDir) "$(FlexDataEntryInstallationFilesDir)\Images" "$(FLEXIndexDemo)\Input"
 	@XCOPY "$(FlexDataEntryRulesDir)\*.*" "$(FLEXIndexDemo)\Rules" /v /s /e /y
 	$(VerifyDir) "$(FlexDataEntryRulesDir)" "$(FLEXIndexDemo)\Rules"

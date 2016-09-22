@@ -62,7 +62,7 @@ CopyDemoFiles:
 CopyImageFilesToInstallFolder: 
     @ECHO Copying the RedactionDemo Image files to installation directory...
     @IF NOT EXIST "$(IDShieldDemo)\DemoFiles\Installs\HybridDemo\Input" @MKDIR "$(IDShieldDemo)\DemoFiles\Installs\HybridDemo\Input"
-    @XCOPY "$(RedactionImageDir)\*.*" "$(IDShieldDemo)\DemoFiles\Installs\HybridDemo\Input" /V /s /e /y
+    @XCOPY "$(RedactionImageDir)\*.*" "$(IDShieldDemo)\DemoFiles\Installs\HybridDemo\Input\" /V /s /e /y
     $(VerifyDir) "$(RedactionImageDir)" "$(IDShieldDemo)\DemoFiles\Installs\HybridDemo\Input"
     @DeleteFiles "$(IDShieldDemo)\vssver.scc"
 
