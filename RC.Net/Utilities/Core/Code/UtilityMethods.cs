@@ -255,7 +255,26 @@ namespace Extract.Utilities
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI31152", ex);
+                var ee = ExtractException.AsExtractException("ELI31152", ex);
+
+                try
+                {
+                    var typeLoadException = ex as ReflectionTypeLoadException;
+                    if (typeLoadException != null)
+                    {
+                        var loaderExceptions = typeLoadException.LoaderExceptions;
+                        foreach (var item in loaderExceptions)
+                        {
+                            ee.AddDebugData("LoaderException", item.Message, encrypt: false);
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    exc.ExtractLog("ELI41364");
+                }
+
+                throw ee;
             }
         }
 
