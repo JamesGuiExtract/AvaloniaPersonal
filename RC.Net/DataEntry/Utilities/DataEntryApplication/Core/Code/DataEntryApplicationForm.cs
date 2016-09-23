@@ -5433,7 +5433,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // Allows config file to be able to update _paginationDocumentDataPanel.
                 _activeDataEntryConfig.Config.ApplyObjectSettings(
-                    _paginationDocumentDataPanel.Control);
+                    _paginationDocumentDataPanel.PanelControl);
 
                 _paginationPanel.DocumentDataRequest += HandlePaginationPanel_DocumentDataRequest;
             }

@@ -2565,7 +2565,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             .FirstOrDefault(c => !c.Deleted));
                     }
 
-                    _documentDataPanelControl = e.DocumentDataPanel.Control;
+                    _documentDataPanelControl = e.DocumentDataPanel.PanelControl;
                 }
             }
             catch (Exception ex)

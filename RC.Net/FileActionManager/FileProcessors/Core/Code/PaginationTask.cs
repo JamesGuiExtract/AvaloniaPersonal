@@ -484,7 +484,10 @@ namespace Extract.FileActionManager.FileProcessors
                 var form = new PaginationTaskForm(this, _paginationDocumentDataPanel,
                     _fileProcessingDB, _actionID, _tagManager, _fileRequestHandler);
 
-                _activeDataEntryConfig.DataEntryControlHost.DataEntryApplication = form;
+                if (_activeDataEntryConfig != null)
+                {
+                    _activeDataEntryConfig.DataEntryControlHost.DataEntryApplication = form;
+                }
 
                 return form;
             }

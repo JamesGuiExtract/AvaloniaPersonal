@@ -23,7 +23,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// The <see cref="UserControl"/> to be displayed for viewing/editing of document data.
         /// </summary>
-        UserControl Control
+        UserControl PanelControl
         {
             get;
         }

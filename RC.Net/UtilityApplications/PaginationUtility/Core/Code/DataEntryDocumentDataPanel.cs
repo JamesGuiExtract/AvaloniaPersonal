@@ -51,7 +51,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// The <see cref="UserControl"/> to be displayed for viewing/editing of document data.
         /// </summary>
-        public UserControl Control
+        public UserControl PanelControl
         {
             get
             {
@@ -172,6 +172,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion IPaginationDocumentDataPanel
 
         #region Overrides
+
+        /// <summary>
+        /// Raises the <see cref="Form.Load"/> event.
+        /// </summary>
+        /// <param name="e">The event data associated with the <see cref="Form.Load"/> 
+        /// event.</param>
+        protected override void OnLoad(EventArgs e)
+        {
+            try
+            {
+                // Reset the colors to prevent the DEP from incorporating the special colors
+                // applied to this separator window.
+                ForeColor = DefaultForeColor;
+                BackColor = DefaultBackColor;
+
+                base.OnLoad(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41365");
+            }
+        }
 
         /// <summary>
         /// Navigates to the specified page, settings _performingProgrammaticZoom in the process to
