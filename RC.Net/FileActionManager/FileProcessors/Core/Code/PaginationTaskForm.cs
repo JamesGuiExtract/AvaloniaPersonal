@@ -882,7 +882,7 @@ namespace Extract.FileActionManager.FileProcessors
                                                                                         e.RotatedPages);
 
                 var documentData = e.DocumentData as PaginationDocumentData;
-                if (documentData != null)
+                if (documentData != null && documentData.Attributes != null && documentData.Attributes.Size() > 0)
                 {
                     AttributeMethods.TranslateAttributesToNewDocument(
                         documentData.Attributes, e.OutputFileName, pageMap, newSpatialPageInfos);
@@ -1407,10 +1407,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// the <see cref="_paginationDocumentDataPanel"/> is not available.</returns>
         PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes, string sourceDocName)
         {
-            return (_paginationDocumentDataPanel != null)
-                ? _paginationDocumentDataPanel.GetDocumentData(
-                    attributes, sourceDocName, FileProcessingDB, _imageViewer)
-                : null;
+            return (_paginationDocumentDataPanel == null)
+                ? new PaginationDocumentData(attributes)
+                : _paginationDocumentDataPanel.GetDocumentData(
+                    attributes, sourceDocName, FileProcessingDB, _imageViewer);
         }
 
         /// <summary>

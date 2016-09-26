@@ -10,7 +10,7 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// <summary>
     /// Represents data associated with an <see cref="OutputDocument"/>.
     /// </summary>
-    public abstract class PaginationDocumentData
+    public class PaginationDocumentData
     {
         #region Fields
 
@@ -34,25 +34,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="attributes">The <see cref="IAttribute"/> hierarchy (voa data) on which this
         /// instance is based.</param>
-        protected PaginationDocumentData(IUnknownVector attributes)
+        public PaginationDocumentData(IUnknownVector attributes)
         {
             _attributes = attributes;
         }
 
         #endregion Constructors
-
-        #region Abstract Members
-
-        /// <summary>
-        /// Maps all field names for the extending class with the <see cref="PaginationDataField"/>
-        /// that defines the field.
-        /// </summary>
-        protected abstract Dictionary<string, PaginationDataField> Fields
-        {
-            get;
-        }
-
-        #endregion Abstract Members
 
         #region Events
 
@@ -249,6 +236,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Public Members
 
         #region Protected Members
+
+        /// <summary>
+        /// Maps all field names for the extending class with the <see cref="PaginationDataField"/>
+        /// that defines the field.
+        /// </summary>
+        protected virtual Dictionary<string, PaginationDataField> Fields
+        {
+            get
+            {
+                return new Dictionary<string, PaginationDataField>();
+            }
+        }
 
         /// <summary>
         /// Gets the value of the specified <see paramref="field"/> from the current

@@ -3147,7 +3147,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     // Produce a voa file for the paginated document using the data the rules suggested.
                     var documentData = e.DocumentData as PaginationDocumentData;
-                    if (documentData != null)
+                    if (documentData != null && documentData.Attributes != null && documentData.Attributes.Size() > 0)
                     {
                         var copyThis = (ICopyableObject)documentData.Attributes;
                         var attributesCopy = (IUnknownVector)copyThis.Clone();
@@ -5629,10 +5629,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// the <see cref="_paginationDocumentDataPanel"/> is not available.</returns>
         PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes)
         {
-            return (_paginationDocumentDataPanel != null)
-                ? _paginationDocumentDataPanel.GetDocumentData(
-                    attributes, _fileName, FileProcessingDB, _imageViewer)
-                : null;
+            return (_paginationDocumentDataPanel == null)
+                ? new PaginationDocumentData(attributes)
+                : _paginationDocumentDataPanel.GetDocumentData(
+                    attributes, _fileName, FileProcessingDB, _imageViewer);
         }
 
         /// <summary>
@@ -5779,7 +5779,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // Produce a voa file for the paginated document using the data the rules suggested.
                 var documentData = e.DocumentData as PaginationDocumentData;
-                if (documentData != null)
+                if (documentData != null && documentData.Attributes != null && documentData.Attributes.Size() > 0)
                 {
                     var copyThis = (ICopyableObject)documentData.Attributes;
                     var attributesCopy = (IUnknownVector)copyThis.Clone();
