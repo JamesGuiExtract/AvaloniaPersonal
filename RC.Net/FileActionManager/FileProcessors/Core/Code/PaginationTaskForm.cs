@@ -129,12 +129,6 @@ namespace Extract.FileActionManager.FileProcessors
         IPaginationDocumentDataPanel _paginationDocumentDataPanel;
 
         /// <summary>
-        /// Used to prevent simultaneous modification of a voa file from multiple Extract Systems
-        /// processes.
-        /// </summary>
-        Dictionary<string, ExtractFileLock> _voaFileLocks = new Dictionary<string, ExtractFileLock>();
-
-        /// <summary>
         /// The _paginationForm index at which the last page was removed and the next file should
         /// be selected
         /// </summary>
@@ -655,11 +649,6 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _formStateManager.Dispose();
                     _formStateManager = null;
-                }
-                if (_voaFileLocks != null)
-                {
-                    CollectionMethods.ClearAndDispose(_voaFileLocks);
-                    _voaFileLocks = null;
                 }
             }
 
@@ -1220,12 +1209,6 @@ namespace Extract.FileActionManager.FileProcessors
             foreach (string sourceFileName in sourceFileNames)
             {
                 string dataFileName = sourceFileName + ".voa";
-                ExtractFileLock voaFileLock = null;
-                if (_voaFileLocks.TryGetValue(dataFileName, out voaFileLock))
-                {
-                    voaFileLock.ReleaseLock();
-                    _voaFileLocks.Remove(sourceFileName);
-                }
 
                 int docPosition = _paginationPanel.RemoveSourceFile(sourceFileName, acceptingPagination: true);
                 position = (position == -1)
@@ -1289,10 +1272,6 @@ namespace Extract.FileActionManager.FileProcessors
                 if (File.Exists(dataFilename))
                 {
                     // If an image was loaded, look for and attempt to load corresponding data.
-                    var voaFileLock = new ExtractFileLock();
-                    voaFileLock.GetLock(dataFilename, "Paginate files task");
-                    _voaFileLocks[dataFilename] = voaFileLock;
-
                     IUnknownVector attributes = new IUnknownVectorClass();
                     attributes.LoadFrom(dataFilename, false);
                     attributes.ReportMemoryUsage();

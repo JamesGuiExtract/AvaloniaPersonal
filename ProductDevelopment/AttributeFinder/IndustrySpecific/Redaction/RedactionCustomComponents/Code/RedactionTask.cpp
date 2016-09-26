@@ -15,7 +15,6 @@
 #include <MiscLeadUtils.h>
 #include <DateUtil.h>
 #include <COMUtilsMethods.h>
-#include <ExtractFileLock.h>
 
 #include <string>
 #include <set>
@@ -50,7 +49,7 @@ CRedactionTask::CRedactionTask()
     m_ipIDShieldDB(NULL),
     m_ipPdfSettings(NULL),
     m_bUseRedactedImage(false),
-	m_bPDFSupportInitialized(false)
+    m_bPDFSupportInitialized(false)
 {
     ASSERT_RESOURCE_ALLOCATION("ELI19993", m_ipAttributeNames != __nullptr);
 
@@ -148,20 +147,20 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         validateLicense();
         _lastCodePos = "10";
 
-		// If PDF support is licensed initialize support
-		// NOTE: no exception is thrown or logged if PDF support is not licensed.
-		// NOTE2: Since the PDF settings are per-thread and the Init call occurs on a different
-		// thread than this one, initPDFSupport needs to be called here.
-		if (!m_bPDFSupportInitialized)
-		{
-			m_bPDFSupportInitialized = true;
+        // If PDF support is licensed initialize support
+        // NOTE: no exception is thrown or logged if PDF support is not licensed.
+        // NOTE2: Since the PDF settings are per-thread and the Init call occurs on a different
+        // thread than this one, initPDFSupport needs to be called here.
+        if (!m_bPDFSupportInitialized)
+        {
+            m_bPDFSupportInitialized = true;
 
-			initPDFSupport();
-		}
+            initPDFSupport();
+        }
 
-		// Set of type names that have been seen already (used to track first instance
-		// of a type when using prefix and suffix text
-		set<string> setTypes;
+        // Set of type names that have been seen already (used to track first instance
+        // of a type when using prefix and suffix text
+        set<string> setTypes;
 
         // Start the a stop watch to track processing time
         StopWatch swProcessingTime;
@@ -183,15 +182,15 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         _lastCodePos = "40";
 
         long nFileID = ipFileRecord->FileID;
-		
-		// Start a FileTaskSession if a database is provided
-		long nFileTaskSessionID(-1);
+        
+        // Start a FileTaskSession if a database is provided
+        long nFileTaskSessionID(-1);
         IFileProcessingDBPtr ipFAMDB(pDB);
-		if (ipFAMDB != nullptr)
-		{
-			nFileTaskSessionID = 
-				ipFAMDB->StartFileTaskSession(gstrREDACTION_TASK_GUID.c_str(), nFileID);
-		}
+        if (ipFAMDB != nullptr)
+        {
+            nFileTaskSessionID = 
+                ipFAMDB->StartFileTaskSession(gstrREDACTION_TASK_GUID.c_str(), nFileID);
+        }
 
         // Default to successful completion
         *pResult = kProcessingSuccessful;
@@ -214,33 +213,33 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         }
         _lastCodePos = "100";
 
-		// If adjusting the redaction text casing
-		// and there is a valid USS file, initialize the spatial string searcher
-		ISpatialStringSearcherPtr ipSearcher = __nullptr;
-		ISpatialStringSearcherPtr ipAttrSearcher = __nullptr;
-		if (m_redactionAppearance.m_bAdjustTextCasing
-			&& isValidFile(strImageName + ".uss"))
-		{
-			ISpatialStringPtr ipText(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI31676", ipText != __nullptr);
+        // If adjusting the redaction text casing
+        // and there is a valid USS file, initialize the spatial string searcher
+        ISpatialStringSearcherPtr ipSearcher = __nullptr;
+        ISpatialStringSearcherPtr ipAttrSearcher = __nullptr;
+        if (m_redactionAppearance.m_bAdjustTextCasing
+            && isValidFile(strImageName + ".uss"))
+        {
+            ISpatialStringPtr ipText(CLSID_SpatialString);
+            ASSERT_RESOURCE_ALLOCATION("ELI31676", ipText != __nullptr);
 
-			ipText->LoadFrom((strImageName + ".uss").c_str(), VARIANT_FALSE);
-			if (ipText->HasSpatialInfo() == VARIANT_TRUE)
-			{
-				ipSearcher.CreateInstance(CLSID_SpatialStringSearcher);
-				ASSERT_RESOURCE_ALLOCATION("ELI31677", ipSearcher != __nullptr);
+            ipText->LoadFrom((strImageName + ".uss").c_str(), VARIANT_FALSE);
+            if (ipText->HasSpatialInfo() == VARIANT_TRUE)
+            {
+                ipSearcher.CreateInstance(CLSID_SpatialStringSearcher);
+                ASSERT_RESOURCE_ALLOCATION("ELI31677", ipSearcher != __nullptr);
 
-				ipSearcher->InitSpatialStringSearcher(ipText, VARIANT_FALSE);
+                ipSearcher->InitSpatialStringSearcher(ipText, VARIANT_FALSE);
 
-				// This searcher will be used to search the context for each
-				// attribute and will be initialized with the expanded context
-				// region for the attribute. In order to be more performative, 
-				// this searcher is created once here, but will be initialized each
-				// time it is needed with the expanded attribute region.
-				ipAttrSearcher.CreateInstance(CLSID_SpatialStringSearcher);
-				ASSERT_RESOURCE_ALLOCATION("ELI31678", ipSearcher != __nullptr);
-			}
-		}
+                // This searcher will be used to search the context for each
+                // attribute and will be initialized with the expanded context
+                // region for the attribute. In order to be more performative, 
+                // this searcher is created once here, but will be initialized each
+                // time it is needed with the expanded attribute region.
+                ipAttrSearcher.CreateInstance(CLSID_SpatialStringSearcher);
+                ASSERT_RESOURCE_ALLOCATION("ELI31678", ipSearcher != __nullptr);
+            }
+        }
 
         // Expand tags and text functions to get the output name
         string strOutputName = CRedactionCustomComponentsUtils::ExpandTagsAndTFE(
@@ -323,17 +322,17 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         else
         {
             _lastCodePos = "190";
-			
-			// [FlexIDSCore:5299]
-			// Items may be removed from ipFoundAttr below, so ipFoundAttr needs to be a separate
-			// vector than ipVOAAttr so meta data isn't lost after running this task. Do this as a
-			// shallow copy so that any changes to attributes in ipVOAAttr are reflected in
-			// ipFoundAttr.
-			IShallowCopyablePtr ipCopySource(ipVOAAttr);
-			ASSERT_RESOURCE_ALLOCATION("ELI35785", ipCopySource != __nullptr);
+            
+            // [FlexIDSCore:5299]
+            // Items may be removed from ipFoundAttr below, so ipFoundAttr needs to be a separate
+            // vector than ipVOAAttr so meta data isn't lost after running this task. Do this as a
+            // shallow copy so that any changes to attributes in ipVOAAttr are reflected in
+            // ipFoundAttr.
+            IShallowCopyablePtr ipCopySource(ipVOAAttr);
+            ASSERT_RESOURCE_ALLOCATION("ELI35785", ipCopySource != __nullptr);
 
-			ipFoundAttr = ipCopySource->ShallowCopy();
-			ASSERT_RESOURCE_ALLOCATION("ELI35786", ipFoundAttr != __nullptr);
+            ipFoundAttr = ipCopySource->ShallowCopy();
+            ASSERT_RESOURCE_ALLOCATION("ELI35786", ipFoundAttr != __nullptr);
         }
         _lastCodePos = "200";
 
@@ -355,211 +354,211 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
             ASSERT_RESOURCE_ALLOCATION("ELI09002", ipValue != __nullptr);
             _lastCodePos = "260";
 
-			// [FlexIDSCore:5002]
-			// Do not attempt to redact non-spatial or metadata attributes.
-			string strAttributeName = asString(ipAttr->Name);
-			if (!asCppBool(ipValue->HasSpatialInfo()) ||
-				(!strAttributeName.empty() && strAttributeName[0] == '_'))
-			{
-				ipFoundAttr->Remove(i);
-				nNumAttr--;
-				i--;
-				continue;
-			}
+            // [FlexIDSCore:5002]
+            // Do not attempt to redact non-spatial or metadata attributes.
+            string strAttributeName = asString(ipAttr->Name);
+            if (!asCppBool(ipValue->HasSpatialInfo()) ||
+                (!strAttributeName.empty() && strAttributeName[0] == '_'))
+            {
+                ipFoundAttr->Remove(i);
+                nNumAttr--;
+                i--;
+                continue;
+            }
 
             // Only cover area if value is spatial
             if (ipValue->HasSpatialInfo() == VARIANT_TRUE)
             {
                 string strCodes = getExemptionCodes(ipAttr);
 
-				string strType = asString(ipAttr->Type);
+                string strType = asString(ipAttr->Type);
 
                 // Get the text associated with this attribute
                 string strText = CRedactionCustomComponentsUtils::ExpandRedactionTags(
                     m_redactionAppearance.m_strText, strCodes, strType);
-				string strPrefixText = "";
-				string strSuffixText = "";
+                string strPrefixText = "";
+                string strSuffixText = "";
                 _lastCodePos = "270";
 
-				if (setTypes.find(strType) == setTypes.end())
-				{
-					strPrefixText = CRedactionCustomComponentsUtils::ExpandRedactionTags(
-						m_redactionAppearance.m_strPrefixText, strCodes, strType);
-					strSuffixText = CRedactionCustomComponentsUtils::ExpandRedactionTags(
-						m_redactionAppearance.m_strSuffixText, strCodes, strType);
-					setTypes.insert(strType);
-				}
+                if (setTypes.find(strType) == setTypes.end())
+                {
+                    strPrefixText = CRedactionCustomComponentsUtils::ExpandRedactionTags(
+                        m_redactionAppearance.m_strPrefixText, strCodes, strType);
+                    strSuffixText = CRedactionCustomComponentsUtils::ExpandRedactionTags(
+                        m_redactionAppearance.m_strSuffixText, strCodes, strType);
+                    setTypes.insert(strType);
+                }
 
-				// Handle all replacement values
-				if (!strText.empty() && m_redactionAppearance.m_vecReplacements.size() > 0)
-				{
-					for(vector<pair<string, string>>::iterator it =
-						m_redactionAppearance.m_vecReplacements.begin();
-						it != m_redactionAppearance.m_vecReplacements.end();
-						it++)
-					{
-						replaceVariable(strText, it->first, it->second, kReplaceAll);
-					}
-				}
+                // Handle all replacement values
+                if (!strText.empty() && m_redactionAppearance.m_vecReplacements.size() > 0)
+                {
+                    for(vector<pair<string, string>>::iterator it =
+                        m_redactionAppearance.m_vecReplacements.begin();
+                        it != m_redactionAppearance.m_vecReplacements.end();
+                        it++)
+                    {
+                        replaceVariable(strText, it->first, it->second, kReplaceAll);
+                    }
+                }
 
                 // Get the Raster zones to redact
                 IIUnknownVectorPtr ipRasterZones = ipValue->GetOriginalImageRasterZones();
                 ASSERT_RESOURCE_ALLOCATION("ELI09180", ipRasterZones != __nullptr);
                 _lastCodePos = "280";
 
-				IIUnknownVectorPtr ipOcrZones = __nullptr;
-				if (ipSearcher != __nullptr && isSentenceCase(strText))
-				{
-					ipOcrZones = ipValue->GetOCRImageRasterZones();
-					ASSERT_RESOURCE_ALLOCATION("ELI31664", ipOcrZones != __nullptr);
-				}
+                IIUnknownVectorPtr ipOcrZones = __nullptr;
+                if (ipSearcher != __nullptr && isSentenceCase(strText))
+                {
+                    ipOcrZones = ipValue->GetOCRImageRasterZones();
+                    ASSERT_RESOURCE_ALLOCATION("ELI31664", ipOcrZones != __nullptr);
+                }
 
                 // Add to the vector of zones to redact
                 long lZoneCount = ipRasterZones->Size();
                 for (long j = 0; j < lZoneCount; j++)
                 {
-					// Get the raster zone
+                    // Get the raster zone
                     IRasterZonePtr ipRasterZone = ipRasterZones->At(j);
                     ASSERT_RESOURCE_ALLOCATION("ELI24862", ipRasterZone != __nullptr);
 
-					// Store the text value locally (this value may be changed
-					// if auto-adjust case is true)
-					string strRedactionText = strText;
+                    // Store the text value locally (this value may be changed
+                    // if auto-adjust case is true)
+                    string strRedactionText = strText;
 
-					// If there is a valid spatial string searcher, then attempt to update
-					// the case of the text based on the searcher results
-					if (ipOcrZones != __nullptr)
-					{
-		                _lastCodePos = "280_10";
+                    // If there is a valid spatial string searcher, then attempt to update
+                    // the case of the text based on the searcher results
+                    if (ipOcrZones != __nullptr)
+                    {
+                        _lastCodePos = "280_10";
 
-						// Get the ocr zone
-						IRasterZonePtr ipOcrZone = ipOcrZones->At(j);
-						ASSERT_RESOURCE_ALLOCATION("ELI31669", ipOcrZone != __nullptr);
+                        // Get the ocr zone
+                        IRasterZonePtr ipOcrZone = ipOcrZones->At(j);
+                        ASSERT_RESOURCE_ALLOCATION("ELI31669", ipOcrZone != __nullptr);
 
-						ILongRectanglePtr ipBounds = ipValue->GetOCRImagePageBounds(
-							ipOcrZone->PageNumber);
-						ASSERT_RESOURCE_ALLOCATION("ELI31670", ipBounds != __nullptr);
+                        ILongRectanglePtr ipBounds = ipValue->GetOCRImagePageBounds(
+                            ipOcrZone->PageNumber);
+                        ASSERT_RESOURCE_ALLOCATION("ELI31670", ipBounds != __nullptr);
 
-						// Get the bounds
-						ILongRectanglePtr ipRect = ipOcrZone->GetRectangularBounds(ipBounds);
-						ASSERT_RESOURCE_ALLOCATION("ELI31671", ipRect != __nullptr);
+                        // Get the bounds
+                        ILongRectanglePtr ipRect = ipOcrZone->GetRectangularBounds(ipBounds);
+                        ASSERT_RESOURCE_ALLOCATION("ELI31671", ipRect != __nullptr);
 
-						// Get the spatial string for the attribute
-						ISpatialStringPtr ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
-						ASSERT_RESOURCE_ALLOCATION("ELI31680", ipTemp != __nullptr);
+                        // Get the spatial string for the attribute
+                        ISpatialStringPtr ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
+                        ASSERT_RESOURCE_ALLOCATION("ELI31680", ipTemp != __nullptr);
 
-						// Only continue if the returned region has spatial information
-						if (ipTemp->HasSpatialInfo() == VARIANT_TRUE)
-						{
-							string strTemp = asString(ipTemp);
-							size_t nIndex = strTemp.find_last_of(".!?");
-							_lastCodePos = "280_15";
+                        // Only continue if the returned region has spatial information
+                        if (ipTemp->HasSpatialInfo() == VARIANT_TRUE)
+                        {
+                            string strTemp = asString(ipTemp);
+                            size_t nIndex = strTemp.find_last_of(".!?");
+                            _lastCodePos = "280_15";
 
-							bool bMakeLowerCase = false;
-							if (nIndex == string::npos || nIndex < (strTemp.length() - 1))
-							{
-								_lastCodePos = "280_16";
+                            bool bMakeLowerCase = false;
+                            if (nIndex == string::npos || nIndex < (strTemp.length() - 1))
+                            {
+                                _lastCodePos = "280_16";
 
-								// Get the page bounds
-								long nPageLeft(0), nPageTop(0), nPageBottom(0), nPageRight(0);
-								ipBounds->GetBounds(&nPageLeft, &nPageTop, &nPageRight, &nPageBottom);
+                                // Get the page bounds
+                                long nPageLeft(0), nPageTop(0), nPageBottom(0), nPageRight(0);
+                                ipBounds->GetBounds(&nPageLeft, &nPageTop, &nPageRight, &nPageBottom);
 
-								// Get the bounds of the zone
-								long nRectLeft(0), nRectTop(0), nRectBottom(0), nRectRight(0);
-								ipRect->GetBounds(&nRectLeft, &nRectTop, &nRectRight, &nRectBottom);
+                                // Get the bounds of the zone
+                                long nRectLeft(0), nRectTop(0), nRectBottom(0), nRectRight(0);
+                                ipRect->GetBounds(&nRectLeft, &nRectTop, &nRectRight, &nRectBottom);
 
-								// Store the original zone bounds
-								ILongRectanglePtr ipOrigRect(CLSID_LongRectangle);
-								ASSERT_RESOURCE_ALLOCATION("ELI31679", ipOrigRect);
-								ipOrigRect->SetBounds(nRectLeft, nRectTop, nRectRight, nRectBottom);
+                                // Store the original zone bounds
+                                ILongRectanglePtr ipOrigRect(CLSID_LongRectangle);
+                                ASSERT_RESOURCE_ALLOCATION("ELI31679", ipOrigRect);
+                                ipOrigRect->SetBounds(nRectLeft, nRectTop, nRectRight, nRectBottom);
 
-								// Get the average height. This is the height we
-								// will use to expand the region (both up and down) to encompass other
-								// lines in the region.
-								long nHeightIncrease = ipTemp->GetAverageCharHeight();
+                                // Get the average height. This is the height we
+                                // will use to expand the region (both up and down) to encompass other
+                                // lines in the region.
+                                long nHeightIncrease = ipTemp->GetAverageCharHeight();
 
-								// First set the bounds left and right and check for words
-								ipRect->SetBounds(nPageLeft, nRectTop,
-									nPageRight, nRectBottom);
-								ipRect->Clip(nPageLeft, nPageTop, nPageRight, nPageBottom);
+                                // First set the bounds left and right and check for words
+                                ipRect->SetBounds(nPageLeft, nRectTop,
+                                    nPageRight, nRectBottom);
+                                ipRect->Clip(nPageLeft, nPageTop, nPageRight, nPageBottom);
 
-								ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
-								ASSERT_RESOURCE_ALLOCATION("ELI31681", ipTemp != __nullptr);
+                                ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
+                                ASSERT_RESOURCE_ALLOCATION("ELI31681", ipTemp != __nullptr);
 
-								// Initialize the attribute searcher with this string
-								ipAttrSearcher->InitSpatialStringSearcher(ipTemp, VARIANT_FALSE);
-								_lastCodePos = "280_17";
+                                // Initialize the attribute searcher with this string
+                                ipAttrSearcher->InitSpatialStringSearcher(ipTemp, VARIANT_FALSE);
+                                _lastCodePos = "280_17";
 
-								// Look left and right, if empty in either direction, expand
-								// the zone of searching up and/or down based on missing words
-								ISpatialStringPtr ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);
-								ISpatialStringPtr ipRightWord = ipAttrSearcher->GetRightWord(ipOrigRect);
-								if (ipLeftWord == __nullptr || ipRightWord == __nullptr)
-								{
-									_lastCodePos = "280_18";
-									nRectTop -= ipLeftWord == __nullptr ? nHeightIncrease : 0;
-									nRectBottom += ipRightWord == __nullptr ? nHeightIncrease : 0;
-									ipRect->SetBounds(nPageLeft, nRectTop, nPageRight, nRectBottom);
-									ipRect->Clip(nPageLeft, nPageTop, nPageRight, nPageBottom);
+                                // Look left and right, if empty in either direction, expand
+                                // the zone of searching up and/or down based on missing words
+                                ISpatialStringPtr ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);
+                                ISpatialStringPtr ipRightWord = ipAttrSearcher->GetRightWord(ipOrigRect);
+                                if (ipLeftWord == __nullptr || ipRightWord == __nullptr)
+                                {
+                                    _lastCodePos = "280_18";
+                                    nRectTop -= ipLeftWord == __nullptr ? nHeightIncrease : 0;
+                                    nRectBottom += ipRightWord == __nullptr ? nHeightIncrease : 0;
+                                    ipRect->SetBounds(nPageLeft, nRectTop, nPageRight, nRectBottom);
+                                    ipRect->Clip(nPageLeft, nPageTop, nPageRight, nPageBottom);
 
-									// Get the data from the expanded region
-									ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
-									ASSERT_RESOURCE_ALLOCATION("ELI31682", ipTemp != __nullptr);
+                                    // Get the data from the expanded region
+                                    ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
+                                    ASSERT_RESOURCE_ALLOCATION("ELI31682", ipTemp != __nullptr);
 
-									ipAttrSearcher->InitSpatialStringSearcher(ipTemp, VARIANT_FALSE);
+                                    ipAttrSearcher->InitSpatialStringSearcher(ipTemp, VARIANT_FALSE);
 
-									// Get the new left and right words
-									ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);
-									ipRightWord = ipAttrSearcher->GetRightWord(ipOrigRect);
-								}
-								_lastCodePos = "280_19";
+                                    // Get the new left and right words
+                                    ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);
+                                    ipRightWord = ipAttrSearcher->GetRightWord(ipOrigRect);
+                                }
+                                _lastCodePos = "280_19";
 
-								// If there is a word to the left, look for punctuation
-								if (ipLeftWord != __nullptr)
-								{
-									_lastCodePos = "280_19_A";
-									string strLeft = asString(ipLeftWord->String);
-									if (strLeft.substr(strLeft.length() - 1)
-										.find_first_of(".!?") == string::npos)
-									{
-										// No punctuation to the left, look for lower case letters
-										if (strLeft.find_first_of(gstrLOWER_ALPHA) != string::npos)
-										{
-											// found lower case letters
-											bMakeLowerCase = true;
-										}
-									}
-									else
-									{
-										// Sentence punctuation to the left, set right word to
-										// null, no need to check further
-										ipRightWord = __nullptr;
-									}
-								}
-								if (!bMakeLowerCase && ipRightWord != __nullptr)
-								{
-									_lastCodePos = "280_19_B";
-									string strRight = asString(ipRightWord->String);
-									if (strRight.find_first_of(gstrLOWER_ALPHA) != string::npos)
-									{
-										bMakeLowerCase = true;
-									}
-								}
-							}
-							else
-							{
-								bMakeLowerCase = true;
-							}
+                                // If there is a word to the left, look for punctuation
+                                if (ipLeftWord != __nullptr)
+                                {
+                                    _lastCodePos = "280_19_A";
+                                    string strLeft = asString(ipLeftWord->String);
+                                    if (strLeft.substr(strLeft.length() - 1)
+                                        .find_first_of(".!?") == string::npos)
+                                    {
+                                        // No punctuation to the left, look for lower case letters
+                                        if (strLeft.find_first_of(gstrLOWER_ALPHA) != string::npos)
+                                        {
+                                            // found lower case letters
+                                            bMakeLowerCase = true;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Sentence punctuation to the left, set right word to
+                                        // null, no need to check further
+                                        ipRightWord = __nullptr;
+                                    }
+                                }
+                                if (!bMakeLowerCase && ipRightWord != __nullptr)
+                                {
+                                    _lastCodePos = "280_19_B";
+                                    string strRight = asString(ipRightWord->String);
+                                    if (strRight.find_first_of(gstrLOWER_ALPHA) != string::npos)
+                                    {
+                                        bMakeLowerCase = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                bMakeLowerCase = true;
+                            }
 
-							if (bMakeLowerCase)
-							{
-								makeLowerCase(strRedactionText);
-							}
+                            if (bMakeLowerCase)
+                            {
+                                makeLowerCase(strRedactionText);
+                            }
 
-			                _lastCodePos = "280_20";
-						}
-					}
-	                _lastCodePos = "285";
+                            _lastCodePos = "280_20";
+                        }
+                    }
+                    _lastCodePos = "285";
 
                     // Construct the page raster zone
                     PageRasterZone zone;
@@ -569,16 +568,16 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
                     zone.m_font = m_redactionAppearance.m_lgFont;
                     zone.m_iPointSize = m_redactionAppearance.m_iPointSize;
 
-					// Set the appropriate text for the redaction
-					// If the first redaction, add prefix and suffix text
-					if (j == 0)
-					{
-						zone.m_strText = strPrefixText + strRedactionText + strSuffixText;
-					}
-					else
-					{
-	                    zone.m_strText = strRedactionText;
-					}
+                    // Set the appropriate text for the redaction
+                    // If the first redaction, add prefix and suffix text
+                    if (j == 0)
+                    {
+                        zone.m_strText = strPrefixText + strRedactionText + strSuffixText;
+                    }
+                    else
+                    {
+                        zone.m_strText = strRedactionText;
+                    }
                     ipRasterZone->GetData(&(zone.m_nStartX), &(zone.m_nStartY), &(zone.m_nEndX),
                         &(zone.m_nEndY), &(zone.m_nHeight), &(zone.m_nPage));
 
@@ -616,46 +615,46 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
             nPermissions = (int) permissions;
         }
 
-		// [FlexIDSCore:4938]
-		// There appears to be a possible corruption issue in fillImageArea. We get random failures
-		// in this method, and retries that are supposed to occur in this call don't seem to
-		// happen... apparently because of the corruption.
-		// At this point it seems unlikely we will be able to find and fix the underlying cause
-		// in time for the 9.0 release. For now, add one retry nested on top of the fillImageArea
-		// retries that aren't happening to (hopefully) mask the issue.
-		bool bRetried = false;
-		while (true)
-		{
-			try
-			{
-				try
-				{
-					// Save redactions
-					fillImageArea(strImageToRedact, strOutputName, vecZones, 
-						m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations,
-						true, strUser, strOwner, nPermissions);
-					_lastCodePos = "400";
+        // [FlexIDSCore:4938]
+        // There appears to be a possible corruption issue in fillImageArea. We get random failures
+        // in this method, and retries that are supposed to occur in this call don't seem to
+        // happen... apparently because of the corruption.
+        // At this point it seems unlikely we will be able to find and fix the underlying cause
+        // in time for the 9.0 release. For now, add one retry nested on top of the fillImageArea
+        // retries that aren't happening to (hopefully) mask the issue.
+        bool bRetried = false;
+        while (true)
+        {
+            try
+            {
+                try
+                {
+                    // Save redactions
+                    fillImageArea(strImageToRedact, strOutputName, vecZones, 
+                        m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations,
+                        true, strUser, strOwner, nPermissions);
+                    _lastCodePos = "400";
 
-					// If successful, break out of the retry loop.
-					break;
-				}
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34374");
-			}
-			catch (UCLIDException &ue)
-			{
-				if (!bRetried)
-				{
-					UCLIDException uexOuter("ELI34375",
-						"Create redacted image attempt failed; retrying...", ue);
-						uexOuter.log();
+                    // If successful, break out of the retry loop.
+                    break;
+                }
+                CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34374");
+            }
+            catch (UCLIDException &ue)
+            {
+                if (!bRetried)
+                {
+                    UCLIDException uexOuter("ELI34375",
+                        "Create redacted image attempt failed; retrying...", ue);
+                        uexOuter.log();
 
-					bRetried = true;
-					continue;
-				}
+                    bRetried = true;
+                    continue;
+                }
 
-				throw ue;
-			}
-		}
+                throw ue;
+            }
+        }
 
         // Stop the stop watch
         swProcessingTime.stop();
@@ -671,11 +670,11 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         {
             // Set the FAMDB pointer
             UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipIDSDB =
-				getIDShieldDBPtr(ipFAMDB);
+                getIDShieldDBPtr(ipFAMDB);
 
             // Add the IDShieldData record to the database
             ipIDSDB->AddIDShieldData(nFileTaskSessionID,
-				swProcessingTime.getElapsedTime(), 0, 
+                swProcessingTime.getElapsedTime(), 0, 
                 idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
                 idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions,
                 idsData.m_lNumPagesAutoAdvanced);
@@ -710,34 +709,34 @@ STDMETHODIMP CRedactionTask::raw_Close()
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionTask::raw_Standby(VARIANT_BOOL* pVal)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	
-	try
-	{		
-		ASSERT_ARGUMENT("ELI33918", pVal != __nullptr);
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+    
+    try
+    {		
+        ASSERT_ARGUMENT("ELI33918", pVal != __nullptr);
 
-		*pVal = VARIANT_TRUE;
+        *pVal = VARIANT_TRUE;
 
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33919");
+        return S_OK;
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33919");
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionTask::get_MinStackSize(unsigned long *pnMinStackSize)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	try
-	{
-		ASSERT_ARGUMENT("ELI35025", pnMinStackSize != __nullptr);
+    try
+    {
+        ASSERT_ARGUMENT("ELI35025", pnMinStackSize != __nullptr);
 
-		validateLicense();
+        validateLicense();
 
-		*pnMinStackSize = 0;
+        *pnMinStackSize = 0;
 
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35026");
+        return S_OK;
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35026");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -875,9 +874,9 @@ STDMETHODIMP CRedactionTask::raw_CopyFrom(IUnknown* pObject)
         // Retrieve redaction appearance settings
         m_redactionAppearance.m_strText = asString(ipSource->RedactionText);
         m_redactionAppearance.m_bAdjustTextCasing = asCppBool(ipSource->AutoAdjustTextCasing);
-		m_redactionAppearance.updateReplacementsFromVector(ipSource->ReplacementValues);
-		m_redactionAppearance.m_strPrefixText = asString(ipSource->PrefixText);
-		m_redactionAppearance.m_strSuffixText = asString(ipSource->SuffixText);
+        m_redactionAppearance.updateReplacementsFromVector(ipSource->ReplacementValues);
+        m_redactionAppearance.m_strPrefixText = asString(ipSource->PrefixText);
+        m_redactionAppearance.m_strSuffixText = asString(ipSource->SuffixText);
         m_redactionAppearance.m_crBorderColor = ipSource->BorderColor;
         m_redactionAppearance.m_crFillColor = ipSource->FillColor;
         
@@ -1585,15 +1584,15 @@ STDMETHODIMP CRedactionTask::get_ReplacementValues(IIUnknownVector** ppvecReplac
 
     try
     {
-		ASSERT_ARGUMENT("ELI31751", ppvecReplacements != __nullptr);
+        ASSERT_ARGUMENT("ELI31751", ppvecReplacements != __nullptr);
 
         // Check license state
         validateLicense();
 
-		IIUnknownVectorPtr ipReplacements = m_redactionAppearance.getReplacements();
-		ASSERT_RESOURCE_ALLOCATION("ELI31752", ipReplacements != __nullptr);
+        IIUnknownVectorPtr ipReplacements = m_redactionAppearance.getReplacements();
+        ASSERT_RESOURCE_ALLOCATION("ELI31752", ipReplacements != __nullptr);
 
-		*ppvecReplacements = ipReplacements.Detach();
+        *ppvecReplacements = ipReplacements.Detach();
 
         return S_OK;
     }
@@ -1606,14 +1605,14 @@ STDMETHODIMP CRedactionTask::put_ReplacementValues(IIUnknownVector* pvecReplacem
 
     try
     {
-		IIUnknownVectorPtr ipReplacements(pvecReplacements);
-		ASSERT_ARGUMENT("ELI31754", ipReplacements != __nullptr);
+        IIUnknownVectorPtr ipReplacements(pvecReplacements);
+        ASSERT_ARGUMENT("ELI31754", ipReplacements != __nullptr);
 
         // Check license state
         validateLicense();
 
-		m_redactionAppearance.updateReplacementsFromVector(ipReplacements);
-		m_bDirty = true;
+        m_redactionAppearance.updateReplacementsFromVector(ipReplacements);
+        m_bDirty = true;
 
         return S_OK;
     }
@@ -1626,12 +1625,12 @@ STDMETHODIMP CRedactionTask::get_PrefixText(BSTR* pbstrPrefixText)
 
     try
     {
-		ASSERT_ARGUMENT("ELI31756", pbstrPrefixText != __nullptr);
+        ASSERT_ARGUMENT("ELI31756", pbstrPrefixText != __nullptr);
 
         // Check license state
         validateLicense();
 
-		*pbstrPrefixText = _bstr_t(m_redactionAppearance.m_strPrefixText.c_str()).Detach();
+        *pbstrPrefixText = _bstr_t(m_redactionAppearance.m_strPrefixText.c_str()).Detach();
 
         return S_OK;
     }
@@ -1647,7 +1646,7 @@ STDMETHODIMP CRedactionTask::put_PrefixText(BSTR bstrPrefixText)
         // Check license state
         validateLicense();
 
-		m_redactionAppearance.m_strPrefixText = asString(bstrPrefixText);
+        m_redactionAppearance.m_strPrefixText = asString(bstrPrefixText);
 
         return S_OK;
     }
@@ -1660,12 +1659,12 @@ STDMETHODIMP CRedactionTask::get_SuffixText(BSTR* pbstrSuffixText)
 
     try
     {
-		ASSERT_ARGUMENT("ELI31759", pbstrSuffixText != __nullptr);
+        ASSERT_ARGUMENT("ELI31759", pbstrSuffixText != __nullptr);
 
         // Check license state
         validateLicense();
 
-		*pbstrSuffixText = _bstr_t(m_redactionAppearance.m_strSuffixText.c_str()).Detach();
+        *pbstrSuffixText = _bstr_t(m_redactionAppearance.m_strSuffixText.c_str()).Detach();
 
         return S_OK;
     }
@@ -1681,7 +1680,7 @@ STDMETHODIMP CRedactionTask::put_SuffixText(BSTR bstrSuffixText)
         // Check license state
         validateLicense();
 
-		m_redactionAppearance.m_strSuffixText = asString(bstrSuffixText);
+        m_redactionAppearance.m_strSuffixText = asString(bstrSuffixText);
 
         return S_OK;
     }
@@ -1770,30 +1769,30 @@ STDMETHODIMP CRedactionTask::Load(IStream* pStream)
         // Redaction appearance
         dataReader >> m_redactionAppearance.m_strText;
 
-		// Get advanced redaction appearance settings
+        // Get advanced redaction appearance settings
         if (nDataVersion >= 3)
         {
-			vector<pair<string,string>>& vecReplacements = m_redactionAppearance.m_vecReplacements;
+            vector<pair<string,string>>& vecReplacements = m_redactionAppearance.m_vecReplacements;
 
-			string strTemp1(""), strTemp2("");
-			unsigned long ulTemp(1);
-			if (nDataVersion >= 4)
-			{
-				dataReader >> ulTemp;
-			}
-			for(unsigned long i=0; i < ulTemp; i++)
-			{
-				dataReader >> strTemp1;
-				dataReader >> strTemp2;
-				vecReplacements.push_back(make_pair(strTemp1, strTemp2));
-			}
+            string strTemp1(""), strTemp2("");
+            unsigned long ulTemp(1);
+            if (nDataVersion >= 4)
+            {
+                dataReader >> ulTemp;
+            }
+            for(unsigned long i=0; i < ulTemp; i++)
+            {
+                dataReader >> strTemp1;
+                dataReader >> strTemp2;
+                vecReplacements.push_back(make_pair(strTemp1, strTemp2));
+            }
             dataReader >> m_redactionAppearance.m_bAdjustTextCasing;
         }
-		if (nDataVersion >= 4)
-		{
-			dataReader >> m_redactionAppearance.m_strPrefixText;
-			dataReader >> m_redactionAppearance.m_strSuffixText;
-		}
+        if (nDataVersion >= 4)
+        {
+            dataReader >> m_redactionAppearance.m_strPrefixText;
+            dataReader >> m_redactionAppearance.m_strSuffixText;
+        }
 
         dataReader >> m_redactionAppearance.m_crBorderColor;
         dataReader >> m_redactionAppearance.m_crFillColor;
@@ -1834,13 +1833,13 @@ STDMETHODIMP CRedactionTask::Load(IStream* pStream)
                 m_ipPdfSettings = ipObj;
                 ASSERT_RESOURCE_ALLOCATION("ELI29775", m_ipPdfSettings != __nullptr);
 
-				// Version 5 corresponds with upgrade to LT 17 which no longer requires setting
-				// both owner and user passwords. Older versions forced this value to true,
-				// force the value to false for those cases.
-				if (nDataVersion < 5)
-				{
-	                m_ipPdfSettings->RequireUserAndOwnerPassword = VARIANT_FALSE;
-				}
+                // Version 5 corresponds with upgrade to LT 17 which no longer requires setting
+                // both owner and user passwords. Older versions forced this value to true,
+                // force the value to false for those cases.
+                if (nDataVersion < 5)
+                {
+                    m_ipPdfSettings->RequireUserAndOwnerPassword = VARIANT_FALSE;
+                }
             }
         }
 
@@ -1884,18 +1883,18 @@ STDMETHODIMP CRedactionTask::Save(IStream* pStream, BOOL fClearDirty)
         // Redaction text
         dataWriter << m_redactionAppearance.m_strText;
 
-		// Advanced redaction text settings
-		dataWriter << (unsigned long)m_redactionAppearance.m_vecReplacements.size();
-		for(vector<pair<string,string>>::iterator it = m_redactionAppearance.m_vecReplacements.begin();
-			it != m_redactionAppearance.m_vecReplacements.end(); it++)
-		{
-			dataWriter << it->first;
-			dataWriter << it->second;
-		}
+        // Advanced redaction text settings
+        dataWriter << (unsigned long)m_redactionAppearance.m_vecReplacements.size();
+        for(vector<pair<string,string>>::iterator it = m_redactionAppearance.m_vecReplacements.begin();
+            it != m_redactionAppearance.m_vecReplacements.end(); it++)
+        {
+            dataWriter << it->first;
+            dataWriter << it->second;
+        }
         dataWriter << m_redactionAppearance.m_bAdjustTextCasing;
 
-		dataWriter << m_redactionAppearance.m_strPrefixText;
-		dataWriter << m_redactionAppearance.m_strSuffixText;
+        dataWriter << m_redactionAppearance.m_strPrefixText;
+        dataWriter << m_redactionAppearance.m_strSuffixText;
 
         // Save redaction color options
         dataWriter << m_redactionAppearance.m_crBorderColor;
@@ -2032,10 +2031,8 @@ void CRedactionTask::storeMetaData(const string& strVoaFile, IIUnknownVectorPtr 
         ASSERT_RESOURCE_ALLOCATION("ELI28349", ipMetaData != __nullptr);
         ipAttributes->PushBack(ipMetaData);
 
-		ExtractFileLock(strVoaFile, true, "ID Shield: Create redacted image");
-
         // Save the voa with the new metadata
-		string strStorageManagerIID = asString(CLSID_AttributeStorageManager);
+        string strStorageManagerIID = asString(CLSID_AttributeStorageManager);
         ipAttributes->SaveTo(strVoaFile.c_str(), false, strStorageManagerIID.c_str());
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28350")
@@ -2153,13 +2150,13 @@ void CRedactionTask::assignIds(IIUnknownVectorPtr ipAttributes, long lNextId,
             IAttributePtr ipAttribute = ipAttributes->At(i);
             ASSERT_RESOURCE_ALLOCATION("ELI28362", ipAttribute);
 
-			// [FlexIDSCore:4901]
-			// Don't added id attributes for metadata attributes.
-			string strAttributeName = asString(ipAttribute->Name);
-			if (!strAttributeName.empty() && strAttributeName.substr(0, 1) == "_")
-			{
-				continue;
-			}
+            // [FlexIDSCore:4901]
+            // Don't added id attributes for metadata attributes.
+            string strAttributeName = asString(ipAttribute->Name);
+            if (!strAttributeName.empty() && strAttributeName.substr(0, 1) == "_")
+            {
+                continue;
+            }
 
             // Check if this attribute already has an attribute id
             IAttributePtr ipIdAttribute = getIdAttribute(ipAttribute);
@@ -2350,7 +2347,7 @@ IAttributePtr CRedactionTask::createTimeInfoAttribute(const string& strSourceDoc
 
         // Start time
         string strTimeStarted = formatSystemTime(tStartTime, "%I:%M:%S.<ms> %p");
-		replaceVariable(strTimeStarted, "<ms>", asString(tStartTime.wMilliseconds));
+        replaceVariable(strTimeStarted, "<ms>", asString(tStartTime.wMilliseconds));
         IAttributePtr ipTime = createAttribute(strSourceDocument, "_TimeStarted", strTimeStarted);
         ASSERT_RESOURCE_ALLOCATION("ELI28391", ipTime != __nullptr);
 
@@ -2593,17 +2590,17 @@ void CRedactionTask::fillAttributeSet(IVariantVectorPtr ipAttributeNames, set<st
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr CRedactionTask::getIDShieldDBPtr(
-	IFileProcessingDBPtr ipFAMDB)
+    IFileProcessingDBPtr ipFAMDB)
 {
     if (m_ipIDShieldDB == __nullptr)
     {
-		IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI34552", ipFAMDBUtils != __nullptr);
-		
+        IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+        ASSERT_RESOURCE_ALLOCATION("ELI34552", ipFAMDBUtils != __nullptr);
+        
         m_ipIDShieldDB.CreateInstance((LPCSTR)ipFAMDBUtils->GetIDShieldDBProgId());
         ASSERT_RESOURCE_ALLOCATION("ELI19794", m_ipIDShieldDB != __nullptr);		
 
-		m_ipIDShieldDB->Initialize(ipFAMDB);
+        m_ipIDShieldDB->Initialize(ipFAMDB);
     }
 
     return m_ipIDShieldDB;

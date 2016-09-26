@@ -414,13 +414,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         bool _invisible;
 
         /// <summary>
-        /// https://extract.atlassian.net/browse/ISSUE-13573
-        /// Used to prevent simultaneous modification of a voa file from multiple Extract Systems
-        /// processes.
-        /// </summary>
-        ExtractFileLock _voaFileLock = new ExtractFileLock();
-
-        /// <summary>
         /// Maps document names to VOA file data that as been cached for use for the file.
         /// </summary>
         Dictionary<string, IUnknownVector> _cachedVOAData = new Dictionary<string, IUnknownVector>();
@@ -1135,7 +1128,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Before Loading the state make sure the config is still valid
-				// https://extract.atlassian.net/browse/ISSUE-12830
+                // https://extract.atlassian.net/browse/ISSUE-12830
                 UserConfigChecker.EnsureValidUserConfigFile();
 
                 base.OnLoad(e);
@@ -1625,7 +1618,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Before closing windows make sure the config is still valid.               
-				// https://extract.atlassian.net/browse/ISSUE-12830
+                // https://extract.atlassian.net/browse/ISSUE-12830
                 UserConfigChecker.EnsureValidUserConfigFile();
 
                 if (!PreventSaveOfDirtyData)
@@ -1800,11 +1793,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _exitToolStripMenuItem.Dispose();
                         _exitToolStripMenuItem = null;
                     }
-                    if (_voaFileLock != null)
-                    {
-                        _voaFileLock.Dispose();
-                        _voaFileLock = null;
-                    }
                 }
                 catch { }
             }
@@ -1945,8 +1933,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (!_imageViewer.IsImageAvailable)
                 {
-                    _voaFileLock.ReleaseLock();
-
                     // The goto next invalid and unviewed buttons and menu options will be enabled via
                     // the DataEntryControlHost.UnviewedItemsFound and InvalidItemsFound events.
                     _gotoNextInvalidCommand.Enabled = false;
@@ -3487,8 +3473,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 else
                 {
                     string dataFilename = _imageViewer.ImageFile + ".voa";
-                    _voaFileLock.GetLock(dataFilename,
-                        _standAloneMode ? "" : "Data entry verification");
 
                     bool saved = _dataEntryControlHost.SaveData(validateData);
 
@@ -5656,9 +5640,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             string dataFilename = fileName + ".voa";
             if (File.Exists(dataFilename))
             {
-                _voaFileLock.GetLock(dataFilename,
-                    _standAloneMode ? "" : "Data entry verification");
-
                 attributes.LoadFrom(dataFilename, false);
             }
             return attributes;

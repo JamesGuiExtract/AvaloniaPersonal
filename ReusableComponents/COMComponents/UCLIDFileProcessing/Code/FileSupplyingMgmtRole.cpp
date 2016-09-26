@@ -13,7 +13,6 @@
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
 #include <FAMUtilsConstants.h>
-#include <ExtractFileLock.h>
 
 //-------------------------------------------------------------------------------------------------
 // Preprocessor directives
@@ -888,14 +887,6 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 			
 			// check if the file matches the FAM condition
 			if (fileMatchesFAMCondition(strFile))
-			{
-				return S_OK;
-			}
-
-			// https://extract.atlassian.net/browse/ISSUE-13573
-			// Automatically ignore ".ExtractLock" files to ensure they don't end up being
-			// inadvertently queued.
-			if (endsWith(strFile, gszLOCK_FILE_EXTENSION))
 			{
 				return S_OK;
 			}

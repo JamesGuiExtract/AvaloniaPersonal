@@ -536,11 +536,7 @@ namespace Extract.FileActionManager.FileProcessors
                                                                 expandedAttrSetName,
                                                                 MOST_RECENT_ATTRIBUTE);
 
-                    using (new ExtractFileLock(voaFileName, "Retrieve attributes in database"))
-                    {
-                        voaData.SaveTo(voaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
-                    }
-
+                    voaData.SaveTo(voaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
                     voaData.ReportMemoryUsage();
                 }
 

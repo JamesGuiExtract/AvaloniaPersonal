@@ -11,7 +11,6 @@
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <StringTokenizer.h>
-#include <ExtractFileLock.h>
 
 #include <string>
 
@@ -160,8 +159,6 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(IFileRecord* pFileReco
 				ipNewAttributes->PushBack(ipAttribute);
 			}
 		}
-
-		ExtractFileLock(strVOAToWrite, true, "ID Shield: Filter data file");
 
 		// Now save the filtered attributes
 		string strStorageManagerIID = asString(CLSID_AttributeStorageManager);

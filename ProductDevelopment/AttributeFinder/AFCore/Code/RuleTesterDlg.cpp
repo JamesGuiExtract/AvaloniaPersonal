@@ -17,7 +17,6 @@
 #include <ComUtils.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
-#include <ExtractFileLock.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -792,8 +791,6 @@ void RuleTesterDlg::OnButtonVoa()
 		if (dlgSave.DoModal() == IDOK)
 		{
 			CString zFileName = dlgSave.GetPathName();
-
-			ExtractFileLock((LPCTSTR)zFileName, true);
 
 			// Save the Attributes to the file
 			string strStorageManagerIID = asString(CLSID_AttributeStorageManager);
