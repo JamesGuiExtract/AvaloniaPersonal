@@ -34,6 +34,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFOutputHandlers", "..\..\..\AFOutputHandlers\Code\AFOutputHandlers.vcxproj", "{835D9667-E21E-460F-BC05-EE5E39551CFA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFPreProcessors", "..\..\..\AFPreProcessors\Code\AFPreProcessors.vcxproj", "{C2101648-5B5C-4AD9-9710-46452425335C}"
