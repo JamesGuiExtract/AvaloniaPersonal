@@ -54,6 +54,36 @@ static const string gstrCREATE_PATIENT_CURRENT_MRN_INDEX =
 	"	ON [LabDEPatient]([CurrentMRN])";
 
 //--------------------------------------------------------------------------------------------------
+// LabDEEncounter Table
+//--------------------------------------------------------------------------------------------------
+static const string gstrLABDE_ENCOUNTER_TABLE = "LabDEEncounter";
+
+static const string gstrCREATE_ENCOUNTER_TABLE =
+	"CREATE TABLE [dbo].[LabDEEncounter] ("
+	" [CSN] NVARCHAR(20) NOT NULL CONSTRAINT[PK_Encounter] PRIMARY KEY CLUSTERED, "
+	" [PatientMRN] NVARCHAR(20) NULL, "
+	" [EncounterDateTime] DATETIME NOT NULL DEFAULT GETDATE(), "
+	" [Department] NVARCHAR(256) NOT NULL, "
+	" [EncounterType] NVARCHAR(256) NOT NULL, "
+	" [EncounterProvider] NVARCHAR(256) NOT NULL, "
+	" ADTMessage XML)";
+
+static const string gstrADD_FK_ENCOUNTER_PATIENT =
+"ALTER TABLE [dbo].[LabDEEncounter] "
+" WITH CHECK ADD CONSTRAINT[FK_Encounter_Patient] FOREIGN KEY([PatientMRN]) "
+" REFERENCES[dbo].[LabDEPatient]([MRN]) "
+" ON UPDATE CASCADE "
+" ON DELETE CASCADE";
+
+// Add a column to the LabDE Order table to be used as an FK to the Encounter table.
+static const string gstrADD_FK_ORDER_TO_ENCOUNTER =
+"ALTER TABLE [dbo].[LabDEOrder] "
+" ADD[EncounterIndex] NVARCHAR(20) NULL, "
+" CONSTRAINT[FK_Order_Encounter] FOREIGN KEY([EncounterIndex]) REFERENCES LabDEEncounter(CSN) "
+" ON UPDATE NO ACTION "
+" ON DELETE NO ACTION";
+
+//--------------------------------------------------------------------------------------------------
 // LabDEOrderStatus Table
 //--------------------------------------------------------------------------------------------------
 static const string gstrLABDE_ORDER_STATUS_TABLE = "LabDEOrderStatus";

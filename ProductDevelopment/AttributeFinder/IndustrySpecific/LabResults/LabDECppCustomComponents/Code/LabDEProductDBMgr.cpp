@@ -35,8 +35,10 @@ using namespace std;
 // Version 6: Changed AddOrUpdateLabDEOrder stored procedure to be created as dbo.
 // Version 7: https://extract.atlassian.net/browse/ISSUE-13579
 //			  Added MergedInto and CurrentMRN column to LabDEPatient table.
+// Version 8: https://extract.atlassian.net/browse/ISSUE-14152
+//			  Create FAM DB schema to create encounters table
 // WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
-static const long glLABDE_DB_SCHEMA_VERSION = 7;
+static const long glLABDE_DB_SCHEMA_VERSION = 8;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -309,6 +311,37 @@ int UpdateToSchemaVersion7(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39371");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion8(_ConnectionPtr ipConnection, 
+						   long* pnNumSteps,
+						   IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 8;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 10;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_ENCOUNTER_TABLE);
+		vecQueries.push_back(gstrADD_FK_ENCOUNTER_PATIENT);
+		vecQueries.push_back(gstrADD_FK_ORDER_TO_ENCOUNTER);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41411");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // CLabDEProductDBMgr
@@ -462,6 +495,8 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
 		vecCreateQueries.push_back(gstrADD_FK_ORDERFILE_FAMFILE);
 		vecCreateQueries.push_back(gstrCREATE_ORDERFILE_ORDER_INDEX);
 		vecCreateQueries.push_back(gstrCREATE_ORDERFILE_FAMFILE_INDEX);
+		vecCreateQueries.push_back(gstrADD_FK_ENCOUNTER_PATIENT);
+		vecCreateQueries.push_back(gstrADD_FK_ORDER_TO_ENCOUNTER);
 
 		if (!asCppBool(bOnlyTables))
 		{
@@ -756,7 +791,12 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 					}
 					break;
 
-			case 7:	// current schema
+			case 7: // The schema update from 7 to 8 needs to take place using FAM DB schema version 141
+					if (nFAMDBSchemaVersion == 141)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion8(ipConnection, pnNumSteps, NULL);
+					}
+			case 8:	// current schema
 					break;
 
 			default:
@@ -860,6 +900,7 @@ void CLabDEProductDBMgr::getLabDETables(vector<string>& rvecTables)
 	rvecTables.push_back(gstrLABDE_ORDER_STATUS_TABLE);
 	rvecTables.push_back(gstrLABDE_ORDER_TABLE);
 	rvecTables.push_back(gstrLABDE_ORDER_FILE_TABLE);
+	rvecTables.push_back(gstrLABDE_ENCOUNTER_TABLE);
 }
 //-------------------------------------------------------------------------------------------------
 void CLabDEProductDBMgr::validateLabDESchemaVersion(bool bThrowIfMissing)
@@ -894,6 +935,7 @@ const vector<string> CLabDEProductDBMgr::getTableCreationQueries(bool bAddUserTa
 	vecQueries.push_back(gstrCREATE_ORDER_STATUS_TABLE);
 	vecQueries.push_back(gstrCREATE_ORDER_TABLE);
 	vecQueries.push_back(gstrCREATE_ORDER_FILE_TABLE);
+	vecQueries.push_back(gstrCREATE_ENCOUNTER_TABLE);
 
 	return vecQueries;
 }
