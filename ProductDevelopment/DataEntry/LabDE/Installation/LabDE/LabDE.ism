@@ -1945,7 +1945,7 @@
 		<col def="I2">ISSetupLocation</col>
 		<col def="S255">ISReleaseFlags</col>
 		<row><td>_1692D718_46D7_4AE3_9772_ABF3C86BE538_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.1600.1 (x86).prq</td><td>3</td><td/><td/></row>
-		<row><td>_4C481AFF_C46F_4889_BA84_97EEFCD86722_</td><td>Microsoft .NET Framework 4.0 Full.prq</td><td>2</td><td/><td/></row>
+		<row><td>_262E6D57_87A8_4CED_B4A8_6F8B22A15741_</td><td>Microsoft .NET Framework 4.6 Full.prq</td><td/><td/><td/></row>
 		<row><td>_9F174DA5_E0A2_4267_8419_7D41646209D7_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.1600.1 (x64).prq</td><td>4</td><td/><td/></row>
 	</table>
 

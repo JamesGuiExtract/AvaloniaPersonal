@@ -2011,8 +2011,7 @@
 		<col def="I2">ISSetupLocation</col>
 		<col def="S255">ISReleaseFlags</col>
 		<row><td>_240AC199_0A26_466B_ACF5_5F8ED7A3930E_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.1600.1 (x64).prq</td><td>3</td><td/><td/></row>
-		<row><td>_5B3B9DA3_8603_4534_A9D6_E8759581A924_</td><td>Microsoft .NET Framework 3.5 SP1.prq</td><td/><td/><td/></row>
-		<row><td>_6EDF7A62_EB30_4E72_BDCF_4E72A35B3198_</td><td>Microsoft .NET Framework 4.0 Full.prq</td><td>2</td><td/><td/></row>
+		<row><td>_50017D5A_140B_4131_A217_ED7E83BB0E99_</td><td>Microsoft .NET Framework 4.6 Full.prq</td><td/><td/><td/></row>
 		<row><td>_78FD7CDC_0A4D_4428_98C4_34D461A0A54D_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.1600.1 (x86).prq</td><td>4</td><td/><td/></row>
 	</table>
 
