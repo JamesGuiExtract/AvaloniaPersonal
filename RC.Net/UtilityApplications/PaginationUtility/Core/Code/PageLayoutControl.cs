@@ -1447,7 +1447,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (firstPage != null)
                 {
                     ClearSelection();
-                    SelectControl(firstPage, true, true);
+                    SelectControl(firstPage, true, true, true);
                     ProcessControlSelection(
                         activeControl: firstPage, 
                         additionalControls: null, 
@@ -1491,8 +1491,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ClearSelection();
-
                 if (outputDocument != null && outputDocument.PageControls.Any())
                 {
                     var firstControl = outputDocument.PageControls.First();
@@ -1513,6 +1511,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         additionalControls: selectedControls,
                         select: true,
                         modifierKeys: Keys.None);
+                }
+                else
+                {
+                    ClearSelection();
                 }
             }
             catch (Exception ex)
@@ -3053,7 +3055,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Allow _lastSelectedControl to become activeControl unless the shift modifier key
                     // is down.
                     bool resetLastSelected = ((modifierKeys & Keys.Shift) == 0);
-                    SelectControl(activeControl, select, resetLastSelected);
+                    SelectControl(activeControl, select, resetLastSelected, lastSelectedControl != activeControl);
                 }
             }
             catch (Exception ex)
@@ -3074,14 +3076,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Selects the specified <see paramref="control"/>.
+        /// Selects the specified <see paramref="control" />.
         /// </summary>
-        /// <param name="control">The <see cref="PaginationControl"/> to select.</param>
-        /// <param name="select"></param>
-        /// <param name="resetLastSelected"><see langword="true"/> if <see paramref="control"/> can
-        /// become the new <see cref="_lastSelectedControl"/>; <see langword="false"/> otherwise.
-        /// </param>
-        void SelectControl(PaginationControl control, bool select, bool resetLastSelected)
+        /// <param name="control">The <see cref="PaginationControl" /> to select.</param>
+        /// <param name="select"><c>true</c> to select or <c>false</c> to de-select.</param>
+        /// <param name="resetLastSelected"><see langword="true" /> if <see paramref="control" /> can
+        /// become the new <see cref="_lastSelectedControl" />; <see langword="false" /> otherwise.
+        /// <param name="scrollToControl"><c>true</c> to scroll the control into view if selected;
+        /// otherwise, <c>false</c>.</param>
+        void SelectControl(PaginationControl control, bool select, bool resetLastSelected, bool scrollToControl)
         {
             SetSelected(control, select, resetLastSelected);
 
@@ -3096,7 +3099,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 PrimarySelection = control;
 
                 // Make sure the selected control is scrolled into view.
-                if (Rectangle.Intersect(ClientRectangle, control.Bounds) != control.Bounds)
+                if (scrollToControl && Rectangle.Intersect(ClientRectangle, control.Bounds) != control.Bounds)
                 {
                     _flowLayoutPanel.ScrollControlIntoViewManual(control);
                 }

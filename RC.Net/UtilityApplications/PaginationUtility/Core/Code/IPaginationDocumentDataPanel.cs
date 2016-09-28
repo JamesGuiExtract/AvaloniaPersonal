@@ -21,9 +21,54 @@ namespace Extract.UtilityApplications.PaginationUtility
         event EventHandler<PageLoadRequestEventArgs> PageLoadRequest;
 
         /// <summary>
+        /// Indicates that the availability of an operation for the <see cref="Undo"/> method to
+        /// revert has changed.
+        /// </summary>
+        event EventHandler<EventArgs> UndoAvailabilityChanged;
+
+        /// <summary>
+        /// Indicates that the availability of an operation for the <see cref="Redo"/> method to
+        /// redo has changed.
+        /// </summary>
+        event EventHandler<EventArgs> RedoAvailabilityChanged;
+
+        /// <summary>
         /// The <see cref="UserControl"/> to be displayed for viewing/editing of document data.
         /// </summary>
         UserControl PanelControl
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether undo/redo operations are supported.
+        /// </summary>
+        /// <value><see langword="true"/> if undo/redo operations are supported.; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool AllowUndo
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether an undo operation is available.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if an undo operation is available; otherwise, <c>false</c>.
+        /// </value>
+        bool UndoOperationAvailable
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether an redo operation is available.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if an redo operation is available; otherwise, <c>false</c>.
+        /// </value>
+        bool RedoOperationAvailable
         {
             get;
         }
@@ -67,5 +112,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="message">The message to display.</param>
         void ShowMessage(string message);
+
+        /// <summary>
+        /// Performs an undo operation.
+        /// </summary>
+        void Undo();
+
+        /// <summary>
+        /// Performs a redo operation.
+        /// </summary>
+        void Redo();
     }
 }

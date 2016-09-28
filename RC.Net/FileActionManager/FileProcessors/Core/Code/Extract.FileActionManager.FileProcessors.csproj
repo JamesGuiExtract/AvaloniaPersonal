@@ -50,7 +50,6 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PlatformTarget>x86</PlatformTarget>
-   
     <RegisterForComInterop>true</RegisterForComInterop>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
@@ -65,7 +64,6 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PlatformTarget>x86</PlatformTarget>
-   
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <RegisterForComInterop>true</RegisterForComInterop>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
@@ -520,6 +518,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Apply.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UndoButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RedoButton.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

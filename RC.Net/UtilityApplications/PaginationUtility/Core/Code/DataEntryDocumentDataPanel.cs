@@ -4,6 +4,7 @@ using Extract.Imaging.Forms;
 using Extract.Utilities.Forms;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -17,6 +18,11 @@ namespace Extract.UtilityApplications.PaginationUtility
     public class DataEntryDocumentDataPanel : DataEntryControlHost, IPaginationDocumentDataPanel
     {
         #region Fields
+
+        /// <summary>
+        /// Used to serialize attribute data between threads.
+        /// </summary>
+        MiscUtils _miscUtils = new MiscUtils();
 
         /// <summary>
         /// The <see cref="ImageViewer"/> to be used.
@@ -41,12 +47,40 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataEntryDocumentDataPanel"/> class.
+        /// </summary>
+        public DataEntryDocumentDataPanel()
+        {
+            try
+            {
+                AttributeStatusInfo.UndoManager.UndoAvailabilityChanged += HandleUndoManager_UndoAvailabilityChanged;
+                AttributeStatusInfo.UndoManager.RedoAvailabilityChanged += HandleUndoManager_RedoAvailabilityChanged;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41423");
+            }
+        }
+
         #region IPaginationDocumentDataPanel
 
         /// <summary>
         /// Raised to indicate the panel is requesting a specific image page to be loaded.
         /// </summary>
         public event EventHandler<PageLoadRequestEventArgs> PageLoadRequest;
+
+        /// <summary>
+        /// Indicates that the availability of an operation for the <see cref="Undo"/> method to
+        /// revert has changed.
+        /// </summary>
+        public event EventHandler<EventArgs> UndoAvailabilityChanged;
+
+        /// <summary>
+        /// Indicates that the availability of an operation for the <see cref="Redo"/> method to
+        /// redo has changed.
+        /// </summary>
+        public event EventHandler<EventArgs> RedoAvailabilityChanged;
 
         /// <summary>
         /// The <see cref="UserControl"/> to be displayed for viewing/editing of document data.
@@ -60,7 +94,49 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Loads the specified <see paramref="data"/>.
+        /// Gets a value indicating whether undo/redo operations are supported.
+        /// </summary>
+        /// <value><see langword="true"/> if undo/redo operations are supported.; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool AllowUndo
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether an undo operation is available.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if an undo operation is available; otherwise, <c>false</c>.
+        /// </value>
+        public bool UndoOperationAvailable
+        {
+            get
+            {
+                return AttributeStatusInfo.UndoManager.UndoOperationAvailable;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether an redo operation is available.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if an redo operation is available; otherwise, <c>false</c>.
+        /// </value>
+        public bool RedoOperationAvailable
+        {
+            get
+            {
+                return AttributeStatusInfo.UndoManager.RedoOperationAvailable;
+            }
+        }
+
+        /// <summary>
+        /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>
         public void LoadData(PaginationDocumentData data)
@@ -73,9 +149,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 LoadData(data.Attributes);
 
+                _documentData = (DataEntryPaginationDocumentData)data;
+                _documentData.SetDataError(DataValidity != DataValidity.Valid);
+
                 UpdateSwipingState();
 
-                _documentData = data as DataEntryPaginationDocumentData;
                 _sourceDocName = _documentData.SourceDocName;
 
                 _imageViewer.ImageFileChanged += HandleImageViewer_ImageFileChanged;
@@ -108,9 +186,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 ExtractException.Assert("ELI41361", "Panel not properly initialized.", _imageViewer != null);
 
+                if (validateData && !DataCanBeSaved())
+                {
+                    return false;
+                }
+
                 _documentData = null;
                 _sourceDocName = null;
 
+                ((DataEntryPaginationDocumentData)data).SetDataError(DataValidity != DataValidity.Valid);
                 data.Attributes = GetData();
                 data.Attributes.ReportMemoryUsage();
 
@@ -152,6 +236,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 _imageViewer = imageViewer;
                 var documentData = new DataEntryPaginationDocumentData(attributes, sourceDocName);
+                CheckDataValidity(documentData);
+
                 return documentData;
             }
             catch (Exception ex)
@@ -250,6 +336,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41352");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:Extract.DataEntry.DataEntryControlHost.DataValidityChanged" /> event.
+        /// </summary>
+        protected override void OnDataValidityChanged()
+        {
+            try
+            {
+                base.OnDataValidityChanged();
+
+                if (_documentData != null)
+                {
+                    _documentData.SetDataError(DataValidity != DataValidity.Valid);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41418");
             }
         }
 
@@ -357,6 +463,40 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="UndoManager.UndoAvailabilityChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleUndoManager_UndoAvailabilityChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                OnUndoAvailabilityChanged();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41424");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="UndoManager.RedoAvailabilityChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleUndoManager_RedoAvailabilityChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                OnRedoAvailabilityChanged();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41425");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -372,6 +512,53 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 return _imageViewer != null;
             }
+        }
+
+        /// <summary>
+        /// Updates the <see cref="DataError"/> property of <see paramref="documentData"/> by
+        /// loading the data into a background panel.
+        /// </summary>
+        /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
+        /// data validity should be checked.</param>
+        void CheckDataValidity(DataEntryPaginationDocumentData documentData)
+        {
+            bool dataError = false;
+
+            // Needed to determine if data is invalid.
+            if (!IsHandleCreated || !Visible)
+            {
+                string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.Attributes);
+
+                var thread = new Thread(new ThreadStart(() =>
+                {
+                    var miscUtils = new MiscUtils();
+                    var deserializedAttributes = (IUnknownVector)miscUtils.GetObjectFromStringizedByteStream(serializedAttributes);
+                    var tempData = new DataEntryPaginationDocumentData(deserializedAttributes, documentData.SourceDocName);
+
+                    using (var form = new Form())
+                    using (var tempPanel = (DataEntryDocumentDataPanel)Activator.CreateInstance(GetType()))
+                    using (tempPanel._imageViewer = new ImageViewer())
+                    {
+                        Config.ApplyObjectSettings(tempPanel);
+                        tempPanel.DataEntryApplication = DataEntryApplication;
+                        tempPanel.SetDatabaseConnections(DatabaseConnections);
+                        form.MakeFormInvisible();
+                        form.Show();
+                        form.Controls.Add(tempPanel);
+                        form.Controls.Add(tempPanel._imageViewer);
+
+                        tempPanel.LoadData(tempData);
+                        dataError = (tempPanel.DataValidity != DataValidity.Valid);
+                    }
+
+                }));
+
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
+                thread.Join();
+            }
+
+            documentData.SetDataError(dataError);
         }
 
         /// <summary>
@@ -393,6 +580,30 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (eventHandler != null)
             {
                 eventHandler(this, new PageLoadRequestEventArgs(_sourceDocName, pageNum));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="UndoAvailabilityChanged"/>
+        /// </summary>
+        void OnUndoAvailabilityChanged()
+        {
+            var eventHandler = UndoAvailabilityChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="RedoAvailabilityChanged"/>
+        /// </summary>
+        void OnRedoAvailabilityChanged()
+        {
+            var eventHandler = RedoAvailabilityChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
             }
         }
 

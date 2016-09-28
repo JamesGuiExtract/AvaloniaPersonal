@@ -168,6 +168,26 @@ namespace Extract.Demo_Pagination
         }
 
         /// <summary>
+        /// Indicates that the availability of an operation for the <see cref="Undo"/> method to
+        /// revert has changed.
+        /// </summary>
+        public event EventHandler<EventArgs> UndoAvailabilityChanged
+        {
+            add { }
+            remove { }
+        }
+
+        /// <summary>
+        /// Indicates that the availability of an operation for the <see cref="Redo"/> method to
+        /// redo has changed.
+        /// </summary>
+        public event EventHandler<EventArgs> RedoAvailabilityChanged
+        {
+            add { }
+            remove { }
+        }
+
+        /// <summary>
         /// The <see cref="UserControl"/> to be displayed for viewing/editing of document data.
         /// </summary>
         public UserControl PanelControl
@@ -175,6 +195,48 @@ namespace Extract.Demo_Pagination
             get
             {
                 return this;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether undo/redo operations are supported.
+        /// </summary>
+        /// <value><see langword="true"/> if undo/redo operations are supported.; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool AllowUndo
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether an undo operation is available.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if an undo operation is available; otherwise, <c>false</c>.
+        /// </value>
+        public bool UndoOperationAvailable
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether an redo operation is available.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if an redo operation is available; otherwise, <c>false</c>.
+        /// </value>
+        public bool RedoOperationAvailable
+        {
+            get
+            {
+                return false;
             }
         }
 
@@ -371,6 +433,22 @@ namespace Extract.Demo_Pagination
         public void ShowMessage(string message)
         {
             // Unused
+        }
+
+        /// <summary>
+        /// Performs an undo operation.
+        /// </summary>
+        public void Undo()
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Performs a redo operation.
+        /// </summary>
+        public void Redo()
+        {
+            throw new NotSupportedException();
         }
 
         #endregion IPaginationDocumentDataPanel

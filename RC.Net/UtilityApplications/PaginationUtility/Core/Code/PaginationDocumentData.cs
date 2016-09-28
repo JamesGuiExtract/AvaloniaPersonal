@@ -49,19 +49,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<AttributeValueChangedEventArgs> AttributeValueChanged;
 
         /// <summary>
-        /// Raised when the value of <see cref="Modified"/> has changed.
+        /// Raised when the value of <see cref="Modified"/> or <see cref="DataError"/> has changed.
         /// </summary>
-        public event EventHandler<EventArgs> ModifiedChanged;
-
-        /// <summary>
-        /// Raised when the value of <see cref="Summary"/> has changed.
-        /// </summary>
-        public event EventHandler<EventArgs> SummaryChanged;
-
-        /// <summary>
-        /// Raised when the value of <see cref="SendForReprocessing"/> has changed.
-        /// </summary>
-        public event EventHandler<EventArgs> SendForReprocessingChanged;
+        public event EventHandler<EventArgs> DocumentDataStateChanged;
 
         #endregion Events
 
@@ -160,7 +150,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return false;
+                return true;
             }
         }
 
@@ -209,7 +199,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                bool modifiedChanged = false;
+                bool dataStateChanged = false;
 
                 foreach (var field in Fields.Values)
                 {
@@ -218,13 +208,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (currentValue != field.OriginalValue)
                     {
                         field.OriginalValue = currentValue;
-                        modifiedChanged = true;
+                        dataStateChanged = true;
                     }
                 }
 
-                if (modifiedChanged)
+                if (dataStateChanged)
                 {
-                    OnModifiedChanged();
+                    OnDocumentDataStateChanged();
                 }
             }
             catch (Exception ex)
@@ -276,7 +266,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (field.TreatAsUnmodified == args.MarkAsModified)
                     {
                         field.TreatAsUnmodified = !args.MarkAsModified;
-                        OnModifiedChanged();
+                        OnDocumentDataStateChanged();
                     }
                 }
 
@@ -327,7 +317,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     field.PreviousValue = value;
                     if (Modified != modified)
                     {
-                        OnModifiedChanged();
+                        OnDocumentDataStateChanged();
                     }
                 }
             }
@@ -378,47 +368,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// the event data.</param>
         void OnAttributeValueChanged(AttributeValueChangedEventArgs args)
         {
-            var eventHandler = AttributeValueChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, args);
-            }
+            AttributeValueChanged?.Invoke(this, args);
         }
 
         /// <summary>
-        /// Raises the <see cref="ModifiedChanged"/> event.
+        /// Raises the <see cref="DocumentDataChanged"/> event.
         /// </summary>
-        protected void OnModifiedChanged()
+        protected void OnDocumentDataStateChanged()
         {
-            var eventHandler = ModifiedChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="SummaryChanged"/> event.
-        /// </summary>
-        protected void OnSummaryChanged()
-        {
-            var eventHandler = SummaryChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="SendForReprocessingChanged"/> event.
-        /// </summary>
-        protected void OnSendForReprocessingChanged()
-        {
-            var eventHandler = SendForReprocessingChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
+            DocumentDataStateChanged?.Invoke(this, new EventArgs());
         }
 
         #endregion Private Members

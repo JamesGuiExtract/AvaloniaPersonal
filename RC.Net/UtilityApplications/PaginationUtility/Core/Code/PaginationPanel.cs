@@ -708,7 +708,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (matchingDocuments.Count() == 1)
                 {
                     var document = matchingDocuments.Single();
-                    UpdateDocumentData(document, documentData);
+                    document.DocumentData = documentData;
 
                     return true;
                 }
@@ -1133,8 +1133,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (documentWithError != null && documentWithError.PageControls.Any(c => !c.Deleted))
             {
                 _primaryPageLayoutControl.SelectDocument(documentWithError);
-                documentWithError.PaginationSeparator.OpenDataPanel();
-                UtilityMethods.ShowMessageBox("Data errors must be corrected before saving", "Data Error", true);
+
+                // The event chain that needs to occur to open a DataEntryDocumentDataPanel cannot
+                // occur in the context of another message handler.
+                this.SafeBeginInvoke("ELI41431", () =>
+                {
+                    documentWithError.PaginationSeparator.OpenDataPanel();
+                    UtilityMethods.ShowMessageBox("Data errors must be corrected before saving", "Data Error", true);
+                });
 
                 return false;
             }
@@ -1533,7 +1539,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         ussFileExists = true;
                         if (sourceDocData.HasSpatialInfo())
                         {
-                            // Make a modifyable copy of the page info, necessary if a page has been rotated.
+                            // Make a modifiable copy of the page info, necessary if a page has been rotated.
                             var oldPageInfos = (LongToObjectMap)((IShallowCopyable)sourceDocData.SpatialPageInfos).ShallowCopy();
                             foreach (int destPage in pageInfo.Value)
                             {
@@ -1764,7 +1770,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     outputDocument.DocumentData = documentData.Item2;
                     if (outputDocument.DocumentData != null)
                     {
-                        outputDocument.DocumentData.ModifiedChanged += DocumentData_ModifiedChanged;
+                        outputDocument.DocumentStateChanged += HandleDocument_DocumentStateChanged;
                     }
                 }
                 else
@@ -2275,25 +2281,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="PaginationDocumentData.ModifiedChanged"/> event for the document
-        /// data of any of the <see cref="_pendingDocuments"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void DocumentData_ModifiedChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                UpdateCommandStates();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39771");
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="PageLayoutControl.LoadNextDocumentRequest"/> event of the
         /// <see cref="_primaryPageLayoutControl"/>.
         /// </summary>
@@ -2721,25 +2708,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 });
                 return false;
-            }
-        }
-
-        /// <summary>
-        /// Updates the data associated with the specified <see paramref="sourceFileName"/>.
-        /// </summary>
-        /// <param name="outputDocument"></param>
-        /// <param name="documentData">The data to associate with <see paramref="sourceFileName"/>.
-        /// (replaces any previously assigned data)</param>
-        void UpdateDocumentData(OutputDocument outputDocument, PaginationDocumentData documentData)
-        {
-            if (outputDocument.DocumentData != null)
-            {
-                outputDocument.DocumentData.ModifiedChanged -= DocumentData_ModifiedChanged;
-            }
-            outputDocument.DocumentData = documentData;
-            if (outputDocument.DocumentData != null)
-            {
-                outputDocument.DocumentData.ModifiedChanged += DocumentData_ModifiedChanged;
             }
         }
 

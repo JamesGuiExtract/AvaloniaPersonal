@@ -2221,13 +2221,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// can be enabled/disabled.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="UnviewedItemsFoundEventArgs"/> instance containing the
+        /// <param name="e">An <see cref="EventArgs"/> instance containing the
         /// event data.</param>
-        void HandleUnviewedItemsFound(object sender, UnviewedItemsFoundEventArgs e)
+        void HandleUnviewedDataStateChanged(object sender, EventArgs e)
         {
             try
             {
-                _gotoNextUnviewedCommand.Enabled = e.UnviewedItemsFound;
+                _gotoNextUnviewedCommand.Enabled = _dataEntryControlHost.IsDataUnviewed;
             }
             catch (Exception ex)
             {
@@ -2243,13 +2243,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// can be enabled/disabled.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="InvalidItemsFoundEventArgs"/> instance containing the
-        /// event data.</param>
-        void HandleInvalidItemsFound(object sender, InvalidItemsFoundEventArgs e)
+        /// <param name="e">An <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleDataValidityChanged(object sender, EventArgs e)
         {
             try
             {
-                _gotoNextInvalidCommand.Enabled = e.InvalidItemsFound;
+                _gotoNextInvalidCommand.Enabled =
+                    _dataEntryControlHost.DataValidity != DataValidity.Valid;
             }
             catch (Exception ex)
             {
@@ -3472,8 +3472,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 else
                 {
-                    string dataFilename = _imageViewer.ImageFile + ".voa";
-
                     bool saved = _dataEntryControlHost.SaveData(validateData);
 
                     if (saved && !_standAloneMode && _fileProcessingDb != null)
@@ -4381,8 +4379,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         // Unregister for events and disengage shortcut handlers for the previous DEP
                         _dataEntryControlHost.SwipingStateChanged -= HandleSwipingStateChanged;
-                        _dataEntryControlHost.InvalidItemsFound -= HandleInvalidItemsFound;
-                        _dataEntryControlHost.UnviewedItemsFound -= HandleUnviewedItemsFound;
+                        _dataEntryControlHost.DataValidityChanged -= HandleDataValidityChanged;
+                        _dataEntryControlHost.UnviewedDataStateChanged -= HandleUnviewedDataStateChanged;
                         _dataEntryControlHost.ItemSelectionChanged -= HandleItemSelectionChanged;
                         if (_settings.InputEventTrackingEnabled)
                         {
@@ -4409,8 +4407,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         // Register for events and engage shortcut handlers for the new DEP
                         _dataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
-                        _dataEntryControlHost.InvalidItemsFound += HandleInvalidItemsFound;
-                        _dataEntryControlHost.UnviewedItemsFound += HandleUnviewedItemsFound;
+                        _dataEntryControlHost.DataValidityChanged += HandleDataValidityChanged;
+                        _dataEntryControlHost.UnviewedDataStateChanged += HandleUnviewedDataStateChanged;
                         _dataEntryControlHost.ItemSelectionChanged += HandleItemSelectionChanged;
                         if (_settings.InputEventTrackingEnabled)
                         {

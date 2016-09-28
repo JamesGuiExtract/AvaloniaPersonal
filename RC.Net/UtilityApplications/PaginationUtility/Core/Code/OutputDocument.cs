@@ -367,18 +367,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         if (_documentData != null)
                         {
-                            _documentData.ModifiedChanged -= HandleDocumentData_Changed;
-                            _documentData.SummaryChanged -= HandleDocumentData_Changed;
-                            _documentData.SendForReprocessingChanged -= HandleDocumentData_Changed;
+                            _documentData.DocumentDataStateChanged -= HandleDocumentDataState_Changed;
                         }
 
                         _documentData = value;
 
                         if (_documentData != null)
                         {
-                            _documentData.ModifiedChanged += HandleDocumentData_Changed;
-                            _documentData.SummaryChanged += HandleDocumentData_Changed;
-                            _documentData.SendForReprocessingChanged += HandleDocumentData_Changed;
+                            _documentData.DocumentDataStateChanged += HandleDocumentDataState_Changed;
                         }
 
                         OnDocumentStateChanged();
@@ -683,7 +679,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="PaginationDocumentData.ModifiedChanged"/>,
+        /// Handles the <see cref="PaginationDocumentData.DocumentDataChanged"/>,
         /// <see cref="PaginationDocumentData.SummaryChanged"/> or
         /// <see cref="PaginationDocumentData.SendForReprocessingChanged"/> events for
         /// <see cref="DocumentData"/>.
@@ -691,7 +687,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleDocumentData_Changed(object sender, EventArgs e)
+        void HandleDocumentDataState_Changed(object sender, EventArgs e)
         {
             try
             {
@@ -714,11 +710,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// containing the event data.</param>
         void OnDocumentOutputting(CancelEventArgs eventArgs)
         {
-            var eventHandler = DocumentOutputting;
-            if (eventHandler != null)
-            {
-                eventHandler(this, eventArgs);
-            }
+            DocumentOutputting?.Invoke(this, eventArgs);
         }
 
         /// <summary>
@@ -726,11 +718,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void OnDocumentOutput()
         {
-            var eventHandler = DocumentOutput;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
+            DocumentOutput?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
@@ -738,11 +726,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void OnInvalidated()
         {
-            var eventHandler = Invalidated;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
+            Invalidated?.Invoke(this, new EventArgs());
         }
 
         /// <summary>

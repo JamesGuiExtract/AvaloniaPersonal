@@ -93,6 +93,16 @@ namespace Extract.FileActionManager.FileProcessors.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap RedoButton {
+            get {
+                object obj = ResourceManager.GetObject("RedoButton", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap RevertToDisk {
             get {
                 object obj = ResourceManager.GetObject("RevertToDisk", resourceCulture);
@@ -106,6 +116,16 @@ namespace Extract.FileActionManager.FileProcessors.Properties {
         internal static System.Drawing.Bitmap RevertToSuggestion {
             get {
                 object obj = ResourceManager.GetObject("RevertToSuggestion", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap UndoButton {
+            get {
+                object obj = ResourceManager.GetObject("UndoButton", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

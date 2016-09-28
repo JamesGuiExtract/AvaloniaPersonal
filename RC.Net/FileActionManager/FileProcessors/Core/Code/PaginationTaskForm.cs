@@ -140,6 +140,16 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         bool _changingDocuments;
 
+        /// <summary>
+        /// The undo command.
+        /// </summary>
+        ApplicationCommand _undoCommand;
+
+        /// <summary>
+        /// The redo command.
+        /// </summary>
+        ApplicationCommand _redoCommand;
+
         #endregion Fields
 
         #region Events
@@ -217,6 +227,11 @@ namespace Extract.FileActionManager.FileProcessors
 
                 _settings = settings;
                 _paginationDocumentDataPanel = paginationDocumentDataPanel;
+
+                if (_paginationDocumentDataPanel != null && _paginationDocumentDataPanel.AllowUndo)
+                {
+                    _undoToolStrip.Visible = true;
+                }
 
                 if (tagManager == null)
                 {
@@ -540,6 +555,18 @@ namespace Extract.FileActionManager.FileProcessors
                 _imageViewer.Shortcuts[Keys.R | Keys.Control] = _imageViewer.SelectRotateClockwise;
                 _imageViewer.Shortcuts[Keys.R | Keys.Control | Keys.Shift] = _imageViewer.SelectRotateCounterclockwise;
 
+                // Undo command
+                _undoCommand = new ApplicationCommand(_imageViewer.Shortcuts,
+                    new Keys[] { Keys.Z | Keys.Control }, PerformUndo,
+                    new ToolStripItem[] { _undoToolStripButton },
+                    false, true, false);
+
+                // Redo command
+                _redoCommand = new ApplicationCommand(_imageViewer.Shortcuts,
+                    new Keys[] { Keys.Y | Keys.Control }, PerformRedo,
+                    new ToolStripItem[] { _redoToolStripButton },
+                    false, true, false);
+
                 if (!string.IsNullOrWhiteSpace(_settings.SourceAction))
                 {
                     int sourceActionID = FileProcessingDB.GetActionID(_settings.SourceAction);
@@ -566,6 +593,8 @@ namespace Extract.FileActionManager.FileProcessors
                 if (_paginationDocumentDataPanel != null)
                 {
                     _paginationPanel.DocumentDataRequest += HandlePaginationPanel_DocumentDataRequest;
+                    _paginationDocumentDataPanel.UndoAvailabilityChanged += HandlePaginationDocumentDataPanel_UndoAvailabilityChanged;
+                    _paginationDocumentDataPanel.RedoAvailabilityChanged += HandlePaginationDocumentDataPanel_RedoAvailabilityChanged;
                 }
 
                 if (_splitContainer.Panel1MinSize < _paginationPanel.MinimumSize.Width)
@@ -964,6 +993,80 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40093");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="UndoAvailabilityChanged"/> event of the
+        /// <see cref="_paginationDocumentDataPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        void HandlePaginationDocumentDataPanel_UndoAvailabilityChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _undoCommand.Enabled = _paginationDocumentDataPanel.UndoOperationAvailable;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41426");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="RedoAvailabilityChanged"/> event of the
+        /// <see cref="_paginationDocumentDataPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        void HandlePaginationDocumentDataPanel_RedoAvailabilityChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _redoCommand.Enabled = _paginationDocumentDataPanel.RedoOperationAvailable;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41427");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_undoToolStripButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        void HandleUndoToolStripButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _paginationDocumentDataPanel.Undo();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41421");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_redoToolStripButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        void HandleRedoToolStripButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _paginationDocumentDataPanel.Redo();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41422");
             }
         }
 
@@ -1539,6 +1642,36 @@ namespace Extract.FileActionManager.FileProcessors
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Performs an undo operation.
+        /// </summary>
+        void PerformUndo()
+        {
+            try
+            {
+                _paginationDocumentDataPanel.Undo();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41428");
+            }
+        }
+
+        /// <summary>
+        /// Performs a redo operation.
+        /// </summary>
+        void PerformRedo()
+        {
+            try
+            {
+                _paginationDocumentDataPanel.Redo();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41429");
+            }
         }
 
         /// <summary>

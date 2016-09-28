@@ -1167,6 +1167,15 @@ namespace Extract.FileActionManager.FileProcessors
 
                 config.ApplyObjectSettings(dataEntryControlHost);
 
+                ExtractException.Assert("ELI41432",
+                    $"{dataEntryControlHost.InvalidDataSaveMode} mode is not supported in this context.",
+                    (dataEntryControlHost.InvalidDataSaveMode != InvalidDataSaveMode.PromptForEach &&
+                     dataEntryControlHost.InvalidDataSaveMode != InvalidDataSaveMode.PromptForEachWarning));
+
+                ExtractException.Assert("ELI41433",
+                    $"{dataEntryControlHost.UnviewedDataSaveMode} mode is not supported in this context.",
+                    dataEntryControlHost.UnviewedDataSaveMode != UnviewedDataSaveMode.PromptOnceForAll);
+
                 _activeDataEntryConfig
                     = _defaultDataEntryConfig
                     = new DataEntryConfiguration(config, dataEntryControlHost);

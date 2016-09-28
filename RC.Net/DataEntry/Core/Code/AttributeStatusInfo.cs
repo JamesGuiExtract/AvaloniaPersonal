@@ -668,7 +668,7 @@ namespace Extract.DataEntry
         /// changes.
         /// </summary>
         /// <value>The <see cref="UndoManager"/>.</value>
-        internal static UndoManager UndoManager
+        public static UndoManager UndoManager
         {
             get
             {

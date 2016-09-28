@@ -18,6 +18,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         IUnknownVector _originalData;
 
+        /// <summary>
+        /// Indicates whether the data currently contains a validation error.
+        /// </summary>
+        bool _dataError;
+
         #endregion Fields
 
         #region Constructors
@@ -90,6 +95,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets whether the data currently contains a validation error.
+        /// </summary>
+        public override bool DataError
+        {
+            get
+            {
+                return _dataError;
+            }
+        }
+
+        /// <summary>
         /// Unused base class implementation.
         /// </summary>
         protected override Dictionary<string, PaginationDataField> Fields
@@ -131,5 +147,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         #endregion Overrides
+
+        #region Internal Members
+
+        /// <summary>
+        /// Sets the whether this data contains a validation error.
+        /// </summary>
+        /// <param name="dataError"><c>true</c> if this data contains a validation error; otherwise,
+        /// <c>false</c>.</param>
+        internal void SetDataError(bool dataError)
+        {
+            if (dataError != _dataError)
+            {
+                _dataError = dataError;
+
+                OnDocumentDataStateChanged();
+            }
+        }
+
+        #endregion Internal Members
     }
 }

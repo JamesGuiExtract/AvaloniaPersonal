@@ -440,14 +440,14 @@ namespace Extract.DataEntry
         ErrorProvider _validationWarningErrorProvider = new ErrorProvider();
 
         /// <summary>
-        /// The number of unviewed attributes known to exist.
+        /// The current set of unviewed attributes.
         /// </summary>
-        int _unviewedAttributeCount;
+        HashSet<IAttribute> _unviewedAttributes = new HashSet<IAttribute>();
 
         /// <summary>
-        /// The number of attributes with invalid data known to exist.
+        /// The attributes that currently have invalid data.
         /// </summary>
-        int _invalidAttributeCount;
+        HashSet<IAttribute> _invalidAttributes = new HashSet<IAttribute>();
 
         /// <summary>
         /// Indicates whether data had been modified since the last load or save.
@@ -1286,6 +1286,60 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets the overall data validity.
+        /// </summary>
+        /// <value>
+        /// The overall data validity.
+        /// </value>
+        public DataValidity DataValidity
+        {
+            get
+            {
+                try
+                {
+                    if (_invalidAttributes.Any(attribute =>
+                                AttributeStatusInfo.GetDataValidity(attribute) == DataValidity.Invalid))
+                    {
+                        return DataValidity.Invalid;
+                    }
+                    else if (_invalidAttributes.Count > 0)
+                    {
+                        return DataValidity.ValidationWarning;
+                    }
+                    else
+                    {
+                        return DataValidity.Valid;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI41414");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets whether any data is unviewed.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if any data is data unviewed; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsDataUnviewed
+        {
+            get
+            {
+                try
+                {
+                    return _unviewedAttributes.Any();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI41415");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region IImageViewerControl Members
@@ -1721,14 +1775,6 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.EnableValidationTriggers(true);
                     }
 
-                    // Count the number of unviewed attributes in the newly loaded data.
-                    _unviewedAttributeCount = CountUnviewedItems();
-                    OnUnviewedItemsFound(_unviewedAttributeCount != 0);
-
-                    // Count the number of invalid attributes in the newly loaded data.
-                    _invalidAttributeCount = CountInvalidItems();
-                    OnInvalidItemsFound(_invalidAttributeCount != 0);
-
                     // Create highlights for all attributes as long as a document is loaded.
                     if (imageIsAvailable)
                     {
@@ -1945,10 +1991,10 @@ namespace Extract.DataEntry
                             MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
 
                         // If we failed to find any unviewed attributes, make sure 
-                        // _unviewedAttributeCount is zero and raise the UnviewedItemsFound event to 
+                        // _unviewedAttributeCount is zero and raise the UnviewedDataStateChanged event to 
                         // indicate no unviewed items are available.
-                        _unviewedAttributeCount = 0;
-                        OnUnviewedItemsFound(false);
+                        _unviewedAttributes.Clear();
+                        OnUnviewedDataStateChanged();
                     }
                 }
             }
@@ -1982,10 +2028,10 @@ namespace Extract.DataEntry
                             MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
 
                         // If we failed to find any attributes with invalid data, make sure 
-                        // _invalidAttributeCount is zero and raise the InvalidItemsFound event to 
+                        // _invalidAttributes is zero and raise the DataValidityChanged event to 
                         // indicate no invalid items remain.
-                        _invalidAttributeCount = 0;
-                        OnInvalidItemsFound(false);
+                        _invalidAttributes.Clear();
+                        OnDataValidityChanged();
                     }
                 }
             }
@@ -2605,12 +2651,12 @@ namespace Extract.DataEntry
                 OnItemSelectionChanged();
 
                 // Reset the unviewed attribute count.
-                _unviewedAttributeCount = 0;
-                OnUnviewedItemsFound(false);
+                _unviewedAttributes.Clear();
+                OnUnviewedDataStateChanged();
 
                 // Reset the invalid attribute count.
-                _invalidAttributeCount = 0;
-                OnInvalidItemsFound(false);
+                _invalidAttributes.Clear();
+                OnDataValidityChanged();
 
                 // Clear the AFUtility instance: the form is running in a single threaded apartment so
                 // AFUtility will not be able to be used when another form is created in another
@@ -2664,16 +2710,14 @@ namespace Extract.DataEntry
         public event EventHandler<SwipingStateChangedEventArgs> SwipingStateChanged;
 
         /// <summary>
-        /// Fired to indicate that unviewed <see cref="IAttribute"/>s are either known to exist or
-        /// not to exist.
+        /// Raised when the <see cref="IsDataUnviewed"/> property changes.
         /// </summary>
-        public event EventHandler<UnviewedItemsFoundEventArgs> UnviewedItemsFound;
+        public event EventHandler<EventArgs> UnviewedDataStateChanged;
 
         /// <summary>
-        /// Fired to indicate that <see cref="IAttribute"/>s with invalid data are either known to
-        /// exist or not to exist.
+        /// Raised when the <see cref="DataValidity"/> property changes.
         /// </summary>
-        public event EventHandler<InvalidItemsFoundEventArgs> InvalidItemsFound;
+        public event EventHandler<EventArgs> DataValidityChanged;
 
         /// <summary>
         /// Fired to notify listeners that a new set of items has been selected.
@@ -3301,6 +3345,18 @@ namespace Extract.DataEntry
                     OnDataChanged();
                 }
 
+                // Blank attributes will not be counted as unviewed in terms of the value of
+                // IsDataUnviewed, but if a query applies a value while still in the unviewed state,
+                // then it should count as unviewed.
+                if (!AttributeStatusInfo.HasBeenViewed(e.Attribute, false) &&
+                    !string.IsNullOrWhiteSpace(e.Attribute.Value.String))
+                {
+                    if (_unviewedAttributes.Add(e.Attribute) && _unviewedAttributes.Count == 1)
+                    {
+                        OnUnviewedDataStateChanged();
+                    }
+                }
+
                 // If the spatial info for a viewable attribute has changed, re-create the highlight 
                 // for the attribute with the new spatial information.
                 if (e.SpatialInfoChanged && AttributeStatusInfo.IsViewable(e.Attribute))
@@ -3627,16 +3683,6 @@ namespace Extract.DataEntry
                     }
                 }
 
-                if (!AttributeStatusInfo.HasBeenViewed(e.Attribute, false))
-                {
-                    UpdateUnviewedCount(true);
-                }
-
-                if (AttributeStatusInfo.GetDataValidity(e.Attribute) != DataValidity.Valid)
-                {
-                    UpdateInvalidCount(true);
-                }
-
                 AttributeStatusInfo.GetStatusInfo(e.Attribute).AttributeValueModified +=
                     HandleAttributeValueModified;
 
@@ -3675,15 +3721,19 @@ namespace Extract.DataEntry
         {
             try
             {
-                // If the attribute is now marked as viewed.
+                bool previousIsDataViewed = IsDataUnviewed;
                 if (e.IsDataViewed)
                 {
-                    UpdateUnviewedCount(false);
+                    _unviewedAttributes.Remove(e.Attribute);
                 }
-                // If the attribute is now marked as unviewed.
-                else
+                else if (!string.IsNullOrWhiteSpace(e.Attribute.Value.String))
                 {
-                    UpdateUnviewedCount(true);
+                    _unviewedAttributes.Add(e.Attribute);
+                }
+
+                if (IsDataUnviewed != previousIsDataViewed)
+                {
+                    OnUnviewedDataStateChanged();
                 }
             }
             catch (Exception ex)
@@ -3704,8 +3754,20 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Update the invalid count to reflect the new state of the attribute.
-                UpdateInvalidCount(e.DataValidity != DataValidity.Valid);
+                DataValidity previousDataValidity = DataValidity;
+                if (e.DataValidity == DataValidity.Valid)
+                {
+                    _invalidAttributes.Remove(e.Attribute);
+                }
+                else
+                {
+                    _invalidAttributes.Add(e.Attribute);
+                }
+
+                if (previousDataValidity != DataValidity)
+                {
+                    OnDataValidityChanged();
+                }
 
                 // Remove the image viewer error icon if the data is now valid.
                 if (e.DataValidity != DataValidity.Invalid)
@@ -4792,6 +4854,197 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Using the values of InvalidDataSaveMode and UnviewedDataSaveMode, determines if data
+        /// can be saved (prompting as necessary).  If data cannot be saved, an appropriate message
+        /// or exception will be displayed and selection will be changed to the first field that
+        /// prevented data from being saved.
+        /// </summary>
+        /// <returns><see langword="true"/> if data can be saved, <see langword="false"/> if the
+        /// data cannot be saved at this time.</returns>
+        protected bool DataCanBeSaved()
+        {
+            // Keep track of the currently selected attribute and whether selection is changed by
+            // this method so that the selection can be restored at the end of this method.
+            Stack<IAttribute> currentlySelectedAttribute = ActiveAttributeGenealogy(true, null);
+            if (currentlySelectedAttribute == null || !currentlySelectedAttribute.Any())
+            {
+                // https://extract.atlassian.net/browse/ISSUE-12548
+                // In the case that nothing is selected, navigate to the first invalid attribute as
+                // the starting point for validation.
+                currentlySelectedAttribute =
+                    AttributeStatusInfo.FindNextInvalidAttribute(_attributes,
+                        true, null, true, false);
+
+                // If there are no invalid attributes, we can return early from this call.
+                if (currentlySelectedAttribute == null || !currentlySelectedAttribute.Any())
+                {
+                    return true;
+                }
+            }
+
+            bool changedSelection = false;
+            bool hasError = HasInvalidAttribute(false);
+
+            // Don't prompt or display exception about validation warnings if we are allowing them
+            // or if prompting for each warning but there are truly invalid attributes.
+            bool ignoreWarnings =
+                   InvalidDataSaveMode == InvalidDataSaveMode.AllowWithWarnings
+                || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning && hasError;
+
+            // If saving could be prevented by invalid data, iterate through the invalid attributes
+            // in order to display the appropriate exception or prompt user for confirmation.
+            if (   InvalidDataSaveMode == InvalidDataSaveMode.Disallow
+                || InvalidDataSaveMode == InvalidDataSaveMode.AllowWithWarnings && hasError
+                || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEach
+                || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning
+               )
+
+            {
+                // Find the first attribute that doesn't pass validation.
+                IAttribute firstInvalidAttribute = null;
+                IAttribute currentAttribute = currentlySelectedAttribute.Last();
+                DataValidity validity = AttributeStatusInfo.GetDataValidity(currentAttribute);
+                if (   validity == DataValidity.Invalid
+                    || validity == DataValidity.ValidationWarning && !ignoreWarnings)
+                {
+                    firstInvalidAttribute = currentAttribute;
+                }
+                else
+                {
+                    firstInvalidAttribute = GetNextInvalidAttribute(!ignoreWarnings);
+
+                    // If GetNextInvalidAttribute found something, the selection has been changed.
+                    changedSelection = firstInvalidAttribute != null;
+                }
+
+                IAttribute invalidAttribute = firstInvalidAttribute;
+
+                // Loop as long as more invalid attributes are found (for the case that we need to
+                // prompt for each invalid field).
+                while (invalidAttribute != null)
+                {
+                    try
+                    {
+                        using (new TemporaryWaitCursor())
+                        {
+                            // Obtain the complete genealogy needed to propagate the invalid attribute.
+                            Stack<IAttribute> attributesToPropagate =
+                                GetAttributeGenealogy(invalidAttribute);
+
+                            // Indicate a manual focus event so that HandleControlGotFocus allows the
+                            // new attribute selection rather than overriding it.
+                            _manualFocusEvent = true;
+
+                            // Propagate and select the invalid attribute.
+                            PropagateAttributes(attributesToPropagate, true, false);
+
+                            // Since this loop is being run within an event handler, DoEvents needs
+                            // to be called to allow the attribute propagation to occur.
+                            Application.DoEvents();
+                        }
+
+                        // Generate an exception which can be displayed to the user.
+                        AttributeStatusInfo.Validate(invalidAttribute, true);
+                    }
+                    catch (DataEntryValidationException validationException)
+                    {
+                        // If saving is allowed after prompting, prompt for each attribute that
+                        // currently does not meet validation requirements.
+                        if (   InvalidDataSaveMode == InvalidDataSaveMode.PromptForEach
+                            || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning && !hasError
+                           )
+                        {
+                            string message = validationException.Message + Environment.NewLine +
+                                Environment.NewLine + "Do you wish to save the data anyway?";
+
+                            // If the user chooses not to continue the save, return false and leave
+                            // selection on the first invalid field.
+                            if (MessageBox.Show(this, message, "Invalid data",
+                                MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
+                                MessageBoxDefaultButton.Button2, 0) == DialogResult.No)
+                            {
+                                return false;
+                            }
+                            // If the user chooses to continue with the save, look for any further
+                            // invalid attributes before returning true.
+                            else
+                            {
+                                invalidAttribute = GetNextInvalidAttribute(!ignoreWarnings);
+
+                                // If the next invalid attribute is the first one that was found,
+                                // the user has responded to prompts for each-- exit the prompting
+                                // loop.
+                                if (invalidAttribute == firstInvalidAttribute)
+                                {
+                                    break;
+                                }
+
+                                continue;
+                            }
+                        }
+                        // If saving is disallowed with invalid data, display the validation
+                        // exception and return false.
+                        else
+                        {
+                            validationException.Display();
+                            return false;
+                        }
+                    }
+
+                    ExtractException.ThrowLogicException("ELI24640");
+                }
+            }
+
+            // If saving should be or can be prevented by unviewed data, check for unviewed data.
+            if (UnviewedDataSaveMode != UnviewedDataSaveMode.Allow)
+            {
+                if (GetNextUnviewedAttribute() != null)
+                {
+                    // If GetNextUnviewedAttribute found something, the selection has been changed.
+                    changedSelection = true;
+
+                    // If saving should be allowed after a prompting, prompt.
+                    if (UnviewedDataSaveMode == UnviewedDataSaveMode.PromptOnceForAll)
+                    {
+                        if (MessageBox.Show(this, "Not all fields have been viewed, do you wish " +
+                            "to save the data anyway?", "Unviewed data", MessageBoxButtons.YesNo, 
+                            MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0) ==
+                                DialogResult.No)
+                        {
+                            // User chose not to save; leave selection on the first unviewed
+                            // attribute and return false.
+                            return false;
+                        }
+                    }
+                    // If saving is disallowed, display an exception and return false.
+                    else
+                    {
+                        new ExtractException("ELI25188", "Data cannot be saved until all fields " +
+                            "have been viewed!").Display();
+                        return false;
+                    }
+                }
+            }
+
+            // Re-propagate the attribute that was selected at the beginning of this method
+            if (changedSelection)
+            {
+                // PropagateAttributes cannot be called in place of this loop since
+                // inactive controls may then be left with improper data.
+                foreach (IDataEntryControl dataControl in _rootLevelControls)
+                {
+                    dataControl.PropagateAttribute(null, false, false);
+                }
+
+                // TODO: If multiple cells in a table were selected, only one will be selected at the
+                // end of this call.
+                PropagateAttributes(currentlySelectedAttribute, true, false);
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Indicates document data has changed.
         /// </summary>
         protected virtual void OnDataChanged()
@@ -4871,32 +5124,21 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Raises the <see cref="UnviewedItemsFound"/> event.
+        /// Raises the <see cref="UnviewedDataStateChanged"/> event.
         /// </summary>
-        /// <param name="unviewedItemsFound"><see langword="true"/> if unviewed 
-        /// <see cref="IAttribute"/>s are now known to exist, <see langword="false"/> if it is
-        /// now known that all <see cref="IAttribute"/>s have been viewed.</param>
-        protected virtual void OnUnviewedItemsFound(bool unviewedItemsFound)
+        protected virtual void OnUnviewedDataStateChanged()
         {
-            if (UnviewedItemsFound != null)
-            {
-                UnviewedItemsFound(this, new UnviewedItemsFoundEventArgs(unviewedItemsFound));
-            }
+            UnviewedDataStateChanged?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
-        /// Raises the <see cref="InvalidItemsFound"/> event.
+        /// Raises the <see cref="DataValidityChanged"/> event.
         /// </summary>
-        /// <param name="invalidItemsFound"><see langword="true"/> if <see cref="IAttribute"/>s
-        /// with invalid data are now known to exist, <see langword="false"/> if it is
-        /// now known that all <see cref="IAttribute"/>s contain valid data.</param>
-        protected virtual void OnInvalidItemsFound(bool invalidItemsFound)
+        protected virtual void OnDataValidityChanged()
         {
-            if (InvalidItemsFound != null)
-            {
-                InvalidItemsFound(this, new InvalidItemsFoundEventArgs(invalidItemsFound));
-            }
+            DataValidityChanged?.Invoke(this, new EventArgs());
         }
+
         /// <summary>
         /// Raises the <see cref="MessageHandled"/> event.
         /// </summary>
@@ -6148,196 +6390,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Increments or decrements _unviewedAttributeCount and raises the
-        /// <see cref="UnviewedItemsFound"/> event as necessary.
-        /// </summary>
-        /// <param name="increment"><see langword="true"/> to increment
-        /// _unviewedAttributeCount <see langword="false"/> to decrement it.</param>
-        void UpdateUnviewedCount(bool increment)
-        {
-            if (_changingData)
-            {
-                return;
-            }
-
-            if (increment)
-            {
-                // If there were previously not any unviewed attributes, raise UnviewedItemsFound
-                // to notify listeners that unviewed attributes are now available.
-                if (_unviewedAttributeCount == 0)
-                {
-                    OnUnviewedItemsFound(true);
-                }
-
-                _unviewedAttributeCount++;
-            }
-            else
-            {
-                _unviewedAttributeCount--;
-
-                // If the _unviewedAttributeCount now stands at zero, perform a full search for
-                // unviewed attributes to confirm the count is in sync, and if so raise the
-                // UnviewedItemsFound event to notify listeners there are no more unviewed
-                // attributes.
-                if (_unviewedAttributeCount <= 0)
-                {
-                    int unviewedRecount = CountUnviewedItems();
-                    if (_unviewedAttributeCount!= 0 || unviewedRecount != 0)
-                    {
-                        ExtractException ee = new ExtractException("ELI24939",
-                            "Unviewed attribute count out of sync!");
-                        ee.AddDebugData("Count", _unviewedAttributeCount, false);
-                        ee.AddDebugData("Recount", unviewedRecount, false);
-#if DEBUG
-                        ee.Display();
-#else
-                        ee.Log();
-#endif
-                        _unviewedAttributeCount = unviewedRecount;
-                    }
-
-                    OnUnviewedItemsFound(_unviewedAttributeCount != 0);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Increments or decrements _invalidAttributeCount and raises the
-        /// <see cref="InvalidItemsFound"/> event as necessary.
-        /// </summary>
-        /// <param name="increment"><see langword="true"/> to increment
-        /// _invalidAttributeCount <see langword="false"/> to decrement it.</param>
-        void UpdateInvalidCount(bool increment)
-        {
-            if (_changingData)
-            {
-                return;
-            }
-
-            if (increment)
-            {
-                // If there were previously not any invalid attributes, raise InvalidItemsFound
-                // to notify listeners that invalid attributes are now available.
-                if (_invalidAttributeCount == 0)
-                {
-                    OnInvalidItemsFound(true);
-                }
-
-                _invalidAttributeCount++;
-            }
-            else
-            {
-                _invalidAttributeCount--;
-
-                // If the _invalidAttributeCount now stands at zero, perform a full search for
-                // invalid attributes to confirm the count is in sync, and if so raise the
-                // InvalidItemsFound event to notify listeners there are no more invalid
-                // attributes.
-                if (_invalidAttributeCount <= 0)
-                {
-                    int invalidRecount = CountInvalidItems();
-                    if (_invalidAttributeCount != 0 || invalidRecount != 0)
-                    {
-                        ExtractException ee = new ExtractException("ELI24940",
-                            "Invalid attribute count out of sync!");
-                        ee.AddDebugData("Count", _invalidAttributeCount, false);
-                        ee.AddDebugData("Recount", invalidRecount, false);
-#if DEBUG
-                        ee.Display();
-#else
-                        ee.Log();
-#endif
-                        _invalidAttributeCount = invalidRecount;
-                    }
-
-                    OnInvalidItemsFound(_invalidAttributeCount != 0);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Counts the number of unviewed items in the current <see cref="IAttribute"/> hierarchy.
-        /// </summary>
-        /// <returns>The number of unviewed items in the current <see cref="IAttribute"/> hierarchy.
-        /// </returns>
-        int CountUnviewedItems()
-        {
-            Stack<IAttribute> startingPoint = null;
-            Stack<IAttribute> nextUnviewedAttributeGenealogy;
-            int count = 0;
-
-            // Loop to find the next unviewed attribute until no more can be found without looping.
-            do
-            {
-                nextUnviewedAttributeGenealogy = AttributeStatusInfo.FindNextUnviewedAttribute(
-                    _attributes, startingPoint, true, false);
-
-                if (nextUnviewedAttributeGenealogy != null)
-                {
-                    // Use the found attribute as the starting point for the search in the next
-                    // iteration.
-                    startingPoint =
-                        CollectionMethods.CopyStack(nextUnviewedAttributeGenealogy);
-
-                    // TODO: Now that there is a reason to access the last attribute from
-                    // FindNextUnviewedAttribute, FindNextUnviewedAttribute should be ideally be
-                    // changed to return a list.
-                    while (nextUnviewedAttributeGenealogy.Count > 1)
-                    {
-                        nextUnviewedAttributeGenealogy.Pop();
-                    }
-
-                    // [DataEntry:197]
-                    // Empty fields should be considered viewed.
-                    IAttribute unviewedAttribute = nextUnviewedAttributeGenealogy.Peek();
-                    if (string.IsNullOrEmpty(unviewedAttribute.Value.String))
-                    {
-                        AttributeStatusInfo.MarkAsViewed(unviewedAttribute, true);
-                    }
-                    else
-                    {
-                        count++;
-                    }
-                }
-            }
-            while (nextUnviewedAttributeGenealogy != null);
-
-            return count;
-        }
-
-        /// <summary>
-        /// Counts the number of invalid items in the current <see cref="IAttribute"/> hierarchy.
-        /// </summary>
-        /// <returns>The number of invalid items in the current <see cref="IAttribute"/> hierarchy.
-        /// </returns>
-        int CountInvalidItems()
-        {
-            Stack<IAttribute> startingPoint = null;
-            Stack<IAttribute> nextInvalidAttributeGenealogy;
-            int count = 0;
-
-            // Loop to find the next invalid attribute until no more can be found without looping.
-            do
-            {
-                nextInvalidAttributeGenealogy = AttributeStatusInfo.FindNextInvalidAttribute(
-                    _attributes, true, startingPoint, true, false);
-
-                if (nextInvalidAttributeGenealogy != null)
-                {
-                    count++;
-
-                    // Use the found attribute as the starting point for the search in the next
-                    // iteration.
-                    startingPoint =
-                        CollectionMethods.CopyStack(nextInvalidAttributeGenealogy);
-                }
-            }
-            while (nextInvalidAttributeGenealogy != null);
-
-            return count;
-        }
-
-        /// <summary>
         /// Updates the unviewed and invalid attribute counts to account for the
         /// <see cref="IAttribute"/>s that have been deleted.
         /// </summary>
@@ -6361,18 +6413,20 @@ namespace Extract.DataEntry
                 // Remove the highlight for this attribute
                 RemoveAttributeHighlight(attribute);
 
-                // If the current attribute is unviewed, decrement the _unviewedAttributeCount
-                // and raise UnviewedItemsFound as appropriate.
-                if (!AttributeStatusInfo.HasBeenViewed(attribute, false))
+                bool previousIsDataUnviewed = IsDataUnviewed;
+                DataValidity previousDataValidity = DataValidity;
+
+                _unviewedAttributes.Remove(attribute);
+                _invalidAttributes.Remove(attribute);
+
+                if (IsDataUnviewed != previousIsDataUnviewed)
                 {
-                    UpdateUnviewedCount(false);
+                    OnUnviewedDataStateChanged();
                 }
 
-                // If the current attribute contains invalid data, decrement the 
-                // _invalidAttributeCount and raise InvalidItemsFound as appropriate.
-                if (AttributeStatusInfo.GetDataValidity(attribute) != DataValidity.Valid)
+                if (previousDataValidity != DataValidity)
                 {
-                    UpdateInvalidCount(false);
+                    OnDataValidityChanged();
                 }
 
                 AttributeStatusInfo.GetStatusInfo(attribute).AttributeValueModified -=
@@ -7453,197 +7507,6 @@ namespace Extract.DataEntry
                     highlight.Visible = show;
                 }
             }
-        }
-
-        /// <summary>
-        /// Using the values of InvalidDataSaveMode and UnviewedDataSaveMode, determines if data
-        /// can be saved (prompting as necessary).  If data cannot be saved, an appropriate message
-        /// or exception will be displayed and selection will be changed to the first field that
-        /// prevented data from being saved.
-        /// </summary>
-        /// <returns><see langword="true"/> if data can be saved, <see langword="false"/> if the
-        /// data cannot be saved at this time.</returns>
-        bool DataCanBeSaved()
-        {
-            // Keep track of the currently selected attribute and whether selection is changed by
-            // this method so that the selection can be restored at the end of this method.
-            Stack<IAttribute> currentlySelectedAttribute = ActiveAttributeGenealogy(true, null);
-            if (currentlySelectedAttribute == null || !currentlySelectedAttribute.Any())
-            {
-                // https://extract.atlassian.net/browse/ISSUE-12548
-                // In the case that nothing is selected, navigate to the first invalid attribute as
-                // the starting point for validation.
-                currentlySelectedAttribute =
-                    AttributeStatusInfo.FindNextInvalidAttribute(_attributes,
-                        true, null, true, false);
-
-                // If there are no invalid attributes, we can return early from this call.
-                if (currentlySelectedAttribute == null || !currentlySelectedAttribute.Any())
-                {
-                    return true;
-                }
-            }
-
-            bool changedSelection = false;
-            bool hasError = HasInvalidAttribute(false);
-
-            // Don't prompt or display exception about validation warnings if we are allowing them
-            // or if prompting for each warning but there are truly invalid attributes.
-            bool ignoreWarnings =
-                   InvalidDataSaveMode == InvalidDataSaveMode.AllowWithWarnings
-                || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning && hasError;
-
-            // If saving could be prevented by invalid data, iterate through the invalid attributes
-            // in order to display the appropriate exception or prompt user for confirmation.
-            if (   InvalidDataSaveMode == InvalidDataSaveMode.Disallow
-                || InvalidDataSaveMode == InvalidDataSaveMode.AllowWithWarnings && hasError
-                || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEach
-                || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning
-               )
-
-            {
-                // Find the first attribute that doesn't pass validation.
-                IAttribute firstInvalidAttribute = null;
-                IAttribute currentAttribute = currentlySelectedAttribute.Last();
-                DataValidity validity = AttributeStatusInfo.GetDataValidity(currentAttribute);
-                if (   validity == DataValidity.Invalid
-                    || validity == DataValidity.ValidationWarning && !ignoreWarnings)
-                {
-                    firstInvalidAttribute = currentAttribute;
-                }
-                else
-                {
-                    firstInvalidAttribute = GetNextInvalidAttribute(!ignoreWarnings);
-
-                    // If GetNextInvalidAttribute found something, the selection has been changed.
-                    changedSelection = firstInvalidAttribute != null;
-                }
-
-                IAttribute invalidAttribute = firstInvalidAttribute;
-
-                // Loop as long as more invalid attributes are found (for the case that we need to
-                // prompt for each invalid field).
-                while (invalidAttribute != null)
-                {
-                    try
-                    {
-                        using (new TemporaryWaitCursor())
-                        {
-                            // Obtain the complete genealogy needed to propagate the invalid attribute.
-                            Stack<IAttribute> attributesToPropagate =
-                                GetAttributeGenealogy(invalidAttribute);
-
-                            // Indicate a manual focus event so that HandleControlGotFocus allows the
-                            // new attribute selection rather than overriding it.
-                            _manualFocusEvent = true;
-
-                            // Propagate and select the invalid attribute.
-                            PropagateAttributes(attributesToPropagate, true, false);
-
-                            // Since this loop is being run within an event handler, DoEvents needs
-                            // to be called to allow the attribute propagation to occur.
-                            Application.DoEvents();
-                        }
-
-                        // Generate an exception which can be displayed to the user.
-                        AttributeStatusInfo.Validate(invalidAttribute, true);
-                    }
-                    catch (DataEntryValidationException validationException)
-                    {
-                        // If saving is allowed after prompting, prompt for each attribute that
-                        // currently does not meet validation requirements.
-                        if (   InvalidDataSaveMode == InvalidDataSaveMode.PromptForEach
-                            || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning && !hasError
-                           )
-                        {
-                            string message = validationException.Message + Environment.NewLine +
-                                Environment.NewLine + "Do you wish to save the data anyway?";
-
-                            // If the user chooses not to continue the save, return false and leave
-                            // selection on the first invalid field.
-                            if (MessageBox.Show(this, message, "Invalid data",
-                                MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
-                                MessageBoxDefaultButton.Button2, 0) == DialogResult.No)
-                            {
-                                return false;
-                            }
-                            // If the user chooses to continue with the save, look for any further
-                            // invalid attributes before returning true.
-                            else
-                            {
-                                invalidAttribute = GetNextInvalidAttribute(!ignoreWarnings);
-
-                                // If the next invalid attribute is the first one that was found,
-                                // the user has responded to prompts for each-- exit the prompting
-                                // loop.
-                                if (invalidAttribute == firstInvalidAttribute)
-                                {
-                                    break;
-                                }
-
-                                continue;
-                            }
-                        }
-                        // If saving is disallowed with invalid data, display the validation
-                        // exception and return false.
-                        else
-                        {
-                            validationException.Display();
-                            return false;
-                        }
-                    }
-
-                    ExtractException.ThrowLogicException("ELI24640");
-                }
-            }
-
-            // If saving should be or can be prevented by unviewed data, check for unviewed data.
-            if (UnviewedDataSaveMode != UnviewedDataSaveMode.Allow)
-            {
-                if (GetNextUnviewedAttribute() != null)
-                {
-                    // If GetNextUnviewedAttribute found something, the selection has been changed.
-                    changedSelection = true;
-
-                    // If saving should be allowed after a prompting, prompt.
-                    if (UnviewedDataSaveMode == UnviewedDataSaveMode.PromptOnceForAll)
-                    {
-                        if (MessageBox.Show(this, "Not all fields have been viewed, do you wish " +
-                            "to save the data anyway?", "Unviewed data", MessageBoxButtons.YesNo, 
-                            MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0) ==
-                                DialogResult.No)
-                        {
-                            // User chose not to save; leave selection on the first unviewed
-                            // attribute and return false.
-                            return false;
-                        }
-                    }
-                    // If saving is disallowed, display an exception and return false.
-                    else
-                    {
-                        new ExtractException("ELI25188", "Data cannot be saved until all fields " +
-                            "have been viewed!").Display();
-                        return false;
-                    }
-                }
-            }
-
-            // Re-propagate the attribute that was selected at the beginning of this method
-            if (changedSelection)
-            {
-                // PropagateAttributes cannot be called in place of this loop since
-                // inactive controls may then be left with improper data.
-                foreach (IDataEntryControl dataControl in _rootLevelControls)
-                {
-                    dataControl.PropagateAttribute(null, false, false);
-                }
-
-                // TODO: If multiple cells in a table were selected, only one will be selected at the
-                // end of this call.
-                PropagateAttributes(currentlySelectedAttribute, true, false);
-            }
-
-            return true;
         }
 
         /// <summary>

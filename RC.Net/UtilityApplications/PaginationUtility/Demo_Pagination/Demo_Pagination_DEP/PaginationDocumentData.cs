@@ -228,7 +228,7 @@ namespace Extract.Demo_Pagination
             set
             {
                 SetAttributeValue(Fields["DocumentType"], value);
-                OnSummaryChanged();
+                OnDocumentDataStateChanged();
             }
         }
 
@@ -245,7 +245,7 @@ namespace Extract.Demo_Pagination
             set
             {
                 SetAttributeValue(Fields["DocumentDate"], value);
-                OnSummaryChanged();
+                OnDocumentDataStateChanged();
             }
         }
 
@@ -262,7 +262,7 @@ namespace Extract.Demo_Pagination
             set
             {
                 SetAttributeValue(Fields["DocumentComment"], value);
-                OnSummaryChanged();
+                OnDocumentDataStateChanged();
             }
         }
 
@@ -279,7 +279,7 @@ namespace Extract.Demo_Pagination
             set
             {
                 SetAttributeValue(Fields["PatientFirst"], value);
-                OnSummaryChanged();
+                OnDocumentDataStateChanged();
             }
         }
 
@@ -312,7 +312,7 @@ namespace Extract.Demo_Pagination
             set
             {
                 SetAttributeValue(Fields["PatientLast"], value);
-                OnSummaryChanged();
+                OnDocumentDataStateChanged();
             }
         }
 
@@ -872,7 +872,7 @@ namespace Extract.Demo_Pagination
 
                 if (previousState != newState)
                 {
-                    OnModifiedChanged();
+                    OnDocumentDataStateChanged();
                 }
             }
             catch (Exception ex)
