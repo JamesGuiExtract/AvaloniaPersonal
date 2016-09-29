@@ -339,12 +339,59 @@ namespace Extract.AttributeFinder.Test
                         AttributesPath = "<SourceDocName>.labeled.voa",
                         TrainingSetPercentage = 80
                     },
-                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization),
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature"),
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
             var results = lm.TrainMachine();
             Assert.AreEqual(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 1.0);
             Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.85);
+        }
+
+        [Test, Category("LearningMachine")]
+        public static void TrainMachineAttributeCategorizationDOBAndCollectionDate()
+        {
+            SetPaginationFiles();
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                    {
+                        InputPath = _inputFolder.Last(),
+                        InputPathType = InputType.Folder,
+                        AttributesPath = "<SourceDocName>.labeled_3_types.voa",
+                        TrainingSetPercentage = 80
+                    },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature"),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var results = lm.TrainMachine();
+            Assert.Greater(results.Item1.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 0.87);
+
+            // Test results are between 70% and 80% when there are 'other' dates (neither DOB nor CollectionDate)
+            Assert.Greater(results.Item2.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 0.7);
+            Assert.Less(results.Item2.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 0.8);
+        }
+
+        [Test, Category("LearningMachine")]
+        public static void TrainMachineAttributeCategorizationDOBAndCollectionDate_NoOther()
+        {
+            SetPaginationFiles();
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                    {
+                        InputPath = _inputFolder.Last(),
+                        InputPathType = InputType.Folder,
+                        AttributesPath = "<SourceDocName>.labeled_2_types.voa",
+                        TrainingSetPercentage = 80
+                    },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature"),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var results = lm.TrainMachine();
+            Assert.AreEqual(results.Item1.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 1.0);
+
+            // Results are better when there are no 'other' dates to worry about
+            Assert.AreEqual(results.Item2.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 1.0);
         }
 
         [Test, Category("LearningMachine")]
@@ -785,6 +832,14 @@ namespace Extract.AttributeFinder.Test
                 _testFiles.GetFile(resourceName, path);
 
                 resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".labeled.voa");
+                path = Path.Combine(_inputFolder.Last(), resourceName);
+                _testFiles.GetFile(resourceName, path);
+
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".labeled_2_types.voa");
+                path = Path.Combine(_inputFolder.Last(), resourceName);
+                _testFiles.GetFile(resourceName, path);
+
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".labeled_3_types.voa");
                 path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
 

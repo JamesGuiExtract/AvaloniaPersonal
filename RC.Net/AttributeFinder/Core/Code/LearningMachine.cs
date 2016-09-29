@@ -474,16 +474,20 @@ namespace Extract.AttributeFinder
                 }
                 else if (Usage == LearningMachineUsage.AttributeCategorization)
                 {
+                    var attributeCreator = new AttributeCreator(document.SourceDocName);
                     foreach(Tuple<ComAttribute, Tuple<int, double?>> attrAndAnswer in
                         protoFeaturesOrGroupsOfProtoFeatures.ToIEnumerable<ComAttribute>()
                         .Zip(outputs, Tuple.Create))
                     {
-                        string category = Encoder.AnswerCodeToName[attrAndAnswer.Item2.Item1];
-                        attrAndAnswer.Item1.Type = category;
+                        var attribute = attrAndAnswer.Item1;
                         if (!preserveInputAttributes)
                         {
-                            attrAndAnswer.Item1.SubAttributes = null;
+                            attribute.SubAttributes.Clear();
                         }
+
+                        string category = Encoder.AnswerCodeToName[attrAndAnswer.Item2.Item1];
+                        attribute.SubAttributes.PushBack(
+                            attributeCreator.Create(LearningMachineDataEncoder.CategoryAttributeName, category));
                     }
 
                     return protoFeaturesOrGroupsOfProtoFeatures;

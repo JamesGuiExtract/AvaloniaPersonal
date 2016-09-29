@@ -1,5 +1,6 @@
 ﻿using Extract.Testing.Utilities;
 using NUnit.Framework;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -29,6 +30,8 @@ namespace Extract.AttributeFinder.Test
         static TestFileManager<TestLearningMachineDataEncoder> _testFiles;
         static string[] _ussFiles;
         static string[] _voaFiles;
+        static string[] _voaFiles2;
+        static string[] _voaFiles3;
         static string[] _eavFiles;
         static string[] _categories;
 
@@ -649,6 +652,112 @@ namespace Extract.AttributeFinder.Test
             encoder1.AttributeFeatureVectorizers.First().Enabled = false;
             Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
             Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
+        }
+
+        // Helper function to build file lists for attribute categorization testing
+        // These images are stapled together from Demo_LabDE images
+        private static void SetAttributeCategorizationFiles()
+        {
+            _ussFiles = new string[7];
+            _voaFiles = new string[7];
+            _voaFiles2 = new string[7];
+            _voaFiles3 = new string[7];
+            for (int i = 0; i < _ussFiles.Length; i++)
+            {
+                var baseName = "Resources.LearningMachine.Pagination.Pagination_{0:D3}.tif{1}";
+                _testFiles.GetFile(string.Format(CultureInfo.CurrentCulture, baseName, i+1, ""));
+                _ussFiles[i] = _testFiles.GetFile(string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".uss"));
+                _voaFiles[i] = _testFiles.GetFile(string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".labeled_3_types.voa"));
+                _voaFiles2[i] = _testFiles.GetFile(string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".labeled_2_types.voa"));
+                _voaFiles3[i] = _testFiles.GetFile(string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".labeled.voa"));
+            }
+        }
+
+        // Test attribute categorization when every attribute is a candidate
+        // This test uses date attributes that are marked DOB, CollectionDate, or 'nothing' (empty AttributeType value)
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeCategorizationAllCandidates()
+        {
+            SetAttributeCategorizationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, null);
+            Assert.AreEqual(199, encoder.FeatureVectorLength);
+
+            // There are three categories available
+            Assert.AreEqual(3, encoder.AnswerNameToCode.Count);
+
+            // All three types (DOB, CollectionDate, and 'nothing') are represented in these VOA files
+            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles, null);
+            var answers = featuresAndAnswers.Item2;
+            Assert.AreEqual(3, answers.Distinct().Count());
+        }
+
+        // Test attribute categorization when not every attribute is a candidate
+        // This test uses date attributes that are marked DOB, CollectionDate or not marked (don't have an AttributeType subattribute)
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeCategorizationNotAllCandidates()
+        {
+            SetAttributeCategorizationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles2, null);
+            // Less features result because there are less candidates
+            Assert.AreEqual(73, encoder.FeatureVectorLength);
+
+            // There are still three categories available because the 'nothing' category is always available
+            Assert.AreEqual(3, encoder.AnswerNameToCode.Count);
+
+            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles2, null);
+            var answers = featuresAndAnswers.Item2;
+            // Only two types (DOB, CollectionDate) are represented in these VOA files
+            Assert.AreEqual(2, answers.Distinct().Count());
+        }
+
+        // Test attribute categorization with categories that were not present during training (will be treated as unknown)
+        // This test uses training data that only have DOB and 'nothing' labels but then computes feature vectors from
+        // VOAs with CollectionDate labels too
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeCategorizationUnknownLabels()
+        {
+            SetAttributeCategorizationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles3, null);
+            // There are two categories available, DOB and 'nothing'
+            Assert.AreEqual(2, encoder.AnswerNameToCode.Count);
+
+            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles2, null);
+            var answers = featuresAndAnswers.Item2;
+            // Three types (DOB, CollectionDate, and 'nothing') are represented in these VOA files but since the encoder
+            // does not know about CollectionDate those labels will be treated like 'nothing'
+            Assert.AreEqual(2, answers.Distinct().Count());
+        }
+
+        // Test attribute categorization encoding for prediction when not every attribute is labeled
+        // Labels should have no effect when predicting, only when configuring/training, so all attributes
+        // will be treated as candidates
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeCategorizationPrediction()
+        {
+            SetAttributeCategorizationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles2, null);
+
+            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles2, null);
+            // Only a subset of attributes are considered for training because not all are labeled (not all have an AttributeType subattribute)
+            Assert.AreEqual(41, featuresAndAnswers.Item1.Length);
+
+            var afutil = new UCLID_AFUTILSLib.AFUtility();
+            var featureVectors =
+                _ussFiles
+                .Zip(_voaFiles2, Tuple.Create)
+                .SelectMany(t =>
+                {
+                    var uss = new UCLID_RASTERANDOCRMGMTLib.SpatialString();
+                    uss.LoadFrom(t.Item1, false);
+                    var voa = afutil.GetAttributesFromFile(t.Item2);
+                    return encoder.GetFeatureVectors(uss, voa);
+                });
+            // All attributes are considered for predicting because labels don't matter in this context
+            Assert.AreEqual(134, featureVectors.Count());
         }
 
         #endregion Tests

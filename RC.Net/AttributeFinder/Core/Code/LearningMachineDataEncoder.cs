@@ -227,6 +227,8 @@ namespace Extract.AttributeFinder
         // For pagination, the query for answer page range attributes
         static readonly string _PAGE_ATTRIBUTE_QUERY = "Document/Pages";
 
+        public static readonly string CategoryAttributeName = "AttributeType";
+
         #endregion Constants
 
         #region Fields
@@ -544,7 +546,8 @@ namespace Extract.AttributeFinder
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
-                    return GetAttributesFeatureVectors(document, protoFeaturesOrGroupsOfProtoFeatures);
+                    return GetAttributesFeatureVectors(document,
+                        protoFeaturesOrGroupsOfProtoFeatures.ToIEnumerable<ComAttribute>());
                 }
                 else
                 {
@@ -605,7 +608,7 @@ namespace Extract.AttributeFinder
                 }
 
                 if (ussFilePaths.Length != inputVOAFilePaths.Length && inputVOAFilePaths.Length != 0
-                    || ussFilePaths.Length != answersOrAnswerFiles.Length)
+                    || answersOrAnswerFiles != null && answersOrAnswerFiles.Length != ussFilePaths.Length)
                 {
                     throw new ExtractException("ELI39538", "Arguments are of different lengths");
                 }
@@ -713,7 +716,7 @@ namespace Extract.AttributeFinder
                 }
 
                 if ( inputVOAFilePaths != null && inputVOAFilePaths.Length != ussFilePaths.Length
-                    || ussFilePaths.Length != answersOrAnswerFiles.Length)
+                    || answersOrAnswerFiles != null && answersOrAnswerFiles.Length != ussFilePaths.Length)
                 {
                     throw new ExtractException("ELI39700", "Arguments are of different lengths");
                 }
@@ -741,6 +744,9 @@ namespace Extract.AttributeFinder
                 {
                     var results = GetAttributesFeatureVectorAndAnswerCollection(ussFilePaths, inputVOAFilePaths,
                         updateStatus2, cancellationToken);
+
+                    ExtractException.Assert("ELI41417", "No labeled candidate attributes found",
+                       results.Length > 0);
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answers = new int[results.Length];
@@ -956,18 +962,21 @@ namespace Extract.AttributeFinder
         /// Gets an enumeration of <see cref="NameToProtoFeaturesMap"/>s for attribute categorization from a vector of
         /// <see cref="ComAttribute"/>s
         /// </summary>
-        /// <param name="attributes">The vector of <see cref="ComAttribute"/>s from which to get protofeatures</param>
+        /// <param name="attributes">The collection of <see cref="ComAttribute"/>s from which to get protofeatures</param>
         /// <returns>An enumeration of <see cref="NameToProtoFeaturesMap"/>s for attribute categorization</returns>
-        private IEnumerable<NameToProtoFeaturesMap> GetAttributesProtoFeatures(IUnknownVector attributes)
+        private IEnumerable<NameToProtoFeaturesMap> GetAttributesProtoFeatures(IEnumerable<ComAttribute> attributes)
         {
             return attributes
-                .ToIEnumerable<ComAttribute>()
                 .Select(attr => GetFilteredMapOfNamesToValues(attr.SubAttributes));
         }
 
         /// <summary>
         /// Gets an enumeration of <see cref="NameToProtoFeaturesMap"/>s for attribute categorization from a VOA file
         /// </summary>
+        /// <remarks>
+        /// Only top-level attributes that are labeled (have an AttributeType subattribute) will be used.
+        /// For this reason this method is only to be used during the training process. 
+        /// </remarks>
         /// <param name="attributesFilePath">The path to the VOA or EAV file</param>
         /// <returns>An enumeration of <see cref="NameToProtoFeaturesMap"/>s for attribute categorization</returns>
         private IEnumerable<NameToProtoFeaturesMap> GetAttributesProtoFeatures(string attributesFilePath)
@@ -976,7 +985,12 @@ namespace Extract.AttributeFinder
             {
                 var attributes = _afUtility.Value.GetAttributesFromFile(attributesFilePath);
                 attributes.ReportMemoryUsage();
-                return GetAttributesProtoFeatures(attributes);
+                var filteredAttributes = attributes
+                    .ToIEnumerable<ComAttribute>()
+                    .Where(attribute =>
+                        AttributeMethods.GetAttributesByName(attribute.SubAttributes, CategoryAttributeName)
+                        .Any());
+                return GetAttributesProtoFeatures(filteredAttributes);
             }
             catch (Exception e)
             {
@@ -1091,14 +1105,14 @@ namespace Extract.AttributeFinder
         /// Gets zero or more feature vectors from a <see cref="ISpatialString"/> and vector of <see cref="ComAttribute"/>s
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> to use for auto-bag-of-words features.</param>
-        /// <param name="attributes">The vector of <see cref="ComAttribute"/>s containing attributes to be classified
+        /// <param name="attributes">The collection of <see cref="ComAttribute"/>s containing attributes to be classified
         /// <returns>The feature vectors computed from the input arguments.</returns>
-        private IEnumerable<double[]> GetAttributesFeatureVectors(ISpatialString document, IUnknownVector attributes)
+        private IEnumerable<double[]> GetAttributesFeatureVectors(ISpatialString document, IEnumerable<ComAttribute> attributes)
         {
             ExtractException.Assert("ELI41405", "Attributes to be classified cannot be null", attributes != null);
 
             var attributeFeatures = Enumerable.Empty<List<double[]>>();
-            int numberOfExamples = attributes.Size();
+            int numberOfExamples = attributes.Count();
 
             var protoFeatureGroups = GetAttributesProtoFeatures(attributes);
 
@@ -1356,6 +1370,9 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                ExtractException.Assert("ELI41413", "Input VOA collection cannot be null",
+                    inputVOAFilePaths != null);
+
                 var results = new Tuple<double[], int>[ussFilePaths.Length][];
                 Parallel.For(0, ussFilePaths.Length, (i, loopState) =>
                 {
@@ -1382,21 +1399,34 @@ namespace Extract.AttributeFinder
                         }
                     }
 
-                    IUnknownVector attributes = null;
-                    if (AttributeFeatureVectorizers.Any() && inputVOAFilePaths != null)
-                    {
-                        string voa = inputVOAFilePaths[i];
-                        ExtractException.Assert("ELI41402", "Input VOA file doesn't exist", File.Exists(voa),
-                            "Filename", voa);
-                        attributes = _afUtility.Value.GetAttributesFromFile(voa);
-                        attributes.ReportMemoryUsage();
-                    }
+                    string voa = inputVOAFilePaths[i];
+                    ExtractException.Assert("ELI41402", "Input VOA file doesn't exist", File.Exists(voa),
+                        "Filename", voa);
+                    var attributes = _afUtility.Value.GetAttributesFromFile(voa);
+                    attributes.ReportMemoryUsage();
 
-                    List<double[]> featureVectors = GetAttributesFeatureVectors(spatialString, attributes).ToList();
-
-                    var answerCodes = attributes.ToIEnumerable<ComAttribute>().Select(attribute =>
+                    var answerCodes = new List<int>(attributes.Size());
+                    var filteredAttributes = new List<ComAttribute>(attributes.Size());
+                    foreach(var attribute in attributes.ToIEnumerable<ComAttribute>())
                     {
-                        string categoryName = attribute.Type;
+                        var categoryAttributes =
+                            AttributeMethods.GetAttributesByName(attribute.SubAttributes, CategoryAttributeName);
+
+                        int countOfCategoryAttributes = categoryAttributes.Count();
+                        ExtractException.Assert("ELI41412", "There should be zero or one category attribute",
+                            countOfCategoryAttributes <= 1,
+                            "VOA file", inputVOAFilePaths[i],
+                            "Candidate attribute name", attribute.Name,
+                            "Category attribute name", CategoryAttributeName,
+                            "Count of category attributes", countOfCategoryAttributes);
+
+                        // Not a candidate attribute
+                        if (countOfCategoryAttributes == 0)
+                        {
+                            continue;
+                        }
+
+                        string categoryName = categoryAttributes.First().Value.String;
                         int code;
                         if (!AnswerNameToCode.TryGetValue(categoryName, out code))
                         {
@@ -1406,8 +1436,11 @@ namespace Extract.AttributeFinder
                             ex.Log();
                             code = UnknownOrNegativeCategoryCode;
                         }
-                        return code;
-                    }).ToList();
+                        filteredAttributes.Add(attribute);
+                        answerCodes.Add(code);
+                    }
+
+                    List<double[]> featureVectors = GetAttributesFeatureVectors(spatialString, filteredAttributes).ToList();
 
                     results[i] = new Tuple<double[], int>[featureVectors.Count];
                     for (int j = 0; j < featureVectors.Count; j++)
@@ -1626,7 +1659,28 @@ namespace Extract.AttributeFinder
                 attributes.ReportMemoryUsage();
                 return attributes
                     .ToIEnumerable<ComAttribute>()
-                    .Select(attr => attr.Type);
+                    .Select(attr =>
+                    {
+                        var categoryAttributes =
+                            AttributeMethods.GetAttributesByName(attr.SubAttributes, CategoryAttributeName);
+
+                        int countOfCategoryAttributes = categoryAttributes.Count();
+                        ExtractException.Assert("ELI41416", "There should be zero or one category attribute",
+                            countOfCategoryAttributes <= 1,
+                            "VOA file", attributesFilePath,
+                            "Candidate attribute name", attr.Name,
+                            "Category attribute name", CategoryAttributeName,
+                            "Count of category attributes", countOfCategoryAttributes);
+
+                        // Not a candidate attribute
+                        if (countOfCategoryAttributes == 0)
+                        {
+                            return null;
+                        }
+
+                        return categoryAttributes.First().Value.String;
+                    })
+                    .Where(a => a != null);
             }
             catch (Exception e)
             {
