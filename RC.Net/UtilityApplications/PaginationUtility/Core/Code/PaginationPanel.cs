@@ -2480,10 +2480,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                // Whenever a DEP is closed, ensure the swiping tools are disabled until another
-                // DEP specifically enables them.
-                ImageViewer.AllowHighlight = false;
-                ImageViewer.CursorTool = CursorTool.None;
+                // ISSUE-14163 Pagination: DE verification swiping tool inappropriately disabled.
+                // Only set AllowHighlight false when the pagination panel is the active pane, otherwise
+                // this prevents the data panel from correctly enabling the word highlight tool (it enables
+                // but highlights are disabled and don't show on the image).
+                if (Visible)
+                {
+                    // Whenever a DEP is closed, ensure the swiping tools are disabled until another
+                    // DEP specifically enables them.
+                    ImageViewer.AllowHighlight = false;
+                    ImageViewer.CursorTool = CursorTool.None;
+                }
             }
             catch (Exception ex)
             {
