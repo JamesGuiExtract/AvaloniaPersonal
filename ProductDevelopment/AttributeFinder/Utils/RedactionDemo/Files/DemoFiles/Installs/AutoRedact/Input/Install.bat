@@ -1,4 +1,7 @@
 @echo off
+
+md ..\..\..\..\Input
+
 copy ..\..\HybridDemo\Input\TestImage001.* ..\..\..\..\Input
 copy ..\..\HybridDemo\Input\TestImage002.* ..\..\..\..\Input
 copy ..\..\HybridDemo\Input\TestImage003.* ..\..\..\..\Input
