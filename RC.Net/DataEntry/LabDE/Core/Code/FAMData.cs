@@ -150,7 +150,7 @@ namespace Extract.DataEntry.LabDE
                 ColorQueryConditions = new OrderedDictionary();
                 ColorQueryConditions.Add("Red", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) = 0");
                 ColorQueryConditions.Add("Yellow", "COUNT(CASE WHEN ([OrderStatus] = '*') THEN 1 END) >= " +
-		            "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END)");
+                    "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END)");
                 ColorQueryConditions.Add("Lime", "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END) > 0");
 
                 AttributeStatusInfo.DataReset += HandleAttributeStatusInfo_DataReset;
@@ -363,7 +363,7 @@ namespace Extract.DataEntry.LabDE
         public DataTable GetMatchingOrders(FAMOrderRow order)
         {
             try 
-	        {
+            {
                 string selectedOrderNumberQuery = GetSelectedOrderNumbersQuery(order);
 
                 // LoadOrderInfo has the side-effect of caching data from selectedOrderNumbers into
@@ -380,11 +380,11 @@ namespace Extract.DataEntry.LabDE
                 }
 
                 return matchingOrderTable;
-	        }
-	        catch (Exception ex)
-	        {
-		        throw ex.AsExtract("ELI38176");
-	        }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38176");
+            }
         }
 
         /// <summary>
@@ -606,7 +606,8 @@ namespace Extract.DataEntry.LabDE
                 "FROM ( \r\n" +
                 // TempID is a special column used to prevent these matching unmapped rows from
                 // being grouped together.
-                "SELECT *, NULL AS [TempID] FROM [LabDEOrder] \r\n" +
+                "SELECT [OrderNumber], [OrderCode], [PatientMRN], [ReceivedDateTime], [OrderStatus], "+
+                "[ReferenceDateTime], [ORMMessage], NULL AS [TempID] FROM [LabDEOrder] \r\n" +
                 (unmappedOrders.Any()
                     ? "UNION ALL\r\n" + string.Join("\r\nUNION ALL\r\n", unmappedOrders)
                     : "") +
