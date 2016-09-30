@@ -35,8 +35,10 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Current version.
+        /// Version 2: Add LearningMachineUsage.AttributeCategorization
+        ///            Add LabelAttributesSettings property and backing field
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         // Encryption password for serialization, renamed to obfuscate purpose
         private static readonly byte[] _CONVERGENCE_MATRIX = new byte[64]
@@ -82,6 +84,13 @@ namespace Extract.AttributeFinder
         private Byte[] _encryptedEncoder;
         private byte[] _encryptedInputConfig;
         private string _encryptedTrainingLog;
+
+        // Only serialize the label attributes settings if Usage is AttributeCategorization
+        [NonSerialized]
+        private LabelAttributes _labelAttributesSettings;
+
+        [OptionalField(VersionAdded = 2)]
+        private LabelAttributes _labelAttributesPersistedSettings;
 
         #endregion Fields
 
@@ -268,6 +277,24 @@ namespace Extract.AttributeFinder
                 if (value != _trainingLog)
                 {
                     _trainingLog = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the settings for attribute labeling
+        /// </summary>
+        public LabelAttributes LabelAttributesSettings
+        {
+            get
+            {
+                return _labelAttributesSettings;
+            }
+            set
+            {
+                if (value != _labelAttributesSettings)
+                {
+                    _labelAttributesSettings = value;
                 }
             }
         }
@@ -589,6 +616,8 @@ namespace Extract.AttributeFinder
                     || other.Encoder != null && !other.Encoder.IsConfigurationEqualTo(Encoder)
                     || other.InputConfig == null && InputConfig != null
                     || other.InputConfig != null && !other.InputConfig.Equals(InputConfig)
+                    || other.LabelAttributesSettings == null && LabelAttributesSettings != null
+                    || other.LabelAttributesSettings != null && !other.LabelAttributesSettings.Equals(LabelAttributesSettings)
                     )
                 {
                     return false;
@@ -863,6 +892,27 @@ namespace Extract.AttributeFinder
             {
                 _encryptedTrainingLog = ExtractEncryption.EncryptString(TrainingLog, ml);
             }
+
+            // Set the label attributes settings if usage is AttributeCategorization
+            if (Usage == LearningMachineUsage.AttributeCategorization)
+            {
+                _labelAttributesPersistedSettings = _labelAttributesSettings;
+            }
+            else
+            {
+                _labelAttributesPersistedSettings = null;
+            }
+        }
+
+        /// <summary>
+        /// Called when deserializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+            // Here to make FXCop happy
+            _labelAttributesPersistedSettings = null;
         }
 
         /// <summary>
@@ -907,6 +957,9 @@ namespace Extract.AttributeFinder
             {
                 TrainingLog = ExtractEncryption.DecryptString(_encryptedTrainingLog, ml);
             }
+
+            // Update property from persisted value
+            LabelAttributesSettings = _labelAttributesPersistedSettings;
         }
 
         /// <summary> Creates a collection of document <see cref="ComAttribute"/>s that represents pagination boundaries

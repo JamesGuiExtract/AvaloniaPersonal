@@ -258,13 +258,13 @@ namespace Extract.AttributeFinder.Test
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
-                    {
-                        InputPath = _inputFolder.Last(),
-                        InputPathType = InputType.Folder,
-                        AttributesPath = "<SourceDocName>.protofeatures.voa",
-                        AnswerPath = "<SourceDocName>.eav",
-                        TrainingSetPercentage = 50
-                    },
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.protofeatures.voa",
+                    AnswerPath = "<SourceDocName>.eav",
+                    TrainingSetPercentage = 50
+                },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
                 Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false },
                 RandomNumberSeed = 10
@@ -284,13 +284,13 @@ namespace Extract.AttributeFinder.Test
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
-                    {
-                        InputPath = _csvPath,
-                        InputPathType = InputType.TextFileOrCsv,
-                        AttributesPath = "<SourceDocName>.protofeatures.voa",
-                        AnswerPath = "<SourceDocName>.eav",
-                        TrainingSetPercentage = 50
-                    },
+                {
+                    InputPath = _csvPath,
+                    InputPathType = InputType.TextFileOrCsv,
+                    AttributesPath = "<SourceDocName>.protofeatures.voa",
+                    AnswerPath = "<SourceDocName>.eav",
+                    TrainingSetPercentage = 50
+                },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
                 Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false },
                 RandomNumberSeed = 10
@@ -311,13 +311,13 @@ namespace Extract.AttributeFinder.Test
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
-                    {
-                        InputPath = _csvPath,
-                        InputPathType = InputType.TextFileOrCsv,
-                        AttributesPath = "",
-                        AnswerPath = "",
-                        TrainingSetPercentage = 80
-                    },
+                {
+                    InputPath = _csvPath,
+                    InputPathType = InputType.TextFileOrCsv,
+                    AttributesPath = "",
+                    AnswerPath = "",
+                    TrainingSetPercentage = 80
+                },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
@@ -333,12 +333,12 @@ namespace Extract.AttributeFinder.Test
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
-                    {
-                        InputPath = _inputFolder.Last(),
-                        InputPathType = InputType.Folder,
-                        AttributesPath = "<SourceDocName>.labeled.voa",
-                        TrainingSetPercentage = 80
-                    },
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.labeled.voa",
+                    TrainingSetPercentage = 80
+                },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature"),
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
@@ -354,12 +354,12 @@ namespace Extract.AttributeFinder.Test
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
-                    {
-                        InputPath = _inputFolder.Last(),
-                        InputPathType = InputType.Folder,
-                        AttributesPath = "<SourceDocName>.labeled_3_types.voa",
-                        TrainingSetPercentage = 80
-                    },
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.labeled_3_types.voa",
+                    TrainingSetPercentage = 80
+                },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature"),
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
@@ -378,12 +378,12 @@ namespace Extract.AttributeFinder.Test
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
-                    {
-                        InputPath = _inputFolder.Last(),
-                        InputPathType = InputType.Folder,
-                        AttributesPath = "<SourceDocName>.labeled_2_types.voa",
-                        TrainingSetPercentage = 80
-                    },
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.labeled_2_types.voa",
+                    TrainingSetPercentage = 80
+                },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature"),
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
@@ -406,13 +406,13 @@ namespace Extract.AttributeFinder.Test
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
-                    {
-                        InputPath = _csvPath,
-                        InputPathType = InputType.TextFileOrCsv,
-                        AttributesPath = "",
-                        AnswerPath = "",
-                        TrainingSetPercentage = 80
-                    },
+                {
+                    InputPath = _csvPath,
+                    InputPathType = InputType.TextFileOrCsv,
+                    AttributesPath = "",
+                    AnswerPath = "",
+                    TrainingSetPercentage = 80
+                },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
@@ -437,13 +437,13 @@ namespace Extract.AttributeFinder.Test
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
-                    {
-                        InputPath = _csvPath,
-                        InputPathType = InputType.TextFileOrCsv,
-                        AttributesPath = "",
-                        AnswerPath = "",
-                        TrainingSetPercentage = 80
-                    },
+                {
+                    InputPath = _csvPath,
+                    InputPathType = InputType.TextFileOrCsv,
+                    AttributesPath = "",
+                    AnswerPath = "",
+                    TrainingSetPercentage = 80
+                },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
@@ -494,7 +494,7 @@ namespace Extract.AttributeFinder.Test
                 computedAttributesPreservedInput.AddRange(fakeExpectedData.ToIEnumerable<ComAttribute>());
                 fakeExpectedData = lm.ComputeAnswer(uss, voa, false);
                 computedAttributesNoPreservedInput.AddRange(fakeExpectedData.ToIEnumerable<ComAttribute>());
-                var fileName = Path.ChangeExtension(eavFiles[i], "voa");
+                var fileName = Path.ChangeExtension(eavFiles[i], "fake.voa");
                 fakeExpectedData.SaveTo(fileName, false, typeof(AttributeStorageManagerClass).GUID.ToString("B"));
                 evoaFiles[i] = fileName;
             }
@@ -599,7 +599,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(lm1.IsConfigurationEqualTo(lm2));
         }
 
-        // Test shallow clone method
+        //// Test shallow clone method
         [Test, Category("LearningMachine")]
         public static void TestShallowClone()
         {
@@ -642,7 +642,7 @@ namespace Extract.AttributeFinder.Test
         {
             var inputConfig1 = new InputConfiguration
             {
-                InputPath = _inputFolder.Last(),
+                InputPath = "Dummy",
                 InputPathType = InputType.Folder,
                 AttributesPath = "",
                 AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
@@ -651,7 +651,7 @@ namespace Extract.AttributeFinder.Test
 
             var inputConfig2 = new InputConfiguration
             {
-                InputPath = _inputFolder.Last(),
+                InputPath = "Dummy",
                 InputPathType = InputType.Folder,
                 AttributesPath = "",
                 AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
@@ -781,13 +781,13 @@ namespace Extract.AttributeFinder.Test
             var lm1 = new LearningMachine
             {
                 InputConfig = new InputConfiguration
-                    {
-                        InputPath = _csvPath,
-                        InputPathType = InputType.TextFileOrCsv,
-                        AttributesPath = "<SourceDocName>.protofeatures.voa",
-                        AnswerPath = "<SourceDocName>.eav",
-                        TrainingSetPercentage = 50
-                    },
+                {
+                    InputPath = _csvPath,
+                    InputPathType = InputType.TextFileOrCsv,
+                    AttributesPath = "<SourceDocName>.protofeatures.voa",
+                    AnswerPath = "<SourceDocName>.eav",
+                    TrainingSetPercentage = 50
+                },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
                 Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false },
                 RandomNumberSeed = 10
@@ -802,6 +802,242 @@ namespace Extract.AttributeFinder.Test
             var results = lm2.TestMachine();
             Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.90);
             Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
+        }
+
+        // Test serializing label attributes configuration
+        [Test, Category("LearningMachine")]
+        public static void TestSerializingLabelAttributesSettings()
+        {
+            var inputConfig1 = new InputConfiguration
+            {
+                InputPath = "Dummy",
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm1 = new LearningMachine
+            {
+                InputConfig = inputConfig1,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization),
+                Classifier = new MulticlassSupportVectorMachineClassifier(),
+                LabelAttributesSettings = new LabelAttributes
+                {
+                    AttributesToLabelPath = @"<SourceDocName>.voa",
+                    SourceOfLabelsPath = @"$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).evoa",
+                    DestinationPath = @"<SourceDocName>.labeled.voa"
+                }
+            };
+            lm1.LabelAttributesSettings.CategoryQueryPairs.Add(
+                new CategoryQueryPair
+                {
+                    Category = "DOB",
+                    CategoryIsXPath = false,
+                    Query = "//@DOB"
+                });
+
+            var savedMachine = new System.IO.MemoryStream();
+            lm1.Save(savedMachine);
+            savedMachine.Position = 0;
+            var lm2 = LearningMachine.Load(savedMachine);
+
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.LabelAttributesSettings = new LabelAttributes();
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.LabelAttributesSettings = lm1.LabelAttributesSettings.DeepClone();
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.LabelAttributesSettings.AttributesToLabelPath = "";
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.LabelAttributesSettings = lm1.LabelAttributesSettings.DeepClone();
+            lm2.LabelAttributesSettings.SourceOfLabelsPath = "";
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.LabelAttributesSettings = lm1.LabelAttributesSettings.DeepClone();
+            lm2.LabelAttributesSettings.DestinationPath = "";
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.LabelAttributesSettings = lm1.LabelAttributesSettings.DeepClone();
+            lm2.LabelAttributesSettings.CategoryQueryPairs.Clear();
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.LabelAttributesSettings = lm1.LabelAttributesSettings.DeepClone();
+            lm2.LabelAttributesSettings.CategoryQueryPairs.Add(
+                lm2.LabelAttributesSettings.CategoryQueryPairs[0].ShallowClone());
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.LabelAttributesSettings = lm1.LabelAttributesSettings.DeepClone();
+            lm2.LabelAttributesSettings.CategoryQueryPairs[0].Category = "dob";
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.LabelAttributesSettings = lm1.LabelAttributesSettings.DeepClone();
+            lm2.LabelAttributesSettings.CategoryQueryPairs[0].Query = "*";
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.LabelAttributesSettings = lm1.LabelAttributesSettings.DeepClone();
+            lm2.LabelAttributesSettings.CategoryQueryPairs[0].CategoryIsXPath = true;
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+        }
+
+        // Confirm that label attributes configuration is not saved when usage
+        // is not AttributeCategorization
+        [Test, Category("LearningMachine")]
+        public static void TestConditionalSerializationOfLabelAttributesSettings()
+        {
+            var inputConfig1 = new InputConfiguration
+            {
+                InputPath = "Dummy",
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm1 = new LearningMachine
+            {
+                InputConfig = inputConfig1,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization),
+                Classifier = new MulticlassSupportVectorMachineClassifier(),
+                LabelAttributesSettings = new LabelAttributes
+                {
+                    AttributesToLabelPath = @"<SourceDocName>.voa",
+                    SourceOfLabelsPath = @"$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).evoa",
+                    DestinationPath = @"<SourceDocName>.labeled.voa"
+                }
+            };
+            lm1.LabelAttributesSettings.CategoryQueryPairs.Add(
+                new CategoryQueryPair
+                {
+                    Category = "DOB",
+                    CategoryIsXPath = false,
+                    Query = "//@DOB"
+                });
+
+            var savedMachine = new System.IO.MemoryStream();
+            lm1.Save(savedMachine);
+            savedMachine.Position = 0;
+            var lm2 = LearningMachine.Load(savedMachine);
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+
+            lm1.Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination);
+            savedMachine = new System.IO.MemoryStream();
+            lm1.Save(savedMachine);
+            savedMachine.Position = 0;
+            lm2 = LearningMachine.Load(savedMachine);
+            Assert.False(lm1.IsConfigurationEqualTo(lm2));
+        }
+
+        // Test label attributes process
+        [Test, Category("LearningMachine")]
+        public static void TestLabelAttributesProcess()
+        {
+            SetPaginationFiles();
+            var inputConfig = new InputConfiguration
+            {
+                InputPath = _inputFolder.Last(),
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "",
+                TrainingSetPercentage = 80
+            };
+            var labelAttributes = new LabelAttributes
+            {
+                AttributesToLabelPath = @"<SourceDocName>.candidates.voa",
+                SourceOfLabelsPath = @"<SourceDocName>.voa",
+                DestinationPath = @"<SourceDocName>.nunit_labeled1.voa"
+            };
+
+            labelAttributes.CategoryQueryPairs.Add(new CategoryQueryPair
+                {
+                    Category = "name()",
+                    CategoryIsXPath = true,
+                    Query = "/*/Document/DocumentData/PatientInfo/DOB"
+                });
+
+            labelAttributes.Process(inputConfig);
+
+            var afutil = new UCLID_AFUTILSLib.AFUtility();
+            foreach (var file in Directory.GetFiles(_inputFolder.Last(), "*.nunit_labeled1.voa"))
+            {
+                var labeledAttributes = afutil.QueryAttributes(afutil.GetAttributesFromFile(file), "*{AttributeType}", false);
+                Assert.GreaterOrEqual(labeledAttributes.Size(), 1);
+
+                var xPathContext = new XPathContext(labeledAttributes);
+                var labeledAsDOB = xPathContext.FindAllOfType<ComAttribute>("/*/*[AttributeType = 'DOB']");
+                Assert.AreEqual(labeledAttributes.Size(), labeledAsDOB.Count());
+            }
+        }
+
+        // Test more complicated label attributes process
+        [Test, Category("LearningMachine")]
+        public static void TestLabelAttributesProcess2()
+        {
+            SetPaginationFiles();
+            var inputConfig = new InputConfiguration
+            {
+                InputPath = _inputFolder.Last(),
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "",
+                TrainingSetPercentage = 80
+            };
+            var labelAttributes = new LabelAttributes
+            {
+                AttributesToLabelPath = @"<SourceDocName>.candidates.voa",
+                SourceOfLabelsPath = @"<SourceDocName>.voa",
+                DestinationPath = @"<SourceDocName>.nunit_labeled2.voa",
+                CreateEmptyLabelForNonMatching = true
+            };
+
+            labelAttributes.CategoryQueryPairs.Add(new CategoryQueryPair
+                {
+                    Category = "name()",
+                    CategoryIsXPath = true,
+                    Query = "/*/Document/DocumentData/PatientInfo/DOB"
+                });
+
+            labelAttributes.CategoryQueryPairs.Add(new CategoryQueryPair
+                {
+                    Category = "name()",
+                    CategoryIsXPath = true,
+                    Query = "/*/Document/DocumentData/Test/CollectionDate"
+                });
+
+            labelAttributes.Process(inputConfig);
+
+            var afutil = new UCLID_AFUTILSLib.AFUtility();
+            foreach (var file in Directory.GetFiles(_inputFolder.Last(), "*.nunit_labeled2.voa"))
+            {
+                var labeledAttributes = afutil.QueryAttributes(afutil.GetAttributesFromFile(file), "*{AttributeType}", false);
+                Assert.GreaterOrEqual(labeledAttributes.Size(), 1);
+
+                var xPathContext = new XPathContext(labeledAttributes);
+                var labeledAsDOB = xPathContext.FindAllOfType<ComAttribute>("/*/*[AttributeType = 'DOB']");
+                var labeledAsCollectionDate = xPathContext.FindAllOfType<ComAttribute>("/*/*[AttributeType = 'CollectionDate']");
+                Assert.GreaterOrEqual(labeledAsDOB.Count(), 1);
+                Assert.GreaterOrEqual(labeledAsCollectionDate.Count(), labeledAsDOB.Count());
+                Assert.Greater(labeledAttributes.Size(), labeledAsDOB.Count() + labeledAsCollectionDate.Count());
+            }
+
+            var specificFile = Directory.GetFiles(_inputFolder.Last(), "*.nunit_labeled2.voa").First();
+            var attributes = afutil.GetAttributesFromFile(specificFile).ToIEnumerable<ComAttribute>();
+            var collectionDateIndexes = attributes.Select((a, i) =>
+                a.SubAttributes.ToIEnumerable<ComAttribute>()
+                    .FirstOrDefault(sa => sa.Name == "AttributeType")?.Value.String == "CollectionDate"
+                    ? i
+                    : (int?)null)
+                .Where(i => i != null);
+            Assert.AreEqual("2,8,17", string.Join(",", collectionDateIndexes));
+
+            var dobIndexes = attributes.Select((a, i) =>
+                a.SubAttributes.ToIEnumerable<ComAttribute>()
+                    .FirstOrDefault(sa => sa.Name == "AttributeType")?.Value.String == "DOB"
+                    ? i
+                    : (int?)null)
+                .Where(i => i != null);
+            Assert.AreEqual("13,16", string.Join(",", dobIndexes));
         }
 
         #endregion Tests
@@ -828,6 +1064,14 @@ namespace Extract.AttributeFinder.Test
                 _testFiles.GetFile(resourceName, path);
 
                 resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".protofeatures.voa");
+                path = Path.Combine(_inputFolder.Last(), resourceName);
+                _testFiles.GetFile(resourceName, path);
+
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".voa");
+                path = Path.Combine(_inputFolder.Last(), resourceName);
+                _testFiles.GetFile(resourceName, path);
+
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".candidates.voa");
                 path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
 

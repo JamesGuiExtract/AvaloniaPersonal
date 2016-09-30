@@ -662,9 +662,13 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <summary>
         /// Build a new learning machine from UI values
         /// </summary>
-        private LearningMachine BuildLearningMachine()
+        internal LearningMachine BuildLearningMachine()
         {
             var learningMachine = new LearningMachine();
+
+            // Preserve existing label attributes settings since there are no UI controls to recreate them with
+            learningMachine.LabelAttributesSettings = CurrentLearningMachine.LabelAttributesSettings
+                ?.DeepClone();
 
             SetInputConfigValues(learningMachine);
             SetEncoderValues(learningMachine);
@@ -1513,9 +1517,16 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
         private void HandleViewAnswerListButton_Click(object sender, EventArgs e)
         {
-            using (var win = new ViewAnswers(_currentLearningMachine.Encoder, _fileName == _NEW_FILE_NAME ? null : _fileName))
+            try
             {
-                win.ShowDialog();
+                using (var win = new ViewAnswers(_currentLearningMachine.Encoder, _fileName == _NEW_FILE_NAME ? null : _fileName))
+                {
+                    win.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.AsExtract("ELI41469").Display();
             }
         }
 
@@ -1544,9 +1555,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         }
 
         /// <summary>
-        /// Handles text changed and lost focus events for text box controls. Updates the current 
-        /// learning machine instance (UpdateLearningMachine) if the <see paramref="sender"/> does
-        /// not have focus (i.e., does not update the machine with every character typed).
+        /// Handles the text changed event for text box controls.
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
@@ -1555,15 +1564,27 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             try
             {
                 var textBox = sender as TextBox;
-
-                // Wait until edit is complete before updating machine
                 if (textBox != null && textBox.Focused)
                 {
-                    // Set dirty flag regardless
                     Dirty = true;
-
-                    return;
                 }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40030");
+            }
+        }
+
+        /// <summary>
+        /// Handles the leave event for text box controls. Updates the current 
+        /// learning machine instance (UpdateLearningMachine)
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        private void HandleTextBox_Leave(object sender, EventArgs e)
+        {
+            try
+            {
                 if (!_suspendMachineUpdates && !_updatingMachine)
                 {
                     _textValueOrCheckStateChangedSinceCreation = true;
@@ -1572,7 +1593,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI40030");
+                ex.ExtractDisplay("ELI41468");
             }
         }
 
@@ -1788,7 +1809,32 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
-        #endregion Event Handlers
+        /// <summary>
+        /// Handles the Click event of the AttributeCategorizationCreateCandidateVoaButton control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleAttributeCategorizationCreateCandidateVoaButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!_valid)
+                {
+                    FocusFirstInvalid();
+                    return;
+                }
 
+                using (var win = new LabelAttributesConfigurationDialog(this))
+                {
+                    win.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.AsExtract("ELI41470").Display();
+            }
+        }
+
+        #endregion Event Handlers
     }
 }

@@ -239,29 +239,6 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Evaluates the specified <see paramref="xpath"/>. Will be evaluated against the root of
-        /// the attribute hierarchy.
-        /// </summary>
-        /// <param name="xpath">The XPath expression to evaluate</param>
-        /// <returns>A <see cref="object"/> representing the XPath result. This will be a
-        /// <see cref="List{T}"/> of objects for queries that return sequences. Any selected element
-        /// in the result that represents an XML node will return the corresponding
-        /// <see cref="IAttribute"/>.
-        /// </returns>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "xpath")]
-        public object Evaluate(string xpath)
-        {
-            try
-            {
-                return InternalEvaluate(null, xpath);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39421");
-            }
-        }
-
-        /// <summary>
         /// Evaluates the specified <see paramref="xpath"/>. Will be evaluated against the current
         /// position of the specified <see paramref="iterator"/>.
         /// </summary>
@@ -288,23 +265,26 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Evaluates the specified <see paramref="xpath"/>. Will be evaluated using the specified
-        /// <see paramref="attribute"/> as the basis.
+        /// <see paramref="attribute"/> as the basis or the root of the hierarchy if it is null.
         /// </summary>
+        ///<param name="xpath">The XPath expression to evaluate</param>
         /// <param name="attribute">The <see cref="IAttribute"/> which should serve as the basis for
         /// <see paramref="xpath"/>'s evaluation.</param>
-        ///<param name="xpath">The XPath expression to evaluate</param>
         /// <returns>A <see cref="object"/> representing the XPath result. This will be a
         /// <see cref="List{T}"/> of objects for queries that return sequences. Any selected element
         /// in the result that represents an XML node will return the corresponding
         /// <see cref="IAttribute"/>.
         /// </returns>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "xpath")]
-        public object Evaluate(IAttribute attribute, string xpath)
+        public object Evaluate(string xpath, IAttribute attribute = null)
         {
             try
             {
-                var node = _attributeToNodeMap[attribute];
-                return InternalEvaluate(node.CreateNavigator(), xpath);
+                XPathNavigator nav = attribute == null
+                    ? null
+                    : _attributeToNodeMap[attribute].CreateNavigator();
+
+                return InternalEvaluate(nav, xpath);
             }
             catch (Exception ex)
             {
@@ -333,6 +313,75 @@ namespace Extract.AttributeFinder
             foreach (var navigator in nodeIterator.Cast<XPathNavigator>())
             {
                 yield return PackageResult(navigator.Evaluate(xpathQuery));
+            }
+        }
+
+        /// <summary>
+        /// Evaluates the specified <see paramref="xpath"/> and filters the result to be a collection
+        /// of the specified type.
+        /// </summary>
+        /// <param name="xpath">The XPath expression to evaluate</param>
+        /// <param name="fromAttribute">The attribute to use as context node. If null then the expression
+        /// will be evaluated against the root of the attribute hierarchy.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> representing the XPath result.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "xpath")]
+        public IEnumerable<T> FindAllOfType<T>(string xpath, IAttribute fromAttribute = null)
+        {
+            try
+            {
+                object result = Evaluate(xpath, fromAttribute);
+
+                if (result is T)
+                {
+                    return Enumerable.Repeat((T)result, 1);
+                }
+
+                return (result as IEnumerable<object>)?.OfType<T>()
+                    ?? Enumerable.Empty<T>();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41461");
+            }
+        }
+
+        /// <summary>
+        /// Evaluates the specified <see paramref="xpath"/> and converts the result to a collection
+        /// of strings.
+        /// </summary>
+        /// <param name="xpath">The XPath expression to evaluate</param>
+        /// <param name="fromAttribute">The attribute to use as context node. If null then the expression
+        /// will be evaluated against the root of the attribute hierarchy.</param>
+        /// <returns>An <see cref="IEnumerable{string}"/> representing the XPath result.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "xpath")]
+        public IEnumerable<string> FindAllAsStrings(string xpath, IAttribute fromAttribute = null)
+        {
+            try
+            {
+                object result = Evaluate(xpath, fromAttribute);
+
+                // Check if the value(s) are already strings
+                string element = result as string;
+                var unforced = element != null
+                    ? Enumerable.Repeat(element, 1)
+                    : result as IEnumerable<string>;
+                if (unforced != null)
+                {
+                    return unforced;
+                }
+
+                // Convert value(s) to string(s)
+                var objects = result as IEnumerable<object>;
+                if (objects != null)
+                {
+                    return objects.Select(o => (o as IAttribute)?.Value.String ?? o.ToString());
+                }
+
+                return Enumerable.Repeat(result.ToString(), 1);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41462");
             }
         }
 

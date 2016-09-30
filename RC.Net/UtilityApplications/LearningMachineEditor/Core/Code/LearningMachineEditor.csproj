@@ -31,7 +31,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-   
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -80,6 +79,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LabelAttributesStatus.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LabelAttributesStatus.Designer.cs">
+      <DependentUpon>LabelAttributesStatus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LabelAttributesConfigurationDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LabelAttributesConfigurationDialog.Designer.cs">
+      <DependentUpon>LabelAttributesConfigurationDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="LearningMachineConfiguration.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -112,6 +123,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="LabelAttributesStatus.resx">
+      <DependentUpon>LabelAttributesStatus.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LabelAttributesConfigurationDialog.resx">
+      <DependentUpon>LabelAttributesConfigurationDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LearningMachineConfiguration.resx">
       <DependentUpon>LearningMachineConfiguration.cs</DependentUpon>
     </EmbeddedResource>

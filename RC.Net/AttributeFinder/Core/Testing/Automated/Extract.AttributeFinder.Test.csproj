@@ -271,6 +271,20 @@
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.labeled_3_types.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.labeled_3_types.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.labeled_3_types.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.candidates.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.candidates.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.candidates.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.candidates.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.candidates.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.candidates.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.candidates.voa" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif" />

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
@@ -458,14 +459,9 @@ namespace Extract.AttributeFinder
         /// This method is called by the Set accessor of each property
         /// </summary>
         /// <param name="propertyName">Optional name of property that changed</param>
-        /// In VS 2015 could use this: [CallerMemberName] String propertyName = ""
-        private void NotifyPropertyChanged(string propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            var eventHandler = PropertyChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion Private Methods

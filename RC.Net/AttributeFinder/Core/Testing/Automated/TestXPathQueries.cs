@@ -183,7 +183,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(attribute != null);
             Assert.That(attribute.Value.String == "HEMOGLOBIN");
 
-            result = xpathContext.Evaluate(attribute, "string(following-sibling::Component[1]/text()[1])");
+            result = xpathContext.Evaluate("string(following-sibling::Component[1]/text()[1])", attribute);
 
             Assert.IsInstanceOf<string>(result);
             Assert.That((string)result == "HEMATOCRIT");
@@ -266,6 +266,44 @@ namespace Extract.AttributeFinder.Test
                 "es:Levenshtein(/*/Test[3]/Component[5]/Zebra, /*/Test[3]/Component[6]/Value)");
 
             CollectionAssert.IsEmpty((IEnumerable<object>)result);
+        }
+
+        [Test, Category("XPath")]
+        public static void Test13_FilterMixedResultTypes()
+        {
+            var xpathContext = GetXPathContext();
+            IEnumerable<IAttribute> attrResult =
+                xpathContext.FindAllOfType<IAttribute>("/*/PatientInfo|/*/PatientInfo/Name/*/text()|/*/Test");
+            Assert.AreEqual(4, attrResult.Count());
+
+            IEnumerable<string> stringResult =
+                xpathContext.FindAllOfType<string>("/*/PatientInfo|/*/PatientInfo/Name/*/text()|/*/Test");
+            Assert.AreEqual(2, stringResult.Count());
+
+            IEnumerable<double> numericResult = xpathContext.FindAllOfType<double>("number(/*/Test[3]/Component[3]/Value)");
+            Assert.AreEqual(1, numericResult.Count());
+            Assert.AreEqual(12.7, numericResult.First());
+
+            double? numberResult = xpathContext.FindAllOfType<double?>("number(/*/Test[3]/Component[3]/Value)").FirstOrDefault();
+            Assert.AreEqual(12.7, numberResult);
+
+            numberResult = xpathContext.FindAllOfType<double?>("/*/Test[3]/Component[3]/Value").FirstOrDefault();
+            Assert.AreEqual(null, numberResult);
+        }
+
+        [Test, Category("XPath")]
+        public static void Test14_ForceMixedResultTypesToString()
+        {
+            var xpathContext = GetXPathContext();
+            IEnumerable<string> stringResult =
+                xpathContext.FindAllAsStrings("/*/PatientInfo|/*/PatientInfo/Name/*/text()|/*/Test");
+            Assert.AreEqual(6, stringResult.Count());
+            Assert.AreEqual("N/A", stringResult.ElementAt(0));
+            Assert.AreEqual("DOE", stringResult.ElementAt(1));
+
+            stringResult = xpathContext.FindAllAsStrings("number(/*/Test[3]/Component[3]/Value)");
+            Assert.AreEqual(1, stringResult.Count());
+            Assert.AreEqual("12.7", stringResult.ElementAt(0));
         }
 
         #endregion Tests

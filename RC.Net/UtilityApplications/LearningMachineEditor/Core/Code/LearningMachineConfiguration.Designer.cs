@@ -296,7 +296,7 @@
             this.attributeCategorizationCreateCandidateVoaButton.TabIndex = 13;
             this.attributeCategorizationCreateCandidateVoaButton.Text = "Create labeled candidate attribute files...";
             this.attributeCategorizationCreateCandidateVoaButton.UseVisualStyleBackColor = true;
-            this.attributeCategorizationCreateCandidateVoaButton.Enabled = false;
+            this.attributeCategorizationCreateCandidateVoaButton.Click += new System.EventHandler(this.HandleAttributeCategorizationCreateCandidateVoaButton_Click);
             // 
             // attributeCategorizationRandomNumberSeedLabel
             // 
@@ -315,7 +315,7 @@
             this.attributeCategorizationRandomNumberSeedTextBox.TabIndex = 12;
             this.attributeCategorizationRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.attributeCategorizationRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.attributeCategorizationRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.attributeCategorizationRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // attributeCategorizationTrainingPercentageLabel
             // 
@@ -334,7 +334,7 @@
             this.attributeCategorizationTrainingPercentageTextBox.TabIndex = 10;
             this.attributeCategorizationTrainingPercentageTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.attributeCategorizationTrainingPercentageTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.attributeCategorizationTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.attributeCategorizationTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // attributeCategorizationCandidateVoaLabel
             // 
@@ -367,7 +367,7 @@
             this.attributeCategorizationCandidateVoaTextBox.Size = new System.Drawing.Size(485, 20);
             this.attributeCategorizationCandidateVoaTextBox.TabIndex = 4;
             this.attributeCategorizationCandidateVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.attributeCategorizationCandidateVoaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.attributeCategorizationCandidateVoaTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // attributeCategorizationFileListOrFolderLabel
             // 
@@ -398,7 +398,7 @@
             this.attributeCategorizationFileListOrFolderTextBox.Size = new System.Drawing.Size(485, 20);
             this.attributeCategorizationFileListOrFolderTextBox.TabIndex = 1;
             this.attributeCategorizationFileListOrFolderTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.attributeCategorizationFileListOrFolderTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.attributeCategorizationFileListOrFolderTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // documentCategorizationFolderInputPanel
             // 
@@ -454,7 +454,7 @@
             this.documentCategorizationFolderFeatureVoaTextBox.Size = new System.Drawing.Size(483, 20);
             this.documentCategorizationFolderFeatureVoaTextBox.TabIndex = 4;
             this.documentCategorizationFolderFeatureVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationFolderFeatureVoaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationFolderFeatureVoaTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // documentCategorizationFolderRandomNumberSeedLabel
             // 
@@ -473,7 +473,7 @@
             this.documentCategorizationFolderRandomNumberSeedTextBox.TabIndex = 12;
             this.documentCategorizationFolderRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.documentCategorizationFolderRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationFolderRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationFolderRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // documentCategorizationFolderTrainingPercentageLabel
             // 
@@ -492,7 +492,7 @@
             this.documentCategorizationFolderTrainingPercentageTextBox.TabIndex = 10;
             this.documentCategorizationFolderTrainingPercentageTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.documentCategorizationFolderTrainingPercentageTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationFolderTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationFolderTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // documentCategorizationFolderAnswerLabel
             // 
@@ -524,7 +524,7 @@
             this.documentCategorizationFolderAnswerTextBox.Size = new System.Drawing.Size(483, 20);
             this.documentCategorizationFolderAnswerTextBox.TabIndex = 7;
             this.documentCategorizationFolderAnswerTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationFolderAnswerTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationFolderAnswerTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // documentCategorizationInputFolderLabel
             // 
@@ -557,7 +557,7 @@
             this.documentCategorizationInputFolderTextBox.Size = new System.Drawing.Size(483, 20);
             this.documentCategorizationInputFolderTextBox.TabIndex = 1;
             this.documentCategorizationInputFolderTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationInputFolderTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationInputFolderTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // folderSearchRadioButton
             // 
@@ -624,7 +624,7 @@
             this.paginationAnswerVoaTextBox.Size = new System.Drawing.Size(485, 20);
             this.paginationAnswerVoaTextBox.TabIndex = 7;
             this.paginationAnswerVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.paginationAnswerVoaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.paginationAnswerVoaTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // paginationRandomNumberSeedLabel
             // 
@@ -643,7 +643,7 @@
             this.paginationRandomNumberSeedTextBox.TabIndex = 12;
             this.paginationRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.paginationRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.paginationRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.paginationRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // paginationTrainingPercentageLabel
             // 
@@ -662,7 +662,7 @@
             this.paginationTrainingPercentageTextBox.TabIndex = 10;
             this.paginationTrainingPercentageTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.paginationTrainingPercentageTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.paginationTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.paginationTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // paginationFeatureVoaLabel
             // 
@@ -695,7 +695,7 @@
             this.paginationFeatureVoaTextBox.Size = new System.Drawing.Size(485, 20);
             this.paginationFeatureVoaTextBox.TabIndex = 4;
             this.paginationFeatureVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.paginationFeatureVoaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.paginationFeatureVoaTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // paginationFileListOrFolderLabel
             // 
@@ -727,7 +727,7 @@
             this.paginationFileListOrFolderTextBox.Size = new System.Drawing.Size(485, 20);
             this.paginationFileListOrFolderTextBox.TabIndex = 1;
             this.paginationFileListOrFolderTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.paginationFileListOrFolderTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.paginationFileListOrFolderTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // textFileOrCsvRadioButton
             // 
@@ -790,7 +790,7 @@
             this.documentCategorizationCsvFeatureVoaTextBox.Size = new System.Drawing.Size(481, 20);
             this.documentCategorizationCsvFeatureVoaTextBox.TabIndex = 4;
             this.documentCategorizationCsvFeatureVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationCsvFeatureVoaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationCsvFeatureVoaTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // documentCategorizationCsvRandomNumberSeedLabel
             // 
@@ -809,7 +809,7 @@
             this.documentCategorizationCsvRandomNumberSeedTextBox.TabIndex = 9;
             this.documentCategorizationCsvRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.documentCategorizationCsvRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationCsvRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationCsvRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // documentCategorizationCsvBrowseButton
             // 
@@ -832,7 +832,7 @@
             this.documentCategorizationCsvTextBox.Size = new System.Drawing.Size(481, 20);
             this.documentCategorizationCsvTextBox.TabIndex = 1;
             this.documentCategorizationCsvTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationCsvTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationCsvTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // trainingPercentageLabel
             // 
@@ -851,7 +851,7 @@
             this.documentCategorizationCsvTrainingPercentageTextBox.TabIndex = 7;
             this.documentCategorizationCsvTrainingPercentageTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.documentCategorizationCsvTrainingPercentageTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.documentCategorizationCsvTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationCsvTrainingPercentageTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // documentCategorizationCsvLabel
             // 
@@ -909,7 +909,7 @@
             this.attributeFeatureFilterTextBox.Size = new System.Drawing.Size(1824, 44);
             this.attributeFeatureFilterTextBox.TabIndex = 4;
             this.attributeFeatureFilterTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.attributeFeatureFilterTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.attributeFeatureFilterTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // useAttributeFeatureFilterCheckBox
             // 
@@ -984,7 +984,7 @@
             this.specifiedPagesTextBox.Size = new System.Drawing.Size(171, 20);
             this.specifiedPagesTextBox.TabIndex = 2;
             this.specifiedPagesTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.specifiedPagesTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.specifiedPagesTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // specifiedPagesCheckBox
             // 
@@ -1006,7 +1006,7 @@
             this.maxFeaturesTextBox.TabIndex = 6;
             this.maxFeaturesTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.maxFeaturesTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.maxFeaturesTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.maxFeaturesTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // maxFeaturesLabel
             // 
@@ -1025,7 +1025,7 @@
             this.maxShingleSizeTextBox.TabIndex = 4;
             this.maxShingleSizeTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.maxShingleSizeTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.maxShingleSizeTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.maxShingleSizeTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // maxShingleSizeLabel
             // 
@@ -1087,7 +1087,7 @@
             this.multilabelSvmUnknownCutoffTextBox.TabIndex = 6;
             this.multilabelSvmUnknownCutoffTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.multilabelSvmUnknownCutoffTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multilabelSvmUnknownCutoffTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.multilabelSvmUnknownCutoffTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // multilabelSvmUseUnknownCheckBox
             // 
@@ -1149,7 +1149,7 @@
             this.multilabelSvmComplexityTextBox.TabIndex = 1;
             this.multilabelSvmComplexityTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.multilabelSvmComplexityTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multilabelSvmComplexityTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.multilabelSvmComplexityTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // multilabelSvmComplexityLabel
             // 
@@ -1192,7 +1192,7 @@
             this.multiclassSvmComplexityTextBox.TabIndex = 1;
             this.multiclassSvmComplexityTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.multiclassSvmComplexityTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multiclassSvmComplexityTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.multiclassSvmComplexityTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // multiclassSvmComplexityLabel
             // 
@@ -1236,7 +1236,7 @@
             this.numberOfCandidateNetwordsTextBox.TabIndex = 8;
             this.numberOfCandidateNetwordsTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numberOfCandidateNetwordsTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.numberOfCandidateNetwordsTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.numberOfCandidateNetwordsTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // numberOfCandidateNetworksLabel
             // 
@@ -1269,7 +1269,7 @@
             this.maximumTrainingIterationsTextBox.TabIndex = 5;
             this.maximumTrainingIterationsTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.maximumTrainingIterationsTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.maximumTrainingIterationsTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.maximumTrainingIterationsTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // maximumTrainingIterationsLabel
             // 
@@ -1288,7 +1288,7 @@
             this.sigmoidAlphaTextBox.TabIndex = 3;
             this.sigmoidAlphaTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.sigmoidAlphaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.sigmoidAlphaTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.sigmoidAlphaTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // sigmoidAlphaLabel
             // 
@@ -1307,7 +1307,7 @@
             this.sizeOfHiddenLayersTextBox.TabIndex = 1;
             this.sizeOfHiddenLayersTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.sizeOfHiddenLayersTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.sizeOfHiddenLayersTextBox.Leave += new System.EventHandler(this.HandleValueChanged);
+            this.sizeOfHiddenLayersTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // sizeOfHiddenLayersLabel
             // 

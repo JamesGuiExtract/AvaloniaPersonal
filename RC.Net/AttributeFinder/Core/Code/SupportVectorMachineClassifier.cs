@@ -281,30 +281,46 @@ namespace Extract.AttributeFinder
                             { StatusMessage = "Choosing complexity value: Iteration {0}", Int32Value = 1 });
 
                         double complexity = complexitiesToTryAsc[i];
-                        TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
-                        double score = GetAccuracyScore(cvInputs, cvOutputs);
-                        double trainScore = GetAccuracyScore(trainInputs, trainOutputs);
-                        if (score > bestScore)
+                        try
                         {
-                            bestScore = score;
-                            bestComplexity = complexity;
-                            bestTrainScore = Math.Max(bestTrainScore, trainScore);
-                        }
-                        else if (score == bestScore)
-                        {
-                            if (trainScore > bestTrainScore)
+                            TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
+                            double score = GetAccuracyScore(cvInputs, cvOutputs);
+                            double trainScore = GetAccuracyScore(trainInputs, trainOutputs);
+                            if (score > bestScore)
                             {
-                                bestTrainScore = trainScore;
+                                bestScore = score;
                                 bestComplexity = complexity;
+                                bestTrainScore = Math.Max(bestTrainScore, trainScore);
+                            }
+                            else if (score == bestScore)
+                            {
+                                if (trainScore > bestTrainScore)
+                                {
+                                    bestTrainScore = trainScore;
+                                    bestComplexity = complexity;
+                                }
+                                else
+                                {
+                                    break;
+                                }
                             }
                             else
                             {
                                 break;
                             }
                         }
-                        else
+                        // https://extract.atlassian.net/browse/ISSUE-14113
+                        // Handle convergence exception as a signal that the complexity value being tried
+                        // is too high
+                        catch (Accord.ConvergenceException)
                         {
-                            break;
+                            updateStatus2(new StatusArgs
+                            {
+                                StatusMessage = "Unable to attain convergence with C={0}",
+                                DoubleValues = Enumerable.Repeat(complexity, 1)
+                            });
+                            // Continue to try lower complexity values
+                            continue;
                         }
                     }
                     for (int i = 0; i < complexitiesToTryDesc.Length; i++)
@@ -314,29 +330,45 @@ namespace Extract.AttributeFinder
                             { StatusMessage = "Choosing complexity value: Iteration {0}", Int32Value = 1 });
 
                         double complexity = complexitiesToTryDesc[i];
-                        TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
-                        double score = GetAccuracyScore(cvInputs, cvOutputs);
-                        double trainScore = GetAccuracyScore(trainInputs, trainOutputs);
-                        if (score > bestScore)
+                        try
                         {
-                            bestScore = score;
-                            bestComplexity = complexity;
-                            bestTrainScore = Math.Max(bestTrainScore, trainScore);
-                        }
-                        else if (score == bestScore)
-                        {
-                            if (trainScore > bestTrainScore)
+                            TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
+                            double score = GetAccuracyScore(cvInputs, cvOutputs);
+                            double trainScore = GetAccuracyScore(trainInputs, trainOutputs);
+                            if (score > bestScore)
                             {
-                                bestTrainScore = trainScore;
+                                bestScore = score;
                                 bestComplexity = complexity;
+                                bestTrainScore = Math.Max(bestTrainScore, trainScore);
+                            }
+                            else if (score == bestScore)
+                            {
+                                if (trainScore > bestTrainScore)
+                                {
+                                    bestTrainScore = trainScore;
+                                    bestComplexity = complexity;
+                                }
+                                else
+                                {
+                                    break;
+                                }
                             }
                             else
                             {
                                 break;
                             }
                         }
-                        else
+                        // https://extract.atlassian.net/browse/ISSUE-14113
+                        // Handle convergence exception as a signal that the complexity value being tried
+                        // is too high
+                        catch (Accord.ConvergenceException)
                         {
+                            updateStatus2(new StatusArgs
+                            {
+                                StatusMessage = "Unable to attain convergence with C={0}",
+                                DoubleValues = Enumerable.Repeat(complexity, 1)
+                            });
+                            // Don't need to try any higher values
                             break;
                         }
                     }
@@ -381,6 +413,7 @@ namespace Extract.AttributeFinder
 
                 var other = otherClassifier as SupportVectorMachineClassifier;
                 if (other == null
+                    || other.GetType() != GetType()
                     || other.AutomaticallyChooseComplexityValue != AutomaticallyChooseComplexityValue
                     || other.Complexity != Complexity)
                 {
