@@ -1279,10 +1279,6 @@ namespace Extract.LabResultsCustomComponents
                         LabOrder labOrder;
                         if (!labOrders.TryGetValue(matchedOrder.Key, out labOrder))
                         {
-                            labOrder = null;
-                            var orderGroup = new OrderGrouping(null, matchedOrder.Value,
-                                limitToOutstandingOrders, sourceDocName, nonComponents);
-
                             if (unknownOrderTests == null)
                             {
                                 unknownOrderTests = matchedOrder.Value;
