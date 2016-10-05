@@ -3160,7 +3160,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             EActionStatus.kActionPending, false, false, out oldStatus);
                     }
                 }
-                else if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
+                else
                 {
                     GrabDocumentForVerification(fileID, e, pageMap, newSpatialPageInfos);                    
                 }
