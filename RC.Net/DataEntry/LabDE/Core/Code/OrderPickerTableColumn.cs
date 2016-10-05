@@ -1114,9 +1114,24 @@ namespace Extract.DataEntry.LabDE
             // Apply the qualifying auto-populated order numbers.
             foreach (KeyValuePair<string, DataGridViewCell> autoPopulation in pendingAutoPopulation)
             {
-                if (autoPopulation.Value != null)
+                bool trackingOperations = AttributeStatusInfo.UndoManager.TrackOperations;
+
+                try
                 {
-                    autoPopulation.Value.Value = autoPopulation.Key;
+                    // This isn't a user edit which should be tracked by the undo system.
+                    AttributeStatusInfo.UndoManager.TrackOperations = false;
+
+                    if (autoPopulation.Value != null)
+                    {
+                        autoPopulation.Value.Value = autoPopulation.Key;
+                    }
+                }
+                finally
+                {
+                    if (trackingOperations)
+                    {
+                        AttributeStatusInfo.UndoManager.TrackOperations = true;
+                    }
                 }
             }
         }

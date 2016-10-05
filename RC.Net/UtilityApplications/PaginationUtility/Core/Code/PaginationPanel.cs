@@ -1244,6 +1244,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                             if (outputDocument.DocumentData != null)
                             {
                                 outputDocument.DocumentData.Revert();
+                                if (_documentDataPanel != null)
+                                {
+                                    _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData);
+                                }
                             }
                             _pendingDocuments.Add(outputDocument);
                         }
@@ -1288,6 +1292,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (outputDocument.DocumentData != null)
                         {
                             outputDocument.DocumentData.Revert();
+                            if (_documentDataPanel != null)
+                            {
+                                _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData);
+                            }
                         }
                     }
                 }
@@ -1379,7 +1387,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 // If the document's data is open for editing, close the panel.
                                 if (_documentWithDataInEdit == outputDocument)
                                 {
-                                    CloseDataPanel(false);
+                                    CloseDataPanel(validateData: false);
                                 }
                                 int docPosition =
                                     _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
@@ -2320,7 +2328,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (DocumentDataPanel != null)
                 {
-                    if (!CloseDataPanel(true))
+                    if (!CloseDataPanel(validateData: false))
                     {
                         _primaryPageLayoutControl.SelectDocument(_documentWithDataInEdit);
                         return;
@@ -2362,6 +2370,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     foreach (var oldDocument in e.OldItems.Cast<OutputDocument>())
                     {
                         oldDocument.DocumentStateChanged -= HandleDocument_DocumentStateChanged;
+                        var disposableData = oldDocument.DocumentData as IDisposable;
+                        if (disposableData != null)
+                        {
+                            disposableData.Dispose();
+                        }
                     }
                 }
             }
@@ -2386,7 +2399,17 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (document.PaginationSeparator != null)
                 {
-                    document.PaginationSeparator.Invalidate();
+                    // This event may be raised from another thread (such as via
+                    // DataEntryPaginationDocumentData.UpdateDocumentStatus)
+                    if (document.PaginationSeparator.InvokeRequired)
+                    {
+                        document.PaginationSeparator.Invoke((MethodInvoker)(() => 
+                            document.PaginationSeparator.Invalidate()));
+                    }
+                    else
+                    {
+                        document.PaginationSeparator.Invalidate();
+                    }
                 }
 
                 UpdateCommandStates();
@@ -2737,7 +2760,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .FirstOrDefault();
                 if (separator != null)
                 {
-                    if (separator.CloseDataPanel(true, validateData))
+                    if (separator.CloseDataPanel(saveData: true, validateData: validateData))
                     {
                         _documentWithDataInEdit = null;
                         return true;

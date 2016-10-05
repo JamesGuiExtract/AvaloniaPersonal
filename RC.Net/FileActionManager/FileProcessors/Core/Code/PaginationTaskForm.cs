@@ -141,6 +141,11 @@ namespace Extract.FileActionManager.FileProcessors
         bool _changingDocuments;
 
         /// <summary>
+        /// Indicates whether all highlights are currently being shown.
+        /// </summary>
+        bool _showAllHighlights;
+
+        /// <summary>
         /// The undo command.
         /// </summary>
         ApplicationCommand _undoCommand;
@@ -149,6 +154,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// The redo command.
         /// </summary>
         ApplicationCommand _redoCommand;
+
+        /// <summary>
+        /// Toggle show all data highlights
+        /// </summary>
+        ApplicationCommand _toggleShowAllHighlightsCommand;
 
         #endregion Fields
 
@@ -227,10 +237,15 @@ namespace Extract.FileActionManager.FileProcessors
 
                 _settings = settings;
                 _paginationDocumentDataPanel = paginationDocumentDataPanel;
-
-                if (_paginationDocumentDataPanel != null && _paginationDocumentDataPanel.AllowUndo)
+                if (_paginationDocumentDataPanel != null)
                 {
-                    _undoToolStrip.Visible = true;
+                    _paginationDocumentDataPanel.PanelControl.ParentChanged +=
+                        HandlePaginationDocumentDataPanel_ParentChanged;
+
+                    if (_paginationDocumentDataPanel.AdvancedDataEntryOperationsSupported)
+                    {
+                        _advancedCommandsToolStrip.Visible = true;
+                    }
                 }
 
                 if (tagManager == null)
@@ -343,11 +358,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// This event indicates the value of <see cref="P:Extract.DataEntry.IDataEntryApplication.ShowAllHighlights" /> has
         /// changed.
         /// </summary>
-        event EventHandler<EventArgs> IDataEntryApplication.ShowAllHighlightsChanged
-        {
-            add { }
-            remove { }
-        }
+        public event EventHandler<EventArgs> ShowAllHighlightsChanged;
 
         /// <summary>
         /// Saves the data currently displayed to disk.
@@ -447,15 +458,15 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Get whether highlights for all data mapped to an <see cref="T:Extract.DataEntry.IDataEntryControl" /> should
-        /// be displayed in the <see cref="T:Extract.Imaging.Forms.ImageViewer" /> or whether only highlights relating to the
-        /// currently selected fields should be displayed.
+        /// Gets whether highlights for all data mapped to an <see cref="IDataEntryControl"/>
+        /// should be displayed in the <see cref="ImageViewer"/> or whether only highlights relating
+        /// to the currently selected fields should be displayed.
         /// </summary>
         public bool ShowAllHighlights
         {
             get
             {
-                return false;
+                return _showAllHighlights;
             }
         }
 
@@ -554,18 +565,28 @@ namespace Extract.FileActionManager.FileProcessors
                 _imageViewer.Shortcuts[Keys.Alt | Keys.Right] = _imageViewer.SelectZoomNext;
                 _imageViewer.Shortcuts[Keys.R | Keys.Control] = _imageViewer.SelectRotateClockwise;
                 _imageViewer.Shortcuts[Keys.R | Keys.Control | Keys.Shift] = _imageViewer.SelectRotateCounterclockwise;
+                if (_paginationDocumentDataPanel != null && _paginationDocumentDataPanel.AdvancedDataEntryOperationsSupported)
+                {
+                    _imageViewer.Shortcuts[Keys.Escape] = _paginationDocumentDataPanel.ToggleHideTooltips;
 
-                // Undo command
-                _undoCommand = new ApplicationCommand(_imageViewer.Shortcuts,
-                    new Keys[] { Keys.Z | Keys.Control }, PerformUndo,
-                    new ToolStripItem[] { _undoToolStripButton },
-                    false, true, false);
+                    // Undo command
+                    _undoCommand = new ApplicationCommand(_imageViewer.Shortcuts,
+                        new Keys[] { Keys.Z | Keys.Control }, PerformUndo,
+                        new ToolStripItem[] { _undoToolStripButton },
+                        false, true, false);
 
-                // Redo command
-                _redoCommand = new ApplicationCommand(_imageViewer.Shortcuts,
-                    new Keys[] { Keys.Y | Keys.Control }, PerformRedo,
-                    new ToolStripItem[] { _redoToolStripButton },
-                    false, true, false);
+                    // Redo command
+                    _redoCommand = new ApplicationCommand(_imageViewer.Shortcuts,
+                        new Keys[] { Keys.Y | Keys.Control }, PerformRedo,
+                        new ToolStripItem[] { _redoToolStripButton },
+                        false, true, false);
+
+                    // Toggle show all data highlights
+                    _toggleShowAllHighlightsButton.Click += HandleToggleShowAllHighlightsClick;
+                    _toggleShowAllHighlightsCommand = new ApplicationCommand(_imageViewer.Shortcuts,
+                        new Keys[] { Keys.F10 }, ToggleShowAllHighlights,
+                        new ToolStripItem[] { _toggleShowAllHighlightsButton }, false, true, false);
+                }
 
                 if (!string.IsNullOrWhiteSpace(_settings.SourceAction))
                 {
@@ -1067,6 +1088,48 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41422");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ParentChanged"/> event of the <see cref="_paginationDocumentDataPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        void HandlePaginationDocumentDataPanel_ParentChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_paginationDocumentDataPanel.AdvancedDataEntryOperationsSupported)
+                {
+                    if (_showAllHighlights)
+                    {
+                        ToggleShowAllHighlights();
+                    }
+                    _toggleShowAllHighlightsCommand.Enabled = _paginationDocumentDataPanel.PanelControl.Parent != null;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41475");
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the user selected the "Highlight all data in image" button.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleToggleShowAllHighlightsClick(object sender, EventArgs e)
+        {
+            try
+            {
+                ToggleShowAllHighlights();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41476");
             }
         }
 
@@ -1675,6 +1738,20 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Toggles whether all data is currently highlighted in the <see cref="ImageViewer"/> or
+        /// whether only the currently selected data is highlighted.
+        /// </summary>
+        void ToggleShowAllHighlights()
+        {
+            _showAllHighlights = !_showAllHighlights;
+
+            _toggleShowAllHighlightsButton.CheckState =
+                _showAllHighlights ? CheckState.Checked : CheckState.Unchecked;
+
+            OnShowAllHighlightsChanged();
+        }
+
+        /// <summary>
         /// Raises the <see cref="ExceptionGenerated"/> event for handling by
         /// <see cref="VerificationForm{T}"/>.
         /// </summary>
@@ -1708,11 +1785,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         void OnInitialized()
         {
-            var eventHandler = Initialized;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
+            Initialized.Invoke(this, new EventArgs());
         }
 
         /// <summary>
@@ -1722,11 +1795,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// be completed with.</param>
         void OnFileComplete(EFileProcessingResult processingResult)
         {
-            var eventHandler = FileComplete;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new FileCompleteEventArgs(processingResult));
-            }
+            FileComplete.Invoke(this, new FileCompleteEventArgs(processingResult));
         }
 
         /// <summary>
@@ -1736,11 +1805,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// event data.</param>
         void OnFileDelayed(FileDelayedEventArgs eventArgs)
         {
-            var eventHandler = FileDelayed;
-            if (eventHandler != null)
-            {
-                eventHandler(this, eventArgs);
-            }
+            FileDelayed.Invoke(this, eventArgs);
         }
 
         /// <summary>
@@ -1750,11 +1815,15 @@ namespace Extract.FileActionManager.FileProcessors
         /// generated.</param>
         void OnExceptionGenerated(VerificationExceptionGeneratedEventArgs ee)
         {
-            var eventHandler = ExceptionGenerated;
-            if (eventHandler != null)
-            {
-                eventHandler(this, ee);
-            }
+            ExceptionGenerated?.Invoke(this, ee);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ShowAllHighlightsChanged"/> event.
+        /// </summary>
+        void OnShowAllHighlightsChanged()
+        {
+            ShowAllHighlightsChanged?.Invoke(this, new EventArgs());
         }
 
         #endregion Private Members

@@ -433,6 +433,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _editDocumentDataButton.Checked = true;
                             return false;
                         }
+
+                        documentDataPanel.ClearData();
                     }
 
                     _tableLayoutPanel.Controls.Remove(_documentDataPanelControl);

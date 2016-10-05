@@ -1142,20 +1142,24 @@ namespace Extract.DataEntry
         {
             if (disposing)
             {
-                // Ensure no more AttributeValueModified events are handled.
-                foreach (CompositeQueryNode queryNode in ChildNodes.OfType<CompositeQueryNode>())
+                try
                 {
-                    queryNode.QueryValueModified -= HandleQueryValueModified;
-                }
+                    // Ensure no more AttributeValueModified events are handled.
+                    foreach (CompositeQueryNode queryNode in ChildNodes.OfType<CompositeQueryNode>())
+                    {
+                        queryNode.QueryValueModified -= HandleQueryValueModified;
+                    }
 
-                foreach (IDisposable childNode in ChildNodes.OfType<IDisposable>())
-                {
-                    childNode.Dispose();
-                }
+                    foreach (IDisposable childNode in ChildNodes.OfType<IDisposable>())
+                    {
+                        childNode.Dispose();
+                    }
 
-                // Unregister for query cached cleared event to prevent memory leak
-                // https://extract.atlassian.net/browse/ISSUE-13855
-                AttributeStatusInfo.QueryCacheCleared -= HandleQueryCacheCleared;
+                    // Unregister for query cached cleared event to prevent memory leak
+                    // https://extract.atlassian.net/browse/ISSUE-13855
+                    AttributeStatusInfo.QueryCacheCleared -= HandleQueryCacheCleared;
+                }
+                catch { }
             }
         }
 

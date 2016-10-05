@@ -90,7 +90,11 @@ namespace Extract.DataEntry
         /// <summary>
         /// A shared <see cref="IAFUtility"/> instance to be used within 
         /// <see cref="Extract.DataEntry"/>.
+        /// <para><b>Note</b></para>
+        /// Needs to be thread static for thread safety; errors arose when using multiple DEPs on
+        /// different threads as part of DataEntryDocumentDataPanel.UpdateDocumentDataStatus.
         /// </summary>
+        [ThreadStatic]
         private static IAFUtility _afUtility;
 
         /// <summary>
@@ -101,7 +105,11 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// A backup copy of the last data put on the clipboard.
+        /// <para><b>Note</b></para>
+        /// Needs to be thread static for thread safety; errors arose when using multiple DEPs on
+        /// different threads as part of DataEntryDocumentDataPanel.UpdateDocumentDataStatus.
         /// </summary>
+        [ThreadStatic]
         static IDataObject _lastClipboardData = null;
 
         /// <summary>

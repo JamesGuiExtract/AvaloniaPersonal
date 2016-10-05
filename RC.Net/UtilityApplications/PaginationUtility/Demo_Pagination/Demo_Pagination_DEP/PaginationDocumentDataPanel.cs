@@ -199,12 +199,13 @@ namespace Extract.Demo_Pagination
         }
 
         /// <summary>
-        /// Gets a value indicating whether undo/redo operations are supported.
+        /// Gets a value indicating whether advanced data entry operations (such as undo/redo) are
+        /// supported.
         /// </summary>
-        /// <value><see langword="true"/> if undo/redo operations are supported.; otherwise,
-        /// <see langword="false"/>.
+        /// <value><see langword="true"/> if advanced data entry operations (such as undo/redo) are
+        /// supported; otherwise,<see langword="false"/>.
         /// </value>
-        public bool AllowUndo
+        public bool AdvancedDataEntryOperationsSupported
         {
             get
             {
@@ -383,6 +384,22 @@ namespace Extract.Demo_Pagination
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39734");
+            }
+        }
+
+        /// <summary>
+        /// Clears the state of all data associated with the previously loaded document.
+        /// </summary>
+        public void ClearData()
+        {
+            try
+            {
+                _loaded = false;
+                Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41492");
             }
         }
 
@@ -1190,6 +1207,32 @@ namespace Extract.Demo_Pagination
                     ? ""
                     : error);
             }
+        }
+
+        /// <summary>
+        /// Updates the document data status.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <exception cref="NotImplementedException"></exception>
+        public void UpdateDocumentDataStatus(PaginationDocumentData data)
+        {
+            try
+            {
+                // Loading the data will update the document status.
+                LoadData(data);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41493");
+            }
+        }
+
+        /// <summary>
+        /// Toggles whether or not tooltip(s) for the active fields are currently visible.
+        /// </summary>
+        public void ToggleHideTooltips()
+        {
+            // Nothing to do
         }
 
         #endregion Private Members

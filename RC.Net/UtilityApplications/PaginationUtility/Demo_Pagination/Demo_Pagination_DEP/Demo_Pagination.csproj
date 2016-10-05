@@ -74,7 +74,7 @@
       <HintPath>$(ProgramFiles)\Extract Systems\CommonComponents\Leadtools.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="PaginationUtility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
-      <ExecutableExtension>.exe</ExecutableExtension>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

@@ -2365,6 +2365,7 @@ namespace Extract.DataEntry
                                     {
                                         AttributeStatusInfo.UndoManager.EndUndo();
                                         AttributeStatusInfo.BlockAutoUpdateQueries = false;
+                                        OnDataChanged();
                                         
                                         if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.Undo))
                                         {
@@ -2379,6 +2380,7 @@ namespace Extract.DataEntry
                                     {
                                         AttributeStatusInfo.UndoManager.EndRedo();
                                         AttributeStatusInfo.BlockAutoUpdateQueries = false;
+                                        OnDataChanged();
 
                                         if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.Redo))
                                         {
@@ -4851,6 +4853,54 @@ namespace Extract.DataEntry
             {
                 _drawingHighlights = false;
             }
+        }
+
+        /// <summary>
+        /// Removes all highlights that have been added to the <see cref="ImageViewer"/> in
+        /// conjunction with the data currently being verified.
+        /// </summary>
+        protected void ClearHighlights()
+        {
+            List<IAttribute> tooltipAttributes = new List<IAttribute>(_attributeToolTips.Keys);
+            foreach (IAttribute attribute in tooltipAttributes)
+            {
+                RemoveAttributeToolTip(attribute);
+            }
+
+            List<IAttribute> errorIconAttributes = new List<IAttribute>(_attributeErrorIcons.Keys);
+            foreach (IAttribute attribute in errorIconAttributes)
+            {
+                RemoveAttributeErrorIcon(attribute);
+            }
+
+            foreach (CompositeHighlightLayerObject highlight in _highlightAttributes.Keys)
+            {
+                if (_imageViewer.LayerObjects.Contains(highlight))
+                {
+                    _imageViewer.LayerObjects.Remove(highlight, true, false);
+                }
+                else
+                {
+                    highlight.Dispose();
+                }
+            }
+
+            if (_hoverToolTip != null)
+            {
+                _hoverToolTip.Dispose();
+                _hoverToolTip = null;
+            }
+
+            if (_userNotificationTooltip != null)
+            {
+                _userNotificationTooltip.Dispose();
+                _userNotificationTooltip = null;
+            }
+
+            _highlightAttributes.Clear();
+            _displayedAttributeHighlights.Clear();
+            _attributeHighlights.Clear();
+            _hoverAttribute = null;
         }
 
         /// <summary>
@@ -7803,54 +7853,6 @@ namespace Extract.DataEntry
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Removes all highlights that have been added to the <see cref="ImageViewer"/> in
-        /// conjunction with the data currently being verified.
-        /// </summary>
-        void ClearHighlights()
-        {
-            List<IAttribute> tooltipAttributes = new List<IAttribute>(_attributeToolTips.Keys);
-            foreach (IAttribute attribute in tooltipAttributes)
-            {
-                RemoveAttributeToolTip(attribute);
-            }
-
-            List<IAttribute> errorIconAttributes = new List<IAttribute>(_attributeErrorIcons.Keys);
-            foreach (IAttribute attribute in errorIconAttributes)
-            {
-                RemoveAttributeErrorIcon(attribute);
-            }
-
-            foreach (CompositeHighlightLayerObject highlight in _highlightAttributes.Keys)
-            {
-                if (_imageViewer.LayerObjects.Contains(highlight))
-                {
-                    _imageViewer.LayerObjects.Remove(highlight, true, false);
-                }
-                else
-                {
-                    highlight.Dispose();
-                }
-            }
-
-            if (_hoverToolTip != null)
-            {
-                _hoverToolTip.Dispose();
-                _hoverToolTip = null;
-            }
-
-            if (_userNotificationTooltip != null)
-            {
-                _userNotificationTooltip.Dispose();
-                _userNotificationTooltip = null;
-            }
-
-            _highlightAttributes.Clear();
-            _displayedAttributeHighlights.Clear();
-            _attributeHighlights.Clear();
-            _hoverAttribute = null;
         }
 
         #endregion Private Members

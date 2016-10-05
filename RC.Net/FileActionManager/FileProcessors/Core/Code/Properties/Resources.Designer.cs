@@ -123,6 +123,16 @@ namespace Extract.FileActionManager.FileProcessors.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ShowAllHighlightsButton {
+            get {
+                object obj = ResourceManager.GetObject("ShowAllHighlightsButton", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap UndoButton {
             get {
                 object obj = ResourceManager.GetObject("UndoButton", resourceCulture);

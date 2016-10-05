@@ -1,4 +1,7 @@
-﻿namespace Extract.UtilityApplications.PaginationUtility
+﻿using Extract.DataEntry;
+using System;
+
+namespace Extract.UtilityApplications.PaginationUtility
 {
     partial class PaginationPanel
     {
@@ -15,6 +18,18 @@
         {
             if (disposing)
             {
+                if (_pendingDocuments != null)
+                {
+                    foreach (var oldDocument in _pendingDocuments)
+                    {
+                        var disposableData = oldDocument.DocumentData as IDisposable;
+                        if (disposableData != null)
+                        {
+                            disposableData.Dispose();
+                        }
+                    }
+                    _pendingDocuments = null;
+                }
                 if (_sourceDocuments != null)
                 {
                     Extract.Utilities.CollectionMethods.ClearAndDispose(_sourceDocuments);
@@ -34,6 +49,7 @@
                 {
                     components.Dispose();
                 }
+                AttributeStatusInfo.UndoManager.ClearHistory();
             }
             base.Dispose(disposing);
         }

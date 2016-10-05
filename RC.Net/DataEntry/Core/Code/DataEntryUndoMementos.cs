@@ -248,6 +248,27 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Adds a reference to object <see paramref="reference"/> that must be released before
+        /// this memento can be disposed.
+        /// </summary>
+        /// <param name="reference">The object referencing this instance.</param>
+        public virtual void AddDisposeReference(object reference)
+        {
+        }
+
+        /// <summary>
+        /// Removes a reference to object <see paramref="reference"/> allowing it to be disposed if
+        /// there are no other references remaining.
+        /// </summary>
+        /// <param name="reference">The object no longer referencing this instance.</param>
+        /// <returns><c>True</c> if this is a disposable instance and <see paramref="reference"/>
+        /// was the last instance referencing this instance; otherwise, <c>False</c>.</returns>
+        public virtual bool RemoveDisposeReference(object reference)
+        {
+            return false;
+        }
+
         #endregion Methods
     }
 
@@ -480,6 +501,11 @@ namespace Extract.DataEntry
         readonly int _index;
 
         /// <summary>
+        /// The reference count
+        /// </summary>
+        HashSet<object> _disposeReferences = new HashSet<object>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataEntryDeletedAttributeMemento"/> class.
         /// </summary>
         /// <param name="affectedAttribute">The affected attribute.</param>
@@ -513,6 +539,28 @@ namespace Extract.DataEntry
             {
                 throw ExtractException.AsExtractException("ELI31020", ex);
             }
+        }
+
+        /// <summary>
+        /// Adds a reference to object <see paramref="reference"/> that must be released before
+        /// this memento can be disposed.
+        /// </summary>
+        /// <param name="reference">The object referencing this instance.</param>
+        public override void AddDisposeReference(object reference)
+        {
+            _disposeReferences.Add(reference);
+        }
+
+        /// <summary>
+        /// Removes a reference to object <see paramref="reference"/> allowing it to be disposed if
+        /// there are no other references remaining.
+        /// </summary>
+        /// <param name="reference">The object no longer referencing this instance.</param>
+        /// <returns><c>True</c> if this is a disposable instance and <see paramref="reference"/>
+        /// was the last instance referencing this instance; otherwise, <c>False</c>.</returns>
+        public override bool RemoveDisposeReference(object reference)
+        {
+            return _disposeReferences.Remove(reference) && _disposeReferences.Count == 0;
         }
 
         #region IDisposable Members
@@ -661,6 +709,27 @@ namespace Extract.DataEntry
                 throw ExtractException.AsExtractException("ELI31012", ex);
             }
         }
+
+        /// <summary>
+        /// Adds a reference to object <see paramref="reference"/> that must be released before
+        /// this memento can be disposed.
+        /// </summary>
+        /// <param name="reference">The object referencing this instance.</param>
+        public void AddDisposeReference(object reference)
+        {
+        }
+
+        /// <summary>
+        /// Removes a reference to object <see paramref="reference"/> allowing it to be disposed if
+        /// there are no other references remaining.
+        /// </summary>
+        /// <param name="reference">The object no longer referencing this instance.</param>
+        /// <returns><c>True</c> if this is a disposable instance and <see paramref="reference"/>
+        /// was the last instance referencing this instance; otherwise, <c>False</c>.</returns>
+        public bool RemoveDisposeReference(object reference)
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -726,6 +795,27 @@ namespace Extract.DataEntry
             {
                 throw ExtractException.AsExtractException("ELI31013", ex);
             }
+        }
+
+        /// <summary>
+        /// Adds a reference to object <see paramref="reference"/> that must be released before
+        /// this memento can be disposed.
+        /// </summary>
+        /// <param name="reference">The object referencing this instance.</param>
+        public void AddDisposeReference(object reference)
+        {
+        }
+
+        /// <summary>
+        /// Removes a reference to object <see paramref="reference"/> allowing it to be disposed if
+        /// there are no other references remaining.
+        /// </summary>
+        /// <param name="reference">The object no longer referencing this instance.</param>
+        /// <returns><c>True</c> if this is a disposable instance and <see paramref="reference"/>
+        /// was the last instance referencing this instance; otherwise, <c>False</c>.</returns>
+        public bool RemoveDisposeReference(object reference)
+        {
+            return false;
         }
     }
 }

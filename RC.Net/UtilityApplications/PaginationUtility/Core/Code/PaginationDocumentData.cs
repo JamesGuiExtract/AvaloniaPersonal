@@ -74,8 +74,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_attributes != value)
                     {
-                        _attributes.Clear();
-                        _attributes.Append(value);
+                        _attributes = value;
                     }
                 }
                 catch (Exception ex)
@@ -98,7 +97,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Gets whether this instances data has been modified.
         /// </summary>
-        public bool Modified
+        public virtual bool Modified
         {
             get
             {

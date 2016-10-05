@@ -3354,7 +3354,7 @@
   <data name="NextDocument" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAAGYktHRAD/AP8A/6C9p5MAAAAHdElNRQfZBw4SOgCREeUD
+        YQUAAAAJcEhZcwAACxEAAAsRAX9kX5EAAAAGYktHRAD/AP8A/6C9p5MAAAAHdElNRQfZBw4SOgCREeUD
         AAAGkklEQVRYR8WXCUwTVhjHYTiP3Z443RSHIngxReWaCWrUOZFNndrhZCOwbKgYo1MQHWpExpSJog4R
         EIqAQKkgKCK0tNADWihQKBSnHGoIKAoGFIOg/72vUeNMKcey7SX/lNDmfb/vfO8ZATB6VXPnzu22sbHB
         PxHbA/Pnz6+zs7NzNdKzXrX3N+P0BRkOCAhAdXU1ampqcOPGjT6rvr4ecrkcvr6+sLe3JyeaGMzW1xl6
@@ -3463,5 +3463,8 @@
   </data>
   <data name="RedoButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\RedoButton.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ShowAllHighlightsButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ShowAllHighlightsButton.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

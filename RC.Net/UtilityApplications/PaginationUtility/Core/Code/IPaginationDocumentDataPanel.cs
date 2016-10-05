@@ -41,12 +41,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets a value indicating whether undo/redo operations are supported.
+        /// Gets a value indicating whether advanced data entry operations (such as undo/redo) are
+        /// supported.
         /// </summary>
-        /// <value><see langword="true"/> if undo/redo operations are supported.; otherwise,
-        /// <see langword="false"/>.
+        /// <value><see langword="true"/> if advanced data entry operations (such as undo/redo) are
+        /// supported; otherwise,<see langword="false"/>.
         /// </value>
-        bool AllowUndo
+        bool AdvancedDataEntryOperationsSupported
         {
             get;
         }
@@ -94,6 +95,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool SaveData(PaginationDocumentData data, bool validateData);
 
         /// <summary>
+        /// Clears the state of all data associated with the previously loaded document.
+        /// </summary>
+        void ClearData();
+
+        /// <summary>
         /// Gets a <see cref="PaginationDocumentData"/> instance based on the provided
         /// <see paramref="attributes"/>.
         /// </summary>
@@ -106,6 +112,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <returns>The <see cref="PaginationDocumentData"/> instance.</returns>
         PaginationDocumentData GetDocumentData(IUnknownVector attributes, string sourceDocName,
             FileProcessingDB fileProcessingDB, ImageViewer imageViewer);
+
+        /// <summary>
+        /// Updates the document data status.
+        /// </summary>
+        void UpdateDocumentDataStatus(PaginationDocumentData data);
 
         /// <summary>
         /// Provides a message to be displayed.
@@ -122,5 +133,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Performs a redo operation.
         /// </summary>
         void Redo();
+
+        /// <summary>
+        /// Toggles whether or not tooltip(s) for the active fields are currently visible.
+        /// </summary>
+        void ToggleHideTooltips();
     }
 }

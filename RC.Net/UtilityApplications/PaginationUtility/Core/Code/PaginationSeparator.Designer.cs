@@ -119,13 +119,12 @@
             // 
             // _summaryLabel
             // 
-            this._summaryLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this._summaryLabel.AutoSize = true;
+            this._summaryLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this._summaryLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._summaryLabel.ForeColor = System.Drawing.Color.White;
             this._summaryLabel.Location = new System.Drawing.Point(98, 5);
             this._summaryLabel.Name = "_summaryLabel";
-            this._summaryLabel.Size = new System.Drawing.Size(0, 13);
+            this._summaryLabel.Size = new System.Drawing.Size(1, 13);
             this._summaryLabel.TabIndex = 0;
             this._summaryLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 

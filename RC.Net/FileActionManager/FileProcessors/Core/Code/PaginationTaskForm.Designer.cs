@@ -83,9 +83,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._rectangularHighlightToolStripButton = new Extract.Imaging.Forms.RectangularHighlightToolStripButton();
             this._angularHighlightToolStripButton = new Extract.Imaging.Forms.AngularHighlightToolStripButton();
             this._wordHighlightToolStripButton = new Extract.Imaging.Forms.WordHighlightToolStripButton();
-            this._undoToolStrip = new System.Windows.Forms.ToolStrip();
-            this._undoToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this._redoToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._viewCommandsToolStrip = new System.Windows.Forms.ToolStrip();
             this._zoomInToolStripButton = new Extract.Imaging.Forms.ZoomInToolStripButton();
             this._zoomOutToolStripButton = new Extract.Imaging.Forms.ZoomOutToolStripButton();
@@ -96,6 +93,10 @@ namespace Extract.FileActionManager.FileProcessors
             this._oneToOneZoomToolStripButton = new Extract.Imaging.Forms.OneToOneZoomToolStripButton();
             this._rotateCounterclockwiseToolStripButton = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton();
             this._rotateClockwiseToolStripButton = new Extract.Imaging.Forms.RotateClockwiseToolStripButton();
+            this._advancedCommandsToolStrip = new System.Windows.Forms.ToolStrip();
+            this._undoToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._redoToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._toggleShowAllHighlightsButton = new System.Windows.Forms.ToolStripButton();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             imageViewerToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
@@ -117,8 +118,8 @@ namespace Extract.FileActionManager.FileProcessors
             this._menuStrip.SuspendLayout();
             this._basicImageViewerToolStrip.SuspendLayout();
             this._highlightToolsToolStrip.SuspendLayout();
-            this._undoToolStrip.SuspendLayout();
             this._viewCommandsToolStrip.SuspendLayout();
+            this._advancedCommandsToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // imageViewerToolStripContainer
@@ -145,7 +146,7 @@ namespace Extract.FileActionManager.FileProcessors
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._basicImageViewerToolStrip);
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._highlightToolsToolStrip);
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsToolStrip);
-            imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._undoToolStrip);
+            imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._advancedCommandsToolStrip);
             // 
             // _imageViewerStatusStrip
             // 
@@ -763,41 +764,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._wordHighlightToolStripButton.Name = "_wordHighlightToolStripButton";
             this._wordHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
             // 
-            // _undoToolStrip
-            // 
-            this._undoToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._undoToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._undoToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._undoToolStripButton,
-            this._redoToolStripButton});
-            this._undoToolStrip.Location = new System.Drawing.Point(599, 24);
-            this._undoToolStrip.Name = "_undoToolStrip";
-            this._undoToolStrip.Size = new System.Drawing.Size(115, 39);
-            this._undoToolStrip.TabIndex = 5;
-            this._undoToolStrip.Visible = false;
-            // 
-            // _undoToolStripButton
-            // 
-            this._undoToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._undoToolStripButton.Enabled = false;
-            this._undoToolStripButton.Image = global::Extract.FileActionManager.FileProcessors.Properties.Resources.UndoButton;
-            this._undoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._undoToolStripButton.Name = "_undoToolStripButton";
-            this._undoToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._undoToolStripButton.Text = "Undo";
-            this._undoToolStripButton.Click += new System.EventHandler(this.HandleUndoToolStripButton_Click);
-            // 
-            // _redoToolStripButton
-            // 
-            this._redoToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._redoToolStripButton.Enabled = false;
-            this._redoToolStripButton.Image = global::Extract.FileActionManager.FileProcessors.Properties.Resources.RedoButton;
-            this._redoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._redoToolStripButton.Name = "_redoToolStripButton";
-            this._redoToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._redoToolStripButton.Text = "Redo";
-            this._redoToolStripButton.Click += new System.EventHandler(this.HandleRedoToolStripButton_Click);
-            // 
             // _viewCommandsToolStrip
             // 
             this._viewCommandsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -815,7 +781,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._rotateCounterclockwiseToolStripButton,
             this._rotateClockwiseToolStripButton,
             toolStripSeparator10});
-            this._viewCommandsToolStrip.Location = new System.Drawing.Point(244, 24);
+            this._viewCommandsToolStrip.Location = new System.Drawing.Point(243, 24);
             this._viewCommandsToolStrip.Name = "_viewCommandsToolStrip";
             this._viewCommandsToolStrip.Size = new System.Drawing.Size(354, 39);
             this._viewCommandsToolStrip.TabIndex = 2;
@@ -934,6 +900,54 @@ namespace Extract.FileActionManager.FileProcessors
             toolStripSeparator10.Name = "toolStripSeparator10";
             toolStripSeparator10.Size = new System.Drawing.Size(6, 39);
             // 
+            // _advancedCommandsToolStrip
+            // 
+            this._advancedCommandsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._advancedCommandsToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._advancedCommandsToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._undoToolStripButton,
+            this._redoToolStripButton,
+            this._toggleShowAllHighlightsButton});
+            this._advancedCommandsToolStrip.Location = new System.Drawing.Point(597, 24);
+            this._advancedCommandsToolStrip.Name = "_advancedCommandsToolStrip";
+            this._advancedCommandsToolStrip.Size = new System.Drawing.Size(151, 39);
+            this._advancedCommandsToolStrip.TabIndex = 5;
+            this._advancedCommandsToolStrip.Visible = false;
+            // 
+            // _undoToolStripButton
+            // 
+            this._undoToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._undoToolStripButton.Enabled = false;
+            this._undoToolStripButton.Image = global::Extract.FileActionManager.FileProcessors.Properties.Resources.UndoButton;
+            this._undoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._undoToolStripButton.Name = "_undoToolStripButton";
+            this._undoToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._undoToolStripButton.Text = "Undo";
+            this._undoToolStripButton.Click += new System.EventHandler(this.HandleUndoToolStripButton_Click);
+            // 
+            // _redoToolStripButton
+            // 
+            this._redoToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._redoToolStripButton.Enabled = false;
+            this._redoToolStripButton.Image = global::Extract.FileActionManager.FileProcessors.Properties.Resources.RedoButton;
+            this._redoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._redoToolStripButton.Name = "_redoToolStripButton";
+            this._redoToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._redoToolStripButton.Text = "Redo";
+            this._redoToolStripButton.Click += new System.EventHandler(this.HandleRedoToolStripButton_Click);
+            // 
+            // _toggleShowAllHighlightsButton
+            // 
+            this._toggleShowAllHighlightsButton.CheckOnClick = true;
+            this._toggleShowAllHighlightsButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._toggleShowAllHighlightsButton.Enabled = false;
+            this._toggleShowAllHighlightsButton.Image = global::Extract.FileActionManager.FileProcessors.Properties.Resources.ShowAllHighlightsButton;
+            this._toggleShowAllHighlightsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._toggleShowAllHighlightsButton.Name = "_toggleShowAllHighlightsButton";
+            this._toggleShowAllHighlightsButton.Size = new System.Drawing.Size(36, 36);
+            this._toggleShowAllHighlightsButton.Text = "Highlight all data in image";
+            this._toggleShowAllHighlightsButton.ToolTipText = "Highlight all data in image (F10)";
+            // 
             // _thumbnailViewer
             // 
             this._thumbnailViewer.ImageViewer = null;
@@ -971,10 +985,10 @@ namespace Extract.FileActionManager.FileProcessors
             this._basicImageViewerToolStrip.PerformLayout();
             this._highlightToolsToolStrip.ResumeLayout(false);
             this._highlightToolsToolStrip.PerformLayout();
-            this._undoToolStrip.ResumeLayout(false);
-            this._undoToolStrip.PerformLayout();
             this._viewCommandsToolStrip.ResumeLayout(false);
             this._viewCommandsToolStrip.PerformLayout();
+            this._advancedCommandsToolStrip.ResumeLayout(false);
+            this._advancedCommandsToolStrip.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1048,8 +1062,9 @@ namespace Extract.FileActionManager.FileProcessors
         private Imaging.Forms.RectangularHighlightToolStripButton _rectangularHighlightToolStripButton;
         private Imaging.Forms.AngularHighlightToolStripButton _angularHighlightToolStripButton;
         private Imaging.Forms.WordHighlightToolStripButton _wordHighlightToolStripButton;
-        private System.Windows.Forms.ToolStrip _undoToolStrip;
+        private System.Windows.Forms.ToolStrip _advancedCommandsToolStrip;
         private System.Windows.Forms.ToolStripButton _undoToolStripButton;
         private System.Windows.Forms.ToolStripButton _redoToolStripButton;
+        private System.Windows.Forms.ToolStripButton _toggleShowAllHighlightsButton;
     }
 }

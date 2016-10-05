@@ -575,6 +575,26 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Pushes the specified stack's items onto the other stack.
+        /// </summary>
+        /// <param name="thisStack">This stack.</param>
+        /// <param name="otherStack">The other stack.</param>
+        public static void Push<T>(this Stack<T> thisStack, Stack<T> otherStack)
+        {
+            try
+            {
+                foreach (T value in otherStack.Reverse())
+                {
+                    thisStack.Push(value);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41477");
+            }
+        }
+
 
         #endregion Public Methods
     }

@@ -1,6 +1,7 @@
 ﻿using Extract.Licensing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Extract.Utilities
@@ -22,7 +23,7 @@ namespace Extract.Utilities
 
         /// <summary>
         /// Indicates changes to data which must be tracked, but that are not on their own
-        /// significant enough to warrant a seperate operation. Minor mementos will continue to be
+        /// significant enough to warrant a separate operation. Minor mementos will continue to be
         /// appended to the current "operation" until the next substantial memento is encountered.
         /// </summary>
         Minor = 1,
@@ -49,6 +50,22 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Adds a reference to object <see paramref="reference"/> that must be released before
+        /// this memento can be disposed.
+        /// </summary>
+        /// <param name="reference">The object referencing this instance.</param>
+        void AddDisposeReference(object reference);
+
+        /// <summary>
+        /// Removes a reference to object <see paramref="reference"/> allowing it to be disposed if
+        /// there are no other references remaining.
+        /// </summary>
+        /// <param name="reference">The object no longer referencing this instance.</param>
+        /// <returns><c>True</c> if this is a disposable instance and <see paramref="reference"/>
+        /// was the last instance referencing this instance; otherwise, <c>False</c>.</returns>
+        bool RemoveDisposeReference(object reference);
+
+        /// <summary>
         /// As new <see cref="IUndoMemento"/>s are added to the operation in which the current
         /// memento exists, this method will be called with the new memento as
         /// <see paramref="memento"/>. If the new memento provides no information not contained
@@ -72,7 +89,7 @@ namespace Extract.Utilities
     }
 
     /// <summary>
-    /// Manages the tracking of data changes for an application and the undo-ing of changes on
+    /// Manages the tracking of data changes for an application and the undoing of changes on
     /// demand. Whatever uses the UndoManager is responsible for calling AddMemento for every
     /// change that is made in the application. Changes will be grouped into operations via either
     /// the <see cref="StartNewOperation"/> method or via use of the
@@ -89,6 +106,73 @@ namespace Extract.Utilities
         static readonly string _OBJECT_NAME = typeof(UndoManager).ToString();
 
         #endregion Constants
+
+        #region UndoState
+
+        /// <summary>
+        /// A particular state undo and redo operations; used for <see cref="GetState"/> and <see cref="RestoreState"/>.
+        /// </summary>
+        class UndoState : IDisposable
+        {
+            /// <summary>
+            /// The undo operations in the state.
+            /// </summary>
+            public Stack<Stack<IUndoMemento>> UndoStack;
+
+            /// <summary>
+            /// The redo operations in the state.
+            /// </summary>
+            public Stack<Stack<IUndoMemento>> RedoStack;
+
+            #region IDisposable Members
+
+            /// <summary>
+            /// Releases all resources used by the <see cref="UndoState"/>.
+            /// </summary>
+            public void Dispose()
+            {
+                try
+                {
+                    Dispose(true);
+                    GC.SuppressFinalize(this);
+                }
+                catch (Exception ex)
+                {
+                    ExtractException.Display("ELI41489", ex);
+                }
+            }
+
+            /// <summary>
+            /// Releases all resources used by the <see cref="UndoState"/>.
+            /// </summary>
+            /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+            /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+            protected virtual void Dispose(bool disposing)
+            {
+                if (disposing && UndoStack != null && RedoStack != null)
+                {
+                    foreach (var operation in UndoStack.Concat(RedoStack))
+                    {
+                        foreach (var memento in operation)
+                        {
+                            if (memento.RemoveDisposeReference(this))
+                            {
+                                ((IDisposable)memento).Dispose();
+                            }
+                        }
+                    }
+
+                    UndoStack = null;
+                    RedoStack = null;
+                }
+
+                // Dispose of unmanaged resources
+            }
+
+            #endregion IDisposable Members
+        }
+
+        #endregion UndoState
 
         #region Fields
 
@@ -111,7 +195,7 @@ namespace Extract.Utilities
         /// <summary>
         /// Keeps track of mementos that need to be disposed of the next time history is cleared.
         /// </summary>
-        List<IDisposable> _mementosToDispose = new List<IDisposable>();
+        List<IUndoMemento> _mementosToDispose = new List<IUndoMemento>();
 
         /// <summary>
         /// Indicates whether an operation is currently being reverted.
@@ -131,8 +215,8 @@ namespace Extract.Utilities
 
         /// <summary>
         /// Indicates any added <see cref="IUndoMemento"/>s should be added to the current operation
-        /// regarless of <see cref="UndoMementoSignificance"/> or whether
-        /// <see cref="StartNewOperation"/> is called. This provideds a mechanism to ensure
+        /// regardless of <see cref="UndoMementoSignificance"/> or whether
+        /// <see cref="StartNewOperation"/> is called. This provides a mechanism to ensure
         /// protracted/complex operations are not inappropriately divided.
         /// </summary>
         bool _operationInProgress;
@@ -217,8 +301,8 @@ namespace Extract.Utilities
 
         /// <summary>
         /// Indicates any added <see cref="IUndoMemento"/>s should be added to the current operation
-        /// regarless of <see cref="UndoMementoSignificance"/> or whether
-        /// <see cref="StartNewOperation"/> is called. This provideds a mechanism to ensure
+        /// regardless of <see cref="UndoMementoSignificance"/> or whether
+        /// <see cref="StartNewOperation"/> is called. This provides a mechanism to ensure
         /// protracted/complex operations are not inappropriately divided.
         /// </summary>
         /// <value>
@@ -243,9 +327,14 @@ namespace Extract.Utilities
                             if (value)
                             {
                                 // If starting a new operation, stop and record the current one.
-                                _undoStack.Push(_currentOperation);
+                                PushOperation(_currentOperation, _undoStack);
                                 _currentOperation = new Stack<IUndoMemento>();
                                 _extendCurrentOperation = false;
+
+                                if (_undoStack.Count == 1)
+                                {
+                                    OnUndoAvailabilityChanged();
+                                }
                             }
                             // If extending the current operation, leave the _currentOperation
                             // stack as is until the next call to StartNewOperation or until
@@ -265,7 +354,7 @@ namespace Extract.Utilities
                                     // If ending an operation but none of the operations were
                                     // significant, discard them.
                                     _mementosToDispose.AddRange(
-                                        _currentOperation.OfType<IDisposable>());
+                                        _currentOperation.Where(m => m is IDisposable));
                                     _currentOperation.Clear();
                                 }
                             }
@@ -292,7 +381,7 @@ namespace Extract.Utilities
         {
             get
             {
-                return (_currentOperation.Count > 0 || _undoStack.Count > 0);
+                return (_undoStack.Count > 0);
             }
         }
 
@@ -354,16 +443,18 @@ namespace Extract.Utilities
         {
             try
             {
+                memento.AddDisposeReference(this);
+
                 // If we are not in an undo or redo operation, any non-supporting memento should
                 // cause all available redo operations to be cleared.
                 if (!_inUndoOperation && !_inRedoOperation && _redoStack.Count > 0 &&
-                    memento.Significance != UndoMementoSignificance.Supporting)
+                    memento.Significance == UndoMementoSignificance.Substantial)
                 {
                     ClearRedoOperations();
                 }
 
                 // If in an undo operation, all mementos received should be collected for an
-                // opposite redo operataion.
+                // opposite redo operation.
                 if (_inUndoOperation)
                 {
                     if (!_currentOperation.Any(m => m.Supersedes(memento)))
@@ -374,7 +465,7 @@ namespace Extract.Utilities
                     }
                 }
                 // If in a redo operation, all mementos received should be collected for an
-                // opposite undo operataion.
+                // opposite undo operation.
                 else if (_inRedoOperation)
                 {
                     if (!_currentOperation.Any(m => m.Supersedes(memento)))
@@ -392,10 +483,12 @@ namespace Extract.Utilities
                     if (!_inRedoOperation && _newOperationPending && !_operationInProgress &&
                         memento.Significance == UndoMementoSignificance.Substantial)
                     {
-                        if (_currentOperation.Count > 0)
+                        PushOperation(_currentOperation, _undoStack);
+                        _currentOperation = new Stack<IUndoMemento>();
+
+                        if (_undoStack.Count == 1)
                         {
-                            _undoStack.Push(_currentOperation);
-                            _currentOperation = new Stack<IUndoMemento>();
+                            OnUndoAvailabilityChanged();
                         }
 
                         _newOperationPending = false;
@@ -410,21 +503,15 @@ namespace Extract.Utilities
                         {
                             _currentOperation.Push(memento);
 
-                            if (_currentOperation.Count == 1 && _undoStack.Count == 0)
-                            {
-                                OnUndoAvailabilityChanged();
-                            }
-
                             return;
                         }
                     }
                 }
 
                 // If the memento was not recorded but is disposable, add it to _mementosToDispose. 
-                IDisposable disposableMemento = memento as IDisposable;
-                if (disposableMemento != null)
+                if (memento is IDisposable)
                 {
-                    _mementosToDispose.Add(disposableMemento);
+                    _mementosToDispose.Add(memento);
                 }
             }
             catch (Exception ex)
@@ -446,7 +533,7 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Requests that the current operation be exetended beyond the next substantial data change
+        /// Requests that the current operation be extended beyond the next substantial data change
         /// even if <see cref="StartNewOperation"/> had been called or
         /// <see cref="OperationInProgress"/> is returned to <see langword="false"/> from
         /// <see langword="true"/>. The operation will end the next time
@@ -490,19 +577,10 @@ namespace Extract.Utilities
 
                 Stack<IUndoMemento> undoOperation = null;
 
-                if (_currentOperation.Count > 0)
-                {
-                    // Undo the current operation
-                    undoOperation = _currentOperation;
+                PushOperation(_currentOperation, _undoStack);
+                _currentOperation = new Stack<IUndoMemento>();
 
-                    // Start a new operation.
-                    _currentOperation = new Stack<IUndoMemento>();
-                }
-                else if (_undoStack.Count > 0)
-                {
-                    // There is no current operation; undo the next operation on the stack.
-                    undoOperation = _undoStack.Pop();
-                }
+                undoOperation = _undoStack.Pop();
 
                 // Perform the undo
                 if (undoOperation != null)
@@ -512,7 +590,8 @@ namespace Extract.Utilities
                         memento.Undo();
                     }
 
-                    _mementosToDispose.AddRange(undoOperation.OfType<IDisposable>());
+                    _mementosToDispose.AddRange(
+                        undoOperation.Where(m => m is IDisposable));
 
                     // End the undo operation if specified.
                     if (endImmediately)
@@ -597,11 +676,11 @@ namespace Extract.Utilities
                 {
                     foreach (IUndoMemento memento in redoOperation)
                     {
-                        // By undo-ing mementos that were done during an undo operation, we are redo-ing.
+                        // By undoing mementos that were done during an undo operation, we are redoing.
                         memento.Undo();
                     }
 
-                    _mementosToDispose.AddRange(redoOperation.OfType<IDisposable>());
+                    _mementosToDispose.AddRange(redoOperation.Where(m => m is IDisposable));
 
                     // End the redo operation if specified.
                     if (endImmediately)
@@ -633,7 +712,7 @@ namespace Extract.Utilities
                     memento.Significance >= UndoMementoSignificance.Minor))
                 {
                     // Add all mementos recorded during the redo operation as an undo operation.
-                    _undoStack.Push(_currentOperation);
+                    PushOperation(_currentOperation, _undoStack);
                 }
 
                 OnOperationEnded();
@@ -670,18 +749,25 @@ namespace Extract.Utilities
                 bool undoAvailabilityChange = UndoOperationAvailable;
                 bool redoAvailabilityChange = RedoOperationAvailable;
 
-                _mementosToDispose.AddRange(_currentOperation.OfType<IDisposable>());
+                _mementosToDispose.AddRange(_currentOperation.Where(m => m is IDisposable));
                 foreach (Stack<IUndoMemento> operation in _undoStack)
                 {
-                    _mementosToDispose.AddRange(operation.OfType<IDisposable>());
+                    _mementosToDispose.AddRange(operation.Where(m => m is IDisposable));
                 }
                 foreach (Stack<IUndoMemento> operation in _redoStack)
                 {
-                    _mementosToDispose.AddRange(operation.OfType<IDisposable>());
+                    _mementosToDispose.AddRange(operation.Where(m => m is IDisposable));
                 }
 
-                CollectionMethods.ClearAndDispose(_mementosToDispose);
+                foreach (var memento in _mementosToDispose)
+                {
+                    if (memento.RemoveDisposeReference(this))
+                    {
+                        ((IDisposable)memento).Dispose();
+                    }
+                }
 
+                _mementosToDispose.Clear();
                 _currentOperation.Clear();
                 _undoStack.Clear();
                 _redoStack.Clear();
@@ -698,6 +784,97 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI31007", ex);
+            }
+        }
+
+        /// <summary>
+        /// Pushes the specified <see cref="operation"/> onto the specified <see cref="undoStack"/>.
+        /// </summary>
+        /// <param name="operation">The operation.</param>
+        /// <param name="undoStack">The undo stack.</param>
+        static void PushOperation(Stack<IUndoMemento> operation,
+            Stack<Stack<IUndoMemento>> undoStack)
+        {
+            // If either the last undo operation, or the operation getting pushed don't contain any substantial
+            // mementos, merge the two rather than adding a new undo operation.
+            if (undoStack.Count > 0 &&
+                (!undoStack.Peek().Any(memento => memento.Significance == UndoMementoSignificance.Substantial) ||
+                !operation.Any(memento => memento.Significance == UndoMementoSignificance.Substantial)))
+            {
+                undoStack.Peek().Push(operation);
+            }
+            else
+            {
+                undoStack.Push(operation);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current undo/redo operations as a state object that can be restored later.
+        /// </summary>
+        /// <returns>An <c>object</c> representing the current undo and redo operations.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public IDisposable GetState()
+        {
+            try
+            {
+                var state = new UndoState()
+                {
+                    UndoStack = new Stack<Stack<IUndoMemento>>(_undoStack.Reverse()),
+                    RedoStack = new Stack<Stack<IUndoMemento>>(_redoStack.Reverse())
+                };
+
+                // Make a copy of the _currentOperation so that further changes don't get reflected
+                // in the returned state.
+                var currentOperation = new Stack<IUndoMemento>(_currentOperation.Reverse());
+                PushOperation(currentOperation, state.UndoStack);
+
+                foreach (var operation in state.UndoStack.Concat(state.RedoStack))
+                {
+                    foreach (var memento in operation)
+                    {
+                        memento.AddDisposeReference(state);
+                    }
+                }
+
+                return state;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41478");
+            }
+        }
+
+        /// <summary>
+        /// Restores availability of a previously retrieved state of undo and redo operations.
+        /// </summary>
+        /// <param name="state">An <c>object</c> representing the undo and redo to make available.</param>
+        public void RestoreState(object state)
+        {
+            try
+            {
+                UndoState undoState = state as UndoState;
+                ExtractException.Assert("ELI41479", "Invalid state", undoState != null);
+
+                bool undoAvailabilityChange = UndoOperationAvailable;
+                bool redoAvailabilityChange = RedoOperationAvailable;
+
+                ClearHistory();
+                _undoStack = new Stack<Stack<IUndoMemento>>(undoState.UndoStack.Reverse());
+                _redoStack = new Stack<Stack<IUndoMemento>>(undoState.RedoStack.Reverse());
+                
+                if (undoAvailabilityChange != UndoOperationAvailable)
+                {
+                    OnUndoAvailabilityChanged();
+                }
+                if (redoAvailabilityChange != RedoOperationAvailable)
+                {
+                    OnRedoAvailabilityChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41480");
             }
         }
 
@@ -791,7 +968,7 @@ namespace Extract.Utilities
 
                 foreach (Stack<IUndoMemento> operation in _redoStack)
                 {
-                    _mementosToDispose.AddRange(operation.OfType<IDisposable>());
+                    _mementosToDispose.AddRange(operation.Where(m => m is IDisposable));
                 }
 
                 _redoStack.Clear();
