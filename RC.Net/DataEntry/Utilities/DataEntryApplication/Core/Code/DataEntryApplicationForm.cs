@@ -3129,7 +3129,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Only grab the file back into the current verification session if suggested
                 // pagination boundaries were accepted (meaning the rules should have already found
                 // everything we would expect them to find for this document).
-                if (sendForReprocessing)
+                if (!e.PagesEqualButRotated && sendForReprocessing)
                 {
                     // Produce a voa file for the paginated document using the data the rules suggested.
                     var documentData = e.DocumentData as PaginationDocumentData;

@@ -201,7 +201,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// rotation amount in degrees from original orientation.
         public CreatingOutputDocumentEventArgs(IEnumerable<PageInfo> sourcePageInfo,
             int pageCount, long fileSize, bool? suggestedPaginationAccepted, int position,
-            PaginationDocumentData documentData, ReadOnlyCollection<PageAndRotation> rotatedPages)
+            PaginationDocumentData documentData, ReadOnlyCollection<PageAndRotation> rotatedPages,
+            bool pagesEqualButRotated)
             : base()
         {
             SourcePageInfo = sourcePageInfo.ToList().AsReadOnly();
@@ -211,6 +212,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             Position = position;
             DocumentData = documentData;
 			RotatedPages = rotatedPages;
+            PagesEqualButRotated = pagesEqualButRotated;
         }
 
         /// <summary>
@@ -288,6 +290,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get;
             private set;
+        }
+
+        public bool PagesEqualButRotated
+        {
+            get;
+            set;
         }
     }
 

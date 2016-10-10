@@ -2135,6 +2135,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                 outputDocument = (OutputDocument)sender;
                 tempFile = _tempFiles[outputDocument];
 
+                var originalPages = outputDocument.OriginalPages;
+                var currentPages = outputDocument.PageControls
+                    .Where(c => !c.Deleted)
+                    .Select(c => c.Page);
+
+                bool pagesEqualButRotated = Page.PagesAreEqualExceptRotation(originalPages,
+                                                                             currentPages);
+
                 var sourcePageInfo = outputDocument.PageControls
                     .Where(c => !c.Deleted)
                     .Select(c => new PageInfo
@@ -2172,7 +2180,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var eventArgs = new CreatingOutputDocumentEventArgs(
                     sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted, position,
-                    outputDocument.DocumentData, rotatedPages);
+                    outputDocument.DocumentData, rotatedPages, pagesEqualButRotated);
 
 
                 OnCreatingOutputDocument(eventArgs);
