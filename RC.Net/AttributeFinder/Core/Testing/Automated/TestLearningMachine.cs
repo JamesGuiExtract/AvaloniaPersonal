@@ -343,7 +343,7 @@ namespace Extract.AttributeFinder.Test
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
             var results = lm.TrainMachine();
-            Assert.AreEqual(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 1.0);
+            Assert.AreEqual(1.0, results.Item1.Match(_ => Double.NaN, cm => cm.FScore));
             Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.85);
         }
 
@@ -388,10 +388,10 @@ namespace Extract.AttributeFinder.Test
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
             var results = lm.TrainMachine();
-            Assert.AreEqual(results.Item1.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 1.0);
+            Assert.AreEqual(1.0, results.Item1.Match(gcm => gcm.OverallAgreement, _ => Double.NaN));
 
             // Results are better when there are no 'other' dates to worry about
-            Assert.AreEqual(results.Item2.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 1.0);
+            Assert.AreEqual(1.0, results.Item2.Match(gcm => gcm.OverallAgreement, _ => Double.NaN));
         }
 
         [Test, Category("LearningMachine")]

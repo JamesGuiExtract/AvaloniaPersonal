@@ -1,9 +1,11 @@
 ﻿using Extract.Testing.Utilities;
 using NUnit.Framework;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Extract.AttributeFinder.Test
 {
@@ -426,6 +428,47 @@ namespace Extract.AttributeFinder.Test
             classifier1.TrainClassifier(inputs, outputs);
             Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
             Assert.That(classifier2.IsConfigurationEqualTo(classifier1));
+        }
+
+        // Test unable to attain convergence handling
+        [Test, Category("TrainableClassifier")]
+        public static void UnableToAttainConvergenceWithAutoChoose()
+        {
+            Tuple<double[][], int[]> results = GetDocumentCategorizationData();
+            double[][] inputs = results.Item1;
+            int[] outputs = results.Item2;
+
+            // Make conflicting data
+            inputs = Enumerable.Repeat(inputs, 100).SelectMany(x => x).ToArray();
+            var rng = new Random(0);
+            outputs = inputs.Select(_ => rng.Next(0, 2)).ToArray();
+
+            var classifier = new MulticlassSupportVectorMachineClassifier();
+            bool unableToConvergeWhenChoosing = false;
+            classifier.TrainClassifier(inputs, outputs, new System.Random(0),
+                (status => unableToConvergeWhenChoosing |= Regex.IsMatch(status.GetFormattedValue(), "Choosing.*Unable to attain convergence")),
+                CancellationToken.None);
+
+            Assert.That(unableToConvergeWhenChoosing);
+            Assert.That(classifier.IsTrained);
+        }
+
+        // Test unable to attain convergence handling
+        [Test, Category("TrainableClassifier")]
+        public static void UnableToAttainConvergenceWithoutAutoChoose()
+        {
+            Tuple<double[][], int[]> results = GetDocumentCategorizationData();
+            double[][] inputs = results.Item1;
+            int[] outputs = results.Item2;
+
+            var classifier = new MulticlassSupportVectorMachineClassifier { Complexity = 50000, AutomaticallyChooseComplexityValue = false };
+            bool unableToConvergeWhenTraining = false;
+            classifier.TrainClassifier(inputs, outputs, new System.Random(0),
+                (status => unableToConvergeWhenTraining |= Regex.IsMatch(status.GetFormattedValue(), @"^ *Unable to attain convergence")),
+                CancellationToken.None);
+
+            Assert.That(unableToConvergeWhenTraining);
+            Assert.That(classifier.IsTrained);
         }
 
         #endregion Tests

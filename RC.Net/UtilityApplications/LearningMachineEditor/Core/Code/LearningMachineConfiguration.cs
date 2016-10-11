@@ -1007,11 +1007,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         private void SetMulticlassSVMClassifierValues(LearningMachine learningMachine)
         {
             double complexity;
-            if (!double.TryParse(multiclassSvmComplexityTextBox.Text, NumberStyles.Number, CultureInfo.InvariantCulture,
-                out complexity))
+            if (!double.TryParse(multiclassSvmComplexityTextBox.Text, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                CultureInfo.InvariantCulture, out complexity)
+                || complexity == 0)
             {
                 multiclassSvmComplexityTextBox.SetError(configurationErrorProvider,
-                    "Could not parse complexity text as a number");
+                    "Complexity must be a number greater than zero");
                 _valid = false;
             }
 
@@ -1029,11 +1030,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         private void SetMultilabelSVMClassifierValues(LearningMachine learningMachine)
         {
             double complexity;
-            if (!double.TryParse(multilabelSvmComplexityTextBox.Text, NumberStyles.Number, CultureInfo.InvariantCulture,
-                out complexity))
+            if (!double.TryParse(multiclassSvmComplexityTextBox.Text, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                CultureInfo.InvariantCulture, out complexity)
+                || complexity == 0)
             {
                 multilabelSvmComplexityTextBox.SetError(configurationErrorProvider,
-                    "Could not parse complexity text as a number");
+                    "Complexity must be a number greater than zero");
                 _valid = false;
             }
 
@@ -1563,10 +1565,14 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         {
             try
             {
-                var textBox = sender as TextBox;
-                if (textBox != null && textBox.Focused)
+                if (!_suspendMachineUpdates && !_updatingMachine)
                 {
                     Dirty = true;
+                    var textBox = sender as TextBox;
+                    if (textBox != null && !textBox.Focused)
+                    {
+                        UpdateLearningMachine();
+                    }
                 }
             }
             catch (Exception ex)

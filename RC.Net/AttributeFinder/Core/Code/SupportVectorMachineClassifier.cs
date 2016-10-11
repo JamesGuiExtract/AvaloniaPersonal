@@ -5,6 +5,7 @@ using Accord.Statistics.Analysis;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -269,120 +270,161 @@ namespace Extract.AttributeFinder
                     double[][] cvInputs = inputs.Submatrix(cvIdx);
                     int[] cvOutputs = outputs.Submatrix(cvIdx);
 
-                    var complexitiesToTryAsc = new double[] {0.33, 1, 3, 10, 30};
-                    var complexitiesToTryDesc = new double[] { 0.1, 0.033, 0.01, 0.0033, 0.001};
-                    double bestComplexity = 1;
-                    double bestScore = int.MinValue;
-                    double bestTrainScore = int.MinValue;
-                    for (int i = 0; i < complexitiesToTryAsc.Length; i++)
+                    Func<double, bool, double> search = (start, fineTune) =>
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        updateStatus2(new StatusArgs
-                            { StatusMessage = "Choosing complexity value: Iteration {0}", Int32Value = 1 });
-
-                        double complexity = complexitiesToTryAsc[i];
-                        try
+                        double bestScore = 0;
+                        var previousBestComplexities = new List<double>();
+                        var bestComplexities = new List<double>();
+                        int i = 1;
+                        double startE = 0, endE = 0;
+                        double midE = Math.Round(Math.Log(start, 2));
+                        double step = 1;
+                        if (fineTune)
                         {
-                            TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
-                            double score = GetAccuracyScore(cvInputs, cvOutputs);
-                            double trainScore = GetAccuracyScore(trainInputs, trainOutputs);
-                            if (score > bestScore)
+                            startE = midE - 1;
+                            endE = midE + 1;
+                            step = 0.25;
+                        }
+                        else
+                        {
+                            startE = midE - 10;
+                            endE = midE + 10;
+                        }
+                        for (double exp = startE; exp <= endE; i++, exp += step)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            double complexity = Math.Pow(2, exp);
+
+                            updateStatus2(new StatusArgs
                             {
-                                bestScore = score;
-                                bestComplexity = complexity;
-                                bestTrainScore = Math.Max(bestTrainScore, trainScore);
-                            }
-                            else if (score == bestScore)
+                                TaskName = "ChoosingComplexity",
+                                StatusMessage = String.Format(CultureInfo.CurrentCulture,
+                                fineTune
+                                    ? "Fine-tuning complexity value: Iteration {0}, C={1:N6}"
+                                    : "Choosing complexity value: Iteration {0}, C={1:N6}",
+                                i,
+                                complexity)
+                            });
+                            try
                             {
-                                if (trainScore > bestTrainScore)
+                                TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
+                                double score = GetAccuracyScore(cvInputs, cvOutputs);
+
+                                updateStatus2(new StatusArgs
                                 {
-                                    bestTrainScore = trainScore;
-                                    bestComplexity = complexity;
+                                    TaskName = "ChoosingComplexity",
+                                    ReplaceLastStatus = true,
+                                    StatusMessage = String.Format(CultureInfo.CurrentCulture,
+                                    fineTune
+                                        ? "Fine-tuning complexity value: Iteration {0}, C={1:N6}, CV accuracy={2:N4}"
+                                        : "Choosing complexity value: Iteration {0}, C={1:N6}, CV accuracy={2:N4}",
+                                    i,
+                                    complexity,
+                                    score)
+                                });
+                                if (score >= bestScore)
+                                {
+                                    if (score > bestScore)
+                                    {
+                                        bestScore = score;
+                                        previousBestComplexities = bestComplexities;
+                                        bestComplexities = new List<double>();
+                                    }
+                                    bestComplexities.Add(complexity);
                                 }
-                                else
+                            }
+                            catch (AggregateException ae)
+                            {
+                                ae.Handle(ex => ex is Accord.ConvergenceException);
+
+                                updateStatus2(new StatusArgs
                                 {
+                                    TaskName = "ChoosingComplexity",
+                                    ReplaceLastStatus = true,
+                                    StatusMessage = String.Format(CultureInfo.CurrentCulture,
+                                    "Choosing complexity value: Iteration {0}, C={1:N6}, Unable to attain convergence!",
+                                    i,
+                                    complexity)
+                                });
+
+                                // https://extract.atlassian.net/browse/ISSUE-14113
+                                // Handle convergence exception as a signal that the complexity value
+                                // being tried is too high
+                                if (complexity >= start && bestComplexities.Any())
+                                {
+                                    // Use previous list of bests if there is only one current best (too close to non-convergence)
+                                    if (previousBestComplexities.Any() && bestComplexities.Count == 1)
+                                    {
+                                        bestComplexities = previousBestComplexities;
+                                    }
                                     break;
                                 }
                             }
-                            else
-                            {
-                                break;
-                            }
                         }
-                        // https://extract.atlassian.net/browse/ISSUE-14113
-                        // Handle convergence exception as a signal that the complexity value being tried
-                        // is too high
-                        catch (Accord.ConvergenceException)
-                        {
-                            updateStatus2(new StatusArgs
-                            {
-                                StatusMessage = "Unable to attain convergence with C={0}",
-                                DoubleValues = Enumerable.Repeat(complexity, 1)
-                            });
-                            // Continue to try lower complexity values
-                            continue;
-                        }
-                    }
-                    for (int i = 0; i < complexitiesToTryDesc.Length; i++)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        updateStatus2(new StatusArgs
-                            { StatusMessage = "Choosing complexity value: Iteration {0}", Int32Value = 1 });
 
-                        double complexity = complexitiesToTryDesc[i];
-                        try
-                        {
-                            TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
-                            double score = GetAccuracyScore(cvInputs, cvOutputs);
-                            double trainScore = GetAccuracyScore(trainInputs, trainOutputs);
-                            if (score > bestScore)
-                            {
-                                bestScore = score;
-                                bestComplexity = complexity;
-                                bestTrainScore = Math.Max(bestTrainScore, trainScore);
-                            }
-                            else if (score == bestScore)
-                            {
-                                if (trainScore > bestTrainScore)
-                                {
-                                    bestTrainScore = trainScore;
-                                    bestComplexity = complexity;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                        // https://extract.atlassian.net/browse/ISSUE-14113
-                        // Handle convergence exception as a signal that the complexity value being tried
-                        // is too high
-                        catch (Accord.ConvergenceException)
-                        {
-                            updateStatus2(new StatusArgs
-                            {
-                                StatusMessage = "Unable to attain convergence with C={0}",
-                                DoubleValues = Enumerable.Repeat(complexity, 1)
-                            });
-                            // Don't need to try any higher values
-                            break;
-                        }
-                    }
-                    Complexity = bestComplexity;
+                        // Pick the middle value for complexities, using lower value if there is an even number of bests
+                        // use '1' if there are no bests
+                        double chosen = bestComplexities.Count == 0
+                            ? 1
+                            : bestComplexities[(bestComplexities.Count - 1) / 2];
+
+                        return chosen;
+                    };
+
+                    // Pick best region
+                    Complexity = search(1, false);
+
+                    // Fine-tune
+                    Complexity = search(Complexity, true);
+
+                    updateStatus2(new StatusArgs
+                    {
+                        StatusMessage = String.Format(CultureInfo.CurrentCulture,
+                        "Complexity chosen: C={0}",
+                        Complexity)
+                    });
                 }
 
-                cancellationToken.ThrowIfCancellationRequested();
+                bool success = false;
+                do
+                {
+                    try
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
 
-                // Train classifier
-                updateStatus(new StatusArgs { StatusMessage = "Training classifier:" });
-                TrainClassifier(inputs, outputs, Complexity, updateStatus2, cancellationToken);
+                        // Train classifier
+                        updateStatus(new StatusArgs { StatusMessage = "Training classifier:" });
+                        TrainClassifier(inputs, outputs, Complexity, updateStatus2, cancellationToken);
 
-                IsTrained = true;
-                LastTrainedOn = DateTime.Now;
+                        success = IsTrained = true;
+                        LastTrainedOn = DateTime.Now;
+                    }
+                    // https://extract.atlassian.net/browse/ISSUE-14113
+                    // Handle convergence exception as a signal that the complexity value being tried
+                    // is too high
+                    catch (AggregateException ae)
+                    {
+                        ae.Handle(ex => ex is Accord.ConvergenceException);
+
+                        updateStatus2(new StatusArgs
+                        {
+                            StatusMessage = String.Format(CultureInfo.CurrentCulture,
+                            "Unable to attain convergence: C={0:N6}",
+                            Complexity)
+                        });
+
+                        // Try lower complexity value
+                        Complexity *= 0.75;
+                        updateStatus2(new StatusArgs
+                        {
+                            StatusMessage = String.Format(CultureInfo.CurrentCulture,
+                            "Trying again with lower Complexity value: C={0:N6}",
+                            Complexity)
+                        });
+                    }
+                }
+                while (!success);
             }
             catch (Exception e)
             {

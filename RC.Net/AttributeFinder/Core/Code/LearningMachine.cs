@@ -665,6 +665,9 @@ namespace Extract.AttributeFinder
 
                 // Once the save process is complete, copy the file into the real destination.
                 FileSystemMethods.MoveFile(tempFile, fileName, overwrite: true);
+
+                // Set tempFile to null in case SecureDelete is turned on to avoid missing file exception
+                tempFile = null;
             }
             catch (Exception e)
             {

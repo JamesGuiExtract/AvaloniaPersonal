@@ -1145,7 +1145,7 @@
             // 
             this.multilabelSvmComplexityTextBox.Location = new System.Drawing.Point(4, 22);
             this.multilabelSvmComplexityTextBox.Name = "multilabelSvmComplexityTextBox";
-            this.multilabelSvmComplexityTextBox.Size = new System.Drawing.Size(44, 20);
+            this.multilabelSvmComplexityTextBox.Size = new System.Drawing.Size(64, 20);
             this.multilabelSvmComplexityTextBox.TabIndex = 1;
             this.multilabelSvmComplexityTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.multilabelSvmComplexityTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
@@ -1188,7 +1188,7 @@
             // 
             this.multiclassSvmComplexityTextBox.Location = new System.Drawing.Point(4, 22);
             this.multiclassSvmComplexityTextBox.Name = "multiclassSvmComplexityTextBox";
-            this.multiclassSvmComplexityTextBox.Size = new System.Drawing.Size(44, 20);
+            this.multiclassSvmComplexityTextBox.Size = new System.Drawing.Size(64, 20);
             this.multiclassSvmComplexityTextBox.TabIndex = 1;
             this.multiclassSvmComplexityTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.multiclassSvmComplexityTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
