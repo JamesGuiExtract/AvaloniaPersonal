@@ -2140,8 +2140,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .Where(c => !c.Deleted)
                     .Select(c => c.Page);
 
-                bool pagesEqualButRotated = Page.PagesAreEqualExceptRotation(originalPages,
-                                                                             currentPages);
+                bool pagesEqual = Page.PagesAreEqual(originalPages, currentPages);
 
                 var sourcePageInfo = outputDocument.PageControls
                     .Where(c => !c.Deleted)
@@ -2178,10 +2177,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                                                             page.Rotation))
                                     .ToList<PageAndRotation>().AsReadOnly();
 
+                bool pagesEqualButRotated = pagesEqual && rotatedPages.Count() > 0;
+
                 var eventArgs = new CreatingOutputDocumentEventArgs(
                     sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted, position,
                     outputDocument.DocumentData, rotatedPages, pagesEqualButRotated);
-
 
                 OnCreatingOutputDocument(eventArgs);
                 string outputFileName = eventArgs.OutputFileName;

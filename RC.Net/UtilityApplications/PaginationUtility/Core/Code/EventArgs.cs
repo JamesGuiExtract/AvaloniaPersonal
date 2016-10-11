@@ -151,7 +151,7 @@ namespace Extract.UtilityApplications.PaginationUtility
     {
         public PageAndRotation(string documentName, int page, int rotation)
         {
-			DocumentName = documentName;
+            DocumentName = documentName;
             Page = page;
             Rotation = rotation;
         }
@@ -168,11 +168,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             private set;
         }
 
-		public string DocumentName
-		{
-			get;
-			private set;
-		}
+        public string DocumentName
+        {
+            get;
+            private set;
+        }
     }
 
     /// <summary>
@@ -211,7 +211,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             SuggestedPaginationAccepted = suggestedPaginationAccepted;
             Position = position;
             DocumentData = documentData;
-			RotatedPages = rotatedPages;
+            RotatedPages = rotatedPages;
             PagesEqualButRotated = pagesEqualButRotated;
         }
 
@@ -286,12 +286,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             set;
         }
 
+        /// <summary>
+        /// Contains a read-only collection of pages that have been rotated (ImageOrientation != 0)
+        /// </summary>
         public ReadOnlyCollection<PageAndRotation> RotatedPages
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Contains a value that describes the condition when a set of document pages are original but for
+        /// one or more of the pages having been rotated - true when this condition pertains.
+        /// </summary>
         public bool PagesEqualButRotated
         {
             get;
@@ -323,10 +330,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
     }
 
-	/// <summary>
-	/// Event args for a <see cref="PaginationPanel.Paginated"/> event.
-	/// </summary>
-	public class PaginatedEventArgs : EventArgs
+    /// <summary>
+    /// Event args for a <see cref="PaginationPanel.Paginated"/> event.
+    /// </summary>
+    public class PaginatedEventArgs : EventArgs
     {
         /// <summary>
         /// Initializes a new <see cref="PaginatedEventArgs"/> instance.

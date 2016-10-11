@@ -280,63 +280,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="first">The first <see cref="Page"/> sequence to compare.</param>
         /// <param name="second">The second <see cref="Page"/> sequence to compare.</param>
-        /// <param name="equalityIncludesPageRotation">This flag can be set to false to 
-        /// exclude page rotation from the test for equality</param>
         /// <returns>true or false</returns>
+        /// NOTE: ImageOrientation is NOT part of the definition of Page equality
         static public bool PagesAreEqual(IEnumerable<Page> first, 
-                                         IEnumerable<Page> second, 
-                                         bool equalityIncludesPageRotation = true)
+                                         IEnumerable<Page> second)
         {
             try
             {
-                if (equalityIncludesPageRotation)
-                {
-                    return first
-                        .Select(page => new Tuple<string, int, int>(
-                            page.OriginalDocumentName, page.OriginalPageNumber, page.ImageOrientation))
-                        .SequenceEqual(second.Select(page => new Tuple<string, int, int>(
-                            page.OriginalDocumentName, page.OriginalPageNumber, page.ImageOrientation)));
-                }
-                else
-                {
-                    // Here to not include page rotation in the equality test
-                    return first
-                        .Select(page => new Tuple<string, int>(
-                            page.OriginalDocumentName, page.OriginalPageNumber))
-                        .SequenceEqual(second.Select(page => new Tuple<string, int>(
-                            page.OriginalDocumentName, page.OriginalPageNumber)));
-                }
+                return first
+                    .Select(page => new Tuple<string, int>(
+                        page.OriginalDocumentName, page.OriginalPageNumber))
+                    .SequenceEqual(second.Select(page => new Tuple<string, int>(
+                        page.OriginalDocumentName, page.OriginalPageNumber)));
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39662");
             }
-        }
-
-        /// <summary>
-        /// Determine if pages are equal except for rotation, and unequal in terms of rotation.
-        /// </summary>
-        /// <param name="first">The first <see cref="Page"/> sequence to compare.</param>
-        /// <param name="second">The second <see cref="Page"/> sequence to compare.</param>
-        /// <returns>True if each page in the sequence contains the same original document 
-        /// name and page number, and at least one of the pages has been rotated w.r.t. 
-        /// the original page rotation</returns>
-        static public bool PagesAreEqualExceptRotation(IEnumerable<Page> first, IEnumerable<Page> second)
-        {
-            if (!PagesAreEqual(first, second, equalityIncludesPageRotation: false))
-            {
-                return false;
-            }
-
-            foreach (var page in second)
-            {
-                if (page.ImageOrientation != 0)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         #endregion Static Methods

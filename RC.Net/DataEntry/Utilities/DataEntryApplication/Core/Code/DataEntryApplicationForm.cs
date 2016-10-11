@@ -3075,10 +3075,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Create directory if it doesn't exist
                 Directory.CreateDirectory(Path.GetDirectoryName(e.OutputFileName));
 
-                bool sendForReprocessing =
-                    (e.DocumentData != null && !e.DocumentData.SendForReprocessing != null)
-                    ? e.DocumentData.SendForReprocessing.Value
-                    : (!e.SuggestedPaginationAccepted.HasValue || !e.SuggestedPaginationAccepted.Value);
+                bool sendForReprocessing = false;
+                if (e.DocumentData != null && !e.DocumentData.SendForReprocessing != null)
+                {
+                    sendForReprocessing = e.DocumentData.SendForReprocessing.Value;
+                }
+                else if (e.PagesEqualButRotated)
+                {
+                    sendForReprocessing = false;
+                }
+                else
+                {
+                    sendForReprocessing = !e.SuggestedPaginationAccepted.HasValue ||
+                                          !e.SuggestedPaginationAccepted.Value;
+                }
 
                 EFilePriority priority = GetPriorityForFile(e);
 
@@ -3129,7 +3139,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Only grab the file back into the current verification session if suggested
                 // pagination boundaries were accepted (meaning the rules should have already found
                 // everything we would expect them to find for this document).
-                if (!e.PagesEqualButRotated && sendForReprocessing)
+                if (sendForReprocessing)
                 {
                     // Produce a voa file for the paginated document using the data the rules suggested.
                     var documentData = e.DocumentData as PaginationDocumentData;
