@@ -1,0 +1,61 @@
+Test|N/A
+.Name|HgbA1C
+.Date|5/8/2008 07:42
+.Component|HgbA1C
+..Value|6
+..Units|%
+..Range|4.2-5.8
+...Min|4.2
+...Max|5.8
+
+Test|N/A
+.Name|HgbA1C
+.Date|2/15/2008 08:20
+.Component|HgbA1C
+..Value|6.6
+..Units|%
+..Range|2-5.8
+...Min|2
+...Max|5.8
+
+Test|N/A
+.Name|HgbA1C
+.Date|8/21/2008 10:20
+.Component|HgbA1C
+..Flag|H
+..Units|%
+..Range|4.2-5.8
+...Min|4.2
+...Max|5.8
+
+Test|N/A
+.Date|2/15/2008 08:20
+.Name|Lipid Panel
+.Component|Chol
+..Value|190
+..Range|<200
+...Min|NONE
+...Max|199
+..Units|mg/dL
+.Component|Trig
+..Value|116
+..Range|<150
+...Min|NONE
+...Max|149
+..Units|mg/dL
+.Component|HDL
+..Range|40-80
+...Min|40
+...Max|80
+..Units|mg/dL
+.Component|LDL-C
+..Value|114
+..Range|<130
+...Min|NONE
+...Max|129
+.Component|CHOL/HDI
+..Flag|L
+..Value|3.6
+..Range|3.2-4.8
+...Min|3.2
+...Max|4.8

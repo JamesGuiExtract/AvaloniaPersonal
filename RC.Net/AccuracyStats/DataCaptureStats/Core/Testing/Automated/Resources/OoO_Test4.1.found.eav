@@ -1,0 +1,198 @@
+Test|N/A
+.Name|Sample Integrity Check
+.Date|09/08/2008
+.Component|Lipemia
+..Value|Normal
+.Component|Icterus
+..Value|Normal
+.Component|Hemolysis
+..Value|Normal
+
+Test|N/A
+.Name|Chemistry
+.Date|09/08/2008
+.Component|Sodium
+..Flag|L
+..Range|136-145
+...Min|136
+...Max|145
+..Units|mEq/L
+..Value|134
+.Component|Potassium
+..Range|3.4-5.0
+...Min|3.4
+...Max|5.0
+..Units|mEq/L
+..Value|4.9
+.Component|Chloride
+..Range|95-110
+...Min|95
+...Max|110
+..Units|mEq/L
+..Value|96
+.Component|CO2
+..Range|21-31
+...Min|21
+...Max|31
+..Units|mEq/L
+..Value|22
+.Component|Anion Gap
+..Flag|H
+..Range|3.0-14.0
+...Min|3.0
+...Max|14.0
+..Units|mEq/L
+..Value|16.0
+.Component|Glucose
+..Flag|H
+..Range|70-110
+...Min|70
+...Max|110
+..Units|mg/dL
+..Value|195
+.Component|BUN
+..Flag|H
+..Range|8-22
+...Min|8
+...Max|22
+..Units|mg/dL
+..Value|34
+.Component|BUN, Post
+..Flag|L
+..Range|8-22
+...Min|8
+...Max|22
+..Units|mg/d
+..Value|6
+.Component|Weight, PRE
+..Value|50.6
+.Component|Weight, POST
+..Value|48.5
+.Component|Treatment Time
+..Value|195
+.Component|Urea Reduction Ratio
+..Value|82
+.Component|Natural Log KT/V
+..Value|2.04
+.Component|Creatinine
+..Flag|H
+..Range|0.40-1.20
+...Min|0.40
+...Max|1.20
+..Units|mg/dL
+..Value|5.58
+.Component|Total Protein
+..Range|6.1-8.4
+...Min|6.1
+...Max|8.4
+..Units|g/dL
+..Value|6.4
+.Component|Albumin
+..Flag|L
+..Range|3.6-5.4
+...Min|3.6
+...Max|5.4
+..Units|g/dL
+..Value|3.4
+.Component|Globulin
+..Range|2.3-3.5
+...Min|2.3
+...Max|3.5
+..Units|g/dL
+..Value|3.0
+.Component|A/G Ratio
+..Range|> 0.9
+...Min|1.0
+...Max|NONE
+..Value|1.1
+.Component|Calcium
+..Range|8.2-10.1
+...Min|8.2
+...Max|10.1
+..Units|mg/dL
+..Value|8.6
+.Component|Calcium, Adj. Total
+..Range|8.2-10.1
+...Min|8.2
+...Max|10.1
+..Units|mg/dL
+..Value|9.1
+.Component|Phosphorus
+..Flag|H
+..Range|2.5-5.0
+...Min|2.5
+...Max|5.0
+..Units|mg/dL
+..Value|5.8
+.Component|CA*PO4
+..Range|< 55
+...Min|NONE
+...Max|54
+..Units|mg 2/dL 2
+..Value|49.9
+.Component|CA*PO4, Adjusted
+..Range|< 55
+...Min|NONE
+...Max|54
+..Units|mg 2/dL 2
+..Value|52.8
+.Component|ALT (SGPT)
+..Range|11-45
+...Min|11
+...Max|45
+..Units|IU/L
+..Value|31
+.Component|AST (SGOT)
+..Range|13-38
+...Min|13
+...Max|38
+..Units|IU/L
+..Value|33
+.Component|Alkaline Phosphatase
+..Range|40-105
+...Min|40
+...Max|105
+..Units|IU/L
+..Value|91
+.Component|Total Bilirubin
+..Range|0.2-1.2
+...Min|0.2
+...Max|1.2
+..Units|mg/d
+..Value|0.7
+.Component|Iron
+..Range|40-150
+...Min|40
+...Max|150
+..Units|ug/dL
+..Value|59
+.Component|Transferrin
+..Flag|L
+..Range|169-325
+...Min|169
+...Max|325
+..Units|mg/dL
+..Value|111
+.Component|TIBC, Calculated
+..Flag|L
+..Range|211-406
+...Min|211
+...Max|406
+..Units|ug/dL
+..Value|155
+.Component|Transferrin Saturation
+..Range|22-52
+...Min|22
+...Max|52
+..Value|38
+
+Test|N/A
+.Name|Immunoassay
+.Date|09/08/2008
+.Component|PTH, Intact
+..Flag|H
+..Range|14-72
+...Min|14
+...Max|72
+..Units|pg/mL
+..Value|211

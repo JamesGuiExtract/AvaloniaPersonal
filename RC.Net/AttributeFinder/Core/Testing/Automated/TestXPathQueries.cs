@@ -1,4 +1,5 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Utilities;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,8 @@ namespace Extract.AttributeFinder.Test
         /// Manages the test images needed for testing.
         /// </summary>
         static TestFileManager<TestXPathQueries> _testImages;
+
+        static IUnknownVector _attributes;
 
         #endregion Fields
 
@@ -306,15 +309,102 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual("12.7", stringResult.ElementAt(0));
         }
 
+        [Test, Category("XPath")]
+        public static void Test15_RemovingAttributeTree()
+        {
+            var xpathContext = GetXPathContext();
+            var result = xpathContext.FindAllOfType<IAttribute>("/*/LabInfo");
+            var enumeration = result.Single().EnumerateDepthFirst();
+            Assert.AreEqual(7, enumeration.Count());
+
+            xpathContext.RemoveMatchingAttributes("/*/LabInfo/Address");
+            enumeration = result.Single().EnumerateDepthFirst();
+            Assert.AreEqual(2, enumeration.Count());
+
+            result = xpathContext.FindAllOfType<IAttribute>("/*/LabInfo/Address");
+            CollectionAssert.IsEmpty(result);
+
+            result = xpathContext.FindAllOfType<IAttribute>("/*/LabInfo/Address/Address1");
+            CollectionAssert.IsEmpty(result);
+        }
+
+        [Test, Category("XPath")]
+        public static void Test16_RemovingMultipleAttributes()
+        {
+            var xpathContext = GetXPathContext();
+
+            var enumeration = _attributes.ToIEnumerable<IAttribute>()
+                .SelectMany(AttributeMethods.EnumerateDepthFirst);
+            Assert.AreEqual(177, enumeration.Count());
+
+            var result = xpathContext.FindAllOfType<IAttribute>("/*/Test");
+            Assert.AreEqual(3, result.Count());
+
+            // Including all subattributes the Test attributes total 157
+            enumeration = result.SelectMany(AttributeMethods.EnumerateDepthFirst);
+            Assert.AreEqual(157, enumeration.Count());
+
+            // Remove most of the contents
+            xpathContext.RemoveMatchingAttributes("/*/Test/Component");
+
+            // Check that there are still 3 Test attribute
+            result = xpathContext.FindAllOfType<IAttribute>("/*/Test");
+            Assert.AreEqual(3, result.Count());
+
+            // Now only 15 attributes in the recursive enumeration instead of 157
+            enumeration = result.SelectMany(AttributeMethods.EnumerateDepthFirst);
+            Assert.AreEqual(15, enumeration.Count());
+
+            // No Components left
+            result = xpathContext.FindAllOfType<IAttribute>("/*/Test/Component");
+            CollectionAssert.IsEmpty(result);
+
+            // Ensure original hierarchy has been suitably modified
+            enumeration = _attributes.ToIEnumerable<IAttribute>()
+                .SelectMany(AttributeMethods.EnumerateDepthFirst);
+            Assert.AreEqual(35, enumeration.Count());
+        }
+
+
+        [Test, Category("XPath")]
+        public static void Test17_RemovingAllAttributes()
+        {
+            var xpathContext = GetXPathContext();
+
+            // Make a shallow copy of _attributes
+            var topLevelAttributes = _attributes.ToIEnumerable<IAttribute>().ToList();
+            Assert.AreEqual(6, topLevelAttributes.Count());
+
+            var enumeration = topLevelAttributes.SelectMany(AttributeMethods.EnumerateDepthFirst);
+            Assert.AreEqual(177, enumeration.Count());
+
+            xpathContext.RemoveMatchingAttributes("//*");
+
+            var result = xpathContext.FindAllOfType<IAttribute>("//*");
+            CollectionAssert.IsEmpty(result);
+
+            Assert.AreEqual(0, _attributes.Size());
+
+            // Top-level attributes saved in copy will have had all subattributes removed
+            Assert.AreEqual(6, topLevelAttributes.Count());
+            enumeration = topLevelAttributes.SelectMany(AttributeMethods.EnumerateDepthFirst);
+            CollectionAssert.AreEqual(topLevelAttributes, enumeration);
+
+            // After removing all attributes the context will only contain the root node,
+            // returned as an empty string from Evaluate
+            var resultObject = xpathContext.Evaluate("//*");
+            Assert.IsEmpty((string)((IEnumerable<object>)resultObject).First());
+        }
+
         #endregion Tests
 
         #region Helper Functions
 
         static XPathContext GetXPathContext()
         {
-            var attributes = new IUnknownVector();
-            attributes.LoadFrom(_testImages.GetFile(_TEST_DATA_FILE), false);
-            return new XPathContext(attributes);
+            _attributes = new IUnknownVector();
+            _attributes.LoadFrom(_testImages.GetFile(_TEST_DATA_FILE), false);
+            return new XPathContext(_attributes);
         }
 
         #endregion Helper Functions

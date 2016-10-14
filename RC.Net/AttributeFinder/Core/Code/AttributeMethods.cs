@@ -209,6 +209,21 @@ namespace Extract.AttributeFinder
             return guid;
         }
 
+        /// <summary>
+        /// Returns an enumeration of <see paramref="attribute"/> and its subattributes, recursively
+        /// </summary>
+        /// <param name="attribute">The attribute root of the tree.</param>
+        /// <returns>An enumeration of <see paramref="attribute"/> and its subattributes, recursively</returns>
+        public static IEnumerable<IAttribute> EnumerateDepthFirst(this IAttribute attribute)
+        {
+            yield return attribute;
+            foreach(var descendant in attribute.SubAttributes
+                .ToIEnumerable<ComAttribute>()
+                .SelectMany(EnumerateDepthFirst))
+            {
+                yield return descendant;
+            }
+        }
         #endregion Public Methods
 
         #region Private Methods

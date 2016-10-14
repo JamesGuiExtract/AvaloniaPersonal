@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5E5368E3-ABD2-4A4C-8E96-A28647FB3944}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Extract.DataCaptureStats.Test</RootNamespace>
+    <AssemblyName>Extract.DataCaptureStats.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\..\Binaries\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
+    </Reference>
+    <COMReference Include="UCLID_AFCORELib">
+      <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFUTILSLib">
+      <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="TestAttributeTreeComparer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
+      <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
+      <Name>Extract.Testing.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Code\Extract.DataCaptureStats.csproj">
+      <Project>{32679A70-BC10-4DD9-9155-9B3E08586EE9}</Project>
+      <Name>Extract.DataCaptureStats</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\TestExtra.found.eav" />
+    <EmbeddedResource Include="Resources\TestExtra.expected.eav" />
+    <EmbeddedResource Include="Resources\TestIncorrectSub.found.eav" />
+    <EmbeddedResource Include="Resources\TestIncorrectSub.expected.eav" />
+    <EmbeddedResource Include="Resources\TestTypes1.found.eav" />
+    <EmbeddedResource Include="Resources\TestTypes1.expected.eav" />
+    <EmbeddedResource Include="Resources\TestContainerXPath1.found.eav" />
+    <EmbeddedResource Include="Resources\TestContainerXPath1.expected.eav" />
+    <EmbeddedResource Include="Resources\TestContainerXPath4.found.eav" />
+    <EmbeddedResource Include="Resources\TestContainerXPath4.expected.eav" />
+    <EmbeddedResource Include="Resources\OoO.1.expected.eav" />
+    <EmbeddedResource Include="Resources\OoO.2.expected.eav" />
+    <EmbeddedResource Include="Resources\OoO.3.expected.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test1.1.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test2.1.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test3.1.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test4.1.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test5.1.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test6.1.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test7.2.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test8.2.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test9.3.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test10.3.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test11.3.found.eav" />
+    <EmbeddedResource Include="Resources\OoO_Test12.3.found.eav" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>UnitTestingDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

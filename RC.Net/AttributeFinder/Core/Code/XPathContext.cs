@@ -386,6 +386,85 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Removes attributes matching <see paramref="xpath"/> from the xml and the original VOA.
+        /// </summary>
+        /// <param name="xpath">The xpath query.</param>
+        /// <param name="fromAttribute">The attribute to use as context node. If null then the expression
+        /// will be evaluated against the root of the attribute hierarchy.</param>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "xpath")]
+        public void RemoveMatchingAttributes(string xpath, IAttribute fromAttribute = null)
+        {
+            try
+            {
+                XPathNavigator navigator = fromAttribute == null
+                    ? null
+                    : _attributeToNodeMap[fromAttribute].CreateNavigator();
+                var expression = XPathExpression.Compile(xpath);
+
+                // Select will fail if the xpath expression return type is not a node set
+                ExtractException.Assert("ELI41508", "XPath must return a node-set (e.g., not a string)",
+                    expression.ReturnType == XPathResultType.NodeSet);
+
+                expression.SetContext(this);
+                XPathNodeIterator it = (navigator ?? _navigator).Select(expression);
+                var attributeToRemoveFromAttributeList = it.Cast<XPathNavigator>()
+                    .Select(nav =>
+                    {
+                        // Convert any node result to the corresponding attribute
+                        var currentHasNode = nav as IHasXmlNode;
+                        XmlNode node = null;
+                        IAttribute attribute = null;
+                        if (currentHasNode != null
+                            && _nodeToAttributeMap.TryGetValue(node = currentHasNode.GetNode(), out attribute))
+                        {
+                            // If there is an attribute associated with this node, it will have a parent
+                            IAttribute parent = null;
+                            nav.MoveToParent();
+                            var parentNode = ((IHasXmlNode)nav).GetNode();
+                            _nodeToAttributeMap.TryGetValue(parentNode, out parent);
+
+                            return new { attribute, node, parent, parentNode };
+                        }
+                        return null;
+                    })
+                    .Where(x => x != null)
+                    .ToList();
+
+                // Remove selected attributes from original collection
+                // as well as from node maps. Also remove the corresponding nodes
+                foreach (var x in attributeToRemoveFromAttributeList)
+                {
+                    // Remove from XML
+                    x.parentNode.RemoveChild(x.node);
+
+                    // Remove from maps
+                    foreach (var attribute in x.attribute.EnumerateDepthFirst())
+                    {
+                        if (_attributeToNodeMap.ContainsKey(attribute))
+                        {
+                            _nodeToAttributeMap.Remove(_attributeToNodeMap[attribute]);
+                            _attributeToNodeMap.Remove(attribute);
+                        }
+                    }
+
+                    // Remove from original hierarchy
+                    if (x.parent != null)
+                    {
+                        x.parent.SubAttributes.RemoveValue(x.attribute);
+                    }
+                    else
+                    {
+                        _attributes.RemoveValue(x.attribute);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41499");
+            }
+        }
+
+        /// <summary>
         /// Determines whether the specified text is a valid xpath expression.
         /// </summary>
         /// <param name="text">The text to validate.</param>

@@ -1,0 +1,423 @@
+Test|N/A
+.Name|CBC WITH DIFFERENTIAL
+.Date|4/23/2008 7:52 AM
+.Component|WBC COUNT
+..Range|3.5 - 11.0
+...Min|3.5
+...Max|11.0
+..Units|K/cumm
+..Value|9.0
+.Component|RBC COUNT
+..Range|4.30 - 6.20
+...Min|4.30
+...Max|6.20
+..Units|M/cumm
+..Value|4.82
+.Component|HEMOGLOBIN
+..Range|13.5 - 18.0
+...Min|13.5
+...Max|18.0
+..Units|g/dL
+..Value|14.9
+.Component|HEMATOCRIT
+..Units|%
+..Value|44
+..Range|39 - 54
+...Min|39
+...Max|54
+.Component|MCV
+..Range|80 - 100
+...Min|80
+...Max|100
+..Units|fL
+..Value|92
+.Component|RDW
+..Range|11.5 - 14.0
+...Min|11.5
+...Max|14.0
+..Units|%
+..Value|13.8
+.Component|PLATELET COUNT
+..Range|150 - 450
+...Min|150
+...Max|450
+..Units|K/cumm
+..Value|185
+.Component|NEUTROPHIL %
+..Range|44 - 75
+...Min|44
+...Max|75
+..Units|%
+..Value|64
+.Component|LYMPHOCYTE%
+..Range|17 - 45
+...Min|17
+...Max|45
+..Units|%
+..Value|27
+.Component|MONOCYTE %
+..Range|4 - 13
+...Min|4
+...Max|13
+..Units|%
+..Value|7
+.Component|EOSINOPHIL%
+..Range|0 - 7
+...Min|0
+...Max|7
+..Units|%
+..Value|2
+.Component|BASOPHIL%
+..Value|0
+..Range|0 - 1
+...Min|0
+...Max|1
+..Units|%
+.Component|ABS. NEUTROPHIL
+..Range|1.7 - 7.6
+...Min|1.7
+...Max|7.6
+..Units|K/cumm
+..Value|5.8
+.Component|ABS. LYMPH
+..Range|0.9 - 3.4
+...Min|0.9
+...Max|3.4
+..Units|K/cumm
+..Value|2.5
+.Component|ABS. MONOCYTE
+..Units|K/cumm
+..Value|0.6
+..Range|0.3 - 0.9
+...Min|0.3
+...Max|0.9
+.Component|ABS. EOSINOPHIL
+..Range|0.0 - 0.7
+...Min|0.0
+...Max|0.7
+..Units|K/cumm
+..Value|0.2
+.Component|ABSOLUTE BASOPHIL
+..Range|0.0 - 0.1
+...Min|0.0
+...Max|0.1
+..Units|K/cumm
+..Value|0.0
+
+Test|N/A
+.Name|CBC WITH DIFFERENTIAL
+.Date|1/10/08 7:59 AM
+.Component|WBC COUNT
+..Range|3.5 - 11.0
+...Min|3.5
+...Max|11.0
+..Units|K/cumm
+..Value|6.8
+.Component|RBC COUNT
+..Range|4.30 - 6.20
+...Min|4.30
+...Max|6.20
+..Units|M/cumm
+..Value|4.80
+.Component|HEMOGLOBIN
+..Range|13.5 - 18.0
+...Min|13.5
+...Max|18.0
+..Units|g/dL
+..Value|15.1
+.Component|HEMATOCRIT
+..Units|%
+..Value|45
+..Range|39 - 54
+...Min|39
+...Max|54
+.Component|MCV
+..Range|80 - 100
+...Min|80
+...Max|100
+..Units|fL
+..Value|94
+.Component|RDW
+..Range|11.5 - 14.0
+...Min|11.5
+...Max|14.0
+..Units|%
+..Value|13.6
+.Component|PLATELET COUNT
+..Range|150 - 450
+...Min|150
+...Max|450
+..Units|K/cumm
+..Value|208
+.Component|NEUTROPHIL %
+..Range|44 - 75
+...Min|44
+...Max|75
+..Units|%
+..Value|46
+.Component|LYMPHOCYTE%
+..Range|17 - 45
+...Min|17
+...Max|45
+..Units|%
+..Value|45
+.Component|MONOCYTE %
+..Range|4 - 13
+...Min|4
+...Max|13
+..Units|%
+..Value|8
+.Component|EOSINOPHIL%
+..Range|0 - 7
+...Min|0
+...Max|7
+..Units|%
+..Value|1
+.Component|BASOPHIL%
+..Value|0
+..Range|0 - 1
+...Min|0
+...Max|1
+..Units|%
+.Component|ABS. NEUTROPHIL
+..Range|1.7 - 7.6
+...Min|1.7
+...Max|7.6
+..Units|K/cumm
+..Value|3.1
+.Component|ABS. LYMPH
+..Range|0.9 - 3.4
+...Min|0.9
+...Max|3.4
+..Units|K/cumm
+..Value|3.0
+.Component|ABS. MONOCYTE
+..Units|K/cumm
+..Value|0.6
+..Range|0.3 - 0.9
+...Min|0.3
+...Max|0.9
+.Component|ABS. EOSINOPHIL
+..Range|0.0 - 0.7
+...Min|0.0
+...Max|0.7
+..Units|K/cumm
+..Value|0.1
+.Component|ABSOLUTE BASOPHIL
+..Range|0.0 - 0.1
+...Min|0.0
+...Max|0.1
+..Units|K/cumm
+..Value|0.0
+
+Test|N/A
+.Name|CBC WITH DIFFERENTIAL
+.Date|10/10/07 08:23 AM
+.Component|WBC COUNT
+..Range|3.5 - 11.0
+...Min|3.5
+...Max|11.0
+..Units|K/cumm
+..Value|6.2
+.Component|RBC COUNT
+..Range|4.30 - 6.20
+...Min|4.30
+...Max|6.20
+..Units|M/cumm
+..Value|4.80
+.Component|HEMOGLOBIN
+..Range|13.5 - 18.0
+...Min|13.5
+...Max|18.0
+..Units|g/dL
+..Value|15.3
+.Component|HEMATOCRIT
+..Units|%
+..Value|45
+..Range|39 - 54
+...Min|39
+...Max|54
+.Component|MCV
+..Range|80 - 100
+...Min|80
+...Max|100
+..Units|fL
+..Value|93
+.Component|RDW
+..Range|11.5 - 14.0
+...Min|11.5
+...Max|14.0
+..Units|%
+..Value|13.7
+.Component|PLATELET COUNT
+..Range|150 - 450
+...Min|150
+...Max|450
+..Units|K/cumm
+..Value|166
+.Component|NEUTROPHIL %
+..Range|44 - 75
+...Min|44
+...Max|75
+..Units|%
+..Value|52
+.Component|LYMPHOCYTE%
+..Range|17 - 45
+...Min|17
+...Max|45
+..Units|%
+..Value|41
+.Component|MONOCYTE %
+..Range|4 - 13
+...Min|4
+...Max|13
+..Units|%
+..Value|6
+.Component|EOSINOPHIL%
+..Range|0 - 7
+...Min|0
+...Max|7
+..Units|%
+..Value|1
+.Component|BASOPHIL%
+..Value|0
+..Range|0 - 1
+...Min|0
+...Max|1
+..Units|%
+.Component|ABS. NEUTROPHIL
+..Range|1.7 - 7.6
+...Min|1.7
+...Max|7.6
+..Units|K/cumm
+..Value|3.2
+.Component|ABS. LYMPH
+..Range|0.9 - 3.4
+...Min|0.9
+...Max|3.4
+..Units|K/cumm
+..Value|2.5
+.Component|ABS. MONOCYTE
+..Units|K/cumm
+..Value|0.4
+..Range|0.3 - 0.9
+...Min|0.3
+...Max|0.9
+.Component|ABS. EOSINOPHIL
+..Range|0.0 - 0.7
+...Min|0.0
+...Max|0.7
+..Units|K/cumm
+..Value|0.1
+.Component|ABSOLUTE BASOPHIL
+..Range|0.0 - 0.1
+...Min|0.0
+...Max|0.1
+..Units|K/cumm
+..Value|0.0
+
+Test|N/A
+.Name|CBC WITH DIFFERENTIAL
+.Date|7/3/04 4:48 AM
+.Component|WBC COUNT
+..Range|3.5 - 11.0
+...Min|3.5
+...Max|11.0
+..Units|K/cumm
+..Value|7.3
+.Component|RBC COUNT
+..Range|4.30 - 6.20
+...Min|4.30
+...Max|6.20
+..Units|M/cumm
+..Value|4.92
+.Component|HEMOGLOBIN
+..Range|13.5 - 18.0
+...Min|13.5
+...Max|18.0
+..Units|g/dL
+..Value|16.1
+.Component|HEMATOCRIT
+..Units|%
+..Value|46
+..Range|39 - 54
+...Min|39
+...Max|54
+.Component|MCV
+..Range|80 - 100
+...Min|80
+...Max|100
+..Units|fL
+..Value|94
+.Component|RDW
+..Range|11.5 - 14.0
+...Min|11.5
+...Max|14.0
+..Units|%
+..Value|13.7
+.Component|PLATELET COUNT
+..Range|150 - 450
+...Min|150
+...Max|450
+..Units|K/cumm
+..Value|164
+.Component|NEUTROPHIL %
+..Range|44 - 75
+...Min|44
+...Max|75
+..Units|%
+..Value|58
+.Component|LYMPHOCYTE%
+..Range|17 - 45
+...Min|17
+...Max|45
+..Units|%
+..Value|34
+.Component|MONOCYTE %
+..Range|4 - 13
+...Min|4
+...Max|13
+..Units|%
+..Value|7
+.Component|EOSINOPHIL%
+..Range|0 - 7
+...Min|0
+...Max|7
+..Units|%
+..Value|1
+.Component|BASOPHIL%
+..Value|0
+..Range|0 - 1
+...Min|0
+...Max|1
+..Units|%
+.Component|ABS. NEUTROPHIL
+..Range|1.7 - 7.6
+...Min|1.7
+...Max|7.6
+..Units|K/cumm
+..Value|4.2
+.Component|ABS. LYMPH
+..Range|0.9 - 3.4
+...Min|0.9
+...Max|3.4
+..Units|K/cumm
+..Value|2.5
+.Component|ABS. MONOCYTE
+..Units|K/cumm
+..Value|0.5
+..Range|0.3 - 0.9
+...Min|0.3
+...Max|0.9
+.Component|ABS. EOSINOPHIL
+..Range|0.0 - 0.7
+...Min|0.0
+...Max|0.7
+..Units|K/cumm
+..Value|0.0
+.Component|ABSOLUTE BASOPHIL
+..Range|0.0 - 0.1
+...Min|0.0
+...Max|0.1
+..Units|K/cumm
+..Value|0.0
