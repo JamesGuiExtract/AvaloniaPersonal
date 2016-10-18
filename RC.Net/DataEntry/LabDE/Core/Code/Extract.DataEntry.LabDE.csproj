@@ -31,7 +31,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-   
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -43,7 +42,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-   
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
@@ -77,11 +75,15 @@
     </Compile>
     <Compile Include="DuplicateDocumentsFFIColumn.cs" />
     <Compile Include="FAMData.cs" />
-    <Compile Include="FAMOrderRow.cs" />
+    <Compile Include="DocumentDataOrderRecord.cs" />
+    <Compile Include="DocumentDataRecord.cs" />
+    <Compile Include="IFAMDataConfiguration.cs" />
     <Compile Include="LabDEQueryUtilities.cs" />
     <Compile Include="FAMMetadataManager.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="DocumentDataField.cs" />
+    <Compile Include="OrderDataConfiguration.cs" />
     <Compile Include="OrderPickerSelectionPane.cs">
       <SubType>UserControl</SubType>
     </Compile>

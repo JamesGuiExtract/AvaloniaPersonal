@@ -1,16 +1,10 @@
 ﻿using Extract.Database;
 using Extract.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Data;
 using System.Data.OleDb;
-using System.Drawing;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using UCLID_AFCORELib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry.LabDE
@@ -20,78 +14,6 @@ namespace Extract.DataEntry.LabDE
     /// </summary>
     internal class FAMData : IDisposable
     {
-        #region Constants
-
-        /// <summary>
-        /// An SQL column specification for the order name.
-        /// </summary>
-        const string _ORDER_NAME_XPATH =
-            "[ORMMessage].value('(/ORM_O01/ORM_O01.ORDER/ORM_O01.ORDER_DETAIL/ORM_O01.OBRRQDRQ1RXOODSODT_SUPPGRP/OBR/OBR.4/CE.2)[1]','NVARCHAR(MAX)')";
-
-        /// <summary>
-        /// An SQL column specification for the ordering provider first name using an x-path query
-        /// for the XML version of an ORM-O01 HL7 message.
-        /// </summary>
-        const string _ORDER_PROVIDER_FIRST_NAME_XPATH =
-            "[ORMMessage].value('(/ORM_O01/ORM_O01.ORDER/ORM_O01.ORDER_DETAIL/ORM_O01.OBRRQDRQ1RXOODSODT_SUPPGRP/OBR/OBR.16/XCN.2/FN.1)[1]','NVARCHAR(MAX)')";
-
-        /// <summary>
-        /// An SQL column specification for the ordering provider last name using an x-path query
-        /// for the XML version of an ORM-O01 HL7 message.
-        /// </summary>
-        const string _ORDER_PROVIDER_LAST_NAME_XPATH =
-            "[ORMMessage].value('(/ORM_O01/ORM_O01.ORDER/ORM_O01.ORDER_DETAIL/ORM_O01.OBRRQDRQ1RXOODSODT_SUPPGRP/OBR/OBR.16/XCN.3)[1]','NVARCHAR(MAX)')";
-
-        /// <summary>
-        /// The default attribute path for the attribute containing the patient MRN.
-        /// </summary>
-        internal const string _DEFAULT_PATIENT_MRN_ATTRIBUTE = "/PatientInfo/MR_Number";
-
-        /// <summary>
-        /// The default attribute path for the attribute containing the order code.
-        /// </summary>
-        internal const string _DEFAULT_ORDER_CODE_ATTRIBUTE = "OrderCode";
-
-        /// <summary>
-        /// The default attribute path for the attribute containing the collection date.
-        /// </summary>
-        internal const string _DEFAULT_COLLECTION_DATE_ATTRIBUTE = "CollectionDate";
-
-        /// <summary>
-        /// The default attribute path for the attribute containing the collection time.
-        /// </summary>
-        internal const string _DEFAULT_COLLECTION_TIME_ATTRIBUTE = "CollectionTime";
-
-        #endregion Constants
-
-        #region OrderInfo Class
-
-        /// <summary>
-        /// Information regarding an order retrieve from the FAM DB.
-        /// </summary>
-        class OrderInfo
-        {
-            /// <summary>
-            /// A description of the order compiled using <see cref="FAMData.OrderQueryColumns"/>.
-            /// </summary>
-            public string Description
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The FAM file IDs for files that have already been filed against this order.
-            /// </summary>
-            public List<int> CorrespondingFileIDs
-            {
-                get;
-                set;
-            }
-        }
-
-        #endregion OrderInfo Class
-
         #region Fields
 
         /// <summary>
@@ -101,21 +23,21 @@ namespace Extract.DataEntry.LabDE
         OleDbConnection _oleDbConnection;
 
         /// <summary>
-        /// Maps each <see cref="DataEntryTableRow"/> in a LabDE order table to an
-        /// <see cref="FAMOrderRow"/> instance to manage access to related FAM DB data.
+        /// Maps each <see cref="DataEntryTableRow"/> in a LabDE table to an
+        /// <see cref="DocumentDataRecord"/> instance to manage access to related FAM DB data.
         /// </summary>
-        Dictionary<DataEntryTableRow, FAMOrderRow> _rowData =
-            new Dictionary<DataEntryTableRow, FAMOrderRow>();
+        Dictionary<DataEntryTableRow, DocumentDataRecord> _rowData =
+            new Dictionary<DataEntryTableRow, DocumentDataRecord>();
 
         /// <summary>
-        /// Cached info for the most recently accessed orders from the FAM DB.
+        /// Cached info for the most recently accessed records from the FAM DB.
         /// </summary>
-        DataCache<string, OrderInfo> _orderInfoCache = new DataCache<string, OrderInfo>(100, null);
+        DataCache<string, DocumentDataRecordInfo> _recordInfoCache = new DataCache<string, DocumentDataRecordInfo>(100, null);
 
         /// <summary>
-        /// A single-quoted list of order numbers that are currently assigned in the UI.
+        /// A single-quoted list of record IDs that are currently assigned in the UI.
         /// </summary>
-        List<string> _alreadyMappedOrderNumbers = null;
+        List<string> _alreadyMappedRecordIDs = null;
 
         #endregion Fields
 
@@ -131,27 +53,6 @@ namespace Extract.DataEntry.LabDE
             try
             {
                 FileProcessingDB = fileProcessingDB;
-
-                // Initialize defaults.
-                PatientMRNAttribute = _DEFAULT_PATIENT_MRN_ATTRIBUTE;
-                OrderCodeAttribute = _DEFAULT_ORDER_CODE_ATTRIBUTE;
-                CollectionDateAttribute = _DEFAULT_COLLECTION_DATE_ATTRIBUTE;
-                CollectionTimeAttribute = _DEFAULT_COLLECTION_TIME_ATTRIBUTE;
-
-                OrderQueryColumns = new OrderedDictionary();
-                OrderQueryColumns.Add("Order Number", "[LabDEOrder].[OrderNumber]");
-                OrderQueryColumns.Add("Order Name", _ORDER_NAME_XPATH);
-                OrderQueryColumns.Add("Patient", "[LabDEPatient].LastName + ', ' + [LabDEPatient].FirstName");
-                OrderQueryColumns.Add("Ordered By",
-                    "(" + _ORDER_PROVIDER_LAST_NAME_XPATH + " + ', ' + " + _ORDER_PROVIDER_FIRST_NAME_XPATH + ")");
-                OrderQueryColumns.Add("Request Date/Time", "[LabDEOrder].[ReferenceDateTime]");
-                OrderQueryColumns.Add("Collection Date/Time", "[LabDEOrderFile].[CollectionDate]");
-
-                ColorQueryConditions = new OrderedDictionary();
-                ColorQueryConditions.Add("Red", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) = 0");
-                ColorQueryConditions.Add("Yellow", "COUNT(CASE WHEN ([OrderStatus] = '*') THEN 1 END) >= " +
-                    "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END)");
-                ColorQueryConditions.Add("Lime", "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END) > 0");
 
                 AttributeStatusInfo.DataReset += HandleAttributeStatusInfo_DataReset;
             }
@@ -187,107 +88,9 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets or sets the attribute path for the attribute containing the order number. The path
-        /// should either be rooted or be relative to the LabDE Order attribute.
+        /// The data configuration
         /// </summary>
-        /// <value>
-        /// The attribute path for the attribute containing the order number.
-        /// </value>
-        public string OrderNumberAttribute
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the attribute path for the attribute containing the patient MRN. The path
-        /// should either be rooted or be relative to the LabDE Order attribute.
-        /// </summary>
-        /// <value>
-        /// The attribute path for the attribute containing the patient MRN.
-        /// </value>
-        public string PatientMRNAttribute
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the attribute path for the attribute containing the order code. The path
-        /// should either be rooted or be relative to the LabDE Order attribute.
-        /// </summary>
-        /// <value>
-        /// The attribute path for the attribute containing the order code.
-        /// </value>
-        public string OrderCodeAttribute
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the attribute path for the attribute containing the collection date. The
-        /// path should either be rooted or be relative to the LabDE Order attribute.
-        /// </summary>
-        /// <value>
-        /// The attribute path for the attribute containing the collection date.
-        /// </value>
-        public string CollectionDateAttribute
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the attribute path for the attribute containing the collection time. The
-        /// path should either be rooted or be relative to the LabDE Order attribute.
-        /// </summary>
-        /// <value>
-        /// The attribute path for the attribute containing the collection time.
-        /// </value>
-        public string CollectionTimeAttribute
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether unavailable orders should be displayed in the
-        /// picker UI.
-        /// </summary>
-        /// <value><see langword="true"/> if unavailable orders should be displayed; otherwise,
-        /// <see langword="false"/>.
-        /// </value>
-        public bool ShowUnavailableOrders
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets an SQL query that selects order numbers based on additional custom criteria
-        /// above having a matching MRN and order code.
-        /// </summary>
-        /// <value>
-        /// An SQL query that selects order numbers based on additional custom criteria
-        /// </value>
-        public string CustomOrderMatchCriteriaQuery
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the definitions of the columns for the order selection grid. The keys are
-        /// the column names and the values are  an SQL query part that selects the appropriate data
-        /// from the [LabDEOrder] table. 
-        /// <para><b>Note</b></para>
-        /// The OrderNumber field must be selected as the first column.
-        /// </summary>
-        /// <value>
-        /// The definitions of the columns for the order selection grid.
-        /// </value>
-        public OrderedDictionary OrderQueryColumns
+        public IFAMDataConfiguration DataConfiguration
         {
             get;
             set;
@@ -295,10 +98,10 @@ namespace Extract.DataEntry.LabDE
 
         /// <summary>
         /// Gets a value indicating whether this instance currently has any
-        /// <see cref="FAMOrderRow"/> instances.
+        /// <see cref="DocumentDataRecord"/> instances.
         /// </summary>
         /// <value><see langword="true"/> if this instance has any
-        /// <see cref="FAMOrderRow"/> instance; otherwise, <see langword="false"/>.
+        /// <see cref="DocumentDataRecord"/> instance; otherwise, <see langword="false"/>.
         /// </value>
         public bool HasRowData
         {
@@ -309,349 +112,41 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets or sets the different possible status colors for the buttons and their SQL query
-        /// conditions. The keys are the color name (from <see cref="System.Drawing.Color"/>) while
-        /// the values are SQL query expression that evaluates to true if the color should be used
-        /// based to indicate available order status. If multiple expressions evaluate to true, the
-        /// first of the matching rows will be used.
-        /// <para><b>Note</b></para>
-        /// The fields available to query against for each order are:
-        /// OrderNumber:        The order number.
-        /// Available:          1 if the order's status in the DB is Available, 0 if it is cancelled.
-        /// FileCount:          The number of files that have been filed against this order.
-        /// ReceivedDateTime:   The time the ORM-O01 HL7 message defining the order was received.
-        /// ReferenceDateTime:  A configurable date/time extracted from the message (requested
-        ///                     date/time is typical).
+        /// Gets the currently loaded <see cref="DocumentDataRecord"/> for the table's current rows.
         /// </summary>
-        /// <value>
-        /// The different possible status colors for the buttons and their SQL query conditions.
-        /// </value>
-        public OrderedDictionary ColorQueryConditions
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets a single-quoted list of order numbers that are currently assigned in the UI.
-        /// </summary>
-        public List<string> AlreadyMappedOrderNumbers
+        public IEnumerable<DocumentDataRecord> LoadedRecords
         {
             get
             {
-                if (_alreadyMappedOrderNumbers == null)
-                {
-                    _alreadyMappedOrderNumbers = _rowData.Keys
-                        .Select(row => GetAttribute(row.Attribute, OrderNumberAttribute).Value.String)
-                        .Where(orderNumber => !string.IsNullOrWhiteSpace(orderNumber))
-                        .Select(orderNumber => "'" + orderNumber + "'")
-                        .ToList();
-                }
-
-                return _alreadyMappedOrderNumbers;
+                return _rowData.Values;
             }
         }
 
         /// <summary>
-        /// Gets a <see cref="DataTable"/> listing the possibly matching orders for
-        /// the provided <see cref="FAMOrderRow"/> with the columns being those defined in
-        /// <see cref="OrderQueryColumns"/>.
+        /// Gets a single-quoted list of record IDs that are currently assigned in the UI.
         /// </summary>
-        /// <param name="order">The <see cref="FAMOrderRow"/> for which matching orders are to be
-        /// retrieved.</param>
-        /// <returns>A <see cref="DataTable"/> listing the possibly matching orders.</returns>
-        public DataTable GetMatchingOrders(FAMOrderRow order)
+        public List<string> AlreadyMappedRecordIDs
         {
-            try 
+            get
             {
-                string selectedOrderNumberQuery = GetSelectedOrderNumbersQuery(order);
-
-                // LoadOrderInfo has the side-effect of caching data from selectedOrderNumbers into
-                // _orderInfoCache
-                DataTable matchingOrderTable = LoadOrderInfo(selectedOrderNumberQuery, true);
-
-                // Cache the list of orders if they have not yet been.
-                if (order.MatchingOrderIDs == null)
+                try
                 {
-                    order.MatchingOrderIDs = new HashSet<string>(
-                        matchingOrderTable.Rows
-                            .OfType<DataRow>()
-                            .Select(row => "'" + row.ItemArray[0].ToString() + "'"));
-                }
-
-                return matchingOrderTable;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38176");
-            }
-        }
-
-        /// <summary>
-        /// Gets data all other order rows that match the criteria used for identifying potential
-        /// matching orders in the database that have not already been mapped to an order number.
-        /// </summary>
-        /// <param name="order">The <see cref="FAMOrderRow"/> for which matching order rows are
-        /// needed.
-        /// </param>
-        /// <returns>SQL queries that will select the data for the order rows into a result set that
-        /// can be joined with data for potentially matching orders in the LabDEOrder database table.
-        /// </returns>
-        List<string> GetMatchingUnmappedOrderRows(FAMOrderRow order)
-        {
-            List<string> unmappedOrders = new List<string>();
-
-            int tempID = 0;
-
-            // If this orders is missing and MRN or OrderCode, it is not possible to match to other
-            // orders.
-            if (string.IsNullOrWhiteSpace(order.OrderCode) ||
-                string.IsNullOrWhiteSpace(order.PatientMRN))
-            {
-                return unmappedOrders;
-            }
-
-            // Loop through all other order attributes
-            foreach (FAMOrderRow otherOrder in _rowData.Values.Except(new[] {order}))
-            {
-                // For each matching but unmapped row.
-                if (otherOrder.PatientMRN.Equals(order.PatientMRN, StringComparison.OrdinalIgnoreCase) &&
-                    otherOrder.OrderCode.Equals(order.OrderCode, StringComparison.OrdinalIgnoreCase) &&
-                    string.IsNullOrWhiteSpace(otherOrder.OrderNumber))
-                {
-                    // Generate an SQL statement that can select data from the UI into query results
-                    // that can be combined with actual UI data.
-                    StringBuilder unmappedOrder = new StringBuilder();
-                    unmappedOrder.Append("SELECT '*' AS [OrderNumber], ");
-
-                    unmappedOrder.Append("'");
-                    unmappedOrder.Append(order.OrderCode);
-                    unmappedOrder.Append("'");
-                    unmappedOrder.Append(" AS [OrderCode], ");
-
-                    unmappedOrder.Append("'");                    
-                    unmappedOrder.Append(order.PatientMRN);
-                    unmappedOrder.Append("'"); 
-                    unmappedOrder.Append(" AS [PatientMRN], ");
-
-                    unmappedOrder.Append("GETDATE() AS [ReceivedDateTime], ");
-
-                    unmappedOrder.Append("'*' AS [OrderStatus], ");
-
-                    unmappedOrder.Append("GETDATE() AS [ReferenceDateTime], ");
-
-                    unmappedOrder.Append("'' AS [ORMMessage], ");
-
-                    // TempID is a special column used to prevent these rows from being grouped in
-                    // the context of GetOrdersStatusColor's DB query.
-                    unmappedOrder.Append(tempID++.ToString(CultureInfo.InvariantCulture));
-                    unmappedOrder.AppendLine(" AS [TempID]");
-
-                    unmappedOrders.Add(unmappedOrder.ToString());
-                }
-            }
-
-            return unmappedOrders;
-        }
-
-        /// <summary>
-        /// Gets a <see cref="DataTable"/> with the orders specified by the order numbers in
-        /// <see paramref="selectedOrderNumbers"/> with the columns being those defined in
-        /// <see cref="OrderQueryColumns"/>. Info for the specified orders is also cached for
-        /// subsequent calls to <see cref="GetOrderDescription"/> or
-        /// <see cref="GetCorrespondingFileIDs"/>.
-        /// </summary>
-        /// <param name="selectedOrderNumbers">A comma delimited list of order numbers to be
-        /// returned or an SQL query that selects the order numbers to be returned.</param>
-        /// <param name="selectViaQuery"><see langword="true"/> if
-        /// <see paramref="selectedOrderNumbers"/> represents an SQL query to select the
-        /// appropriate order numbers, <see langword="false"/> if the order numbers are specified
-        /// via a comma separated list (in which case the order numbers should be single-quoted for
-        /// proper string comparisons).</param>
-        /// <returns>A <see cref="DataTable"/> listing specified orders.</returns>
-        public DataTable LoadOrderInfo(string selectedOrderNumbers, bool selectViaQuery)
-        {
-            ExtractException.Assert("ELI38151",
-                "Order query columns have not been properly defined.",
-                OrderQueryColumns.Count > 0 &&
-                OrderQueryColumns[0].ToString().ToUpperInvariant().Contains("ORDERNUMBER"));
-
-            // If selectedOrderNumbers is a query, select the results into a table that can be
-            // joined with LabDEOrderFile.
-            string declarationsClause = "";
-            if (selectViaQuery)
-            {
-                declarationsClause = "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
-                    "INSERT INTO @OrderNumbers\r\n" + selectedOrderNumbers;
-            }
-
-            string columnsClause = string.Join(", \r\n",
-                OrderQueryColumns
-                    .OfType<DictionaryEntry>()
-                    .Select(column => column.Value + " AS [" + column.Key + "]"));
-
-            // Add a query against [LabDEOrderFile].[FileID] behind the scenes here to be able to collect
-            // and return correspondingFileIds.
-            string query = declarationsClause + "\r\n\r\n" +
-                "SELECT " + columnsClause + "\r\n, [LabDEOrderFile].[FileID]\r\n " +
-                "FROM [LabDEOrder] \r\n" +
-                "INNER JOIN [LabDEPatient] p ON [LabDEOrder].[PatientMRN] = p.[MRN] \r\n" +
-                "INNER JOIN [LabDEPatient] ON p.[CurrentMRN] = [LabDEPatient].[MRN] \r\n" +
-                "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] \r\n" +
-                (selectViaQuery
-                    ? "INNER JOIN @OrderNumbers ON [LabDEOrder].[OrderNumber] = [@OrderNumbers].[OrderNumber]"
-                    : "WHERE [LabDEOrder].[OrderNumber] IN (" + selectedOrderNumbers + ")");
-
-            string lastOrderNumber = null;
-            using (DataTable results = DBMethods.ExecuteDBQuery(OleDbConnection, query))
-            {
-                // The results will contain both an extra column (FileID) not expected by the
-                // caller, as well as potentially multiple rows per order for orders for which
-                // multiple files have been submitted. Generate the eventual return value as a
-                // copy of results to initialize the columns, but we will then manually copy only
-                // the rows expected by the caller.
-                DataTable matchingOrders = results.Copy();
-                matchingOrders.Rows.Clear();
-
-                // Remove the FileID column that was not specified by OrderQueryColumns, but rather
-                // used behind the scenes to compile correspondingFileIds.
-                matchingOrders.Columns.Remove("FileID");
-
-                OrderInfo orderInfo = null;
-
-                // Loop to copy a single row per distinct order into matchingOrders.
-                foreach (DataRow row in results.Rows)
-                {
-                    string orderNumber = row.ItemArray[0].ToString();
-                    if (orderNumber != lastOrderNumber)
+                    if (_alreadyMappedRecordIDs == null)
                     {
-                        matchingOrders.ImportRow(row);
-                        lastOrderNumber = orderNumber;
-
-                        // Cache the order info for GetOrderDescription or GetCorrespondingFileIds.
-                        orderInfo = new OrderInfo();
-                        orderInfo.Description = string.Join("\r\n", matchingOrders.Columns
-                            .OfType<DataColumn>()
-                            .Select(column => column.ColumnName + ": " +
-                                row.ItemArray[column.Ordinal].ToString()));
-                        orderInfo.CorrespondingFileIDs = new List<int>();
-                        
-                        _orderInfoCache.CacheData(orderNumber, orderInfo);
-                     }
-
-                    // Collect all associated file IDs for the current order.
-                    object fileIdValue = row.ItemArray.Last();
-                    if (!(fileIdValue is System.DBNull))
-                    {
-                        orderInfo.CorrespondingFileIDs.Add((int)fileIdValue);
+                        _alreadyMappedRecordIDs = _rowData.Values
+                            .Select(row => row.IdField.Value)
+                            .Where(id => !string.IsNullOrWhiteSpace(id))
+                            .Select(id => "'" + id + "'")
+                            .ToList();
                     }
+
+                    return _alreadyMappedRecordIDs;
                 }
-
-                return matchingOrders;
-            }
-        }
-
-        /// <summary>
-        /// Gets a <see cref="Color"/> that indicating availability of matching orders for the
-        /// provided <see cref="FAMOrderRow"/>.
-        /// </summary>
-        /// <param name="order">The <see cref="FAMOrderRow"/> for which a status color is needed.
-        /// </param>
-        /// <returns>A <see cref="Color"/> that indicating availability of matching orders for the
-        /// provided <see cref="FAMOrderRow"/> or <see langword="null"/> if there is no color that
-        /// reflects the current status.</returns>
-        public Color? GetOrdersStatusColor(FAMOrderRow order)
-        {
-            ExtractException.Assert("ELI38152",
-                "Order query columns have not been properly defined.",
-                ColorQueryConditions.Count > 0);   
-                
-            // Select the matching order numbers into a table variable.                
-            string declarationsClause =
-                "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
-                    "INSERT INTO @OrderNumbers\r\n" + GetSelectedOrderNumbersQuery(order);
-
-            // If we haven't yet cached the order numbers, set up query components to retrieve the
-            // possibly matching orders from the database.
-            string columnsClause = "";
-            if (order.MatchingOrderIDs == null)
-            {
-                // Create a column to select the order numbers in a comma delimited format that can
-                // be re-used in subsequent queries.
-                columnsClause =
-                    "(SELECT CAST([OrderNumber] AS NVARCHAR(20)) + ''','''  " +
-                        "FROM @OrderNumbers FOR XML PATH('')) [OrderNumbers], \r\n";
-            }
-
-            // Convert ColorQueryConditions into a clause that will return 1 when the expression
-            // evaluates as true.
-            columnsClause +=
-                string.Join(", \r\n", ColorQueryConditions
-                    .OfType<DictionaryEntry>()
-                    .Select(column =>
-                        "CASE WHEN (" + column.Value + ") THEN 1 ELSE 0 END AS [" + column.Key + "]"));
-
-            // Queries to select data all other order rows that would match to the same LabDEOrder
-            // table rows.
-            List<string> unmappedOrders = GetMatchingUnmappedOrderRows(order);
-
-            // Aggregate the data returned by a query for potentially matching orders (including
-            // unmapped orders currently in the UI into fields accessible to the ColorQueryConditions.
-            string orderDataQuery =
-                "SELECT [CombinedOrders].[OrderNumber], \r\n" +
-                "MAX([CombinedOrders].[OrderStatus]) AS [OrderStatus], \r\n" +
-                "COUNT([LabDEOrderFile].[FileID]) AS [FileCount], \r\n" +
-                "MAX([CombinedOrders].[ReceivedDateTime]) AS [ReceivedDateTime], \r\n" +
-                "MAX([CombinedOrders].[ReferenceDateTime]) AS [ReferenceDateTime] \r\n" +
-                "FROM ( \r\n" +
-                // TempID is a special column used to prevent these matching unmapped rows from
-                // being grouped together.
-                "SELECT [OrderNumber], [OrderCode], [PatientMRN], [ReceivedDateTime], [OrderStatus], "+
-                "[ReferenceDateTime], [ORMMessage], NULL AS [TempID] FROM [LabDEOrder] \r\n" +
-                (unmappedOrders.Any()
-                    ? "UNION ALL\r\n" + string.Join("\r\nUNION ALL\r\n", unmappedOrders)
-                    : "") +
-                ") AS [CombinedOrders]\r\n" +
-                "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [CombinedOrders].[OrderNumber] \r\n" +
-                "INNER JOIN @OrderNumbers ON [CombinedOrders].[OrderNumber] = [@OrderNumbers].[OrderNumber] " +
-                    "OR [CombinedOrders].[OrderNumber] = '*'\r\n" +
-                (AlreadyMappedOrderNumbers.Any()
-                    ? "WHERE ([CombinedOrders].[OrderNumber] NOT IN (" + string.Join(",", AlreadyMappedOrderNumbers) + "))\r\n"
-                    : "") +
-                // Group by TempID as well so that all matching orders from the UI end up as separate rows.
-                "GROUP BY [CombinedOrders].[OrderNumber], [CombinedOrders].[TempID]";
-
-            string colorQuery = declarationsClause + "\r\n\r\n" +
-                "SELECT " + columnsClause + " FROM (\r\n" + orderDataQuery + "\r\n) AS [OrderData]";
-
-            // Iterate the columns of the resulting row to find the first color for which the
-            // configured condition evaluates to true.
-            using (DataTable results = DBMethods.ExecuteDBQuery(OleDbConnection, colorQuery))
-            {
-                DataRow resultsRow = results.Rows[0];
-
-                // Cache the order numbers if they have not already been.
-                if (order.MatchingOrderIDs == null)
+                catch (Exception ex)
                 {
-                    order.MatchingOrderIDs = (resultsRow["OrderNumbers"] == DBNull.Value)
-                        ? new HashSet<string>()
-                        : new HashSet<string>(
-                        // Remove trailing ',' then surround with apostrophes
-                            ("'" + resultsRow["OrderNumbers"].ToString().TrimEnd(new[] { ',', '\'' }) + "'")
-                            .Split(','));
-                }
-
-                foreach (string color in ColorQueryConditions.Keys)
-                {
-                    if (resultsRow.Field<int>(color) == 1)
-                    {
-                        return (Color)typeof(Color).GetProperty(color).GetValue(null, null);
-                    }
+                    throw ex.AsExtract("ELI41516");
                 }
             }
-
-            // If the condition was not true for any color, return null.
-            return null;
         }
 
         #endregion Properties
@@ -659,14 +154,89 @@ namespace Extract.DataEntry.LabDE
         #region Methods
 
         /// <summary>
-        /// Gets a <see cref="FAMOrderRow"/> instance that provides access to FAM database data for
+        /// Gets a <see cref="DataTable"/> with the records specified by <see paramref="recordIDs"/>.
+        /// Info for the records is cached for subsequent calls to <see cref="GetRecordDescription"/> or
+        /// <see cref="GetCorrespondingFileIDs"/>.
+        /// </summary>
+        /// <param name="recordIDs">A comma delimited list of record IDs to be returned or an SQL
+        /// query that selects the record numbers to be returned.</param>
+        /// <param name="queryForRecordIDs"><see langword="true"/> if
+        /// <see paramref="recordIDs"/> represents an SQL query to select the appropriate record IDs,
+        /// <see langword="false"/> if the record IDs are specified via a comma separated list (in
+        /// which case the record IDs should be single-quoted for proper string comparisons).
+        /// </param>
+        /// <returns>A <see cref="DataTable"/> listing specified records.</returns>
+        public DataTable LoadRecordInfo(string recordIDs, bool queryForRecordIDs)
+        {
+            try
+            {
+                var recordInfoQuery = DataConfiguration.GetRecordInfoQuery(recordIDs, queryForRecordIDs);
+
+                string lastRecordID = null;
+                using (DataTable results = DBMethods.ExecuteDBQuery(OleDbConnection, recordInfoQuery))
+                {
+                    // The results will contain both an extra column (FileID) not expected by the
+                    // caller, as well as potentially multiple rows per record for records for which
+                    // multiple files have been submitted. Generate the eventual return value as a
+                    // copy of results to initialize the columns, but we will then manually copy only
+                    // the rows expected by the caller.
+                    DataTable matchingRecords = results.Copy();
+                    matchingRecords.Rows.Clear();
+
+                    // Remove the FileID column that was not specified by recordInfoQuery, but rather
+                    // used behind the scenes to compile correspondingFileIds.
+                    matchingRecords.Columns.Remove("FileID");
+
+                    DocumentDataRecordInfo recordInfo = null;
+
+                    // Loop to copy a single row per distinct record into matchingRecords.
+                    foreach (DataRow row in results.Rows
+                        .OfType<DataRow>()
+                        .OrderBy(row => row.ItemArray[0].ToString()))
+                    {
+                        string recordID = row.ItemArray[0].ToString();
+                        if (recordID != lastRecordID)
+                        {
+                            matchingRecords.ImportRow(row);
+                            lastRecordID = recordID;
+
+                            // Cache the record info for GetRecordDescription or GetCorrespondingFileIds.
+                            recordInfo = new DocumentDataRecordInfo();
+                            recordInfo.Description = string.Join("\r\n", matchingRecords.Columns
+                                .OfType<DataColumn>()
+                                .Select(column => column.ColumnName + ": " +
+                                    row.ItemArray[column.Ordinal].ToString()));
+                            recordInfo.CorrespondingFileIDs = new List<int>();
+
+                            _recordInfoCache.CacheData(recordID, recordInfo);
+                        }
+
+                        // Collect all associated file IDs for the current record.
+                        object fileIdValue = row.ItemArray.Last();
+                        if (!(fileIdValue is System.DBNull))
+                        {
+                            recordInfo.CorrespondingFileIDs.Add((int)fileIdValue);
+                        }
+                    }
+
+                    return matchingRecords;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41515");
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="DocumentDataRecord"/> instance that provides access to FAM database data for
         /// the specified <see paramref="dataEntryRow"/>.
         /// </summary>
         /// <param name="dataEntryRow">The <see cref="DataEntryTableRow"/> for which data is needed.
         /// </param>
-        /// <returns>a <see cref="FAMOrderRow"/> instance that provides access to FAM database data.
+        /// <returns>a <see cref="DocumentDataRecord"/> instance that provides access to FAM database data.
         /// </returns>
-        public FAMOrderRow GetRowData(DataEntryTableRow dataEntryRow)
+        public DocumentDataRecord GetRowData(DataEntryTableRow dataEntryRow)
         {
             try
             {
@@ -675,37 +245,26 @@ namespace Extract.DataEntry.LabDE
                     return null;
                 }
 
-                // Create a new FAMOrderRow instance if one does not already exist for this row.
-                bool newRow = false;
-                FAMOrderRow rowData = null;
+                // Create a new DocumentDataRecord instance if one does not already exist for this row.
+                DocumentDataRecord rowData = null;
                 if (!_rowData.TryGetValue(dataEntryRow, out rowData))
                 {
-                    newRow = true;
-                    rowData = new FAMOrderRow(this, dataEntryRow);
+                    rowData = DataConfiguration.CreateDocumentDataRecord(
+                        this, dataEntryRow, dataEntryRow.Attribute);
                     _rowData[dataEntryRow] = rowData;
-                    
-                    rowData.OrderAttribute = dataEntryRow.Attribute;
                     rowData.RowDataUpdated += HandleRowData_DataUpdated;
+
+                    // After initially creating a new DocumentDataRecord, raise OnRowDataUpdated so
+                    // the record picker column will know of the record ID's initial value (if
+                    // the record ID exists).
+                    OnRowDataUpdated(new RowDataUpdatedArgs(rowData,
+                        !string.IsNullOrWhiteSpace(rowData.IdField.Value)));
                 }
-
-                // Provide rowData instance with access to the attributes that currently represent
-                // the MRN and order code for the selected row.
-                rowData.PatientMRNAttribute =
-                    GetAttribute(dataEntryRow.Attribute, PatientMRNAttribute);
-                rowData.OrderCodeAttribute =
-                    GetAttribute(dataEntryRow.Attribute, OrderCodeAttribute);
-                rowData.OrderNumberAttribute =
-                    GetAttribute(dataEntryRow.Attribute, OrderNumberAttribute);
-
-                if (newRow)
+                else
                 {
-                    // After initially creating a new FAMOrderRow, raise OnRowDataUpdated so the
-                    // order picker column will know of the order number's initial value (if the
-                    // order number exists).
-                    OnRowDataUpdated(new RowDataUpdatedArgs(rowData, 
-                        !string.IsNullOrWhiteSpace(rowData.OrderNumber)));
+                    rowData.Attribute = dataEntryRow.Attribute;
                 }
-                
+
                 return rowData;
             }
             catch (Exception ex)
@@ -715,21 +274,20 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets a text description for the specified <see paramref="orderNumber"/>. The description
-        /// is built using <see cref="OrderQueryColumns"/>.
+        /// Gets a text description for the specified <see paramref="recordID"/>. 
         /// </summary>
-        /// <param name="orderNumber">The order for which a description is needed.</param>
-        /// <returns>A text description of the order.</returns>
-        public string GetOrderDescription(string orderNumber)
+        /// <param name="recordID">The record ID for which a description is needed.</param>
+        /// <returns>A text description of the record.</returns>
+        public string GetRecordDescription(string recordID)
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(orderNumber))
+                if (!string.IsNullOrWhiteSpace(recordID))
                 {
-                    OrderInfo orderInfo = GetOrderInfo(orderNumber);
-                    if (orderInfo != null)
+                    DocumentDataRecordInfo recordInfo = GetRecordInfo(recordID);
+                    if (recordInfo != null)
                     {
-                        return orderInfo.Description;
+                        return recordInfo.Description;
                     }
                 }
 
@@ -742,22 +300,57 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets the file IDs for files that have already been filed against
-        /// <see paramref="orderNumber"/> in LabDE.
+        /// Gets a <see cref="DataTable"/> listing the possibly matching FAM DB records for
+        /// the provided <see cref="DocumentDataRecord"/> with the columns being those defined by
+        /// the query returned by <see cref="IFAMDataConfiguration.GetRecordInfoQuery"/>
         /// </summary>
-        /// <param name="orderNumber">The order number.</param>
-        /// <returns>The file IDs for files that have already been filed against the order number.
-        /// </returns>
-        public IEnumerable<int> GetCorrespondingFileIDs(string orderNumber)
+        /// <param name="record">The <see cref="DocumentDataRecord"/> for which matching records are to be
+        /// retrieved.</param>
+        /// <returns>A <see cref="DataTable"/> listing the possibly matching records.</returns>
+        public DataTable GetMatchingRecords(DocumentDataRecord record)
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(orderNumber))
+                string selectedRecordIDsQuery = record.GetSelectedRecordIDsQuery();
+
+                // LoadRecordInfo has the side-effect of caching data from selectedRecordIDsQuery into
+                // _recordInfoCache
+                DataTable matchingRecordTable = LoadRecordInfo(selectedRecordIDsQuery, true);
+
+                // Cache the list of records if they have not yet been.
+                if (record.MatchingRecordIDs == null)
                 {
-                    OrderInfo orderInfo = GetOrderInfo(orderNumber);
-                    if (orderInfo != null)
+                    record.MatchingRecordIDs = new HashSet<string>(
+                        matchingRecordTable.Rows
+                            .OfType<DataRow>()
+                            .Select(row => "'" + row.ItemArray[0].ToString() + "'"));
+                }
+
+                return matchingRecordTable;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38176");
+            }
+        }
+
+        /// <summary>
+        /// Gets the file IDs for files that have already been filed against
+        /// <see paramref="recordID"/> in LabDE.
+        /// </summary>
+        /// <param name="recordID">The record ID.</param>
+        /// <returns>The file IDs for files that have already been filed against the record ID.
+        /// </returns>
+        public IEnumerable<int> GetCorrespondingFileIDs(string recordID)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(recordID))
+                {
+                    DocumentDataRecordInfo recordInfo = GetRecordInfo(recordID);
+                    if (recordInfo != null)
                     {
-                        return orderInfo.CorrespondingFileIDs;
+                        return recordInfo.CorrespondingFileIDs;
                     }
                 }
 
@@ -770,7 +363,7 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Deletes any <see cref="FAMOrderRow"/> being managed for the specified
+        /// Deletes any <see cref="DocumentDataRecord"/> being managed for the specified
         /// <see paramref="dataEntryRow"/>.
         /// </summary>
         /// <param name="dataEntryRow">The <see cref="DataEntryTableRow"/> for which data should be
@@ -784,7 +377,7 @@ namespace Extract.DataEntry.LabDE
                     return;
                 }
 
-                FAMOrderRow rowData = null;
+                DocumentDataRecord rowData = null;
                 if (_rowData.TryGetValue(dataEntryRow, out rowData))
                 {
                     rowData.RowDataUpdated -= HandleRowData_DataUpdated;
@@ -819,104 +412,48 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets the descriptions of all orders currently in <see cref="_rowData"/> that have
+        /// Gets the descriptions of all records currently in <see cref="_rowData"/> that have
         /// previously been submitted via LabDE.
         /// </summary>
-        /// <returns>The descriptions of all orders on the active document that have previously been
-        /// submitted.</returns>
-        public IEnumerable<string> GetPreviouslySubmittedOrders()
+        /// <returns>The descriptions of all records on the active document that have previously
+        /// been submitted.</returns>
+        public IEnumerable<string> GetPreviouslySubmittedRecords()
         {
-            foreach (KeyValuePair<DataEntryTableRow, FAMOrderRow> rowData in _rowData)
+            foreach (var documentDataRecord in _rowData.Values)
             {
-                string orderNumber =
-                    GetAttribute(rowData.Key.Attribute, OrderNumberAttribute).Value.String;
+                string id = documentDataRecord.IdField.Value;
 
-                OrderInfo orderInfo = GetOrderInfo(orderNumber);
-                if (orderInfo != null && orderInfo.CorrespondingFileIDs.Any()) 
+                DocumentDataRecordInfo recordInfo = GetRecordInfo(id);
+                if (recordInfo != null && recordInfo.CorrespondingFileIDs.Any()) 
                 {
-                    yield return orderInfo.Description;
+                    yield return recordInfo.Description;
                 }
             }
         }
 
         /// <summary>
-        /// Links the orders currently in <see cref="_rowData"/> with <see paramref="fileId"/>
-        /// FAM DB (via the LabDEOrderFile table). If the link already exists, the collection date
-        /// will be modified if necessary to match the currently specified collection date.
+        /// Links the records currently in <see cref="_rowData"/> with <see paramref="fileId"/>
+        /// in the FAM DB. If the link already exists, the link will be updated as appropriate for
+        /// the new record.
         /// </summary>
-        /// <param name="fileId">The fileId the orders should be linked to.</param>
-        public void LinkFileWithCurrentOrders(int fileId)
+        /// <param name="fileId">The fileId the records should be linked to.</param>
+        public void LinkFileWithCurrentRecords(int fileId)
         {
             try
             {
-                foreach (KeyValuePair<DataEntryTableRow, FAMOrderRow> rowData in _rowData)
+                foreach (var rowData in _rowData)
                 {
-                    if (string.IsNullOrWhiteSpace(rowData.Value.OrderNumber))
+                    if (string.IsNullOrWhiteSpace(rowData.Value.IdField.Value))
                     {
                         continue;
                     }
 
-                    IAttribute collectionDateAttribute =
-                        GetAttribute(rowData.Key.Attribute, CollectionDateAttribute);
-
-                    if (collectionDateAttribute == null)
-                    {
-                        continue;
-                    }
-                        
-                    IAttribute collectionTimeAttribute =
-                        GetAttribute(rowData.Key.Attribute, CollectionTimeAttribute);
-                    DateTime collectionDateTime = DateTime.Parse(
-                        collectionDateAttribute.Value.String + " " + collectionTimeAttribute.Value.String,
-                        CultureInfo.CurrentCulture);
-
-                    LinkFileWithOrder(rowData.Value.OrderNumber, fileId, collectionDateTime);
+                    rowData.Value.LinkFileWithRecord(fileId);
                 }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38183");
-            }
-        }
-
-        /// <summary>
-        /// Links the specified <see paramref="orderNumber"/> with <see paramref="fileId"/>.
-        /// If the link already exists, the collection date time of the order will be modified if
-        /// necessary to match <see paramref="collectionDateTime"/>.
-        /// </summary>
-        /// <param name="orderNumber">The order number to link to the <see paramref="fileId"/>
-        /// </param>
-        /// <param name="fileId">The file ID to link to the <see paramref="orderNumber"/>.</param>
-        /// <param name="collectionDateTime">The collection date time to assign to the link.</param>
-        public void LinkFileWithOrder(string orderNumber, int fileId, DateTime collectionDateTime)
-        {
-            try
-            {
-                string query = string.Format(CultureInfo.CurrentCulture,
-                    "DECLARE @linkExists INT \r\n" +
-                    "   SELECT @linkExists = COUNT([OrderNumber]) \r\n" +
-                    "       FROM [LabDEOrderFile] WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
-                    "IF @linkExists = 1 \r\n" +
-                    "BEGIN \r\n" +
-                    "    UPDATE [LabDEOrderFile] SET [CollectionDate] = {2} \r\n" +
-                    "        WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
-                    "END \r\n" +
-                    "ELSE \r\n" +
-                    "BEGIN \r\n" +
-                    "    IF {0} IN (SELECT [OrderNumber] FROM [LabDEOrder]) \r\n" +
-                    "    BEGIN \r\n" +
-                    "        INSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID], [CollectionDate]) \r\n" +
-                    "            VALUES ({0}, {1}, {2}) \r\n" +
-                    "   END \r\n" +
-                    "END",
-                    "'" + orderNumber + "'", fileId, "'" + collectionDateTime + "'");
-
-                // The query has no results-- immediately dispose of the DataTable returned.
-                DBMethods.ExecuteDBQuery(OleDbConnection, query).Dispose();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38184");
             }
         }
 
@@ -931,13 +468,13 @@ namespace Extract.DataEntry.LabDE
             {
                 if (clearDatabaseData)
                 {
-                    _orderInfoCache.Clear();
+                    _recordInfoCache.Clear();
                 }
 
-                // _alreadyMappedOrderNumbers is generated from date in the UI, not the DB.
-                _alreadyMappedOrderNumbers = null;
+                // _alreadyMappedRecordNumbers is generated from date in the UI, not the DB.
+                _alreadyMappedRecordIDs = null;
 
-                foreach (FAMOrderRow row in _rowData.Values)
+                foreach (DocumentDataRecord row in _rowData.Values)
                 {
                     row.ClearCachedData(clearDatabaseData);
                 }
@@ -946,6 +483,16 @@ namespace Extract.DataEntry.LabDE
             {
                 throw ex.AsExtract("ELI38193");
             }
+        }
+
+        /// <summary>
+        /// Executes the database query.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public DataTable ExecuteDBQuery(string query)
+        {
+            return DBMethods.ExecuteDBQuery(OleDbConnection, query);
         }
 
         #endregion Methods
@@ -991,8 +538,8 @@ namespace Extract.DataEntry.LabDE
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="FAMOrderRow.RowDataUpdated"/> event of one of the
-        /// <see cref="FAMOrderRow"/>s from <see cref="_rowData"/>.
+        /// Handles the <see cref="DocumentDataRecord.RowDataUpdated"/> event of one of the
+        /// <see cref="DocumentDataRecord"/>s from <see cref="_rowData"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
@@ -1063,114 +610,31 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Retrieves the <see cref="OrderInfo"/> for the specified <see paramref="orderNumber"/>.
+        /// Retrieves the <see cref="DocumentDataRecordInfo"/> for the specified <see paramref="recordID"/>.
         /// </summary>
-        /// <param name="orderNumber">The order number for which info should be retrieved.</param>
+        /// <param name="recordID">The record ID for which info should be retrieved.</param>
         /// <returns>
-        /// The <see cref="OrderInfo"/> for the specified <see paramref="orderNumber"/>.
+        /// The <see cref="DocumentDataRecordInfo"/> for the specified <see paramref="recordID"/>.
         /// </returns>
-        OrderInfo GetOrderInfo(string orderNumber)
+        DocumentDataRecordInfo GetRecordInfo(string recordID)
         {
-            OrderInfo orderInfo = null;
+            DocumentDataRecordInfo recordInfo = null;
 
-            // First attempt to get the order info from the cache.
-            if (!string.IsNullOrWhiteSpace(orderNumber) &&
-                !_orderInfoCache.TryGetData(orderNumber, out orderInfo))
+            // First attempt to get the record info from the cache.
+            if (!string.IsNullOrWhiteSpace(recordID) &&
+                !_recordInfoCache.TryGetData(recordID, out recordInfo))
             {
-                // If there's not cached info on-hand for this order, load it from the DB now.
+                // If there's not cached info on-hand for this record, load it from the DB now.
                 // The resulting DataTable is not needed; immediately dispose of it.
-                // Order number is a string field; single quotes should be used for SQL
-                // string comparisons.
-                LoadOrderInfo("'" + orderNumber + "'", false).Dispose();
+                // Record ID will be a string field; single quotes should be used for SQL string
+                // comparisons.
+                LoadRecordInfo("'" + recordID + "'", false).Dispose();
 
-                // The order info should now be cached if the order exists.
-                _orderInfoCache.TryGetData(orderNumber, out orderInfo);
+                // The record info should now be cached if the record exists.
+                _recordInfoCache.TryGetData(recordID, out recordInfo);
             }
 
-            return orderInfo;
-        }
-
-        /// <summary>
-        /// Gets an SQL query that retrieves possibly matching order numbers for the specified
-        /// <see paramref="order"/>.
-        /// </summary>
-        /// <returns>An SQL query that retrieves possibly matching order numbers for the specified.
-        /// </returns>
-        string GetSelectedOrderNumbersQuery(FAMOrderRow order)
-        {
-            string selectedOrderNumbersQuery = null;
-
-            if (order.MatchingOrderIDs != null)
-            {
-                // If the matching order IDs have been cached, select them directly rather than
-                //querying for them.
-                if (order.MatchingOrderIDs.Count > 0)
-                {
-                    selectedOrderNumbersQuery = string.Join("\r\nUNION\r\n",
-                        order.MatchingOrderIDs
-                            .Select(orderNum => "SELECT " + orderNum));
-                }
-                else
-                {
-                    // https://extract.atlassian.net/browse/ISSUE-13003
-                    // In the case that we've cached MatchingOrderIDs, but there are none, use a
-                    // query of "SELECT NULL"-- without anything at all an SQL syntax error will
-                    // result when selectedOrderNumbersQuery is plugged into a larger query.
-                    selectedOrderNumbersQuery = "SELECT NULL";
-                }
-            }
-            else if (!string.IsNullOrWhiteSpace(order.PatientMRN) &&
-                !string.IsNullOrWhiteSpace(order.OrderCode))
-            {
-                List<string> queryParts = new List<string>();
-                queryParts.Add("SELECT [OrderNumber] FROM [LabDEOrder] " +
-                    "INNER JOIN [LabDEPatient] ON [PatientMRN] = [MRN] " +
-                    "WHERE [CurrentMRN] = '" + order.PatientMRN.Replace("'", "''") + "'");
-                queryParts.Add("SELECT [OrderNumber] FROM [LabDEOrder] " +
-                    "WHERE [OrderCode] = '" + order.OrderCode.Replace("'", "''") + "'");
-
-                if (!ShowUnavailableOrders)
-                {
-                    queryParts.Add("SELECT [LabDEOrder].[OrderNumber] FROM [LabDEOrder] " +
-                        "WHERE [OrderStatus] = 'A'");
-                }
-                if (!string.IsNullOrWhiteSpace(CustomOrderMatchCriteriaQuery))
-                {
-                    queryParts.Add(CustomOrderMatchCriteriaQuery);
-                }
-
-                selectedOrderNumbersQuery = string.Join("\r\nINTERSECT\r\n", queryParts);
-            }
-            else
-            {
-                // If missing MRN or order code, prevent any orders from being looked up.
-                selectedOrderNumbersQuery = 
-                    "SELECT [LabDEOrder].[OrderNumber] FROM [LabDEOrder] WHERE 1 = 0";
-            }
-
-            return selectedOrderNumbersQuery;
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IAttribute"/> indicated by the specified
-        /// <see paramref="attributeQuery"/>.
-        /// </summary>
-        /// <param name="orderAttribute">The <see cref="IAttribute"/> that represents the order for
-        /// which <see paramref="attributeQuery"/> is relevant.</param>
-        /// <param name="attributeQuery">The attribute query.</param>
-        /// <returns>The <see cref="IAttribute"/> indicated by the specified
-        /// <see paramref="attributeQuery"/>.</returns>
-        static IAttribute GetAttribute(IAttribute orderAttribute, string attributeQuery)
-        {
-            // If attributeQuery is root-relative, set orderAttribute so that the query is not
-            // evaluated relative to it.
-            if (attributeQuery.StartsWith("/", StringComparison.Ordinal))
-            {
-                orderAttribute = null;
-            }
-
-            return AttributeStatusInfo.ResolveAttributeQuery(orderAttribute, attributeQuery)
-                .SingleOrDefault();
+            return recordInfo;
         }
 
         /// <summary>
@@ -1179,13 +643,34 @@ namespace Extract.DataEntry.LabDE
         /// <param name="e">The <see cref="RowDataUpdatedArgs"/> representing this event.</param>
         void OnRowDataUpdated(RowDataUpdatedArgs e)
         {
-            if (RowDataUpdated != null)
-            {
-                RowDataUpdated(this, e);
-            }
+            RowDataUpdated?.Invoke(this, e);
         }
 
         #endregion Private Members
+    }
+
+    /// <summary>
+    /// Information regarding a record in the FAM DB.
+    /// </summary>
+    internal class DocumentDataRecordInfo
+    {
+        /// <summary>
+        /// A description of the record.
+        /// </summary>
+        public string Description
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The FAM file IDs for files that have already been filed against this record.
+        /// </summary>
+        public List<int> CorrespondingFileIDs
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
@@ -1197,31 +682,31 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Initializes a new instance of the <see cref="RowDataUpdatedArgs"/> class.
         /// </summary>
-        /// <param name="rowData">The <see cref="FAMOrderRow"/> for which data was updated.</param>
-        /// <param name="orderNumberUpdated"><see langword="true"/> if the order number has been
+        /// <param name="rowData">The <see cref="DocumentDataRecord"/> for which data was updated.</param>
+        /// <param name="recordIdUpdated"><see langword="true"/> if the record ID has been
         /// changed; otherwise, <see langword="false"/>.</param>
-        public RowDataUpdatedArgs(FAMOrderRow rowData, bool orderNumberUpdated)
+        public RowDataUpdatedArgs(DocumentDataRecord rowData, bool recordIdUpdated)
             : base()
         {
-            FAMOrderRow = rowData;
-            OrderNumberUpdated = orderNumberUpdated;
+            DocumentDataRecord = rowData;
+            RecordIdUpdated = recordIdUpdated;
         }
 
         /// <summary>
-        /// The <see cref="FAMOrderRow"/> for which data was updated.
+        /// The <see cref="DocumentDataRecord"/> for which data was updated.
         /// </summary>
-        public FAMOrderRow FAMOrderRow
+        public DocumentDataRecord DocumentDataRecord
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the order number has been changed.
+        /// Gets or sets a value indicating whether the record ID has been changed.
         /// </summary>
-        /// <value><see langword="true"/> if the order number has been changed; otherwise, 
+        /// <value><see langword="true"/> if the record ID has been changed; otherwise, 
         /// <see langword="false"/>.</value>
-        public bool OrderNumberUpdated
+        public bool RecordIdUpdated
         {
             get;
             private set;

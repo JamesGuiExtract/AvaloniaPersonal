@@ -60,6 +60,11 @@ namespace Extract.DataEntry.LabDE
         FAMData _famData;
 
         /// <summary>
+        /// The data configuration
+        /// </summary>
+        OrderDataConfiguration _dataConfiguration;
+
+        /// <summary>
         /// Indicates whether there is a pending request to invalidate the column (to force a
         /// re-paint).
         /// </summary>
@@ -70,7 +75,7 @@ namespace Extract.DataEntry.LabDE
         /// to enforce that auto-population of order numbers only happens regarding changes that
         /// directly affect the row rather than as a side-effect of edits to other rows.
         /// </summary>
-        HashSet<FAMOrderRow> _autoPopulationExemptions = new HashSet<FAMOrderRow>();
+        HashSet<DocumentDataRecord> _autoPopulationExemptions = new HashSet<DocumentDataRecord>();
 
         /// <summary>
         /// Specifies whether the current instance is running in design mode
@@ -137,7 +142,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The attribute path for the attribute containing the patient MRN.
         /// </value>
-        [DefaultValue(FAMData._DEFAULT_PATIENT_MRN_ATTRIBUTE)]
+        [DefaultValue(OrderDataConfiguration._DEFAULT_PATIENT_MRN_ATTRIBUTE_PATH)]
         [Category(_PROPERTY_GRID_CATEGORY)]
         public string PatientMRNAttribute
         {
@@ -145,7 +150,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    return FAMData.PatientMRNAttribute;
+                    return DataConfiguration.PatientMRNAttributePath;
                 }
                 catch (Exception ex)
                 {
@@ -157,7 +162,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    FAMData.PatientMRNAttribute = value;
+                    DataConfiguration.PatientMRNAttributePath = value;
                 }
                 catch (Exception ex)
                 {
@@ -173,7 +178,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The attribute path for the attribute containing the order code.
         /// </value>
-        [DefaultValue(FAMData._DEFAULT_ORDER_CODE_ATTRIBUTE)]
+        [DefaultValue(OrderDataConfiguration._DEFAULT_ORDER_CODE_ATTRIBUTE_PATH)]
         [Category(_PROPERTY_GRID_CATEGORY)]
         public string OrderCodeAttribute
         {
@@ -181,7 +186,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    return FAMData.OrderCodeAttribute;
+                    return DataConfiguration.OrderCodeAttributePath;
                 }
                 catch (Exception ex)
                 {
@@ -193,7 +198,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    FAMData.OrderCodeAttribute = value;
+                    DataConfiguration.OrderCodeAttributePath = value;
                 }
                 catch (Exception ex)
                 {
@@ -209,7 +214,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The attribute path for the attribute containing the collection date.
         /// </value>
-        [DefaultValue(FAMData._DEFAULT_COLLECTION_DATE_ATTRIBUTE)]
+        [DefaultValue(OrderDataConfiguration._DEFAULT_COLLECTION_DATE_ATTRIBUTE_PATH)]
         [Category(_PROPERTY_GRID_CATEGORY)]
         public string CollectionDateAttribute
         {
@@ -217,7 +222,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    return FAMData.CollectionDateAttribute;
+                    return DataConfiguration.CollectionDateAttributePath;
                 }
                 catch (Exception ex)
                 {
@@ -229,7 +234,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    FAMData.CollectionDateAttribute = value;
+                    DataConfiguration.CollectionDateAttributePath = value;
                 }
                 catch (Exception ex)
                 {
@@ -245,7 +250,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The attribute path for the attribute containing the collection time.
         /// </value>
-        [DefaultValue(FAMData._DEFAULT_COLLECTION_TIME_ATTRIBUTE)]
+        [DefaultValue(OrderDataConfiguration._DEFAULT_COLLECTION_TIME_ATTRIBUTE_PATH)]
         [Category(_PROPERTY_GRID_CATEGORY)]
         public string CollectionTimeAttribute
         {
@@ -253,7 +258,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    return FAMData.CollectionTimeAttribute;
+                    return DataConfiguration.CollectionTimeAttributePath;
                 }
                 catch (Exception ex)
                 {
@@ -265,7 +270,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    FAMData.CollectionTimeAttribute = value;
+                    DataConfiguration.CollectionTimeAttributePath = value;
                 }
                 catch (Exception ex)
                 {
@@ -289,7 +294,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    return FAMData.ShowUnavailableOrders;
+                    return DataConfiguration.ShowUnavailableOrders;
                 }
                 catch (Exception ex)
                 {
@@ -301,7 +306,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    FAMData.ShowUnavailableOrders = value;
+                    DataConfiguration.ShowUnavailableOrders = value;
                 }
                 catch (Exception ex)
                 {
@@ -324,7 +329,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    return FAMData.CustomOrderMatchCriteriaQuery;
+                    return DataConfiguration.CustomOrderMatchCriteriaQuery;
                 }
                 catch (Exception ex)
                 {
@@ -336,7 +341,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    FAMData.CustomOrderMatchCriteriaQuery = value;
+                    DataConfiguration.CustomOrderMatchCriteriaQuery = value;
                 }
                 catch (Exception ex)
                 {
@@ -364,7 +369,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    return FromOrderedDictionary(FAMData.OrderQueryColumns);
+                    return FromOrderedDictionary(DataConfiguration.OrderQueryColumns);
                 }
                 catch (Exception ex)
                 {
@@ -383,7 +388,7 @@ namespace Extract.DataEntry.LabDE
                         newDictionary.Count > 0 &&
                         newDictionary[0].ToString().ToUpperInvariant().Contains("ORDERNUMBER"));
 
-                    FAMData.OrderQueryColumns = newDictionary;
+                    DataConfiguration.OrderQueryColumns = newDictionary;
                 }
                 catch (Exception ex)
                 {
@@ -419,7 +424,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    return FromOrderedDictionary(FAMData.ColorQueryConditions);
+                    return FromOrderedDictionary(DataConfiguration.ColorQueryConditions);
                 }
                 catch (Exception ex)
                 {
@@ -431,7 +436,7 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    FAMData.ColorQueryConditions = ToOrderedDictionary(value);
+                    DataConfiguration.ColorQueryConditions = ToOrderedDictionary(value);
                 }
                 catch (Exception ex)
                 {
@@ -509,7 +514,7 @@ namespace Extract.DataEntry.LabDE
             {
                 LoadDataForAllRows();
 
-                return FAMData.GetPreviouslySubmittedOrders();
+                return FAMData.GetPreviouslySubmittedRecords();
             }
             catch (Exception ex)
             {
@@ -531,7 +536,7 @@ namespace Extract.DataEntry.LabDE
                 string currentFileName = DataEntryControlHost.ImageViewer.ImageFile;
                 int fileId = FileProcessingDB.GetFileID(currentFileName);
 
-                FAMData.LinkFileWithCurrentOrders(fileId);
+                FAMData.LinkFileWithCurrentRecords(fileId);
             }
             catch (Exception ex)
             {
@@ -670,8 +675,6 @@ namespace Extract.DataEntry.LabDE
                 _orderNumberColumn = DataGridView.Columns
                     .OfType<DataEntryTableColumn>()
                     .SingleOrDefault(column => column.Name == OrderNumberColumn);
-
-                FAMData.OrderNumberAttribute = _orderNumberColumn.AttributeName;
             }
             catch (Exception ex)
             {
@@ -717,7 +720,7 @@ namespace Extract.DataEntry.LabDE
 
                         var orderNumberCell = dataEntryRow.Cells[_orderNumberColumn.Index];
                         var orderNumber = orderNumberCell.Value.ToString();
-                        FAMOrderRow rowData = FAMData.GetRowData(dataEntryRow);
+                        DocumentDataRecord rowData = FAMData.GetRowData(dataEntryRow);
                         if (string.IsNullOrWhiteSpace(orderNumber) &&
                             rowData != null && rowData.StatusColor.HasValue)
                         {
@@ -841,27 +844,29 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                var row = e.FAMOrderRow.DataEntryTableRow;
+                var row = e.DocumentDataRecord.DataEntryTableRow;
                 if (row != null)
                 {
                     var cell = row.Cells[Index];
                     if (cell != null && cell.DataGridView == DataGridView)
                     {
+                        DocumentDataOrderRecord orderRecord = (DocumentDataOrderRecord)e.DocumentDataRecord;
+
                         ClearCachedData(false);
 
                         // If the order number has changed, update the tooltip text for the order
                         // number and picker cells to be a summary of the currently selected order.
-                        if (e.OrderNumberUpdated)
+                        if (e.RecordIdUpdated)
                         {
                             // If the row number specifically is being changed, block
                             // auto-population to prevent a deleted order number from being
                             // automatically replaced.
-                            _autoPopulationExemptions.Add(e.FAMOrderRow);
+                            _autoPopulationExemptions.Add(e.DocumentDataRecord);
 
                             var dataEntryTable = DataGridView as DataEntryTableBase;
                             if (dataEntryTable != null)
                             {
-                                IAttribute orderNumberAttribute = e.FAMOrderRow.OrderNumberAttribute;
+                                IAttribute orderNumberAttribute = orderRecord.IdField.Attribute;
                                 IDataEntryTableCell orderCell =
                                     dataEntryTable.GetAttributeUIElement(orderNumberAttribute)
                                         as IDataEntryTableCell;
@@ -870,7 +875,7 @@ namespace Extract.DataEntry.LabDE
                                     DataGridViewCell pickerButtonCell =
                                         orderCell.AsDataGridViewCell.OwningRow.Cells[Index];
                                     string orderDescription =
-                                        FAMData.GetOrderDescription(e.FAMOrderRow.OrderNumber);
+                                        FAMData.GetRecordDescription(orderRecord.IdField.Value);
                                     orderCell.AsDataGridViewCell.ToolTipText = orderDescription;
                                     pickerButtonCell.ToolTipText = orderDescription;
                                 }
@@ -879,9 +884,9 @@ namespace Extract.DataEntry.LabDE
                         // If an edit is being made that directly affects this row and the order
                         // number has not yet been filled in, allow the edit to auto-populate an
                         // order number (if applicable).
-                        else if (string.IsNullOrWhiteSpace(e.FAMOrderRow.OrderNumber))
+                        else if (string.IsNullOrWhiteSpace(orderRecord.IdField.Value))
                         {
-                            _autoPopulationExemptions.Remove(e.FAMOrderRow);
+                            _autoPopulationExemptions.Remove(e.DocumentDataRecord);
                         }
 
                         InvokeInvalidate();
@@ -970,12 +975,26 @@ namespace Extract.DataEntry.LabDE
                 if (_famData == null)
                 {
                     _famData = new FAMData(FileProcessingDB);
+                    _famData.DataConfiguration = DataConfiguration;
                     _famData.RowDataUpdated += HandleFamData_RowDataUpdated;
                 }
 
                 _famData.FileProcessingDB = FileProcessingDB;
 
                 return _famData;
+            }
+        }
+
+        OrderDataConfiguration DataConfiguration
+        {
+            get
+            {
+                if (_dataConfiguration == null)
+                {
+                    _dataConfiguration = new OrderDataConfiguration();
+                }
+
+                return _dataConfiguration;
             }
         }
 
@@ -1002,7 +1021,7 @@ namespace Extract.DataEntry.LabDE
         /// </returns>
         string ShowPickerFFI(DataEntryTableRow dataEntryRow, string defaultOrderNumber)
         {
-            FAMOrderRow rowData = FAMData.GetRowData(dataEntryRow);
+            DocumentDataRecord rowData = FAMData.GetRowData(dataEntryRow);
             if (rowData != null)
             {
                 using (var fileInspectorForm = new FAMFileInspectorForm())
@@ -1070,7 +1089,7 @@ namespace Extract.DataEntry.LabDE
 
             foreach (DataGridViewRow tableRow in DataGridView.Rows)
             {
-                FAMOrderRow rowData = FAMData.GetRowData(tableRow as DataEntryTableRow);
+                DocumentDataRecord rowData = FAMData.GetRowData(tableRow as DataEntryTableRow);
                 var orderNumberCell = tableRow.Cells[_orderNumberColumn.Index];
 
                 // Only consider rows for which we have data, currently do not have an order number
@@ -1080,7 +1099,7 @@ namespace Extract.DataEntry.LabDE
                 {
                     // Get a view for all un-mapped matching orders that qualify under
                     // AutoSelectionFilter.
-                    using (DataTable table = rowData.UnmappedMatchingOrders.ToTable())
+                    using (DataTable table = rowData.UnmappedMatchingRecords.ToTable())
                     using (DataView view = new DataView(table))
                     {
                         if (!string.IsNullOrWhiteSpace(AutoSelectionFilter))

@@ -123,7 +123,7 @@ namespace Extract.DataEntry.LabDE
             {
                 var disposableSource = _ordersDataGridView.DataSource as IDisposable;
 
-                _ordersDataGridView.DataSource = RowData.UnmappedMatchingOrders;
+                _ordersDataGridView.DataSource = RowData.UnmappedMatchingRecords;
 
                 if (disposableSource != null)
                 {
@@ -319,10 +319,10 @@ namespace Extract.DataEntry.LabDE
         #region Internal Members
 
         /// <summary>
-        /// The <see cref="FAMOrderRow"/> that is used to retrieve and cache order information for
+        /// The <see cref="DocumentDataRecord"/> that is used to retrieve and cache order information for
         /// the currently selected <see cref="DataEntryTableRow"/>.
         /// </summary>
-        internal FAMOrderRow RowData
+        internal DocumentDataRecord RowData
         {
             get;
             set;
@@ -413,7 +413,7 @@ namespace Extract.DataEntry.LabDE
             if (string.IsNullOrWhiteSpace(orderNumberToSelect) &&
                 !string.IsNullOrWhiteSpace(AutoSelectionFilter))
             {
-                using (DataTable selectionTable = RowData.UnmappedMatchingOrders.ToTable())
+                using (DataTable selectionTable = RowData.UnmappedMatchingRecords.ToTable())
                 using (DataView selectionView = new DataView(selectionTable))
                 {
                     selectionView.RowFilter = AutoSelectionFilter;
