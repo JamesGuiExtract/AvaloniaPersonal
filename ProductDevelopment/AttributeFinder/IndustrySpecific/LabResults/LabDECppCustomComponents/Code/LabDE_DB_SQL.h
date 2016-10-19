@@ -71,7 +71,7 @@ static const string gstrCREATE_ENCOUNTER_TABLE =
 static const string gstrADD_FK_ENCOUNTER_PATIENT =
 "ALTER TABLE [dbo].[LabDEEncounter] "
 " WITH CHECK ADD CONSTRAINT[FK_Encounter_Patient] FOREIGN KEY([PatientMRN]) "
-" REFERENCES[dbo].[LabDEPatient]([MRN]) "
+" REFERENCES [dbo].[LabDEPatient]([MRN]) "
 " ON UPDATE CASCADE "
 " ON DELETE CASCADE";
 
@@ -174,6 +174,79 @@ static const string gstrCREATE_ORDERFILE_ORDER_INDEX =
 
 static const string gstrCREATE_ORDERFILE_FAMFILE_INDEX =
     "CREATE NONCLUSTERED INDEX [IX_OrderFile_FAMFile] ON [LabDEOrderFile]([FileID])";
+
+//--------------------------------------------------------------------------------------------------
+// LabDEEncounterFile Table
+//--------------------------------------------------------------------------------------------------
+static const string gstrLABDE_ENCOUNTER_FILE_TABLE = "LabDEEncounterFile";
+
+static const string gstrCREATE_ENCOUNTER_FILE_TABLE =
+"CREATE TABLE [dbo].[LabDEEncounterFile]( "
+" [EncounterID] NVARCHAR(20) NOT NULL, "
+" [FileID] INT NOT NULL, "
+" [DateTime] DATETIME, "
+" CONSTRAINT [PK_EncounterFile] PRIMARY KEY CLUSTERED "
+" ( "
+"	[EncounterID], "
+"	[FileID]"
+" ))";
+
+static const string gstrADD_FK_ENCOUNTERFILE_ENCOUNTER =
+"ALTER TABLE [dbo].[LabDEEncounterFile]  "
+" WITH CHECK ADD CONSTRAINT [FK_EncounterFile_EncounterID] FOREIGN KEY ([EncounterID]) "
+" REFERENCES [dbo].[LabDEEncounter] ([CSN])"
+" ON UPDATE CASCADE "
+" ON DELETE CASCADE";
+
+static const string gstrADD_FK_ENCOUNTERFILE_FAMFILE =
+"ALTER TABLE [dbo].[LabDEEncounterFile]  "
+" WITH CHECK ADD CONSTRAINT [FK_EncounterFile_FAMFile] FOREIGN KEY ([FileID]) "
+" REFERENCES [dbo].[FAMFile] ([ID])"
+" ON UPDATE CASCADE "
+" ON DELETE CASCADE";
+
+static const string gstrCREATE_ENCOUNTERFILE_ENCOUNTER_INDEX =
+"CREATE NONCLUSTERED INDEX [IX_EncounterFile_Encounter] ON [LabDEEncounterFile]([EncounterID])";
+
+static const string gstrCREATE_ENCOUNTERFILE_FAMFILE_INDEX =
+"CREATE NONCLUSTERED INDEX [IX_EncounterFile_FAMFile] ON [LabDEEncounterFile]([FileID])";
+
+
+//--------------------------------------------------------------------------------------------------
+// LabDEPatientFile Table
+//--------------------------------------------------------------------------------------------------
+static const string gstrLABDE_PATIENT_FILE_TABLE = "LabDEPatientFile";
+
+static const string gstrCREATE_PATIENT_FILE_TABLE =
+"CREATE TABLE [dbo].[LabDEPatientFile]( "
+" [PatientMRN] NVARCHAR(20) NOT NULL, "
+" [FileID] INT NOT NULL, "
+" [DateTime] DATETIME, "
+" CONSTRAINT [PK_PatientFile] PRIMARY KEY CLUSTERED "
+" ( "
+"	[PatientMRN], "
+"	[FileID]"
+" ))";
+
+static const string gstrADD_FK_PATIENTFILE_PATIENT =
+"ALTER TABLE [dbo].[LabDEPatientFile] "
+" WITH CHECK ADD CONSTRAINT [FK_PatientFile_PatientMRN] FOREIGN KEY ([PatientMRN]) "
+" REFERENCES [dbo].[LabDEPatient]([MRN]) "
+" ON UPDATE CASCADE "
+" ON DELETE CASCADE";
+
+static const string gstrADD_FK_PATIENTFILE_FAMFILE =
+"ALTER TABLE [dbo].[LabDEPatientFile]  "
+" WITH CHECK ADD CONSTRAINT [FK_PatientFile_FAMFile] FOREIGN KEY ([FileID]) "
+" REFERENCES [dbo].[FAMFile] ([ID])"
+" ON UPDATE CASCADE "
+" ON DELETE CASCADE";
+
+static const string gstrCREATE_PATIENTFILE_PATIENT_INDEX =
+"CREATE NONCLUSTERED INDEX [IX_PatientFile_Encounter] ON [LabDEPatientFile]([PatientMRN])";
+
+static const string gstrCREATE_PATIENTFILE_FAMFILE_INDEX =
+"CREATE NONCLUSTERED INDEX [IX_EncounterFile_FAMFile] ON [LabDEPatientFile]([FileID])";
 
 //--------------------------------------------------------------------------------------------------
 // Stored procedures
