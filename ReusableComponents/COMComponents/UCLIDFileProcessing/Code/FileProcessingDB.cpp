@@ -1066,8 +1066,34 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		// Query to create the database
 		string strCreateDB = "CREATE DATABASE [" + m_strDatabaseName + "]";
 
-		// Execute the query to create the new database
-		ipDBConnection->Execute(strCreateDB.c_str(), NULL, adCmdText | adExecuteNoRecords);
+		try
+		{
+			try
+			{
+				// Execute the query to create the new database
+				ipDBConnection->Execute(strCreateDB.c_str(), NULL, adCmdText | adExecuteNoRecords);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41506")
+		}
+		catch (UCLIDException ex)
+		{
+			// ISSUE-13625
+			// FAMDBAdmin: DB creation initially fails after having tried to create a DB that already exists
+			// Remove the connection from the connection map on error, so it isn't re-used, as at this
+			// point it is a connection to an existing database, not a new database.
+			//
+			try
+			{
+				ipDBConnection->Close();
+
+				DWORD dwThreadID = GetCurrentThreadId();
+				CSingleLock lg(&m_mutex, TRUE);
+				m_mapThreadIDtoDBConnections.erase(dwThreadID);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41507")
+
+			throw ex;
+		}
 
 		// Close the connections
 		ipDBConnection->Close();
