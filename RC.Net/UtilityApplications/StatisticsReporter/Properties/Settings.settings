@@ -2,35 +2,38 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="StatisticsReporter.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="EndDateTime" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">1970-01-01</Value>
-    </Setting>
-    <Setting Name="ExpectedAttributeSetName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">N/A</Value>
-    </Setting>
-    <Setting Name="FoundAttributeSetName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">N/A</Value>
+    <Setting Name="EndDateTime" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1/1/3000</Value>
     </Setting>
     <Setting Name="IncludeFilesIfNoExpectedVoa" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="StartDateTime" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">1970-01-01</Value>
+    <Setting Name="StartDateTime" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1/1/1970</Value>
     </Setting>
     <Setting Name="TypeOfStatistics" Type="System.String" Scope="User">
       <Value Profile="(Default)">DataCapture</Value>
     </Setting>
     <Setting Name="XPathOfAttributesToIgnore" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\*\ignore</Value>
+      <Value Profile="(Default)">/*//*[not(.//text())]</Value>
     </Setting>
     <Setting Name="XPathOfContainerOnlyAttributes" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\*\container</Value>
+      <Value Profile="(Default)">/*//*[not(text()) or text()='N/A']</Value>
+    </Setting>
+    <Setting Name="ExpectedAttributeSetName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Expected</Value>
+    </Setting>
+    <Setting Name="FoundAttributeSetName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Found</Value>
     </Setting>
     <Setting Name="DatabaseName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">None</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DatabaseServerName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">None</Value>
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ReportOutputFileName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

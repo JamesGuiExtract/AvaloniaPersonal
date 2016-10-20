@@ -25,37 +25,13 @@ namespace StatisticsReporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1970-01-01")]
-        public global::System.DateTime EndDateTime {
+        [global::System.Configuration.DefaultSettingValueAttribute("1/1/3000")]
+        public string EndDateTime {
             get {
-                return ((global::System.DateTime)(this["EndDateTime"]));
+                return ((string)(this["EndDateTime"]));
             }
             set {
                 this["EndDateTime"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("N/A")]
-        public string ExpectedAttributeSetName {
-            get {
-                return ((string)(this["ExpectedAttributeSetName"]));
-            }
-            set {
-                this["ExpectedAttributeSetName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("N/A")]
-        public string FoundAttributeSetName {
-            get {
-                return ((string)(this["FoundAttributeSetName"]));
-            }
-            set {
-                this["FoundAttributeSetName"] = value;
             }
         }
         
@@ -73,10 +49,10 @@ namespace StatisticsReporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1970-01-01")]
-        public global::System.DateTime StartDateTime {
+        [global::System.Configuration.DefaultSettingValueAttribute("1/1/1970")]
+        public string StartDateTime {
             get {
-                return ((global::System.DateTime)(this["StartDateTime"]));
+                return ((string)(this["StartDateTime"]));
             }
             set {
                 this["StartDateTime"] = value;
@@ -97,7 +73,7 @@ namespace StatisticsReporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\*\\ignore")]
+        [global::System.Configuration.DefaultSettingValueAttribute("/*//*[not(.//text())]")]
         public string XPathOfAttributesToIgnore {
             get {
                 return ((string)(this["XPathOfAttributesToIgnore"]));
@@ -109,7 +85,7 @@ namespace StatisticsReporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\*\\container")]
+        [global::System.Configuration.DefaultSettingValueAttribute("/*//*[not(text()) or text()=\'N/A\']")]
         public string XPathOfContainerOnlyAttributes {
             get {
                 return ((string)(this["XPathOfContainerOnlyAttributes"]));
@@ -121,7 +97,31 @@ namespace StatisticsReporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("None")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Expected")]
+        public string ExpectedAttributeSetName {
+            get {
+                return ((string)(this["ExpectedAttributeSetName"]));
+            }
+            set {
+                this["ExpectedAttributeSetName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Found")]
+        public string FoundAttributeSetName {
+            get {
+                return ((string)(this["FoundAttributeSetName"]));
+            }
+            set {
+                this["FoundAttributeSetName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string DatabaseName {
             get {
                 return ((string)(this["DatabaseName"]));
@@ -133,13 +133,25 @@ namespace StatisticsReporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("None")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string DatabaseServerName {
             get {
                 return ((string)(this["DatabaseServerName"]));
             }
             set {
                 this["DatabaseServerName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ReportOutputFileName {
+            get {
+                return ((string)(this["ReportOutputFileName"]));
+            }
+            set {
+                this["ReportOutputFileName"] = value;
             }
         }
     }

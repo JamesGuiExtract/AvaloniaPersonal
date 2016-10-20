@@ -3,6 +3,9 @@
 #include <zlib.h>
 #include <vector>
 
+#pragma warning(push)
+#pragma warning(disable : 4251)
+
 class EXT_ZLIB_UTILS_DLL Deflater
 {
 public:
@@ -35,3 +38,5 @@ private:
 	std::vector<unsigned char> m_buffer;
 	std::vector<unsigned char> m_result;
 };
+
+#pragma warning(pop)
