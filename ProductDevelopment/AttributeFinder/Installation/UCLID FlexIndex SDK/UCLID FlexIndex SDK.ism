@@ -4281,7 +4281,7 @@
 		<row><td>ID_STRING35</td><td>0</td><td>CONFIG~1|Configure Email Settings</td><td>0</td><td/><td>178112137</td></row>
 		<row><td>ID_STRING35</td><td>1033</td><td>CONFIG~1|Configure Email Settings</td><td>0</td><td/><td>-912409910</td></row>
 		<row><td>ID_STRING36</td><td>0</td><td>[ProductName] requires that your computer is running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>-979544531</td></row>
-		<row><td>ID_STRING36</td><td>1033</td><td>[ProductName] requires that your computer be running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>186539561</td></row>
+		<row><td>ID_STRING36</td><td>1033</td><td>[ProductName] requires that your computer be running Windows Vista SP2, Windows Server 2008 R2, Windows 7 SP1, Windows 8 or Windows 10</td><td>0</td><td/><td>-1524318002</td></row>
 		<row><td>ID_STRING37</td><td>0</td><td>NEWSHO~1|NewShortcut15</td><td>0</td><td/><td>-1331801781</td></row>
 		<row><td>ID_STRING37</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331775157</td></row>
 		<row><td>ID_STRING38</td><td>0</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331819989</td></row>
@@ -4607,7 +4607,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 	<table name="LaunchCondition">
 		<col key="yes" def="s255">Condition</col>
 		<col def="l255">Description</col>
-		<row><td>(Not Version9X=400) And (Not Version9X=410) And (Not Version9X=490) And (Not VersionNT=400) And (Not VersionNT=500)</td><td>##ID_STRING36##</td></row>
+		<row><td>(VersionNT=600 AND ServicePackLevel&gt;=2 AND MsiNTProductType=1) OR (VersionNT=601 AND ServicePackLevel&gt;=1) OR (VersionNT=601 AND MsiNTProductType=3) OR (VersionNT &gt;=602)</td><td>##ID_STRING36##</td></row>
 	</table>
 
 	<table name="ListBox">
