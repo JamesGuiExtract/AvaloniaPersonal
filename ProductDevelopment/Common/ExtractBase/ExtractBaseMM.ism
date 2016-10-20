@@ -1325,6 +1325,10 @@ QwBEAFIATwBNAAEATQBlAGQAaQBhAA==
 		<col key="yes" def="s255">RequiredID</col>
 		<col key="yes" def="i2">RequiredLanguage</col>
 		<col def="S32">RequiredVersion</col>
+		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC100_ATL_x86.AFA96EB4_FA9F_335C_A7CB_36079407553D</td><td>0</td><td>10.0</td></row>
+		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC100_CRT_x86.AFA96EB4_FA9F_335C_A7CB_36079407553D</td><td>0</td><td>10.0</td></row>
+		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC100_MFCLOC_x86.AFA96EB4_FA9F_335C_A7CB_36079407553D</td><td>0</td><td>10.0</td></row>
+		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC100_MFC_x86.AFA96EB4_FA9F_335C_A7CB_36079407553D</td><td>0</td><td>10.0</td></row>
 		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC140_CRT_x86.EC55875F_6DF4_3DBD_A117_4A27D8F55B9B</td><td>0</td><td>14.0</td></row>
 		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC140_MFCLOC_x86.5840D246_3D34_3071_9C86_D071F20CB55F</td><td>0</td><td>14.0</td></row>
 		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC140_MFC_x86.5840D246_3D34_3071_9C86_D071F20CB55F</td><td>0</td><td>14.0</td></row>
