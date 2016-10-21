@@ -3152,7 +3152,7 @@
 		<row><td>ID_STRING28</td><td>1033</td><td>CONVER~1|Convert FAM Database</td><td>0</td><td/><td>370922414</td></row>
 		<row><td>ID_STRING29</td><td>1033</td><td>CONFIG~1|Configure Email Settings</td><td>0</td><td/><td>-912450806</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>Documentation</td><td>0</td><td/><td>-216449551</td></row>
-		<row><td>ID_STRING30</td><td>1033</td><td>[ProductName] requires that your computer be running Windows Vista SP2, Windows Server 2008 R2, Windows 7 SP1, Windows 8 or Windows 10</td><td>0</td><td/><td>-1524345683</td></row>
+		<row><td>ID_STRING30</td><td>1033</td><td>[ProductName] requires that your computer be running Windows Vista SP2, Windows Server 2008 SP2 or R2, Windows 7 SP1, Windows 8 or Windows 10 or later</td><td>0</td><td/><td>-1390094647</td></row>
 		<row><td>ID_STRING31</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331803989</td></row>
 		<row><td>ID_STRING32</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331770293</td></row>
 		<row><td>ID_STRING33</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>555630608</td></row>
@@ -3445,7 +3445,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 	<table name="LaunchCondition">
 		<col key="yes" def="s255">Condition</col>
 		<col def="l255">Description</col>
-		<row><td>(VersionNT=600 AND ServicePackLevel&gt;=2 AND MsiNTProductType=1) OR (VersionNT=601 AND ServicePackLevel&gt;=1) OR (VersionNT=601 AND MsiNTProductType=3) OR (VersionNT &gt;=602)</td><td>##ID_STRING30##</td></row>
+		<row><td>(VersionNT=600 AND ServicePackLevel&gt;=2) OR (VersionNT=601 AND ServicePackLevel&gt;=1) OR (VersionNT=601 AND MsiNTProductType=3) OR (VersionNT &gt;=602)</td><td>##ID_STRING30##</td></row>
 	</table>
 
 	<table name="ListBox">

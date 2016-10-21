@@ -3086,7 +3086,7 @@
 		<row><td>ID_STRING21</td><td>1033</td><td>FAMNET~1|FAM Network Manager</td><td>0</td><td/><td>-1717418965</td></row>
 		<row><td>ID_STRING22</td><td>1033</td><td>TESTTE~1|Test Text Function Expander</td><td>0</td><td/><td>-1717418933</td></row>
 		<row><td>ID_STRING23</td><td>1033</td><td>DETECT~1|Detect and Report Failure</td><td>0</td><td/><td>-1717408661</td></row>
-		<row><td>ID_STRING24</td><td>1033</td><td>[ProductName] requires that your computer be running Windows Vista SP2, Windows Server 2008 R2, Windows 7 SP1, Windows 8 or Windows 10</td><td>0</td><td/><td>-1524345139</td></row>
+		<row><td>ID_STRING24</td><td>1033</td><td>[ProductName] requires that your computer be running Windows Vista SP2, Windows Server 2008 SP2 or R2, Windows 7 SP1, Windows 8 or Windows 10 or later</td><td>0</td><td/><td>-1390135575</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>NEWSHO~1|NewShortcut1</td><td>0</td><td/><td>1788699080</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>VIEWEX~1|View Exception Log</td><td>0</td><td/><td>-576664821</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>VOAFIL~1|VOA File Viewer</td><td>0</td><td/><td>1788719624</td></row>
@@ -3368,7 +3368,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 	<table name="LaunchCondition">
 		<col key="yes" def="s255">Condition</col>
 		<col def="l255">Description</col>
-		<row><td>(VersionNT=600 AND ServicePackLevel&gt;=2 AND MsiNTProductType=1) OR (VersionNT=601 AND ServicePackLevel&gt;=1) OR (VersionNT=601 AND MsiNTProductType=3) OR (VersionNT &gt;=602)</td><td>##ID_STRING24##</td></row>
+		<row><td>(VersionNT=600 AND ServicePackLevel&gt;=2) OR (VersionNT=601 AND ServicePackLevel&gt;=1) OR (VersionNT=601 AND MsiNTProductType=3) OR (VersionNT &gt;=602)</td><td>##ID_STRING24##</td></row>
 	</table>
 
 	<table name="ListBox">
