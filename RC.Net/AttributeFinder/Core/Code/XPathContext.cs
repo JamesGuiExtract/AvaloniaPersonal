@@ -420,7 +420,7 @@ namespace Extract.AttributeFinder
                             // If there is an attribute associated with this node, it will have a parent
                             IAttribute parent = null;
                             nav.MoveToParent();
-                            var parentNode = ((IHasXmlNode)nav).GetNode();
+                            var parentNode = currentHasNode.GetNode();
                             _nodeToAttributeMap.TryGetValue(parentNode, out parent);
 
                             return new { attribute, node, parent, parentNode };
@@ -615,7 +615,10 @@ namespace Extract.AttributeFinder
             foreach (var attribute in attributes.ToIEnumerable<IAttribute>())
             {
                 var xmlElement = parentElement.OwnerDocument.CreateElement(attribute.Name);
-                xmlElement.InnerText = attribute.Value.String;
+                if (!string.IsNullOrEmpty(attribute.Value.String))
+                {
+                    xmlElement.InnerText = attribute.Value.String;
+                }
                 parentElement.AppendChild(xmlElement);
                 nodeToAttributeMap[xmlElement] = attribute;
                 attributeToNodeMap[attribute] = xmlElement;

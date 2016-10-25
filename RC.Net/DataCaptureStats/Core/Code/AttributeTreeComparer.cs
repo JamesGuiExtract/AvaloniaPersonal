@@ -1,14 +1,10 @@
-﻿using Extract;
-using Extract.AttributeFinder;
+﻿using Extract.AttributeFinder;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.DataCaptureStats
 {
@@ -19,11 +15,12 @@ namespace Extract.DataCaptureStats
     {
         #region Constants
 
-        public const string DefaultIgnoreXPath = "";
-        public const string DefaultContainerXPath = "/*//*[text()='' or text()='N/A']";
+        // By default ignore any empty attributes with only empty children (or no children)
+        public const string DefaultIgnoreXPath = "/*//*[not(.//text())]";
+        public const string DefaultContainerXPath = "/*//*[not(text()) or text()='N/A']";
 
-        private static IEqualityComparer<string> StringComparer = System.StringComparer.OrdinalIgnoreCase;
-        private static StringComparison StringComparison = System.StringComparison.OrdinalIgnoreCase;
+        private static readonly IEqualityComparer<string> StringComparer = System.StringComparer.OrdinalIgnoreCase;
+        private static readonly StringComparison StringComparison = System.StringComparison.OrdinalIgnoreCase;
 
         #endregion Constants
 

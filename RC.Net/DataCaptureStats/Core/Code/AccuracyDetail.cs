@@ -1,10 +1,6 @@
 ﻿using Extract.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Extract.DataCaptureStats
 {
@@ -20,12 +16,24 @@ namespace Extract.DataCaptureStats
     /// </summary>
     public class AccuracyDetail
     {
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccuracyDetail"/> class.
+        /// </summary>
+        /// <param name="label">The label.</param>
+        /// <param name="path">The path.</param>
+        /// <param name="value">The value.</param>
         public AccuracyDetail(AccuracyDetailLabel label, string path, int value)
         {
             Label = label;
             Path = path;
             Value = value;
         }
+
+        #endregion Constructors
+
+        #region Properties
 
         /// <summary>
         /// Gets the <see cref="AccuracyDetailLabel"/> of this instance
@@ -41,6 +49,8 @@ namespace Extract.DataCaptureStats
         /// Gets or sets the numeric value of this detail
         /// </summary>
         public int Value { get; set; }
+
+        #endregion Properties
 
         #region Overrides
 

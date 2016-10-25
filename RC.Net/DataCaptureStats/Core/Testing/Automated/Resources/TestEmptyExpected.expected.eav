@@ -1,0 +1,12 @@
+Test|
+.NonEmpty|Val
+.Empty|
+.EmptyWithEmptyChildren|
+..Empty|
+.EmptyWithNonEmptyChild|
+..Empty|
+..NonEmpty|Val
+.EmptyWithNonEmptyGrandChild|
+..Empty|
+..Empty|
+...NonEmpty|Val

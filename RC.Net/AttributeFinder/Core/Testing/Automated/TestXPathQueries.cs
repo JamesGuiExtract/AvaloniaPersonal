@@ -20,7 +20,7 @@ namespace Extract.AttributeFinder.Test
         /// <summary>
         /// The name of an embedded resource test VOA file.
         /// </summary>
-        static readonly string _TEST_DATA_FILE = "Resources.A418.tif.voa";
+        const string _TEST_DATA_FILE = "Resources.A418.tif.voa";
 
         #endregion Constants
 
@@ -365,7 +365,6 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(35, enumeration.Count());
         }
 
-
         [Test, Category("XPath")]
         public static void Test17_RemovingAllAttributes()
         {
@@ -396,14 +395,25 @@ namespace Extract.AttributeFinder.Test
             Assert.IsEmpty((string)((IEnumerable<object>)resultObject).First());
         }
 
+        // Empty attributes should not have a text node
+        // https://extract.atlassian.net/browse/ISSUE-14210
+        [Test, Category("XPath")]
+        public static void Test18_EmptyAttribute()
+        {
+            var xpathContext = GetXPathContext(path: "Resources.EmptyAttribute.voa");
+
+            var result = xpathContext.FindAllOfType<IAttribute>("//*[not(text())]");
+            Assert.AreEqual(1, result.Count());
+        }
+
         #endregion Tests
 
         #region Helper Functions
 
-        static XPathContext GetXPathContext()
+        static XPathContext GetXPathContext(string path=_TEST_DATA_FILE)
         {
             _attributes = new IUnknownVector();
-            _attributes.LoadFrom(_testImages.GetFile(_TEST_DATA_FILE), false);
+            _attributes.LoadFrom(_testImages.GetFile(path), false);
             return new XPathContext(_attributes);
         }
 

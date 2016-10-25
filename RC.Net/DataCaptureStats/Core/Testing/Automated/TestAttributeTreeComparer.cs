@@ -1,10 +1,7 @@
-﻿using Extract.DataCaptureStats;
-using Extract.Testing.Utilities;
+﻿using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
@@ -737,6 +734,27 @@ namespace Extract.DataCaptureStats.Test
             var result = AttributeTreeComparer.CompareAttributes(_expected, _found,
                 containerXPath: containerXPath)
                 .ToArray();
+            CollectionAssert.AreEquivalent(expectedResult, result);
+        }
+
+        // Test handling of empty attribute via the default ignore pattern (should be treated as if it weren't there)
+        [Test, Category("AttributeTreeComparer")]
+        public static void TestEmptyExpectedAttribute()
+        {
+            SetFiles("Resources.TestEmptyExpected.found.eav", "Resources.TestEmptyExpected.expected.eav");
+            var expectedResult = new AccuracyDetail[]
+            {
+                new AccuracyDetail(AccuracyDetailLabel.ContainerOnly, "Test", 0),
+                new AccuracyDetail(AccuracyDetailLabel.ContainerOnly, "Test/EmptyWithNonEmptyChild", 0),
+                new AccuracyDetail(AccuracyDetailLabel.ContainerOnly, "Test/EmptyWithNonEmptyGrandChild", 0),
+                new AccuracyDetail(AccuracyDetailLabel.ContainerOnly, "Test/EmptyWithNonEmptyGrandChild/Empty", 0),
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "Test/EmptyWithNonEmptyChild/NonEmpty", 1),
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "Test/EmptyWithNonEmptyGrandChild/Empty/NonEmpty", 1),
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "Test/NonEmpty", 1),
+                new AccuracyDetail(AccuracyDetailLabel.Incorrect, "Test/Empty", 1),
+            };
+
+            var result = AttributeTreeComparer.CompareAttributes(_expected, _found).ToArray();
             CollectionAssert.AreEquivalent(expectedResult, result);
         }
 

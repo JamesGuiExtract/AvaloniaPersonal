@@ -13,13 +13,13 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\Binaries\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\Binaries\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -40,7 +40,7 @@
   <ItemGroup>
     <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\..\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
     </Reference>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
@@ -90,19 +90,20 @@
   <ItemGroup>
     <Compile Include="TestAttributeTreeComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestStatisticsAggregator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
+    <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
       <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
       <Name>Extract.Testing.Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Code\Extract.DataCaptureStats.csproj">
       <Project>{32679A70-BC10-4DD9-9155-9B3E08586EE9}</Project>
-      <Name>Extract.DataCaptureStats</Name>
+      <Name>Extract.AccuracyStats.DataCaptureStats</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +132,8 @@
     <EmbeddedResource Include="Resources\OoO_Test10.3.found.eav" />
     <EmbeddedResource Include="Resources\OoO_Test11.3.found.eav" />
     <EmbeddedResource Include="Resources\OoO_Test12.3.found.eav" />
+    <EmbeddedResource Include="Resources\TestEmptyExpected.found.eav" />
+    <EmbeddedResource Include="Resources\TestEmptyExpected.expected.eav" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

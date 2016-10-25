@@ -88,6 +88,7 @@
     <Compile Include="TestTrainableClassifiers.cs" />
     <Compile Include="TestXPathQueries.cs" />
     <EmbeddedResource Include="Resources\A418.tif.voa" />
+    <EmbeddedResource Include="Resources\EmptyAttribute.voa" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">

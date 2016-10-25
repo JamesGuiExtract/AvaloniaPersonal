@@ -745,9 +745,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningMachineEditor", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatisticsReporter", "..\..\..\..\..\RC.Net\UtilityApplications\StatisticsReporter\StatisticsReporter.csproj", "{293A7737-EEE1-4B72-B681-73E3962DB04D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataCaptureStats", "..\..\..\..\..\RC.Net\AccuracyStats\DataCaptureStats\Core\Code\Extract.DataCaptureStats.csproj", "{32679A70-BC10-4DD9-9155-9B3E08586EE9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataCaptureStats", "..\..\..\..\..\RC.Net\DataCaptureStats\Core\Code\Extract.DataCaptureStats.csproj", "{32679A70-BC10-4DD9-9155-9B3E08586EE9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataCaptureStats.Test", "..\..\..\..\..\RC.Net\AccuracyStats\DataCaptureStats\Core\Testing\Automated\Extract.DataCaptureStats.Test.csproj", "{5E5368E3-ABD2-4A4C-8E96-A28647FB3944}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataCaptureStats.Test", "..\..\..\..\..\RC.Net\DataCaptureStats\Core\Testing\Automated\Extract.DataCaptureStats.Test.csproj", "{5E5368E3-ABD2-4A4C-8E96-A28647FB3944}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
