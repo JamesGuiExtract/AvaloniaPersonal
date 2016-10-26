@@ -76,38 +76,6 @@ namespace Extract.DataEntry.LabDE
         #region Properties
 
         /// <summary>
-        /// Gets or sets the <see cref="IAttribute"/> that represents the
-        /// <see cref="DocumentDataRecord"/> to which this field belongs.
-        /// </summary>
-        /// <value>
-        /// The <see cref="IAttribute"/> that represents the <see cref="DocumentDataRecord"/>
-        /// to which this field belongs.
-        /// </value>
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        public IAttribute RecordAttribute
-        {
-            get
-            {
-                return _recordAttribute;
-            }
-
-            set
-            {
-                try
-                {
-                    if (value != _recordAttribute)
-                    {
-                        Attribute = GetAttribute();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI41512");
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the <see cref="IAttribute"/> representing this field's value.
         /// </summary>
         /// <value>
@@ -159,6 +127,20 @@ namespace Extract.DataEntry.LabDE
                 {
                     throw ex.AsExtract("ELI41511");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the attribute for the <see cref="Attribute"/> which represents this field's value.
+        /// </summary>
+        /// <value>
+        /// The attribute for the <see cref="Attribute"/> which represents this field's value.
+        /// </value>
+        public string AttributePath
+        {
+            get
+            {
+                return _attributePath;
             }
         }
 
@@ -257,7 +239,7 @@ namespace Extract.DataEntry.LabDE
         /// <returns>The <see cref="IAttribute"/> that should represent this field's value.</returns>
         IAttribute GetAttribute()
         {
-            // If attributeQuery is root-relative, set orderAttribute so that the query is not
+            // If attributeQuery is root-relative, set queryRootAttribute so that the query is not
             // evaluated relative to it.
             var queryRootAttribute = _attributePath.StartsWith("/", StringComparison.Ordinal)
                 ? null

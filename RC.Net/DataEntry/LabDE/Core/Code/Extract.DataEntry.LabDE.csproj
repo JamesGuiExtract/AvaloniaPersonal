@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DocumentDataEncounterRecord.cs" />
     <Compile Include="DuplicateDocumentsButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -83,13 +84,16 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DocumentDataField.cs" />
+    <Compile Include="EncounterDataConfiguration.cs" />
     <Compile Include="OrderDataConfiguration.cs" />
-    <Compile Include="OrderPickerSelectionPane.cs">
+    <Compile Include="EncounterPickerTableColumn.cs" />
+    <Compile Include="RecordPickerSelectionPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="OrderPickerSelectionPane.Designer.cs">
-      <DependentUpon>OrderPickerSelectionPane.cs</DependentUpon>
+    <Compile Include="RecordPickerSelectionPane.Designer.cs">
+      <DependentUpon>RecordPickerSelectionPane.cs</DependentUpon>
     </Compile>
+    <Compile Include="RecordPickerTableColumn.cs" />
     <Compile Include="OrderPickerTableColumn.cs" />
     <Compile Include="PreviousStatusFFIColumn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -242,8 +246,8 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="OrderPickerSelectionPane.resx">
-      <DependentUpon>OrderPickerSelectionPane.cs</DependentUpon>
+    <EmbeddedResource Include="RecordPickerSelectionPane.resx">
+      <DependentUpon>RecordPickerSelectionPane.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

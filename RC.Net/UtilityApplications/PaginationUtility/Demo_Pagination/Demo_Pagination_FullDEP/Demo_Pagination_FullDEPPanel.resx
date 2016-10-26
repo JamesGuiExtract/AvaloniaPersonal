@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <metadata name="Name.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="_patientFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_patientFirstNameColumn.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+	&lt;Composite Name='ValidationMessage'&gt;The specified name does not match for this patient's record&lt;/Composite&gt;
+	&lt;Attribute Name='MRN'&gt;../../MR_Number&lt;/Attribute&gt;
+	&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidationMessage='ValidationMessage'&gt;
+&lt;SQL Connection='FAMDB'&gt;
+SELECT COALESCE(MAX([FirstName]), '&lt;Value Parameterize='False'/&gt;') FROM [LabDEPatient] WHERE [MRN] = &lt;MRN/&gt;
+&lt;/SQL&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <metadata name="_patientMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_patientMiddleNameColumn.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+	&lt;Composite Name='ValidationMessage'&gt;The specified name does not match for this patient's record&lt;/Composite&gt;
+	&lt;Attribute Name='MRN'&gt;../../MR_Number&lt;/Attribute&gt;
+	&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='True'&gt;
+&lt;Expression&gt;
+&lt;!--Case insensitive compare does not seem to work (at least when run from the DE verification framework)--&gt;
+&lt;Expression Name='DBValue'&gt;
+&lt;SQL Connection='FAMDB'&gt;
+SELECT COALESCE(MAX([MiddleName]), '&lt;Value Parameterize='False'/&gt;') FROM [LabDEPatient] WHERE [MRN] = &lt;MRN/&gt;
+&lt;/SQL&gt;.ToUpper()&lt;/Expression&gt; == '' or
+&lt;Expression Name='DEPValue'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;.ToUpper()&lt;/Expression&gt; == '' or
+&lt;DBValue/&gt; == &lt;DEPValue/&gt; or
+(&lt;DBValue/&gt;.Length == 1 and &lt;DEPValue/&gt;.StartsWith(&lt;DBValue/&gt;)) or
+(&lt;DEPValue/&gt;.Length == 1 and &lt;DBValue/&gt;.StartsWith(&lt;DEPValue/&gt;))
+&lt;/Expression&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <metadata name="_patientLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_patientLastNameColumn.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+	&lt;Composite Name='ValidationMessage'&gt;The specified name does not match for this patient's record&lt;/Composite&gt;
+	&lt;Attribute Name='MRN'&gt;../../MR_Number&lt;/Attribute&gt;
+	&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidationMessage='ValidationMessage'&gt;
+&lt;SQL Connection='FAMDB'&gt;
+SELECT COALESCE(MAX([LastName]), '&lt;Value Parameterize='False'/&gt;') FROM [LabDEPatient] WHERE [MRN] = &lt;MRN/&gt;
+&lt;/SQL&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <metadata name="_patientSuffixColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_patientGender.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+  &lt;!--Case insensitive compare does not seem to work (at least when run from the DE verification framework)--&gt;
+  &lt;Expression Name='DBValue'&gt;
+    &lt;SQL Connection='FAMDB'&gt;
+      SELECT [Gender] FROM [LabDEPatient] WHERE [MRN] = &lt;Attribute&gt;../MR_Number&lt;/Attribute&gt;
+    &lt;/SQL&gt;.ToUpper()
+  &lt;/Expression&gt;
+  &lt;Expression Name='DEPValue'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;.ToUpper()&lt;/Expression&gt;
+  &lt;Composite Name='ValidationMessage1'&gt;The specified gender does not match the value in the LabDE database for this MRN ("&lt;DBValue/&gt;")&lt;/Composite&gt;
+  &lt;Composite Name='ValidationMessage2'&gt;'Specify "M" for male, "F" for female or "U" for unknown'&lt;/Composite&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidationListType='AutoCompleteOnly'&gt;
+  M
+  F
+  U
+&lt;/Query&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='True'
+  ValidationMessage='ValidationMessage1'&gt;
+  &lt;Expression&gt;
+      &lt;DEPValue/&gt; == &lt;DBValue/&gt;
+    or
+      &lt;DBValue/&gt; == 'U'
+    or
+      &lt;DBValue/&gt; == ''
+   or
+      &lt;DBValue/&gt; == ' '
+    or
+      &lt;DEPValue/&gt; == 'U'
+    or
+      &lt;DEPValue/&gt; == ''
+  &lt;/Expression&gt;
+&lt;/Query&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='True'
+  ValidationMessage='ValidationMessage2'&gt;
+  &lt;Expression&gt;
+      &lt;DEPValue/&gt; == 'U'
+    or
+      &lt;DEPValue/&gt; == ''
+    or
+      &lt;DEPValue/&gt; == 'M'
+    or
+      &lt;DEPValue/&gt; == 'F'
+  &lt;/Expression&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <data name="_patientBirthDate.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+	&lt;Composite Name='ValidationMessage'&gt;The specified DOB does not match for this patient's record&lt;/Composite&gt;
+	&lt;Attribute Name='MRN'&gt;../MR_Number&lt;/Attribute&gt;
+	&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidationMessage='ValidationMessage'&gt;
+&lt;SQL Connection='FAMDB'&gt;
+SELECT COALESCE(CONVERT(NVARCHAR(10), CONVERT(DATETIME,MAX([DOB]), 101), 101), '&lt;Value Parameterize='False'/&gt;') FROM [LabDEPatient] WHERE [MRN] = &lt;MRN/&gt;
+&lt;/SQL&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <data name="_patientRecordNum.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Query SelectionMode='None'&gt;&lt;SQL Connection='FAMDB'&gt;SELECT [MRN] FROM [LabDEPatient] WHERE [MergedInto] IS NULL
+AND LEN(&lt;Attribute TriggerUpdate='False'&gt;.&lt;/Attribute&gt;) = 0
+AND LEN(&lt;Attribute Name='Last'&gt;../Name/Last&lt;/Attribute&gt;) &gt; 1 AND [LastName] LIKE SUBSTRING(&lt;Last/&gt;,1,50) + '%'
+AND LEN(&lt;Attribute Name='First'&gt;../Name/First&lt;/Attribute&gt;) &gt; 1 AND [FirstName] LIKE SUBSTRING(&lt;First/&gt;,1,50) + '%'
+AND CONVERT(NVARCHAR(10), [DOB], 101) = SUBSTRING(&lt;Attribute&gt;../DOB&lt;/Attribute&gt;,1,10)
+&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;RegEx Pattern='(?&amp;lt;=\[)\d+(?=\])'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;&lt;/Query&gt;</value>
+  </data>
+  <data name="_patientRecordNum.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+&lt;Composite Name='UnknownMRN'&gt;The specified MRN does not exist in the LabDE database.&lt;/Composite&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='True' ValidationWarning='True' ValidationMessage='UnknownMRN'&gt;
+&lt;SQL Connection='FAMDB'&gt;SELECT 'True' FROM [LabDEPatient] WHERE [MRN] = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,20) AND [MergedInto] IS NULL&lt;/SQL&gt;
+&lt;/Query&gt;
+&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL Connection='FAMDB'&gt;
+SELECT '[' + t.[MRN] + '] ' + t.[FirstName] + ' ' + t.[LastName] + ', DOB: ' + CONVERT(NVARCHAR(10), t.[DOB], 110) FROM [LabDEPatient]
+INNER JOIN [LabDEPatient] t ON [LabDEPatient].[MRN] = t.[MRN] AND t.[MergedInto] IS NULL
+&lt;!-- Offer auto-complete for any patients that match 2 of 3 fields --&gt;
+&lt;!-- If this query is changed, be sure to test against a large database --&gt;
+WHERE (t.[LastName] LIKE (CASE WHEN LEN(&lt;Attribute Name='Last'&gt;../Name/Last&lt;/Attribute&gt;) &gt; 1 THEN SUBSTRING(&lt;Last/&gt;,1,50) + '%' ELSE '' END)
+AND t.[FirstName] LIKE (CASE WHEN LEN(&lt;Attribute Name='First'&gt;../Name/First&lt;/Attribute&gt;) &gt; 0 THEN SUBSTRING(&lt;First/&gt;,1,50) + '%' ELSE '' END))
+OR
+(t.[LastName] LIKE (CASE WHEN LEN(&lt;Last/&gt;) &gt; 1 THEN SUBSTRING(&lt;Last/&gt;,1,50) + '%' ELSE '' END)
+AND CONVERT(NVARCHAR(10), t.[DOB], 101) = SUBSTRING(&lt;Attribute Name='DOB'&gt;../DOB&lt;/Attribute&gt;,1,10))
+OR
+(t.[FirstName] LIKE (CASE WHEN LEN(&lt;First/&gt;) &gt; 0 THEN SUBSTRING(&lt;First/&gt;,1,50) + '%' ELSE '' END)
+AND CONVERT(NVARCHAR(10), t.[DOB], 101) = SUBSTRING(&lt;DOB/&gt;,1,10))
+&lt;/SQL&gt;&lt;/Query&gt;</value>
+  </data>
+  <metadata name="_encounterCSN.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_encounterPicker.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_encounterPicker.RecordQueryColumns" xml:space="preserve">
+    <value>CSN: [LabDEEncounter].[CSN]
+Patient: [LabDEPatient].[LastName] + ', ' + [LabDEPatient].[FirstName]
+Date / Time: [LabDEEncounter].[EncounterDateTime]
+Department: [LabDEEncounter].[Department]
+Type: [LabDEEncounter].[EncounterType]
+Provider: [LabDEEncounter].[EncounterProvider]</value>
+  </data>
+  <metadata name="_encounterDate.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_encounterTime.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_encounterDepartment.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_encounterType.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_encounterProvider.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+</root>

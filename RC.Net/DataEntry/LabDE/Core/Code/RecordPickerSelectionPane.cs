@@ -12,18 +12,18 @@ namespace Extract.DataEntry.LabDE
 {
     /// <summary>
     /// Defines the custom <see cref="IFFIFileSelectionPane"/> to be used in the FFI instance opened
-    /// by an <see cref="OrderPickerTableColumn"/>. This pane will display the orders that may be
-    /// associated with the currently selected order row in a LabDE DEP.
+    /// by an <see cref="RecordPickerTableColumn"/>. This pane will display the records that may be
+    /// associated with the currently selected row in a LabDE DEP.
     /// </summary>
     [ToolboxItem(false)]
-    public partial class OrderPickerSelectionPane : UserControl, IFFIFileSelectionPane, IFFIDataManager
+    public partial class RecordPickerSelectionPane : UserControl, IFFIFileSelectionPane, IFFIDataManager
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static readonly string _OBJECT_NAME = typeof(OrderPickerSelectionPane).ToString();
+        static readonly string _OBJECT_NAME = typeof(RecordPickerSelectionPane).ToString();
 
         #endregion Constants
 
@@ -39,9 +39,9 @@ namespace Extract.DataEntry.LabDE
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OrderPickerSelectionPane"/> class.
+        /// Initializes a new instance of the <see cref="RecordPickerSelectionPane"/> class.
         /// </summary>
-        public OrderPickerSelectionPane()
+        public RecordPickerSelectionPane()
         {
             try
             {
@@ -71,9 +71,9 @@ namespace Extract.DataEntry.LabDE
         #region Public Members
 
         /// <summary>
-        /// Gets the order number that was selected in the UI.
+        /// Gets the record ID that was selected in the UI.
         /// </summary>
-        public string SelectedOrderNumber
+        public string SelectedRecordId
         {
             get;
             set;
@@ -82,7 +82,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Gets or sets the filter on the displayed matching rows that determine which rows are
         /// candidates for auto-selection when the picker UI is displayed. If <see langword="null"/>
-        /// orders will not be automatically selected (unless an order number had already been
+        /// records will not be automatically selected (unless a record ID had already been
         /// assigned).
         /// </summary>
         /// <value>
@@ -97,33 +97,33 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets or sets the order in which rows matching <see cref="AutoSelectionOrder"/> are to be
+        /// Gets or sets the record in which rows matching <see cref="AutoSelectionRecord"/> are to be
         /// considered for auto-selection where the first matching row is the row that is selected.
         /// <see langword="null"/> if a row should be auto-selected only if it is the only row
         /// matching <see cref="AutoSelectionFilter"/>.
         /// </summary>
         /// <value>
-        /// The order in which rows matching <see cref="AutoSelectionOrder"/> are to be considered
+        /// The record in which rows matching <see cref="AutoSelectionRecord"/> are to be considered
         /// for auto-selection. The syntax is as described for the <see cref="DataView.Sort"/>
         /// property.
         /// </value>
-        public virtual string AutoSelectionOrder
+        public virtual string AutoSelectionRecord
         {
             get;
             set;
         }
 
         /// <summary>
-        /// Updates the data in <see cref="_ordersDataGridView"/> to display the current possible
-        /// matching orders in the FAM database.
+        /// Updates the data in <see cref="_recordsDataGridView"/> to display the current possible
+        /// matching records in the FAM database.
         /// </summary>
-        public void UpdateOrderSelectionGrid()
+        public void UpdateRecordSelectionGrid()
         {
             try
             {
-                var disposableSource = _ordersDataGridView.DataSource as IDisposable;
+                var disposableSource = _recordsDataGridView.DataSource as IDisposable;
 
-                _ordersDataGridView.DataSource = RowData.UnmappedMatchingRecords;
+                _recordsDataGridView.DataSource = RowData.UnmappedMatchingRecords;
 
                 if (disposableSource != null)
                 {
@@ -152,7 +152,7 @@ namespace Extract.DataEntry.LabDE
         {
             get
             {
-                return "Available orders";
+                return "Available records";
             }
         }
 
@@ -165,15 +165,15 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    string orderNumber = GetSelectedOrderNumber();
+                    string recordId = GetSelectedRecordId();
 
-                    if (string.IsNullOrEmpty(orderNumber))
+                    if (string.IsNullOrEmpty(recordId))
                     {
                         return new int[0];
                     }
                     else
                     {
-                        return RowData.GetCorrespondingFileIds(orderNumber);
+                        return RowData.GetCorrespondingFileIds(recordId);
                     }
                 }
                 catch (Exception ex)
@@ -234,8 +234,8 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    return ( !string.IsNullOrWhiteSpace(GetSelectedOrderNumber()) &&
-                        SelectedOrderNumber != GetSelectedOrderNumber() );
+                    return ( !string.IsNullOrWhiteSpace(GetSelectedRecordId()) &&
+                        SelectedRecordId != GetSelectedRecordId() );
                 }
                 catch (Exception ex)
                 {
@@ -279,17 +279,17 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                // On OK, set the SelectedOrderNumber property for the caller.
-                string newSelectedOrderNumber = GetSelectedOrderNumber();
+                // On OK, set the SelectedRecordId property for the caller.
+                string newSelectedRecordId = GetSelectedRecordId();
 
-                if (string.IsNullOrWhiteSpace(newSelectedOrderNumber))
+                if (string.IsNullOrWhiteSpace(newSelectedRecordId))
                 {
-                    UtilityMethods.ShowMessageBox("No order has been selected.",
-                        "No order selected", true);
+                    UtilityMethods.ShowMessageBox("No record has been selected.",
+                        "No record selected", true);
                     return false;
                 }
 
-                SelectedOrderNumber = newSelectedOrderNumber;
+                SelectedRecordId = newSelectedRecordId;
 
                 return true;
             }
@@ -319,7 +319,7 @@ namespace Extract.DataEntry.LabDE
         #region Internal Members
 
         /// <summary>
-        /// The <see cref="DocumentDataRecord"/> that is used to retrieve and cache order information for
+        /// The <see cref="DocumentDataRecord"/> that is used to retrieve and cache record information for
         /// the currently selected <see cref="DataEntryTableRow"/>.
         /// </summary>
         internal DocumentDataRecord RowData
@@ -335,16 +335,16 @@ namespace Extract.DataEntry.LabDE
 
         /// <summary>
         /// Handles the <see cref="DataGridView.SelectionChanged"/>event of the
-        /// <see cref="_ordersDataGridView"/>.
+        /// <see cref="_recordsDataGridView"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleOrdersDataGridView_SelectionChanged(object sender, EventArgs e)
+        void HandleRecordsDataGridView_SelectionChanged(object sender, EventArgs e)
         {
             try
             {
-                // Refresh to display the that have been filed against the newly selected order.
+                // Refresh to display the that have been filed against the newly selected record.
                 OnRefreshRequired();
             }
             catch (Exception ex)
@@ -355,19 +355,19 @@ namespace Extract.DataEntry.LabDE
 
         /// <summary>
         /// Handles the <see cref="DataGridView.DataBindingComplete"/> event of the
-        /// <see cref="_ordersDataGridView"/>.
+        /// <see cref="_recordsDataGridView"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="DataGridViewBindingCompleteEventArgs"/> instance
         /// containing the event data.</param>
-        void HandleOrdersDataGridView_DataBindingComplete(object sender,
+        void HandleRecordsDataGridView_DataBindingComplete(object sender,
             DataGridViewBindingCompleteEventArgs e)
         {
             try
             {
                 // Upon completion of binding, selection will automatically be set to the first row
                 // of the grid unless an alternate selection is applied here. Set the initial
-                // selection to SelectedOrderNumber (if specified), otherwise, don't start with any
+                // selection to SelectedRecordId (if specified), otherwise, don't start with any
                 // selection.
                 ResetSelection();
             }
@@ -382,65 +382,65 @@ namespace Extract.DataEntry.LabDE
         #region Private Members
 
         /// <summary>
-        /// Gets the order number of the currently selected row in
-        /// <see cref="_ordersDataGridView"/>.
+        /// Gets the record ID of the currently selected row in
+        /// <see cref="_recordsDataGridView"/>.
         /// </summary>
-        /// <returns>The order number of the currently selected row.</returns>
-        string GetSelectedOrderNumber()
+        /// <returns>The record ID of the currently selected row.</returns>
+        string GetSelectedRecordId()
         {
-            if (_ordersDataGridView.SelectedRows.Count != 1)
+            if (_recordsDataGridView.SelectedRows.Count != 1)
             {
                 return null;
             }
 
-            return _ordersDataGridView.SelectedRows
+            return _recordsDataGridView.SelectedRows
                 .OfType<DataGridViewRow>()
                 .Single()
                 .Cells[0].Value.ToString();
         }
 
         /// <summary>
-        /// Resets the order selection to <see cref="SelectedOrderNumber"/>.
+        /// Resets the record selection to <see cref="SelectedRecordId"/>.
         /// </summary>
         void ResetSelection()
         {
-            _ordersDataGridView.ClearSelection();
+            _recordsDataGridView.ClearSelection();
 
-            string orderNumberToSelect = SelectedOrderNumber;
+            string recordIdToSelect = SelectedRecordId;
 
-            // If there is not already a selected order, see if there is an order that matches any
-            // AutoSelectionFilter and AutoSelectionOrder criteria
-            if (string.IsNullOrWhiteSpace(orderNumberToSelect) &&
+            // If there is not already a selected record, see if there is an record that matches any
+            // AutoSelectionFilter and AutoSelectionRecord criteria
+            if (string.IsNullOrWhiteSpace(recordIdToSelect) &&
                 !string.IsNullOrWhiteSpace(AutoSelectionFilter))
             {
                 using (DataTable selectionTable = RowData.UnmappedMatchingRecords.ToTable())
                 using (DataView selectionView = new DataView(selectionTable))
                 {
                     selectionView.RowFilter = AutoSelectionFilter;
-                    selectionView.Sort = AutoSelectionOrder;
+                    selectionView.Sort = AutoSelectionRecord;
 
                     if (selectionView.Count > 0)
                     {
                         if (selectionView.Count == 1 ||
-                            !string.IsNullOrWhiteSpace(AutoSelectionOrder))
+                            !string.IsNullOrWhiteSpace(AutoSelectionRecord))
                         {
-                            orderNumberToSelect = (string)(selectionView[0].Row.ItemArray[0]);
+                            recordIdToSelect = (string)(selectionView[0].Row.ItemArray[0]);
                         }
                     }
                 }
             }
 
-            // Select the row with orderNumberToSelect (if any).
-            _ordersDataGridView.CurrentCell =
-                _ordersDataGridView.Rows
+            // Select the row with recordNumberToSelect (if any).
+            _recordsDataGridView.CurrentCell =
+                _recordsDataGridView.Rows
                     .OfType<DataGridViewRow>()
                     .Select(row => row.Cells[0])
-                    .Where(cell => !string.IsNullOrEmpty(orderNumberToSelect) &&
-                        orderNumberToSelect.Equals(cell.Value.ToString(), StringComparison.Ordinal))
+                    .Where(cell => !string.IsNullOrEmpty(recordIdToSelect) &&
+                        recordIdToSelect.Equals(cell.Value.ToString(), StringComparison.Ordinal))
                     .SingleOrDefault();
-            if (_ordersDataGridView.CurrentCell != null)
+            if (_recordsDataGridView.CurrentCell != null)
             {
-                _ordersDataGridView.CurrentCell.OwningRow.Selected = true;
+                _recordsDataGridView.CurrentCell.OwningRow.Selected = true;
             }
         }
 

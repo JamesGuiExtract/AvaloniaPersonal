@@ -6,18 +6,18 @@ namespace Extract.DataEntry.LabDE
 {
     /// <summary>
     /// Defines a column that can be added to a <see cref="DataEntryTable"/> in order to allow
-    /// selection of the proper order number from the orders stored in the FAMDB. The column will
+    /// selection of the proper CSN from the encounters stored in the FAMDB. The column will
     /// provide a button that opens a UI to allow the user to view and select from the possible
-    /// matching orders.
+    /// matching encounters.
     /// </summary>
-    public class OrderPickerTableColumn : RecordPickerTableColumn
+    public class EncounterPickerTableColumn : RecordPickerTableColumn
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static readonly string _OBJECT_NAME = typeof(OrderPickerTableColumn).ToString();
+        static readonly string _OBJECT_NAME = typeof(EncounterPickerTableColumn).ToString();
 
         #endregion Constants
 
@@ -29,19 +29,19 @@ namespace Extract.DataEntry.LabDE
         bool _inDesignMode;
 
         /// <summary>
-        /// The <see cref="OrderDataConfiguration"/> defining data to retrieve data from a FAM
+        /// The <see cref="EncounterDataConfiguration"/> defining data to retrieve data from a FAM
         /// database.
         /// </summary>
-        OrderDataConfiguration _dataConfiguration;
+        EncounterDataConfiguration _dataConfiguration;
 
         #endregion Fields
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OrderPickerTableColumn"/> class.
+        /// Initializes a new instance of the <see cref="EncounterPickerTableColumn"/> class.
         /// </summary>
-        public OrderPickerTableColumn()
+        public EncounterPickerTableColumn()
             : base()
         {
             try
@@ -59,38 +59,38 @@ namespace Extract.DataEntry.LabDE
 
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
-                    LicenseIdName.LabDECoreObjects, "ELI41555", _OBJECT_NAME);
+                    LicenseIdName.LabDECoreObjects, "ELI41562", _OBJECT_NAME);
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI41556");
+                throw ex.AsExtract("ELI41563");
             }
         }
 
         #endregion Constructors
 
         #region Properties
-
+        
         /// <summary>
-        /// Gets or sets the attribute path for the attribute containing the collection date. The
-        /// path should either be rooted or be relative to the LabDE Order attribute.
+        /// Gets or sets the attribute path for the attribute containing the encounter date. The
+        /// path should either be rooted or be relative to the LabDE encounter attribute.
         /// </summary>
         /// <value>
-        /// The attribute path for the attribute containing the collection date.
+        /// The attribute path for the attribute containing the encounter date.
         /// </value>
-        [DefaultValue(OrderDataConfiguration._DEFAULT_COLLECTION_DATE_ATTRIBUTE_PATH)]
+        [DefaultValue(EncounterDataConfiguration._DEFAULT_DATE_ATTRIBUTE_PATH)]
         [Category(DesignerGridCategory)]
-        public string CollectionDateAttribute
+        public string EncounterDateAttribute
         {
             get
             {
                 try
                 {
-                    return OrderDataConfiguration.CollectionDateAttributePath;
+                    return EncounterDataConfiguration.EncounterDateAttributePath;
                 }
                 catch (Exception ex)
                 {
-                    throw ex.AsExtract("ELI41557");
+                    throw ex.AsExtract("ELI41564");
                 }
             }
 
@@ -98,35 +98,35 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    OrderDataConfiguration.CollectionDateAttributePath = value;
+                    EncounterDataConfiguration.EncounterDateAttributePath = value;
                 }
                 catch (Exception ex)
                 {
-                    throw ex.AsExtract("ELI41558");
+                    throw ex.AsExtract("ELI41565");
                 }
             }
         }
 
         /// <summary>
-        /// Gets or sets the attribute path for the attribute containing the collection time. The
-        /// path should either be rooted or be relative to the LabDE Order attribute.
+        /// Gets or sets the attribute path for the attribute containing the encounter time. The
+        /// path should either be rooted or be relative to the LabDE encounter attribute.
         /// </summary>
         /// <value>
-        /// The attribute path for the attribute containing the collection time.
+        /// The attribute path for the attribute containing the encounter time.
         /// </value>
-        [DefaultValue(OrderDataConfiguration._DEFAULT_COLLECTION_TIME_ATTRIBUTE_PATH)]
+        [DefaultValue(EncounterDataConfiguration._DEFAULT_TIME_ATTRIBUTE_PATH)]
         [Category(DesignerGridCategory)]
-        public string CollectionTimeAttribute
+        public string EncounterTimeAttribute
         {
             get
             {
                 try
                 {
-                    return OrderDataConfiguration.CollectionTimeAttributePath;
+                    return EncounterDataConfiguration.EncounterTimeAttributePath;
                 }
                 catch (Exception ex)
                 {
-                    throw ex.AsExtract("ELI41559");
+                    throw ex.AsExtract("ELI41566");
                 }
             }
 
@@ -134,11 +134,11 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    OrderDataConfiguration.CollectionTimeAttributePath = value;
+                    EncounterDataConfiguration.EncounterTimeAttributePath = value;
                 }
                 catch (Exception ex)
                 {
-                    throw ex.AsExtract("ELI41560");
+                    throw ex.AsExtract("ELI41567");
                 }
             }
         }
@@ -157,7 +157,7 @@ namespace Extract.DataEntry.LabDE
         {
             get
             {
-                return OrderDataConfiguration;
+                return EncounterDataConfiguration;
             }
         }
 
@@ -169,15 +169,16 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                OrderPickerTableColumn column = (OrderPickerTableColumn)base.Clone();
+                EncounterPickerTableColumn column = (EncounterPickerTableColumn)base.Clone();
 
                 column.AutoPopulate = this.AutoPopulate;
                 column.AutoSelectionFilter = this.AutoSelectionFilter;
                 column.AutoSelectionRecord = this.AutoSelectionRecord;
-                column.CollectionDateAttribute = this.CollectionDateAttribute;
-                column.CollectionTimeAttribute = this.CollectionTimeAttribute;
+                column.EncounterDateAttribute = this.EncounterDateAttribute;
+                column.EncounterTimeAttribute = this.EncounterTimeAttribute;
                 column.ColorQueryConditions = this.ColorQueryConditions;
                 column.RecordIdAttribute = this.RecordIdAttribute;
+                column.RecordIdColumn = this.RecordIdColumn;
                 column.RecordIdColumn = this.RecordIdColumn;
                 column.RecordMatchCriteria = this.RecordMatchCriteria;
                 column.RecordQueryColumns = this.RecordQueryColumns;
@@ -186,7 +187,7 @@ namespace Extract.DataEntry.LabDE
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI41561", ex);
+                throw ExtractException.AsExtractException("ELI41568", ex);
             }
         }
 
@@ -195,20 +196,20 @@ namespace Extract.DataEntry.LabDE
         #region Private Members
 
         /// <summary>
-        /// Gets the <see cref="OrderDataConfiguration"/> defining data to retrieve data from a FAM
-        /// database.
+        /// Gets the <see cref="EncounterDataConfiguration"/> defining data to retrieve data from a
+        /// FAM database.
         /// </summary>
         /// <value>
-        /// The <see cref="OrderDataConfiguration"/> defining data to retrieve data from a FAM
+        /// The <see cref="EncounterDataConfiguration"/> defining data to retrieve data from a FAM
         /// database.
         /// </value>
-        OrderDataConfiguration OrderDataConfiguration
+        EncounterDataConfiguration EncounterDataConfiguration
         {
             get
             {
                 if (_dataConfiguration == null)
                 {
-                    _dataConfiguration = new OrderDataConfiguration();
+                    _dataConfiguration = new EncounterDataConfiguration();
                 }
 
                 return _dataConfiguration;

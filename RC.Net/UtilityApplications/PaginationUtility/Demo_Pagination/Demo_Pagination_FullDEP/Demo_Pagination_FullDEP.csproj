@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4C92EF9E-66D3-4F7C-AB51-9BFFB6BB71C2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Extract.UtilityApplications.PaginationUtility.Demo_Pagination_FullDEP</RootNamespace>
+    <AssemblyName>Demo_Pagination_FullDEP</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Extract">
+      <HintPath>..\..\..\..\..\binaries\Debug\Extract.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.DataEntry">
+      <HintPath>..\..\..\..\..\binaries\Debug\Extract.DataEntry.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.DataEntry.LabDE">
+      <HintPath>..\..\..\..\..\binaries\Debug\Extract.DataEntry.LabDE.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.FileActionManager.FAMFileInspector">
+      <HintPath>..\..\..\..\..\binaries\Debug\Extract.FileActionManager.FAMFileInspector.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Imaging">
+      <HintPath>..\..\..\..\..\binaries\Debug\Extract.Imaging.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Imaging.Forms">
+      <HintPath>..\..\..\..\..\binaries\Debug\Extract.Imaging.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Interop">
+      <HintPath>..\..\..\..\..\binaries\Debug\Extract.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Licensing">
+      <HintPath>..\..\..\..\..\binaries\Debug\Extract.Licensing.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Utilities">
+      <HintPath>..\..\..\..\..\binaries\Debug\Extract.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Utilities.Forms">
+      <HintPath>..\..\..\..\..\binaries\Debug\Extract.Utilities.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="FAMFileInspector">
+      <HintPath>..\..\..\..\..\binaries\Debug\FAMFileInspector.exe</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.WinForms">
+      <HintPath>..\..\..\..\..\binaries\Debug\Leadtools.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="PaginationUtility">
+      <HintPath>..\..\..\..\..\binaries\Debug\PaginationUtility.exe</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Demo_Pagination_FullDEPPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Demo_Pagination_FullDEPPanel.Designer.cs">
+      <DependentUpon>Demo_Pagination_FullDEPPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Demo_Pagination_FullDEP.config" />
+    <None Include="ExtractInternalKey.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Demo_Pagination_FullDEPPanel.resx">
+      <DependentUpon>Demo_Pagination_FullDEPPanel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>call md "$(ProjectDir)..\Solution\Bin"
+call xcopy "$(ProjectDir)*.config" "$(ProjectDir)..\Solution" /d/y
+call xcopy "$(TargetPath)" "$(ProjectDir)..\Solution\Bin" /y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

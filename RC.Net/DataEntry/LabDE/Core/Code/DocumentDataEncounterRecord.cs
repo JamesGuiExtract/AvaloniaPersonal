@@ -13,14 +13,14 @@ namespace Extract.DataEntry.LabDE
     /// <summary>
     /// Represents a field in the voa data found by rules and/or displayed for verification.
     /// </summary>
-    internal class DocumentDataOrderRecord : DocumentDataRecord, IDisposable
+    internal class DocumentDataEncounterRecord : DocumentDataRecord, IDisposable
     {
         #region Fields
 
         /// <summary>
-        /// The configuration
+        /// The <see cref="EncounterDataConfiguration"/> being used.
         /// </summary>
-        OrderDataConfiguration _configuration;
+        EncounterDataConfiguration _configuration;
 
         #endregion Fields
 
@@ -32,20 +32,20 @@ namespace Extract.DataEntry.LabDE
         /// <param name="famData">The <see cref="FAMData"/> instance that is managing this instance.
         /// </param>
         /// <param name="dataEntryTableRow">The <see cref="DataEntryTableRow"/> representing the
-        /// order in the LabDE DEP to which this instance pertains.</param>
+        /// encounter in the LabDE DEP to which this instance pertains.</param>
         /// <param name="attribute">The <see cref="IAttribute"/> that represents this record.</param>
-        public DocumentDataOrderRecord(FAMData famData, DataEntryTableRow dataEntryTableRow, IAttribute attribute)
+        public DocumentDataEncounterRecord(FAMData famData, DataEntryTableRow dataEntryTableRow, IAttribute attribute)
             : base(famData, dataEntryTableRow, attribute)
         {
             try
             {
-                _configuration = famData.DataConfiguration as OrderDataConfiguration;
-
+                _configuration = famData.DataConfiguration as EncounterDataConfiguration;
+                
                 ApplyConfiguration(_configuration);
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI41549");
+                throw ex.AsExtract("ELI41538");
             }
         }
 
@@ -54,37 +54,37 @@ namespace Extract.DataEntry.LabDE
         #region Overrides
 
         /// <summary>
-        /// Gets a <see cref="Color"/> that indicating availability of matching orders for the
+        /// Gets a <see cref="Color"/> that indicating availability of matching encounters for the
         /// provided <see cref="DocumentDataRecord"/>.
         /// </summary>
         /// <param name="order">The <see cref="DocumentDataRecord"/> for which a status color is needed.
         /// </param>
-        /// <returns>A <see cref="Color"/> that indicating availability of matching orders for the
+        /// <returns>A <see cref="Color"/> that indicating availability of matching encounters for the
         /// provided <see cref="DocumentDataRecord"/> or <see langword="null"/> if there is no color that
         /// reflects the current status.</returns>
         public override Color? GetRecordsStatusColor()
         {
             try
             {
-                ExtractException.Assert("ELI38152",
-                        "Order query columns have not been properly defined.",
-                        _configuration.ColorQueryConditions.Count > 0);
+                ExtractException.Assert("ELI41539",
+                    "Order query columns have not been properly defined.",
+                    _configuration.ColorQueryConditions.Count > 0);
 
                 // Select the matching order numbers into a table variable.                
                 string declarationsClause =
-                    "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
-                        "INSERT INTO @OrderNumbers\r\n" + GetSelectedRecordIDsQuery();
+                    "DECLARE @CSN TABLE ([CSN] NVARCHAR(20)) \r\n" +
+                        "INSERT INTO @CSN\r\n" + GetSelectedRecordIDsQuery();
 
-                // If we haven't yet cached the order numbers, set up query components to retrieve the
-                // possibly matching orders from the database.
+                // If we haven't yet cached the CSNs, set up query components to retrieve the
+                // possibly matching encounters from the database.
                 string columnsClause = "";
                 if (MatchingRecordIDs == null)
                 {
-                    // Create a column to select the order numbers in a comma delimited format that can
+                    // Create a column to select the CSNs in a comma delimited format that can
                     // be re-used in subsequent queries.
                     columnsClause =
-                        "(SELECT CAST([OrderNumber] AS NVARCHAR(20)) + ''','''  " +
-                            "FROM @OrderNumbers FOR XML PATH('')) [OrderNumbers], \r\n";
+                        "(SELECT CAST([CSN] AS NVARCHAR(20)) + ''','''  " +
+                            "FROM @CSN FOR XML PATH('')) [CSNs], \r\n";
                 }
 
                 // Convert ColorQueryConditions into a clause that will return 1 when the expression
@@ -97,36 +97,34 @@ namespace Extract.DataEntry.LabDE
 
                 // Queries to select data all other order rows that would match to the same LabDEOrder
                 // table rows.
-                List<string> unmappedOrders = GetQueriesForUnmappedRecordRows(FAMData.LoadedRecords);
+                List<string> unmappedRecords = GetQueriesForUnmappedRecordRows(FAMData.LoadedRecords);
 
-                // Aggregate the data returned by a query for potentially matching orders (including
-                // unmapped orders currently in the UI into fields accessible to the ColorQueryConditions.
-                string orderDataQuery =
-                    "SELECT [CombinedOrders].[OrderNumber], \r\n" +
-                    "MAX([CombinedOrders].[OrderStatus]) AS [OrderStatus], \r\n" +
-                    "COUNT([LabDEOrderFile].[FileID]) AS [FileCount], \r\n" +
-                    "MAX([CombinedOrders].[ReceivedDateTime]) AS [ReceivedDateTime], \r\n" +
-                    "MAX([CombinedOrders].[ReferenceDateTime]) AS [ReferenceDateTime] \r\n" +
+                // Aggregate the data returned by a query for potentially matching records (including
+                // unmapped records currently in the UI into fields accessible to the ColorQueryConditions.
+                string recordDataQuery =
+                    "SELECT [CombinedRecords].[CSN], \r\n" +
+                    "COUNT([LabDEEncounterFile].[FileID]) AS [FileCount], \r\n" +
+                    "MAX([CombinedRecords].[EncounterDateTime]) AS [EncounterDateTime] \r\n" +
                     "FROM ( \r\n" +
                     // TempID is a special column used to prevent these matching unmapped rows from
                     // being grouped together.
-                    "SELECT [OrderNumber], [ReceivedDateTime], [OrderStatus], [ReferenceDateTime], [ORMMessage], NULL AS [TempID] " +
-                    "   FROM [LabDEOrder] \r\n" +
-                    (unmappedOrders.Any()
-                        ? "UNION ALL\r\n" + string.Join("\r\nUNION ALL\r\n", unmappedOrders)
+                    "SELECT [CSN], [EncounterDateTime], NULL AS [TempID] " +
+                    "   FROM [LabDEEncounter] \r\n" +
+                    (unmappedRecords.Any()
+                        ? "UNION ALL\r\n" + string.Join("\r\nUNION ALL\r\n", unmappedRecords)
                         : "") +
-                    ") AS [CombinedOrders]\r\n" +
-                    "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [CombinedOrders].[OrderNumber] \r\n" +
-                    "INNER JOIN @OrderNumbers ON [CombinedOrders].[OrderNumber] = [@OrderNumbers].[OrderNumber] " +
-                        "OR [CombinedOrders].[OrderNumber] = '*'\r\n" +
+                    ") AS [CombinedRecords]\r\n" +
+                    "FULL JOIN [LabDEEncounterFile] ON [LabDEEncounterFile].[EncounterID] = [CombinedRecords].[CSN] \r\n" +
+                    "INNER JOIN @CSN ON [CombinedRecords].[CSN] = [@CSN].[CSN] " +
+                        "OR [CombinedRecords].[CSN] = '*'\r\n" +
                     (FAMData.AlreadyMappedRecordIDs.Any()
-                        ? "WHERE ([CombinedOrders].[OrderNumber] NOT IN (" + string.Join(",", FAMData.AlreadyMappedRecordIDs) + "))\r\n"
+                        ? "WHERE ([CombinedRecords].[CSN] NOT IN (" + string.Join(",", FAMData.AlreadyMappedRecordIDs) + "))\r\n"
                         : "") +
-                    // Group by TempID as well so that all matching orders from the UI end up as separate rows.
-                    "GROUP BY [CombinedOrders].[OrderNumber], [CombinedOrders].[TempID]";
+                    // Group by TempID as well so that all matching records from the UI end up as separate rows.
+                    "GROUP BY [CombinedRecords].[CSN], [CombinedRecords].[TempID]";
 
                 string colorQuery = declarationsClause + "\r\n\r\n" +
-                    "SELECT " + columnsClause + " FROM (\r\n" + orderDataQuery + "\r\n) AS [OrderData]";
+                    "SELECT " + columnsClause + " FROM (\r\n" + recordDataQuery + "\r\n) AS [EncounterData]";
 
                 // Iterate the columns of the resulting row to find the first color for which the
                 // configured condition evaluates to true.
@@ -134,14 +132,14 @@ namespace Extract.DataEntry.LabDE
                 {
                     DataRow resultsRow = results.Rows[0];
 
-                    // Cache the order numbers if they have not already been.
+                    // Cache the CSNs if they have not already been.
                     if (MatchingRecordIDs == null)
                     {
-                        MatchingRecordIDs = (resultsRow["OrderNumbers"] == DBNull.Value)
+                        MatchingRecordIDs = (resultsRow["CSNs"] == DBNull.Value)
                             ? new HashSet<string>()
                             : new HashSet<string>(
                                 // Remove trailing ',' then surround with apostrophes
-                                ("'" + resultsRow["OrderNumbers"].ToString().TrimEnd(new[] { ',', '\'' }) + "'")
+                                ("'" + resultsRow["CSNs"].ToString().TrimEnd(new[] { ',', '\'' }) + "'")
                                 .Split(','));
                     }
 
@@ -159,7 +157,7 @@ namespace Extract.DataEntry.LabDE
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI41548");
+                throw ex.AsExtract("ELI41547");
             }
         }
 
@@ -171,38 +169,37 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                var collectionDateField = new DocumentDataField(Attribute, _configuration.CollectionDateAttributePath, false);
-                var collectionTimeField = new DocumentDataField(Attribute, _configuration.CollectionTimeAttributePath, false);
+                var dateField = new DocumentDataField(Attribute, _configuration.EncounterDateAttributePath, false);
+                var timeField = new DocumentDataField(Attribute, _configuration.EncounterTimeAttributePath, false);
 
-                DateTime collectionDateTime = DateTime.Parse(
-                    collectionDateField.Value + " " + collectionTimeField.Value,
-                    CultureInfo.CurrentCulture);
+                DateTime encounterDateTime =
+                    DateTime.Parse(dateField.Value + " " + timeField.Value, CultureInfo.CurrentCulture);
 
                 string query = string.Format(CultureInfo.CurrentCulture,
                     "DECLARE @linkExists INT \r\n" +
                     "   SELECT @linkExists = COUNT([OrderNumber]) \r\n" +
-                    "       FROM [LabDEOrderFile] WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
+                    "       FROM [LabDEEncounterFile] WHERE [CSN] = {0} AND [FileID] = {1} \r\n" +
                     "IF @linkExists = 1 \r\n" +
                     "BEGIN \r\n" +
-                    "    UPDATE [LabDEOrderFile] SET [CollectionDate] = {2} \r\n" +
-                    "        WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
+                    "    UPDATE [LabDEEncounterFile] SET [EncounterDateTime] = {2} \r\n" +
+                    "        WHERE [CSN] = {0} AND [FileID] = {1} \r\n" +
                     "END \r\n" +
                     "ELSE \r\n" +
                     "BEGIN \r\n" +
-                    "    IF {0} IN (SELECT [OrderNumber] FROM [LabDEOrder]) \r\n" +
+                    "    IF {0} IN (SELECT [CSN] FROM [LabDEEncounter]) \r\n" +
                     "    BEGIN \r\n" +
-                    "        INSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID], [CollectionDate]) \r\n" +
+                    "        INSERT INTO [LabDEEncounterFile] ([CSN], [FileID], [EncounterDateTime]) \r\n" +
                     "            VALUES ({0}, {1}, {2}) \r\n" +
                     "   END \r\n" +
                     "END",
-                    "'" + IdField.Value + "'", fileId, "'" + collectionDateTime + "'");
+                    "'" + IdField.Value + "'", fileId, "'" + encounterDateTime + "'");
 
                 // The query has no results-- immediately dispose of the DataTable returned.
                 FAMData.ExecuteDBQuery(query).Dispose();
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI38184");
+                throw ex.AsExtract("ELI41540");
             }
         }
 
@@ -232,24 +229,20 @@ namespace Extract.DataEntry.LabDE
             }
 
             // Loop through all other order attributes
-            foreach (DocumentDataOrderRecord otherOrder in records
+            foreach (DocumentDataEncounterRecord otherOrder in records
                 .Except(new[] { this })
-                .OfType<DocumentDataOrderRecord>())
+                .OfType<DocumentDataEncounterRecord>())
             {
                 // For each matching but unmapped row.
                 if (string.IsNullOrWhiteSpace(otherOrder.IdField.Value) &&
-                    otherOrder._activeFields.Values.Select(field => field.Value)
-                    .SequenceEqual(
-                        _activeFields.Values.Select(field => field.Value)))
+                    otherOrder.MatchingRecordIDs.Intersect(MatchingRecordIDs).Any())
                 {
                     // Generate an SQL statement that can select data from the UI into query results
                     // that can be combined with actual UI data.
                     StringBuilder unmappedOrder = new StringBuilder();
-                    unmappedOrder.Append("SELECT '*' AS [OrderNumber], ");
-                    unmappedOrder.Append("GETDATE() AS [ReceivedDateTime], ");
-                    unmappedOrder.Append("'*' AS [OrderStatus], ");
-                    unmappedOrder.Append("GETDATE() AS [ReferenceDateTime], ");
-                    unmappedOrder.Append("'' AS [ORMMessage], ");
+                    unmappedOrder.Append("SELECT '*' AS [CSN], ");
+                    unmappedOrder.Append("GETDATE() AS [EncounterDateTime], ");
+                    unmappedOrder.Append("'' AS [Department], ");
 
                     // TempID is a special column used to prevent these rows from being grouped in
                     // the context of GetOrdersStatusColor's DB query.

@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UCLID_AFCORELib;
 
 namespace Extract.DataEntry.LabDE
@@ -12,9 +14,16 @@ namespace Extract.DataEntry.LabDE
     /// <summary>
     /// Provides access to data pertaining to a record to be mapped in a LabDE table.
     /// </summary>
-    internal abstract class DocumentDataRecord: IDisposable
+    /// <seealso cref="System.IDisposable" />
+    internal abstract class DocumentDataRecord : IDisposable
     {
         #region Fields
+
+        /// <summary>
+        /// A <see cref="Regex"/> used to parse attribute paths from the
+        /// <see cref="RecordMatchCriteria"/>.
+        /// </summary>
+        Regex _attributeRegex = new Regex(@"{(?<path>[\S\s]+)}", RegexOptions.Compiled);
 
         /// <summary>
         /// A cached <see cref="DataTable"/> of potential matching FAM DB records for the current
@@ -29,7 +38,26 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         Color? _statusColor;
 
+        /// <summary>
+        /// The <see cref="IAttribute"/> representing this record.
+        /// </summary>
         IAttribute _attribute;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        IFAMDataConfiguration _configuration;
+
+        /// <summary>
+        /// The record identifier field
+        /// </summary>
+        DocumentDataField _idField;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected Dictionary<IAttribute, DocumentDataField> _activeFields =
+            new Dictionary<IAttribute, DocumentDataField>();
 
         #endregion Fields
 
@@ -47,7 +75,6 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                Fields = new HashSet<DocumentDataField>();
                 FAMData = famData;
                 DataEntryTableRow = dataEntryTableRow;
                 Attribute = attribute;
@@ -81,17 +108,6 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets the <see cref="IFAMDataConfiguration"/> for this record.
-        /// </summary>
-        /// <value>
-        /// The <see cref="IFAMDataConfiguration"/> for this record.
-        /// </value>
-        public abstract IFAMDataConfiguration FAMDataConfiguration
-        {
-            get;
-        }
-
-        /// <summary>
         /// Gets the <see cref="IAttribute"/> representing this record.
         /// </summary>
         /// <value>
@@ -113,10 +129,7 @@ namespace Extract.DataEntry.LabDE
                     {
                         _attribute = value;
 
-                        foreach (var field in Fields)
-                        {
-                            field.RecordAttribute = value;
-                        }
+                        ApplyConfiguration(_configuration);
                     }
                 }
                 catch (Exception ex)
@@ -127,7 +140,7 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// The <see cref="DataEntryTableRow"/> representing the order in the LabDE DEP to which
+        /// The <see cref="DataEntryTableRow"/> representing the record in the LabDE DEP to which
         /// this instance pertains.
         /// </summary>
         public DataEntryTableRow DataEntryTableRow
@@ -142,30 +155,21 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The <see cref="DocumentDataField"/> representing the ID.
         /// </value>
-        public abstract DocumentDataField IdField
+        public DocumentDataField IdField
         {
-            get;
+            get
+            {
+                return _idField;
+            }
         }
 
         /// <summary>
-        /// Gets all <see cref="DocumentDataField"/>s needed for the current record type.
+        /// Gets a <see cref="Color"/> indicating the availability of matching FAM DB records for the
+        /// current LabDE record.
         /// </summary>
         /// <value>
-        /// The <see cref="DocumentDataField"/>s needed for the current record type.
-        /// </value>
-        protected HashSet<DocumentDataField> Fields
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets a <see cref="Color"/> indicating the availability of matching FAM DB orders for the
-        /// current LabDE order.
-        /// </summary>
-        /// <value>
-        /// A <see cref="Color"/> indicating the availability of matching FAM DB orders for the
-        /// current LabDE order; <see langword="null"/> if there is no color to indicate the current
+        /// A <see cref="Color"/> indicating the availability of matching FAM DB records for the
+        /// current LabDE record; <see langword="null"/> if there is no color to indicate the current
         /// status.
         /// </value>
         public Color? StatusColor
@@ -174,7 +178,7 @@ namespace Extract.DataEntry.LabDE
             {
                 if (!_statusColor.HasValue)
                 {
-                    _statusColor = GetOrdersStatusColor();
+                    _statusColor = GetRecordsStatusColor();
                 }
 
                 return _statusColor.Value;
@@ -182,10 +186,10 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets or sets a HashSet of potentially matching order numbers for the current LabDE order.
+        /// Gets or sets a HashSet of potentially matching IDs for the current LabDE record.
         /// </summary>
         /// <value>
-        /// A HashSet of potentially matching order numbers for the current LabDE order. 
+        /// A HashSet of potentially matching IDs for the current LabDE record. 
         /// </value>
         public HashSet<string> MatchingRecordIDs
         {
@@ -197,7 +201,7 @@ namespace Extract.DataEntry.LabDE
         /// Gets a <see cref="DataTable"/> of potential matching FAM DB records for the current instance.
         /// </summary>
         /// <value>
-        /// A <see cref="DataTable"/> of potential matching FAM DB orders for the current instance.
+        /// A <see cref="DataTable"/> of potential matching FAM DB records for the current instance.
         /// </value>
         public virtual DataTable MatchingRecords
         {
@@ -224,23 +228,23 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    // Put the unmapped orders in to a string list excluding this row's currently
-                    // mapped order number. (order numbers will be quoted for SQL).
-                    string otherAlreadyMappedOrders = string.Join(",",
+                    // Put the unmapped records in to a string list excluding this row's currently
+                    // mapped record ID. (record IDs will be quoted for SQL).
+                    string otherAlreadyMappedRecords = string.Join(",",
                         FAMData.AlreadyMappedRecordIDs
-                            .Except(new[] { "'" + IdField.Value + "'" }, 
+                            .Except(new[] { "'" + IdField.Value + "'" },
                                 StringComparer.OrdinalIgnoreCase));
 
-                    // If there are any already mapped orders to be excluded, add a row filter for
+                    // If there are any already mapped records to be excluded, add a row filter for
                     // the view.
-                    DataView unmappedOrdersView = new DataView(MatchingRecords);
-                    if (!string.IsNullOrWhiteSpace(otherAlreadyMappedOrders))
+                    DataView unmappedRecordsView = new DataView(MatchingRecords);
+                    if (!string.IsNullOrWhiteSpace(otherAlreadyMappedRecords))
                     {
-                        unmappedOrdersView.RowFilter = string.Format(CultureInfo.InvariantCulture,
-                            "[{0}] NOT IN ({1})", FAMDataConfiguration.IdFieldName, otherAlreadyMappedOrders);
+                        unmappedRecordsView.RowFilter = string.Format(CultureInfo.InvariantCulture,
+                            "[{0}] NOT IN ({1})", _configuration.IdFieldDisplayName, otherAlreadyMappedRecords);
                     }
 
-                    return unmappedOrdersView;
+                    return unmappedRecordsView;
                 }
                 catch (Exception ex)
                 {
@@ -254,38 +258,81 @@ namespace Extract.DataEntry.LabDE
         #region Methods
 
         /// <summary>
-        /// Gets an SQL query that retrieves possibly matching order numbers for this instance.
+        /// Gets an SQL query that retrieves possibly matching record IDs for this instance.
         /// </summary>
-        /// <returns>An SQL query that retrieves possibly matching order numbers for this instance.
+        /// <returns>An SQL query that retrieves possibly matching record IDs for this instance.
         /// </returns>
-        public abstract string GetSelectedRecordIDsQuery();
+        public virtual string GetSelectedRecordIDsQuery()
+        {
+            try
+            {
+                string recordIDsQuery = null;
+
+                if (MatchingRecordIDs != null)
+                {
+                    // If the matching order IDs have been cached, select them directly rather than
+                    //querying for them.
+                    if (MatchingRecordIDs.Count > 0)
+                    {
+                        recordIDsQuery = string.Join("\r\nUNION\r\n",
+                            MatchingRecordIDs.Select(orderNum => "SELECT " + orderNum));
+                    }
+                    else
+                    {
+                        // https://extract.atlassian.net/browse/ISSUE-13003
+                        // In the case that we've cached MatchingOrderIDs, but there are none, use a
+                        // query of "SELECT NULL"-- without anything at all an SQL syntax error will
+                        // result when recordIDsQuery is plugged into a larger query.
+                        recordIDsQuery = "SELECT NULL";
+                    }
+                }
+                else
+                {
+                    var resolvedCriteria = _configuration.RecordMatchCriteria
+                        .Select(criteria => _attributeRegex.Replace(criteria, match =>
+                            $"'{_activeFields.Values.Single(field => field.AttributePath == match.Groups["path"].Value).Value}'"));
+
+                    recordIDsQuery = _configuration.BaseSelectQuery;
+                    if (resolvedCriteria.Any())
+                    {
+                        recordIDsQuery += "WHERE " + string.Join("\r\nAND\r\n", resolvedCriteria);
+                    }
+                }
+
+                return recordIDsQuery;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41550");
+            }
+        }
 
         /// <summary>
-        /// Gets a <see cref="Color"/> that indicating availability of matching orders for this instance.
+        /// Gets a <see cref="Color"/> that indicating availability of matching records for this instance.
         /// </summary>
-        /// <returns>A <see cref="Color"/> that indicating availability of matching orders for the
+        /// <returns>A <see cref="Color"/> that indicating availability of matching records for the
         /// provided <see cref="DocumentDataRecord"/> or <see langword="null"/> if there is no color that
         /// reflects the current status.</returns>
-        public abstract Color? GetOrdersStatusColor();
+        public abstract Color? GetRecordsStatusColor();
 
         /// <summary>
         /// Links this record with the specified <see paramref="fileId"/>.
         /// </summary>
-        /// <param name="fileId">The file ID to link to the <see paramref="orderNumber"/>.</param>
-        public abstract void LinkFileWithRecord( int fileId);
+        /// <param name="fileId">The file ID to link to this record.</param>
+        public abstract void LinkFileWithRecord(int fileId);
 
         /// <summary>
         /// Gets the file IDs for files that have already been filed against
-        /// <see paramref="orderNumber"/> in LabDE.
+        /// <see paramref="recordId"/> in LabDE.
         /// </summary>
-        /// <param name="recordNumber">The order number.</param>
-        /// <returns>The file IDs for files that have already been filed against the order number.
+        /// <param name="recordId">The record ID.</param>
+        /// <returns>The file IDs for files that have already been filed against the record ID.
         /// </returns>
-        public virtual IEnumerable<int> GetCorrespondingFileIds(string recordNumber)
+        public virtual IEnumerable<int> GetCorrespondingFileIds(string recordId)
         {
             try
             {
-                return FAMData.GetCorrespondingFileIDs(recordNumber);
+                return FAMData.GetCorrespondingFileIDs(recordId);
             }
             catch (Exception ex)
             {
@@ -323,14 +370,45 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
+        /// <summary>
+        /// Applies the specified <see paramref="configuration"/> to be used for this instance.
+        /// </summary>
+        /// <param name="configuration">The <see cref="IFAMDataConfiguration"/> to be able to
+        /// retrieve data from a FAM database for a particular record type</param>
+        protected void ApplyConfiguration(IFAMDataConfiguration configuration)
+        {
+            try
+            {
+                if (_idField != null)
+                {
+                    _idField.Dispose();
+                    _idField = null;
+                }
+                CollectionMethods.ClearAndDispose(_activeFields);
+
+                _configuration = configuration;
+
+                if (_configuration != null)
+                {
+                    _idField = new DocumentDataField(Attribute, _configuration.IdFieldAttributePath, true);
+                    _idField.AttributeUpdated += Handle_AttributeUpdated;
+
+                    InitializeMatchCriteria(configuration);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41551");
+            }
+        }
+
         #endregion Methods
 
         #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="DocumentDataField.AttributeUpdated"/> event for one of
-        /// the <see cref="IAttribute"/>s containing key data used in determining potential matching
-        /// order codes.
+        /// the <see cref="IAttribute"/>s containing key data used in determining potential matches.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/>
@@ -378,10 +456,13 @@ namespace Extract.DataEntry.LabDE
                     _matchingRecords = null;
                 }
 
-                foreach (var field in Fields)
+                if (_idField != null)
                 {
-                    field.Dispose();
+                    _idField.Dispose();
+                    _idField = null;
                 }
+
+                CollectionMethods.ClearAndDispose(_activeFields);
             }
 
             // Dispose of unmanaged resources
@@ -392,9 +473,40 @@ namespace Extract.DataEntry.LabDE
         #region Private Members
 
         /// <summary>
+        /// Parses the <see cref="IFAMDataConfiguration.RecordMatchCriteria"/> of the specified
+        /// <see paramref="configuration"/> to be able to find and watch events for referenced
+        /// <see cref="IAttribute"/>s.
+        /// </summary>
+        /// <param name="configuration">The <see cref="IFAMDataConfiguration"/> to be able to
+        /// retrieve data from a FAM database for a particular record type</param>
+        void InitializeMatchCriteria(IFAMDataConfiguration configuration)
+        {
+            foreach (string matchCriteria in configuration.RecordMatchCriteria)
+            {
+                foreach (var match in _attributeRegex.Matches(matchCriteria).OfType<Match>())
+                {
+                    var field = new DocumentDataField(
+                        Attribute,
+                        match.Groups["path"].Value,
+                        true);
+                    if (field.Attribute != null &&
+                        !_activeFields.ContainsKey(field.Attribute))
+                    {
+                        _activeFields[field.Attribute] = field;
+                        field.AttributeUpdated += Handle_AttributeUpdated;
+                    }
+                    else
+                    {
+                        field.Dispose();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="RowDataUpdated"/> event.
         /// </summary>
-        /// <param name="recordIdUpdated"><see langword="true"/> if the order number has been
+        /// <param name="recordIdUpdated"><see langword="true"/> if the record ID has been
         /// changed; otherwise, <see langword="false"/>.</param>
         void OnRowDataUpdated(bool recordIdUpdated)
         {

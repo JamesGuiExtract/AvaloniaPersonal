@@ -8,107 +8,83 @@ using UCLID_AFCORELib;
 namespace Extract.DataEntry.LabDE
 {
     /// <summary>
-    /// A configuration to be used to represent order record types.
+    /// A configuration to be used to represent encounter record types.
     /// </summary>
     /// <seealso cref="Extract.DataEntry.LabDE.IFAMDataConfiguration" />
-    internal class OrderDataConfiguration : IFAMDataConfiguration
+    internal class EncounterDataConfiguration : IFAMDataConfiguration
     {
         #region Constants
 
         /// <summary>
-        /// The base select query
+        /// The root clause of an SQL query that is to be used to query potentially matching records.
         /// </summary>
         const string _BASE_SELECT_QUERY =
-            "SELECT [OrderNumber] FROM [LabDEOrder]\r\n" +
-            "   INNER JOIN[LabDEPatient] p ON[LabDEOrder].[PatientMRN] = p.[MRN] \r\n" +
-            "   INNER JOIN [LabDEPatient] ON p.[CurrentMRN] = [LabDEPatient].[MRN]";
+            "SELECT [CSN] FROM [LabDEEncounter]\r\n" +
+            "   INNER JOIN[LabDEPatient] ON[PatientMRN] = [MRN]";
 
         /// <summary>
-        /// The display name of the ID field name for orders
+        /// The display name of the ID field name for encounters
         /// </summary>
-        const string _ID_FIELD_DISPLAY_NAME = "Order Number";
+        const string _ID_FIELD_DISPLAY_NAME = "CSN";
 
         /// <summary>
-        /// The name of the column representing the order number field in the database.
+        /// The name of the column representing the encounter ID field in the database.
         /// </summary>
-        const string ID_FIELD_DATABASE_NAME = "OrderNumber";
+        const string ID_FIELD_DATABASE_NAME = "CSN";
 
         /// <summary>
         /// The attribute path, relative to the main record attribute, of the attribute that
-        /// represents the order number.
+        /// represents the record ID.
         /// </summary>
-        const string _DEFAULT_ID_FIELD_ATTRIBUTE_PATH = "OrderNumber";
+        const string _DEFAULT_ID_FIELD_ATTRIBUTE_PATH = "CSN";
 
         /// <summary>
-        /// An SQL column specification for the order name.
+        /// The default attribute path for the attribute containing the encounter date.
         /// </summary>
-        const string _ORDER_NAME_XPATH =
-            "[ORMMessage].value('(/ORM_O01/ORM_O01.ORDER/ORM_O01.ORDER_DETAIL/ORM_O01.OBRRQDRQ1RXOODSODT_SUPPGRP/OBR/OBR.4/CE.2)[1]','NVARCHAR(MAX)')";
+        internal const string _DEFAULT_DATE_ATTRIBUTE_PATH = "Date";
 
         /// <summary>
-        /// An SQL column specification for the ordering provider first name using an x-path query
-        /// for the XML version of an ORM-O01 HL7 message.
+        /// The default attribute path for the attribute containing the encounter date.
         /// </summary>
-        const string _ORDER_PROVIDER_FIRST_NAME_XPATH =
-            "[ORMMessage].value('(/ORM_O01/ORM_O01.ORDER/ORM_O01.ORDER_DETAIL/ORM_O01.OBRRQDRQ1RXOODSODT_SUPPGRP/OBR/OBR.16/XCN.2/FN.1)[1]','NVARCHAR(MAX)')";
-
-        /// <summary>
-        /// An SQL column specification for the ordering provider last name using an x-path query
-        /// for the XML version of an ORM-O01 HL7 message.
-        /// </summary>
-        const string _ORDER_PROVIDER_LAST_NAME_XPATH =
-            "[ORMMessage].value('(/ORM_O01/ORM_O01.ORDER/ORM_O01.ORDER_DETAIL/ORM_O01.OBRRQDRQ1RXOODSODT_SUPPGRP/OBR/OBR.16/XCN.3)[1]','NVARCHAR(MAX)')";
-
-        /// <summary>
-        /// The default attribute path for the attribute containing the collection date.
-        /// </summary>
-        internal const string _DEFAULT_COLLECTION_DATE_ATTRIBUTE_PATH = "CollectionDate";
-
-        /// <summary>
-        /// The default attribute path for the attribute containing the collection time.
-        /// </summary>
-        internal const string _DEFAULT_COLLECTION_TIME_ATTRIBUTE_PATH = "CollectionTime";
+        internal const string _DEFAULT_TIME_ATTRIBUTE_PATH = "Time";
 
         #endregion Constants
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OrderDataConfiguration"/> class.
+        /// Initializes a new instance of the <see cref="EncounterDataConfiguration"/> class.
         /// </summary>
-        public OrderDataConfiguration()
+        public EncounterDataConfiguration()
         {
             try
             {
-                // Initialize defaults
+                // Initialize defaults.
                 IdFieldAttributePath = _DEFAULT_ID_FIELD_ATTRIBUTE_PATH;
-                CollectionDateAttributePath = _DEFAULT_COLLECTION_DATE_ATTRIBUTE_PATH;
-                CollectionTimeAttributePath = _DEFAULT_COLLECTION_TIME_ATTRIBUTE_PATH;
+                EncounterDateAttributePath = _DEFAULT_DATE_ATTRIBUTE_PATH;
+                EncounterTimeAttributePath = _DEFAULT_TIME_ATTRIBUTE_PATH;
 
                 RecordMatchCriteria = new List<string>();
-                RecordMatchCriteria.Add("[PatientMRN] = {/PatientInfo/MR_Number}");
-                RecordMatchCriteria.Add("[OrderCode] = {OrderCode}");
-                RecordMatchCriteria.Add("[OrderStatus] = 'A'");
-                RecordMatchCriteria.Add("COALESCE([ReferenceDateTime],[ReceivedDateTime]) > DATEADD(MONTH, -3, GETDATE())");
+                RecordMatchCriteria.Add("{/PatientInfo/MR_Number} = [PatientMRN]");
+                RecordMatchCriteria.Add("{Department} = [Department]");
 
                 RecordQueryColumns = new OrderedDictionary();
-                RecordQueryColumns.Add(IdFieldDatabaseName, "[LabDEOrder].[OrderNumber]");
-                RecordQueryColumns.Add("Order Name", _ORDER_NAME_XPATH);
+                RecordQueryColumns.Add(IdFieldDatabaseName, "[LabDEEncounter].[CSN]");
                 RecordQueryColumns.Add("Patient", "[LabDEPatient].[LastName] + ', ' + [LabDEPatient].[FirstName]");
-                RecordQueryColumns.Add("Ordered By",
-                    "(" + _ORDER_PROVIDER_LAST_NAME_XPATH + " + ', ' + " + _ORDER_PROVIDER_FIRST_NAME_XPATH + ")");
-                RecordQueryColumns.Add("Request Date/Time", "[LabDEOrder].[ReferenceDateTime]");
-                RecordQueryColumns.Add("Collection Date/Time", "[LabDEOrderFile].[CollectionDate]");
+                RecordQueryColumns.Add("Date / Time", "[LabDEEncounter].[EncounterDateTime]");
+                RecordQueryColumns.Add("Department", "[LabDEEncounter].[Department]");
+                RecordQueryColumns.Add("Type", "[LabDEEncounter].[EncounterType]");
+                RecordQueryColumns.Add("Provider", "[LabDEEncounter].[EncounterProvider]");
 
                 ColorQueryConditions = new OrderedDictionary();
-                ColorQueryConditions.Add("Red", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) = 0");
-                ColorQueryConditions.Add("Yellow", "COUNT(CASE WHEN ([OrderStatus] = '*') THEN 1 END) >= " +
-                    "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END)");
-                ColorQueryConditions.Add("Lime", "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END) > 0");
+                ColorQueryConditions.Add("Red", "COUNT(*) = 0");
+                ColorQueryConditions.Add("Yellow",
+                    "COUNT(CASE WHEN ([CSN] = '*') THEN 1 END) >= COUNT(CASE WHEN ([FileCount] = 0) THEN 1 END)");
+                ColorQueryConditions.Add("Lime", "COUNT(CASE WHEN ([FileCount] = 0) THEN 1 END) > 0");
             }
             catch (System.Exception ex)
             {
-                throw ex.AsExtract("ELI41521");
+                throw ex.AsExtract("ELI41534");
             }
         }
 
@@ -162,11 +138,11 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets the 
+        /// Gets the attribute path, relative to the main record attribute, of the attribute that
+        /// represents the record ID.
         /// </summary>
-        /// <value>
-        /// The 
-        /// </value>
+        /// <value>The attribute path, relative to the main record attribute, of the attribute that
+        /// represents the rec
         public string IdFieldAttributePath
         {
             get;
@@ -174,38 +150,36 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets or sets the attribute path for the attribute containing the collection date. The
-        /// path should either be rooted or be relative to the LabDE Order attribute.
+        /// Gets or sets the default attribute path for the attribute containing the encounter date.
         /// </summary>
         /// <value>
-        /// The attribute path for the attribute containing the collection date.
+        /// The default attribute path for the attribute containing the encounter date.
         /// </value>
-        public string CollectionDateAttributePath
+        public string EncounterDateAttributePath
         {
             get;
             set;
         }
 
         /// <summary>
-        /// Gets or sets the attribute path for the attribute containing the collection time. The
-        /// path should either be rooted or be relative to the LabDE Order attribute.
+        /// Gets or sets the default attribute path for the attribute containing the encounter time.
         /// </summary>
         /// <value>
-        /// The attribute path for the attribute containing the collection time.
+        /// The default attribute path for the attribute containing the encounter time.
         /// </value>
-        public string CollectionTimeAttributePath
+        public string EncounterTimeAttributePath
         {
             get;
             set;
         }
 
         /// <summary>
-        /// Gets or sets an SQL query that selects record IDs based on additional custom criteria
-        /// above having basic matches of key fields.
+        /// Gets or sets a list of SQL clauses (to be used in a WHERE clause against
+        /// <see cref="BaseSelectQuery"/>) that must all be true for a potential record to be matching.
         /// </summary>
         /// <value>
-        /// An SQL query that selects record IDs based on additional custom criteria
-        /// </value>
+        /// A list of SQL clauses (to be used in a WHERE clause against <see cref="BaseSelectQuery"/>)
+        /// that must all be true for a potential record to be matching.
         public List<string> RecordMatchCriteria
         {
             get;
@@ -220,7 +194,7 @@ namespace Extract.DataEntry.LabDE
         /// The IdFieldDatabaseName must be selected as the first column.
         /// </summary>
         /// <value>
-        /// The definitions of the columns for the order selection grid.
+        /// The definitions of the columns for the selection grid.
         /// </value>
         public OrderedDictionary RecordQueryColumns
         {
@@ -232,16 +206,13 @@ namespace Extract.DataEntry.LabDE
         /// Gets or sets the different possible status colors for the buttons and their SQL query
         /// conditions. The keys are the color name (from <see cref="System.Drawing.Color"/>) while
         /// the values are SQL query expression that evaluates to true if the color should be used
-        /// based to indicate available order status. If multiple expressions evaluate to true, the
+        /// based to indicate available record status. If multiple expressions evaluate to true, the
         /// first of the matching rows will be used.
         /// <para><b>Note</b></para>
-        /// The fields available to query against for each order are:
-        /// OrderNumber:        The order number.
-        /// Available:          1 if the order's status in the DB is Available, 0 if it is cancelled.
-        /// FileCount:          The number of files that have been filed against this order.
-        /// ReceivedDateTime:   The time the ORM-O01 HL7 message defining the order was received.
-        /// ReferenceDateTime:  A configurable date/time extracted from the message (requested
-        ///                     date/time is typical).
+        /// The fields available to query against for each encounter are:
+        /// CSN:                The CSN (ID) of the encounter
+        /// FileCount:          The number of files that have been filed against this encounter
+        /// EncounterDateTime:  The date/time of the encounter
         /// </summary>
         /// <value>
         /// The different possible status colors for the buttons and their SQL query conditions.
@@ -254,13 +225,15 @@ namespace Extract.DataEntry.LabDE
 
         #endregion Properties
 
+        #region Methods
+
         /// <summary>
-        /// Creates a new <see cref="DocumentDataRecord"/>.
+        /// Creates a new <see cref="DocumentDataRecord"/> to be used in this configuration..
         /// </summary>
         /// <param name="famData">The <see cref="FAMData"/> instance that is managing this instance.
         /// </param>
         /// <param name="dataEntryTableRow">The <see cref="DataEntryTableRow"/> representing the
-        /// order in the LabDE DEP to which this instance pertains.</param>
+        /// encounter in the DEP to which this instance pertains.</param>
         /// <param name="attribute">The <see cref="IAttribute"/> that represents this record.</param>
         /// <returns>
         /// A new <see cref="DocumentDataRecord"/>.
@@ -270,22 +243,22 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                return new DocumentDataOrderRecord(famData, dataEntryTableRow, attribute);
+                return new DocumentDataEncounterRecord(famData, dataEntryTableRow, attribute);
             }
             catch (System.Exception ex)
             {
-                throw ex.AsExtract("ELI41517");
+                throw ex.AsExtract("ELI41535");
             }
         }
 
         /// <summary>
         /// Generates an SQL query to retrieve data from a FAM DB related to the
-        /// <see paramref="selectedRecordNumbers"/>.
+        /// <see paramref="recordIDs"/>.
         /// <para><b>Note</b></para>
         /// The first column returned by the query must be the record ID. Also, in addition to the
         /// relevant record data, the query must return a "FileID" column that is used to report any
-        /// documents that have been filed against the order. Multiple rows may be return per record
-        /// for records for which multiple files have been submitted.
+        /// documents that have been filed against the encounter. Multiple rows may be return per
+        /// record for records for which multiple files have been submitted.
         /// </summary>
         /// <param name="recordIDs">The record IDs for which info is needed.</param>
         /// <param name="selectViaQuery"><c>true</c> if <see paramref="recordIDs"/> represents an SQL
@@ -297,19 +270,19 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                ExtractException.Assert("ELI38151",
-                        "Order query columns have not been properly defined.",
+                ExtractException.Assert("ELI41536",
+                        "Encounter query columns have not been properly defined.",
                         RecordQueryColumns.Count > 0 &&
                         RecordQueryColumns[0].ToString().IndexOf(
                             IdFieldDatabaseName, StringComparison.OrdinalIgnoreCase) >= 0);
 
-                // If selectedOrderNumbers is a query, select the results into a table that can be
-                // joined with LabDEOrderFile.
+                // If recordIDs is a query, select the results into a table that can be joined with
+                // LabDEOrderFile.
                 string declarationsClause = "";
                 if (selectViaQuery)
                 {
-                    declarationsClause = "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
-                        "INSERT INTO @OrderNumbers\r\n" + recordIDs;
+                    declarationsClause = "DECLARE @CSNs TABLE ([CSN] NVARCHAR(20)) \r\n" +
+                        "INSERT INTO @CSNs\r\n" + recordIDs;
                 }
 
                 string columnsClause = string.Join(", \r\n",
@@ -317,24 +290,26 @@ namespace Extract.DataEntry.LabDE
                         .OfType<DictionaryEntry>()
                         .Select(column => column.Value + " AS [" + column.Key + "]"));
 
-                // Add a query against [LabDEOrderFile].[FileID] behind the scenes here to be able to collect
+                // Add a query against [LabDEEncounterFile].[FileID] behind the scenes here to be able to collect
                 // and return correspondingFileIds.
                 string query = declarationsClause + "\r\n\r\n" +
-                    "SELECT " + columnsClause + "\r\n, [LabDEOrderFile].[FileID]\r\n " +
-                    "FROM [LabDEOrder] \r\n" +
-                    "INNER JOIN [LabDEPatient] p ON [LabDEOrder].[PatientMRN] = p.[MRN] \r\n" +
+                    "SELECT " + columnsClause + ",\r\n [LabDEEncounterFile].[FileID]\r\n " +
+                    "FROM [LabDEEncounter] \r\n" +
+                    "INNER JOIN [LabDEPatient] p ON [LabDEEncounter].[PatientMRN] = p.[MRN] \r\n" +
                     "INNER JOIN [LabDEPatient] ON p.[CurrentMRN] = [LabDEPatient].[MRN] \r\n" +
-                    "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] \r\n" +
+                    "FULL JOIN [LabDEEncounterFile] ON [LabDEEncounterFile].[EncounterID] = [LabDEEncounter].[CSN] \r\n" +
                     (selectViaQuery
-                        ? "INNER JOIN @OrderNumbers ON [LabDEOrder].[OrderNumber] = [@OrderNumbers].[OrderNumber]"
-                        : "WHERE [LabDEOrder].[OrderNumber] IN (" + recordIDs + ")");
+                        ? "INNER JOIN @CSNs ON [LabDEEncounter].[CSN] = [@CSNs].[CSN]"
+                        : "WHERE [LabDEEncounter].[CSN] IN (" + recordIDs + ")");
 
                 return query;
             }
             catch (System.Exception ex)
             {
-                throw ex.AsExtract("ELI41518");
+                throw ex.AsExtract("ELI41537");
             }
         }
+
+        #endregion Methods
     }
 }
