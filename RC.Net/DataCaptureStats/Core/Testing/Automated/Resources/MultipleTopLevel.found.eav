@@ -1,0 +1,24 @@
+LabInfo|N/A
+.Name|CHILDREN'S HOSPITAL OF WISCONSIN
+PatientInfo|N/A
+.DOB|02/19/1999
+.Gender|M
+.Name|DOE, JOHN
+..Last|DOE
+..First|JOHN
+PhysicianInfo|N/A
+.OrderingPhysicianName|ZAIUS
+..Last|ZAIUS
+ResultStatus|Final
+Test|N/A
+.CollectionTime|09:30
+.CollectionDate|06/10/2009
+.Component|HEMOGLOBIN A1C
+..OriginalName|POC HEMOGLOBIN A1C
+..Flag|H
+..Range|4.5-5.7
+..Units|%
+..Value|8.40
+.Name|GLYCOHEMOGLOBIN A1C
+ResultDate|06/10/2009
+ResultTime|23:43
