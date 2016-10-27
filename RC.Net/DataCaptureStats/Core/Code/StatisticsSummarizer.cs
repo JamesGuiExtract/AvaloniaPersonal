@@ -65,7 +65,8 @@ namespace Extract.DataCaptureStats
                     writer.RenderBeginTag(HtmlTextWriterTag.Head);
                     writer.AddAttribute(HtmlTextWriterAttribute.Type, "text/css");
                     writer.RenderBeginTag(HtmlTextWriterTag.Style);
-                    writer.Write("table.DataCaptureStats th { text-align: left; }");
+                    writer.WriteLine("table.DataCaptureStats th { text-align: left; }");
+                    writer.Write("table.DataCaptureStats td { text-align: right; }");
                     writer.RenderEndTag();
                     writer.RenderEndTag();
                     // Table

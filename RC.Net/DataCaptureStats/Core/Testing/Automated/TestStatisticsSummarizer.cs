@@ -253,6 +253,7 @@ namespace Extract.DataCaptureStats.Test
 	<head>
 		<style type=""text/css"">
 			table.DataCaptureStats th { text-align: left; }
+			table.DataCaptureStats td { text-align: right; }
 		</style>
 	</head><table class=""DataCaptureStats"">
 		<tr>
