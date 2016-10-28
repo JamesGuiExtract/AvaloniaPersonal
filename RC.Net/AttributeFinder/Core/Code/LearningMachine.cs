@@ -14,9 +14,11 @@ using System.Reflection;
 using System.Runtime.Caching;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
+using System.Text;
 using System.Threading;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using ZstdNet;
 using AccuracyData = Extract.Utilities.Union<Accord.Statistics.Analysis.GeneralConfusionMatrix, Accord.Statistics.Analysis.ConfusionMatrix>;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
@@ -658,9 +660,14 @@ namespace Extract.AttributeFinder
             {
                 // Save to a temporary file
                 tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                using (var stream = new FileStream(tempFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (var fstream = new FileStream(tempFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (var stream = new MemoryStream())
+                using (var options = new CompressionOptions(9))
+                using (var compressor = new Compressor(options))
                 {
                     Save(stream);
+                    var bytes = compressor.Wrap(stream.ToArray());
+                    fstream.Write(bytes, 0, bytes.Length);
                 }
 
                 // Once the save process is complete, copy the file into the real destination.
@@ -711,9 +718,23 @@ namespace Extract.AttributeFinder
                 LearningMachine machine = null;
                 FileSystemMethods.PerformFileOperationWithRetry(() =>
                 {
-                    using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    using (var decompressor = new Decompressor())
                     {
-                        machine = Load(stream);
+                        var bytes = File.ReadAllBytes(fileName);
+                        byte[] uncompressedBytes = null;
+                        if (Encoding.ASCII.GetString(bytes.Take(16).ToArray())
+                            .Equals("<LearningMachine", StringComparison.Ordinal))
+                        {
+                            uncompressedBytes = bytes;
+                        }
+                        else
+                        {
+                            uncompressedBytes = decompressor.Unwrap(bytes);
+                        }
+                        using (var stream = new MemoryStream(uncompressedBytes))
+                        {
+                            machine = Load(stream);
+                        }
                     }
                 }, onlyOnSharingViolation: true);
 
