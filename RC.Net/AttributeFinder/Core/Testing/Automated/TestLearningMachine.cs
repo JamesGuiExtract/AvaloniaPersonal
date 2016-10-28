@@ -1040,6 +1040,27 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual("13,16", string.Join(",", dobIndexes));
         }
 
+        // Confirm that a 10.4 machine loads in later version
+        [Test, Category("LearningMachine")]
+        public static void TestLoading10_4Machine()
+        {
+            var path = _testFiles.GetFile("Resources.LearningMachine.Pagination.10.4.lm");
+            Assert.DoesNotThrow(() => LearningMachine.Load(path));
+        }
+
+        // Confirm that a 10.4 machine saved in a later version is smaller (since it has been compressd)
+        // https://extract.atlassian.net/browse/ISSUE-14140
+        [Test, Category("LearningMachine")]
+        public static void TestSavingCompressedMachine()
+        {
+            var path = _testFiles.GetFile("Resources.LearningMachine.Pagination.10.4.lm");
+            long uncompressedSize = new FileInfo(path).Length;
+            LearningMachine.Load(path).Save(path);
+            long compressedSize = new FileInfo(path).Length;
+
+            Assert.Less(compressedSize, uncompressedSize);
+        }
+
         #endregion Tests
 
         #region Helper Methods

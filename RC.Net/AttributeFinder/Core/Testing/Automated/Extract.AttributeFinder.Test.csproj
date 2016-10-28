@@ -291,6 +291,7 @@
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.candidates.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.candidates.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.candidates.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\Pagination\10.4.lm" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif" />
