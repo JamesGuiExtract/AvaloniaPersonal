@@ -2256,8 +2256,12 @@ namespace Extract.Imaging.Forms
                     ExtractException.Assert("ELI21100", "Orientation must be a multiple of 90.",
                         value % 90 == 0);
 
-                    // Rotate the orientation
-                    Rotate(_orientation - value, false, false);
+                    int orientationDelta = (value - _orientation + 360) % 360;
+                    if (orientationDelta != 0)
+                    {
+                        // Rotate the delta
+                        Rotate(orientationDelta, false, false);
+                    }
                 }
                 catch (Exception e)
                 {

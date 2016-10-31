@@ -445,7 +445,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                             imageViewer.OpenImage(Page.OriginalDocumentName, false, false);
                         }
                         imageViewer.PageNumber = Page.OriginalPageNumber;
-                        imageViewer.Orientation = -Page.ImageOrientation;
+
+                        // Set the image viewer orientation to be the same value as the control.
+                        // I can't figure out why it used to be the -Page.Orientation; when it was
+                        // that way a control with a 90 or 270 degree orientation would cause the
+                        // image to get flipped the second time it was selected (so that the image
+                        // displayed in the full-sized image viewer would not match the thumbnail)
+                        // https://extract.atlassian.net/browse/ISSUE-14208
+                        imageViewer.Orientation = Page.ImageOrientation;
 
                         if (_activeImageViewer == null)
                         {

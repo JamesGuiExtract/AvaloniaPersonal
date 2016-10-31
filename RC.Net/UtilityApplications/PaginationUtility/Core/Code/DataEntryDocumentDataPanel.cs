@@ -397,21 +397,39 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                base.SetImageViewerPageNumber(pageNumber);
-
-                // Special logic applies only if the panel is not being used in the pagination
+                // Special logic applies only if the panel is being used in the pagination
                 // context.
                 if (InPaginationPanel)
                 {
-                    var flowLayoutPanel = this.GetAncestors()
-                        .OfType<PaginationFlowLayoutPanel>()
-                        .Single();
+                    // Don't switch to a page that is not part of this document. There are many
+                    // issues with doing so including unexpected page rotation behavior.
+                    // https://extract.atlassian.net/browse/ISSUE-14208
+                    var isValidPage = this.GetAncestors()
+                        .OfType<PaginationSeparator>()
+                        .Single()
+                        .Document
+                        .PageControls
+                        .Where(c => c.Page.OriginalPageNumber == pageNumber)
+                        .Any();
 
-                    int scrollPos = flowLayoutPanel.VerticalScroll.Value;
-                    OnPageLoadRequest(pageNumber);
-                    flowLayoutPanel.VerticalScroll.Value = scrollPos;
-                    base.ImageViewer = _imageViewer;
-                    DrawHighlights(true);
+                    if (isValidPage)
+                    {
+                        base.SetImageViewerPageNumber(pageNumber);
+
+                        var flowLayoutPanel = this.GetAncestors()
+                            .OfType<PaginationFlowLayoutPanel>()
+                            .Single();
+
+                        int scrollPos = flowLayoutPanel.VerticalScroll.Value;
+                        OnPageLoadRequest(pageNumber);
+                        flowLayoutPanel.VerticalScroll.Value = scrollPos;
+                        base.ImageViewer = _imageViewer;
+                        DrawHighlights(true);
+                    }
+                }
+                else
+                {
+                    base.SetImageViewerPageNumber(pageNumber);
                 }
             }
             catch (Exception ex)

@@ -1676,8 +1676,6 @@ namespace Extract.DataEntry
                                 (int)(_ERROR_ICON_SIZE * pageProperties.XResolution),
                                 (int)(_ERROR_ICON_SIZE * pageProperties.YResolution));
                         }
-
-                        SetImageViewerPageNumber(1);
                     }
 
                     if (attributes != null)
