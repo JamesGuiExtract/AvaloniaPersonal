@@ -25,18 +25,6 @@ namespace StatisticsReporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1/1/3000")]
-        public string EndDateTime {
-            get {
-                return ((string)(this["EndDateTime"]));
-            }
-            set {
-                this["EndDateTime"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool IncludeFilesIfNoExpectedVoa {
             get {
@@ -44,18 +32,6 @@ namespace StatisticsReporter.Properties {
             }
             set {
                 this["IncludeFilesIfNoExpectedVoa"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1/1/1970")]
-        public string StartDateTime {
-            get {
-                return ((string)(this["StartDateTime"]));
-            }
-            set {
-                this["StartDateTime"] = value;
             }
         }
         
@@ -152,6 +128,54 @@ namespace StatisticsReporter.Properties {
             }
             set {
                 this["ReportOutputFileName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ApplyDateRangeToFound {
+            get {
+                return ((bool)(this["ApplyDateRangeToFound"]));
+            }
+            set {
+                this["ApplyDateRangeToFound"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("All")]
+        public string EndDateTime {
+            get {
+                return ((string)(this["EndDateTime"]));
+            }
+            set {
+                this["EndDateTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("All")]
+        public string StartDateTime {
+            get {
+                return ((string)(this["StartDateTime"]));
+            }
+            set {
+                this["StartDateTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ErrorIfContainerOnlyConflict {
+            get {
+                return ((bool)(this["ErrorIfContainerOnlyConflict"]));
+            }
+            set {
+                this["ErrorIfContainerOnlyConflict"] = value;
             }
         }
     }

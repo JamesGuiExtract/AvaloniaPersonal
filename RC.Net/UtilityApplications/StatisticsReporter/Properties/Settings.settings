@@ -2,14 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="StatisticsReporter.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="EndDateTime" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1/1/3000</Value>
-    </Setting>
     <Setting Name="IncludeFilesIfNoExpectedVoa" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="StartDateTime" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1/1/1970</Value>
     </Setting>
     <Setting Name="TypeOfStatistics" Type="System.String" Scope="User">
       <Value Profile="(Default)">DataCapture</Value>
@@ -34,6 +28,18 @@
     </Setting>
     <Setting Name="ReportOutputFileName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ApplyDateRangeToFound" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="EndDateTime" Type="System.String" Scope="User">
+      <Value Profile="(Default)">All</Value>
+    </Setting>
+    <Setting Name="StartDateTime" Type="System.String" Scope="User">
+      <Value Profile="(Default)">All</Value>
+    </Setting>
+    <Setting Name="ErrorIfContainerOnlyConflict" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

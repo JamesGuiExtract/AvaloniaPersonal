@@ -4,9 +4,12 @@ using Extract.Licensing;
 using Extract.Utilities;
 using StatisticsReporter.Properties;
 using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Web.UI;
 
 namespace StatisticsReporter
 {
@@ -46,8 +49,12 @@ namespace StatisticsReporter
                 dcSettings.FileSettings.XPathOfContainerOnlyAttributes = ReportSettings.Settings.XPathOfContainerOnlyAttributes;
                 dcSettings.ExpectedAttributeSetName = ReportSettings.Settings.ExpectedAttributeSetName;
                 dcSettings.FoundAttributeSetName = ReportSettings.Settings.FoundAttributeSetName;
-                dcSettings.StartDate = DateTime.Parse( ReportSettings.Settings.StartDateTime, CultureInfo.CurrentCulture);
-                dcSettings.EndDate = DateTime.Parse(ReportSettings.Settings.EndDateTime, CultureInfo.CurrentCulture);
+
+                var range = ConvertDateTimeStrings(ReportSettings.Settings.StartDateTime, ReportSettings.Settings.EndDateTime);
+                dcSettings.StartDate = range.Item1;
+                dcSettings.EndDate = range.Item2;
+
+                dcSettings.ApplyDatesToFound = ReportSettings.Settings.ApplyDateRangeToFound;
 
                 //// Create the Process Statistics 
                 ProcessStatistics Statistics = new ProcessStatistics(dcSettings);
@@ -66,10 +73,13 @@ namespace StatisticsReporter
                 var AggrgatedResults = Results.AggregateStatistics();
 
                 // Summarize the data
-                var SummarizedResults = AggrgatedResults.SummarizeStatistics(false);
+                var SummarizedResults = AggrgatedResults.SummarizeStatistics(ReportSettings.Settings.ErrorIfContainerOnlyConflict);
 
-                // Save the data to the configure output file
-                File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, SummarizedResults.AccuracyDetailsToHtml());
+                // Get the Html page to save
+                string HtmlOutputPage = CreateHtmlPage(SummarizedResults.AccuracyDetailsToHtml(), ReportSettings, range);
+                
+                // Save the data to the configured output file
+                File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, HtmlOutputPage);
 
                 // Stop the timer and write the elapsed time
                 timeToProcess.Stop();
@@ -93,5 +103,182 @@ namespace StatisticsReporter
             Console.WriteLine("\tStatisticsReporter <ConfigFileName>");
             Console.WriteLine("\t\t<ConfigFileName - File containing the config settings for the report.");
         }
+
+        /// <summary>
+        /// Converts the given StartDateString and EndDateString to dates. 
+        /// </summary>
+        /// <param name="StartDateString">The start date as a parsable date or a date range specifier</param>
+        /// <param name="EndDateString">The end date as a parsable date or a date range specifier</param>
+        /// <returns>Tuple with two <see cref="DateTime"/> values, the start date as Item1 and end date as Item2</returns>
+        static Tuple<DateTime,DateTime> ConvertDateTimeStrings(string StartDateString, string EndDateString)
+        {
+            DateTime startDate;
+            DateTime endDate;
+            if (DateTime.TryParse(StartDateString, out startDate))
+            {
+                // if the start date was a valid date the end date should be a valid date
+                if (!DateTime.TryParse(EndDateString, out endDate))
+                {
+                    ExtractException ee = new ExtractException("ELI41578", "EndDate setting is not a valid date.");
+                    ee.AddDebugData("EndDate", EndDateString, false);
+                    throw ee;
+                }
+                return new Tuple<DateTime, DateTime>(startDate, endDate);
+            }
+
+            // If start date is not a valid date then it may be a relative to now
+            // it is expected that the StartDateString and EndDateString have the same value that specifies the relative range
+            if (String.IsNullOrWhiteSpace(StartDateString) || string.IsNullOrWhiteSpace(EndDateString) ||
+                StartDateString.ToUpperInvariant() != EndDateString.ToUpperInvariant())
+            {
+                ExtractException ee = new ExtractException("ELI41579", "StartDate and EndDate are not valid dates or Relative time periods.");
+                ee.AddDebugData("StartDate", StartDateString, false);
+                ee.AddDebugData("EndDate", EndDateString, false);
+                throw ee;
+            }
+
+            // Check for All
+            if (StartDateString.Equals("All", StringComparison.OrdinalIgnoreCase))
+            {
+                DateTime referenceDate = DateTime.Now;
+                startDate = referenceDate.AddYears(-100);
+                endDate = referenceDate.AddYears(100);
+                return new Tuple<DateTime, DateTime>(startDate, endDate);
+            }
+
+            // Any remaining values should be convertible to a TimePeriodRange
+            TimePeriodRange timeRange;
+            if (!Enum.TryParse(StartDateString, out timeRange))
+            {
+                ExtractException ee = new ExtractException("ELI41582", "Specified Time Period is invalid.");
+                ee.AddDebugData("StartDate", StartDateString, false);
+                throw ee;
+            }
+
+            return DateTimeMethods.GetDateRangeForTimePeriodRange(timeRange);
+        }
+
+        /// <summary>
+        /// Creates a HTML page with a table for the report settings and the table contained in the <paramref name="statsData"/> parameter
+        /// </summary>
+        /// <param name="statsData">The HTML formated table of stats data</param>
+        /// <param name="reportSettings">Instance of report settings used to generate report</param>
+        /// <param name="range">The Tuple that contains the start and end DateTime for the report</param>
+        /// <returns>String that is HTML formated page with the <paramref name="statsData"/> string and other page formatting</returns>
+        static string CreateHtmlPage(string statsData, ConfigSettings<Settings> reportSettings, Tuple<DateTime, DateTime> range)
+        {
+            // The order that settings should be displayed
+            List<string> SettingsOrder = new List<string>
+            {
+                "TypeOfStatistics",
+                "DatabaseServerName",
+                "DatabaseName",
+                "StartDateTime",
+                "EndDateTime",
+                "IncludeFilesIfNoExpectedVoa",
+                "ExpectedAttributeSetName",
+                "FoundAttributeSetName",
+                "ApplyDateRangeToFound",
+                "XPathOfAttributesToIgnore",
+                "XPathOfContainerOnlyAttributes",
+                "ReportOutputFileName",
+                "ErrorIfContainerOnlyConflict"
+            };
+
+            var baseWriter = new StringWriter(CultureInfo.InvariantCulture);
+            using (var writer = new HtmlTextWriter(baseWriter))
+            {
+                writer.RenderBeginTag(HtmlTextWriterTag.Html);
+                
+                // Header for the Html
+                writer.RenderBeginTag(HtmlTextWriterTag.Head);
+                writer.AddAttribute(HtmlTextWriterAttribute.Type, "text/css");
+                writer.RenderBeginTag(HtmlTextWriterTag.Style);
+                writer.WriteLine("table.ReportSettings th { text-align: left; }");
+                writer.WriteLine("table.ReportSettings td { text-align: left; }");
+                writer.WriteLine("table.DataCaptureStats th { text-align: left; }");
+                writer.WriteLine("table.DataCaptureStats td { text-align: right; }");
+                writer.Write("thead { background: DarkSeaGreen; }");
+                writer.RenderEndTag();
+                writer.RenderEndTag();
+
+                // Table for configuration
+                writer.AddAttribute(HtmlTextWriterAttribute.Class, "ReportSettings");
+                writer.RenderBeginTag(HtmlTextWriterTag.Table);
+
+                // Header row
+                writer.RenderBeginTag(HtmlTextWriterTag.Thead);
+                writer.RenderBeginTag(HtmlTextWriterTag.Tr);
+                writer.RenderBeginTag(HtmlTextWriterTag.Th);
+                writer.Write("Setting");
+                writer.RenderEndTag();// Th
+                writer.RenderBeginTag(HtmlTextWriterTag.Th);
+                writer.Write("Value");
+                writer.RenderEndTag();//Th
+                writer.RenderEndTag();//Tr
+                writer.RenderEndTag();//Thead
+
+                // Get the settings in order
+                foreach (string settingName in SettingsOrder)
+                {
+                    // Get the setting with the setting name
+                    SettingsPropertyValue setting = reportSettings.Settings.PropertyValues[settingName];
+                    
+                    // If no setting with name was found log exception and continue
+                    if (setting == null)
+                    {
+                        ExtractException ex = new ExtractException("ELI41585", "Setting was not found.");
+                        ex.AddDebugData("Setting", settingName, false);
+                        ex.Log();
+                        continue;
+                    }
+
+                    string Value;
+                    if (setting.Name.Equals("StartDateTime"))
+                    {
+                        Value = String.Format(CultureInfo.CurrentCulture, "{0} ({1:MM/dd/yyyy hh:mm:ss tt})", setting.PropertyValue, range.Item1);
+                    }
+                    else if (setting.Name.Equals("EndDateTime"))
+                    {
+                        Value = String.Format(CultureInfo.CurrentCulture, "{0} ({1:MM/dd/yyyy hh:mm:ss tt})", setting.PropertyValue, range.Item2);
+                    }
+                    else
+                    {
+                        Value = setting.PropertyValue.ToString();
+                    }
+
+                    AddPropertyToHTML(writer, setting.Name, Value);
+                }
+                writer.RenderEndTag(); // table
+
+                // Add a line between the tables over the entire width of the pages
+                writer.AddAttribute(HtmlTextWriterAttribute.Width, "100%");
+                writer.RenderBeginTag(HtmlTextWriterTag.Hr);
+                writer.RenderEndTag(); // Hr
+
+                writer.Write(statsData);
+                writer.RenderEndTag(); // Html
+                return baseWriter.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Method adds a row for the property to the <paramref name="writer"/>
+        /// </summary>
+        /// <param name="writer">The writer that is being used to create the HTML page</param>
+        /// <param name="propertyName">Name of property being added</param>
+        /// <param name="propertyValue">Value of property being added</param>
+        static void AddPropertyToHTML(HtmlTextWriter writer, string propertyName, string propertyValue)
+        {
+            writer.RenderBeginTag(HtmlTextWriterTag.Tr);
+            writer.RenderBeginTag(HtmlTextWriterTag.Th);
+            writer.Write(propertyName);
+            writer.RenderEndTag(); //Th
+            writer.RenderBeginTag(HtmlTextWriterTag.Td);
+            writer.Write(propertyValue);
+            writer.RenderEndTag(); //Td
+            writer.RenderEndTag(); //Tr
+        }
+
     }
 }

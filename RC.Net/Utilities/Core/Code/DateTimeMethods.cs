@@ -46,8 +46,92 @@ namespace Extract.Utilities
         /// <summary>
         /// A year.
         /// </summary>
-        Year = 7
+        Year = 7,
+
+        /// <summary>
+        /// A Quarter
+        /// </summary>
+        Quarter = 8
     }
+
+    /// <summary>
+    /// Colloquial time periods which can be used for creating time range based
+    /// </summary>
+    public enum TimePeriodRange
+    {
+        /// <summary>
+        /// Any time from the start of the current minute up to the start of the next minute.
+        /// </summary>
+        ThisMinute = 0,
+
+        /// <summary>
+        /// Any time from the start of the last minute up to the start of this minute.
+        /// </summary>
+        LastMinute = 1,
+
+        /// <summary>
+        /// Any time from the start of this hour up to the start of next hour.
+        /// </summary>
+        ThisHour = 2,
+
+        /// <summary>
+        /// Any time from the start of previous hour up to the start of this hour.
+        /// </summary>
+        LastHour = 3,
+
+        /// <summary>
+        /// Any time from midnight today up to midnight tomorrow.
+        /// </summary>
+        Today = 4,
+
+        /// <summary>
+        /// Any time from midnight yesterday up to midnight today.
+        /// </summary>
+        Yesterday = 5,
+
+        /// <summary>
+        /// Any time this week where the start and end of the week is dictated by
+        /// CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek.
+        /// </summary>
+        ThisWeek = 6,
+
+        /// <summary>
+        /// Any time last week where the start and end of the week is dictated by
+        /// CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek.
+        /// </summary>
+        LastWeek = 7,
+
+        /// <summary>
+        /// Any time this month.
+        /// </summary>
+        ThisMonth = 8,
+
+        /// <summary>
+        /// Any time last month.
+        /// </summary>
+        LastMonth = 9,
+
+        /// <summary>
+        /// Any time this quarter
+        /// </summary>
+        ThisQuarter = 10,
+
+        /// <summary>
+        /// Any time last quarter
+        /// </summary>
+        LastQuarter = 11,
+
+        /// <summary>
+        /// Any time this year.
+        /// </summary>
+        ThisYear = 12,
+
+        /// <summary>
+        /// Any time last year.
+        /// </summary>
+        LastYear = 13
+    }
+
 
     /// <summary>
     /// Methods for performing operations on <see cref="DateTime"/> instances.
@@ -109,6 +193,14 @@ namespace Extract.Utilities
             {
                 switch (dateTimeUnit)
                 {
+                    case DateTimeUnit.Quarter:
+                        {
+                            int quarterNumber = (dateTime.Month - 1) / 3 + 1;
+                            DateTime firstDayOfQuarter = new DateTime(dateTime.Year, (quarterNumber - 1) * 3 + 1, 1);
+                            DateTime lastDayOfQuarter = firstDayOfQuarter.AddMonths(3).AddDays(-1);
+                            long midPoint = (lastDayOfQuarter.Ticks + firstDayOfQuarter.Ticks) / 2;
+                            return dateTime.Ticks < midPoint ? firstDayOfQuarter : lastDayOfQuarter;
+                        }
                     case DateTimeUnit.Year:
                         {
                             // Special case; years are not a constant length of time do to leap years.
@@ -215,6 +307,9 @@ namespace Extract.Utilities
             {
                 switch (dateTimeUnit)
                 {
+                    case DateTimeUnit.Quarter:
+                        int quarterNumber = (dateTime.Month - 1) / 3 + 1;
+                        return new DateTime(dateTime.Year, (quarterNumber - 1) * 3 + 1, 1);
                     case DateTimeUnit.Year:
                         // Special case; years are not a constant length of time do to leap years.
                         return new DateTime(dateTime.Year, 1, 1);
@@ -309,6 +404,12 @@ namespace Extract.Utilities
             {
                 switch (dateTimeUnit)
                 {
+                    case DateTimeUnit.Quarter:
+                        {
+                            int quarterNumber = (dateTime.Month - 1) / 3 + 1;
+                            DateTime firstDayOfQuarter = new DateTime(dateTime.Year, (quarterNumber - 1) * 3 + 1, 1);
+                            return firstDayOfQuarter.AddMonths(3).AddDays(-1);
+                        }
                     case DateTimeUnit.Year:
                         {
                             // Special case; years are not a constant length of time do to leap years.
@@ -359,5 +460,102 @@ namespace Extract.Utilities
         }
 
         #endregion Extension Methods
+
+        #region Utility Methods
+
+        /// <summary>
+        /// Gets the Date range for the given timePeriod
+        /// Converts as follows
+        ///     ThisMinute  : Start Date/Time will be the start of the current minute and the end date will be the end of the current minute
+        ///     LastMinute  : Start Date/Time will be the start of the previous minute and the end date will be the end of the previous minute
+        ///     ThisHour    : Start Date/Time will be the start of the current hour and the end date will be the end of the current hour
+        ///     LastHour    : Start Date/Time will be the start of the previous hour and the end date will be the end of the previous hour
+        ///     Today       : Start Date/time will be Todays date  0:00  end date will be Today 23:59:59
+        ///     YesterDay   : Start Date/Time will be Yesterday 0:00 end date will be yesterday 23:59:59
+        ///     ThisWeek    : Start Date/Time will be Sunday of current week at 0:00 end date will be Saturday 23:59:59 of the current week
+        ///     LastWeek    : Start Date/Time will be Sunday of previous week at 0:00 end date will be Saturday 23:59:59 of previous week
+        ///     ThisMonth   : Start Date/Time will be the first day of current month at 0:00 end date will be last day of current month 23:59:59
+        ///     LastMonth   : Start Date/Time will be the first day of previous month at 0:00 end date will be last day of previous month 23:59:59
+        ///     ThisYear    : Start Date/Time will be Jan 1 of current year at 0:00 end date will be Dec 31 of current year at 23:59:59
+        ///     LastYear    : Start Date/Time will be Jan 1 of previous year at 0:00 end date will be Dec 31 of previous year at 23:59:59
+        /// </summary>
+        /// <param name="timePeriod">The timePeriod to return a range of dates for</param>
+        /// <returns>Tuple with two <see cref="DateTime"/> values, the start date as Item1 and end date as Item2</returns>
+        public static Tuple<DateTime, DateTime> GetDateRangeForTimePeriodRange(TimePeriodRange timePeriod)
+        {
+            try
+            {
+                DateTime startDate;
+                DateTime endDate;
+                DateTime referenceDate = DateTime.Now;
+                DateTimeUnit dateTimePart;
+
+                switch (timePeriod)
+                {
+                    case TimePeriodRange.ThisMinute:
+                        dateTimePart = DateTimeUnit.Minute;
+                        break;
+                    case TimePeriodRange.LastMinute:
+                        referenceDate = referenceDate.AddMinutes(-1);
+                        dateTimePart = DateTimeUnit.Minute;
+                        break;
+                    case TimePeriodRange.ThisHour:
+                        dateTimePart = DateTimeUnit.Hour;
+                        break;
+                    case TimePeriodRange.LastHour:
+                        referenceDate = referenceDate.AddHours(-1);
+                        dateTimePart = DateTimeUnit.Hour;
+                        break;
+                    case TimePeriodRange.Today:
+                        dateTimePart = DateTimeUnit.Day;
+                        break;
+                    case TimePeriodRange.Yesterday:
+                        referenceDate = referenceDate.AddDays(-1);
+                        dateTimePart = DateTimeUnit.Day;
+                        break;
+                    case TimePeriodRange.ThisWeek:
+                        dateTimePart = DateTimeUnit.Week;
+                        break;
+                    case TimePeriodRange.LastWeek:
+                        referenceDate = referenceDate.AddDays(-7);
+                        dateTimePart = DateTimeUnit.Week;
+                        break;
+                    case TimePeriodRange.ThisMonth:
+                        dateTimePart = DateTimeUnit.Month;
+                        break;
+                    case TimePeriodRange.LastMonth:
+                        referenceDate = referenceDate.AddMonths(-1);
+                        dateTimePart = DateTimeUnit.Month;
+                        break;
+                    case TimePeriodRange.ThisYear:
+                        dateTimePart = DateTimeUnit.Year;
+                        break;
+                    case TimePeriodRange.LastYear:
+                        dateTimePart = DateTimeUnit.Year;
+                        referenceDate = referenceDate.AddYears(-1);
+                        break;
+                    case TimePeriodRange.ThisQuarter:
+                        dateTimePart = DateTimeUnit.Quarter;
+                        break;
+                    case TimePeriodRange.LastQuarter:
+                        dateTimePart = DateTimeUnit.Quarter;
+                        referenceDate = referenceDate.AddMonths(-3);
+                        break;
+
+                    default:
+                        throw new ExtractException("ELI41580", "Unexpected relative time period.");
+                }
+                startDate = referenceDate.Floor(dateTimePart);
+                endDate = referenceDate.Ceiling(dateTimePart);
+                return new Tuple<DateTime, DateTime>(startDate, endDate);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex.AsExtract("ELI41584");
+            }
+        }
+
+        #endregion Utility Methods
     }
 }

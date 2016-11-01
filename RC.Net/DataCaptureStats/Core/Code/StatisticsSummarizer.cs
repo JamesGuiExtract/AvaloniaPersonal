@@ -59,20 +59,11 @@ namespace Extract.DataCaptureStats
                 var baseWriter = new StringWriter(CultureInfo);
                 using (var writer = new HtmlTextWriter(baseWriter))
                 {
-                    // Html
-                    writer.RenderBeginTag(HtmlTextWriterTag.Html);
-                    // Header
-                    writer.RenderBeginTag(HtmlTextWriterTag.Head);
-                    writer.AddAttribute(HtmlTextWriterAttribute.Type, "text/css");
-                    writer.RenderBeginTag(HtmlTextWriterTag.Style);
-                    writer.WriteLine("table.DataCaptureStats th { text-align: left; }");
-                    writer.Write("table.DataCaptureStats td { text-align: right; }");
-                    writer.RenderEndTag();
-                    writer.RenderEndTag();
                     // Table
                     writer.AddAttribute(HtmlTextWriterAttribute.Class, "DataCaptureStats");
                     writer.RenderBeginTag(HtmlTextWriterTag.Table);
                     // Header row
+                    writer.RenderBeginTag(HtmlTextWriterTag.Thead);
                     writer.RenderBeginTag(HtmlTextWriterTag.Tr);
                     foreach (var col in columns.Keys)
                     {
@@ -80,6 +71,7 @@ namespace Extract.DataCaptureStats
                         writer.Write(col);
                         writer.RenderEndTag();
                     }
+                    writer.RenderEndTag();
                     writer.RenderEndTag();
                     // Other rows
                     foreach (var p in statisticsToReport.Select(a => a.Path).Distinct().OrderBy(p => p))
@@ -114,7 +106,6 @@ namespace Extract.DataCaptureStats
                         writer.RenderEndTag(); // End row
                     }
                     writer.RenderEndTag(); // End table
-                    writer.RenderEndTag(); // End Html
                 }
 
                 return baseWriter.ToString();

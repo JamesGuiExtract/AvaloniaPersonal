@@ -248,63 +248,58 @@ namespace Extract.DataCaptureStats.Test
         [Test, Category("StatisticsSummarizer")]
         public static void TestHtmlFormatting()
         {
-            var expectedResult = 
-@"<html>
-	<head>
-		<style type=""text/css"">
-			table.DataCaptureStats th { text-align: left; }
-			table.DataCaptureStats td { text-align: right; }
-		</style>
-	</head><table class=""DataCaptureStats"">
+            var expectedResult =
+@"<table class=""DataCaptureStats"">
+	<thead>
 		<tr>
 			<th>Path</th><th>Expected</th><th>Correct</th><th>% Correct</th><th>Incorrect</th><th>ROCE</th>
-		</tr><tr>
-			<th>(Summary)</th><td>16</td><td>14</td><td>87.5</td><td>1</td><td>14</td>
-		</tr><tr>
-			<th>PatientInfo (Summary)</th><td>4</td><td>4</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>PatientInfo/DOB</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>PatientInfo/Gender</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>PatientInfo/Name (Summary)</th><td>2</td><td>2</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>PatientInfo/Name/First</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>PatientInfo/Name/Last</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>PhysicianInfo (Summary)</th><td>2</td><td>1</td><td>50</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>PhysicianInfo/OrderingPhysicianName (Summary)</th><td>2</td><td>1</td><td>50</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>PhysicianInfo/OrderingPhysicianName/First</th><td>1</td><td>0</td><td>0</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>PhysicianInfo/OrderingPhysicianName/Last</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>ResultDate</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>ResultTime</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>Test (Summary)</th><td>8</td><td>7</td><td>87.5</td><td>1</td><td>7</td>
-		</tr><tr>
-			<th>Test/CollectionDate</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>Test/CollectionTime</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>Test/Component</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>Test/Component/Flag</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>Test/Component/Range</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>Test/Component/Units</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
-		</tr><tr>
-			<th>Test/Component/Value</th><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td>
-		</tr><tr>
-			<th>Test/Name</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
 		</tr>
-	</table>
-</html>";
+	</thead><tr>
+		<th>(Summary)</th><td>16</td><td>14</td><td>87.5</td><td>1</td><td>14</td>
+	</tr><tr>
+		<th>PatientInfo (Summary)</th><td>4</td><td>4</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>PatientInfo/DOB</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>PatientInfo/Gender</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>PatientInfo/Name (Summary)</th><td>2</td><td>2</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>PatientInfo/Name/First</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>PatientInfo/Name/Last</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>PhysicianInfo (Summary)</th><td>2</td><td>1</td><td>50</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>PhysicianInfo/OrderingPhysicianName (Summary)</th><td>2</td><td>1</td><td>50</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>PhysicianInfo/OrderingPhysicianName/First</th><td>1</td><td>0</td><td>0</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>PhysicianInfo/OrderingPhysicianName/Last</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>ResultDate</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>ResultTime</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>Test (Summary)</th><td>8</td><td>7</td><td>87.5</td><td>1</td><td>7</td>
+	</tr><tr>
+		<th>Test/CollectionDate</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>Test/CollectionTime</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>Test/Component</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>Test/Component/Flag</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>Test/Component/Range</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>Test/Component/Units</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr><tr>
+		<th>Test/Component/Value</th><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td>
+	</tr><tr>
+		<th>Test/Name</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+	</tr>
+</table>";
 
             SetFiles("Resources.MultipleTopLevel.found.eav", "Resources.MultipleTopLevel.expected.eav");
             var result = AttributeTreeComparer.CompareAttributes(_expected, _found,

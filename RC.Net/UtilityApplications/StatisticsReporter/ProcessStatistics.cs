@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using UCLID_COMUTILSLib;
@@ -76,6 +77,12 @@ namespace StatisticsReporter
         /// The end date used to select the Found Set
         /// </summary>
         public DateTime EndDate { get; set; }
+
+        /// <summary>
+        /// If True indicates that the StartDate and EndDate are applied to Found set
+        /// If False indicates that the StartDate and EndDate are applied to Expected set
+        /// </summary>
+        public bool ApplyDatesToFound { get; set; }
         
         /// <summary>
         /// Per File settings property
@@ -118,12 +125,13 @@ namespace StatisticsReporter
         #region Constants
 
         // Query used to get the expected and found voa's
+        // The variable <ApplyDateRangeSet> needs to be replaced with "Found" or "Expected"
         static readonly string ExpectedFoundSQL =
             "   SELECT Expected.VOA AS ExpectedVOA, " +
             "       Found.VOA AS FoundVOA, " +
             "       Found.FileID, " +
             "       FAMFile.FileName, " +
-            "       Found.DateTimeStamp " +
+            "       <ApplyDateRangeSet>.DateTimeStamp " +
             "FROM " +
             "( " +
             "    SELECT dbo.AttributeSetForFile.VOA, " +
@@ -136,29 +144,29 @@ namespace StatisticsReporter
             "    WHERE Description = '<Found>' " +
             ") AS Found " +
             "INNER JOIN FAMFile ON Found.FileID = FAMFile.ID " +
-            "LEFT JOIN " +
+            "<IncludeAll> " +
             "( " +
             "    SELECT dbo.AttributeSetForFile.VOA, " +
             "           dbo.FileTaskSession.FileID, " +
-            "           dbo.FileTaskSession.DateTimeStamp " +
+            "           dbo.FileTaskSession.DateTimeStamp, " +
+            "           dbo.AttributeSetName.ID as ExpectedSetID " +
             "    FROM dbo.AttributeSetForFile " +
             "         INNER JOIN dbo.AttributeSetName ON dbo.AttributeSetForFile.AttributeSetNameID = dbo.AttributeSetName.ID " +
             "         INNER JOIN dbo.FileTaskSession ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID " +
             "    WHERE Description = '<Expected>' " +
             ") AS Expected ON FAMFile.ID = Expected.FileID " +
-            "WHERE Found.DateTimeStamp = " +
+            "WHERE <ApplyDateRangeSet>.DateTimeStamp = " +
             "( " +
             "    SELECT MAX(DateTimeStamp) " +
             "    FROM FileTaskSession " +
             "       INNER JOIN AttributeSetForFile on AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID " +
-            "       WHERE FileID = FAMFile.ID AND AttributeSetForFile.AttributeSetNameID = FoundSetID " +
-            ") AND Found.DateTimeStamp > '<StartDateTime>' AND Found.DateTimeStamp < '<EndDateTime>'" +
-            "      AND (Expected.FileID IS NOT NULL OR <IncludeAll>);";
+            "       WHERE FileID = FAMFile.ID AND AttributeSetForFile.AttributeSetNameID = <ApplyDateRangeSet>SetID " +
+            ") AND <ApplyDateRangeSet>.DateTimeStamp >= '<StartDateTime>' AND <ApplyDateRangeSet>.DateTimeStamp <= '<EndDateTime>';";
 
         
         //  These are used to replace the IncludeAll tag in the ExpectedFoundSQL string
-        static readonly string IncludeTrue = "1=1";
-        static readonly string IncludeFalse = "1=0";
+        static readonly string IncludeTrue = "LEFT JOIN";
+        static readonly string IncludeFalse = "INNER JOIN";
 
         #endregion
 
@@ -228,7 +236,7 @@ namespace StatisticsReporter
                     // Process the found records
                     while (ExpectedAndFoundReader.Read())
                     {
-                        // Get the streams fo the expected and found voa data (the thread will read the voa from the stream
+                        // Get the streams for the expected and found voa data (the thread will read the voa from the stream
                         Stream expectedStream = ExpectedAndFoundReader.GetStream(ExpectedVOAColumn);
                         Stream foundStream = ExpectedAndFoundReader.GetStream(FoundVOAColumn);
 
@@ -372,8 +380,9 @@ namespace StatisticsReporter
                 sql = sql.Replace("<Expected>", Settings.ExpectedAttributeSetName);
                 sql = sql.Replace("<Found>", Settings.FoundAttributeSetName);
                 sql = sql.Replace("<IncludeAll>", Settings.IncludeFilesIfNoExpectedVOA ? IncludeTrue : IncludeFalse);
-                sql = sql.Replace("<StartDateTime>", Settings.StartDate.AsString());
-                sql = sql.Replace("<EndDateTime>", Settings.EndDate.AsString());
+                sql = sql.Replace("<StartDateTime>", Settings.StartDate.ToString("yyyy/MM/dd HH:mm:ss:fff", CultureInfo.CurrentCulture));
+                sql = sql.Replace("<EndDateTime>", Settings.EndDate.ToString("yyyy/MM/dd HH:mm:ss:fff", CultureInfo.CurrentCulture));
+                sql = sql.Replace("<ApplyDateRangeSet>", (Settings.ApplyDatesToFound) ? "Found" : "Expected");
                 cmd.CommandText = sql;
 
                 // Open the connection
