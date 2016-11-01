@@ -11,8 +11,8 @@ namespace Extract.DataEntry.LabDE
     internal interface IFAMDataConfiguration
     {
         /// <summary>
-        /// Gets or sets the root clause of an SQL query that selects and joins any relevant tables
-        /// to be used to query potentially matching records.
+        /// Gets the root clause of an SQL query that selects and joins any relevant tables to be
+        /// used to query potentially matching records.
         /// </summary>
         /// <value>
         /// The root clause of an SQL query that is to be used to query potentially matching records.

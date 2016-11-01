@@ -44,7 +44,8 @@ namespace Extract.DataEntry.LabDE
         IAttribute _attribute;
 
         /// <summary>
-        /// 
+        /// The <see cref="IFAMDataConfiguration"/> to be able to retrieve data from a FAM database
+        /// for a particular record type.
         /// </summary>
         IFAMDataConfiguration _configuration;
 
