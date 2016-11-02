@@ -322,6 +322,7 @@
 		<row><td>Binaries</td><td>{8F19E4E8-C671-43BF-A610-541055BFC7C6}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>rdt.rl</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CountyTester.dll</td><td>{788C1618-1F79-4F4F-81C9-EBD98A8155CD}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>CountyTester.dll</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.AttributeFinder.Forms.dll</td><td>{68ABFD88-09D1-4F6C-B89E-A08737ACF09E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.attributefinder.form</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Extract.DataCaptureStats.Test.dll</td><td>{3A38A540-A124-467E-91C9-3EF378277E64}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISRegistryComponent</td><td>{775BB93C-F45F-4CDA-B0EF-7634480DA491}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>NonSelfRegCommon</td><td>{4CEEF54D-9017-40FC-BB20-28BA50FC1090}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RasterZoneTester.dll</td><td>{55E680F8-657F-46BD-831C-35ABA107CEBA}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>rasterzonetester.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1195,6 +1196,7 @@
 		<row><td>StringPatternMatcherAutoTest</td><td>StringPatternMatcherAutoTest.dll</td><td>STRING~1.DLL|StringPatternMatcherAutoTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\StringPatternMatcherAutoTest.dll</td><td>17</td><td/></row>
 		<row><td>baseutilstest.dll</td><td>BaseUtilsTest.dll</td><td>BASEUT~1.DLL|BaseUtilsTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\BaseUtilsTest.dll</td><td>17</td><td/></row>
 		<row><td>extract.attributefinder.form</td><td>Extract.AttributeFinder.Forms.dll</td><td>EXTRAC~1.DLL|Extract.AttributeFinder.Forms.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGRDTNETCO_FILES&gt;\Extract.AttributeFinder.Forms.dll</td><td>1</td><td/></row>
+		<row><td>extract.datacapturestats.tes</td><td>Extract.DataCaptureStats.Test.dll</td><td>EXTRAC~1.DLL|Extract.DataCaptureStats.Test.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGRDTNETCO_FILES&gt;\Extract.DataCaptureStats.Test.dll</td><td>1</td><td/></row>
 		<row><td>rasterzonetester.dll</td><td>RasterZoneTester.dll</td><td>RASTER~1.DLL|RasterZoneTester.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\RasterZoneTester.dll</td><td>17</td><td/></row>
 		<row><td>rdt.rl</td><td>Binaries</td><td>RDT.rl</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGRDTCO_FILES&gt;\RDT.rl</td><td>1</td><td/></row>
 		<row><td>redactiontester.dll</td><td>RedactionTester.dll</td><td>REDACT~1.DLL|RedactionTester.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\RedactionTester.dll</td><td>17</td><td/></row>
@@ -1346,6 +1348,7 @@
 		<row><td>Binaries</td><td/><td/><td>_4DA596EB_D030_476D_9DFB_B301700AE020_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CountyTester.dll</td><td/><td/><td>_838DAD13_280B_4007_8722_79D0195C1866_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.AttributeFinder.Forms.dll</td><td/><td/><td>_AAB3E2B6_F109_488F_B594_277577FB335E_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Extract.DataCaptureStats.Test.dll</td><td/><td/><td>_0EB20414_AFEB_4192_B8F7_AEFC1E08F8E6_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISRegistryComponent</td><td/><td/><td>_8F9E7157_C911_4639_A6E5_B5069B7CBB1D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>NonSelfRegCommon</td><td/><td/><td>_D6198984_8972_4217_BDA2_B23267AA1193_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RasterZoneTester.dll</td><td/><td/><td>_0CDFC925_E00D_4C43_872C_928F405F92CC_FILTER</td><td/><td/><td/><td/></row>

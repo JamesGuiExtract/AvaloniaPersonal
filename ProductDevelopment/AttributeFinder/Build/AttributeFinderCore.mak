@@ -216,6 +216,8 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\LearningMachineEditor.exe" /mapout:"$(BinariesFolder)\Map\mapLearningMachineEditor.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Interop.Zip.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Interop.Zip.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\StatisticsReporter.exe" /mapout:"$(BinariesFolder)\Map\mapStatisticsReporter.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.DataCaptureStats.dll" /mapout:"$(BinariesFolder)\Map\Extract.DataCaptureStats.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ZstdNet.dll" /mapout:"$(BinariesFolder)\Map\ZstdNet.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
     
     @ECHO.
     @DATE /T
@@ -301,6 +303,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY "$(BinariesFolder)\Extract.Utilities.ShellExtensions.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY /v "$(BinariesFolder)\DataEntryCC.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v "$(BinariesFolder)\StatisticsReporter.exe.config" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /v "$(BinariesFolder)\zstdlib_x86.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY "$(RCNETDir)\APIs\ScintillaNET v2.4\Dist\*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	
 # Copy all the FOSS license files

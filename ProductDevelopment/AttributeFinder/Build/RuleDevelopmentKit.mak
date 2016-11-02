@@ -111,6 +111,7 @@ CopyFilesToInstallFolder: CreateDestinationFolders
 	@COPY /V  "$(RCDotNetDir)\Core\Testing\Automated\*.nunit" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V  "$(BinariesFolder)\Extract.DataEntry.DEP.*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V  "$(BinariesFolder)\Extract.AttributeFinder.Forms.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon"
+	@COPY /V  "$(BinariesFolder)\Extract.DataCaptureStats.Test.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon"
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.nl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"
