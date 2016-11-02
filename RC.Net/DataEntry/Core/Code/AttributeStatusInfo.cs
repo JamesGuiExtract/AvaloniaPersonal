@@ -1474,16 +1474,51 @@ namespace Extract.DataEntry
                     // If validation triggers are being enabled, try to register all triggers.
                     if (_validationTriggersEnabled)
                     {
-                        foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
-                        {
-                            validationTrigger.UpdateValue();
-                        }
+                        RefreshValidation();
                     }
                 }
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29047", ex);
+            }
+        }
+
+        /// <summary>
+        /// Triggers the execution of all auto-update queries.
+        /// </summary>
+        [ComVisible(false)]
+        public static void RefreshAutoUpdateValues()
+        {
+            try
+            {
+                foreach (AutoUpdateTrigger autoUpdateTrigger in _autoUpdateTriggers.Values)
+                {
+                    autoUpdateTrigger.UpdateValue();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41573");
+            }
+        }
+
+        /// <summary>
+        /// Triggers the execution of all validation queries.
+        /// </summary>
+        [ComVisible(false)]
+        public static void RefreshValidation()
+        {
+            try
+            {
+                foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
+                {
+                    validationTrigger.UpdateValue();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41574");
             }
         }
 

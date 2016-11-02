@@ -469,6 +469,7 @@ namespace Extract.DataEntry.LabDE
                 if (!_inDesignMode && Visible && DataGridView is DataEntryTableBase)
                 {
                     DataGridView.HandleCreated += HandleDataGridView_HandleCreated;
+                    DataGridView.HandleDestroyed += HandleDataGridView_HandleDestroyed;
                     DataGridView.CellContentClick += HandleDataGridView_CellContentClick;
                     DataGridView.CellPainting += HandleDataGridView_CellPainting;
                     DataGridView.Rows.CollectionChanged += HandleDataGridViewRows_CollectionChanged;
@@ -518,10 +519,32 @@ namespace Extract.DataEntry.LabDE
                 _recordIDColumn = DataGridView.Columns
                     .OfType<DataEntryTableColumn>()
                     .SingleOrDefault(column => column.Name == RecordIdColumn);
+
+                // This column may exist in thread where the UI has not been created (such as data
+                // entry pre-loader OH or DataEntryDocumentPanel.UpdateDocumentStatus. UI updates
+                // based on cleared cache isn't relevant (and will fail) if the UI is not created.
+                AttributeStatusInfo.QueryCacheCleared += HandleAttributeStatusInfo_QueryCacheCleared;
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI38137");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.HandleDestroyed"/> event of the <see cref="DataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleDataGridView_HandleDestroyed(object sender, EventArgs e)
+        {
+            try
+            {
+                AttributeStatusInfo.QueryCacheCleared -= HandleAttributeStatusInfo_QueryCacheCleared;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41581");
             }
         }
 
@@ -765,6 +788,26 @@ namespace Extract.DataEntry.LabDE
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI38230");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="AttributeStatusInfo.QueryCacheCleared" /> event.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
+        void HandleAttributeStatusInfo_QueryCacheCleared(object sender, EventArgs e)
+        {
+            try
+            {
+                ClearCachedData(true);
+                _autoPopulationExemptions.Clear();
+                
+                InvokeInvalidate();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41575");
             }
         }
 

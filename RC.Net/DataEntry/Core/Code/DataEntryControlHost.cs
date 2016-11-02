@@ -1945,19 +1945,16 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Forces data that has been cached to be cleared so that any data in referenced databases
-        /// are re-queried for the latest changes.
+        /// Forces application of modified database data to all validation and auto-update queries
+        /// by clearing data that has been cached and re-executing all queries.
         /// </summary>
-        public virtual void ClearCache()
+        public virtual void RefreshDatabaseData()
         {
             try
             {
                 AttributeStatusInfo.ClearQueryCache();
-                Refresh();
-
-                // This forces all validation queries to be re-evaluated.
-                AttributeStatusInfo.EnableValidationTriggers(false);
-                AttributeStatusInfo.EnableValidationTriggers(true);
+                AttributeStatusInfo.RefreshAutoUpdateValues();
+                AttributeStatusInfo.RefreshValidation();
             }
             catch (Exception ex)
             {
