@@ -89,6 +89,8 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Resources\ReceiveAdtEncounterMessage.nix" />
+    <None Include="Resources\ReceiveOrmEncounterMessage.nix" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Merge_AtoB.txt" />
@@ -150,6 +152,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\EncounterMsg_3.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RadiologyOrder.txt" />
+    <EmbeddedResource Include="Resources\RadiologyOrderUpdate.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
