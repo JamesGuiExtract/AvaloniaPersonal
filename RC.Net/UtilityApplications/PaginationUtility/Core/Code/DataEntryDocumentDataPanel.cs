@@ -19,7 +19,7 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// An <see cref="IPaginationDocumentDataPanel"/> implementation that allow for full DEP support
     /// in the context of a pagination data editing panel.
     /// </summary>
-    public class DataEntryDocumentDataPanel : DataEntryControlHost, IPaginationDocumentDataPanel
+    public class DataEntryDocumentDataPanel : DataEntryControlHost
     {
         #region Fields
 
@@ -54,20 +54,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         DataEntryQuery _summaryDataEntryQuery;
 
-        /// <summary>
-        /// Keeps track of the documents for which a <see cref="UpdateDocumentStatus"/> call is in
-        /// progress on a background thread.
-        /// </summary>
-        ConcurrentDictionary<PaginationDocumentData, int> _pendingDocumentStatusUpdate =
-            new ConcurrentDictionary<PaginationDocumentData, int>();
+        ///// <summary>
+        ///// Keeps track of the documents for which a <see cref="UpdateDocumentStatus"/> call is in
+        ///// progress on a background thread.
+        ///// </summary>
+        //ConcurrentDictionary<PaginationDocumentData, int> _pendingDocumentStatusUpdate =
+        //    new ConcurrentDictionary<PaginationDocumentData, int>();
 
-        /// <summary>
-        /// Limits the number of threads that can run concurrently for <see cref="UpdateDocumentStatus"/> calls.
-        /// (1 - 3 where the number does no exceed the num of CPUs - 1).
-        /// </summary>
-        Semaphore _documentStatusUpdateSemaphore = new Semaphore(
-            Math.Max(1, Math.Min(3, Environment.ProcessorCount - 1)),
-            Math.Max(1, Math.Min(3, Environment.ProcessorCount - 1)));
+        ///// <summary>
+        ///// Limits the number of threads that can run concurrently for <see cref="UpdateDocumentStatus"/> calls.
+        ///// (1 - 3 where the number does no exceed the num of CPUs - 1).
+        ///// </summary>
+        //Semaphore _documentStatusUpdateSemaphore = new Semaphore(
+        //    Math.Max(1, Math.Min(3, Environment.ProcessorCount - 1)),
+        //    Math.Max(1, Math.Min(3, Environment.ProcessorCount - 1)));
 
         #endregion Fields
 
@@ -190,10 +190,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 ExtractException.Assert("ELI41360", "Panel not properly initialized.", _imageViewer != null);
 
-                // If this data is getting loaded, there is no need to proceed with any pending
-                // document status update.
-                int temp;
-                _pendingDocumentStatusUpdate.TryRemove(data, out temp);
+                //// If this data is getting loaded, there is no need to proceed with any pending
+                //// document status update.
+                //int temp;
+                //_pendingDocumentStatusUpdate.TryRemove(data, out temp);
 
                 base.ImageViewer = _imageViewer;
 
@@ -206,7 +206,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (_imageViewer.Visible)
                 {
-                    _documentData.SetSummary(SummaryDataEntryQuery.Evaluate().ToString());
+                    _documentData.SetSummary(SummaryDataEntryQuery?.Evaluate().ToString());
                     _documentData.SetModified(UndoOperationAvailable);
                     _documentData.SetDataError(DataValidity != DataValidity.Valid);
                 }
@@ -289,13 +289,16 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 base.ImageViewer = null;
 
-                _imageViewer.ImageFileChanged -= HandleImageViewer_ImageFileChanged;
-                _imageViewer.ImageFileClosing -= HandleImageViewer_ImageFileClosing;
-                _imageViewer.PageChanged -= HandleImageViewer_PageChanged;
+                if (_imageViewer != null)
+                {
+                    _imageViewer.ImageFileChanged -= HandleImageViewer_ImageFileChanged;
+                    _imageViewer.ImageFileClosing -= HandleImageViewer_ImageFileClosing;
+                    _imageViewer.PageChanged -= HandleImageViewer_PageChanged;
 
-                _imageViewer.Invalidate();
+                    _imageViewer.Invalidate();
 
-                UpdateSwipingState();
+                    UpdateSwipingState();
+                }
             }
             catch (Exception ex)
             {
@@ -303,55 +306,55 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        /// <summary>
-        /// Gets a <see cref="PaginationDocumentData"/> instance based on the provided
-        /// <see paramref="attributes"/>.
-        /// </summary>
-        /// <param name="attributes">The VOA data for while a <see cref="PaginationDocumentData"/>
-        /// instance is needed.</param>
-        /// <param name="sourceDocName">The name of the source document for which data is being
-        /// loaded.</param>
-        /// <param name="fileProcessingDB"></param>
-        /// <param name="imageViewer"></param>
-        /// <returns>The <see cref="PaginationDocumentData"/> instance.</returns>
-        public PaginationDocumentData GetDocumentData(IUnknownVector attributes,
-            string sourceDocName, FileProcessingDB fileProcessingDB, ImageViewer imageViewer)
-        {
-            try
-            {
-                _imageViewer = imageViewer;
-                var documentData = new DataEntryPaginationDocumentData(attributes, sourceDocName);
-                if (!IsHandleCreated || !Visible)
-                {
-                    UpdateDocumentStatus(documentData);
-                }
+        ///// <summary>
+        ///// Gets a <see cref="PaginationDocumentData"/> instance based on the provided
+        ///// <see paramref="attributes"/>.
+        ///// </summary>
+        ///// <param name="attributes">The VOA data for while a <see cref="PaginationDocumentData"/>
+        ///// instance is needed.</param>
+        ///// <param name="sourceDocName">The name of the source document for which data is being
+        ///// loaded.</param>
+        ///// <param name="fileProcessingDB"></param>
+        ///// <param name="imageViewer"></param>
+        ///// <returns>The <see cref="PaginationDocumentData"/> instance.</returns>
+        //public PaginationDocumentData GetDocumentData(IUnknownVector attributes,
+        //    string sourceDocName, FileProcessingDB fileProcessingDB, ImageViewer imageViewer)
+        //{
+        //    try
+        //    {
+        //        _imageViewer = imageViewer;
+        //        var documentData = new DataEntryPaginationDocumentData(attributes, sourceDocName);
+        //        if (!IsHandleCreated || !Visible)
+        //        {
+        //            UpdateDocumentStatus(documentData);
+        //        }
 
-                return documentData;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI41350");
-            }
-        }
+        //        return documentData;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex.AsExtract("ELI41350");
+        //    }
+        //}
 
-        /// <summary>
-        /// Updates the <see cref="PaginationDocumentData.Summary"/>, <see cref="PaginationDocumentData.Modified"/>
-        /// and <see cref="PaginationDocumentData.DataError"/> properties of <see paramref="data"/> based on
-        /// the current document data.
-        /// </summary>
-        /// <param name="data">The <see cref="PaginationDocumentData"/> instance to update.</param>
-        public void UpdateDocumentDataStatus(PaginationDocumentData data)
-        {
-            try
-            {
-                var dataEntryData = data as DataEntryPaginationDocumentData;
-                UpdateDocumentStatus(dataEntryData);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI41474");
-            }
-        }
+        ///// <summary>
+        ///// Updates the <see cref="PaginationDocumentData.Summary"/>, <see cref="PaginationDocumentData.Modified"/>
+        ///// and <see cref="PaginationDocumentData.DataError"/> properties of <see paramref="data"/> based on
+        ///// the current document data.
+        ///// </summary>
+        ///// <param name="data">The <see cref="PaginationDocumentData"/> instance to update.</param>
+        //public void UpdateDocumentDataStatus(PaginationDocumentData data)
+        //{
+        //    try
+        //    {
+        //        var dataEntryData = data as DataEntryPaginationDocumentData;
+        //        UpdateDocumentStatus(dataEntryData);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex.AsExtract("ELI41474");
+        //    }
+        //}
         
         /// <summary>
         /// Provides a message to be displayed.
@@ -465,6 +468,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.EnabledChanged" /> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+        protected override void OnEnabledChanged(EventArgs e)
+        {
+            base.OnEnabledChanged(e);
+        }
+
+        /// <summary>
         /// Indicates document data has changed.
         /// </summary>
         protected override void OnDataChanged()
@@ -473,10 +485,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnDataChanged();
 
-                if (_documentData != null && SummaryDataEntryQuery != null)
-                {
-                    _documentData.SetSummary(SummaryDataEntryQuery.Evaluate().ToString());
-                }
+                _documentData?.SetSummary(SummaryDataEntryQuery?.Evaluate().ToString());
             }
             catch (Exception ex)
             {
@@ -563,12 +572,23 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _summaryDataEntryQuery = null;
                 }
 
-                if (_documentStatusUpdateSemaphore != null)
-                {
-                    _documentStatusUpdateSemaphore.Dispose();
-                    _documentStatusUpdateSemaphore = null;
-                }
+                //if (_documentStatusUpdateSemaphore != null)
+                //{
+                //    _documentStatusUpdateSemaphore.Dispose();
+                //    _documentStatusUpdateSemaphore = null;
+                //}
             }
+        }
+
+        /// <summary>
+        /// Sets the image viewer.
+        /// </summary>
+        /// <param name="_imageViewer">The image viewer.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        internal void SetImageViewer(ImageViewer imageViewer)
+        {
+            _imageViewer = imageViewer;
+            base.ImageViewer = imageViewer;
         }
 
         #endregion Overrides
@@ -695,7 +715,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <value>
         /// The <see cref="DataEntryQuery"/> used to generate the <see cref="PaginationDocumentData.Summary"/>.
         /// </value>
-        DataEntryQuery SummaryDataEntryQuery
+        internal DataEntryQuery SummaryDataEntryQuery
         {
             get
             {
@@ -708,138 +728,134 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        /// <summary>
-        /// Updates the <see cref="Summary"/>, <see cref="DataModified"/> and  <see cref="DataError"/>
-        /// properties of <see paramref="documentData"/> by loading the data into a background panel.
-        /// </summary>
-        /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
-        /// document status should be updated.</param>
-        void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData)
-        {
-			string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
+   //     /// <summary>
+   //     /// Updates the <see cref="Summary"/>, <see cref="DataModified"/> and  <see cref="DataError"/>
+   //     /// properties of <see paramref="documentData"/> by loading the data into a background panel.
+   //     /// </summary>
+   //     /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
+   //     /// document status should be updated.</param>
+   //     void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData)
+   //     {
+			//string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
 
-            if (!_pendingDocumentStatusUpdate.TryAdd(documentData, 0))
-            {
-                // Document status is already being updated.
-                return;
-            }
+   //         if (!_pendingDocumentStatusUpdate.TryAdd(documentData, 0))
+   //         {
+   //             // Document status is already being updated.
+   //             return;
+   //         }
 
-            var thread = new Thread(new ThreadStart(() =>
-            {
-                try
-                {
-                    UpdateDocumentStatusThread(documentData, serializedAttributes);
-                }
-                catch (Exception ex)
-                {
-                    // Exceptions will be thrown if the FAM task has been stopped while a
-                    // UpdateDocumentStatusThread was still running, but we don't care to know about
-                    // the exceptions in this case.
-                    if (IsHandleCreated)
-                    {
-                        ex.ExtractLog("ELI41494");
-                    }
-                }
-            }));
+   //         var thread = new Thread(new ThreadStart(() =>
+   //         {
+   //             try
+   //             {
+   //                 UpdateDocumentStatusThread(documentData, serializedAttributes);
+   //             }
+   //             catch (Exception ex)
+   //             {
+   //                 // Exceptions will be thrown if the FAM task has been stopped while a
+   //                 // UpdateDocumentStatusThread was still running, but we don't care to know about
+   //                 // the exceptions in this case.
+   //                 if (IsHandleCreated)
+   //                 {
+   //                     ex.ExtractLog("ELI41494");
+   //                 }
+   //             }
+   //         }));
 
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-        }
+   //         thread.SetApartmentState(ApartmentState.STA);
+   //         thread.Start();
+   //     }
 
-        /// <summary>
-        /// Code running in a background thread in support of <see cref="UpdateDocumentStatus"/>
-        /// </summary>
-        /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
-        /// data validity should be checked.</param>
-        void UpdateDocumentStatusThread(DataEntryPaginationDocumentData documentData, string serializedAttributes)
-        {
-            ExtractException ee = null;
-            bool dataModified = false;
-            bool dataError = false;
-            string summary = null;
-            Dictionary<string, DbConnection> connectionCopies = null;
+   //     /// <summary>
+   //     /// Code running in a background thread in support of <see cref="UpdateDocumentStatus"/>
+   //     /// </summary>
+   //     /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
+   //     /// data validity should be checked.</param>
+   //     void UpdateDocumentStatusThread(DataEntryPaginationDocumentData documentData, string serializedAttributes)
+   //     {
+   //         ExtractException ee = null;
+   //         bool dataModified = false;
+   //         bool dataError = false;
+   //         string summary = null;
+   //         Dictionary<string, DbConnection> connectionCopies = null;
 
-            try
-            {
-                // If the document was loaded by the time this thread was spun up, abort.
-                if (!_pendingDocumentStatusUpdate.ContainsKey(documentData))
-                {
-                    return;
-                }
+   //         try
+   //         {
+   //             // If the document was loaded by the time this thread was spun up, abort.
+   //             if (!_pendingDocumentStatusUpdate.ContainsKey(documentData))
+   //             {
+   //                 return;
+   //             }
 
-                _documentStatusUpdateSemaphore.WaitOne();
+   //             _documentStatusUpdateSemaphore.WaitOne();
 
-                // If by the time this thread has a chance to update, the document was loaded, abort.
-                if (!_pendingDocumentStatusUpdate.ContainsKey(documentData))
-                {
-                    return;
-                }
+   //             // If by the time this thread has a chance to update, the document was loaded, abort.
+   //             if (!_pendingDocumentStatusUpdate.ContainsKey(documentData))
+   //             {
+   //                 return;
+   //             }
 
-                var miscUtils = new MiscUtils();
-                var deserializedAttributes = (IUnknownVector)miscUtils.GetObjectFromStringizedByteStream(serializedAttributes);
+   //             var miscUtils = new MiscUtils();
+   //             var deserializedAttributes = (IUnknownVector)miscUtils.GetObjectFromStringizedByteStream(serializedAttributes);
 
-                using (var form = new Form())
-                using (var tempPanel = (DataEntryDocumentDataPanel)Activator.CreateInstance(GetType()))
-                using (tempPanel._imageViewer = new ImageViewer())
-                using (var tempData = new DataEntryPaginationDocumentData(deserializedAttributes, documentData.SourceDocName))
-                {
-                    Config.ApplyObjectSettings(tempPanel);
-                    tempPanel.DataEntryApplication = DataEntryApplication;
-                    // DBConnections are not threadsafe; create copies for the new thread.
-                    connectionCopies = CopyDatabaseConnections();
-                    tempPanel.SetDatabaseConnections(connectionCopies);
-                    form.MakeFormInvisible();
-                    form.Show();
-                    form.Controls.Add(tempPanel);
-                    form.Controls.Add(tempPanel._imageViewer);
+   //             using (var form = new Form())
+   //             using (var tempPanel = (DataEntryDocumentDataPanel)Activator.CreateInstance(GetType()))
+   //             using (tempPanel._imageViewer = new ImageViewer())
+   //             using (var tempData = new DataEntryPaginationDocumentData(deserializedAttributes, documentData.SourceDocName))
+   //             {
+   //                 Config.ApplyObjectSettings(tempPanel);
+   //                 tempPanel.DataEntryApplication = DataEntryApplication;
+   //                 // DBConnections are not threadsafe; create copies for the new thread.
+   //                 connectionCopies = CopyDatabaseConnections();
+   //                 tempPanel.SetDatabaseConnections(connectionCopies);
+   //                 form.MakeFormInvisible();
+   //                 form.Show();
+   //                 form.Controls.Add(tempPanel);
+   //                 form.Controls.Add(tempPanel._imageViewer);
 
-                    tempPanel.LoadData(tempData);
-                    dataModified = tempPanel.UndoOperationAvailable;
-                    dataError = (tempPanel.DataValidity != DataValidity.Valid);
-                    summary = tempPanel.SummaryDataEntryQuery.Evaluate().ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                ee = ex.AsExtract("ELI41453");
-            }
-            finally
-            {
-                _documentStatusUpdateSemaphore?.Release();
-                if (connectionCopies != null)
-                {
-                    CollectionMethods.ClearAndDispose(connectionCopies);
-                }
-            }
+   //                 tempPanel.LoadData(tempData);
+   //                 dataModified = tempPanel.UndoOperationAvailable;
+   //                 dataError = (tempPanel.DataValidity != DataValidity.Valid);
+   //                 summary = tempPanel.SummaryDataEntryQuery?.Evaluate().ToString();
+   //             }
+   //         }
+   //         catch (Exception ex)
+   //         {
+   //             ee = ex.AsExtract("ELI41453");
+   //         }
+   //         finally
+   //         {
+   //             _documentStatusUpdateSemaphore.Release();
+   //             if (connectionCopies != null)
+   //             {
+   //                 CollectionMethods.ClearAndDispose(connectionCopies);
+   //             }
+   //         }
 
+   //         _imageViewer.SafeBeginInvoke("ELI41465", () =>
+   //         {
+   //             try
+   //             {
+   //                 if (ee != null)
+   //                 {
+   //                     ee.ExtractDisplay("ELI41464");
+   //                 }
 
-            if (!_imageViewer.IsDisposed && _imageViewer.IsHandleCreated)
-            {
-                _imageViewer.SafeBeginInvoke("ELI41465", () =>
-                {
-                    try
-                    {
-                        if (ee != null)
-                        {
-                            ee.ExtractDisplay("ELI41464");
-                        }
+   //                 if (_pendingDocumentStatusUpdate.ContainsKey(documentData))
+   //                 {
+   //                     documentData.SetModified(dataModified);
+   //                     documentData.SetDataError(dataError);
+   //                     documentData.SetSummary(summary);
+   //                 }
+   //             }
+   //             finally
+   //             {
+   //                 int temp;
+   //                 _pendingDocumentStatusUpdate.TryRemove(documentData, out temp);
+   //             }
 
-                        if (_pendingDocumentStatusUpdate.ContainsKey(documentData))
-                        {
-                            documentData.SetModified(dataModified);
-                            documentData.SetDataError(dataError);
-                            documentData.SetSummary(summary);
-                        }
-                    }
-                    finally
-                    {
-                        int temp;
-                        _pendingDocumentStatusUpdate.TryRemove(documentData, out temp);
-                    }
-
-                });
-            }
-        }
+   //         });
+   //     }
 
         /// <summary>
         /// Creates a new database connection dictionary where the the <see cref="DbConnection"/>

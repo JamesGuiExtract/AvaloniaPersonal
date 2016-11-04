@@ -209,8 +209,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="settings">A <see cref="PaginationTask"/> representing the settings to use in
         /// the form.</param>
-        /// <param name="paginationDocumentDataPanel">An <see cref="IPaginationDocumentDataPanel"/>
-        /// to be used to view and edit data related to a particular document.</param>
+        /// <param name="paginationDocumentDataPanelAssembly"></param>
         /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
         /// <param name="actionID">The ID of the action being processed.</param>
         /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if needed.</param>
@@ -218,7 +217,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// by the task to carry out requests for files to be checked out, released or re-ordered
         /// in the queue.</param>
         public PaginationTaskForm(PaginationTask settings,
-            IPaginationDocumentDataPanel paginationDocumentDataPanel, FileProcessingDB fileProcessingDB,
+            string paginationDocumentDataPanelAssembly, FileProcessingDB fileProcessingDB,
             int actionID, FAMTagManager tagManager, IFileRequestHandler fileRequestHandler)
         {
             try
@@ -236,17 +235,6 @@ namespace Extract.FileActionManager.FileProcessors
                 InitializeComponent();
 
                 _settings = settings;
-                _paginationDocumentDataPanel = paginationDocumentDataPanel;
-                if (_paginationDocumentDataPanel != null)
-                {
-                    _paginationDocumentDataPanel.PanelControl.ParentChanged +=
-                        HandlePaginationDocumentDataPanel_ParentChanged;
-
-                    if (_paginationDocumentDataPanel.AdvancedDataEntryOperationsSupported)
-                    {
-                        _advancedCommandsToolStrip.Visible = true;
-                    }
-                }
 
                 if (tagManager == null)
                 {
@@ -275,6 +263,18 @@ namespace Extract.FileActionManager.FileProcessors
                     = settings.OutputExpectedPaginationAttributesFiles;
                 _paginationPanel.ExpectedPaginationAttributesPath = settings.ExpectedPaginationAttributesOutputPath;
                 _paginationPanel.FileProcessingDB = FileProcessingDB;
+
+                _paginationDocumentDataPanel = CreateDocumentDataPanel(paginationDocumentDataPanelAssembly);
+                if (_paginationDocumentDataPanel != null)
+                {
+                    _paginationDocumentDataPanel.PanelControl.ParentChanged +=
+                        HandlePaginationDocumentDataPanel_ParentChanged;
+
+                    if (_paginationDocumentDataPanel.AdvancedDataEntryOperationsSupported)
+                    {
+                        _advancedCommandsToolStrip.Visible = true;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -1290,6 +1290,28 @@ namespace Extract.FileActionManager.FileProcessors
         #endregion IVerificationForm Members
 
         #region Private Members
+
+        /// <summary>
+        /// Creates the <see cref="IPaginationDocumentDataPanel"/> that should be used to edit data
+        /// for documents in the pagination pane.
+        /// </summary>
+        /// <param name="paginationDocumentDataPanelAssembly"></param>
+        /// <returns>The <see cref="IPaginationDocumentDataPanel"/> that should be used to edit data
+        /// for documents in the pagination pane.</returns>
+        IPaginationDocumentDataPanel CreateDocumentDataPanel(string paginationDocumentDataPanelAssembly)
+        {
+            if (paginationDocumentDataPanelAssembly.EndsWith(".config", StringComparison.OrdinalIgnoreCase))
+            {
+                return new DataEntryPanelContainer(paginationDocumentDataPanelAssembly, this, _tagUtility, _imageViewer);
+            }
+            else
+            {
+                // May be null if the an IPaginationDocumentDataPanel is not specified to be used in
+                // this workflow.
+                return UtilityMethods.CreateTypeFromAssembly<IPaginationDocumentDataPanel>(
+                        paginationDocumentDataPanelAssembly);
+            }
+        }
 
         /// <summary>
         /// Updates the properties of the controls based on the currently open image.

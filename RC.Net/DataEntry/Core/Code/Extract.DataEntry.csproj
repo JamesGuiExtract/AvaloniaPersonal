@@ -191,6 +191,7 @@
       <DependentUpon>DataEntryComboBox.cs</DependentUpon>
     </Compile>
     <Compile Include="DataEntryConfiguration.cs" />
+    <Compile Include="DataEntryConfigurationManager.cs" />
     <Compile Include="DataEntryControlHost.cs" />
     <Compile Include="DataEntryControlHost.Designer.cs">
       <DependentUpon>DataEntryControlHost.cs</DependentUpon>

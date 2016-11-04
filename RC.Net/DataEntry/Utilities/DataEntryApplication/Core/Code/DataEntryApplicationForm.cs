@@ -105,53 +105,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Provides the resources used to brand the DataEntryApplication as a specific product.
         /// </summary>
         BrandingResourceManager _brandingResources;
-        
-        /// <summary>
-        /// A map of defined document types to the configuration to be used.
-        /// </summary>
-        Dictionary<string, DataEntryConfiguration> _documentTypeConfigurations;
 
         /// <summary>
-        /// If not <see langword="null"/> this configuration should be used for documents with
-        /// missing or undefined document types.
+        /// The configuration manager
         /// </summary>
-        DataEntryConfiguration _defaultDataEntryConfig;
-
-        /// <summary>
-        /// The configuration that is currently loaded.
-        /// </summary>
-        DataEntryConfiguration _activeDataEntryConfig;
-
-        /// <summary>
-        /// The current document type
-        /// </summary>
-        string _activeDocumentType;
-
-        /// <summary>
-        /// Indicates whether the document type is in the process of being changed.
-        /// </summary>
-        bool _changingDocumentType;
-
-        /// <summary>
-        /// An undefined document type that should temporarily be made available in
-        /// _documentTypeComboBox so that the document can be saved with its original DocumentType.
-        /// </summary>
-        string _temporaryDocumentType;
-
-        /// <summary>
-        /// The <see cref="IAttribute"/> that contains the DocumentType value.
-        /// </summary>
-        IAttribute _documentTypeAttribute;
-
-        /// <summary>
-        /// The <see cref="AttributeStatusInfo"/> associated with _documentTypeAttribute
-        /// </summary>
-        AttributeStatusInfo _documentTypeAttributeStatusInfo;
-
-        /// <summary>
-        /// The data entry panel control host implementation to be used by the application.
-        /// </summary>
-        DataEntryControlHost _dataEntryControlHost;
+        DataEntryConfigurationManager<Properties.Settings> _configManager;
 
         /// <summary>
         /// A <see cref="Form"/> to display the <see cref="ImageViewer"/> in a separate window.
@@ -321,13 +279,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The redo command.
         /// </summary>
         ApplicationCommand _redoCommand;
-
-        /// <summary>
-        /// DatabaseConnectionInfo instances to be used for any validation or auto-update queries
-        /// requiring a database; The key is the connection name (blank for default connection).
-        /// </summary>
-        Dictionary<string, DatabaseConnectionInfo> _dbConnections =
-            new Dictionary<string, DatabaseConnectionInfo>();
 
         /// <summary>
         /// The user-specified settings for the data entry application.
@@ -626,11 +577,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Read the user preferences object from the registry
                 _userPreferences = UserPreferences.FromRegistry();
 
-                // Load all configurations defined in configFileName
-                LoadDataEntryConfigurations(expandedConfigFileName);
+                _configManager = new DataEntryConfigurationManager<Properties.Settings>(this, _tagUtility,
+                    _applicationConfig, _imageViewer, _documentTypeComboBox);
 
-                // If a default configuration exists, use it to begin with.
-                _activeDataEntryConfig = _defaultDataEntryConfig;
+                _configManager.LoadDataEntryConfigurations(expandedConfigFileName);
+
+                //// Load all configurations defined in configFileName
+                //LoadDataEntryConfigurations(expandedConfigFileName);
+
+                //// If a default configuration exists, use it to begin with.
+                //_activeDataEntryConfig = _configManager.DefaultDataEntryConfiguration;
 
                 if (!_standAloneMode)
                 {
@@ -666,6 +622,117 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 throw ExtractException.AsExtractException("ELI23669", ex);
             }
+        }
+
+        /// <summary>
+        /// Handles the ConfigurationChanging event of the _configManager control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CancelEventArgs"/> instance containing the event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        void HandleConfigManager_ConfigurationChanging(object sender, CancelEventArgs e)
+        {
+            e.Cancel = (AttemptSave(false) == DialogResult.Cancel);
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryConfigurationManagerConfigurationChanged"/> event of the
+        /// <see cref="_configManager"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="ConfigurationChangedEventArgs"/> instance containing the
+        /// event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        void HandleConfigManager_ConfigurationChanged(object sender, ConfigurationChangedEventArgs e)
+        {
+            // Adjust UI elements to reflect the new configuration.
+            SetUIConfiguration(ActiveDataEntryConfig);
+
+            // If a DEP is being used, load the data into it
+            if (DataEntryControlHost != null)
+            {
+                var oldDatEntryControlHost = e.OldDataEntryConfiguration?.DataEntryControlHost;
+                var newDataEntryControlHost = e.NewDataEntryConfiguration?.DataEntryControlHost;
+
+                if (oldDatEntryControlHost != newDataEntryControlHost)
+                {
+                    // Undo/redo command should be unavailable until a change is actually made.
+                    _undoCommand.Enabled = false;
+                    _redoCommand.Enabled = false;
+
+                    if (oldDatEntryControlHost != null)
+                    {
+                        // Set Active = false for the old DEP so that it no longer tracks image
+                        // viewer events.
+                        oldDatEntryControlHost.Active = false;
+
+                        // Unregister for events and disengage shortcut handlers for the previous DEP
+                        oldDatEntryControlHost.SwipingStateChanged -= HandleSwipingStateChanged;
+                        oldDatEntryControlHost.DataValidityChanged -= HandleDataValidityChanged;
+                        oldDatEntryControlHost.UnviewedDataStateChanged -= HandleUnviewedDataStateChanged;
+                        oldDatEntryControlHost.ItemSelectionChanged -= HandleItemSelectionChanged;
+                        if (_settings.InputEventTrackingEnabled)
+                        {
+                            oldDatEntryControlHost.MessageHandled -= HandleMessageFilterMessageHandled;
+                        }
+
+                        _gotoNextInvalidCommand.ShortcutHandler = null;
+                        _gotoNextUnviewedCommand.ShortcutHandler = null;
+                        _hideToolTipsCommand.ShortcutHandler = null;
+                        _acceptSpatialInfoCommand.ShortcutHandler = null;
+                        _removeSpatialInfoCommand.ShortcutHandler = null;
+
+                        //AttributeStatusInfo.ResetData(null, null, null);
+                        oldDatEntryControlHost.ClearData();
+                    }
+
+                    if (newDataEntryControlHost != null)
+                    {
+                        // Load the panel into the _scrollPane
+                        LoadDataEntryControlHostPanel();
+
+                        IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
+                        newDataEntryControlHost.LoadData(attributes);
+
+                        // Register for events and engage shortcut handlers for the new DEP
+                        newDataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
+                        newDataEntryControlHost.DataValidityChanged += HandleDataValidityChanged;
+                        newDataEntryControlHost.UnviewedDataStateChanged += HandleUnviewedDataStateChanged;
+                        newDataEntryControlHost.ItemSelectionChanged += HandleItemSelectionChanged;
+                        if (_settings.InputEventTrackingEnabled)
+                        {
+                            newDataEntryControlHost.MessageHandled += HandleMessageFilterMessageHandled;
+                        }
+
+                        _gotoNextInvalidCommand.ShortcutHandler =
+                            newDataEntryControlHost.GoToNextInvalid;
+                        _gotoNextUnviewedCommand.ShortcutHandler =
+                            newDataEntryControlHost.GoToNextUnviewed;
+                        _hideToolTipsCommand.ShortcutHandler =
+                            newDataEntryControlHost.ToggleHideTooltips;
+                        _acceptSpatialInfoCommand.ShortcutHandler =
+                            newDataEntryControlHost.AcceptSpatialInfo;
+                        _removeSpatialInfoCommand.ShortcutHandler =
+                            newDataEntryControlHost.RemoveSpatialInfo;
+                        _undoCommand.ShortcutHandler = newDataEntryControlHost.Undo;
+                        _redoCommand.ShortcutHandler = newDataEntryControlHost.Redo;
+
+                        // Set Active = true for the new DEP so that it tracks image viewer events.
+                        newDataEntryControlHost.Active = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the ConfigurationChangeError event of the _configManager control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="VerificationExceptionGeneratedEventArgs"/> instance containing the event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        void HandleConfigManager_ConfigurationChangeError(object sender, VerificationExceptionGeneratedEventArgs e)
+        {
+            RaiseVerificationException(e.Exception, e.CanProcessingContinue);
         }
 
         #endregion Constructors
@@ -731,9 +798,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             get
             {
-                return (_activeDataEntryConfig == null)
-                    ? null
-                    : _activeDataEntryConfig.DataEntryControlHost;
+                return DataEntryControlHost;
             }
         }
 
@@ -773,50 +838,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35080");
-            }
-        }
-
-        /// <summary>
-        /// Loads the type of the correct config for document.
-        /// </summary>
-        /// <param name="attributes">The attributes representing the document data.</param>
-        /// <returns><see langword="true"/> if the configuration was changed based on the data;
-        /// otherwise, <see langword="false"/>.</returns>
-        public bool LoadCorrectConfigForData(IUnknownVector attributes)
-        {
-            try
-            {
-                // If there were document type specific configurations defined, apply the
-                // appropriate configuration now.
-                bool changedDocumentType, changedDataEntryConfig;
-                if (_documentTypeConfigurations != null)
-                {
-                    string documentType = GetDocumentType(attributes, false);
-
-                    // If there is a default configuration, add the original document type to the
-                    // document type combo and allow the document to be saved with the undefined
-                    // document type.
-                    if (_defaultDataEntryConfig != null &&
-                        _documentTypeComboBox.FindStringExact(documentType) == -1)
-                    {
-                        _temporaryDocumentType = documentType;
-                        _documentTypeComboBox.Items.Insert(0, documentType);
-                    }
-
-                    SetActiveDocumentType(documentType, true,
-                        out changedDocumentType, out changedDataEntryConfig);
-                }
-                else
-                {
-                    changedDocumentType = false;
-                    changedDataEntryConfig = false;
-                }
-
-                return changedDataEntryConfig;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI35079");
             }
         }
 
@@ -1024,7 +1045,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 _imageViewer.OpenImage(fileName, false);
 
-                if (_fileProcessingDb != null && _dataEntryControlHost != null)
+                if (_fileProcessingDb != null && DataEntryControlHost != null)
                 {
                     _fileProcessingDBComment =
                         _fileProcessingDb.GetFileActionComment(_fileId, _actionId);
@@ -1066,7 +1087,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // being loaded via prefetch. I don't feel comfortable that I can make a low-risk
                 // fix for this issue right now. Therefore I am disabling highlight loading as part
                 // of pre-fetch.
-                //_dataEntryControlHost.Prefetch(fileName);
+                // DataEntryControlHost.Prefetch(fileName);
             }
             catch (Exception ex)
             {
@@ -1139,6 +1160,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     LoadPaginationDocumentDataPanel();
 
+                    if (!_configManager.RegisteredDocumentTypes.Any())
+                    {
+                        _dataTab.Controls.Remove(_documentTypePanel);
+                        _scrollPanel.Dock = DockStyle.Fill;
+                    }
+
+
                     // Show pagination tab before showing the data tab to trigger the pagination
                     // control to be created and loaded.
                     _paginationTab.Show();
@@ -1148,14 +1176,22 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     // If pagination is not needed, move the panel that houses the DEP out of the
                     // tab control and directly into the left side of _splitContainer. 
+                    _dataTab.Controls.Remove(_documentTypePanel);
                     _dataTab.Controls.Remove(_scrollPanel);
                     _splitContainer.Panel1.Controls.Remove(_tabControl);
+                    _splitContainer.Panel1.Controls.Add(_documentTypePanel);
                     _splitContainer.Panel1.Controls.Add(_scrollPanel);
 
                     _dataTab = null;
                     _tabControl = null;
                     _paginationTab = null;
                     _paginationPanel = null;
+
+                    if (!_configManager.RegisteredDocumentTypes.Any())
+                    {
+                        _splitContainer.Panel1.Controls.Remove(_documentTypePanel);
+                        _scrollPanel.Dock = DockStyle.Fill;
+                    }
                 }
 
                 // Set the application name
@@ -1468,11 +1504,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 // Adjust UI elements to reflect the current configuration.
-                SetUIConfiguration(_activeDataEntryConfig);
+                SetUIConfiguration(ActiveDataEntryConfig);
 
-                // Load the DEP associated with the active configuration.
-                SetDataEntryControlHost((_activeDataEntryConfig == null)
-                    ? null : _activeDataEntryConfig.DataEntryControlHost);
+                _configManager.ConfigurationChanging += HandleConfigManager_ConfigurationChanging;
+                _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
+                _configManager.ConfigurationChangeError += HandleConfigManager_ConfigurationChangeError;
 
                 if (_applicationConfig.Settings.EnableLogging)
                 {
@@ -1644,12 +1680,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                 }
 
-                if (!e.Cancel && _dataEntryControlHost != null)
+                if (!e.Cancel && DataEntryControlHost != null)
                 {
                     // Clear data to give the host a chance to clear any static COM objects that will
                     // not be accessible from a different thread due to the single apartment threading
                     // model.
-                    _dataEntryControlHost.ClearData();
+                    DataEntryControlHost.ClearData();
                 }
 
                 if (_isLoaded && !_invisible)
@@ -1682,18 +1718,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         _brandingResources.Dispose();
                         _brandingResources = null;
-                    }
-
-                    if (_documentTypeConfigurations != null)
-                    {
-                        CollectionMethods.ClearAndDispose(_documentTypeConfigurations);
-                        _documentTypeConfigurations = null;
-                    }
-
-                    if (_defaultDataEntryConfig != null)
-                    {
-                        _defaultDataEntryConfig.Dispose();
-                        _defaultDataEntryConfig = null;
                     }
 
                     if (_inputEventTracker != null)
@@ -1750,16 +1774,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         components = null;
                     }
 
-                    if (_dataEntryControlHost != null)
+                    if (_configManager != null)
                     {
-                        // Will cause the control host to be disposed of.
-                        SetDataEntryControlHost(null);
-                    }
-
-                    if (_dbConnections != null)
-                    {
-                        CollectionMethods.ClearAndDispose(_dbConnections);
-                        _dbConnections = null;
+                        _configManager.Dispose();
+                        _configManager = null;
                     }
 
                     // Dispose of menu items
@@ -1873,8 +1891,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 ExtractException.Assert("ELI29142", "Saving is disabled!",
-                    _activeDataEntryConfig == null ||
-                    !_activeDataEntryConfig.Config.Settings.PreventSave);
+                    ActiveDataEntryConfig == null ||
+                    !ActiveDataEntryConfig.Config.Settings.PreventSave);
 
                 SaveData(false);
             }
@@ -1915,21 +1933,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // If a _temporaryDocumentType was added to the _documentTypeMenu to match the
-                // original type of the last document loaded, remove it now that the image has
-                // changed.
-                if (_temporaryDocumentType != null)
-                {
-                    _documentTypeComboBox.Items.Remove(_temporaryDocumentType);
-                    _temporaryDocumentType = null;
-                }
-
                 // Ensure the data in the controls is cleared when a document is closed or prior to
                 // loading any new data.
-                if (_dataEntryControlHost != null)
-                {
-                    _dataEntryControlHost.ClearData();
-                }
+                _configManager.ClearData();
 
                 if (!_imageViewer.IsImageAvailable)
                 {
@@ -1969,9 +1975,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // particularly GDI objects) do not seem to be cleaned up and eventually 
                     // "Error creating window handle" exceptions will result. Calling GC.Collect
                     // cleans up these resources. (GCFrequency default == 1)
-                    if (_imageViewer.IsImageAvailable && _activeDataEntryConfig != null &&
-                        _activeDataEntryConfig.Config.Settings.GCFrequency > 0 &&
-                        _documentLoadCount % _activeDataEntryConfig.Config.Settings.GCFrequency == 0)
+                    if (_imageViewer.IsImageAvailable && ActiveDataEntryConfig != null &&
+                        ActiveDataEntryConfig.Config.Settings.GCFrequency > 0 &&
+                        _documentLoadCount % ActiveDataEntryConfig.Config.Settings.GCFrequency == 0)
                     {
                         GC.Collect();
                     }
@@ -1984,14 +1990,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
 
                     IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
-                    if (!LoadCorrectConfigForData(attributes) && _dataEntryControlHost != null)
-                    {
-                        // [DataEntry:729]
-                        // If the data entry config didn't change, still need to call
-                        // GetDatabaseConnection to get the latest version of the database (in case
-                        // it has been updated).
-                        _dataEntryControlHost.SetDatabaseConnections(GetDatabaseConnections());
-                    }
+                    _configManager.LoadCorrectConfigForData(attributes);
 
                     // Record counts on load
                     if (!_standAloneMode && _fileProcessingDb != null)
@@ -2000,15 +1999,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
 
                     // If a DEP is being used, load the data into it
-                    if (_dataEntryControlHost != null)
+                    if (DataEntryControlHost != null)
                     {
-                        _dataEntryControlHost.LoadData(attributes);
-
-                        if (_documentTypeConfigurations != null)
-                        {
-                            // Monitor for changes to the document type from the DEP.
-                            GetDocumentType(attributes, true);
-                        }
+                        DataEntryControlHost.LoadData(attributes);
 
                         // Now that the data has been loaded into the DEP, update the document data
                         // in the pagination panel so that it is sharing the same attributes
@@ -2032,9 +2025,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     base.Text = "Waiting - " + base.Text;
 
-                    if (_dataEntryControlHost != null)
+                    if (DataEntryControlHost != null)
                     {
-                        _dataEntryControlHost.LoadData(null);
+                        DataEntryControlHost.LoadData(null);
                     }
                 }
 
@@ -2052,7 +2045,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // PreventSave is set. If PreventSave is set, the option should still be
                     // available; its behavior will just be different.
                     _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable &&
-                        _activeDataEntryConfig != null;
+                        ActiveDataEntryConfig != null;
                 }
 
                 _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
@@ -2067,8 +2060,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Saving the document should be allowed as long as a document is available,
                     // a data entry configuration is loaded, and PreventSave is not specified.
                     _saveMenuItem.Enabled = _imageViewer.IsImageAvailable &&
-                        _activeDataEntryConfig != null &&
-                        !_activeDataEntryConfig.Config.Settings.PreventSave;
+                        ActiveDataEntryConfig != null &&
+                        !ActiveDataEntryConfig.Config.Settings.PreventSave;
 
                     if (_fileProcessingDb != null)
                     {
@@ -2113,7 +2106,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Make sure ImageViewer activity in pagination UI or switching tabs doesn't get
                 // interpreted as a file getting closed in verification.
                 if (_paginating ||
-                    (_dataEntryControlHost != null && !_dataEntryControlHost.IsDocumentLoaded))
+                    (DataEntryControlHost != null && !DataEntryControlHost.IsDocumentLoaded))
                 {
                     return;
                 }
@@ -2227,7 +2220,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                _gotoNextUnviewedCommand.Enabled = _dataEntryControlHost.IsDataUnviewed;
+                _gotoNextUnviewedCommand.Enabled = DataEntryControlHost.IsDataUnviewed;
             }
             catch (Exception ex)
             {
@@ -2249,7 +2242,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 _gotoNextInvalidCommand.Enabled =
-                    _dataEntryControlHost.DataValidity != DataValidity.Valid;
+                    DataEntryControlHost.DataValidity != DataValidity.Valid;
             }
             catch (Exception ex)
             {
@@ -2322,9 +2315,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (_dataEntryControlHost != null)
+                if (DataEntryControlHost != null)
                 {
-                    _dataEntryControlHost.GoToNextUnviewed();
+                    DataEntryControlHost.GoToNextUnviewed();
                 }
             }
             catch (Exception ex)
@@ -2344,9 +2337,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (_dataEntryControlHost != null)
+                if (DataEntryControlHost != null)
                 {
-                    _dataEntryControlHost.GoToNextInvalid();
+                    DataEntryControlHost.GoToNextInvalid();
                 }
             }
             catch (Exception ex)
@@ -2386,9 +2379,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (_dataEntryControlHost != null)
+                if (DataEntryControlHost != null)
                 {
-                    _dataEntryControlHost.ToggleHideTooltips();
+                    DataEntryControlHost.ToggleHideTooltips();
                 }
             }
             catch (Exception ex)
@@ -2408,9 +2401,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (_dataEntryControlHost != null)
+                if (DataEntryControlHost != null)
                 {
-                    _dataEntryControlHost.AcceptSpatialInfo();
+                    DataEntryControlHost.AcceptSpatialInfo();
                 }
             }
             catch (Exception ex)
@@ -2430,9 +2423,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (_dataEntryControlHost != null)
+                if (DataEntryControlHost != null)
                 {
-                    _dataEntryControlHost.RemoveSpatialInfo();
+                    DataEntryControlHost.RemoveSpatialInfo();
                 }
             }
             catch (Exception ex)
@@ -2730,59 +2723,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Handles the <see cref="AttributeStatusInfo.AttributeValueModified"/> event for the
-        /// <see cref="IAttribute"/> containing the document type.
-        /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">The event data associated with the event.</param>
-        void HandleDocumentTypeAttributeValueModified(object sender,
-                AttributeValueModifiedEventArgs e)
-        {
-            try
-            {
-                // Update the active document type, but don't allow the current configuration to be
-                // changed.
-                ChangeActiveDocumentType(e.Attribute.Value.String, false);
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI30653", ex);
-                ee.AddDebugData("Event data", e, false);
-                // Debated on whether this should be displayed instead, since this may be something
-                // that happens in the midst of verification not but this could happen during
-                // document load and even it if doesn't, it could indicate that the document will
-                // not be able to be correctly saved.
-                RaiseVerificationException(ee, true);
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ComboBox.SelectedIndexChanged"/> event for the
-        /// _documentTypeComboBox.
-        /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">The event data associated with the event.</param>
-        void HandleDocumentTypeSelectedIndexChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                // Update the active document type, changing the current configuration if
-                // appropriate.
-                ChangeActiveDocumentType(_documentTypeComboBox.Text, true);
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI30616", ex);
-                ee.AddDebugData("Event arguments", e, false);
-                // Debated on whether this should be displayed instead, since this may be something
-                // that happens in the midst of verification not but this could happen during
-                // document load and even it if doesn't, it could indicate that the document will
-                // not be able to be correctly saved.
-                RaiseVerificationException(ee, true);
-            }
-        }
-
-        /// <summary>
         /// Handles the case that the user selected the "Undo" button or menu item.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
@@ -2791,9 +2731,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (_dataEntryControlHost != null)
+                if (DataEntryControlHost != null)
                 {
-                    _dataEntryControlHost.Undo();
+                    DataEntryControlHost.Undo();
                 }
             }
             catch (Exception ex)
@@ -2813,9 +2753,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (_dataEntryControlHost != null)
+                if (DataEntryControlHost != null)
                 {
-                    _dataEntryControlHost.Redo();
+                    DataEntryControlHost.Redo();
                 }
             }
             catch (Exception ex)
@@ -2886,7 +2826,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // FinalizeDocumentLoad. Prevent tab changes until a document fully loaded,
                     // though allow for tab changes for form setup before any files are loaded.                    
                     else if (e.TabPage == _paginationTab && _imageViewer.IsImageAvailable &&
-                        _dataEntryControlHost != null && !_dataEntryControlHost.IsDocumentLoaded)
+                        DataEntryControlHost != null && !DataEntryControlHost.IsDocumentLoaded)
                     {
                         e.Cancel = true;
                     }
@@ -2913,7 +2853,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     return;
                 }
 
-                if (_tabControl.SelectedTab == _dataTab && _dataEntryControlHost.ImageViewer == null)
+                if (_tabControl.SelectedTab == _dataTab && DataEntryControlHost.ImageViewer == null)
                 {
                     // Ensure the _paginationPanel won't try to do anything with the image viewer
                     // while the data tab has focus.
@@ -2926,8 +2866,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _imageViewer.OpenImage(_fileName, false);
                     }
 
-                    _dataEntryControlHost.ImageViewer = _imageViewer;
-                    _dataEntryControlHost.DisableKeyboardInput = false;
+                    DataEntryControlHost.ImageViewer = _imageViewer;
+                    DataEntryControlHost.DisableKeyboardInput = false;
                     _imageViewer.AllowHighlight = true;
                     _imageViewer.ImageFileChanged += HandleImageFileChanged;
                     _imageViewer.ImageFileClosing += HandleImageFileClosing;
@@ -2980,12 +2920,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _paginagionAttributesToRefresh.Clear();
 
-                    _dataEntryControlHost.EnsureFieldSelection();
+                    DataEntryControlHost.EnsureFieldSelection();
 
                     // Table controls don't always seem to be drawn correctly after switching tabs.
-                    _dataEntryControlHost.Refresh();
+                    DataEntryControlHost.Refresh();
                 }
-                else if (_tabControl.SelectedTab != _dataTab && _dataEntryControlHost.ImageViewer != null)
+                else if (_tabControl.SelectedTab != _dataTab && DataEntryControlHost.ImageViewer != null)
                 {
                     // These events are handled in the context of data entry verification. If
                     // pagination is active these events should be ignored.
@@ -2995,8 +2935,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _imageViewer.LoadingNewImage -= HandleLoadingNewImage;
                     // Setting ImageViewer to null will unregister image viewer events we shouldn't
                     // handle while in pagination.
-                    _dataEntryControlHost.DisableKeyboardInput = true;
-                    _dataEntryControlHost.ImageViewer = null;
+                    DataEntryControlHost.DisableKeyboardInput = true;
+                    DataEntryControlHost.ImageViewer = null;
 
                     _saveAndCommitFileCommand.Enabled = false;
                     _saveMenuItem.Enabled = false;
@@ -3439,7 +3379,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             get
             {
-                return _dataEntryControlHost != null && _dataEntryControlHost.Dirty;
+                return DataEntryControlHost != null && DataEntryControlHost.Dirty;
             }
         }
 
@@ -3474,15 +3414,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             try
             {
-                if (_activeDataEntryConfig == null ||
-                        _dataEntryControlHost == null ||
-                        _activeDataEntryConfig.Config.Settings.PreventSave)
+                if (ActiveDataEntryConfig == null ||
+                        DataEntryControlHost == null ||
+                        ActiveDataEntryConfig.Config.Settings.PreventSave)
                 {
                     return false;
                 }
                 else
                 {
-                    bool saved = _dataEntryControlHost.SaveData(validateData);
+                    bool saved = DataEntryControlHost.SaveData(validateData);
 
                     if (saved && !_standAloneMode && _fileProcessingDb != null)
                     {
@@ -3659,6 +3599,34 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Private Members
 
         /// <summary>
+        /// Gets the active data entry configuration.
+        /// </summary>
+        /// <value>
+        /// The active data entry configuration.
+        /// </value>
+        DataEntryConfiguration ActiveDataEntryConfig
+        {
+            get
+            {
+                return _configManager?.ActiveDataEntryConfiguration;
+            }
+        }
+
+        /// <summary>
+        /// Gets the data entry control host.
+        /// </summary>
+        /// <value>
+        /// The data entry control host.
+        /// </value>
+        DataEntryControlHost DataEntryControlHost
+        {
+            get
+            {
+                return ActiveDataEntryConfig?.DataEntryControlHost;
+            }
+        }
+
+        /// <summary>
         /// Gets whether statistics are currently being tracked (data entry file duration, counters,
         /// or input events).
         /// </summary>
@@ -3767,7 +3735,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     ExtractException.Assert("ELI30677",
                         "No controls are loaded from which to save data.",
-                        _dataEntryControlHost != null);
+                        DataEntryControlHost != null);
 
                     // If running in FAM mode, close the document until the next one is loaded so it
                     // is clear that the last document has been committed.
@@ -3787,7 +3755,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         // Record statistics to database that need to happen when a file is closed.
                         RecordCounts(onLoad: false,
-                            attributes: _dataEntryControlHost.MostRecentlySavedAttributes);
+                            attributes: DataEntryControlHost.MostRecentlySavedAttributes);
                         EndFileTaskSession();
 
                         _fileId = -1;
@@ -3821,9 +3789,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             // If preventing save, don't save, but also return "Yes" so the application behaves as
             // if it did save correctly.
-            if (_activeDataEntryConfig == null || 
-                _dataEntryControlHost == null ||
-                _activeDataEntryConfig.Config.Settings.PreventSave)
+            if (ActiveDataEntryConfig == null ||
+                DataEntryControlHost == null ||
+                ActiveDataEntryConfig.Config.Settings.PreventSave)
             {
                 return response;
             }
@@ -3868,7 +3836,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _tabControl.SelectedTab = _dataTab;
             }
 
-            if (_imageViewer.IsImageAvailable && (commitData || _dataEntryControlHost.Dirty))
+            if (_imageViewer.IsImageAvailable && (commitData || DataEntryControlHost.Dirty))
             {
                 if (commitData)
                 {
@@ -3877,13 +3845,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Turn off commitData if an applied tag matches the SkipValidationIfDocTaggedAs
                     // setting (and save without prompting)
                     if (!_standAloneMode && _fileProcessingDb != null && !string.IsNullOrEmpty(
-                            _activeDataEntryConfig.Config.Settings.SkipValidationIfDocTaggedAs))
+                            ActiveDataEntryConfig.Config.Settings.SkipValidationIfDocTaggedAs))
                     {
                         // [DataEntry:1294]
                         // Support multiple tags to allow validation to be skipped delimited by
                         // a comma or semi-colon.
                         IEnumerable<string> tagsToBeSkipped =
-                            _activeDataEntryConfig.Config.Settings.SkipValidationIfDocTaggedAs
+                            ActiveDataEntryConfig.Config.Settings.SkipValidationIfDocTaggedAs
                                 .Split(new[] { ',', ';' })
                                 .Select(tagName => tagName.Trim())
                                 .Where(tagName => !string.IsNullOrWhiteSpace(tagName));
@@ -3917,7 +3885,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // document.
                     if (response == DialogResult.No)
                     {
-                        _dataEntryControlHost.Dirty = false;
+                        DataEntryControlHost.Dirty = false;
                     }
                 }
 
@@ -4038,310 +4006,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Loads all defined document types and their associated configurations from the specified
-        /// master config file.
-        /// </summary>
-        /// <param name="masterConfigFileName">The config file which will specify document type
-        /// configurations (if available).</param>
-        void LoadDataEntryConfigurations(string masterConfigFileName)
-        {
-            // Retrieve the documentTypeConfigurations XML section if it exists
-            IXPathNavigable documentTypeConfiguration =
-                _applicationConfig.GetSectionXml("documentTypeConfigurations");
-           
-            XPathNavigator configurationNode = null;
-            if (documentTypeConfiguration != null)
-            {
-                configurationNode = documentTypeConfiguration.CreateNavigator();
-            }
-
-            // If unable to find the documentTypeConfigurations or find a defined configuration,
-            // use the master config file as the one and only configuration.
-            if (configurationNode == null || !configurationNode.MoveToFirstChild())
-            {
-                _defaultDataEntryConfig = LoadDataEntryConfiguration(masterConfigFileName, null);
-
-                // Hide the document type combo.
-                if (_dataTab != null)
-                {
-                    _dataTab.Controls.Remove(_documentTypePanel);
-                }
-                else
-                {
-                    _splitContainer.Panel1.Controls.Remove(_documentTypePanel);
-                }
-                _scrollPanel.Dock = DockStyle.Fill;
-                return;
-            }
-
-            // Document type configurations have been defined.
-            _documentTypeConfigurations = new Dictionary<string, DataEntryConfiguration>();
-
-            // Load each configuration.
-            do
-            {
-                if (!configurationNode.Name.Equals("configuration", StringComparison.OrdinalIgnoreCase))
-                {
-                    ExtractException ee = new ExtractException("ELI30617",
-                        "Config file error: Unknown DocumentTypeConfiguration element.");
-                    ee.AddDebugData("Name", configurationNode.Name, false);
-                    throw ee;
-                }
-
-                XPathNavigator attribute = configurationNode.Clone();
-                if (!attribute.MoveToFirstAttribute())
-                {
-                    throw new ExtractException("ELI30618",
-                        "Config file error: Missing required DocumentTypeConfiguration elements.");
-                }
-
-                // Load the configurations element's attributes
-                string configFileName = null;
-                bool defaultConfiguration = false;
-                do
-                {
-                    if (attribute.Name.Equals("configFile", StringComparison.OrdinalIgnoreCase))
-                    {
-                        configFileName = attribute.Value;
-                    }
-                    else if (attribute.Name.Equals("default", StringComparison.OrdinalIgnoreCase))
-                    {
-                        defaultConfiguration = attribute.ValueAsBoolean;
-                        if (defaultConfiguration && _defaultDataEntryConfig != null)
-                        {
-                            throw new ExtractException("ELI30664", 
-                                "Only one document type configuration may be set as the default.");
-                        }
-                    }
-                    else
-                    {
-                        ExtractException ee = new ExtractException("ELI30619",
-                            "Config file error: Unknown attribute in Configuration node.");
-                        ee.AddDebugData("Name", attribute.Name, false);
-                        throw ee;
-                    }
-                }
-                while (attribute.MoveToNextAttribute());
-
-                ExtractException.Assert("ELI30620",
-                    "Config file error: Missing configFile attribute in Configuration node.",
-                    !string.IsNullOrEmpty(configFileName));
-
-                configFileName = DataEntryMethods.ResolvePath(configFileName);
-
-                DataEntryConfiguration config =
-                    LoadDataEntryConfiguration(configFileName, masterConfigFileName);
-                if (defaultConfiguration)
-                {
-                    _defaultDataEntryConfig = config;
-                }
-
-                XPathNavigator documentTypeNode = configurationNode.Clone();
-                if (!documentTypeNode.MoveToFirstChild())
-                {
-                    throw new ExtractException("ELI30621",
-                        "Config file error: At least one DocumentType element is required for each Configuration.");
-                }
-
-                // Load all document types that will use this configuration.
-                do
-                {
-                    if (!documentTypeNode.Name.Equals("DocumentType",
-                            StringComparison.OrdinalIgnoreCase))
-                    {
-                        ExtractException ee = new ExtractException("ELI30622",
-                            "Unknown DocumentTypeConfiguration element.");
-                        ee.AddDebugData("Name", documentTypeNode.Name, false);
-                        throw ee;
-                    }
-
-                    string documentType = documentTypeNode.Value;
-                    string documentTypeUpper = documentType.ToUpper(CultureInfo.CurrentCulture);
-                    if (_documentTypeConfigurations.ContainsKey(documentTypeUpper))
-                    {
-                        ExtractException ee = new ExtractException("ELI30623",
-                            "Config file error: Duplicate documentType element.");
-                        ee.AddDebugData("DocumentType", documentType, false);
-                        throw ee;
-                    }
-
-                    _documentTypeComboBox.Items.Add(documentType);
-                    _documentTypeConfigurations[documentTypeUpper] = config;
-                }
-                while (documentTypeNode.MoveToNext());
-            }
-            while (configurationNode.MoveToNext());
-
-            // Register to be notified when the user selects a new document type.
-            _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeSelectedIndexChanged;
-        }
-
-        /// <summary>
-        /// Loads the data entry configuration defined by the specified config file.
-        /// </summary>
-        /// <param name="configFileName">The configuration file that defines the configuration to
-        /// be loaded.</param>
-        /// <param name="masterConfigFileName">If not <see langword="null"/>, the configuration that
-        /// may provide defaults for DataEntry and objectSettings config file values.</param>
-        /// <returns>The loaded <see cref="DataEntryConfiguration"/>.</returns>
-        DataEntryConfiguration LoadDataEntryConfiguration(string configFileName,
-            string masterConfigFileName)
-        {
-            try
-            {
-                // Load the configuration settings from file.
-                ConfigSettings<Extract.DataEntry.Properties.Settings> config =
-                    new ConfigSettings<Extract.DataEntry.Properties.Settings>(
-                        configFileName, masterConfigFileName, false, false, _tagUtility);
-
-                // Retrieve the name of the DEP assembly
-                string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
-                    config.Settings.DataEntryPanelFileName);
-
-                // Create the data entry control host from the specified assembly
-                DataEntryControlHost dataEntryControlHost =
-                    CreateDataEntryControlHost(dataEntryPanelFileName);
-
-                DataEntryConfiguration configuration =
-                    new DataEntryConfiguration(config, dataEntryControlHost);
-
-                // Tie the newly created DEP to this application and its ImageViewer.
-                dataEntryControlHost.DataEntryApplication = (IDataEntryApplication)this;
-                dataEntryControlHost.Config = config;
-                dataEntryControlHost.ImageViewer = _imageViewer;
-
-                QueryNode.QueryCacheLimit = _applicationConfig.Settings.QueryCacheLimit;
-
-                // If HighlightConfidenceBoundary settings has been specified in the config file and
-                // the controlHost has exactly two confidence tiers, use the provided value as the
-                // minimum OCR confidence value in order to highlight text as confidently OCR'd
-                if (!string.IsNullOrEmpty(config.Settings.HighlightConfidenceBoundary)
-                    && dataEntryControlHost.HighlightColors.Length == 2)
-                {
-                    int confidenceBoundary = Convert.ToInt32(
-                        config.Settings.HighlightConfidenceBoundary,
-                        CultureInfo.CurrentCulture);
-
-                    ExtractException.Assert("ELI25684", "HighlightConfidenceBoundary settings must " +
-                        "be a value between 1 and 100",
-                        confidenceBoundary >= 1 && confidenceBoundary <= 100);
-
-                    HighlightColor[] highlightColors = dataEntryControlHost.HighlightColors;
-                    highlightColors[0].MaxOcrConfidence = confidenceBoundary - 1;
-                    dataEntryControlHost.HighlightColors = highlightColors;
-                }
-
-                dataEntryControlHost.DisabledControls = config.Settings.DisabledControls;
-                dataEntryControlHost.DisabledValidationControls =
-                    config.Settings.DisabledValidationControls;
-
-                // Apply settings from the config file that pertain to the DEP.
-                if (!string.IsNullOrEmpty(masterConfigFileName))
-                {
-                    _applicationConfig.ApplyObjectSettings(dataEntryControlHost);
-                }
-                config.ApplyObjectSettings(dataEntryControlHost);
-
-                return configuration;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI30539",
-                    "Failed to load data entry configuration", ex);
-                ee.AddDebugData("Config file", configFileName, false);
-                throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Applies the specified document type and loads the DEP associated with the document
-        /// types configuration if necessary.
-        /// </summary>
-        /// <param name="documentType">The new document type.</param>
-        /// <param name="allowConfigurationChange"><see langword="true"/> if the configuration
-        /// should be changed if the new document type calls for it, <see langword="false"/> if
-        /// the current configuration should not be changed.</param>
-        /// <param name="changedDocumentType"><see langword="true"/> if the active document type
-        /// was changed, <see langword="false"/> otherwise.</param>
-        /// <param name="changedDataEntryConfig"><see langword="true"/> if the active configuration
-        /// was changed, <see langword="false"/> otherwise</param>
-        void SetActiveDocumentType(string documentType, bool allowConfigurationChange,
-            out bool changedDocumentType, out bool changedDataEntryConfig)
-        {
-            try
-            {
-                changedDocumentType = false;
-                changedDataEntryConfig = false;
-                DataEntryConfiguration newDataEntryConfig = _defaultDataEntryConfig;
-
-                if (!documentType.Equals(_activeDocumentType, StringComparison.OrdinalIgnoreCase))
-                {
-                    changedDocumentType = true;
-                    bool blockedConfigurationChange = false;
-
-                    // Search for the configuration to use for the new document type.
-                    if (_documentTypeConfigurations != null)
-                    {
-                        string documentTypeUpper = documentType.ToUpper(CultureInfo.CurrentCulture);
-                        if (!_documentTypeConfigurations.TryGetValue(
-                                documentTypeUpper, out newDataEntryConfig))
-                        {
-                            newDataEntryConfig = _defaultDataEntryConfig;
-                        }
-                    }
-
-                    // If a configuration was found and it differs from the active one, load it.
-                    if (newDataEntryConfig != _activeDataEntryConfig)
-                    {
-                        if (!allowConfigurationChange)
-                        {
-                            // The document type calls for the configuration to be changed, but
-                            // configuration changes are disallowed. This change is to be blocked.
-                            blockedConfigurationChange = true;
-                        }
-                        else if (AttemptSave(false) == DialogResult.Cancel)
-                        {
-                            // If the user cancelled the change, restore the _activeDocumentType
-                            // selection in the document type combo box.
-                            _documentTypeComboBox.Text = _activeDocumentType;
-                            changedDocumentType = false;
-                        }
-                        else
-                        {
-                            // Apply the new configuration and load its DEP.
-                            changedDataEntryConfig = true;
-                            _activeDataEntryConfig = newDataEntryConfig;
-                            SetDataEntryControlHost((_activeDataEntryConfig == null) 
-                                ? null :_activeDataEntryConfig.DataEntryControlHost);
-                        }
-                    }
-
-                    if (changedDocumentType)
-                    {
-                        changedDocumentType = !blockedConfigurationChange;
-
-                        if (blockedConfigurationChange ||
-                            _documentTypeComboBox.FindStringExact(documentType) == -1)
-                        {
-                            // The new documentType is not valid.
-                            _documentTypeComboBox.SelectedIndex = -1;
-                        }
-                        else
-                        {
-                            // Assign the new document type.
-                            _activeDocumentType = documentType;
-                            _documentTypeComboBox.Text = documentType;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI30655", ex);
-            }
-        }
-
-        /// <summary>
         /// Instantiates the one and only <see cref="DataEntryControlHost"/> implemented by the
         /// specified assembly.
         /// </summary>
@@ -4371,150 +4035,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Sets the control which implements the data entry panel (DEP).
-        /// </summary>
-        /// <param name="dataEntryControlHost">The control which implements the data entry panel
-        /// (DEP). <see langword="null"/> is allowed, but results in a blank DEP.</param>
-        void SetDataEntryControlHost(DataEntryControlHost dataEntryControlHost)
-        {
-            try
-            {
-                if (dataEntryControlHost != _dataEntryControlHost)
-                {
-                    if (_dataEntryControlHost != null)
-                    {
-                        // Set Active = false for the old DEP so that it no longer tracks image
-                        // viewer events.
-                        _dataEntryControlHost.Active = false;
-
-                        // Unregister for events and disengage shortcut handlers for the previous DEP
-                        _dataEntryControlHost.SwipingStateChanged -= HandleSwipingStateChanged;
-                        _dataEntryControlHost.DataValidityChanged -= HandleDataValidityChanged;
-                        _dataEntryControlHost.UnviewedDataStateChanged -= HandleUnviewedDataStateChanged;
-                        _dataEntryControlHost.ItemSelectionChanged -= HandleItemSelectionChanged;
-                        if (_settings.InputEventTrackingEnabled)
-                        {
-                            _dataEntryControlHost.MessageHandled -= HandleMessageFilterMessageHandled;
-                        }
-
-                        _gotoNextInvalidCommand.ShortcutHandler = null;
-                        _gotoNextUnviewedCommand.ShortcutHandler = null;
-                        _hideToolTipsCommand.ShortcutHandler = null;
-                        _acceptSpatialInfoCommand.ShortcutHandler = null;
-                        _removeSpatialInfoCommand.ShortcutHandler = null;
-
-                        _dataEntryControlHost.ClearData();
-
-                        _dataEntryControlHost.SetDatabaseConnections(null);
-                    }
-
-                    _dataEntryControlHost = dataEntryControlHost;
-
-                    if (_dataEntryControlHost != null)
-                    {
-                        // If there's database(s) available, let the control host know about it.
-                        _dataEntryControlHost.SetDatabaseConnections(GetDatabaseConnections());
-
-                        // Register for events and engage shortcut handlers for the new DEP
-                        _dataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
-                        _dataEntryControlHost.DataValidityChanged += HandleDataValidityChanged;
-                        _dataEntryControlHost.UnviewedDataStateChanged += HandleUnviewedDataStateChanged;
-                        _dataEntryControlHost.ItemSelectionChanged += HandleItemSelectionChanged;
-                        if (_settings.InputEventTrackingEnabled)
-                        {
-                            _dataEntryControlHost.MessageHandled += HandleMessageFilterMessageHandled;
-                        }
-
-                        _gotoNextInvalidCommand.ShortcutHandler =
-                            _dataEntryControlHost.GoToNextInvalid;
-                        _gotoNextUnviewedCommand.ShortcutHandler =
-                            _dataEntryControlHost.GoToNextUnviewed;
-                        _hideToolTipsCommand.ShortcutHandler =
-                            _dataEntryControlHost.ToggleHideTooltips;
-                        _acceptSpatialInfoCommand.ShortcutHandler =
-                            _dataEntryControlHost.AcceptSpatialInfo;
-                        _removeSpatialInfoCommand.ShortcutHandler =
-                            _dataEntryControlHost.RemoveSpatialInfo;
-                        _undoCommand.ShortcutHandler = _dataEntryControlHost.Undo;
-                        _redoCommand.ShortcutHandler = _dataEntryControlHost.Redo;
-
-                        // Set Active = true for the new DEP so that it tracks image viewer events.
-                        _dataEntryControlHost.Active = true;
-                    }
-
-                    // Load the panel into the _scrollPane
-                    LoadDataEntryControlHostPanel();
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI23884",
-                    "Failed to set DataEntryControlHost.", ex);
-                ee.AddDebugData("DataEntryControlHost", dataEntryControlHost, false);
-                throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Changes the current document's document type to the specified value.
-        /// </summary>
-        /// <param name="documentType">The new document type</param>
-        /// <param name="allowConfigurationChange"><see langword="true"/> if the configuration
-        /// should be changed if the new document type calls for it, <see langword="false"/> if
-        /// the current configuration should not be changed.</param>
-        void ChangeActiveDocumentType(string documentType, bool allowConfigurationChange)
-        {
-            if (_changingDocumentType)
-            {
-                return;
-            }
-
-            try
-            {
-                _changingDocumentType = true;
-                ExtractException.Assert("ELI30624", "Document type configurations not defined.",
-                    _documentTypeConfigurations != null);
-
-                bool changedDocumentType, changedDataEntryConfig;
-                SetActiveDocumentType(documentType, allowConfigurationChange,
-                    out changedDocumentType, out changedDataEntryConfig);
-                if (changedDocumentType)
-                {
-                    if (changedDataEntryConfig)
-                    {
-                        // Adjust UI elements to reflect the new configuration.
-                        SetUIConfiguration(_activeDataEntryConfig);
-
-                        // If a DEP is being used, load the data into it
-                        if (_dataEntryControlHost != null)
-                        {
-                            IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
-                            _dataEntryControlHost.LoadData(attributes);
-
-                            // Undo/redo command should be unavailable until a change is actually made.
-                            _undoCommand.Enabled = false;
-                            _redoCommand.Enabled = false;
-                        }
-                    }
-
-                    if (_dataEntryControlHost != null)
-                    {
-                        // Apply the new document type to the DocumentType attribute.
-                        AssignNewDocumentType(documentType, changedDataEntryConfig);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI30663", ex);
-            }
-            finally
-            {
-                _changingDocumentType = false;
-            }
-        }
-
-        /// <summary>
         /// Adjusts UI elements to reflect the specified configuration.
         /// </summary>
         /// <param name="config">The <see cref="DataEntryConfiguration"/> the UI should reflect.
@@ -4522,7 +4042,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         void SetUIConfiguration(DataEntryConfiguration config)
         {
             // Change the text on certain controls if not running in stand alone mode
-            if (!_standAloneMode)
+            if (!_standAloneMode && IsHandleCreated)
             {
                 bool enableSave = config != null && !config.Config.Settings.PreventSave;
 
@@ -4559,121 +4079,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Assigns a new document type to the DocumentType <see cref="IAttribute"/>.
-        /// </summary>
-        /// <param name="newDocumentType">The new document type.</param>
-        /// <param name="reloadDocumentTypeAttribute">Whether to re-find the DocumentType attribute
-        /// rather than use one that has already been found.</param>
-        void AssignNewDocumentType(string newDocumentType, bool reloadDocumentTypeAttribute)
-        {
-            // If reloading the DocumentType attribute, remove event registration from the last
-            // DocumentType attribute we found.
-            if (reloadDocumentTypeAttribute)
-            {
-                _documentTypeAttribute = null;
-
-                if (_documentTypeAttributeStatusInfo != null)
-                {
-                    _documentTypeAttributeStatusInfo.AttributeValueModified -=
-                        HandleDocumentTypeAttributeValueModified;
-                    _documentTypeAttributeStatusInfo = null;
-                }
-            }
-
-            // Attempt to find a new DocumentType attribute if we don't currently have one.
-            if (_documentTypeAttribute == null && _dataEntryControlHost != null)
-            {
-                IUnknownVector matchingAttributes =
-                DataEntryMethods.AFUtility.QueryAttributes(
-                    _dataEntryControlHost.Attributes, "DocumentType", false);
-
-                int matchingAttributeCount = matchingAttributes.Size();
-                if (matchingAttributeCount > 0)
-                {
-                    _documentTypeAttribute = (IAttribute)matchingAttributes.At(0);
-                }
-                else
-                {
-                    // Create a new DocumentType attribute if necessary.
-                    _documentTypeAttribute = (IAttribute)new AttributeClass();
-                    _documentTypeAttribute.Name = "DocumentType";
-
-                    AttributeStatusInfo.Initialize(_documentTypeAttribute,
-                        _dataEntryControlHost.Attributes, null);
-                }
-
-                // Register to be notified of changes to the attribute.
-                _documentTypeAttributeStatusInfo =
-                    AttributeStatusInfo.GetStatusInfo(_documentTypeAttribute);
-                _documentTypeAttributeStatusInfo.AttributeValueModified +=
-                    HandleDocumentTypeAttributeValueModified;
-            }
-
-            // If the DocumentType value was changed, refresh any DEP control that displays the
-            // DocumentType.
-            if (!_documentTypeAttribute.Value.String.Equals(
-                    newDocumentType, StringComparison.OrdinalIgnoreCase))
-            {
-                AttributeStatusInfo.SetValue(_documentTypeAttribute, newDocumentType, false, true);
-                IDataEntryControl dataEntryControl =
-                    AttributeStatusInfo.GetOwningControl(_documentTypeAttribute);
-                if (dataEntryControl != null)
-                {
-                    dataEntryControl.RefreshAttributes(false, _documentTypeAttribute);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the document type for the specified data using the first root-level DocumentType
-        /// <see cref="IAttribute"/>.
-        /// </summary>
-        /// <param name="attributes">The attributes representing the document's data.</param>
-        /// <param name="listenForChanges"><see langword="true"/> to watch for changes to the
-        /// <see cref="IAttribute"/>'s value, <see langword="false"/> otherwise.</param>
-        string GetDocumentType(IUnknownVector attributes, bool listenForChanges)
-        {
-            string documentType = "";
-            _documentTypeAttribute = null;
-
-            // Remove event registration from the last DocumentType attribute we found.
-            if (_documentTypeAttributeStatusInfo != null)
-            {
-                _documentTypeAttributeStatusInfo.AttributeValueModified -=
-                    HandleDocumentTypeAttributeValueModified;
-                _documentTypeAttributeStatusInfo = null;
-            }
-
-            // Search for the DocumentType attribute.
-            IUnknownVector matchingAttributes =
-                DataEntryMethods.AFUtility.QueryAttributes(
-                    attributes, "DocumentType", false);
-
-            int matchingAttributeCount = matchingAttributes.Size();
-            if (matchingAttributeCount > 0)
-            {
-                _documentTypeAttribute = (IAttribute)matchingAttributes.At(0);
-            }
-
-            // If one was found, retrieve the document type and register to be notified of changes
-            // if specified.
-            if (_documentTypeAttribute != null)
-            {
-                documentType = _documentTypeAttribute.Value.String;
-
-                if (listenForChanges)
-                {
-                    _documentTypeAttributeStatusInfo =
-                        AttributeStatusInfo.GetStatusInfo(_documentTypeAttribute);
-                    _documentTypeAttributeStatusInfo.AttributeValueModified +=
-                        HandleDocumentTypeAttributeValueModified;
-                }
-            }
-
-            return documentType;
-        }
-
-        /// <summary>
         /// Toggles whether all data is currently highlighted in the <see cref="ImageViewer"/> or
         /// whether only the currently selected data is highlighted.
         /// </summary>
@@ -4694,9 +4099,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         void ToggleAutoZoom()
         {
-            if (_dataEntryControlHost != null)
+            if (DataEntryControlHost != null)
             {
-                _dataEntryControlHost.ToggleZoomToSelection();
+                DataEntryControlHost.ToggleZoomToSelection();
             }
         }
 
@@ -4918,273 +4323,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             return true;
         }
-        
-        /// <summary>
-        /// Attempts to open database connection(s) for use by the DEP for validation and
-        /// auto-updates if connection information is specified in the config settings.
-        /// </summary>
-        /// <returns>A dictionary of <see cref="DbConnection"/>(s) where the key is the connection
-        /// name (blank for default). If no database connection is currently configured, any open
-        /// connection will be closed and <see langword="null"/> will returned.
-        /// </returns>
-        Dictionary<string, DbConnection> GetDatabaseConnections()
-        {
-            try
-            {
-                if (_activeDataEntryConfig == null)
-                {
-                    CollectionMethods.ClearAndDispose(_dbConnections);
-                }
-                else
-                {
-                    // Retrieve the databaseConnections XML section from the active configuration if
-                    // it exists
-                    IXPathNavigable databaseConnections =
-                        _activeDataEntryConfig.Config.GetSectionXml("databaseConnections");
-
-                    bool loadedDefaultConnection = false;
-
-                    // Parse and create/update each specified connection.
-                    XPathNavigator databaseConnectionsNode = null;
-                    if (databaseConnections != null)
-                    {
-                        databaseConnectionsNode = databaseConnections.CreateNavigator();
-
-                        if (databaseConnectionsNode.MoveToFirstChild())
-                        {
-                            do
-                            {
-                                bool isDefaultConnection = false;
-                                var connectionInfo =
-                                    LoadDatabaseConnection(databaseConnectionsNode, out isDefaultConnection);
-
-                                ExtractException.Assert("ELI37781",
-                                    "Multiple default connections are defined.",
-                                    !isDefaultConnection || !loadedDefaultConnection);
-
-                                loadedDefaultConnection |= isDefaultConnection;
-
-                                // https://extract.atlassian.net/browse/ISSUE-13385
-                                // If this is the default connection, use the FKB version (if
-                                // specified) to be able to expand the <ComponentDataDir> using
-                                // _tagUtility from this point forward (including for any subsequent
-                                // connection definitions).
-                                if (isDefaultConnection && _tagUtility != null)
-                                {
-                                    AddComponentDataDirTag(connectionInfo);
-                                }
-                            }
-                            while (databaseConnectionsNode.MoveToNext());
-                        }
-                    }
-
-                    // If there was no default database connection specified via the
-                    // databaseConnections section, attempt to load it via the legacy DB properties.
-                    if (!loadedDefaultConnection && _activeDataEntryConfig != null)
-                    {
-                        SetDatabaseConnection("",
-                            _activeDataEntryConfig.Config.Settings.DatabaseType,
-                            _activeDataEntryConfig.Config.Settings.LocalDataSource,
-                            _activeDataEntryConfig.Config.Settings.DatabaseConnectionString);
-                    }
-                }
-
-                // This class keeps track of DatabaseConfigurationInfo objects for ease of
-                // management, but the DataEntryControlHost only cares about the DbConnections
-                // themselves; return the managed connection for each.
-                return _dbConnections.ToDictionary(
-                    (conn) => conn.Key, (conn) => conn.Value.ManagedDbConnection);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI26159");
-            }
-        }
-
-        /// <summary>
-        /// Given the specified <see paramref="databaseConnectionsNode"/>, creates or updates the
-        /// specified database connection for use in the <see cref="DataEntryControlHost"/>.
-        /// </summary>
-        /// <param name="databaseConnectionsNode">A <see cref="XPathNavigator"/> instance from a
-        /// data entry config file defining the connection.</param>
-        /// <param name="isDefaultConnection"><see langword="true"/> if the connection is defined as
-        /// the default database connection; otherwise, <see langword="false"/>.</param>
-        /// <returns>A <see cref="DatabaseConnectionInfo"/> representing the
-        /// <see cref="DbConnection"/>.</returns>
-        DatabaseConnectionInfo LoadDatabaseConnection(XPathNavigator databaseConnectionsNode,
-            out bool isDefaultConnection)
-        {
-            isDefaultConnection = false;
-            string connectionName = "";
-            string databaseType = "";
-            string localDataSource = "";
-            string databaseConnectionString = "";
-
-            XPathNavigator attribute = databaseConnectionsNode.Clone();
-            if (attribute.MoveToFirstAttribute())
-            {
-                do
-                {
-                    if (attribute.Name.Equals("name", StringComparison.OrdinalIgnoreCase))
-                    {
-                        connectionName = attribute.Value;
-                    }
-                    else if (attribute.Name.Equals("default", StringComparison.OrdinalIgnoreCase))
-                    {
-                        isDefaultConnection = attribute.Value.ToBoolean();
-                    }
-                }
-                while (attribute.MoveToNextAttribute());
-            }
-
-            XPathNavigator connectionProperty = databaseConnectionsNode.Clone();
-            if (connectionProperty.MoveToFirstChild())
-            {
-                // Load all properties of the defined connection.
-                do
-                {
-                    // Use GetNodeValue extension method for XmlNode to allow for expansion of path
-                    // tags in the config file.
-                    var xmlNode = (XmlNode)connectionProperty.UnderlyingObject;
-
-                    if (connectionProperty.Name.Equals("databaseType",
-                        StringComparison.OrdinalIgnoreCase))
-                    {
-                        databaseType = xmlNode.GetNodeValue(_tagUtility, false, true);
-                    }
-                    else if (connectionProperty.Name.Equals("localDataSource",
-                        StringComparison.OrdinalIgnoreCase))
-                    {
-                        localDataSource = xmlNode.GetNodeValue(_tagUtility, false, true);
-                    }
-                    else if (connectionProperty.Name.Equals("databaseConnectionString",
-                        StringComparison.OrdinalIgnoreCase))
-                    {
-                        databaseConnectionString = xmlNode.GetNodeValue(_tagUtility, false, true);
-                    }
-                }
-                while (connectionProperty.MoveToNext());
-
-                if (string.IsNullOrWhiteSpace(connectionName))
-                {
-                    // If the connection is not named, assume it to be the default.
-                    isDefaultConnection = true;
-                }
-                else
-                {
-                    SetDatabaseConnection(connectionName,
-                        databaseType, localDataSource, databaseConnectionString);
-                }
-
-                // If this is the default connection, add the connection under a blank name as well
-                // (blank in _dbConnections indicates the default connection.) 
-                if (isDefaultConnection && !string.IsNullOrEmpty(connectionName))
-                {
-                    _dbConnections[""] = _dbConnections[connectionName];
-                }
-
-                return _dbConnections[connectionName];
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Adds or updates <see cref="_dbConnections"/> with a <see cref="DatabaseConnectionInfo"/>
-        /// instance under the specified <see paramref="name"/>.
-        /// </summary>
-        /// <param name="name">The name of the connection ("" for the default connection)</param>
-        /// <param name="databaseType">The qualified type name of the database connection.</param>
-        /// <param name="localDataSource">If using an SQL CE DB, the name of the DB file can be
-        /// specified here in lieu of the <see paramref="connectionString"/>.</param>
-        /// <param name="connectionString">The connection string to use when connecting to the DB.
-        /// </param>
-        void SetDatabaseConnection(string name, string databaseType, string localDataSource,
-            string connectionString)
-        {
-            if (!string.IsNullOrWhiteSpace(localDataSource))
-            {
-                ExtractException.Assert("ELI37778", "Either a database connection string " +
-                    "can be specified, or a local datasource-- not both.",
-                    string.IsNullOrEmpty(connectionString), "Local data source", localDataSource,
-                    "Connection string", connectionString);
-
-                connectionString = SqlCompactMethods.BuildDBConnectionString(
-                    DataEntryMethods.ResolvePath(localDataSource).ToLower(CultureInfo.CurrentCulture));
-            }
-
-            DatabaseConnectionInfo dbConnInfo = null;
-            if (_dbConnections.TryGetValue(name, out dbConnInfo))
-            {
-                // If there is an existing connection by this name that differs from the newly
-                // specified one (or there is no newly specified connection) close the existing
-                // connection.
-                if (string.IsNullOrWhiteSpace(connectionString) ||
-                    Type.GetType(databaseType) != dbConnInfo.TargetConnectionType ||
-                    connectionString != dbConnInfo.ConnectionString)
-                {
-                    _dbConnections.Remove(name);
-                    if (dbConnInfo != null)
-                    {
-                        dbConnInfo.Dispose();
-                        dbConnInfo = null;
-                    }
-                }
-            }
-
-            // Create the DatabaseConnectionInfo instance if needed.
-            if (dbConnInfo == null && !string.IsNullOrWhiteSpace(connectionString))
-            {
-                dbConnInfo = new DatabaseConnectionInfo(databaseType, connectionString);
-                dbConnInfo.UseLocalSqlCeCopy = true;
-                _dbConnections[name] = dbConnInfo;
-            }
-        }
-
-        /// <summary>
-        /// If an FKBVersion value is available in the Settings table of the specified
-        /// <see paramref="connectionInfo"/>, adds the &lt;ComponentDataDir&gt; tag to
-        /// <see cref="_tagUtility"/>.
-        /// </summary>
-        /// <param name="connectionInfo">A <see cref="DatabaseConnectionInfo"/> that is expected to
-        /// represent the default customer OrderMappingDB database. The tag will only be added if
-        /// this database has a Settings table and that table has a populated FKBVersion setting.
-        /// </param>
-        void AddComponentDataDirTag(DatabaseConnectionInfo connectionInfo)
-        {
-            if (_tagUtility != null &&
-                DBMethods.GetQueryResultsAsStringArray(connectionInfo.ManagedDbConnection,
-                "SELECT COUNT(*) FROM [INFORMATION_SCHEMA].[TABLES] WHERE [TABLE_NAME] = 'Settings'")
-                .Single() == "1")
-            {
-                string FKBVersion = DBMethods.GetQueryResultsAsStringArray(
-                    connectionInfo.ManagedDbConnection,
-                    "SELECT [Value] FROM [Settings] WHERE [Name] = 'FKBVersion'")
-                    .SingleOrDefault();
-
-                if (!string.IsNullOrWhiteSpace(FKBVersion))
-                {
-                    var ruleExecutionEnv = new RuleExecutionEnv();
-                    ruleExecutionEnv.PushRSDFileName("");
-                    try
-                    {
-                        ruleExecutionEnv.FKBVersion = FKBVersion;
-                        if (FileProcessingDB != null)
-                        {
-                            ruleExecutionEnv.AlternateComponentDataDir =
-                                FileProcessingDB.GetDBInfoSetting("AlternateComponentDataDir", false);
-                        }
-
-                        var afUtility = new AFUtility();
-                        _tagUtility.AddTag("<ComponentDataDir>", afUtility.GetComponentDataFolder());
-                    }
-                    finally
-                    {
-                        ruleExecutionEnv.PopRSDFileName();
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// Create a new FileTaskSession table row and starts a timer for the session.
@@ -5306,19 +4444,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         void LoadDataEntryControlHostPanel()
         {
-            if (_dataEntryControlHost == null && _scrollPanel.Controls.Count > 0)
+            if (DataEntryControlHost == null && _scrollPanel.Controls.Count > 0)
             {
                 _scrollPanel.Controls.Clear();
             }
-            else if (_dataEntryControlHost != null && (_scrollPanel.Controls.Count == 0 || 
-                        !_scrollPanel.Controls.Contains(_dataEntryControlHost)))
+            else if (DataEntryControlHost != null && (_scrollPanel.Controls.Count == 0 || 
+                        !_scrollPanel.Controls.Contains(DataEntryControlHost)))
             {
                 if (_scrollPanel.Controls.Count > 0)
                 {
                     _scrollPanel.Controls.Clear();
                 }
 
-                Control mainDataControl = (Control)_dataTab ?? _dataEntryControlHost;
+                Control mainDataControl = (Control)_dataTab ?? DataEntryControlHost;
 
                 // Pad by _DATA_ENTRY_PANEL_PADDING around DEP content
                 mainDataControl.Location
@@ -5334,7 +4472,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _DATA_ENTRY_PANEL_PADDING + _scrollPanel.AutoScrollMargin.Width;
                 }
 
-                _dataEntryControlHost.Anchor = AnchorStyles.Left | AnchorStyles.Top |
+                DataEntryControlHost.Anchor = AnchorStyles.Left | AnchorStyles.Top |
                     AnchorStyles.Right;
 
                 int horizontalPadding =
@@ -5345,7 +4483,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     horizontalPadding += _dataTab.Margin.Horizontal + _dataTab.Padding.Horizontal;
                 }
 
-                int minPanel1Width = _dataEntryControlHost.MinimumSize.Width;
+                int minPanel1Width = DataEntryControlHost.MinimumSize.Width;
                 if (_paginationPanel != null)
                 {
                     minPanel1Width = Math.Max(minPanel1Width, _paginationPanel.MinimumSize.Width);
@@ -5369,14 +4507,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 mainDataControl.Width = _scrollPanel.Width - horizontalPadding;
                 if (_dataTab != null)
                 {
-                    _dataEntryControlHost.Width = _dataTab.ClientRectangle.Width;
+                    DataEntryControlHost.Width = _dataTab.ClientRectangle.Width;
                     _scrollPanel.Width = _dataTab.ClientRectangle.Width;
                 }
 
                 // Add the DEP to an auto-scroll pane to allow scrolling if the DEP is too
                 // long. (The scroll pane is sized to allow the full width of the DEP to 
                 // display initially) 
-                _scrollPanel.Controls.Add(_dataEntryControlHost);
+                _scrollPanel.Controls.Add(DataEntryControlHost);
             }
         }
 
@@ -5413,7 +4551,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         void LoadPaginationDocumentDataPanel()
         {
             string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
-                _activeDataEntryConfig.Config.Settings.DataEntryPanelFileName);
+                _configManager.DefaultDataEntryConfiguration.Config.Settings.DataEntryPanelFileName);
 
             // May be null if the DEP assembly does not define an IPaginationDocumentDataPanel.
             _paginationDocumentDataPanel =
@@ -5424,7 +4562,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             if (_paginationDocumentDataPanel != null)
             {
                 // Allows config file to be able to update _paginationDocumentDataPanel.
-                _activeDataEntryConfig.Config.ApplyObjectSettings(
+                _configManager.DefaultDataEntryConfiguration.Config.ApplyObjectSettings(
                     _paginationDocumentDataPanel.PanelControl);
 
                 _paginationPanel.DocumentDataRequest += HandlePaginationPanel_DocumentDataRequest;

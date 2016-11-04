@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UCLID_AFCORELib;
+using static System.FormattableString;
 
 namespace Extract.DataEntry.LabDE
 {
@@ -291,7 +292,7 @@ namespace Extract.DataEntry.LabDE
                 {
                     var resolvedCriteria = _configuration.RecordMatchCriteria
                         .Select(criteria => _attributeRegex.Replace(criteria, match =>
-                            $"'{_activeFields.Values.Single(field => field.AttributePath == match.Groups["path"].Value).Value}'"));
+                            Invariant($"'{_activeFields.Values.Single(field => field.AttributePath == match.Groups["path"].Value).Value}'")));
 
                     recordIDsQuery = _configuration.BaseSelectQuery;
                     if (resolvedCriteria.Any())

@@ -48,7 +48,6 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-   
     <RegisterForComInterop>true</RegisterForComInterop>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
@@ -61,7 +60,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-   
     <RegisterForComInterop>true</RegisterForComInterop>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>x86</PlatformTarget>
@@ -198,9 +196,6 @@
     </Compile>
     <Compile Include="DataEntryApplicationForm.Designer.cs">
       <DependentUpon>DataEntryApplicationForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DataEntryScrollPanel.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

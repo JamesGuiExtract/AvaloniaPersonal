@@ -362,7 +362,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _documentDataPanelControl.Width = _tableLayoutPanel.Width;
                         _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 1);
                         _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
-                        UpdateSize();
 
                         args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData);
 
@@ -438,8 +437,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     _tableLayoutPanel.Controls.Remove(_documentDataPanelControl);
+                    _tableLayoutPanel.Height = _tableLayoutPanel.Controls.OfType<Control>().Max(c => c.Bottom);
+                    Height = _tableLayoutPanel.Height;
                     _documentDataPanelControl = null;
-                    UpdateSize();
 
                     OnDocumentDataPanelClosed();
                 }
@@ -534,7 +534,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         Padding = new Padding(0, 0, rightPadding, 0);
                     }
+                }
 
+                if (_tableLayoutPanel != null)
+                {
+                    Height = _tableLayoutPanel.Height;
                 }
 
                 base.OnLayout(e);
@@ -707,25 +711,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.ControlRemoved"/> event of the
-        /// <see cref="_tableLayoutPanel"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.ControlEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandleTableLayoutPanel_ControlRemoved(object sender, ControlEventArgs e)
-        {
-            try
-            {
-                UpdateSize();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI40181");
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="OutputDocument.Invalidated"/> event of
         /// <see cref="_outputDocument"/>.
         /// </summary>
@@ -835,18 +820,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _editedDataPictureBox.Visible = false;
                 _dataErrorPictureBox.Visible = false;
             }
-        }
-
-        /// <summary>
-        /// Updates the size of the control to fit the current contents.
-        /// </summary>
-        void UpdateSize()
-        {
-            // In order to solve issues with this control not auto-sizing based on the size of
-            // _tableLayoutPanel, explicitly ask for and resize according to _tableLayoutPanel's
-            // preferred size.
-            var size = _tableLayoutPanel.GetPreferredSize(new Size(Width, 1000));
-            Height = size.Height;
         }
 
         /// <summary>

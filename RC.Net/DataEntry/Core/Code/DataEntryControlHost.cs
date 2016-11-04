@@ -2539,6 +2539,7 @@ namespace Extract.DataEntry
                 // Set flag to indicate that a document change is in progress so that highlights
                 // are not redrawn as the spatial info of the controls are updated.
                 _changingData = true;
+                UnregisterDataEntryControls();
 
                 // Forget all LastAppliedStringValues that are currently being remembered to ensure
                 // that they don't get used later on after the value has been changed to something
@@ -2673,6 +2674,7 @@ namespace Extract.DataEntry
             finally
             {
                 _changingData = false;
+                ReRegisterDataEntryControls();
             }
         }
 
@@ -5420,11 +5422,37 @@ namespace Extract.DataEntry
             {
                 foreach (IDataEntryControl dataControl in _dataControls)
                 {
+                    ((Control)dataControl).GotFocus -= HandleControlGotFocus;
                     dataControl.SwipingStateChanged -= HandleSwipingStateChanged;
                     dataControl.AttributesSelected -= HandleAttributesSelected;
                     dataControl.UpdateStarted -= HandleControlUpdateStarted;
                     dataControl.UpdateEnded -= HandleControlUpdateEnded;
                     dataControl.DataEntryControlHost = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                // This is called from Dispose, so don't throw an exception.
+                ExtractException.AsExtractException("ELI25201", ex).Log();
+            }
+        }
+
+        /// <summary>
+        /// Re-register the <see cref="DataEntryControlHost"/> from <see cref="IDataEntryControl"/>
+        /// events.
+        /// </summary>
+        void ReRegisterDataEntryControls()
+        {
+            try
+            {
+                foreach (IDataEntryControl dataControl in _dataControls)
+                {
+                    ((Control)dataControl).GotFocus += HandleControlGotFocus;
+                    dataControl.SwipingStateChanged += HandleSwipingStateChanged;
+                    dataControl.AttributesSelected += HandleAttributesSelected;
+                    dataControl.UpdateStarted += HandleControlUpdateStarted;
+                    dataControl.UpdateEnded += HandleControlUpdateEnded;
+                    dataControl.DataEntryControlHost = this;
                 }
             }
             catch (Exception ex)

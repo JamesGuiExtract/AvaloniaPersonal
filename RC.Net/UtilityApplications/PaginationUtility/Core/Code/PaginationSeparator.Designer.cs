@@ -85,7 +85,6 @@
             this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this._tableLayoutPanel.Size = new System.Drawing.Size(212, 23);
             this._tableLayoutPanel.TabIndex = 3;
-            this._tableLayoutPanel.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.HandleTableLayoutPanel_ControlRemoved);
             // 
             // _reprocessDocumentPictureBox
             // 

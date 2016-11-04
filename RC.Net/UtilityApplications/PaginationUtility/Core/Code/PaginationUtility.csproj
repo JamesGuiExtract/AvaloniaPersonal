@@ -94,6 +94,12 @@
     <Compile Include="DataEntryDocumentDataPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="DataEntryPanelContainer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DataEntryPanelContainer.Designer.cs">
+      <DependentUpon>DataEntryPanelContainer.cs</DependentUpon>
+    </Compile>
     <Compile Include="NewDocumentGlyph.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -194,6 +200,9 @@
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataEntryPanelContainer.resx">
+      <DependentUpon>DataEntryPanelContainer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="NewDocumentGlyph.resx">
       <DependentUpon>NewDocumentGlyph.cs</DependentUpon>

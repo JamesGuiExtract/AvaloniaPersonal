@@ -1,24 +1,22 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
-namespace Extract.DataEntry.Utilities.DataEntryApplication
+namespace Extract.Utilities.Forms
 {
     /// <summary>
     /// A <see langword="class"/> to allow auto-scrolling of content that is too big for the
     /// <see cref="Control"/> in which it is contained, but with behavior that is improved compared
     /// with that of <see cref="Panel"/> with auto scroll enabled.
     /// </summary>
-    internal class DataEntryScrollPanel : Panel
+    public class ScrollPanel : Panel
     {
         #region Constructors
 
         /// <summary>
-        /// Instantiates a new <see cref="DataEntryScrollPanel"/> instance.
+        /// Instantiates a new <see cref="ScrollPanel"/> instance.
         /// </summary>
-        public DataEntryScrollPanel()
+        public ScrollPanel()
             : base()
         {
         }

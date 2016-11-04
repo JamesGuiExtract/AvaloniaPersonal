@@ -744,31 +744,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningMachineEditor", "..\..\..\..\..\RC.Net\UtilityApplications\LearningMachineEditor\Core\Code\LearningMachineEditor.csproj", "{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatisticsReporter", "..\..\..\..\..\RC.Net\UtilityApplications\StatisticsReporter\StatisticsReporter.csproj", "{293A7737-EEE1-4B72-B681-73E3962DB04D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B6C67039-DF95-4BC8-AEE7-533919A33778} = {B6C67039-DF95-4BC8-AEE7-533919A33778}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Interop.Zip", "..\..\..\..\..\RC.Net\Interop\Zip\Code\Extract.Interop.Zip.vcxproj", "{B6C67039-DF95-4BC8-AEE7-533919A33778}"
-	ProjectSection(ProjectDependencies) = postProject
-		{A1474E20-9B5F-4DF9-A400-490270BC7999} = {A1474E20-9B5F-4DF9-A400-490270BC7999}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataCaptureStats", "..\..\..\..\..\RC.Net\DataCaptureStats\Core\Code\Extract.DataCaptureStats.csproj", "{32679A70-BC10-4DD9-9155-9B3E08586EE9}"
-	ProjectSection(ProjectDependencies) = postProject
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataCaptureStats.Test", "..\..\..\..\..\RC.Net\DataCaptureStats\Core\Testing\Automated\Extract.DataCaptureStats.Test.csproj", "{5E5368E3-ABD2-4A4C-8E96-A28647FB3944}"
 EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -4006,28 +3987,6 @@ Global
 		{293A7737-EEE1-4B72-B681-73E3962DB04D}.Template|Win32.Build.0 = Release|Any CPU
 		{293A7737-EEE1-4B72-B681-73E3962DB04D}.Template|x86.ActiveCfg = Release|Any CPU
 		{293A7737-EEE1-4B72-B681-73E3962DB04D}.Template|x86.Build.0 = Release|Any CPU
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Debug|Win32.Build.0 = Debug|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Debug|x86.ActiveCfg = Debug|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Debug|x86.Build.0 = Debug|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Release|Any CPU.ActiveCfg = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Release|Win32.ActiveCfg = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Release|Win32.Build.0 = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Release|x86.ActiveCfg = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Release|x86.Build.0 = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|Any CPU.ActiveCfg = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|Any CPU.Build.0 = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|Mixed Platforms.ActiveCfg = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|Mixed Platforms.Build.0 = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|Win32.ActiveCfg = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|Win32.Build.0 = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|x86.ActiveCfg = Release|Win32
-		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|x86.Build.0 = Release|Win32
 		{32679A70-BC10-4DD9-9155-9B3E08586EE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{32679A70-BC10-4DD9-9155-9B3E08586EE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32679A70-BC10-4DD9-9155-9B3E08586EE9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
