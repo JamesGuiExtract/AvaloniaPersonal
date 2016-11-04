@@ -2563,8 +2563,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     var activePage = PrimarySelection as PageThumbnailControl;
                     if (activePage == null || activePage.Document != e.OutputDocument)
                     {
-                        ProcessControlSelection(e.OutputDocument.PageControls
-                            .FirstOrDefault(c => !c.Deleted));
+                        // Always select a page to prevent UI from hanging
+                        // https://extract.atlassian.net/browse/ISSUE-14206
+                        var pageToSelect =
+                               e.OutputDocument.PageControls.FirstOrDefault(c => !c.Deleted)
+                            ?? e.OutputDocument.PageControls.First();
+                        ProcessControlSelection(pageToSelect);
                     }
 
                     _documentDataPanelControl = e.DocumentDataPanel.PanelControl;

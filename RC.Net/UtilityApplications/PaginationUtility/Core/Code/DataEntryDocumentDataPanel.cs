@@ -805,36 +805,40 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
-                _documentStatusUpdateSemaphore.Release();
+                _documentStatusUpdateSemaphore?.Release();
                 if (connectionCopies != null)
                 {
                     CollectionMethods.ClearAndDispose(connectionCopies);
                 }
             }
 
-            _imageViewer.SafeBeginInvoke("ELI41465", () =>
+
+            if (!_imageViewer.IsDisposed && _imageViewer.IsHandleCreated)
             {
-                try
+                _imageViewer.SafeBeginInvoke("ELI41465", () =>
                 {
-                    if (ee != null)
+                    try
                     {
-                        ee.ExtractDisplay("ELI41464");
+                        if (ee != null)
+                        {
+                            ee.ExtractDisplay("ELI41464");
+                        }
+
+                        if (_pendingDocumentStatusUpdate.ContainsKey(documentData))
+                        {
+                            documentData.SetModified(dataModified);
+                            documentData.SetDataError(dataError);
+                            documentData.SetSummary(summary);
+                        }
+                    }
+                    finally
+                    {
+                        int temp;
+                        _pendingDocumentStatusUpdate.TryRemove(documentData, out temp);
                     }
 
-                    if (_pendingDocumentStatusUpdate.ContainsKey(documentData))
-                    {
-                        documentData.SetModified(dataModified);
-                        documentData.SetDataError(dataError);
-                        documentData.SetSummary(summary);
-                    }
-                }
-                finally
-                {
-                    int temp;
-                    _pendingDocumentStatusUpdate.TryRemove(documentData, out temp);
-                }
-
-            });
+                });
+            }
         }
 
         /// <summary>

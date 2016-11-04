@@ -517,7 +517,7 @@ namespace Extract
                 Form mainForm = null;
                 foreach (Form form in Application.OpenForms)
                 {
-                    if (form.TopLevel)
+                    if (form.IsHandleCreated && !form.IsDisposed && form.TopLevel)
                     {
                         mainForm = form;
                         break;
@@ -546,6 +546,13 @@ namespace Extract
             ToolStrip toolStrip = parent as ToolStrip;
             if (toolStrip != null)
             {
+                // Don't do anything if disposed or no handle is created
+                // http://stackoverflow.com/a/16301367
+                if (toolStrip.IsDisposed || !toolStrip.IsHandleCreated)
+                {
+                    return;
+                }
+
                 // Don't capture mouse events
                 if (toolStrip.InvokeRequired)
                 {

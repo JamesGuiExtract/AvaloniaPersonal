@@ -18,23 +18,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (disposing)
             {
-                if (_pendingDocuments != null)
+                foreach (var oldDocument in _pendingDocuments)
                 {
-                    foreach (var oldDocument in _pendingDocuments)
+                    var disposableData = oldDocument.DocumentData as IDisposable;
+                    if (disposableData != null)
                     {
-                        var disposableData = oldDocument.DocumentData as IDisposable;
-                        if (disposableData != null)
-                        {
-                            disposableData.Dispose();
-                        }
+                        disposableData.Dispose();
                     }
-                    _pendingDocuments = null;
                 }
-                if (_sourceDocuments != null)
-                {
-                    Extract.Utilities.CollectionMethods.ClearAndDispose(_sourceDocuments);
-                    _sourceDocuments = null;
-                }
+                _pendingDocuments.Clear();
+
+                Extract.Utilities.CollectionMethods.ClearAndDispose(_sourceDocuments);
+
                 if (_primaryPageLayoutControl != null)
                 {
                     _primaryPageLayoutControl.Dispose();

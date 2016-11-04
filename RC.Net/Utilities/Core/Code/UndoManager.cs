@@ -795,9 +795,15 @@ namespace Extract.Utilities
         static void PushOperation(Stack<IUndoMemento> operation,
             Stack<Stack<IUndoMemento>> undoStack)
         {
+            // If operation is empty don't add it to the stack
+            // https://extract.atlassian.net/browse/ISSUE-14221
+            if (operation.Count == 0)
+            {
+                return;
+            }
             // If either the last undo operation, or the operation getting pushed don't contain any substantial
             // mementos, merge the two rather than adding a new undo operation.
-            if (undoStack.Count > 0 &&
+            else if (undoStack.Count > 0 &&
                 (!undoStack.Peek().Any(memento => memento.Significance == UndoMementoSignificance.Substantial) ||
                 !operation.Any(memento => memento.Significance == UndoMementoSignificance.Substantial)))
             {
