@@ -7,6 +7,7 @@ SET VAULT_REPOSITORY="Extract"
 SET NUANCE_API_ROOT=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Nuance_19
 SET NUANCE_API_DIR=%NUANCE_API_ROOT%\bin
 SET LEADTOOLS_API_DIR=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_17\Bin
+SET LEADTOOLS_API_DOTNET=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_17\DotNet
 
 SET PATH=%windir%;%windir%\System32;%windir%\System32\WindowsPowerShell\v1.0;I:\Common\Engineering\Tools\Utils;%VAULT_DIR%;%NUANCE_API_DIR%;%LEADTOOLS_API_DIR%;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\SafeNetUltraPro\Bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Inlite_5_7\bin
 SET PATH=%PATH%;%DevEnvDir%;%VCPP_DIR%\BIN;%VS_COMMON%\Tools;%VS_COMMON%\Tools\bin;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;%VCPP_DIR%\VCPackages;%VCPP_DIR%\Bin;%DOTFUSCATOR%;%FX_COP%;
