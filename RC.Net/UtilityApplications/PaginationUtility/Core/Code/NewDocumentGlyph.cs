@@ -41,7 +41,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
 
-                var brush = ExtractBrushes.GetSolidBrush(Color.Green);
+                var brush = ExtractBrushes.GetSolidBrush(Color.Chartreuse);
 
                 StringFormat format = new StringFormat
                 {

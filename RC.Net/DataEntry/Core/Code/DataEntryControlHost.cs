@@ -2666,6 +2666,7 @@ namespace Extract.DataEntry
 
                 _lastLoggedFocusAttribute = null;
                 _lastLoggedFocusControl = null;
+                _previousDataValidity = DataValidity.Valid;
             }
             catch (Exception ex)
             {
@@ -3741,6 +3742,8 @@ namespace Extract.DataEntry
             }
         }
 
+        DataValidity _previousDataValidity = DataValidity.Valid;
+
         /// <summary>
         /// Handles the case that an <see cref="IAttribute"/> that was previously marked as 
         /// containing invalid data now contains valid data (or vice-versa).
@@ -3753,7 +3756,6 @@ namespace Extract.DataEntry
         {
             try
             {
-                DataValidity previousDataValidity = DataValidity;
                 if (e.DataValidity == DataValidity.Valid)
                 {
                     _invalidAttributes.Remove(e.Attribute);
@@ -3763,10 +3765,12 @@ namespace Extract.DataEntry
                     _invalidAttributes.Add(e.Attribute);
                 }
 
-                if (previousDataValidity != DataValidity)
+                if (_previousDataValidity != DataValidity)
                 {
                     OnDataValidityChanged();
                 }
+
+                _previousDataValidity = DataValidity;
 
                 // Remove the image viewer error icon if the data is now valid.
                 if (e.DataValidity != DataValidity.Invalid)

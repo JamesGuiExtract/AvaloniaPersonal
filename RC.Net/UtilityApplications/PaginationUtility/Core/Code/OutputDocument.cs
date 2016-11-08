@@ -101,6 +101,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
+        /// Gets or sets a value indicating whether /[default data panel open].
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if [default data panel open]; otherwise, <c>false</c>.
+        /// </value>
+        public bool DefaultDataPanelOpen
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets the <see cref="PageThumbnailControl"/>s that comprise the document to output.
         /// </summary>
         public ReadOnlyCollection<PageThumbnailControl> PageControls

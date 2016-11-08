@@ -54,7 +54,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._tableLayoutPanel.AutoSize = true;
             this._tableLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._tableLayoutPanel.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this._tableLayoutPanel.BackColor = System.Drawing.Color.SteelBlue;
             this._tableLayoutPanel.ColumnCount = 11;
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 2F));
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 18F));
@@ -231,9 +231,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.BackColor = System.Drawing.Color.SteelBlue;
             this.Controls.Add(this._tableLayoutPanel);
-            this.ForeColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.ForeColor = System.Drawing.Color.White;
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "PaginationSeparator";
             this.Size = new System.Drawing.Size(212, 23);
