@@ -135,33 +135,43 @@ namespace StatisticsReporter
             "FROM " +
             "( " +
             "    SELECT dbo.AttributeSetForFile.VOA, " +
-            "           dbo.FileTaskSession.FileID, " +
-            "           dbo.FileTaskSession.DateTimeStamp, " +
+            "           FTS.FileID, " +
+            "           FTS.DateTimeStamp, " +
             "           dbo.AttributeSetName.ID as FoundSetID " +
             "    FROM dbo.AttributeSetForFile " +
             "         INNER JOIN dbo.AttributeSetName ON dbo.AttributeSetForFile.AttributeSetNameID = dbo.AttributeSetName.ID " +
-            "         INNER JOIN dbo.FileTaskSession ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID " +
+            "         INNER JOIN dbo.FileTaskSession FTS ON dbo.AttributeSetForFile.FileTaskSessionID = FTS.ID " +
             "    WHERE Description = '<Found>' " +
+            "          AND DateTimeStamp = " +
+            "           ( " +
+            "               SELECT MAX(DateTimeStamp) " +
+            "               FROM FileTaskSession " +
+            "                   INNER JOIN AttributeSetForFile ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID " +
+            "               WHERE FileID = FTS.FileID " +
+            "                   AND AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID " +
+            "           ) " +
             ") AS Found " +
             "INNER JOIN FAMFile ON Found.FileID = FAMFile.ID " +
             "<IncludeAll> " +
             "( " +
             "    SELECT dbo.AttributeSetForFile.VOA, " +
-            "           dbo.FileTaskSession.FileID, " +
-            "           dbo.FileTaskSession.DateTimeStamp, " +
+            "           FTS.FileID, " +
+            "          FTS.DateTimeStamp, " +
             "           dbo.AttributeSetName.ID as ExpectedSetID " +
             "    FROM dbo.AttributeSetForFile " +
             "         INNER JOIN dbo.AttributeSetName ON dbo.AttributeSetForFile.AttributeSetNameID = dbo.AttributeSetName.ID " +
-            "         INNER JOIN dbo.FileTaskSession ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID " +
+            "         INNER JOIN dbo.FileTaskSession FTS ON dbo.AttributeSetForFile.FileTaskSessionID = FTS.ID " +
             "    WHERE Description = '<Expected>' " +
+            "          AND DateTimeStamp = " +
+            "           ( " +
+            "               SELECT MAX(DateTimeStamp) " +
+            "               FROM FileTaskSession " +
+            "                   INNER JOIN AttributeSetForFile ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID " +
+            "               WHERE FileID = FTS.FileID " +
+            "                   AND AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID " +
+            "           ) " +
             ") AS Expected ON FAMFile.ID = Expected.FileID " +
-            "WHERE <ApplyDateRangeSet>.DateTimeStamp = " +
-            "( " +
-            "    SELECT MAX(DateTimeStamp) " +
-            "    FROM FileTaskSession " +
-            "       INNER JOIN AttributeSetForFile on AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID " +
-            "       WHERE FileID = FAMFile.ID AND AttributeSetForFile.AttributeSetNameID = <ApplyDateRangeSet>SetID " +
-            ") AND <ApplyDateRangeSet>.DateTimeStamp >= '<StartDateTime>' AND <ApplyDateRangeSet>.DateTimeStamp <= '<EndDateTime>';";
+            "WHERE <ApplyDateRangeSet>.DateTimeStamp >= '<StartDateTime>' AND <ApplyDateRangeSet>.DateTimeStamp <= '<EndDateTime>';";
 
         
         //  These are used to replace the IncludeAll tag in the ExpectedFoundSQL string
