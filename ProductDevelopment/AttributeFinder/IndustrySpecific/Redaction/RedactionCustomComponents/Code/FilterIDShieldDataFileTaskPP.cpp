@@ -472,7 +472,6 @@ bool CFilterIDShieldDataFileTaskPP::doInputOutputFilesMatch(const string &strInp
 		// Get a FAM tag manager and set the FPS file directory
 		IFAMTagManagerPtr ipFamTagManager(CLSID_FAMTagManager);
 		ASSERT_RESOURCE_ALLOCATION("ELI24850", ipFamTagManager != __nullptr);
-		ipFamTagManager->FPSFileDir = "C:\\Validation";
 		
 		// Create a fake source doc name
 		string strFakeSource = "C:\\Images\\123.tif";
