@@ -52,6 +52,9 @@ public:
 							  /*[out, retval]*/ IIUnknownVector** pAttributes);
 	STDMETHOD(ShowHelpAboutBox)(/*[in]*/ EHelpAboutType eType, /*[in]*/ BSTR strProductVersion);
 	STDMETHOD(GetComponentDataFolder)(/*[out, retval]*/ BSTR *pstrComponentDataFolder);
+	STDMETHOD(GetComponentDataFolder2)(/*[in]*/ BSTR bstrFKBVersion,
+									   /*[in]*/ BSTR bstrAlternateComponentDataRoot,
+									   /*[out, retval]*/ BSTR *pstrComponentDataFolder);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -103,7 +106,7 @@ private:
 	IOCRUtilsPtr getOCRUtils();
 	//----------------------------------------------------------------------------------------------
 	// Gets the FKB version specific (or registry overridden) component data folder
-	void getComponentDataFolder(string& rFolder);
+	void getComponentDataFolder(string strFKBVersion, string strAlternateComponentDataRoot, string& rFolder);
 	//----------------------------------------------------------------------------------------------
 	void validateLicense();
 };

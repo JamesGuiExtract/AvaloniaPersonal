@@ -349,14 +349,37 @@ STDMETHODIMP CAttributeFinderEngine::GetComponentDataFolder(BSTR *pstrComponentD
 		validateLicense();
 
 		// get the component data folder and return it
+		string strFKBVersion = trim(asString(m_ipRuleExecutionEnv->FKBVersion), " \t", " \t");
+		string strAlternateComponentDataRoot = asString(m_ipRuleExecutionEnv->AlternateComponentDataDir);
 		string strFolder;
-		getComponentDataFolder(strFolder);
+		getComponentDataFolder(strFKBVersion, strAlternateComponentDataRoot, strFolder);
 
 		*pstrComponentDataFolder = _bstr_t(strFolder.c_str()).Detach();
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13440");
+}
+
+STDMETHODIMP CAttributeFinderEngine::GetComponentDataFolder2(BSTR bstrFKBVersion,
+															 BSTR bstrAlternateComponentDataRoot,
+															 BSTR *pstrComponentDataFolder)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		// get the component data folder and return it
+		string strFolder;
+		getComponentDataFolder(asString(bstrFKBVersion), asString(bstrAlternateComponentDataRoot), strFolder);
+
+		*pstrComponentDataFolder = _bstr_t(strFolder.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41608");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -575,7 +598,8 @@ ULONGLONG getVersionAsULONGLONG(string strVersion)
 	return nVersion;
 }
 //-------------------------------------------------------------------------------------------------
-void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
+void CAttributeFinderEngine::getComponentDataFolder(string strFKBVersion,
+	string strAlternateComponentDataRoot, string& rstrFolder)
 {
 	bool bOverriden = false;
 	getRootComponentDataFolder(rstrFolder, bOverriden);
@@ -593,9 +617,7 @@ void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
 		ASSERT_RESOURCE_ALLOCATION("ELI32474", m_ipRuleExecutionEnv != __nullptr);
 	}
 
-	string strFKBVersion = trim(asString(m_ipRuleExecutionEnv->FKBVersion), " \t", " \t");
 	string strLegacyFKBVersion = getLegacyFKBVersion();
-	string strAlternateComponentDataRoot = asString(m_ipRuleExecutionEnv->AlternateComponentDataDir);
 	if (!strAlternateComponentDataRoot.empty() && strAlternateComponentDataRoot.back() != '\\')
 	{
 		strAlternateComponentDataRoot += "\\";

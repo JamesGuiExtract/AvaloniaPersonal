@@ -68,6 +68,9 @@ public:
 		/*[out, retval]*/ IStrToObjectMap** ppMapNameToAttributes);
 	STDMETHOD(GetComponentDataFolder)(
 		/*[out, retval]*/ BSTR* pstrComponentDataFolder);
+	STDMETHOD(GetComponentDataFolder2)(/*[in]*/ BSTR bstrFKBVersion,
+									   /*[in]*/ BSTR bstrAlternateComponentDataRoot,
+									   /*[out, retval]*/ BSTR *pstrComponentDataFolder);
 	STDMETHOD(GetPrefixedFileName)(
 		/*[in]*/ BSTR strNonPrefixFullPath, 
 		/*[out, retval]*/ BSTR* pstrFileToRead);

@@ -171,6 +171,27 @@ STDMETHODIMP CAFUtility::GetComponentDataFolder(BSTR *pstrComponentDataFolder)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::GetComponentDataFolder2(BSTR bstrFKBVersion,
+												 BSTR bstrAlternateComponentDataRoot,
+												 BSTR *pstrComponentDataFolder)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// get the component data folder and return it
+		string strFolder;
+		strFolder = m_ipEngine->GetComponentDataFolder2(bstrFKBVersion, bstrAlternateComponentDataRoot);
+
+		*pstrComponentDataFolder = _bstr_t(strFolder.c_str()).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41609");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFUtility::GetPrefixedFileName(BSTR strNonPrefixFullPath, BSTR* pstrFileToRead)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());

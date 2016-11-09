@@ -581,6 +581,12 @@ library UCLID_AFCORELib
 		// Retrieve the full path to the component data folder
 		[id(9), helpstring("method GetComponentDataFolder")] HRESULT GetComponentDataFolder([out, retval] BSTR *pbstrComponentDataFolder);
 		//-----------------------------------------------------------------------------------------
+		// Gets the FKB directory using the supplied FKB version and optional alternate folder to
+		// be used in addition to the default or registry specified locations
+		[id(10), helpstring("method GetComponentDataFolder2")] HRESULT GetComponentDataFolder2(
+			[in] BSTR bstrFKBVersion, [in] BSTR bstrAlternateComponentDataRoot,
+			[out, retval] BSTR* pstrComponentDataFolder);
+		//-----------------------------------------------------------------------------------------
 	};
 
 	[

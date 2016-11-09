@@ -522,6 +522,12 @@ library UCLID_AFUTILSLib
 		// the attribute context available for back-referencing.
 		[id(34), helpstring("method GetNewRegExpParser")] HRESULT GetNewRegExpParser(
 			[in] IAFDocument *pDoc, [out, retval] IRegularExprParser **ppRegExParser);
+		//-----------------------------------------------------------------------------------------
+		// Gets the FKB directory using the supplied FKB version and optional alternate folder to
+		// be used in addition to the default or registry specified locations
+		[id(35), helpstring("method GetComponentDataFolder2")] HRESULT GetComponentDataFolder2(
+			[in] BSTR bstrFKBVersion, [in] BSTR bstrAlternateComponentDataRoot,
+			[out, retval] BSTR* pstrComponentDataFolder);
 	};
 	[
 		object,

@@ -261,8 +261,8 @@ namespace Extract.DataEntry
                 }
                 while (connectionProperty.MoveToNext());
 
-                SetDatabaseConnection(connectionName,
-                    databaseType, localDataSource, databaseConnectionString);
+                    SetDatabaseConnection(connectionName,
+                        databaseType, localDataSource, databaseConnectionString);
 
                 // If this is the default connection, add the connection under a blank name as well
                 // (blank in _dbConnections indicates the default connection.) 
@@ -417,24 +417,6 @@ namespace Extract.DataEntry
         /// </param>
         void AddComponentDataDirTag(DatabaseConnectionInfo connectionInfo)
         {
-            // It cannot be guaranteed the current managed thread will call into the same native
-            // thread for all the RuleExecutionEnv calls below. In particular, managed threads
-            // appear prone to re-using the same native thread when many calls are happening
-            // simultaneously on multiple threads as is the case when loading many docs at once due
-            // to DataEntryPanelContainer.UpdateDocumentStatus, or multi-DEP per doc type
-            // configurations or, in particular, both at once.
-            // While it cannot be guaranteed there will not be issues without these conditions,
-            // only setting <ComponentDataDir> once per _tagUtility instance appears to, at minimum,
-            // drastically reduce the chance of an error.
-            if (_tagUtility != null &&
-                _tagUtility
-                    .GetAllTags()
-                    .ToIEnumerable<string>()
-                    .Contains("<ComponentDataDir>"))
-            {
-                return;
-            }
-
             if (_tagUtility != null &&
                 DBMethods.GetQueryResultsAsStringArray(connectionInfo.ManagedDbConnection,
                 "SELECT COUNT(*) FROM [INFORMATION_SCHEMA].[TABLES] WHERE [TABLE_NAME] = 'Settings'")
@@ -447,37 +429,23 @@ namespace Extract.DataEntry
 
                 if (!string.IsNullOrWhiteSpace(FKBVersion))
                 {
-                    // Due to potential threading issues detailed above, allow for up to 3 attempts
-                    // to get the ComponentDataDir.
-                    for (int i = 0; i < 3; i++)
+                    try
                     {
-                        try
+                        string alternateComponentDataDir = null;
+                        if (_fileProcessingDB != null)
                         {
-                            var ruleExecutionEnv = new RuleExecutionEnv();
-                            ruleExecutionEnv.PushRSDFileName("");
-                            ruleExecutionEnv.FKBVersion = FKBVersion;
-                            if (_fileProcessingDB != null)
-                            {
-                                ruleExecutionEnv.AlternateComponentDataDir =
-                                    _fileProcessingDB.GetDBInfoSetting("AlternateComponentDataDir", false);
-                            }
+                            alternateComponentDataDir =
+                                _fileProcessingDB.GetDBInfoSetting("AlternateComponentDataDir", false);
+                        }
 
-                            var afUtility = new AFUtility();
-                            _tagUtility.AddTag("<ComponentDataDir>", afUtility.GetComponentDataFolder());
-                            ruleExecutionEnv.PopRSDFileName();
-                            break;
-                        }
-                        catch (Exception ex)
-                        {
-                            if (i < 2)
-                            {
-                                ex.ExtractLog("ELI41592");
-                            }
-                            else
-                            {
-                                throw ex.AsExtract("ELI41593");
-                            }
-                        }
+                        var afUtility = new AFUtility();
+                        var componentDataFolder =
+                            afUtility.GetComponentDataFolder2(FKBVersion, alternateComponentDataDir);
+                        _tagUtility.AddTag("<ComponentDataDir>", componentDataFolder);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex.AsExtract("ELI41593");
                     }
                 }
             }
