@@ -476,7 +476,11 @@ namespace Extract
                 UCLID_EXCEPTIONMGMTLib.COMUCLIDException uex = AsCppException();
 
                 // Ensure the COM dialog handles the user's first mouse click [DotNetRCAndUtils #58]
-                UncaptureToolStrips();
+                // https://extract.atlassian.net/browse/ISSUE-1222
+
+                // Commented-out to, I hope, avoid UI lock-up with complicated paginate files DEPs
+                // https://extract.atlassian.net/browse/ISSUE-14206
+                // UncaptureToolStrips();
 
                 // Call the Display() method on the UCLIDException object to cause the 
                 // exception to get displayed using the standard exception displaying mechanism used 
