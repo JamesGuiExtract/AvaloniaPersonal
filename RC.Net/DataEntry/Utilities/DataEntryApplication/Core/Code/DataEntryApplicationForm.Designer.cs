@@ -143,6 +143,83 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
+            // _sandDockManager
+            // 
+            this._sandDockManager.DockSystemContainer = this._splitContainer.Panel2;
+            this._sandDockManager.OwnerForm = this;
+            // 
+            // _magnifierControl
+            // 
+            this._magnifierControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._magnifierControl.ImageViewer = null;
+            this._magnifierControl.Location = new System.Drawing.Point(0, 0);
+            this._magnifierControl.Name = "_magnifierControl";
+            this._magnifierControl.Size = new System.Drawing.Size(1097, 162);
+            this._magnifierControl.TabIndex = 1;
+            // 
+            // _magnifierDockableWindow
+            // 
+            this._magnifierDockableWindow.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this._magnifierDockableWindow.Collapsed = true;
+            this._magnifierDockableWindow.Controls.Add(this._magnifierControl);
+            this._magnifierDockableWindow.FloatingSize = new System.Drawing.Size(500, 300);
+            this._magnifierDockableWindow.Guid = new System.Guid("25fa87c7-8272-45c9-9ec8-f2f81c20e9eb");
+            this._magnifierDockableWindow.Location = new System.Drawing.Point(0, 18);
+            this._magnifierDockableWindow.Name = "_magnifierDockableWindow";
+            this._magnifierDockableWindow.Size = new System.Drawing.Size(1097, 162);
+            this._magnifierDockableWindow.TabIndex = 0;
+            this._magnifierDockableWindow.Text = "Magnifier";
+            // 
+            // _dockContainer
+            // 
+            this._dockContainer.ContentSize = 200;
+            this._dockContainer.Controls.Add(this._magnifierDockableWindow);
+            this._dockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._magnifierDockableWindow))}, this._magnifierDockableWindow)))});
+            this._dockContainer.Location = new System.Drawing.Point(0, 66);
+            this._dockContainer.Manager = this._sandDockManager;
+            this._dockContainer.Name = "_dockContainer";
+            this._dockContainer.Size = new System.Drawing.Size(1097, 204);
+            this._dockContainer.TabIndex = 1;
+            // 
+            // _thumbnailDockableWindow
+            // 
+            this._thumbnailDockableWindow.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this._thumbnailDockableWindow.Collapsed = true;
+            this._thumbnailDockableWindow.Controls.Add(this._thumbnailViewer);
+            this._thumbnailDockableWindow.FloatingSize = new System.Drawing.Size(500, 300);
+            this._thumbnailDockableWindow.Guid = new System.Guid("fe65f9f4-1b32-4a67-b510-e1427e22c782");
+            this._thumbnailDockableWindow.Location = new System.Drawing.Point(4, 18);
+            this._thumbnailDockableWindow.Name = "_thumbnailDockableWindow";
+            this._thumbnailDockableWindow.PrimaryControl = this;
+            this._thumbnailDockableWindow.Size = new System.Drawing.Size(200, 468);
+            this._thumbnailDockableWindow.TabIndex = 0;
+            this._thumbnailDockableWindow.Text = "Page thumbnails";
+            // 
+            // _thumbnailViewer
+            // 
+            this._thumbnailViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._thumbnailViewer.ImageViewer = null;
+            this._thumbnailViewer.Location = new System.Drawing.Point(0, 0);
+            this._thumbnailViewer.Name = "_thumbnailViewer";
+            this._thumbnailViewer.Size = new System.Drawing.Size(200, 468);
+            this._thumbnailViewer.TabIndex = 0;
+            // 
+            // _dockContainer1
+            // 
+            this._dockContainer1.ContentSize = 200;
+            this._dockContainer1.Controls.Add(this._thumbnailDockableWindow);
+            this._dockContainer1.Dock = System.Windows.Forms.DockStyle.Right;
+            this._dockContainer1.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._thumbnailDockableWindow))}, this._thumbnailDockableWindow)))});
+            this._dockContainer1.Location = new System.Drawing.Point(706, 0);
+            this._dockContainer1.Manager = this._sandDockManager;
+            this._dockContainer1.Name = "_dockContainer1";
+            this._dockContainer1.Size = new System.Drawing.Size(204, 510);
+            this._dockContainer1.TabIndex = 2;
+            // 
             // _splitContainer
             // 
             this._splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -270,83 +347,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
             this._paginationPanel.Paginated += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(this.HandlePaginationPanel_Paginated);
             this._paginationPanel.PaginationError += new System.EventHandler<Extract.ExtractExceptionEventArgs>(this.HandlePaginationPanel_PaginationError);
-            // 
-            // _dockContainer
-            // 
-            this._dockContainer.ContentSize = 200;
-            this._dockContainer.Controls.Add(this._magnifierDockableWindow);
-            this._dockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
-            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
-                        ((TD.SandDock.DockControl)(this._magnifierDockableWindow))}, this._magnifierDockableWindow)))});
-            this._dockContainer.Location = new System.Drawing.Point(0, 66);
-            this._dockContainer.Manager = this._sandDockManager;
-            this._dockContainer.Name = "_dockContainer";
-            this._dockContainer.Size = new System.Drawing.Size(1097, 204);
-            this._dockContainer.TabIndex = 1;
-            // 
-            // _magnifierDockableWindow
-            // 
-            this._magnifierDockableWindow.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this._magnifierDockableWindow.Collapsed = true;
-            this._magnifierDockableWindow.Controls.Add(this._magnifierControl);
-            this._magnifierDockableWindow.FloatingSize = new System.Drawing.Size(500, 300);
-            this._magnifierDockableWindow.Guid = new System.Guid("25fa87c7-8272-45c9-9ec8-f2f81c20e9eb");
-            this._magnifierDockableWindow.Location = new System.Drawing.Point(0, 18);
-            this._magnifierDockableWindow.Name = "_magnifierDockableWindow";
-            this._magnifierDockableWindow.Size = new System.Drawing.Size(1097, 162);
-            this._magnifierDockableWindow.TabIndex = 0;
-            this._magnifierDockableWindow.Text = "Magnifier";
-            // 
-            // _magnifierControl
-            // 
-            this._magnifierControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._magnifierControl.ImageViewer = null;
-            this._magnifierControl.Location = new System.Drawing.Point(0, 0);
-            this._magnifierControl.Name = "_magnifierControl";
-            this._magnifierControl.Size = new System.Drawing.Size(1097, 162);
-            this._magnifierControl.TabIndex = 1;
-            // 
-            // _sandDockManager
-            // 
-            this._sandDockManager.DockSystemContainer = this._splitContainer.Panel2;
-            this._sandDockManager.OwnerForm = this;
-            // 
-            // _dockContainer1
-            // 
-            this._dockContainer1.ContentSize = 200;
-            this._dockContainer1.Controls.Add(this._thumbnailDockableWindow);
-            this._dockContainer1.Dock = System.Windows.Forms.DockStyle.Right;
-            this._dockContainer1.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
-            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
-                        ((TD.SandDock.DockControl)(this._thumbnailDockableWindow))}, this._thumbnailDockableWindow)))});
-            this._dockContainer1.Location = new System.Drawing.Point(706, 0);
-            this._dockContainer1.Manager = this._sandDockManager;
-            this._dockContainer1.Name = "_dockContainer1";
-            this._dockContainer1.Size = new System.Drawing.Size(204, 510);
-            this._dockContainer1.TabIndex = 2;
-            // 
-            // _thumbnailDockableWindow
-            // 
-            this._thumbnailDockableWindow.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this._thumbnailDockableWindow.Collapsed = true;
-            this._thumbnailDockableWindow.Controls.Add(this._thumbnailViewer);
-            this._thumbnailDockableWindow.FloatingSize = new System.Drawing.Size(500, 300);
-            this._thumbnailDockableWindow.Guid = new System.Guid("fe65f9f4-1b32-4a67-b510-e1427e22c782");
-            this._thumbnailDockableWindow.Location = new System.Drawing.Point(4, 18);
-            this._thumbnailDockableWindow.Name = "_thumbnailDockableWindow";
-            this._thumbnailDockableWindow.PrimaryControl = this;
-            this._thumbnailDockableWindow.Size = new System.Drawing.Size(200, 468);
-            this._thumbnailDockableWindow.TabIndex = 0;
-            this._thumbnailDockableWindow.Text = "Page thumbnails";
-            // 
-            // _thumbnailViewer
-            // 
-            this._thumbnailViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._thumbnailViewer.ImageViewer = null;
-            this._thumbnailViewer.Location = new System.Drawing.Point(0, 0);
-            this._thumbnailViewer.Name = "_thumbnailViewer";
-            this._thumbnailViewer.Size = new System.Drawing.Size(200, 468);
-            this._thumbnailViewer.TabIndex = 0;
             // 
             // _imageViewer
             // 

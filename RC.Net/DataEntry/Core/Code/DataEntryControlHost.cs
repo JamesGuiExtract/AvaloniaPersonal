@@ -661,6 +661,11 @@ namespace Extract.DataEntry
         bool _isIdle = true;
 
         /// <summary>
+        /// The current <see cref="DataValidity"/> of the data loaded into the control.
+        /// </summary>
+        DataValidity _dataValidity = DataValidity.Valid;
+
+        /// <summary>
         /// Commands that should be executed the next time the host is idle along with ELI codes
         /// that should be attributed to any exceptions.
         /// </summary>
@@ -2539,6 +2544,10 @@ namespace Extract.DataEntry
                 // Set flag to indicate that a document change is in progress so that highlights
                 // are not redrawn as the spatial info of the controls are updated.
                 _changingData = true;
+
+                // Unregister for events in the process of unregistering the data entry controls.
+                // The UI shouldn't be responding to any control events while clearing data.
+                // Control events will be re-registered in finally block.
                 UnregisterDataEntryControls();
 
                 // Forget all LastAppliedStringValues that are currently being remembered to ensure
@@ -2666,7 +2675,7 @@ namespace Extract.DataEntry
 
                 _lastLoggedFocusAttribute = null;
                 _lastLoggedFocusControl = null;
-                _previousDataValidity = DataValidity.Valid;
+                _dataValidity = DataValidity.Valid;
             }
             catch (Exception ex)
             {
@@ -2783,7 +2792,6 @@ namespace Extract.DataEntry
                     // Create and initialize smart tag support for all text controls.
                     InitializeSmartTagManager();
 
-                    _dataEntryApp.ShowAllHighlightsChanged += HandleShowAllHighlightsChanged;
                     Application.Idle += HandleApplicationIdle;
                 }
 
@@ -3742,8 +3750,6 @@ namespace Extract.DataEntry
             }
         }
 
-        DataValidity _previousDataValidity = DataValidity.Valid;
-
         /// <summary>
         /// Handles the case that an <see cref="IAttribute"/> that was previously marked as 
         /// containing invalid data now contains valid data (or vice-versa).
@@ -3765,12 +3771,13 @@ namespace Extract.DataEntry
                     _invalidAttributes.Add(e.Attribute);
                 }
 
-                if (_previousDataValidity != DataValidity)
+                var newDataValidity = DataValidity;
+                if (_dataValidity != newDataValidity)
                 {
                     OnDataValidityChanged();
                 }
 
-                _previousDataValidity = DataValidity;
+                _dataValidity = newDataValidity;
 
                 // Remove the image viewer error icon if the data is now valid.
                 if (e.DataValidity != DataValidity.Invalid)
@@ -4157,27 +4164,32 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Show or hide all highlights as appropriate.
-                foreach (IAttribute attribute in _attributeHighlights.Keys)
+                // This instance may be part of a doc type configuration that is not currently
+                // active. If _imageViewer is not set, don't do anything.
+                if (_imageViewer != null)
                 {
-                    // If _showAllHighlights is being set to true, show the highlight
-                    // (unless it is an indirect hint).
-                    if (_dataEntryApp.ShowAllHighlights)
+                    // Show or hide all highlights as appropriate.
+                    foreach (IAttribute attribute in _attributeHighlights.Keys)
                     {
-                        if (AttributeStatusInfo.HasSpatialInfo(attribute, true))
+                        // If _showAllHighlights is being set to true, show the highlight
+                        // (unless it is an indirect hint).
+                        if (_dataEntryApp.ShowAllHighlights)
                         {
-                            ShowAttributeHighlights(attribute, true);
+                            if (AttributeStatusInfo.HasSpatialInfo(attribute, true))
+                            {
+                                ShowAttributeHighlights(attribute, true);
+                            }
+                        }
+                        // Hide all other attributes as long as they are not part of the active
+                        // selection.
+                        else if (!_displayedAttributeHighlights.ContainsKey(attribute))
+                        {
+                            ShowAttributeHighlights(attribute, false);
                         }
                     }
-                    // Hide all other attributes as long as they are not part of the active
-                    // selection.
-                    else if (!_displayedAttributeHighlights.ContainsKey(attribute))
-                    {
-                        ShowAttributeHighlights(attribute, false);
-                    }
-                }
 
-                DrawHighlights(false);
+                    DrawHighlights(false);
+                }
             }
             catch (Exception ex)
             {
@@ -5437,7 +5449,7 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 // This is called from Dispose, so don't throw an exception.
-                ExtractException.AsExtractException("ELI25201", ex).Log();
+                ex.ExtractLog("ELI41597");
             }
         }
 
@@ -5447,22 +5459,14 @@ namespace Extract.DataEntry
         /// </summary>
         void ReRegisterDataEntryControls()
         {
-            try
+            foreach (IDataEntryControl dataControl in _dataControls)
             {
-                foreach (IDataEntryControl dataControl in _dataControls)
-                {
-                    ((Control)dataControl).GotFocus += HandleControlGotFocus;
-                    dataControl.SwipingStateChanged += HandleSwipingStateChanged;
-                    dataControl.AttributesSelected += HandleAttributesSelected;
-                    dataControl.UpdateStarted += HandleControlUpdateStarted;
-                    dataControl.UpdateEnded += HandleControlUpdateEnded;
-                    dataControl.DataEntryControlHost = this;
-                }
-            }
-            catch (Exception ex)
-            {
-                // This is called from Dispose, so don't throw an exception.
-                ExtractException.AsExtractException("ELI25201", ex).Log();
+                ((Control)dataControl).GotFocus += HandleControlGotFocus;
+                dataControl.SwipingStateChanged += HandleSwipingStateChanged;
+                dataControl.AttributesSelected += HandleAttributesSelected;
+                dataControl.UpdateStarted += HandleControlUpdateStarted;
+                dataControl.UpdateEnded += HandleControlUpdateEnded;
+                dataControl.DataEntryControlHost = this;
             }
         }
 
@@ -7797,6 +7801,11 @@ namespace Extract.DataEntry
                 _imageViewer.CursorEnteredLayerObject += HandleCursorEnteredLayerObject;
                 _imageViewer.CursorLeftLayerObject += HandleCursorLeftLayerObject;
             }
+
+            // While this event is not from the _imageViewer, it uses the _imageViewer. This
+            // instance may be part of a doc type configuration that is not currently active.
+            // _imageViewer will be set only when this instance is active.
+            _dataEntryApp.ShowAllHighlightsChanged += HandleShowAllHighlightsChanged;
         }
 
         /// <summary>
@@ -7824,6 +7833,8 @@ namespace Extract.DataEntry
                     _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
                 }
             }
+
+            _dataEntryApp.ShowAllHighlightsChanged -= HandleShowAllHighlightsChanged;
         }
 
         /// <summary>

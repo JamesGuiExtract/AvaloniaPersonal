@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Windows;
 
 namespace Extract.Database
@@ -30,7 +31,8 @@ namespace Extract.Database
         /// <summary>
         /// For SQL CE database connection opened, keeps track of the local database copy to use.
         /// </summary>
-        static TemporaryFileCopyManager _localDatabaseCopyManager = new TemporaryFileCopyManager();
+        ThreadLocal<TemporaryFileCopyManager> _localDatabaseCopyManager = new ThreadLocal<TemporaryFileCopyManager>(
+            () => new TemporaryFileCopyManager());
 
         /// <summary>
         /// The type of connection if not provided via the <see cref="DataProvider"/> property.
@@ -393,7 +395,7 @@ namespace Extract.Database
                         // The connection should also be reset if we are using a SQL CE connection
                         // to a local DB copy and the master copy has been updated.
                         if (!recreateConnection && _activeSqlCeDb != null &&
-                            _localDatabaseCopyManager.HasFileBeenModified(_activeSqlCeDb))
+                            _localDatabaseCopyManager.Value.HasFileBeenModified(_activeSqlCeDb))
                         {
                             recreateConnection = true;
                         }
@@ -509,7 +511,7 @@ namespace Extract.Database
                 {
                     try
                     {
-                        _localDatabaseCopyManager.Dereference(_activeSqlCeDb, this);
+                        _localDatabaseCopyManager.Value.Dereference(_activeSqlCeDb, this);
                     }
                     catch (Exception ex2)
                     {
@@ -540,7 +542,7 @@ namespace Extract.Database
                     _managedConnectionString = null;
                     if (_activeSqlCeDb != null)
                     {
-                        _localDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
+                        _localDatabaseCopyManager.Value.Dereference((string)_activeSqlCeDb, this);
                         _activeSqlCeDb = null;
                     }
                 }
@@ -658,7 +660,7 @@ namespace Extract.Database
 
                     if (_activeSqlCeDb != null)
                     {
-                        _localDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
+                        _localDatabaseCopyManager.Value.Dereference((string)_activeSqlCeDb, this);
                         _activeSqlCeDb = null;
                     }
                 }
@@ -708,7 +710,7 @@ namespace Extract.Database
             // with the database maintaining read-only status since changes to this copy will not
             // affect the original. Ensure read-only is off so the database can be used.
             connectionStringBuilder.Add(parameterName,
-                _localDatabaseCopyManager.GetCurrentTemporaryFileName(
+                _localDatabaseCopyManager.Value.GetCurrentTemporaryFileName(
                     sqlceDatabaseFile, this, true, true));
             return connectionStringBuilder.ConnectionString;
         }

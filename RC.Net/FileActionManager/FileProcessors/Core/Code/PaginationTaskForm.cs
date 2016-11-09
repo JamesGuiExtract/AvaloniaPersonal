@@ -209,7 +209,8 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="settings">A <see cref="PaginationTask"/> representing the settings to use in
         /// the form.</param>
-        /// <param name="paginationDocumentDataPanelAssembly"></param>
+        /// <param name="paginationDocumentDataPanelAssembly">The name of an assembly or DEP config
+        /// file to be used to display any data panel for verifying/editing index data.</param>
         /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
         /// <param name="actionID">The ID of the action being processed.</param>
         /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if needed.</param>
@@ -416,7 +417,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             get
             {
-                throw new NotImplementedException();
+                return "";
             }
         }
 
@@ -1396,8 +1397,6 @@ namespace Extract.FileActionManager.FileProcessors
 
             foreach (string sourceFileName in sourceFileNames)
             {
-                string dataFileName = sourceFileName + ".voa";
-
                 int docPosition = _paginationPanel.RemoveSourceFile(sourceFileName, acceptingPagination: true);
                 position = (position == -1)
                     ? docPosition

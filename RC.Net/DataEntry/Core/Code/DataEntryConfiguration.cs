@@ -2,12 +2,9 @@
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.XPath;
 using UCLID_AFCORELib;
@@ -20,17 +17,14 @@ namespace Extract.DataEntry
     /// <summary>
     /// Represents a data entry configuration used to display document data.
     /// </summary>
-    public class DataEntryConfiguration : IDisposable //where T : ApplicationSettingsBase, new()
+    public class DataEntryConfiguration : IDisposable
     {
+        #region Fields
+
         /// <summary>
         /// The configuration settings specified via config file.
         /// </summary>
-        ConfigSettings<Extract.DataEntry.Properties.Settings> _config;
-
-        ///// <summary>
-        ///// The application configuration
-        ///// </summary>
-        //ConfigSettings<T> _applicationConfig;
+        ConfigSettings<Properties.Settings> _config;
 
         /// <summary>
         /// The <see cref="DataEntryControlHost"/> instance associated with the configuration.
@@ -45,7 +39,7 @@ namespace Extract.DataEntry
             new Dictionary<string, DatabaseConnectionInfo>();
 
         /// <summary>
-        /// The <see cref="ITagUtility"/> interface of the <see cref="FAMTagManager"/> provided to
+        /// The <see cref="ITagUtility"/> interface provided to
         /// expand path tags/functions.
         /// </summary>
         ITagUtility _tagUtility;
@@ -55,14 +49,17 @@ namespace Extract.DataEntry
         /// </summary>
         FileProcessingDB _fileProcessingDB;
 
+        #endregion Fields
+
+        #region Constructors
+
         /// <summary>
         /// Initializes a new <see cref="DataEntryConfiguration"/> instance.
         /// </summary>
         /// <param name="config">The configuration settings specified via config file.</param>
-        /// <param name="tagUtilty"></param>
-        /// <param name="_fileProcessingDB"></param>
-        /// <param name="dataEntryControlHost">The <see cref="DataEntryControlHost"/> instance
-        /// associated with the configuration.</param>
+        /// <param name="tagUtility">The <see cref="ITagUtility"/> interface provided to expand path
+        /// tags/functions.</param>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
         public DataEntryConfiguration(
             ConfigSettings<Extract.DataEntry.Properties.Settings> config,
             ITagUtility tagUtility, FileProcessingDB fileProcessingDB)
@@ -77,14 +74,18 @@ namespace Extract.DataEntry
                 string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
                     config.Settings.DataEntryPanelFileName);
 
-                // Create the data entry control host from the specified assembly
+                // Create a DataEntryControlHost instance from the specified assembly
                 _dataEntryControlHost = CreateDataEntryControlHost(dataEntryPanelFileName);
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI0");
+                throw ex.AsExtract("ELI41588");
             }
         }
+
+        #endregion Constructors
+
+        #region Properties
 
         /// <summary>
         /// The configuration settings specified via config file.
@@ -108,8 +109,12 @@ namespace Extract.DataEntry
             }
         }
 
+        #endregion Properties
+
+        #region Methods
+
         /// <summary>
-        /// Closes the database connections.
+        /// Opens the database connections used by this configuration.
         /// </summary>
         public void OpenDatabaseConnections()
         {
@@ -119,13 +124,13 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI0");
+                throw ex.AsExtract("ELI41590");
             }
         }
 
 
         /// <summary>
-        /// Closes the database connections.
+        /// Closes the database connections used by this configuration.
         /// </summary>
         public void CloseDatabaseConnections()
         {
@@ -143,9 +148,54 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI0");
+                throw ex.AsExtract("ELI41591");
             }
         }
+
+        #endregion Methods
+
+        #region IDisposable
+
+        /// <overloads>Releases resources used by the <see cref="DataEntryConfiguration"/>.
+        /// </overloads>
+        /// <summary>
+        /// Releases all resources used by the <see cref="DataEntryConfiguration"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="DataEntryConfiguration"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Dispose of managed resources
+                if (_dataEntryControlHost != null)
+                {
+                    _dataEntryControlHost.Dispose();
+                    _dataEntryControlHost = null;
+                }
+
+                if (_dbConnections != null)
+                {
+                    CollectionMethods.ClearAndDispose(_dbConnections);
+                    _dbConnections = null;
+                }
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable
+
+        #region Private Members
 
         /// <summary>
         /// Given the specified <see paramref="databaseConnectionsNode"/>, creates or updates the
@@ -211,16 +261,8 @@ namespace Extract.DataEntry
                 }
                 while (connectionProperty.MoveToNext());
 
-                if (string.IsNullOrWhiteSpace(connectionName))
-                {
-                    // If the connection is not named, assume it to be the default.
-                    isDefaultConnection = true;
-                }
-                else
-                {
-                    SetDatabaseConnection(connectionName,
-                        databaseType, localDataSource, databaseConnectionString);
-                }
+                SetDatabaseConnection(connectionName,
+                    databaseType, localDataSource, databaseConnectionString);
 
                 // If this is the default connection, add the connection under a blank name as well
                 // (blank in _dbConnections indicates the default connection.) 
@@ -299,54 +341,57 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Retrieve the databaseConnections XML section from the active configuration if
-                // it exists
-                IXPathNavigable databaseConnections = Config.GetSectionXml("databaseConnections");
-
-                bool loadedDefaultConnection = false;
-
-                // Parse and create/update each specified connection.
-                XPathNavigator databaseConnectionsNode = null;
-                if (databaseConnections != null)
+                if (!_dbConnections.Any())
                 {
-                    databaseConnectionsNode = databaseConnections.CreateNavigator();
+                    // Retrieve the databaseConnections XML section from the active configuration if
+                    // it exists
+                    IXPathNavigable databaseConnections = Config.GetSectionXml("databaseConnections");
 
-                    if (databaseConnectionsNode.MoveToFirstChild())
+                    bool loadedDefaultConnection = false;
+
+                    // Parse and create/update each specified connection.
+                    XPathNavigator databaseConnectionsNode = null;
+                    if (databaseConnections != null)
                     {
-                        do
+                        databaseConnectionsNode = databaseConnections.CreateNavigator();
+
+                        if (databaseConnectionsNode.MoveToFirstChild())
                         {
-                            bool isDefaultConnection = false;
-                            var connectionInfo =
-                                LoadDatabaseConnection(databaseConnectionsNode, out isDefaultConnection);
-
-                            ExtractException.Assert("ELI37781",
-                                "Multiple default connections are defined.",
-                                !isDefaultConnection || !loadedDefaultConnection);
-
-                            loadedDefaultConnection |= isDefaultConnection;
-
-                            // https://extract.atlassian.net/browse/ISSUE-13385
-                            // If this is the default connection, use the FKB version (if
-                            // specified) to be able to expand the <ComponentDataDir> using
-                            // _tagUtility from this point forward (including for any subsequent
-                            // connection definitions).
-                            if (isDefaultConnection && _tagUtility != null)
+                            do
                             {
-                                AddComponentDataDirTag(connectionInfo);
-                            }
-                        }
-                        while (databaseConnectionsNode.MoveToNext());
-                    }
-                }
+                                bool isDefaultConnection = false;
+                                var connectionInfo =
+                                    LoadDatabaseConnection(databaseConnectionsNode, out isDefaultConnection);
 
-                // If there was no default database connection specified via the
-                // databaseConnections section, attempt to load it via the legacy DB properties.
-                if (!loadedDefaultConnection)
-                {
-                    SetDatabaseConnection("",
-                        Config.Settings.DatabaseType,
-                        Config.Settings.LocalDataSource,
-                        Config.Settings.DatabaseConnectionString);
+                                ExtractException.Assert("ELI37781",
+                                    "Multiple default connections are defined.",
+                                    !isDefaultConnection || !loadedDefaultConnection);
+
+                                loadedDefaultConnection |= isDefaultConnection;
+
+                                // https://extract.atlassian.net/browse/ISSUE-13385
+                                // If this is the default connection, use the FKB version (if
+                                // specified) to be able to expand the <ComponentDataDir> using
+                                // _tagUtility from this point forward (including for any subsequent
+                                // connection definitions).
+                                if (isDefaultConnection && _tagUtility != null)
+                                {
+                                    AddComponentDataDirTag(connectionInfo);
+                                }
+                            }
+                            while (databaseConnectionsNode.MoveToNext());
+                        }
+                    }
+
+                    // If there was no default database connection specified via the
+                    // databaseConnections section, attempt to load it via the legacy DB properties.
+                    if (!loadedDefaultConnection)
+                    {
+                        SetDatabaseConnection("",
+                            Config.Settings.DatabaseType,
+                            Config.Settings.LocalDataSource,
+                            Config.Settings.DatabaseConnectionString);
+                    }
                 }
 
                 // This class keeps track of DatabaseConfigurationInfo objects for ease of
@@ -372,24 +417,44 @@ namespace Extract.DataEntry
         /// </param>
         void AddComponentDataDirTag(DatabaseConnectionInfo connectionInfo)
         {
-            try
+            // It cannot be guaranteed the current managed thread will call into the same native
+            // thread for all the RuleExecutionEnv calls below. In particular, managed threads
+            // appear prone to re-using the same native thread when many calls are happening
+            // simultaneously on multiple threads as is the case when loading many docs at once due
+            // to DataEntryPanelContainer.UpdateDocumentStatus, or multi-DEP per doc type
+            // configurations or, in particular, both at once.
+            // While it cannot be guaranteed there will not be issues without these conditions,
+            // only setting <ComponentDataDir> once per _tagUtility instance appears to, at minimum,
+            // drastically reduce the chance of an error.
+            if (_tagUtility != null &&
+                _tagUtility
+                    .GetAllTags()
+                    .ToIEnumerable<string>()
+                    .Contains("<ComponentDataDir>"))
             {
-                if (_tagUtility != null &&
-                    DBMethods.GetQueryResultsAsStringArray(connectionInfo.ManagedDbConnection,
-                    "SELECT COUNT(*) FROM [INFORMATION_SCHEMA].[TABLES] WHERE [TABLE_NAME] = 'Settings'")
-                    .Single() == "1")
-                {
-                    string FKBVersion = DBMethods.GetQueryResultsAsStringArray(
-                        connectionInfo.ManagedDbConnection,
-                        "SELECT [Value] FROM [Settings] WHERE [Name] = 'FKBVersion'")
-                        .SingleOrDefault();
+                return;
+            }
 
-                    if (!string.IsNullOrWhiteSpace(FKBVersion))
+            if (_tagUtility != null &&
+                DBMethods.GetQueryResultsAsStringArray(connectionInfo.ManagedDbConnection,
+                "SELECT COUNT(*) FROM [INFORMATION_SCHEMA].[TABLES] WHERE [TABLE_NAME] = 'Settings'")
+                .Single() == "1")
+            {
+                string FKBVersion = DBMethods.GetQueryResultsAsStringArray(
+                    connectionInfo.ManagedDbConnection,
+                    "SELECT [Value] FROM [Settings] WHERE [Name] = 'FKBVersion'")
+                    .SingleOrDefault();
+
+                if (!string.IsNullOrWhiteSpace(FKBVersion))
+                {
+                    // Due to potential threading issues detailed above, allow for up to 3 attempts
+                    // to get the ComponentDataDir.
+                    for (int i = 0; i < 3; i++)
                     {
-                        var ruleExecutionEnv = new RuleExecutionEnv();
-                        ruleExecutionEnv.PushRSDFileName("");
                         try
                         {
+                            var ruleExecutionEnv = new RuleExecutionEnv();
+                            ruleExecutionEnv.PushRSDFileName("");
                             ruleExecutionEnv.FKBVersion = FKBVersion;
                             if (_fileProcessingDB != null)
                             {
@@ -399,15 +464,23 @@ namespace Extract.DataEntry
 
                             var afUtility = new AFUtility();
                             _tagUtility.AddTag("<ComponentDataDir>", afUtility.GetComponentDataFolder());
-                        }
-                        finally
-                        {
                             ruleExecutionEnv.PopRSDFileName();
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            if (i < 2)
+                            {
+                                ex.ExtractLog("ELI41592");
+                            }
+                            else
+                            {
+                                throw ex.AsExtract("ELI41593");
+                            }
                         }
                     }
                 }
             }
-            catch { }
         }
 
         /// <summary>
@@ -441,41 +514,6 @@ namespace Extract.DataEntry
             }
         }
 
-        /// <overloads>Releases resources used by the <see cref="DataEntryConfiguration"/>.
-        /// </overloads>
-        /// <summary>
-        /// Releases all resources used by the <see cref="DataEntryConfiguration"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="DataEntryConfiguration"/>.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
-        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // Dispose of managed resources
-                if (_dataEntryControlHost != null)
-                {
-                    _dataEntryControlHost.Dispose();
-                    _dataEntryControlHost = null;
-                }
-
-                if (_dbConnections != null)
-                {
-                    CollectionMethods.ClearAndDispose(_dbConnections);
-                    _dbConnections = null;
-                }
-            }
-
-            // Dispose of unmanaged resources
-        }
+        #endregion Private Members
     }
 }

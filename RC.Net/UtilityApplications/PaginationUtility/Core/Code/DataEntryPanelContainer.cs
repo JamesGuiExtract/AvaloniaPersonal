@@ -4,8 +4,6 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -16,15 +14,25 @@ using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
+    /// <summary>
+    /// A <see cref="UserControl"/> that contains a <see cref="DataEntryDocumentDataPanel"/> and
+    /// potentially a document type combo box for multi-DEP DE configurations.
+    /// </summary>
+    /// <seealso cref="System.Windows.Forms.UserControl" />
+    /// <seealso cref="Extract.UtilityApplications.PaginationUtility.IPaginationDocumentDataPanel" />
     public partial class DataEntryPanelContainer : UserControl, IPaginationDocumentDataPanel
     {
+        #region Fields
+
         /// <summary>
         /// Used to serialize attribute data between threads.
         /// </summary>
         MiscUtils _miscUtils = new MiscUtils();
 
         /// <summary>
-        /// The configuration manager
+        /// Manages all <see cref="DataEntryConfiguration"/>s currently available. Multiple
+        /// configurations will exist when there are multiple DEPs defined where the one used depends
+        /// on doc-type.
         /// </summary>
         DataEntryConfigurationManager<Properties.Settings> _configManager;
 
@@ -55,32 +63,39 @@ namespace Extract.UtilityApplications.PaginationUtility
             Math.Max(1, Math.Min(3, Environment.ProcessorCount - 1)));
 
         /// <summary>
-        /// The tag utility
+        /// The <see cref="ITagUtility"/> to expand path tags/functions.
         /// </summary>
         ITagUtility _tagUtility;
 
         /// <summary>
-        /// The expanded configuration file name
+        /// The expanded filename of the config file for the data entry configuration.
         /// </summary>
         string _expandedConfigFileName;
 
         /// <summary>
-        /// The data entry application
+        /// The <see cref="IDataEntryApplication"/> for which this instance is being used.
         /// </summary>
         IDataEntryApplication _dataEntryApp;
 
         /// <summary>
-        /// The image viewer
+        /// The <see cref="ImageViewer"/> to use.
         /// </summary>
         ImageViewer _imageViewer;
+
+        #endregion Fields
+
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEntryPanelContainer" /> class.
         /// </summary>
-        /// <param name="configFileName"></param>
-        /// <param name="dataEntryApp">The data entry application.</param>
-        /// <param name="tagUtility">The tag utility.</param>
-        /// <param name="imageViewer">The image viewer.</param>
+        /// <param name="configFileName">The name of the config file defining the data entry
+        /// configuration.</param>
+        /// <param name="dataEntryApp">The <see cref="IDataEntryApplication"/> for which this
+        /// instance is being used.</param>
+        /// <param name="tagUtility">The <see cref="ITagUtility"/> to expand path tags/functions.
+        /// </param>
+        /// <param name="imageViewer">The <see cref="ImageViewer"/> to use.</param>
         public DataEntryPanelContainer(string configFileName, IDataEntryApplication dataEntryApp, ITagUtility tagUtility, ImageViewer imageViewer)
         {
             try
@@ -104,6 +119,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
                 _configManager.LoadDataEntryConfigurations(_expandedConfigFileName);
 
+                // Hide the _documentTypePanel if there are no RegisteredDocumentTypes that allow for
+                // doc type specific DEP configurations.
                 if (!_configManager.RegisteredDocumentTypes.Any())
                 {
                     MinimumSize = new Size(MinimumSize.Width, MinimumSize.Height - _documentTypePanel.Height);
@@ -120,9 +137,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI0");
+                throw ex.AsExtract("ELI41598");
             }
         }
+
+        #endregion Constructors
+
+        #region IPaginationDocumentDataPanel
 
         /// <summary>
         /// Raised to indicate the panel is requesting a specific image page to be loaded.
@@ -216,61 +237,39 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ActiveDataEntryPanel.LoadData(data);
 
                 _documentTypeComboBox.Enabled = true;
+                _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeComboBox_SelectedIndexChanged;
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI0");
+                ex.ExtractDisplay("ELI41599");
             }
         }
 
         /// <summary>
-        /// Handles the ConfigurationChanged event of the _configManager control.
+        /// Applies any data to the specified <see paramref="data" />.
+        /// <para><b>Note</b></para>
+        /// In addition to returning <see langword="false" />, it is the implementor's responsibility
+        /// to notify the user of any problems with the data that needs to be corrected before it
+        /// can be saved.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="ConfigurationChangedEventArgs"/> instance containing the event data.</param>
-        /// <exception cref="System.NotImplementedException"></exception>
-        void HandleConfigManager_ConfigurationChanged(object sender, ConfigurationChangedEventArgs e)
+        /// <param name="data">The data to save.</param>
+        /// <param name="validateData"><see langword="true" /> if the <see paramref="data" /> should
+        /// be validated for errors when saving; otherwise, <see langwor="false" />.</param>
+        /// <returns>
+        /// <see langword="true" /> if the data was saved correctly or
+        /// <see langword="false" /> if corrections are needed before it can be saved.
+        /// </returns>
+        public bool SaveData(PaginationDocumentData data, bool validateData)
         {
-            var oldDatEntryControlHost = e.OldDataEntryConfiguration?.DataEntryControlHost as DataEntryDocumentDataPanel;
-            var newDataEntryControlHost = e.NewDataEntryConfiguration?.DataEntryControlHost as DataEntryDocumentDataPanel;
-
-            if (oldDatEntryControlHost != newDataEntryControlHost)
+            try
             {
-                //// Undo/redo command should be unavailable until a change is actually made.
-                //_undoCommand.Enabled = false;
-                //_redoCommand.Enabled = false;
+                _documentTypeComboBox.Enabled = false;
 
-                if (oldDatEntryControlHost != null)
-                {
-                    // Set Active = false for the old DEP so that it no longer tracks image
-                    // viewer events.
-                    oldDatEntryControlHost.Active = false;
-
-                    newDataEntryControlHost.PageLoadRequest += DataEntryControlHost_PageLoadRequest;
-                    newDataEntryControlHost.UndoAvailabilityChanged += DataEntryControlHost_UndoAvailabilityChanged;
-                    newDataEntryControlHost.RedoAvailabilityChanged += NewDataEntryControlHost_RedoAvailabilityChanged;
-
-                    //AttributeStatusInfo.ResetData(null, null, null);
-                    oldDatEntryControlHost.ClearData();
-                }
-
-                if (newDataEntryControlHost != null)
-                {
-                    // Load the panel into the _scrollPane
-                    LoadDataEntryControlHostPanel();
-
-                    if (_documentData != null)
-                    {
-                        newDataEntryControlHost.LoadData(_documentData);
-                    }
-
-                    newDataEntryControlHost.PageLoadRequest += DataEntryControlHost_PageLoadRequest;
-                    newDataEntryControlHost.UndoAvailabilityChanged += DataEntryControlHost_UndoAvailabilityChanged;
-                    newDataEntryControlHost.RedoAvailabilityChanged += NewDataEntryControlHost_RedoAvailabilityChanged;
-
-                    // Set Active = true for the new DEP so that it tracks image viewer events.
-                    newDataEntryControlHost.Active = true;
-                }
+                return ActiveDataEntryPanel.SaveData(data, validateData);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41600");
             }
         }
 
@@ -282,6 +281,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 _documentTypeComboBox.Enabled = false;
+                if (_documentData != null)
+                {
+                    _documentTypeComboBox.SelectedIndexChanged -= HandleDocumentTypeComboBox_SelectedIndexChanged;
+                }
 
                 _documentData = null;
                 _sourceDocName = null;
@@ -291,7 +294,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI0");
+                throw ex.AsExtract("ELI41601");
             }
         }
 
@@ -319,7 +322,284 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI0");
+                throw ex.AsExtract("ELI41602");
+            }
+        }
+
+        /// <summary>
+        /// Updates the document data status.
+        /// </summary>
+        /// <param name="data"></param>
+        public void UpdateDocumentDataStatus(PaginationDocumentData data)
+        {
+            try
+            {
+                var dataEntryData = data as DataEntryPaginationDocumentData;
+                UpdateDocumentStatus(dataEntryData);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41603");
+            }
+        }
+
+        /// <summary>
+        /// Provides a message to be displayed.
+        /// </summary>
+        /// <param name="message">The message to display.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public void ShowMessage(string message)
+        {
+            // Not supported
+        }
+
+        /// <summary>
+        /// Performs an undo operation.
+        /// </summary>
+        public void Undo()
+        {
+            try
+            {
+                ActiveDataEntryPanel.Undo();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41604");
+            }
+        }
+
+        /// <summary>
+        /// Performs a redo operation.
+        /// </summary>
+        public void Redo()
+        {
+            try
+            {
+                ActiveDataEntryPanel.Redo();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41605");
+            }
+        }
+
+        /// <summary>
+        /// Toggles whether or not tooltip(s) for the active fields are currently visible.
+        /// </summary>
+        public void ToggleHideTooltips()
+        {
+            try
+            {
+                ActiveDataEntryPanel.ToggleHideTooltips();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41606");
+            }
+        }
+
+        #endregion IPaginationDocumentDataPanel
+
+        #region Overrides
+
+        /// <summary> 
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (components != null)
+                {
+                    components.Dispose();
+                    components = null;
+                }
+
+                if (_configManager != null)
+                {
+                    _configManager.Dispose();
+                    _configManager = null;
+                }
+
+                if (_documentStatusUpdateSemaphore != null)
+                {
+                    _documentStatusUpdateSemaphore.Dispose();
+                    _documentStatusUpdateSemaphore = null;
+                }
+            }
+            base.Dispose(disposing);
+        }
+
+        #endregion Overrides
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Handles the ConfigurationChanged event of the _configManager control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="ConfigurationChangedEventArgs"/> instance containing the event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        void HandleConfigManager_ConfigurationChanged(object sender, ConfigurationChangedEventArgs e)
+        {
+            var oldDatEntryControlHost = e.OldDataEntryConfiguration?.DataEntryControlHost as DataEntryDocumentDataPanel;
+            var newDataEntryControlHost = e.NewDataEntryConfiguration?.DataEntryControlHost as DataEntryDocumentDataPanel;
+
+            if (oldDatEntryControlHost != newDataEntryControlHost)
+            {
+                if (oldDatEntryControlHost != null)
+                {
+                    // Set Active = false for the old DEP so that it no longer tracks image
+                    // viewer events.
+                    oldDatEntryControlHost.Active = false;
+
+                    oldDatEntryControlHost.PageLoadRequest -= DataEntryControlHost_PageLoadRequest;
+                    oldDatEntryControlHost.UndoAvailabilityChanged -= DataEntryControlHost_UndoAvailabilityChanged;
+                    oldDatEntryControlHost.RedoAvailabilityChanged -= NewDataEntryControlHost_RedoAvailabilityChanged;
+
+                    oldDatEntryControlHost.ClearData();
+                }
+
+                if (newDataEntryControlHost != null)
+                {
+                    // Load the panel into the _scrollPane
+                    LoadDataEntryControlHostPanel();
+
+                    if (_documentData != null)
+                    {
+                        newDataEntryControlHost.LoadData(_documentData);
+                    }
+
+                    newDataEntryControlHost.PageLoadRequest += DataEntryControlHost_PageLoadRequest;
+                    newDataEntryControlHost.UndoAvailabilityChanged += DataEntryControlHost_UndoAvailabilityChanged;
+                    newDataEntryControlHost.RedoAvailabilityChanged += NewDataEntryControlHost_RedoAvailabilityChanged;
+
+                    // Set Active = true for the new DEP so that it tracks image viewer events.
+                    newDataEntryControlHost.Active = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ComboBox.SelectedIndexChanged"/> event of the
+        /// <see cref="_documentTypeComboBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleDocumentTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_documentData != null)
+                {
+                    _documentData.SetModified(AttributeStatusInfo.UndoManager.UndoOperationAvailable);
+                    _documentData.SetDataError(ActiveDataEntryPanel.DataValidity != DataValidity.Valid);
+                    _documentData.SetSummary(ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41607");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryControlHost.PageLoadRequest"/> event of the
+        /// <see cref="ActiveDataEntryPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="PageLoadRequestEventArgs"/> instance containing the event data.</param>
+        void DataEntryControlHost_PageLoadRequest(object sender, PageLoadRequestEventArgs e)
+        {
+            OnPageLoadRequest(e.PageNumber);
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryControlHost.UndoAvailabilityChanged"/> event of the
+        /// <see cref="ActiveDataEntryPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void DataEntryControlHost_UndoAvailabilityChanged(object sender, EventArgs e)
+        {
+            OnUndoAvailabilityChanged();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryControlHost.RedoAvailabilityChanged"/> event of the
+        /// <see cref="ActiveDataEntryPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void NewDataEntryControlHost_RedoAvailabilityChanged(object sender, EventArgs e)
+        {
+            OnRedoAvailabilityChanged();
+        }
+
+        #endregion Event Handlers
+
+        #region Private Members
+
+        /// <summary>
+        /// Gets the active data entry panel.
+        /// </summary>
+        /// <value>
+        /// The active data entry panel.
+        /// </value>
+        DataEntryDocumentDataPanel ActiveDataEntryPanel
+        {
+            get
+            {
+                return _configManager
+                    ?.ActiveDataEntryConfiguration
+                    ?.DataEntryControlHost
+                    as DataEntryDocumentDataPanel;
+            }
+        }
+
+        /// <summary>
+        /// Loads the DEP into the left-hand panel or separate window and positions and sizes it
+        /// correctly.
+        /// </summary>
+        void LoadDataEntryControlHostPanel()
+        {
+            ActiveDataEntryPanel?.SetImageViewer(_imageViewer);
+
+            try
+            {
+                _scrollPanel.SuspendLayout();
+
+                MinimumSize = new Size(0, 0);
+                Size = new Size(_scrollPanel.Width, 0);
+
+                if (ActiveDataEntryPanel == null && _scrollPanel.Controls.Count > 0)
+                {
+                    _scrollPanel.Controls.Clear();
+                }
+                else if (ActiveDataEntryPanel != null &&
+                        !_scrollPanel.Controls.Contains(ActiveDataEntryPanel))
+                {
+                    if (_scrollPanel.Controls.Count > 0)
+                    {
+                        _scrollPanel.Controls.Clear();
+                    }
+
+                    // Add the DEP to an auto-scroll pane to allow scrolling if the DEP is too
+                    // long. (The scroll pane is sized to allow the full width of the DEP to 
+                    // display initially) 
+                    _scrollPanel.Controls.Add(ActiveDataEntryPanel);
+                    ActiveDataEntryPanel.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
+                    ActiveDataEntryPanel.Left = _scrollPanel.Left;
+                    ActiveDataEntryPanel.Width = _scrollPanel.Width;
+                    MinimumSize = new Size(
+                        ActiveDataEntryPanel.MinimumSize.Width,
+                        ActiveDataEntryPanel.Height + _documentTypePanel.Height);
+                }
+            }
+            finally
+            {
+                _scrollPanel.ResumeLayout(true);
             }
         }
 
@@ -372,7 +652,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             bool dataModified = false;
             bool dataError = false;
             string summary = null;
-            Dictionary<string, DbConnection> connectionCopies = null;
 
             try
             {
@@ -418,10 +697,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             finally
             {
                 _documentStatusUpdateSemaphore.Release();
-                if (connectionCopies != null)
-                {
-                    CollectionMethods.ClearAndDispose(connectionCopies);
-                }
             }
 
             _imageViewer.SafeBeginInvoke("ELI41465", () =>
@@ -450,158 +725,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Performs an undo operation.
-        /// </summary>
-        public void Undo()
-        {
-            ActiveDataEntryPanel.Undo();
-        }
-
-        /// <summary>
-        /// Performs a redo operation.
-        /// </summary>
-        public void Redo()
-        {
-            ActiveDataEntryPanel.Redo();
-        }
-
-        /// <summary>
-        /// Applies any data to the specified <see paramref="data" />.
-        /// <para><b>Note</b></para>
-        /// In addition to returning <see langword="false" />, it is the implementor's responsibility
-        /// to notify the user of any problems with the data that needs to be corrected before it
-        /// can be saved.
-        /// </summary>
-        /// <param name="data">The data to save.</param>
-        /// <param name="validateData"><see langword="true" /> if the <see paramref="data" /> should
-        /// be validated for errors when saving; otherwise, <see langwor="false" />.</param>
-        /// <returns>
-        /// <see langword="true" /> if the data was saved correctly or
-        /// <see langword="false" /> if corrections are needed before it can be saved.
-        /// </returns>
-        public bool SaveData(PaginationDocumentData data, bool validateData)
-        {
-            _documentTypeComboBox.Enabled = false;
-
-            return ActiveDataEntryPanel.SaveData(data, validateData);
-        }
-
-        /// <summary>
-        /// Provides a message to be displayed.
-        /// </summary>
-        /// <param name="message">The message to display.</param>
-        /// <exception cref="System.NotImplementedException"></exception>
-        public void ShowMessage(string message)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Toggles whether or not tooltip(s) for the active fields are currently visible.
-        /// </summary>
-        public void ToggleHideTooltips()
-        {
-            ActiveDataEntryPanel.ToggleHideTooltips();
-        }
-
-        /// <summary>
-        /// Updates the document data status.
-        /// </summary>
-        /// <param name="data"></param>
-        public void UpdateDocumentDataStatus(PaginationDocumentData data)
-        {
-            try
-            {
-                var dataEntryData = data as DataEntryPaginationDocumentData;
-                UpdateDocumentStatus(dataEntryData);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI0");
-            }
-        }
-
-        void DataEntryControlHost_PageLoadRequest(object sender, PageLoadRequestEventArgs e)
-        {
-            OnPageLoadRequest(e.PageNumber);
-        }
-
-        void DataEntryControlHost_UndoAvailabilityChanged(object sender, EventArgs e)
-        {
-            OnUndoAvailabilityChanged();
-        }
-
-        void NewDataEntryControlHost_RedoAvailabilityChanged(object sender, EventArgs e)
-        {
-            OnRedoAvailabilityChanged();
-        }
-
-        #region Private Members
-
-        /// <summary>
-        /// Gets the active data entry panel.
-        /// </summary>
-        /// <value>
-        /// The active data entry panel.
-        /// </value>
-        DataEntryDocumentDataPanel ActiveDataEntryPanel
-        {
-            get
-            {
-                return _configManager
-                    ?.ActiveDataEntryConfiguration
-                    ?.DataEntryControlHost
-                    as DataEntryDocumentDataPanel;
-            }
-        }
-
-        /// <summary>
-        /// Loads the DEP into the left-hand panel or separate window and positions and sizes it
-        /// correctly.
-        /// </summary>
-        void LoadDataEntryControlHostPanel()
-        {
-            ActiveDataEntryPanel?.SetImageViewer(_imageViewer);
-
-            try
-            {
-                _scrollPanel.SuspendLayout();
-
-                MinimumSize = new Size(0, 0);
-                Size = new Size(_scrollPanel.Width, 0);
-
-                if (ActiveDataEntryPanel == null && _scrollPanel.Controls.Count > 0)
-                {
-                    _scrollPanel.Controls.Clear();
-                }
-                else if (ActiveDataEntryPanel != null && (_scrollPanel.Controls.Count == 0 ||
-                            !_scrollPanel.Controls.Contains(ActiveDataEntryPanel)))
-                {
-                    if (_scrollPanel.Controls.Count > 0)
-                    {
-                        _scrollPanel.Controls.Clear();
-                    }
-
-                    // Add the DEP to an auto-scroll pane to allow scrolling if the DEP is too
-                    // long. (The scroll pane is sized to allow the full width of the DEP to 
-                    // display initially) 
-                    _scrollPanel.Controls.Add(ActiveDataEntryPanel);
-                    ActiveDataEntryPanel.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-                    ActiveDataEntryPanel.Left = _scrollPanel.Left;
-                    ActiveDataEntryPanel.Width = _scrollPanel.Width;
-                    MinimumSize = new Size(
-                        ActiveDataEntryPanel.MinimumSize.Width,
-                        ActiveDataEntryPanel.Height + _documentTypePanel.Height);
-                }
-            }
-            finally
-            {
-                _scrollPanel.ResumeLayout(true);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="PageLoadRequest"/>
+        /// Raises the <see cref="PageLoadRequest"/> event.
         /// </summary>
         /// <param name="pageNum">The page number that needs to be loaded in <see cref="_sourceDocName"/>.
         /// </param>
@@ -611,7 +735,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Raises the <see cref="UndoAvailabilityChanged"/>
+        /// Raises the <see cref="UndoAvailabilityChanged"/> event.
         /// </summary>
         void OnUndoAvailabilityChanged()
         {
@@ -619,7 +743,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Raises the <see cref="RedoAvailabilityChanged"/>
+        /// Raises the <see cref="RedoAvailabilityChanged"/> event.
         /// </summary>
         void OnRedoAvailabilityChanged()
         {

@@ -1,33 +1,28 @@
-﻿using Extract.Database;
-using Extract.DataEntry;
-using Extract.FileActionManager.Forms;
+﻿using Extract.FileActionManager.Forms;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
-using System.Data.Common;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
 using System.Xml.XPath;
 using UCLID_AFCORELib;
-using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
-using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry
 {
     /// <summary>
-    /// 
+    /// Manages all <see cref="DataEntryConfiguration"/>s currently available. Multiple
+    /// configurations will exist when there are multiple DEPs defined where the one used depends
+    /// on doc-type.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class DataEntryConfigurationManager<T> : IDisposable where T : ApplicationSettingsBase, new()
     {
+        #region Fields
+
         /// <summary>
         /// The date entry application
         /// </summary>
@@ -96,14 +91,22 @@ namespace Extract.DataEntry
         /// </summary>
         AttributeStatusInfo _documentTypeAttributeStatusInfo;
 
+        #endregion Fields
+
+        #region Constructors
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEntryConfigurationManager" /> class.
         /// </summary>
-        /// <param name="dataEntryApp">The data entry application.</param>
-        /// <param name="tagUtility">The tag utility.</param>
-        /// <param name="applicationConfig">The application configuration.</param>
+        /// <param name="dataEntryApp">The <see cref="IDataEntryApplication"/> for which the
+        /// configurations are being managed.</param>
+        /// <param name="tagUtility">The <see cref="ITagUtility"/> being used to expand path
+        /// tags/functions.</param>
+        /// <param name="applicationConfig">The application level settings that would contain any
+        /// documentTypeConfigurations.</param>
         /// <param name="imageViewer">The image viewer.</param>
-        /// <param name="documentTypeComboBox"></param>
+        /// <param name="documentTypeComboBox">The <see cref="ComboBox"/> that offers the user the
+        /// ability to see and change the current doc type.</param>
         public DataEntryConfigurationManager(IDataEntryApplication dataEntryApp, ITagUtility tagUtility,
             ConfigSettings<T> applicationConfig, ImageViewer imageViewer, ComboBox documentTypeComboBox)
         {
@@ -118,27 +121,40 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI0");
+                throw ex.AsExtract("ELI41594");
             }
         }
 
+        #endregion Constructors
+
+        #region Events
+
         /// <summary>
-        /// Occurs when [configuration changed].
+        /// Raised when the active configuration is about to change (initial load or when doc type
+        /// changes).
         /// </summary>
         public event EventHandler<CancelEventArgs> ConfigurationChanging;
 
         /// <summary>
-        /// Occurs when [configuration changed].
+        /// Raised when the active configuration has been changed (initial load or when doc type
+        /// changes).
         /// </summary>
         public event EventHandler<ConfigurationChangedEventArgs> ConfigurationChanged;
 
         /// <summary>
-        /// Occurs when [configuration change error].
+        /// Raised if there was an error changing configurations. An exception will not otherwise be
+        /// raised in this situation, so it is the owner's responsibility to handle the error
+        /// appropriately.
         /// </summary>
         public event EventHandler<VerificationExceptionGeneratedEventArgs> ConfigurationChangeError;
 
+        #endregion Events
+
+        #region Properties
+
         /// <summary>
-        /// The default data entry configuration
+        /// Gets the default <see cref="DataEntryConfiguration"/> to use in the case that document
+        /// type does not indicate the usage of another configuration.
         /// </summary>
         public DataEntryConfiguration DefaultDataEntryConfiguration
         {
@@ -149,7 +165,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// The default data entry configuration
+        /// Gets the currently active <see cref="DataEntryConfiguration"/>.
         /// </summary>
         public DataEntryConfiguration ActiveDataEntryConfiguration
         {
@@ -159,12 +175,13 @@ namespace Extract.DataEntry
             }
         }
 
+        #endregion Properties
+
+        #region Methods
+
         /// <summary>
-        /// Gets the multiple document types.
+        /// Gets all document types specified via documentTypeConfigurations in the config file.
         /// </summary>
-        /// <value>
-        /// The multiple document types.
-        /// </value>
         public IEnumerable<string> RegisteredDocumentTypes
         {
             get
@@ -314,12 +331,13 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI0");
+                throw ex.AsExtract("ELI41595");
             }
         }
 
         /// <summary>
-        /// Clears the data.
+        /// Clears all data currently loaded in the active <see cref="DataEntry Configuration"/> and
+        /// its associated <see cref="DataEntryControlHost"/>.
         /// </summary>
         public void ClearData()
         {
@@ -341,16 +359,51 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI0");
+                throw ex.AsExtract("ELI41596");
             }
         }
 
-    /// <summary>
-    /// Applies the specified document type and loads the DEP associated with the document
-    /// types configuration if necessary.
-    /// </summary>
-    /// <param name="documentType">The new document type.</param>
-    DataEntryConfiguration GetConfigurationForDocumentType(string documentType)
+        #endregion Methods
+
+        #region IDisposable
+
+        /// <overloads>Releases resources used by the <see cref="DataEntryConfiguration"/>.
+        /// </overloads>
+        /// <summary>
+        /// Releases all resources used by the <see cref="DataEntryConfiguration"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="DataEntryConfiguration"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Dispose of managed resources
+                CollectionMethods.ClearAndDispose(_documentTypeConfigurations);
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable
+
+        #region Private Members
+
+        /// <summary>
+        /// Applies the specified document type and loads the DEP associated with the document
+        /// types configuration if necessary.
+        /// </summary>
+        /// <param name="documentType">The new document type.</param>
+        DataEntryConfiguration GetConfigurationForDocumentType(string documentType)
         {
             try
             {
@@ -396,7 +449,7 @@ namespace Extract.DataEntry
                 configuration.DataEntryControlHost.Config = config;
                 configuration.DataEntryControlHost.ImageViewer = _imageViewer;
 
-                //QueryNode.QueryCacheLimit = _applicationConfig.Settings.QueryCacheLimit;
+                QueryNode.QueryCacheLimit = config.Settings.QueryCacheLimit;
 
                 // If HighlightConfidenceBoundary settings has been specified in the config file and
                 // the controlHost has exactly two confidence tiers, use the provided value as the
@@ -465,10 +518,10 @@ namespace Extract.DataEntry
                 {
                     if (changedDataEntryConfig)
                     {
-                        //if (lastDataEntryConfig != null)
-                        //{
-                        //    lastDataEntryConfig.CloseDatabaseConnections();
-                        //}
+                        if (lastDataEntryConfig != null)
+                        {
+                            lastDataEntryConfig.CloseDatabaseConnections();
+                        }
 
                         if (ActiveDataEntryConfiguration != null)
                         {
@@ -748,11 +801,12 @@ namespace Extract.DataEntry
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI30616", ex);
                 ee.AddDebugData("Event arguments", e, false);
+                // Raising ConfigurationChangeError will fail the document.
                 // Debated on whether this should be displayed instead, since this may be something
                 // that happens in the midst of verification not but this could happen during
                 // document load and even it if doesn't, it could indicate that the document will
                 // not be able to be correctly saved.
-                OnConfigurationChangeError(ee, true);
+                OnConfigurationChangeError(ee);
             }
         }
 
@@ -775,18 +829,20 @@ namespace Extract.DataEntry
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI30653", ex);
                 ee.AddDebugData("Event data", e, false);
+                // Raising ConfigurationChangeError will fail the document.
                 // Debated on whether this should be displayed instead, since this may be something
                 // that happens in the midst of verification not but this could happen during
                 // document load and even it if doesn't, it could indicate that the document will
                 // not be able to be correctly saved.
-                OnConfigurationChangeError(ee, true);
+                OnConfigurationChangeError(ee);
             }
         }
 
         /// <summary>
-        /// Called when [configuration changing].
+        /// Raises the <see cref="ConfigurationChanging"/> event.
         /// </summary>
-        /// <returns></returns>
+        /// <returns><c>true</c> if the configuration change can proceed; <c>false</c> if a handler
+        /// requested that the configuration change be cancelled.</returns>
         bool OnConfigurationChanging()
         {
             var eventArgs = new CancelEventArgs(false);
@@ -797,10 +853,12 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Called when [configuration changed].
+        /// Raises the <see cref="ConfigurationChanged"/> event.
         /// </summary>
-        /// <param name="newDataEntryConfig"></param>
-        /// <param name="oldDataEntryConfig"></param>
+        /// <param name="oldDataEntryConfig">The <see cref="DataEntryConfiguration"/> that is being
+        /// switched out.</param>
+        /// <param name="newDataEntryConfig">The <see cref="DataEntryConfiguration"/> that is now in
+        /// use.</param>
         void OnConfigurationChanged(DataEntryConfiguration oldDataEntryConfig,
             DataEntryConfiguration newDataEntryConfig)
         {
@@ -808,92 +866,15 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Called when [configuration change error].
+        /// Raises the <see cref="ConfigurationChangeError"/> event.
         /// </summary>
         /// <param name="ee">The <see cref="ExtractException"/> representing the error.</param>
-        /// <param name="canProcessingContinue">if set to <c>true</c> [can processing continue].</param>
-        void OnConfigurationChangeError(ExtractException ee, bool canProcessingContinue)
+        void OnConfigurationChangeError(ExtractException ee)
         {
             ConfigurationChangeError?.Invoke(this,
-                new VerificationExceptionGeneratedEventArgs(ee, canProcessingContinue));
+                new VerificationExceptionGeneratedEventArgs(ee, true));
         }
 
-        #region IDisposable
-
-        /// <overloads>Releases resources used by the <see cref="DataEntryConfiguration"/>.
-        /// </overloads>
-        /// <summary>
-        /// Releases all resources used by the <see cref="DataEntryConfiguration"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="DataEntryConfiguration"/>.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
-        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // Dispose of managed resources
-                if (_documentTypeConfigurations != null)
-                {
-                    CollectionMethods.ClearAndDispose(_documentTypeConfigurations);
-                    _documentTypeConfigurations = null;
-                }
-            }
-
-            // Dispose of unmanaged resources
-        }
-
-        #endregion IDisposable
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <seealso cref="System.EventArgs" />
-    public class ConfigurationChangedEventArgs : EventArgs
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigurationChangedEventArgs"/> class.
-        /// </summary>
-        /// <param name="oldDataEntryConfig">The old data entry configuration.</param>
-        /// <param name="newDataEntryConfig">The new data entry configuration.</param>
-        public ConfigurationChangedEventArgs(DataEntryConfiguration oldDataEntryConfig,
-            DataEntryConfiguration newDataEntryConfig)
-        {
-            OldDataEntryConfiguration = oldDataEntryConfig;
-            NewDataEntryConfiguration = newDataEntryConfig;
-        }
-
-        /// <summary>
-        /// Gets the old data entry configuration.
-        /// </summary>
-        /// <value>
-        /// The old data entry configuration.
-        /// </value>
-        public DataEntryConfiguration OldDataEntryConfiguration
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets the new data entry configuration.
-        /// </summary>
-        /// <value>
-        /// The new data entry configuration.
-        /// </value>
-        public DataEntryConfiguration NewDataEntryConfiguration
-        {
-            get;
-            private set;
-        }
+        #endregion Private Members
     }
 }

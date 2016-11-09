@@ -979,7 +979,6 @@ namespace Extract.AttributeFinder.Rules
                 attributes.ReportMemoryUsage();
                 // In case the there are multiple configurations for different document types,
                 // ensure the proper configuration is loaded for the supplied data.
-//                dataEntryApplicationForm.LoadCorrectConfigForData(attributes);
                 dataEntryApplicationForm.ActiveDataEntryControlHost.LoadData(attributes);
                 IUnknownVector loadedAttributes =
                     dataEntryApplicationForm.ActiveDataEntryControlHost.GetData();

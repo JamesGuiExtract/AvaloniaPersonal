@@ -641,17 +641,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         _primaryPageLayoutControl.SelectDocument(outputDocument);
                     }
-
-                    if (_pendingDocuments
-                            .Except(new[] { outputDocument })
-                            .Any(document => !document.Collapsed))
-                    {
-                        outputDocument.Collapsed = true;
-                    }
-                    else
-                    {
-                        outputDocument.DefaultDataPanelOpen = true;
-                    }
                 }
 
                 ApplyOrderOfLoadedSourceDocuments();
@@ -1034,13 +1023,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ApplyOrderOfLoadedSourceDocuments();
 
                     UpdateCommandStates();
-
-                    if (_pendingDocuments.Any() &&
-                        _pendingDocuments.All(document => document.Collapsed))
-                    {
-                        _pendingDocuments.First().Collapsed = false;
-                        _pendingDocuments.First().PaginationSeparator.OpenDataPanel();
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -1324,13 +1306,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _primaryPageLayoutControl.Focus();
 
                 UpdateCommandStates();
-
-                //if (_pendingDocuments.Any() &&
-                //    _pendingDocuments.All(document => document.Collapsed))
-                //{
-                //    _pendingDocuments.First().Collapsed = false;
-                //    _pendingDocuments.First().PaginationSeparator.OpenDataPanel();
-                //}
             }
             catch (Exception ex)
             {

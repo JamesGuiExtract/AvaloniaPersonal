@@ -1,5 +1,4 @@
 using Extract.AttributeFinder;
-using Extract.Database;
 using Extract.DataEntry.Utilities.DataEntryApplication.Properties;
 using Extract.FileActionManager.Forms;
 using Extract.Imaging;
@@ -11,7 +10,6 @@ using Extract.UtilityApplications.PaginationUtility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Common;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -19,11 +17,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml;
-using System.Xml.XPath;
 using TD.SandDock;
 using UCLID_AFCORELib;
-using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_DATAENTRYCUSTOMCOMPONENTSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -107,7 +102,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         BrandingResourceManager _brandingResources;
 
         /// <summary>
-        /// The configuration manager
+        /// Manages all <see cref="DataEntryConfiguration"/>s currently available. Multiple
+        /// configurations will exist when there are multiple DEPs defined where the one used depends
+        /// on doc-type.
         /// </summary>
         DataEntryConfigurationManager<Properties.Settings> _configManager;
 
@@ -577,16 +574,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Read the user preferences object from the registry
                 _userPreferences = UserPreferences.FromRegistry();
 
+                if (_applicationConfig.Settings.EnableLogging)
+                {
+                    AttributeStatusInfo.Logger = Logger.CreateLogger(
+                        _applicationConfig.Settings.LogToFile,
+                        _applicationConfig.Settings.LogFilter,
+                        _applicationConfig.Settings.InputEventFilter,
+                        this);
+                }
+
                 _configManager = new DataEntryConfigurationManager<Properties.Settings>(this, _tagUtility,
                     _applicationConfig, _imageViewer, _documentTypeComboBox);
-
-                _configManager.LoadDataEntryConfigurations(expandedConfigFileName);
-
-                //// Load all configurations defined in configFileName
-                //LoadDataEntryConfigurations(expandedConfigFileName);
-
-                //// If a default configuration exists, use it to begin with.
-                //_activeDataEntryConfig = _configManager.DefaultDataEntryConfiguration;
 
                 if (!_standAloneMode)
                 {
@@ -622,117 +620,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 throw ExtractException.AsExtractException("ELI23669", ex);
             }
-        }
-
-        /// <summary>
-        /// Handles the ConfigurationChanging event of the _configManager control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="CancelEventArgs"/> instance containing the event data.</param>
-        /// <exception cref="System.NotImplementedException"></exception>
-        void HandleConfigManager_ConfigurationChanging(object sender, CancelEventArgs e)
-        {
-            e.Cancel = (AttemptSave(false) == DialogResult.Cancel);
-        }
-
-        /// <summary>
-        /// Handles the <see cref="DataEntryConfigurationManagerConfigurationChanged"/> event of the
-        /// <see cref="_configManager"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="ConfigurationChangedEventArgs"/> instance containing the
-        /// event data.</param>
-        /// <exception cref="System.NotImplementedException"></exception>
-        void HandleConfigManager_ConfigurationChanged(object sender, ConfigurationChangedEventArgs e)
-        {
-            // Adjust UI elements to reflect the new configuration.
-            SetUIConfiguration(ActiveDataEntryConfig);
-
-            // If a DEP is being used, load the data into it
-            if (DataEntryControlHost != null)
-            {
-                var oldDatEntryControlHost = e.OldDataEntryConfiguration?.DataEntryControlHost;
-                var newDataEntryControlHost = e.NewDataEntryConfiguration?.DataEntryControlHost;
-
-                if (oldDatEntryControlHost != newDataEntryControlHost)
-                {
-                    // Undo/redo command should be unavailable until a change is actually made.
-                    _undoCommand.Enabled = false;
-                    _redoCommand.Enabled = false;
-
-                    if (oldDatEntryControlHost != null)
-                    {
-                        // Set Active = false for the old DEP so that it no longer tracks image
-                        // viewer events.
-                        oldDatEntryControlHost.Active = false;
-
-                        // Unregister for events and disengage shortcut handlers for the previous DEP
-                        oldDatEntryControlHost.SwipingStateChanged -= HandleSwipingStateChanged;
-                        oldDatEntryControlHost.DataValidityChanged -= HandleDataValidityChanged;
-                        oldDatEntryControlHost.UnviewedDataStateChanged -= HandleUnviewedDataStateChanged;
-                        oldDatEntryControlHost.ItemSelectionChanged -= HandleItemSelectionChanged;
-                        if (_settings.InputEventTrackingEnabled)
-                        {
-                            oldDatEntryControlHost.MessageHandled -= HandleMessageFilterMessageHandled;
-                        }
-
-                        _gotoNextInvalidCommand.ShortcutHandler = null;
-                        _gotoNextUnviewedCommand.ShortcutHandler = null;
-                        _hideToolTipsCommand.ShortcutHandler = null;
-                        _acceptSpatialInfoCommand.ShortcutHandler = null;
-                        _removeSpatialInfoCommand.ShortcutHandler = null;
-
-                        //AttributeStatusInfo.ResetData(null, null, null);
-                        oldDatEntryControlHost.ClearData();
-                    }
-
-                    if (newDataEntryControlHost != null)
-                    {
-                        // Load the panel into the _scrollPane
-                        LoadDataEntryControlHostPanel();
-
-                        IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
-                        newDataEntryControlHost.LoadData(attributes);
-
-                        // Register for events and engage shortcut handlers for the new DEP
-                        newDataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
-                        newDataEntryControlHost.DataValidityChanged += HandleDataValidityChanged;
-                        newDataEntryControlHost.UnviewedDataStateChanged += HandleUnviewedDataStateChanged;
-                        newDataEntryControlHost.ItemSelectionChanged += HandleItemSelectionChanged;
-                        if (_settings.InputEventTrackingEnabled)
-                        {
-                            newDataEntryControlHost.MessageHandled += HandleMessageFilterMessageHandled;
-                        }
-
-                        _gotoNextInvalidCommand.ShortcutHandler =
-                            newDataEntryControlHost.GoToNextInvalid;
-                        _gotoNextUnviewedCommand.ShortcutHandler =
-                            newDataEntryControlHost.GoToNextUnviewed;
-                        _hideToolTipsCommand.ShortcutHandler =
-                            newDataEntryControlHost.ToggleHideTooltips;
-                        _acceptSpatialInfoCommand.ShortcutHandler =
-                            newDataEntryControlHost.AcceptSpatialInfo;
-                        _removeSpatialInfoCommand.ShortcutHandler =
-                            newDataEntryControlHost.RemoveSpatialInfo;
-                        _undoCommand.ShortcutHandler = newDataEntryControlHost.Undo;
-                        _redoCommand.ShortcutHandler = newDataEntryControlHost.Redo;
-
-                        // Set Active = true for the new DEP so that it tracks image viewer events.
-                        newDataEntryControlHost.Active = true;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Handles the ConfigurationChangeError event of the _configManager control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="VerificationExceptionGeneratedEventArgs"/> instance containing the event data.</param>
-        /// <exception cref="System.NotImplementedException"></exception>
-        void HandleConfigManager_ConfigurationChangeError(object sender, VerificationExceptionGeneratedEventArgs e)
-        {
-            RaiseVerificationException(e.Exception, e.CanProcessingContinue);
         }
 
         #endregion Constructors
@@ -1154,46 +1041,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 base.OnLoad(e);
 
-                if (!_standAloneMode && _settings.PaginationEnabled)
-                {
-                    ValidationPaginationActions();
-
-                    LoadPaginationDocumentDataPanel();
-
-                    if (!_configManager.RegisteredDocumentTypes.Any())
-                    {
-                        _dataTab.Controls.Remove(_documentTypePanel);
-                        _scrollPanel.Dock = DockStyle.Fill;
-                    }
-
-
-                    // Show pagination tab before showing the data tab to trigger the pagination
-                    // control to be created and loaded.
-                    _paginationTab.Show();
-                    _dataTab.Show();
-                }
-                else
-                {
-                    // If pagination is not needed, move the panel that houses the DEP out of the
-                    // tab control and directly into the left side of _splitContainer. 
-                    _dataTab.Controls.Remove(_documentTypePanel);
-                    _dataTab.Controls.Remove(_scrollPanel);
-                    _splitContainer.Panel1.Controls.Remove(_tabControl);
-                    _splitContainer.Panel1.Controls.Add(_documentTypePanel);
-                    _splitContainer.Panel1.Controls.Add(_scrollPanel);
-
-                    _dataTab = null;
-                    _tabControl = null;
-                    _paginationTab = null;
-                    _paginationPanel = null;
-
-                    if (!_configManager.RegisteredDocumentTypes.Any())
-                    {
-                        _splitContainer.Panel1.Controls.Remove(_documentTypePanel);
-                        _scrollPanel.Dock = DockStyle.Fill;
-                    }
-                }
-
                 // Set the application name
                 if (string.IsNullOrEmpty(_actionName))
                 {
@@ -1204,19 +1051,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // [DataEntry:740] Show the name of the current action in the title bar.
                     base.Text = "Waiting - " + _brandingResources.ApplicationTitle +
                         " (" + _actionName + ")";
-                }
-
-                _magnifierToolStripButton.DockableWindow = _magnifierDockableWindow;
-                if (_paginationPanel == null)
-                {
-                    _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
-                }
-                else
-                {
-                    // If pagination is available, the thumbnail pane is redundant and does not
-                    // currently play well with the pagination panel. Disallow use of the thumbnail
-                    // window in this configuration.
-                    _thumbnailsToolStripButton.Visible = false;
                 }
 
                 // Establish shortcut keys
@@ -1450,6 +1284,66 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                 }
 
+                _configManager.ConfigurationChanging += HandleConfigManager_ConfigurationChanging;
+                _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
+                _configManager.ConfigurationChangeError += HandleConfigManager_ConfigurationChangeError;
+
+                string expandedConfigFileName =
+                    _tagUtility.ExpandTagsAndFunctions(_settings.ConfigFileName, null, null);
+                _configManager.LoadDataEntryConfigurations(expandedConfigFileName);
+
+                if (!_standAloneMode && _settings.PaginationEnabled)
+                {
+                    ValidationPaginationActions();
+
+                    LoadPaginationDocumentDataPanel();
+
+                    if (!_configManager.RegisteredDocumentTypes.Any())
+                    {
+                        _dataTab.Controls.Remove(_documentTypePanel);
+                        _scrollPanel.Dock = DockStyle.Fill;
+                    }
+
+                    // Show pagination tab before showing the data tab to trigger the pagination
+                    // control to be created and loaded.
+                    _paginationTab.Show();
+                    _dataTab.Show();
+                }
+                else
+                {
+                    // If pagination is not needed, move the panel that houses the DEP out of the
+                    // tab control and directly into the left side of _splitContainer. 
+                    _dataTab.Controls.Remove(_documentTypePanel);
+                    _dataTab.Controls.Remove(_scrollPanel);
+                    _splitContainer.Panel1.Controls.Remove(_tabControl);
+                    _splitContainer.Panel1.Controls.Add(_documentTypePanel);
+                    _splitContainer.Panel1.Controls.Add(_scrollPanel);
+
+                    _dataTab = null;
+                    _tabControl = null;
+                    _paginationTab = null;
+                    _paginationPanel = null;
+
+                    if (!_configManager.RegisteredDocumentTypes.Any())
+                    {
+                        _splitContainer.Panel1.Controls.Remove(_documentTypePanel);
+                        _scrollPanel.Dock = DockStyle.Fill;
+                    }
+                }
+
+                _magnifierToolStripButton.DockableWindow = _magnifierDockableWindow;
+                if (_paginationPanel == null)
+                {
+                    _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
+                }
+                else
+                {
+                    // If pagination is available, the thumbnail pane is redundant and does not
+                    // currently play well with the pagination panel. Disallow use of the thumbnail
+                    // window in this configuration.
+                    _thumbnailsToolStripButton.Visible = false;
+                }
+
                 // Load the DEP into the left-hand panel or separate image window and position and
                 // sizes it correctly.
                 LoadDataEntryControlHostPanel();
@@ -1505,19 +1399,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // Adjust UI elements to reflect the current configuration.
                 SetUIConfiguration(ActiveDataEntryConfig);
-
-                _configManager.ConfigurationChanging += HandleConfigManager_ConfigurationChanging;
-                _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
-                _configManager.ConfigurationChangeError += HandleConfigManager_ConfigurationChangeError;
-
-                if (_applicationConfig.Settings.EnableLogging)
-                {
-                    AttributeStatusInfo.Logger = Logger.CreateLogger(
-                        _applicationConfig.Settings.LogToFile,
-                        _applicationConfig.Settings.LogFilter,
-                        _applicationConfig.Settings.InputEventFilter,
-                        this);
-                }
 
                 _isLoaded = true;
                 OnInitialized();
@@ -1860,6 +1741,116 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #endregion Events
 
         #region Event Handlers
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryConfigurationManager.ConfigurationChanging"/> event of the
+        /// <see cref="_configManager"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CancelEventArgs"/> instance containing the event data.</param>
+        void HandleConfigManager_ConfigurationChanging(object sender, CancelEventArgs e)
+        {
+            e.Cancel = (AttemptSave(false) == DialogResult.Cancel);
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryConfigurationManager.ConfigurationChanged"/> event of the
+        /// <see cref="_configManager"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="ConfigurationChangedEventArgs"/> instance containing the
+        /// event data.</param>
+        void HandleConfigManager_ConfigurationChanged(object sender, ConfigurationChangedEventArgs e)
+        {
+            // Adjust UI elements to reflect the new configuration.
+            SetUIConfiguration(ActiveDataEntryConfig);
+
+            // If a DEP is being used, load the data into it
+            if (DataEntryControlHost != null)
+            {
+                var oldDatEntryControlHost = e.OldDataEntryConfiguration?.DataEntryControlHost;
+                var newDataEntryControlHost = e.NewDataEntryConfiguration?.DataEntryControlHost;
+
+                if (oldDatEntryControlHost != newDataEntryControlHost)
+                {
+                    // Undo/redo command should be unavailable until a change is actually made.
+                    _undoCommand.Enabled = false;
+                    _redoCommand.Enabled = false;
+
+                    if (oldDatEntryControlHost != null)
+                    {
+                        // Set Active = false for the old DEP so that it no longer tracks image
+                        // viewer events.
+                        oldDatEntryControlHost.Active = false;
+
+                        // Unregister for events and disengage shortcut handlers for the previous DEP
+                        oldDatEntryControlHost.SwipingStateChanged -= HandleSwipingStateChanged;
+                        oldDatEntryControlHost.DataValidityChanged -= HandleDataValidityChanged;
+                        oldDatEntryControlHost.UnviewedDataStateChanged -= HandleUnviewedDataStateChanged;
+                        oldDatEntryControlHost.ItemSelectionChanged -= HandleItemSelectionChanged;
+                        if (_settings.InputEventTrackingEnabled)
+                        {
+                            oldDatEntryControlHost.MessageHandled -= HandleMessageFilterMessageHandled;
+                        }
+
+                        _gotoNextInvalidCommand.ShortcutHandler = null;
+                        _gotoNextUnviewedCommand.ShortcutHandler = null;
+                        _hideToolTipsCommand.ShortcutHandler = null;
+                        _acceptSpatialInfoCommand.ShortcutHandler = null;
+                        _removeSpatialInfoCommand.ShortcutHandler = null;
+
+                        //AttributeStatusInfo.ResetData(null, null, null);
+                        oldDatEntryControlHost.ClearData();
+                    }
+
+                    if (newDataEntryControlHost != null)
+                    {
+                        // Load the panel into the _scrollPane
+                        LoadDataEntryControlHostPanel();
+
+                        IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
+                        newDataEntryControlHost.LoadData(attributes);
+
+                        // Register for events and engage shortcut handlers for the new DEP
+                        newDataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
+                        newDataEntryControlHost.DataValidityChanged += HandleDataValidityChanged;
+                        newDataEntryControlHost.UnviewedDataStateChanged += HandleUnviewedDataStateChanged;
+                        newDataEntryControlHost.ItemSelectionChanged += HandleItemSelectionChanged;
+                        if (_settings.InputEventTrackingEnabled)
+                        {
+                            newDataEntryControlHost.MessageHandled += HandleMessageFilterMessageHandled;
+                        }
+
+                        _gotoNextInvalidCommand.ShortcutHandler =
+                            newDataEntryControlHost.GoToNextInvalid;
+                        _gotoNextUnviewedCommand.ShortcutHandler =
+                            newDataEntryControlHost.GoToNextUnviewed;
+                        _hideToolTipsCommand.ShortcutHandler =
+                            newDataEntryControlHost.ToggleHideTooltips;
+                        _acceptSpatialInfoCommand.ShortcutHandler =
+                            newDataEntryControlHost.AcceptSpatialInfo;
+                        _removeSpatialInfoCommand.ShortcutHandler =
+                            newDataEntryControlHost.RemoveSpatialInfo;
+                        _undoCommand.ShortcutHandler = newDataEntryControlHost.Undo;
+                        _redoCommand.ShortcutHandler = newDataEntryControlHost.Redo;
+
+                        // Set Active = true for the new DEP so that it tracks image viewer events.
+                        newDataEntryControlHost.Active = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryConfigurationManager.ConfigurationChangeError"/> event
+        /// of the <see cref="_configManager"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="VerificationExceptionGeneratedEventArgs"/> instance containing the event data.</param>
+        void HandleConfigManager_ConfigurationChangeError(object sender, VerificationExceptionGeneratedEventArgs e)
+        {
+            RaiseVerificationException(e.Exception, e.CanProcessingContinue);
+        }
 
         /// <summary>
         /// Handles the case that the user requested that the data be saved and committed.
@@ -3599,10 +3590,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Private Members
 
         /// <summary>
-        /// Gets the active data entry configuration.
+        /// Gets the active <see cref="DataEntryConfiguration"/>.
         /// </summary>
         /// <value>
-        /// The active data entry configuration.
+        /// The active <see cref="DataEntryConfiguration"/>.
         /// </value>
         DataEntryConfiguration ActiveDataEntryConfig
         {
@@ -3613,10 +3604,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Gets the data entry control host.
+        /// Gets the <see cref="DataEntryControlHost"/>.
         /// </summary>
         /// <value>
-        /// The data entry control host.
+        /// The <see cref="DataEntryControlHost"/>.
         /// </value>
         DataEntryControlHost DataEntryControlHost
         {

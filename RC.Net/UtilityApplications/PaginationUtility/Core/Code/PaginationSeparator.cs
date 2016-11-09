@@ -561,12 +561,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 UpdateControls();
 
-                if (Document != null && Document.DefaultDataPanelOpen)
-                {
-                    Document.DefaultDataPanelOpen = false;
-                    this.SafeBeginInvoke("ELI0", () => OpenDataPanel());
-                }
-
                 base.OnInvalidated(e);
             }
             catch (Exception ex)
@@ -671,10 +665,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     DocumentSelectedToCommit = _selectedCheckBox.Checked;
 
-                    //if (DocumentSelectedToCommit)
-                    //{
-                    //    Collapsed = true;
-                    //}
+                    if (DocumentSelectedToCommit)
+                    {
+                        Collapsed = true;
+                    }
                 }
             }
             catch (Exception ex)

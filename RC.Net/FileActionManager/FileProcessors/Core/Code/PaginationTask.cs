@@ -155,12 +155,6 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         string _documentDataPanelAssembly;
 
-        ///// <summary>
-        ///// A panel that is available to view/edit key data fields associated with either physical
-        ///// or proposed paginated documents.
-        ///// </summary>
-        //IPaginationDocumentDataPanel _paginationDocumentDataPanel;
-
         /// <summary>
         /// The name of the action currently being processed.
         /// </summary>
