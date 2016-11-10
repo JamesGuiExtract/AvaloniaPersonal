@@ -197,7 +197,7 @@ namespace Extract.Utilities
                         {
                             int quarterNumber = (dateTime.Month - 1) / 3 + 1;
                             DateTime firstDayOfQuarter = new DateTime(dateTime.Year, (quarterNumber - 1) * 3 + 1, 1);
-                            DateTime lastDayOfQuarter = firstDayOfQuarter.AddMonths(3).AddDays(-1);
+                            DateTime lastDayOfQuarter = firstDayOfQuarter.AddMonths(3);
                             long midPoint = (lastDayOfQuarter.Ticks + firstDayOfQuarter.Ticks) / 2;
                             return dateTime.Ticks < midPoint ? firstDayOfQuarter : lastDayOfQuarter;
                         }
@@ -408,7 +408,7 @@ namespace Extract.Utilities
                         {
                             int quarterNumber = (dateTime.Month - 1) / 3 + 1;
                             DateTime firstDayOfQuarter = new DateTime(dateTime.Year, (quarterNumber - 1) * 3 + 1, 1);
-                            return firstDayOfQuarter.AddMonths(3).AddDays(-1);
+                            return firstDayOfQuarter.AddMonths(3);
                         }
                     case DateTimeUnit.Year:
                         {
