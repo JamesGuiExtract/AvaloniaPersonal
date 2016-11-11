@@ -17,6 +17,8 @@ namespace StatisticsReporter
     {
         static void Main(string[] args)
         {
+            ConfigSettings<Settings> ReportSettings = null;
+            Tuple<DateTime, DateTime> range = null;
             try
             {
                 // Validate the license
@@ -33,7 +35,7 @@ namespace StatisticsReporter
                 }
 
                 string configFileName =  args[0];
-                ConfigSettings<Settings> ReportSettings = new ConfigSettings<Settings>(configFileName);
+                ReportSettings = new ConfigSettings<Settings>(configFileName);
 
                 // Verify that there are settings that make sense
                 ExtractException.Assert("ELI41543", "Must specify ReportOutputFileName in config file.", !string.IsNullOrWhiteSpace(ReportSettings.Settings.ReportOutputFileName));
@@ -50,9 +52,18 @@ namespace StatisticsReporter
                 dcSettings.ExpectedAttributeSetName = ReportSettings.Settings.ExpectedAttributeSetName;
                 dcSettings.FoundAttributeSetName = ReportSettings.Settings.FoundAttributeSetName;
 
-                var range = ConvertDateTimeStrings(ReportSettings.Settings.StartDateTime, ReportSettings.Settings.EndDateTime);
+                range = ConvertDateTimeStrings(ReportSettings.Settings.StartDateTime, ReportSettings.Settings.EndDateTime);
                 dcSettings.StartDate = range.Item1;
                 dcSettings.EndDate = range.Item2;
+                
+                // Make sure the Start date is less than the end date
+                if (dcSettings.StartDate > dcSettings.EndDate)
+                {
+                    ExtractException ee = new ExtractException("ELI41586", "Report start date is after end date.");
+                    ee.AddDebugData("StartDate", dcSettings.StartDate, false);
+                    ee.AddDebugData("EndDate", dcSettings.EndDate, false);
+                    throw ee;
+                }
 
                 dcSettings.ApplyDatesToFound = ReportSettings.Settings.ApplyDateRangeToFound;
 
@@ -66,8 +77,10 @@ namespace StatisticsReporter
                 Stopwatch timeToProcess = new Stopwatch();
                 timeToProcess.Start();
 
+                long fileCount = 0;
+
                 // Get the results for the per file comparisons
-                var Results = Statistics.ProcessData();
+                var Results = Statistics.ProcessData(out fileCount);
                 
                 // Aggregate the results
                 var AggrgatedResults = Results.AggregateStatistics();
@@ -76,7 +89,7 @@ namespace StatisticsReporter
                 var SummarizedResults = AggrgatedResults.SummarizeStatistics(ReportSettings.Settings.ErrorIfContainerOnlyConflict);
 
                 // Get the Html page to save
-                string HtmlOutputPage = CreateHtmlPage(SummarizedResults.AccuracyDetailsToHtml(), ReportSettings, range);
+                string HtmlOutputPage = CreateHtmlPage(SummarizedResults.AccuracyDetailsToHtml(), ReportSettings, range, fileCount);
                 
                 // Save the data to the configured output file
                 File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, HtmlOutputPage);
@@ -89,6 +102,20 @@ namespace StatisticsReporter
             {
                 e.AsExtract("ELI41525").Log();
                 Console.Error.WriteLine(e.Message);
+                try
+                {
+                    if (ReportSettings != null && range != null)
+                    {
+                        string HtmlOutput = CreateHtmlPage("", ReportSettings, range, 0);
+                        // Save the data to the configured output file
+
+                        File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, HtmlOutput);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    ex.AsExtract("ELI41589").Log();
+                }
                 Environment.ExitCode = 1;
             }
         }
@@ -165,7 +192,7 @@ namespace StatisticsReporter
         /// <param name="reportSettings">Instance of report settings used to generate report</param>
         /// <param name="range">The Tuple that contains the start and end DateTime for the report</param>
         /// <returns>String that is HTML formated page with the <paramref name="statsData"/> string and other page formatting</returns>
-        static string CreateHtmlPage(string statsData, ConfigSettings<Settings> reportSettings, Tuple<DateTime, DateTime> range)
+        static string CreateHtmlPage(string statsData, ConfigSettings<Settings> reportSettings, Tuple<DateTime, DateTime> range, long fileCount)
         {
             // The order that settings should be displayed
             List<string> SettingsOrder = new List<string>
@@ -256,7 +283,18 @@ namespace StatisticsReporter
                 writer.RenderBeginTag(HtmlTextWriterTag.Hr);
                 writer.RenderEndTag(); // Hr
 
-                writer.Write(statsData);
+                 writer.Write(statsData);
+
+                // Add a line after the stats tables over the entire width of the pages
+                writer.AddAttribute(HtmlTextWriterAttribute.Width, "100%");
+                writer.RenderBeginTag(HtmlTextWriterTag.Hr);
+                writer.RenderEndTag(); // Hr
+
+                // Add the file count
+                writer.RenderBeginTag(HtmlTextWriterTag.P);
+                writer.WriteLine("Files processed : {0}", fileCount);
+                writer.RenderEndTag(); // p
+
                 writer.RenderEndTag(); // Html
                 return baseWriter.ToString();
             }

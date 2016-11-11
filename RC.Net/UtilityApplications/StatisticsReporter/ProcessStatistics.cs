@@ -5,6 +5,7 @@ using Extract.Interop.Zip;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -124,6 +125,9 @@ namespace StatisticsReporter
 
         #region Constants
 
+        static readonly string AttributeSetNames =
+            "   SELECT Description FROM dbo.[AttributeSetName] WHERE Description in ('<Expected>', '<Found>');";
+
         // Query used to get the expected and found voa's
         // The variable <ApplyDateRangeSet> needs to be replaced with "Found" or "Expected"
         static readonly string ExpectedFoundSQL =
@@ -145,13 +149,13 @@ namespace StatisticsReporter
             "          AND DateTimeStamp = " +
             "           ( " +
             "               SELECT MAX(DateTimeStamp) " +
-            "               FROM FileTaskSession " +
-            "                   INNER JOIN AttributeSetForFile ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID " +
+            "               FROM dbo.FileTaskSession " +
+            "                   INNER JOIN dbo.AttributeSetForFile ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID " +
             "               WHERE FileID = FTS.FileID " +
-            "                   AND AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID " +
+            "                   AND dbo.AttributeSetForFile.AttributeSetNameID = dbo.AttributeSetName.ID " +
             "           ) " +
             ") AS Found " +
-            "INNER JOIN FAMFile ON Found.FileID = FAMFile.ID " +
+            "INNER JOIN dbo.FAMFile ON Found.FileID = dbo.FAMFile.ID " +
             "<IncludeAll> " +
             "( " +
             "    SELECT dbo.AttributeSetForFile.VOA, " +
@@ -165,12 +169,12 @@ namespace StatisticsReporter
             "          AND DateTimeStamp = " +
             "           ( " +
             "               SELECT MAX(DateTimeStamp) " +
-            "               FROM FileTaskSession " +
-            "                   INNER JOIN AttributeSetForFile ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID " +
+            "               FROM dbo.FileTaskSession " +
+            "                   INNER JOIN dbo.AttributeSetForFile ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID " +
             "               WHERE FileID = FTS.FileID " +
-            "                   AND AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID " +
+            "                   AND dbo.AttributeSetForFile.AttributeSetNameID = dbo.AttributeSetName.ID " +
             "           ) " +
-            ") AS Expected ON FAMFile.ID = Expected.FileID " +
+            ") AS Expected ON dbo.FAMFile.ID = Expected.FileID " +
             "WHERE <ApplyDateRangeSet>.DateTimeStamp >= '<StartDateTime>' AND <ApplyDateRangeSet>.DateTimeStamp <= '<EndDateTime>';";
 
         
@@ -216,11 +220,14 @@ namespace StatisticsReporter
         /// <summary>
         /// Processes the data by retrieving the voa data from the database and creating the results for each file
         /// </summary>
-        /// <param name="settings">Settings for the process data</param>
-        public IEnumerable<AccuracyDetail> ProcessData()
+        /// <param name="fileCount">Variable for number of files processed</param>
+        public IEnumerable<AccuracyDetail> ProcessData(out long fileCount)
         {
             try
             {
+                // Set the fileCount to 0
+                fileCount = 0;
+
                 // Assert that settings have been set
                 ExtractException.Assert("ELI41527", "Settings have not been configured for Processing", Settings != null);
 
@@ -246,6 +253,9 @@ namespace StatisticsReporter
                     // Process the found records
                     while (ExpectedAndFoundReader.Read())
                     {
+                        // Increment the file count
+                        fileCount++;
+
                         // Get the streams for the expected and found voa data (the thread will read the voa from the stream
                         Stream expectedStream = ExpectedAndFoundReader.GetStream(ExpectedVOAColumn);
                         Stream foundStream = ExpectedAndFoundReader.GetStream(FoundVOAColumn);
@@ -383,6 +393,13 @@ namespace StatisticsReporter
                 sqlConnectionBuild.NetworkLibrary = "dbmssocn";
 
                 _Connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
+
+                // Open the connection
+                _Connection.Open();
+
+                // Verify that the Found and expected attributes sets exist
+                ValidateSetNames(_Connection.CreateCommand());
+
                 SqlCommand cmd = _Connection.CreateCommand();
 
                 // Set up the sql to obtain the expected and found
@@ -395,9 +412,6 @@ namespace StatisticsReporter
                 sql = sql.Replace("<ApplyDateRangeSet>", (Settings.ApplyDatesToFound) ? "Found" : "Expected");
                 cmd.CommandText = sql;
 
-                // Open the connection
-                _Connection.Open();
-
                 // Return the reader
                 return cmd.ExecuteReader();
             }
@@ -405,7 +419,52 @@ namespace StatisticsReporter
             {
                 throw ex.AsExtract("ELI41545");
             }
-        } 
+        }
+
+        /// <summary>
+        /// Validates the found and expected set names stored in Settings
+        /// </summary>
+        /// <param name="attributeSetsCommand"> An Sql command object created on an open connection.</param>
+        void ValidateSetNames(SqlCommand attributeSetsCommand)
+        {
+            using (attributeSetsCommand)
+            {
+                attributeSetsCommand.CommandText = AttributeSetNames.Replace("<Expected>", Settings.ExpectedAttributeSetName);
+                attributeSetsCommand.CommandText = attributeSetsCommand.CommandText.Replace("<Found>", Settings.FoundAttributeSetName);
+
+                using (var setReader = attributeSetsCommand.ExecuteReader())
+                {
+                    bool ExpectedSetExists = false;
+                    bool FoundSetExists = false;
+                    foreach (DbDataRecord r in setReader)
+                    {
+                        string value = r.GetString(0);
+                        if (value.Equals(Settings.ExpectedAttributeSetName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            ExpectedSetExists = true;
+                        }
+                        if (value.Equals(Settings.FoundAttributeSetName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            FoundSetExists = true;
+                        }
+                    }
+
+                    if (!ExpectedSetExists || !FoundSetExists)
+                    {
+                        ExtractException ee = new ExtractException("ELI41587", "File attribute set does not exist.");
+                        if (!ExpectedSetExists)
+                        {
+                            ee.AddDebugData("Expected Set", Settings.ExpectedAttributeSetName, false);
+                        }
+                        if (!FoundSetExists)
+                        {
+                            ee.AddDebugData("Found Set", Settings.FoundAttributeSetName, false);
+                        }
+                        throw ee;
+                    }
+                }
+            }
+        }
 
         #endregion
 
