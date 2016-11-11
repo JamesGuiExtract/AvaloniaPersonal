@@ -545,6 +545,7 @@ namespace Extract.AttributeFinder.Rules
                 var text = textBox.TextValue();
                 var checkd = checkBox.Checked;
                 if (String.IsNullOrWhiteSpace(text) ||
+                    checkBox == _valueCheckBox && !checkd || // Any text is valid for non-XPath Value field
                     CreateAttribute.TextIsValid(text, xPathEnabled: checkd))
                 {
                     textBox.SetError(_errorProvider, String.Empty);

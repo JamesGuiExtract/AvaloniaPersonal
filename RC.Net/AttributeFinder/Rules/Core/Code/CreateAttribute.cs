@@ -694,17 +694,22 @@ namespace Extract.AttributeFinder.Rules
 
                 while (iter.MoveNext())
                 {
-                    if (null == iter.CurrentAttribute)
+                    IUnknownVector vectorToAddTo = null;
+                    if (iter.IsAtRootElement)
                     {
-                        ExtractException ee = 
-                            new ExtractException("ELI39681", 
-                                                 "No Attribute was found for the XPath expression");
-                        ee.AddDebugData("PossibleCause", 
-                                        String.Format(CultureInfo.CurrentCulture,
-                                                      "XPath root query: {0}", 
-                                                      _root), 
-                                        encrypt: false);
-                        throw ee;
+                        vectorToAddTo = pAttributes;
+                    }
+                    else
+                    {
+                        vectorToAddTo = iter.CurrentAttribute?.SubAttributes;
+
+                        ExtractException.Assert("ELI39681",
+                            "No Attribute was found for the XPath expression",
+                            vectorToAddTo != null,
+                            "PossibleCause",
+                            String.Format(CultureInfo.CurrentCulture,
+                                "XPath root query: {0}",
+                                _root));
                     }
 
                     foreach (var subAttr in _subattributesToCreate)
@@ -769,10 +774,7 @@ namespace Extract.AttributeFinder.Rules
                             continue;
                         }
 
-                        iter.CurrentAttribute.SubAttributes.PushBack(newAttr);
-
-                        // So that the garbage collector knows of and properly manages the associated memory.
-                        pAttributes.ReportMemoryUsage();
+                        vectorToAddTo.PushBack(newAttr);
                     }
                 }
 

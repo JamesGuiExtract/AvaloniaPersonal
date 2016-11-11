@@ -53,6 +53,15 @@ namespace Extract.AttributeFinder.Test
         const string _TEST_IMAGE_013_EXPECTED_VOA_FILE = "Resources.TestImage013.tif.test.voa";
 
         #endregion Test Three File Names
+
+        #region Test Four File Names
+
+        // Test four is the same as test 3 expect that it creates top-level attributes
+        const string _TEST_FOUR_RSD_FILE = "Resources.CreateTopLevelAttrIdShield_testImage013.rsd";
+        const string _TEST_IMAGE_013_EXPECTED_VOA_FILE_FOR_TEST_4 = "Resources.Test4.tif.test.voa";
+
+        #endregion Test Four File Names
+
         #endregion Fields
 
         #region Setup and Teardown
@@ -130,6 +139,23 @@ namespace Extract.AttributeFinder.Test
                    _TEST_IMAGE_013_TIF_FILE); 
         }
 
+        /// <summary>
+        /// Tests creating three attributes at the top-level, corresponding to three SSN attributes in the document.
+        /// After the rules are run, the returned IUnknownVector should match the IUnknownVector 
+        /// loaded from the reference file.
+        /// The original document is TestImage013.tif, from Demo_IDShield/Input.
+        /// (Like Test3 except creates top-level attributes)
+        /// </summary>
+        [Test, Category("CreateAttribute")]
+        public static void Test4()
+        {
+            DoTest(_TEST_IMAGE_013_VOA_FILE, 
+                   _TEST_IMAGE_013_USS_FILE, 
+                   _TEST_FOUR_RSD_FILE, 
+                   _TEST_IMAGE_013_EXPECTED_VOA_FILE_FOR_TEST_4,
+                   _TEST_IMAGE_013_TIF_FILE); 
+        }
+
         #endregion Public Test Functions
 
         #region Private Functions
@@ -160,7 +186,7 @@ namespace Extract.AttributeFinder.Test
             var filename = _testFiles.GetFile(voaFilename);
             attributes.LoadFrom(filename, bSetDirtyFlagToTrue: false);
 
-            if (!string.IsNullOrWhiteSpace(filenameToApply))
+            if (!string.IsNullOrWhiteSpace(filenameToApply) && attributes.Size() == 1)
             {
                 ((IAttribute)attributes.At(0)).Value.SourceDocName = filenameToApply;
             }

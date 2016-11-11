@@ -107,6 +107,24 @@ namespace Extract.AttributeFinder
             }
 
             /// <summary>
+            /// Gets a value indicating whether the current position is the top-level, Document node
+            /// </summary>
+            /// <value>
+            /// <c>true</c> if the current position is the root element; otherwise, <c>false</c>.
+            /// </value>
+            public bool IsAtRootElement
+            {
+                get
+                {
+                    return XPathNodeIterator.Current.NodeType == XPathNodeType.Element
+                        && ((IHasXmlNode)XPathNodeIterator.Current)
+                        .GetNode()
+                        .ParentNode
+                        .NodeType == XmlNodeType.Document;
+                }
+            }
+
+            /// <summary>
             /// Advances to the next position in the iteration.
             /// </summary>
             /// <returns><see langword="true"/> if there was another element in the iteration to

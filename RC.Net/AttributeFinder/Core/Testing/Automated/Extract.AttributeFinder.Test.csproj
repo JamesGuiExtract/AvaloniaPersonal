@@ -190,42 +190,22 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\A418_xpath_3_subattrs_added.voa" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\CreateAttribute_3SubAttrs.rsd" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\A418.tif.TestCreateAttributes.voa" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\CreateSubattrFlexIndex2.rsd" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Example02.tif.test.voa" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Example02.tif.uss" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Example02.tif.voa" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\CreateSubAttrIdShield_testImage013.rsd" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\TestImage013.tif.test.voa" />
     <EmbeddedResource Include="Resources\TestImage013.tif.uss" />
     <EmbeddedResource Include="Resources\TestImage013.tif.voa" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\A418.tif" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\A418.tif.uss" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Example02.tif" />
     <EmbeddedResource Include="Resources\TestImage013.tif" />
+    <EmbeddedResource Include="Resources\CreateTopLevelAttrIdShield_testImage013.rsd" />
+    <EmbeddedResource Include="Resources\Test4.tif.test.voa" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif" />
