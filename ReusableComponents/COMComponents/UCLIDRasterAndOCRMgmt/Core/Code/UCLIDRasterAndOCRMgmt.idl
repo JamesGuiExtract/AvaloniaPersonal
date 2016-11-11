@@ -1280,6 +1280,11 @@ library UCLID_RASTERANDOCRMGMTLib
 		// REQUIRE: GetMode() != kNonSpatialMode
 		[id(107), helpstring("method GetUnrotatedPageInfoMap")] HRESULT GetUnrotatedPageInfoMap
 			([out, retval]  ILongToObjectMap** pVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Returns a pseudo-spatial version of a hybrid mode string
+		// REQUIRE: GetMode() == kHybridMode
+		[id(108), helpstring("method GetPseudoSpatialFromHybrid")] HRESULT GetPseudoSpatialFromHybrid
+			([out, retval]  ISpatialString** pVal);
 	};
 
 	[

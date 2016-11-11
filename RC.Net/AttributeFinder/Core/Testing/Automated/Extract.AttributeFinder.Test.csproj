@@ -80,6 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestLocateImageRegion.cs" />
     <Compile Include="TestLearningMachine.cs" />
     <Compile Include="TestLearningMachineDataEncoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -206,6 +207,14 @@
     <EmbeddedResource Include="Resources\TestImage013.tif" />
     <EmbeddedResource Include="Resources\CreateTopLevelAttrIdShield_testImage013.rsd" />
     <EmbeddedResource Include="Resources\Test4.tif.test.voa" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\LIR_Test_01_OneToOne.rsd" />
+    <EmbeddedResource Include="Resources\LIR_Test_02_MoreLinesThanZones.rsd" />
+    <EmbeddedResource Include="Resources\LIR_Test_03_MoreZonesThanLines.rsd" />
+    <EmbeddedResource Include="Resources\LIR_Test_04_MoreZonesThanLines.rsd" />
+    <EmbeddedResource Include="Resources\LIR_Test_05_One-To-One_ModifiedLines.rsd" />
+    <EmbeddedResource Include="Resources\LIR_Test_06_MultipleZonesOneChar.rsd" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif" />

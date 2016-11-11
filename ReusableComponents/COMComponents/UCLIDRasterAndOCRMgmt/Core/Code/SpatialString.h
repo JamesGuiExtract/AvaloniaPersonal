@@ -178,6 +178,7 @@ public:
 	STDMETHOD(ValidatePageDimensions)();
 	STDMETHOD(CreateFromSpatialStrings)(IIUnknownVector *pStrings);
 	STDMETHOD(GetUnrotatedPageInfoMap)( ILongToObjectMap **pVal);
+	STDMETHOD(GetPseudoSpatialFromHybrid)(ISpatialString** ppResultString);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);

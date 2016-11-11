@@ -1158,11 +1158,21 @@ long CLocateImageRegion::getPageBoundaryPosition(EBoundary eSide, ISpatialString
 	}
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInputText, 
+IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipOriginalInputText, 
 														 IAFDocument* pDocument)
 {
 	IAFDocumentPtr ipAFDoc(pDocument);
 	ASSERT_RESOURCE_ALLOCATION("ELI14636", ipAFDoc != __nullptr);
+
+	ISpatialStringPtr ipInputText;
+	if (ipOriginalInputText->GetMode() == kHybridMode)
+	{
+		ipInputText = ipOriginalInputText->GetPseudoSpatialFromHybrid();
+	}
+	else
+	{
+		ipInputText = ipOriginalInputText;
+	}
 
 	// create an IIUnknownVector to hold the results
 	IIUnknownVectorPtr ipVecFoundRegions(CLSID_IUnknownVector);

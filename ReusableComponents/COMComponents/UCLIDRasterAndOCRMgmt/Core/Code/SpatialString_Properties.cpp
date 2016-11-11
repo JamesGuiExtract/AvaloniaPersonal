@@ -2707,3 +2707,138 @@ STDMETHODIMP CSpatialString::GetUnrotatedPageInfoMap(ILongToObjectMap** pVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38492")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::GetPseudoSpatialFromHybrid(ISpatialString** ppResultString)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI41610", ppResultString != __nullptr);
+
+		validateLicense();
+
+		// Make sure this string is hybrid
+		ASSERT_RUNTIME_CONDITION("ELI41611", m_eMode == kHybridMode,
+			"String must be hybrid for GetPseudoSpatialFromHybrid");
+
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipReturn(CLSID_SpatialString);
+		ASSERT_RESOURCE_ALLOCATION("ELI41612", ipReturn != __nullptr);
+
+		IIUnknownVectorPtr ipZones = getThisAsCOMPtr()->GetOCRImageRasterZones();
+		ASSERT_RESOURCE_ALLOCATION("ELI41613", ipZones != __nullptr);
+
+		// Get vector of lines in this string
+		vector<pair<long, long>> vecLines;
+		getLines(vecLines);
+
+		// Count the number of zones and lines. There will need to be one line per zone eventually
+		long lNumZones = ipZones->Size();
+		long lNumLines = vecLines.size();
+
+		// The string to supply text for the result
+		string strValue = m_strString;
+
+		// Calculate non-spatial suffix
+		string strSuffix;
+		if (lNumLines >= lNumZones)
+		{
+			unsigned long lLastLineWithZoneEndIndex = vecLines.at(lNumZones - 1).second;
+			if (lLastLineWithZoneEndIndex < strValue.length() - 1)
+			{
+				strSuffix = strValue.substr(lLastLineWithZoneEndIndex + 1);
+			}
+		}
+
+		// Pad the line vector and string value to match zones if necessary
+		bool bAddedPadding = lNumLines < lNumZones;
+		if (bAddedPadding)
+		{
+			string strPadding = "^";
+			long lastNewlineIndex = strValue.rfind("\r\n");
+			bool bAddNewline = lastNewlineIndex == string::npos || lastNewlineIndex != strValue.length() - 2;
+			unsigned long lEndPos = strValue.length() - 1;
+			for (; lNumLines < lNumZones; ++lNumLines)
+			{
+				unsigned long lStartPos = lEndPos + 1;
+				if (bAddNewline)
+				{
+					strValue += "\r\n";
+					lStartPos += 2;
+				}
+				else
+				{
+					bAddNewline = true;
+				}
+				strValue += strPadding;
+				lEndPos = lStartPos + strPadding.length() - 1;
+				vecLines.push_back(pair<long, long>(lStartPos, lEndPos));
+			}
+		}
+
+		for (long i = 0; i < lNumZones; ++i)
+		{
+			pair<long, long> pLine = vecLines.at(i);
+			long lNextCharInSourceIndex = i == 0 ? 0 : vecLines.at(i-1).second + 1;
+
+			// Append any non-spatial prefix
+			if (pLine.first > lNextCharInSourceIndex)
+			{
+				string strPrefix = strValue.substr(lNextCharInSourceIndex, pLine.first - lNextCharInSourceIndex);
+
+				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipPrefix(CLSID_SpatialString);
+				ASSERT_RESOURCE_ALLOCATION("ELI41622", ipPrefix != __nullptr);
+
+				ipPrefix->CreateNonSpatialString(strPrefix.c_str(), m_strSourceDocName.c_str());
+				ipReturn->Append(ipPrefix);
+			}
+
+			// Make a spatial string for this line/zone
+			string strSubString = strValue.substr(pLine.first, 1 + pLine.second - pLine.first);
+
+			ICopyableObjectPtr ipCopyable(ipZones->At(i));
+			ASSERT_RESOURCE_ALLOCATION("ELI41614", ipCopyable != __nullptr);
+			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipCopyable->Clone();
+			ipZone = ipCopyable->Clone();
+
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipSubString(CLSID_SpatialString);
+			ASSERT_RESOURCE_ALLOCATION("ELI41616", ipSubString != __nullptr);
+			ipSubString->CreatePseudoSpatialString(ipZone, strSubString.c_str(),
+				m_strSourceDocName.c_str(), m_ipPageInfoMap);
+
+			ipReturn->Append(ipSubString);
+		}
+
+		if (bAddedPadding)
+		{
+			UCLIDException ue("ELI41617",
+				"Application trace: String value was padded during conversion from hybrid to pseudo-spatial");
+			ue.addDebugInfo("SourceDocName", m_strSourceDocName);
+			ue.log();
+		}
+
+		// Append the non-spatial suffix if necessary
+		if (!strSuffix.empty())
+		{
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipSuffix(CLSID_SpatialString);
+			ASSERT_RESOURCE_ALLOCATION("ELI41623", ipSuffix != __nullptr);
+
+			ipSuffix->CreateNonSpatialString(strSuffix.c_str(), m_strSourceDocName.c_str());
+			ipReturn->Append(ipSuffix);
+
+			if (strSuffix.find_first_not_of("\r\n") != string::npos)
+			{
+				UCLIDException ue("ELI41624",
+					"Application trace: Value substring was added without spatial information "
+					"during conversion from hybrid to pseudo-spatial");
+				ue.addDebugInfo("SourceDocName", m_strSourceDocName);
+				ue.log();
+			}
+		}
+
+		// Set the return value and return
+		*ppResultString = (ISpatialString*)ipReturn.Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41618");
+}
