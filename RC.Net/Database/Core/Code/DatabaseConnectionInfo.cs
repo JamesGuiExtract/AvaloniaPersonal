@@ -663,6 +663,12 @@ namespace Extract.Database
                         _localDatabaseCopyManager.Value.Dereference((string)_activeSqlCeDb, this);
                         _activeSqlCeDb = null;
                     }
+
+                    if (_localDatabaseCopyManager != null)
+                    {
+                        _localDatabaseCopyManager.Dispose();
+                        _localDatabaseCopyManager = null;
+                    }
                 }
                 catch { }
             }

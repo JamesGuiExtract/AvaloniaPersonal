@@ -435,8 +435,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_documentDataPanel != null)
                         {
                             _documentDataPanel.PageLoadRequest += HandleDocumentDataPanel_PageLoadRequest;
+                        }
                     }
-                }
                 }
                 catch (Exception ex)
                 {

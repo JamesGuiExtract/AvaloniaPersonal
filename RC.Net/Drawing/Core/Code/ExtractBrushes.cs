@@ -2,7 +2,7 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
+using System.Threading;
 
 namespace Extract.Drawing
 {
@@ -16,12 +16,9 @@ namespace Extract.Drawing
         /// <summary>
         /// The cached collection of <see cref="SolidBrush"/> objects.
         /// </summary>
-        static Dictionary<Color, SolidBrush> _solidBrushes = new Dictionary<Color, SolidBrush>();
-
-        /// <summary>
-        /// Mutex used to protect read/write access to the dictionary.
-        /// </summary>
-        static object _lock = new object();
+        static ThreadLocal<Dictionary<Color, SolidBrush>> _solidBrushes =
+            new ThreadLocal<Dictionary<Color, SolidBrush>>(() =>
+                new Dictionary<Color, SolidBrush>());
 
         #endregion Fields
 
@@ -38,13 +35,10 @@ namespace Extract.Drawing
             try
             {
                 SolidBrush brush;
-                lock (_lock)
+                if (!_solidBrushes.Value.TryGetValue(color, out brush))
                 {
-                    if (!_solidBrushes.TryGetValue(color, out brush))
-                    {
-                        brush = new SolidBrush(color);
-                        _solidBrushes.Add(color, brush);
-                    }
+                    brush = new SolidBrush(color);
+                    _solidBrushes.Value.Add(color, brush);
                 }
 
                 return brush;
@@ -52,24 +46,6 @@ namespace Extract.Drawing
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI27977", ex);
-            }
-        }
-
-        /// <summary>
-        /// Disposes of all cached <see cref="Brush"/> objects and clears out the collection.
-        /// </summary>
-        public static void ClearAndDisposeAllBrushes()
-        {
-            try
-            {
-                lock (_lock)
-                {
-                    CollectionMethods.ClearAndDispose(_solidBrushes);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI27978", ex);
             }
         }
 

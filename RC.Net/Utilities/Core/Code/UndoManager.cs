@@ -381,7 +381,9 @@ namespace Extract.Utilities
         {
             get
             {
-                return (_undoStack.Count > 0);
+                return (_undoStack.Count > 0 ||
+                        _currentOperation.Any(memento =>
+                            memento.Significance == UndoMementoSignificance.Substantial));
             }
         }
 
@@ -501,7 +503,15 @@ namespace Extract.Utilities
                     {
                         if (!_currentOperation.Any(m => m.Supersedes(memento)))
                         {
+                            bool undoPreviouslyAvaliable = UndoOperationAvailable;
+
                             _currentOperation.Push(memento);
+
+                            if (memento.Significance == UndoMementoSignificance.Substantial &&
+                                undoPreviouslyAvaliable != UndoOperationAvailable)
+                            {
+                                OnUndoAvailabilityChanged();
+                            }
 
                             return;
                         }
@@ -830,10 +840,13 @@ namespace Extract.Utilities
                     RedoStack = new Stack<Stack<IUndoMemento>>(_redoStack.Reverse())
                 };
 
-                // Make a copy of the _currentOperation so that further changes don't get reflected
-                // in the returned state.
-                var currentOperation = new Stack<IUndoMemento>(_currentOperation.Reverse());
-                PushOperation(currentOperation, state.UndoStack);
+                // Make a copy of the _currentOperation (at least, as long is it contains substantial changes)
+                // so that further changes don't get reflected in the returned state.
+                if (_currentOperation.Any(memento => memento.Significance == UndoMementoSignificance.Substantial))
+                {
+                    var currentOperation = new Stack<IUndoMemento>(_currentOperation.Reverse());
+                    PushOperation(currentOperation, state.UndoStack);
+                }
 
                 foreach (var operation in state.UndoStack.Concat(state.RedoStack))
                 {

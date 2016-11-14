@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Threading;
 
 namespace Extract.Drawing
 {
@@ -16,58 +17,53 @@ namespace Extract.Drawing
         /// <summary>
         /// A collection of pens, keyed by color.
         /// </summary>
-        static readonly Dictionary<Color, Pen> _pens = new Dictionary<Color, Pen>();
+        static ThreadLocal<Dictionary<Color, Pen>> _pens =
+            new ThreadLocal<Dictionary<Color, Pen>>(() =>
+                new Dictionary<Color, Pen>());
 
         /// <summary>
         /// A collection of thick pens, keyed by color.
         /// </summary>
-        static readonly Dictionary<Color, Pen> _thickPens = new Dictionary<Color, Pen>();
+        static readonly ThreadLocal<Dictionary<Color, Pen>> _thickPens =
+            new ThreadLocal<Dictionary<Color, Pen>>(() =>
+                new Dictionary<Color, Pen>());
 
         /// <summary>
         /// A collection of GDI pens, keyed by color and width.
         /// </summary>
-        static readonly Dictionary<KeyValuePair<Color, int>, GdiPen> _gdiPens =
-            new Dictionary<KeyValuePair<Color, int>, GdiPen>();
+        static readonly ThreadLocal<Dictionary<KeyValuePair<Color, int>, GdiPen>> _gdiPens =
+            new ThreadLocal<Dictionary<KeyValuePair<Color, int>, GdiPen>>(() =>
+                new Dictionary<KeyValuePair<Color, int>, GdiPen>());
 
         /// <summary>
         /// A collection of thick dashed pens, keyed by color.
         /// </summary>
-        static readonly Dictionary<Color, Pen> _thickDashedPens = new Dictionary<Color, Pen>();
+        static readonly ThreadLocal<Dictionary<Color, Pen>> _thickDashedPens = 
+            new ThreadLocal<Dictionary<Color, Pen>>(() =>
+                new Dictionary<Color, Pen>());
 
         /// <summary>
         /// A pen that draws a dashed black line.
         /// </summary>
-        static Pen _dashedBlack;
+        static ThreadLocal<Pen> _dashedBlack =
+            new ThreadLocal<Pen>(() =>
+            {
+                var pen = new Pen(Color.Black, 1);
+                pen.DashStyle = DashStyle.Dash;
+                return pen;
+            });
+                
 
         /// <summary>
         /// A pen that draws a dotted black line.
         /// </summary>
-        static Pen _dottedBlack;
-
-        /// <summary>
-        /// Mutex object to provide exclusive access to the dashed and dotted pens
-        /// </summary>
-        static readonly object _lockDashedAndDotted = new object();
-
-        /// <summary>
-        /// Mutex object to provide exclusive access to the pens collections
-        /// </summary>
-        static readonly object _lockPens = new object();
-
-        /// <summary>
-        /// Mutex object to provide exclusive access to the thick pens collections
-        /// </summary>
-        static readonly object _lockThick = new object();
-
-        /// <summary>
-        /// Mutex object to provide exclusive access to the GDI pens collections
-        /// </summary>
-        static readonly object _lockGdi = new object();
-
-        /// <summary>
-        /// Mutex object to provide exclusive access to the thick dashed pens collections
-        /// </summary>
-        static readonly object _lockThickDashed = new object();
+        static ThreadLocal<Pen> _dottedBlack =
+            new ThreadLocal<Pen>(() =>
+            {
+                var pen = new Pen(Color.Black, 1);
+                pen.DashStyle = DashStyle.Dot;
+                return pen;
+            });
 
         /// <summary>
         /// The width of thick pens.
@@ -86,19 +82,7 @@ namespace Extract.Drawing
         {
             get
             {
-                if (_dashedBlack == null)
-                {
-                    lock (_lockDashedAndDotted)
-                    {
-                        if (_dashedBlack == null)
-                        {
-                            _dashedBlack = new Pen(Color.Black, 1);
-                            _dashedBlack.DashStyle = DashStyle.Dash;
-                        }
-                    }
-                }
-
-                return _dashedBlack;
+                return _dashedBlack.Value;
             }
         }
 
@@ -110,19 +94,7 @@ namespace Extract.Drawing
         {
             get
             {
-                if (_dottedBlack == null)
-                {
-                    lock (_lockDashedAndDotted)
-                    {
-                        if (_dottedBlack == null)
-                        {
-                            _dottedBlack = new Pen(Color.Black, 1);
-                            _dottedBlack.DashStyle = DashStyle.Dot;
-                        }
-                    }
-                }
-
-                return _dottedBlack;
+                return _dottedBlack.Value;
             }
         }
 
@@ -135,17 +107,11 @@ namespace Extract.Drawing
         {
             try
             {
-                // Mutex around collection to prevent multiple reads and writes
-                Pen pen;
-                lock (_lockPens)
+                Pen pen = null;
+                if (!_pens.Value.TryGetValue(color, out pen))
                 {
-                    // Check if the pen has already been created
-                    if (!_pens.TryGetValue(color, out pen))
-                    {
-                        // Create the pen
-                        pen = new Pen(color);
-                        _pens.Add(color, pen);
-                    }
+                    pen = new Pen(color);
+                    _pens.Value.Add(color, pen);
                 }
 
                 return pen;
@@ -165,17 +131,11 @@ namespace Extract.Drawing
         {
             try
             {
-                // Mutex around collection to prevent multiple reads and writes
-                Pen thickPen;
-                lock (_lockThick)
+                Pen thickPen = null;
+                if (!_thickPens.Value.TryGetValue(color, out thickPen))
                 {
-                    // Check if the pen has already been created
-                    if (!_thickPens.TryGetValue(color, out thickPen))
-                    {
-                        // Create the pen
-                        thickPen = new Pen(color, ThickPenWidth);
-                        _thickPens.Add(color, thickPen);
-                    }
+                    thickPen = new Pen(color, ThickPenWidth);
+                    _thickPens.Value.Add(color, thickPen);
                 }
 
                 return thickPen;
@@ -196,20 +156,12 @@ namespace Extract.Drawing
         {
             try
             {
-                // Mutex around collection to prevent multiple reads and writes
-                GdiPen gdiPen;
-                lock (_lockGdi)
+                GdiPen gdiPen = null;
+                var key = new KeyValuePair<Color, int>(color, width);
+                if (!_gdiPens.Value.TryGetValue(key, out gdiPen))
                 {
-                    // The key for the _gdiPens dictionary is a combination of color and width.
-                    var key = new KeyValuePair<Color, int>(color, width);
-
-                    // Check if the pen has already been created
-                    if (!_gdiPens.TryGetValue(key, out gdiPen))
-                    {
-                        // Create the pen
-                        gdiPen = new GdiPen(color, width);
-                        _gdiPens.Add(key, gdiPen);
-                    }
+                    gdiPen = new GdiPen(color, width);
+                    _gdiPens.Value.Add(key, gdiPen);
                 }
 
                 return gdiPen;
@@ -246,18 +198,12 @@ namespace Extract.Drawing
         {
             try
             {
-                // Mutex around collection to prevent multiple reads and writes
-                Pen dashedPen;
-                lock (_lockThickDashed)
+                Pen dashedPen = null;
+                if (!_thickDashedPens.Value.TryGetValue(color, out dashedPen))
                 {
-                    // Check if the pen has already been created
-                    if (!_thickDashedPens.TryGetValue(color, out dashedPen))
-                    {
-                        // Create the pen
-                        dashedPen = new Pen(color, 2);
-                        dashedPen.DashStyle = DashStyle.Dash;
-                        _thickDashedPens.Add(color, dashedPen);
-                    }
+                    dashedPen = new Pen(color, 2);
+                    dashedPen.DashStyle = DashStyle.Dash;
+                    _thickDashedPens.Value.Add(color, dashedPen);
                 }
 
                 return dashedPen;
@@ -265,48 +211,6 @@ namespace Extract.Drawing
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28972", ex);
-            }
-        }
-
-        /// <summary>
-        /// Disposes of all cached pen objects and clears out the collections.
-        /// </summary>
-        public static void ClearAndDisposeAllPens()
-        {
-            try
-            {
-                lock (_lockDashedAndDotted)
-                {
-                    if (_dashedBlack != null)
-                    {
-                        _dashedBlack.Dispose();
-                        _dashedBlack = null;
-                    }
-                    if (_dottedBlack != null)
-                    {
-                        _dottedBlack.Dispose();
-                        _dottedBlack = null;
-                    }
-                }
-
-                lock (_lockThick)
-                {
-                    CollectionMethods.ClearAndDispose(_thickPens);
-                }
-
-                lock (_lockThickDashed)
-                {
-                    CollectionMethods.ClearAndDispose(_thickDashedPens);
-                }
-
-                lock (_lockPens)
-                {
-                    CollectionMethods.ClearAndDispose(_pens);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI27859", ex);
             }
         }
 
