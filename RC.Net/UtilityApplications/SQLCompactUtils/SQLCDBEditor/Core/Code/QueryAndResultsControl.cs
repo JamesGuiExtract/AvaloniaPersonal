@@ -14,6 +14,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using static System.FormattableString;
 
 namespace Extract.SQLCDBEditor
 {
@@ -2123,7 +2124,7 @@ namespace Extract.SQLCDBEditor
             DbProviderFactory providerFactory = DBMethods.GetDBProvider(connection);
             _adapter = providerFactory.CreateDataAdapter();
             _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection, 
-                "SELECT * FROM " + tableName, null);
+                Invariant($"SELECT * FROM [{tableName}]"), null);
 
             // Create a command builder for the adapter that allow edits made in the _resultsGrid
             // to be applied back to the database.
