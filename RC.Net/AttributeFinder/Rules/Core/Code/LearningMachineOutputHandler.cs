@@ -175,7 +175,12 @@ namespace Extract.AttributeFinder.Rules
                 }
                 IUnknownVector result = LearningMachine.ComputeAnswer(_expandedPath,
                     pDoc.Text, pAttributes, PreserveInputAttributes);
-                pAttributes.CopyFrom(result);
+
+                // Copy result contents unless the result is the same vector that was passed in
+                if (result != pAttributes)
+                {
+                    pAttributes.CopyFrom(result);
+                }
             }
             catch (Exception ex)
             {
