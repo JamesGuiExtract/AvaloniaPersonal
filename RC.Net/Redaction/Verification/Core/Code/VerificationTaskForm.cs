@@ -4328,6 +4328,15 @@ namespace Extract.Redaction.Verification
             throw new ExtractException("ELI37503", "Method not implemented.");
         }
 
+        /// <summary>
+        /// Executes disposal of any thread-local or thread-static objects just prior to the UI
+        /// thread closing.
+        /// </summary>
+        public void DisposeThread()
+        {
+            // Nothing to do
+        }
+
         #endregion IVerificationForm Members
 
         #region IMessageFilter Members

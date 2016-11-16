@@ -517,6 +517,8 @@ namespace Extract.DataEntry.LabDE
         {
             if (disposing)
             {
+                AttributeStatusInfo.DataReset -= HandleAttributeStatusInfo_DataReset;
+
                 if (_rowData != null)
                 {
                     CollectionMethods.ClearAndDispose(_rowData);

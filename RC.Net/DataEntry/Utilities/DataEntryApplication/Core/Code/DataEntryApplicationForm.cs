@@ -399,6 +399,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         bool _paginating;
 
+        /// <summary>
+        /// Indicates whether AttributeStatusInfo.DisposeThread is pending.
+        /// </summary>
+        bool _disposeThreadPending;
+
         #endregion Fields
 
         #region Constructors
@@ -1691,6 +1696,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         _exitToolStripMenuItem.Dispose();
                         _exitToolStripMenuItem = null;
+                    }
+                    if (_disposeThreadPending)
+                    {
+                        AttributeStatusInfo.DisposeThread();
+                        _disposeThreadPending = false;
                     }
                 }
                 catch { }
@@ -3582,6 +3592,22 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI37500");
+            }
+        }
+
+        /// <summary>
+        /// Executes disposal of any thread-local or thread-static objects just prior to the UI
+        /// thread closing.
+        /// </summary>
+        public void DisposeThread()
+        {
+            if (IsDisposed)
+            {
+                AttributeStatusInfo.DisposeThread();
+            }
+            else
+            {
+                _disposeThreadPending = true;
             }
         }
 

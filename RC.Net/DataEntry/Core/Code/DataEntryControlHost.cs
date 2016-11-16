@@ -782,9 +782,8 @@ namespace Extract.DataEntry
                         graphics.DrawImage(SystemIcons.Warning.ToBitmap(), 0, 0, 16, 16);
                         using (Icon warningIcon = Icon.FromHandle(scaledBitmap.GetHicon()))
                         {
-                            // TODO: Handle the HIcon that is created here since it is a leaked GDI resource
-                            // http://realfiction.net/go/169 and
-                            // http://dotnetfacts.blogspot.com/2008/03/things-you-must-dispose.html
+                            // NOTE: This requires the icon to be explicitly destroyed via
+                            // NativeMethods.DestroyIcon to prevent GDI object leaks.
                             _validationWarningErrorProvider.Icon = warningIcon;
                         }
                     }
@@ -2933,6 +2932,7 @@ namespace Extract.DataEntry
                 {
                     if (_validationWarningErrorProvider.Icon != null)
                     {
+                        NativeMethods.DestroyIcon(_validationWarningErrorProvider.Icon);
                         _validationWarningErrorProvider.Icon.Dispose();
                     }
                     _validationWarningErrorProvider.Dispose();

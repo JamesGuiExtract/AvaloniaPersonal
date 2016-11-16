@@ -132,6 +132,21 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Executes disposal of any thread-local or thread-static objects just prior to the UI
+        /// thread closing.
+        /// </summary>
+        public void DisposeThread()
+        {
+            // Unregister all event handlers on this thread.
+            foreach (EventHandler<T> eventHandler in _eventHandlers.Value)
+            {
+                _threadEventHandler -= eventHandler;
+            }
+
+            _eventHandlers.Value.Clear();
+        }
+
         #endregion Methods
 
         #region Private Members

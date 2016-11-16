@@ -998,6 +998,12 @@ namespace Extract.Imaging.Forms
                             Deactivate(false);
                             _backgroundWorkerIdle.WaitOne(5000);
 
+                            // https://extract.atlassian.net/browse/ISSUE-14246
+                            // Without explicitly unregistering these events, _backgroundWorker
+                            // holds onto the image viewer and, in turn, potentially classes like
+                            // DataEntryControlHost via event handlers tied to the image viewer.
+                            _backgroundWorker.DoWork -= WorkerThread;
+                            _backgroundWorker.RunWorkerCompleted -= BackgroundWorkerCompleted;
                             _backgroundWorker.Dispose();
                             _backgroundWorker = null;
                         }

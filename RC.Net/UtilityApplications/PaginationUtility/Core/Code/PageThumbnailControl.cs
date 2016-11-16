@@ -412,6 +412,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                // Expensive refreshes of the entire form should only be performed if the page was
+                // changed.
+                bool imagePageChanged = false;
+
                 if (!PageLayoutControl.EnablePageDisplay)
                 {
                     return;
@@ -442,25 +446,30 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         if (Page.OriginalDocumentName != imageViewer.ImageFile)
                         {
+                            imagePageChanged = true;
+
                             imageViewer.OpenImage(Page.OriginalDocumentName, false, false);
                         }
-                        imageViewer.PageNumber = Page.OriginalPageNumber;
-
-                        // Set the image viewer orientation to be the same value as the control.
-                        // I can't figure out why it used to be the -Page.Orientation; when it was
-                        // that way a control with a 90 or 270 degree orientation would cause the
-                        // image to get flipped the second time it was selected (so that the image
-                        // displayed in the full-sized image viewer would not match the thumbnail)
-                        // https://extract.atlassian.net/browse/ISSUE-14208
-                        imageViewer.Orientation = Page.ImageOrientation;
-
-                        if (_activeImageViewer == null)
+                        if (imagePageChanged || imageViewer.PageNumber != Page.OriginalPageNumber)
                         {
-                            imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
-                            imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
-                            imageViewer.PageChanged += HandleImageViewer_PageChanged;
+                            imageViewer.PageNumber = Page.OriginalPageNumber;
 
-                            _activeImageViewer = imageViewer;
+                            // Set the image viewer orientation to be the same value as the control.
+                            // I can't figure out why it used to be the -Page.Orientation; when it was
+                            // that way a control with a 90 or 270 degree orientation would cause the
+                            // image to get flipped the second time it was selected (so that the image
+                            // displayed in the full-sized image viewer would not match the thumbnail)
+                            // https://extract.atlassian.net/browse/ISSUE-14208
+                            imageViewer.Orientation = Page.ImageOrientation;
+
+                            if (_activeImageViewer == null)
+                            {
+                                imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
+                                imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
+                                imageViewer.PageChanged += HandleImageViewer_PageChanged;
+
+                                _activeImageViewer = imageViewer;
+                            }
                         }
                     }
                     finally
@@ -471,7 +480,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
                     }
 
-                    ParentForm.Refresh();
+                    if (imagePageChanged)
+                    {
+                        ParentForm.Refresh();
+                    }
                 }
                 // Close the image if specified.
                 else if (!display && _activeImageViewer != null)

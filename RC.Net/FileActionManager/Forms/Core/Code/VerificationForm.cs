@@ -1421,6 +1421,7 @@ namespace Extract.FileActionManager.Forms
 
                     try
                     {
+                        MainForm.DisposeThread();
                         MainForm = null;
                     }
                     catch (Exception ex)

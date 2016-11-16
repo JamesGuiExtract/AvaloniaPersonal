@@ -152,5 +152,11 @@ namespace Extract.FileActionManager.Forms
         /// file to be re-displayed.
         /// </summary>
         void DelayFile();
+
+        /// <summary>
+        /// Executes disposal of any thread-local or thread-static objects just prior to the UI
+        /// thread closing.
+        /// </summary>
+        void DisposeThread();
     }
 }

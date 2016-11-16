@@ -726,6 +726,15 @@ namespace Extract.FileActionManager.FileProcessors
             throw new ExtractException("ELI37504", "Method not implmented.");
         }
 
+        /// <summary>
+        /// Executes disposal of any thread-local or thread-static objects just prior to the UI
+        /// thread closing.
+        /// </summary>
+        public void DisposeThread()
+        {
+            // Nothing to do
+        }
+
         #endregion IVerificationForm Members
 
         #region Private Members

@@ -193,19 +193,22 @@ namespace Extract.Database
             _columns = new List<ColumnInfo>();
 
             var query = String.Format(CultureInfo.InvariantCulture, "SELECT TOP (1) * FROM [{0}];", TableName);
-            DbCommand cmd = DBMethods.CreateDBCommand(connection, query, null);
-
-            var reader = cmd.ExecuteReader();
-            DataTable dt = reader.GetSchemaTable();
-            foreach (DataRow dr in dt.Rows)
+            using (DbCommand cmd = DBMethods.CreateDBCommand(connection, query, null))
             {
-                ColumnInfo ci = new ColumnInfo();
-                foreach (DataColumn dc in dt.Columns)
+                var reader = cmd.ExecuteReader();
+                using (DataTable dt = reader.GetSchemaTable())
                 {
-                    ci.Update(name: dc.ColumnName, value: dr[dc]);
-                }
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        ColumnInfo ci = new ColumnInfo();
+                        foreach (DataColumn dc in dt.Columns)
+                        {
+                            ci.Update(name: dc.ColumnName, value: dr[dc]);
+                        }
 
-                _columns.Add(ci);
+                        _columns.Add(ci);
+                    }
+                }
             }
         }
 

@@ -290,7 +290,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _sourceDocName = null;
 
                 ActiveDataEntryPanel.ClearData();
-
             }
             catch (Exception ex)
             {
@@ -634,6 +633,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         ex.ExtractLog("ELI41494");
                     }
+                }
+                finally
+                {
+                    AttributeStatusInfo.DisposeThread();
+
+                    // https://extract.atlassian.net/browse/ISSUE-14246
+                    // Without this call the Application.ThreadContext may hold references to
+                    // controls created in this thread not unlike the situation described here:
+                    // http://blogs.msmvps.com/senthil/2008/05/29/the-case-of-the-leaking-thread-handles/
+                    Application.ExitThread();
                 }
             }));
 

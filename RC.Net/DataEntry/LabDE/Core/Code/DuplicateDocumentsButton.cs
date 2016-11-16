@@ -673,6 +673,21 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing"><see langword="true" /> if managed resources should be disposed;
+        /// otherwise, <see langword="false" />.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                AttributeStatusInfo.DataReset -= HandleAttributeStatusInfo_DataReset;
+            }
+
+            base.Dispose(disposing);
+        }
+
         #endregion Overrides
 
         #region Event handlers

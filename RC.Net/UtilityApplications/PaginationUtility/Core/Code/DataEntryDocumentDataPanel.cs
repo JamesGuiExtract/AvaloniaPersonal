@@ -472,6 +472,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (disposing)
             {
+                // Unless unregistered, these events will hold referenced to this panel and prevent
+                // it from being finalized.
+                AttributeStatusInfo.UndoManager.UndoAvailabilityChanged -= HandleUndoManager_UndoAvailabilityChanged;
+                AttributeStatusInfo.UndoManager.RedoAvailabilityChanged -= HandleUndoManager_RedoAvailabilityChanged;
+
                 if (_summaryDataEntryQuery != null)
                 {
                     _summaryDataEntryQuery.Dispose();

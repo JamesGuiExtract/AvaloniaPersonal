@@ -3410,6 +3410,35 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Executes disposal of any thread-local or thread-static objects just prior to the UI
+        /// thread closing.
+        /// </summary>
+        public static void DisposeThread()
+        {
+            try
+            {
+                // Ensure all AttributeStatusInfos are released; these may otherwise hold references
+                // to objects thereby preventing them from being finalized.
+                ResetData(null, null, null);
+
+                // This unregisters event handlers that may otherwise hold references to objects
+                // thereby preventing them from being finalized.
+                _dataResetHandler.DisposeThread();
+                _queryCacheClearHandler.DisposeThread();
+                _attributeInitializedHandler.DisposeThread();
+                _viewedStateChangedHandler.DisposeThread();
+                _validationStateChangedHandler.DisposeThread();
+                _editEndedHandler.DisposeThread();
+                _queryDelayEndedHandler.DisposeThread();
+            }
+            catch (Exception ex)
+            {
+                // Exceptions should not be thrown during disposal.
+                ex.ExtractLog("ELI41626");
+            }
+        }
+
         #endregion Static Members
 
         #region Events

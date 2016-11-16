@@ -160,6 +160,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         ApplicationCommand _toggleShowAllHighlightsCommand;
 
+        /// <summary>
+        /// Indicates whether AttributeStatusInfo.DisposeThread is pending.
+        /// </summary>
+        bool _disposeThreadPending;
+
         #endregion Fields
 
         #region Events
@@ -700,6 +705,16 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _formStateManager.Dispose();
                     _formStateManager = null;
+                }
+                if (_paginationDocumentDataPanel?.PanelControl != null)
+                {
+                    _paginationDocumentDataPanel.PanelControl.Dispose();
+                    _paginationDocumentDataPanel = null;
+                }
+                if (_disposeThreadPending)
+                {
+                    AttributeStatusInfo.DisposeThread();
+                    _disposeThreadPending = false;
                 }
             }
 
@@ -1285,6 +1300,22 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40140");
+            }
+        }
+
+        /// <summary>
+        /// Executes disposal of any thread-local or thread-static objects just prior to the UI
+        /// thread closing.
+        /// </summary>
+        public void DisposeThread()
+        {
+            if (IsDisposed)
+            {
+                AttributeStatusInfo.DisposeThread();
+            }
+            else
+            {
+                _disposeThreadPending = true;
             }
         }
 

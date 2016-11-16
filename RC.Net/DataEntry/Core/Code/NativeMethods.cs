@@ -24,6 +24,15 @@ namespace Extract.DataEntry
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         private static extern IntPtr GetParent(IntPtr hWnd);
 
+        /// <summary>
+        /// Destroys an icon and frees any memory the icon occupied.
+        /// </summary>
+        /// <param name="handle">A handle to the icon to be destroyed. The icon must not be in use.</param>
+        /// <returns></returns>
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        extern static bool DestroyIcon(IntPtr handle);
+
         #endregion P/Invoke statements
 
         #region Methods
@@ -46,6 +55,22 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI26075", ex);
+            }
+        }
+
+        /// <summary>
+        /// Destroys an icon and frees any memory the icon occupied.
+        /// </summary>
+        /// <param name="icon">The icon to be destroyed. The icon must not be in use.</param>
+        public static void DestroyIcon(Icon icon)
+        {
+            try
+            {
+                DestroyIcon(icon.Handle);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41627");
             }
         }
 
