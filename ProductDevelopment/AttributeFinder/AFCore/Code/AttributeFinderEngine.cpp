@@ -78,11 +78,8 @@ CAttributeFinderEngine::CAttributeFinderEngine()
 		CRuleSetProfiler::ms_bEnabled = isProfilingEnabled();
 
 		// Use the RuleExecutionEnv to find any FKB version that should be used to resolve the path.
-		if (m_ipRuleExecutionEnv == __nullptr)
-		{
-			m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
-			ASSERT_RESOURCE_ALLOCATION("ELI32474", m_ipRuleExecutionEnv != __nullptr);
-		}
+		m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
+		ASSERT_RESOURCE_ALLOCATION("ELI32474", m_ipRuleExecutionEnv != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13441")
 }
