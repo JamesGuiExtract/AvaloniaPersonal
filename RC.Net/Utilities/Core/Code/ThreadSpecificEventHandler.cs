@@ -138,13 +138,20 @@ namespace Extract.Utilities
         /// </summary>
         public void DisposeThread()
         {
-            // Unregister all event handlers on this thread.
-            foreach (EventHandler<T> eventHandler in _eventHandlers.Value)
+            try
             {
-                _threadEventHandler -= eventHandler;
-            }
+                // Unregister all event handlers on this thread.
+                foreach (EventHandler<T> eventHandler in _eventHandlers.Value)
+                {
+                    _threadEventHandler -= eventHandler;
+                }
 
-            _eventHandlers.Value.Clear();
+                _eventHandlers.Value.Clear();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI41628");
+            }
         }
 
         #endregion Methods

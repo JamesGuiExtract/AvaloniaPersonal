@@ -450,9 +450,15 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                             imageViewer.OpenImage(Page.OriginalDocumentName, false, false);
                         }
-                        if (imagePageChanged || imageViewer.PageNumber != Page.OriginalPageNumber)
+                        if (imageViewer.PageNumber != Page.OriginalPageNumber)
                         {
+                            imagePageChanged = true;
+
                             imageViewer.PageNumber = Page.OriginalPageNumber;
+                        }
+                        if (imageViewer.Orientation != Page.ImageOrientation)
+                        {
+                            imagePageChanged = true;
 
                             // Set the image viewer orientation to be the same value as the control.
                             // I can't figure out why it used to be the -Page.Orientation; when it was
@@ -461,15 +467,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                             // displayed in the full-sized image viewer would not match the thumbnail)
                             // https://extract.atlassian.net/browse/ISSUE-14208
                             imageViewer.Orientation = Page.ImageOrientation;
+                        }
 
-                            if (_activeImageViewer == null)
-                            {
-                                imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
-                                imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
-                                imageViewer.PageChanged += HandleImageViewer_PageChanged;
+                        if (_activeImageViewer == null)
+                        {
+                            imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
+                            imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
+                            imageViewer.PageChanged += HandleImageViewer_PageChanged;
 
-                                _activeImageViewer = imageViewer;
-                            }
+                            _activeImageViewer = imageViewer;
                         }
                     }
                     finally
