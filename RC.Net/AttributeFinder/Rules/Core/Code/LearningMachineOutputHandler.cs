@@ -173,14 +173,7 @@ namespace Extract.AttributeFinder.Rules
                     var pathTags = new AttributeFinderPathTags(pDoc);
                     _expandedPath = pathTags.Expand(SavedMachinePath);
                 }
-                IUnknownVector result = LearningMachine.ComputeAnswer(_expandedPath,
-                    pDoc.Text, pAttributes, PreserveInputAttributes);
-
-                // Copy result contents unless the result is the same vector that was passed in
-                if (result != pAttributes)
-                {
-                    pAttributes.CopyFrom(result);
-                }
+                LearningMachine.ComputeAnswer(_expandedPath, pDoc.Text, pAttributes, PreserveInputAttributes);
             }
             catch (Exception ex)
             {

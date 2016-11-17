@@ -214,7 +214,9 @@ namespace Extract.AttributeFinder.Test
             {
                 var uss = new SpatialStringClass();
                 uss.LoadFrom(ussFiles[i], false);
-                Assert.AreEqual(answers[i], ((ComAttribute)lm.ComputeAnswer(uss, null, false).At(0)).Value.String);
+                var voa = new IUnknownVectorClass();
+                lm.ComputeAnswer(uss, voa, false);
+                Assert.AreEqual(answers[i], ((ComAttribute)voa.At(0)).Value.String);
             }
 
             // Test preserving input (no input)
@@ -223,7 +225,9 @@ namespace Extract.AttributeFinder.Test
             {
                 var uss = new SpatialStringClass();
                 uss.LoadFrom(ussFiles[i], false);
-                Assert.AreEqual(answers[i], ((ComAttribute)lm.ComputeAnswer(uss, null, true).At(0)).Value.String);
+                var voa = new IUnknownVectorClass();
+                lm.ComputeAnswer(uss, voa, true);
+                Assert.AreEqual(answers[i], ((ComAttribute)voa.At(0)).Value.String);
             }
 
             // Test preserving input (with input)
@@ -235,7 +239,9 @@ namespace Extract.AttributeFinder.Test
                 uss.LoadFrom(ussFiles[i], false);
                 var voa = new IUnknownVectorClass();
                 voa.LoadFrom(voaFiles[i], false);
-                Assert.Less(voa.Size(), lm.ComputeAnswer(uss, voa, true).Size());
+                var previousSize = voa.Size();
+                lm.ComputeAnswer(uss, voa, true);
+                Assert.Less(previousSize, voa.Size());
             }
 
             // Test not preserving input (with input)
@@ -247,7 +253,8 @@ namespace Extract.AttributeFinder.Test
                 uss.LoadFrom(ussFiles[i], false);
                 var voa = new IUnknownVectorClass();
                 voa.LoadFrom(voaFiles[i], false);
-                Assert.AreEqual(1, lm.ComputeAnswer(uss, voa, false).Size());
+                lm.ComputeAnswer(uss, voa, false);
+                Assert.AreEqual(1, voa.Size());
             }
         }
 
@@ -490,12 +497,13 @@ namespace Extract.AttributeFinder.Test
                 var voa = new IUnknownVectorClass();
                 voa.LoadFrom(voaFiles[i], false);
                 originalInputAttributes.AddRange(voa.ToIEnumerable<ComAttribute>());
-                var fakeExpectedData = lm.ComputeAnswer(uss, voa, true);
-                computedAttributesPreservedInput.AddRange(fakeExpectedData.ToIEnumerable<ComAttribute>());
-                fakeExpectedData = lm.ComputeAnswer(uss, voa, false);
-                computedAttributesNoPreservedInput.AddRange(fakeExpectedData.ToIEnumerable<ComAttribute>());
+                lm.ComputeAnswer(uss, voa, true);
+                computedAttributesPreservedInput.AddRange(voa.ToIEnumerable<ComAttribute>());
+                voa.LoadFrom(voaFiles[i], false);
+                lm.ComputeAnswer(uss, voa, false);
+                computedAttributesNoPreservedInput.AddRange(voa.ToIEnumerable<ComAttribute>());
                 var fileName = Path.ChangeExtension(eavFiles[i], "fake.voa");
-                fakeExpectedData.SaveTo(fileName, false, typeof(AttributeStorageManagerClass).GUID.ToString("B"));
+                voa.SaveTo(fileName, false, typeof(AttributeStorageManagerClass).GUID.ToString("B"));
                 evoaFiles[i] = fileName;
             }
             var results = lm.Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, evoaFiles);
@@ -726,7 +734,9 @@ namespace Extract.AttributeFinder.Test
             {
                 var uss = new SpatialStringClass();
                 uss.LoadFrom(ussFiles[i], false);
-                Assert.AreEqual(answers[i], ((ComAttribute)lm2.ComputeAnswer(uss, null, false).At(0)).Value.String);
+                var voa = new IUnknownVectorClass();
+                lm2.ComputeAnswer(uss, voa, false);
+                Assert.AreEqual(answers[i], ((ComAttribute)voa.At(0)).Value.String);
             }
         }
 
@@ -766,7 +776,9 @@ namespace Extract.AttributeFinder.Test
             {
                 var uss = new SpatialStringClass();
                 uss.LoadFrom(ussFiles[i], false);
-                Assert.AreEqual(answers[i], ((ComAttribute)lm2.ComputeAnswer(uss, null, false).At(0)).Value.String);
+                var voa = new IUnknownVectorClass();
+                lm2.ComputeAnswer(uss, voa, false);
+                Assert.AreEqual(answers[i], ((ComAttribute)voa.At(0)).Value.String);
             }
         }
 
@@ -1044,7 +1056,7 @@ namespace Extract.AttributeFinder.Test
         [Test, Category("LearningMachine")]
         public static void TestLoading10_4Machine()
         {
-            var path = _testFiles.GetFile("Resources.LearningMachine.Pagination.10.4.lm");
+            var path = _testFiles.GetFile("Resources.LearningMachine.10.4.lm");
             Assert.DoesNotThrow(() => LearningMachine.Load(path));
         }
 
@@ -1053,7 +1065,7 @@ namespace Extract.AttributeFinder.Test
         [Test, Category("LearningMachine")]
         public static void TestSavingCompressedMachine()
         {
-            var path = _testFiles.GetFile("Resources.LearningMachine.Pagination.10.4.lm");
+            var path = _testFiles.GetFile("Resources.LearningMachine.10.4.lm");
             long uncompressedSize = new FileInfo(path).Length;
             LearningMachine.Load(path).Save(path);
             long compressedSize = new FileInfo(path).Length;

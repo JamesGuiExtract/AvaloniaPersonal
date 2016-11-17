@@ -80,6 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestLearningMachineOutputHandler.cs" />
     <Compile Include="TestLocateImageRegion.cs" />
     <Compile Include="TestLearningMachine.cs" />
     <Compile Include="TestLearningMachineDataEncoder.cs" />
@@ -107,6 +108,10 @@
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj">
+      <Project>{52C53912-5790-4F68-AB57-6CBC3EF45A14}</Project>
+      <Name>Extract.AttributeFinder.Rules</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Code\Extract.AttributeFinder.csproj">
       <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
@@ -280,7 +285,10 @@
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.candidates.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.candidates.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.candidates.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\10.4.lm" />
+    <EmbeddedResource Include="Resources\LearningMachine\10.4.lm" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocClassifier.lm" />
+    <EmbeddedResource Include="Resources\LearningMachine\AttributeClassifier.lm" />
+    <EmbeddedResource Include="Resources\LearningMachine\Paginator.lm" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif" />

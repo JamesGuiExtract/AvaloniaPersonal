@@ -418,27 +418,23 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Computes an answer for the input data
+        /// Computes an answer for the input data. Modifies <see paramref="attributeVector"/> with the answer
         /// </summary>
         /// <remarks>If <see paramref="preserveInputAttributes"/>=<see langword="true"/> and
         /// <see cref="Usage"/>=<see cref="LearningMachineUsage.Pagination"/> then the input Page <see cref="ComAttribute"/>s will be
-        /// returned as subattributes of the resulting Document <see cref="ComAttribute"/>s.</remarks>
+        /// moved to be subattributes of the resulting Document <see cref="ComAttribute"/>s.</remarks>
         /// <param name="document">The <see cref="SpatialString"/> used for encoding auto-BoW features</param>
-        /// <param name="protoFeaturesOrGroupsOfProtoFeatures">The VOA used for encoding attribute features</param>
+        /// <param name="attributeVector">The VOA used for encoding attribute features</param>
         /// <param name="preserveInputAttributes">Whether to preserve the input <see cref="ComAttribute"/>s or not.</param>
-        /// <returns>A VOA representation of the computed answer</returns>
-        public IUnknownVector ComputeAnswer(SpatialString document, IUnknownVector protoFeaturesOrGroupsOfProtoFeatures, bool preserveInputAttributes)
+        public void ComputeAnswer(SpatialString document, IUnknownVector attributeVector, bool preserveInputAttributes)
         {
             try
             {
                 ExtractException.Assert("ELI39762", "Machine has not been trained", IsTrained);
 
-                if (preserveInputAttributes && protoFeaturesOrGroupsOfProtoFeatures == null)
-                {
-                    protoFeaturesOrGroupsOfProtoFeatures = new IUnknownVectorClass();
-                }
+                ExtractException.Assert("ELI41629", "Attribute vector cannot be null", attributeVector != null);
 
-                IEnumerable<double[]> inputs = Encoder.GetFeatureVectors(document, protoFeaturesOrGroupsOfProtoFeatures);
+                IEnumerable<double[]> inputs = Encoder.GetFeatureVectors(document, attributeVector);
                 IEnumerable<Tuple<int, double?>> outputs = inputs.Select(Classifier.ComputeAnswer);
                 if (Usage == LearningMachineUsage.DocumentCategorization)
                 {
@@ -457,14 +453,13 @@ namespace Extract.AttributeFinder
                             ss.CreateNonSpatialString(category, document.SourceDocName);
                             return new ComAttribute { Name = "DocumentType", Value = ss };
                         });
-                    if (preserveInputAttributes)
+                    if (!preserveInputAttributes)
                     {
-                        return protoFeaturesOrGroupsOfProtoFeatures.ToIEnumerable<ComAttribute>()
-                            .Concat(categories).ToIUnknownVector();
+                        attributeVector.Clear();
                     }
-                    else
+                    foreach (var attr in categories)
                     {
-                        return categories.ToIUnknownVector();
+                        attributeVector.PushBack(attr);
                     }
                 }
                 else if (Usage == LearningMachineUsage.Pagination)
@@ -474,7 +469,7 @@ namespace Extract.AttributeFinder
                     if (preserveInputAttributes)
                     {
                         inputPageAttributes = new List<ComAttribute>();
-                        foreach (var attribute in protoFeaturesOrGroupsOfProtoFeatures.ToIEnumerable<ComAttribute>())
+                        foreach (var attribute in attributeVector.ToIEnumerable<ComAttribute>())
                         {
                             if (attribute.Name.Equals(LearningMachineDataEncoder.PageAttributeName, StringComparison.OrdinalIgnoreCase))
                             {
@@ -499,13 +494,17 @@ namespace Extract.AttributeFinder
                         numberOfPages, isFirstPage, document, inputPageAttributes);
                     resultingAttributes.AddRange(paginationAttributes);
 
-                    return resultingAttributes.ToIUnknownVector();
+                    attributeVector.Clear();
+                    foreach (var attr in resultingAttributes)
+                    {
+                        attributeVector.PushBack(attr);
+                    }
                 }
                 else if (Usage == LearningMachineUsage.AttributeCategorization)
                 {
                     var attributeCreator = new AttributeCreator(document.SourceDocName);
                     foreach(Tuple<ComAttribute, Tuple<int, double?>> attrAndAnswer in
-                        protoFeaturesOrGroupsOfProtoFeatures.ToIEnumerable<ComAttribute>()
+                        attributeVector.ToIEnumerable<ComAttribute>()
                         .Zip(outputs, Tuple.Create))
                     {
                         var attribute = attrAndAnswer.Item1;
@@ -518,8 +517,6 @@ namespace Extract.AttributeFinder
                         attribute.SubAttributes.PushBack(
                             attributeCreator.Create(LearningMachineDataEncoder.CategoryAttributeName, category));
                     }
-
-                    return protoFeaturesOrGroupsOfProtoFeatures;
                 }
                 else
                 {
@@ -1182,11 +1179,11 @@ namespace Extract.AttributeFinder
         /// returned as subattributes of the resulting Document <see cref="ComAttribute"/>s.</remarks>
         /// <param name="learningMachinePath">Path to saved <see cref="LearningMachine"/></param>
         /// <param name="document">The <see cref="SpatialString"/> used for encoding auto-BoW features</param>
-        /// <param name="protoFeaturesOrGroupsOfProtoFeatures">The VOA used for encoding attribute features</param>
+        /// <param name="attributeVector">The VOA used for encoding attribute features</param>
         /// <param name="preserveInputAttributes">Whether to preserve the input <see cref="ComAttribute"/>s or not.</param>
         /// <returns>A VOA representation of the computed answer</returns>
-        public static IUnknownVector ComputeAnswer(string learningMachinePath, SpatialString document,
-            IUnknownVector protoFeaturesOrGroupsOfProtoFeatures, bool preserveInputAttributes)
+        public static void ComputeAnswer(string learningMachinePath, SpatialString document,
+            IUnknownVector attributeVector, bool preserveInputAttributes)
         {
             try
             {
@@ -1202,7 +1199,7 @@ namespace Extract.AttributeFinder
                     cache.Set(fullPath, machine, policy);
                 }
 
-                return machine.ComputeAnswer(document, protoFeaturesOrGroupsOfProtoFeatures, preserveInputAttributes);
+                machine.ComputeAnswer(document, attributeVector, preserveInputAttributes);
             }
             catch (Exception e)
             {
