@@ -274,18 +274,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._documentTypePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._documentTypePanel.BackColor = System.Drawing.Color.LightSteelBlue;
+            this._documentTypePanel.BackColor = System.Drawing.SystemColors.Info;
             this._documentTypePanel.Controls.Add(this._documentTypeLabel);
             this._documentTypePanel.Controls.Add(this._documentTypeComboBox);
-            this._documentTypePanel.Location = new System.Drawing.Point(-3, -3);
+            this._documentTypePanel.Location = new System.Drawing.Point(0, 0);
             this._documentTypePanel.Name = "_documentTypePanel";
-            this._documentTypePanel.Size = new System.Drawing.Size(182, 40);
+            this._documentTypePanel.Size = new System.Drawing.Size(182, 27);
             this._documentTypePanel.TabIndex = 0;
+            this._documentTypePanel.Visible = false;
             // 
             // _documentTypeLabel
             // 
             this._documentTypeLabel.AutoSize = true;
-            this._documentTypeLabel.Location = new System.Drawing.Point(3, 13);
+            this._documentTypeLabel.Location = new System.Drawing.Point(3, 6);
             this._documentTypeLabel.Name = "_documentTypeLabel";
             this._documentTypeLabel.Size = new System.Drawing.Size(83, 13);
             this._documentTypeLabel.TabIndex = 0;
@@ -297,7 +298,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             | System.Windows.Forms.AnchorStyles.Right)));
             this._documentTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._documentTypeComboBox.Enabled = false;
-            this._documentTypeComboBox.Location = new System.Drawing.Point(92, 9);
+            this._documentTypeComboBox.Location = new System.Drawing.Point(92, 3);
             this._documentTypeComboBox.MaxDropDownItems = 25;
             this._documentTypeComboBox.Name = "_documentTypeComboBox";
             this._documentTypeComboBox.Size = new System.Drawing.Size(65, 21);
@@ -310,9 +311,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._scrollPanel.AutoScroll = true;
-            this._scrollPanel.Location = new System.Drawing.Point(-3, 41);
+            this._scrollPanel.Location = new System.Drawing.Point(0, 0);
             this._scrollPanel.Name = "_scrollPanel";
-            this._scrollPanel.Size = new System.Drawing.Size(182, 420);
+            this._scrollPanel.Size = new System.Drawing.Size(182, 461);
             this._scrollPanel.TabIndex = 0;
             // 
             // _paginationTab

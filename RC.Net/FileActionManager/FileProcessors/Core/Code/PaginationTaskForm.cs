@@ -270,9 +270,9 @@ namespace Extract.FileActionManager.FileProcessors
                 _paginationPanel.ExpectedPaginationAttributesPath = settings.ExpectedPaginationAttributesOutputPath;
                 _paginationPanel.FileProcessingDB = FileProcessingDB;
 
-                _paginationDocumentDataPanel = CreateDocumentDataPanel(paginationDocumentDataPanelAssembly);
-                if (_paginationDocumentDataPanel != null)
+                if (!string.IsNullOrWhiteSpace(paginationDocumentDataPanelAssembly))
                 {
+                    _paginationDocumentDataPanel = CreateDocumentDataPanel(paginationDocumentDataPanelAssembly);
                     _paginationDocumentDataPanel.PanelControl.ParentChanged +=
                         HandlePaginationDocumentDataPanel_ParentChanged;
 

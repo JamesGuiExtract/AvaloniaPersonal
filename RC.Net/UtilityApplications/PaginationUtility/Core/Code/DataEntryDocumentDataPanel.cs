@@ -427,8 +427,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                // Special logic applies only if the panel is not being used in the pagination
-                // context.
+                // Special logic applies only if the panel is being used in the pagination context.
                 if (InPaginationPanel)
                 {
                     if (_imageViewer.ImageFile.Equals(_sourceDocName, StringComparison.OrdinalIgnoreCase))
@@ -458,6 +457,44 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41353");
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="P:Extract.DataEntry.DataEntryControlHost.ImageViewer" /> with which to display the document corresponding to data
+        /// contained in the <see cref="T:Extract.DataEntry.DataEntryControlHost" />'s data controls.
+        /// </summary>
+        /// <value>
+        /// Sets the <see cref="P:Extract.DataEntry.DataEntryControlHost.ImageViewer" /> used to display the open document. <see langword="null" />
+        /// to disconnect the <see cref="T:Extract.DataEntry.DataEntryControlHost" /> from the image viewer.
+        /// </value>
+        /// <seealso cref="T:Extract.Imaging.Forms.IImageViewerControl" />
+        public override ImageViewer ImageViewer
+        {
+            get
+            {
+                try
+                {
+                    if (base.ImageViewer == null && _imageViewer != null)
+                    {
+                        if (!_imageViewer.ImageFile.Equals(_sourceDocName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            _imageViewer.OpenImage(_sourceDocName, false, false);
+                        }
+                        base.ImageViewer = _imageViewer;
+                    }
+
+                    return base.ImageViewer;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI0");
+                }
+            }
+
+            set
+            {
+                base.ImageViewer = value;
             }
         }
 

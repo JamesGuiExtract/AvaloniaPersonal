@@ -2992,9 +2992,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .Union(additionalControls)
                     .OfType<PaginationSeparator>()
                     .SelectMany(c => (c.Document ?? new OutputDocument("")).PageControls);
-                var additionalControlSet = (additionalControls == null)
-                    ? new HashSet<PaginationControl>()
-                    : new HashSet<PaginationControl>(additionalControls.Concat(includedDocumentPages));
+                var additionalControlSet = new HashSet<PaginationControl>(
+                    additionalControls.Concat(includedDocumentPages));
 
                 // If the shift key is down and activeControl is not the same as the lastSelectedControl,
                 // select all controls between activeControl and lastSelectedControl.
@@ -3056,6 +3055,28 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Then select activeControl, making it the new active control if necessary.
                 if (activeControl != null)
                 {
+                    // If a separator is being selected, make the active control be the previously
+                    // selected page (if from the same document), or the first page of the
+                    // separator's document.
+                    if (select)
+                    {
+                        var lastSelectedPage = lastSelectedControl as PageThumbnailControl;
+                        var activeSeparator = activeControl as PaginationSeparator;
+                        if (lastSelectedPage != null && activeSeparator != null)
+                        {
+                            if (activeSeparator.Document == lastSelectedPage.Document)
+                            {
+                                activeControl = lastSelectedPage;
+                            }
+                            else if (additionalControlSet
+                                .OfType<PageThumbnailControl>()
+                                .All(pageControl => pageControl.Document == activeSeparator.Document))
+                            {
+                                activeControl = activeSeparator.Document.PageControls.First();
+                            }
+                        }
+                    }
+
                     // Allow _lastSelectedControl to become activeControl unless the shift modifier key
                     // is down.
                     bool resetLastSelected = ((modifierKeys & Keys.Shift) == 0);

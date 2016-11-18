@@ -149,7 +149,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return true;
+                return false;
             }
         }
 

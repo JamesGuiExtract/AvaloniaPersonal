@@ -366,6 +366,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData);
 
                         _editDocumentDataButton.Checked = true;
+
+                        // Ensure this control gets sized based upon the added _documentDataPanelControl.
+                        PerformLayout();
                     }
                     else
                     {

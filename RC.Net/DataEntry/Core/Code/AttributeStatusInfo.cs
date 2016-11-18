@@ -3414,6 +3414,7 @@ namespace Extract.DataEntry
         /// Executes disposal of any thread-local or thread-static objects just prior to the UI
         /// thread closing.
         /// </summary>
+        [ComVisible(false)]
         public static void DisposeThread()
         {
             try

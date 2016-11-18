@@ -388,7 +388,10 @@ namespace Extract.DataEntry
             if (disposing)
             {
                 // Dispose of managed resources
-                CollectionMethods.ClearAndDispose(_documentTypeConfigurations);
+                if (_documentTypeConfigurations != null)
+                {
+                    CollectionMethods.ClearAndDispose(_documentTypeConfigurations);
+                }
             }
 
             // Dispose of unmanaged resources

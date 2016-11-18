@@ -401,6 +401,29 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #region Overrides
 
+        /// <summary>
+        /// Raises the <see cref="E:Load" /> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.EventArgs" /> instance containing the event data.</param>
+        protected override void OnLoad(EventArgs e)
+        {
+            try
+            {
+                base.OnLoad(e);
+
+                // If an ActiveDataEntryPanel is assigned prior to the form being loaded, it will
+                // not be sized correctly without a layout call here.
+                if (ActiveDataEntryPanel != null)
+                {
+                    PerformLayout();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41630");
+            }
+        }
+        
         /// <summary> 
         /// Clean up any resources being used.
         /// </summary>

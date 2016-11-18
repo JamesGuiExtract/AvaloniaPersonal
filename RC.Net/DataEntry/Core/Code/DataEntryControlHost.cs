@@ -230,6 +230,15 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// The image viewer with which to display documents.
+        /// <para><b>Note</b></para>
+        /// 11/20/16 SNK
+        /// Recently added usages of the data entry framework (PaginationPanel) mean that the
+        /// _imageViewer can be set to null even while a image is still loaded. In this class, use
+        /// the ImageViewer property getter to allow an extending class to provided the ImageViewer
+        /// on-demand (via overload of the getter) in response to events that are re-activating the
+        /// data entry controls.
+        /// Use this field in place of the property in cases where an extending class should not be
+        /// allowed the opportunity to try to provide the ImageViewer on-demand.
         /// </summary>
         ImageViewer _imageViewer;
 
@@ -1643,7 +1652,7 @@ namespace Extract.DataEntry
                     // last selected control remaining active when the next document is loaded.
                     if (_activeDataControl != null)
                     {
-                        _activeDataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
+                        _activeDataControl.IndicateActive(false, ImageViewer.DefaultHighlightColor);
                         _activeDataControl = null;
                     }
 
@@ -1666,15 +1675,15 @@ namespace Extract.DataEntry
                     // more often than they have to.
                     AttributeStatusInfo.EnableValidationTriggers(false);
 
-                    bool imageIsAvailable = _imageViewer.IsImageAvailable;
+                    bool imageIsAvailable = ImageViewer.IsImageAvailable;
 
                     if (imageIsAvailable && attributes != null)
                     {
                         // Calculate the size the error icon for invalid data should be on each
                         // page and create a SpatialPageInfo entry for each page.
-                        for (int page = 1; page <= _imageViewer.PageCount; page++)
+                        for (int page = 1; page <= ImageViewer.PageCount; page++)
                         {
-                            var pageProperties = _imageViewer.GetPageProperties(page);
+                            var pageProperties = ImageViewer.GetPageProperties(page);
 
                             _errorIconSizes[page] = new Size(
                                 (int)(_ERROR_ICON_SIZE * pageProperties.XResolution),
@@ -1697,7 +1706,7 @@ namespace Extract.DataEntry
                         _attributes = attributes;
 
                         // Notify AttributeStatusInfo of the new attribute hierarchy
-                        AttributeStatusInfo.ResetData(_imageViewer.ImageFile, _attributes,
+                        AttributeStatusInfo.ResetData(ImageViewer.ImageFile, _attributes,
                             _dbConnections, null);
 
                         // Enable or disable swiping as appropriate.
@@ -1736,7 +1745,7 @@ namespace Extract.DataEntry
                         // Remove activate status from the active control.
                         if (!imageIsAvailable && dataControl == _activeDataControl)
                         {
-                            dataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
+                            dataControl.IndicateActive(false, ImageViewer.DefaultHighlightColor);
                         }
 
                         // Set the enabled status of every data control depending on the 
@@ -1832,7 +1841,7 @@ namespace Extract.DataEntry
                 _changingData = false;
 
                 ExtractException ee = new ExtractException("ELI23919", "Failed to load data!", ex);
-                if (_imageViewer.IsImageAvailable)
+                if (_imageViewer != null && _imageViewer.IsImageAvailable)
                 {
                     ee.AddDebugData("FileName", _imageViewer.ImageFile, false);
                 }
@@ -1874,7 +1883,10 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException ee = new ExtractException("ELI35073", "Unable to get data!", ex);
-                ee.AddDebugData("Filename", _imageViewer.ImageFile, false);
+                if (_imageViewer != null && _imageViewer.IsImageAvailable)
+                {
+                    ee.AddDebugData("Filename", _imageViewer.ImageFile, false);
+                }
                 throw ee;
             }
         }
@@ -1895,7 +1907,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_imageViewer.IsImageAvailable)
+                if (ImageViewer.IsImageAvailable)
                 {
                     using (new TemporaryWaitCursor())
                     {
@@ -1914,7 +1926,7 @@ namespace Extract.DataEntry
                             PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
                             // If all attributes passed validation, save the data.
-                            _mostRecentlySaveAttributes.SaveTo(_imageViewer.ImageFile + ".voa",
+                            _mostRecentlySaveAttributes.SaveTo(ImageViewer.ImageFile + ".voa",
                                 true, _ATTRIBUTE_STORAGE_MANAGER_GUID);
 
                             OnDataSaved();
@@ -1941,7 +1953,10 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException ee = new ExtractException("ELI23909", "Unable to save data!", ex);
-                ee.AddDebugData("Filename", _imageViewer.ImageFile, false);
+                if (_imageViewer != null && _imageViewer.IsImageAvailable)
+                {
+                    ee.AddDebugData("Filename", _imageViewer.ImageFile, false);
+                }
                 throw ee;
             }
 
@@ -1975,7 +1990,7 @@ namespace Extract.DataEntry
             {
                 // The shortcut keys will remain enabled for this option; ignore the command if
                 // there is no document loaded.
-                if (!_imageViewer.IsImageAvailable)
+                if (_imageViewer == null || !_imageViewer.IsImageAvailable)
                 {
                     return;
                 }
@@ -2013,7 +2028,7 @@ namespace Extract.DataEntry
             {
                 // The shortcut keys will remain enabled for this option; ignore the command if
                 // there is no document loaded.
-                if (!_imageViewer.IsImageAvailable)
+                if (_imageViewer == null || !_imageViewer.IsImageAvailable)
                 {
                     return;
                 }
@@ -2048,6 +2063,11 @@ namespace Extract.DataEntry
         {
             try
             {
+                if (_imageViewer == null || !_imageViewer.IsImageAvailable)
+                {
+                    return;
+                }
+
                 if (!_temporarilyHidingTooltips)
                 {
                     // Remove tooltips for all selected attributes
@@ -2324,7 +2344,7 @@ namespace Extract.DataEntry
                         if (_activeDataControl != null)
                         {
                             _activeDataControl.IndicateActive(
-                                false, _imageViewer.DefaultHighlightColor);
+                                false, ImageViewer.DefaultHighlightColor);
                         }
 
                         if (undo)
@@ -2348,7 +2368,7 @@ namespace Extract.DataEntry
                         if (_activeDataControl != null)
                         {
                             ExecuteOnIdle("ELI34414", () => _activeDataControl.IndicateActive(
-                                true, _imageViewer.DefaultHighlightColor));
+                                true, ImageViewer.DefaultHighlightColor));
                         }
 
                         // Invoke EndUndo/EndRedo on idle the to ensure that nothing that happened
@@ -2408,6 +2428,13 @@ namespace Extract.DataEntry
         {
             try
             {
+                // The shortcut keys will remain enabled for this option; ignore the command if
+                // there is no document loaded.
+                if (_imageViewer == null || !_imageViewer.IsImageAvailable)
+                {
+                    return;
+                }
+
                 // If already zoomed in on the current selection, zoom back out to the last manual
                 // zoom.
                 if (_zoomedToSelection)
@@ -2588,15 +2615,18 @@ namespace Extract.DataEntry
                 }
 
                 // Dispose of all highlights
-                foreach (CompositeHighlightLayerObject highlight in _highlightAttributes.Keys)
+                if (_imageViewer != null)
                 {
-                    if (_imageViewer.LayerObjects.Contains(highlight))
+                    foreach (CompositeHighlightLayerObject highlight in _highlightAttributes.Keys)
                     {
-                        _imageViewer.LayerObjects.Remove(highlight, true, false);
-                    }
-                    else
-                    {
-                        highlight.Dispose();
+                        if (_imageViewer.LayerObjects.Contains(highlight))
+                        {
+                            _imageViewer.LayerObjects.Remove(highlight, true, false);
+                        }
+                        else
+                        {
+                            highlight.Dispose();
+                        }
                     }
                 }
                 _highlightAttributes.Clear();
@@ -2841,6 +2871,17 @@ namespace Extract.DataEntry
             }
         }
 
+        ///// <summary>
+        ///// Raises the <see cref="E:System.Windows.Forms.Control.LostFocus" /> event.
+        ///// </summary>
+        ///// <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+        //protected override void OnLostFocus(EventArgs e)
+        //{
+        //    base.OnLostFocus(e);
+
+        //    _regainingFocus = true;
+        //}
+
         /// <summary>
         /// Override <see cref="Control.OnEnter"/> to keep track of when focus had belonged to 
         /// a control outside of the control host, but is now returning to a control within the 
@@ -2986,13 +3027,13 @@ namespace Extract.DataEntry
                 {
                     if (e.CursorTool == CursorTool.SelectLayerObject)
                     {
-                        _imageViewer.CursorEnteredLayerObject += HandleCursorEnteredLayerObject;
-                        _imageViewer.CursorLeftLayerObject += HandleCursorLeftLayerObject;
+                        ImageViewer.CursorEnteredLayerObject += HandleCursorEnteredLayerObject;
+                        ImageViewer.CursorLeftLayerObject += HandleCursorLeftLayerObject;
                     }
                     else if (_lastCursorTool == CursorTool.SelectLayerObject)
                     {
-                        _imageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
-                        _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
+                        ImageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
+                        ImageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
                     }
 
                     if (e.CursorTool != CursorTool.None)
@@ -3137,7 +3178,7 @@ namespace Extract.DataEntry
                 // De-activate any existing control that is active
                 if (_activeDataControl != null)
                 {
-                    _activeDataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
+                    _activeDataControl.IndicateActive(false, ImageViewer.DefaultHighlightColor);
                 }
 
                 // If this method was attempting to change focus, there is at least once case where
@@ -3167,10 +3208,10 @@ namespace Extract.DataEntry
 
                 // If an image is loaded, activate the new control. (Prevent controls from being
                 // active with no loaded document)
-                if (_imageViewer.IsImageAvailable)
+                if (ImageViewer.IsImageAvailable)
                 {
                     _activeDataControl = newActiveDataControl;
-                    _activeDataControl.IndicateActive(true, _imageViewer.DefaultHighlightColor);
+                    _activeDataControl.IndicateActive(true, ImageViewer.DefaultHighlightColor);
                 }
 
                 // Once a new control gains focus, show tooltips again if they were hidden.
@@ -3189,9 +3230,9 @@ namespace Extract.DataEntry
                 DrawHighlights(true);
 
                 // Enable or disable swiping as appropriate.
-                bool swipingEnabled = _imageViewer.IsImageAvailable &&
-                                      _activeDataControl != null &&
-                                      _activeDataControl.SupportsSwiping;
+                bool swipingEnabled = ImageViewer.IsImageAvailable &&
+                    _activeDataControl != null &&
+                    _activeDataControl.SupportsSwiping;
 
                 OnSwipingStateChanged(new SwipingStateChangedEventArgs(swipingEnabled));
 
@@ -3500,7 +3541,7 @@ namespace Extract.DataEntry
                         startedSwipeProcessing = true;
                         _processingSwipe = true;
 
-                        _imageViewer.LayerObjects.Remove(e.LayerObject, true, false);
+                        ImageViewer.LayerObjects.Remove(e.LayerObject, true, false);
 
                         // Recognize the text in the highlight's raster zone and send it to the active
                         // data control for processing.
@@ -3516,7 +3557,7 @@ namespace Extract.DataEntry
                                     // [DataEntry:294] Keep the angle threshold small so long swipes
                                     // on slightly skewed docs don't include more text than intended.
                                     SpatialString zoneOcrText = _ocrManager.GetOcrText(
-                                        _imageViewer.ImageFile, zone, 0.2);
+                                        ImageViewer.ImageFile, zone, 0.2);
 
                                     if (ocrText == null)
                                     {
@@ -3543,14 +3584,14 @@ namespace Extract.DataEntry
                             // highlight tool, create a hybrid string whose spatial area is the full
                             // area of the "swipe" rather than just what OCR'd. (allows an easy way
                             // to add spatial info for a field.)
-                            if (_imageViewer.CursorTool == CursorTool.WordHighlight)
+                            if (ImageViewer.CursorTool == CursorTool.WordHighlight)
                             {
                                 // Create unrotated/skewed spatial page info for the resulting
                                 // hybrid string.
                                 var spatialPageInfos = new LongToObjectMap();
                                 var spatialPageInfo = new SpatialPageInfo();
-                                spatialPageInfo.Initialize(_imageViewer.ImageWidth, _imageViewer.ImageHeight, 0, 0);
-                                spatialPageInfos.Set(_imageViewer.PageNumber, spatialPageInfo);
+                                spatialPageInfo.Initialize(ImageViewer.ImageWidth, ImageViewer.ImageHeight, 0, 0);
+                                spatialPageInfos.Set(ImageViewer.PageNumber, spatialPageInfo);
 
                                 // Create the hybrid result using the spatial data from the swipe
                                 // with the text from the OCR attempt.
@@ -3560,7 +3601,7 @@ namespace Extract.DataEntry
                                         .Select(rasterZone => rasterZone.ToComRasterZone())
                                         .ToIUnknownVector(),
                                     (ocrText == null) ? "" : ocrText.String,
-                                    _imageViewer.ImageFile, spatialPageInfos);
+                                    ImageViewer.ImageFile, spatialPageInfos);
                                 ocrText = hybridOcrText;
                             }
                             else
@@ -3586,7 +3627,7 @@ namespace Extract.DataEntry
                 {
                     try
                     {
-                        _imageViewer.Invalidate();
+                        ImageViewer.Invalidate();
                     }
                     catch (Exception ex2)
                     {
@@ -3816,7 +3857,7 @@ namespace Extract.DataEntry
                 // reason... exempt F10 from being handled here.
                 // [DataEntry:335] Don't handle tab key either since that already has special
                 // handling in PreFilterMessage.
-                bool sendKeyToActiveControl = (!_imageViewer.Capture && activeControl != null && 
+                bool sendKeyToActiveControl = (!ImageViewer.Capture && activeControl != null && 
                     !activeControl.Focused && e.KeyCode != Keys.F10 && e.KeyCode != Keys.Tab);
 
                 // If the image viewer is in a separate form which has focus, DataEntryApplication's
@@ -4022,8 +4063,8 @@ namespace Extract.DataEntry
             {
                 if (!_performingProgrammaticZoom)
                 {
-                    Rectangle viewArea = _imageViewer.GetTransformedRectangle(
-                        _imageViewer.GetVisibleImageArea(), true);
+                    Rectangle viewArea = ImageViewer.GetTransformedRectangle(
+                        ImageViewer.GetVisibleImageArea(), true);
                     Size zoomSize = viewArea.Size;
 
                     // Before assigning _lastNonAutoZoomViewArea and _lastManualZoomSize, be sure
@@ -4035,7 +4076,7 @@ namespace Extract.DataEntry
                         _zoomedToSelection = false;
                         _manuallyZoomedToSelection = false;
                         _lastNonZoomedToSelectionViewArea = viewArea;
-                        _lastNonZoomedToSelectionFitMode = _imageViewer.FitMode;
+                        _lastNonZoomedToSelectionFitMode = ImageViewer.FitMode;
                     }
                 }
             }
@@ -4060,11 +4101,11 @@ namespace Extract.DataEntry
                 // _lastNonZoomedToSelectionViewArea.
                 if (!_performingProgrammaticZoom && !_zoomedToSelection)
                 {
-                    Rectangle viewArea = _imageViewer.GetTransformedRectangle(
-                        _imageViewer.GetVisibleImageArea(), true);
+                    Rectangle viewArea = ImageViewer.GetTransformedRectangle(
+                        ImageViewer.GetVisibleImageArea(), true);
                     _lastManualZoomSize = viewArea.Size;
                     _lastNonZoomedToSelectionViewArea = viewArea;
-                    _lastNonZoomedToSelectionFitMode = _imageViewer.FitMode;
+                    _lastNonZoomedToSelectionFitMode = ImageViewer.FitMode;
                 }
             }
             catch (Exception ex)
@@ -4432,7 +4473,7 @@ namespace Extract.DataEntry
                 }
 
                 // Don't allow new highlights to be created if there is no longer a document loaded.
-                if (_imageViewer.IsImageAvailable)
+                if (ImageViewer.IsImageAvailable)
                 {
                     SetAttributeHighlight(attribute, false);
                 }
@@ -4523,11 +4564,11 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (pageNumber != _imageViewer.PageNumber)
+                if (pageNumber != ImageViewer.PageNumber)
                 {
                     _performingProgrammaticZoom = true;
                     _lastViewArea = new Rectangle();
-                    _imageViewer.PageNumber = pageNumber;
+                    ImageViewer.PageNumber = pageNumber;
                 }
             }
             catch (Exception ex)
@@ -4716,7 +4757,7 @@ namespace Extract.DataEntry
                         }
 
                         // Update pageToShow if appropriate
-                        if (highlight.PageNumber == _imageViewer.PageNumber)
+                        if (highlight.PageNumber == ImageViewer.PageNumber)
                         {
                             pageToShow = highlight.PageNumber;
                         }
@@ -4783,7 +4824,7 @@ namespace Extract.DataEntry
                         RemoveAttributeToolTip(_hoverAttribute);
                         _hoverToolTip = new DataEntryToolTip(this, _hoverAttribute, true, null);
 
-                        _imageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject, false);
+                        ImageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject, false);
                     }
                 }
 
@@ -4818,7 +4859,7 @@ namespace Extract.DataEntry
                     {
                         if (errorIcon.Visible)
                         {
-                            _imageViewer.LayerObjects.MoveToTop(errorIcon);
+                            ImageViewer.LayerObjects.MoveToTop(errorIcon);
                         }
                     }
                 }
@@ -4856,7 +4897,7 @@ namespace Extract.DataEntry
                     _pendingSelection = null;
                 }
 
-                _imageViewer.Invalidate();
+                ImageViewer.Invalidate();
             }
             catch (Exception ex)
             {
@@ -4888,9 +4929,9 @@ namespace Extract.DataEntry
 
             foreach (CompositeHighlightLayerObject highlight in _highlightAttributes.Keys)
             {
-                if (_imageViewer.LayerObjects.Contains(highlight))
+                if (ImageViewer.LayerObjects.Contains(highlight))
                 {
-                    _imageViewer.LayerObjects.Remove(highlight, true, false);
+                    ImageViewer.LayerObjects.Remove(highlight, true, false);
                 }
                 else
                 {
@@ -5123,8 +5164,8 @@ namespace Extract.DataEntry
         /// swiping is to be enabled.</param>
         protected virtual void OnSwipingStateChanged(SwipingStateChangedEventArgs e)
         {
-            if (e.SwipingEnabled && _imageViewer.CursorTool == CursorTool.None &&
-                _imageViewer.IsImageAvailable)
+            if (e.SwipingEnabled && ImageViewer.CursorTool == CursorTool.None &&
+                ImageViewer.IsImageAvailable)
             {
                 // If swiping is being re-enabled and the previous active cursor tool was one of
                 // the highlight tools, re-enable it so a user does not need to manually
@@ -5133,15 +5174,15 @@ namespace Extract.DataEntry
 
                 if (_lastCursorTool == CursorTool.AngularHighlight)
                 {
-                    _imageViewer.CursorTool = CursorTool.AngularHighlight;
+                    ImageViewer.CursorTool = CursorTool.AngularHighlight;
                 }
                 else if (_lastCursorTool == CursorTool.RectangularHighlight)
                 {
-                    _imageViewer.CursorTool = CursorTool.RectangularHighlight;
+                    ImageViewer.CursorTool = CursorTool.RectangularHighlight;
                 }
                 else if (_lastCursorTool == CursorTool.WordHighlight)
                 {
-                    _imageViewer.CursorTool = CursorTool.WordHighlight;
+                    ImageViewer.CursorTool = CursorTool.WordHighlight;
                 }
             }
 
@@ -5355,7 +5396,7 @@ namespace Extract.DataEntry
         /// that implement the <see cref="IDataEntryControl"/> interface.  Registers events 
         /// necessary to facilitate the flow of information between the controls.
         /// <para><b>Requirements</b></para>
-        /// Must be called before the _imageViewer loads a document.
+        /// Must be called before the ImageViewer loads a document.
         /// </summary>
         /// <param name="parentControl">The control for which <see cref="IDataEntryControl"/>s
         /// should be registered.</param>
@@ -5840,7 +5881,7 @@ namespace Extract.DataEntry
             try
             {
                 if (_selectionBounds.Count == 0 ||
-                    !_selectionBounds.Keys.Contains(_imageViewer.PageNumber))
+                    !_selectionBounds.Keys.Contains(ImageViewer.PageNumber))
                 {
                     // Nothing to do.
                     return;
@@ -5851,22 +5892,22 @@ namespace Extract.DataEntry
                 foreach (KeyValuePair<IAttribute, DataEntryToolTip> attributeTooltip in
                         _attributeToolTips)
                 {
-                    _selectionBounds[_imageViewer.PageNumber] = Rectangle.Union(
-                        _selectionBounds[_imageViewer.PageNumber],
+                    _selectionBounds[ImageViewer.PageNumber] = Rectangle.Union(
+                        _selectionBounds[ImageViewer.PageNumber],
                         attributeTooltip.Value.TextLayerObject.GetBounds());
                 }
 
                 // Initialize the newViewRegion as the selected object region.
-                Rectangle selectedImageRegion = _selectionBounds[_imageViewer.PageNumber];
+                Rectangle selectedImageRegion = _selectionBounds[ImageViewer.PageNumber];
                 Rectangle newViewRegion = selectedImageRegion;
 
                 // [DataEntry:532] Ensure we're not trying to zoom to a region that extends offpage.
                 newViewRegion.Intersect(
-                    new Rectangle(0, 0, _imageViewer.ImageWidth, _imageViewer.ImageHeight));
+                    new Rectangle(0, 0, ImageViewer.ImageWidth, ImageViewer.ImageHeight));
 
                 // Determine the current view region.
-                Rectangle currentViewRegion = _imageViewer.GetTransformedRectangle(
-                        _imageViewer.GetVisibleImageArea(), true);
+                Rectangle currentViewRegion = ImageViewer.GetTransformedRectangle(
+                        ImageViewer.GetVisibleImageArea(), true);
 
                 // If we are trying to enforce auto-zoom on the same selection as last time and the
                 // current selection is in view, there is nothing to do.
@@ -5980,8 +6021,8 @@ namespace Extract.DataEntry
                 {
                     // Determine the maximum amount of context space that can be added based on a
                     // percentage of the smaller dimension.
-                    int smallerDimension = Math.Min(_imageViewer.ImageWidth,
-                        _imageViewer.ImageHeight);
+                    int smallerDimension = Math.Min(ImageViewer.ImageWidth,
+                        ImageViewer.ImageHeight);
                     int maxPadAmount = (int)(smallerDimension * _AUTO_ZOOM_MAX_CONTEXT) / 2;
 
                     // If zooming to the current selection, translate the zoomContext percentage
@@ -6002,26 +6043,26 @@ namespace Extract.DataEntry
                     _manuallyZoomedToSelection = forceZoomToSelection || (_zoomedToSelection && _manuallyZoomedToSelection);
                     if (_zoomedToSelection)
                     {
-                        _zoomToSelectionPage = _imageViewer.PageNumber;
+                        _zoomToSelectionPage = ImageViewer.PageNumber;
                     }
 
-                    FitMode fitMode = _imageViewer.FitMode;
+                    FitMode fitMode = ImageViewer.FitMode;
 
                     for (int i = 0; i < 3; i++)
                     {
                         // Apply the padding.
-                        Rectangle transformedViewRegion = _imageViewer.PadViewingRectangle(
+                        Rectangle transformedViewRegion = ImageViewer.PadViewingRectangle(
                             newViewRegion, xPadAmount, yPadAmount, true);
 
                         // Translate the image coordinates into client coordinates.
                         transformedViewRegion =
-                            _imageViewer.GetTransformedRectangle(transformedViewRegion, false);
+                            ImageViewer.GetTransformedRectangle(transformedViewRegion, false);
 
                         // Zoom to the specified rectangle.
-                        _imageViewer.ZoomToRectangle(transformedViewRegion);
+                        ImageViewer.ZoomToRectangle(transformedViewRegion);
 
-                        currentViewRegion = _imageViewer.GetTransformedRectangle(
-                            _imageViewer.GetVisibleImageArea(), true);
+                        currentViewRegion = ImageViewer.GetTransformedRectangle(
+                            ImageViewer.GetVisibleImageArea(), true);
 
                         // [DataEntry:1277]
                         // Test to ensure all of the selected image region is contained. Scrollbars
@@ -6043,9 +6084,9 @@ namespace Extract.DataEntry
                     // [DataEntry:1096]
                     // Restore the previous fit mode if zoom operation cleared the fit mode
                     // (Unless AutoZoom is being used which should clear the fit mode).
-                    if (fitMode != _imageViewer.FitMode && autoZoomMode != AutoZoomMode.AutoZoom)
+                    if (fitMode != ImageViewer.FitMode && autoZoomMode != AutoZoomMode.AutoZoom)
                     {
-                        _imageViewer.FitMode = fitMode;
+                        ImageViewer.FitMode = fitMode;
                     }
 
                     // If zoom has to change very much to zoom on the specified rectangle, calling
@@ -6373,7 +6414,7 @@ namespace Extract.DataEntry
             {
                 // So that focus does not jump to the next control, assign focus to the image viewer
                 // during the toggle of enabled.
-                _imageViewer.Focus();
+                ImageViewer.Focus();
 
                 Control control = (Control)_activeDataControl;
                 control.Enabled = false;
@@ -6632,7 +6673,7 @@ namespace Extract.DataEntry
             {
                 _attributeHighlights[attribute].Add(highlight);
                 _highlightAttributes[highlight] = attribute;
-                _imageViewer.LayerObjects.Add(highlight, false);
+                ImageViewer.LayerObjects.Add(highlight, false);
             }
 
             // Create an error icon for the attribute if the value is currently invalid
@@ -6759,7 +6800,7 @@ namespace Extract.DataEntry
 
                 // Create the highlight
                 CompositeHighlightLayerObject highlight =
-                    new CompositeHighlightLayerObject(_imageViewer, page, "", highlightZones[key],
+                    new CompositeHighlightLayerObject(ImageViewer, page, "", highlightZones[key],
                         isHint ? Color.White : highlightColor);
                 highlight.Selectable = false;
                 highlight.CanRender = false;
@@ -6814,7 +6855,7 @@ namespace Extract.DataEntry
                 if (attribute.Value.HasSpatialInfo())
                 {
                     SpatialString valueOnPage = attribute.Value.GetSpecifiedPages(
-                        _imageViewer.PageNumber, _imageViewer.PageNumber);
+                        ImageViewer.PageNumber, ImageViewer.PageNumber);
 
                     // Ensure the attribute has spatial info on the current page
                     if (valueOnPage != null && valueOnPage.HasSpatialInfo())
@@ -6825,7 +6866,7 @@ namespace Extract.DataEntry
 
                         attributeBoundingZones[attribute] =
                             new RasterZone(Rectangle.FromLTRB(left, top, right, bottom),
-                                _imageViewer.PageNumber);
+                                ImageViewer.PageNumber);
                     }
                     // If the attribute does not have spatial info on the current page, skip it.
                     else
@@ -6844,7 +6885,7 @@ namespace Extract.DataEntry
                     IEnumerable<RasterZone> rasterZones = AttributeStatusInfo.GetHintRasterZones(attribute);
                     foreach (RasterZone rasterZone in rasterZones)
                     {
-                        if (rasterZone.PageNumber == _imageViewer.PageNumber)
+                        if (rasterZone.PageNumber == ImageViewer.PageNumber)
                         {
                             if (bounds == null)
                             {
@@ -6860,7 +6901,7 @@ namespace Extract.DataEntry
                     // If there was at least one raster zone, use this attribute.
                     if (bounds != null)
                     {
-                        attributeBoundingZones[attribute] = new RasterZone(bounds.Value, _imageViewer.PageNumber);
+                        attributeBoundingZones[attribute] = new RasterZone(bounds.Value, ImageViewer.PageNumber);
                     }
                     // Otherwise, skip this attribute.
                     else
@@ -6907,7 +6948,7 @@ namespace Extract.DataEntry
 
             if (_hoverToolTip != null)
             {
-                _imageViewer.LayerObjects.MoveToTop(_hoverToolTip.TextLayerObject);
+                ImageViewer.LayerObjects.MoveToTop(_hoverToolTip.TextLayerObject);
             }
         }
         
@@ -6970,7 +7011,7 @@ namespace Extract.DataEntry
             List<IAttribute> sortedList = new List<IAttribute>();
 
             // Compile the sorted attributes page-by-page
-            for (int i = 1; i <= _imageViewer.PageCount; i++)
+            for (int i = 1; i <= ImageViewer.PageCount; i++)
             {
                 // If there are no attributes on the specified page, move on.
                 List<IAttribute> attributesOnPage;
@@ -7137,7 +7178,7 @@ namespace Extract.DataEntry
                     (int)Config.Settings.TooltipFontSize, out errorIconRotation);
 
                 // Create the error icon
-                ImageLayerObject errorIcon = new ImageLayerObject(_imageViewer, page,
+                ImageLayerObject errorIcon = new ImageLayerObject(ImageViewer, page,
                     "", errorIconAnchorPoint, AnchorAlignment.Left, 
                     Properties.Resources.LargeErrorIcon, _errorIconSizes[page], 
                     (float)errorIconRotation);
@@ -7145,7 +7186,7 @@ namespace Extract.DataEntry
                 errorIcon.Visible = makeVisible;
                 errorIcon.CanRender = false;
 
-                _imageViewer.LayerObjects.Add(errorIcon, false);
+                ImageViewer.LayerObjects.Add(errorIcon, false);
 
                 // NOTE: For now I think the cases where the error icon would extend off-page are so
                 // rare that it's not worth handling. But this would be where such a check should
@@ -7349,7 +7390,7 @@ namespace Extract.DataEntry
                 foreach (var highlight in preCreatedHighlights)
                 {
                     _highlightAttributes[highlight] = attribute;
-                    _imageViewer.LayerObjects.Add(highlight, false);
+                    ImageViewer.LayerObjects.Add(highlight, false);
 
                     if (makeVisible)
                     {
@@ -7431,9 +7472,9 @@ namespace Extract.DataEntry
                 {
                     _highlightAttributes.Remove(highlight);
 
-                    if (_imageViewer.LayerObjects.Contains(highlight))
+                    if (ImageViewer.LayerObjects.Contains(highlight))
                     {
-                        _imageViewer.LayerObjects.Remove(highlight, true, false);
+                        ImageViewer.LayerObjects.Remove(highlight, true, false);
                     }
                     else
                     {
@@ -7495,9 +7536,9 @@ namespace Extract.DataEntry
             {
                 foreach (ImageLayerObject errorIcon in errorIcons)
                 {
-                    if (_imageViewer.LayerObjects.Contains(errorIcon))
+                    if (ImageViewer.LayerObjects.Contains(errorIcon))
                     {
-                        _imageViewer.LayerObjects.Remove(errorIcon, true, false);
+                        ImageViewer.LayerObjects.Remove(errorIcon, true, false);
                     }
                     else
                     {
@@ -7608,14 +7649,14 @@ namespace Extract.DataEntry
                 _controlUpdatesLocked = lockUpdates;
             }
 
-            // Lock or unlock the _imageViewer using Begin/EndUpdate
+            // Lock or unlock the ImageViewer using Begin/EndUpdate
             if (lockUpdates)
             {
-                _imageViewer.BeginUpdate();
+                ImageViewer.BeginUpdate();
             }
             else
             {
-                _imageViewer.EndUpdate();
+                ImageViewer.EndUpdate();
             }
 
             // Lock the DEP's parent (a Panel) to prevent scrolling
@@ -7680,7 +7721,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_imageViewer.IsImageAvailable)
+                if (ImageViewer.IsImageAvailable)
                 {
                     // Initialize _currentlySelectedGroupAttribute as null. 
                     _currentlySelectedGroupAttribute = null;
@@ -7774,7 +7815,7 @@ namespace Extract.DataEntry
             // otherwise be drawn on top of the tooltip, shift the tooltip below the cursor
             // position if the angular highlight cursor tool is active.
             Point toolTipPosition = ImageViewer.TopLevelControl.PointToClient(MousePosition);
-            if (_imageViewer.CursorTool == CursorTool.AngularHighlight)
+            if (ImageViewer.CursorTool == CursorTool.AngularHighlight)
             {
                 toolTipPosition.Offset(0, 35);
             }

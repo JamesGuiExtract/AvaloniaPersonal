@@ -1303,7 +1303,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     LoadPaginationDocumentDataPanel();
 
-                    if (!_configManager.RegisteredDocumentTypes.Any())
+                    if (_configManager.RegisteredDocumentTypes.Any())
+                    {
+                        _scrollPanel.Top = _documentTypePanel.Bottom + 1;
+                        _scrollPanel.Height -= _scrollPanel.Top;
+                        _documentTypePanel.Visible = true;
+                    }
+                    else
                     {
                         _dataTab.Controls.Remove(_documentTypePanel);
                         _scrollPanel.Dock = DockStyle.Fill;
@@ -1329,7 +1335,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _paginationTab = null;
                     _paginationPanel = null;
 
-                    if (!_configManager.RegisteredDocumentTypes.Any())
+                    if (_configManager.RegisteredDocumentTypes.Any())
+                    {
+                        _scrollPanel.Top = _documentTypePanel.Bottom + 1;
+                        _scrollPanel.Height -= _scrollPanel.Top;
+                        _documentTypePanel.Visible = true;
+                    }
+                    else
                     {
                         _splitContainer.Panel1.Controls.Remove(_documentTypePanel);
                         _scrollPanel.Dock = DockStyle.Fill;
