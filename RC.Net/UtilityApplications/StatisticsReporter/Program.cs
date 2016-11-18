@@ -65,9 +65,13 @@ namespace StatisticsReporter
                     throw ee;
                 }
 
+                // Validate the XPaths
+                UtilityMethods.IsValidXPathExpression(dcSettings.FileSettings.XPathOfContainerOnlyAttributes, throwException: true);
+                UtilityMethods.IsValidXPathExpression(dcSettings.FileSettings.XPathToIgnore, throwException: true);
+
                 dcSettings.ApplyDatesToFound = ReportSettings.Settings.ApplyDateRangeToFound;
 
-                //// Create the Process Statistics 
+                // Create the Process Statistics 
                 ProcessStatistics Statistics = new ProcessStatistics(dcSettings);
 
                 // Set the delegates

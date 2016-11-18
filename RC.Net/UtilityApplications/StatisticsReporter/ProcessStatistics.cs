@@ -221,6 +221,7 @@ namespace StatisticsReporter
         /// Processes the data by retrieving the voa data from the database and creating the results for each file
         /// </summary>
         /// <param name="fileCount">Variable for number of files processed</param>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public IEnumerable<AccuracyDetail> ProcessData(out long fileCount)
         {
             try

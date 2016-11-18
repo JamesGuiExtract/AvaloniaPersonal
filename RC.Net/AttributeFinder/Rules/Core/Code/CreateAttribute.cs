@@ -421,7 +421,7 @@ namespace Extract.AttributeFinder.Rules
 
             if (xPathEnabled)
             {
-                return XPathContext.IsValidXPathExpression(text);
+                return UtilityMethods.IsValidXPathExpression(text);
             }
             else
             {

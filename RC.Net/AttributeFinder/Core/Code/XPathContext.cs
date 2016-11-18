@@ -482,24 +482,6 @@ namespace Extract.AttributeFinder
             }
         }
 
-        /// <summary>
-        /// Determines whether the specified text is a valid xpath expression.
-        /// </summary>
-        /// <param name="text">The text to validate.</param>
-        /// <returns>true if valid</returns>
-        public static bool IsValidXPathExpression(string text)
-        {
-            try
-            {
-                XPathExpression.Compile(text);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
         #endregion Public Members
 
         #region Overrides

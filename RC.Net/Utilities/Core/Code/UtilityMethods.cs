@@ -858,6 +858,34 @@ namespace Extract.Utilities
                 throw e.AsExtract("ELI39611");
             }
         }
+
+        /// <summary>
+        /// Determines whether the specified text is a valid xpath expression.
+        /// </summary>
+        /// <param name="text">The text to validate.</param>
+        /// <param name="throwException">if set to <c>true</c> throws the exception thrown by
+        /// <see cref="System.Xml.XPath.XPathExpression.Compile"/>.</param>
+        /// <returns>
+        /// true if valid
+        /// </returns>
+        public static bool IsValidXPathExpression(string text, bool throwException = false)
+        {
+            try
+            {
+                System.Xml.XPath.XPathExpression.Compile(text);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (throwException)
+                {
+                    var ue = new ExtractException("ELI41632", "Invalid XPath Expression", ex);
+                    ue.AddDebugData("XPath", text, encrypt: false);
+                    throw ue;
+                }
+                return false;
+            }
+        }
     }
 
     /// <summary>
