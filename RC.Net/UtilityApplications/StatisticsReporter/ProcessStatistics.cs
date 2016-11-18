@@ -402,6 +402,9 @@ namespace StatisticsReporter
 
                 SqlCommand cmd = _Connection.CreateCommand();
 
+                // Set the timeout so that it waits indefinitely
+                cmd.CommandTimeout = 0;
+
                 // Set up the sql to obtain the expected and found
                 string sql = ExpectedFoundSQL;
                 sql = sql.Replace("<Expected>", Settings.ExpectedAttributeSetName);
