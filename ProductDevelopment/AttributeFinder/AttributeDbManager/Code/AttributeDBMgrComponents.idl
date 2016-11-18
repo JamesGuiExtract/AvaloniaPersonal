@@ -42,6 +42,7 @@ library AttributeDbMgrComponentsLib
 		HRESULT CreateNewAttributeSetForFile([in] long nFileTaskSessionID, 
 											 [in] BSTR bstrAttributeSetName, 
 											 [in] IIUnknownVector* ipAttributes, 
+											 [in] VARIANT_BOOL vbStoreDiscreteFields,
 											 [in] VARIANT_BOOL vbStoreRasterZone,
 											 [in] VARIANT_BOOL vbStoreEmptyAttributes);
 

@@ -989,8 +989,6 @@ void CAttributeDBMgr::SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownV
 			throw ue;
 		}
 
-		FieldsPtr ipFields = AssignComPtr( ipASFF->Fields, "ELI40361" );
-
 		// Now prepare the VOA for save
 		string storageManagerIID = asString(CLSID_AttributeStorageManager);
 		IIUnknownVectorPtr pAttributesClone = pAttributes->PrepareForStorage( storageManagerIID.c_str() );
@@ -998,6 +996,7 @@ void CAttributeDBMgr::SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownV
 		IPersistStreamPtr ipPersistObj = pAttributesClone;
 
 #ifdef UNCOMPRESSED_STREAM
+		FieldsPtr ipFields = AssignComPtr( ipASFF->Fields, "ELI40361" );
 		setIPersistObjToField( ipFields, "VOA", ipPersistObj );
 		ipASFF->Update();
 #endif
@@ -1088,6 +1087,7 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 															 long nFileTaskSessionID,
   														     BSTR bstrAttributeSetName,
   														     IIUnknownVector* pAttributes,
+  															 VARIANT_BOOL vbStoreDiscreteFields,
   															 VARIANT_BOOL vbStoreRasterZone,
   															 VARIANT_BOOL vbStoreEmptyAttributes )
 {
@@ -1117,11 +1117,14 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 			longlong llRootASFF_ID = ExecuteRootInsertASFF( strInsertRootASFF, ipConnection );
 			SaveVoaDataInASFF( ipConnection, ipAttributes, llRootASFF_ID );
 
-			storeAttributeData( ipConnection,
-								ipAttributes,
-								asCppBool(vbStoreRasterZone),
-								asCppBool(vbStoreEmptyAttributes),
-								llRootASFF_ID );
+			if (vbStoreDiscreteFields)
+			{
+				storeAttributeData(ipConnection,
+					ipAttributes,
+					asCppBool(vbStoreRasterZone),
+					asCppBool(vbStoreEmptyAttributes),
+					llRootASFF_ID);
+			}
 
 			tg.CommitTrans();
 
@@ -1146,6 +1149,7 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessionID,
 														    BSTR bstrAttributeSetName,
 														    IIUnknownVector* pAttributes,
+  															VARIANT_BOOL vbStoreDiscreteFields,
 															VARIANT_BOOL vbStoreRasterZone,
 															VARIANT_BOOL vbStoreEmptyAttributes )
 {
@@ -1156,6 +1160,7 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessio
 														   nFileTaskSessionID,
 														   bstrAttributeSetName,
 														   pAttributes,
+														   vbStoreDiscreteFields,
 														   vbStoreRasterZone,
 														   vbStoreEmptyAttributes );
 		if ( !bRet )
@@ -1167,6 +1172,7 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessio
 												   nFileTaskSessionID,
 												   bstrAttributeSetName,
 												   pAttributes,
+												   vbStoreDiscreteFields,
 												   vbStoreRasterZone,
 												   vbStoreEmptyAttributes );
 		}

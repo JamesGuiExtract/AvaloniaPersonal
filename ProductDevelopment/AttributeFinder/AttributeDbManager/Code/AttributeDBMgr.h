@@ -81,6 +81,7 @@ public:
 	STDMETHOD(CreateNewAttributeSetForFile)(long nFileTaskSessionID,
 											BSTR bstrAttributeSetName,
 											IIUnknownVector* pAttributes,
+											VARIANT_BOOL vbStoreDiscreteFields,
 											VARIANT_BOOL vbStoreRasterZone,
 											VARIANT_BOOL vbStoreEmptyAttributes);
 
@@ -165,6 +166,7 @@ private:
 												long nFileTaskSessionID,
   												BSTR bstrAttributeSetName,
   												IIUnknownVector* pAttributes,
+												VARIANT_BOOL vbStoreDiscreteFields,
   												VARIANT_BOOL vbStoreRasterZone,
   												VARIANT_BOOL vbStoreEmptyAttributes );
 

@@ -43,6 +43,7 @@
             this._voaFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._attributeSetNamePathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._voaFileNamePathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._storeDiscreteDataCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
@@ -70,20 +71,20 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(361, 227);
+            this._cancelButton.Location = new System.Drawing.Point(361, 253);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 8;
+            this._cancelButton.TabIndex = 10;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(280, 227);
+            this._okButton.Location = new System.Drawing.Point(280, 253);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 7;
+            this._okButton.TabIndex = 9;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -112,10 +113,10 @@
             // _storeRasterZonesCheckBox
             // 
             this._storeRasterZonesCheckBox.AutoSize = true;
-            this._storeRasterZonesCheckBox.Location = new System.Drawing.Point(12, 175);
+            this._storeRasterZonesCheckBox.Location = new System.Drawing.Point(12, 201);
             this._storeRasterZonesCheckBox.Name = "_storeRasterZonesCheckBox";
             this._storeRasterZonesCheckBox.Size = new System.Drawing.Size(204, 17);
-            this._storeRasterZonesCheckBox.TabIndex = 5;
+            this._storeRasterZonesCheckBox.TabIndex = 7;
             this._storeRasterZonesCheckBox.Text = "Store spatial information (raster zones)";
             this._storeRasterZonesCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -128,7 +129,7 @@
             this.groupBox1.Location = new System.Drawing.Point(12, 97);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(424, 63);
-            this.groupBox1.TabIndex = 4;
+            this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Mode";
             // 
@@ -161,10 +162,10 @@
             this._doNotSaveEmptyCheckBox.AutoSize = true;
             this._doNotSaveEmptyCheckBox.Checked = true;
             this._doNotSaveEmptyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this._doNotSaveEmptyCheckBox.Location = new System.Drawing.Point(12, 201);
+            this._doNotSaveEmptyCheckBox.Location = new System.Drawing.Point(12, 227);
             this._doNotSaveEmptyCheckBox.Name = "_doNotSaveEmptyCheckBox";
             this._doNotSaveEmptyCheckBox.Size = new System.Drawing.Size(161, 17);
-            this._doNotSaveEmptyCheckBox.TabIndex = 6;
+            this._doNotSaveEmptyCheckBox.TabIndex = 8;
             this._doNotSaveEmptyCheckBox.Text = "Do not store empty attributes";
             this._doNotSaveEmptyCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -204,13 +205,25 @@
             this._voaFileNamePathTagButton.TextControl = this._voaFileNameTextBox;
             this._voaFileNamePathTagButton.UseVisualStyleBackColor = true;
             // 
+            // _storeDiscreteDataCheckBox
+            // 
+            this._storeDiscreteDataCheckBox.AutoSize = true;
+            this._storeDiscreteDataCheckBox.Location = new System.Drawing.Point(12, 175);
+            this._storeDiscreteDataCheckBox.Name = "_storeDiscreteDataCheckBox";
+            this._storeDiscreteDataCheckBox.Size = new System.Drawing.Size(288, 17);
+            this._storeDiscreteDataCheckBox.TabIndex = 6;
+            this._storeDiscreteDataCheckBox.Text = "Store discrete data fields in addition to the binary stream";
+            this._storeDiscreteDataCheckBox.UseVisualStyleBackColor = true;
+            this._storeDiscreteDataCheckBox.CheckedChanged += new System.EventHandler(this.HandleStoreDiscretDataCheckBoxCheckChanged);
+            // 
             // StoreAttributesInDBTaskSettingsDialog
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(448, 262);
+            this.ClientSize = new System.Drawing.Size(448, 287);
+            this.Controls.Add(this._storeDiscreteDataCheckBox);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._attributeSetNameComboBox);
             this.Controls.Add(this._storeRasterZonesCheckBox);
@@ -224,7 +237,7 @@
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._doNotSaveEmptyCheckBox);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(1000, 300);
+            this.MaximumSize = new System.Drawing.Size(1000, 326);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(463, 300);
             this.Name = "StoreAttributesInDBTaskSettingsDialog";
@@ -253,5 +266,6 @@
         private System.Windows.Forms.RadioButton _RetrieveRadioButton;
         private System.Windows.Forms.RadioButton _StoreRadioButton;
         private System.Windows.Forms.CheckBox _doNotSaveEmptyCheckBox;
+        private System.Windows.Forms.CheckBox _storeDiscreteDataCheckBox;
     }
 }

@@ -125,12 +125,16 @@ namespace Extract.FileActionManager.FileProcessors
                 _StoreRadioButton.Checked = Settings.StoreModeIsSet;
                 _RetrieveRadioButton.Checked = !Settings.StoreModeIsSet;
 
+                _storeDiscreteDataCheckBox.Checked = Settings.StoreDiscreteData;
+                _storeDiscreteDataCheckBox.Enabled = Settings.StoreModeIsSet;
+                _storeDiscreteDataCheckBox.Visible = Settings.StoreModeIsSet;
+
                 _storeRasterZonesCheckBox.Checked = Settings.StoreRasterZones;
-                _storeRasterZonesCheckBox.Enabled = Settings.StoreModeIsSet;
+                _storeRasterZonesCheckBox.Enabled = Settings.StoreModeIsSet && Settings.StoreDiscreteData;
                 _storeRasterZonesCheckBox.Visible = Settings.StoreModeIsSet;
 
                 _doNotSaveEmptyCheckBox.Checked = !Settings.StoreEmptyAttributes;
-                _doNotSaveEmptyCheckBox.Enabled = Settings.StoreModeIsSet;
+                _doNotSaveEmptyCheckBox.Enabled = Settings.StoreModeIsSet && Settings.StoreDiscreteData;
                 _doNotSaveEmptyCheckBox.Visible = Settings.StoreModeIsSet;
 
                 // Don't initialize the combo box until the store/retrieve radio selection has been
@@ -251,6 +255,8 @@ namespace Extract.FileActionManager.FileProcessors
                 Settings.StoreModeIsSet = _StoreRadioButton.Checked;
                 Settings.StoreEmptyAttributes = !_doNotSaveEmptyCheckBox.Checked;
 
+                Settings.StoreDiscreteData = _storeDiscreteDataCheckBox.Checked;
+
                 DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
@@ -266,11 +272,14 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                _storeDiscreteDataCheckBox.Visible = true;
+                _storeDiscreteDataCheckBox.Enabled = true;
+
                 _storeRasterZonesCheckBox.Visible = true;
-                _storeRasterZonesCheckBox.Enabled = true;
+                _storeRasterZonesCheckBox.Enabled = _storeDiscreteDataCheckBox.Checked;
 
                 _doNotSaveEmptyCheckBox.Visible = true;
-                _doNotSaveEmptyCheckBox.Enabled = true;
+                _doNotSaveEmptyCheckBox.Enabled = _storeDiscreteDataCheckBox.Checked;
 
                 // Add the "add new attribute set name..." label to the attribute set name combo box
                 SetAttributeSetNameComboBox(null);
@@ -288,6 +297,9 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                _storeDiscreteDataCheckBox.Enabled = false;
+                _storeDiscreteDataCheckBox.Visible = false;
+
                 _storeRasterZonesCheckBox.Enabled = false;
                 _storeRasterZonesCheckBox.Visible = false;
 
@@ -301,6 +313,22 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 ExtractException.Display("ELI39193", ex);
+            }
+        }
+
+        /// <summary>
+        /// Event handler for store radio button - click
+        /// </summary>
+        private void HandleStoreDiscretDataCheckBoxCheckChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _storeRasterZonesCheckBox.Enabled = _storeDiscreteDataCheckBox.Checked;
+                _doNotSaveEmptyCheckBox.Enabled = _storeDiscreteDataCheckBox.Checked;
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI41631", ex);
             }
         }
 

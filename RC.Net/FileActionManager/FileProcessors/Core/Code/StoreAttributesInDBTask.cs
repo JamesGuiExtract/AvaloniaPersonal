@@ -48,6 +48,13 @@ namespace Extract.FileActionManager.FileProcessors
         string AttributeSetName { get; set; }
 
         /// <summary>
+        /// Gets or sets whether discrete data should be stored with the attributes.
+        /// </summary>
+        /// <value><see langword="true"/> if discrete data should be stored; otherwise,
+        /// <see langword="false"/>.</value>
+        bool StoreDiscreteData { get; set; }
+
+        /// <summary>
         /// Gets or sets whether raster zone data should be stored with the attributes.
         /// </summary>
         /// <value><see langword="true"/> if raster zone data should be stored; otherwise,
@@ -82,8 +89,9 @@ namespace Extract.FileActionManager.FileProcessors
 
         /// <summary>
         /// Current task version.
+        /// Version 4: Added StoreDiscreteData property
         /// </summary>
-        const int _CURRENT_VERSION = 3;
+        const int _CURRENT_VERSION = 4;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -109,6 +117,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// The name to use for the dataset.
         /// </summary>
         string _attributeSetName;
+
+        /// <summary>
+        /// Indicates whether discrete data should be stored with the attributes.
+        /// </summary>
+        private bool _storeDiscreteData;
 
         /// <summary>
         /// Indicates whether raster zone data should be stored with the attributes.
@@ -137,7 +150,7 @@ namespace Extract.FileActionManager.FileProcessors
 
         #endregion Fields
 
-         #region Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StoreAttributesInDBTask"/> class.
@@ -209,6 +222,28 @@ namespace Extract.FileActionManager.FileProcessors
                 if (!string.Equals(_attributeSetName, value, StringComparison.Ordinal))
                 {
                     _attributeSetName = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether discrete data should be stored with the attributes.
+        /// </summary>
+        /// <value><see langword="true"/> if discrete data should be stored; otherwise,
+        /// <see langword="false"/>.</value>
+        public bool StoreDiscreteData
+        {
+            get
+            {
+                return _storeDiscreteData;
+            }
+
+            set
+            {
+                if (value != _storeDiscreteData)
+                {
+                    _storeDiscreteData = value;
                     _dirty = true;
                 }
             }
@@ -523,6 +558,7 @@ namespace Extract.FileActionManager.FileProcessors
                     _attributeDBManager.CreateNewAttributeSetForFile(fileTaskSessionID,
                                                                       expandedAttrSetName,
                                                                       voaData,
+                                                                      StoreDiscreteData,
                                                                       StoreRasterZones,
                                                                       StoreEmptyAttributes);
 
@@ -637,6 +673,15 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         _storeEmptyAttributes = reader.ReadBoolean();
                     }
+
+                    if (reader.Version > 3)
+                    {
+                        _storeDiscreteData = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        _storeDiscreteData = true;
+                    }
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -669,6 +714,7 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write(_storeRasterZones);
                     writer.Write(_storeModeIsSet);
                     writer.Write(_storeEmptyAttributes);
+                    writer.Write(_storeDiscreteData);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -735,6 +781,7 @@ namespace Extract.FileActionManager.FileProcessors
             _storeRasterZones = task.StoreRasterZones;
             _storeModeIsSet = task._storeModeIsSet;
             _storeEmptyAttributes = task._storeEmptyAttributes;
+            _storeDiscreteData = task._storeDiscreteData;
 
             _dirty = true;
         }
