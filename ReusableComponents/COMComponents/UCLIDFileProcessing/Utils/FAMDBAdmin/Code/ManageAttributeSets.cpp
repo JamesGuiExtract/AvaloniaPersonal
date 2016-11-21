@@ -6,6 +6,7 @@
 #include "ManageAttributeSets.h"
 #include "afxdialogex.h"
 #include "cpputil.h"
+#include <COMUtils.h>
 
 #include <UCLIDException.h>
 #include <SuspendWindowUpdates.h>
@@ -184,26 +185,68 @@ void CManageAttributeSets::OnBnClickedBtnRemoveAttributeSet()
 	try
 	{
 		// Check if there is no Attribute Set selected
-		if ( m_listAttributeSets.GetSelectedCount() != 1 )
+		if ( m_listAttributeSets.GetSelectedCount() == 0 )
 		{
 			return;
 		}
 
-		// Get the selected Attribute Set to rename
+		// Display the wait cursor while attribute set is deleted
+		CWaitCursor cursor;
+
+		// Get the selected Attribute Set(s) to remove
 		POSITION pos = m_listAttributeSets.GetFirstSelectedItemPosition();
+
 		if (pos != __nullptr)
 		{
+			// Prompt to verify
+			if (MessageBox("Remove the selected attribute set(s)?", "Confirmation", MB_YESNOCANCEL) != IDYES)
+			{
+				return;
+			}
+
+			string strAttributeSetsDeleted = "";
+
+			// Display the wait cursor while attribute sets are deleted
+			CWaitCursor cursor;
+
 			// Get index of first selection
 			int iIndex = m_listAttributeSets.GetNextSelectedItem( pos );
 
-			string strCurrSelection = m_listAttributeSets.GetItemText(iIndex, giATTRIBUTE_SETS_COLUMN);
-
-			string strMessage = "Delete Attribute Set: " + strCurrSelection + "?";
-			if (attributeSetExists(strCurrSelection) &&
-				MessageBox(strMessage.c_str(), "Delete Attribute Set", MB_YESNO | MB_DEFBUTTON2) == IDYES)
+			// Remove the attribute sets
+			while (iIndex != -1)
 			{
-				m_ipAttributeDBMgr->DeleteAttributeSetName(strCurrSelection.c_str());
+				// Get the attribute sets to remove
+				string strCurrSelection = m_listAttributeSets.GetItemText(iIndex, giATTRIBUTE_SETS_COLUMN);
+
+				// Catch any exceptions for each attribute set being deleted.
+				try
+				{
+					// Delete the attribute set
+					m_ipAttributeDBMgr->DeleteAttributeSetName(strCurrSelection.c_str());
+
+					// Add the attribute set to string for debug
+					if (!strAttributeSetsDeleted.empty())
+					{
+						strAttributeSetsDeleted += ", ";
+					}
+					strAttributeSetsDeleted += strCurrSelection;
+				}
+				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41633");
+
+				// Get index of next selection
+				iIndex = m_listAttributeSets.GetNextSelectedItem( pos );
 			}
+
+			// Add application trace whenever a database modification is made
+			// [LRCAU #5052 - JDS - 12/18/2008]
+			// https://extract.atlassian.net/browse/ISSUE-10496
+			UCLIDException uex("ELI41634", "Application trace: Database change");
+			uex.addDebugInfo("Change", "Remove attribute set(s)");
+			uex.addDebugInfo("User Name", getCurrentUserName());
+			uex.addDebugInfo("Server Name", asString(m_ipAttributeDBMgr->FAMDB->DatabaseServer));
+			uex.addDebugInfo("Database", asString(m_ipAttributeDBMgr->FAMDB->DatabaseName));
+			uex.addDebugInfo("Attribute set(s) removed", strAttributeSetsDeleted);
+			uex.log();
 		}
 		refreshAttributeSetsList();
 	}
@@ -259,12 +302,14 @@ void CManageAttributeSets::updateControls()
 		// Get the selection count
 		unsigned int iCount = m_listAttributeSets.GetSelectedCount();
 
+		// Allow removing multiple attribute sets
+		m_btnRemove.EnableWindow(asMFCBool(iCount > 0));
+
 		BOOL bEnableOneSelected = asMFCBool(iCount == 1);
 
 		// Enable only if one item is selected
 		m_btnRename.EnableWindow(bEnableOneSelected);
 		m_btnHistory.EnableWindow(bEnableOneSelected);
-		m_btnRemove.EnableWindow(bEnableOneSelected);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38671");
 }

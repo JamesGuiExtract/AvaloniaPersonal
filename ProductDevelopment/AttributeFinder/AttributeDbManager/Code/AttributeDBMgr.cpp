@@ -576,6 +576,21 @@ STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38540");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeDBMgr::get_FAMDB(IFileProcessingDB** retVal)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+		ASSERT_ARGUMENT("ELI41635", retVal != nullptr);
+
+		IFileProcessingDBPtr ipTemp = m_ipFAMDB;
+		*retVal = ipTemp.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41636");
+}
+//-------------------------------------------------------------------------------------------------
 
 namespace
 {

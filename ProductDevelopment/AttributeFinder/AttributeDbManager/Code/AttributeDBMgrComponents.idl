@@ -33,6 +33,8 @@ library AttributeDbMgrComponentsLib
 	]
 	interface IAttributeDBMgr : IDispatch
 	{
+		[propget, id(1), helpstring("property FAMDB")] 
+		HRESULT FAMDB([out, retval] IFileProcessingDB** pVal);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To set the FAMDB
 		[propput, id(1), helpstring("property FAMDB")] 

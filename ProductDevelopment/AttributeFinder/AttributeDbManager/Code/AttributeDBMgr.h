@@ -77,6 +77,7 @@ public:
 											   IProgressStatus* pProgressStatus);
 // IAttributeDBMgr Methods
 	STDMETHOD(put_FAMDB)(IFileProcessingDB* newVal);
+	STDMETHOD(get_FAMDB)(IFileProcessingDB** retVal);
 
 	STDMETHOD(CreateNewAttributeSetForFile)(long nFileTaskSessionID,
 											BSTR bstrAttributeSetName,
