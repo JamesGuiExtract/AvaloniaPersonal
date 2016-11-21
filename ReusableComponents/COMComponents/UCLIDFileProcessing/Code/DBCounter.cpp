@@ -173,8 +173,11 @@ bool DBCounter::isValid(const long nDatabaseIDHash, FieldsPtr ipFields/* = nullp
 		validate(nDatabaseIDHash, ipFields);
 		return true;
 	}
-	catch (...)
+	catch (UCLIDException ue)
 	{
+		// Log the exception to help track down what caused the counter to be invalid
+		ue.log();
+
 		return false;
 	}
 }

@@ -8907,16 +8907,22 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 
 				try
 				{
-					dbCounter.LoadFromFields(ipResultSet->Fields);
-					bool bValid = bIsDatabaseIDValid && 
-						dbCounter.isValid(m_DatabaseIDValues.m_nHashValue, ipResultSet->Fields);
+					try
+					{
+						dbCounter.LoadFromFields(ipResultSet->Fields);
+						bool bValid = bIsDatabaseIDValid &&
+							dbCounter.isValid(m_DatabaseIDValues.m_nHashValue, ipResultSet->Fields);
 
-					ipSecureCounter->Initialize(getThisAsCOMPtr(), dbCounter.m_nID,
-						_bstr_t(dbCounter.m_strName.c_str()), dbCounter.m_nAlertLevel,
-						dbCounter.m_nAlertMultiple, asVariantBool(bValid));
+						ipSecureCounter->Initialize(getThisAsCOMPtr(), dbCounter.m_nID,
+							_bstr_t(dbCounter.m_strName.c_str()), dbCounter.m_nAlertLevel,
+							dbCounter.m_nAlertMultiple, asVariantBool(bValid));
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41637")
 				}
-				catch (...)
+				catch (UCLIDException ue)
 				{
+					// Log the exception to make it easier to track Counter problems
+					ue.log();
 					ipSecureCounter->Initialize(getThisAsCOMPtr(), 0, "", 0, 0, false);
 				}
 				
