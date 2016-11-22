@@ -2871,17 +2871,6 @@ namespace Extract.DataEntry
             }
         }
 
-        ///// <summary>
-        ///// Raises the <see cref="E:System.Windows.Forms.Control.LostFocus" /> event.
-        ///// </summary>
-        ///// <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
-        //protected override void OnLostFocus(EventArgs e)
-        //{
-        //    base.OnLostFocus(e);
-
-        //    _regainingFocus = true;
-        //}
-
         /// <summary>
         /// Override <see cref="Control.OnEnter"/> to keep track of when focus had belonged to 
         /// a control outside of the control host, but is now returning to a control within the 
@@ -2890,9 +2879,23 @@ namespace Extract.DataEntry
         /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
         protected override void OnEnter(EventArgs e)
         {
-            base.OnEnter(e);
+            try
+            {
+                base.OnEnter(e);
 
-            _regainingFocus = true;
+                _regainingFocus = true;
+
+                // https://extract.atlassian.net/browse/ISSUE-13981
+                // Ensure _regainingFocus only remains set for the duration of the action that
+                // triggered this OnEnter. Some events (such as swipes) that trigger OnEnter do not
+                // trigger a subsequent GotFocus so _regainingFocus could get left as true and the
+                // next focus even could wind up with multiple fields focused.
+                ExecuteOnIdle("ELI41638", () => _regainingFocus = false);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41639");
+            }
         }
 
         /// <summary>
@@ -3262,6 +3265,12 @@ namespace Extract.DataEntry
         {
             try
             {
+                // If an attribute has been selected, _manualFocusEvent and _regainingFocus can be
+                // reset here. Otherwise, focus changes between multiple cells in the same control
+                // can leave these set causing unexpected attributes selected.
+                _manualFocusEvent = false;
+                _regainingFocus = false;
+
                 // Note whether the current selection was due to tabbing (used by the tabbing-by-row
                 // logic).
                 if (_tabKeyDown)

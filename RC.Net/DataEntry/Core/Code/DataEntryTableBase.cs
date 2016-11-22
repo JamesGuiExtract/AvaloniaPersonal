@@ -1396,7 +1396,8 @@ namespace Extract.DataEntry
             {
                 // If in edit mode and the DEP doesn't contain focus, eat the OnValidating event.
                 // This will prevent edit mode from ending.
-                if (EditingControl == null || DataEntryControlHost.ContainsFocus)
+                if (EditingControl == null ||
+                    (DataEntryControlHost != null && DataEntryControlHost.ContainsFocus))
                 {
                     // [DataEntry:920]
                     // When in the process of validating, prevent IndicateActive(false) from
