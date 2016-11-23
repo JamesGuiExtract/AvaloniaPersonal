@@ -168,15 +168,21 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <param name="fileId">The file ID to link to the record.</param>
         public override void LinkFileWithRecord(int fileId)
-        {
+        { 
             try
             {
                 var collectionDateField = new DocumentDataField(Attribute, _configuration.CollectionDateAttributePath, false);
                 var collectionTimeField = new DocumentDataField(Attribute, _configuration.CollectionTimeAttributePath, false);
 
-                DateTime collectionDateTime = DateTime.Parse(
+                DateTime collectionDateTime;
+                bool useCollectionDateTime = false;
+                if (DateTime.TryParse(
                     collectionDateField.Value + " " + collectionTimeField.Value,
-                    CultureInfo.CurrentCulture);
+                    CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.NoCurrentDateDefault,
+                    out collectionDateTime))
+                {
+                    useCollectionDateTime = true;
+                }
 
                 string query = string.Format(CultureInfo.CurrentCulture,
                     "DECLARE @linkExists INT \r\n" +
@@ -184,18 +190,23 @@ namespace Extract.DataEntry.LabDE
                     "       FROM [LabDEOrderFile] WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
                     "IF @linkExists = 1 \r\n" +
                     "BEGIN \r\n" +
-                    "    UPDATE [LabDEOrderFile] SET [CollectionDate] = {2} \r\n" +
+                    (useCollectionDateTime
+                        ? "    UPDATE [LabDEOrderFile] SET [CollectionDate] = '{2}' \r\n"
+                        : "    UPDATE [LabDEOrderFile] SET [CollectionDate] = NULL \r\n") +
                     "        WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
                     "END \r\n" +
                     "ELSE \r\n" +
                     "BEGIN \r\n" +
                     "    IF {0} IN (SELECT [OrderNumber] FROM [LabDEOrder]) \r\n" +
                     "    BEGIN \r\n" +
-                    "        INSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID], [CollectionDate]) \r\n" +
-                    "            VALUES ({0}, {1}, {2}) \r\n" +
+                    (useCollectionDateTime
+                        ? "        INSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID], [CollectionDate]) \r\n" +
+                          "            VALUES ({0}, {1}, '{2}') \r\n"
+                        : "        INSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID]) \r\n" +
+                          "            VALUES ({0}, {1}) \r\n") +
                     "   END \r\n" +
                     "END",
-                    "'" + IdField.Value + "'", fileId, "'" + collectionDateTime + "'");
+                    "'" + IdField.Value + "'", fileId, collectionDateTime);
 
                 // The query has no results-- immediately dispose of the DataTable returned.
                 FAMData.ExecuteDBQuery(query).Dispose();

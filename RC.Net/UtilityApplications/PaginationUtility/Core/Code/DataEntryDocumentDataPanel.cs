@@ -488,7 +488,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 catch (Exception ex)
                 {
-                    throw ex.AsExtract("ELI0");
+                    throw ex.AsExtract("ELI41640");
                 }
             }
 

@@ -152,6 +152,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         string _fileName;
 
         /// <summary>
+        /// Indicates whether the an image is currently open for verification in the main data entry
+        /// panel (data tab if pagination is enabled).
+        /// </summary>
+        bool _imageOpened;
+
+        /// <summary>
         /// The ID of the action being processed.
         /// </summary>
         int _actionId;
@@ -1821,7 +1827,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _acceptSpatialInfoCommand.ShortcutHandler = null;
                         _removeSpatialInfoCommand.ShortcutHandler = null;
 
-                        //AttributeStatusInfo.ResetData(null, null, null);
                         oldDatEntryControlHost.ClearData();
                     }
 
@@ -2088,6 +2093,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _closeFileCommand.Enabled = (_standAloneMode && _imageViewer.IsImageAvailable);
 
                 _documentTypeComboBox.Enabled = _imageViewer.IsImageAvailable;
+                _imageOpened = _imageViewer.IsImageAvailable;
 
                 // Ensure the DEP is scrolled back to the top when a document is loaded, but delay
                 // the call to scroll until the next control selection change since the scroll panel
@@ -2933,7 +2939,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _paginagionAttributesToRefresh.Clear();
 
-                    DataEntryControlHost.EnsureFieldSelection();
+                    // https://extract.atlassian.net/browse/ISSUE-14265
+                    // If the current image was never opened in the main date entry verification
+                    // panel (data tab), we will not be able to select a field.
+                    if (_imageOpened)
+                    {
+                        DataEntryControlHost.EnsureFieldSelection();
+                    }
 
                     // Table controls don't always seem to be drawn correctly after switching tabs.
                     DataEntryControlHost.Refresh();
