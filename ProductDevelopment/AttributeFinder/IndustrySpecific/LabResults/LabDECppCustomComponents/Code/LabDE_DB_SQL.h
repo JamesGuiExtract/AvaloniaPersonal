@@ -75,6 +75,11 @@ static const string gstrADD_FK_ENCOUNTER_PATIENT =
 " ON UPDATE CASCADE "
 " ON DELETE CASCADE";
 
+static const string gstrCREATE_ENCOUNTER_PATIENT_MRN_INDEX =
+"CREATE NONCLUSTERED INDEX [IX_LabDEEncounterPatientMRN] "
+"ON [dbo].[LabDEEncounter]([PatientMRN]) "
+"ON[PRIMARY] ";
+
 //--------------------------------------------------------------------------------------------------
 // LabDEOrderStatus Table
 //--------------------------------------------------------------------------------------------------
