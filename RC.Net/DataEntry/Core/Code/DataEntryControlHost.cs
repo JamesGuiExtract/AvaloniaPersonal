@@ -5645,6 +5645,13 @@ namespace Extract.DataEntry
                         ExtractException.Assert("ELI38240", "Failed to advance selection.",
                             activeAttribute != originalActiveAttribute);
 
+                        // Prevent infinite loop in the case that there are no active/enabled controls
+                        // https://extract.atlassian.net/browse/ISSUE-14265
+                        if (originalActiveAttribute == null)
+                        {
+                            originalActiveAttribute = activeAttribute;
+                        }
+
                         repeat = true;
                     }
                 }
