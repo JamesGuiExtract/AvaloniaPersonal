@@ -4881,7 +4881,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         lastPageNum.ToString(CultureInfo.InvariantCulture));
                 }
 
-                return pathTags.Expand(_settings.PaginationSettings.PaginationOutputPath);
+                return Path.GetFullPath(pathTags.Expand(_settings.PaginationSettings.PaginationOutputPath));
             }
             catch (Exception ex)
             {

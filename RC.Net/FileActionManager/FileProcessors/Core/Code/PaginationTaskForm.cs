@@ -1659,7 +1659,7 @@ namespace Extract.FileActionManager.FileProcessors
                         lastPageNum.ToString(CultureInfo.InvariantCulture));
                 }
 
-                return pathTags.Expand(_settings.OutputPath);
+                return Path.GetFullPath(pathTags.Expand(_settings.OutputPath));
             }
             catch (Exception ex)
             {
