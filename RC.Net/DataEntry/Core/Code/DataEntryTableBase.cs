@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -22,7 +23,7 @@ namespace Extract.DataEntry
     /// A base of common code needed by any <see cref="IDataEntryControl"/> that extends
     /// <see cref="DataGridView"/>.
     /// </summary>
-    public abstract partial class DataEntryTableBase : DataGridView, IDataEntryControl
+    public abstract partial class DataEntryTableBase : DataGridView, IDataEntryControl, ISupportInitialize
     {
         #region Constants
 
@@ -2893,6 +2894,35 @@ namespace Extract.DataEntry
         }
 
         #endregion Protected Members
+
+        #region ISupportInitialize
+
+        /// <summary>
+        /// Signals the object that initialization is complete.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
+        void ISupportInitialize.EndInit()
+        {
+            try
+            {
+                // Especially for tables that single row, make rows fit within table nicely.
+                if (ClientSize.Height - 2 < RowTemplate.Height)
+                {
+                    RowTemplate.Height = ClientSize.Height - 2;
+                }
+
+                InterfaceMapping interfaceMapping = typeof(DataGridView).GetInterfaceMap(typeof(ISupportInitialize));
+                MethodInfo endInitMethod = interfaceMapping.TargetMethods.Single(
+                    m => m.Name.EndsWith("EndInit", StringComparison.Ordinal));
+                endInitMethod.Invoke(this, new object[0]);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41646");
+            }
+        }
+
+        #endregion ISupportInitialize
 
         #region Event Handlers
 
