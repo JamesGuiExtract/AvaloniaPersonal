@@ -5162,7 +5162,14 @@ namespace Extract.DataEntry
         /// </summary>
         protected virtual void OnDataChanged()
         {
-            _dirty = true;
+            // https://extract.atlassian.net/browse/ISSUE-14269
+            // The DataEntryConfigurationManager (and perhaps other classes as well) may modify data
+            // independently before the data is loaded into the DEP. Only mark as dirty if a
+            // document is currently loaded.
+            if (_isDocumentLoaded)
+            {
+                _dirty = true;
+            }
         }
 
         /// <summary>

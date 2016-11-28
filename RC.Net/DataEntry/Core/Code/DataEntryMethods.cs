@@ -1290,6 +1290,7 @@ namespace Extract.DataEntry
                     // displaying the list anyway (not sure if AutoCompleteMode is getting
                     // automatically turned back on or what).
                     autoCompleteList = new AutoCompleteStringCollection();
+                    autoCompleteValues = new string[0];
                     return true;
                 }
 
