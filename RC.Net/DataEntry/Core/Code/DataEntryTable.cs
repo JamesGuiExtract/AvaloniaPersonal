@@ -1598,6 +1598,28 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.Resize" /> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+        protected override void OnResize(EventArgs e)
+        {
+            try
+            {
+                base.OnResize(e);
+
+                // Especially for tables that single row, make rows fit within table nicely.
+                if (ClientSize.Height - 2 < RowTemplate.Height)
+                {
+                    RowTemplate.Height = ClientSize.Height - 2;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41642");
+            }
+        }
+
+        /// <summary>
         /// Deletes the attributes that aren't needed anymore (via AttributeStatusInfo), and ensures
         /// the deleted attribute is no longer referenced by any table member.
         /// </summary>
