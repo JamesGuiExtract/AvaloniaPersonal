@@ -85,6 +85,7 @@
     prototype BOOL CheckProductKeyInstalled(STRING, STRING, BYREF STRING, BOOL);
     prototype InstallSQLCE();
     prototype DetectDotNET_40();
+    prototype DetectDotNET_4_6();	
     prototype UninstallSQLCE();
     prototype InstallDotNetService(STRING);
     prototype UninstallDotNetService(STRING);    
@@ -218,7 +219,8 @@ begin
 	//		abort;
 	//	endif;
 	//endif;
-    DetectDotNET_40();
+    //DetectDotNET_40();
+	DetectDotNET_4_6();
 end;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -575,7 +577,7 @@ end;
 //
 //  FUNCTION:   DetectDotNET_40
 //
-//  EVENT:      Aborts with message if .NET 3.5 is not installed
+//  EVENT:      Aborts with message if .NET 4.0 is not installed
 //
 ///////////////////////////////////////////////////////////////////////////////
 function DetectDotNET_40()
@@ -593,6 +595,40 @@ begin
 		gbInstalled  = FALSE;
 		if (MODE != SILENTMODE) then
 			MessageBox("Microsoft .NET 4.0 must be installed before running this install.", MB_OK);
+		endif;
+		abort;
+	endif; 
+end;
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   DetectDotNET_4_6
+//
+//  EVENT:      Aborts with message if .NET 4.6 is not installed
+//
+///////////////////////////////////////////////////////////////////////////////
+// From:
+// https://msdn.microsoft.com/en-us/library/hh925568(v=vs.110).aspx
+
+function DetectDotNET_4_6()
+STRING szProgram, svValue;
+int nResult, svServiceState, minimumDotNet4_6_releaseVersionValue, ret, releaseValue;       
+NUMBER nvType, nvSize;
+begin
+	// Change the root for the registry
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	
+	minimumDotNet4_6_releaseVersionValue = 393295; 
+ 	svValue = "";   
+	RegDBGetKeyValueEx (REG_PATH_DOT_NET_40_INSTALL, "Release", nvType, svValue, nvSize);
+	
+	releaseValue = 0;
+	ret = StrToNum(releaseValue, svValue);
+	if (ret < 0 || releaseValue < minimumDotNet4_6_releaseVersionValue) then
+		gbInstalled = FALSE;
+		if (MODE != SILENTMODE) then
+			MessageBox("Microsoft .NET 4.6 must be installed before running this install.", MB_OK);
 		endif;
 		abort;
 	endif; 
