@@ -551,8 +551,8 @@ namespace Extract.FileActionManager.FileProcessors
                     timer.Start();
                     int fileTaskSessionID = pDB.StartFileTaskSession(_CLASS_GUID,
                                                                      pFileRecord.FileID);
-                    IUnknownVector voaData = new IUnknownVector();
-                    voaData.LoadFrom(voaFileName, false);
+                    var afutility = new UCLID_AFUTILSLib.AFUtility();
+                    IUnknownVector voaData = afutility.GetAttributesFromFile(voaFileName);
                     voaData.ReportMemoryUsage();
 
                     _attributeDBManager.CreateNewAttributeSetForFile(fileTaskSessionID,

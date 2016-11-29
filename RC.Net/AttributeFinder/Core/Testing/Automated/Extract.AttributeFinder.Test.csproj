@@ -81,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestLearningMachineOutputHandler.cs" />
+    <Compile Include="TestAFUtils.cs" />
     <Compile Include="TestLocateImageRegion.cs" />
     <Compile Include="TestLearningMachine.cs" />
     <Compile Include="TestLearningMachineDataEncoder.cs" />
