@@ -5,6 +5,7 @@ using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -581,7 +582,8 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("Unable to {0} attributes for file: {1}, attribute set name: {2}",
+                sb.AppendFormat(CultureInfo.CurrentCulture,
+                    "Unable to {0} attributes for file: {1}, attribute set name: {2}",
                                  StoreModeIsSet ? "store" : "retrieve",
                                  pFileRecord.Name,
                                  _attributeSetName);        // NOTE: can't easily expand this name...

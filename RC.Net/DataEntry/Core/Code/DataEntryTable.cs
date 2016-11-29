@@ -500,8 +500,18 @@ namespace Extract.DataEntry
         /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
         protected override void OnHandleCreated(EventArgs e)
         {
+            var autoSizeMode = ColumnHeadersHeightSizeMode;
+
             try
             {
+                // https://extract.atlassian.net/browse/ISSUE-14222
+                // The sequence of events when this form sometimes results in an
+                // InvalidOperationException related to column sizing during layout. The call stack
+                // at the time of the exception is outside of Extract code. However, since the
+                // situation seems to be related to enforcing ColumnHeadersHeightSizeMode,
+                // temporarily disable any column header resizing while changing visibility.
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+
                 base.OnHandleCreated(e);
 
                 // If we are not in design mode and the control is being made visible for the first
@@ -599,6 +609,17 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException.AsExtractException("ELI24250", ex).Display();
+            }
+            finally
+            {
+                try
+                {
+                    ColumnHeadersHeightSizeMode = autoSizeMode;
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractLog("ELI41647");
+                }
             }
         }
 
