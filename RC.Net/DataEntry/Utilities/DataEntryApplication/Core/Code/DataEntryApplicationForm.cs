@@ -597,6 +597,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _configManager = new DataEntryConfigurationManager<Properties.Settings>(this, _tagUtility,
                     _applicationConfig, _imageViewer, _documentTypeComboBox);
 
+                // ComponentData directories referenced by configuration databases will be cached.
+                // Clear any cached ComponentData directory each time the UI is opened.
+                DataEntryConfiguration.ResetComponentDataDir();
+
                 if (!_standAloneMode)
                 {
                     _exitToolStripMenuItem.Text = "Stop processing";

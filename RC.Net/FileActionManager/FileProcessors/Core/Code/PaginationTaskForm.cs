@@ -624,6 +624,10 @@ namespace Extract.FileActionManager.FileProcessors
                     _paginationDocumentDataPanel.RedoAvailabilityChanged += HandlePaginationDocumentDataPanel_RedoAvailabilityChanged;
                 }
 
+                // ComponentData directories referenced by configuration databases will be cached.
+                // Clear any cached ComponentData directory each time the UI is opened.
+                DataEntryConfiguration.ResetComponentDataDir();
+
                 if (_splitContainer.Panel1MinSize < _paginationPanel.MinimumSize.Width)
                 {
                     _splitContainer.Panel1MinSize = _paginationPanel.MinimumSize.Width;

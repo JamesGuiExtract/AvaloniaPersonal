@@ -704,11 +704,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var miscUtils = new MiscUtils();
                 var deserializedAttributes = (IUnknownVector)miscUtils.GetObjectFromStringizedByteStream(serializedAttributes);
 
-                using (var form = new Form())
+                using (var form = new InvisibleForm())
                 using (var imageViewer = new ImageViewer())
                 using (var tempPanel = new DataEntryPanelContainer(_expandedConfigFileName, _dataEntryApp, _tagUtility, imageViewer))
                 {
-                    form.MakeFormInvisible();
                     form.Show();
                     form.Controls.Add(tempPanel);
                     form.Controls.Add(imageViewer);

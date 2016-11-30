@@ -191,7 +191,6 @@ namespace Extract.DataEntry.LabDE
                     (useEncounterDateTime
                         ? "    UPDATE [LabDEEncounterFile] SET [EncounterDateTime] = '{2}' \r\n"
                         : "    UPDATE [LabDEEncounterFile] SET [EncounterDateTime] = NULL \r\n") +
-                    "        WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
                     "        WHERE [CSN] = {0} AND [FileID] = {1} \r\n" +
                     "END \r\n" +
                     "ELSE \r\n" +

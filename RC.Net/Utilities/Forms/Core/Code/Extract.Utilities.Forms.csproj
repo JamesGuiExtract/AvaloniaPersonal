@@ -147,6 +147,9 @@
     <Compile Include="BetterSplitContainer.Designer.cs">
       <DependentUpon>BetterSplitContainer.cs</DependentUpon>
     </Compile>
+    <Compile Include="InvisibleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ScrollPanel.cs">
       <SubType>Component</SubType>
     </Compile>

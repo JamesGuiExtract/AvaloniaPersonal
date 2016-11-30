@@ -1,13 +1,13 @@
 ﻿using Extract.Database;
 using Extract.Utilities;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
-using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -20,6 +20,18 @@ namespace Extract.DataEntry
     public class DataEntryConfiguration : IDisposable
     {
         #region Fields
+
+        /// <summary>
+        /// Cached component data directories based on the FKB version specified in a configuration
+        /// database. The keys are the database connection strings and the values are the corresponding
+        /// component data directories.
+        /// </summary>
+        static ConcurrentDictionary<string, string> _componentDataDirs = new ConcurrentDictionary<string, string>();
+
+        /// <summary>
+        /// Protects access to non-thread-safe code.
+        /// </summary>
+        static object _lock = new object();
 
         /// <summary>
         /// The configuration settings specified via config file.
@@ -112,6 +124,22 @@ namespace Extract.DataEntry
         #endregion Properties
 
         #region Methods
+
+        /// <summary>
+        /// ComponentData directories referenced by configuration databases will be cached.
+        /// Use this method to clear any cached ComponentData directories.
+        /// </summary>
+        public static void ResetComponentDataDir()
+        {
+            try
+            {
+                _componentDataDirs.Clear();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41652");
+            }
+        }
 
         /// <summary>
         /// Opens the database connections used by this configuration.
@@ -417,19 +445,36 @@ namespace Extract.DataEntry
         /// </param>
         void AddComponentDataDirTag(DatabaseConnectionInfo connectionInfo)
         {
-            if (_tagUtility != null &&
-                DBMethods.GetQueryResultsAsStringArray(connectionInfo.ManagedDbConnection,
-                "SELECT COUNT(*) FROM [INFORMATION_SCHEMA].[TABLES] WHERE [TABLE_NAME] = 'Settings'")
-                .Single() == "1")
-            {
-                string FKBVersion = DBMethods.GetQueryResultsAsStringArray(
-                    connectionInfo.ManagedDbConnection,
-                    "SELECT [Value] FROM [Settings] WHERE [Name] = 'FKBVersion'")
-                    .SingleOrDefault();
+            // https://extract.atlassian.net/browse/ISSUE-14279
+            // This code does not appear to be thread safe. Cache the component directories we look
+            // up to avoid unnecessary lookups, and serialize access to the lookup when necessary.
 
-                if (!string.IsNullOrWhiteSpace(FKBVersion))
+            if (_tagUtility == null)
+            {
+                return;
+            }
+
+            string fkbVersion;
+            if (_componentDataDirs.TryGetValue(connectionInfo.ConnectionString, out fkbVersion))
+            {
+                _tagUtility.AddTag("<ComponentDataDir>", fkbVersion);
+                return;
+            }
+
+            lock (_lock)
+            {
+                bool addedTag = false;
+
+                if (DBMethods.GetQueryResultsAsStringArray(connectionInfo.ManagedDbConnection,
+                    "SELECT COUNT(*) FROM [INFORMATION_SCHEMA].[TABLES] WHERE [TABLE_NAME] = 'Settings'")
+                    .Single() == "1")
                 {
-                    try
+                    string FKBVersion = DBMethods.GetQueryResultsAsStringArray(
+                        connectionInfo.ManagedDbConnection,
+                        "SELECT [Value] FROM [Settings] WHERE [Name] = 'FKBVersion'")
+                        .SingleOrDefault();
+
+                    if (!string.IsNullOrWhiteSpace(FKBVersion))
                     {
                         string alternateComponentDataDir = null;
                         if (_fileProcessingDB != null)
@@ -441,11 +486,16 @@ namespace Extract.DataEntry
                         var afUtility = new AFUtility();
                         var componentDataFolder =
                             afUtility.GetComponentDataFolder2(FKBVersion, alternateComponentDataDir);
+                        _componentDataDirs.TryAdd(connectionInfo.ConnectionString, componentDataFolder);
                         _tagUtility.AddTag("<ComponentDataDir>", componentDataFolder);
+
+                        addedTag = true;
                     }
-                    catch (Exception ex)
+
+                    if (!addedTag)
                     {
-                        throw ex.AsExtract("ELI41593");
+                        // Add a blank entry so we don't bother trying to look up the directory again.
+                        _componentDataDirs.TryAdd(connectionInfo.ConnectionString, "");
                     }
                 }
             }
