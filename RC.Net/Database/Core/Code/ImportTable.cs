@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Extract.Utilities;
 
 namespace Extract.Database
 {
@@ -193,6 +194,8 @@ namespace Extract.Database
             int rowsProcessed = 0;
             int rowsFailed = 0;
             DbTransaction tx = null;
+            DbTableColumnInfo tci = null;
+            bool rolledBack = false;
 
             try
             {
@@ -208,7 +211,7 @@ namespace Extract.Database
                 // Obtain information about the columns the data is to be imported into.
                 List<int> columnSizes = new List<int>();
                 List<string> columnNames = new List<string>();
-                DbTableColumnInfo tci = new DbTableColumnInfo(settings.TableName, sqlConnection);
+                tci = new DbTableColumnInfo(settings.TableName, sqlConnection);
                 foreach (var ci in tci)
                 {
                     columnNames.Add(ci.ColumnName);
@@ -221,7 +224,12 @@ namespace Extract.Database
 
                 if (settings.ReplaceData)
                 {
-                    string deleteRows = "DELETE FROM " + settings.TableName;
+                    // Is there a possibility of other auto-increment columns besides identity columns?
+                    // Code is not setup to handle such a thing so except
+                    ExtractException.Assert("ELI41649", "Cannot handle non-identity auto-increment columns",
+                        !tci.Any(column => column.IsAutoIncrement && !column.IsIdentity));
+
+                    string deleteRows = UtilityMethods.FormatInvariant($"DELETE FROM [{settings.TableName}]");
                     using (DbCommand deleteCommand =
                         DBMethods.CreateDBCommand(sqlConnection, deleteRows, null))
                     {
@@ -303,7 +311,8 @@ namespace Extract.Database
                         rowsFailed++;
 
                         StringBuilder message = new StringBuilder();
-                        message.AppendFormat("*Failed to import row \"{0}\" with the following error: {1}",
+                        message.AppendFormat(CultureInfo.CurrentCulture,
+                            "*Failed to import row \"{0}\" with the following error: {1}",
                                               rows[rowsProcessed],
                                               ex.Message);
                         messages.Add(message.ToString());
@@ -315,6 +324,7 @@ namespace Extract.Database
                     if (0 != rowsFailed)
                     {
                         tx.Rollback();
+                        rolledBack = true;
                     }
                     else
                     {
@@ -324,18 +334,61 @@ namespace Extract.Database
             }
             catch (Exception ex)
             {
+                var uex = new ExtractException("ELI40310", "Import operation failed.", ex);
                 if (null != tx)
                 {
-                    tx.Rollback();
+                    try
+                    {
+                        tx.Rollback();
+                    }
+                    catch (Exception x)
+                    {
+                        uex = new ExtractException("ELI41651", "Failed rolling back transaction.", uex);
+                        uex.AddDebugData("Error message", x.Message, false);
+                    }
                 }
 
-                throw new ExtractException("ELI40310", "Import operation failed.", ex);
+                throw uex;
             }
             finally
             {
                 if (null != tx)
                 {
                     tx.Dispose();
+                }
+            }
+
+            // Update auto-increment seed for any ID columns
+            // https://extract.atlassian.net/browse/ISSUE-14276
+            if (settings.ReplaceData && !rolledBack)
+            {
+                try
+                {
+                    foreach (var column in tci.Where(column => column.IsIdentity))
+                    {
+                        string newNextValue;
+                        var query = UtilityMethods.FormatInvariant(
+                            $"SELECT COALESCE(MAX([{column.ColumnName}]), 0) + 1 FROM [{settings.TableName}]");
+                        using (DbCommand cmd = DBMethods.CreateDBCommand(sqlConnection, query, parameters: null))
+                            newNextValue = cmd.ExecuteScalar().ToString();
+
+                        int step;
+                        query = UtilityMethods.FormatInvariant(
+                            $"SELECT AUTOINC_INCREMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME",
+                            $" = '{settings.TableName}' AND COLUMN_NAME = '{column.ColumnName}'");
+                        using (DbCommand cmd = DBMethods.CreateDBCommand(sqlConnection, query, parameters: null))
+                            step = cmd.ExecuteScalar() as int? ?? 1;
+
+                        query = UtilityMethods.FormatInvariant(
+                            $"ALTER TABLE [{settings.TableName}]",
+                            $" ALTER COLUMN [{column.ColumnName}] IDENTITY ({newNextValue}, {step})");
+                        using (DbCommand cmd = DBMethods.CreateDBCommand(sqlConnection, query, parameters: null))
+                            cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI41650");
                 }
             }
 
@@ -504,7 +557,7 @@ namespace Extract.Database
                 }
 
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("Succeeded: {0}", command.ToString());
+                sb.AppendFormat(CultureInfo.CurrentCulture, "Succeeded: {0}", command.ToString());
 
                 return sb.ToString();
             }
@@ -559,7 +612,7 @@ namespace Extract.Database
 
                 command.ExecuteNonQuery();
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("Succeeded: {0}", command.ToString());
+                sb.AppendFormat(CultureInfo.CurrentCulture, "Succeeded: {0}", command.ToString());
 
                 return sb.ToString();
             }

@@ -422,7 +422,7 @@ namespace Extract.Database
                 int columnCount = 
                     data.Max(row =>
                         Enumerable.Range(0, row.Length - 1)
-                        .Count(index => row.IndexOf(columnSeparator, index) >= 0) + 1);
+                        .Count(index => row.IndexOf(columnSeparator, index, StringComparison.Ordinal) >= 0) + 1);
                 for (int i = 0; i < columnCount; i++)
                 {
                     dataTable.Columns.Add();

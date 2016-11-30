@@ -1374,7 +1374,7 @@ namespace Extract.SQLCDBEditor
                             .Where(control => control != sender))
                         {
                             // Use true here so that queries are automatically refreshed.
-                            queryAndResultsControl.RefreshData(updateQueryResult: true, forceQueryExcecution: false);
+                            queryAndResultsControl.RefreshData(updateQueryResult: true, forceQueryExecution: false);
                         }
 
                         _dirty = true;

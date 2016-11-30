@@ -886,6 +886,16 @@ namespace Extract.Utilities
                 return false;
             }
         }
+
+        /// <summary>
+        /// Formats one or more FormattableStrings using Invariant culture
+        /// </summary>
+        /// <param name="strings">The strings to be formatted</param>
+        /// <returns>The string constructed by joining the results of each formatted string application</returns>
+        public static string FormatInvariant(params FormattableString[] strings)
+        {
+            return string.Join("", strings.Select(str => FormattableString.Invariant(str)));
+        }
     }
 
     /// <summary>

@@ -184,23 +184,23 @@ namespace Extract.DataEntry.LabDE
 
                 string query = string.Format(CultureInfo.CurrentCulture,
                     "DECLARE @linkExists INT \r\n" +
-                    "   SELECT @linkExists = COUNT([OrderNumber]) \r\n" +
-                    "       FROM [LabDEEncounterFile] WHERE [CSN] = {0} AND [FileID] = {1} \r\n" +
+                    "   SELECT @linkExists = COUNT([EncounterID]) \r\n" +
+                    "       FROM [LabDEEncounterFile] WHERE [EncounterID] = {0} AND [FileID] = {1} \r\n" +
                     "IF @linkExists = 1 \r\n" +
                     "BEGIN \r\n" +
                     (useEncounterDateTime
-                        ? "    UPDATE [LabDEEncounterFile] SET [EncounterDateTime] = '{2}' \r\n"
-                        : "    UPDATE [LabDEEncounterFile] SET [EncounterDateTime] = NULL \r\n") +
-                    "        WHERE [CSN] = {0} AND [FileID] = {1} \r\n" +
+                        ? "    UPDATE [LabDEEncounterFile] SET [DateTime] = '{2}' \r\n"
+                        : "    UPDATE [LabDEEncounterFile] SET [DateTime] = NULL \r\n") +
+                    "        WHERE [EncounterID] = {0} AND [FileID] = {1} \r\n" +
                     "END \r\n" +
                     "ELSE \r\n" +
                     "BEGIN \r\n" +
                     "    IF {0} IN (SELECT [CSN] FROM [LabDEEncounter]) \r\n" +
                     "    BEGIN \r\n" +
                     (useEncounterDateTime
-                        ? "        INSERT INTO [LabDEEncounterFile] ([OrderNumber], [FileID], [EncounterDateTime]) \r\n" +
+                        ? "        INSERT INTO [LabDEEncounterFile] ([EncounterID], [FileID], [DateTime]) \r\n" +
                           "            VALUES ({0}, {1}, '{2}') \r\n"
-                        : "        INSERT INTO [LabDEEncounterFile] ([OrderNumber], [FileID]) \r\n" +
+                        : "        INSERT INTO [LabDEEncounterFile] ([EncounterID], [FileID]) \r\n" +
                           "            VALUES ({0}, {1}) \r\n") +
                     "   END \r\n" +
                     "END",

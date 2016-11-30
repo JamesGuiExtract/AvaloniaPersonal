@@ -779,9 +779,9 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="updateQueryResult"><see langword="true"/> to update the results or a query
         /// <see langword="false"/> to just make the visible results as out-of-date.</param>
-        /// <param name="forceQueryExcecution"><see langword="true"/> toForce the query to be
+        /// <param name="forceQueryExecution"><see langword="true"/> toForce the query to be
         /// re-executed and be updated; <see langword="false"/> otherwise.</param>
-        public void RefreshData(bool updateQueryResult, bool forceQueryExcecution)
+        public void RefreshData(bool updateQueryResult, bool forceQueryExecution)
         {
             DataTable latestDataTable = null;
 
@@ -805,6 +805,10 @@ namespace Extract.SQLCDBEditor
 
                 if (QueryAndResultsType == QueryAndResultsType.Table)
                 {
+                    // Recompile the query in case the table schema has changed
+                    _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection,
+                        _adapter.SelectCommand.CommandText, parameters: null);
+
                     _adapter.Fill(latestDataTable);
                     ApplySchema(latestDataTable);
                     StoreColumnSizes(latestDataTable);
@@ -834,7 +838,7 @@ namespace Extract.SQLCDBEditor
                     // [DotNetRCAndUtils:824]
                     // We already know the query needs to be re-run. The query may be in a partially
                     // dirty state and unable to run anyway.
-                    if ((_queryChanged || _queryError || _resultsChanged) && !forceQueryExcecution)
+                    if ((_queryChanged || _queryError || _resultsChanged) && !forceQueryExecution)
                     {
                         return;
                     }
@@ -864,7 +868,7 @@ namespace Extract.SQLCDBEditor
                     }
                 }
 
-                if (QueryAndResultsType == QueryAndResultsType.Query && forceQueryExcecution)
+                if (QueryAndResultsType == QueryAndResultsType.Query && forceQueryExecution)
                 {
                     // Always refresh the results if forceQueryExcecution is true.
                     dataChanged = true;
@@ -884,10 +888,11 @@ namespace Extract.SQLCDBEditor
                             if (latestDataTable.Rows[i][j].ToString() != _resultsTable.Rows[i][j].ToString())
                             {
                                 dataChanged = true;
-                                break;
+                                goto EndOfCompare;
                             }
                         }
                     }
+                    EndOfCompare:;
                 }
 
                 // If the data hasn't changed, there is nothing more to do.
@@ -2414,7 +2419,8 @@ namespace Extract.SQLCDBEditor
 
                         // If the row's auto-increment value is out of sync with the DB, apply the
                         // correct value to the row.
-                        if (!nextValue.Equals(row[dataColumn.Ordinal]))
+                        var autoIncrementValue = row[dataColumn.Ordinal];
+                        if (!nextValue.Equals(autoIncrementValue))
                         {
                             // Since an auto-increment column is going to be read-only, apply
                             // the new auto-increment value via a separate array variable.

@@ -1,4 +1,5 @@
 ﻿using Extract.Database;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
@@ -202,7 +203,7 @@ namespace Extract.SQLCDBEditor
                         var rowMessages = result.Item2;
                         DisplayResultMessage(replaceData, rowMessages, failedRows);
 
-                        ModifiedTableName = failedRows != rowMessages.Count() ? _tablename : "";
+                        ModifiedTableName = importSettings.ReplaceData || failedRows != rowMessages.Count() ? _tablename : "";
                         this.Close();
                     }
                 }
@@ -498,7 +499,7 @@ namespace Extract.SQLCDBEditor
             DbProviderFactory providerFactory = DBMethods.GetDBProvider(_connection);
             _adapter = providerFactory.CreateDataAdapter();
             _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection, 
-                "SELECT TOP (1) * FROM " + _tablename, null);
+                UtilityMethods.FormatInvariant($"SELECT TOP (1) * FROM [{_tablename}]"), null);
             _adapter.Fill(_resultsTable);
         }
 
@@ -566,25 +567,15 @@ namespace Extract.SQLCDBEditor
         void DisplayResultMessage(bool replaceData, string[] rowMessages, int countOfFailedRows = 0)
         {
             string message;
+            int rowsImported = rowMessages.Count() - countOfFailedRows;
             if (replaceData)
             {
-                int rowsImported = rowMessages.Count();
-
                 message = String.Format(CultureInfo.CurrentCulture,
                                         "The table data has been replaced with {0} rows of imported data",
                                         rowsImported);
             }
             else
             {
-                int rowsImported = 0;
-                foreach (string rowText in rowMessages)
-                {
-                    if (!rowText.StartsWith("*", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        ++rowsImported;
-                    }
-                }
-
                 message = String.Format(CultureInfo.CurrentCulture,
                                         "{0} rows of data have been appended to the table\n" +
                                         "{1} rows of data FAILED to be appended",
