@@ -1825,7 +1825,8 @@ namespace Extract.DataEntry
 
                         // [DataEntry:393]
                         // If the minimum number of rows are not present, add new blank rows as necessary.
-                        while (Rows.Count < _minimumNumberOfRows)
+                        int hasNewRow = (NewRowIndex == -1 ? 0 : 1);
+                        while (Rows.Count - hasNewRow < _minimumNumberOfRows)
                         {
                             int addedRowIndex = Rows.Add();
 
