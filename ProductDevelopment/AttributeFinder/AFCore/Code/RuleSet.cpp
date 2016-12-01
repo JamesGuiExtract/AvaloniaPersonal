@@ -484,6 +484,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					}
 				}
 				
+				int nLastUsedPageNumber = 0;
 				for (int doc = 0; doc < nAFDocs; doc++)
 				{
 					UCLID_AFCORELib::IAFDocumentPtr ipCurrAFDoc = ipAFDocsToRun->At(doc);					
@@ -554,18 +555,17 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					{
 						ISpatialStringPtr ipValue(CLSID_SpatialString);
 						
-						// if non-spatial just assume the page number is 1 + current doc number
-						int nPageNumber = doc+1;
+						// if non-spatial just assume the page number is 1 + last used page number
+						int nPageNumber = nLastUsedPageNumber+1;
 						int nLastPageNumber = nPageNumber;
 
 						// If the document has spatial info get the first and last page
 						if (ipCurrAFDoc->Text->HasSpatialInfo() == VARIANT_TRUE)
 						{
-							// Page number should match the current count
-							ASSERT_RUNTIME_CONDITION("ELI39671", nPageNumber == ipCurrAFDoc->Text->GetFirstPageNumber(),
-								"Unexpected page number.");
+							nPageNumber = ipCurrAFDoc->Text->GetFirstPageNumber();
 							nLastPageNumber = ipCurrAFDoc->Text->GetLastPageNumber();
 						}
+						nLastUsedPageNumber = nLastPageNumber;
 
 						// if the First and last page are the same use that page number otherwise
 						// use the word "All"

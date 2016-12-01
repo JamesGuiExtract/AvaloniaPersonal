@@ -26,6 +26,13 @@ namespace Extract.AttributeFinder.Test
         static readonly string _RUN_MODE_TEST_RSD_FILE = "Resources.RunModeTest.rsd";
 
         /// <summary>
+        /// The embedded resource rsd files used to test running as a splitter
+        /// https://extract.atlassian.net/browse/ISSUE-14297
+        /// </summary>
+        static readonly string _TWO_LAYERS_RSD_FILE = "Resources.TwoLayers.rsd";
+        static readonly string _INSERT_UNDER_PARENT_RSD_FILE = "Resources.insertUnderParent.rsd";
+
+        /// <summary>
         /// The embedded resource rsd file that is saved with an older version to test defaults when 
         /// loading 
         /// </summary>
@@ -466,6 +473,21 @@ namespace Extract.AttributeFinder.Test
 
             // Compare the results sub attributes to expected - InstanceGUIDs should not match
             Assert.That(IsEqual(resultsSubAttribute, expected, false), "Results do not match expected.");
+        }
+
+        /// <summary>
+        /// Tests that no exception is thrown when running RSD splitter that uses entire-document mode
+        /// w/ insert-under-parent against each page of the original document
+        /// https://extract.atlassian.net/browse/ISSUE-14297
+        /// </summary>
+        [Test, Category("RuleSetRunMode")]
+        public static void Test14_RSDSplitterEntireDocumentUnderParent()
+        {
+            var rules = new RuleSet();
+             rules.LoadFrom(_testFiles.GetFile(_TWO_LAYERS_RSD_FILE), false);
+            _testFiles.GetFile(_INSERT_UNDER_PARENT_RSD_FILE);
+
+            Assert.DoesNotThrow(() => RunRules(rules, null));
         }
 
         #endregion Tests
