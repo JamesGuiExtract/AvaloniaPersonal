@@ -148,7 +148,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _documentData.SetSummary(SummaryDataEntryQuery?.Evaluate().ToString());
                     _documentData.SetModified(UndoOperationAvailable);
-                    _documentData.SetDataError(DataValidity == DataValidity.Invalid);
+                    if (!Config.Settings.PerformanceTesting)
+                    {
+                        _documentData.SetDataError(DataValidity == DataValidity.Invalid);
+                    }
                 }
 
                 UpdateSwipingState();
@@ -198,7 +201,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 var dataEntryData = (DataEntryPaginationDocumentData)data;
-                dataEntryData.SetDataError(DataValidity == DataValidity.Invalid);
+                if (!Config.Settings.PerformanceTesting)
+                {
+                    dataEntryData.SetDataError(DataValidity == DataValidity.Invalid);
+                }
                 dataEntryData.UndoState = AttributeStatusInfo.UndoManager.GetState();
 
                 // GetData contains attributes that have been prepared for output.
@@ -408,7 +414,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnDataValidityChanged();
 
-                if (_documentData != null)
+                if (_documentData != null && !Config.Settings.PerformanceTesting)
                 {
                     _documentData.SetDataError(DataValidity == DataValidity.Invalid);
                 }

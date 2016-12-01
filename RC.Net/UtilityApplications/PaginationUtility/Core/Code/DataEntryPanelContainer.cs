@@ -716,7 +716,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         tempPanel.LoadData(tempData);
                         dataModified = tempPanel.UndoOperationAvailable;
-                        dataError = (tempPanel.ActiveDataEntryPanel.DataValidity != DataValidity.Valid);
+                        if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)
+                        {
+                            dataError = (tempPanel.ActiveDataEntryPanel.DataValidity != DataValidity.Valid);
+                        }
                         summary = tempPanel.ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString();
                     }
                 }
