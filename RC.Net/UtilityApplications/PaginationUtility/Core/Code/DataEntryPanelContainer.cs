@@ -96,11 +96,36 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="tagUtility">The <see cref="ITagUtility"/> to expand path tags/functions.
         /// </param>
         /// <param name="imageViewer">The <see cref="ImageViewer"/> to use.</param>
-        public DataEntryPanelContainer(string configFileName, IDataEntryApplication dataEntryApp, ITagUtility tagUtility, ImageViewer imageViewer)
+        public DataEntryPanelContainer(string configFileName, IDataEntryApplication dataEntryApp,
+            ITagUtility tagUtility, ImageViewer imageViewer)
+            : this(configFileName, dataEntryApp, tagUtility, imageViewer, null)
+        {
+            // Thread manager can't be passed into this() above since "this" doesn't exist at that
+            // point.
+            StatusUpdateThreadManager = new ThreadManager(this);
+        }
+
+        /// <summary>
+        /// Private initialization of a new instance of the <see cref="DataEntryPanelContainer" /> class.
+        /// Can be used to create an instance with a shared <see cref="ThreadManager"/>.
+        /// </summary>
+        /// <param name="configFileName">The name of the config file defining the data entry
+        /// configuration.</param>
+        /// <param name="dataEntryApp">The <see cref="IDataEntryApplication"/> for which this
+        /// instance is being used.</param>
+        /// <param name="tagUtility">The <see cref="ITagUtility"/> to expand path tags/functions.
+        /// </param>
+        /// <param name="imageViewer">The <see cref="ImageViewer"/> to use.</param>
+        /// <param name="threadManager">The <see cref="ThreadManager"/> to use to manage
+        /// <see cref="UpdateDocumentStatus"/> threads.</param>
+        DataEntryPanelContainer(string configFileName, IDataEntryApplication dataEntryApp,
+            ITagUtility tagUtility, ImageViewer imageViewer, ThreadManager threadManager)
         {
             try
             {
                 InitializeComponent();
+
+                StatusUpdateThreadManager = threadManager;
 
                 _expandedConfigFileName = tagUtility.ExpandTagsAndFunctions(configFileName, null, null);
                 _dataEntryApp = dataEntryApp;
@@ -115,7 +140,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _configManager = new DataEntryConfigurationManager<Properties.Settings>(
                     dataEntryApp, tagUtility, configSettings, imageViewer, _documentTypeComboBox);
-             
+
                 _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
                 _configManager.LoadDataEntryConfigurations(_expandedConfigFileName);
 
@@ -432,6 +457,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (disposing)
             {
+                if (StatusUpdateThreadManager != null && StatusUpdateThreadManager.Owner == this)
+                {
+                    // Will wait up to 10 seconds for any document status threads to finish
+                    StatusUpdateThreadManager.Dispose();
+                    StatusUpdateThreadManager = null;
+                }
+
                 if (components != null)
                 {
                     components.Dispose();
@@ -581,6 +613,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets the <see cref="ThreadManager"/> to use to manage
+        /// <see cref="UpdateDocumentStatus"/> threads.
+        /// </summary>
+        ThreadManager StatusUpdateThreadManager
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Loads the DEP into the left-hand panel or separate window and positions and sizes it
         /// correctly.
         /// </summary>
@@ -680,6 +722,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// data validity should be checked.</param>
         void UpdateDocumentStatusThread(DataEntryPaginationDocumentData documentData, string serializedAttributes)
         {
+            bool registeredThread = false;
             ExtractException ee = null;
             bool dataModified = false;
             bool dataError = false;
@@ -687,8 +730,19 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             try
             {
-                // If the document was loaded by the time this thread was spun up, abort.
-                if (!_pendingDocumentStatusUpdate.ContainsKey(documentData))
+                if (StatusUpdateThreadManager != null)
+                {
+                    registeredThread = StatusUpdateThreadManager.TryRegisterThread();
+                    if (!registeredThread)
+                    {
+                        throw new ExtractException("ELI41655",
+                            "Failed to register document status update thread.");
+                    }
+                }
+
+                // If the document was loaded by the time this thread was spun up or the form is disposing, abort.
+                if (!_pendingDocumentStatusUpdate.ContainsKey(documentData) ||
+                    (StatusUpdateThreadManager != null && StatusUpdateThreadManager.StoppingThreads))
                 {
                     return;
                 }
@@ -696,7 +750,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _documentStatusUpdateSemaphore.WaitOne();
 
                 // If by the time this thread has a chance to update, the document was loaded, abort.
-                if (!_pendingDocumentStatusUpdate.ContainsKey(documentData))
+                if (!_pendingDocumentStatusUpdate.ContainsKey(documentData) ||
+                    (StatusUpdateThreadManager != null && StatusUpdateThreadManager.StoppingThreads))
                 {
                     return;
                 }
@@ -706,7 +761,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 using (var form = new InvisibleForm())
                 using (var imageViewer = new ImageViewer())
-                using (var tempPanel = new DataEntryPanelContainer(_expandedConfigFileName, _dataEntryApp, _tagUtility, imageViewer))
+                using (var tempPanel = new DataEntryPanelContainer(
+                    _expandedConfigFileName, _dataEntryApp, _tagUtility, imageViewer, StatusUpdateThreadManager))
                 {
                     form.Show();
                     form.Controls.Add(tempPanel);
@@ -731,6 +787,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             finally
             {
                 _documentStatusUpdateSemaphore.Release();
+                if (registeredThread)
+                {
+                    StatusUpdateThreadManager.SignalThreadEnded();
+                }
+            }
+
+            if (StatusUpdateThreadManager != null && StatusUpdateThreadManager.StoppingThreads)
+            {
+                return;
             }
 
             _imageViewer.SafeBeginInvoke("ELI41465", () =>
@@ -754,7 +819,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     int temp;
                     _pendingDocumentStatusUpdate.TryRemove(documentData, out temp);
                 }
-
             });
         }
 
