@@ -350,6 +350,8 @@ private:
 
 	// Programmatically added path tags.
 	map<string, string> m_mapAddedTags;
+	// Mutex for accessing m_mapAddedTags
+	CMutex m_mutexAddedTags;
 
 	static CMutex ms_Mutex;
 

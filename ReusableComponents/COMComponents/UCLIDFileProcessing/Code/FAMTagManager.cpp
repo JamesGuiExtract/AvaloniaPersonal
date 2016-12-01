@@ -296,6 +296,7 @@ STDMETHODIMP CFAMTagManager::raw_GetBuiltInTags(IVariantVector* *ppTags)
 		}
 
 		// Report any programmatically added tags.
+		CSingleLock lock(&m_mutexAddedTags, TRUE);
 		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
 			 iter != m_mapAddedTags.end();
 			 iter++)
@@ -439,6 +440,8 @@ STDMETHODIMP CFAMTagManager::raw_AddTag(BSTR bstrTagName, BSTR bstrTagValue)
 		{
 			strTag += ">";
 		}
+
+		CSingleLock lock(&m_mutexAddedTags, TRUE);
 		m_mapAddedTags[strTag] = asString(bstrTagValue);
 
 		return S_OK;
@@ -936,6 +939,7 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 	}
 
 	// Expand any programmatically added tags.
+	CSingleLock lock2(&m_mutexAddedTags, TRUE);
 	for (map<string, string>::iterator iter = m_mapAddedTags.begin();
 			iter != m_mapAddedTags.end();
 			iter++)

@@ -755,6 +755,8 @@ STDMETHODIMP CAFUtility::raw_AddTag(BSTR bstrTagName, BSTR bstrTagValue)
 		{
 			strTag += ">";
 		}
+
+		CSingleLock lock(&m_mutexAddedTags, TRUE);
 		m_mapAddedTags[strTag] = asString(bstrTagValue);
 
 		return S_OK;
@@ -2347,6 +2349,7 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 		expandCommonComponentsDir(rstrInput);
 
 		// Expand any programmatically added tags.
+		CSingleLock lock(&m_mutexAddedTags, TRUE);
 		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
 				iter != m_mapAddedTags.end();
 				iter++)
@@ -2492,6 +2495,7 @@ IVariantVectorPtr CAFUtility::getBuiltInTags()
 		ipVec->PushBack(get_bstr_t(strCOMMON_COMPONENTS_DIR_TAG));
 
 		// Report any programmatically added tags.
+		CSingleLock lock(&m_mutexAddedTags, TRUE);
 		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
 			 iter != m_mapAddedTags.end();
 			 iter++)

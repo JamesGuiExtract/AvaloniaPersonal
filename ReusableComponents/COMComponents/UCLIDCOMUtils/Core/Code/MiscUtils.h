@@ -128,8 +128,10 @@ private:
 	void validateLicense(); // validate license of this component 
 	void validateETFEngineLicense(); // validate license for encryption component
 
-	// Programatically added path tags.
+	// Programmatically added path tags.
 	map<string, string> m_mapAddedTags;
+	// Mutex for accessing m_mapAddedTags
+	CMutex m_mutexAddedTags;
 
 	// persistence mgr
 	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apSettings;
