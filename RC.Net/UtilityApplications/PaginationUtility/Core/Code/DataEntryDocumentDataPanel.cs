@@ -525,6 +525,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _summaryDataEntryQuery.Dispose();
                     _summaryDataEntryQuery = null;
                 }
+
+                try
+                {
+                    // Reduce memory leaks
+                    // https://extract.atlassian.net/browse/ISSUE-14288
+                    ClearData();
+                }
+                catch { }
             }
         }
 
