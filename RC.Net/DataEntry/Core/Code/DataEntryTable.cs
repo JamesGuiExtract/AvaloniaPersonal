@@ -2007,12 +2007,22 @@ namespace Extract.DataEntry
 
                 _tabOrderPlaceholderAttributes.Clear();
 
-                // [DataEntry:378]
-                // Prevent copying and pasting table data between different documents.
-                string rowDataType = GetDataFormatName(Clipboard.GetDataObject());
-                if (!string.IsNullOrEmpty(rowDataType) && rowDataType != "System.String")
+                try
                 {
-                    DataEntryMethods.ClearClipboardData();
+                    // [DataEntry:378]
+                    // Prevent copying and pasting table data between different documents.
+                    string rowDataType = GetDataFormatName(Clipboard.GetDataObject());
+                    if (!string.IsNullOrEmpty(rowDataType) && rowDataType != "System.String")
+                    {
+                        DataEntryMethods.ClearClipboardData();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-14294
+                    // Clipboard operations being finicky has long been an issue. Don't allow a
+                    // failure checking clipboard data to cause a larger issue.
+                    ex.ExtractLog("ELI41660");
                 }
             }
             catch (Exception ex)
@@ -3457,12 +3467,22 @@ namespace Extract.DataEntry
                     ApplyAttributesToSelectedRows(attributesToPaste);
                 }
 
-                // [DataEntry:757]
-                // DataEntryControlHost will be unable to determine when clipboard data needs to be
-                // cleared for row pasting. Clear the clipboard if specified.
-                if (!dragAndDrop && ClearClipboardOnPaste && Clipboard.ContainsText())
+                try
                 {
-                    DataEntryMethods.ClearClipboardData();
+                    // [DataEntry:757]
+                    // DataEntryControlHost will be unable to determine when clipboard data needs to be
+                    // cleared for row pasting. Clear the clipboard if specified.
+                    if (!dragAndDrop && ClearClipboardOnPaste && Clipboard.ContainsText())
+                    {
+                        DataEntryMethods.ClearClipboardData();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-14294
+                    // Clipboard operations being finicky has long been an issue. Don't allow a
+                    // failure checking clipboard data to cause a larger issue.
+                    ex.ExtractLog("ELI41661");
                 }
             }
             catch (Exception ex)
