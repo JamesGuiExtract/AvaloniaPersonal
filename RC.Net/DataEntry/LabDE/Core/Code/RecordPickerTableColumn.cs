@@ -1,5 +1,6 @@
 ﻿using Extract.Drawing;
 using Extract.FileActionManager.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -869,6 +870,20 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         void InvokeInvalidate()
         {
+            if (!DataEntryControlHost.IsDocumentLoaded)
+            {
+                // https://extract.atlassian.net/browse/ISSUE-14303
+                // If the document is not yet loaded we don't need to invoke any invalidate.
+                // However, if auto-populating, go ahead and do that immediately so that the DEP
+                // does not depend on being invalidated in order to have a correctly populated
+                // record ID.
+                if (AutoPopulate)
+                {
+                    DataEntryControlHost.Invoke((MethodInvoker)(() => AutoPopulateRecordNumbers()));
+                }
+                return;
+            }
+
             // Don't invoke the invalidate multiple times (multiple rows may all trigger this call
             // in response to the same UI event).
             if (!_pendingInvalidate && DataEntryControlHost != null && Visible)
@@ -937,6 +952,14 @@ namespace Extract.DataEntry.LabDE
                             else
                             {
                                 pendingAutoPopulation[recordId] = recordIdCell;
+
+                                if (!DataEntryControlHost.IsDocumentLoaded)
+                                {
+                                    // As a work-around to issue of values applied during load of
+                                    // being reverted, set LastAppliedStringValue.
+                                    IAttribute recordIdAttribute = rowData.IdField.Attribute;
+                                    AttributeStatusInfo.GetStatusInfo(recordIdAttribute).LastAppliedStringValue = recordId;
+                                }
                             }
                         }
                     }
