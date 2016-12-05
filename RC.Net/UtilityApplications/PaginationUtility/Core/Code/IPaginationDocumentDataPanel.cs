@@ -75,6 +75,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets the current "active" data entry. This is the last data entry control to have
+        /// received input focus (but doesn't necessarily mean the control currently has input
+        /// focus).
+        /// </summary>
+        Control ActiveDataControl
+        {
+            get;
+        }
+
+        /// <summary>
         /// Loads the specified <see paramref="data"/>.
         /// </summary>
         /// <param name="data">The data to load.</param>
@@ -138,5 +148,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Toggles whether or not tooltip(s) for the active fields are currently visible.
         /// </summary>
         void ToggleHideTooltips();
+
+        /// <summary>
+        /// Refreshes the state of the control.
+        /// </summary>
+        void RefreshControlState();
     }
 }

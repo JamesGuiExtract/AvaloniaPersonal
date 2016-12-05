@@ -23,11 +23,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         ImageViewer _imageViewer;
 
         /// <summary>
-        /// Indicates whether swiping should be enabled based on the current state of the DEP.
-        /// </summary>
-        bool _swipingEnabled;
-
-        /// <summary>
         /// The currently loaded <see cref="DataEntryPaginationDocumentData"/>.
         /// </summary>
         DataEntryPaginationDocumentData _documentData;
@@ -376,8 +371,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // context.
                 if (InPaginationPanel)
                 {
-                    _swipingEnabled = e.SwipingEnabled;
-
                     UpdateSwipingState();
                 }
             }
@@ -443,7 +436,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                             base.ImageViewer = _imageViewer;
                         }
 
-                        DrawHighlights(true);
+                        // https://extract.atlassian.net/browse/ISSUE-14304
+                        // In a paginate files setup, focus will leave and return for scenarios
+                        // where it normally wouldn't in data entry verification including changing
+                        // pages via the thumbnail controls. When focus returns use
+                        // ensureActiveAttributeVisible == false to prevent page changes.
+                        DrawHighlights(ensureActiveAttributeVisible: false);
+                        UpdateSwipingState();
                     }
                     else if (!string.IsNullOrWhiteSpace(_sourceDocName))
                     {
@@ -454,7 +453,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                         OnPageLoadRequest(1);
                         flowLayoutPanel.VerticalScroll.Value = scrollPos;
                         base.ImageViewer = _imageViewer;
-                        DrawHighlights(true);
+
+                        // https://extract.atlassian.net/browse/ISSUE-14304
+                        // In a paginate files setup, focus will leave and return for scenarios
+                        // where it normally wouldn't in data entry verification including changing
+                        // pages via the thumbnail controls. When focus returns use
+                        // ensureActiveAttributeVisible == false to prevent page changes.
+                        DrawHighlights(ensureActiveAttributeVisible: false);
                     }
                 }
 
@@ -657,9 +662,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Updates the enabled state of the swiping tools based on the current state of the DEP.
         /// </summary>
-        void UpdateSwipingState()
+        public void UpdateSwipingState()
         {
-            _imageViewer.AllowHighlight = base.ImageViewer != null && _swipingEnabled;
+            try
+            {
+                _imageViewer.AllowHighlight =
+                    base.ImageViewer != null &&
+                    ImageViewer.IsImageAvailable &&
+                    ActiveDataControl != null &&
+                    ActiveDataControl.SupportsSwiping;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41665");
+            }
         }
 
         /// <summary>

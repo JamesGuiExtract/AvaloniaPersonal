@@ -1361,6 +1361,47 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
+        /// Sets input focus to <see paramref="targetControl"/> which is a descendant of
+        /// <see paramref="ancestorControl"/> activating any intermediate controls in the process.
+        /// </summary>
+        /// <param name="ancestorControl">The ancestor control to <see paramref="targetControl"/></param>
+        /// <param name="targetControl">The control to be focused.</param>
+        /// <returns><c>true</c> if the input focus request was successful; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool FocusNestedControl(this Control ancestorControl, Control targetControl)
+        {
+            try
+            {
+                if (targetControl == null || !targetControl.CanFocus)
+                {
+                    return false;
+                }
+
+                var ancestors = targetControl.GetAncestors()
+                    .TakeWhile(control => control != ancestorControl);
+
+                Control parent = ancestorControl;
+                foreach (Control next in ancestors.Reverse())
+                {
+                    var parentContainer = parent as ContainerControl;
+                    if (parentContainer != null)
+                    {
+                        parentContainer.ActiveControl = next;
+                    }
+
+                    parent = next;
+                }
+
+                return targetControl.Focus();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41663");
+            }
+        }
+
+
+        /// <summary>
         /// Helper method for <see cref="GetAncestors"/>
         /// </summary>
         /// <param name="control">The control to get ancestors of</param>

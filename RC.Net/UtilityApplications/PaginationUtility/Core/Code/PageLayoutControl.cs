@@ -815,6 +815,56 @@ namespace Extract.UtilityApplications.PaginationUtility
             set;
         }
 
+        /// <summary>
+        /// Gets the <see cref="PaginationControl"/> that should be considered the primary selection
+        /// and the basis for all keyboard navigation. If a <see cref="PageThumbnailControl"/> the
+        /// corresponding image page will be displayed in the <see cref="ImageViewer"/> as well.
+        /// </summary>
+        /// <value>
+        /// The <see cref="PaginationControl"/> that should be considered the primary
+        /// selection.
+        /// </value>
+        public PaginationControl PrimarySelection
+        {
+            get
+            {
+                return _primarySelection;
+            }
+
+            private set
+            {
+                if (value != _primarySelection)
+                {
+                    if (_primarySelection != null)
+                    {
+                        SetHighlightedAndDisplayed(_primarySelection, false);
+                    }
+
+                    if (_hoverPageControl != null && value != _hoverPageControl)
+                    {
+                        SetHighlightedAndDisplayed(_hoverPageControl, false);
+                    }
+
+                    _primarySelection = value;
+
+                    if (_primarySelection != null)
+                    {
+                        SetHighlightedAndDisplayed(_primarySelection, true);
+
+                        // _commandTargetControl is used for shortcut keys as well as for the
+                        // context menu. Set _commandTargetControl whenever the primary control is
+                        // being set to allow shortcuts keys to work even if the control hasn't been
+                        // clicked.
+                        _commandTargetControl = _primarySelection;
+                    }
+                    else if (!_preventTransientDocumentClose && ImageViewer.IsImageAvailable)
+                    {
+                        ImageViewer.CloseImage();
+                    }
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -2641,57 +2691,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #region Private Members
         
-        /// <summary>
-        /// Gets or sets the <see cref="PaginationControl"/> that should be considered the
-        /// primary selection and the basis for all keyboard navigation. If a
-        /// <see cref="PageThumbnailControl"/> the corresponding image page will be displayed in the
-        /// <see cref="ImageViewer"/> as well.
-        /// </summary>
-        /// <value>
-        /// The <see cref="PaginationControl"/> that should be considered the primary
-        /// selection.
-        /// </value>
-        PaginationControl PrimarySelection
-        {
-            get
-            {
-                return _primarySelection;
-            }
-
-            set
-            {
-                if (value != _primarySelection)
-                {
-                    if (_primarySelection != null)
-                    {
-                        SetHighlightedAndDisplayed(_primarySelection, false);
-                    }
-
-                    if (_hoverPageControl != null && value != _hoverPageControl)
-                    {
-                        SetHighlightedAndDisplayed(_hoverPageControl, false);
-                    }
-
-                    _primarySelection = value;
-
-                    if (_primarySelection != null)
-                    {
-                        SetHighlightedAndDisplayed(_primarySelection, true);
-
-                        // _commandTargetControl is used for shortcut keys as well as for the
-                        // context menu. Set _commandTargetControl whenever the primary control is
-                        // being set to allow shortcuts keys to work even if the control hasn't been
-                        // clicked.
-                        _commandTargetControl = _primarySelection;
-                    }
-                    else if (!_preventTransientDocumentClose && ImageViewer.IsImageAvailable)
-                    {
-                        ImageViewer.CloseImage();
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Gets the currently selected <see cref="PaginationControl"/>s.
         /// </summary>

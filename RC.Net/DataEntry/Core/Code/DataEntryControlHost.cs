@@ -1353,6 +1353,19 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets the current "active" data entry. This is the last data entry control to have
+        /// received input focus (but doesn't necessarily mean the control currently has input
+        /// focus).
+        /// </summary>
+        public IDataEntryControl ActiveDataControl
+        {
+            get
+            {
+                return _activeDataControl;
+            }
+        }
+
         #endregion Properties
 
         #region IImageViewerControl Members
@@ -3389,11 +3402,21 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.GetOwningControl(e.Attribute);
                     if (owningControl != null && owningControl.ClearClipboardOnPaste)
                     {
-                        string text = Clipboard.GetText();
-
-                        if (e.Attribute.Value.String.EndsWith(text, StringComparison.Ordinal))
+                        try
                         {
-                            DataEntryMethods.ClearClipboardData();
+                            string text = Clipboard.GetText();
+
+                            if (e.Attribute.Value.String.EndsWith(text, StringComparison.Ordinal))
+                            {
+                                DataEntryMethods.ClearClipboardData();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // https://extract.atlassian.net/browse/ISSUE-14305
+                            // Clipboard operations being finicky has long been an issue. Don't allow a
+                            // failure checking clipboard data to cause a larger issue.
+                            ex.ExtractLog("ELI41668");
                         }
                     }
                 }

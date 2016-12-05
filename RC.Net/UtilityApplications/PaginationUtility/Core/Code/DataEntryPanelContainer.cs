@@ -242,6 +242,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets the current "active" data entry. This is the last data entry control to have
+        /// received input focus (but doesn't necessarily mean the control currently has input
+        /// focus).
+        /// </summary>
+        public Control ActiveDataControl
+        {
+            get
+            {
+                return ActiveDataEntryPanel.ActiveDataControl as Control;
+            }
+        }
+
+        /// <summary>
         /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>
@@ -419,6 +432,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41606");
+            }
+        }
+
+        /// <summary>
+        /// Refreshes the state of the control.
+        /// </summary>
+        public void RefreshControlState()
+        {
+            try
+            {
+                if (ActiveDataEntryPanel != null)
+                {
+                    ActiveDataEntryPanel.UpdateSwipingState();
+                }
+                else
+                {
+                    _imageViewer.AllowHighlight = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41666");
             }
         }
 

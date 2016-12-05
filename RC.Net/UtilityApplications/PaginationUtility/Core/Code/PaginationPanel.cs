@@ -428,6 +428,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_documentDataPanel != null)
                         {
                             _documentDataPanel.PageLoadRequest -= HandleDocumentDataPanel_PageLoadRequest;
+                            _documentDataPanel.PanelControl.Leave -= HandlePanelControl_Leave;
                         }
 
                         _documentDataPanel = value;
@@ -435,6 +436,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_documentDataPanel != null)
                         {
                             _documentDataPanel.PageLoadRequest += HandleDocumentDataPanel_PageLoadRequest;
+                            _documentDataPanel.PanelControl.Leave += HandlePanelControl_Leave;
                         }
                     }
                 }
@@ -2008,13 +2010,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _imageViewer.ImageFileClosing -= HandleImageViewer_ImageFileClosing;
                         }
 
-                _imageViewer = value;
+                        _imageViewer = value;
 
                         if (_imageViewer != null)
                         {
                             _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
-            }
-        }
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -2485,6 +2487,43 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (pageToSelect != null)
             {
                 _primaryPageLayoutControl.SelectPage(pageToSelect);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Leave"/> event of the
+        /// <see cref="_documentDataPanel.PanelControl"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandlePanelControl_Leave(object sender, EventArgs e)
+        {
+            try
+            {
+                // If focus is lost while a page belonging to the active data entry panel is active
+                // and there are not mouse buttons or modifier keys down as they might be for an
+                // ongoing operation, return focus to the data panel. This allows swiping tools to
+                // remain active if they should be active.
+                if (_documentDataPanel != null &&
+                    _primaryPageLayoutControl.PrimarySelection != null &&
+                    _documentWithDataInEdit.PageControls.Contains(_primaryPageLayoutControl.PrimarySelection) &&
+                        Control.MouseButtons == MouseButtons.None &&
+                        Control.ModifierKeys == Keys.None)
+                {
+                    this.SafeBeginInvoke("ELI41664", () =>
+                    {
+                        if (_documentDataPanel != null)
+                        {
+                            this.FocusNestedControl(_documentDataPanel.ActiveDataControl);
+                            // Activates swiping if swiping should currently be enabled.
+                            _documentDataPanel.RefreshControlState();
+                        }
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41667");
             }
         }
 
