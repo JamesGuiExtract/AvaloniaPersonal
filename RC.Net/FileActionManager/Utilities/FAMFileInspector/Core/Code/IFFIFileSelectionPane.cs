@@ -75,5 +75,12 @@ namespace Extract.FileActionManager.Utilities
         {
             get;
         }
+
+        /// <summary>
+        /// Gets or sets the accept action to be run when this instance needs to trigger, e.g., its
+        /// parent form to close as if the accept button were clicked.
+        /// https://extract.atlassian.net/browse/ISSUE-14308
+        /// </summary>
+        Action<object, EventArgs> AcceptFunction { get; set; }
     }
 }

@@ -48,8 +48,9 @@
             this._recordsDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this._recordsDataGridView.Size = new System.Drawing.Size(1139, 189);
             this._recordsDataGridView.TabIndex = 0;
+            this._recordsDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleRecordsDataGridView_CellDoubleClick);
+            this._recordsDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.HandleRecordsDataGridView_DataBindingComplete);
             this._recordsDataGridView.SelectionChanged += new System.EventHandler(this.HandleRecordsDataGridView_SelectionChanged);
-            this._recordsDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(HandleRecordsDataGridView_DataBindingComplete);
             // 
             // RecordPickerSelectionPane
             // 

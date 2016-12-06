@@ -519,6 +519,13 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         readonly bool _inDesignMode;
 
+
+        /// <summary>
+        /// A <see cref="IFFIFileSelectionPane"/> instance that should replace the
+        /// standard file selection pane.
+        /// </summary>
+        private IFFIFileSelectionPane _fileSelectorPane;
+
         #endregion Fields
 
         #region Constructors
@@ -749,8 +756,18 @@ namespace Extract.FileActionManager.Utilities
         [CLSCompliant(false)]
         public IFFIFileSelectionPane FileSelectorPane
         { 
-            get; 
-            set;
+            get
+            {
+                return _fileSelectorPane;
+            }
+            set
+            {
+                _fileSelectorPane = value;
+                if (_fileSelectorPane != null)
+                {
+                    _fileSelectorPane.AcceptFunction = (row, args) => HandleOkButton_Click(row, args);
+                }
+            }
         }
 
         /// <summary>

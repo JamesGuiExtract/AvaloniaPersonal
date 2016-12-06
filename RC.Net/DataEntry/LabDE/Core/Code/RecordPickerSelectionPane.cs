@@ -136,6 +136,13 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
+        /// <summary>
+        /// Gets or sets the accept action to be run when this instance needs to trigger, e.g., its
+        /// parent form to close as if the accept button were clicked.
+        /// https://extract.atlassian.net/browse/ISSUE-14308
+        /// </summary>
+        public Action<object, EventArgs> AcceptFunction { get; set; }
+
         #endregion Public Members
 
         #region IFFIFileSelectionPane
@@ -374,6 +381,24 @@ namespace Extract.DataEntry.LabDE
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI38209");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.CellDoubleClick"/> event of the <see cref="_recordsDataGridView"/>
+        /// by executing the <see cref="AcceptFunction"/>
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataGridViewCellEventArgs"/> instance containing the event data.</param>
+        void HandleRecordsDataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                AcceptFunction?.Invoke(sender, e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41671");
             }
         }
 
