@@ -979,7 +979,8 @@ namespace Extract.AttributeFinder.Rules
                 attributes.ReportMemoryUsage();
                 // In case the there are multiple configurations for different document types,
                 // ensure the proper configuration is loaded for the supplied data.
-                dataEntryApplicationForm.ActiveDataEntryControlHost.LoadData(attributes);
+                // NOTE: Probably better for finalize to be false, but don't want to change late in 10.5 cycle.
+                dataEntryApplicationForm.ActiveDataEntryControlHost.LoadData(attributes, forDisplay: true);
                 IUnknownVector loadedAttributes =
                     dataEntryApplicationForm.ActiveDataEntryControlHost.GetData();
                 loadedAttributes.ReportMemoryUsage();

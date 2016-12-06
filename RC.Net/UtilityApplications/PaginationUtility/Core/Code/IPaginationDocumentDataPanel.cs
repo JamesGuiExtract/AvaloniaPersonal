@@ -88,7 +88,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Loads the specified <see paramref="data"/>.
         /// </summary>
         /// <param name="data">The data to load.</param>
-        void LoadData(PaginationDocumentData data);
+        /// <param name="forDisplay"><c>true</c> if the loaded data is to be displayed; <c>false</c>
+        /// if the data is being loaded only for data manipulation or validation.</param>
+        void LoadData(PaginationDocumentData data, bool forDisplay);
 
         /// <summary>
         /// Applies any data to the specified <see paramref="data"/>.

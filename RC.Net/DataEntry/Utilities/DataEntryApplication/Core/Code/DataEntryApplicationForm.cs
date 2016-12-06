@@ -1840,7 +1840,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         LoadDataEntryControlHostPanel();
 
                         IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
-                        newDataEntryControlHost.LoadData(attributes);
+                        newDataEntryControlHost.LoadData(attributes, forDisplay: true);
 
                         // Register for events and engage shortcut handlers for the new DEP
                         newDataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
@@ -2023,7 +2023,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // If a DEP is being used, load the data into it
                     if (DataEntryControlHost != null)
                     {
-                        DataEntryControlHost.LoadData(attributes);
+                        DataEntryControlHost.LoadData(attributes, forDisplay: true);
 
                         // Now that the data has been loaded into the DEP, update the document data
                         // in the pagination panel so that it is sharing the same attributes
@@ -2049,7 +2049,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     if (DataEntryControlHost != null)
                     {
-                        DataEntryControlHost.LoadData(null);
+                        DataEntryControlHost.LoadData(null, forDisplay: true);
                     }
                 }
 
@@ -3167,7 +3167,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // queue in most cases, but not if the applied pagination matched source doc form.
                 FileRequestHandler.PauseProcessingQueue();
 
-                foreach (var item in e.ModifiedDocumentData)
+                foreach (var item in e.UnmodifiedPaginationSources
+                    .Where(item => item.Value != null))
                 {
                     string sourceFileName = item.Key;
                     PaginationDocumentData documentData = (PaginationDocumentData)item.Value;
@@ -3185,7 +3186,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // unmodified source document needs to follow the same path as the new documents
                 // (and definitely should not be set pending for the source cleanup action)
                 if (e.DisregardedPaginationSources.SingleOrDefault() == _fileName
-                    || e.UnmodifiedPaginationSources.SingleOrDefault() == _fileName)
+                    || e.UnmodifiedPaginationSources
+                        .Select(source => source.Key)
+                        .SingleOrDefault() == _fileName)
                 {
                     if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
                     {

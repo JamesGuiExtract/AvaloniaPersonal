@@ -258,7 +258,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>
-        public void LoadData(PaginationDocumentData data)
+        /// <param name="forDisplay"><c>true</c> if the loaded data is to be displayed; <c>false</c>
+        /// if the data is being loaded only for data manipulation or validation.</param>
+        public void LoadData(PaginationDocumentData data, bool forDisplay)
         {
             try
             {
@@ -272,7 +274,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _documentData = (DataEntryPaginationDocumentData)data;
                 _sourceDocName = _documentData.SourceDocName;
 
-                ActiveDataEntryPanel.LoadData(data);
+                ActiveDataEntryPanel.LoadData(data, forDisplay);
 
                 _documentTypeComboBox.Enabled = true;
                 _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeComboBox_SelectedIndexChanged;
@@ -557,7 +559,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (_documentData != null)
                     {
-                        newDataEntryControlHost.LoadData(_documentData);
+                        newDataEntryControlHost.LoadData(_documentData, forDisplay: true);
                     }
 
                     newDataEntryControlHost.PageLoadRequest += DataEntryControlHost_PageLoadRequest;
@@ -805,7 +807,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     using (var tempData = new DataEntryPaginationDocumentData(deserializedAttributes, documentData.SourceDocName))
                     {
-                        tempPanel.LoadData(tempData);
+                        tempPanel.LoadData(tempData, forDisplay: false);
                         dataModified = tempPanel.UndoOperationAvailable;
                         if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)
                         {

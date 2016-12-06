@@ -754,6 +754,19 @@ namespace Extract.DataEntry.LabDE
                             _autoPopulationExemptions.Remove(e.DocumentDataRecord);
                         }
 
+                        if (!DataEntryControlHost.IsDocumentLoaded)
+                        {
+                            // https://extract.atlassian.net/browse/ISSUE-14303
+                            // If the document is not yet loaded we don't need to invoke any invalidate.
+                            // However, if auto-populating, go ahead and do that immediately so that the DEP
+                            // does not depend on being invalidated in order to have a correctly populated
+                            // record ID.
+                            if (AutoPopulate)
+                            {
+                                DataEntryControlHost.Invoke((MethodInvoker)(() => AutoPopulateRecordNumbers()));
+                            }
+                        }
+
                         InvokeInvalidate();
                     }
                 }
@@ -776,6 +789,19 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
+                if (!DataEntryControlHost.IsDocumentLoaded)
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-14303
+                    // If the document is not yet loaded we don't need to invoke any invalidate.
+                    // However, if auto-populating, go ahead and do that immediately so that the DEP
+                    // does not depend on being invalidated in order to have a correctly populated
+                    // record ID.
+                    if (AutoPopulate)
+                    {
+                        DataEntryControlHost.Invoke((MethodInvoker)(() => AutoPopulateRecordNumbers()));
+                    }
+                }
+
                 // At the end of an update, if a paint was postponed, invoke an invalidate now.
                 if (_pendingInvalidate)
                 {
@@ -870,20 +896,6 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         void InvokeInvalidate()
         {
-            if (!DataEntryControlHost.IsDocumentLoaded)
-            {
-                // https://extract.atlassian.net/browse/ISSUE-14303
-                // If the document is not yet loaded we don't need to invoke any invalidate.
-                // However, if auto-populating, go ahead and do that immediately so that the DEP
-                // does not depend on being invalidated in order to have a correctly populated
-                // record ID.
-                if (AutoPopulate)
-                {
-                    DataEntryControlHost.Invoke((MethodInvoker)(() => AutoPopulateRecordNumbers()));
-                }
-                return;
-            }
-
             // Don't invoke the invalidate multiple times (multiple rows may all trigger this call
             // in response to the same UI event).
             if (!_pendingInvalidate && DataEntryControlHost != null && Visible)

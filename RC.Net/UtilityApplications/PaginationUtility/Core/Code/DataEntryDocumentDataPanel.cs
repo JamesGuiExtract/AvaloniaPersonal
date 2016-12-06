@@ -124,7 +124,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>
-        public void LoadData(PaginationDocumentData data)
+        /// <param name="forDisplay"><c>true</c> if the loaded data is to be displayed; <c>false</c>
+        /// if the data is being loaded only for data manipulation or validation.</param>
+        public void LoadData(PaginationDocumentData data, bool forDisplay)
         {
             try
             {
@@ -137,7 +139,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentData = (DataEntryPaginationDocumentData)data;
 
-                LoadData(_documentData.WorkingAttributes);
+                LoadData(_documentData.WorkingAttributes, forDisplay);
 
                 if (_imageViewer.Visible)
                 {
@@ -203,7 +205,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 dataEntryData.UndoState = AttributeStatusInfo.UndoManager.GetState();
 
                 // GetData contains attributes that have been prepared for output.
-                data.Attributes = GetData();
+                data.Attributes = GetData(validateData);
                 data.Attributes.ReportMemoryUsage();
 
                 return true;

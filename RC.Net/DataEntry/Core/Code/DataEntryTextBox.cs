@@ -723,7 +723,8 @@ namespace Extract.DataEntry
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI26009", ex);
+                    ex.ExtractDisplay("ELI26009");
+                    return "";
                 }
             }
 
@@ -755,7 +756,7 @@ namespace Extract.DataEntry
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI26010", ex);
+                    ex.ExtractDisplay("ELI26010");
                 }
             }
         }

@@ -1641,12 +1641,14 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Loads the provided data in the <see cref="IDataEntryControl"/>s.
+        /// Loads the provided data in the <see cref="IDataEntryControl" />s.
         /// </summary>
-        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
-        /// that represent the document's data or <see langword="null"/> to clear all data from the
+        /// <param name="attributes">The <see cref="IUnknownVector" /> of <see cref="IAttribute" />s
+        /// that represent the document's data or <see langword="null" /> to clear all data from the
         /// DEP, remove data validation warnings and to disable the DEP.</param>
-        public void LoadData(IUnknownVector attributes)
+        /// <param name="forDisplay"><c>true</c> if the loaded data is to be displayed; <c>false</c>
+        /// if the data is being loaded only for data manipulation or validation.</param>
+        public void LoadData(IUnknownVector attributes, bool forDisplay)
         {
             try
             {
@@ -1828,7 +1830,22 @@ namespace Extract.DataEntry
                     // Some tasks (such as selecting the first control), must take place after the
                     // ImageFileChanged event is complete. Use BeginInvoke to schedule
                     // FinalizeDocumentLoad at the end of the current message queue.
-                    this.SafeBeginInvoke("ELI34448", () => FinalizeDocumentLoad());
+                    if (forDisplay)
+                    {
+                        this.SafeBeginInvoke("ELI34448", () => FinalizeDocumentLoad());
+                    }
+                    else
+                    {
+                        OnUpdateEnded(new EventArgs());
+
+                        if (_attributes != null && _attributes.Size() > 0 &&
+                            AttributeStatusInfo.IsLoggingEnabled(LogCategories.DataLoad))
+                        {
+                            ExecuteOnIdle("ELI41670", () => AttributeStatusInfo.Logger.LogEvent(
+                                LogCategories.DataLoad, null,
+                                "END (NoFinalize): ----------------------------------------------------"));
+                        }
+                    }
 
                     // If testing performance, send the shortcut key to save as soon as each document is loaded.
                     if (Config.Settings.PerformanceTesting)
@@ -1875,7 +1892,7 @@ namespace Extract.DataEntry
         /// </returns>
         // Since this method has side-effects, it should not be a property.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public IUnknownVector GetData()
+        public virtual IUnknownVector GetData(bool validateData)
         {
             try
             {
@@ -1883,15 +1900,22 @@ namespace Extract.DataEntry
                 // non-incremental value modified event can be raised.
                 AttributeStatusInfo.EndEdit();
 
-                // Create a copy of the data to be saved so that attributes that should
-                // not be persisted can be removed.
-                ICloneIdentifiableObject copyThis = (ICloneIdentifiableObject)_attributes;
-                _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
-                _mostRecentlySaveAttributes.ReportMemoryUsage();
+                if (!validateData || DataCanBeSaved())
+                {
+                    // Create a copy of the data to be saved so that attributes that should
+                    // not be persisted can be removed.
+                    ICloneIdentifiableObject copyThis = (ICloneIdentifiableObject)_attributes;
+                    _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
+                    _mostRecentlySaveAttributes.ReportMemoryUsage();
 
-                PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
+                    PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
-                return _mostRecentlySaveAttributes;
+                    return _mostRecentlySaveAttributes;
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception ex)
             {

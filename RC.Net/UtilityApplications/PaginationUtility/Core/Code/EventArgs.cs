@@ -350,13 +350,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public PaginatedEventArgs(IEnumerable<string> paginatedDocumentSources,
             IEnumerable<string> disregardedPaginationSources,
-            IEnumerable<KeyValuePair<string, PaginationDocumentData>> modifiedDocumentData,
-            IEnumerable<string> unmodifiedPaginationSources)
+            IEnumerable<KeyValuePair<string, PaginationDocumentData>> unmodifiedPaginationSources)
             : base()
         {
             PaginatedDocumentSources = paginatedDocumentSources.ToList().AsReadOnly();
             DisregardedPaginationSources = disregardedPaginationSources.ToList().AsReadOnly();
-            ModifiedDocumentData = modifiedDocumentData.ToList().AsReadOnly();
             UnmodifiedPaginationSources = unmodifiedPaginationSources.ToList().AsReadOnly();
         }
 
@@ -381,22 +379,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets all documents names and associated <see cref="PaginationDocumentData"/> where data
-        /// was modified, but the document pages have not been modified compared to pagination on
-        /// disk.
+        /// All documents applied as they exist on disk (including documents referenced in
+        /// <see cref="DisregardedPaginationSources"/>).
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public ReadOnlyCollection<KeyValuePair<string, PaginationDocumentData>> ModifiedDocumentData
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// All documents applied as they exist on disk (including documents referenced in
-        /// <see cref="DisregardedPaginationSources"/> and <see cref="ModifiedDocumentData"/>)
-        /// </summary>
-        public ReadOnlyCollection<string> UnmodifiedPaginationSources
+        public ReadOnlyCollection<KeyValuePair<string, PaginationDocumentData>> UnmodifiedPaginationSources
         {
             get;
             private set;

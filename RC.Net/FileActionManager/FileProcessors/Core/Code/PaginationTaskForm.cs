@@ -972,7 +972,8 @@ namespace Extract.FileActionManager.FileProcessors
                 // queue in most cases, but not if the applied pagination matched source doc form.
                 FileRequestHandler.PauseProcessingQueue();
 
-                foreach (var item in e.ModifiedDocumentData)
+                foreach (var item in e.UnmodifiedPaginationSources
+                    .Where(item => item.Value != null))
                 {
                     string sourceFileName = item.Key;
                     PaginationDocumentData documentData = (PaginationDocumentData)item.Value;
@@ -986,7 +987,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // if it not moving forward in the primary workflow.
                 ReleaseFiles(e.PaginatedDocumentSources, _settings.SourceAction);
                 // OutputAction is for documents that should move forward in the primary workflow.
-                ReleaseFiles(e.UnmodifiedPaginationSources, _settings.OutputAction);
+                ReleaseFiles(e.UnmodifiedPaginationSources.Select(source => source.Key), _settings.OutputAction);
             }
             catch (Exception ex)
             {

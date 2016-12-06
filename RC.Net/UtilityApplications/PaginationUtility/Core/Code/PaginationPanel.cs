@@ -852,14 +852,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SuspendUIUpdatesForOperation();
+                SuspendUIUpdates = true;
+                _committingChanges = true;
 
                 if (!CanSelectedDocumentsBeCommitted())
                 {
                     return false;
                 }
-
-                _committingChanges = true;
 
                 // Prevent the UI from trying to load/close pages in the image viewer as the
                 // operation is taking place.
@@ -956,23 +955,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .First(c => !c.Deleted)
                         .Page.OriginalDocumentName);
 
-                var sourcesWithModifiedData = documentsInSourceForm
-                    .Where(doc => doc.DocumentData != null && doc.DocumentData.Modified)
+                var unmodifiedPagination = documentsInSourceForm
                     .Select(doc => new KeyValuePair<string, PaginationDocumentData>(
                         doc.PageControls
                         // Documents can be in source form even with deleted pages from some other document
                         .First(c => !c.Deleted)
                         .Page.OriginalDocumentName, doc.DocumentData));
 
-                var unmodifiedPagination = documentsInSourceForm
-                    .Select(doc => doc.PageControls
-                        // Documents can be in source form even with deleted pages from some other document
-                        .First(c => !c.Deleted)
-                        .Page.OriginalDocumentName);
-
                 OnPaginated(sourceDocumentsNotOutput,
                     disregardedPagination,
-                    sourcesWithModifiedData,
                     unmodifiedPagination);
 
                 // For any documents did not have either manual or suggested pagination, reset all
@@ -1016,6 +1007,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
+                    SuspendUIUpdates = false;
+
                     _committingChanges = false;
                     if (_outputDocumentPositions != null)
                     {
@@ -1121,35 +1114,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool CanSelectedDocumentsBeCommitted()
         {
             // If document data could not be saved, abort the commit operation.
-            if (!SaveDocumentData(true, true))
-            {
+            if (!SaveDocumentData(selectedDocumentsOnly: CommitOnlySelection, validateData: true))
+            { 
                 return false;
-            }
-
-            var documentWithError = _pendingDocuments
-                .FirstOrDefault(document =>
-                    document.DataError &&
-                    document.PageControls.Any(c => !c.Deleted) &&
-                    (!CommitOnlySelection || document.Selected));
-
-            if (documentWithError != null && documentWithError.PageControls.Any(c => !c.Deleted))
-            {
-                _primaryPageLayoutControl.SelectDocument(documentWithError);
-
-                // The event chain that needs to occur to open a DataEntryDocumentDataPanel cannot
-                // occur in the context of another message handler.
-                this.SafeBeginInvoke("ELI41431", () =>
-                {
-                    documentWithError.PaginationSeparator.OpenDataPanel();
-                    UtilityMethods.ShowMessageBox("Data errors must be corrected before saving", "Data Error", true);
-                });
-
-                return false;
-            }
-
-            if (!CommitOnlySelection)
-            {
-                return true;
             }
 
             var affectedSourceDocuments = new HashSet<string>(
@@ -1472,7 +1439,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SaveDocumentData(false, false);
+                SaveDocumentData(selectedDocumentsOnly: false, validateData: false);
                 EnablePageDisplay = false;
                 ImageViewerPageNavigationEnabled = true;
                 _primaryPageLayoutControl.ClearSelection();
@@ -2399,6 +2366,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 var document = (OutputDocument)sender;
 
+                // Prevent unnecessary updates of separators as document data is being prepared for commit.
+                if (_committingChanges && _pendingDocuments.Contains(document))
+                {
+                    return;
+                }
+
                 if (document.PaginationSeparator != null)
                 {
                     // This event may be raised from another thread (such as via
@@ -2558,6 +2531,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Event Handlers
 
         #region Private Members
+
+        /// <summary>
+        /// Gets a value indicating whether this instance's data panel is open.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance's data panel is open; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool IsDataPanelOpen
+        {
+            get
+            {
+                return _documentDataPanel != null &&
+                    _tableLayoutPanel.Controls.Contains(_documentDataPanel.PanelControl);
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether all documents are currently collapsed (pages hidden).
@@ -2746,39 +2734,56 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Saves the data from any defined <see cref="DocumentDataPanel"/> if currently active.
+        /// Saves all the <see cref="PaginationDocumentData"/> for the documents.
         /// </summary>
-        /// <param name="onlyIfSelected"><see langword="true"/> if data should be saved only if
+        /// <param name="selectedDocumentsOnly"><see langword="true"/> if data should be saved only if
         /// the document is selected for commit, <see langword="false"/> if the data should be saved
         /// regardless.</param>
         /// <param name="validateData"><see langword="true"/> if the document's data should
         /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
         /// <returns><see langword="true"/> if the data was saved or <see langword="false"/> if the
         /// data could not be saved and needs to be corrected.
-        /// <para><b>Note</b></para>
-        /// It is the responsibility of the DocumentDataPanel to inform the user of any data issues
-        /// that need correction.
         /// </returns>
-        bool SaveDocumentData(bool onlyIfSelected, bool validateData)
+        bool SaveDocumentData(bool selectedDocumentsOnly, bool validateData)
         {
-            if (_documentWithDataInEdit == null || 
-                (onlyIfSelected && CommitOnlySelection && !_documentWithDataInEdit.Selected) ||
-                CloseDataPanel(validateData))
+            foreach (var document in _pendingDocuments.Where(document =>
+                document.PageControls.Any(c => !c.Deleted) &&
+                (!selectedDocumentsOnly || document.Selected)))
             {
-                return true;
-            }
-            else
-            {
-                this.SafeBeginInvoke("ELI39721", () =>
+                bool dataIsValid;
+
+                if (document == _documentWithDataInEdit && IsDataPanelOpen)
                 {
-                    if (_documentWithDataInEdit != null)
+                    dataIsValid = CloseDataPanel(validateData);
+                    if (!dataIsValid)
                     {
-                        _primaryPageLayoutControl.SelectDocument(_documentWithDataInEdit);
-                        _documentWithDataInEdit.PaginationSeparator.OpenDataPanel();
+                        // It is the responsibility of the DocumentDataPanel to inform the user of
+                        // any data issues that need correction if the panel is open.
+                        return false;
                     }
-                });
-                return false;
+                }
+                else
+                {
+                    // To account for the case that the panel may manipulate raw data; make
+                    // sure the data has been loaded into a panel before saving.
+                    _documentDataPanel.LoadData(document.DocumentData, forDisplay: false);
+                    Application.DoEvents();
+                    dataIsValid = _documentDataPanel.SaveData(document.DocumentData, validateData);
+                }
+
+                if (validateData && !dataIsValid)
+                {
+                    this.SafeBeginInvoke("ELI41669", () =>
+                    {
+                        _primaryPageLayoutControl.SelectDocument(document);
+                        document.PaginationSeparator.OpenDataPanel();
+                    });
+
+                    return false;
+                }
             }
+
+            return true;
         }
 
         /// <summary>
@@ -3120,11 +3125,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="modifiedDocumentData">All documents names and associated
         /// <see cref="PaginationDocumentData"/> where data was modified, but the document pages
         /// have not been modified compared to pagination on disk.</param>
-        /// <param name="unmodifiedPaginationSources"></param>
+        /// <param name="unmodifiedPaginationSources">All documents names and associated
+        /// <see cref="PaginationDocumentData"/> where the document pages have not been modified.
+        /// </param>
         void OnPaginated(IEnumerable<string> paginatedDocumentSources,
             IEnumerable<string> disregardedPaginationSources,
-            IEnumerable<KeyValuePair<string, PaginationDocumentData>> modifiedDocumentData,
-            IEnumerable<string> unmodifiedPaginationSources)
+            IEnumerable<KeyValuePair<string, PaginationDocumentData>> unmodifiedPaginationSources)
         {
             var eventHandler = Paginated;
             if (eventHandler != null)
@@ -3132,7 +3138,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 eventHandler(this, 
                     new PaginatedEventArgs(
                         paginatedDocumentSources, disregardedPaginationSources,
-                        modifiedDocumentData, unmodifiedPaginationSources));
+                        unmodifiedPaginationSources));
             }
         }
 

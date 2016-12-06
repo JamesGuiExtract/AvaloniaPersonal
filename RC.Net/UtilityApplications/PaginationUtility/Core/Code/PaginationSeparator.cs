@@ -363,7 +363,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 1);
                         _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
 
-                        args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData);
+                        args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, forDisplay: true);
 
                         _editDocumentDataButton.Checked = true;
 
