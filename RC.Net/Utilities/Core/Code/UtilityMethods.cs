@@ -11,6 +11,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 
+using static System.FormattableString;
+
 namespace Extract.Utilities
 {
     /// <summary>
@@ -239,7 +241,7 @@ namespace Extract.Utilities
                         if (value != null)
                         {
                             var ee = new ExtractException("ELI31151",
-                                "Assembly contains multiple implementations of specified type.");
+                                Invariant($"Assembly: {assemblyFileName}, contains multiple implementations of specified type."));
                             ee.AddDebugData("Type", typeof(T).ToString(), false);
                             throw ee;
                         }
@@ -266,6 +268,7 @@ namespace Extract.Utilities
                         foreach (var item in loaderExceptions)
                         {
                             ee.AddDebugData("LoaderException", item.Message, encrypt: false);
+                            ee.AddDebugData("Assembly File", assemblyFileName, true);
                         }
                     }
                 }
