@@ -589,9 +589,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // For reasons I don't understand, the dispose of one PageThumbnailControl can
                     // sometimes trigger the OnLoad call of a subsequent PageThumbnailControl.
                     // Ensure the page thumbnail exists before trying to use it.
-                    if (!IsDisposed && _page != null && _page.ThumbnailImage != null)
+                    if (!IsDisposed && _page != null && !_page.IsDisposed)
                     {
-                        _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
+                        // RasterPictureBox does dispose of the old image.
+                        _rasterPictureBox.Image = _page.ThumbnailImage;
                     }
                 }
                 catch (Exception ex)
@@ -874,7 +875,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Ensure this control has not been disposed of since invoking the thumbnail change.
                 if (!IsDisposed && _page != null && !_page.IsDisposed)
                 {
-                    _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
+                    // RasterPictureBox does dispose of the old image.
+                    _rasterPictureBox.Image = _page.ThumbnailImage;
                     _rasterPictureBox.Invalidate();
                 }
             });

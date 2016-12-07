@@ -46,6 +46,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _isDisposed;
 
+        /// <summary>
+        /// Synchronizes access to the <see cref="ThumbnailImage"/> property.
+        /// </summary>
+        object _lock = new object();
+
         #endregion Fields
 
         #region Constructors
@@ -125,6 +130,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Gets or sets the thumbnail image for this page.
+        /// <para><b>Note</b></para>
+        /// The returned value is a separate copy that needs to be disposed.
         /// </summary>
         /// <value>
         /// The thumbnail image for this page.
@@ -133,24 +140,39 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _thumbnailImage;
+                lock (_lock)
+                {
+                    return (_thumbnailImage != null && !_thumbnailImage.IsDisposed)
+                        ? _thumbnailImage.Clone()
+                        : null;
+                }
             }
 
             set
             {
                 try
                 {
-                    if (value != _thumbnailImage)
-                    {
-                        // To prevent any threading issues due to thumbnails loading on a background\
-                        // thread, assign the new thumbnail image before disposing of the old one.
-                        RasterImage oldThumbnailImage = _thumbnailImage;
-                        _thumbnailImage = value.Clone();
-                        if (oldThumbnailImage != null)
-                        {
-                            oldThumbnailImage.Dispose();
-                        }
+                    bool thumbnailChanged = false;
 
+                    lock (_lock)
+                    {
+                        if (value != _thumbnailImage)
+                        {
+                            // To prevent any threading issues due to thumbnails loading on a background\
+                            // thread, assign the new thumbnail image before disposing of the old one.
+                            RasterImage oldThumbnailImage = _thumbnailImage;
+                            _thumbnailImage = value.Clone();
+                            if (oldThumbnailImage != null)
+                            {
+                                oldThumbnailImage.Dispose();
+                            }
+
+                            thumbnailChanged = true;
+                        }
+                    }
+
+                    if (thumbnailChanged)
+                    {
                         OnThumbnailChanged();
                     }
                 }
@@ -181,15 +203,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (value != _imageOrientation)
                     {
-                        if (ThumbnailImage != null)
+                        lock (_lock)
                         {
-                            ImageMethods.RotateImageByDegrees(ThumbnailImage,
-                                value - _imageOrientation);
+                            if (_thumbnailImage != null)
+                            {
+                                ImageMethods.RotateImageByDegrees(_thumbnailImage,
+                                    value - _imageOrientation);
 
-                            OnOrientationChanged();
+                                OnOrientationChanged();
+                            }
+
+                            _imageOrientation = value;
                         }
-
-                        _imageOrientation = value;
                     }
                 }
                 catch (Exception ex)
@@ -363,10 +388,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _isDisposed = true;
 
                     // Dispose of managed resources
-                    if (_thumbnailImage != null)
+                    lock (_lock)
                     {
-                        _thumbnailImage.Dispose();
-                        _thumbnailImage = null;
+                        if (_thumbnailImage != null)
+                        {
+                            _thumbnailImage.Dispose();
+                            _thumbnailImage = null;
+                        }
                     }
                 }
                 catch { }
