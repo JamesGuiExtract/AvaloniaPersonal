@@ -392,6 +392,11 @@ namespace Extract.DataEntry
                 {
                     CollectionMethods.ClearAndDispose(_documentTypeConfigurations);
                 }
+
+                if (_defaultDataEntryConfig != null)
+                {
+                    _defaultDataEntryConfig.Dispose();
+                }
             }
 
             // Dispose of unmanaged resources
