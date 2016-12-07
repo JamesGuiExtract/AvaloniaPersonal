@@ -287,6 +287,72 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Overrides
 
         /// <summary>
+        /// Indicates whether all data must be viewed before saving and, if not, whether a prompt
+        /// will be displayed before allowing unviewed data to be saved.
+        /// </summary>
+        /// <value><see langword="UnviewedDataSaveMode.Allow"/> to allow unviewed data to be 
+        /// saved without prompting, <see langword="UnviewedDataSaveMode.Prompt"/> to allow unviewed
+        /// data to be saved, but only after prompting (once for all unviewed fields) or 
+        /// <see langword="UnviewedDataSaveMode.Disallow"/> to require that all data be viewed
+        /// before saving.</value>
+        /// <returns><see langword="UnviewedDataSaveMode.Allow"/> if unviewed data can be
+        /// saved without prompting, <see langword="UnviewedDataSaveMode.Prompt"/> if unviewed data
+        /// can be saved, but only after prompting (once for all unviewed fields) or 
+        /// <see langword="UnviewedDataSaveMode.Disallow"/> if all data must be viewed before
+        /// saving.</returns>
+        public override UnviewedDataSaveMode UnviewedDataSaveMode
+        {
+            get
+            {
+                // Allow is currently the only supported mode in the pagination panel
+                return InPaginationPanel
+                    ? UnviewedDataSaveMode.Allow
+                    : base.UnviewedDataSaveMode;
+            }
+
+            set
+            {
+                base.UnviewedDataSaveMode = value;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether all data must conform to validation rules before saving and, if not,
+        /// whether a prompt will be displayed before allowing invalid data to be saved.
+        /// </summary>
+        /// <value>
+        /// <see langword="InvalidDataSaveMode.Allow" /> to allow invalid data to be saved
+        /// without prompting, <see langword="InvalidDataSaveMode.Prompt" /> to allow invalid data
+        /// to be saved, but only after prompting (once for each invalid field) or
+        /// <see langword="InvalidDataSaveMode.Disallow" /> to require that all data meet validation
+        /// requirements before saving.
+        /// </value>
+        public override InvalidDataSaveMode InvalidDataSaveMode
+        {
+            get
+            {
+                if (InPaginationPanel)
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-14216
+                    // AllowWithWarnings is currently the only supported mode in the pagination panel
+                    return Config.Settings.PerformanceTesting
+                        ? InvalidDataSaveMode.Allow
+                        : InvalidDataSaveMode.AllowWithWarnings;
+                    
+                }
+                else
+                {
+                    return base.InvalidDataSaveMode;
+                }
+            }
+
+            set
+            {
+                base.InvalidDataSaveMode = value;
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="Form.Load"/> event.
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="Form.Load"/> 
@@ -450,18 +516,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         var flowLayoutPanel = this.GetAncestors()
                             .OfType<PaginationFlowLayoutPanel>()
-                            .Single();
-                        int scrollPos = flowLayoutPanel.VerticalScroll.Value;
-                        OnPageLoadRequest(1);
-                        flowLayoutPanel.VerticalScroll.Value = scrollPos;
-                        base.ImageViewer = _imageViewer;
+                            .SingleOrDefault();
+                        if (flowLayoutPanel != null)
+                        {
+                            int scrollPos = flowLayoutPanel.VerticalScroll.Value;
+                            OnPageLoadRequest(1);
+                            flowLayoutPanel.VerticalScroll.Value = scrollPos;
+                            base.ImageViewer = _imageViewer;
 
-                        // https://extract.atlassian.net/browse/ISSUE-14304
-                        // In a paginate files setup, focus will leave and return for scenarios
-                        // where it normally wouldn't in data entry verification including changing
-                        // pages via the thumbnail controls. When focus returns use
-                        // ensureActiveAttributeVisible == false to prevent page changes.
-                        DrawHighlights(ensureActiveAttributeVisible: false);
+                            // https://extract.atlassian.net/browse/ISSUE-14304
+                            // In a paginate files setup, focus will leave and return for scenarios
+                            // where it normally wouldn't in data entry verification including changing
+                            // pages via the thumbnail controls. When focus returns use
+                            // ensureActiveAttributeVisible == false to prevent page changes.
+                            DrawHighlights(ensureActiveAttributeVisible: false);
+                        }
                     }
                 }
 

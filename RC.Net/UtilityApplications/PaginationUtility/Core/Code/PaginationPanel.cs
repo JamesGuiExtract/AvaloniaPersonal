@@ -852,7 +852,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SuspendUIUpdates = true;
+                SuspendUIUpdatesForOperation();
                 _committingChanges = true;
 
                 if (!CanSelectedDocumentsBeCommitted())
@@ -1007,8 +1007,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    SuspendUIUpdates = false;
-
                     _committingChanges = false;
                     if (_outputDocumentPositions != null)
                     {
@@ -2746,6 +2744,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </returns>
         bool SaveDocumentData(bool selectedDocumentsOnly, bool validateData)
         {
+            if (_documentDataPanel == null)
+            {
+                return true;
+            }
+
             foreach (var document in _pendingDocuments.Where(document =>
                 document.PageControls.Any(c => !c.Deleted) &&
                 (!selectedDocumentsOnly || document.Selected)))

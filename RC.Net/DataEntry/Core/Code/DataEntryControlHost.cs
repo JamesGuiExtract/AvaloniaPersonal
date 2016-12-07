@@ -887,7 +887,7 @@ namespace Extract.DataEntry
         /// saving.</returns>
         [Category("Data Entry Control Host")]
         [DefaultValue(UnviewedDataSaveMode.Allow)]
-        public UnviewedDataSaveMode UnviewedDataSaveMode
+        public virtual UnviewedDataSaveMode UnviewedDataSaveMode
         {
             get
             {
@@ -919,7 +919,7 @@ namespace Extract.DataEntry
         /// </returns>
         [Category("Data Entry Control Host")]
         [DefaultValue(InvalidDataSaveMode.PromptForEachWarning)]
-        public InvalidDataSaveMode InvalidDataSaveMode
+        public virtual InvalidDataSaveMode InvalidDataSaveMode
         {
             get
             {
@@ -1885,8 +1885,10 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Commands the <see cref="DataEntryControlHost"/> to finalize and return the attribute
-        /// vector. This does not perform any validation of the data.
+        /// vector.
         /// </summary>
+        /// <param name="validateData"><c>true</c> if the data should be validated; otherwise, 
+        /// <c>false</c>.</param>
         /// <returns>An <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s representing the
         /// current data.
         /// </returns>
