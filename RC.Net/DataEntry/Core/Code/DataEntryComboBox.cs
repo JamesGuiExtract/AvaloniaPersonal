@@ -159,12 +159,6 @@ namespace Extract.DataEntry
         bool _isActive;
 
         /// <summary>
-        /// To prevent a problem where the value can inadvertently be changed during a font change,
-        /// the value the control has before a font change will be stored.
-        /// </summary>
-        string _valueBeforeFontChange;
-
-        /// <summary>
         /// Indicates whether an update of the auto-complete list was requested, but the update was
         /// postponed because <see cref="DataEntryControlHost"/> UpdateInProgress returned.
         /// <see langword="true"/>.
@@ -1776,14 +1770,6 @@ namespace Extract.DataEntry
         /// <param name="fontStyle">The new <see cref="FontStyle"/> to apply.</param>
         void SetFontStyle(FontStyle fontStyle)
         {
-            _fontStyle = fontStyle;
-
-            // [DataEntry:954]
-            // Changing the font will cause an open list to collapse and re-display. At times this
-            // results in a different value getting inadvertently selected. Record the original
-            // value so that it can be restored after changing the font.
-            _valueBeforeFontChange = Text;
-
             // Perform the font change asynchronously otherwise it results in memory corruption
             // related to auto-complete lists (probably related to the window handle recreation it
             // triggers).
@@ -1800,12 +1786,27 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Don't do anything if there are no items in the collection to avoid triggering an exception
+                // https://extract.atlassian.net/browse/ISSUE-14315
+                if (Items.Count == 0)
+                {
+                    return;
+                }
+
+                _fontStyle = fontStyle;
+
+                // [DataEntry:954]
+                // Changing the font will cause an open list to collapse and re-display. At times this
+                // results in a different value getting inadvertently selected. Record the original
+                // value so that it can be restored after changing the font.
+                var valueBeforeFontChange = Text;
+
                 Font = new Font(Font, fontStyle);
 
                 // Restore the value the control had before the font change (if it had one).
-                if (!string.IsNullOrEmpty(_valueBeforeFontChange) && Text != _valueBeforeFontChange)
+                if (!string.IsNullOrEmpty(valueBeforeFontChange) && Text != valueBeforeFontChange)
                 {
-                    Text = _valueBeforeFontChange;
+                    Text = valueBeforeFontChange;
                 }
             }
             catch (Exception ex)
