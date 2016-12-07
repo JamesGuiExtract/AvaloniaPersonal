@@ -122,7 +122,7 @@ namespace Extract.Imaging.Forms
                     {
                         _active = value;
 
-                        if (_active && _imageViewer.IsImageAvailable)
+                        if (_active && _imageViewer != null && _imageViewer.IsImageAvailable)
                         {
                             // If _imageList hasn't been initialized, do it now.
                             if (_imageList == null || _imageList.Items.Count == 0)
@@ -397,19 +397,33 @@ namespace Extract.Imaging.Forms
         /// <param name="pageNumber">The page number to select.</param>
         void SelectPage(int pageNumber)
         {
-            // Select the thumbnail corresponding to this page
-            RasterImageListItem item = _imageList.Items[pageNumber - 1];
-            if (!item.Selected)
+
+            if (Active && _imageViewer != null && _imageViewer.IsImageAvailable)
             {
-                // Ensure the item to select is visible
-                _imageList.EnsureVisible(pageNumber - 1);
+                // If _imageList hasn't been initialized, do it now.
+                // https://extract.atlassian.net/browse/ISSUE-14317
+                if (_imageList == null || _imageList.Items.Count == 0)
+                {
+                    LoadDefaultThumbnails();
 
-                // Clear the current selection
-                ClearSelection();
+                    // Kick off or un-pause a worker thread.
+                    StartThumbnailWorker();
+                }
 
-                // Select this item
-                item.Selected = true;
-                item.Invalidate();
+                // Select the thumbnail corresponding to this page
+                RasterImageListItem item = _imageList.Items[pageNumber - 1];
+                if (!item.Selected)
+                {
+                    // Ensure the item to select is visible
+                    _imageList.EnsureVisible(pageNumber - 1);
+
+                    // Clear the current selection
+                    ClearSelection();
+
+                    // Select this item
+                    item.Selected = true;
+                    item.Invalidate();
+                }
             }
         }
 
