@@ -555,21 +555,10 @@ namespace Extract
                 }
 
                 // Don't capture mouse events
-                if (toolStrip.InvokeRequired)
-                {
-                    toolStrip.Invoke((MethodInvoker)(() =>
-                    {
-                        try
-                        {
-                            toolStrip.Capture = false;
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.ExtractLog("ELI38031");
-                        }
-                    }));
-                }
-                else
+                // Don't invoke to avoid deadlocks; leave other
+                // thread's toolstrips as they are
+                // https://extract.atlassian.net/browse/ISSUE-14206
+                if (!toolStrip.InvokeRequired)
                 {
                     toolStrip.Capture = false;
                 }

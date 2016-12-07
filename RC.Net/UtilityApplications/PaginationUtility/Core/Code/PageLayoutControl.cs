@@ -3063,7 +3063,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         var activeSeparator = activeControl as PaginationSeparator;
                         if (lastSelectedPage != null && activeSeparator != null)
                         {
-                            if (activeSeparator.Document == lastSelectedPage.Document)
+                            if (activeSeparator.Document == null
+                                || activeSeparator.Document == lastSelectedPage.Document)
                             {
                                 activeControl = lastSelectedPage;
                             }
