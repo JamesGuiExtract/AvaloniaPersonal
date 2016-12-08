@@ -1299,7 +1299,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                 }
 
-                _configManager.ConfigurationChanging += HandleConfigManager_ConfigurationChanging;
                 _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
                 _configManager.ConfigurationChangeError += HandleConfigManager_ConfigurationChangeError;
 
@@ -1775,17 +1774,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="DataEntryConfigurationManager.ConfigurationChanging"/> event of the
-        /// <see cref="_configManager"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="CancelEventArgs"/> instance containing the event data.</param>
-        void HandleConfigManager_ConfigurationChanging(object sender, CancelEventArgs e)
-        {
-            e.Cancel = (AttemptSave(false) == DialogResult.Cancel);
-        }
-
-        /// <summary>
         /// Handles the <see cref="DataEntryConfigurationManager.ConfigurationChanged"/> event of the
         /// <see cref="_configManager"/>.
         /// </summary>
@@ -1800,29 +1788,33 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // If a DEP is being used, load the data into it
             if (DataEntryControlHost != null)
             {
-                var oldDatEntryControlHost = e.OldDataEntryConfiguration?.DataEntryControlHost;
+                var oldDataEntryControlHost = e.OldDataEntryConfiguration?.DataEntryControlHost;
                 var newDataEntryControlHost = e.NewDataEntryConfiguration?.DataEntryControlHost;
 
-                if (oldDatEntryControlHost != newDataEntryControlHost)
+                if (oldDataEntryControlHost != newDataEntryControlHost)
                 {
                     // Undo/redo command should be unavailable until a change is actually made.
                     _undoCommand.Enabled = false;
                     _redoCommand.Enabled = false;
 
-                    if (oldDatEntryControlHost != null)
+                    IUnknownVector attributes = null;
+
+                    if (oldDataEntryControlHost != null)
                     {
+                        attributes = oldDataEntryControlHost.GetData(validateData: false);
+
                         // Set Active = false for the old DEP so that it no longer tracks image
                         // viewer events.
-                        oldDatEntryControlHost.Active = false;
+                        oldDataEntryControlHost.Active = false;
 
                         // Unregister for events and disengage shortcut handlers for the previous DEP
-                        oldDatEntryControlHost.SwipingStateChanged -= HandleSwipingStateChanged;
-                        oldDatEntryControlHost.DataValidityChanged -= HandleDataValidityChanged;
-                        oldDatEntryControlHost.UnviewedDataStateChanged -= HandleUnviewedDataStateChanged;
-                        oldDatEntryControlHost.ItemSelectionChanged -= HandleItemSelectionChanged;
+                        oldDataEntryControlHost.SwipingStateChanged -= HandleSwipingStateChanged;
+                        oldDataEntryControlHost.DataValidityChanged -= HandleDataValidityChanged;
+                        oldDataEntryControlHost.UnviewedDataStateChanged -= HandleUnviewedDataStateChanged;
+                        oldDataEntryControlHost.ItemSelectionChanged -= HandleItemSelectionChanged;
                         if (_settings.InputEventTrackingEnabled)
                         {
-                            oldDatEntryControlHost.MessageHandled -= HandleMessageFilterMessageHandled;
+                            oldDataEntryControlHost.MessageHandled -= HandleMessageFilterMessageHandled;
                         }
 
                         _gotoNextInvalidCommand.ShortcutHandler = null;
@@ -1831,7 +1823,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _acceptSpatialInfoCommand.ShortcutHandler = null;
                         _removeSpatialInfoCommand.ShortcutHandler = null;
 
-                        oldDatEntryControlHost.ClearData();
+                        oldDataEntryControlHost.ClearData();
                     }
 
                     if (newDataEntryControlHost != null)
@@ -1839,7 +1831,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // Load the panel into the _scrollPane
                         LoadDataEntryControlHostPanel();
 
-                        IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
+                        // Load the attributes from the previous DataEntryControlHost
                         newDataEntryControlHost.LoadData(attributes, forDisplay: true);
 
                         // Register for events and engage shortcut handlers for the new DEP
