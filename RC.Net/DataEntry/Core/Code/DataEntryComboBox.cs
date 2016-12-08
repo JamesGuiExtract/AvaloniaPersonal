@@ -581,7 +581,7 @@ namespace Extract.DataEntry
                 base.OnTextChanged(e);
 
                 // Only apply data if the combo box is currently mapped
-                if (_attribute != null && !string.IsNullOrEmpty(Text))
+                if (_attribute != null)
                 {
                     AttributeStatusInfo.SetValue(_attribute, Text, true, false);
                 }
