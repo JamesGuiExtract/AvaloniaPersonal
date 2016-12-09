@@ -967,6 +967,9 @@ namespace Extract.DataEntry
                     ee.Log();
                 }
 
+                // Make sure _all_ the attributes are released
+                ReleaseAttributes(_statusInfoMap.Keys.ToIUnknownVector<IAttribute>());
+
                 _statusInfoMap.Clear();
                 _subAttributesToParentMap.Clear();
                 _attributesBeingModified.Clear();
@@ -1009,7 +1012,7 @@ namespace Extract.DataEntry
                 // Release the attributes still in the _attributes hierarchy.
                 if (_attributes != null)
                 {
-                    AttributeStatusInfo.ReleaseAttributes(_attributes);
+                    ReleaseAttributes(_attributes);
                 }
 
                 _attributes = attributes;

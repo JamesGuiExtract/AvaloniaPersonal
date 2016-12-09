@@ -1904,6 +1904,13 @@ namespace Extract.DataEntry
 
                 if (!validateData || DataCanBeSaved())
                 {
+
+                    // Clear the status info data objects for the cloned/pruned collection
+                    if (_mostRecentlySaveAttributes != null)
+                    {
+                        AttributeStatusInfo.ReleaseAttributes(_mostRecentlySaveAttributes);
+                    }
+
                     // Create a copy of the data to be saved so that attributes that should
                     // not be persisted can be removed.
                     ICloneIdentifiableObject copyThis = (ICloneIdentifiableObject)_attributes;
@@ -1956,6 +1963,12 @@ namespace Extract.DataEntry
 
                         if (!validateData || DataCanBeSaved())
                         {
+                            // Clear the status info data objects for the cloned/pruned collection
+                            if (_mostRecentlySaveAttributes != null)
+                            {
+                                AttributeStatusInfo.ReleaseAttributes(_mostRecentlySaveAttributes);
+                            }
+
                             // Create a copy of the data to be saved so that attributes that should
                             // not be persisted can be removed.
                             ICloneIdentifiableObject copyThis = (ICloneIdentifiableObject) _attributes;
@@ -2699,6 +2712,12 @@ namespace Extract.DataEntry
                 {
                     // Clear any existing attributes.
                     _attributes = new IUnknownVectorClass();
+                }
+
+                // Clear the status info data objects for the cloned/pruned collection
+                if (_mostRecentlySaveAttributes != null)
+                {
+                    AttributeStatusInfo.ReleaseAttributes(_mostRecentlySaveAttributes);
                 }
 
                 // [DataEntry:576]

@@ -14,7 +14,7 @@ using UCLID_COMUTILSLib;
 namespace Extract.DataEntry
 {
     /// <summary>
-    /// Manages all <see cref="DataEntryConfiguration"/>s currently available. Multiple
+    /// Manages all <see cref="DataEntryConfiguration" />s currently available. Multiple
     /// configurations will exist when there are multiple DEPs defined where the one used depends
     /// on doc-type.
     /// </summary>
@@ -80,6 +80,11 @@ namespace Extract.DataEntry
         /// The document type ComboBox
         /// </summary>
         ComboBox _documentTypeComboBox;
+
+        /// <summary>
+        /// The attributes used to determine the current data configuration.
+        /// </summary>
+        IUnknownVector _attributes;
 
         /// <summary>
         /// The <see cref="IAttribute"/> that contains the DocumentType value.
@@ -343,6 +348,9 @@ namespace Extract.DataEntry
         {
             try
             {
+                UnregisterDocumentTypeHook();
+                _attributes = null;
+
                 // If a _temporaryDocumentType was added to the _documentTypeMenu to match the
                 // original type of the last document loaded, remove it now that the image has
                 // changed.
@@ -541,8 +549,8 @@ namespace Extract.DataEntry
 
                     if (_activeDataEntryConfig?.DataEntryControlHost != null)
                     {
-                        // Apply the new document type to the DocumentType attribute.
-                        AssignNewDocumentType(documentType, changedDataEntryConfig);
+                        // In order to be notified if doc type is changed from within the DEP.
+                        RegisterDocumentTypeHook();
                     }
                 }
 
@@ -559,72 +567,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Assigns a new document type to the DocumentType <see cref="IAttribute"/>.
-        /// </summary>
-        /// <param name="newDocumentType">The new document type.</param>
-        /// <param name="reloadDocumentTypeAttribute">Whether to re-find the DocumentType attribute
-        /// rather than use one that has already been found.</param>
-        void AssignNewDocumentType(string newDocumentType, bool reloadDocumentTypeAttribute)
-        {
-            // If reloading the DocumentType attribute, remove event registration from the last
-            // DocumentType attribute we found.
-            if (reloadDocumentTypeAttribute)
-            {
-                _documentTypeAttribute = null;
-
-                if (_documentTypeAttributeStatusInfo != null)
-                {
-                    _documentTypeAttributeStatusInfo.AttributeValueModified -=
-                        HandleDocumentTypeAttributeValueModified;
-                    _documentTypeAttributeStatusInfo = null;
-                }
-            }
-
-            // Attempt to find a new DocumentType attribute if we don't currently have one.
-            if (_documentTypeAttribute == null && _activeDataEntryConfig?.DataEntryControlHost != null)
-            {
-                IUnknownVector matchingAttributes =
-                DataEntryMethods.AFUtility.QueryAttributes(
-                    _activeDataEntryConfig?.DataEntryControlHost.Attributes, "DocumentType", false);
-
-                int matchingAttributeCount = matchingAttributes.Size();
-                if (matchingAttributeCount > 0)
-                {
-                    _documentTypeAttribute = (IAttribute)matchingAttributes.At(0);
-                }
-                else
-                {
-                    // Create a new DocumentType attribute if necessary.
-                    _documentTypeAttribute = (IAttribute)new AttributeClass();
-                    _documentTypeAttribute.Name = "DocumentType";
-
-                    AttributeStatusInfo.Initialize(_documentTypeAttribute,
-                        _activeDataEntryConfig?.DataEntryControlHost.Attributes, null);
-                }
-
-                // Register to be notified of changes to the attribute.
-                _documentTypeAttributeStatusInfo =
-                    AttributeStatusInfo.GetStatusInfo(_documentTypeAttribute);
-                _documentTypeAttributeStatusInfo.AttributeValueModified +=
-                    HandleDocumentTypeAttributeValueModified;
-            }
-
-            // If the DocumentType value was changed, refresh any DEP control that displays the
-            // DocumentType.
-            if (!_documentTypeAttribute.Value.String.Equals(
-                    newDocumentType, StringComparison.OrdinalIgnoreCase))
-            {
-                AttributeStatusInfo.SetValue(_documentTypeAttribute, newDocumentType ?? "", false, true);
-                IDataEntryControl dataEntryControl =
-                    AttributeStatusInfo.GetOwningControl(_documentTypeAttribute);
-                if (dataEntryControl != null)
-                {
-                    dataEntryControl.RefreshAttributes(false, _documentTypeAttribute);
-                }
-            }
-        }
-
-        /// <summary>
         /// Loads the type of the correct config for document.
         /// </summary>
         /// <param name="attributes">The attributes representing the document data.</param>
@@ -634,12 +576,15 @@ namespace Extract.DataEntry
         {
             try
             {
+                _attributes = attributes;
+
                 // If there were document type specific configurations defined, apply the
                 // appropriate configuration now.
                 bool changedDocumentType;
                 if (_documentTypeConfigurations != null)
                 {
-                    string documentType = GetDocumentType(attributes, false);
+                    _documentTypeAttribute = GetDocumentTypeAttribute();
+                    string documentType = _documentTypeAttribute?.Value.String;
 
                     // If there is a default configuration, add the original document type to the
                     // document type combo and allow the document to be saved with the undefined
@@ -720,6 +665,10 @@ namespace Extract.DataEntry
                     if (changedDocumentType)
                     {
                         changedDocumentType = !blockedConfigurationChange;
+                        if (changedDocumentType)
+                        {
+                            SetDocumentTypeAttribute(documentType);
+                        }
 
                         if (blockedConfigurationChange ||
                             _documentTypeComboBox.FindStringExact(documentType) == -1)
@@ -744,51 +693,78 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Gets the document type for the specified data using the first root-level DocumentType
-        /// <see cref="IAttribute"/>.
+        /// <see cref="IAttribute"/>. 
         /// </summary>
         /// <param name="attributes">The attributes representing the document's data.</param>
-        /// <param name="listenForChanges"><see langword="true"/> to watch for changes to the
-        /// <see cref="IAttribute"/>'s value, <see langword="false"/> otherwise.</param>
-        string GetDocumentType(IUnknownVector attributes, bool listenForChanges)
+        IAttribute GetDocumentTypeAttribute()
         {
-            string documentType = "";
-            _documentTypeAttribute = null;
+            IAttribute documentTypeAttribute = null;
 
             // Remove event registration from the last DocumentType attribute we found.
+            UnregisterDocumentTypeHook();
+
+            if (_attributes != null)
+            {
+                // Search for the DocumentType attribute.
+                IUnknownVector matchingAttributes =
+                    DataEntryMethods.AFUtility.QueryAttributes(
+                        _attributes, "DocumentType", false);
+
+                int matchingAttributeCount = matchingAttributes.Size();
+                if (matchingAttributeCount > 0)
+                {
+                    documentTypeAttribute = (IAttribute)matchingAttributes.At(0);
+                }
+                else
+                {
+                    // Add the document type attribute if it didn't previously exist.
+                    documentTypeAttribute = new UCLID_AFCORELib.Attribute();
+                    documentTypeAttribute.Name = "DocumentType";
+                    _attributes.PushBack(documentTypeAttribute);
+                }
+            }
+
+            return documentTypeAttribute;
+        }
+
+        /// <summary>
+        /// Sets the document type attribute to <see paramref="documentType"/>.
+        /// </summary>
+        /// <param name="documentType">The f value to assign to the document type attribute.</param>
+        void SetDocumentTypeAttribute(string documentType)
+        {
+            _documentTypeAttribute = GetDocumentTypeAttribute();
+            if (_documentTypeAttribute != null)
+            {
+                _documentTypeAttribute.Value.ReplaceAndDowngradeToNonSpatial(documentType);
+            }
+        }
+
+        /// <summary>
+        /// Registers to be notified of changes to the document type made from withing a DEP.
+        /// </summary>
+        void RegisterDocumentTypeHook()
+        {
+            if (_documentTypeAttribute != null)
+            {
+                _documentTypeAttributeStatusInfo =
+                    AttributeStatusInfo.GetStatusInfo(_documentTypeAttribute);
+                _documentTypeAttributeStatusInfo.AttributeValueModified +=
+                    HandleDocumentTypeAttributeValueModified;
+            }
+        }
+
+        /// <summary>
+        /// Unregisters from being notified of changes to the document type made from withing a DEP.
+        /// </summary>
+        void UnregisterDocumentTypeHook()
+        {
             if (_documentTypeAttributeStatusInfo != null)
             {
                 _documentTypeAttributeStatusInfo.AttributeValueModified -=
                     HandleDocumentTypeAttributeValueModified;
                 _documentTypeAttributeStatusInfo = null;
             }
-
-            // Search for the DocumentType attribute.
-            IUnknownVector matchingAttributes =
-                DataEntryMethods.AFUtility.QueryAttributes(
-                    attributes, "DocumentType", false);
-
-            int matchingAttributeCount = matchingAttributes.Size();
-            if (matchingAttributeCount > 0)
-            {
-                _documentTypeAttribute = (IAttribute)matchingAttributes.At(0);
-            }
-
-            // If one was found, retrieve the document type and register to be notified of changes
-            // if specified.
-            if (_documentTypeAttribute != null)
-            {
-                documentType = _documentTypeAttribute.Value.String;
-
-                if (listenForChanges)
-                {
-                    _documentTypeAttributeStatusInfo =
-                        AttributeStatusInfo.GetStatusInfo(_documentTypeAttribute);
-                    _documentTypeAttributeStatusInfo.AttributeValueModified +=
-                        HandleDocumentTypeAttributeValueModified;
-                }
-            }
-
-            return documentType;
         }
 
         /// <summary>
