@@ -1804,8 +1804,9 @@ namespace Extract.DataEntry
 
                 Font = new Font(Font, fontStyle);
 
-                // Restore the value the control had before the font change (if it had one).
-                if (!string.IsNullOrEmpty(valueBeforeFontChange) && Text != valueBeforeFontChange)
+                // Restore the value the control had before the font change, even if that means clearing it
+                // https://extract.atlassian.net/browse/ISSUE-14320
+                if (Text != valueBeforeFontChange)
                 {
                     Text = valueBeforeFontChange;
                 }
