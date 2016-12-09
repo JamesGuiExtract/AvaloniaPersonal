@@ -173,6 +173,16 @@ namespace Extract.UtilityApplications.PaginationUtility.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Redo {
+            get {
+                object obj = ResourceManager.GetObject("Redo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap RevertToDisk {
             get {
                 object obj = ResourceManager.GetObject("RevertToDisk", resourceCulture);
@@ -196,6 +206,16 @@ namespace Extract.UtilityApplications.PaginationUtility.Properties {
         internal static System.Drawing.Bitmap SaveImageButton {
             get {
                 object obj = ResourceManager.GetObject("SaveImageButton", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Undo {
+            get {
+                object obj = ResourceManager.GetObject("Undo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

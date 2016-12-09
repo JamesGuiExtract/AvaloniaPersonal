@@ -150,14 +150,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     MinimumSize = new Size(MinimumSize.Width, MinimumSize.Height - _documentTypePanel.Height);
                     Height -= _documentTypePanel.Height;
-                    _documentTypePanel.Visible = false;
-                    _documentTypePanel.Height = 0;
-                    _scrollPanel.Dock = DockStyle.Fill;
-
-                    if (ActiveDataEntryPanel != null)
-                    {
-                        ActiveDataEntryPanel.Dock = DockStyle.Fill;
-                    }
+                    _documentTypeLabel.Visible = false;
+                    _documentTypeComboBox.Visible = false;
+                    // To hide column that had _documentTypeComboBox.
+                    _tableLayoutPanel.ColumnStyles[1].SizeType = SizeType.AutoSize;
                 }
             }
             catch (Exception ex)
@@ -330,6 +326,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _sourceDocName = null;
 
                 ActiveDataEntryPanel.ClearData();
+
+                _undoButton.Enabled = false;
+                _redoButton.Enabled = false;
             }
             catch (Exception ex)
             {
@@ -614,6 +613,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         void DataEntryControlHost_UndoAvailabilityChanged(object sender, EventArgs e)
         {
+            _undoButton.Enabled = UndoOperationAvailable;
+
             OnUndoAvailabilityChanged();
         }
 
@@ -625,7 +626,43 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         void NewDataEntryControlHost_RedoAvailabilityChanged(object sender, EventArgs e)
         {
+            _redoButton.Enabled = UndoOperationAvailable;
+
             OnRedoAvailabilityChanged();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_undoButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleUndoButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Undo();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41675");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_undoButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleRedoButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Redo();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41676");
+            }
         }
 
         #endregion Event Handlers

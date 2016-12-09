@@ -578,13 +578,13 @@ namespace Extract.FileActionManager.FileProcessors
                     // Undo command
                     _undoCommand = new ApplicationCommand(_imageViewer.Shortcuts,
                         new Keys[] { Keys.Z | Keys.Control }, PerformUndo,
-                        new ToolStripItem[] { _undoToolStripButton },
+                        new ToolStripItem[] { },
                         false, true, false);
 
                     // Redo command
                     _redoCommand = new ApplicationCommand(_imageViewer.Shortcuts,
                         new Keys[] { Keys.Y | Keys.Control }, PerformRedo,
-                        new ToolStripItem[] { _redoToolStripButton },
+                        new ToolStripItem[] { },
                         false, true, false);
 
                     // Toggle show all data highlights

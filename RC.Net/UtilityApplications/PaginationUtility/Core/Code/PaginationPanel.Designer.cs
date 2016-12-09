@@ -145,7 +145,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._revertToSourceToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._revertToSourceToolStripButton.Name = "_revertToSourceToolStripButton";
             this._revertToSourceToolStripButton.Size = new System.Drawing.Size(117, 22);
-            this._revertToSourceToolStripButton.Text = "Revert to original";
+            this._revertToSourceToolStripButton.Text = "Discard all layout changes";
             this._revertToSourceToolStripButton.Click += new System.EventHandler(this.HandleRevertToSourceToolStripButton_Click);
             // 
             // _revertToOriginalToolStripButton
@@ -154,7 +154,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._revertToOriginalToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._revertToOriginalToolStripButton.Name = "_revertToOriginalToolStripButton";
             this._revertToOriginalToolStripButton.Size = new System.Drawing.Size(131, 22);
-            this._revertToOriginalToolStripButton.Text = "Revert to suggested";
+            this._revertToOriginalToolStripButton.Text = "Restore suggested layout changes";
             this._revertToOriginalToolStripButton.Click += new System.EventHandler(this.HandleRevertToOriginalToolStripButton_Click);
             // 
             // PaginationPanel
