@@ -165,14 +165,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         internal static readonly int _CLIPBOARD_RETRY_COUNT = 10;
 
         /// <summary>
-        /// The number of consecutive <see cref="Control.MouseMove"/> events with the control key
-        /// down needed to trigger the display of the page under the mouse. This prevents the
-        /// inadvertent display of pages when trying to use keyboard navigation instead of the
-        /// mouse.
-        /// </summary>
-        static readonly int _HOVER_MOVE_EVENT_CRITERIA = 10;
-
-        /// <summary>
         /// The number of pixels from the top or bottom of the control where scrolling will be
         /// triggered during a drag/drop operation.
         /// </summary>
@@ -212,18 +204,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// the <see cref="ImageViewer"/>.
         /// </summary>
         PaginationControl _primarySelection;
-
-        /// <summary>
-        /// The page control who's page is currently displayed as a result of the control-hover
-        /// feature.
-        /// </summary>
-        PageThumbnailControl _hoverPageControl;
-
-        /// <summary>
-        /// The number of consecutive hover events with the control key down toward
-        /// <see cref="_HOVER_MOVE_EVENT_CRITERIA"/>.
-        /// </summary>
-        int _hoverMoveEventTotal;
 
         /// <summary>
         /// The last selected <see cref="PaginationControl"/>.
@@ -840,11 +820,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         SetHighlightedAndDisplayed(_primarySelection, false);
                     }
 
-                    if (_hoverPageControl != null && value != _hoverPageControl)
-                    {
-                        SetHighlightedAndDisplayed(_hoverPageControl, false);
-                    }
-
                     _primarySelection = value;
 
                     if (_primarySelection != null)
@@ -1249,7 +1224,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 control.Click -= HandlePaginationControl_Click;
                 control.MouseMove -= HandlePaginationControl_MouseMove;
-                control.KeyUp -= HandlePaginationControl_KeyUp;
 
                 // Determine which controls are before and after the removed control to determine
                 // how the removal affects the output documents.
@@ -2079,20 +2053,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
                     }
                 }
-                else if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
-                {
-                    // Require enough successive mouse move events with the control key down to
-                    // prevent the inadvertent display of pages when trying to use keyboard
-                    // navigation instead of the mouse.
-                    if (_hoverMoveEventTotal < _HOVER_MOVE_EVENT_CRITERIA)
-                    {
-                        _hoverMoveEventTotal++;
-                    }
-                    else
-                    {
-                        ShowHoverPage();
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -2251,44 +2211,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     ex.ExtractDisplay("ELI35619");
                 }
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.KeyUp"/> event of a <see cref="PaginationControl"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/> instance containing
-        /// the event data.</param>
-        void HandlePaginationControl_KeyUp(object sender, KeyEventArgs e)
-        {
-            try
-            {
-                if (_hoverPageControl != null && !e.Control)
-                {
-                    if (PrimarySelection != _hoverPageControl)
-                    {
-                        SetHighlightedAndDisplayed(_hoverPageControl, false);
-
-                        if (PrimarySelection != null)
-                        {
-                            SetHighlightedAndDisplayed(_primarySelection, true);
-                        }
-                    }
-
-                    _hoverMoveEventTotal = 0;
-                    _hoverPageControl = null;
-                }
-                else
-                {
-                    // Any time a key is pressed, reset _hoverMoveEventTotal as the keypress indicates
-                    // the user is using the keyboard rather than the mouse hover feature.
-                    _hoverMoveEventTotal = 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35455");
             }
         }
 
@@ -2790,7 +2712,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             control.Click += HandlePaginationControl_Click;
             control.MouseMove += HandlePaginationControl_MouseMove;
-            control.KeyUp += HandlePaginationControl_KeyUp;
 
             var asPaginationSeparator = control as PaginationSeparator;
 
@@ -3776,38 +3697,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 additionalControls: insertedPaginationControls,
                 select: true,
                 modifierKeys: Keys.None);
-        }
-
-        /// <summary>
-        /// Shows in the <see cref="ImageViewer"/> the page the mouse is currently hovering over.
-        /// </summary>
-        void ShowHoverPage()
-        {
-            Point mouseLocation = PointToClient(Control.MousePosition);
-            var pageControl = GetPaginationControlAtPoint(mouseLocation) as PageThumbnailControl;
-
-            if (pageControl != null && pageControl != _hoverPageControl)
-            {
-                NavigablePaginationControl navigableControl =
-                    PrimarySelection as NavigablePaginationControl;
-                if (navigableControl != null && navigableControl.Highlighted)
-                {
-                    navigableControl.Highlighted = false;
-                }
-                if (_hoverPageControl != null && _hoverPageControl.Highlighted)
-                {
-                    _hoverPageControl.Highlighted = false;
-                }
-
-                _hoverPageControl = pageControl;
-                pageControl.DisplayPage(ImageViewer, true);
-                pageControl.Highlighted = true;
-
-                // By ensuring the _hoverPageControl has keyboard focus we can prevent cases where
-                // the hover selection doesn't "release" when the control key is released because
-                // some other control (such as the load next document button) ate the event.
-                _hoverPageControl.Focus();
-            }
         }
 
         /// <summary>
