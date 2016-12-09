@@ -1,6 +1,5 @@
 ﻿using Extract.Drawing;
 using Extract.FileActionManager.Utilities;
-using Extract.Utilities.Forms;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Data;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Design;
@@ -71,6 +71,16 @@ namespace Extract.DataEntry.LabDE
         /// Specifies whether the current instance is running in design mode
         /// </summary>
         bool _inDesignMode;
+
+        /// <summary>
+        /// Specifies whether events have been registered
+        /// </summary>
+        bool _eventsRegistered;
+
+        /// <summary>
+        /// Safety check flag for assigning event handlers
+        /// </summary>
+        bool _isDisposed;
 
         #endregion Fields
 
@@ -467,13 +477,15 @@ namespace Extract.DataEntry.LabDE
                 // (The extra test for DataEntryTableBase is because of unreliability of the
                 // _inDesignMode checks. DataGridView will not be a DataEntryTableBase when editing
                 // the column in the designer.
-                if (!_inDesignMode && Visible && DataGridView is DataEntryTableBase)
+                if (!_eventsRegistered && !_isDisposed && !_inDesignMode && Visible && DataGridView is DataEntryTableBase)
                 {
                     DataGridView.HandleCreated += HandleDataGridView_HandleCreated;
                     DataGridView.HandleDestroyed += HandleDataGridView_HandleDestroyed;
                     DataGridView.CellContentClick += HandleDataGridView_CellContentClick;
                     DataGridView.CellPainting += HandleDataGridView_CellPainting;
                     DataGridView.Rows.CollectionChanged += HandleDataGridViewRows_CollectionChanged;
+
+                    _eventsRegistered = true;
                 }
             }
             catch (Exception ex)
@@ -496,6 +508,24 @@ namespace Extract.DataEntry.LabDE
                     _famData.RowDataUpdated -= HandleFamData_RowDataUpdated;
                     _famData.Dispose();
                     _famData = null;
+                }
+
+                _recordIDColumn = null;
+                _dataEntryControlHost = null;
+
+                // This fixes a multiple registration problem, where event handlers were getting assigned
+                // many times (3 that I saw) - and fixes a memory leak as well.
+                // Done for Issue-14322, didn't fix the issue but is an improvement.
+                if (_eventsRegistered)
+                {
+                    DataGridView.HandleCreated -= HandleDataGridView_HandleCreated;
+                    DataGridView.HandleDestroyed -= HandleDataGridView_HandleDestroyed;
+                    DataGridView.CellContentClick -= HandleDataGridView_CellContentClick;
+                    DataGridView.CellPainting -= HandleDataGridView_CellPainting;
+                    DataGridView.Rows.CollectionChanged -= HandleDataGridViewRows_CollectionChanged;
+
+                    _eventsRegistered = false;
+                    _isDisposed = true;
                 }
             }
 
@@ -560,6 +590,12 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
+                // Make sure to respect Handled flag, if already handled there is nothing to do, get out
+                if (e.Handled)
+                {
+                    return;
+                }
+
                 if (DataEntryControlHost != null && DataEntryControlHost.UpdateInProgress)
                 {
                     // If the UI data is currently being updated, postpone the paint until the
@@ -583,6 +619,15 @@ namespace Extract.DataEntry.LabDE
                         {
                             _autoPopulationExemptions.Clear();
                             LoadDataForAllRows();
+
+                            // This prevents a still mysterious "Parameter is not valid" exception. Apparently
+                            // the Handled flag is set true somewhere inside LoadDataForAllRows, but even putting a 
+                            // break into e.Handled.set() hasn't clarified this... e.Graphics has been disposed.
+                            // https://extract.atlassian.net/browse/ISSUE-14322
+                            if (e.Handled)
+                            {
+                                return;
+                            }
                         }
 
                         var recordIdCell = dataEntryRow.Cells[_recordIDColumn.Index];
