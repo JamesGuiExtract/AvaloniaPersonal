@@ -559,6 +559,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (_documentData != null)
                     {
                         newDataEntryControlHost.LoadData(_documentData, forDisplay: true);
+
+                        _undoButton.Enabled = UndoOperationAvailable;
+                        _redoButton.Enabled = RedoOperationAvailable;
                     }
 
                     newDataEntryControlHost.PageLoadRequest += DataEntryControlHost_PageLoadRequest;
@@ -626,7 +629,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         void NewDataEntryControlHost_RedoAvailabilityChanged(object sender, EventArgs e)
         {
-            _redoButton.Enabled = UndoOperationAvailable;
+            _redoButton.Enabled = RedoOperationAvailable;
 
             OnRedoAvailabilityChanged();
         }
