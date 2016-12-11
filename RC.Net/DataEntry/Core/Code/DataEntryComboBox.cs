@@ -833,6 +833,30 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.Leave" /> event.
+        /// Sets the fontstyle to indicate that this control has been viewed.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+        protected override void OnLeave(EventArgs e)
+        {
+            try
+            {
+                base.OnLeave(e);
+
+                if (_fontStyle == FontStyle.Bold &&
+                    _attribute != null && 
+                    AttributeStatusInfo.HasBeenViewed(_attribute, false))
+                {
+                    SetFontStyle(FontStyle.Regular);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41677");
+            }
+        }
+
         #endregion Overrides
 
         #region IDataEntryControl Events
@@ -1137,8 +1161,7 @@ namespace Extract.DataEntry
                     }
 
                     // If the attribute has not been viewed, apply bold font. Otherwise, use
-                    // regular font. Compare against _fontStyle instead of the current font since
-                    // a font change could be pending in the message queue.
+                    // regular font.
                     bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
                     if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
                     {
@@ -1189,13 +1212,8 @@ namespace Extract.DataEntry
                     base.BackColor = color;
 
                     // Mark the attribute as having been viewed and update the attribute's status
-                    // info accordingly. Compare against _fontStyle instead of the current font
-                    // since a font change could be pending in the message queue.
+                    // info accordingly.
                     AttributeStatusInfo.MarkAsViewed(_attribute, true);
-                    if (_fontStyle == FontStyle.Bold)
-                    {
-                        SetFontStyle(FontStyle.Regular);
-                    }
                 }
                 else
                 {
@@ -1279,9 +1297,7 @@ namespace Extract.DataEntry
                     // changed.
                     OnAttributesSelected();
 
-                    // Update the font according to the viewed status. Compare against
-                    // _fontStyle instead of the current font since a font change could be
-                    // pending in the message queue.
+                    // Update the font according to the viewed status.
                     bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
                     if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
                     {
@@ -1789,7 +1805,7 @@ namespace Extract.DataEntry
             {
                 // Don't do anything if there are no items in the collection to avoid triggering an exception
                 // https://extract.atlassian.net/browse/ISSUE-14315
-                if (Items.Count == 0)
+                if (Items.Count == 0 || _fontStyle == fontStyle)
                 {
                     return;
                 }
