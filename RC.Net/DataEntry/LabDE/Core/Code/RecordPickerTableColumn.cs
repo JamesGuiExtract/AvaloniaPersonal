@@ -619,15 +619,6 @@ namespace Extract.DataEntry.LabDE
                         {
                             _autoPopulationExemptions.Clear();
                             LoadDataForAllRows();
-
-                            // This prevents a still mysterious "Parameter is not valid" exception. Apparently
-                            // the Handled flag is set true somewhere inside LoadDataForAllRows, but even putting a 
-                            // break into e.Handled.set() hasn't clarified this... e.Graphics has been disposed.
-                            // https://extract.atlassian.net/browse/ISSUE-14322
-                            if (e.Handled)
-                            {
-                                return;
-                            }
                         }
 
                         var recordIdCell = dataEntryRow.Cells[_recordIDColumn.Index];
@@ -636,7 +627,27 @@ namespace Extract.DataEntry.LabDE
                         if (string.IsNullOrWhiteSpace(recordId) &&
                             rowData != null && rowData.StatusColor.HasValue)
                         {
-                            e.PaintBackground(e.CellBounds, false);
+                            // This prevents a still mysterious "Parameter is not valid" exception. Apparently
+                            // the Handled flag is set true somewhere inside LoadDataForAllRows, but even putting a 
+                            // break into e.Handled.set() hasn't clarified this... e.Graphics has been disposed.
+                            // https://extract.atlassian.net/browse/ISSUE-14322
+                            if (e.Handled)
+                            {
+                                return;
+                            }
+
+                            try
+                            {
+                                e.PaintBackground(e.CellBounds, false);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Just in case the above test doesn't prevent the exception - log it.
+                                // https://extract.atlassian.net/browse/ISSUE-14322
+                                ex.ExtractLog("ELI41678");
+
+                                return;
+                            }
 
                             // By making the brush color be translucent, some of the original button
                             // shading shows through giving a more polished appearance than a flat
