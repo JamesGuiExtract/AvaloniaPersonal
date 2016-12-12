@@ -1414,7 +1414,7 @@ namespace Extract.DataEntry
                             {
                                 RegisterForEvents();
 
-                                if (_attributes != null)
+                                if (_attributes != null && _imageViewer.IsImageAvailable)
                                 {
                                     CreateAllAttributeHighlights(_attributes, null);
                                 }
@@ -6310,7 +6310,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns>The <see cref="IAttribute"/>s currently selected in the _activeDataControl.
         /// </returns>
-        IEnumerable<IAttribute> GetActiveAttributes()
+        protected IEnumerable<IAttribute> GetActiveAttributes()
         {
             SelectionState selectionState;
             if (_activeDataControl != null &&
@@ -6794,6 +6794,14 @@ namespace Extract.DataEntry
             VariantVector zoneIndices = null;
             IUnknownVector comRasterZones = null;
             List<RasterZone> rasterZones = null;
+
+            // https://extract.atlassian.net/browse/ISSUE-14328
+            // In the PaginationPanel, the document open in the image viewer may not be the document
+            // to which this highlight pertains.
+            if (!FileSystemMethods.ArePathsEqual(attribute.Value.SourceDocName, ImageViewer.ImageFile))
+            {
+                return attributeHighlights;
+            }
 
             // For spatial attributes whose text has not been manually edited, use confidence tiers
             // to color code the highlights using OCR confidence.
@@ -7404,7 +7412,7 @@ namespace Extract.DataEntry
         /// generated. Must not be <see langword="null"/>.</param>
         /// <param name="preCreatedHighlights">A <see cref="HighlightDictionary"/> that may contain
         /// pre-created highlights for the <see paramref="attributes"/>.</param>
-        void CreateAllAttributeHighlights(IUnknownVector attributes,
+        protected void CreateAllAttributeHighlights(IUnknownVector attributes,
             HighlightDictionary preCreatedHighlights)
         {
             ExtractException.Assert("ELI25174", "Null argument exception!", attributes != null);

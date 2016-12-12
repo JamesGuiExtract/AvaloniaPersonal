@@ -1,11 +1,11 @@
 ﻿using Extract.AttributeFinder;
 using Extract.DataEntry;
 using Extract.Imaging.Forms;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Linq;
 using System.Windows.Forms;
-using UCLID_COMUTILSLib;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -28,15 +28,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         DataEntryPaginationDocumentData _documentData;
 
         /// <summary>
-        /// The source document related to <see cref="_documentData"/> if there is a singular source
-        /// document; otherwise <see langword="null"/>.
-        /// </summary>
-        string _sourceDocName;
-
-        /// <summary>
         /// The query used to generate the <see cref="PaginationDocumentData.Summary"/>.
         /// </summary>
         DataEntryQuery _summaryDataEntryQuery;
+
+        /// <summary>
+        /// Indicates whether the PageLayoutControl's PrimarySelection corresponds with the output
+        /// document for which this DEP is editing data.
+        /// </summary>
+        bool _primaryPageIsForActiveDocument;
 
         #endregion Fields
 
@@ -160,11 +160,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     OnRedoAvailabilityChanged();
                 }
 
-                _sourceDocName = _documentData.SourceDocName;
-
                 _imageViewer.ImageFileChanged += HandleImageViewer_ImageFileChanged;
                 _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
-                _imageViewer.PageChanged += HandleImageViewer_PageChanged;
 
                 Active = true;
             }
@@ -226,7 +223,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 Active = false;
 
                 _documentData = null;
-                _sourceDocName = null;
+                _primaryPageIsForActiveDocument = false;
 
                 base.ClearData();
 
@@ -236,7 +233,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _imageViewer.ImageFileChanged -= HandleImageViewer_ImageFileChanged;
                     _imageViewer.ImageFileClosing -= HandleImageViewer_ImageFileClosing;
-                    _imageViewer.PageChanged -= HandleImageViewer_PageChanged;
 
                     _imageViewer.Invalidate();
 
@@ -259,8 +255,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="_imageViewer">The <see cref="ImageViewer"/> to use.</param>
         internal void SetImageViewer(ImageViewer imageViewer)
         {
-            _imageViewer = imageViewer;
-            base.ImageViewer = imageViewer;
+            try
+            {
+                _imageViewer = imageViewer;
+
+                // https://extract.atlassian.net/browse/ISSUE-14328
+                // If the PageLayoutControl's PrimarySelection corresponds with the output document
+                // for which data is being edited, share the image viewer with the DEP. Otherwise,
+                // the DEP should be allowed access because its spatial data will not correspond with
+                // the displayed document.
+                if (PrimarySelectionIsForActiveDocument)
+                {
+                    base.ImageViewer = imageViewer;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41679");
+            }
         }
 
         /// <summary>
@@ -279,6 +291,39 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 return _summaryDataEntryQuery;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the PageLayoutControl's PrimarySelection
+        /// corresponds with the output document for which this DEP is editing data.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if he PageLayoutControl's PrimarySelection corresponds with the output
+        /// document for which this DEP is editing data; otherwise, <c>false</c>.
+        /// </value>
+        internal bool PrimarySelectionIsForActiveDocument
+        {
+            get
+            {
+                return _primaryPageIsForActiveDocument;
+            }
+
+            set
+            {
+                if (value != _primaryPageIsForActiveDocument)
+                {
+                    if (value && _imageViewer != null)
+                    {
+                        base.ImageViewer = _imageViewer;
+                    }
+                    else
+                    {
+                        base.ImageViewer = null;
+                    }
+
+                    _primaryPageIsForActiveDocument = value;
+                }
             }
         }
 
@@ -387,31 +432,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // context.
                 if (InPaginationPanel)
                 {
-                    // Don't switch to a page that is not part of this document. There are many
-                    // issues with doing so including unexpected page rotation behavior.
                     // https://extract.atlassian.net/browse/ISSUE-14208
-                    var isValidPage = this.GetAncestors()
-                        .OfType<PaginationSeparator>()
-                        .Single()
-                        .Document
-                        .PageControls
-                        .Where(c => c.Page.OriginalPageNumber == pageNumber)
-                        .Any();
-
-                    if (isValidPage)
-                    {
-                        base.SetImageViewerPageNumber(pageNumber);
-
-                        var flowLayoutPanel = this.GetAncestors()
-                            .OfType<PaginationFlowLayoutPanel>()
-                            .Single();
-
-                        int scrollPos = flowLayoutPanel.VerticalScroll.Value;
-                        OnPageLoadRequest(pageNumber);
-                        flowLayoutPanel.VerticalScroll.Value = scrollPos;
-                        base.ImageViewer = _imageViewer;
-                        DrawHighlights(true);
-                    }
+                    // https://extract.atlassian.net/browse/ISSUE-14328
+                    // If in the pagination panel, DrawHighlights will take care of changing the page
+                    // if necessary. Do not attempt to change the page here-- the image viewer may
+                    // not even be on the correct document.
                 }
                 else
                 {
@@ -497,40 +522,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Special logic applies only if the panel is being used in the pagination context.
                 if (InPaginationPanel)
                 {
-                    if (_imageViewer.ImageFile.Equals(_sourceDocName, StringComparison.OrdinalIgnoreCase))
+                    // If OnEnter, the primary page selection is not for this document, it needs to
+                    // be returned to the document. Otherwise, the DEP will not have access to the
+                    // ImageViewer and exceptions will occur.
+                    if (!PrimarySelectionIsForActiveDocument)
                     {
-                        if (base.ImageViewer == null && !string.IsNullOrWhiteSpace(_sourceDocName))
-                        {
-                            base.ImageViewer = _imageViewer;
-                        }
-
-                        // https://extract.atlassian.net/browse/ISSUE-14304
-                        // In a paginate files setup, focus will leave and return for scenarios
-                        // where it normally wouldn't in data entry verification including changing
-                        // pages via the thumbnail controls. When focus returns use
-                        // ensureActiveAttributeVisible == false to prevent page changes.
-                        DrawHighlights(ensureActiveAttributeVisible: false);
-                        UpdateSwipingState();
-                    }
-                    else if (!string.IsNullOrWhiteSpace(_sourceDocName))
-                    {
-                        var flowLayoutPanel = this.GetAncestors()
-                            .OfType<PaginationFlowLayoutPanel>()
-                            .SingleOrDefault();
-                        if (flowLayoutPanel != null)
-                        {
-                            int scrollPos = flowLayoutPanel.VerticalScroll.Value;
-                            OnPageLoadRequest(1);
-                            flowLayoutPanel.VerticalScroll.Value = scrollPos;
-                            base.ImageViewer = _imageViewer;
-
-                            // https://extract.atlassian.net/browse/ISSUE-14304
-                            // In a paginate files setup, focus will leave and return for scenarios
-                            // where it normally wouldn't in data entry verification including changing
-                            // pages via the thumbnail controls. When focus returns use
-                            // ensureActiveAttributeVisible == false to prevent page changes.
-                            DrawHighlights(ensureActiveAttributeVisible: false);
-                        }
+                        LoadDocumentInImageViewer();
                     }
                 }
 
@@ -557,12 +554,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    if (base.ImageViewer == null && _imageViewer != null)
+                    if (base.ImageViewer == null && _imageViewer != null &&
+                        PrimarySelectionIsForActiveDocument)
                     {
-                        if (!_imageViewer.ImageFile.Equals(_sourceDocName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            _imageViewer.OpenImage(_sourceDocName, false, false);
-                        }
                         base.ImageViewer = _imageViewer;
                     }
 
@@ -577,6 +571,36 @@ namespace Extract.UtilityApplications.PaginationUtility
             set
             {
                 base.ImageViewer = value;
+            }
+        }
+
+        /// <summary>
+        /// Renders the <see cref="T:Extract.Imaging.Forms.CompositeHighlightLayerObject" />s associated with the
+        /// <see cref="T:Extract.DataEntry.IDataEntryControl" />s.
+        /// </summary>
+        /// <param name="ensureActiveAttributeVisible">If <see langword="true" />, the portion of
+        /// the document currently in view will be adjusted to ensure all active attribute(s) and
+        /// their associated tooltip is visible.  If <see langword="false" /> the view will be
+        /// unchanged even if the attribute and/or tooltip is not currently in the view.</param>
+        protected override void DrawHighlights(bool ensureActiveAttributeVisible)
+        {
+            try
+            {
+                if (InPaginationPanel)
+                {
+                    // If ensureActiveAttributeVisible is true, we need to be sure the correct document
+                    // is currently loaded in the image viewer.
+                    if (ensureActiveAttributeVisible)
+                    {
+                        LoadDocumentInImageViewer();
+                    }
+                }
+
+                base.DrawHighlights(ensureActiveAttributeVisible);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41680");
             }
         }
 
@@ -625,8 +649,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (Visible &&
-                    _imageViewer.ImageFile.Equals(_sourceDocName, StringComparison.OrdinalIgnoreCase))
+                // https://extract.atlassian.net/browse/ISSUE-14328
+                // If the PageLayoutControl's PrimarySelection corresponds with the output document
+                // for which data is being edited, share the image viewer with the DEP. Otherwise,
+                // the DEP should be allowed access because its spatial data will not correspond with
+                // the displayed document.
+                if (Visible && PrimarySelectionIsForActiveDocument)
                 {
                     base.ImageViewer = _imageViewer;
                 }
@@ -651,26 +679,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41355");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ImageViewer.PageChanged"/> event.
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The <see cref="PageChangedEventArgs"/> that contains the event data.</param>
-        void HandleImageViewer_PageChanged(object sender, PageChangedEventArgs e)
-        {
-            try
-            {
-                base.ImageViewer =
-                    (_imageViewer.ImageFile.Equals(_sourceDocName, StringComparison.OrdinalIgnoreCase))
-                        ? _imageViewer
-                        : null;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI41356");
             }
         }
 
@@ -731,6 +739,44 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Selects the appropriate page to load the appropriate document for the current selection
+        /// in the DEP.
+        /// </summary>
+        void LoadDocumentInImageViewer()
+        {
+            var outputDocument = this.GetAncestors()
+                .OfType<PaginationSeparator>()
+                .SingleOrDefault()
+                ?.Document;
+
+            if (outputDocument == null)
+            {
+                return;
+            }
+
+            // Find the page control that corresponds to the active attribute.
+            var pageControl = GetActiveAttributes()
+                .Select(attribute => attribute.Value.HasSpatialInfo() ? attribute.Value : null)
+                .Select(spatialString => outputDocument.PageControls.FirstOrDefault(c =>
+                    spatialString != null && c != null &&
+                    FileSystemMethods.ArePathsEqual(c.Page.OriginalDocumentName, spatialString.SourceDocName) &&
+                    c.Page.OriginalPageNumber == spatialString.GetFirstPageNumber()))
+                .FirstOrDefault();
+
+            // If the page control corresponding to the active attribute is not from the
+            // document currently active in the image viewer, raise the PageLoadRequest
+            // to load the correct page (and the highlights for that page).
+            if (pageControl != null && pageControl.Page.OriginalDocumentName != _imageViewer.ImageFile)
+            {
+                ClearHighlights();
+
+                OnPageLoadRequest(pageControl.Page.OriginalDocumentName, pageControl.Page.OriginalPageNumber);
+
+                CreateAllAttributeHighlights(Attributes, null);
+            }
+        }
+
+        /// <summary>
         /// Updates the enabled state of the swiping tools based on the current state of the DEP.
         /// </summary>
         public void UpdateSwipingState()
@@ -752,15 +798,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Raises the <see cref="PageLoadRequest"/>
         /// </summary>
+        /// <param name="sourceDocName">The source document that needs to be loaded in the image viewer.
+        /// </param>
         /// <param name="pageNum">The page number that needs to be loaded in <see cref="_sourceDocName"/>.
         /// </param>
-        void OnPageLoadRequest(int pageNum)
+        void OnPageLoadRequest(string sourceDocName, int pageNum)
         {
-            var eventHandler = PageLoadRequest;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new PageLoadRequestEventArgs(_sourceDocName, pageNum));
-            }
+            PageLoadRequest?.Invoke(this, new PageLoadRequestEventArgs(sourceDocName, pageNum));
         }
 
         /// <summary>
@@ -768,11 +812,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void OnUndoAvailabilityChanged()
         {
-            var eventHandler = UndoAvailabilityChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
+            UndoAvailabilityChanged?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
@@ -780,11 +820,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void OnRedoAvailabilityChanged()
         {
-            var eventHandler = RedoAvailabilityChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
+            RedoAvailabilityChanged?.Invoke(this, new EventArgs());
         }
 
         #endregion Private Members

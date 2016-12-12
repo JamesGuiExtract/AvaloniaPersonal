@@ -42,12 +42,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         DataEntryPaginationDocumentData _documentData;
 
         /// <summary>
-        /// The source document related to <see cref="_documentData"/> if there is a singular source
-        /// document; otherwise <see langword="null"/>.
-        /// </summary>
-        string _sourceDocName;
-
-        /// <summary>
         /// Keeps track of the documents for which a <see cref="UpdateDocumentStatus"/> call is in
         /// progress on a background thread.
         /// </summary>
@@ -251,6 +245,32 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the PageLayoutControl's PrimarySelection
+        /// corresponds with the output document for which this DEP is editing data.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if he PageLayoutControl's PrimarySelection corresponds with the output
+        /// document for which this DEP is editing data; otherwise, <c>false</c>.
+        /// </value>
+        public bool PrimaryPageIsForActiveDocument
+        {
+            get
+            {
+                return (ActiveDataEntryPanel == null)
+                    ? false
+                    : ActiveDataEntryPanel.PrimarySelectionIsForActiveDocument;
+            }
+
+            set
+            {
+                if (ActiveDataEntryPanel != null)
+                {
+                    ActiveDataEntryPanel.PrimarySelectionIsForActiveDocument = value;
+                }
+            }
+        }
+
+        /// <summary>
         /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>
@@ -268,7 +288,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _configManager.LoadCorrectConfigForData(data.Attributes);
 
                 _documentData = (DataEntryPaginationDocumentData)data;
-                _sourceDocName = _documentData.SourceDocName;
 
                 ActiveDataEntryPanel.LoadData(data, forDisplay);
 
@@ -323,7 +342,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 _documentData = null;
-                _sourceDocName = null;
 
                 ActiveDataEntryPanel.ClearData();
 
@@ -605,7 +623,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="e">The <see cref="PageLoadRequestEventArgs"/> instance containing the event data.</param>
         void DataEntryControlHost_PageLoadRequest(object sender, PageLoadRequestEventArgs e)
         {
-            OnPageLoadRequest(e.PageNumber);
+            OnPageLoadRequest(e);
         }
 
         /// <summary>
@@ -900,13 +918,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Raises the <see cref="PageLoadRequest"/> event.
+        /// Raises the <see cref="PageLoadRequest" /> event.
         /// </summary>
-        /// <param name="pageNum">The page number that needs to be loaded in <see cref="_sourceDocName"/>.
-        /// </param>
-        void OnPageLoadRequest(int pageNum)
+        /// <param name="e">The <see cref="PageLoadRequestEventArgs"/> instance containing the event data.</param>
+        void OnPageLoadRequest(PageLoadRequestEventArgs e)
         {
-            PageLoadRequest?.Invoke(this, new PageLoadRequestEventArgs(_sourceDocName, pageNum));
+            PageLoadRequest?.Invoke(this, e);
         }
 
         /// <summary>

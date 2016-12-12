@@ -392,7 +392,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The <see cref="IPaginationDocumentDataPanel"/> that is currently open for editing
         /// or <see langword="null"/> if there is no data panel currently open for editing.
         /// </summary>
-        Control _documentDataPanelControl;
+        IPaginationDocumentDataPanel _documentDataPanel;
+
+        /// <summary>
+        /// The <see cref="OutputDocument"/> whose data is currently being edited by
+        /// _documentDataPanel.
+        /// </summary>
+        OutputDocument _documentInDataEdit;
 
         #endregion Fields
 
@@ -824,6 +830,13 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (_primarySelection != null)
                     {
+                        if (_documentDataPanel != null)
+                        {
+                            _documentDataPanel.PrimaryPageIsForActiveDocument =
+                                (_documentInDataEdit != null) &&
+                                _documentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document;
+                        }
+
                         SetHighlightedAndDisplayed(_primarySelection, true);
 
                         // _commandTargetControl is used for shortcut keys as well as for the
@@ -960,7 +973,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         pageControl.Deleted = true;
                     }
-                    
+
                     InsertPaginationControl(pageControl, pageIndex);
 
                     if (pageIndex != -1)
@@ -1473,9 +1486,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ClearSelection();
                     SelectControl(firstPage, true, true, true);
                     ProcessControlSelection(
-                        activeControl: firstPage, 
-                        additionalControls: null, 
-                        select: true, modifierKeys: 
+                        activeControl: firstPage,
+                        additionalControls: null,
+                        select: true, modifierKeys:
                         Keys.None);
                 }
             }
@@ -1720,7 +1733,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _unDeleteMenuItem.ShortcutKeyDisplayString = "Shift + Del";
                 _unDeleteMenuItem.ShowShortcutKeys = true;
                 _unDeleteCommand = new ApplicationCommand(Shortcuts,
-                    new Keys[] { Keys.Shift| Keys.Delete }, HandleUnDeleteSelectedItems,
+                    new Keys[] { Keys.Shift | Keys.Delete }, HandleUnDeleteSelectedItems,
                     JoinToolStripItems(_unDeleteMenuItem),
                     false, true, false);
                 _unDeleteMenuItem.Click += HandleUnDeleteMenuItem_Click;
@@ -1788,7 +1801,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 // If the _documentDataPanelControl has focus, keystrokes shouldn't be treated as
                 // pagination shortcut keys.
-                if (_documentDataPanelControl != null && _documentDataPanelControl.ContainsFocus)
+                if (_documentDataPanel?.PanelControl != null &&
+                    _documentDataPanel.PanelControl.ContainsFocus)
                 {
                     IgnoreShortcutKey = true;
                 }
@@ -2480,11 +2494,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // I cannot, for the life of me, figure out how to scroll to the bottom of
                 // _flowLayoutPanel here; nothing seems to work.
-//                this.SafeBeginInvoke("ELI35660", () =>
-//                {
-//                    _flowLayoutPanel.ScrollControlIntoViewManual(_loadNextDocumentButtonControl);
-//                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;    
-//                });
+                //                this.SafeBeginInvoke("ELI35660", () =>
+                //                {
+                //                    _flowLayoutPanel.ScrollControlIntoViewManual(_loadNextDocumentButtonControl);
+                //                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;    
+                //                });
             }
             catch (Exception ex)
             {
@@ -2532,6 +2546,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // If a data panel was provided to be opened...
                 if (e.DocumentDataPanel != null)
                 {
+                    _documentDataPanel = e.DocumentDataPanel;
+                    _documentInDataEdit = e.OutputDocument;
+
                     var activePage = PrimarySelection as PageThumbnailControl;
                     if (activePage == null || activePage.Document != e.OutputDocument)
                     {
@@ -2542,8 +2559,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                             ?? e.OutputDocument.PageControls.First();
                         ProcessControlSelection(pageToSelect);
                     }
-
-                    _documentDataPanelControl = e.DocumentDataPanel.PanelControl;
                 }
             }
             catch (Exception ex)
@@ -2563,7 +2578,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _documentDataPanelControl = null;
+                _documentDataPanel = null;
+                _documentInDataEdit = null;
             }
             catch (Exception ex)
             {
@@ -2612,7 +2628,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Event Handlers
 
         #region Private Members
-        
+
         /// <summary>
         /// Gets the currently selected <see cref="PaginationControl"/>s.
         /// </summary>
@@ -3252,7 +3268,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (selectionTarget == null)
             {
                 var nextControl = GetNextNavigableControl(forward);
-                
+
                 // Ignore the load next document button.
                 if (nextControl == _loadNextDocumentButtonControl)
                 {
@@ -3299,8 +3315,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             // Do not allow handling of modifier keys since modifier keys have a different meaning
             // for document navigation.
             ProcessControlSelection(
-                activeControl: selectionTarget, 
-                additionalControls: pageControls, 
+                activeControl: selectionTarget,
+                additionalControls: pageControls,
                 select: true,
                 modifierKeys: Keys.None);
         }
@@ -3400,7 +3416,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var asPageThumbnailControl = _commandTargetControl as PageThumbnailControl;
 
                 if (_toggleDocumentSeparatorCommand.Enabled &&
-                    (controlIsSeparator  ||
+                    (controlIsSeparator ||
                         (asPageThumbnailControl != null && asPageThumbnailControl.PageNumber == 1)))
                 {
                     _toggleDocumentSeparatorMenuItem.Text = "Merge with previous document";
@@ -4182,7 +4198,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 "pages are output or deleted.", "Page limit reached",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
-                            
+
                             return;
                         }
 
@@ -4317,14 +4333,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                                               pageControl.Page.OriginalPageNumber,
                                               pageControl.Page.ImageOrientation));
 
-                _rastersForPrinting = ImagePagesToRasterImages( imagePages );
+                _rastersForPrinting = ImagePagesToRasterImages(imagePages);
                 _printPageCounter = 0;
 
                 _printDocument.Print();
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38440"); 
+                ex.ExtractDisplay("ELI38440");
             }
         }
 
@@ -4354,7 +4370,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="pageImage">The RasterImage object to print.</param>
         /// <param name="e">The PrintPageEventArgs associated with the print task.</param>
-        static void PrintOnePage( RasterImage pageImage, PrintPageEventArgs e )
+        static void PrintOnePage(RasterImage pageImage, PrintPageEventArgs e)
         {
             // [IDSD #318], [DotNetRCAndUtils:1078]
             // The margin bounds should be the margin rectangle intersected with the
@@ -4363,13 +4379,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             // from setting the margin bounds as follows, and then directly mapping the 
             // source to the margin bounds. I found that the previous algorithm compressed the
             // image vertically a little.
-            var printableArea = Rectangle.Round( e.PageSettings.PrintableArea );
+            var printableArea = Rectangle.Round(e.PageSettings.PrintableArea);
             Rectangle marginBounds = e.MarginBounds;
             marginBounds.Height = printableArea.Height;
             marginBounds.Width = printableArea.Width;
-            Rectangle sourceBounds = new Rectangle( 0, 0, pageImage.Width, pageImage.Height );
+            Rectangle sourceBounds = new Rectangle(0, 0, pageImage.Width, pageImage.Height);
 
-            using (var image = RasterImageConverter.ConvertToImage( pageImage, ConvertToImageOptions.None))
+            using (var image = RasterImageConverter.ConvertToImage(pageImage, ConvertToImageOptions.None))
             {
                 e.Graphics.DrawImage(image, marginBounds, sourceBounds, GraphicsUnit.Pixel);
             }
@@ -4381,7 +4397,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="items">The <see cref="ToolStripItem"/>s to join into the array.</param>
         /// <returns>An array of non-<see langword="null"/> <see cref="ToolStripItem"/>s.</returns>
-        static ToolStripItem[]  JoinToolStripItems(params ToolStripItem[] items)
+        static ToolStripItem[] JoinToolStripItems(params ToolStripItem[] items)
         {
             return items.Where(item => item != null).ToArray();
         }

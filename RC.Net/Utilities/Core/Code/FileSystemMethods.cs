@@ -752,6 +752,31 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Compares two file system paths or filenames for equality.
+        /// </summary>
+        /// <param name="firstPath">The first path to compare.</param>
+        /// <param name="secondPath">The second path to compare.</param>
+        /// <returns><c>true</c> if both are valid paths and are equal; otherwise, <c>false</c>.</returns>
+        public static bool ArePathsEqual(string firstPath, string secondPath)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(firstPath) || string.IsNullOrWhiteSpace(secondPath))
+                {
+                    return false;
+                }
+
+                firstPath = GetAbsolutePath(firstPath);
+                secondPath = GetAbsolutePath(secondPath);
+                return firstPath.Equals(secondPath, StringComparison.OrdinalIgnoreCase);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41681");
+            }
+        }
+
+        /// <summary>
         /// Attempts to convert the specified path to a UNC path.
         /// <para><b>Warning</b></para>
         /// The performance (speed) of this method may be poor. 

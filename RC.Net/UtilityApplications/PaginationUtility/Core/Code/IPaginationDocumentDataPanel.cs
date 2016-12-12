@@ -85,6 +85,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the PageLayoutControl's PrimarySelection
+        /// corresponds with the output document for which this DEP is editing data.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if he PageLayoutControl's PrimarySelection corresponds with the output
+        /// document for which this DEP is editing data; otherwise, <c>false</c>.
+        /// </value>
+        bool PrimaryPageIsForActiveDocument
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Loads the specified <see paramref="data"/>.
         /// </summary>
         /// <param name="data">The data to load.</param>
