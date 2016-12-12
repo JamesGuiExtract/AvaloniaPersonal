@@ -285,9 +285,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 int temp;
                 _pendingDocumentStatusUpdate.TryRemove(data, out temp);
 
-                _configManager.LoadCorrectConfigForData(data.Attributes);
-
                 _documentData = (DataEntryPaginationDocumentData)data;
+                _configManager.LoadCorrectConfigForData(_documentData.WorkingAttributes);
+
 
                 ActiveDataEntryPanel.LoadData(data, forDisplay);
 

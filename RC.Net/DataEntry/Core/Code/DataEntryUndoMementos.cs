@@ -229,7 +229,7 @@ namespace Extract.DataEntry
                             // unnecessary validation state changing until the refresh is complete.
                             AttributeStatusInfo.EnableValidationTriggers(false);
 
-                            OwningControl.RefreshAttributes();
+                            OwningControl?.RefreshAttributes();
                         }
                         finally
                         {
@@ -238,7 +238,7 @@ namespace Extract.DataEntry
                     }
                     else
                     {
-                        OwningControl.RefreshAttributes(true, AttributesToRefresh.ToArray());
+                        OwningControl?.RefreshAttributes(true, AttributesToRefresh.ToArray());
                     }
                 }
             }

@@ -1499,8 +1499,6 @@ namespace Extract.FileActionManager.FileProcessors
                     attributes.LoadFrom(dataFilename, false);
                     attributes.ReportMemoryUsage();
 
-                    PaginationDocumentData documentData = GetAsPaginationDocumentData(attributes, fileName);
-
                     var attributeArray = attributes
                         .ToIEnumerable<IAttribute>()
                         .ToArray();
@@ -1557,7 +1555,8 @@ namespace Extract.FileActionManager.FileProcessors
                                 .Select(data => data.SubAttributes)
                                 .SingleOrDefault() ?? new IUnknownVector();
 
-                            documentData = GetAsPaginationDocumentData(documentAttributes, fileName);
+                            PaginationDocumentData documentData =
+                                GetAsPaginationDocumentData(documentAttributes, fileName);
 
                             if (!suggestedPagination.HasValue)
                             {
@@ -1581,8 +1580,9 @@ namespace Extract.FileActionManager.FileProcessors
                     }
 
                     // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
+                    PaginationDocumentData rootDocumentData = GetAsPaginationDocumentData(attributes, fileName);
                     _paginationPanel.LoadFile(
-                        fileName, -1, null, null, false, documentData, selectDocument);
+                        fileName, -1, null, null, false, rootDocumentData, selectDocument);
                     return;
                 }
 

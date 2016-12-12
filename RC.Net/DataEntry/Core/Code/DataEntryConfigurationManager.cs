@@ -91,11 +91,6 @@ namespace Extract.DataEntry
         /// </summary>
         IAttribute _documentTypeAttribute;
 
-        /// <summary>
-        /// The <see cref="AttributeStatusInfo"/> associated with _documentTypeAttribute
-        /// </summary>
-        AttributeStatusInfo _documentTypeAttributeStatusInfo;
-
         #endregion Fields
 
         #region Constructors
@@ -546,12 +541,6 @@ namespace Extract.DataEntry
 
                         OnConfigurationChanged(lastDataEntryConfig, ActiveDataEntryConfiguration);
                     }
-
-                    if (_activeDataEntryConfig?.DataEntryControlHost != null)
-                    {
-                        // In order to be notified if doc type is changed from within the DEP.
-                        RegisterDocumentTypeHook();
-                    }
                 }
 
                 return changedDocumentType;
@@ -583,7 +572,7 @@ namespace Extract.DataEntry
                 bool changedDocumentType;
                 if (_documentTypeConfigurations != null)
                 {
-                    _documentTypeAttribute = GetDocumentTypeAttribute();
+                    GetDocumentTypeAttribute();
                     string documentType = _documentTypeAttribute?.Value.String;
 
                     // If there is a default configuration, add the original document type to the
@@ -696,10 +685,8 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/>. 
         /// </summary>
         /// <param name="attributes">The attributes representing the document's data.</param>
-        IAttribute GetDocumentTypeAttribute()
+        void GetDocumentTypeAttribute()
         {
-            IAttribute documentTypeAttribute = null;
-
             // Remove event registration from the last DocumentType attribute we found.
             UnregisterDocumentTypeHook();
 
@@ -713,30 +700,31 @@ namespace Extract.DataEntry
                 int matchingAttributeCount = matchingAttributes.Size();
                 if (matchingAttributeCount > 0)
                 {
-                    documentTypeAttribute = (IAttribute)matchingAttributes.At(0);
+                    _documentTypeAttribute = (IAttribute)matchingAttributes.At(0);
                 }
                 else
                 {
                     // Add the document type attribute if it didn't previously exist.
-                    documentTypeAttribute = new UCLID_AFCORELib.Attribute();
-                    documentTypeAttribute.Name = "DocumentType";
-                    _attributes.PushBack(documentTypeAttribute);
+                    _documentTypeAttribute = new UCLID_AFCORELib.Attribute();
+                    _documentTypeAttribute.Name = "DocumentType";
+                    _attributes.PushBack(_documentTypeAttribute);
                 }
             }
 
-            return documentTypeAttribute;
+            RegisterDocumentTypeHook();
         }
 
         /// <summary>
         /// Sets the document type attribute to <see paramref="documentType"/>.
         /// </summary>
-        /// <param name="documentType">The f value to assign to the document type attribute.</param>
+        /// <param name="documentType">The value to assign to the document type attribute.</param>
         void SetDocumentTypeAttribute(string documentType)
         {
-            _documentTypeAttribute = GetDocumentTypeAttribute();
+            GetDocumentTypeAttribute();
+
             if (_documentTypeAttribute != null)
             {
-                _documentTypeAttribute.Value.ReplaceAndDowngradeToNonSpatial(documentType);
+                AttributeStatusInfo.SetValue(_documentTypeAttribute, documentType, true, true);
             }
         }
 
@@ -747,10 +735,9 @@ namespace Extract.DataEntry
         {
             if (_documentTypeAttribute != null)
             {
-                _documentTypeAttributeStatusInfo =
+                var statusInfo =
                     AttributeStatusInfo.GetStatusInfo(_documentTypeAttribute);
-                _documentTypeAttributeStatusInfo.AttributeValueModified +=
-                    HandleDocumentTypeAttributeValueModified;
+                statusInfo.AttributeValueModified += HandleDocumentTypeAttributeValueModified;
             }
         }
 
@@ -759,11 +746,11 @@ namespace Extract.DataEntry
         /// </summary>
         void UnregisterDocumentTypeHook()
         {
-            if (_documentTypeAttributeStatusInfo != null)
+            if (_documentTypeAttribute != null)
             {
-                _documentTypeAttributeStatusInfo.AttributeValueModified -=
-                    HandleDocumentTypeAttributeValueModified;
-                _documentTypeAttributeStatusInfo = null;
+                var statusInfo =
+                    AttributeStatusInfo.GetStatusInfo(_documentTypeAttribute);
+                statusInfo.AttributeValueModified -= HandleDocumentTypeAttributeValueModified;
             }
         }
 
