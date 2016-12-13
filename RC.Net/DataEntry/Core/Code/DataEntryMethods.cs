@@ -848,7 +848,16 @@ namespace Extract.DataEntry
                     // original text.
                     existingText = existingText.Clone();
 
-                    // So that SpatialString::Insert/Append works properly ensure the source doc
+                    // if the existing text is on a different document than the new Text, make the existing text
+                    // non spatial and then keep the spatial information of the new text
+                    // https://extract.atlassian.net/browse/ISSUE-14346
+                    if (existingText.HasSpatialInfo() && newText.HasSpatialInfo() 
+                        && !FileSystemMethods.ArePathsEqual(existingText.SourceDocName,newText.SourceDocName))
+                    {
+                        existingText.DowngradeToNonSpatialMode();
+                    }
+
+                   // So that SpatialString::Insert/Append works properly ensure the source doc
                     // names are the same.
                     existingText.SourceDocName = newText.SourceDocName;
 
