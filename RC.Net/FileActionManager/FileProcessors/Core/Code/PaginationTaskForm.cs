@@ -1497,6 +1497,7 @@ namespace Extract.FileActionManager.FileProcessors
                     // If an image was loaded, look for and attempt to load corresponding data.
                     IUnknownVector attributes = new IUnknownVectorClass();
                     attributes.LoadFrom(dataFilename, false);
+                    attributes.UpdateSourceDocNameOfAttributes(fileName);
                     attributes.ReportMemoryUsage();
 
                     var attributeArray = attributes

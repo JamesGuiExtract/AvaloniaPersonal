@@ -4827,6 +4827,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             if (File.Exists(dataFilename))
             {
                 attributes.LoadFrom(dataFilename, false);
+                attributes.UpdateSourceDocNameOfAttributes(fileName);
             }
             return attributes;
         }

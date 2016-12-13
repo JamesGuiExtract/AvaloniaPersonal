@@ -224,6 +224,32 @@ namespace Extract.AttributeFinder
                 yield return descendant;
             }
         }
+
+        /// <summary>
+        /// Recursively updates the source document name of a vector of attributes.
+        /// </summary>
+        /// <param name="attributes">The attributes.</param>
+        /// <param name="newSourceDocName">New source document name.</param>
+        public static void UpdateSourceDocNameOfAttributes(this IIUnknownVector attributes, string newSourceDocName)
+        {
+            try
+            {
+                foreach (var attribute in attributes.ToIEnumerable<IAttribute>()
+                    .SelectMany(EnumerateDepthFirst))
+                {
+                    var val = attribute.Value;
+                    if (!string.Equals(newSourceDocName, val.SourceDocName, StringComparison.Ordinal))
+                    {
+                        val.SourceDocName = newSourceDocName;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41683");
+            }
+        }
+
         #endregion Public Methods
 
         #region Private Methods
