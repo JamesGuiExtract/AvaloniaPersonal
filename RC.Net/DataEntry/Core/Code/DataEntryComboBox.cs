@@ -1787,11 +1787,28 @@ namespace Extract.DataEntry
         /// <param name="fontStyle">The new <see cref="FontStyle"/> to apply.</param>
         void SetFontStyle(FontStyle fontStyle)
         {
-            // Perform the font change asynchronously otherwise it results in memory corruption
-            // related to auto-complete lists (probably related to the window handle recreation it
-            // triggers).
-            base.BeginInvoke(new FontStyleDelegate(SetFontStyleDirect),
-                        new object[] { fontStyle });
+            try
+            {
+                // Perform the font change asynchronously otherwise it results in memory corruption
+                // related to auto-complete lists (probably related to the window handle recreation it
+                // triggers).
+                if (IsHandleCreated && !IsDisposed)
+                {
+                    BeginInvoke(new FontStyleDelegate(SetFontStyleDirect),
+                                new object[] { fontStyle });
+                }
+            }
+            // An InvalidOperationException will be thrown if this object has been disposed of, e.g.,
+            // when the application is closing and BeginInvoke is called. This happens because this method is
+            // called from OnLeave which is run when you close a window while the combobox has focus.
+            catch (InvalidOperationException ex)
+            {
+                // I think this will always be false, but if not, throw the exception
+                if (IsHandleCreated && !IsDisposed)
+                {
+                    throw ex.AsExtract("ELI41682");
+                }
+            }
         }
 
         /// <summary>
