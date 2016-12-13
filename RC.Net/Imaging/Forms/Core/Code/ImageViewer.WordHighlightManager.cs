@@ -601,16 +601,14 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    // When a new page is loaded, activate.
                     if (_imageViewer.IsImageAvailable)
                     {
-                        // [FlexIDSCore:5007]
-                        // Until the highlights for the new document are loaded, ensure any existing
-                        // highlights are removed.
-                        DisableWordHighlights();
-                        Activate();
+                        // PageChanged will always be called after image file changed triggering
+                        // activation of word highlights. Don't trigger unnecessary activations
+                        // which can cause the WordHighlightManager to get tangled in activations
+                        // and cancellations which leads to unnecessary periods where the UI is
+                        // unresponsive.
                     }
-                    // Otherwise, deactivate and reset all loaded data
                     else
                     {
                         Deactivate(true);
@@ -814,6 +812,26 @@ namespace Extract.Imaging.Forms
             {
                 bool restartLoading = false;
                 bool operationAborted = false;
+                HashSet<LayerObject> deletedWordHighlights = null;
+
+                try
+                {
+                    // Get a set of the layer objects being deleted that are word highlights.
+                    // Do this before calling CancelRunningOperation to avoid unnecessary cycles of
+                    // cancellations and activations that can lead to momentary unresponsiveness of
+                    // the UI.
+                    deletedWordHighlights = new HashSet<LayerObject>(e.LayerObjects
+                        .Where(o => IsWordHighlight(o)));
+
+                    if (deletedWordHighlights.Count == 0)
+                    {
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExtractException.Display("ELI41684", ex);
+                }
 
                 try
                 {
@@ -834,78 +852,68 @@ namespace Extract.Imaging.Forms
                             "Application trace: Word highlight background operation aborted.").Log();
                     }
 
-                    // Get a set of the layer objects being deleted that are word highlights.
-                    HashSet<LayerObject> deletedWordHighlights =
-                        new HashSet<LayerObject>(e.LayerObjects
-                            .Where(o => IsWordHighlight(o)));
+                    restartLoading |= true;
 
-                    // If any word highlights are deleted by anything but the WordHighlightManager,
-                    // reload the highlights for the affected pages.
-                    if (deletedWordHighlights.Count > 0)
+                    // Collect a list of all pages from which highlights are being deleted and all
+                    // word highlights from those pages.
+                    IEnumerable<int> affectedPages = deletedWordHighlights
+                        .Select(h => h.PageNumber)
+                        .Distinct();
+                    List<LayerObject> highlightsFromAffectedPages = new List<LayerObject>();
+                    foreach (int page in affectedPages)
                     {
-                        restartLoading |= true;
-
-                        // Collect a list of all pages from which highlights are being deleted and all
-                        // word highlights from those pages.
-                        IEnumerable<int> affectedPages = deletedWordHighlights
-                            .Select(h => h.PageNumber)
-                            .Distinct();
-                        List<LayerObject> highlightsFromAffectedPages = new List<LayerObject>();
-                        foreach (int page in affectedPages)
+                        HashSet<LayerObject> pageHighlights;
+                        bool removalSucceeded = _wordHighlights.TryRemove(page, out pageHighlights);
+                        ExtractException.Assert("ELI31363", "Internal error.",
+                            removalSucceeded || operationAborted);
+                        if (!removalSucceeded)
                         {
-                            HashSet<LayerObject> pageHighlights;
-                            bool removalSucceeded = _wordHighlights.TryRemove(page, out pageHighlights);
-                            ExtractException.Assert("ELI31363", "Internal error.",
-                                removalSucceeded || operationAborted);
-                            if (!removalSucceeded)
-                            {
-                                // https://extract.atlassian.net/browse/ISSUE-12188
-                                // Fixes to ensure _backgroundWorkerIdle is not set just before the
-                                // background worker is to clear highlight data should prevent
-                                // situations where highlights have been removed between the
-                                // initialization of deletedWordHighlights and here. But in the
-                                // fail-safe that the background thread did not exit immediately,
-                                // quietly abort handling of the deleted highlights as they likely
-                                // have been removed by ClearData if operationAborted is true and we
-                                // are here.
-                                return;
-                            }
-                            highlightsFromAffectedPages.AddRange(pageHighlights);
+                            // https://extract.atlassian.net/browse/ISSUE-12188
+                            // Fixes to ensure _backgroundWorkerIdle is not set just before the
+                            // background worker is to clear highlight data should prevent
+                            // situations where highlights have been removed between the
+                            // initialization of deletedWordHighlights and here. But in the
+                            // fail-safe that the background thread did not exit immediately,
+                            // quietly abort handling of the deleted highlights as they likely
+                            // have been removed by ClearData if operationAborted is true and we
+                            // are here.
+                            return;
+                        }
+                        highlightsFromAffectedPages.AddRange(pageHighlights);
 
-                            // No longer consider any of these highlights as loaded.
-                            _pagesOfAddedWordHighlights.Remove(page);
-                            foreach (Highlight highlight in pageHighlights)
-                            {
-                                _wordLineMapping.Remove(highlight);
-
-                                if (!_imageViewer.RedactionMode)
-                                {
-                                    // _highlightOcr will only be populated when not in RedactionMode.
-                                    ThreadSafeSpatialString temp;
-                                    _highlightOcr.TryRemove(highlight, out temp);
-                                }
-                            }
+                        // No longer consider any of these highlights as loaded.
+                        _pagesOfAddedWordHighlights.Remove(page);
+                        foreach (Highlight highlight in pageHighlights)
+                        {
+                            _wordLineMapping.Remove(highlight);
 
                             if (!_imageViewer.RedactionMode)
                             {
-                                // _loadedOcrWords will only be populated when not in RedactionMode.
-                                List<ThreadSafeSpatialString> ocrWords;
-                                ExtractException.Assert("ELI34064", "Internal error.",
-                                    _loadedOcrWords.TryRemove(page, out ocrWords));
+                                // _highlightOcr will only be populated when not in RedactionMode.
+                                ThreadSafeSpatialString temp;
+                                _highlightOcr.TryRemove(highlight, out temp);
                             }
                         }
 
-                        // Look for any highlights on the affected pages that aren't already
-                        // being deleted and delete them so that word highlights aren't duplicated
-                        // when they are re-loaded.
-                        List<LayerObject> remainingHighlights =
-                            new List<LayerObject>(highlightsFromAffectedPages
-                                .Where(h => !deletedWordHighlights.Contains(h)));
-
-                        if (remainingHighlights.Count > 0)
+                        if (!_imageViewer.RedactionMode)
                         {
-                            _imageViewer.LayerObjects.Remove(remainingHighlights, true, false);
+                            // _loadedOcrWords will only be populated when not in RedactionMode.
+                            List<ThreadSafeSpatialString> ocrWords;
+                            ExtractException.Assert("ELI34064", "Internal error.",
+                                _loadedOcrWords.TryRemove(page, out ocrWords));
                         }
+                    }
+
+                    // Look for any highlights on the affected pages that aren't already
+                    // being deleted and delete them so that word highlights aren't duplicated
+                    // when they are re-loaded.
+                    List<LayerObject> remainingHighlights =
+                        new List<LayerObject>(highlightsFromAffectedPages
+                            .Where(h => !deletedWordHighlights.Contains(h)));
+
+                    if (remainingHighlights.Count > 0)
+                    {
+                        _imageViewer.LayerObjects.Remove(remainingHighlights, true, false);
                     }
                 }
                 catch (Exception ex)

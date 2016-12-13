@@ -434,9 +434,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     // https://extract.atlassian.net/browse/ISSUE-14208
                     // https://extract.atlassian.net/browse/ISSUE-14328
-                    // If in the pagination panel, DrawHighlights will take care of changing the page
-                    // if necessary. Do not attempt to change the page here-- the image viewer may
-                    // not even be on the correct document.
+                    // Don't switch to a page that is not part of this document. There are many
+                    // issues with doing so including unexpected page rotation behavior.
+                    LoadPageInImageViewer(allowSourceDocumentSwitch: false);
                 }
                 else
                 {
@@ -527,7 +527,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // ImageViewer and exceptions will occur.
                     if (!PrimarySelectionIsForActiveDocument)
                     {
-                        LoadDocumentInImageViewer();
+                        LoadPageInImageViewer(allowSourceDocumentSwitch: true);
                     }
                 }
 
@@ -592,7 +592,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // is currently loaded in the image viewer.
                     if (ensureActiveAttributeVisible)
                     {
-                        LoadDocumentInImageViewer();
+                        LoadPageInImageViewer(allowSourceDocumentSwitch: true);
                     }
                 }
 
@@ -742,7 +742,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Selects the appropriate page to load the appropriate document for the current selection
         /// in the DEP.
         /// </summary>
-        void LoadDocumentInImageViewer()
+        /// <param name="allowSourceDocumentSwitch"><c>true</c> if the page change should be allowed
+        /// if the page is from a different source document; otherwise, <c>false</c>.</param>
+        void LoadPageInImageViewer(bool allowSourceDocumentSwitch)
         {
             var outputDocument = this.GetAncestors()
                 .OfType<PaginationSeparator>()
@@ -766,13 +768,20 @@ namespace Extract.UtilityApplications.PaginationUtility
             // If the page control corresponding to the active attribute is not from the
             // document currently active in the image viewer, raise the PageLoadRequest
             // to load the correct page (and the highlights for that page).
-            if (pageControl != null && pageControl.Page.OriginalDocumentName != _imageViewer.ImageFile)
+            if (pageControl != null)
             {
-                ClearHighlights();
+                if (FileSystemMethods.ArePathsEqual(pageControl.Page.OriginalDocumentName, _imageViewer.ImageFile))
+                {
+                    OnPageLoadRequest(pageControl.Page.OriginalDocumentName, pageControl.Page.OriginalPageNumber);
+                }
+                else if (allowSourceDocumentSwitch)
+                {
+                    ClearHighlights();
 
-                OnPageLoadRequest(pageControl.Page.OriginalDocumentName, pageControl.Page.OriginalPageNumber);
+                    OnPageLoadRequest(pageControl.Page.OriginalDocumentName, pageControl.Page.OriginalPageNumber);
 
-                CreateAllAttributeHighlights(Attributes, null);
+                    CreateAllAttributeHighlights(Attributes, null);
+                }
             }
         }
 

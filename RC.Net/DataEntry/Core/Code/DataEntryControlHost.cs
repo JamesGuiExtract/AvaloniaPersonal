@@ -1667,7 +1667,7 @@ namespace Extract.DataEntry
                     // last selected control remaining active when the next document is loaded.
                     if (_activeDataControl != null)
                     {
-                        _activeDataControl.IndicateActive(false, ImageViewer.DefaultHighlightColor);
+                        _activeDataControl.IndicateActive(false, _defaultHighlightColor);
                         _activeDataControl = null;
                     }
 
@@ -1690,7 +1690,7 @@ namespace Extract.DataEntry
                     // more often than they have to.
                     AttributeStatusInfo.EnableValidationTriggers(false);
 
-                    bool imageIsAvailable = ImageViewer.IsImageAvailable;
+                    bool imageIsAvailable = ImageViewer != null && ImageViewer.IsImageAvailable;
 
                     if (imageIsAvailable && attributes != null)
                     {
@@ -1760,7 +1760,7 @@ namespace Extract.DataEntry
                         // Remove activate status from the active control.
                         if (!imageIsAvailable && dataControl == _activeDataControl)
                         {
-                            dataControl.IndicateActive(false, ImageViewer.DefaultHighlightColor);
+                            dataControl.IndicateActive(false, _defaultHighlightColor);
                         }
 
                         // Set the enabled status of every data control depending on the 
@@ -1953,7 +1953,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (ImageViewer.IsImageAvailable)
+                if (ImageViewer != null && ImageViewer.IsImageAvailable)
                 {
                     using (new TemporaryWaitCursor())
                     {
@@ -2395,8 +2395,7 @@ namespace Extract.DataEntry
                         // complete.
                         if (_activeDataControl != null)
                         {
-                            _activeDataControl.IndicateActive(
-                                false, ImageViewer.DefaultHighlightColor);
+                            _activeDataControl.IndicateActive(false, _defaultHighlightColor);
                         }
 
                         if (undo)
@@ -2420,7 +2419,7 @@ namespace Extract.DataEntry
                         if (_activeDataControl != null)
                         {
                             ExecuteOnIdle("ELI34414", () => _activeDataControl.IndicateActive(
-                                true, ImageViewer.DefaultHighlightColor));
+                                true, _defaultHighlightColor));
                         }
 
                         // Invoke EndUndo/EndRedo on idle the to ensure that nothing that happened
@@ -2724,9 +2723,9 @@ namespace Extract.DataEntry
                 // Since the data associated with the currently selected control has been cleared,
                 // set _activeDataControl to null so that the next control focus change is processed
                 // re-initializes the current selection even if the same control is still selected.
-                if (_activeDataControl != null && _imageViewer != null)
+                if (_activeDataControl != null)
                 {
-                    _activeDataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
+                    _activeDataControl.IndicateActive(false, _defaultHighlightColor);
                     _activeDataControl = null;
                 }
 
@@ -3239,7 +3238,7 @@ namespace Extract.DataEntry
                 // De-activate any existing control that is active
                 if (_activeDataControl != null)
                 {
-                    _activeDataControl.IndicateActive(false, ImageViewer.DefaultHighlightColor);
+                    _activeDataControl.IndicateActive(false, _defaultHighlightColor);
                 }
 
                 // If this method was attempting to change focus, there is at least once case where
@@ -3267,13 +3266,8 @@ namespace Extract.DataEntry
 
                 _refocusingControl = null;
 
-                // If an image is loaded, activate the new control. (Prevent controls from being
-                // active with no loaded document)
-                if (ImageViewer.IsImageAvailable)
-                {
-                    _activeDataControl = newActiveDataControl;
-                    _activeDataControl.IndicateActive(true, ImageViewer.DefaultHighlightColor);
-                }
+                _activeDataControl = newActiveDataControl;
+                _activeDataControl.IndicateActive(true, _defaultHighlightColor);
 
                 // Once a new control gains focus, show tooltips again if they were hidden.
                 if (_temporarilyHidingTooltips)
@@ -3291,7 +3285,8 @@ namespace Extract.DataEntry
                 DrawHighlights(true);
 
                 // Enable or disable swiping as appropriate.
-                bool swipingEnabled = ImageViewer.IsImageAvailable &&
+                bool swipingEnabled = ImageViewer != null &&
+                    ImageViewer.IsImageAvailable &&
                     _activeDataControl != null &&
                     _activeDataControl.SupportsSwiping;
 
@@ -4550,7 +4545,7 @@ namespace Extract.DataEntry
                 }
 
                 // Don't allow new highlights to be created if there is no longer a document loaded.
-                if (ImageViewer.IsImageAvailable)
+                if (ImageViewer != null && ImageViewer.IsImageAvailable)
                 {
                     SetAttributeHighlight(attribute, false);
                 }
@@ -4641,7 +4636,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (pageNumber != ImageViewer.PageNumber)
+                if (ImageViewer != null && pageNumber != ImageViewer.PageNumber)
                 {
                     _performingProgrammaticZoom = true;
                     _lastViewArea = new Rectangle();
@@ -5248,8 +5243,8 @@ namespace Extract.DataEntry
         /// swiping is to be enabled.</param>
         protected virtual void OnSwipingStateChanged(SwipingStateChangedEventArgs e)
         {
-            if (e.SwipingEnabled && ImageViewer.CursorTool == CursorTool.None &&
-                ImageViewer.IsImageAvailable)
+            if (e.SwipingEnabled && ImageViewer != null && ImageViewer.IsImageAvailable &&
+                ImageViewer.CursorTool == CursorTool.None)
             {
                 // If swiping is being re-enabled and the previous active cursor tool was one of
                 // the highlight tools, re-enable it so a user does not need to manually
@@ -6310,6 +6305,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns>The <see cref="IAttribute"/>s currently selected in the _activeDataControl.
         /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         protected IEnumerable<IAttribute> GetActiveAttributes()
         {
             SelectionState selectionState;
@@ -6505,7 +6501,10 @@ namespace Extract.DataEntry
             {
                 // So that focus does not jump to the next control, assign focus to the image viewer
                 // during the toggle of enabled.
-                ImageViewer.Focus();
+                if (ImageViewer != null)
+                {
+                    ImageViewer.Focus();
+                }
 
                 Control control = (Control)_activeDataControl;
                 control.Enabled = false;
@@ -7412,6 +7411,7 @@ namespace Extract.DataEntry
         /// generated. Must not be <see langword="null"/>.</param>
         /// <param name="preCreatedHighlights">A <see cref="HighlightDictionary"/> that may contain
         /// pre-created highlights for the <see paramref="attributes"/>.</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         protected void CreateAllAttributeHighlights(IUnknownVector attributes,
             HighlightDictionary preCreatedHighlights)
         {
@@ -7820,7 +7820,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (ImageViewer.IsImageAvailable)
+                if (ImageViewer != null && ImageViewer.IsImageAvailable)
                 {
                     // Initialize _currentlySelectedGroupAttribute as null. 
                     _currentlySelectedGroupAttribute = null;
