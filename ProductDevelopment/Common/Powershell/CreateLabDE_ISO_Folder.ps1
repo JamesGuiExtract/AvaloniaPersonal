@@ -8,9 +8,7 @@
 #'d:\Internal\ProductReleases\FlexIndex\Internal\ReleaseISO\LabDE\'  'd:\Internal\ProductReleases\SharedInstalls\'  'd:\Internal\ProductReleases\FlexIndex\Internal\BleedingEdge\FlexIndex Ver. 10.4.0.93\LabDE\SetupFiles\'
 
 Param(
-	[String][Parameter(Mandatory=$true)][ValidateNotNull()] $BaseDestRootPath,
-	[String][Parameter(Mandatory=$true)][ValidateNotNull()] $SharedInstallsPath,
-	[String][Parameter(Mandatory=$true)][ValidateNotNull()] $SetupFilesPath
+	[String][Parameter(Mandatory=$true)][ValidateNotNull()] $FlexIndexVersion
 )
 
 
@@ -22,15 +20,25 @@ function MakeFileLink([String] $ServerName, [String] $LinkPath, [String] $Target
 	Invoke-Command -ComputerName $ServerName -ScriptBlock $script	
 }
 
+$BaseDestRootPath = 'D:\Internal\ISOTree\' + $FlexIndexVersion + '\LabDE\'
+$SharedInstallsPath = 'D:\Internal\ProductReleases\SharedInstalls\'
+$SetupFilesPath = 'D:\Internal\ProductReleases\FlexIndex\Internal\BleedingEdge\' + $FlexIndexVersion + '\LabDE\SetupFiles\'
+
+# Create the directory if it doesn't exist
+New-Item -ItemType Directory -Force -Path $BaseDestRootPath
+
 
 $BaseInvokePath = Split-Path $MyInvocation.MyCommand.Path
 
 # LabDEExtras
 $BaseDestPath =$BaseDestRootPath + 'LabDEExtras\'
 
-$CommonDestTarget = " -BaseDestPath $BaseDestPath -BaseTargetPath $SharedInstallsPath"
+New-Item -ItemType Directory -Force -Path $BaseDestPath
+
+$CommonDestTarget = " -BaseDestPath '$BaseDestPath' -BaseTargetPath '$SharedInstallsPath'"
 $MakeLinksToCommonArgs = "\MakeLinksToCommonInstalls.ps1 " + $CommonDestTarget
 $MakeLinksToCommonPath = $BaseInvokePath + $MakeLinksToCommonArgs
+
 Invoke-Expression $MakeLinksToCommonPath 
 
 $MakeSymLinkCommon = $BaseInvokePath + "\MakeSymLink.ps1 -ServerName Engsvr "
@@ -38,7 +46,7 @@ $CorePointLink = $MakeSymLinkCommon + $CommonDestTarget + " -InstallFolder 'Core
 
 Invoke-Expression $CorePointLink
 
-$CommonSetup = "$MakeSymLinkCommon -BaseDestPath $BaseDestPath -BaseTargetPath '$SetupFilesPath'"
+$CommonSetup = "$MakeSymLinkCommon -BaseDestPath '$BaseDestPath' -BaseTargetPath '$SetupFilesPath'"
 #Extract Systems LM
 Invoke-Expression "$CommonSetup -InstallFolder 'Extract Systems LM'"
 Invoke-Expression "$CommonSetup -InstallFolder 'LabDEInstall'"
@@ -61,8 +69,10 @@ MakeFileLink 'Engsvr' $FileDest $FileTarget
 #LabDE
 
 $BaseDestPath =$BaseDestRootPath + 'LabDE\'
-$CommonDestTarget = " -BaseDestPath $BaseDestPath -BaseTargetPath $SharedInstallsPath"
-$CommonSetup = "$MakeSymLinkCommon -BaseDestPath $BaseDestPath -BaseTargetPath '$SetupFilesPath'"
+New-Item -ItemType Directory -Path $BaseDestPath
+
+$CommonDestTarget = " -BaseDestPath '$BaseDestPath' -BaseTargetPath '$SharedInstallsPath'"
+$CommonSetup = "$MakeSymLinkCommon -BaseDestPath '$BaseDestPath' -BaseTargetPath '$SetupFilesPath'"
 
 Invoke-Expression "$CommonSetup -InstallFolder 'LabDE'"
 Invoke-Expression "$CommonSetup -InstallFolder 'SilentInstalls'"
