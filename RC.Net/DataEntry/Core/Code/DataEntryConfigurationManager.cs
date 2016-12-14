@@ -175,6 +175,21 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets/sets the attributes used to determine the current data configuration.
+        /// </summary>
+        public IUnknownVector Attributes
+        {
+            get
+            {
+                return _attributes;
+            }
+            set
+            {
+                _attributes = value;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -221,9 +236,6 @@ namespace Extract.DataEntry
                 if (configurationNode == null || !configurationNode.MoveToFirstChild())
                 {
                     _defaultDataEntryConfig = LoadDataEntryConfiguration(masterConfigFileName, null);
-
-                    ChangeActiveDocumentType(null, true);
-
                     return;
                 }
 
@@ -288,7 +300,6 @@ namespace Extract.DataEntry
                     if (defaultConfiguration)
                     {
                         _defaultDataEntryConfig = config;
-                        ChangeActiveDocumentType(null, true);
                     }
 
                     XPathNavigator documentTypeNode = configurationNode.Clone();

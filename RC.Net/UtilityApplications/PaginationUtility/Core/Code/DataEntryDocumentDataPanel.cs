@@ -139,7 +139,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentData = (DataEntryPaginationDocumentData)data;
 
-                LoadData(_documentData.WorkingAttributes, forDisplay);
+                LoadData(_documentData.WorkingAttributes, _documentData.SourceDocName, forDisplay);
 
                 if (_imageViewer.Visible)
                 {
@@ -223,7 +223,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 Active = false;
 
                 _documentData = null;
-                _primaryPageIsForActiveDocument = false;
 
                 base.ClearData();
 
@@ -654,9 +653,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // for which data is being edited, share the image viewer with the DEP. Otherwise,
                 // the DEP should be allowed access because its spatial data will not correspond with
                 // the displayed document.
-                if (Visible && PrimarySelectionIsForActiveDocument)
+                if (_imageViewer.IsImageAvailable && Visible && PrimarySelectionIsForActiveDocument)
                 {
                     base.ImageViewer = _imageViewer;
+
+                    UpdateSwipingState();
                 }
             }
             catch (Exception ex)

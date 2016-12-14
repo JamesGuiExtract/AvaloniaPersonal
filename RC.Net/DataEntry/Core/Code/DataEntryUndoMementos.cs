@@ -789,7 +789,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                ((Control)_dataControl).Focus();
+                (_dataControl as Control)?.Focus();
             }
             catch (Exception ex)
             {

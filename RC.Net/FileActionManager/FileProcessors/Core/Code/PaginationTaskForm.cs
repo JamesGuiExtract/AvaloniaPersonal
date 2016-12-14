@@ -1611,7 +1611,7 @@ namespace Extract.FileActionManager.FileProcessors
         PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes, string sourceDocName)
         {
             return (_paginationDocumentDataPanel == null)
-                ? new PaginationDocumentData(attributes)
+                ? new PaginationDocumentData(attributes, sourceDocName)
                 : _paginationDocumentDataPanel.GetDocumentData(
                     attributes, sourceDocName, FileProcessingDB, _imageViewer);
         }

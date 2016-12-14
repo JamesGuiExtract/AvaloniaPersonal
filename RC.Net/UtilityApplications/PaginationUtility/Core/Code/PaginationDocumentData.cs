@@ -34,9 +34,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="attributes">The <see cref="IAttribute"/> hierarchy (voa data) on which this
         /// instance is based.</param>
-        public PaginationDocumentData(IUnknownVector attributes)
+        /// <param name="sourceDocName"><param name="sourceDocName">The name of the source document
+        /// for which data is being loaded.</param></param>
+        public PaginationDocumentData(IUnknownVector attributes, string sourceDocName)
         {
             _attributes = attributes;
+            SourceDocName = sourceDocName;
         }
 
         #endregion Constructors
@@ -56,6 +59,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Events
 
         #region Public Members
+
+        /// <summary>
+        /// The source document related to this instance if there is a singular source document;
+        /// otherwise, <see langword="null"/>.
+        /// </summary>
+        public string SourceDocName
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Gets the <see cref="IAttribute"/> hierarchy (voa data) on which this

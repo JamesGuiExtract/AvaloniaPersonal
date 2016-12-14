@@ -1700,6 +1700,14 @@ namespace Extract.DataEntry
                     _autoCompleteUpdatePending = false;
                 }
 
+                // _attribute could have been set to null in between the time this method invocation
+                // was added to the queue and now.
+                // https://extract.atlassian.net/browse/ISSUE-14347
+                if (_attribute == null)
+                {
+                    return;
+                }
+
                 // Get updated values for the auto-complete fields if an update is required.
                 AutoCompleteMode autoCompleteMode = AutoCompleteMode;
                 AutoCompleteSource autoCompleteSource = AutoCompleteSource;

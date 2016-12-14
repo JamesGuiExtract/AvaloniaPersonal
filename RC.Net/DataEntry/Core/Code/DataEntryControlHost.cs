@@ -254,6 +254,11 @@ namespace Extract.DataEntry
         IUnknownVector _attributes = new IUnknownVectorClass();
 
         /// <summary>
+        /// The name of the source document to which _attributes correspond.
+        /// </summary>
+        string _sourceDocName;
+
+        /// <summary>
         /// The <see cref="IAttribute"/>s output from the most recent call to <see cref="SaveData"/>.
         /// <see langword="null"/> if data has not been saved or new data has been loaded since the
         /// most recent save.
@@ -1412,6 +1417,8 @@ namespace Extract.DataEntry
                         {
                             if (_active)
                             {
+                                SetPageIconSizes();
+
                                 RegisterForEvents();
 
                                 if (_attributes != null && _imageViewer.IsImageAvailable)
@@ -1426,6 +1433,8 @@ namespace Extract.DataEntry
                         }
                         else
                         {
+                            _errorIconSizes.Clear();
+
                             // In the case that the image viewer is being set to null, we may not be
                             // switching documents, but it may be activating a pagination tab. In this
                             // case, image viewer events and processing should be prevented just as they
@@ -1646,9 +1655,11 @@ namespace Extract.DataEntry
         /// <param name="attributes">The <see cref="IUnknownVector" /> of <see cref="IAttribute" />s
         /// that represent the document's data or <see langword="null" /> to clear all data from the
         /// DEP, remove data validation warnings and to disable the DEP.</param>
+        /// <param name="sourceDocName">The name of the source document to which
+        /// <see paramref="attributes"/> correspond.</param>
         /// <param name="forDisplay"><c>true</c> if the loaded data is to be displayed; <c>false</c>
         /// if the data is being loaded only for data manipulation or validation.</param>
-        public void LoadData(IUnknownVector attributes, bool forDisplay)
+        public void LoadData(IUnknownVector attributes, string sourceDocName, bool forDisplay)
         {
             try
             {
@@ -1659,6 +1670,7 @@ namespace Extract.DataEntry
                         "Begin: ----------------------------------------------------");
                 }
 
+                _sourceDocName = sourceDocName;
                 HighlightDictionary preCreatedHighlights = null;
 
                 using (new TemporaryWaitCursor())
@@ -1694,16 +1706,7 @@ namespace Extract.DataEntry
 
                     if (imageIsAvailable && attributes != null)
                     {
-                        // Calculate the size the error icon for invalid data should be on each
-                        // page and create a SpatialPageInfo entry for each page.
-                        for (int page = 1; page <= ImageViewer.PageCount; page++)
-                        {
-                            var pageProperties = ImageViewer.GetPageProperties(page);
-
-                            _errorIconSizes[page] = new Size(
-                                (int)(_ERROR_ICON_SIZE * pageProperties.XResolution),
-                                (int)(_ERROR_ICON_SIZE * pageProperties.YResolution));
-                        }
+                        SetPageIconSizes();
                     }
 
                     if (attributes != null)
@@ -1721,7 +1724,7 @@ namespace Extract.DataEntry
                         _attributes = attributes;
 
                         // Notify AttributeStatusInfo of the new attribute hierarchy
-                        AttributeStatusInfo.ResetData(ImageViewer.ImageFile, _attributes,
+                        AttributeStatusInfo.ResetData(_sourceDocName, _attributes,
                             _dbConnections, null);
 
                         // Enable or disable swiping as appropriate.
@@ -1873,7 +1876,7 @@ namespace Extract.DataEntry
                 ExtractException ee = new ExtractException("ELI23919", "Failed to load data!", ex);
                 if (_imageViewer != null && _imageViewer.IsImageAvailable)
                 {
-                    ee.AddDebugData("FileName", _imageViewer.ImageFile, false);
+                    ee.AddDebugData("FileName", _sourceDocName, false);
                 }
                 throw ee;
             }
@@ -1931,7 +1934,7 @@ namespace Extract.DataEntry
                 ExtractException ee = new ExtractException("ELI35073", "Unable to get data!", ex);
                 if (_imageViewer != null && _imageViewer.IsImageAvailable)
                 {
-                    ee.AddDebugData("Filename", _imageViewer.ImageFile, false);
+                    ee.AddDebugData("Filename", _sourceDocName, false);
                 }
                 throw ee;
             }
@@ -1978,7 +1981,7 @@ namespace Extract.DataEntry
                             PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
                             // If all attributes passed validation, save the data.
-                            _mostRecentlySaveAttributes.SaveTo(ImageViewer.ImageFile + ".voa",
+                            _mostRecentlySaveAttributes.SaveTo(_sourceDocName + ".voa",
                                 true, _ATTRIBUTE_STORAGE_MANAGER_GUID);
 
                             OnDataSaved();
@@ -2007,7 +2010,7 @@ namespace Extract.DataEntry
                 ExtractException ee = new ExtractException("ELI23909", "Unable to save data!", ex);
                 if (_imageViewer != null && _imageViewer.IsImageAvailable)
                 {
-                    ee.AddDebugData("Filename", _imageViewer.ImageFile, false);
+                    ee.AddDebugData("Filename", _sourceDocName, false);
                 }
                 throw ee;
             }
@@ -4189,6 +4192,27 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event of the <see cref="ImageViewer"/>
+        /// control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="ImageFileChangedEventArgs"/> instance containing the event data.</param>
+        void HandleImageViewer_ImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        {
+            try
+            {
+                if (ImageViewer.IsImageAvailable)
+                {
+                    SetPageIconSizes();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41689");
+            }
+        }
+
+        /// <summary>
         /// Handles the case that the  <see cref="ImageViewer"/> has changed pages.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
@@ -4666,7 +4690,7 @@ namespace Extract.DataEntry
             // To avoid unnecessary drawing, wait until we are done loading a document or a
             // control is done with an update before attempting to display any layer objects.
             // Also, ensure against recursive calls.
-            if (_changingData || _drawingHighlights || ControlUpdateReferenceCount > 0)
+            if (ImageViewer == null || _changingData || _drawingHighlights || ControlUpdateReferenceCount > 0)
             {
                 return;
             }
@@ -7049,7 +7073,7 @@ namespace Extract.DataEntry
                 ImageViewer.LayerObjects.MoveToTop(_hoverToolTip.TextLayerObject);
             }
         }
-        
+
         /// <summary>
         /// Determines whether the specified <see cref="RasterZone"/>s are arranged horizontally
         /// or vertically.
@@ -7749,13 +7773,16 @@ namespace Extract.DataEntry
             }
 
             // Lock or unlock the ImageViewer using Begin/EndUpdate
-            if (lockUpdates)
+            if (ImageViewer != null)
             {
-                ImageViewer.BeginUpdate();
-            }
-            else
-            {
-                ImageViewer.EndUpdate();
+                if (lockUpdates)
+                {
+                    ImageViewer.BeginUpdate();
+                }
+                else
+                {
+                    ImageViewer.EndUpdate();
+                }
             }
 
             // Lock the DEP's parent (a Panel) to prevent scrolling
@@ -7863,6 +7890,26 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Determines the size error icons overlaid onto the document image should be given the DPI
+        /// of each page.
+        /// </summary>
+         void SetPageIconSizes()
+        {
+            _errorIconSizes.Clear();
+
+            // Calculate the size the error icon for invalid data should be on each
+            // page and create a SpatialPageInfo entry for each page.
+            for (int page = 1; page <= ImageViewer.PageCount; page++)
+            {
+                var pageProperties = ImageViewer.GetPageProperties(page);
+
+                _errorIconSizes[page] = new Size(
+                    (int)(_ERROR_ICON_SIZE * pageProperties.XResolution),
+                    (int)(_ERROR_ICON_SIZE * pageProperties.YResolution));
+            }
+        }
+
+        /// <summary>
         /// Executes the provided delegate only after the DEP's message pump is completely empty.
         /// This differs from simply using BeginInvoke to execute it via the message pump since
         /// messages already in the queue may result in further messages getting queued. Therefore,
@@ -7934,6 +7981,7 @@ namespace Extract.DataEntry
             _imageViewer.MouseDown += HandleImageViewerMouseDown;
             _imageViewer.ZoomChanged += HandleImageViewerZoomChanged;
             _imageViewer.ScrollPositionChanged += HandleImageViewerScrollPositionsChanged;
+            _imageViewer.ImageFileChanged += HandleImageViewer_ImageFileChanged;
             _imageViewer.PageChanged += HandleImageViewerPageChanged;
             _imageViewer.FitModeChanged += HandleImageViewerFitModeChanged;
             if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
@@ -7965,6 +8013,7 @@ namespace Extract.DataEntry
                 _imageViewer.MouseDown -= HandleImageViewerMouseDown;
                 _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
                 _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
+                _imageViewer.ImageFileChanged -= HandleImageViewer_ImageFileChanged;
                 _imageViewer.PageChanged -= HandleImageViewerPageChanged;
                 _imageViewer.FitModeChanged -= HandleImageViewerFitModeChanged;
                 if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)

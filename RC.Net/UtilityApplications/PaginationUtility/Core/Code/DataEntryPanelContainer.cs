@@ -76,6 +76,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         ImageViewer _imageViewer;
 
+        /// <summary>
+        /// Indicates whether the PageLayoutControl's PrimarySelection corresponds with the output
+        /// document for which this DEP is editing data.
+        /// </summary>
+        bool _primaryPageIsForActiveDocument;
+
         #endregion Fields
 
         #region Constructors
@@ -256,13 +262,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return (ActiveDataEntryPanel == null)
-                    ? false
-                    : ActiveDataEntryPanel.PrimarySelectionIsForActiveDocument;
+                return _primaryPageIsForActiveDocument;
             }
 
             set
             {
+                _primaryPageIsForActiveDocument = value;
                 if (ActiveDataEntryPanel != null)
                 {
                     ActiveDataEntryPanel.PrimarySelectionIsForActiveDocument = value;
@@ -287,7 +292,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentData = (DataEntryPaginationDocumentData)data;
                 _configManager.LoadCorrectConfigForData(_documentData.WorkingAttributes);
-
 
                 ActiveDataEntryPanel.LoadData(data, forDisplay);
 
@@ -576,6 +580,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (_documentData != null)
                     {
+                        newDataEntryControlHost.PrimarySelectionIsForActiveDocument = _primaryPageIsForActiveDocument;
                         newDataEntryControlHost.LoadData(_documentData, forDisplay: true);
 
                         _undoButton.Enabled = UndoOperationAvailable;

@@ -832,6 +832,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         if (_documentDataPanel != null)
                         {
+                            // Let the data entry panel know if the current page corresponds to the document
+                            // it has loaded.
                             _documentDataPanel.PrimaryPageIsForActiveDocument =
                                 (_documentInDataEdit != null) &&
                                 _documentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document;
@@ -2559,6 +2561,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                             ?? e.OutputDocument.PageControls.First();
                         ProcessControlSelection(pageToSelect);
                     }
+
+                    // Let the data entry panel know if the current page corresponds to the document
+                    // it has loaded.
+                    _documentDataPanel.PrimaryPageIsForActiveDocument =
+                        (_documentInDataEdit != null) &&
+                        (_documentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document);
                 }
             }
             catch (Exception ex)

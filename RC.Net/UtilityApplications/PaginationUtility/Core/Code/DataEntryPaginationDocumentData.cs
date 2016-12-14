@@ -52,12 +52,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="sourceDocName">The source document related to <see cref="_documentData"/>
         /// if there is a singular source document; otherwise <see langword="null"/>.</param>
         public DataEntryPaginationDocumentData(IUnknownVector attributes, string sourceDocName)
-            : base(attributes)
+            : base(attributes, sourceDocName)
         {
             try
             {
-                SourceDocName = sourceDocName;
-
                 WorkingAttributes = attributes;
                 _originalData = (IUnknownVector)((ICopyableObject)attributes).Clone();
                 _originalData.ReportMemoryUsage();
@@ -71,16 +69,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Constructors
 
         #region Properties
-
-        /// <summary>
-        /// The source document related to this instance if there is a singular source document;
-        /// otherwise, <see langword="null"/>.
-        /// </summary>
-        public string SourceDocName
-        {
-            get;
-            private set;
-        }
 
         /// <summary>
         /// Gets or sets an object representing the undo/redo operations that should be restored to

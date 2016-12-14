@@ -1,5 +1,6 @@
 ﻿using Extract.Utilities.Forms;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -90,6 +91,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 InitializeComponent();
+
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    _tableLayoutPanel.Visible = false;
+                }
 
                 _showSelectionCheckBox = showSelectionCheckBox;
                 if (!_showSelectionCheckBox)
@@ -545,7 +551,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 base.OnLayout(e);
-
             }
             catch (Exception ex)
             {
@@ -769,6 +774,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Force a follow-up layout to occur after assigning this separator to a new document.
                     doLayout = true;
                 }
+
+                if (!_tableLayoutPanel.Visible)
+                {
+                    _tableLayoutPanel.Visible = true;
+                }
+
                 _collapseDocumentButton.Visible = true;
                 _selectedCheckBox.Visible = _showSelectionCheckBox;
                 _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
@@ -796,7 +807,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     : Document.DocumentData.SendForReprocessing;
                 _reprocessDocumentPictureBox.Visible =
                     !_hideReprocessIndicator &&
-                    !dataSharedInVerification && 
+                    !dataSharedInVerification &&
                     Document.PageControls.Any(c => !c.Deleted) &&
                     (sendForReprocessingOverride.HasValue
                         ? Document.DocumentData.SendForReprocessing.Value
@@ -813,16 +824,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             else
             {
-                _collapseDocumentButton.Visible = false;
-                _selectedCheckBox.Visible = false;
-                _editDocumentDataButton.Visible = false;
-                _summaryLabel.Text = "";
-                _pagesLabel.Text = "";
-                _newDocumentGlyph.Visible = false;
-                _editedPaginationGlyph.Visible = false;
-                _reprocessDocumentPictureBox.Visible = false;
-                _editedDataPictureBox.Visible = false;
-                _dataErrorPictureBox.Visible = false;
+                _tableLayoutPanel.Visible = false;
             }
         }
 

@@ -1797,11 +1797,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _undoCommand.Enabled = false;
                     _redoCommand.Enabled = false;
 
-                    IUnknownVector attributes = null;
-
                     if (oldDataEntryControlHost != null)
                     {
-                        attributes = oldDataEntryControlHost.GetData(validateData: false);
+                        // Make sure to update the attribute collection that the config manager is using
+                        // so that the correct docuement type attribute is updated.
+                        // https://extract.atlassian.net/browse/ISSUE-14347
+                        // Ignore the attributes if none were ever loaded (the default config's control
+                        // host will have an empty attribute vector initially)
+                        if (oldDataEntryControlHost.IsDocumentLoaded)
+                        {
+                            _configManager.Attributes = oldDataEntryControlHost.GetData(validateData: false);
+                        }
 
                         // Set Active = false for the old DEP so that it no longer tracks image
                         // viewer events.
@@ -1832,7 +1838,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         LoadDataEntryControlHostPanel();
 
                         // Load the attributes from the previous DataEntryControlHost
-                        newDataEntryControlHost.LoadData(attributes, forDisplay: true);
+                        newDataEntryControlHost.LoadData(_configManager.Attributes, _fileName, forDisplay: true);
 
                         // Register for events and engage shortcut handlers for the new DEP
                         newDataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
@@ -2005,7 +2011,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
                     _configManager.LoadCorrectConfigForData(attributes);
-
+                    attributes = _configManager.Attributes;
+                    var list = attributes.ToIEnumerable<IAttribute>().SelectMany(a => a.EnumerateDepthFirst())
+                        .Select(a => $"{a.Name}|{a.Value.String}").ToArray();
                     // Record counts on load
                     if (!_standAloneMode && _fileProcessingDb != null)
                     {
@@ -2015,7 +2023,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // If a DEP is being used, load the data into it
                     if (DataEntryControlHost != null)
                     {
-                        DataEntryControlHost.LoadData(attributes, forDisplay: true);
+                        DataEntryControlHost.LoadData(attributes, _fileName, forDisplay: true);
 
                         // Now that the data has been loaded into the DEP, update the document data
                         // in the pagination panel so that it is sharing the same attributes
@@ -2041,7 +2049,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     if (DataEntryControlHost != null)
                     {
-                        DataEntryControlHost.LoadData(null, forDisplay: true);
+                        DataEntryControlHost.LoadData(null, null, forDisplay: true);
                     }
                 }
 
@@ -4109,7 +4117,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _saveMenuItem.Enabled = enableSave;
                 }
-                else
+                else if (config != null)
                 {
                     QueryNode.PerformanceTesting = config.Config.Settings.PerformanceTesting;
                 }
@@ -4800,7 +4808,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes)
         {
             return (_paginationDocumentDataPanel == null)
-                ? new PaginationDocumentData(attributes)
+                ? new PaginationDocumentData(attributes, _fileName)
                 : _paginationDocumentDataPanel.GetDocumentData(
                     attributes, _fileName, FileProcessingDB, _imageViewer);
         }
