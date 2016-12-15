@@ -1417,8 +1417,6 @@ namespace Extract.DataEntry
                         {
                             if (_active)
                             {
-                                SetPageIconSizes();
-
                                 RegisterForEvents();
 
                                 if (_attributes != null && _imageViewer.IsImageAvailable)
@@ -1703,11 +1701,6 @@ namespace Extract.DataEntry
                     AttributeStatusInfo.EnableValidationTriggers(false);
 
                     bool imageIsAvailable = ImageViewer != null && ImageViewer.IsImageAvailable;
-
-                    if (imageIsAvailable && attributes != null)
-                    {
-                        SetPageIconSizes();
-                    }
 
                     if (attributes != null)
                     {
@@ -4188,27 +4181,6 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI27067", ex);
                 ee.AddDebugData("Event Data", e, false);
                 ee.Display();
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event of the <see cref="ImageViewer"/>
-        /// control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="ImageFileChangedEventArgs"/> instance containing the event data.</param>
-        void HandleImageViewer_ImageFileChanged(object sender, ImageFileChangedEventArgs e)
-        {
-            try
-            {
-                if (ImageViewer.IsImageAvailable)
-                {
-                    SetPageIconSizes();
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI41689");
             }
         }
 
@@ -7302,7 +7274,7 @@ namespace Extract.DataEntry
                 // Create the error icon
                 ImageLayerObject errorIcon = new ImageLayerObject(ImageViewer, page,
                     "", errorIconAnchorPoint, AnchorAlignment.Left, 
-                    Properties.Resources.LargeErrorIcon, _errorIconSizes[page], 
+                    Properties.Resources.LargeErrorIcon, GetPageIconSize(page), 
                     (float)errorIconRotation);
                 errorIcon.Selectable = false;
                 errorIcon.Visible = makeVisible;
@@ -7891,21 +7863,37 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Determines the size error icons overlaid onto the document image should be given the DPI
-        /// of each page.
+        /// of the specified <see paramref="page"/>.
         /// </summary>
-         void SetPageIconSizes()
+        /// <param name="page">The page for which the size is needed.</param>
+        Size GetPageIconSize(int pageNumber)
         {
             _errorIconSizes.Clear();
 
-            // Calculate the size the error icon for invalid data should be on each
-            // page and create a SpatialPageInfo entry for each page.
-            for (int page = 1; page <= ImageViewer.PageCount; page++)
+            Size iconSize;
+            if (_errorIconSizes.TryGetValue(pageNumber, out iconSize))
             {
-                var pageProperties = ImageViewer.GetPageProperties(page);
+                return iconSize;
+            }
+            else if (ImageViewer.IsImageAvailable)
+            {
+                // Calculate the size the error icon for invalid data should be on each
+                // page and create a SpatialPageInfo entry for each page.
+                for (int page = 1; page <= ImageViewer.PageCount; page++)
+                {
+                    var pageProperties = ImageViewer.GetPageProperties(page);
 
-                _errorIconSizes[page] = new Size(
-                    (int)(_ERROR_ICON_SIZE * pageProperties.XResolution),
-                    (int)(_ERROR_ICON_SIZE * pageProperties.YResolution));
+                    _errorIconSizes[page] = new Size(
+                        (int)(_ERROR_ICON_SIZE * pageProperties.XResolution),
+                        (int)(_ERROR_ICON_SIZE * pageProperties.YResolution));
+                }
+
+                return _errorIconSizes[pageNumber];
+            }
+            else
+            {
+                new ExtractException("ELI41690", "Failed to look up page size.").Log();
+                return new Size((int)(_ERROR_ICON_SIZE * 300), (int)(_ERROR_ICON_SIZE * 300));
             }
         }
 
@@ -7981,7 +7969,6 @@ namespace Extract.DataEntry
             _imageViewer.MouseDown += HandleImageViewerMouseDown;
             _imageViewer.ZoomChanged += HandleImageViewerZoomChanged;
             _imageViewer.ScrollPositionChanged += HandleImageViewerScrollPositionsChanged;
-            _imageViewer.ImageFileChanged += HandleImageViewer_ImageFileChanged;
             _imageViewer.PageChanged += HandleImageViewerPageChanged;
             _imageViewer.FitModeChanged += HandleImageViewerFitModeChanged;
             if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
@@ -8013,7 +8000,6 @@ namespace Extract.DataEntry
                 _imageViewer.MouseDown -= HandleImageViewerMouseDown;
                 _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
                 _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
-                _imageViewer.ImageFileChanged -= HandleImageViewer_ImageFileChanged;
                 _imageViewer.PageChanged -= HandleImageViewerPageChanged;
                 _imageViewer.FitModeChanged -= HandleImageViewerFitModeChanged;
                 if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
