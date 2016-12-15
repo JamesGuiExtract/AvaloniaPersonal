@@ -5796,7 +5796,7 @@ namespace Extract.DataEntry
                         // group contains the currently active attribute and is a tab stop on its
                         // own, don't select the group, rather first select the attribute
                         // independently (set selectGroup = false).
-                        if (startingPoint != null)
+                        if (startingPoint != null && nextTabStopGenealogy != null)
                         {
                             IAttribute nextTabStopAttribute = null;
                             foreach (IAttribute attribute in nextTabStopGenealogy)
