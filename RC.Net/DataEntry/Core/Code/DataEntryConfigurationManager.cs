@@ -236,6 +236,7 @@ namespace Extract.DataEntry
                 if (configurationNode == null || !configurationNode.MoveToFirstChild())
                 {
                     _defaultDataEntryConfig = LoadDataEntryConfiguration(masterConfigFileName, null);
+                    ChangeActiveDocumentType(null, true);
                     return;
                 }
 
@@ -300,6 +301,7 @@ namespace Extract.DataEntry
                     if (defaultConfiguration)
                     {
                         _defaultDataEntryConfig = config;
+                        ChangeActiveDocumentType(null, true);
                     }
 
                     XPathNavigator documentTypeNode = configurationNode.Clone();
