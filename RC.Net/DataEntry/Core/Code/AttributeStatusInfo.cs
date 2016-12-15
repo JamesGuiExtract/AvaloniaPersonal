@@ -3180,6 +3180,11 @@ namespace Extract.DataEntry
                     IUnknownVector attributesToQuery =
                         (rootAttribute == null) ? _attributes : rootAttribute.SubAttributes;
 
+                    if (null == attributesToQuery)
+                    {
+                        return results;
+                    }
+
                     // Apply the remaining query to all attributes matching the current query.
                     int count = attributesToQuery.Size();
                     if (count > 0)
@@ -3201,6 +3206,10 @@ namespace Extract.DataEntry
                         for (int i = 0; i < count; i++)
                         {
                             IAttribute attribute = (IAttribute)attributesToQuery.At(i);
+                            if (null == attribute)
+                            {
+                                continue;
+                            }
 
                             // Check if the attribute should be eliminated by a name filter
                             if (!string.IsNullOrEmpty(nameFilter) && nameFilter != "*" &&
