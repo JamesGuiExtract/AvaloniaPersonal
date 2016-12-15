@@ -305,12 +305,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentTypeComboBox.Enabled = true;
                 _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeComboBox_SelectedIndexChanged;
-
-                _loading = false;
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41599");
+            }
+            finally
+            {
+                _loading = false;
             }
         }
 
