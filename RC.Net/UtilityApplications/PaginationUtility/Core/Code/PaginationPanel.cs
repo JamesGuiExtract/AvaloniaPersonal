@@ -2457,7 +2457,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (pageToSelect != null)
             {
-                _primaryPageLayoutControl.SelectPage(pageToSelect);
+                // https://extract.atlassian.net/browse/ISSUE-14343
+                // Don't allow the selection of a page scroll away from the DEP that requested the
+                // page change.
+                _primaryPageLayoutControl.SelectPage(pageToSelect, scrollToPage: false);
             }
         }
 

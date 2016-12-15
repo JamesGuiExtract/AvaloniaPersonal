@@ -443,8 +443,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _paginationUtility = paginationUtility;
                 _flowLayoutPanel.Click += HandleFlowLayoutPanel_Click;
                 _flowLayoutPanel.ClientSizeChanged += HandleFlowLayoutPanel_ClientSizeChanged;
-                ((PaginationLayoutEngine)_flowLayoutPanel.LayoutEngine).RedundantControlsFound +=
-                    PaginationLayoutEngine_RedundantControlsFound;
+                ((PaginationLayoutEngine)_flowLayoutPanel.LayoutEngine).LayoutCompleted +=
+                    PaginationLayoutEngine_LayoutCompleted;
 
                 _printPageCounter = 0;
             }
@@ -1213,7 +1213,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Removes the specified <paramref name="control"/>.
         /// <para><b>Note</b>
         /// Any calls to this method outside of the
-        /// <see cref="PaginationLayoutEngine.RedundantControlsFound"/> event handler should be done
+        /// <see cref="PaginationLayoutEngine.LayoutCompleted"/> event handler should be done
         /// in a <see cref="PageLayoutControlUpdateLock"/> that suspends all layouts until all
         /// controls that are to be moved/removed have been moved/removed. Otherwise controls may be
         /// unexpectedly removed in the midst of an operation.
@@ -1504,13 +1504,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Selects the specified <see paramref="pageControls"/>.
         /// </summary>
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to select.</param>
-        public void SelectPage(PageThumbnailControl pageControl)
+        /// <param name="scrollToPage"><c>true</c> if the <see paramref="pageControl"/> should be
+        /// scrolled into view after being selected; otherwise, <c>false</c>.</param>
+        public void SelectPage(PageThumbnailControl pageControl, bool scrollToPage = true)
         {
             try
             {
                 if (pageControl != PrimarySelection)
                 {
-                    ProcessControlSelection(pageControl);
+                    ProcessControlSelection(pageControl, scrollToPage);
                 }
             }
             catch (Exception ex)
@@ -2281,13 +2283,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="PaginationLayoutEngine.RedundantControlsFound"/> event of the
+        /// Handles the <see cref="PaginationLayoutEngine.LayoutCompleted"/> event of the
         /// <see cref="_flowLayoutPanel"/>'s <see cref="PaginationLayoutEngine"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RedundantControlsFoundEventArgs"/> instance containing
+        /// <param name="e">The <see cref="LayoutCompletedEventArgs"/> instance containing
         /// the event data.</param>
-        void PaginationLayoutEngine_RedundantControlsFound(object sender, RedundantControlsFoundEventArgs e)
+        void PaginationLayoutEngine_LayoutCompleted(object sender, LayoutCompletedEventArgs e)
         {
             try
             {
@@ -2493,7 +2495,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 OnLoadNextDocumentRequest();
 
-
                 // I cannot, for the life of me, figure out how to scroll to the bottom of
                 // _flowLayoutPanel here; nothing seems to work.
                 //                this.SafeBeginInvoke("ELI35660", () =>
@@ -2626,6 +2627,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 UpdateCommandStates();
+
+                // https://extract.atlassian.net/browse/ISSUE-14326
+                // Ensure that collapsing a document doesn't cause it to scroll out of view.
+                var separator = (PaginationSeparator)sender;
+                if (separator.Collapsed)
+                {
+                    _flowLayoutPanel.ScrollControlIntoViewManual(separator);
+                }
             }
             catch (Exception ex)
             {
@@ -2895,9 +2904,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="activeControl">The <see cref="PaginationControl"/> that should be
         /// considered active.</param>
-        void ProcessControlSelection(PaginationControl activeControl)
+        /// <param name="scrollToControl"><c>true</c> if the <see paramref="activeControl"/> should be
+        /// scrolled into view after being selected; otherwise, <c>false</c>.</param></param>
+        void ProcessControlSelection(PaginationControl activeControl, bool scrollToControl = true)
         {
-            ProcessControlSelection(activeControl, null, true, Control.ModifierKeys);
+            ProcessControlSelection(activeControl, null, true, Control.ModifierKeys, scrollToControl);
         }
 
         /// <summary>
@@ -2911,8 +2922,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="false"/> if it should be cleared.</param>
         /// <param name="modifierKeys">The <see cref="Keys"/> that should be used as the active
         /// modifier keys.</param>
+        /// <param name="scrollToControl"><c>true</c> if the <see paramref="activeControl"/> should be
+        /// scrolled into view after being selected; otherwise, <c>false</c>.</param></param>
         void ProcessControlSelection(PaginationControl activeControl,
-            IEnumerable<PaginationControl> additionalControls, bool select, Keys modifierKeys)
+            IEnumerable<PaginationControl> additionalControls, bool select, Keys modifierKeys, bool scrollToControl = true)
         {
             try
             {
@@ -3025,7 +3038,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Allow _lastSelectedControl to become activeControl unless the shift modifier key
                     // is down.
                     bool resetLastSelected = ((modifierKeys & Keys.Shift) == 0);
-                    SelectControl(activeControl, select, resetLastSelected, lastSelectedControl != activeControl);
+                    // Only ever scroll to the control if a new control as been selected.
+                    scrollToControl &= (lastSelectedControl != activeControl);
+                    SelectControl(activeControl, select, resetLastSelected, scrollToControl);
                 }
             }
             catch (Exception ex)

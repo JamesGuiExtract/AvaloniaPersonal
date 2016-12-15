@@ -23,12 +23,29 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _allowScrollToControl;
 
         /// <summary>
+        /// A control that should be scrolled to after the next _layoutEngine has executed a pending layout.
+        /// </summary>
+        Control _scrollToControl;
+
+        /// <summary>
         /// The <see cref="PaginationLayoutEngine"/> that manages the layout of the
         /// <see cref="PaginationControl"/>s.
         /// </summary>
         PaginationLayoutEngine _layoutEngine = new PaginationLayoutEngine();
 
         #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PaginationFlowLayoutPanel"/> class.
+        /// </summary>
+        public PaginationFlowLayoutPanel()
+        {
+            _layoutEngine.LayoutCompleted += HandleLayoutEngine_LayoutCompleted;
+        }
+
+        #endregion Constructors
 
         #region Methods
 
@@ -40,9 +57,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _allowScrollToControl = true;
+                if (_layoutEngine.LayoutPending)
+                {
+                    // If the scroll is commanded before a layout, the end result may not have the
+                    // control in view after all. Wait until the layout has completed before
+                    // executing the scroll.
+                    _scrollToControl = control;
+                }
+                else
+                {
+                    _allowScrollToControl = true;
 
-                base.ScrollControlIntoView(control);
+                    base.ScrollControlIntoView(control);
+                }   
             }
             catch (Exception ex)
             {
@@ -100,5 +127,32 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         #endregion Overrides
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Handles the <see cref="PaginationLayoutEngine.LayoutCompleted"/> event of the
+        /// <see cref="_layoutEngine"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="LayoutCompletedEventArgs"/> instance containing the event data.</param>
+        void HandleLayoutEngine_LayoutCompleted(object sender, LayoutCompletedEventArgs e)
+        {
+            try
+            {
+                if (_scrollToControl != null)
+                {
+                    var control = _scrollToControl;
+                    _scrollToControl = null;
+                    ScrollControlIntoViewManual(control);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41695");
+            }
+        }
+
+        #endregion Event Handlers
     }
 }

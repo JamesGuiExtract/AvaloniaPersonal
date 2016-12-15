@@ -112,15 +112,15 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
-    /// The event arguments for the <see cref="PaginationLayoutEngine.RedundantControlsFound"/> event.
+    /// The event arguments for the <see cref="PaginationLayoutEngine.LayoutCompleted"/> event.
     /// </summary>
-    internal class RedundantControlsFoundEventArgs : EventArgs
+    internal class LayoutCompletedEventArgs : EventArgs
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RedundantControlsFoundEventArgs"/> class.
+        /// Initializes a new instance of the <see cref="LayoutCompletedEventArgs"/> class.
         /// </summary>
         /// <param name="redundantControls">The redundant <see cref="PaginationControl"/>s.</param>
-        public RedundantControlsFoundEventArgs(params PaginationControl[] redundantControls)
+        public LayoutCompletedEventArgs(params PaginationControl[] redundantControls)
         {
             try
             {
@@ -133,7 +133,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets the <see cref="PaginationControl"/>s.
+        /// Gets the <see cref="PaginationControl"/>s that are now redundant and can be removed.
         /// </summary>
         public PaginationControl[] RedundantControls
         {

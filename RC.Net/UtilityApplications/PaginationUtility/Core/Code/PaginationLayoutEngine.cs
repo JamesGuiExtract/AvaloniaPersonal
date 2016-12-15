@@ -16,10 +16,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Events
 
         /// <summary>
-        /// Raised when redundant and unnecessary <see cref="PaginationControl"/>s are found during
-        /// a <see cref="Layout"/> call.
+        /// Raised when a Layout operation has completed.
         /// </summary>
-        public event EventHandler<RedundantControlsFoundEventArgs> RedundantControlsFound;
+        public event EventHandler<LayoutCompletedEventArgs> LayoutCompleted;
 
         /// <summary>
         /// Indicates when a layout operation has been invoked. (Layout operations are delayed to be
@@ -27,7 +26,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _layoutInvoked;
 
-        #endregion Events
+        #endregion Properties
+
+        #region Properties
+
+        /// <summary>
+        /// Gets a value indicating whether a layout operation is pending.
+        /// </summary>
+        public bool LayoutPending
+        {
+            get
+            {
+                return _layoutInvoked;
+            }
+        }
+
+        #endregion Properties
 
         #region Overrides
 
@@ -211,20 +225,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                 redundantControls.Add(lastControl);
             }
 
-            OnRedundantControlsFound(redundantControls.ToArray());
+            OnLayoutCompleted(redundantControls.ToArray());
         }
 
         /// <summary>
-        /// Raises the <see cref="RedundantControlsFound"/> event.
+        /// Raises the <see cref="LayoutCompleted"/> event.
         /// </summary>
         /// <param name="redundantControls">The redundant <see cref="PaginationControl"/>s.</param>
-        void OnRedundantControlsFound(PaginationControl[] redundantControls)
+        void OnLayoutCompleted(PaginationControl[] redundantControls)
         {
-            var eventHandler = RedundantControlsFound;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new RedundantControlsFoundEventArgs(redundantControls));
-            }
+            LayoutCompleted?.Invoke(this, new LayoutCompletedEventArgs(redundantControls));
         }
 
         #endregion Private Members
