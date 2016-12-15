@@ -1830,6 +1830,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _removeSpatialInfoCommand.ShortcutHandler = null;
 
                         oldDataEntryControlHost.ClearData();
+                        
+                        // Don't preserve undo state between DEPs
+                        // https://extract.atlassian.net/browse/ISSUE-14335
+                        AttributeStatusInfo.UndoManager.ClearHistory();
                     }
 
                     if (newDataEntryControlHost != null)
@@ -2012,8 +2016,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
                     _configManager.LoadCorrectConfigForData(attributes);
                     attributes = _configManager.Attributes;
-                    var list = attributes.ToIEnumerable<IAttribute>().SelectMany(a => a.EnumerateDepthFirst())
-                        .Select(a => $"{a.Name}|{a.Value.String}").ToArray();
                     // Record counts on load
                     if (!_standAloneMode && _fileProcessingDb != null)
                     {

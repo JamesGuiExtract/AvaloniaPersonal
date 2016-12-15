@@ -82,6 +82,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _primaryPageIsForActiveDocument;
 
+        /// <summary>
+        /// Set during LoadData so that configuration changes during load can be distinguished from
+        /// other configuration changes, e.g., when a different doctype is selected by the user.
+        /// </summary>
+        bool _loading;
+
         #endregion Fields
 
         #region Constructors
@@ -285,6 +291,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                _loading = true;
+
                 // If this data is getting loaded, there is no need to proceed with any pending
                 // document status update.
                 int temp;
@@ -297,6 +305,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentTypeComboBox.Enabled = true;
                 _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeComboBox_SelectedIndexChanged;
+
+                _loading = false;
             }
             catch (Exception ex)
             {
@@ -571,6 +581,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     oldDatEntryControlHost.RedoAvailabilityChanged -= NewDataEntryControlHost_RedoAvailabilityChanged;
 
                     oldDatEntryControlHost.ClearData();
+
+                    // Don't preserve undo state between DEPs, but do if the change is during data loading,
+                    // e.g., switching between documents
+                    // https://extract.atlassian.net/browse/ISSUE-14335
+                    if (!_loading)
+                    {
+                        _documentData.UndoState = null;
+                    }
                 }
 
                 if (newDataEntryControlHost != null)
