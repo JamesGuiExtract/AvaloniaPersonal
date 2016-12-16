@@ -2260,6 +2260,8 @@ void FileProcessingDlg::updateUI()
 	}
 	else
 	{
+		zStatusText = getFAMStatus();
+
 		updateMenuAndToolbar();
 	}
 
