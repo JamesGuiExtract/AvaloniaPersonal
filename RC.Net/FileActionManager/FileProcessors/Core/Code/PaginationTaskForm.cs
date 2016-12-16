@@ -272,7 +272,10 @@ namespace Extract.FileActionManager.FileProcessors
 
                 if (!string.IsNullOrWhiteSpace(paginationDocumentDataPanelAssembly))
                 {
-                    _paginationDocumentDataPanel = CreateDocumentDataPanel(paginationDocumentDataPanelAssembly);
+                    var expandedAssemblyFileName = _tagUtility.ExpandTagsAndFunctions(
+                        paginationDocumentDataPanelAssembly, null, null);
+
+                    _paginationDocumentDataPanel = CreateDocumentDataPanel(expandedAssemblyFileName);
                     _paginationDocumentDataPanel.PanelControl.ParentChanged +=
                         HandlePaginationDocumentDataPanel_ParentChanged;
 
@@ -1346,7 +1349,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // May be null if the an IPaginationDocumentDataPanel is not specified to be used in
                 // this workflow.
                 return UtilityMethods.CreateTypeFromAssembly<IPaginationDocumentDataPanel>(
-                        paginationDocumentDataPanelAssembly);
+                    paginationDocumentDataPanelAssembly);
             }
         }
 
