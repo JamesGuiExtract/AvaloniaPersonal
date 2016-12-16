@@ -630,7 +630,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_documentData != null)
                 {
                     _documentData.SetModified(AttributeStatusInfo.UndoManager.UndoOperationAvailable);
-                    _documentData.SetDataError(ActiveDataEntryPanel.DataValidity != DataValidity.Valid);
+                    _documentData.SetDataError(ActiveDataEntryPanel.DataValidity == DataValidity.Invalid);
                     _documentData.SetSummary(ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString());
                 }
             }
