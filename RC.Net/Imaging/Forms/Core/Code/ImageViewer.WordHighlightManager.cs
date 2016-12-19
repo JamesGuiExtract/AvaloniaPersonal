@@ -864,8 +864,16 @@ namespace Extract.Imaging.Forms
                     {
                         HashSet<LayerObject> pageHighlights;
                         bool removalSucceeded = _wordHighlights.TryRemove(page, out pageHighlights);
-                        ExtractException.Assert("ELI31363", "Internal error.",
-                            removalSucceeded || operationAborted);
+                        if (!removalSucceeded && !operationAborted)
+                        {
+                            // https://extract.atlassian.net/browse/ISSUE-14365
+                            // We have come across this assertion just prior to the release of 10.5.
+                            // To avoid the risk of substantial changes late in the release cycle
+                            // and because I think it is unlikely to produce any visible behavior
+                            // issues are likely to result from this condition, this is being
+                            // converted from a displayed to a logged exception for now.
+                            new ExtractException("ELI31363", "Internal error.").Log();
+                        }
                         if (!removalSucceeded)
                         {
                             // https://extract.atlassian.net/browse/ISSUE-12188
