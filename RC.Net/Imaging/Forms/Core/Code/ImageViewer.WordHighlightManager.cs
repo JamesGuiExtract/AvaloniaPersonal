@@ -813,6 +813,7 @@ namespace Extract.Imaging.Forms
                 bool restartLoading = false;
                 bool operationAborted = false;
                 HashSet<LayerObject> deletedWordHighlights = null;
+                int wordHighlightCount = 0;
 
                 try
                 {
@@ -820,6 +821,12 @@ namespace Extract.Imaging.Forms
                     // Do this before calling CancelRunningOperation to avoid unnecessary cycles of
                     // cancellations and activations that can lead to momentary unresponsiveness of
                     // the UI.
+                    wordHighlightCount = _wordHighlights.Count;
+                    if (wordHighlightCount == 0)
+                    {
+                        return;
+                    }
+
                     deletedWordHighlights = new HashSet<LayerObject>(e.LayerObjects
                         .Where(o => IsWordHighlight(o)));
 
@@ -852,6 +859,27 @@ namespace Extract.Imaging.Forms
                             "Application trace: Word highlight background operation aborted.").Log();
                     }
 
+                    // https://extract.atlassian.net/browse/ISSUE-14365
+                    // If the word highlight collection sized changed, re-check for deletions that
+                    // need to be processed.
+                    if (_wordHighlights.Count == 0)
+                    {
+                        return;
+                    }
+                    if (_wordHighlights.Count != wordHighlightCount)
+                    {
+                        deletedWordHighlights =
+                            new HashSet<LayerObject>(e.LayerObjects
+                                .Where(o => IsWordHighlight(o)));
+
+                        if (deletedWordHighlights.Count == 0)
+                        {
+                            return;
+                        }
+                    }
+
+                    // If any word highlights are deleted by anything but the WordHighlightManager,
+                    // reload the highlights for the affected pages.
                     restartLoading |= true;
 
                     // Collect a list of all pages from which highlights are being deleted and all
