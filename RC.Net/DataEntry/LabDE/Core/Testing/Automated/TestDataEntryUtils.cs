@@ -3,6 +3,7 @@ using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -78,7 +79,14 @@ namespace Extract.DataEntry.Test
             // Dates with time components
             CheckResult(expected: "02/02/2016", converted: Util.FormatDateWithOptionalTime("2.2.16 1:45 AM"));
             CheckResult(expected: "02/02/2016", converted: Util.FormatDateWithOptionalTime("2.2.2016 1:45 AM"));
+        }
 
+        /// <summary>
+        /// Tests the format date utility function.
+        /// </summary>
+        [Test, Category("FormatDateTest")]
+        public static void TestFormatDateTryParseMethod()
+        {
             // https://extract.atlassian.net/browse/ISSUE-14370
             CheckResult(expected: "08/07/2014", converted: Util.FormatDate("2014/08/07"));
             CheckResult(expected: "08/07/2014", converted: Util.FormatDate("08-07-14"));
@@ -87,10 +95,15 @@ namespace Extract.DataEntry.Test
             CheckResult(expected: "08/07/2014", converted: Util.FormatDate("07 August 14"));
             CheckResult(expected: "08/07/2014", converted: Util.FormatDate("Aug 7, 2014"));
             CheckResult(expected: "08/07/2014", converted: Util.FormatDate("August 7, 2014"));
+
+            // Test that future years are not output
+            var toParse = DateTime.Now.AddYears(1).ToString("MM dd yy", CultureInfo.CurrentCulture);
+            var expected = DateTime.Now.AddYears(-99).ToString("MM/dd/yyyy", CultureInfo.CurrentCulture);
+            CheckResult(expected: expected, converted: Util.FormatDate(toParse));
         }
 
         /// <summary>
-        /// Tests the format time utility function.
+        /// Tests the format time utility fuction.
         /// </summary>
         [Test, Category("FormatTimeTest")]
         public static void TestFormatTime()

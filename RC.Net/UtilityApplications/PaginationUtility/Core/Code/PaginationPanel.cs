@@ -904,10 +904,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // call. This may include documents from documentsToRemove for which pages haven't
                 // been copied to any other document.
                 var documentsToRemain = _pendingDocuments.Except(documentsToCommit);
-                var missingSourceDocuments = _sourceDocuments
-                    .Where(sourceDoc => !documentsToRemain
-                        .SelectMany(outputDoc => outputDoc.PageControls)
-                        .Any(pageControl => pageControl.Page.SourceDocument == sourceDoc));
+                var sourcesOfDocumentsToRemain = documentsToRemain
+                    .SelectMany(outputDoc => outputDoc.PageControls)
+                    .Select(pageControl => pageControl.Page.SourceDocument);
+                var missingSourceDocuments = _sourceDocuments.Except(sourcesOfDocumentsToRemain);
 
                 // Calculate source documents that are only source documents, i.e., that are not also expected
                 // to continue through the work-flow unmodified

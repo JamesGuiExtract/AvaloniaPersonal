@@ -1,5 +1,6 @@
 ﻿using Extract.Database;
 using Extract.Licensing;
+using Extract.Utilities;
 using Spring.Core.TypeResolution;
 using System;
 using System.Collections.Generic;
@@ -444,7 +445,13 @@ namespace Extract.DataEntry.LabDE
                             // https://extract.atlassian.net/browse/ISSUE-14370
                             // Fallback to built-in DateTime parsing.
                             DateTime parsedDateTime;
-                            if (DateTime.TryParse(date, CultureInfo.CurrentCulture,
+
+                            // Setup a format-info object to ensure years are always <= to current year
+                            var dtfi = (DateTimeFormatInfo)CultureInfo.CurrentCulture.DateTimeFormat.Clone();
+                            dtfi.Calendar = (Calendar)dtfi.Calendar.Clone();
+                            dtfi.Calendar.TwoDigitYearMax = DateTime.Now.Year;
+
+                            if (DateTime.TryParse(date, dtfi,
                                 DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.NoCurrentDateDefault,
                                 out parsedDateTime))
                             {
@@ -769,18 +776,12 @@ namespace Extract.DataEntry.LabDE
         /// <returns>4 digit year</returns>
         static string ConvertTwoDigitYearToFourDigits(string inYear)
         {
-            string year;
-            int value = Convert.ToInt32(inYear, CultureInfo.InvariantCulture);
-            if (value <= DateTime.Now.Year % 100)
-            {
-                year = "20" + inYear;
-            }
-            else
-            {
-                year = "19" + inYear;
-            }
-
-            return year;
+            int onesPart = Convert.ToInt32(inYear, CultureInfo.InvariantCulture);
+            int currentYear = DateTime.Now.Year;
+            int hundredsPart = onesPart <= currentYear % 100
+                ? currentYear / 100
+                : currentYear / 100 - 1;
+            return UtilityMethods.FormatInvariant($"{hundredsPart}{inYear}");
         }
 
         /// <summary>
