@@ -122,8 +122,6 @@ namespace Extract.DataEntry.LabDE.Test
 
             string dbConnectString = 
                 ConfigurationManager.ConnectionStrings["LabDECoreTestingAutomatedConnectionString"].ConnectionString;
-            _dbConnection = new SqlConnection(dbConnectString);
-            _dbConnection.Open();
 
             _AdtDirectory = ConfigurationManager.AppSettings["AdtDropDirectory"];
             _OrmDirectory = ConfigurationManager.AppSettings["OrmDropDirectory"];
@@ -148,6 +146,9 @@ namespace Extract.DataEntry.LabDE.Test
             cmb.UseDefaultOkButton = true;
 
             cmb.Show();
+
+            _dbConnection = new SqlConnection(dbConnectString);
+            _dbConnection.Open();
 
             ProgressStatus progressStatus = new ProgressStatus();
             if (null != progressStatus)
