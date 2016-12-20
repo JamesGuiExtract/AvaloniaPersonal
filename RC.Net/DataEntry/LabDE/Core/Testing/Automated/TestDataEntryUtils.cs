@@ -80,12 +80,17 @@ namespace Extract.DataEntry.Test
             CheckResult(expected: "02/02/2016", converted: Util.FormatDateWithOptionalTime("2.2.2016 1:45 AM"));
 
             // https://extract.atlassian.net/browse/ISSUE-14370
-            CheckResult(expected: "02/14/2004", converted: Util.FormatDate("2004/02/14"));
-            CheckResult(expected: "05/07/2014", converted: Util.FormatDate("05 07 14"));
+            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("2014/08/07"));
+            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("08-07-14"));
+            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("08 07 14"));
+            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("07 Aug 14"));
+            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("07 August 14"));
+            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("Aug 7, 2014"));
+            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("August 7, 2014"));
         }
 
         /// <summary>
-        /// Tests the format time utility fuction.
+        /// Tests the format time utility function.
         /// </summary>
         [Test, Category("FormatTimeTest")]
         public static void TestFormatTime()
