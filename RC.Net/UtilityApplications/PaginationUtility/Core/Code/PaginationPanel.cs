@@ -899,6 +899,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .ToDictionary(
                         doc => doc, doc => _primaryPageLayoutControl.GetDocumentPosition(doc));
 
+                // https://extract.atlassian.net/browse/ISSUE-14372
+                // Compile any source documents that will not present in the UI anymore after this
+                // call. This may include documents from documentsToRemove for which pages haven't
+                // been copied to any other document.
+                var documentsToRemain = _pendingDocuments.Except(documentsToCommit);
+                var missingSourceDocuments = _sourceDocuments
+                    .Where(sourceDoc => !documentsToRemain
+                        .SelectMany(outputDoc => outputDoc.PageControls)
+                        .Any(pageControl => pageControl.Page.SourceDocument == sourceDoc));
+
                 // Calculate source documents that are only source documents, i.e., that are not also expected
                 // to continue through the work-flow unmodified
                 // These are any sources of documents that are not in source form...
@@ -908,9 +918,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // ...plus sources of documents with no pages left
                 // https://extract.atlassian.net/browse/ISSUE-13998
-                sourceDocumentsNotOutput.UnionWith(documentsToRemove
-                    .SelectMany(doc => doc.OriginalPages)
-                    .Select(p => p.OriginalDocumentName));
+                sourceDocumentsNotOutput.UnionWith(missingSourceDocuments
+                    .Select(p => p.FileName));
 
                 // ...minus any sources of documents that are in source form
                 var sourceFormSourceDocuments = new HashSet<string>(
