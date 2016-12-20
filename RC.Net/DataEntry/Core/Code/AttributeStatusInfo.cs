@@ -2362,7 +2362,8 @@ namespace Extract.DataEntry
                     // Since non-viewable attributes will not be considered invalid, ensure the
                     // validation status is up-to-date for any attribute whose viewed status has
                     // been changed since the original document load.
-                    if (!statusInfo._owningControl.DataEntryControlHost.ChangingData)
+                    if (statusInfo._owningControl != null &&
+                        !statusInfo._owningControl.DataEntryControlHost.ChangingData)
                     {
                         AttributeStatusInfo.Validate(attribute, false);
                         if (isViewable)
