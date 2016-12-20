@@ -441,7 +441,19 @@ namespace Extract.DataEntry.LabDE
                         }
                         else
                         {
-                            return "";
+                            // https://extract.atlassian.net/browse/ISSUE-14370
+                            // Fallback to built-in DateTime parsing.
+                            DateTime parsedDateTime;
+                            if (DateTime.TryParse(date, CultureInfo.CurrentCulture,
+                                DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.NoCurrentDateDefault,
+                                out parsedDateTime))
+                            {
+                                return parsedDateTime.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+                            }
+                            else
+                            {
+                                return "";
+                            }
                         }
                     }
                 }

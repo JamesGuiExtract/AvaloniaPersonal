@@ -41,7 +41,7 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
-        /// Tests the format date utility fuction.
+        /// Tests the format date utility function.
         /// </summary>
         [Test, Category("FormatDateTest")]
         public static void TestFormatDate()
@@ -78,6 +78,10 @@ namespace Extract.DataEntry.Test
             // Dates with time components
             CheckResult(expected: "02/02/2016", converted: Util.FormatDateWithOptionalTime("2.2.16 1:45 AM"));
             CheckResult(expected: "02/02/2016", converted: Util.FormatDateWithOptionalTime("2.2.2016 1:45 AM"));
+
+            // https://extract.atlassian.net/browse/ISSUE-14370
+            CheckResult(expected: "02/14/2004", converted: Util.FormatDate("2004/02/14"));
+            CheckResult(expected: "05/07/2014", converted: Util.FormatDate("05 07 14"));
         }
 
         /// <summary>
