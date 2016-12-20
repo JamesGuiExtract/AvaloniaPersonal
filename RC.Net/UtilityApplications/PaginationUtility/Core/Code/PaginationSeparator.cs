@@ -92,11 +92,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 InitializeComponent();
 
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
-                {
-                    _tableLayoutPanel.Visible = false;
-                }
-
                 _showSelectionCheckBox = showSelectionCheckBox;
                 if (!_showSelectionCheckBox)
                 {
@@ -368,6 +363,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _documentDataPanelControl.Width = _tableLayoutPanel.Width;
                         _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 1);
                         _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
+                        _documentDataPanelControl.Dock = DockStyle.Fill;
 
                         args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, forDisplay: true);
 
@@ -775,11 +771,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     doLayout = true;
                 }
 
-                if (!_tableLayoutPanel.Visible)
-                {
-                    _tableLayoutPanel.Visible = true;
-                }
-
                 _collapseDocumentButton.Visible = true;
                 _selectedCheckBox.Visible = _showSelectionCheckBox;
                 _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
@@ -824,7 +815,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             else
             {
-                _tableLayoutPanel.Visible = false;
+                foreach(Control control in _tableLayoutPanel.Controls)
+                {
+                    control.Visible = false;
+                }
             }
         }
 

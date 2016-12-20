@@ -154,8 +154,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // doc type specific DEP configurations.
                 if (!_configManager.RegisteredDocumentTypes.Any())
                 {
-                    MinimumSize = new Size(MinimumSize.Width, MinimumSize.Height - _documentTypePanel.Height);
-                    Height -= _documentTypePanel.Height;
                     _documentTypeLabel.Visible = false;
                     _documentTypeComboBox.Visible = false;
                     // To hide column that had _documentTypeComboBox.
@@ -518,7 +516,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ex.ExtractDisplay("ELI41630");
             }
         }
-        
+
         /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
@@ -773,9 +771,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // long. (The scroll pane is sized to allow the full width of the DEP to 
                     // display initially) 
                     _scrollPanel.Controls.Add(ActiveDataEntryPanel);
-                    ActiveDataEntryPanel.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-                    ActiveDataEntryPanel.Left = _scrollPanel.Left;
-                    ActiveDataEntryPanel.Width = _scrollPanel.Width;
+                    ActiveDataEntryPanel.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom;
                     MinimumSize = new Size(
                         ActiveDataEntryPanel.MinimumSize.Width,
                         ActiveDataEntryPanel.Height + _documentTypePanel.Height);
@@ -784,6 +780,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             finally
             {
                 _scrollPanel.ResumeLayout(true);
+                // I don't understand why, but if dock or any other sizing is set prior to the
+                // initial layout call, ActiveDataEntryPanel ends up wider than _scrollPanel.
+                ActiveDataEntryPanel.Dock = DockStyle.Fill;
             }
         }
 
