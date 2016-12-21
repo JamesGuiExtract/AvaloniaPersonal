@@ -28,7 +28,7 @@ $BaseInvokePath = Split-Path $MyInvocation.MyCommand.Path
 # FlexIndexExtras
 $BaseDestPath =$BaseDestRootPath + 'IDShieldExtras\'
 
-New-Item -ItemType Directory -Force -Path $BaseDestPath
+New-Item -ItemType Directory -Force -Path ($BaseDestPath -replace 'D:', '\\Engsvr')
 
 $CommonDestTarget = " -BaseDestPath '$BaseDestPath' -BaseTargetPath '$SharedInstallsPath'"
 $MakeLinksToCommonArgs = "\MakeLinksToCommonInstalls.ps1 " + $CommonDestTarget
@@ -60,7 +60,7 @@ MakeFileLink 'Engsvr' $FileDest $FileTarget
 #FlexIndex
 
 $BaseDestPath =$BaseDestRootPath + 'IDShield\'
-New-Item -ItemType Directory -Path $BaseDestPath
+New-Item -ItemType Directory -Path ($BaseDestPath -replace 'D:', '\\Engsvr')
 
 $CommonDestTarget = " -BaseDestPath '$BaseDestPath' -BaseTargetPath '$SharedInstallsPath'"
 $CommonSetup = "$MakeSymLinkCommon -BaseDestPath '$BaseDestPath' -BaseTargetPath '$SetupFilesPath'"

@@ -25,14 +25,14 @@ $SharedInstallsPath = 'D:\Internal\ProductReleases\SharedInstalls\'
 $SetupFilesPath = 'D:\Internal\ProductReleases\FlexIndex\Internal\BleedingEdge\' + $FlexIndexVersion + '\FLEXIndex\SetupFiles\'
 
 # Create the directory if it doesn't exist
-New-Item -ItemType Directory -Force -Path $BaseDestRootPath
+New-Item -ItemType Directory -Force -Path ($BaseDestRootPath -replace 'D:', '\\Engsvr')
 
 $BaseInvokePath = Split-Path $MyInvocation.MyCommand.Path
 
 # FlexIndexExtras
 $BaseDestPath =$BaseDestRootPath + 'FlexIndexExtras\'
 
-New-Item -ItemType Directory -Force -Path $BaseDestPath
+New-Item -ItemType Directory -Force -Path ($BaseDestPath -replace 'D:', '\\Engsvr')
 
 $CommonDestTarget = " -BaseDestPath '$BaseDestPath' -BaseTargetPath '$SharedInstallsPath'"
 $MakeLinksToCommonArgs = "\MakeLinksToCommonInstalls.ps1 " + $CommonDestTarget
@@ -67,7 +67,7 @@ MakeFileLink 'Engsvr' $FileDest $FileTarget
 
 $BaseDestPath =$BaseDestRootPath + 'FlexIndex\'
 
-New-Item -ItemType Directory -Path $BaseDestPath
+New-Item -ItemType Directory -Path ($BaseDestPath -replace 'D:', '\\Engsvr')
 
 $CommonDestTarget = " -BaseDestPath '$BaseDestPath' -BaseTargetPath '$SharedInstallsPath'"
 $CommonSetup = "$MakeSymLinkCommon -BaseDestPath '$BaseDestPath' -BaseTargetPath '$SetupFilesPath'"
