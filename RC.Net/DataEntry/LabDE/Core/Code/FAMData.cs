@@ -630,7 +630,7 @@ namespace Extract.DataEntry.LabDE
                 // The resulting DataTable is not needed; immediately dispose of it.
                 // Record ID will be a string field; single quotes should be used for SQL string
                 // comparisons.
-                LoadRecordInfo("'" + recordID + "'", false).Dispose();
+                LoadRecordInfo("'" + recordID.Replace("'", "''") + "'", false).Dispose();
 
                 // The record info should now be cached if the record exists.
                 _recordInfoCache.TryGetData(recordID, out recordInfo);
