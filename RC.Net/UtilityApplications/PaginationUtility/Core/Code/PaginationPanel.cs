@@ -2806,10 +2806,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// the process.
         /// </summary>
         /// <param name="validateData"><see langword="true"/> if the document's data should
-        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
+        /// be validated for errors when saving; otherwise, <see langword="false"/>.</param>
         /// <returns><see langword="true"/> if the data panel was successfully closed,
-        /// <see langwor="false"/> if it could not be closed due to an error in the data.</returns>
-        bool CloseDataPanel(bool validateData)
+        /// <see langword="false"/> if it could not be closed due to an error in the data.</returns>
+        public bool CloseDataPanel(bool validateData)
         {
             if (DocumentDataPanel != null)
             {

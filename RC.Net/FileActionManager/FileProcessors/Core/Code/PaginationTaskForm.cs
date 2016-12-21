@@ -702,27 +702,36 @@ namespace Extract.FileActionManager.FileProcessors
         {
             if (disposing)
             {
-                // Release managed resources
-                if (components != null)
+                try
                 {
-                    components.Dispose();
-                    components = null;
+                    // Close any open panels before disposing of anything
+                    // https://extract.atlassian.net/browse/ISSUE-14377
+                    _paginationPanel?.CloseDataPanel(validateData: false);
+
+                    // Release managed resources
+                    if (components != null)
+                    {
+                        components.Dispose();
+                        components = null;
+                    }
+                    if (_formStateManager != null)
+                    {
+                        _formStateManager.Dispose();
+                        _formStateManager = null;
+                    }
+                    if (_paginationDocumentDataPanel?.PanelControl != null)
+                    {
+                        _paginationDocumentDataPanel.PanelControl.Dispose();
+                        _paginationDocumentDataPanel = null;
+                    }
+                    if (_disposeThreadPending)
+                    {
+                        AttributeStatusInfo.DisposeThread();
+                        _disposeThreadPending = false;
+                    }
                 }
-                if (_formStateManager != null)
-                {
-                    _formStateManager.Dispose();
-                    _formStateManager = null;
-                }
-                if (_paginationDocumentDataPanel?.PanelControl != null)
-                {
-                    _paginationDocumentDataPanel.PanelControl.Dispose();
-                    _paginationDocumentDataPanel = null;
-                }
-                if (_disposeThreadPending)
-                {
-                    AttributeStatusInfo.DisposeThread();
-                    _disposeThreadPending = false;
-                }
+                catch
+                { }
             }
 
             // Release unmanaged resources
