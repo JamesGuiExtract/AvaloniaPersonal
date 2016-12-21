@@ -1973,6 +1973,8 @@ namespace Extract.DataEntry
 
                             PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
+                            OnDataSaving(_mostRecentlySaveAttributes, forCommit: validateData);
+
                             // If all attributes passed validation, save the data.
                             _mostRecentlySaveAttributes.SaveTo(_sourceDocName + ".voa",
                                 true, _ATTRIBUTE_STORAGE_MANAGER_GUID);
@@ -2827,6 +2829,11 @@ namespace Extract.DataEntry
         /// controls.
         /// </summary>
         public event EventHandler<EventArgs> UpdateEnded;
+
+        /// <summary>
+        /// Raised just before the DEP's data is saved to disk.
+        /// </summary>
+        public event EventHandler<AttributesEventArgs> DataSaving;
 
         /// <summary>
         /// Raised whenever the DEP's data has been saved.
@@ -5316,6 +5323,17 @@ namespace Extract.DataEntry
         protected virtual void OnDataValidityChanged()
         {
             DataValidityChanged?.Invoke(this, new EventArgs());
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DataSaving"/> event.
+        /// </summary>
+        /// <param name="attributes">The attribute vector to be saved to disk.</param>
+        /// <param name="forCommit"><c>true</c> if the data is being saved as part of a commit; 
+        /// otherwise, <c>false</c>.</param>
+        protected virtual void OnDataSaving(IUnknownVector attributes, bool forCommit)
+        {
+            DataSaving?.Invoke(this, new AttributesEventArgs(attributes));
         }
 
         /// <summary>
