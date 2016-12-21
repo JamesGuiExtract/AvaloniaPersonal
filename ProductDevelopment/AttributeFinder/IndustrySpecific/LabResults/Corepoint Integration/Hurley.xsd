@@ -108,13 +108,12 @@
   <xs:element name="FlexData">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="PatientInfo" minOccurs="0" type="PatientInfoType" />
-        <xs:element name="MessageSequenceNumberFile" minOccurs="0" type="NonSpatialAttributeType" />
-        <xs:element name="Note" minOccurs="0" type="NonSpatialAttributeType" />
+        <xs:element name="PatientInfo" type="PatientInfoType" />
+        <xs:element name="MessageSequenceNumberFile" type="NonSpatialAttributeType" />
         <xs:element name="EMREncounterInfo" minOccurs="0" type="EMREncounterInfoType" />
         <xs:element name="EMROrderInfo" minOccurs="0" type="EMROrderInfoType" />
-        <xs:element name="DocumentInfo" minOccurs="0" type="DocumentInfoType" />
-        <xs:element name="PhysicianInfo" minOccurs="0" type="PhysicianInfoType" />
+        <xs:element name="DocumentInfo" type="DocumentInfoType" />
+        <xs:element name="PhysicianInfo" type="PhysicianInfoType" />
         <xs:element name="DocumentType" type="NonSpatialAttributeType" />
       </xs:sequence>
     </xs:complexType>
