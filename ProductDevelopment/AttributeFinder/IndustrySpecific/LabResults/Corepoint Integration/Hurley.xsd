@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="FlexData" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="NonSpatialAttributeType">
+    <xs:sequence>
+      <xs:element name="FullText" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PatientNameType">
+    <xs:complexContent>
+      <xs:extension base="NonSpatialAttributeType">
+        <xs:sequence>
+          <xs:element name="First" type="NonSpatialAttributeType" />
+          <xs:element name="Middle" type="NonSpatialAttributeType" />
+          <xs:element name="Last" type="NonSpatialAttributeType" />
+          <xs:element name="Suffix" type="NonSpatialAttributeType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PatientInfoType">
+    <xs:complexContent>
+      <xs:extension base="NonSpatialAttributeType">
+        <xs:sequence>
+          <xs:element name="Name" type="PatientNameType" />
+          <xs:element name="DOB" type="NonSpatialAttributeType" />
+          <xs:element name="Gender" type="NonSpatialAttributeType" />
+          <xs:element name="MR_Number" type="NonSpatialAttributeType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EncounterType">
+    <xs:complexContent>
+      <xs:extension base="NonSpatialAttributeType">
+        <xs:sequence>
+          <xs:element name="CSN" type="NonSpatialAttributeType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EMREncounterInfoType">
+    <xs:complexContent>
+      <xs:extension base="NonSpatialAttributeType">
+        <xs:sequence>
+          <xs:element name="Encounter" minOccurs="0" type="EncounterType" />
+          <xs:element name="EncounterCode" minOccurs="0" type="NonSpatialAttributeType" />
+          <xs:element name="CreateEncounter" minOccurs="0" type="NonSpatialAttributeType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OrderType">
+    <xs:complexContent>
+      <xs:extension base="NonSpatialAttributeType">
+        <xs:sequence>
+          <xs:element name="OrderNumber" type="NonSpatialAttributeType" />
+          <xs:element name="Name" type="NonSpatialAttributeType" />
+          <xs:element name="OrderCode" type="NonSpatialAttributeType" />
+          <xs:element name="CollectionDate" type="NonSpatialAttributeType" />
+          <xs:element name="CollectionTime" type="NonSpatialAttributeType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EMROrderInfoType">
+    <xs:complexContent>
+      <xs:extension base="NonSpatialAttributeType">
+        <xs:sequence>
+          <xs:element name="Order" minOccurs="0" type="OrderType" />
+          <xs:element name="ProcedureCode" minOccurs="0" type="NonSpatialAttributeType" />
+          <xs:element name="CreateOrder" minOccurs="0" type="NonSpatialAttributeType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DocumentInfoType">
+    <xs:complexContent>
+      <xs:extension base="NonSpatialAttributeType">
+        <xs:sequence>
+          <xs:element name="DocumentDate" type="NonSpatialAttributeType" />
+          <xs:element name="DocumentDescription" type="NonSpatialAttributeType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PhysicianNameType">
+    <xs:complexContent>
+      <xs:extension base="NonSpatialAttributeType">
+        <xs:sequence>
+          <xs:element name="Last" type="NonSpatialAttributeType" />
+          <xs:element name="First" type="NonSpatialAttributeType" />
+          <xs:element name="Middle" type="NonSpatialAttributeType" />
+          <xs:element name="Code" type="NonSpatialAttributeType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PhysicianInfoType">
+    <xs:complexContent>
+      <xs:extension base="NonSpatialAttributeType">
+        <xs:sequence>
+          <xs:element name="OtherPhysicianName" maxOccurs="unbounded" type="PhysicianNameType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="FlexData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="PatientInfo" minOccurs="0" type="PatientInfoType" />
+        <xs:element name="MessageSequenceNumberFile" minOccurs="0" type="NonSpatialAttributeType" />
+        <xs:element name="Note" minOccurs="0" type="NonSpatialAttributeType" />
+        <xs:element name="EMREncounterInfo" minOccurs="0" type="EMREncounterInfoType" />
+        <xs:element name="EMROrderInfo" minOccurs="0" type="EMROrderInfoType" />
+        <xs:element name="DocumentInfo" minOccurs="0" type="DocumentInfoType" />
+        <xs:element name="PhysicianInfo" minOccurs="0" type="PhysicianInfoType" />
+        <xs:element name="DocumentType" type="NonSpatialAttributeType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
