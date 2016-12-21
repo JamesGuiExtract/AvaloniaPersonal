@@ -815,10 +815,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             else
             {
-                foreach(Control control in _tableLayoutPanel.Controls)
-                {
-                    control.Visible = false;
-                }
+                _collapseDocumentButton.Visible = false;
+                _selectedCheckBox.Visible = false;
+                _editDocumentDataButton.Visible = false;
+                _summaryLabel.Text = "";
+                _pagesLabel.Text = "";
+                _newDocumentGlyph.Visible = false;
+                _editedPaginationGlyph.Visible = false;
+                _reprocessDocumentPictureBox.Visible = false;
+                _editedDataPictureBox.Visible = false;
+                _dataErrorPictureBox.Visible = false;
             }
         }
 

@@ -24,6 +24,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _modified;
 
         /// <summary>
+        /// Indicates whether the data should be indicated as modified even if SetModified is called
+        /// to clear the modified status.
+        /// </summary>
+        bool _permanentlyModified;
+
+        /// <summary>
         /// A description of the document.
         /// </summary>
         string _summary;
@@ -140,7 +146,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _modified;
+                return _permanentlyModified || _modified;
             }
         }
 
@@ -177,6 +183,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 base.Attributes = (IUnknownVector)_originalData.Clone();
                 base.Attributes.ReportMemoryUsage();
                 WorkingAttributes = base.Attributes;
+                _permanentlyModified = false;
                 SetModified(false);
             }
             catch (Exception ex)
@@ -269,6 +276,15 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 OnDocumentDataStateChanged();
             }
+        }
+
+        /// <summary>
+        /// Sets whether the data should be indicated as modified even if <see cref="SetModified"/>
+        /// is called to clear the modified status.
+        /// </summary>
+        internal void SetPermanentlyModified()
+        {
+            _permanentlyModified = true;
         }
 
         /// <summary>

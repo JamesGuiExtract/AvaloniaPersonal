@@ -599,6 +599,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (_documentData != null)
                     {
                         newDataEntryControlHost.PrimarySelectionIsForActiveDocument = _primaryPageIsForActiveDocument;
+                        if (_documentData.Modified)
+                        {
+                            // If the DEP is being swapped for a new document type, the panel will
+                            // have the modification history wiped and will no longer be able to
+                            // track if it is dirty. Therefore, consider it permanently dirty
+                            // (cleared only via revert).
+                            // NOTE: The doc type change that triggered the panel change will have
+                            // marked the data dirty; it is the load where the dirty status would
+                            // be cleared. The modified check here prevents a freshly loaded document
+                            // from being marked permanently dirty.
+                            _documentData.SetPermanentlyModified();
+                        }
                         newDataEntryControlHost.LoadData(_documentData, forDisplay: true);
 
                         _undoButton.Enabled = UndoOperationAvailable;

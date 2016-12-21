@@ -2811,24 +2811,31 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="false"/> if it could not be closed due to an error in the data.</returns>
         public bool CloseDataPanel(bool validateData)
         {
-            if (DocumentDataPanel != null)
+            try
             {
-                var panelControl = (Control)DocumentDataPanel;
-                var separator = panelControl.GetAncestors()
-                    .OfType<PaginationSeparator>()
-                    .FirstOrDefault();
-                if (separator != null)
+                if (DocumentDataPanel != null)
                 {
-                    if (separator.CloseDataPanel(saveData: true, validateData: validateData))
+                    var panelControl = (Control)DocumentDataPanel;
+                    var separator = panelControl.GetAncestors()
+                        .OfType<PaginationSeparator>()
+                        .FirstOrDefault();
+                    if (separator != null)
                     {
-                        _documentWithDataInEdit = null;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
+                        if (separator.CloseDataPanel(saveData: true, validateData: validateData))
+                        {
+                            _documentWithDataInEdit = null;
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41699");
             }
 
             return true;
