@@ -1301,6 +1301,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
                 _configManager.ConfigurationChangeError += HandleConfigManager_ConfigurationChangeError;
+                _configManager.DocumentTypeChanged += HandleConfigManager_DocumentTypeChanged;
 
                 string expandedConfigFileName =
                     _tagUtility.ExpandTagsAndFunctions(_settings.ConfigFileName, null, null);
@@ -1871,6 +1872,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         newDataEntryControlHost.Active = true;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryConfigurationManager.DocumentTypeChanged"/> event of the
+        /// <see cref="_configManager"/>.
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleConfigManager_DocumentTypeChanged(object sender, EventArgs e)
+        {
+            if (ActiveDataEntryControlHost != null)
+            {
+                ActiveDataEntryControlHost.Dirty = true;
             }
         }
 

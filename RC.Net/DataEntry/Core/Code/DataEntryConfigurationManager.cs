@@ -142,6 +142,11 @@ namespace Extract.DataEntry
         public event EventHandler<ConfigurationChangedEventArgs> ConfigurationChanged;
 
         /// <summary>
+        /// Occurs when the document type changes (initial load included).
+        /// </summary>
+        public event EventHandler<EventArgs> DocumentTypeChanged;
+
+        /// <summary>
         /// Raised if there was an error changing configurations. An exception will not otherwise be
         /// raised in this situation, so it is the owner's responsibility to handle the error
         /// appropriately.
@@ -554,6 +559,8 @@ namespace Extract.DataEntry
 
                         OnConfigurationChanged(lastDataEntryConfig, ActiveDataEntryConfiguration);
                     }
+
+                    OnDocumentTypeChanged();
                 }
 
                 return changedDocumentType;
@@ -847,6 +854,14 @@ namespace Extract.DataEntry
             DataEntryConfiguration newDataEntryConfig)
         {
             ConfigurationChanged?.Invoke(this, new ConfigurationChangedEventArgs(oldDataEntryConfig, newDataEntryConfig));
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DocumentTypeChanged"/> event.
+        /// </summary>
+        void OnDocumentTypeChanged()
+        {
+            DocumentTypeChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
