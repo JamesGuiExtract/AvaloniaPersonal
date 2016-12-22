@@ -1753,7 +1753,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Space";
                 _toggleDocumentSeparatorMenuItem.ShowShortcutKeys = true;
                 _toggleDocumentSeparatorCommand = new ApplicationCommand(Shortcuts,
-                    new Keys[] { Keys.Space }, HandleToggleDocumentSeparator,
+                    new Keys[] { Keys.Space }, HandleAddDocumentSeparator,
                     JoinToolStripItems(
                         _toggleDocumentSeparatorMenuItem, _paginationUtility.ToggleDocumentSeparatorMenuItem),
                     false, true, false);
@@ -2439,7 +2439,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void HandleToggleDocumentSeparator_Click(object sender, EventArgs e)
         {
-            HandleToggleDocumentSeparator();
+            HandleToggleDocumentSeparator(addOnly: false);
         }
 
         /// <summary>
@@ -3443,10 +3443,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                         (asPageThumbnailControl != null && asPageThumbnailControl.PageNumber == 1)))
                 {
                     _toggleDocumentSeparatorMenuItem.Text = "Merge with previous document";
+                    _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "";
                 }
                 else
                 {
                     _toggleDocumentSeparatorMenuItem.Text = "Start new document on this page";
+                    _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Space";
                 }
 
                 // Inserted copied items requires there to be copied items and a single selection.
@@ -4473,9 +4475,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles a UI command to add a document separator from before this control.
+        /// </summary>
+        internal void HandleAddDocumentSeparator()
+        {
+            HandleToggleDocumentSeparator(addOnly: true);
+        }
+
+        /// <summary>
         /// Handles a UI command to insert or remove a document separator from before this control.
         /// </summary>
-        internal void HandleToggleDocumentSeparator()
+        /// <param name="addOnly"><c>true</c> if a separator should only ever be added; <c>false</c>
+        /// if the separator can be both added and removed.</param>
+        internal void HandleToggleDocumentSeparator(bool addOnly)
         {
             try
             {
@@ -4491,7 +4503,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         if (targetSeparator != null)
                         {
-                            RemovePaginationControl(targetSeparator, true);
+                            if (!addOnly)
+                            {
+                                RemovePaginationControl(targetSeparator, true);
+                            }
                         }
                         else
                         {

@@ -1020,7 +1020,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _primaryPageLayoutControl.HandleToggleDocumentSeparator();
+                _primaryPageLayoutControl.HandleToggleDocumentSeparator(addOnly: false);
             }
             catch (Exception ex)
             {
