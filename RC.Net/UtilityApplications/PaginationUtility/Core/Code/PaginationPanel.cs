@@ -2488,6 +2488,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // ongoing operation, return focus to the data panel. This allows swiping tools to
                 // remain active if they should be active.
                 if (_documentDataPanel != null &&
+                    !_committingChanges && !_raisingCommittingChanges &&
                     _primaryPageLayoutControl.PrimarySelection != null &&
                     _documentWithDataInEdit.PageControls.Contains(_primaryPageLayoutControl.PrimarySelection) &&
                         Control.MouseButtons == MouseButtons.None &&
@@ -2495,7 +2496,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     this.SafeBeginInvoke("ELI41664", () =>
                     {
-                        if (_documentDataPanel != null)
+                        if (_documentDataPanel != null && !_committingChanges && !_raisingCommittingChanges)
                         {
                             this.FocusNestedControl(_documentDataPanel.ActiveDataControl);
                             // Activates swiping if swiping should currently be enabled.
