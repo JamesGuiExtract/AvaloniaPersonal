@@ -1606,21 +1606,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                int rotation = pageInfo.Rotation;
-                var orientation = ConvertDegreesToOrientation(rotation);
-
-                var newSpatialPageInfo = new SpatialPageInfo();
+                int newRotation = pageInfo.Rotation;
+                int oldRotation = ConvertOrientationToImageRotationDegrees(oldSpatialPageInfo.Orientation);
+                int totalRotation = (oldRotation + newRotation + 360) % 360;
+                var orientation = ConvertDegreesToOrientation(totalRotation);
 
                 // If the page has been rotated 90 degrees right or left, then the 
                 // height and width need to be swapped.
                 int height = oldSpatialPageInfo.Height;
                 int width = oldSpatialPageInfo.Width;
-                if (rotation != 0 && rotation != 180)
+                if (newRotation != 0 && newRotation != 180)
                 {
                     height = width;
                     width = oldSpatialPageInfo.Height;
                 }
 
+                var newSpatialPageInfo = new SpatialPageInfo();
                 newSpatialPageInfo.Initialize(width,
                                               height,
                                               orientation,
@@ -1635,7 +1636,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Converts degrees to an orientation enumeration value.
+        /// Converts degrees of image rotation to an orientation enumeration value
+        /// expected to be used for SpatialPageInfos.
         /// </summary>
         /// <param name="degrees">must be 0, 90, 180, or 270.</param>
         /// <returns>the appropriate EOrientation value</returns>
@@ -1664,6 +1666,38 @@ namespace Extract.UtilityApplications.PaginationUtility
                         ExtractException ee = new ExtractException("ELI41321", "Invalid parameter");
                         ee.AddDebugData("Orientation degrees", degrees, encrypt: false);
                         ee.AddDebugData("The problem is", " rotation must be in + or - 90 degree increments", encrypt: false);
+                        throw ee;
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Converts the EOrientation value used by SpatialPageInfos to degrees
+        /// of image rotation.
+        /// </summary>
+        /// <param name="orientation">The orientation value</param>
+        /// <returns>0, 90, 180, or 270</returns>
+        static int ConvertOrientationToImageRotationDegrees(EOrientation orientation)
+        {
+            switch (orientation)
+            {
+                case EOrientation.kRotNone:
+                    return 0;
+
+                case EOrientation.kRotLeft:
+                    return 90;
+
+                case EOrientation.kRotDown:
+                    return 180;
+
+                case EOrientation.kRotRight:
+                    return 270;
+
+                default:
+                    {
+                        ExtractException ee = new ExtractException("ELI41701",
+                            "Cannot convert specified orientation to degrees");
+                        ee.AddDebugData("Orientation", orientation, encrypt: false);
                         throw ee;
                     }
             }
