@@ -301,10 +301,17 @@ namespace Extract.AttributeFinder
                     // If for some reason same source page is copied to multiple destination pages,
                     // only copy attribute value to the first of those pages.
                     int newPageNum = newPageNums.Min();
-                    page.SpatialPageInfos = newSpatialPageInfos;
-                    page.UpdatePageNumber(newPageNum);
-                    page.SourceDocName = newDocumentName;
-                    updatedPages.Add(page);
+
+                    // https://extract.atlassian.net/browse/ISSUE-14384
+                    // Before allowing an attribute to be persisted as spatial, ensure we have
+                    // any spatial page infos needed.
+                    if (newSpatialPageInfos.GetKeys().Contains(newPageNum))
+                    {
+                        page.SpatialPageInfos = newSpatialPageInfos;
+                        page.UpdatePageNumber(newPageNum);
+                        page.SourceDocName = newDocumentName;
+                        updatedPages.Add(page);
+                    }
                 }
             }
 
@@ -356,8 +363,15 @@ namespace Extract.AttributeFinder
                     // If for some reason same source page is copied to multiple destination pages,
                     // only copy attribute value to the first of those pages.
                     int newPageNum = newPageNums.Min();
-                    rasterZone.PageNumber = newPageNum;
-                    updatedRasterZones.Add(rasterZone);
+
+                    // https://extract.atlassian.net/browse/ISSUE-14384
+                    // Before allowing an attribute to be persisted as spatial, ensure we have
+                    // any spatial page infos needed.
+                    if (newSpatialPageInfos.GetKeys().Contains(newPageNum))
+                    {
+                        rasterZone.PageNumber = newPageNum;
+                        updatedRasterZones.Add(rasterZone);
+                    }
                 }
             }
 
