@@ -1105,12 +1105,31 @@ namespace Extract
                     lock (_thisLock)
                     {
                         // Ensure the data value is serializable
-                        object dataValue = "null";
-                        if (debugDataValue != null)
+                        object dataValue = debugDataValue;
+                        if (dataValue == null)
                         {
-                            // If the value is not serializable get its string representation
-                            dataValue = debugDataValue.GetType().IsSerializable ?
-                                debugDataValue : debugDataValue.ToString();
+                            dataValue = "null";
+                        }
+                        else
+                        {
+                            if (encrypt)
+                            {
+                                dataValue = dataValue.ToString();
+
+                                // Can't encrypt an empty string
+                                if (!dataValue.Equals(""))
+                                {
+                                    dataValue = _ENCRYPTED_PREFIX +
+                                        NativeMethods.EncryptString((string)dataValue);
+                                }
+                            }
+                            else
+                            {
+                                // If the value is not serializable get its string representation
+                                dataValue = debugDataValue.GetType().IsSerializable
+                                    ? debugDataValue
+                                    : debugDataValue.ToString();
+                            }
                         }
 
                         // Ensure the debug data name is unique
@@ -1124,13 +1143,8 @@ namespace Extract
                             i++;
                         }
 
-                        // Add the debug data (encrypting if encrypt is true and debugDataValue
-                        // is not null)
-                        Data.Add(uniqueDebugDataName,
-                            ((encrypt && debugDataValue != null) ?
-                            _ENCRYPTED_PREFIX +
-                            NativeMethods.EncryptString(dataValue.ToString())
-                            : dataValue));
+                        // Add the debug data
+                        Data.Add(uniqueDebugDataName, dataValue);
                     }
                 }
                 // debugDataName is null or empty, do nothing

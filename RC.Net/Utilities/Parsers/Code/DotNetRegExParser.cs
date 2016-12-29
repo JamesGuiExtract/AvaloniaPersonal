@@ -52,6 +52,14 @@ namespace Extract.Utilities.Parsers
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(DotNetRegexParser).ToString();
 
+        /// <summary>
+        /// The timeout value to be used for this regex. This can be overridden by specifying a new
+        /// value at the very beginning of a regex pattern enclosed in an otherwise illegal regex
+        /// construct (??) using supported TimeSpan.Parse format: "[ws][-]{ d | [d.]hh:mm[:ss[.ff]] }[ws]".
+        /// E.g., (?? timeout = 00:00:10 ) would make the timeout 10 seconds.
+        /// </summary>
+        TimeSpan _timeout = TimeSpan.FromMinutes(10);
+
         #endregion
 
         #region IRegularExprParser Properties
@@ -689,6 +697,9 @@ namespace Extract.Utilities.Parsers
             // if internal variable is null, create a new parser with the pattern and options.
             if (_regexParser == null)
             {
+                // Look for any proprietary options
+                ParseRegexOptions();
+
                 // If an ExpressionFormatter has been specified, use it to do any necessary
                 // custom formatting of the pattern.
                 expandedPattern = (ExpressionFormatter == null)
@@ -700,7 +711,7 @@ namespace Extract.Utilities.Parsers
 
                 try
                 {
-                    _regexParser = new Regex(expandedPattern, RegexOptions);
+                    _regexParser = new Regex(expandedPattern, RegexOptions, _timeout);
                 }
                 catch (Exception ex)
                 {
@@ -715,6 +726,60 @@ namespace Extract.Utilities.Parsers
             }
 
             return _regexParser;
+        }
+
+        /// <summary>
+        /// Parses proprietary global regex options and removes this part of the pattern.
+        /// </summary>
+        void ParseRegexOptions()
+        {
+            try
+            {
+                if (_pattern.StartsWith("(??", StringComparison.Ordinal))
+                {
+                    var optionsEnd = _pattern.IndexOf(')');
+                    var options = _pattern.Substring(3, optionsEnd - 3);
+                    _pattern = _pattern.Length == optionsEnd + 1
+                        ? ""
+                        : _pattern.Substring(optionsEnd + 1);
+
+                    foreach (var pair in options.Split(new[] { ',' }))
+                    {
+                        var nameValue = pair.Split(new[] { '=' });
+                        if (nameValue.Length != 2)
+                        {
+                            var uex = new ExtractException("ELI41702", "Could not parse regex option");
+                            uex.AddDebugData("Option string", pair, true);
+                            throw uex;
+                        }
+
+                        var name = nameValue[0].Trim().ToUpperInvariant();
+                        var val = nameValue[1].Trim().ToUpperInvariant();
+                        switch (name)
+                        {
+                            case "TIMEOUT":
+                                if (!TimeSpan.TryParse(val, out _timeout))
+                                {
+                                    var parseException = new ExtractException("ELI41703", "Could not parse timeout value");
+                                    parseException.AddDebugData("Timeout", val, true);
+                                    parseException.AddDebugData("Required format", "[ws][-]{ d | [d.]hh:mm[:ss[.ff]] }[ws]", true);
+                                    throw parseException;
+                                }
+                                break;
+                            default:
+                                var uex = new ExtractException("ELI41704", "Unrecognized regex option");
+                                uex.AddDebugData("Option name", name, true);
+                                throw uex;
+                        }
+
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41705");
+            }
         }
 
         #endregion
