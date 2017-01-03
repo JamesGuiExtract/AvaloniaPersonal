@@ -92,6 +92,16 @@ protected:
 	afx_msg void OnButtonVoa();
 	afx_msg void OnButtonEnableSRIR();
 	afx_msg void OnButtonAbout();
+	afx_msg void OnAttributePropertiesClick();
+	afx_msg void OnEditAttributeClick();
+	afx_msg void OnUseAttributeAsInputClick();
+	afx_msg void OnShowAttributeInUSSViewerClick();
+	afx_msg void OnShowOriginalOCRIncCharsClick();
+	afx_msg void OnShowOriginalOCRExCharsClick();
+	afx_msg void OnShowOriginalOCRIncWordsClick();
+	afx_msg void OnShowOriginalOCRExWordsClick();
+	afx_msg void OnShowOcrInUssViewerIncLinesClick();
+	afx_msg void OnShowOcrInUssViewerExLinesClick();
 	//}}AFX_MSG
 	BOOL OnToolTipNotify(UINT nID, NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
@@ -179,6 +189,9 @@ private:
 	// Status bar for displaying rule execution time
 	CStatusBar m_statusBar;
 
+	// Attribute info form used for context menu actions
+	UCLID_AFCORELib::IRuleTesterAttributeInfoPtr m_ipAttributeInfo;
+
 	// Stores last rule execution time
 	CString zLastRunTime;
 
@@ -234,6 +247,14 @@ private:
 	void	editSelectedAttribute();
 
 	//=============================================================================
+	// PURPOSE: Displays a dialog showing information about the Attribute selected
+	//			in the Tree List
+	// REQUIRE: Nothing
+	// PROMISE: Will display info dialog for the associated Attribute
+	// ARGS:	None.
+	void	showMenuForSelectedAttribute();
+
+	//=============================================================================
 	// PURPOSE: Load input items into combo box
 	// REQUIRE: Nothing
 	// PROMISE: None.
@@ -264,8 +285,8 @@ private:
 	//			be highlighted.  If the attribute is not a spatial attribute, 
 	//			then all currently highlightly spatial attributes (if any) will 
 	//			be "unhighlighted".
-	// ARGS:	None.
-	void	highlightAttributeInRow();
+	// ARGS:	bOpenWindow - whether to open the SRW if it isn't already open.
+	void	highlightAttributeInRow(bool bOpenWindow);
 	//=============================================================================
 	// PURPOSE: To open the specified image or GDD file
 	// REQUIRE: pszFile points to a valid image or GDD file
@@ -282,6 +303,19 @@ private:
 	// PURPOSE: To update the window caption to reflect loaded rules file
 	void updateWindowCaption();
 	//=============================================================================
+	// PURPOSE: To check if the cursor is over an attribute in the treeview
+	// RETURNS: True if there is an attribute item under the cursor, else false
+	bool isAttributeUnderCursor();
+	//=============================================================================
+	// PURPOSE: To get the attribute that is currently selected in the treeview
+	// RETURNS: Pointer to the selected attribute or __nullptr if no attribute is selected
+	UCLID_AFCORELib::IAttributePtr getSelectedAttribute();
+	//=============================================================================
+	// PURPOSE: To display a spatial string in the USS file viewer
+	void displaySpatialStringInUSS(ISpatialStringPtr);
+	//=============================================================================
+public:
+	afx_msg void OnHighlightInImageViewerClick();
 };
 
 //{{AFX_INSERT_LOCATION}}

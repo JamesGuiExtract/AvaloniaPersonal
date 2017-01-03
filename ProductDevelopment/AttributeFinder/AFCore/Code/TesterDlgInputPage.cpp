@@ -404,10 +404,10 @@ void TesterDlgInputPage::OnSelchangeComboInput()
 		if (!(m_editInput.GetStyle() & ES_READONLY) && 
 			m_strCurrentInputType != strNewInputType)
 		{
-			ISpatialStringPtr ipText(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI06510", ipText != __nullptr);
-			ipText->CreateNonSpatialString(get_bstr_t(zInputText), "");
-			m_mapInputTypeToText[m_strCurrentInputType] = ipText;
+			UCLID_AFCORELib::IAFDocumentPtr ipDoc(CLSID_AFDocument);
+			ASSERT_RESOURCE_ALLOCATION("ELI06510", ipDoc != __nullptr);
+			ipDoc->Text->CreateNonSpatialString(get_bstr_t(zInputText), "");
+			m_mapInputTypeToDoc[m_strCurrentInputType] = ipDoc;
 		}
 
 		// set the "new" input type as the current input type
@@ -418,34 +418,34 @@ void TesterDlgInputPage::OnSelchangeComboInput()
 			m_strCurrentInputType == TesterConfigMgr::gstrTEXTFROMFILE);
 
 		// restore the last text stored for the new input type
-		// if there is no entry in the map of input type to text for the
-		// currently selected, input type, then associate an empty string
+		// if there is no entry in the map of input type to document for the
+		// currently selected, input type, then associate an empty document
 		// with the specified input type
-		if (m_mapInputTypeToText.find(m_strCurrentInputType) == 
-			m_mapInputTypeToText.end())
+		if (m_mapInputTypeToDoc.find(m_strCurrentInputType) == 
+			m_mapInputTypeToDoc.end())
 		{
-			ISpatialStringPtr ipText(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI06799", ipText != __nullptr);
-			m_mapInputTypeToText[m_strCurrentInputType] = ipText;
+			UCLID_AFCORELib::IAFDocumentPtr ipDoc(CLSID_AFDocument);
+			ASSERT_RESOURCE_ALLOCATION("ELI06799", ipDoc != __nullptr);
+			m_mapInputTypeToDoc[m_strCurrentInputType] = ipDoc;
 		}
 
 		// get the spatial text associated with the current input type
 		// if our logic is current, the pointer should never be NULL
-		ISpatialStringPtr ipSpatialText = m_mapInputTypeToText[m_strCurrentInputType];
-		if (ipSpatialText == __nullptr)
+		UCLID_AFCORELib::IAFDocumentPtr ipDoc = m_mapInputTypeToDoc[m_strCurrentInputType];
+		if (ipDoc == __nullptr)
 		{
 			THROW_LOGIC_ERROR_EXCEPTION("ELI06800");
 		}
 
 		// set the text of the edit box to the appropriate content
-		_bstr_t _bstrText = ipSpatialText->String;
+		_bstr_t _bstrText = ipDoc->Text->String;
 		string strText = _bstrText;
 		m_editInput.SetWindowText(strText.c_str());
 
-		// The text input box should be read only if ipSpatialText has spatial info or if file input
+		// The text input box should be read only if ipDoc has spatial info or if file input
 		// is selected but the specified file does not exist.
 		BOOL bMakeTextReadonly =
-			asMFCBool(bInvalidInputFileSpecified || asCppBool(ipSpatialText->HasSpatialInfo()));
+			asMFCBool(bInvalidInputFileSpecified || asCppBool(ipDoc->Text->HasSpatialInfo()));
 
 		if (bInvalidInputFileSpecified)
 		{
@@ -688,13 +688,13 @@ ISpatialStringPtr TesterDlgInputPage::openFile(const string& strFileName)
 }
 //-------------------------------------------------------------------------------------------------
 void TesterDlgInputPage::notifyImageWindowInputReceived(
-	ISpatialStringPtr ipSpatialText)
+	UCLID_AFCORELib::IAFDocumentPtr ipDoc)
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
 	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
 
 	// store the new text associated with the image window
-	m_mapInputTypeToText[m_pTesterConfigMgr->gstrTEXTFROMIMAGEWINDOW] = ipSpatialText;
+	m_mapInputTypeToDoc[m_pTesterConfigMgr->gstrTEXTFROMIMAGEWINDOW] = ipDoc;
 	
 	// set the current selection in the combo box to 
 	// OCR text from image
@@ -705,7 +705,7 @@ void TesterDlgInputPage::notifyImageWindowInputReceived(
 	OnSelchangeComboInput();
 }
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr TesterDlgInputPage::getText()
+UCLID_AFCORELib::IAFDocumentPtr TesterDlgInputPage::getDocument()
 {
 	// if the input page has not even been opened yet, then
 	// there is not text available
@@ -729,43 +729,43 @@ ISpatialStringPtr TesterDlgInputPage::getText()
 		m_editInput.GetWindowText(zInputText);
 
 		// associate the text with the current input type
-		ISpatialStringPtr ipText = m_mapInputTypeToText[m_strCurrentInputType];
-		if (ipText == __nullptr)
+		UCLID_AFCORELib::IAFDocumentPtr ipDoc = m_mapInputTypeToDoc[m_strCurrentInputType];
+		if (ipDoc == __nullptr)
 		{
-			ipText.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI06812", ipText != __nullptr);
-			m_mapInputTypeToText[m_strCurrentInputType] = ipText;
+			ipDoc.CreateInstance(CLSID_AFDocument);
+			ASSERT_RESOURCE_ALLOCATION("ELI06812", ipDoc != __nullptr);
+			m_mapInputTypeToDoc[m_strCurrentInputType] = ipDoc;
 		}
 
 		// If the string has spatial info then replace the text and make it hybrid
-		if (ipText->HasSpatialInfo())
+		if (ipDoc->Text->HasSpatialInfo())
 		{
-			ipText->ReplaceAndDowngradeToHybrid(get_bstr_t(zInputText));
+			ipDoc->Text->ReplaceAndDowngradeToHybrid(get_bstr_t(zInputText));
 		}
 		else
 		{
 			// Replace the text in the spatial string (the string is already
 			// non-spatial so no downgrade will occur)
-			ipText->ReplaceAndDowngradeToNonSpatial(get_bstr_t(zInputText));
+			ipDoc->Text->ReplaceAndDowngradeToNonSpatial(get_bstr_t(zInputText));
 		}
 	}
 
 	// get the spatial string associated with the current input type
-	// or return a dumb-non-spatial string
-	if (m_mapInputTypeToText.find(m_strCurrentInputType)
-		!= m_mapInputTypeToText.end())
+	// or return an empty document
+	if (m_mapInputTypeToDoc.find(m_strCurrentInputType)
+		!= m_mapInputTypeToDoc.end())
 	{
-		ISpatialStringPtr ipString = m_mapInputTypeToText[m_strCurrentInputType];
+		UCLID_AFCORELib::IAFDocumentPtr ipString = m_mapInputTypeToDoc[m_strCurrentInputType];
 		ASSERT_RESOURCE_ALLOCATION("ELI06810", ipString != __nullptr);
 		return ipString;
 	}
 	else
 	{
-		// create an empty string and return
-		ISpatialStringPtr ipText(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI06549", ipText != __nullptr);
+		// create an empty doc and return
+		UCLID_AFCORELib::IAFDocumentPtr ipDoc(CLSID_AFDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI06549", ipDoc != __nullptr);
 
-		return ipText;
+		return ipDoc;
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -775,7 +775,7 @@ void TesterDlgInputPage::inputFileChanged(string strFileName/* = */)
 	{
 		CWaitCursor wait;
 
-		ISpatialStringPtr ipSpatialString(CLSID_SpatialString);
+		UCLID_AFCORELib::IAFDocumentPtr ipDoc(CLSID_AFDocument);
 
 		// If no filename is specified, use the text in m_editFile.
 		if (strFileName.empty())
@@ -798,7 +798,7 @@ void TesterDlgInputPage::inputFileChanged(string strFileName/* = */)
 		if (isValidFile(strFileName))
 		{
 			// Open the specified file 
-			ipSpatialString = openFile(strFileName);
+			ipDoc->Text = openFile(strFileName);
 			m_strCurrentInputFile = strFileName;
 		}
 		else
@@ -807,7 +807,7 @@ void TesterDlgInputPage::inputFileChanged(string strFileName/* = */)
 		}
 
 		// Update the internal map 
-		m_mapInputTypeToText[TesterConfigMgr::gstrTEXTFROMFILE] = ipSpatialString;
+		m_mapInputTypeToDoc[TesterConfigMgr::gstrTEXTFROMFILE] = ipDoc;
 
 		// set the current combo box selection to input-from-file
 		m_comboInput.SetCurSel(m_comboInput.FindStringExact(-1, 

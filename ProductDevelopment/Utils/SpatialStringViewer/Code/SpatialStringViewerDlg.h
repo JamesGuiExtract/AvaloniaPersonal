@@ -54,6 +54,7 @@ protected:
 	afx_msg void OnFileClose();
 	afx_msg void OnFileExit();
 	afx_msg void OnFileOpen();
+	afx_msg void OnFileSaveAs();
 	afx_msg void OnHelpAboutUclidSpatialStringViewer();
 	afx_msg void OnFileProperties();
 	afx_msg void OnMnuFindRegexpr();

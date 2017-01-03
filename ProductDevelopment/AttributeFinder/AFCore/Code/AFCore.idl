@@ -507,6 +507,24 @@ library UCLID_AFCORELib
 
 	[
 		object,
+		uuid(E7990914-D9FA-4BE0-8B6A-AEBD691CB37F),
+		dual,
+		helpstring("IRuleTesterAttributeInfo Interface"),
+		pointer_default(unique)
+	]
+	interface IRuleTesterAttributeInfo : IDispatch
+	{
+		[id(1), helpstring("method RuleTesterAttributeInfo")] HRESULT RuleTesterAttributeInfo(
+			[in] IAttribute *pAttribute, ISpatialString *pOriginalOCR, long nHandle);
+		[id(2), helpstring("method ShowValueInUSSFileViewer")] HRESULT ShowValueInUSSFileViewer(
+			[in] ISpatialString *pValue);
+		[id(3), helpstring("method ShowOriginalOCRInUSSFileViewer")] HRESULT ShowOriginalOCRInUSSFileViewer(
+			[in] IAttribute *pAttribute, ISpatialString *pOriginalOCR, VARIANT_BOOL bIncludeIntersecting,
+			ESpatialEntity entityType);
+	}
+
+	[
+		object,
 		uuid(28A2337C-2F24-4F0B-ADBC-95FE5E51AB59),
 		dual,
 		helpstring("IOutputHandler Interface"),

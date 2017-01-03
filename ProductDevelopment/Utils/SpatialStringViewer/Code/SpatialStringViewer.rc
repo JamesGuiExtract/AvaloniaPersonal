@@ -66,6 +66,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\SpatialStringViewer.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -306,6 +307,7 @@ BEGIN
     BEGIN
         MENUITEM "&Open ...",                   ID_FILE_OPEN
         MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "&Save as ...\tCtrl+S",        ID_FILE_SAVE_AS
         MENUITEM SEPARATOR
         MENUITEM "&Properties ...",             ID_FILE_PROPERTIES
         MENUITEM SEPARATOR
@@ -332,6 +334,7 @@ END
 
 IDR_ACCELERATORS ACCELERATORS
 BEGIN
+    "S",            ID_FILE_SAVE_AS,        VIRTKEY, CONTROL, NOINVERT
     "F",            ID_MNU_FIND_REGEXPR,    VIRTKEY, CONTROL, NOINVERT
     "I",            ID_MNU_OPEN_CHAR_INFO,  VIRTKEY, CONTROL, NOINVERT
 END
@@ -358,6 +361,7 @@ END
 //
 
 IDR_TOOLBAR             BITMAP                  "res\\toolbar1.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

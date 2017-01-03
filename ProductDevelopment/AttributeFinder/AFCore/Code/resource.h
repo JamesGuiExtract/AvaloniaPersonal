@@ -70,6 +70,7 @@
 #define IDR_MNU_CONTEXT                 235
 #define IDC_EDIT_OH                     235
 #define IDC_BTN_SELECTIV                236
+#define IDR_MNU_ATTRIBUTE_CONTEXT       236
 #define IDC_BTN_SELECTOH                237
 #define IDC_EDIT_DESC                   238
 #define IDC_EDIT_ATTRIBUTE_SPLITTER     239
@@ -224,6 +225,23 @@
 #define ID_FILE_PROPERTIES              32797
 #define ID_BUTTON_KEY_SR                32798
 #define ID_BUTTON_ABOUT                 32799
+#define ID_Menu                         32800
+#define ID_CONTEXT_                     32801
+#define ID_CONTEXT_32802                32802
+#define ID_CONTEXT_32803                32803
+#define ID_ATTRIBUTE_PROPERTIES         32804
+#define ID_EDIT_ATTRIBUTE               32805
+#define ID_USE_ATTRIBUTE_AS_INPUT       32806
+#define ID_SHOW_ATTRIBUTE_IN_USS_VIEWER 32807
+#define ID_SHOW_OCR_IN_USS_VIEWER_INC_CHARS 32808
+#define ID_SHOW_OCR_IN_USS_VIEWER_EX_CHARS 32809
+#define ID_SHOW_OCR_IN_USS_VIEWER_INC_WORDS 32810
+#define ID_SHOW_OCR_IN_USS_VIEWER_EX_WORDS 32811
+#define ID_SHOW_OCR_IN_USS_VIEWER_INC_LINES 32812
+#define ID_SHOW_OCR_IN_USS_VIEWER_EX_LINES 32813
+#define ID_CANCEL_ATTR_CONTEXT          32814
+#define ID_CONTEXT_HIGHLIGHTINIMAGEVIEWER 32815
+#define ID_HIGHLIGHT_ATTRIBUTE          32817
 #define ID_INDICATOR_COUNTERS           57604
 #define ID_INDICATOR_INTERNAL_USE_ONLY  57605
 #define ID_INDICATOR_SWIPING            57606
@@ -237,8 +255,8 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        371
-#define _APS_NEXT_COMMAND_VALUE         32800
+#define _APS_NEXT_RESOURCE_VALUE        372
+#define _APS_NEXT_COMMAND_VALUE         32818
 #define _APS_NEXT_CONTROL_VALUE         375
 #define _APS_NEXT_SYMED_VALUE           134
 #endif

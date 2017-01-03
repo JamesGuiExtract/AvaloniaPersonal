@@ -90,18 +90,31 @@ END
 //
 
 IDR_ATTRIBUTERULE       REGISTRY                "AttributeRule.rgs"
+
 IDR_RULESET             REGISTRY                "RuleSet.rgs"
+
 IDR_ATTRIBUTE           REGISTRY                "Attribute.rgs"
+
 IDR_ATTRIBUTEFINDERENGINE REGISTRY                "AttributeFinderEngine.rgs"
+
 IDR_ATTRIBUTEFINDINFO   REGISTRY                "AttributeFindInfo.rgs"
+
 IDR_AFDOCUMENT          REGISTRY                "AFDocument.rgs"
+
 IDR_RULEEXECUTIONENV    REGISTRY                "RuleExecutionEnv.rgs"
+
 IDR_RULEEXECUTIONSESSION REGISTRY                "RuleExecutionSession.rgs"
+
 IDR_RULETESTERUI        REGISTRY                "RuleTesterUI.rgs"
+
 IDR_ATTRIBUTEFINDERENGINEPP REGISTRY                "AttributeFinderEnginePP.rgs"
+
 IDR_CONDITIONALRULEPP   REGISTRY                "ConditionalRulePP.rgs"
+
 IDR_SPATIALLYCOMPAREATTRIBUTES REGISTRY                "SpatiallyCompareAttributes.rgs"
+
 IDR_ATTRIBUTESTORAGEMANAGER REGISTRY                "AttributeStorageManager.rgs"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -111,11 +124,17 @@ IDR_ATTRIBUTESTORAGEMANAGER REGISTRY                "AttributeStorageManager.rgs
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_RSEDITOR            ICON                    "res\\RSEditor.ico"
+
 IDI_ICON_DOC            ICON                    "res\\icon_doc.ico"
+
 IDI_ICON_DOWN           ICON                    "res\\icon_down.ico"
+
 IDI_ICON_UP             ICON                    "res\\icon_up.ico"
+
 IDI_ICON_RULE_TESTER    ICON                    "res\\RuleTester.ico"
+
 IDI_ID_SHIELD           ICON                    "..\\..\\IndustrySpecific\\Redaction\\RedactionCustomComponents\\Code\\res\\DataAreaDialog.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -262,7 +281,7 @@ BEGIN
     LTEXT           "123",IDC_STATIC_RULE_DESCRIPTION,70,95,215,10
     CONTROL         "Progress1",IDC_PROGRESS_ATTR,"msctls_progress32",PBS_SMOOTH | WS_BORDER,10,71,275,15
     CONTROL         "Progress1",IDC_PROGRESS_RULE,"msctls_progress32",PBS_SMOOTH | WS_BORDER,10,106,275,15
-    CONTROL         213,IDC_STATIC_ANIMATION,"Static",SS_BITMAP | SS_CENTERIMAGE,102,10,18,13
+    CONTROL         IDC_BTN_DELRULE,IDC_STATIC_ANIMATION,"Static",SS_BITMAP | SS_CENTERIMAGE,102,10,18,13
     PUSHBUTTON      "Cancel",ID_CANCEL_SEARCH,121,130,55,15
 END
 
@@ -555,6 +574,27 @@ BEGIN
     END
 END
 
+IDR_MNU_ATTRIBUTE_CONTEXT MENU
+BEGIN
+    POPUP "Context"
+    BEGIN
+        MENUITEM "&Attribute info\tEnter",      ID_ATTRIBUTE_PROPERTIES
+        MENUITEM "&Highlight in image viewer",  ID_CONTEXT_HIGHLIGHTINIMAGEVIEWER
+        MENUITEM "&Edit attribute",             ID_EDIT_ATTRIBUTE
+        MENUITEM "&Use attribute as ruletester input document", ID_USE_ATTRIBUTE_AS_INPUT
+        MENUITEM "&Show attribute value in USS viewer", ID_SHOW_ATTRIBUTE_IN_USS_VIEWER
+        MENUITEM SEPARATOR
+        MENUITEM "Show original OCRed text in USS viewer, &include intersecting chars", ID_SHOW_OCR_IN_USS_VIEWER_INC_CHARS
+        MENUITEM "... e&xclude intersecting chars", ID_SHOW_OCR_IN_USS_VIEWER_EX_CHARS
+        MENUITEM "... include intersecting words", ID_SHOW_OCR_IN_USS_VIEWER_INC_WORDS
+        MENUITEM "... exclude intersecting words", ID_SHOW_OCR_IN_USS_VIEWER_EX_WORDS
+        MENUITEM "... include intersecting lines", ID_SHOW_OCR_IN_USS_VIEWER_INC_LINES
+        MENUITEM "... exclude intersecting lines", ID_SHOW_OCR_IN_USS_VIEWER_EX_LINES
+        MENUITEM SEPARATOR
+        MENUITEM "Cancel",                      ID_CANCEL_ATTR_CONTEXT
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -600,8 +640,9 @@ IDR_PROGRESS_ANIMATION  GIF                     "res\\ProgressAnimation.gif"
 IDR_ACCELERATOR_TESTERDLG ACCELERATORS
 BEGIN
     "E",            ID_BUTTON_EXECUTE,      VIRTKEY, CONTROL, NOINVERT
-    "I",            ID_BUTTON_SRIR,         VIRTKEY, CONTROL, NOINVERT
     "T",            ID_BUTTON_HTIR,         VIRTKEY, CONTROL, NOINVERT
+    "I",            ID_BUTTON_SRIR,         VIRTKEY, CONTROL, NOINVERT
+    VK_RETURN,      ID_ATTRIBUTE_PROPERTIES, VIRTKEY, NOINVERT
 END
 
 IDR_ACCELERATOR_EDITORDLG ACCELERATORS

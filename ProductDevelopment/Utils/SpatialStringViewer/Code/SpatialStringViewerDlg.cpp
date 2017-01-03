@@ -241,6 +241,7 @@ BEGIN_MESSAGE_MAP(CSpatialStringViewerDlg, CDialog)
 	ON_COMMAND(ID_FILE_CLOSE, OnFileClose)
 	ON_COMMAND(ID_FILE_EXIT, OnFileExit)
 	ON_COMMAND(ID_FILE_OPEN, OnFileOpen)
+	ON_COMMAND(ID_FILE_SAVE_AS, OnFileSaveAs)
 	ON_COMMAND(ID_HELP_ABOUTUCLIDSPATIALSTRINGVIEWER, OnHelpAboutUclidSpatialStringViewer)
 	ON_COMMAND(ID_FILE_PROPERTIES, OnFileProperties)
 	ON_COMMAND(ID_MNU_FIND_REGEXPR, OnMnuFindRegexpr)
@@ -539,6 +540,36 @@ void CSpatialStringViewerDlg::OnFileOpen()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06729")
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::OnFileSaveAs()
+{
+	try
+	{
+		// ask user to select file to save
+		CFileDialog fileDlg(FALSE, ".uss", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
+			"UCLID Spatial String Files (*.uss)|*.uss|All Files (*.*)|*.*||", this);
+
+		// Pass the pointer of dialog to create ThreadDataStruct object
+		ThreadFileDlg tfd(&fileDlg);
+
+		if (tfd.doModal() != IDOK)
+		{
+			return;
+		}
+
+		// Get the filename
+		_bstr_t bstrFileName = get_bstr_t(fileDlg.GetPathName());
+
+		// Save the string
+		getSpatialString()->SaveTo(bstrFileName, VARIANT_TRUE, VARIANT_TRUE);
+
+		// Update the stored filename and caption
+		m_strUSSFileName = asString(bstrFileName);
+		updateWindowCaption( m_strUSSFileName );
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41746")
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialStringViewerDlg::OnHelpAboutUclidSpatialStringViewer() 

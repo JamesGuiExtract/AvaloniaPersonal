@@ -61,7 +61,8 @@ RuleTesterDlg::RuleTesterDlg(FileRecoveryManager *pFRM,
  m_pFRM(pFRM),
  m_eMode(kWithSettingsTab),
  m_bNoHighlight( false ),
- m_bNoSpotRecognition(false)
+ m_bNoSpotRecognition(false),
+ m_ipAttributeInfo(NULL)
 {
 	try
 	{
@@ -77,6 +78,11 @@ RuleTesterDlg::RuleTesterDlg(FileRecoveryManager *pFRM,
 		{
 			m_eMode = kWithRulesetTab;
 		}
+
+		// Create the attribute info form to use for context menu actions
+		// Use the Prog ID to avoid circular dependency
+		m_ipAttributeInfo.CreateInstance("Extract.AttributeFinder.Forms.RuleTesterAttributeInfoForm");
+		ASSERT_RESOURCE_ALLOCATION("ELI41712", m_ipAttributeInfo != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04905")
 }
@@ -127,8 +133,19 @@ BEGIN_MESSAGE_MAP(RuleTesterDlg, CDialog)
 	ON_COMMAND(ID_BUTTON_VOA, OnButtonVoa)
 	ON_COMMAND(ID_BUTTON_KEY_SR, OnButtonEnableSRIR)
 	ON_COMMAND(ID_BUTTON_ABOUT, OnButtonAbout)
-	//}}AFX_MSG_MAP
+	ON_COMMAND(ID_ATTRIBUTE_PROPERTIES, OnAttributePropertiesClick)
+	ON_COMMAND(ID_CONTEXT_HIGHLIGHTINIMAGEVIEWER, OnHighlightInImageViewerClick)
+	ON_COMMAND(ID_EDIT_ATTRIBUTE, OnEditAttributeClick)
+	ON_COMMAND(ID_USE_ATTRIBUTE_AS_INPUT, OnUseAttributeAsInputClick)
+	ON_COMMAND(ID_SHOW_ATTRIBUTE_IN_USS_VIEWER, OnShowAttributeInUSSViewerClick)
+	ON_COMMAND(ID_SHOW_OCR_IN_USS_VIEWER_INC_CHARS, OnShowOriginalOCRIncCharsClick)
+	ON_COMMAND(ID_SHOW_OCR_IN_USS_VIEWER_EX_CHARS, OnShowOriginalOCRExCharsClick)
+	ON_COMMAND(ID_SHOW_OCR_IN_USS_VIEWER_INC_WORDS, OnShowOriginalOCRIncWordsClick)
+	ON_COMMAND(ID_SHOW_OCR_IN_USS_VIEWER_EX_WORDS, OnShowOriginalOCRExWordsClick)
+	ON_COMMAND(ID_SHOW_OCR_IN_USS_VIEWER_INC_LINES, OnShowOcrInUssViewerIncLinesClick)
+	ON_COMMAND(ID_SHOW_OCR_IN_USS_VIEWER_EX_LINES, OnShowOcrInUssViewerExLinesClick)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXT,0x0000,0xFFFF,OnToolTipNotify)
+	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -154,15 +171,39 @@ LRESULT RuleTesterDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					if ( !m_bNoHighlight )
 					{
-						highlightAttributeInRow();
+						highlightAttributeInRow(false);
 					}
+				}
+			}
+			else if (pnmhdr->code == NM_RCLICK)
+			{
+				// Get the mouse position relative to the tree view.
+				CPoint	point;
+				GetCursorPos( &point );
+				m_wndTreeList.m_tree.ScreenToClient( &point );
+				HTREEITEM hItem = m_wndTreeList.m_tree.HitTest(point);
+				if (hItem != NULL)
+				{
+					m_wndTreeList.m_tree.SelectItem(hItem);
+					showMenuForSelectedAttribute();
 				}
 			}
 		}
 	}
 	else if (message == WM_LBUTTONDBLCLK)
 	{
-		editSelectedAttribute();
+		if ( !m_bNoHighlight )
+		{
+			// Get the mouse position relative to the tree view.
+			CPoint	point;
+			GetCursorPos( &point );
+			m_wndTreeList.m_tree.ScreenToClient( &point );
+			HTREEITEM hItem = m_wndTreeList.m_tree.HitTest(point);
+			if (hItem != NULL)
+			{
+				highlightAttributeInRow(true);
+			}
+		}
 	}
 	
 	return CDialog::DefWindowProc(message, wParam, lParam);
@@ -431,16 +472,16 @@ void RuleTesterDlg::OnButtonExecute()
 
 		// get the current text from the input property page
 		// also get the current source document name
-		ISpatialStringPtr ipInputText = m_testerDlgInputPage.getText();
+		UCLID_AFCORELib::IAFDocumentPtr ipInputDoc = m_testerDlgInputPage.getDocument();
 
 		// Redraw the window to update button states and to display new text if the input file has
 		// changed since the text was last loaded.
 		RedrawWindow();
 
 		// if no input text is available, clear the results grid, and return
-		// Allow processing even if ipInputText->IsEmpty() == VARIANT_TRUE
+		// Allow processing even if ipInputDoc->Text->IsEmpty() == VARIANT_TRUE
 		// [FlexIDSCore #3716]
-		if (ipInputText == __nullptr)
+		if (ipInputDoc == __nullptr)
 		{
 			OnButtonClear();
 			return;
@@ -475,15 +516,12 @@ void RuleTesterDlg::OnButtonExecute()
 			m_ipRuleSet->SaveTo(get_bstr_t(m_pFRM->getRecoveryFileName().c_str()), VARIANT_FALSE);
 		}
 
-		// make a copy of the input text in case the string will be
+		// make a copy of the input document in case it will be
 		// modified by the following rules
-		ICopyableObjectPtr ipCopyObj(ipInputText);
+		ICopyableObjectPtr ipCopyObj(ipInputDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI18406", ipCopyObj != __nullptr);
-		ISpatialStringPtr ipCopyInputText = ipCopyObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI06671", ipCopyInputText != __nullptr);
-		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc = ipCopyObj->Clone();
 		ASSERT_RESOURCE_ALLOCATION("ELI18407", ipAFDoc != __nullptr);
-		ipAFDoc->Text = ipCopyInputText;
 
 		// If an existing voa file should be passed to the rules, attach the voa file attributes to
 		// ipAFDoc.
@@ -1441,29 +1479,18 @@ void RuleTesterDlg::editSelectedAttribute()
 
 	try
 	{
-		// Get the selected Tree List item
-		HTREEITEM	hItem = m_wndTreeList.m_tree.GetSelectedItem();
-		if (hItem == NULL)
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		if (ipAttribute == __nullptr)
 		{
-			// This is not a Tree List item, just return
-			return;
-		}
-
-		// Retrieve Item Data
-		DWORD dwTemp = m_wndTreeList.m_tree.GetItemData( hItem );
-		if (dwTemp == 0)
-		{
-			// This must be a document tag item, just return
+			// There is no attribute selected, just return
 			return;
 		}
 
 		// Retrieve Tree List strings
-		string strName = m_wndTreeList.m_tree.GetItemText( hItem, 0 );
-		string strValue = m_wndTreeList.m_tree.GetItemText( hItem, 1 );
-		string strType = m_wndTreeList.m_tree.GetItemText( hItem, 2 );
-
-		// Convert Value string to CPP-style format
-		convertNormalStringToCppString( strValue );
+		string strName = asString(ipAttribute->Name);
+		string strValue = asString(ipAttribute->Value->String);
+		string strType = asString(ipAttribute->Type);
 
 		// Provide strings to Edit dialog
 		CTesterDlgEdit dlgEdit( strName.c_str(), strValue.c_str(), strType.c_str() );
@@ -1494,10 +1521,8 @@ void RuleTesterDlg::editSelectedAttribute()
 
 			if (bUpdated || bValueUpdated)
 			{
-				// Retrieve Attribute
-				IAttribute	*pAttr = (IAttribute *)dwTemp;
-				UCLID_AFCORELib::IAttributePtr ipAttribute( pAttr );
-				ASSERT_RESOURCE_ALLOCATION("ELI09254", ipAttribute != __nullptr);
+				// Get the selected Tree List item
+				HTREEITEM hItem = m_wndTreeList.m_tree.GetSelectedItem();
 
 				// Update Name and/or Type information
 				if (bUpdated)
@@ -1544,27 +1569,19 @@ UCLID_AFCORELib::IAttributeFinderEnginePtr RuleTesterDlg::getAFEngine()
 	return m_ipEngine;
 }
 //-------------------------------------------------------------------------------------------------
-void RuleTesterDlg::highlightAttributeInRow()
+void RuleTesterDlg::highlightAttributeInRow(bool bOpenWindow)
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
 
 	try
 	{
-		// Get the selected Tree List item
-		HTREEITEM	hItem = m_wndTreeList.m_tree.GetSelectedItem();
-
-		// Retrieve Item Data
-		DWORD dwTemp = m_wndTreeList.m_tree.GetItemData( hItem );
-		if (dwTemp == 0)
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		if (ipAttribute == __nullptr)
 		{
-			// This must be a document tag item, just return
+			// There is no attribute selected, just return
 			return;
 		}
-
-		// Get pointer to associated Attribute
-		IAttribute	*pAttr = (IAttribute *)dwTemp;
-		UCLID_AFCORELib::IAttributePtr ipAttribute( pAttr );
-		ASSERT_RESOURCE_ALLOCATION("ELI06567", ipAttribute != __nullptr);
 
 		// get the spatial string representing the attribute value
 		ISpatialStringPtr ipValue = ipAttribute->Value;
@@ -1596,7 +1613,7 @@ void RuleTesterDlg::highlightAttributeInRow()
 		}
 		
 		ipSRIR = ipSRIRUtils->GetSRIRWithImage(ipValue->SourceDocName,
-								getInputManager(), VARIANT_TRUE);
+								getInputManager(), asVariantBool(bOpenWindow));
 		m_strCurHighlightImage = strImage;
 		
 		if (ipSRIR)
@@ -1716,5 +1733,211 @@ void RuleTesterDlg::updateWindowCaption()
 
 	// update the window caption
 	SetWindowText(strResult.c_str());
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::showMenuForSelectedAttribute()
+{
+	try
+	{
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		if (ipAttribute == __nullptr)
+		{
+			// There is no attribute selected, just return
+			return;
+		}
+
+		// Load the context menu
+		CMenu menu;
+		menu.LoadMenu( IDR_MNU_ATTRIBUTE_CONTEXT );
+		CMenu *pContextMenu = menu.GetSubMenu( 0 );
+		// Map the point to the correct position
+		CPoint	point;
+		GetCursorPos(&point);
+		
+		// Display and manage the context menu
+		pContextMenu->TrackPopupMenu( TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, 
+			point.x, point.y, this );
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09386")
+}
+//-------------------------------------------------------------------------------------------------
+bool RuleTesterDlg::isAttributeUnderCursor()
+{
+	// Get the mouse position relative to the tree view.
+	CPoint	point;
+	GetCursorPos( &point );
+	m_wndTreeList.m_tree.ScreenToClient( &point );
+	HTREEITEM hItem = m_wndTreeList.m_tree.HitTest(point);
+	return hItem != NULL;
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_AFCORELib::IAttributePtr RuleTesterDlg::getSelectedAttribute()
+{
+	try
+	{
+		HTREEITEM	hItem = m_wndTreeList.m_tree.GetSelectedItem();
+		if (hItem == NULL)
+		{
+			// This is not a Tree List item, return null
+			return __nullptr;
+		}
+
+		// Retrieve Item Data
+		DWORD dwTemp = m_wndTreeList.m_tree.GetItemData( hItem );
+		if (dwTemp == NULL)
+		{
+			// This must be a document tag item, return null
+			return __nullptr;
+		}
+
+		// Retrieve Attribute
+		IAttribute	*pAttr = (IAttribute *)dwTemp;
+		UCLID_AFCORELib::IAttributePtr ipAttribute( pAttr );
+		ASSERT_RESOURCE_ALLOCATION("ELI41711", ipAttribute != __nullptr);
+
+		return ipAttribute;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41710")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnAttributePropertiesClick()
+{
+	try
+	{
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		ASSERT_RESOURCE_ALLOCATION("ELI41713", ipAttribute != __nullptr);
+
+		ISpatialStringPtr ipInputText = m_testerDlgInputPage.getDocument()->Text;
+
+		// Show the attribute properties
+		m_ipAttributeInfo->RuleTesterAttributeInfo(ipAttribute, ipInputText, (long)this->m_hWnd);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41714")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnEditAttributeClick()
+{
+	editSelectedAttribute();
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnUseAttributeAsInputClick()
+{
+	try
+	{
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		ASSERT_RESOURCE_ALLOCATION("ELI41722", ipAttribute != __nullptr);
+
+		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI41750", ipAFDoc != __nullptr);
+
+		ipAFDoc->Attribute = ipAttribute;
+		m_testerDlgInputPage.notifyImageWindowInputReceived(ipAFDoc);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41723")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnShowAttributeInUSSViewerClick()
+{
+	try
+	{
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		ASSERT_RESOURCE_ALLOCATION("ELI41726", ipAttribute != __nullptr);
+
+		m_ipAttributeInfo->ShowValueInUSSFileViewer(ipAttribute->Value);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41727")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnShowOriginalOCRIncCharsClick()
+{
+	try
+	{
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		ASSERT_RESOURCE_ALLOCATION("ELI41728", ipAttribute != __nullptr);
+
+		ISpatialStringPtr ipInputText = m_testerDlgInputPage.getDocument()->Text;
+		m_ipAttributeInfo->ShowOriginalOCRInUSSFileViewer(ipAttribute, ipInputText, VARIANT_TRUE, kCharacter);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41729")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnShowOriginalOCRExCharsClick()
+{
+	try
+	{
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		ASSERT_RESOURCE_ALLOCATION("ELI41730", ipAttribute != __nullptr);
+
+		ISpatialStringPtr ipInputText = m_testerDlgInputPage.getDocument()->Text;
+		m_ipAttributeInfo->ShowOriginalOCRInUSSFileViewer(ipAttribute, ipInputText, VARIANT_FALSE, kCharacter);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41731")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnShowOriginalOCRIncWordsClick()
+{
+	try
+	{
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		ASSERT_RESOURCE_ALLOCATION("ELI41732", ipAttribute != __nullptr);
+
+		ISpatialStringPtr ipInputText = m_testerDlgInputPage.getDocument()->Text;
+		m_ipAttributeInfo->ShowOriginalOCRInUSSFileViewer(ipAttribute, ipInputText, VARIANT_TRUE, kWord);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41733")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnShowOriginalOCRExWordsClick()
+{
+	try
+	{
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		ASSERT_RESOURCE_ALLOCATION("ELI41734", ipAttribute != __nullptr);
+
+		ISpatialStringPtr ipInputText = m_testerDlgInputPage.getDocument()->Text;
+		m_ipAttributeInfo->ShowOriginalOCRInUSSFileViewer(ipAttribute, ipInputText, VARIANT_FALSE, kWord);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41735")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnShowOcrInUssViewerIncLinesClick()
+{
+	try
+	{
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		ASSERT_RESOURCE_ALLOCATION("ELI41736", ipAttribute != __nullptr);
+
+		ISpatialStringPtr ipInputText = m_testerDlgInputPage.getDocument()->Text;
+		m_ipAttributeInfo->ShowOriginalOCRInUSSFileViewer(ipAttribute, ipInputText, VARIANT_TRUE, kLine);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41737")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnShowOcrInUssViewerExLinesClick()
+{
+	try
+	{
+		// Get the selected attribute
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		ASSERT_RESOURCE_ALLOCATION("ELI41738", ipAttribute != __nullptr);
+
+		ISpatialStringPtr ipInputText = m_testerDlgInputPage.getDocument()->Text;
+		m_ipAttributeInfo->ShowOriginalOCRInUSSFileViewer(ipAttribute, ipInputText, VARIANT_FALSE, kLine);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41739")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnHighlightInImageViewerClick()
+{
+	highlightAttributeInRow(true);
 }
 //-------------------------------------------------------------------------------------------------

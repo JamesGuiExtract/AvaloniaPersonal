@@ -21,7 +21,7 @@ public:
 	TesterDlgInputPage();
 	~TesterDlgInputPage();
 	void setTesterConfigMgr(TesterConfigMgr *pTesterConfigMgr);
-	void notifyImageWindowInputReceived(ISpatialStringPtr ipSpatialText);
+	void notifyImageWindowInputReceived(UCLID_AFCORELib::IAFDocumentPtr ipDoc);
 
 	// PROMISE: Attempts to read in the specified file. If strFileName is not specified or empty it
 	// will use the text in IDC_EDIT_FILE as the source file name.
@@ -31,7 +31,7 @@ public:
 	void dataInputFileChanged(string strDataInputFileName = "");
 	
 	// get current text from the input page
-	ISpatialStringPtr getText();
+	UCLID_AFCORELib::IAFDocumentPtr getDocument();
 
 	// Indicates whether an existing voa file should be passed to the rule object.
 	bool useDataInputFile();
@@ -98,7 +98,7 @@ private:
 	// Variables
 	//////////////////
 
-	map<string, ISpatialStringPtr> m_mapInputTypeToText;
+	map<string, UCLID_AFCORELib::IAFDocumentPtr> m_mapInputTypeToDoc;
 	string m_strCurrentInputType;
 
 	TesterConfigMgr *m_pTesterConfigMgr;

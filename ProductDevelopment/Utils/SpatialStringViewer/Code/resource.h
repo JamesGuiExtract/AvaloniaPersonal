@@ -62,11 +62,11 @@
 #define IDC_EDIT_OCR_VERSION            1055
 #define IDC_FIND_PREVIOUS               1056
 #define IDC_FIND_RESET_FIND             1057
-#define IDC_BUTTON_FIRST_PAGE            1058
-#define IDC_BUTTON_PREV_PAGE             1059
-#define IDC_BUTTON_GOTO_PAGE             1060
-#define IDC_BUTTON_LAST_PAGE             1061
-#define IDC_BUTTON_NEXT_PAGE             1062
+#define IDC_BUTTON_FIRST_PAGE           1058
+#define IDC_BUTTON_PREV_PAGE            1059
+#define IDC_BUTTON_GOTO_PAGE            1060
+#define IDC_BUTTON_LAST_PAGE            1061
+#define IDC_BUTTON_NEXT_PAGE            1062
 #define ID_FILE_EXIT                    32773
 #define ID_HELP_ABOUTUCLIDSPATIALSTRINGVIEWER 32774
 #define ID_FILE_PROPERTIES              32775
@@ -77,6 +77,8 @@
 #define ID_MNU_OPEN_CHAR_INFO           32781
 #define ID_MNU_CHAR_INFO                32783
 #define ID_MNU_WORDLENGTHDISTRIBUTION   32784
+#define ID_FILE_SAVEAS                  32785
+#define ID_ACCELERATOR32790             32790
 #define ID_INDICATOR_START              59138
 #define ID_INDICATOR_END                59139
 #define ID_INDICATOR_PERCENT            59140
@@ -92,7 +94,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        141
-#define _APS_NEXT_COMMAND_VALUE         32785
+#define _APS_NEXT_COMMAND_VALUE         32791
 #define _APS_NEXT_CONTROL_VALUE         1063
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
