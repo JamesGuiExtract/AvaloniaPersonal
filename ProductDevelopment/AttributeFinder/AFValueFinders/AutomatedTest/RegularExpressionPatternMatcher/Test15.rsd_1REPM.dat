@@ -1,0 +1,7 @@
+<TEST_RULE_1>===(?n)
+  (?!)
+  (?'First'blahblah)
+
+<TEST_RULE_2>===(?n)
+  (?!)
+  (?'Second'[\S\s]{9})

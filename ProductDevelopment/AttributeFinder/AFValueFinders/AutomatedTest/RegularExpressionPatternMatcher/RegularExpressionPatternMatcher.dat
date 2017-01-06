@@ -60,3 +60,6 @@
 
 // Attribute Referencing test case
 <TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF1.eav
+
+// Test pattern not matching anything
+<TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav

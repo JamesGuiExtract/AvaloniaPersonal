@@ -99,8 +99,9 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 				ipRegExpParser->Pattern = _bstrPattern;
 
 				// The primary match doesn't matter (and may be zero-length); Use only the named groups.
+				// Method has been changed to return null if there was no match so don't assert allocation
+				// https://extract.atlassian.net/browse/ISSUE-14396
 				ipSearchResults = ipRegExpParser->FindNamedGroups(ipInputText->String, VARIANT_TRUE);
-				ASSERT_RESOURCE_ALLOCATION("ELI33358", ipSearchResults != __nullptr);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33332");
 		}
@@ -115,7 +116,7 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 		ASSERT_RESOURCE_ALLOCATION("ELI33354", ipFoundAttributes != __nullptr);
 		
 		// Did we find any?
-		long nSize = ipSearchResults->Size();
+		long nSize = ipSearchResults == __nullptr ? 0 : ipSearchResults->Size();
 		if (nSize > 0)
 		{
 			// Add each named group returned as a found attribute.

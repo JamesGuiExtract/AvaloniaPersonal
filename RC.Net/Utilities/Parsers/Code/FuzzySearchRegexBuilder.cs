@@ -311,7 +311,7 @@ namespace Extract.Utilities.Parsers
         const string _DEFAULT_SUBSTITUTE_PATTERN = ".";
 
         // Regex pattern that matches a fuzzy regex pattern
-        const string _FUZZY_SEARCH_EXPRESSION = _PREFIX + _OPTIONS + "(?'search_string'" + _VALID_SEQUENCE + @")\)";
+        const string _FUZZY_SEARCH_EXPRESSION = _PREFIX + _OPTIONS + "(?'search_string'" + RegexParsingPatterns.VALID_SEQUENCE + @")\)";
 
         // The prefix of a fuzzy pattern (non-escaped open parenthesis followed by '?~')
         const string _PREFIX = @"(?<=(^|[^\\])(\\\\)*)\(\?~";
@@ -320,39 +320,18 @@ namespace Extract.Utilities.Parsers
         const string _OPTIONS = @"<(?>(?>((?<=<)|,)\s*" + _OPTION + @"\s*(?=,|>))*)>";
 
         // A single option (name=value)
-        const string _OPTION = @"(?'option_name'\w+)\s*=\s*(?'option_value'" + _VALID_SEQUENCE + ")";
-
-        // A minimal sequence of characters and/or escape sequences that matches round and square
-        // bracket pairs, following the special character rules that the .NET regex parser uses.
-        // Capped at 1000 so that a malformed fuzzy regex syntax in a very large regex pattern will
-        // not cause parsing process to hang.
-        const string _VALID_SEQUENCE = @"(" + _ATOM + @"){1,1000}?" + _NO_OPEN_BRACKETS;
-
-        // Matches a single character or escape sequence and tracks open parentheses and square brackets.
-        const string _ATOM =
-            @"(?>
-                  \\( \d{1,3} | c\S | x[0-9a-eA-E]{2} | u[0-9a-eA-E]{4} | [\s\S] )
-                | \[\^] (?'Square') # in this position a closing bracket is effectively escaped
-                | \[ (?'Square')
-                | \] (?(Square)(?'-Square')) # Closing square is only special if there is an open square
-                | \( (?'Round')
-                | \) (?'-Round')
-                | [^])]
-              )";
-
-        // Fails the match if there is a bracket unclosed
-        const string _NO_OPEN_BRACKETS = @"(?(Square)(?!)|(?(Round)(?!)))";
+        const string _OPTION = @"(?'option_name'\w+)\s*=\s*(?'option_value'" + RegexParsingPatterns.VALID_SEQUENCE + ")";
 
         // A valid fuzzy search token, consists of a search token, an optional, fixed-length
         // quantifier and an optional qualifier (+ meaning the term is required and ? meaning
         // that the term can be missing without affecting the error count)
         const string _TOKEN =
-            @"\G(?'search_token'" + _VALID_SEQUENCE + @")({(?'repetitions'\d+)})?(?'qualifier'[+?])?";
+            @"\G(?'search_token'" + RegexParsingPatterns.VALID_SEQUENCE + @")({(?'repetitions'\d+)})?(?'qualifier'[+?])?";
 
         // A sub-token of a fuzzy search token. This is used to break apart a token that is a
         // parenthesized group token before performing any specified replacements on its pieces.
         const string _SUB_TOKEN =
-            @"\G(?'search_token'" + _VALID_SEQUENCE + @")(?'quantifier'" + _QUANTIFIER + @")?";
+            @"\G(?'search_token'" + RegexParsingPatterns.VALID_SEQUENCE + @")(?'quantifier'" + _QUANTIFIER + @")?";
 
         // A .NET regex quantifier (can be variable length and non-greedy)
         const string _QUANTIFIER = @"({\d+(,(\d+)?)?} | [?*+])\??";
@@ -1011,7 +990,8 @@ namespace Extract.Utilities.Parsers
         {
             try
             {
-                const string REPLACEMENT_PAIR_EXPRESSION = @"\((?'replace'" + _VALID_SEQUENCE + @")=>(?'replacement'" + _VALID_SEQUENCE + @")\)";
+                const string REPLACEMENT_PAIR_EXPRESSION = @"\((?'replace'" + RegexParsingPatterns.VALID_SEQUENCE
+                    + @")=>(?'replacement'" + RegexParsingPatterns.VALID_SEQUENCE + @")\)";
                 const string REPLACEMENTS_EXPRESSION = REPLACEMENT_PAIR_EXPRESSION + @"(\s*" + REPLACEMENT_PAIR_EXPRESSION + @")*";
 
                 // Create a new options instance.
