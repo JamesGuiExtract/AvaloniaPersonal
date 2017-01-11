@@ -29,6 +29,7 @@ const string TesterConfigMgr::NAME_COLUMN_WIDTH = "NameColumnWidth";
 const string TesterConfigMgr::SHOW_ONLY_VALID_ENTRIES = "ShowOnlyValidEntries";
 const string TesterConfigMgr::SPLITTER_POS_Y = "SplitterPositionY";
 const string TesterConfigMgr::TYPE_COLUMN_WIDTH = "TypeColumnWidth";
+const string TesterConfigMgr::RULE_COLUMN_WIDTH = "RuleColumnWidth";
 const string TesterConfigMgr::LAST_FILE_SAVE_DIR = "LastFileSaveDirectory";
 const string TesterConfigMgr::AUTO_EXPAND_ATTRIBUTES = "AutoExpandAttributes";
 
@@ -45,6 +46,7 @@ const string TesterConfigMgr::DEFAULT_NAME_COLUMN_WIDTH = "125";
 const string TesterConfigMgr::DEFAULT_SPLITTER_POS_Y = "205";
 const string TesterConfigMgr::DEFAULT_SHOW_ONLY_VALID_ENTRIES = "0";
 const string TesterConfigMgr::DEFAULT_TYPE_COLUMN_WIDTH = "125";
+const string TesterConfigMgr::DEFAULT_RULE_COLUMN_WIDTH = "250";
 const string TesterConfigMgr::DEFAULT_LAST_FILE_SAVE_DIR = ".";
 const string TesterConfigMgr::DEFAULT_AUTO_EXPAND_ATTRIBUTES = "0";
 
@@ -437,6 +439,41 @@ long TesterConfigMgr::getTypeColumnWidth()
 		// Not found, just default to one-third of minimum width
 		m_pCfgMgr->createKey( m_strSectionFolderName, TYPE_COLUMN_WIDTH, 
 			DEFAULT_TYPE_COLUMN_WIDTH );
+	}
+	else
+	{
+		// Retrieve column width
+		strWidth = m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
+			TYPE_COLUMN_WIDTH, DEFAULT_TYPE_COLUMN_WIDTH );
+		lColumnWidth = asLong( strWidth );
+	}
+
+	return lColumnWidth;
+}
+//-------------------------------------------------------------------------------------------------
+void TesterConfigMgr::setRuleColumnWidth(long lColumnWidth)
+{
+	CString	zWidth;
+
+	// Format string
+	zWidth.Format( "%ld", lColumnWidth );
+
+	// Store string
+	m_pCfgMgr->setKeyValue( m_strSectionFolderName, RULE_COLUMN_WIDTH, 
+		(LPCTSTR)zWidth );
+}
+//-------------------------------------------------------------------------------------------------
+long TesterConfigMgr::getRuleColumnWidth()
+{
+	string	strWidth;
+	long	lColumnWidth = giRTDLG_MIN_WIDTH / 3;
+
+	// Check for existence of column width
+	if (!m_pCfgMgr->keyExists( m_strSectionFolderName, RULE_COLUMN_WIDTH ))
+	{
+		// Not found, just default to one-third of minimum width
+		m_pCfgMgr->createKey( m_strSectionFolderName, RULE_COLUMN_WIDTH, 
+			DEFAULT_RULE_COLUMN_WIDTH );
 	}
 	else
 	{

@@ -546,6 +546,12 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 						{
 							UCLID_AFCORELib::IAttributePtr ipAttribute = ipAttributes->At(j);
 							ipAttribute->Name = _bstrAttributeName;
+
+							// Update data object with trace info
+							if (shouldAddAttributeHistory())
+							{
+								addAttributeHistoryInfo(ipAttribute, asString(_bstrAttributeName));
+							}
 						}
 
 						// append results to the result vector of found attributes.
@@ -2606,3 +2612,60 @@ ISpatialStringPtr CRuleSet::createParentValueFromAFDocAttributes(UCLID_AFCORELib
 	}
 	return ipValue;
 }
+//-------------------------------------------------------------------------------------------------
+bool CRuleSet::shouldAddAttributeHistory()
+{
+	if (m_ipRuleExecutionEnv == __nullptr)
+	{
+		m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
+		ASSERT_RESOURCE_ALLOCATION("ELI41796", m_ipRuleExecutionEnv != __nullptr);
+	}
+	return m_ipRuleExecutionEnv->ShouldAddAttributeHistory == VARIANT_TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSet::addAttributeHistoryInfo(UCLID_AFCORELib::IAttributePtr ipAttribute, string strAttributeName)
+{
+	IIUnknownVectorPtr ipTrace = ipAttribute->DataObject;
+	if (ipTrace == __nullptr)
+	{
+		ipTrace.CreateInstance(CLSID_IUnknownVector);
+		ipAttribute->DataObject = ipTrace;
+	}
+	ASSERT_RESOURCE_ALLOCATION("ELI41764", ipTrace != __nullptr);
+
+	// Add these values to the last item in the collection if there is one...
+	IStrToStrMapPtr ipMap;
+	long nSize = ipTrace->Size();
+	if (nSize > 0)
+	{
+		ipMap = ipTrace->At(nSize - 1);
+	}
+
+	// ...and if it doesn't already have a Ruleset key
+	// Else, create a new map
+	string key = "Ruleset";
+	_bstr_t bstrKey = _bstr_t(key.c_str());
+	if (ipMap == __nullptr || ipMap->Contains(bstrKey))
+	{
+		ipMap.CreateInstance(CLSID_StrToStrMap);
+		ipTrace->PushBack(ipMap);
+	}
+	ipMap->Set(bstrKey, _bstr_t(m_strFileName.c_str()));
+
+	key = "Attribute";
+	bstrKey = _bstr_t(key.c_str());
+	ipMap->Set(bstrKey, _bstr_t(strAttributeName.c_str()));
+
+	// Process subattributes
+	IIUnknownVectorPtr ipSubattributes = ipAttribute->SubAttributes;
+	ASSERT_RESOURCE_ALLOCATION("ELI41767", ipSubattributes != __nullptr);
+
+	nSize = ipSubattributes->Size();
+	for (long i = 0; i < nSize; i++)
+	{
+		UCLID_AFCORELib::IAttributePtr ipSubattribute = ipSubattributes->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI41768", ipSubattribute != __nullptr);
+		addAttributeHistoryInfo(ipSubattribute, strAttributeName);
+	}
+}
+//-------------------------------------------------------------------------------------------------

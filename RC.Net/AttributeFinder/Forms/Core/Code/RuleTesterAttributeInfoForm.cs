@@ -217,6 +217,28 @@ namespace Extract.AttributeFinder.Forms
             }
         }
 
+        /// <summary>
+        /// Shows the attribute history
+        /// </summary>
+        /// <param name="pAttribute">The attribute.</param>
+        /// <param name="nHandle">The handle to the parent window</param>
+        public void ShowAttributeHistory(ComAttribute pAttribute, int nHandle)
+        {
+            try
+            {
+                var form = new RuleTesterAttributeHistoryForm(pAttribute);
+
+                // Display the dialog centered on the parent
+                NativeWindow parentWindow = new NativeWindow();
+                parentWindow.AssignHandle((IntPtr)nHandle);
+                form.ShowDialog(parentWindow);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41773");
+            }
+        }
+
         #endregion IRuleTesterAttributeInfo Members
 
         #region Event Handlers

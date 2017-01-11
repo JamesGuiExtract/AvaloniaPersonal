@@ -96,6 +96,12 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RuleTesterAttributeHistoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RuleTesterAttributeHistoryForm.Designer.cs">
+      <DependentUpon>RuleTesterAttributeHistoryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="RuleTesterAttributeInfoForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -111,6 +117,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="RuleTesterAttributeHistoryForm.resx">
+      <DependentUpon>RuleTesterAttributeHistoryForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="RuleTesterAttributeInfoForm.resx">
       <DependentUpon>RuleTesterAttributeInfoForm.cs</DependentUpon>
     </EmbeddedResource>

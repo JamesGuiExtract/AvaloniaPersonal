@@ -168,6 +168,7 @@ protected:
 	afx_msg void OnDoubleClickRunMode();
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	afx_msg void OnBtnSelectRunMode();
+	afx_msg void OnMove(int x, int y);
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -223,10 +224,6 @@ private:
 	// persistent manager
 	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 	unique_ptr<MRUList> ma_pMRUList;
-
-	// A rule execution session used to allow GetComponentData calls from within rule objects' UIs
-	// to take the configured FKB version into account.
-	UCLID_AFCORELib::IRuleExecutionSessionPtr m_ipRuleExecutionSession;
 
 	// Initial width and heights used to anchor controls
 	int m_nDefaultW;
@@ -327,4 +324,11 @@ private:
 
 	// Update the RunMode text box based on the run mode settings
 	void updateRunModeTextBox();
+
+	// pointer to the singleton rule execution environment object
+	UCLID_AFCORELib::IRuleExecutionEnvPtr m_ipRuleExecutionEnv;
+
+	UCLID_AFCORELib::IRuleExecutionEnvPtr getRuleExecutionEnv();
+
+	bool m_bInitialized;
 };

@@ -17,6 +17,7 @@
 #include <ComUtils.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <sstream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -146,6 +147,8 @@ BEGIN_MESSAGE_MAP(RuleTesterDlg, CDialog)
 	ON_COMMAND(ID_SHOW_OCR_IN_USS_VIEWER_EX_LINES, OnShowOcrInUssViewerExLinesClick)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXT,0x0000,0xFFFF,OnToolTipNotify)
 	//}}AFX_MSG_MAP
+	ON_COMMAND(ID_CONTEXT_FINDINGRULEHISTORY, &RuleTesterDlg::OnContextFindingRuleHistoryClick)
+	ON_WM_MOVE()
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -362,40 +365,6 @@ void RuleTesterDlg::OnClose()
 
 	try
 	{
-		//////////////////
-		// Remember window positions
-		//////////////////
-		WINDOWPLACEMENT windowPlacement;
-		if (GetWindowPlacement( &windowPlacement ) != 0)
-		{
-			RECT	rect;
-			rect = windowPlacement.rcNormalPosition;
-			
-			ma_pCfgTesterMgr->setWindowPos( rect.left, rect.top );
-			ma_pCfgTesterMgr->setWindowSize( rect.right - rect.left, 
-				rect.bottom - rect.top );
-		}
-
-		//////////////////
-		// Remember splitter position
-		//////////////////
-		CRect	rectSplitter;
-		m_splitterCtrl.GetWindowRect( rectSplitter );
-		ScreenToClient( &rectSplitter );
-		ma_pCfgTesterMgr->setSplitterPosition( rectSplitter.top );
-
-		//////////////////
-		// Retrieve and store width of Name column
-		//////////////////
-		long lWidth = m_wndTreeList.m_tree.GetColumnWidth( 0 );
-		ma_pCfgTesterMgr->setNameColumnWidth( lWidth );
-
-		//////////////////
-		// Retrieve and store width of Type column
-		//////////////////
-		lWidth = m_wndTreeList.m_tree.GetColumnWidth( 2 );
-		ma_pCfgTesterMgr->setTypeColumnWidth( lWidth );
-
 		//////////////////
 		// When the user wants to close the window, just hide it.
 		//////////////////
@@ -1229,6 +1198,13 @@ void RuleTesterDlg::updateList(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 				m_wndTreeList.m_tree.SetItemText( hTmp, 2, strType.c_str() );
 			}
 
+			// Add last rule description and number, if present
+			IIUnknownVectorPtr ipTrace = ipAttr->DataObject;
+			if (ipTrace != __nullptr && ipTrace->Size() > 0)
+			{
+				m_wndTreeList.m_tree.SetItemText(hTmp, 3, getRuleDescription(ipTrace).c_str());
+			}
+
 			// Set the Item Data
 			m_wndTreeList.m_tree.SetItemData( hTmp, (DWORD)&(*ipAttr) );
 
@@ -1331,6 +1307,13 @@ void RuleTesterDlg::addSubAttributes(UCLID_AFCORELib::IAttributePtr ipAttribute,
 			m_wndTreeList.m_tree.SetItemText( hTmp, 2, strType.c_str() );
 		}
 
+		// Add last rule number, if present
+		IIUnknownVectorPtr ipTrace = ipThisSub->DataObject;
+		if (ipTrace != __nullptr && ipTrace->Size() > 0)
+		{
+			m_wndTreeList.m_tree.SetItemText(hTmp, 3, getRuleDescription(ipTrace).c_str());
+		}
+
 		// Set the Item Data
 		m_wndTreeList.m_tree.SetItemData( hTmp, (DWORD)&(*ipThisSub) );
 
@@ -1386,88 +1369,87 @@ void RuleTesterDlg::setCurrentAttributeName(const string& strAttributeName)
 void RuleTesterDlg::doResize()
 {
 	// if it's minimized, do nothing
-	if (IsIconic())
+	// Ensure that the dlg's controls are realized before moving them.
+	if (IsIconic() || !m_bInitialized)
 	{
 		return;
 	}
 
-	// Ensure that the dlg's controls are realized before moving them.
-	if (m_bInitialized)		
+	// Get total dialog size
+	CRect rectDlg;
+	GetClientRect(&rectDlg);
+	int i = GetSystemMetrics(SM_CYCAPTION);
+	int k = GetSystemMetrics(SM_CXSIZEFRAME);
+
+	// get the size of the toolbar control
+	CRect rectToolBar;
+	m_apToolBar->GetWindowRect(&rectToolBar);
+	ScreenToClient(&rectToolBar);
+
+	// Resize the splitter control
+	CRect rectSplitter;
+	m_splitterCtrl.GetWindowRect(&rectSplitter);
+	ScreenToClient(&rectSplitter);
+
+	long nMin = rectToolBar.Height() + m_propPageMinSize.cy;
+	long nMax = rectDlg.bottom - (giMIN_LISTBOX_PLUS_TOOLBAR_HEIGHT - 
+		rectToolBar.Height());
+	if (rectSplitter.bottom > nMax)
 	{
-		// Get total dialog size
-		CRect rectDlg;
-		GetClientRect(&rectDlg);
-		int i = GetSystemMetrics(SM_CYCAPTION);
-		int k = GetSystemMetrics(SM_CXSIZEFRAME);
-
-		// get the size of the toolbar control
-		CRect rectToolBar;
-		m_apToolBar->GetWindowRect(&rectToolBar);
-		ScreenToClient(&rectToolBar);
-
-		// Resize the splitter control
-		CRect rectSplitter;
-		m_splitterCtrl.GetWindowRect(&rectSplitter);
-		ScreenToClient(&rectSplitter);
-
-		long nMin = rectToolBar.Height() + m_propPageMinSize.cy;
-		long nMax = rectDlg.bottom - (giMIN_LISTBOX_PLUS_TOOLBAR_HEIGHT - 
-			rectToolBar.Height());
-		if (rectSplitter.bottom > nMax)
-		{
-			rectSplitter.bottom = nMax;
-			rectSplitter.top = nMax - 5;
-		}
-		rectSplitter.right = rectDlg.Width();
-		m_splitterCtrl.SetRange(nMin, nMax);
-		m_splitterCtrl.ResizeSplitter(rectSplitter);
-
-		// Position the Tree List two pixels below the splitter and 
-		// leave 1 additional pixel of space around rect
-		m_splitterCtrl.GetWindowRect( &rectSplitter );
-		ScreenToClient( &rectSplitter );
-		CRect rectGridCtrl( 1, rectSplitter.bottom + 3,
-			rectSplitter.Width() - 2, rectDlg.Height() - g_nStatusBarHeight - 2);
-		GetDlgItem( IDC_TREE_LIST )->MoveWindow( &rectGridCtrl );
-
-		// Adjust columns in Tree List
-		m_wndTreeList.DoResize();
-
-		// Resize the Picture control around the Grid
-		CWnd*	pPicture = GetDlgItem( IDC_PICTURE );
-		if (pPicture != __nullptr)
-		{
-			// Get the Tree List dimensions
-			CRect	rectGrid;
-			m_wndTreeList.GetWindowRect( rectGrid );
-
-			// Adjust rect size
-			ScreenToClient( rectGrid );
-			rectGrid.left -= 1;
-			rectGrid.top -= 1;
-			rectGrid.right += 1;
-			rectGrid.bottom += 1;
-
-			// Set Picture size
-			pPicture->MoveWindow( &rectGrid );
-		}
-
-		// Resize the property sheet
-		CRect rectPropSheet;
-		rectPropSheet.left = 0;
-		// leave space below toolbar for lines from OnPaint()
-		rectPropSheet.top = rectToolBar.bottom + 2;
-		rectPropSheet.right = rectDlg.right - 5;
-		rectPropSheet.bottom = rectSplitter.top - 1;
-		m_propSheet.resize(rectPropSheet);
-		m_nCurrentBottomOfPropPage = rectPropSheet.bottom;
-
-		// Resize the status bar
-		m_statusBar.SetPaneInfo(0,ID_INDICATOR_TIME, SBPS_NORMAL, rectDlg.Width());
-
-		// Position the toolbar in the dialog
-		RepositionBars( AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
+		rectSplitter.bottom = nMax;
+		rectSplitter.top = nMax - 5;
 	}
+	rectSplitter.right = rectDlg.Width();
+	m_splitterCtrl.SetRange(nMin, nMax);
+	m_splitterCtrl.ResizeSplitter(rectSplitter);
+
+	// Position the Tree List two pixels below the splitter and 
+	// leave 1 additional pixel of space around rect
+	m_splitterCtrl.GetWindowRect( &rectSplitter );
+	ScreenToClient( &rectSplitter );
+	CRect rectGridCtrl( 1, rectSplitter.bottom + 3,
+		rectSplitter.Width() - 2, rectDlg.Height() - g_nStatusBarHeight - 2);
+	GetDlgItem( IDC_TREE_LIST )->MoveWindow( &rectGridCtrl );
+
+	// Adjust columns in Tree List
+	m_wndTreeList.DoResize();
+
+	// Resize the Picture control around the Grid
+	CWnd*	pPicture = GetDlgItem( IDC_PICTURE );
+	if (pPicture != __nullptr)
+	{
+		// Get the Tree List dimensions
+		CRect	rectGrid;
+		m_wndTreeList.GetWindowRect( rectGrid );
+
+		// Adjust rect size
+		ScreenToClient( rectGrid );
+		rectGrid.left -= 1;
+		rectGrid.top -= 1;
+		rectGrid.right += 1;
+		rectGrid.bottom += 1;
+
+		// Set Picture size
+		pPicture->MoveWindow( &rectGrid );
+	}
+
+	// Resize the property sheet
+	CRect rectPropSheet;
+	rectPropSheet.left = 0;
+	// leave space below toolbar for lines from OnPaint()
+	rectPropSheet.top = rectToolBar.bottom + 2;
+	rectPropSheet.right = rectDlg.right - 5;
+	rectPropSheet.bottom = rectSplitter.top - 1;
+	m_propSheet.resize(rectPropSheet);
+	m_nCurrentBottomOfPropPage = rectPropSheet.bottom;
+
+	// Resize the status bar
+	m_statusBar.SetPaneInfo(0,ID_INDICATOR_TIME, SBPS_NORMAL, rectDlg.Width());
+
+	// Position the toolbar in the dialog
+	RepositionBars( AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
+
+	saveLayout();
 
 	Invalidate();
 	UpdateWindow();
@@ -1651,12 +1633,14 @@ void RuleTesterDlg::prepareTreeList()
 	// Prepare Column widths
 	long lNameWidth = ma_pCfgTesterMgr->getNameColumnWidth();
 	long lTypeWidth = ma_pCfgTesterMgr->getTypeColumnWidth();
-	long lValueWidth = rect.Width() - lNameWidth - lTypeWidth;
+	long lRuleWidth = ma_pCfgTesterMgr->getRuleColumnWidth();
+	long lValueWidth = rect.Width() - lNameWidth - lTypeWidth - lRuleWidth;
 
 	// Create three columns
 	m_wndTreeList.m_tree.InsertColumn( 0, "Name", LVCFMT_LEFT, lNameWidth );
 	m_wndTreeList.m_tree.InsertColumn( 1, "Value", LVCFMT_LEFT, lValueWidth );
 	m_wndTreeList.m_tree.InsertColumn( 2, "Type", LVCFMT_LEFT, lTypeWidth );
+	m_wndTreeList.m_tree.InsertColumn( 3, "Rule", LVCFMT_LEFT, lRuleWidth );
 
 	// Set Value column as stretchable
 	m_wndTreeList.SetStretchColumn( 1 );
@@ -1939,5 +1923,99 @@ void RuleTesterDlg::OnShowOcrInUssViewerExLinesClick()
 void RuleTesterDlg::OnHighlightInImageViewerClick()
 {
 	highlightAttributeInRow(true);
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnContextFindingRuleHistoryClick()
+{
+	try
+	{
+		UCLID_AFCORELib::IAttributePtr ipAttribute = getSelectedAttribute();
+		ASSERT_RESOURCE_ALLOCATION("ELI41774", ipAttribute != __nullptr);
+
+		m_ipAttributeInfo->ShowAttributeHistory(ipAttribute, (long)this->m_hWnd);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41775")
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::OnMove(int x, int y)
+{
+	try
+	{
+		CDialog::OnMove(x, y);
+
+		saveLayout();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41786")
+}
+//-------------------------------------------------------------------------------------------------
+string RuleTesterDlg::getRuleDescription(IIUnknownVectorPtr ipTrace)
+{
+	std::ostringstream sValue;
+
+	string strKey = "Rule number";
+	_bstr_t bstrKey = _bstr_t(strKey.c_str());
+	IStrToStrMapPtr ipMap = ipTrace->At(ipTrace->Size() - 1);
+	if (ipMap != __nullptr && ipMap->Contains(bstrKey))
+	{
+		sValue << asString(ipMap->GetValue(bstrKey)) << ".";
+	}
+
+	strKey = "Rule description";
+	bstrKey = _bstr_t(strKey.c_str());
+	if (ipMap != __nullptr && ipMap->Contains(bstrKey))
+	{
+		sValue << " " << asString(ipMap->GetValue(bstrKey));
+	}
+	return sValue.str();
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::saveLayout()
+{
+	// if it's minimized, do nothing
+	// Ensure that the dlg's controls are realized before moving them.
+	if (IsIconic() || !m_bInitialized)
+	{
+		return;
+	}
+
+	//////////////////
+	// Remember window positions
+	//////////////////
+	WINDOWPLACEMENT windowPlacement;
+	if (GetWindowPlacement( &windowPlacement ) != 0)
+	{
+		RECT	rect;
+		rect = windowPlacement.rcNormalPosition;
+		
+		ma_pCfgTesterMgr->setWindowPos( rect.left, rect.top );
+		ma_pCfgTesterMgr->setWindowSize( rect.right - rect.left, 
+			rect.bottom - rect.top );
+	}
+
+	//////////////////
+	// Remember splitter position
+	//////////////////
+	CRect	rectSplitter;
+	m_splitterCtrl.GetWindowRect( rectSplitter );
+	ScreenToClient( &rectSplitter );
+	ma_pCfgTesterMgr->setSplitterPosition( rectSplitter.top );
+
+	//////////////////
+	// Retrieve and store width of Name column
+	//////////////////
+	long lWidth = m_wndTreeList.m_tree.GetColumnWidth( 0 );
+	ma_pCfgTesterMgr->setNameColumnWidth( lWidth );
+
+	//////////////////
+	// Retrieve and store width of Type column
+	//////////////////
+	lWidth = m_wndTreeList.m_tree.GetColumnWidth( 2 );
+	ma_pCfgTesterMgr->setTypeColumnWidth( lWidth );
+
+	//////////////////
+	// Retrieve and store width of Rule column
+	//////////////////
+	lWidth = m_wndTreeList.m_tree.GetColumnWidth( 3 );
+	ma_pCfgTesterMgr->setRuleColumnWidth( lWidth );
 }
 //-------------------------------------------------------------------------------------------------

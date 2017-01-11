@@ -217,6 +217,11 @@ void CRuleSetEditor::OnFileSaveas()
 		addFileToMRUList(m_strLastFileOpened);
 
 		updateWindowCaption();
+
+		// Set the name of the RSD file being edited in the environment so that the <RSDFileDir> tag
+		// can be expanded by the RegExpr Rule and the Regular Expression Pattern Matcher
+		// https://extract.atlassian.net/browse/ISSUE-12886
+		getRuleExecutionEnv()->RSDFileBeingEdited = bstrFileName;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04419")
 }
@@ -718,6 +723,9 @@ BOOL CRuleSetEditor::OnInitDialog()
 			GetWindowRect(rectDlg);
 			m_nMinWidth = rectDlg.Width();
 			m_nMinHeight = rectDlg.Height();
+
+			// Set as initialized
+			m_bInitialized = true;
 
 			// Call resize so that status bar gets sized correctly
 			// https://extract.atlassian.net/browse/ISSUE-13474
@@ -1827,9 +1835,6 @@ void CRuleSetEditor::OnClose()
 		// of whether they are saving the current ruleset or not.  So,
 		// it is OK to delete the recovery file
 		m_FRM.deleteRecoveryFile();
-
-		// Save window position to the registry
-		m_wMgr.SaveWindowPosition();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04808")
 	
@@ -1893,10 +1898,8 @@ void CRuleSetEditor::OnSize(UINT nType, int cx, int cy)
 	
 	try
 	{
-		static bool bInitialized = false;
-		if (!bInitialized)
+		if (!m_bInitialized)
 		{
-			bInitialized = true;
 			return;
 		}
 		
@@ -1925,8 +1928,26 @@ void CRuleSetEditor::OnSize(UINT nType, int cx, int cy)
 		}
 
 		doResize();
+
+		// Save window position to the registry
+		m_wMgr.SaveWindowPosition();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08055")
+}
+//--------------------------------------------------------------------------------------------------
+void CRuleSetEditor::OnMove(int x, int y)
+{
+	try
+	{
+		CDialog::OnMove(x, y);
+
+		// Save window position to the registry
+		if (m_bInitialized)
+		{
+			m_wMgr.SaveWindowPosition();
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41785")
 }
 //--------------------------------------------------------------------------------------------------
 void CRuleSetEditor::OnSelectMRUMenu(UINT nID)
@@ -1961,7 +1982,7 @@ void CRuleSetEditor::OnFileProperties()
 		
 		if (dialog.DoModal() == IDOK)
 		{
-			m_ipRuleExecutionSession->SetFKBVersion(m_ipRuleSet->FKBVersion);
+			getRuleExecutionEnv()->FKBVersion = m_ipRuleSet->FKBVersion;
 
 			// update the status bar as the user may have changed settings
 			setStatusBarText();

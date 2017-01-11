@@ -3,6 +3,7 @@
 #pragma once
 
 #include "resource.h"       // main symbols
+#include <IConfigurationSettingsPersistenceMgr.h>
 
 #include <string>
 #include <map>
@@ -50,7 +51,9 @@ public:
 	STDMETHOD(put_FKBVersion)(BSTR newVal);
 	STDMETHOD(get_AlternateComponentDataDir)(BSTR *pVal);
 	STDMETHOD(put_AlternateComponentDataDir)(BSTR newVal);
-
+	STDMETHOD(get_ShouldAddAttributeHistory)(VARIANT_BOOL *pbVal);
+	STDMETHOD(get_RSDFileBeingEdited)(BSTR *pVal);
+	STDMETHOD(put_RSDFileBeingEdited)(BSTR newVal);
 private:
 	// member variable to keep track of which thread is
 	// associated which which RSD file
@@ -68,6 +71,8 @@ private:
 
 	// The alternate component data directory root in use (per thread).
 	static map<DWORD, string> m_mapThreadIDToAlternateComponentDataDir;
+
+	static map<DWORD, string> m_mapThreadIDToRSDFileBeingEdited;
 
 	// method to get the RSD file stack associated with the current thread
 	// If no stack is associated with the current thread, an exception will
@@ -87,4 +92,18 @@ private:
 	// to the stack (m_mapThreadIDToRSDFileStack)
 	static CCriticalSection m_criticalSection;
 
+	// Whether rule objects should add history information to attributes (used for debugging)
+	static bool m_bShouldAddAttributeHistory;
+
+	// Registry settings manager object (added for attribute history setting)
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
+
+	// Checks the registry for the value of current settings (currently just used for the add attribute history setting)
+	void updateSettingsFromRegistry();
+
+	// Gets the value of the current RSD file being edited for this thread
+	string& getRSDFileBeingEdited();
+
+	// Gets the current rsd file (either executing or being edited) for this thread
+	string getCurrentRSDFileName();
 };

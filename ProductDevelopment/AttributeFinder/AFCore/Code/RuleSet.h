@@ -236,6 +236,8 @@ private:
 
 	// Flag to indicate that the attributes should be cloned when m_eRuleSetRunMode == kPassInputVOAToOutput
 	bool m_bDeepCopyInput;
+
+	UCLID_AFCORELib::IRuleExecutionEnvPtr m_ipRuleExecutionEnv;
 	
 	/////////////////
 	// Helper functions
@@ -324,4 +326,10 @@ private:
 	
 	// Create parent value using the attributes on the AFDocument and the settings
 	ISpatialStringPtr createParentValueFromAFDocAttributes(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, string pageString);
+
+	// Recursively adds the ruleset name and attribute name to an attribute and its subattributes
+	void addAttributeHistoryInfo(UCLID_AFCORELib::IAttributePtr ipAttribute, string strAttributeName);
+
+	// Checks the rule execution environment to see whether attribute history information should be added to attributes
+	bool shouldAddAttributeHistory();
 };

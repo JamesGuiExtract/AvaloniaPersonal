@@ -68,7 +68,8 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
  m_FRM(".tmp"),
  m_strBinFolder(strBinFolder),
  m_pMRUFilesMenu(__nullptr),
- m_wMgr(this, gstrAF_AFCORE_KEY_PATH + "\\RuleSetEditor")
+ m_wMgr(this, gstrAF_AFCORE_KEY_PATH + "\\RuleSetEditor"),
+ m_bInitialized(false)
 {
 	try
 	{
@@ -105,20 +106,6 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
 			
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
 		ASSERT_RESOURCE_ALLOCATION("ELI07842", m_ipMiscUtils != __nullptr);
-
-		// Initiate a rule execution session. This allows GetComponentData calls from within rule
-		// objects' UIs to take the configured FKB version into account.
-		m_ipRuleExecutionSession.CreateInstance(CLSID_RuleExecutionSession);
-		ASSERT_RESOURCE_ALLOCATION("ELI33511", m_ipRuleExecutionSession != __nullptr);
-		if (strFileName != "")
-		{
-			m_ipRuleExecutionSession->SetRSDFileName(strFileName.c_str());
-		}
-		else
-		{
-			// The file name doesn't really matter here.
-			m_ipRuleExecutionSession->SetRSDFileName("RuleSetEditor");
-		}
 
 		ma_pUserCfgMgr.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_AFCORE_KEY_PATH));
 		
@@ -181,7 +168,13 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
 		// trim off trailing slash
 		m_strBinFolder = ::trim(m_strBinFolder, "", "\\");
 
-		m_ipRuleExecutionSession->SetFKBVersion(m_ipRuleSet->FKBVersion);
+		// Set the name of the RSD file being edited so that the <RSDFileDir> tag can be expanded by
+		// the RegExpr Rule and the Regular Expression Pattern Matcher
+		// https://extract.atlassian.net/browse/ISSUE-12886
+		getRuleExecutionEnv()->RSDFileBeingEdited = _bstr_t(m_strCurrentFileName.c_str());
+
+		// Set the FKB version
+		getRuleExecutionEnv()->FKBVersion = m_ipRuleSet->FKBVersion;
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI05074")
 }
@@ -194,7 +187,6 @@ CRuleSetEditor::~CRuleSetEditor()
 		m_ipClipboardMgr = __nullptr;
 		m_ipInfo = __nullptr;
 		m_ipMiscUtils = __nullptr;
-		m_ipRuleExecutionSession = __nullptr;
 		m_ipRuleSet = __nullptr;
 		m_ipRuleSetStream = __nullptr;
 	}
@@ -297,6 +289,7 @@ BEGIN_MESSAGE_MAP(CRuleSetEditor, CDialog)
 	ON_STN_DBLCLK(IDC_EDIT_MODE, &CRuleSetEditor::OnDoubleClickRunMode)
 	ON_WM_GETMINMAXINFO()
 	ON_BN_CLICKED(IDC_BUTTON_MODE_SELECT, &CRuleSetEditor::OnBtnSelectRunMode)
+	ON_WM_MOVE()
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -371,13 +364,10 @@ void CRuleSetEditor::openFile(string strFileName)
 		_bstr_t bstrFileName = get_bstr_t(strFileName.c_str());
 		m_ipRuleSet->LoadFrom(bstrFileName, VARIANT_FALSE);
 
-		// Reset execution session
-		m_ipRuleExecutionSession = __nullptr;
-		m_ipRuleExecutionSession.CreateInstance(CLSID_RuleExecutionSession);
-		ASSERT_RESOURCE_ALLOCATION("ELI38065", m_ipRuleExecutionSession != __nullptr);
-		m_ipRuleExecutionSession->SetRSDFileName(bstrFileName);
-		m_ipRuleExecutionSession->SetFKBVersion(m_ipRuleSet->FKBVersion);
-		
+		// Reset current RSD name and FKB
+		getRuleExecutionEnv()->RSDFileBeingEdited = bstrFileName;
+		getRuleExecutionEnv()->FKBVersion = m_ipRuleSet->FKBVersion;
+
 		// add the file to MRU list
 		addFileToMRUList(strFileName);
 		
@@ -1522,3 +1512,15 @@ void CRuleSetEditor::updateRunModeTextBox()
 		break;
 	}
 }
+//-------------------------------------------------------------------------------------------------
+UCLID_AFCORELib::IRuleExecutionEnvPtr CRuleSetEditor::getRuleExecutionEnv()
+{
+	if (m_ipRuleExecutionEnv == __nullptr)
+	{
+		m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
+		ASSERT_RESOURCE_ALLOCATION("ELI41784", m_ipRuleExecutionEnv != __nullptr);
+	}
+
+	return m_ipRuleExecutionEnv;
+}
+//-------------------------------------------------------------------------------------------------

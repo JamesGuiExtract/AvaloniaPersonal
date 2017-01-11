@@ -117,6 +117,7 @@ void CRDTConfigDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_DIFF_COMMAND_LINE, m_zDiffCommandLine);
 	DDX_Check(pDX, IDC_CHECK_AUTOEXPAND, m_bAutoExpandAttribute);
 	DDX_Check(pDX, IDC_CHECK_ENABLE_PROFILING, m_bEnableProfiling);
+	DDX_Check(pDX, IDC_CHECK_ADD_ATTRIBUTE_HISTORY_INFO, m_bAddAttributeHistory);
 	//}}AFX_DATA_MAP
 }
 //-------------------------------------------------------------------------------------------------
@@ -262,6 +263,8 @@ void CRDTConfigDlg::OnDefaults()
 	m_bAutoExpandAttribute = FALSE;
 
 	m_bEnableProfiling = FALSE;
+
+	m_bAddAttributeHistory = FALSE;
 
 	// Set default for prefix
 	int iIndex = m_comboPrefix.FindString( -1, gstrEMPTY_DEFAULT.c_str() );
@@ -496,6 +499,8 @@ void CRDTConfigDlg::getRegistrySettings()
 
 	m_bEnableProfiling = asMFCBool(getEnableProfiling());
 
+	m_bAddAttributeHistory = asMFCBool(getAddAttributeHistory());
+
 	// Load MRU list items
 	loadMRUListItems();
 
@@ -662,6 +667,21 @@ bool CRDTConfigDlg::getEnableProfiling()
 	return asCppBool(strValue);
 }
 //-------------------------------------------------------------------------------------------------
+bool CRDTConfigDlg::getAddAttributeHistory()
+{
+	if (!ma_pSettingsCfgMgr->keyExists(SETTINGS_SECTION, gstrAF_ADD_ATTRIBUTE_HISTORY_KEY))
+	{
+		ma_pSettingsCfgMgr->createKey(SETTINGS_SECTION, gstrAF_ADD_ATTRIBUTE_HISTORY_KEY,
+			gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+		return asCppBool(gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+	}
+
+	string strValue = ma_pSettingsCfgMgr->getKeyValue(SETTINGS_SECTION, gstrAF_ADD_ATTRIBUTE_HISTORY_KEY,
+		gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+
+	return asCppBool(strValue);
+}
+//-------------------------------------------------------------------------------------------------
 void CRDTConfigDlg::loadMRUListItems()
 {
 	////////////////////
@@ -756,6 +776,8 @@ void CRDTConfigDlg::saveRegistrySettings()
 	setAutoExpandAttributes(asCppBool(m_bAutoExpandAttribute));
 
 	setEnableProfiling(asCppBool(m_bEnableProfiling));
+	
+	setAddAttributeHistory(asCppBool(m_bAddAttributeHistory));
 
 	////////////////////////////////////////////
 	// Write selected combobox items to registry
@@ -900,6 +922,12 @@ void CRDTConfigDlg::setAutoExpandAttributes(bool bNewSetting)
 void CRDTConfigDlg::setEnableProfiling(bool bNewSetting)
 {
 	ma_pSettingsCfgMgr->setKeyValue(SETTINGS_SECTION, gstrAF_PROFILE_RULES_KEY,
+		bNewSetting ? "1" : "0");
+}
+//-------------------------------------------------------------------------------------------------
+void CRDTConfigDlg::setAddAttributeHistory(bool bNewSetting)
+{
+	ma_pSettingsCfgMgr->setKeyValue(SETTINGS_SECTION, gstrAF_ADD_ATTRIBUTE_HISTORY_KEY,
 		bNewSetting ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------

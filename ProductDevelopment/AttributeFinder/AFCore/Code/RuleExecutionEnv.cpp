@@ -4,22 +4,35 @@
 #include "stdafx.h"
 #include "AFCore.h"
 #include "RuleExecutionEnv.h"
+#include "Common.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <ComUtils.h>
+#include <LicenseMgmt.h>
+#include <ComponentLicenseIDs.h>
 
 // allocate static variables
 map<DWORD, stack<string> > CRuleExecutionEnv::m_mapThreadIDToRSDFileStack;
 map<DWORD, string> CRuleExecutionEnv::m_mapThreadIDToFKBVersion;
 map<DWORD, string> CRuleExecutionEnv::m_mapThreadIDToAlternateComponentDataDir;
 CCriticalSection CRuleExecutionEnv::m_criticalSection;
+map<DWORD, string> CRuleExecutionEnv::m_mapThreadIDToRSDFileBeingEdited;
+bool CRuleExecutionEnv::m_bShouldAddAttributeHistory;
+
+//-------------------------------------------------------------------------------------------------
+// Constants
+//-------------------------------------------------------------------------------------------------
+const string gstrSETTINGS_SECTION = "\\AttributeFinder\\Settings";
 
 //-------------------------------------------------------------------------------------------------
 // CRuleExecutionEnv
 //-------------------------------------------------------------------------------------------------
 CRuleExecutionEnv::CRuleExecutionEnv()
 {
+	// Setup Registry persistence item
+	ma_pSettingsCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
+		new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrREG_ROOT_KEY ) );
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleExecutionEnv::InterfaceSupportsErrorInfo(REFIID riid)
@@ -64,8 +77,15 @@ STDMETHODIMP CRuleExecutionEnv::PushRSDFileName(BSTR strFileName, long *pnStackS
 		// push the RSD file on the stack associated with the current thread
 		rThisThreadRSDFileStack.push(strFile);
 
+		long nStackSize = rThisThreadRSDFileStack.size();
+
+		if (nStackSize == 1)
+		{
+			updateSettingsFromRegistry();
+		}
+
 		// return the stack size
-		*pnStackSize = rThisThreadRSDFileStack.size();
+		*pnStackSize = nStackSize;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07455")
 
@@ -101,11 +121,7 @@ STDMETHODIMP CRuleExecutionEnv::GetCurrentRSDFileName(BSTR *pstrFileName)
 
 	try
 	{
-		// get the current thread's RSD file stack
-		stack<string>& rThisThreadRSDFileStack = getCurrentStack(true);
-
-		// the entry was found - return the corresponding string
-		*pstrFileName = get_bstr_t(rThisThreadRSDFileStack.top()).Detach();
+		*pstrFileName = get_bstr_t(getCurrentRSDFileName()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07456")
 
@@ -118,12 +134,10 @@ STDMETHODIMP CRuleExecutionEnv::GetCurrentRSDFileDir(BSTR *pstrRSDFileDir)
 
 	try
 	{
-		// get the current thread's RSD file stack
-		stack<string>& rThisThreadRSDFileStack = getCurrentStack(true);
+		string strRSDFile = getCurrentRSDFileName();
 
 		// the entry was found - return the directory associated
 		// with the corresponding RSD file
-		string strRSDFile = rThisThreadRSDFileStack.top();
 		string strRSDFileDir = getDirectoryFromFullPath(strRSDFile);
 		*pstrRSDFileDir = get_bstr_t(strRSDFileDir).Detach();
 	}
@@ -195,8 +209,9 @@ STDMETHODIMP CRuleExecutionEnv::put_FKBVersion(BSTR newVal)
 		string newFKBVersion = asString(newVal);
 		string& rstrFKBVerson = getFKBVersionString();
 
-		// If this it the top-level rule, apply the FKB version (no questions asked)
-		if (getCurrentStack().size() == 1)
+		// If this it the top-level rule (or if there are no rulesets executing),
+		// apply the FKB version (no questions asked)
+		if (getCurrentStack().size() < 2)
 		{
 			rstrFKBVerson = newFKBVersion;
 		}
@@ -245,6 +260,48 @@ STDMETHODIMP CRuleExecutionEnv::put_AlternateComponentDataDir(BSTR newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35916")
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleExecutionEnv::get_ShouldAddAttributeHistory(VARIANT_BOOL *pbVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		*pbVal = asVariantBool(m_bShouldAddAttributeHistory);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41778")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleExecutionEnv::get_RSDFileBeingEdited(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI41781", pVal != __nullptr);
+
+		*pVal = _bstr_t(getRSDFileBeingEdited().c_str()).Detach();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41782")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleExecutionEnv::put_RSDFileBeingEdited(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		string& rstrRSDFileBeingEdited = getRSDFileBeingEdited();
+		rstrRSDFileBeingEdited = asString(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41783")
+}
+//-------------------------------------------------------------------------------------------------
 stack<string>& CRuleExecutionEnv::getCurrentStack(bool bThrowExceptionIfStackEmpty)
 {
 	// protect the stack against simultaneous access
@@ -287,5 +344,61 @@ string& CRuleExecutionEnv::getAlternateComponentDataDir()
 	string& rComponentDataDir = m_mapThreadIDToAlternateComponentDataDir[dwThreadID];
 
 	return rComponentDataDir;
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleExecutionEnv::updateSettingsFromRegistry()
+{
+	// Only respect the add attribute history setting if the RDT is licensed
+	if (!LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS))
+	{
+		return;
+	}
+
+	if (!ma_pSettingsCfgMgr->keyExists(gstrSETTINGS_SECTION, gstrAF_ADD_ATTRIBUTE_HISTORY_KEY))
+	{
+		ma_pSettingsCfgMgr->createKey(gstrSETTINGS_SECTION,
+			gstrAF_ADD_ATTRIBUTE_HISTORY_KEY, gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+
+		m_bShouldAddAttributeHistory = asCppBool(gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+	}
+	else
+	{
+		string strValue = ma_pSettingsCfgMgr->getKeyValue(gstrSETTINGS_SECTION,
+			gstrAF_ADD_ATTRIBUTE_HISTORY_KEY, gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+
+		m_bShouldAddAttributeHistory = asCppBool(strValue);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+string& CRuleExecutionEnv::getRSDFileBeingEdited()
+{
+	CSingleLock lg( &m_criticalSection, TRUE );
+
+	// Get the RSD file being edited for the current thread.
+	DWORD dwThreadID = GetCurrentThreadId();
+	string& rRSDFileBeingEdited = m_mapThreadIDToRSDFileBeingEdited[dwThreadID];
+
+	return rRSDFileBeingEdited;
+}
+//-------------------------------------------------------------------------------------------------
+string CRuleExecutionEnv::getCurrentRSDFileName()
+{
+	string strRSDFile;
+
+	// get the current thread's RSD file stack
+	stack<string>& rThisThreadRSDFileStack = getCurrentStack();
+	if (rThisThreadRSDFileStack.size() > 0)
+	{
+		strRSDFile = rThisThreadRSDFileStack.top();
+	}
+	else
+	{
+		strRSDFile = getRSDFileBeingEdited();
+	}
+
+	ASSERT_RUNTIME_CONDITION("ELI41780", !strRSDFile.empty(),
+		"There is no current RSD file");
+
+	return strRSDFile;
 }
 //-------------------------------------------------------------------------------------------------

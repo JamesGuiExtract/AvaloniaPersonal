@@ -322,6 +322,12 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				UCLID_AFCORELib::IAttributePtr ipAttribute = ipAttributes->At(j);
 				ASSERT_RESOURCE_ALLOCATION("ELI19120", ipAttribute != __nullptr);
 
+				// Update data object with trace info
+				if (shouldAddAttributeHistory())
+				{
+					addAttributeHistoryInfo(ipAttribute, i + 1, asString(ipAttributeRule->GetDescription()));
+				}
+
 				// get attribute value as a spatial string first
 				// and then get the string value for the attribute
 				ISpatialStringPtr ipValue = ipAttribute->Value;
@@ -958,5 +964,49 @@ bool CAttributeFindInfo::enabledSplitterExists()
 {
 	return (m_ipAttributeSplitter != __nullptr) && (m_ipAttributeSplitter->Object != __nullptr) &&
 		(m_ipAttributeSplitter->GetEnabled() == VARIANT_TRUE);
+}
+//-------------------------------------------------------------------------------------------------
+bool CAttributeFindInfo::shouldAddAttributeHistory()
+{
+	if (m_ipRuleExecutionEnv == __nullptr)
+	{
+		m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
+		ASSERT_RESOURCE_ALLOCATION("ELI41779", m_ipRuleExecutionEnv != __nullptr);
+	}
+	return m_ipRuleExecutionEnv->ShouldAddAttributeHistory == VARIANT_TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+void CAttributeFindInfo::addAttributeHistoryInfo(UCLID_AFCORELib::IAttributePtr ipAttribute, long nRuleNumber,
+	string strDescription)
+{
+	IIUnknownVectorPtr ipTrace = ipAttribute->DataObject;
+	if (ipTrace == __nullptr)
+	{
+		ipTrace.CreateInstance(CLSID_IUnknownVector);
+		ipAttribute->DataObject = ipTrace;
+	}
+	ASSERT_RESOURCE_ALLOCATION("ELI41765", ipTrace != __nullptr);
+
+	IStrToStrMapPtr ipMap(CLSID_StrToStrMap);
+	string key = "Rule number";
+	_bstr_t bstrValue = _bstr_t(asString(nRuleNumber).c_str());
+	ipMap->Set(_bstr_t(key.c_str()), bstrValue);
+
+	key = "Rule description";
+	bstrValue = _bstr_t(strDescription.c_str());
+	ipMap->Set(_bstr_t(key.c_str()), bstrValue);
+	ipTrace->PushBack(ipMap);
+
+	// Process subattributes
+	IIUnknownVectorPtr ipSubattributes = ipAttribute->SubAttributes;
+	ASSERT_RESOURCE_ALLOCATION("ELI41769", ipSubattributes != __nullptr);
+
+	long nSize = ipSubattributes->Size();
+	for (long i = 0; i < nSize; i++)
+	{
+		UCLID_AFCORELib::IAttributePtr ipSubattribute = ipSubattributes->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI41770", ipSubattribute != __nullptr);
+		addAttributeHistoryInfo(ipSubattribute, nRuleNumber, strDescription);
+	}
 }
 //-------------------------------------------------------------------------------------------------

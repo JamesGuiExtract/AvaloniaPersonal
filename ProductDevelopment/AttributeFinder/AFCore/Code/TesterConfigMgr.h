@@ -69,6 +69,11 @@ public:
 	long getTypeColumnWidth();
 	void setTypeColumnWidth(long lColumnWidth);
 
+	// Returns the width of the Rule column
+	// Stores the width of the Rule column
+	long getRuleColumnWidth();
+	void setRuleColumnWidth(long lColumnWidth);
+
 	//	Gets the last file save directory
 	//	Sets the last file save directory 	
 	string getLastFileSaveDirectory(void);
@@ -106,6 +111,7 @@ private:
 	static const string SHOW_ONLY_VALID_ENTRIES;
 	static const string SPLITTER_POS_Y;
 	static const string TYPE_COLUMN_WIDTH;
+	static const string RULE_COLUMN_WIDTH;
 	static const string LAST_FILE_SAVE_DIR;
 	static const string AUTO_EXPAND_ATTRIBUTES;
 
@@ -122,6 +128,7 @@ private:
 	static const string DEFAULT_SPLITTER_POS_Y;
 	static const string DEFAULT_SHOW_ONLY_VALID_ENTRIES;
 	static const string DEFAULT_TYPE_COLUMN_WIDTH;
+	static const string DEFAULT_RULE_COLUMN_WIDTH;
 	static const string DEFAULT_LAST_FILE_SAVE_DIR;
 	static const string DEFAULT_AUTO_EXPAND_ATTRIBUTES;
 

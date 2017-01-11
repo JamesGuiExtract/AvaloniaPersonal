@@ -35,4 +35,7 @@ const std::string gstrAF_REG_EAVGENERATOR_FOLDER_PATH =
 const std::string gstrAF_PROFILE_RULES_KEY = "ProfileRules";
 const std::string gstrAF_DEFAULT_PROFILE_RULES = "0";
 
+const std::string gstrAF_ADD_ATTRIBUTE_HISTORY_KEY = "AddAttributeHistory";
+const std::string gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY = "0";
+
 const std::string gstrDEFAULT_EMPTY_PAGE_STRING = "___EMPTYPAGE___";

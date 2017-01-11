@@ -85,6 +85,8 @@ private:
 	IObjectWithDescriptionPtr m_ipAttributeSplitter;
 	bool m_bIgnoreAttributeSplitterErrors;
 
+	UCLID_AFCORELib::IRuleExecutionEnvPtr m_ipRuleExecutionEnv;
+
 	//////////////
 	// Methods
 	//////////////
@@ -109,4 +111,12 @@ private:
 	// A method to determine if a splitter object exists in this AttributeFindInfo and
 	// if it is also enabled
 	bool enabledSplitterExists();
+	//----------------------------------------------------------------------------------------------
+	// Recursively adds rule number and description information to an attribute and subattributes
+	void addAttributeHistoryInfo(UCLID_AFCORELib::IAttributePtr ipAttribute, long nRuleNumber,
+		string strDescription);
+	//----------------------------------------------------------------------------------------------
+	// Checks the rule execution environment to determine whether attribute history info should be
+	// added to attributes
+	bool shouldAddAttributeHistory();
 };

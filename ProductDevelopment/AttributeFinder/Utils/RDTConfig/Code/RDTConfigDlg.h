@@ -36,6 +36,7 @@ public:
 	BOOL	m_bAutoOpenImage;
 	BOOL	m_bAutoExpandAttribute;
 	BOOL	m_bEnableProfiling;
+	BOOL	m_bAddAttributeHistory;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -153,6 +154,10 @@ private:
 	// Gets and sets whether ruleset profiling is enabled.
 	bool	getEnableProfiling();
 	void	setEnableProfiling(bool bNewSetting);
+
+	// Gets and sets whether rulesets should add attribute history
+	bool	getAddAttributeHistory();
+	void	setAddAttributeHistory(bool bNewSetting);
 
 	// Return the string for the command line to use to diff the files. The user can specify
 	// any program they want to use, replacing the file names with the placeholders %1 and %2. 

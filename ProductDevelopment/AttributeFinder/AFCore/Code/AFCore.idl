@@ -521,6 +521,8 @@ library UCLID_AFCORELib
 		[id(3), helpstring("method ShowOriginalOCRInUSSFileViewer")] HRESULT ShowOriginalOCRInUSSFileViewer(
 			[in] IAttribute *pAttribute, ISpatialString *pOriginalOCR, VARIANT_BOOL bIncludeIntersecting,
 			ESpatialEntity entityType);
+		[id(4), helpstring("method ShowAttributeHistory")] HRESULT ShowAttributeHistory(
+			[in] IAttribute *pAttribute, long nHandle);
 	}
 
 	[
@@ -658,6 +660,9 @@ library UCLID_AFCORELib
 		// component data directory.
 		[propget, id(7), helpstring("property AlternateComponentDataDir")] HRESULT AlternateComponentDataDir([out, retval] BSTR *pVal);
 		[propput, id(7), helpstring("property AlternateComponentDataDir")] HRESULT AlternateComponentDataDir([in] BSTR newVal);
+		[propget, id(8), helpstring("property ShouldAddAttributeHistory")] HRESULT ShouldAddAttributeHistory([out, retval] VARIANT_BOOL * pbVal);
+		[propget, id(9), helpstring("property RSDFileBeingEdited")] HRESULT RSDFileBeingEdited([out, retval] BSTR *pVal);
+		[propput, id(9), helpstring("property RSDFileBeingEdited")] HRESULT RSDFileBeingEdited([in] BSTR newVal);
 	};
 	
 	//---------------------------------------------------------------------------------------------

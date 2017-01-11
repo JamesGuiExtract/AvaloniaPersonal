@@ -102,6 +102,9 @@ protected:
 	afx_msg void OnShowOriginalOCRExWordsClick();
 	afx_msg void OnShowOcrInUssViewerIncLinesClick();
 	afx_msg void OnShowOcrInUssViewerExLinesClick();
+	afx_msg void OnHighlightInImageViewerClick();
+	afx_msg void OnContextFindingRuleHistoryClick();
+	afx_msg void OnMove(int x, int y);
 	//}}AFX_MSG
 	BOOL OnToolTipNotify(UINT nID, NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
@@ -311,11 +314,14 @@ private:
 	// RETURNS: Pointer to the selected attribute or __nullptr if no attribute is selected
 	UCLID_AFCORELib::IAttributePtr getSelectedAttribute();
 	//=============================================================================
-	// PURPOSE: To display a spatial string in the USS file viewer
-	void displaySpatialStringInUSS(ISpatialStringPtr);
+	// PURPOSE: To format the rule number and description of the last finding rule
+	//			that created this attribute into a string
+	// RETURNS: A string made of the rule number and description
+	string RuleTesterDlg::getRuleDescription(IIUnknownVectorPtr ipTrace);
 	//=============================================================================
-public:
-	afx_msg void OnHighlightInImageViewerClick();
+	// PURPOSE: To save the window size and position info to the registry
+	void RuleTesterDlg::saveLayout();
+	//=============================================================================
 };
 
 //{{AFX_INSERT_LOCATION}}
