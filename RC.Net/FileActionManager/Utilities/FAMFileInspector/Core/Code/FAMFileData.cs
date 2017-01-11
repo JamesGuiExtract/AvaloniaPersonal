@@ -1,5 +1,6 @@
 ﻿using Extract.Imaging;
 using Extract.Imaging.Forms;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,14 +23,16 @@ namespace Extract.FileActionManager.Utilities
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FAMFileData"/> class.
+        /// Initializes a new instance of the <see cref="FAMFileData" /> class.
         /// </summary>
         /// <param name="fileName">The name of the file to which this instance pertains.</param>
-        public FAMFileData(string fileName)
+        /// <param name="voaPathExpression">The path tag expression that defines the attribute data file path</param>
+        public FAMFileData(string fileName, string voaPathExpression)
         {
             try
             {
                 FileName = fileName;
+                VOAPathExpression = voaPathExpression;
             }
             catch (Exception ex)
             {
@@ -177,7 +180,9 @@ namespace Extract.FileActionManager.Utilities
             {
                 try
                 {
-                    string voaFilename = FileName + ".voa";
+                    // Expand the voa file name
+                    SourceDocumentPathTags pathTags = new SourceDocumentPathTags(FileName);
+                    string voaFilename = pathTags.Expand(VOAPathExpression);
                     if (File.Exists(voaFilename))
                     {
                         var data = new IUnknownVector();
@@ -246,6 +251,17 @@ namespace Extract.FileActionManager.Utilities
         /// The page count.
         /// </value>
         public int PageCount
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the path tag expression that determines which associated attribute
+        /// data file will be used for this file
+        /// https://extract.atlassian.net/browse/ISSUE-12702
+        /// </summary>
+        public string VOAPathExpression
         {
             get;
             set;

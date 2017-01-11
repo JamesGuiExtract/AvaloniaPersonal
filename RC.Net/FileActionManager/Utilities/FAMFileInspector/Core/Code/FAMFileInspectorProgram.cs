@@ -76,6 +76,12 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         static string _fileListFileName;
 
+        /// <summary>
+        /// The path tag function that specified which VOA file will be used
+        /// https://extract.atlassian.net/browse/ISSUE-12702
+        /// </summary>
+        static string _voaPathExpression = "<SourceDocName>.voa";
+
         #endregion Fields
 
         #region Main
@@ -136,6 +142,7 @@ namespace Extract.FileActionManager.Utilities
                 {
                     famFileInspectorForm.SubsetType = _subsetType.Value;
                 }
+                famFileInspectorForm.VOAPathExpression = _voaPathExpression;
 
                 if (!string.IsNullOrWhiteSpace(famFileInspectorForm.SourceDirectory))
                 {
@@ -383,6 +390,17 @@ namespace Extract.FileActionManager.Utilities
 
                     _fileListFileName = args[i];
                 }
+                else if (argument.Equals("/voa", StringComparison.OrdinalIgnoreCase))
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        ShowUsage("VOA path expression expected.");
+                        return false;
+                    }
+
+                    _voaPathExpression = args[i];
+                }
                 else if (i == 0)
                 {
                     _databaseServer = argument;
@@ -563,7 +581,9 @@ namespace Extract.FileActionManager.Utilities
                 "[/filefilter <filefilter>] [/r]] " +
                 " | " +
                 "/filelist <filename> ]" +
-                " [/filecount [top|bottom|random] <count>]");
+                " [/filecount [top|bottom|random] <count>]" +
+                " | " +
+                "/voa <voaPathTagExpression> ]");
             usage.AppendLine();
             usage.AppendLine("ServerName: The name of the database server to connect to.");
             usage.AppendLine();
@@ -593,6 +613,9 @@ namespace Extract.FileActionManager.Utilities
             usage.AppendLine("/filecount [top|bottom|random] <count>: Specifies number of files that may be " +
                 "displayed in the file list at once and, optionally, how the subset should be selected from " +
                 "the overall set of files by default. If top/bottom/random is omitted, the default is top.");
+            usage.AppendLine();
+            usage.AppendLine("/voa <voaPathTagExpression>: Specifies the relative path to the attribute " +
+                "data file to be associated with each source document name. The default is \"<SourceDocName>.voa\"");
 
             MessageBox.Show(usage.ToString(), isError ? "Error" : "Usage", MessageBoxButtons.OK,
                 isError ? MessageBoxIcon.Error : MessageBoxIcon.Information,

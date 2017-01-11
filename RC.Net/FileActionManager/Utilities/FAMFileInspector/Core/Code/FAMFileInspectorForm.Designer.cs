@@ -115,6 +115,7 @@
             this._formToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._customSearchTopDockContainer = new TD.SandDock.DockContainer();
             this._customSearchTopDockableWindow = new TD.SandDock.DockableWindow();
+            this._voaPathExpressionLabel = new System.Windows.Forms.Label();
             groupBox1 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
             groupBox1.SuspendLayout();
@@ -462,6 +463,7 @@
             // 
             // _searchPanel
             // 
+            this._searchPanel.Controls.Add(this._voaPathExpressionLabel);
             this._searchPanel.Controls.Add(this._closeSearchPaneButton);
             this._searchPanel.Controls.Add(this._caseSensitiveSearchCheckBox);
             this._searchPanel.Controls.Add(label1);
@@ -1232,6 +1234,17 @@
             this._customSearchTopDockableWindow.Size = new System.Drawing.Size(1211, 173);
             this._customSearchTopDockableWindow.TabIndex = 1;
             // 
+            // _voaPathExpressionLabel
+            // 
+            this._voaPathExpressionLabel.AutoSize = true;
+            this._voaPathExpressionLabel.Location = new System.Drawing.Point(374, 9);
+            this._voaPathExpressionLabel.Name = "_voaPathExpressionLabel";
+            this._voaPathExpressionLabel.Size = new System.Drawing.Size(122, 13);
+            this._voaPathExpressionLabel.TabIndex = 11;
+            this._voaPathExpressionLabel.Text = "<SourceDocName>.voa";
+            this._voaPathExpressionLabel.Visible = false;
+            // 
+            // 
             // FAMFileInspectorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1389,6 +1402,7 @@
         private System.Windows.Forms.ToolStripContainer _formToolStripContainer;
         private TD.SandDock.DockContainer _customSearchTopDockContainer;
         private TD.SandDock.DockableWindow _customSearchTopDockableWindow;
+        private System.Windows.Forms.Label _voaPathExpressionLabel;
 
     }
 }

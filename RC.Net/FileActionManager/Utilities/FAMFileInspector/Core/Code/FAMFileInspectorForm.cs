@@ -922,6 +922,17 @@ namespace Extract.FileActionManager.Utilities
             set;
         }
 
+        /// <summary>
+        /// Gets or sets the path tag expression that determines which associated attribute
+        /// data file will be used for each file
+        /// https://extract.atlassian.net/browse/ISSUE-12702
+        /// </summary>
+        public string VOAPathExpression
+        {
+            get;
+            set;
+        } = "<SourceDocName>.voa";
+
         #endregion Properties
 
         #region Methods
@@ -1357,6 +1368,10 @@ namespace Extract.FileActionManager.Utilities
 
                 InitializeFileSelectionElements();
 
+                // Set label to reflect the VOA that will be used when doing a data search
+                // https://extract.atlassian.net/browse/ISSUE-12702
+                _voaPathExpressionLabel.Text = VOAPathExpression;
+
                 GenerateFileList(false);
 
                 EnsureFileListColumnSizes();
@@ -1759,7 +1774,8 @@ namespace Extract.FileActionManager.Utilities
                 // Show the appropriate search term data grid view based on the selected search type.
                 bool textSearch = _searchTypeComboBox.ToEnumValue<SearchType>() == SearchType.Text;
                 _textSearchTermsDataGridView.Visible = textSearch;
-                _dataSearchTermsDataGridView.Visible = !textSearch;
+                _dataSearchTermsDataGridView.Visible = 
+                    _voaPathExpressionLabel.Visible = !textSearch;
             }
             catch (Exception ex)
             {
@@ -3600,7 +3616,7 @@ namespace Extract.FileActionManager.Utilities
                             // Retrieve the data for the results table.
                             var fileData = (preservedData != null && preservedData.ContainsKey(fileName))
                                 ? preservedData[fileName]
-                                : new FAMFileData(fileName);
+                                : new FAMFileData(fileName, VOAPathExpression);
 
                             Bitmap flagValue = fileData.Flagged ? Resources.FlagImage : null;
 
@@ -3699,7 +3715,7 @@ namespace Extract.FileActionManager.Utilities
                         // Retrieve the data for the results table.
                         var fileData = (preservedData != null && preservedData.ContainsKey(filePath))
                             ? preservedData[filePath]
-                            : new FAMFileData(filePath);
+                            : new FAMFileData(filePath, VOAPathExpression);
 
                         Bitmap flagValue = fileData.Flagged ? Resources.FlagImage : null;
 
