@@ -311,126 +311,6 @@ namespace Extract.Utilities.Parsers
         /// <summary>
         /// Finds the <see cref="Pattern"/> in the input string.
         /// </summary>
-        /// <param name="parser">The <see cref="Regex"/> to be used for the search</param>
-        /// <param name="input">The string to search.</param>
-        /// <param name="findFirstMatchOnly">Determines if only the first match should be returned
-        /// or all matches.</param>
-        /// <param name="returnNamedMatches">If <see langword="true"/> returns named submatches 
-        /// otherwise returns no sub matches</param>
-        /// <returns>IUnknownVector that contains ObjectPair objects that have  
-        ///     Object1 = a Token object representing a match
-        ///     Object2 = null if no captured groups and a IUnknownVector of Token objects
-        ///                 with the Name set to the group name. </returns>
-        IUnknownVector Find(Regex parser, string input, bool findFirstMatchOnly, bool returnNamedMatches)
-        {
-            try
-            {
-                // Get the first match if there is one
-                Match foundMatch = parser.Match(input);
-
-                // Create the return object
-                IUnknownVector returnVector = new IUnknownVector();
-
-                // While there is a match and that match is not empty process the matches
-                while (foundMatch.Success && foundMatch.Length != 0 && foundMatch.Index < input.Length)
-                {
-                    // Create the token object for the match
-                    Token t = new Token();
-                    t.InitToken(foundMatch.Index, foundMatch.Index + foundMatch.Length - 1, "",
-                        foundMatch.Value);
-
-                    // Get the sub matches 
-                    IUnknownVector namedMatches = null;
-
-                    if (returnNamedMatches)
-                    {
-                        namedMatches = new IUnknownVector();
-
-                        // Process the groups, starting with the 2nd item
-                        // in the group list because the first item is just the
-                        // entire match
-                        for (int i = 1; i < foundMatch.Groups.Count; i++)
-                        {
-                            // Get the group
-                            Group g = foundMatch.Groups[i];
-
-                            // Get the name of the group from the parser
-                            string groupName = parser.GroupNameFromNumber(i);
-
-                            // Don't create a capture token if name begins with a number or
-                            // an '_' since these are understood as representing non-named groups
-                            // Group name can be empty string so don't just index into it
-                            // https://extract.atlassian.net/browse/ISSUE-13902
-                            char firstChar = groupName.FirstOrDefault();
-                            if (!_outputUnderscoreGroups && firstChar == '_'
-                                || firstChar == default(char) || char.IsNumber(firstChar))
-                            {
-                                continue;
-                            }
-
-                            // If returning all captures and the group actually captured something
-                            // iterate through its capture collection
-                            if (ReturnAllGroupCaptures && g.Success)
-                            {
-                                foreach (Capture c in g.Captures)
-                                {
-                                    // Create a new token object
-                                    Token captureToken = new Token();
-
-                                    // Initialize with the values from the capture
-                                    captureToken.InitToken(c.Index, c.Index + c.Length - 1, groupName, c.Value);
-
-                                    // Add to the named matches collection.
-                                    namedMatches.PushBack(captureToken);
-                                }
-                            }
-                            // Otherwise use the values of the group
-                            else
-                            {
-                                // Create a new token object
-                                Token captureToken = new Token();
-
-                                // Initialize with the values from the group
-                                captureToken.InitToken(g.Index, g.Index + g.Length - 1, groupName, g.Value);
-
-                                // Add to the named matches collection.
-                                namedMatches.PushBack(captureToken);
-                            }
-                        }
-                    }
-
-                    // Set up the Object pair with the token and the sub matches
-                    ObjectPair op = new ObjectPair();
-                    op.Object1 = t;
-                    op.Object2 = namedMatches;
-
-                    // Put match on return vector
-                    returnVector.PushBack(op);
-
-                    // If only want the first match return.
-                    if (findFirstMatchOnly)
-                    {
-                        return returnVector;
-                    }
-
-                    // Get the next match
-                    foundMatch = foundMatch.NextMatch();
-                }
-
-                // Return the results
-                return returnVector;
-            }
-            catch (Exception ex)
-            {
-                var ue = ex.AsExtract("ELI41754");
-                ue.AddDebugData("Pattern", _pattern, true);
-                throw ue;
-            }
-        }
-
-        /// <summary>
-        /// Finds the <see cref="Pattern"/> in the input string.
-        /// </summary>
         /// <param name="strInput">The string to search.</param>
         /// <param name="bFindFirstMatchOnly">Determines if only the first match should be returned
         /// or all matches.</param>
@@ -490,109 +370,6 @@ namespace Extract.Utilities.Parsers
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI22259", "Could not process find.", ex);
-            }
-        }
-
-        /// <summary>
-        /// Search the input text and retrieves tokens representing the named groups from a
-        /// successful search. The primary search result is ignored.
-        /// </summary>
-        /// <param name="parser">The <see cref="Regex"/> to be used for the search</param>
-        /// <param name="input">The string to search.</param>
-        /// <param name="findFirstMatchOnly"><see langword="true"/> to return the named groups for
-        /// the first match only; <see langword="true"/> to return the named groups for all matches.
-        /// </param>
-        /// <returns>An <see cref="IUnknownVector"/> of <see cref="Token"/>s representing the named
-        /// groups from a successful search. Null will be returned if the overall regex
-        /// did not match. An empty vector will be returned if there was a match but there were no
-        /// non-empty named groups.</returns>
-        IUnknownVector FindNamedGroups(Regex parser, string input, bool findFirstMatchOnly)
-        {
-            try
-            {
-                // Get the first match if there is one
-                Match foundMatch = parser.Match(input);
-
-                if (!foundMatch.Success)
-                {
-                    return null;
-                }
-
-                // Create the return object
-                IUnknownVector returnVector = new IUnknownVector();
-
-                // Iterate every match.
-                while (foundMatch.Success)
-                {
-                    // Process the groups, starting with the 2nd item
-                    // in the group list because the first item is just the
-                    // entire match
-                    for (int i = 1; i < foundMatch.Groups.Count; i++)
-                    {
-                        // Get the group
-                        Group g = foundMatch.Groups[i];
-
-                        // Get the name of the group from the parser
-                        string groupName = parser.GroupNameFromNumber(i);
-
-                        // Don't create a capture token if name begins with a number or
-                        // an '_' since these are understood as representing non-named groups
-                        // Group name can be empty string so don't just index into it
-                        // https://extract.atlassian.net/browse/ISSUE-13902
-                        char firstChar = groupName.FirstOrDefault();
-                        if (!_outputUnderscoreGroups && firstChar == '_'
-                            || firstChar == default(char) || char.IsNumber(firstChar))
-                        {
-                            continue;
-                        }
-
-                        // If returning all captures and the group actually captured something
-                        // iterate through its capture collection
-                        if (ReturnAllGroupCaptures && g.Success)
-                        {
-                            foreach (Capture c in g.Captures)
-                            {
-                                // Create a new token object
-                                Token captureToken = new Token();
-
-                                // Initialize with the values from the capture
-                                captureToken.InitToken(c.Index, c.Index + c.Length - 1, groupName, c.Value);
-
-                                // Add to the named matches collection.
-                                returnVector.PushBack(captureToken);
-                            }
-                        }
-                        // Otherwise use the values of the group
-                        else
-                        {
-                            // Create a new token object
-                            Token captureToken = new Token();
-
-                            // Initialize with the values from the group
-                            captureToken.InitToken(g.Index, g.Index + g.Length - 1, groupName, g.Value);
-
-                            // Add to the named matches collection.
-                            returnVector.PushBack(captureToken);
-                        }
-                    }
-
-                    // If only want the first match return.
-                    if (findFirstMatchOnly)
-                    {
-                        break;
-                    }
-
-                    // Get the next match
-                    foundMatch = foundMatch.NextMatch();
-                }
-
-                return returnVector;
-            }
-            catch (Exception ex)
-            {
-                var ue = ex.AsExtract("ELI41755");
-                ue.AddDebugData("Pattern", _pattern, true);
-                throw ue;
             }
         }
 
@@ -796,34 +573,6 @@ namespace Extract.Utilities.Parsers
         }
 
         /// <summary>
-        /// Checks input string for exact match of the pattern.
-        /// </summary>
-        /// <param name="parser">The <see cref="Regex"/> to be used for the search</param>
-        /// <param name="input">The string to check for pattern.</param>
-        /// <returns><see langword="true"/> if the input exactly matches pattern.
-        /// <see langword="false"/> otherwise</returns>
-        bool StringMatchesPattern(Regex parser, string input)
-        {
-            try
-            {
-                // Find the pattern in the input
-                Match foundMatch = parser.Match(input);
-
-                // If the beginning and end of the match is the beginning and end of the
-                // input string return true
-                return foundMatch.Success
-                    && foundMatch.Index == 0
-                    && foundMatch.Length == input.Length;
-            }
-            catch (Exception ex)
-            {
-                var ue = ex.AsExtract("ELI41756");
-                ue.AddDebugData("Pattern", _pattern, true);
-                throw ue;
-            }
-        }
-
-        /// <summary>
         /// Determines the locations and resultant replacement text if matches were replaced with 
         /// the specified text.
         /// </summary>
@@ -864,63 +613,6 @@ namespace Extract.Utilities.Parsers
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI24230", "Could not find replacements.", ex);
-            }
-        }
-
-        /// <summary>
-        /// Determines the locations and resultant replacement text if matches were replaced with 
-        /// the specified text.
-        /// </summary>
-        /// <param name="parser">The <see cref="Regex"/> to be used for the search</param>
-        /// <param name="input">The <see cref="String"/> to search for replacements.</param>
-        /// <param name="replacement">The string to use to replace matches in 
-        /// <paramref name="input"/>. May contain capture groups (e.g. "$1 $2").</param>
-        /// <param name="findFirstMatchOnly"><see langword="true"/> if only the first match should 
-        /// be found; <see langword="false"/> if more than one match should be found.</param>
-        /// <returns>An <see cref="IUnknownVector"/> of <see cref="Token"/>s, where the 
-        /// positions are expressed prior to performing the replacement and the value of the token 
-        /// represents the text after performing the replacement.</returns>
-        IUnknownVector FindReplacements(Regex parser, string input, string replacement,
-            bool findFirstMatchOnly)
-        {
-            try
-            {
-                // Get the first match if there is one
-                Match foundMatch = parser.Match(input);
-
-                // Create a vector to hold the found replacements
-                IUnknownVector replacements = new IUnknownVector();
-
-                // While there is a match and that match is not empty process the match
-                while (foundMatch.Success && foundMatch.Length != 0 &&
-                    foundMatch.Index < input.Length)
-                {
-                    // Create the token object for the match
-                    Token token = new Token();
-                    token.InitToken(foundMatch.Index, foundMatch.Index + foundMatch.Length - 1, "",
-                        foundMatch.Result(replacement));
-
-                    // Put match in return vector
-                    replacements.PushBack(token);
-
-                    // If we are only looking for the first match, we are done.
-                    if (findFirstMatchOnly)
-                    {
-                        return replacements;
-                    }
-
-                    // Get the next match
-                    foundMatch = foundMatch.NextMatch();
-                }
-
-                // Return the results
-                return replacements;
-            }
-            catch (Exception ex)
-            {
-                var ue = ex.AsExtract("ELI41757");
-                ue.AddDebugData("Pattern", _pattern, true);
-                throw ue;
             }
         }
 
@@ -1185,6 +877,314 @@ namespace Extract.Utilities.Parsers
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Finds the <see cref="Pattern"/> in the input string.
+        /// </summary>
+        /// <param name="parser">The <see cref="Regex"/> to be used for the search</param>
+        /// <param name="input">The string to search.</param>
+        /// <param name="findFirstMatchOnly">Determines if only the first match should be returned
+        /// or all matches.</param>
+        /// <param name="returnNamedMatches">If <see langword="true"/> returns named submatches 
+        /// otherwise returns no sub matches</param>
+        /// <returns>IUnknownVector that contains ObjectPair objects that have  
+        ///     Object1 = a Token object representing a match
+        ///     Object2 = null if no captured groups and a IUnknownVector of Token objects
+        ///                 with the Name set to the group name. </returns>
+        IUnknownVector Find(Regex parser, string input, bool findFirstMatchOnly, bool returnNamedMatches)
+        {
+            try
+            {
+                // Get the first match if there is one
+                Match foundMatch = parser.Match(input);
+
+                // Create the return object
+                IUnknownVector returnVector = new IUnknownVector();
+
+                // While there is a match and that match is not empty process the matches
+                while (foundMatch.Success && foundMatch.Length != 0 && foundMatch.Index < input.Length)
+                {
+                    // Create the token object for the match
+                    Token t = new Token();
+                    t.InitToken(foundMatch.Index, foundMatch.Index + foundMatch.Length - 1, "",
+                        foundMatch.Value);
+
+                    // Get the sub matches 
+                    IUnknownVector namedMatches = null;
+
+                    if (returnNamedMatches)
+                    {
+                        namedMatches = new IUnknownVector();
+
+                        // Process the groups, starting with the 2nd item
+                        // in the group list because the first item is just the
+                        // entire match
+                        for (int i = 1; i < foundMatch.Groups.Count; i++)
+                        {
+                            // Get the group
+                            Group g = foundMatch.Groups[i];
+
+                            // Get the name of the group from the parser
+                            string groupName = parser.GroupNameFromNumber(i);
+
+                            // Don't create a capture token if name begins with a number or
+                            // an '_' since these are understood as representing non-named groups
+                            // Group name can be empty string so don't just index into it
+                            // https://extract.atlassian.net/browse/ISSUE-13902
+                            char firstChar = groupName.FirstOrDefault();
+                            if (!_outputUnderscoreGroups && firstChar == '_'
+                                || firstChar == default(char) || char.IsNumber(firstChar))
+                            {
+                                continue;
+                            }
+
+                            // If returning all captures and the group actually captured something
+                            // iterate through its capture collection
+                            if (ReturnAllGroupCaptures && g.Success)
+                            {
+                                foreach (Capture c in g.Captures)
+                                {
+                                    // Create a new token object
+                                    Token captureToken = new Token();
+
+                                    // Initialize with the values from the capture
+                                    captureToken.InitToken(c.Index, c.Index + c.Length - 1, groupName, c.Value);
+
+                                    // Add to the named matches collection.
+                                    namedMatches.PushBack(captureToken);
+                                }
+                            }
+                            // Otherwise use the values of the group
+                            else
+                            {
+                                // Create a new token object
+                                Token captureToken = new Token();
+
+                                // Initialize with the values from the group
+                                captureToken.InitToken(g.Index, g.Index + g.Length - 1, groupName, g.Value);
+
+                                // Add to the named matches collection.
+                                namedMatches.PushBack(captureToken);
+                            }
+                        }
+                    }
+
+                    // Set up the Object pair with the token and the sub matches
+                    ObjectPair op = new ObjectPair();
+                    op.Object1 = t;
+                    op.Object2 = namedMatches;
+
+                    // Put match on return vector
+                    returnVector.PushBack(op);
+
+                    // If only want the first match return.
+                    if (findFirstMatchOnly)
+                    {
+                        return returnVector;
+                    }
+
+                    // Get the next match
+                    foundMatch = foundMatch.NextMatch();
+                }
+
+                // Return the results
+                return returnVector;
+            }
+            catch (Exception ex)
+            {
+                var ue = ex.AsExtract("ELI41754");
+                ue.AddDebugData("Pattern", _pattern, true);
+                throw ue;
+            }
+        }
+
+        /// <summary>
+        /// Search the input text and retrieves tokens representing the named groups from a
+        /// successful search. The primary search result is ignored.
+        /// </summary>
+        /// <param name="parser">The <see cref="Regex"/> to be used for the search</param>
+        /// <param name="input">The string to search.</param>
+        /// <param name="findFirstMatchOnly"><see langword="true"/> to return the named groups for
+        /// the first match only; <see langword="true"/> to return the named groups for all matches.
+        /// </param>
+        /// <returns>An <see cref="IUnknownVector"/> of <see cref="Token"/>s representing the named
+        /// groups from a successful search. Null will be returned if the overall regex
+        /// did not match. An empty vector will be returned if there was a match but there were no
+        /// non-empty named groups.</returns>
+        IUnknownVector FindNamedGroups(Regex parser, string input, bool findFirstMatchOnly)
+        {
+            try
+            {
+                // Get the first match if there is one
+                Match foundMatch = parser.Match(input);
+
+                if (!foundMatch.Success)
+                {
+                    return null;
+                }
+
+                // Create the return object
+                IUnknownVector returnVector = new IUnknownVector();
+
+                // Iterate every match.
+                while (foundMatch.Success)
+                {
+                    // Process the groups, starting with the 2nd item
+                    // in the group list because the first item is just the
+                    // entire match
+                    for (int i = 1; i < foundMatch.Groups.Count; i++)
+                    {
+                        // Get the group
+                        Group g = foundMatch.Groups[i];
+
+                        // Get the name of the group from the parser
+                        string groupName = parser.GroupNameFromNumber(i);
+
+                        // Don't create a capture token if name begins with a number or
+                        // an '_' since these are understood as representing non-named groups
+                        // Group name can be empty string so don't just index into it
+                        // https://extract.atlassian.net/browse/ISSUE-13902
+                        char firstChar = groupName.FirstOrDefault();
+                        if (!_outputUnderscoreGroups && firstChar == '_'
+                            || firstChar == default(char) || char.IsNumber(firstChar))
+                        {
+                            continue;
+                        }
+
+                        // If returning all captures and the group actually captured something
+                        // iterate through its capture collection
+                        if (ReturnAllGroupCaptures && g.Success)
+                        {
+                            foreach (Capture c in g.Captures)
+                            {
+                                // Create a new token object
+                                Token captureToken = new Token();
+
+                                // Initialize with the values from the capture
+                                captureToken.InitToken(c.Index, c.Index + c.Length - 1, groupName, c.Value);
+
+                                // Add to the named matches collection.
+                                returnVector.PushBack(captureToken);
+                            }
+                        }
+                        // Otherwise use the values of the group
+                        else
+                        {
+                            // Create a new token object
+                            Token captureToken = new Token();
+
+                            // Initialize with the values from the group
+                            captureToken.InitToken(g.Index, g.Index + g.Length - 1, groupName, g.Value);
+
+                            // Add to the named matches collection.
+                            returnVector.PushBack(captureToken);
+                        }
+                    }
+
+                    // If only want the first match return.
+                    if (findFirstMatchOnly)
+                    {
+                        break;
+                    }
+
+                    // Get the next match
+                    foundMatch = foundMatch.NextMatch();
+                }
+
+                return returnVector;
+            }
+            catch (Exception ex)
+            {
+                var ue = ex.AsExtract("ELI41755");
+                ue.AddDebugData("Pattern", _pattern, true);
+                throw ue;
+            }
+        }
+
+        /// <summary>
+        /// Checks input string for exact match of the pattern.
+        /// </summary>
+        /// <param name="parser">The <see cref="Regex"/> to be used for the search</param>
+        /// <param name="input">The string to check for pattern.</param>
+        /// <returns><see langword="true"/> if the input exactly matches pattern.
+        /// <see langword="false"/> otherwise</returns>
+        bool StringMatchesPattern(Regex parser, string input)
+        {
+            try
+            {
+                // Find the pattern in the input
+                Match foundMatch = parser.Match(input);
+
+                // If the beginning and end of the match is the beginning and end of the
+                // input string return true
+                return foundMatch.Success
+                    && foundMatch.Index == 0
+                    && foundMatch.Length == input.Length;
+            }
+            catch (Exception ex)
+            {
+                var ue = ex.AsExtract("ELI41756");
+                ue.AddDebugData("Pattern", _pattern, true);
+                throw ue;
+            }
+        }
+
+        /// <summary>
+        /// Determines the locations and resultant replacement text if matches were replaced with 
+        /// the specified text.
+        /// </summary>
+        /// <param name="parser">The <see cref="Regex"/> to be used for the search</param>
+        /// <param name="input">The <see cref="String"/> to search for replacements.</param>
+        /// <param name="replacement">The string to use to replace matches in 
+        /// <paramref name="input"/>. May contain capture groups (e.g. "$1 $2").</param>
+        /// <param name="findFirstMatchOnly"><see langword="true"/> if only the first match should 
+        /// be found; <see langword="false"/> if more than one match should be found.</param>
+        /// <returns>An <see cref="IUnknownVector"/> of <see cref="Token"/>s, where the 
+        /// positions are expressed prior to performing the replacement and the value of the token 
+        /// represents the text after performing the replacement.</returns>
+        IUnknownVector FindReplacements(Regex parser, string input, string replacement,
+            bool findFirstMatchOnly)
+        {
+            try
+            {
+                // Get the first match if there is one
+                Match foundMatch = parser.Match(input);
+
+                // Create a vector to hold the found replacements
+                IUnknownVector replacements = new IUnknownVector();
+
+                // While there is a match and that match is not empty process the match
+                while (foundMatch.Success && foundMatch.Length != 0 &&
+                    foundMatch.Index < input.Length)
+                {
+                    // Create the token object for the match
+                    Token token = new Token();
+                    token.InitToken(foundMatch.Index, foundMatch.Index + foundMatch.Length - 1, "",
+                        foundMatch.Result(replacement));
+
+                    // Put match in return vector
+                    replacements.PushBack(token);
+
+                    // If we are only looking for the first match, we are done.
+                    if (findFirstMatchOnly)
+                    {
+                        return replacements;
+                    }
+
+                    // Get the next match
+                    foundMatch = foundMatch.NextMatch();
+                }
+
+                // Return the results
+                return replacements;
+            }
+            catch (Exception ex)
+            {
+                var ue = ex.AsExtract("ELI41757");
+                ue.AddDebugData("Pattern", _pattern, true);
+                throw ue;
+            }
         }
 
         #endregion
