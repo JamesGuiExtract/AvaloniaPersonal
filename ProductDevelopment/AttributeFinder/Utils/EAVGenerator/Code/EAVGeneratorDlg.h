@@ -48,6 +48,7 @@ public:
 	CButton m_btnMerge;
 	CString m_zAttributePath;
 	CString m_zAttributeGUID;
+	CString m_zAttributeSDN;
 	CStatic m_labelFilename;
 	CButton m_radioReplace;
 	CButton m_radioAppend;
@@ -135,6 +136,7 @@ private:
 	static const int	VALUE_COLUMN = 1;
 	static const int	TYPE_COLUMN = 2;
 	static const int	SPATIALNESS_COLUMN = 3;
+	static const int	PAGE_COLUMN = 4;
 
 	// static constants used to specify whether to open or not open the SRW
 	static const bool gbOPEN_SRW = true;

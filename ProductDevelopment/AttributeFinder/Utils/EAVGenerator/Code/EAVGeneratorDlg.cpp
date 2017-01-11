@@ -58,6 +58,7 @@ CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
         m_zValue = _T("");
         m_zAttributePath = _T("");
         m_zAttributeGUID = _T("");
+        m_zAttributeSDN = _T("");
 
         //}}AFX_DATA_INIT
         // Note that LoadIcon does not require a subsequent DestroyIcon in Win32
@@ -221,12 +222,13 @@ void CEAVGeneratorDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Text(pDX, IDC_EDIT_VALUE, m_zValue);
     DDX_Text(pDX, IDC_EDIT_ATTRIBUTE_PATH, m_zAttributePath);
     DDX_Text(pDX, IDC_EDIT_ATTRIBUTE_GUID, m_zAttributeGUID);
+    DDX_Text(pDX, IDC_EDIT_ATTRIBUTE_SDN, m_zAttributeSDN);
     DDX_Control(pDX, IDC_BTN_MERGE, m_btnMerge);
     DDX_Control(pDX, IDC_LABEL_FILENAME, m_labelFilename);
     DDX_Control(pDX, IDC_RADIO_REPLACE, m_radioReplace);
     DDX_Control(pDX, IDC_RADIO_APPEND, m_radioAppend);
     DDX_Control(pDX, IDC_STATIC_ATTRIBUTE_PATH, m_labelAttributePath);
-    DDX_Control(pDX, IDC_STATIC_FILENAME, m_currentFilename);
+    DDX_Control(pDX, IDC_EDIT_FILENAME, m_currentFilename);
     DDX_Control(pDX, IDC_STATIC_GROUP, m_valueGroup);
     DDX_Control(pDX, IDC_STATIC_NAME, m_labelName);
     DDX_Control(pDX, IDC_STATIC_TYPE, m_labelType);
@@ -456,11 +458,12 @@ void CEAVGeneratorDlg::addSubAttributes(IAttributePtr ipAttribute,
         ISpatialStringPtr ipValue = ipThisSub->Value;
         ASSERT_RESOURCE_ALLOCATION("ELI15605", ipValue != __nullptr);
 
-        // Get Name, Value, Type, and Mode
+        // Get Name, Value, Type, Mode and Page
         string	strName = asString(ipThisSub->Name);
         string	strValue = asString(ipValue->String);
         string	strType = asString(ipThisSub->Type);
         ESpatialStringMode eMode = ipValue->GetMode();
+        string strPage = eMode == kNonSpatialMode ? "" : asString(ipValue->GetFirstPageNumber());
 
         // convert cpp string to user-displayable string
         ::convertCppStringToNormalString(strValue);
@@ -480,6 +483,7 @@ void CEAVGeneratorDlg::addSubAttributes(IAttributePtr ipAttribute,
         m_listAttributes.SetItemText( nNewItemIndex, TYPE_COLUMN, strType.c_str() );
         m_listAttributes.SetItemText( nNewItemIndex, SPATIALNESS_COLUMN,
             getModeAsString(eMode).c_str());
+        m_listAttributes.SetItemText( nNewItemIndex, PAGE_COLUMN, strPage.c_str());
 
         // Add any grandchildren items
         addSubAttributes( ipThisSub, iNumItemsUnderInsertionPoint, iSubLevel + 1 );
@@ -562,6 +566,8 @@ void CEAVGeneratorDlg::displayAttributes(IIUnknownVectorPtr ipAttributes)
             string strName = asString(ipAttribute->Name);
             string strValue = asString(ipValue->String);
             string strType = asString(ipAttribute->Type);
+			ESpatialStringMode eMode = ipValue->GetMode();
+			string strPage = eMode == kNonSpatialMode ? "" : asString(ipValue->GetFirstPageNumber());
 
             // convert the attribute value to user displayable text [P16 #2860]
             convertCppStringToNormalString(strValue);
@@ -586,7 +592,10 @@ void CEAVGeneratorDlg::displayAttributes(IIUnknownVectorPtr ipAttributes)
 
             // Add the mode
             m_listAttributes.SetItemText( nNewItemIndex, SPATIALNESS_COLUMN,
-                getModeAsString(ipValue->GetMode()).c_str());
+                getModeAsString(eMode).c_str());
+
+			// Add the page number
+			m_listAttributes.SetItemText( nNewItemIndex, PAGE_COLUMN, strPage.c_str());
 
             // Add any sub attributes to end of list
             addSubAttributes( ipAttribute, 0, 1 );
@@ -1097,6 +1106,9 @@ void CEAVGeneratorDlg::updateButtons()
         // Initialize GUID text to empty string
         m_zAttributeGUID = "";
 
+        // Initialize SDN text to empty string
+        m_zAttributeSDN = "";
+
         // Get the attribute from the list box
         IAttribute* pAttribute = (IAttribute*) m_listAttributes.GetItemData(iSelectedItemIndex);
         if (pAttribute != __nullptr)
@@ -1106,6 +1118,8 @@ void CEAVGeneratorDlg::updateButtons()
             {
                 m_zAttributeGUID = asString(ipIdentifible->InstanceGUID).c_str();
             }
+
+			m_zAttributeSDN = asString(pAttribute->Value->SourceDocName).c_str();
         }
 
         // First item cannot move up
@@ -1122,6 +1136,7 @@ void CEAVGeneratorDlg::updateButtons()
         m_zType = "";
         m_zAttributePath = "";
         m_zAttributeGUID = "";
+        m_zAttributeSDN = "";
 
         // Disable the up and down arrows
         m_btnUp.EnableWindow(FALSE);
@@ -1193,9 +1208,14 @@ void CEAVGeneratorDlg::updateList(int nColumnNumber, const CString& zText)
                 ipValue->ReplaceAndDowngradeToNonSpatial(strText.c_str());
             }
 
-            // Update the spatial mode column
-            m_listAttributes.SetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN,
-                getModeAsString(ipValue->GetMode()).c_str());
+            // Update the spatial mode and page columns
+			ESpatialStringMode eMode = ipValue->GetMode();
+			string strPage = eMode == kNonSpatialMode ? "" : asString(ipValue->GetFirstPageNumber());
+
+			m_listAttributes.SetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN,
+				getModeAsString(eMode).c_str());
+			m_listAttributes.SetItemText(nSelectedItemIndex, PAGE_COLUMN, strPage.c_str());
+
         }
         break;
 
@@ -1250,7 +1270,7 @@ void CEAVGeneratorDlg::updateWindowCaption(const CString& zFileName)
         ::getLongPathName((LPCTSTR)zFileName, strFileName);
     }
     // update current file name
-    GetDlgItem(IDC_STATIC_FILENAME)->SetWindowText(strFileName.c_str());
+    GetDlgItem(IDC_EDIT_FILENAME)->SetWindowText(strFileName.c_str());
 }
 //-------------------------------------------------------------------------------------------------
 bool CEAVGeneratorDlg::validateAttributes()
@@ -1713,9 +1733,13 @@ void CEAVGeneratorDlg::appendOrReplaceAttribute(IAttributePtr ipNewAttribute)
             ::convertCppStringToNormalString(strText);
             m_listAttributes.SetItemText(nSelectedItemIndex, VALUE_COLUMN, strText.c_str());
 
-            // Update the spatial mode column
-            m_listAttributes.SetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN,
-                getModeAsString(ipOldValue->GetMode()).c_str());
+            // Update the spatial mode and page columns
+			ESpatialStringMode eMode = ipOldValue->GetMode();
+			string strPage = eMode == kNonSpatialMode ? "" : asString(ipOldValue->GetFirstPageNumber());
+
+			m_listAttributes.SetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN,
+				getModeAsString(eMode).c_str());
+			m_listAttributes.SetItemText(nSelectedItemIndex, PAGE_COLUMN, strPage.c_str());
 
             // Set the appropriate radio button and reset the flag
             CheckRadioButton(IDC_RADIO_REPLACE, IDC_RADIO_APPEND, IDC_RADIO_REPLACE);
@@ -1811,6 +1835,7 @@ void CEAVGeneratorDlg::moveSubAttributes(int nInsertAfter, int nMoveFrom, unsign
         string strValue = m_listAttributes.GetItemText(nMoveFrom, VALUE_COLUMN);
         string strType = m_listAttributes.GetItemText(nMoveFrom, TYPE_COLUMN);
         string strSpatialness = m_listAttributes.GetItemText(nMoveFrom, SPATIALNESS_COLUMN);
+        string strPage = m_listAttributes.GetItemText(nMoveFrom, PAGE_COLUMN);
         
         // Used to hold the current attribute - just need to move the pointers 
         IAttribute *pAttribute = (IAttribute *)m_listAttributes.GetItemData(nMoveFrom);
@@ -1826,6 +1851,7 @@ void CEAVGeneratorDlg::moveSubAttributes(int nInsertAfter, int nMoveFrom, unsign
         m_listAttributes.SetItemText(nNewItem, VALUE_COLUMN, strValue.c_str());
         m_listAttributes.SetItemText(nNewItem, TYPE_COLUMN, strType.c_str());
         m_listAttributes.SetItemText(nNewItem, SPATIALNESS_COLUMN, strSpatialness.c_str());
+        m_listAttributes.SetItemText(nNewItem, PAGE_COLUMN, strPage.c_str());
 
         // Advance the item numbers
         nInsertAt++;
@@ -1914,22 +1940,25 @@ void CEAVGeneratorDlg::doResize()
     GetWindowRect(rectDlg);
     m_listAttributes.GetClientRect(rectControl);
 
-    LVCOLUMN col0, col1, col2, col3;
-    col0.mask = col1.mask = col2.mask =	col3.mask = LVCF_WIDTH;
+    LVCOLUMN col0, col1, col2, col3, col4;
+    col0.mask = col1.mask = col2.mask =	col3.mask = col4.mask = LVCF_WIDTH;
     m_listAttributes.GetColumn(0, &col0);
     m_listAttributes.GetColumn(1, &col1);
     m_listAttributes.GetColumn(2, &col2);
     m_listAttributes.GetColumn(3, &col3);
+    m_listAttributes.GetColumn(4, &col4);
         
-    col0.cx = rectControl.Width() / 5;
+    col0.cx = rectControl.Width() / 6;
     col2.cx = col0.cx;
-    col3.cx = (rectControl.Width()-rectDlg.Width()+giEAVGENDLG_MIN_WIDTH)/6;
-    col1.cx = rectControl.Width() - col0.cx - col2.cx - col3.cx;
+    col3.cx = (rectControl.Width()-rectDlg.Width()+giEAVGENDLG_MIN_WIDTH)/7;
+	col4.cx = col3.cx * 2 / 3;
+    col1.cx = rectControl.Width() - col0.cx - col2.cx - col3.cx - col4.cx;
         
     m_listAttributes.SetColumn(0, &col0);
     m_listAttributes.SetColumn(1, &col1);
     m_listAttributes.SetColumn(2, &col2);
     m_listAttributes.SetColumn(3, &col3);
+    m_listAttributes.SetColumn(4, &col4);
         
     // Move controls anchored top and right
     m_wMgr.moveAnchoredTopRight(m_btnAdd, m_nDefaultW, m_nDefaultH, FALSE);
@@ -1947,17 +1976,21 @@ void CEAVGeneratorDlg::doResize()
     m_wMgr.moveAnchoredBottomLeft(m_labelName, m_nDefaultW, m_nDefaultH, FALSE);
     m_wMgr.moveAnchoredBottomLeft(m_labelValue, m_nDefaultW, m_nDefaultH, FALSE);
     m_wMgr.moveAnchoredBottomLeft(m_labelType, m_nDefaultW, m_nDefaultH, FALSE);
-    m_wMgr.moveAnchoredBottomLeft(m_labelAttributePath, m_nDefaultW, m_nDefaultH, FALSE);
-    m_wMgr.moveAnchoredBottomLeft(m_labelAttributeGUID, m_nDefaultW, m_nDefaultH, FALSE);
     m_wMgr.moveAnchoredBottomLeft(m_labelFilename, m_nDefaultW, m_nDefaultH, FALSE);
+    m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_STATIC_ATTRIBUTE_SDN), m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Move controls anchored bottom and right
+    m_wMgr.moveAnchoredBottomRight(m_labelAttributePath, m_nDefaultW, m_nDefaultH, FALSE);
+    m_wMgr.moveAnchoredBottomRight(m_editAttributePath, m_nDefaultW, m_nDefaultH, FALSE);
+    m_wMgr.moveAnchoredBottomRight(m_labelAttributeGUID, m_nDefaultW, m_nDefaultH, FALSE);
+    m_wMgr.moveAnchoredBottomRight(m_editAttributeGUID, m_nDefaultW, m_nDefaultH, FALSE);
 
     // Move controls anchored bottom, left and right
     m_wMgr.moveAnchoredBottomLeftRight(m_editName, m_nDefaultW, m_nDefaultH, FALSE);
     m_wMgr.moveAnchoredBottomLeftRight(m_editValue, m_nDefaultW, m_nDefaultH, FALSE);
     m_wMgr.moveAnchoredBottomLeftRight(m_editType, m_nDefaultW, m_nDefaultH, FALSE);
-    m_wMgr.moveAnchoredBottomLeftRight(m_editAttributePath, m_nDefaultW, m_nDefaultH, FALSE);
-    m_wMgr.moveAnchoredBottomLeftRight(m_editAttributeGUID, m_nDefaultW, m_nDefaultH, FALSE);
     m_wMgr.moveAnchoredBottomLeftRight(m_currentFilename, m_nDefaultW, m_nDefaultH, FALSE);
+    m_wMgr.moveAnchoredBottomLeftRight(*GetDlgItem(IDC_EDIT_ATTRIBUTE_SDN), m_nDefaultW, m_nDefaultH, FALSE);
 
     // Update default values
     GetClientRect(rectDlg);

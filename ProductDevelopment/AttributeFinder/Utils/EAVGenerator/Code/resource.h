@@ -22,7 +22,7 @@
 #define IDC_BTN_SPLIT                   1012
 #define IDC_BTN_COPY                    1013
 #define IDC_BTN_OPEN                    1014
-#define IDC_STATIC_FILENAME             1015
+#define IDC_EDIT_FILENAME	            1015
 #define IDC_BTN_NEW                     1016
 #define IDC_RADIO_REPLACE               1017
 #define IDC_RADIO_APPEND                1018
@@ -38,12 +38,14 @@
 #define IDC_LABEL_FILENAME              1028
 #define IDC_STATIC_ATTRIBUTE_GUID       1029
 #define IDC_EDIT_ATTRIBUTE_GUID         1030
+#define IDC_STATIC_ATTRIBUTE_SDN        1031
+#define IDC_EDIT_ATTRIBUTE_SDN          1032
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        143
+#define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         32774
 #define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           101
