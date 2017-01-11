@@ -1968,9 +1968,6 @@ void CEAVGeneratorDlg::doResize()
     m_wMgr.moveAnchoredTopRight(m_btnMerge, m_nDefaultW, m_nDefaultH, FALSE);
     m_wMgr.moveAnchoredTopRight(m_btnUp, m_nDefaultW, m_nDefaultH, FALSE);
     m_wMgr.moveAnchoredTopRight(m_btnDown, m_nDefaultW, m_nDefaultH, FALSE);
-    m_wMgr.moveAnchoredTopRight(m_valueGroup, m_nDefaultW, m_nDefaultH, FALSE);
-    m_wMgr.moveAnchoredTopRight(m_radioReplace, m_nDefaultW, m_nDefaultH, FALSE);
-    m_wMgr.moveAnchoredTopRight(m_radioAppend, m_nDefaultW, m_nDefaultH, FALSE);
 
     // Move controls anchored bottom and left
     m_wMgr.moveAnchoredBottomLeft(m_labelName, m_nDefaultW, m_nDefaultH, FALSE);
@@ -1984,6 +1981,9 @@ void CEAVGeneratorDlg::doResize()
     m_wMgr.moveAnchoredBottomRight(m_editAttributePath, m_nDefaultW, m_nDefaultH, FALSE);
     m_wMgr.moveAnchoredBottomRight(m_labelAttributeGUID, m_nDefaultW, m_nDefaultH, FALSE);
     m_wMgr.moveAnchoredBottomRight(m_editAttributeGUID, m_nDefaultW, m_nDefaultH, FALSE);
+    m_wMgr.moveAnchoredBottomRight(m_valueGroup, m_nDefaultW, m_nDefaultH, FALSE);
+    m_wMgr.moveAnchoredBottomRight(m_radioReplace, m_nDefaultW, m_nDefaultH, FALSE);
+    m_wMgr.moveAnchoredBottomRight(m_radioAppend, m_nDefaultW, m_nDefaultH, FALSE);
 
     // Move controls anchored bottom, left and right
     m_wMgr.moveAnchoredBottomLeftRight(m_editName, m_nDefaultW, m_nDefaultH, FALSE);
