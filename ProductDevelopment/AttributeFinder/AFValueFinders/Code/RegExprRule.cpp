@@ -85,6 +85,7 @@ STDMETHODIMP CRegExprRule::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IRegExprRule,
 		&IID_IAttributeFindingRule,
 		&IID_IAttributeModifyingRule,
+		&IID_IDocumentPreprocessor,
 		&IID_IPersistStream,
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
@@ -648,6 +649,46 @@ STDMETHODIMP CRegExprRule::raw_GetComponentDescription(BSTR * pstrComponentDescr
 	return S_OK;
 }
 
+//-------------------------------------------------------------------------------------------------
+// IDocumentPreprocessor
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRegExprRule::raw_Process(IAFDocument* pDocument, IProgressStatus *pProgressStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	
+	try
+	{
+		validateLicense();
+
+		IAFDocumentPtr ipAFDoc(pDocument);
+		ASSERT_ARGUMENT("ELI37668", ipAFDoc != __nullptr);
+
+		// It never makes sense for this rule, when used as a preprocessor, to return anything but the
+		// first match.
+		m_bFirstMatchOnly = true;
+
+		IIUnknownVectorPtr ipAttributes = parseText(ipAFDoc);
+		if (ipAttributes != __nullptr && ipAttributes->Size() > 0)
+		{
+			// Get the one and only match and use as AFDocument attribute
+			IAttributePtr ipAttribute(ipAttributes->At(0));
+			ASSERT_RESOURCE_ALLOCATION("ELI37669", ipAttribute != __nullptr);
+
+			ipAFDoc->Attribute = ipAttribute;
+
+			return S_OK;
+		}
+
+		// if no value is found, set the spatial string to empty and empty the subattribute vector
+		ipAFDoc->Text->Clear();
+		ipAFDoc->Attribute->SubAttributes->Clear();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37670");
+	
+	return S_OK;
+}
 //-------------------------------------------------------------------------------------------------
 // IMustBeConfiguredObject
 //-------------------------------------------------------------------------------------------------

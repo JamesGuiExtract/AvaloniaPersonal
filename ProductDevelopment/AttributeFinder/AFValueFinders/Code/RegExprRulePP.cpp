@@ -341,7 +341,7 @@ LRESULT CRegExprRulePP::OnClickedFirstMatchOnlyInfo(WORD wNotifyCode, WORD wID, 
 	try
 	{
 		// show tooltip info
-		CString zText("When used as an attribute modifier, this object always searches for the first match only.");
+		CString zText("When used as a preprocessor or attribute modifier, this object always searches for the first match only.");
 		m_infoTip.Show(zText);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33505");

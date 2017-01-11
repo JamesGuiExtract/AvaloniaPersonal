@@ -22,6 +22,7 @@ class ATL_NO_VTABLE CRegExprRule :
 	public IDispatchImpl<IRegExprRule, &IID_IRegExprRule, &LIBID_UCLID_AFVALUEFINDERSLib>,
 	public IDispatchImpl<IAttributeFindingRule, &IID_IAttributeFindingRule, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<IAttributeModifyingRule, &IID_IAttributeModifyingRule, &LIBID_UCLID_AFCORELib>,
+	public IDispatchImpl<IDocumentPreprocessor, &IID_IDocumentPreprocessor, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
@@ -46,6 +47,7 @@ BEGIN_COM_MAP(CRegExprRule)
 	COM_INTERFACE_ENTRY2(IDispatch, IRegExprRule)
 	COM_INTERFACE_ENTRY(IAttributeFindingRule)
 	COM_INTERFACE_ENTRY(IAttributeModifyingRule)
+	COM_INTERFACE_ENTRY(IDocumentPreprocessor)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
@@ -62,11 +64,15 @@ END_PROP_MAP()
 BEGIN_CATEGORY_MAP(CRegExprRule)
 	IMPLEMENTED_CATEGORY(CATID_AFAPI_VALUE_MODIFIERS)
 	IMPLEMENTED_CATEGORY(CATID_AFAPI_VALUE_FINDERS)
+	IMPLEMENTED_CATEGORY(CATID_AFAPI_DOCUMENT_PREPROCESSORS)
 END_CATEGORY_MAP()
 
 public:
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
+
+// IDocumentPreprocessor
+	STDMETHOD(raw_Process)(/*[in]*/ IAFDocument* pDocument, /*[in]*/ IProgressStatus *pProgressStatus);
 
 // IRegExprRule
 	STDMETHOD(get_IsCaseSensitive)(/*[out, retval]*/ VARIANT_BOOL *pVal);

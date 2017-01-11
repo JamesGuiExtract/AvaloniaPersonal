@@ -19,6 +19,9 @@
 // Test RemoveSpatialInfo PreProcessor
 <FILE>;..\RemoveSpatialInfo\TestRemoveSpatialInfo.dat
 
+// Test Regex rule Preprocessor
+<FILE>;..\RegularExpression\RegularExpression.dat
+
 // Test ReplaceStrings PreProcessor
 <FILE>;..\ReplaceStrings\ReplaceStrings.dat
 
