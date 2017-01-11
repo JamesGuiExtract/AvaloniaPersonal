@@ -73,7 +73,7 @@
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION(strELI)
 
 // Provides synchronization for SECURE_CREATE_OBJECT. 
-static CMutex m_secureObjectLock;
+static CCriticalSection m_secureObjectLock;
 
 using namespace std;
 

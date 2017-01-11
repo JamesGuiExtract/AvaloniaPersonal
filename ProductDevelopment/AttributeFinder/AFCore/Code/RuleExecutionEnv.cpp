@@ -13,7 +13,7 @@
 map<DWORD, stack<string> > CRuleExecutionEnv::m_mapThreadIDToRSDFileStack;
 map<DWORD, string> CRuleExecutionEnv::m_mapThreadIDToFKBVersion;
 map<DWORD, string> CRuleExecutionEnv::m_mapThreadIDToAlternateComponentDataDir;
-CMutex CRuleExecutionEnv::m_mutex;
+CCriticalSection CRuleExecutionEnv::m_criticalSection;
 
 //-------------------------------------------------------------------------------------------------
 // CRuleExecutionEnv
@@ -248,7 +248,7 @@ STDMETHODIMP CRuleExecutionEnv::put_AlternateComponentDataDir(BSTR newVal)
 stack<string>& CRuleExecutionEnv::getCurrentStack(bool bThrowExceptionIfStackEmpty)
 {
 	// protect the stack against simultaneous access
-	CSingleLock lg( &m_mutex, TRUE );
+	CSingleLock lg( &m_criticalSection, TRUE );
 
 	// get the stack associated with the current thread
 	// or create a new stack if this is the first time we're in the current thread
@@ -269,7 +269,7 @@ stack<string>& CRuleExecutionEnv::getCurrentStack(bool bThrowExceptionIfStackEmp
 //-------------------------------------------------------------------------------------------------
 string& CRuleExecutionEnv::getFKBVersionString()
 {
-	CSingleLock lg( &m_mutex, TRUE );
+	CSingleLock lg( &m_criticalSection, TRUE );
 
 	// Get the FKB version string for the current thread.
 	DWORD dwThreadID = GetCurrentThreadId();
@@ -280,7 +280,7 @@ string& CRuleExecutionEnv::getFKBVersionString()
 //-------------------------------------------------------------------------------------------------
 string& CRuleExecutionEnv::getAlternateComponentDataDir()
 {
-	CSingleLock lg( &m_mutex, TRUE );
+	CSingleLock lg( &m_criticalSection, TRUE );
 
 	// Get the alternate component data directory for the current thread.
 	DWORD dwThreadID = GetCurrentThreadId();

@@ -345,15 +345,15 @@ private:
 
 	// cache of custom tag name/values and mutex for reading/writing it
 	static map<string, string> ms_mapCustomFileTagNameToValue;
+	static CCriticalSection ms_criticalSection;
 
 	static string ms_strINIFileName;
 
 	// Programmatically added path tags.
 	map<string, string> m_mapAddedTags;
-	// Mutex for accessing m_mapAddedTags
-	CMutex m_mutexAddedTags;
-
-	static CMutex ms_Mutex;
+	
+	// Critical section for accessing m_mapAddedTags
+	CCriticalSection m_criticalSectionAddedTags;
 
 	// A map of handles to all active profiling calls started by StartProfilingRule.
 	static map<long, CRuleSetProfiler> ms_mapProfilers;

@@ -55,7 +55,7 @@ const unsigned long gulENCRYPTEDPasswords2 = 0x88526517;
 //-------------------------------------------------------------------------------------------------
 // Staic Members
 //-------------------------------------------------------------------------------------------------
-CMutex SafeNetLicenseMgr::ms_mutex;
+CCriticalSection SafeNetLicenseMgr::ms_criticalSection;
 
 //-------------------------------------------------------------------------------------------------
 // Globals
@@ -245,7 +245,7 @@ void SafeNetLicenseMgr::CellLock::lock()
 			do
 			{
 				// Lock the mutex
-				CSingleLock slg(&ms_mutex, TRUE );
+				CSingleLock slg(&ms_criticalSection, TRUE );
 
 				// TODO: A Query Response check should be done here to verify that the key is still available
 				// Lock the cell
@@ -317,7 +317,7 @@ void SafeNetLicenseMgr::CellLock::unlock()
 		SP_STATUS spsStatus;
 
 		// Lock mutex
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 
 		spsStatus = SFNTsntlUnlockData( &m_rsnManager.m_Packet, m_rCell.m_dwLockCellAddr, 
 			gsnPwds.wWritePassword, gsnPwds.wOWPassword1, gsnPwds.wOWPassword2 );
@@ -355,7 +355,7 @@ void SafeNetLicenseMgr::ResetLockTask::runTask(IProgress *pProgress, int nTaskID
 		double dElapsedTime;
 		do
 		{
-			CSingleLock slg(&ms_mutex, TRUE );
+			CSingleLock slg(&ms_criticalSection, TRUE );
 
 			// TODO: A Query Response check should be done here to verify that the key is still available
 			spsStatus = SFNTsntlLockData( &m_rPacket, m_rCell.m_dwLockCellAddr , gsnPwds.wWritePassword );
@@ -376,7 +376,7 @@ void SafeNetLicenseMgr::ResetLockTask::runTask(IProgress *pProgress, int nTaskID
 		swTimeOut.stop();
 
 		// Unlock the data cell
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 
 		spsStatus = SFNTsntlUnlockData( &m_rPacket, m_rCell.m_dwLockCellAddr, gsnPwds.wWritePassword, gsnPwds.wOWPassword1,gsnPwds.wOWPassword2 );
 
@@ -480,7 +480,7 @@ void SafeNetLicenseMgr::getLicense()
 {
 	try
 	{
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 
 		// If a license has already been obtained once flag this as a reconnect attempt
 		bool bIsReconnectAttempt = m_bHasLicense || m_bLicenseHasBeenObtained;
@@ -697,7 +697,7 @@ void SafeNetLicenseMgr::releaseLicense(const string& strELICode, bool bLogReleas
 	{
 		resetHeartBeatThread();
 
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 
 		SP_STATUS spsStatus; 
 		SP_WORD nLicenses = 1;
@@ -738,7 +738,7 @@ SP_DWORD SafeNetLicenseMgr::getCellValue ( DataCell &rCell )
 		SP_DWORD dwRtnValue;
 		SP_STATUS spsStatus;
 
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 
 		spsStatus  = SFNTsntlReadValue ( &m_Packet, rCell.m_dwCellAddr, &dwRtnValue);
 
@@ -760,7 +760,7 @@ SP_DWORD SafeNetLicenseMgr::increaseCellValue( DataCell &rCell, SP_DWORD dwAmoun
 		// Validate heartbeat. This will also attempt to get a new license if license is invalid
 		validateHeartbeatActive();
 
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 
 		// if lock is not obtained an exception will be thrown
 		CellLock clLock( *this, rCell );
@@ -810,7 +810,7 @@ SP_DWORD SafeNetLicenseMgr::decreaseCellValue( DataCell &rCell, SP_DWORD dwAmoun
 			// Validate heartbeat. This will also attempt to get a new license if license is invalid
 			validateHeartbeatActive();
 
-			CSingleLock slg(&ms_mutex, TRUE );
+			CSingleLock slg(&ms_criticalSection, TRUE );
 
 			// if lock is not obtained an exception will be thrown
 			CellLock clLock( *this, rCell );
@@ -921,7 +921,7 @@ SP_DWORD SafeNetLicenseMgr::setCellValue(DataCell &rCell, SP_DWORD dwValue)
 		// Validate heartbeat. This will also attempt to get a new license if license is invalid
 		validateHeartbeatActive();
 
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 
 		// make sure the value is with in the range of the data value
 		SP_DWORD dwMax;
@@ -1000,7 +1000,7 @@ bool  SafeNetLicenseMgr::queryLicense( QueryResponsePair qrpQR )
 {
 	try
 	{
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 
 		unsigned char czResponse[SP_LEN_OF_QR + 1];
 		SP_DWORD dwResponse32 = 0;
@@ -1023,7 +1023,7 @@ void SafeNetLicenseMgr::validateUSBLicense()
 {
 	try
 	{
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 		int iQryNumber = rand() % m_rusblLicense.m_iNumQrys;
 		QueryResponsePair qrpQR = m_rusblLicense.getQRPair(iQryNumber);
 		if ( !queryLicense( qrpQR ) )
@@ -1048,7 +1048,7 @@ void SafeNetLicenseMgr::validateHeartbeatActive()
 		// Make sure the license has been obtained
 		getLicense();
 
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 
 		// Check to see if the thread has ended
 		if (!isHeartBeatThreadRunning())	
@@ -1109,7 +1109,7 @@ void SafeNetLicenseMgr::checkAlert(const string& strCounterName, SP_DWORD dwCoun
 	{
 		bool bSendAlert = false;
 		{
-			CSingleLock slg(&ms_mutex, TRUE );
+			CSingleLock slg(&ms_criticalSection, TRUE );
 
 			// if the counter value is zero assume an alert has already been sent and return
 			// this is so several email messages will not be sent if a large batch is running
@@ -1163,7 +1163,7 @@ void SafeNetLicenseMgr::addRecipients( IExtractEmailMessagePtr ipMessage,
 	{
 		ASSERT_ARGUMENT("ELI24890", ipMessage != __nullptr);
 
-		CSingleLock slg(&ms_mutex, TRUE );
+		CSingleLock slg(&ms_criticalSection, TRUE );
 
 		vector<string> vecTokens;
 
@@ -1194,7 +1194,7 @@ void SafeNetLicenseMgr::addRecipients( IExtractEmailMessagePtr ipMessage,
 void SafeNetLicenseMgr::resetHeartBeatThread()
 {
 	// need to stop the heartbeat thread
-	// Don't need to protect this with the ms_mutex 
+	// Don't need to protect this with the ms_criticalSection 
 	if ( m_htdData.m_pThread != __nullptr )
 	{
 		// Make sure the thread is still running
@@ -1207,7 +1207,7 @@ void SafeNetLicenseMgr::resetHeartBeatThread()
 	}
 
 	// Lock mutex so that if getlicense is called on another thread this doesn't get called
-	CSingleLock slg(&ms_mutex, TRUE );
+	CSingleLock slg(&ms_criticalSection, TRUE );
 	
 	// The thread should not be running at this point so reset the thread pointer
 	m_htdData.m_pThread = NULL;

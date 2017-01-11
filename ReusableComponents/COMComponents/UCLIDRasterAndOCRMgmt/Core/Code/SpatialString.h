@@ -247,7 +247,7 @@ private:
 	IMemoryManagerPtr m_ipMemoryManager;
 
 	// For thread protection 
-	CMutex m_mutex;
+	CCriticalSection m_criticalSection;
 
 	///////////
 	// Methods

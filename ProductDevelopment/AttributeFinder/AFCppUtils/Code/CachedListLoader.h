@@ -70,7 +70,7 @@ private:
 
 	// Ensures only one list is retrieve at a time in case multiple instances are referencing the
 	// same list.
-	static CMutex ms_Mutex;
+	static CCriticalSection ms_criticalSection;
 
 	// Keeps track of the lists referenced by this instance.
 	map<string, CachedObjectFromFile<IVariantVectorPtr, StringLoader>* > 

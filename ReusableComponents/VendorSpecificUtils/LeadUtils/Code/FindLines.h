@@ -75,7 +75,7 @@ private:
 	// Variables
 	/////////////////
 
-	static CMutex ms_mutex;
+	static CCriticalSection ms_criticalSection;
 
 	bool m_bHorizontal;
 

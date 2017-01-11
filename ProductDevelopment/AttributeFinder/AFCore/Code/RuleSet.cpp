@@ -43,11 +43,11 @@ const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definit
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
 
 // Used to protect the data in CounterData instances.
-CMutex CRuleSet::ms_mutexCounterData;
+CCriticalSection CRuleSet::ms_criticalSectionCounterData;
 
 // Used to synchronize construction/destruction of rulesets (for threadsafe checks against
 // ms_referenceCount)
-CMutex CRuleSet::ms_mutexConstruction;
+CCriticalSection CRuleSet::ms_criticalSectionConstruction;
 
 // License manager instance
 unique_ptr<SafeNetLicenseMgr> CRuleSet::m_apSafeNetMgr(__nullptr);
@@ -87,7 +87,7 @@ m_bDeepCopyInput(false)
 {
 	try
 	{
-		CSingleLock lg(&ms_mutexConstruction, TRUE);
+		CSingleLock lg(&ms_criticalSectionConstruction, TRUE);
 
 		ms_referenceCount++;
 
@@ -120,7 +120,7 @@ CRuleSet::~CRuleSet()
 
 	try
 	{
-		CSingleLock lg(&ms_mutexConstruction, TRUE);
+		CSingleLock lg(&ms_criticalSectionConstruction, TRUE);
 
 		if (ms_referenceCount <= 0)
 		{
@@ -138,7 +138,7 @@ CRuleSet::~CRuleSet()
 		{
 			try
 			{
-				CSingleLock lg(&ms_mutexCounterData, TRUE);
+				CSingleLock lg(&ms_criticalSectionCounterData, TRUE);
 
 				flushCounters();
 
@@ -188,7 +188,7 @@ STDMETHODIMP CRuleSet::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlag
 	try
 	{
 		validateLicense();
-		CSingleLock lg( &m_mutex, TRUE);
+		CSingleLock lg( &m_criticalSection, TRUE);
 
 		// Check if the file is encrypted
 		string strFileName = asString(strFullFileName);
@@ -1618,7 +1618,7 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 
 	try
 	{
-		CSingleLock lg( &m_mutex, TRUE);
+		CSingleLock lg( &m_criticalSection, TRUE);
 
 		// Check license
 		validateLicense();
@@ -2311,7 +2311,7 @@ void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool 
 		"Invalid counter decrement attempted.");
 
 	// Lock to ensure thread safety of counterData.
-	CSingleLock lg(&ms_mutexCounterData, TRUE);
+	CSingleLock lg(&ms_criticalSectionCounterData, TRUE);
 
 	CounterData& counterData = counter.GetCounterData();
 
@@ -2417,7 +2417,7 @@ void CRuleSet::flushCounters()
 	for (auto entry = mapCounters.begin(); entry != mapCounters.end(); entry++)
 	{
 		// Lock to ensure thread safety of counterData.
-		CSingleLock lg(&ms_mutexCounterData, TRUE);
+		CSingleLock lg(&ms_criticalSectionCounterData, TRUE);
 
 		CounterInfo& counterInfo = entry->second;
 		CounterData& counterData = counterInfo.GetCounterData();

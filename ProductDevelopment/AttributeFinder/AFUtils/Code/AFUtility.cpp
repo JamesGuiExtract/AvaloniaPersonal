@@ -42,7 +42,7 @@ const string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
 // globals and statics
 map<string, string> CAFUtility::ms_mapCustomFileTagNameToValue;
 string CAFUtility::ms_strINIFileName;
-CMutex CAFUtility::ms_Mutex;
+CCriticalSection CAFUtility::ms_criticalSection;
 map<long, CRuleSetProfiler> CAFUtility::ms_mapProfilers;
 volatile long CAFUtility::ms_nNextProfilerHandle = 0;
 
@@ -756,7 +756,7 @@ STDMETHODIMP CAFUtility::raw_AddTag(BSTR bstrTagName, BSTR bstrTagValue)
 			strTag += ">";
 		}
 
-		CSingleLock lock(&m_mutexAddedTags, TRUE);
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
 		m_mapAddedTags[strTag] = asString(bstrTagValue);
 
 		return S_OK;
@@ -922,8 +922,8 @@ STDMETHODIMP CAFUtility::StartProfilingRule(BSTR bstrName, BSTR bstrType,
 		string strName = asString(bstrName);
 		string strType = asString(bstrType);
 
-		// Mutex while accessing static collection
-		CSingleLock lg(&ms_Mutex, TRUE);
+		// Critical Section while accessing static collection
+		CSingleLock lg(&ms_criticalSection, TRUE);
 
 		ms_mapProfilers.insert(pair<long, CRuleSetProfiler>(
 			*pnHandle, CRuleSetProfiler(strName, strType, pRuleObject, nSubID)));
@@ -941,8 +941,8 @@ STDMETHODIMP CAFUtility::StopProfilingRule(long nHandle)
 	{
 		validateLicense();
 
-		// Mutex while accessing static collection
-		CSingleLock lg(&ms_Mutex, TRUE);
+		// Critical Section while accessing static collection
+		CSingleLock lg(&ms_criticalSection, TRUE);
 
 		ms_mapProfilers.erase(nHandle);
 
@@ -1325,10 +1325,10 @@ bool CAFUtility::getCustomTagValue(const string& strTagName, string& rstrTagValu
 	// Get the tag name without the < > symbols
 	string strTag = strTagName.substr(1, nLen-2);
 
-	// Scope for the mutex
+	// Scope for the critical section
 	{
-		// Mutex while accessing static collection
-		CSingleLock lg(&ms_Mutex, TRUE);
+		// Critical Section while accessing static collection
+		CSingleLock lg(&ms_criticalSection, TRUE);
 
 		// check if we have already cached the value of the tag
 		map<string, string>::iterator iter;
@@ -2349,7 +2349,7 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 		expandCommonComponentsDir(rstrInput);
 
 		// Expand any programmatically added tags.
-		CSingleLock lock(&m_mutexAddedTags, TRUE);
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
 		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
 				iter != m_mapAddedTags.end();
 				iter++)
@@ -2495,7 +2495,7 @@ IVariantVectorPtr CAFUtility::getBuiltInTags()
 		ipVec->PushBack(get_bstr_t(strCOMMON_COMPONENTS_DIR_TAG));
 
 		// Report any programmatically added tags.
-		CSingleLock lock(&m_mutexAddedTags, TRUE);
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
 		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
 			 iter != m_mapAddedTags.end();
 			 iter++)
@@ -2555,8 +2555,8 @@ IVariantVectorPtr CAFUtility::loadCustomFileTagsFromINI()
 //-------------------------------------------------------------------------------------------------
 const char* CAFUtility::getINIFileName()
 {
-	// Mutex while accessing static value
-	CSingleLock lg(&ms_Mutex, TRUE);
+	// Critical section while accessing static value
+	CSingleLock lg(&ms_criticalSection, TRUE);
 
 	if (ms_strINIFileName.empty())
 	{

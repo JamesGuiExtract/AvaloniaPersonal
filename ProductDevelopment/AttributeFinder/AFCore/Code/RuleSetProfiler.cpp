@@ -13,7 +13,7 @@ const string gstrOutputFolder = "RuleSetProfilingData";
 //--------------------------------------------------------------------------------------------------
 // Statics
 //--------------------------------------------------------------------------------------------------
-CMutex CRuleSetProfiler::ms_mutex;
+CCriticalSection CRuleSetProfiler::ms_criticalSection;
 volatile bool CRuleSetProfiler::ms_bEnabled = false;
 volatile int CRuleSetProfiler::m_nActiveThreadCount = 0;
 map<DWORD, CRuleSetProfiler::ProfilerStack> CRuleSetProfiler::m_mapThreadIDToProfilerStack;
@@ -147,7 +147,7 @@ void CRuleSetProfiler::startProfiling()
 	// Retrieve the call stack and object data for the current thread. After retrieving these,
 	// we won't need to lock for this instance again.
 	{
-		CSingleLock lg(&ms_mutex, TRUE);
+		CSingleLock lg(&ms_criticalSection, TRUE);
 
 		// get the stack associated with the current thread
 		// or create a new stack if this is the first time we're in the current thread
@@ -224,7 +224,7 @@ CRuleSetProfiler::~CRuleSetProfiler()
 			{
 				// If this was the last object on the stack, we are not longer actively collecting data
 				// for this thread; decrement m_nActiveThreadCount;
-				CSingleLock lg(&ms_mutex, TRUE);
+				CSingleLock lg(&ms_criticalSection, TRUE);
 				m_nActiveThreadCount--;
 			}
 		}
@@ -236,13 +236,13 @@ bool CRuleSetProfiler::IsProfilingActiveOnThread()
 {
 	try
 	{
-		CSingleLock lg(&ms_mutex, TRUE);
+		CSingleLock lg(&ms_criticalSection, TRUE);
 
 		// Retrieve the call stack for the current thread.
 		DWORD dwThreadID = GetCurrentThreadId();
 		ProfilerStack *pThreadProfilerStack = &m_mapThreadIDToProfilerStack[dwThreadID];
 
-		// If the stack is not empty, there is processing occuring on this thread.
+		// If the stack is not empty, there is processing occurring on this thread.
 		return !pThreadProfilerStack->empty();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33636");
@@ -252,7 +252,7 @@ void CRuleSetProfiler::GenerateOuput()
 {
 	try
 	{
-		CSingleLock lg(&ms_mutex, TRUE);
+		CSingleLock lg(&ms_criticalSection, TRUE);
 
 		// If profiling is not enabled, don't output anything.
 		if (!ms_bEnabled)
@@ -298,7 +298,7 @@ void CRuleSetProfiler::GenerateOuput()
 		ASSERT_RESOURCE_ALLOCATION("ELI33615", ipCallsNode != __nullptr);
 		ipReportNode->appendChild(ipCallsNode);
 
-		// Popluate the "summary" and "call" nodes.
+		// Populate the "summary" and "call" nodes.
 		for (ProfilerMap::iterator iter = aggregateDataMap.begin();
 			 iter != aggregateDataMap.end();
 			 iter++)
@@ -326,7 +326,7 @@ void CRuleSetProfiler::Reset()
 {
 	try
 	{
-		CSingleLock lg(&ms_mutex, TRUE);
+		CSingleLock lg(&ms_criticalSection, TRUE);
 
 		if (m_nActiveThreadCount > 0)
 		{
@@ -364,7 +364,7 @@ void CRuleSetProfiler::aggregateData(const ProfilerMap& sourceData, ProfilerMap&
 		}
 
 		// If this is the initial call to aggregateData (to compile the overall call stats),
-		// rescurse to aggregate the caller data for this instance.
+		// recurse to aggregate the caller data for this instance.
 		if (!bIsCallerData)
 		{
 			aggregateData(iterSourceData->second.m_mapCallerPerfData,

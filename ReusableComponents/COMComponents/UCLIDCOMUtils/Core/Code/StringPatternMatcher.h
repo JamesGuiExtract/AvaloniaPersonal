@@ -275,7 +275,7 @@ private:
 	// is non-greedy by default
 	bool m_bGreedyByDefault;
 
-	// semaphore object to ensure that this object is not accessed simultaneously
+	// Critical section object to ensure that this object is not accessed simultaneously
 	// from multiple threads
-	CMutex m_lock;
+	CCriticalSection m_lock;
 };

@@ -1098,7 +1098,7 @@ STDMETHODIMP CMiscUtils::GetBuiltInTags(IVariantVector** ppTags)
 		ipTags->PushBack(get_bstr_t(strCOMMON_COMPONENTS_DIR_TAG));
 
 		// Report any programmatically added tags.
-		CSingleLock lock(&m_mutexAddedTags, TRUE);
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
 		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
 			 iter != m_mapAddedTags.end();
 			 iter++)
@@ -1207,7 +1207,7 @@ STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnk
 		}
 
 		// Expand any programmatically added tags.
-		CSingleLock lock(&m_mutexAddedTags, TRUE);
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
 		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
 			 iter != m_mapAddedTags.end();
 			 iter++)
@@ -1307,7 +1307,7 @@ STDMETHODIMP CMiscUtils::AddTag(BSTR bstrTagName, BSTR bstrTagValue)
 			strTag += ">";
 		}
 
-		CSingleLock lock(&m_mutexAddedTags, TRUE);
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
 		m_mapAddedTags[strTag] = asString(bstrTagValue);
 
 		return S_OK;

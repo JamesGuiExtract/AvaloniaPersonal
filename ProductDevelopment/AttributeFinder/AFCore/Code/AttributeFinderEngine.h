@@ -91,7 +91,7 @@ private:
 	// Persists any value calculated by getLegacyFKBVersion()
 	static string ms_strLegacyFKBVersion;
 
-	static CMutex m_mutex;
+	static CCriticalSection m_criticalSection;
 
 	//////////////
 	// Methods

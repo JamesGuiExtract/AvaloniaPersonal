@@ -130,10 +130,10 @@ private:
 
 	// Programmatically added path tags.
 	map<string, string> m_mapAddedTags;
-	// Mutex for accessing m_mapAddedTags
-	CMutex m_mutexAddedTags;
+	
+	// Critical Section for accessing m_mapAddedTags
+	CCriticalSection m_criticalSectionAddedTags;
 
 	// persistence mgr
 	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apSettings;
-	CMutex m_mutex;
 };

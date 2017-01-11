@@ -165,21 +165,16 @@ private:
 	string m_strPreviousFileName;
 
 	// Used to protect the data in CounterData instances.
-	static CMutex ms_mutexCounterData;
+	static CCriticalSection ms_criticalSectionCounterData;
 
 	// Used to synchronize construction/destruction of rulesets (for threadsafe checks against
 	// ms_referenceCount)
-	static CMutex ms_mutexConstruction;
+	static CCriticalSection ms_criticalSectionConstruction;
 
 	// The should be only one SafeNetLicenseMgr object
-	// protected by ms_mutexLM
+	// protected by ms_criticalSectionCounterData
 	static unique_ptr<SafeNetLicenseMgr> m_apSafeNetMgr;
 	
-	// This is need to keep track of the number of RuleSet instances that are active so it will
-	// be possible to know when the m_apSafeNetMgr object can safely be deleted 
-	// protected by ms_mutexLM
-	static int m_iSNMRefCount;
-
 	// A vector of RuleExecutionCounters to be decremented when rules are run. If specified, when
 	// running a ruleset each counter shall be tried in order until one with the proper counterID
 	// is found with enough counts available. If there is no available counter with enough counts
@@ -187,8 +182,8 @@ private:
 	// if one is available.
 	IIUnknownVectorPtr m_ipRuleExecutionCounters;
 
-	// This mutex is used to protect the same instance between threads
-	CMutex m_mutex;
+	// This critical section is used to protect the same instance between threads
+	CCriticalSection m_criticalSection;
 
 	// Counter Flags
 	bool m_bUseDocsIndexingCounter;

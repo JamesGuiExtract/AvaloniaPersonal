@@ -36,7 +36,7 @@ static const char* LATEST_FKB_FLAG = "Latest";
 unique_ptr<IConfigurationSettingsPersistenceMgr> CAttributeFinderEngine::mu_spUserCfgMgr(
 		new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_REG_ROOT_FOLDER_PATH));
 string CAttributeFinderEngine::ms_strLegacyFKBVersion = "_uninitialized_";
-CMutex CAttributeFinderEngine::m_mutex;
+CCriticalSection CAttributeFinderEngine::m_criticalSection;
 
 //-------------------------------------------------------------------------------------------------
 // Global function
@@ -45,8 +45,8 @@ bool isOptionalProgressDlgLicensed()
 {
 	static const unsigned long OPTIONAL_PROGRESS_ID = 167;
 
-	static CMutex sMutex;
-	CSingleLock lg(&sMutex, TRUE);
+	static CCriticalSection sCriticalSection;
+	CSingleLock lg(&sCriticalSection, TRUE);
 
 	static bool bLicensed = false;
 
@@ -425,7 +425,7 @@ string CAttributeFinderEngine::getLegacyFKBVersion()
 	{
 		// To avoid the need to recalculate the legacy version multiple times, this is a static
 		// method that requires locking.
-		CSingleLock lg(&m_mutex, TRUE);
+		CSingleLock lg(&m_criticalSection, TRUE);
 
 		if (ms_strLegacyFKBVersion == "_uninitialized_")
 		{
@@ -526,7 +526,7 @@ IOCRUtilsPtr CAttributeFinderEngine::getOCRUtils()
 void CAttributeFinderEngine::getRootComponentDataFolder(string& rstrFolder, bool& rbOverridden)
 {
 	// Lock to protect access to a static registry manager instance for this method.
-	CSingleLock lg(&m_mutex, TRUE);
+	CSingleLock lg(&m_criticalSection, TRUE);
 
 	// No matter whether we are in debug or release mode, if the component data folder has been
 	// defined in the registry we should use that folder

@@ -16,7 +16,7 @@ int getFormatFromString(const string& strFormat)
 {
 	// Map of strings to formats
 	static map<string, int> smapStringToFormat;
-	static CMutex mutex;
+	static CCriticalSection criticalSection;
 	static bool bInitialized = false;
 
 	try
@@ -35,7 +35,7 @@ int getFormatFromString(const string& strFormat)
 		// If the map has not been filled yet, fill it
 		if (!bInitialized)
 		{
-			CSingleLock lock(&mutex, TRUE);
+			CSingleLock lock(&criticalSection, TRUE);
 			if (!bInitialized)
 			{
 				smapStringToFormat["PCX"] = FILE_PCX;

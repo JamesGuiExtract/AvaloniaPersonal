@@ -123,7 +123,7 @@ private:
 	ProfilerMap* m_pThreadProfilerMap;
 
 	// Protects access to static fields.
-	static CMutex ms_mutex;
+	static CCriticalSection ms_criticalSection;
 
 	// The number of threads for which data is currently being collected.
 	static volatile int m_nActiveThreadCount;

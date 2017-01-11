@@ -13,7 +13,7 @@
 //--------------------------------------------------------------------------------------------------
 // Statics
 //--------------------------------------------------------------------------------------------------
-CMutex COnceEveryMathCondition::ms_Mutex;
+CCriticalSection COnceEveryMathCondition::ms_criticalSection;
 map<string, long> COnceEveryMathCondition::ms_mapIDToCount;
 
 //--------------------------------------------------------------------------------------------------
@@ -403,9 +403,9 @@ bool COnceEveryMathCondition::checkCount()
 	bool bResult = false;
 	long nCount = 0;
 
-	// Scope for the mutex
+	// Scope for the critical section
 	{
-		CSingleLock lg(&ms_Mutex, TRUE);
+		CSingleLock lg(&ms_criticalSection, TRUE);
 
 		// Search the map for the usage ID
 		map<string, long>::iterator it = ms_mapIDToCount.find(m_strUsageID);

@@ -2302,7 +2302,7 @@ int getCompressionFactor(L_INT nFormat)
 	// Static map to store the format to compression factor values
 	static map<L_INT, int> smapFormatToCompressionFactor;
 
-	static CMutex mutex;
+	static CCriticalSection criticalSection;
 
 	try
 	{
@@ -2313,12 +2313,12 @@ int getCompressionFactor(L_INT nFormat)
 		// Get the string value for the format
 		string strFormat = getStringFromFormat(nFormat);
 
-		// Get a registry persistance manager to search for a compression value
+		// Get a registry persistence manager to search for a compression value
 		// for this file type
 		RegistryPersistenceMgr rpm(HKEY_LOCAL_MACHINE, gstrRC_REG_PATH);
 
 		// Mutex while accessing the map
-		CSingleLock lg(&mutex, TRUE);
+		CSingleLock lg(&criticalSection, TRUE);
 
 		// Look for the value in the map
 		map<L_INT, int>::iterator it = smapFormatToCompressionFactor.find(nFormat);

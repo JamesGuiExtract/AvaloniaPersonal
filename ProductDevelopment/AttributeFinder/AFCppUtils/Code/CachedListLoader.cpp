@@ -14,7 +14,7 @@
 map<string, CachedObjectFromFile<IVariantVectorPtr, StringLoader> >
 	CCachedListLoader::ms_mapCachedLists;
 map<string, long> CCachedListLoader::ms_mapReferenceCounts;
-CMutex CCachedListLoader::ms_Mutex;
+CCriticalSection CCachedListLoader::ms_criticalSection;
 
 //-------------------------------------------------------------------------------------------------
 // CCachedListLoader
@@ -35,7 +35,7 @@ CCachedListLoader::~CCachedListLoader()
 	{
 		m_ipMiscUtils = __nullptr;
 
-		CSingleLock lg(&ms_Mutex, TRUE);
+		CSingleLock lg(&ms_criticalSection, TRUE);
 
 		// For each list that is referenced by this instance, decrement the reference count for the
 		// list as this instance is destructed.
@@ -88,9 +88,9 @@ IVariantVectorPtr CCachedListLoader::getList(const _bstr_t& bstrListSpecificatio
 					if (nIndexEndFileName == string::npos)
 					{
 						UCLIDException ue("ELI30046",
-							"No delimeter character was found in the file specifcation.");
+							"No delimiter character was found in the file specification.");
 						ue.addDebugInfo("File specification", asString(bstrListSpecification));
-						ue.addDebugInfo("Expected delimeter", *pcDelimeter);
+						ue.addDebugInfo("Expected delimiter", *pcDelimeter);
 						throw ue;
 					}
 
@@ -295,7 +295,7 @@ IVariantVectorPtr CCachedListLoader::getCachedList(const string& strFileName)
 	// same cached instance.
 	makeUpperCase(strFileNameUpper);
 
-	CSingleLock lg(&ms_Mutex, TRUE);
+	CSingleLock lg(&ms_criticalSection, TRUE);
 
 	if (m_mapReferencedLists.find(strFileNameUpper) == m_mapReferencedLists.end())
 	{

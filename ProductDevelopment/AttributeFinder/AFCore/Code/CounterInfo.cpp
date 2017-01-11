@@ -25,7 +25,7 @@ const map<long, string> gmapStandardCounters = getStandardCounters();
 
 std::map<long, string> CounterInfo::ms_mapCounterNames;
 std::map<long, CounterData> CounterInfo::ms_mapCustomCounterData;
-CMutex CounterInfo::ms_mutex;
+CCriticalSection CounterInfo::ms_CriticalSection;
 
 //--------------------------------------------------------------------------------------------------
 // CounterData
@@ -121,7 +121,7 @@ void CounterInfo::SetSecureCounter(ISecureCounterPtr ipSecureCounter)
 		throw ue;
 	}
 
-	CSingleLock lg(&ms_mutex, TRUE);
+	CSingleLock lg(&ms_CriticalSection, TRUE);
 
 	if (ms_mapCounterNames.find(m_nID) == ms_mapCounterNames.end())
 	{
@@ -161,7 +161,7 @@ CounterData& CounterInfo::GetCounterData()
 	// Custom counters
 	else
 	{
-		CSingleLock lg(&ms_mutex, TRUE);
+		CSingleLock lg(&ms_CriticalSection, TRUE);
 
 		if (m_nID >= 100 && ms_mapCustomCounterData.find(m_nID) == ms_mapCustomCounterData.end())
 		{

@@ -93,8 +93,8 @@ private:
 	//////////////
 	bool m_bDirty;
 
-	// Mutex for checking and incrementing the count
-	static CMutex ms_Mutex;
+	// Critical lSection for checking and incrementing the count
+	static CCriticalSection ms_criticalSection;
 
 	// Map which holds the counts for each unique usage ID
 	static map<string, long> ms_mapIDToCount;

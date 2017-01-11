@@ -100,5 +100,5 @@ private:
 	static std::map<long, CounterData> ms_mapCustomCounterData;
 
 	// Protects access to ms_mapCounterNames and ms_mapCustomCounterData
-	static CMutex ms_mutex;
+	static CCriticalSection ms_CriticalSection;
 };

@@ -455,7 +455,7 @@ STDMETHODIMP CSpatialString::LoadFrom(BSTR strFullFileName,
 	try
 	{
 		validateLicense();
-		CSingleLock lg(&m_mutex, TRUE);
+		CSingleLock lg(&m_criticalSection, TRUE);
 
 		// Default return OriginalSourceDocName path to empty string
 		string strOrigSourceDocName = "";
@@ -532,7 +532,7 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 	try
 	{
 		validateLicense();
-		CSingleLock lg(&m_mutex, TRUE);
+		CSingleLock lg(&m_criticalSection, TRUE);
 
 		// if the user is trying to save to a text file,
 		// the text associated with this object to the ASCII file

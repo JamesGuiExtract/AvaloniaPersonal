@@ -83,8 +83,8 @@ private:
 	// default component data directory.
 	string& getAlternateComponentDataDir();
 
-	// This Mutex will guard against simultaneous accesses (read or write)
+	// This Critical section will guard against simultaneous accesses (read or write)
 	// to the stack (m_mapThreadIDToRSDFileStack)
-	static CMutex m_mutex;
+	static CCriticalSection m_criticalSection;
 
 };

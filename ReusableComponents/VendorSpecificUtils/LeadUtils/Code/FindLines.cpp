@@ -50,7 +50,7 @@ static const int gnFAT_LINE_LENGTH_OVERLAP = 85;
 //-------------------------------------------------------------------------------------------------
 // Statics
 //-------------------------------------------------------------------------------------------------
-CMutex LeadToolsLineFinder::ms_mutex;
+CCriticalSection LeadToolsLineFinder::ms_criticalSection;
 
 //-------------------------------------------------------------------------------------------------
 // LeadToolsLineFinder
@@ -107,7 +107,7 @@ LeadToolsLineFinder::~LeadToolsLineFinder()
 //-------------------------------------------------------------------------------------------------
 LeadToolsLineFinder& LeadToolsLineFinder::operator =(LeadToolsLineFinder &source)
 {
-	// Don't copy line vector, bitmap, exception or line extension que.  These are temporary 
+	// Don't copy line vector, bitmap, exception or line extension queue.  These are temporary 
 	// resources that can't be guaranteed after the findLines call completes and that
 	// shouldn't be re-used in a copy.  Only the settings should be copied.
 	m_pvecLines = NULL;
@@ -347,7 +347,7 @@ bool LeadToolsLineFinder::attemptMerge(LineRect &rrectLine)
 	// Create a vector to keep track of all existing lines for which the incoming line is merged with
 	vector<int> vecMergedIndexes;
 
-	// Loop through the exising vector of lines.  Continue looping after 
+	// Loop through the existing vector of lines.  Continue looping after 
 	// merges as its possible the line will qualify for merging with more than one line.
 	for (size_t i = 0; i < m_pvecLines->size(); i++)
 	{
@@ -380,7 +380,7 @@ bool LeadToolsLineFinder::attemptMerge(LineRect &rrectLine)
 				// Use the vertical positioning of the narrower of the two.  In most cases, lines
 				// that overlap in this manner will be due to text or handwriting on a line
 				// that is recognized as a line itself.  This "line" is almost always
-				// wider;  ignoring the verical positioning of such a line tends to yield the best
+				// wider;  ignoring the vertical positioning of such a line tends to yield the best
 				// results.
 				if (m_pvecLines->at(i).LineLength() < rrectLine.LineLength())
 				{
@@ -456,7 +456,7 @@ void LeadToolsLineFinder::extendLines()
 		// affect performance too much on a small number of cores since only 10-15% of total findLines 
 		// processing time is spent in extendLines.  However, on a machine with a large number of cores
 		// this function may become a bottleneck.
-		CSingleLock lg( &ms_mutex, TRUE );
+		CSingleLock lg( &ms_criticalSection, TRUE );
 
 		vector<LineRect> vecExtendedLines;
 
@@ -643,7 +643,7 @@ bool LeadToolsLineFinder::extendLine(LineRect &rrectLine, int nDirection)
 
 			_lastCodePos = "110";
 
-			// Update the tracking postion (nTrackDist == 0 indicates the first call to updateTrackingPos
+			// Update the tracking position (nTrackDist == 0 indicates the first call to updateTrackingPos
 			// for this line & direction
 			updateTrackingPos(nTrackEdge, bFoundBlack, nTrackDist == 0);
 
@@ -830,7 +830,7 @@ int LeadToolsLineFinder::initializeTrackingPos(LineRect rectLine, int nDirection
 		if (bErrorReadingPixel || setScanLines.size() == vecItersToDelete.size())
 		{
 			// Either there was an error reading a pixel, or there were no black pixels
-			// found at this postion
+			// found at this position
 			if (!bErrorReadingPixel && !bInitialized)
 			{
 				// If we have not yet found a black pixel for this end of the line,
@@ -848,7 +848,7 @@ int LeadToolsLineFinder::initializeTrackingPos(LineRect rectLine, int nDirection
 			}
 			else
 			{
-				// If we are initiallized (or an error was encounterd), return an
+				// If we are initialized (or an error was encountered), return an
 				// average of the remaining scan lines.
 				int nTotal = 0;
 				for each(int i in setScanLines)
