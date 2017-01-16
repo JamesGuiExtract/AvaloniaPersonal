@@ -302,11 +302,8 @@ private:
 	IVariantVectorPtr getBuiltInTags();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE:	To return a Variant vector containing the custom file tags. These will be loaded
-	//			from the INI file specified by getINIFileName() ("UCLIDAFCore.ini")
+	//			from the INI file specified by m_strINIFileName ("UCLIDAFCore.ini")
 	IVariantVectorPtr loadCustomFileTagsFromINI();
-	//---------------------------------------------------------------------------------------------
-	// Gets the name of the AFCore INI file.
-	const char* getINIFileName();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To fill the specified IIUnknownVector with attributes read from the specified
 	//			EAV file.
@@ -347,7 +344,7 @@ private:
 	static map<string, string> ms_mapCustomFileTagNameToValue;
 	static CCriticalSection ms_criticalSection;
 
-	static string ms_strINIFileName;
+	string m_strINIFileName;
 
 	// Programmatically added path tags.
 	map<string, string> m_mapAddedTags;

@@ -41,7 +41,6 @@ const string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
 
 // globals and statics
 map<string, string> CAFUtility::ms_mapCustomFileTagNameToValue;
-string CAFUtility::ms_strINIFileName;
 CCriticalSection CAFUtility::ms_criticalSection;
 map<long, CRuleSetProfiler> CAFUtility::ms_mapProfilers;
 volatile long CAFUtility::ms_nNextProfilerHandle = 0;
@@ -60,6 +59,8 @@ CAFUtility::CAFUtility()
 		ASSERT_RESOURCE_ALLOCATION("ELI19181", ma_pUserCfgMgr.get() != __nullptr );
 		ASSERT_RESOURCE_ALLOCATION("ELI07623", m_ipMiscUtils != __nullptr);
 		ASSERT_RESOURCE_ALLOCATION("ELI32488", m_ipEngine != __nullptr);
+		m_strINIFileName = getModuleDirectory(_Module.m_hInst);
+		m_strINIFileName += "\\UCLIDAFCore.INI";
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI07338")
 }
@@ -1346,7 +1347,7 @@ bool CAFUtility::getCustomTagValue(const string& strTagName, string& rstrTagValu
 		const char *pszSectionName = "ExpandableTags";
 		char pszResult[1024];
 		if (GetPrivateProfileString(pszSectionName, strTag.c_str(), "", 
-			pszResult, sizeof(pszResult), getINIFileName()) <= 0)
+			pszResult, sizeof(pszResult), m_strINIFileName.c_str()) <= 0)
 		{
 			return false;
 		}
@@ -2525,7 +2526,7 @@ IVariantVectorPtr CAFUtility::loadCustomFileTagsFromINI()
 		char pszResult[2048];
 
 		long nRet = GetPrivateProfileSection(pszSectionName, pszResult, sizeof(pszResult),
-			getINIFileName());
+			m_strINIFileName.c_str());
 
 		// if the section has tags
 		if (nRet > 0)
@@ -2551,19 +2552,5 @@ IVariantVectorPtr CAFUtility::loadCustomFileTagsFromINI()
 		return ipVec;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26580");
-}
-//-------------------------------------------------------------------------------------------------
-const char* CAFUtility::getINIFileName()
-{
-	// Critical section while accessing static value
-	CSingleLock lg(&ms_criticalSection, TRUE);
-
-	if (ms_strINIFileName.empty())
-	{
-		ms_strINIFileName = getModuleDirectory(_Module.m_hInst);
-		ms_strINIFileName += "\\UCLIDAFCore.INI";
-	}
-
-	return ms_strINIFileName.c_str();
 }
 //-------------------------------------------------------------------------------------------------
