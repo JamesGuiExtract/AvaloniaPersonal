@@ -2441,7 +2441,8 @@ bool CRuleSet::isRuleExecutionAllowed()
 	// - Internal-use flag OR
 	// - Is a swiping rule OR
 	// - Full RDT license
-	return isUsingCounter() || m_bRuleSetOnlyForInternalUse || m_bSwipingRule || isRdtLicensed();
+	// https://extract.atlassian.net/browse/ISSUE-14407 - added countersDisabled() call first
+	return countersDisabled() || isUsingCounter() || m_bRuleSetOnlyForInternalUse || m_bSwipingRule || isRdtLicensed();
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::enabledDocumentPreprocessorExists()
