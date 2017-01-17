@@ -367,10 +367,18 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 
 		_lastCodePos = "201";
 
-		// Assign any counters provided for the ruleset to decrement from.
-		// For performance reasons, don't refresh the list here; it will be refreshed by
-		// FileProcessingDB every time processing is started.
-		ipRules->RuleExecutionCounters = ipDB->GetSecureCounters(VARIANT_FALSE);
+		// If Counters are disabled set RuleExecutionCounters to null otherwise load from the database
+		if (countersDisabled())
+		{
+			ipRules->RuleExecutionCounters = __nullptr;
+		}
+		else
+		{
+			// Assign any counters provided for the ruleset to decrement from.
+			// For performance reasons, don't refresh the list here; it will be refreshed by
+			// FileProcessingDB every time processing is started.
+			ipRules->RuleExecutionCounters = ipDB->GetSecureCounters(VARIANT_FALSE);
+		}
 
 		_lastCodePos = "205";
 
@@ -1103,5 +1111,10 @@ IAttributeFinderEnginePtr CAFEngineFileProcessor::getAFEngine()
 		ASSERT_RESOURCE_ALLOCATION("ELI11112", m_ipAFEngine != __nullptr);
 	}
 	return m_ipAFEngine;
+}
+//-------------------------------------------------------------------------------------------------
+bool CAFEngineFileProcessor::countersDisabled()
+{
+	return LicenseManagement::isLicensed(gnIGNORE_RULE_EXECUTION_COUNTER_DECREMENTS);
 }
 //-------------------------------------------------------------------------------------------------

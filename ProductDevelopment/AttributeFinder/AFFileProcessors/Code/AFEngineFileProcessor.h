@@ -159,4 +159,7 @@ private:
 	IOCREnginePtr getOCREngine();
 	IOCRUtilsPtr getOCRUtils();
 	IAttributeFinderEnginePtr getAFEngine();
+
+	// Method to check if counters are disabled by license
+	bool countersDisabled();
 };
