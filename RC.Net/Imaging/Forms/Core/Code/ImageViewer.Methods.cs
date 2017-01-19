@@ -7,7 +7,6 @@ using Leadtools.Annotations;
 using Leadtools.Drawing;
 using Leadtools.ImageProcessing;
 using Leadtools.ImageProcessing.Color;
-using Leadtools.WinForms;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -244,6 +243,18 @@ namespace Extract.Imaging.Forms
                     }
                 }
 
+                var ussFileName = fileName + ".uss";
+                if (File.Exists(ussFileName))
+                {
+                    var spatialString = new SpatialString();
+                    spatialString.LoadFrom(ussFileName, false);
+                    _spatialPageInfos = spatialString.SpatialPageInfos;
+                }
+                else
+                {
+                    _spatialPageInfos = null;
+                }
+
                 // Raise the opening image event
                 OpeningImageEventArgs opening = new OpeningImageEventArgs(fileName, updateMruList);
                 OnOpeningImage(opening);
@@ -289,7 +300,7 @@ namespace Extract.Imaging.Forms
                         _imagePages = new List<ImagePageData>(_pageCount);
                         for (int i = 0; i < _pageCount; i++)
                         {
-                            _imagePages.Add(new ImagePageData());
+                            _imagePages.Add(MakePageData(pageNumber: i + 1));
                         }
 
                         // Display the first page
@@ -391,6 +402,49 @@ namespace Extract.Imaging.Forms
                     throw ee2;
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="ImagePageData"/> instance and assigns OCR-based orientation
+        /// if available.
+        /// </summary>
+        /// <param name="pageNumber">The page number to use to find the orientation</param>
+        /// <returns>An <see cref="ImagePageData"/> instance</returns>
+        ImagePageData MakePageData(int pageNumber)
+        {
+            var pageData = new ImagePageData();
+
+            try
+            {
+                if (_spatialPageInfos != null && _spatialPageInfos.Contains(pageNumber))
+                {
+                    var pageInfo = (SpatialPageInfo)_spatialPageInfos.GetValue(pageNumber);
+                    switch (pageInfo.Orientation)
+                    {
+                        case EOrientation.kRotNone:
+                            pageData.Orientation = 0;
+                            break;
+
+                        case EOrientation.kRotLeft:
+                            pageData.Orientation = 270;
+                            break;
+
+                        case EOrientation.kRotDown:
+                            pageData.Orientation = 180;
+                            break;
+
+                        case EOrientation.kRotRight:
+                            pageData.Orientation = 90;
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI41806");
+            }
+
+            return pageData;
         }
 
         /// <summary>

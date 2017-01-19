@@ -526,6 +526,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         bool _updatingFitMode;
 
+        /// <summary>
+        /// The spatial page infos from the associated USS file. Used to auto-rotate pages on load.
+        /// </summary>
+        LongToObjectMap _spatialPageInfos;
+
         #endregion Fields
 
         #region Delegates
