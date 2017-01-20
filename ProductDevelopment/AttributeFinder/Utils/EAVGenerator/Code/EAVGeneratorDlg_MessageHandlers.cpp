@@ -1045,25 +1045,37 @@ void CEAVGeneratorDlg::OnItemchangedListDisplay(NMHDR* pNMHDR, LRESULT* pResult)
         // check to be sure the message came from the display list
         if (pNMHDR->idFrom == IDC_LIST_DISPLAY)
         {
-            // check if this message is for a selection change
-            if ((pNMListView->uChanged & LVIF_STATE) && (pNMListView->uNewState & LVIS_SELECTED))
-            {
-                // selection changed - just highlight the selected attribute, 
-                // do not try to open the SRW if it is not open.
-                highlightAttributeInRow(gbDO_NOT_OPEN_SRW);
-
-            }
-
-            // enable or disable the input manager on selection change
-            enableOrDisableInputManager();
-
-            // update the buttons based on the selection change
-            updateButtons();
+			// Schedule update rather than do it right away.
+			// This avoids making the UI hang while doing the same work over and over
+			// while selecting multiple attributes
+			m_nTimer = SetTimer(1, 50, __nullptr);
         }
 
         *pResult = 0;
     }
     CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06214")		
+}
+//-------------------------------------------------------------------------------------------------
+void CEAVGeneratorDlg::OnTimer(UINT_PTR nIDEvent)
+{
+    AFX_MANAGE_STATE(AfxGetModuleState());
+    try
+    {
+		KillTimer(m_nTimer);
+
+		// Highlight the selected attribute, 
+		// do not try to open the SRW if it is not open.
+		highlightAttributeInRow(gbDO_NOT_OPEN_SRW);
+
+		// enable or disable the input manager on selection change
+		enableOrDisableInputManager();
+
+		// update the buttons based on the selection change
+		updateButtons();
+
+		__super::OnTimer(nIDEvent);
+    }
+    CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41816")		
 }
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::OnKeydownListDisplay(NMHDR* pNMHDR, LRESULT* pResult) 
@@ -1139,20 +1151,6 @@ void CEAVGeneratorDlg::OnOK()
 {
     // purpose of having this function here is to prevent
     // user from closing the dialog by pressing Enter key
-}
-//-------------------------------------------------------------------------------------------------
-void CEAVGeneratorDlg::OnNMClickListDisplay(NMHDR *pNMHDR, LRESULT *pResult)
-{
-    AFX_MANAGE_STATE(AfxGetModuleState());
-
-    try
-    {
-        // just highlight the selected attribute, do not try to open the
-        // SRW if it is not open.
-        highlightAttributeInRow(gbDO_NOT_OPEN_SRW);
-    }
-    CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18079");
-    *pResult = 0;
 }
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::OnNMDblclkListDisplay(NMHDR *pNMHDR, LRESULT *pResult)

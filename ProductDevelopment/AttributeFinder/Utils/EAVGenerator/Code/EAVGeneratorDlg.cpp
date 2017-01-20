@@ -262,10 +262,10 @@ BEGIN_MESSAGE_MAP(CEAVGeneratorDlg, CDialog)
     ON_NOTIFY(LVN_KEYDOWN, IDC_LIST_DISPLAY, OnKeydownListDisplay)
     ON_COMMAND(IDC_BTN_SAVEAS, OnBtnSaveas)
     ON_NOTIFY_EX_RANGE(TTN_NEEDTEXT,0x0000,0xFFFF,OnToolTipNotify)
-    ON_NOTIFY(NM_CLICK, IDC_LIST_DISPLAY, &CEAVGeneratorDlg::OnNMClickListDisplay)
     ON_NOTIFY(NM_DBLCLK, IDC_LIST_DISPLAY, &CEAVGeneratorDlg::OnNMDblclkListDisplay)
     ON_BN_CLICKED(IDC_BTN_MERGE, &CEAVGeneratorDlg::OnBtnMerge)
     ON_WM_GETMINMAXINFO()
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -1057,20 +1057,17 @@ void CEAVGeneratorDlg::saveAttributesToVOA(const CString& zFileName)
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::selectListItem(int iIndex)
 {
-    int iCount = m_listAttributes.GetItemCount();
-    for (int i = 0; i < iCount; i++)
-    {
-        if (i == iIndex)
-        {
-            // Select the specified item
-            m_listAttributes.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
-        }
-        else
-        {
-            // Deselect all other items
-            m_listAttributes.SetItemState(i, 0, LVIS_SELECTED);
-        }
-    }
+	// Deselect all
+	m_listAttributes.SetItemState(-1, ~LVIS_SELECTED, LVIS_SELECTED);
+
+	// Select requested
+	if (iIndex >= 0 && iIndex < m_listAttributes.GetItemCount())
+	{
+		m_listAttributes.SetItemState(iIndex, LVIS_SELECTED, LVIS_SELECTED);
+
+		// Set mark so that a shift+click selects multiple items
+		m_listAttributes.SetSelectionMark(iIndex);
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::updateButtons()
@@ -1306,10 +1303,6 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 
     try
     {
-        // TODO: Changing selection tends to result in multiple calls into this method with the
-        // first containing the old selection. It would be more efficient to if the below processing
-        // took place only when the selection was in its final state.
-
         // Delete all temporary highlights
         deleteTemporaryHighlights();
 
@@ -1319,6 +1312,7 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 
         // Iterate through the selected items
         POSITION pos = m_listAttributes.GetFirstSelectedItemPosition();
+		long nItemsMerged = 0;
         while (pos != __nullptr)
         {
             // Get the next selected item index
@@ -1358,7 +1352,8 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
                 // It doesn't already exist. Add it.
                 mapImageToSpatialString[strImage] = ipClone;
             }
-            else
+			// Stop merging after 50 items to prevent apparent hang
+            else if (nItemsMerged < 50)
             {
                 // It already exists. Append to it.
                 ISpatialStringPtr ipOldValue = iter->second;
@@ -1369,7 +1364,17 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
                 // Use MergeAsHybridString which will ensure the spatial page infos are compatible
                 // before combining the strings.
                 ipOldValue->MergeAsHybridString(ipClone);
+
+				++nItemsMerged;
             }
+			else if (nItemsMerged == 50)
+			{
+				++nItemsMerged;
+
+				UCLIDException ue("ELI41814", "Application trace: highlight selected attributes aborted.");
+				ue.addDebugInfo("Application", "VOAFileViewer");
+				ue.log();
+			}
         }
 
         // Iterate through the highlights of each image
@@ -1602,15 +1607,15 @@ void CEAVGeneratorDlg::clearListControl()
         _lastCodePos = "10";
         for (int i=0; i < nCount; i++)
         {
-            IAttribute* pipAttribute = (IAttribute*) m_listAttributes.GetItemData(0);
+            IAttribute* pipAttribute = (IAttribute*) m_listAttributes.GetItemData(i);
             ASSERT_RESOURCE_ALLOCATION("ELI18181", pipAttribute != __nullptr);
 
             // release the attribute pointer
             pipAttribute->Release();
 
-            m_listAttributes.DeleteItem(0);
             _lastCodePos = "10: " + asString(i+1) + " of " + asString(nCount);
         }
+		m_listAttributes.DeleteAllItems();
         _lastCodePos = "20";
         m_setOfGUIDs.clear();
     }

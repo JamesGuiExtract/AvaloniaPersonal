@@ -114,7 +114,6 @@ protected:
 	afx_msg void OnCancel();
 	afx_msg void OnKeydownListDisplay(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBtnSaveas();
-	afx_msg void OnNMClickListDisplay(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMDblclkListDisplay(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	//}}AFX_MSG
@@ -194,6 +193,9 @@ private:
 
 	// GUID's of attributes currently loaded
 	set<string> m_setOfGUIDs;
+
+	// Handle of timer used for scheduling attribute selection
+	UINT_PTR m_nTimer;
 
 	//////////
 	// Methods
@@ -359,6 +361,8 @@ private:
 	// PURPOSE: To add attribute instanceGUID's to the set of GUID's and log an exception if
 	// a GUID is duplicated
 	void addGUIDToSet(IIdentifiableObjectPtr ipIdentityObject);
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
