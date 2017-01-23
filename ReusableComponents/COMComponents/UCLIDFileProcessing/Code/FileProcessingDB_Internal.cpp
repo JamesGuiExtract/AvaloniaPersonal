@@ -5677,7 +5677,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 
 	// Get the new DatabaseID - will be the same as old except for the LastUpdated
 	DatabaseIDValues newDatabaseIDValues = m_DatabaseIDValues;
-	newDatabaseIDValues.m_ctLastUpdated =  getSQLServerDateTimeAsCTime(getDBConnection());
+	newDatabaseIDValues.m_ctLastUpdated = getSQLServerDateTimeOffsetAsCTime(getDBConnection());
 
 	// Get the time since the request was generated
 	CTimeSpan tsDiff = newDatabaseIDValues.m_ctLastUpdated - counterUpdates.m_ctTimeCodeGenerated;
@@ -5932,7 +5932,7 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 	DatabaseIDValues &newDatabaseID = counterUpdates.m_DatabaseID;
 	
 	// Update the counterUpdates DatabaseID to have a new last updated time
-	newDatabaseID.m_ctLastUpdated =  getSQLServerDateTimeAsCTime(getDBConnection());
+	newDatabaseID.m_ctLastUpdated =  getSQLServerDateTimeOffsetAsCTime(getDBConnection());
 
 	// Get the time since the request was generated
 	CTimeSpan tsDiff = newDatabaseID.m_ctLastUpdated - counterUpdates.m_ctTimeCodeGenerated;
@@ -5989,47 +5989,13 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 			UCLIDException ue("ELI38979", "Unlock code counter information invalid.");
 			throw ue;
 		}
-
 		vecUpdateQueries.push_back(existingCounter.GetSQLQuery(newDatabaseID));
-
-		// Create the counter change records
-		DBCounterChangeValue counterChange;
-		counterChange.m_nCounterID = existingCounter.m_nCounterID;
-		counterChange.m_ctUpdatedTime = newDatabaseID.m_ctLastUpdated;
-		counterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;
-		counterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
-		counterChange.m_strComment = "Unlock";
-		counterChange.m_nFromValue = existingCounter.m_nValue;
-		counterChange.m_nToValue = existingCounter.m_nValue;
-		counterChange.CalculateHashValue(counterChange.m_llHashValue);
-
-		vecUpdateQueries.push_back(counterChange.GetInsertQuery());
-
-		ueLog.addDebugInfo("CounterID", existingCounter.m_nCounterID);
-		ueLog.addDebugInfo("CounterName", existingCounter.m_strCounterName);
-		ueLog.addDebugInfo("CounterValue", existingCounter.m_nValue);
+		vecUpdateQueries.push_back(getQueryToResetCounterCorruption(existingCounter,
+			newDatabaseID, ueLog));
 	}
-
-	// Need to updated the DatabaseID record
-	ByteStream bsNewDBID;
-	ByteStreamManipulator bsmNewDBID(ByteStreamManipulator::kWrite, bsNewDBID);
-	bsmNewDBID << newDatabaseID;
-	bsmNewDBID.flushToByteStream(8);
-	
-	ByteStream bsFAMPassword;
-	getFAMPassword(bsFAMPassword);
-
-	string strNewEncryptedDBID = MapLabel::setMapLabelWithS(bsNewDBID,bsFAMPassword);
-
-	string strUpdateDBInfoQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
-	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_NAME, gstrDATABASEID);
-	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_VALUE, strNewEncryptedDBID);
-	
-	// Add Query to update to new DatabaseId
-	vecUpdateQueries.push_back(strUpdateDBInfoQuery);
-
+	vecUpdateQueries.push_back(getDatabaseIDUpdateQuery(newDatabaseID));
 	executeVectorOfSQL(ipConnection, vecUpdateQueries);
-	
+
 	m_strEncryptedDatabaseID = "";
 	m_bDatabaseIDValuesValidated = false;
 
@@ -6093,4 +6059,89 @@ bool CFileProcessingDB::isFileInPagination(_ConnectionPtr ipConnection, long nFi
 	bResult = !asCppBool(ipResultSet->adoEOF);
 
 	return bResult;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema142(_ConnectionPtr ipConnection)
+{
+	try
+	{
+		TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
+		m_strEncryptedDatabaseID = "";
+		string strEncryptedDatabaseID = getDBInfoSetting(ipConnection, gstrDATABASEID, false);
+
+		DatabaseIDValues OldDatabaseIDValues(strEncryptedDatabaseID);
+
+		createAndStoreNewDatabaseID(ipConnection);
+
+		// Check if the values are valid with the old way of checking
+		// That could have problems if timezone differences between the current timezone on the 
+		// machine running this and the timezones when the database was created
+		if (OldDatabaseIDValues.CheckIfValid(ipConnection, false, false, false))
+		{
+			// Update the databaseID and secure counter data so that everything is uncorrupted
+			UCLIDException ueLog("ELI41819", "Counters updated for new schema");
+			vector<string> vecUpdateQueries;
+			// Get map with the key as CounterId and the counter as a CounterOperation with operation set to kNone
+			map<long, CounterOperation> mapCounters;
+			// Get the counters from SecureCounter table but don't check the hash (the counterID portion of the hash
+			// will still be checked
+			getCounterInfo(mapCounters, false);
+			auto iter = mapCounters.begin();
+			for (auto iter = mapCounters.begin(); iter != mapCounters.end(); iter++)
+			{
+				CounterOperation &existingCounter = iter->second;
+				vecUpdateQueries.push_back(existingCounter.GetSQLQuery(m_DatabaseIDValues));
+				vecUpdateQueries.push_back(getQueryToResetCounterCorruption(existingCounter, 
+					m_DatabaseIDValues, ueLog, "Schema Update"));
+			}
+			vecUpdateQueries.push_back(getDatabaseIDUpdateQuery(m_DatabaseIDValues));
+			executeVectorOfSQL(ipConnection, vecUpdateQueries);
+
+			ueLog.log();
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41818");
+}
+//-------------------------------------------------------------------------------------------------
+string CFileProcessingDB::getQueryToResetCounterCorruption(CounterOperation counter,
+	DatabaseIDValues databaseID, UCLIDException &ueLog, string strComment)
+{
+	vector<string> resultQueries;
+	
+	// Create the counter change records
+	DBCounterChangeValue counterChange;
+	counterChange.m_nCounterID = counter.m_nCounterID;
+	counterChange.m_ctUpdatedTime = databaseID.m_ctLastUpdated;
+	counterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;
+	counterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
+	counterChange.m_strComment = strComment;
+	counterChange.m_nFromValue = counter.m_nValue;
+	counterChange.m_nToValue = counter.m_nValue;
+	counterChange.CalculateHashValue(counterChange.m_llHashValue);
+
+	ueLog.addDebugInfo("CounterID", counter.m_nCounterID);
+	ueLog.addDebugInfo("CounterName", counter.m_strCounterName);
+	ueLog.addDebugInfo("CounterValue", counter.m_nValue);
+	
+	return counterChange.GetInsertQuery();
+}
+//-------------------------------------------------------------------------------------------------
+string  CFileProcessingDB::getDatabaseIDUpdateQuery(DatabaseIDValues databaseID)
+{
+	// Need to updated the DatabaseID record
+	ByteStream bsNewDBID;
+	ByteStreamManipulator bsmNewDBID(ByteStreamManipulator::kWrite, bsNewDBID);
+	bsmNewDBID << databaseID;
+	bsmNewDBID.flushToByteStream(8);
+
+	ByteStream bsFAMPassword;
+	getFAMPassword(bsFAMPassword);
+
+	string strNewEncryptedDBID = MapLabel::setMapLabelWithS(bsNewDBID, bsFAMPassword);
+
+	string strUpdateDBInfoQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
+	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_NAME, gstrDATABASEID);
+	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_VALUE, strNewEncryptedDBID);
+
+	return strUpdateDBInfoQuery;
 }

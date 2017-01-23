@@ -784,4 +784,39 @@ EXPORT_BaseUtils SYSTEMTIME asUTCSystemTime(const CTime &ct)
 
 	return tmToSystemTime(_tm);
 }
+//-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils CTime FromDateTimeStringWithTimeZoneAdjustment(string strDate)
+{
+	int nTZHours = 0;
+	int nTZMin = 0;
+	int nIgnore = 0;
+
+	// Initialize SYSTEMTIME structure
+	SYSTEMTIME st;
+	memset(&st, 0, sizeof(st));
+
+	// Obtain the date time components from the date string
+	sscanf_s(strDate.c_str(), "%4hd-%2hd-%2hd %2hd:%2hd:%2hd.%7d %3d:%2d", &st.wYear, &st.wMonth,
+		&st.wDay, &st.wHour, &st.wMinute, &st.wSecond, &nIgnore, &nTZHours, &nTZMin);
+
+	// Convert the system time to file time - this doesn't do any adjustment for timezone
+	FILETIME fileTime;
+	SystemTimeToFileTime(&st, &fileTime);
+
+	// Create the CTime object from the file time
+	CTime timeValue(fileTime);
+	 
+	// Adjust for timezone 
+	CTimeSpan ts(0, abs(nTZHours), nTZMin, 0);
+	if (nTZHours < 0)
+	{
+		timeValue += ts;
+	}
+	else
+	{
+		timeValue -= ts;
+	}
+
+	return  timeValue;
+}
 

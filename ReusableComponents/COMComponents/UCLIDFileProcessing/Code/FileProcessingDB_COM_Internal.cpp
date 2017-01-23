@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 141;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 142;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1533,6 +1533,32 @@ int UpdateToSchemaVersion141(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40381");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion142(_ConnectionPtr ipConnection, 
+							 long* pnNumSteps, 
+							 IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 142;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrALTER_SECURE_COUNTER_VALUE_LAST_UPDATED_TIME);
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41817");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6672,7 +6698,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 138:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion139);
 				case 139:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion140);
 				case 140:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion141);
-				case 141:	break;
+				case 141:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion142);
+				case 142:	break;
 
 				default:
 					{
@@ -6783,6 +6810,12 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			executeCmdQuery(ipConnection, gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
 			tg.CommitTrans();
+
+			if (nOriginalSchemaVersion < 142)
+			{
+				// Need to update the DatabaseID and Secure Counter tables 
+				updateDatabaseIDAndSecureCounterTablesSchema142(ipConnection);
+			}
 
 			UCLIDException ue("ELI32551", "Application Trace: Database schema updated.");
 			ue.addDebugInfo("Old version", nOriginalSchemaVersion);
@@ -9235,7 +9268,7 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 
 						dbCounterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
 										
-						dbCounterChange.m_ctUpdatedTime = getSQLServerDateTimeAsCTime(getDBConnection());
+						dbCounterChange.m_ctUpdatedTime = getSQLServerDateTimeOffsetAsCTime(getDBConnection());
 
 						dbCounterChange.CalculateHashValue(dbCounterChange.m_llHashValue);
 
@@ -9386,7 +9419,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				bsmRequest << DBIDValue;
 
 				// Add the current time
-				bsmRequest << getSQLServerDateTimeAsCTime(getDBConnection());
+				bsmRequest << getSQLServerDateTimeOffsetAsCTime(getDBConnection());
 
 				bsmRequest << (((nNumCounters == 0) || bValid) ? nNumCounters : -nNumCounters);
 

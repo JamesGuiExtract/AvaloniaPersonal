@@ -66,7 +66,8 @@ ByteStreamManipulator& operator << (ByteStreamManipulator & bsm, const DatabaseI
 	return bsm;
 }
 //-------------------------------------------------------------------------------------------------
-bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid, bool bGenerateInvalidReason)
+bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid, bool bGenerateInvalidReason,
+	bool bNoTZConversion)
 {
 	// Reset the invalid reason
 	m_strInvalidReason = "";
@@ -76,7 +77,7 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 	CTime ctCreationDate, ctRestoreDate;
 	string strDatabaseName = ipConnection->DefaultDatabase;
 	
-	getDatabaseInfo(ipConnection, strDatabaseName, strServer, ctCreationDate, ctRestoreDate);
+	getDatabaseInfo(ipConnection, strDatabaseName, strServer, ctCreationDate, ctRestoreDate, bNoTZConversion);
 
 	makeLowerCase(strDatabaseName);
 	makeLowerCase(strServer);

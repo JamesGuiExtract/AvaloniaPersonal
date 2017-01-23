@@ -84,10 +84,13 @@ string DBCounterChangeValue::GetInsertQuery()
 		" (CounterID, FromValue, ToValue, LastUpdatedTime, LastUpdatedByFAMSessionID, MinFamFileCount, HashValue, Comment) "
 		"VALUES (";
 
+	// Format the time as UTC 
+	string strTime = m_ctUpdatedTime.FormatGmt("%Y-%m-%d %H:%M:%S +00:00");
+	
 	strInsertQuery += asString(m_nCounterID) + ", ";
 	strInsertQuery += asString(m_nFromValue) + ", ";
 	strInsertQuery += asString(m_nToValue) + ", ";
-	strInsertQuery += "'" + m_ctUpdatedTime.Format("%m/%d/%Y %H:%M:%S") + "', ";
+	strInsertQuery += "'" + strTime + "', ";
 	strInsertQuery += (m_nLastUpdatedByFAMSessionID == 0) ? "NULL, " : asString(m_nLastUpdatedByFAMSessionID) + ", ";
 	strInsertQuery += asString(m_llMinFAMFileCount) + ", ";
 	strInsertQuery += asString(m_llHashValue) + ", ";

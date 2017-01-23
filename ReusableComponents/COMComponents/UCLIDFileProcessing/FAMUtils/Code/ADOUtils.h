@@ -156,7 +156,9 @@ FAMUTILS_API string getStringField( const FieldsPtr& ipFields, const string& str
 // PROMISE: To return the CTime value of the field named strFieldName in the ipFields collection
 //			if the field does not exist an exception will be thrown
 //			if the field is of the wrong type an exception will be thrown
-FAMUTILS_API CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName );
+//			if noTZConversion true then datetime is in the local time zone otherwise there will be no adjustment
+//			made to the time for the timezone
+FAMUTILS_API CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName, bool noTZConversion = false);
 
 // PROMISE: To return the double value of the field named strFieldName in the ipFields collection
 //			if the field does not exist an exception will be thrown
@@ -177,7 +179,7 @@ FAMUTILS_API void setLongLongField( const FieldsPtr& ipFields, const string& str
 FAMUTILS_API void setStringField( const FieldsPtr& ipFields, const string& strFieldName, const string& strValue, bool bEmptyStrAsNull = false );
 
 // PROMISE: To set the field named strFieldName in the ipFields collection to the time date in timeDate
-FAMUTILS_API void setTimeDateField( const FieldsPtr& ipFields, const string& strFieldName, const CTime timeDate);
+FAMUTILS_API void setTimeDateField(const FieldsPtr& ipFields, const string& strFieldName, const CTime timeDate);
 
 // PROMISE: To set the field named strFieldName in the ipFields collection to the double value dValue
 //			if the field does not exist an exception will be thrown
@@ -189,6 +191,9 @@ FAMUTILS_API string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection )
 
 // PROMISE: To return datetime as CTime from the SQL server using the GETDATE() SQL function
 FAMUTILS_API CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection);
+
+// PROMISE: To return the datetimeOffset as CTime from the SQL server using the SYSDATETIMEOFFSET() SQL function
+FAMUTILS_API CTime getSQLServerDateTimeOffsetAsCTime(const _ConnectionPtr& ipDBConnection);
 
 // Returns the connection string using the given server and database.
 // If strAdditionalConnectionStringComponents is non=empty it will be added to the end of the
@@ -293,10 +298,21 @@ FAMUTILS_API void setIPersistObjToField(const FieldsPtr& ipFields, const string&
 
 // PROMISE: To return the Server name, creation date and last restore date of the database as strings
 // NOTE:	If the database has never been restored the last restore date will equal the creation date
-FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string strDBName,
+//			The following arguments will be returned with values from the database
+//				strServerName
+//				strCreateDate
+//				strLastRestoreDate
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
 	string &strServerName, string &strCreateDate, string &strLastRestoreDate);
-FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string strDBName,
-	string &strServerName, CTime &ctCreateDate, CTime &ctLastRestoreDate);
+
+// PROMISE: To return the Server name, creation date and last restore date of the database as strings
+// NOTE:	If the database has never been restored the last restore date will equal the creation date
+//			The following arguments will be returned with values from the database
+//				strServerName
+//				ctCreateDate
+//				ctLastRestoreDate
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
+	string &strServerName, CTime &ctCreateDate, CTime &ctLastRestoreDate, bool noTZConversion = true);
 
 // PROMISE: To return the bsDatabaseID ByteStream that contains the following:
 //				<DatabaseGUID>,<DatabaseServer>,<DatabaseName>,<DatabaseCreationDate>,<DatabaseRestoreDate><LastUpdateTime>

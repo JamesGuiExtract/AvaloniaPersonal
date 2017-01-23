@@ -11,6 +11,7 @@
 #include <StringTokenizer.h>
 #include <ByteStream.h>
 #include <ByteStreamManipulator.h>
+#include <DateUtil.h>
 
 using namespace ADODB;
 using namespace std;
@@ -23,6 +24,7 @@ static const string& gstrMARS_CONNECTION = "MARS Connection=True";
 
 // Misc queries
 static const string gstrGET_SQL_SERVER_TIME = "SELECT GETDATE() as CurrDateTime";
+static const string gstrGET_SQL_SERVER_DATETIMEOFFSET = "SELECT SYSDATETIMEOFFSET() as CurrDateTimeOffset";
 
 //-------------------------------------------------------------------------------------------------
 long getLongField( const FieldsPtr& ipFields, const string& strFieldName )
@@ -295,7 +297,7 @@ void setStringField( const FieldsPtr& ipFields, const string& strFieldName, cons
 	}
 }
 //-------------------------------------------------------------------------------------------------
-CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName )
+CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName, bool noTZConversion)
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -313,19 +315,35 @@ CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName )
 			variant_t vtItem = ipItem->Value;
 			
 			// The value should be Date type
-			if ( vtItem.vt != VT_DATE )
+			if ( vtItem.vt != VT_DATE && vtItem.vt != VT_BSTR)
 			{
 				UCLIDException ue("ELI15409", "Value is not a date time type.");
 				ue.addDebugInfo("Type", vtItem.vt);
 				throw ue;
 			}
-			
-			// Get the date time as systemTime
-			SYSTEMTIME systemTime;
-			VariantTimeToSystemTime(vtItem, &systemTime);
+			if (vtItem.vt == VT_BSTR)
+			{
+				return FromDateTimeStringWithTimeZoneAdjustment(asString(vtItem.bstrVal));
+			}
+			else
+			{
+				// Get the date time as systemTime
+				SYSTEMTIME systemTime;
+				VariantTimeToSystemTime(vtItem, &systemTime);
 
-			// Convert to CTime and return
-			return CTime(systemTime);
+				if (noTZConversion)
+				{
+					FILETIME fileTime;
+					SystemTimeToFileTime(&systemTime, &fileTime);
+					CTime checkFromFileTime(fileTime);
+					return checkFromFileTime;
+				}
+				else
+				{
+					CTime checkFromSystemTime(systemTime);
+					return checkFromSystemTime;
+				}
+			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15410");
 	}
@@ -568,6 +586,27 @@ CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection)
 	ASSERT_RESOURCE_ALLOCATION("ELI30824", ipFields != __nullptr );
 
 	return getTimeDateField(ipFields, "CurrDateTime");
+}
+//-------------------------------------------------------------------------------------------------
+CTime getSQLServerDateTimeOffsetAsCTime(const _ConnectionPtr& ipDBConnection)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI41808", ipDBConnection != __nullptr);
+
+		// Get the current date time
+		_RecordsetPtr ipRSTime;
+		ipRSTime = ipDBConnection->Execute (gstrGET_SQL_SERVER_DATETIMEOFFSET.c_str(), NULL, adCmdText );
+		ASSERT_RESOURCE_ALLOCATION("ELI41809", ipRSTime != __nullptr );
+	
+		// Get the fields pointer
+		FieldsPtr ipFields = ipRSTime->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI41810", ipFields != __nullptr );
+
+		return getTimeDateField(ipFields, "CurrDateTimeOffset");
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41807")
+
 }
 //-------------------------------------------------------------------------------------------------
 string createConnectionString(const string& strServer, const string& strDatabase,
@@ -1137,7 +1176,7 @@ FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& i
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20156");
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string strDBName,
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
 	string &strServerName, string &strCreateDate, string &strLastRestoreDate)
 {
 	try
@@ -1170,8 +1209,8 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string s
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38757");
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string strDBName,
-	string &strServerName, CTime &ctCreateDate, CTime &ctLastRestoreDate)
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
+	string &strServerName, CTime &ctCreateDate, CTime &ctLastRestoreDate, bool noTZConversion)
 {
 	try
 	{
@@ -1190,8 +1229,8 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string s
 			FieldsPtr ipFields = result->Fields;
 			ASSERT_RESOURCE_ALLOCATION("ELI38806", ipFields != __nullptr );
 
-			ctCreateDate = getTimeDateField(ipFields, "create_date");
-			ctLastRestoreDate = getTimeDateField(ipFields, "restore_date");
+			ctCreateDate = getTimeDateField(ipFields, "create_date", noTZConversion);
+			ctLastRestoreDate = getTimeDateField(ipFields, "restore_date", noTZConversion);
 			strServerName = getStringField(ipFields, "ServerName");
 		}
 		else
@@ -1224,7 +1263,7 @@ FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, ByteStrea
 		
 		GUID guidDatabaseID;
 		CoCreateGuid(&guidDatabaseID);
-		CTime ctLastUpdateTime(0);
+		CTime ctLastUpdateTime = getSQLServerDateTimeOffsetAsCTime(ipConnection);
 
 		// Put the values in the ByteStream;
 		bsm << guidDatabaseID;

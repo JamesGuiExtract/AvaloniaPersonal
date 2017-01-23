@@ -368,7 +368,7 @@ static const string gstrCREATE_SECURE_COUNTER_VALUE_CHANGE =
 	"  CounterID int NOT NULL, "
 	"  FromValue int NOT NULL, "
 	"  ToValue int NOT NULL, "
-	"  LastUpdatedTime datetime NOT NULL, "
+	"  LastUpdatedTime datetimeoffset NOT NULL, "
 	"  LastUpdatedByFAMSessionID int NULL, "
 	"  MinFAMFileCount bigint NOT NULL, "
 	"  HashValue bigint NOT NULL, "
@@ -1600,3 +1600,6 @@ static const string gstrALTER_PAGINATION_ALLOW_NULL_DESTFILE =
 
 static const string gstrALTER_PAGINATION_ALLOW_NULL_DESTPAGE = 
 	"ALTER TABLE [dbo].[Pagination] ALTER COLUMN [DestPage] INT NULL";
+
+static const string gstrALTER_SECURE_COUNTER_VALUE_LAST_UPDATED_TIME =
+"ALTER TABLE dbo.SecureCounterValueChange ALTER COLUMN LastUpdatedTime datetimeoffset";

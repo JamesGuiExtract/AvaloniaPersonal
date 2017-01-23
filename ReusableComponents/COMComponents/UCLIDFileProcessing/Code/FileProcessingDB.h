@@ -1069,6 +1069,12 @@ private:
 	// Method unlocks the counters if they are in a bad state
 	void unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates, UCLIDException &ueLog);
 
+	// Method generates the queries for the given counter to fix corruption
+	string getQueryToResetCounterCorruption(CounterOperation counter, DatabaseIDValues databaseID, 
+		UCLIDException &ueLog, string strComment = "Unlock");
+
+	string getDatabaseIDUpdateQuery(DatabaseIDValues databaseID);
+
 	// Returns a map with all the existing counters as CounterOperation records. All of the records
 	// returned will have the m_eOperation set to kNone. As the changes are processed they will be 
 	// changes to reflect the operations specified with the upgrade code.
@@ -1077,13 +1083,19 @@ private:
 	// only the CounterID portion will be checked against the record's ID
 	void getCounterInfo(map<long, CounterOperation> &mapOfCounterOps, bool bCheckCounterHash = true);
 	
+	// Creates counter update queries for all existing counters. The querys make the counteres valid for the 
+	// given databaseIDValues
 	void createCounterUpdateQueries(const DatabaseIDValues &databaseIDValues, vector<string> &vecCounterUpdates, 
 		map<long, CounterOperation> &mapCounters );
 
+	// Creates a new databaseID and stores in in the database
 	void createAndStoreNewDatabaseID(_ConnectionPtr ipConnection);
 
 	// Checks if the file was created in a currently active FAMSession thru pagination.
 	bool isFileInPagination(_ConnectionPtr ipConnection, long nFileID);
+
+	// Method to update DatabaseID and Secure Counter tables after schema updated to 142
+	void updateDatabaseIDAndSecureCounterTablesSchema142(_ConnectionPtr ipConnection);
 
 	void validateLicense();
 
