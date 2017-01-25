@@ -1744,6 +1744,27 @@ namespace Extract.Imaging.Forms
             else
             {
                 zoomInfo.ScaleFactor /= _ZOOM_FACTOR;
+
+                // https://extract.atlassian.net/browse/ISSUE-14420
+                // Don't allow zoom out beyond a full page view.
+                // [DataEntry:837]
+                // If a zero-size display rectangle has been specified (as is the case with a minimized
+                // window), skip check for zoom out beyond full page.
+                if (DisplayRectangle.Width > 0 && DisplayRectangle.Height > 0)
+                {
+                    // Set the scale factor in order to check if the new zoom level makes 
+                    // PhysicalViewRectangle smaller than DisplayRectangle
+                    ScaleFactor = zoomInfo.ScaleFactor;
+
+                    if (PhysicalViewRectangle.Width < DisplayRectangle.Width &&
+                        PhysicalViewRectangle.Height < DisplayRectangle.Height)
+                    {
+                        // If zoomed out further than the full page, use ZoomToRectangle to set zoom
+                        // exactly to the full page.
+                        ZoomToRectangle(PhysicalViewRectangle);
+                        return;
+                    }
+                }
             }
 
             // Apply the new zoom setting
@@ -3160,7 +3181,15 @@ namespace Extract.Imaging.Forms
                     
                     // Recalculate and redraw a new selection border
                     _trackingData.UpdateRectangle(mouseX, mouseY);
-                    DrawTrackingRectangleBorder(e, Color.Black);
+
+                    // https://extract.atlassian.net/browse/ISSUE-14420
+                    // Prevent an accidental click from getting interpreted as an extreme zoom.
+                    if (_trackingData.Rectangle.Width >= _MIN_ZOOM_CLIENT_PIXELS || 
+                        _trackingData.Rectangle.Height >= _MIN_ZOOM_CLIENT_PIXELS)
+                    {
+                        DrawTrackingRectangleBorder(e, Color.Black);
+                    }
+
                     break;
 
                 default:
@@ -3319,7 +3348,13 @@ namespace Extract.Imaging.Forms
 
                         if (!cancel)
                         {
-                            ZoomToRectangle(_trackingData.Rectangle);
+                            // https://extract.atlassian.net/browse/ISSUE-14420
+                            // Prevent an accidental click from getting interpreted as an extreme zoom.
+                            if (_trackingData.Rectangle.Width >= _MIN_ZOOM_CLIENT_PIXELS ||
+                                _trackingData.Rectangle.Height >= _MIN_ZOOM_CLIENT_PIXELS)
+                            {
+                                ZoomToRectangle(_trackingData.Rectangle);
+                            }
                         }
                         break;
 

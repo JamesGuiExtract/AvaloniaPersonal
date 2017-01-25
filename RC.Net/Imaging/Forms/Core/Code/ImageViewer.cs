@@ -65,6 +65,12 @@ namespace Extract.Imaging.Forms
         const double _MAX_ZOOM_OUT_SCALE_FACTOR = 0.02;
 
         /// <summary>
+        /// The minimum number of client pixels a user needs to drag the zoom tool before it will
+        /// register a tracking event and result in a zoom.
+        /// </summary>
+        const int _MIN_ZOOM_CLIENT_PIXELS = 8;
+
+        /// <summary>
         /// The value that the scale factor is multiplied or divided by when zooming in and 
         /// zooming out, respectively. 
         /// </summary>
