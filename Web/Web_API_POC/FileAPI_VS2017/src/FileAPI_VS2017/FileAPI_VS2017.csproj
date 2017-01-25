@@ -1,8 +1,7 @@
 ﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup Label="Configuration">
     <DocumentationFile>bin\Debug\net46\FileAPI_VS2017.xml</DocumentationFile>
-    <SignAssembly>
-    </SignAssembly>
+    <SignAssembly />
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -40,5 +39,16 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.0.0" />
     <PackageReference Include="Swashbuckle" Version="6.0.0-beta902" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="app.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="web.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

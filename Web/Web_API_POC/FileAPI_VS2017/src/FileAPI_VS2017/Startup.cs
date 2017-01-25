@@ -52,6 +52,7 @@ namespace FileAPI_VS2017
             // TODO - when project is renamed, this xml file name must be changed.
             var xmlPath = Path.Combine(basepath, "FileAPI_VS2017.xml");
 
+            services.AddSwaggerGen();
             services.ConfigureSwaggerGen(options =>
             {
                 options.SingleApiVersion(new Info
@@ -73,30 +74,8 @@ namespace FileAPI_VS2017
                     }
                 });
                 options.IncludeXmlComments(xmlPath);
+                options.DescribeAllEnumsAsStrings();
             });
-
-            // This used to work with VS 2015 and Swashbuckle v6.0.0.-beta902,
-            // which is the same version I'm using here with VS 2017!
-            /*
-            services.AddSwaggerGen(c =>
-            {
-                c.IncludeXmlComments(xmlPath);
-                c.SwaggerDoc("v1", new Info
-                {
-                    Title = "Aristotle API",
-                    Version = "v1",
-                    Description = "Web API Documentation",
-                    Contact = new Contact
-                    {
-                        Name = "Extract developers team",
-                        Email = "developers@extractsystems.com",
-                        Url = "http://www.extractsystems.com"
-                    }
-                });
-            });
-            */
-
-            services.AddSwaggerGen();
         }
 
         /// <summary>
@@ -104,12 +83,11 @@ namespace FileAPI_VS2017
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        /// <param name="loggerFactory"></param>
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            string logPath = env.ContentRootPath + "\\Logs";
+            Log.Create(logPath);
 
             app.UseMvc();
 

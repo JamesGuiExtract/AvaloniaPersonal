@@ -1,4 +1,6 @@
-﻿namespace FileAPI_VS2017
+﻿using static FileAPI_VS2017.Utils;
+
+namespace FileAPI_VS2017
 {
     /// <summary>
     /// FileItem
@@ -19,5 +21,14 @@
         /// the size of the file (type is long)
         /// </summary>
         public long Size { get; set; }
+
+        /// <summary>
+        /// ToString() - an override
+        /// </summary>
+        /// <returns>string containing all public properties, listed</returns>
+        public override string ToString()
+        {
+            return Inv($"Name: {Name}, Id: {Id}, Size: {Size}");
+        }
     }
 }

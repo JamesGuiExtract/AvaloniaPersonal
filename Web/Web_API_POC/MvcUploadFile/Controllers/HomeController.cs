@@ -65,7 +65,8 @@ namespace MvcUploadFile.Controllers
             {
                 using (var client = new HttpClient())
                 {
-                    client.BaseAddress = new Uri("http://localhost:58926");
+                    client.BaseAddress = new Uri("http://david2016svrvm");
+                    //client.BaseAddress = new Uri("http://localhost:58926");
 
                     foreach (var file in files)
                     {
@@ -77,7 +78,8 @@ namespace MvcUploadFile.Controllers
                         fileContent.Headers.Add("X-FileName", fileName);
                         fileContent.Headers.Add("X-ContentType", file.ContentType);
 
-                        var response = await client.PostAsync("api/FileItem", fileContent);
+                        //var response = await client.PostAsync("api/FileItem", fileContent);
+                        var response = await client.PostAsync("FileApi_VS2017/api/FileItem", fileContent);
                     }
                 }
             }
