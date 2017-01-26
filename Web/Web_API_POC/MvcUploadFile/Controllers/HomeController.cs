@@ -8,55 +8,26 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
+using Microsoft.Extensions.Options;
+
 
 namespace MvcUploadFile.Controllers
 {
     public class HomeController : Controller
     {
         private IHostingEnvironment _environment;
+        private readonly Options _options;
 
-        public HomeController(IHostingEnvironment env)
+        public HomeController(IHostingEnvironment env, IOptions<Options> options)
         {
             _environment = env;
+            _options = options.Value;
         }
 
         public IActionResult Index()
         {
             return View();
         }
-
-        // This method works as a server-side
-        /*
-        [HttpPost]
-        public async Task<IActionResult> Index(ICollection<IFormFile> files)
-        {
-            try
-            {
-                var uploads = Path.Combine(_environment.WebRootPath, "uploads");
-                if (!Directory.Exists(uploads))
-                {
-                    Directory.CreateDirectory(uploads);
-                }
-
-                foreach (var file in files)
-                {
-                    if (file.Length > 0)
-                    {
-                        using (var fileStream = new FileStream(Path.Combine(uploads, file.FileName), FileMode.Create))
-                        {
-                            await file.CopyToAsync(fileStream);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                var msg = ex.Message;
-            }
-
-            return View();
-        }
-        */
 
         [HttpPost]
         public async Task<IActionResult> Index(ICollection<IFormFile> files)
@@ -65,8 +36,9 @@ namespace MvcUploadFile.Controllers
             {
                 using (var client = new HttpClient())
                 {
-                    client.BaseAddress = new Uri("http://david2016svrvm");
+                    //client.BaseAddress = new Uri("http://david2016svrvm");
                     //client.BaseAddress = new Uri("http://localhost:58926");
+                    client.BaseAddress = new Uri(_options.SiteSpecificUrl);
 
                     foreach (var file in files)
                     {
@@ -79,7 +51,8 @@ namespace MvcUploadFile.Controllers
                         fileContent.Headers.Add("X-ContentType", file.ContentType);
 
                         //var response = await client.PostAsync("api/FileItem", fileContent);
-                        var response = await client.PostAsync("FileApi_VS2017/api/FileItem", fileContent);
+                        //var response = await client.PostAsync("FileApi_VS2017/api/FileItem", fileContent);
+                        var response = await client.PostAsync(_options.WebApiPortionOfUrl, fileContent);
                     }
                 }
             }
