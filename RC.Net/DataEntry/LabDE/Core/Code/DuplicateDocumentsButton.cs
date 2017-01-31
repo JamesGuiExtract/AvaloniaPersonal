@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using static System.FormattableString;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry.LabDE
@@ -785,7 +786,7 @@ namespace Extract.DataEntry.LabDE
                     "SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
                     "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    "   WHERE [Name] = 'CollectionDate' AND (";
+                    Invariant($"   WHERE [Name] = '{CollectionDateMetadataField}' AND (");
                 
                 string[] collectionDates = string.IsNullOrWhiteSpace(CollectionDate)
                     ? new[] { "[NO_COLLECTION_DATE]"}
