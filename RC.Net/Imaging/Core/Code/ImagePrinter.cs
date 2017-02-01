@@ -170,46 +170,53 @@ namespace Extract.Imaging
         /// </param>
         void HandlePrintPage(object sender, PrintPageEventArgs e)
         {
-            _currentPageNumber++;
-            e.HasMorePages = _currentPageNumber < e.PageSettings.PrinterSettings.ToPage;
-
-            using (RasterImage pageImage = _imageReader.ReadPage(_currentPageNumber))
+            try
             {
-                // [IDSD #318], [DotNetRCAndUtils:1078]
-                // The margin bounds should be the margin rectangle intersected with the
-                // printable area offset by the inverse of the top-left of the printable area.
-                var printableArea = Rectangle.Round(e.PageSettings.PrintableArea);
-                Rectangle marginBounds = e.MarginBounds;
-                marginBounds.Intersect(printableArea);
-                marginBounds.Offset(-printableArea.X, -printableArea.Y);
-                Rectangle sourceBounds = new Rectangle(0, 0, pageImage.Width, pageImage.Height);
+                _currentPageNumber++;
+                e.HasMorePages = _currentPageNumber < e.PageSettings.PrinterSettings.ToPage;
 
-                // Calculate the scale so the image fits exactly within the bounds of the page
-                float scale = (float)Math.Min(
-                    marginBounds.Width / (double)sourceBounds.Width,
-                    marginBounds.Height / (double)sourceBounds.Height);
-
-                // Calculate the horizontal and vertical padding
-                PointF padding = new PointF(
-                    (marginBounds.Width - sourceBounds.Width * scale) / 2.0F,
-                    (marginBounds.Height - sourceBounds.Height * scale) / 2.0F);
-
-                // Calculate the destination rectangle
-                Rectangle destinationBounds = new Rectangle(
-                    (int)(marginBounds.Left + padding.X), (int)(marginBounds.Top + padding.Y),
-                    (int)(marginBounds.Width - padding.X * 2), (int)(marginBounds.Height - padding.Y * 2));
-
-                using (var image = RasterImageConverter.ConvertToImage(pageImage,
-                    ConvertToImageOptions.None))
+                using (RasterImage pageImage = _imageReader.ReadPage(_currentPageNumber))
                 {
-                    e.Graphics.DrawImage(image, destinationBounds, sourceBounds, GraphicsUnit.Pixel);
+                    // [IDSD #318], [DotNetRCAndUtils:1078]
+                    // The margin bounds should be the margin rectangle intersected with the
+                    // printable area offset by the inverse of the top-left of the printable area.
+                    var printableArea = Rectangle.Round(e.PageSettings.PrintableArea);
+                    Rectangle marginBounds = e.MarginBounds;
+                    marginBounds.Intersect(printableArea);
+                    marginBounds.Offset(-printableArea.X, -printableArea.Y);
+                    Rectangle sourceBounds = new Rectangle(0, 0, pageImage.Width, pageImage.Height);
 
-                    // If printing annotations, apply them now.
-                    if (_printAnnotations)
+                    // Calculate the scale so the image fits exactly within the bounds of the page
+                    float scale = (float)Math.Min(
+                        marginBounds.Width / (double)sourceBounds.Width,
+                        marginBounds.Height / (double)sourceBounds.Height);
+
+                    // Calculate the horizontal and vertical padding
+                    PointF padding = new PointF(
+                        (marginBounds.Width - sourceBounds.Width * scale) / 2.0F,
+                        (marginBounds.Height - sourceBounds.Height * scale) / 2.0F);
+
+                    // Calculate the destination rectangle
+                    Rectangle destinationBounds = new Rectangle(
+                        (int)(marginBounds.Left + padding.X), (int)(marginBounds.Top + padding.Y),
+                        (int)(marginBounds.Width - padding.X * 2), (int)(marginBounds.Height - padding.Y * 2));
+
+                    using (var image = RasterImageConverter.ConvertToImage(pageImage,
+                        ConvertToImageOptions.None))
                     {
-                        DrawAnnotations(e, sourceBounds, destinationBounds, scale);
+                        e.Graphics.DrawImage(image, destinationBounds, sourceBounds, GraphicsUnit.Pixel);
+
+                        // If printing annotations, apply them now.
+                        if (_printAnnotations)
+                        {
+                            DrawAnnotations(e, sourceBounds, destinationBounds, scale);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41825");
             }
         }
 
