@@ -230,7 +230,7 @@ CreateSharepointInstall:
 #@CD \Engineering\ProductDevelopment\AttributeFinder\Build
 	
 UpdateLicenseFiles:
-	@IF "$(Branch)"=="" (
+	@IF "$(Branch)"=="master" (
 		@Echo Updating Licensing Files...
 		@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDComponentsLM\COMLMCore\Code\*.dat" "$(BinariesFolder)"
 		@Copy "$(BinariesFolder)\Components.dat" "$(DeveloperLicensing)"

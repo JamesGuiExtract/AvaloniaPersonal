@@ -1,7 +1,5 @@
 @ECHO OFF
 
-SET Branch=
-
 IF "%~1"=="" GOTO missing_version_number_error
 
 GOTO no_get_build
