@@ -1,11 +1,17 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Formatters;              // for HttpNoContentOutputFormatter
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
 using System.IO;
+using System.Collections.Generic;
 using Swashbuckle.Swagger.Model;
+
+using static FileAPI_VS2017.Controllers.UsersController;
+using FileAPI_VS2017.Models;
 
 namespace FileAPI_VS2017
 {
@@ -41,8 +47,13 @@ namespace FileAPI_VS2017
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
-
+            services.AddMvc(options =>
+            {
+                // Remove the HttpNoContentOutputFormatter, so that null object will be represented
+                // in JSON (as "null"), instead of returning http error "204 No Content" response
+                options.OutputFormatters.RemoveType<HttpNoContentOutputFormatter>();
+            });
+            
             // Add the API Model
             services.AddSingleton<IFileItemRepository, FileItemRepository>();
 
@@ -58,8 +69,8 @@ namespace FileAPI_VS2017
                 options.SingleApiVersion(new Info
                 {
                     Version = "v1",
-                    Title = "File API",
-                    Description = "File API documentation",
+                    Title = "Document API",
+                    Description = "Extract Document API documentation",
                     TermsOfService = "None",
                     Contact = new Contact
                     {
@@ -78,6 +89,8 @@ namespace FileAPI_VS2017
             });
         }
 
+        
+
         /// <summary>
         /// Configure method...
         /// </summary>
@@ -89,10 +102,28 @@ namespace FileAPI_VS2017
             string logPath = env.ContentRootPath + "\\Logs";
             Log.Create(logPath);
 
+            if (env.IsDevelopment())
+            {
+            }
+
             app.UseMvc();
 
             app.UseSwagger();
             app.UseSwaggerUi();
+
+            // Now add some mock users to the server...
+            var claimUser = new List<Claim>();
+            claimUser.Add(new Claim { Name = "Access", Value = "User" });
+            claimUser.Add(new Claim { Name = "DefaultWorkflow", Value = "Verify" });
+
+            var claimAdmin = new List<Claim>();
+            claimAdmin.Add(new Claim { Name = "Access", Value = "User" });
+            claimAdmin.Add(new Claim { Name = "Access", Value = "Admin" });
+            claimAdmin.Add(new Claim { Name = "DefaultWorkflow", Value = "Root" });
+
+            AddMockUser(new Models.User { Username = "John Doe", Password = "password1", Claims = claimUser });
+            AddMockUser(new Models.User { Username = "Jim Doe", Password = "password2", Claims = claimUser });
+            AddMockUser(new Models.User { Username = "David", Password = "password", Claims = claimAdmin });
         }
     }
 }
