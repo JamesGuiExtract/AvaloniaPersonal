@@ -62,7 +62,13 @@ namespace DocumentAPI.Controllers
         {
             if (!ModelState.IsValid || String.IsNullOrEmpty(workflowName))
             {
-                //return BadRequest("Error: empty user name");
+                return new WorkflowStatus
+                {
+                    Error = Utils.MakeError(isError: true,
+                                            message: "workFlowName is empty",
+                                            code: -1),
+                    State = Enum.GetName(typeof(WorkflowState), WorkflowState.Error)
+                };
             }
 
             var status = new WorkflowStatus

@@ -44,7 +44,7 @@ namespace DocumentAPI.Controllers
 
             int startPosition;
             string value;
-            string preamble;
+            string preamble = "";
             if (id.Contains("File"))
             {
                 preamble = "File";
@@ -52,10 +52,6 @@ namespace DocumentAPI.Controllers
             else if (id.Contains("Text"))
             {
                 preamble = "Text";
-            }
-            else
-            {
-                preamble = "";
             }
 
             if (!String.IsNullOrEmpty(preamble))
@@ -72,7 +68,10 @@ namespace DocumentAPI.Controllers
                 value = id;
             }
 
-            int fileId = Convert.ToInt32(value);
+            int fileId;
+            bool converted = Int32.TryParse(value, out fileId);
+            Contract.Assert(true == converted, "Bad fileId value, original id: {0}, value: {1}", id, value);
+
             return fileId;
         }
 
@@ -120,7 +119,7 @@ namespace DocumentAPI.Controllers
         }
 
         /// <summary>
-        /// get a "safe" filename - handles filename collisions in the upload directory by appending a GUID on collision.
+        /// get a "safe" filename - appends a GUID so there is never a file name collision issue
         /// </summary>
         /// <param name="path">The path of the file</param>
         /// <param name="filename">The (base) name of the file, including extension</param>
@@ -315,7 +314,6 @@ namespace DocumentAPI.Controllers
 
             try
             {
-                // TODO - test this...
                 var fileProcessingDB = Utils.FileDbMgr;
                 Contract.Assert(fileProcessingDB != null, "fileProcessingDB is null, cannot submit text file to FAM queue");
 
@@ -339,7 +337,98 @@ namespace DocumentAPI.Controllers
             }
         }
 
-        // Add File GetFileResult(string fileId)
+        /// <summary>
+        /// This function returns the content (MIME) type associated with the file extension,
+        /// or throws if the type is unsupported.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        /// <remarks> Supported MIME types:
+        /// .tif|.tiff Tagged Image File Format(TIFF) image/tiff
+        /// .pdf Adobe Portable Document Format(PDF)    application/pdf
+        /// .xml XML application/xml
+        /// .zip ZIP archive application/zip
+        /// </remarks>
+        static string FileContentType(string filename)
+        {
+            Contract.Assert(!String.IsNullOrEmpty(filename), "bad argument - empty string");
+
+            var ext = Path.GetExtension(filename);
+            Contract.Assert(!String.IsNullOrEmpty(ext), "extension is empty - filename: {0}", filename);
+
+            if (ext.IsEquivalent(".tif") || ext.IsEquivalent(".tiff"))
+            {
+                return "image/tiff";
+            }
+            else if (ext.IsEquivalent(".pdf"))
+            {
+                return "application/pdf";
+            }
+            else if (ext.IsEquivalent(".xml"))
+            {
+                return "application/xml";
+            }
+            else if (ext.IsEquivalent(".zip"))
+            {
+                return "application/zip";
+            }
+
+            Contract.Violated(Inv($"Unsupported extension requested, filename: {filename}"));
+            return "";
+        }
+
+        /// <summary>
+        /// get the original source file associated with the file id
+        /// </summary>
+        /// <param name="Id">the file id, as a string. Often prepended with "Text" or "File"</param>
+        /// <returns>the original image file associated with the file id</returns>
+        [HttpGet("GetSourceFile/{Id}")]
+        public IActionResult GetSourceFile(string Id)
+        {
+            string filename = "";
+
+            try
+            {
+                var fileProcessingDB = Utils.FileDbMgr;
+                Contract.Assert(fileProcessingDB != null, "null fileProcessingDb, cannot add file to FAM queue");
+
+                var fileId = ConvertIdToFileId(Id);
+                filename = fileProcessingDB.GetFileNameFromFileID(fileId);
+            }
+            catch (Exception ex)
+            {
+                var message = Inv($"Exception: {ex.Message}, while getting filename from fileId, for fileId: {Id}, resetting fileProcessingDb manager");
+
+                Log.WriteLine(message);
+                Utils.ResetFileProcessingDB();
+
+                return BadRequest(message);
+            }
+
+            try
+            { 
+                Contract.Assert(!String.IsNullOrEmpty(filename), "Error getting the filename for fileId: {0}", Id);
+
+                if (!System.IO.File.Exists(filename))
+                {
+                    return NotFound(Inv($"The file: {filename}, does not exist"));
+                }
+
+                var fileContentType = FileContentType(filename);
+                var fileDownloadName = Path.GetFileName(filename);
+                Contract.Assert(!String.IsNullOrEmpty(fileDownloadName), "path.GetFileName returned empty value for filename: {0}", filename);
+
+                return PhysicalFile(filename, fileContentType, fileDownloadName);
+            }
+            catch (Exception ex)
+            {
+                var message = Inv($"Exception: {ex.Message}, while returning file: {filename}, for fileId: {Id}");
+
+                Log.WriteLine(message);
+                return BadRequest(message);
+            }
+        }
+
         /// <summary>
         /// Gets a result file for the specified input document
         /// </summary>
@@ -351,8 +440,6 @@ namespace DocumentAPI.Controllers
             return new byte[10];
         }
 
-        // Add GetTextResult
-        // TODO - may unify the Get????Result() methods, why not?
         /// <summary>
         /// Gets a text result for a specified input document
         /// </summary>

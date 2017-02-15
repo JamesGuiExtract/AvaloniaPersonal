@@ -10,7 +10,6 @@ namespace DocumentAPI
     public class Log
     {
         static StreamWriter _logFile;
-        static readonly Lazy<Log> _log = new Lazy<Log>(() => new Log());
 
         /// <summary>
         /// LogPath - for debugging only, 
@@ -59,7 +58,7 @@ namespace DocumentAPI
 
         private static string CurrentDateTimeAsString()
         {
-            return $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")}";
+            return DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
         }
 
         /// <summary>

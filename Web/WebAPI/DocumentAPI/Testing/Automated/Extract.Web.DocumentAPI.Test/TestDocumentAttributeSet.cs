@@ -401,13 +401,10 @@ namespace Extract.Web.DocumentAPI.Test
             var name = parentNode.Name;
             if (name.IsEquivalent("HCData") ||
                 name.IsEquivalent("MCData") ||
-                name.IsEquivalent("LCData"))
+                name.IsEquivalent("LCData") ||
+                name.IsEquivalent("Manual") )
             {
-                Assert.IsTrue(parentNode.Attributes != null && parentNode.Attributes["FieldType"] != null,
-                                "IDShield naming detected but FieldType attribute is missing");
-
-                var actualName = parentNode.Attributes["FieldType"].Value;
-                return actualName;
+                return "Data";
             }
 
             return name;
@@ -459,12 +456,24 @@ namespace Extract.Web.DocumentAPI.Test
             }
         }
 
+        /// <summary>
+        /// verify that the spatial page line number matches, if it exists
+        /// </summary>
+        /// <param name="spatialLineNode"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="index"></param>
         static void TestSpatialLinePageNumber(XmlNode spatialLineNode, int? pageNumber, int index)
         {
             try
             {
                 if (pageNumber == null)
                 {
+                    if (spatialLineNode.Attributes != null)
+                    {
+                        Assert.IsTrue(spatialLineNode.Attributes["PageNumber"] == null, 
+                                      "pageNumber is null but xml spatialLineNode has a PageNumber attribute");
+                    }
+
                     return;
                 }
 
@@ -587,13 +596,6 @@ namespace Extract.Web.DocumentAPI.Test
                         TestSpatialLineBounds(nextNode, docAttr.SpatialPosition.LineInfo[i].SpatialLineBounds, i);
                     }
                 }
-                //else
-                //{
-                //    This happens in LabDE<Test> nodes -they break the < TopLevelName >< FullText >< SpatialLine >, and
-                //        instead use < TopLevelName >< FullText(empty) >< ChildLevelName ><< FullText >< SpatialLine > -
-                //        don't advance by one, this is done in the child processing loop below.
-                //    lastNode = lastNode.NextSibling;
-                //}
 
                 // Now process all the childAttribute items.
                 for (int i = 0; i < docAttr.ChildAttributes.Count; ++i)

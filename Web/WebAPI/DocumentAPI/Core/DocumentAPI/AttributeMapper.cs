@@ -17,16 +17,16 @@ namespace DocumentAPI
     public class AttributeMapper
     {
         /// <summary>
-        /// 
+        /// Is the attribute name an IDShield name?
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <param name="name">name value</param>
+        /// <returns>true iff it is an IDShield name</returns>
         private static bool IsIdShieldName(string name)
         {
             if (name.IsEquivalent("HCData") ||
                 name.IsEquivalent("MCData") ||
                 name.IsEquivalent("LCData") ||
-                name.IsEquivalent("Clue")   ||
+                name.IsEquivalent("Clues")   ||
                 name.IsEquivalent("Manual") )
             {
                 return true;
@@ -53,6 +53,12 @@ namespace DocumentAPI
                 {
                     name = "Data";
                 }
+                else if (name.IsEquivalent("Clues"))
+                {
+                    // This is done to ensure that differently cased variants of "clues" get translated reliably
+                    // into "Clues" always.
+                    name = "Clues";
+                }
             }
 
             return name;
@@ -75,9 +81,8 @@ namespace DocumentAPI
         }
 
         private static Dictionary<string, string> mapRedactionConfidenceValues = 
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
             {
-                {"NotApplicable", Enum.GetName(typeof(ConfidenceLevel), ConfidenceLevel.NotApplicable) },
                 {"HCData", Enum.GetName(typeof(ConfidenceLevel), ConfidenceLevel.High) },
                 {"MCData", Enum.GetName(typeof(ConfidenceLevel), ConfidenceLevel.Medium) },
                 {"LCData", Enum.GetName(typeof(ConfidenceLevel), ConfidenceLevel.Low)},
@@ -92,14 +97,11 @@ namespace DocumentAPI
         /// <returns></returns>
         private static string DetermineRedactionConfidence(string originalName)
         {
-            if (IsIdShieldName(originalName))
+            string confidence;
+            var found = mapRedactionConfidenceValues.TryGetValue(originalName, out confidence);
+            if (found)
             {
-                string confidence;
-                var found = mapRedactionConfidenceValues.TryGetValue(originalName, out confidence);
-                if (found)
-                {
-                    return confidence;
-                }
+                return confidence;
             }
 
             return Enum.GetName(typeof(ConfidenceLevel), ConfidenceLevel.NotApplicable);

@@ -31,13 +31,10 @@ namespace DocumentAPI
 
             Configuration = builder.Build();
             Utils.DatabaseServer = Configuration["DatabaseServer"];
-            Contract.Assert(!string.IsNullOrEmpty(Utils.DatabaseServer), "DatabaseServer from appsettings is empty");
 
             Utils.DatabaseName = Configuration["DatabaseName"];
-            Contract.Assert(!string.IsNullOrEmpty(Utils.DatabaseName), "DatabaseName from appsettings is empty");
 
             Utils.AttributeSetName = Configuration["AttributeSetName"];
-            Contract.Assert(!string.IsNullOrEmpty(Utils.AttributeSetName), "AttributeSetName from appsettings is empty");
 
             Utils.environment = env;
         }

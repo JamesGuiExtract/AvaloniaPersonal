@@ -21,6 +21,9 @@ namespace DocumentAPI
         private static string _databaseName;
         private static string _attributeSetName = "Attr";
 
+        private static object _fileProcessingDbLock = new Object();
+        private static object _attributeDbMgrLock = new Object();
+
         /// <summary>
         /// Inv - short form of Invariant. Normally I would use the full name, but in this case the 
         /// full name is just noise, a distraction from the more important functionality. All this
@@ -119,36 +122,38 @@ namespace DocumentAPI
         {
             get
             {
-                if (_fileProcessingDB == null)
+                lock (_fileProcessingDbLock)
                 {
-                    try
+                    if (_fileProcessingDB == null)
                     {
-                        FAMDBUtils dbUtils = new FAMDBUtils();
-                        Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
-                        _fileProcessingDB = (FileProcessingDB)Activator.CreateInstance(mgrType);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.WriteLine(Inv($"Exception creating FileProcessingDB instance: {ex.Message}"));
-                        throw;
+                        try
+                        {
+                            FAMDBUtils dbUtils = new FAMDBUtils();
+                            Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
+                            _fileProcessingDB = (FileProcessingDB)Activator.CreateInstance(mgrType);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.WriteLine(Inv($"Exception creating FileProcessingDB instance: {ex.Message}"));
+                            throw;
+                        }
+
+                        Contract.Assert(_fileProcessingDB != null, "Failed to create FileProcessingDB instance");
+
+                        try
+                        {
+                            _fileProcessingDB.DatabaseServer = DatabaseServer;
+                            _fileProcessingDB.DatabaseName = DatabaseName;
+                        }
+                        catch (Exception exp)
+                        {
+                            Log.WriteLine(Inv($"Exception setting FileProcessingDB DB context: {exp.Message}"));
+                            throw;
+                        }
                     }
 
-                    Contract.Assert(_fileProcessingDB != null, "Failed to create FileProcessingDB instance");
-
-                    // TODO - get these values from configuration
-                    try
-                    {
-                        _fileProcessingDB.DatabaseServer = DatabaseServer;
-                        _fileProcessingDB.DatabaseName = DatabaseName;
-                    }
-                    catch (Exception exp)
-                    {
-                        Log.WriteLine(Inv($"Exception setting FileProcessingDB DB context: {exp.Message}"));
-                        throw;
-                    }
+                    return _fileProcessingDB;
                 }
-
-                return _fileProcessingDB;
             }
         }
 
@@ -158,7 +163,10 @@ namespace DocumentAPI
         /// </summary>
         public static void ResetFileProcessingDB()
         {
-            _fileProcessingDB = null;
+            lock (_fileProcessingDbLock)
+            {
+                _fileProcessingDB = null;
+            }
         }
 
         /// <summary>
@@ -168,23 +176,26 @@ namespace DocumentAPI
         {
             get
             {
-                if (_attributeDbMgr == null)
+                lock (_attributeDbMgrLock)
                 {
-                    try
+                    if (_attributeDbMgr == null)
                     {
-                        _attributeDbMgr = new AttributeDBMgr();
-                        Contract.Assert(_attributeDbMgr != null, "Failure to create attributeDbMgr!");
+                        try
+                        {
+                            _attributeDbMgr = new AttributeDBMgr();
+                            Contract.Assert(_attributeDbMgr != null, "Failure to create attributeDbMgr!");
 
-                        _attributeDbMgr.FAMDB = FileDbMgr;
+                            _attributeDbMgr.FAMDB = FileDbMgr;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.WriteLine(Inv($"Exception creating AttributeDBMgr: {ex.Message}"));
+                            throw;
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        Log.WriteLine(Inv($"Exception creating AttributeDBMgr: {ex.Message}"));
-                        throw;
-                    }
+
+                    return _attributeDbMgr;
                 }
-
-                return _attributeDbMgr;
             }
         }
 
@@ -193,7 +204,10 @@ namespace DocumentAPI
         /// </summary>
         public static void ResetAttributeMgr()
         {
-            _attributeDbMgr = null;
+            lock (_attributeDbMgrLock)
+            {
+                _attributeDbMgr = null;
+            }
         }
 
         /// <summary>
@@ -207,6 +221,7 @@ namespace DocumentAPI
             }
             set
             {
+                Contract.Assert(!String.IsNullOrEmpty(value), "DatabaseServer cannot be set to empty");
                 _databaseServer = value;
             }
         }
@@ -223,6 +238,7 @@ namespace DocumentAPI
             }
             set
             {
+                Contract.Assert(!String.IsNullOrEmpty(value), "DatabaseName cannot be set to empty");
                 _databaseName = value;
             }
         }
@@ -284,11 +300,13 @@ namespace DocumentAPI
         {
             get
             {
+                Contract.Assert(!String.IsNullOrEmpty(_attributeSetName), "AttributeSetName is empty");
                 return _attributeSetName;
             }
 
             set
             {
+                Contract.Assert(!String.IsNullOrEmpty(value), "AttributeSetName cannot be set to empty");
                 _attributeSetName = value;
             }
         }
@@ -321,10 +339,10 @@ namespace DocumentAPI
         /// <summary>
         /// routine to simplify making a ProcessingStatus instance
         /// </summary>
-        /// <param name="status"></param>
-        /// <param name="isError"></param>
-        /// <param name="message"></param>
-        /// <param name="code"></param>
+        /// <param name="status">status value</param>
+        /// <param name="isError">true if error, false otherwise, defaults to false</param>
+        /// <param name="message">error message, defaults to empty</param>
+        /// <param name="code">error code, defaults to zero (no error)</param>
         /// <returns></returns>
         public static ProcessingStatus MakeProcessingStatus(DocumentProcessingStatus status,
                                                             bool isError = false,
@@ -341,14 +359,11 @@ namespace DocumentAPI
         /// <summary>
         /// routine to simplify making a List of some type with a single item.
         /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
+        /// <param name="item">the item to add to the list</param>
+        /// <returns>List of T, with the input item added</returns>
         public static List<T> MakeListOf<T>(T item)
         {
-            List<T> listT = new List<T>();
-            listT.Add(item);
-
-            return listT;
+            return new List<T> { item };
         }
     }
 }
