@@ -888,6 +888,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _fileId = fileID;
                 _fileName = fileName;
                 _fileTaskSessionID = null;
+
                 if (_paginationPanel != null)
                 {
                     _paginationPanel.FileTaskSessionID = null;
@@ -3793,9 +3794,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (_standAloneMode)
                 {
                     SaveData(false);
+                    return;
                 }
+
+                // https://extract.atlassian.net/browse/ISSUE-14495
+                // If the save+commit button is not disabled immediately, another SaveAndCommit
+                // can be triggered before the first one is complete (BeginInvokes allow for
+                // processing another event in the midst of the initial handling).
+                _saveAndCommitFileCommand.Enabled = false;
+                
                 // AttemptSave will return Cancel if there was invalid data in the DEP.
-                else if (AttemptSave(true) != DialogResult.Cancel)
+                if (AttemptSave(true) == DialogResult.Cancel)
+                {
+                    // If the same attempt was cancelled, the save and commit button needs to be
+                    // re-enabled. Otherwise, it will be re-enabled when the next file is loaded.
+                    _saveAndCommitFileCommand.Enabled = true;
+                }
+                else
                 {
                     ExtractException.Assert("ELI30677",
                         "No controls are loaded from which to save data.",
