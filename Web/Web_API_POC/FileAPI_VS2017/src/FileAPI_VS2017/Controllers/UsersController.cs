@@ -1,16 +1,11 @@
-﻿using System;
+﻿using FileAPI_VS2017.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-
-using FileAPI_VS2017.Models;
 using static FileAPI_VS2017.Utils;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace FileAPI_VS2017.Controllers
 {
@@ -38,8 +33,8 @@ namespace FileAPI_VS2017.Controllers
         /// login
         /// </summary>
         /// <param name="user">A User object (name, password, optional claim)</param>
-        // POST api/values
-        [HttpPost("/Login")]
+        // POST api/User/Login
+        [HttpPost("Login")]
         public IActionResult Login([FromBody] User user)
         {
             if (!ModelState.IsValid || 
@@ -72,8 +67,8 @@ namespace FileAPI_VS2017.Controllers
         /// logout
         /// </summary>
         /// <param name="user"></param>
-        // DELETE api/values/name
-        [HttpDelete("/Logout")]
+        // DELETE api/User/logout
+        [HttpDelete("Logout")]
         public IActionResult Logout([FromBody] User user)
         {
             User theUser;

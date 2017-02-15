@@ -1,14 +1,10 @@
-﻿using System;
+﻿using FileAPI_VS2017.Models;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-
-using FileAPI_VS2017.Models;
 using static FileAPI_VS2017.Utils;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace FileAPI_VS2017.Controllers
 {
@@ -25,11 +21,11 @@ namespace FileAPI_VS2017.Controllers
         /// GET handler - returns a list of workflow names
         /// </summary>
         /// <returns>list of workflow names</returns>
-        // GET: api/workflow
-        [HttpGet("/GetWorkflows")]
+        // GET: api/workflow/Workflows
+        [HttpGet("GetWorkflows")]
         public IEnumerable<string> Get()
         {
-            return _worflowList.Select(kvp => kvp.Value.Name).ToList<String>();
+            return _worflowList.Select(kvp => kvp.Value.Name);
         }
 
 
@@ -45,7 +41,7 @@ namespace FileAPI_VS2017.Controllers
         //[Route("api/[controller]/GetDefaultWorkflow")]
         //[HttpPost("/GetDefaultWorkflow")]
         //public IActionResult GetDefaultWorkflow([FromQuery] User user)
-        [HttpGet("/GetDefaultWorkflow/{username}")]
+        [HttpGet("GetDefaultWorkflow/{username}")]
         public IActionResult GetDefaultWorkflow(string username)
         {
             if (!ModelState.IsValid || String.IsNullOrEmpty(username))
@@ -61,8 +57,7 @@ namespace FileAPI_VS2017.Controllers
         /// </summary>
         /// <param name="workflowName"></param>
         /// <returns></returns>
-        [HttpGet("/GetWorkflowStatus/{workflowName}")]
-        //public IActionResult GetWorkflowStatus(string workflowName)
+        [HttpGet("GetWorkflowStatus/{workflowName}")]
         public WorkflowStatus GetWorkflowStatus(string workflowName)
         {
             if (!ModelState.IsValid || String.IsNullOrEmpty(workflowName))
@@ -114,18 +109,16 @@ namespace FileAPI_VS2017.Controllers
             _worflowList[workflow.Name] = new Workflow
             {
                 Name = workflow.Name,
+                Description = workflow.Description,
+                EntryAction = workflow.EntryAction,
+                ExitAction = workflow.ExitAction,
+                RunAfterResultsAction = workflow.RunAfterResultsAction,
+                DocumentFolder = workflow.DocumentFolder,
+                AttributeSetName = workflow.AttributeSetName,
                 Id = identifier,
-                Status = new WorkflowStatus
-                {
-                    NumberDone = workflow.Status.NumberDone,
-                    NumberProcessing = workflow.Status.NumberProcessing,
-                    NumberFailed = workflow.Status.NumberFailed,
-                    NumberIgnored = workflow.Status.NumberIgnored,
-                    State = workflow.Status.State
-                }
             };
 
-            return new ObjectResult(workflow.Name);
+            return new ObjectResult(workflow);
         }
 
         /// <summary>

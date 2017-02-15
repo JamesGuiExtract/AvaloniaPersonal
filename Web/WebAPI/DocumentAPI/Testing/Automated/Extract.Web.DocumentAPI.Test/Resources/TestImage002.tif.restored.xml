@@ -1,0 +1,24 @@
+<FlexData>
+	<DocumentType>
+		<FullText>Warranty Deed</FullText>
+	</DocumentType>
+	<HCData FieldType="SSN">
+		<FullText AverageCharConfidence="92">777-55-3333</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="92">777-55-3333</LineText>
+			<SpatialLineZone StartX="674" StartY="716" EndX="864" EndY="717" Height="33"/>
+			<SpatialLineBounds Top="700" Left="673" Bottom="732" Right="864"/>
+		</SpatialLine>
+	</HCData>
+	<HCData FieldType="SSN">
+		<FullText AverageCharConfidence="87">444.44-6666</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="87">444.44-6666</LineText>
+			<SpatialLineZone StartX="940" StartY="717" EndX="1140" EndY="719" Height="31"/>
+			<SpatialLineBounds Top="702" Left="939" Bottom="733" Right="1140"/>
+		</SpatialLine>
+	</HCData>
+	<_SensitiveItemCount>
+		<FullText>__COUNT__(HCData,MCData,LCData)</FullText>
+	</_SensitiveItemCount>
+</FlexData>

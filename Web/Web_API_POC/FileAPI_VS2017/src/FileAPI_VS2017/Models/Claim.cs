@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace FileAPI_VS2017.Models
+﻿namespace FileAPI_VS2017.Models
 {
     /// <summary>
     /// This class represents a Claim - a name and value pair used for authorization

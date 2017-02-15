@@ -1,17 +1,14 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
+﻿using FileAPI_VS2017.Models;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Formatters;              // for HttpNoContentOutputFormatter
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
-using System.IO;
-using System.Collections.Generic;
 using Swashbuckle.Swagger.Model;
-
+using System.Collections.Generic;
+using System.IO;
 using static FileAPI_VS2017.Controllers.UsersController;
-using FileAPI_VS2017.Models;
 
 namespace FileAPI_VS2017
 {
@@ -31,7 +28,12 @@ namespace FileAPI_VS2017
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+
             Configuration = builder.Build();
+            Utils.DatabaseServer = Configuration["DatabaseServer"];
+            Utils.DatabaseName = Configuration["DatabaseName"];
+
+            Utils.environment = env;
         }
 
         /// <summary>
@@ -55,7 +57,7 @@ namespace FileAPI_VS2017
             });
             
             // Add the API Model
-            services.AddSingleton<IFileItemRepository, FileItemRepository>();
+            //services.AddSingleton<IFileItemRepository, FileItemRepository>();
 
             // Register Swashbuckle/Swagger - auto-generate API documentation
             var basepath = PlatformServices.Default.Application.ApplicationBasePath;
@@ -75,7 +77,7 @@ namespace FileAPI_VS2017
                     Contact = new Contact
                     {
                         Name = "Extract developers team",
-                        Email = "developers.extractsystems.com",
+                        Email = "developers@extractsystems.com",
                         Url = "http://www.extractsystems.com"
                     },
                     License = new License
@@ -84,9 +86,12 @@ namespace FileAPI_VS2017
                         Url = "http://extractsystems.com"
                     }
                 });
+
                 options.IncludeXmlComments(xmlPath);
                 options.DescribeAllEnumsAsStrings();
             });
+
+            services.Configure<ServerOptions>(Configuration);
         }
 
         

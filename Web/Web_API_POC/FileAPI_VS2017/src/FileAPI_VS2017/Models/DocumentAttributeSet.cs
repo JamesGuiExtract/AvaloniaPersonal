@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace FileAPI_VS2017.Models
 {
@@ -11,13 +8,13 @@ namespace FileAPI_VS2017.Models
     public class DocumentAttributeSet
     {
         /// <summary>
-        /// Error info - Error.ErrorOccurred == true if there has been an error
-        /// </summary>
-        public ErrorInfo Error { get; set; }
-
-        /// <summary>
         /// list of attributes - may be empty (on error WILL be empty)
         /// </summary>
         public List<DocumentAttribute> Attributes { get; set; }
+
+        /// <summary>
+        /// Error info - Error == true if there has been an error
+        /// </summary>
+        public ErrorInfo Error { get; set; }
     }
 }

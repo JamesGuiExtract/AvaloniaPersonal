@@ -19,25 +19,42 @@
     <Reference Include="Extract.Licensing">
       <HintPath>..\..\..\..\..\..\..\..\Engineering\Binaries\Debug\Extract.Licensing.dll</HintPath>
     </Reference>
+    <Reference Include="Interop.AttributeDbMgrComponentsLib">
+      <HintPath>..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\obj\Debug\Interop.AttributeDbMgrComponentsLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.UCLID_AFCORELib">
+      <HintPath>..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\obj\Debug\Interop.UCLID_AFCORELib.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.UCLID_COMLMLib">
+      <HintPath>..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\obj\Debug\Interop.UCLID_COMLMLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.UCLID_COMUTILSLib">
+      <HintPath>..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\obj\Debug\Interop.UCLID_COMUTILSLib.dll</HintPath>
+    </Reference>
     <Reference Include="Interop.UCLID_FILEPROCESSINGLib">
       <HintPath>..\..\..\..\..\..\..\..\Engineering\Binaries\Debug\Interop.UCLID_FILEPROCESSINGLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.UCLID_RASTERANDOCRMGMTLib">
+      <HintPath>..\..\..\..\..\Binaries\Debug\Interop.UCLID_RASTERANDOCRMGMTLib.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="1.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="1.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
+    <PackageReference Include="Microsoft.Net.Http.Headers" Version="1.1.0" />
     <PackageReference Include="Swashbuckle" Version="6.0.0-beta902" />
   </ItemGroup>
   <ItemGroup>

@@ -1,12 +1,11 @@
-﻿using System;
-using System.IO;                        // FileStream
+﻿using FileAPI_VS2017.Models;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.IO;                        // FileStream
+using System.Net.Http;                  // for HttpClient
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Hosting;     // IHostingEnvironment
-
-using FileAPI_VS2017.Models;
 using UCLID_FILEPROCESSINGLib;
 using static FileAPI_VS2017.Utils;
 
@@ -34,103 +33,70 @@ namespace FileAPI_VS2017.Controllers
     [Route("api/[controller]")]
     public class DocumentController : Controller
     {
-        private IFileItemRepository FileItems { get; set; }
-        private IHostingEnvironment Environment { get; set; }
-
-        private FileProcessingDB _fileProcessingDB = null;
-
         /// <summary>
-        /// ctor
+        /// Convert from a string Id to a file Id - for now this is trivial, later there may be another step.
         /// </summary>
-        /// <param name="fileItems"></param>
-        /// <param name="env"></param>
-        public DocumentController(IFileItemRepository fileItems, IHostingEnvironment env)
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private int ConvertIdToFileId(string id)
         {
-            FileItems = fileItems;
-            Environment = env;
-
-            // TODO - remove all of this from the CTOR
-            try
-            {
-                //LicenseUtilities.LoadLicenseFilesFromFolder(licenseType: 0, mapLabel: new MapLabel());
-                //LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI9999999999", "Web FILE API");
-
-                FAMDBUtils dbUtils = new FAMDBUtils();
-                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
-                _fileProcessingDB = (FileProcessingDB)Activator.CreateInstance(mgrType);
-
-                _fileProcessingDB.DatabaseServer = "(local)";
-                _fileProcessingDB.DatabaseName = "Demo_LabDE";
-            }
-            catch (Exception ex)
-            {
-                Log.WriteLine(Inv($"Error: {ex.Message}"));
-            }
+            int fileId = Convert.ToInt32(id);
+            return fileId;
         }
 
         /// <summary>
         /// Gets result set for a submitted file that has finished processing
         /// </summary>
         /// <returns></returns>
-        [HttpGet("/GetResultSet/{id}")]
+        [HttpGet("GetResultSet/{id}")]
+        //[Produces(typeof(DocumentAttributeSet))]
+        [ProducesResponseType(typeof(DocumentAttributeSet), 200)]   // BIG NOTE: This used to be SwaggerResponse, changed in "Swashbuckle": "6.0.0-beta902"!
         public DocumentAttributeSet GetResultSet(string id)
         {
             if (!ModelState.IsValid || String.IsNullOrEmpty(id))
             {
-                return new DocumentAttributeSet
-                {
-                    Error = new ErrorInfo
-                    {
-                        ErrorOccurred = true,
-                        Message = "id argument cannot be empty",
-                        Code = -1
-                    },
-
-                    Attributes = null
-                };
+                Log.WriteLine("string id is empty");
+                return MakeDocumentAttributeSetError("id argument cannot be empty");
             }
 
-            // For now, return a fake attribute set (DocumentAttributeSet)
-            DocumentAttribute dc = new DocumentAttribute
+            try
             {
-                Name = "FlexData",
-                Value = "",
-                Type = "",
-                AverageCharacterConfidence = 78,
-                AttributeTypeOf = AttributeType.Data,
-                RedactionConfidenceLevel = RedactionConfidence.NotApplicable,
-                SpatialPosition = new Position
+                // Make sure to set the attribute mgr FAMDB, or the call to GetAttributeSetForFile will throw.
+                var attrMgr = Utils.AttrDbMgr;
+
+                var fileId = ConvertIdToFileId(id);
+                const int mostRecentSet = -1;
+
+                var results = attrMgr.GetAttributeSetForFile(fileID: fileId,
+                                                             attributeSetName: Utils.AttributeSetName,
+                                                             relativeIndex: mostRecentSet);
+                if (results == null)
                 {
-                    PageNumber = 1,
-                    LineInfo = new SpatialLine
-                    {
-                        Zone = new SpatialLineZone
-                        {
-                            Start = new System.Drawing.Point { X = 0, Y = 0 },
-                            End = new System.Drawing.Point { X = 250, Y = 1 },
-                            Height = 200
-                        },
-
-                        Bounds = new SpatialLineBounds
-                        {
-                            TopLeft = new System.Drawing.Point { X = 0, Y = 0 },
-                            BottonRight = new System.Drawing.Point { X = 250, Y = 200 }
-                        }
-                    }
+                    Log.WriteLine(Inv($"results retrieval failed for Id: {id}"));
+                    return MakeDocumentAttributeSetError("Results retrieval failed");
                 }
-            };
 
-            DocumentAttributeSet das = new DocumentAttributeSet
+                return AttributeMapper.MapAttributesToDocumentAttributeSet(results);
+            }
+            catch (Exception ex)
             {
-                Error = new ErrorInfo(),
-                Attributes = new List<DocumentAttribute>() { dc }
-            };
+                Log.WriteLine(Inv($"Exception: {ex.Message}, while getting ASFF for fileId: {id}, resetting attribute manager"));
+                Utils.ResetAttributeMgr();
 
-            return das;
+                return MakeDocumentAttributeSetError(ex.Message);
+            }
         }
 
+        /// <summary>
+        /// get a "safe" filename - handles filename collisions in the upload directory by appending a GUID on collision.
+        /// </summary>
+        /// <param name="path">The path of the file</param>
+        /// <param name="filename">The (base) name of the file, including extension</param>
+        /// <returns>a filename that can be used safely</returns>
         private string GetSafeFilename(string path, string filename)
         {
+            Contract.Assert(!String.IsNullOrEmpty(path) && !String.IsNullOrEmpty(filename), "Either path or filename is empty");
+
             string fullname = Path.Combine(path, filename);
             if (!System.IO.File.Exists(fullname))
             {
@@ -150,65 +116,64 @@ namespace FileAPI_VS2017.Controllers
         /// Upload 1 to N files for document processing
         /// </summary>
         /// <returns></returns>
-        [HttpPost("/SubmitFile")]
+        [HttpPost("SubmitFile")]
         public async Task<IActionResult> SubmitFile()
         {
-            Log.WriteLine("HttpPost");
-
             try
             {
-                Log.WriteLine("checking for uploads path");
-
-                string path = String.IsNullOrEmpty(Environment.WebRootPath) ? "c:\\temp\\fileApi" : Environment.WebRootPath;
-                Log.WriteLine($"Path: {path}");
-
+                string path = String.IsNullOrEmpty(environment.WebRootPath) ? "c:\\temp\\fileApi" : environment.WebRootPath;
                 var uploads = Path.Combine(path, "uploads");
                 if (!Directory.Exists(uploads))
                 {
-                    Log.WriteLine(Inv($"Creating path: {uploads}"));
                     Directory.CreateDirectory(uploads);
                 }
 
                 string fileName = Request.Headers["X-FileName"];
+                if (String.IsNullOrEmpty(fileName))
+                {
+                    return BadRequest("Filename is empty");
+                }
+
                 var fullPath = GetSafeFilename(uploads, fileName);
-                Log.WriteLine(Inv($"Writing file: {fullPath}"));
 
                 using (var fs = new FileStream(fullPath, FileMode.Create))
                 {
                     await Request.Body.CopyToAsync(fs);
-                    Log.WriteLine("Done writing file");
 
-                    // Now add the file to the FAM queue
                     try
                     {
-                        if (_fileProcessingDB != null)
-                        {
-                            Log.WriteLine("Adding file to FAM queue");
-                            bool bAlreadyExists;
-                            UCLID_FILEPROCESSINGLib.EActionStatus previousActionStatus;
+                        // Now add the file to the FAM queue
+                        var fileProcessingDB = Utils.FileDbMgr;
+                        Contract.Assert(fileProcessingDB != null, "null fileProcessingDb, cannot add file to FAM queue");
 
-                            _fileProcessingDB.AddFile(fullPath,                                                 // full path to file
-                                                      "A01_ExtractData",                                        // action name
-                                                      EFilePriority.kPriorityNormal,                            // file priority
-                                                      false,                                                    // force status change
-                                                      false,                                                    // file modified
-                                                      UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
-                                                      false,                                                    // skip page count
-                                                      out bAlreadyExists,                                       // returns whether file already existed
-                                                      out previousActionStatus);                                // returns the previous action status (if file already existed)
+                        bool bAlreadyExists;
+                        UCLID_FILEPROCESSINGLib.EActionStatus previousActionStatus;
 
-                            // TODO - need to get the FileID from FAM
-                        }
+                        fileProcessingDB.AddFile(fullPath,                                                 // full path to file
+                                                 "A01_ExtractData",                                        // action name
+                                                 EFilePriority.kPriorityNormal,                            // file priority
+                                                 false,                                                    // force status change
+                                                 false,                                                    // file modified
+                                                 UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
+                                                 true,                                                     // skip page count
+                                                 out bAlreadyExists,                                       // returns whether file already existed
+                                                 out previousActionStatus);                                // returns the previous action status (if file already existed)
+
+                        // TODO - need to get the FileID from FAM
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(Inv($"Error: {ex.Message}"));
+                        Log.WriteLine(Inv($"Error: {ex.Message}, resetting the fileProcessingDB"));
+                        Utils.ResetFileProcessingDB();
+
+                        return BadRequest(ex.Message);
                     }
                 }
             }
             catch (Exception ex)
             {
                 Log.WriteLine(Inv($"Error: {ex.Message}"));
+                return BadRequest(ex.Message);
             }
 
             return new ObjectResult("Ok");
@@ -219,11 +184,9 @@ namespace FileAPI_VS2017.Controllers
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        [HttpPost("/SubmitText")]
+        [HttpPost("SubmitText")]
         public IActionResult SubmitText([FromBody]SubmitTextArgs args)
         {
-            Log.WriteLine("HttpPost");
-
             if (!ModelState.IsValid || String.IsNullOrEmpty(args.Text))
             {
                 return BadRequest("args.Text is empty");
@@ -231,61 +194,56 @@ namespace FileAPI_VS2017.Controllers
 
             try
             {
-                Log.WriteLine("checking for uploads path");
-
-                string path = String.IsNullOrEmpty(Environment.WebRootPath) ? "c:\\temp\\fileApi" : Environment.WebRootPath;
-                Log.WriteLine($"Path: {path}");
+                string path = String.IsNullOrEmpty(environment.WebRootPath) ? "c:\\temp\\fileApi" : environment.WebRootPath;
 
                 var uploads = Path.Combine(path, "uploads");
                 if (!Directory.Exists(uploads))
                 {
-                    Log.WriteLine(Inv($"Creating path: {uploads}"));
                     Directory.CreateDirectory(uploads);
                 }
 
                 var fullPath = GetSafeFilename(uploads, "SubmittedText.txt");
-                Log.WriteLine(Inv($"Writing file: {fullPath}"));
 
                 using (var fs = new FileStream(fullPath, FileMode.Create))
                 {
                     byte[] text = Encoding.ASCII.GetBytes(args.Text);
                     fs.Write(text, 0, args.Text.Length);
                     fs.Close();
-                    Log.WriteLine("Done writing file");
 
                     // Now add the file to the FAM queue
                     try
                     {
-                        if (_fileProcessingDB != null)
-                        {
-                            Log.WriteLine("Adding file to FAM queue");
-                            bool bAlreadyExists;
-                            UCLID_FILEPROCESSINGLib.EActionStatus previousActionStatus;
+                        var fileProcessingDB = Utils.FileDbMgr;
+                        Contract.Assert(fileProcessingDB != null, "fileProcessingDB is null, cannot submit text file to FAM queue");
 
-                            _fileProcessingDB.AddFile(fullPath,                                                 // full path to file
-                                                      "A01_ExtractData",                                        // action name
-                                                      EFilePriority.kPriorityNormal,                            // file priority
-                                                      false,                                                    // force status change
-                                                      false,                                                    // file modified
-                                                      UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
-                                                      false,                                                    // skip page count
-                                                      out bAlreadyExists,                                       // returns whether file already existed
-                                                      out previousActionStatus);                                // returns the previous action status (if file already existed)
+                        bool bAlreadyExists;
+                        UCLID_FILEPROCESSINGLib.EActionStatus previousActionStatus;
 
-                            // TODO - need to get the FileID from FAM
-                        }
+                        fileProcessingDB.AddFile(fullPath,                                                 // full path to file
+                                                 "A01_ExtractData",                                        // action name
+                                                 EFilePriority.kPriorityNormal,                            // file priority
+                                                 false,                                                    // force status change
+                                                 false,                                                    // file modified
+                                                 UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
+                                                 false,                                                    // skip page count
+                                                 out bAlreadyExists,                                       // returns whether file already existed
+                                                 out previousActionStatus);                                // returns the previous action status (if file already existed)
+
+                        // TODO - need to get the FileID from FAM
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(Inv($"Error: {ex.Message}"));
-                    }
+                        Log.WriteLine(Inv($"Error: {ex.Message}, resetting the fileProcessingDB"));
+                        Utils.ResetFileProcessingDB();
 
-                    Log.WriteLine("Done");
+                        return BadRequest(ex.Message);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Log.WriteLine(Inv($"Error: {ex.Message}"));
+                return BadRequest(ex.Message);
             }
 
             return new ObjectResult("Ok");  // TODO - need to send back a fileID here
@@ -296,7 +254,7 @@ namespace FileAPI_VS2017.Controllers
         /// </summary>
         /// <param name="stringId"></param>
         /// <returns></returns>
-        [HttpGet("/GetStatus")]
+        [HttpGet("GetStatus")]
         public List<ProcessingStatus> GetStatus([FromQuery] string stringId)
         {
             if (String.IsNullOrEmpty(stringId))
@@ -306,6 +264,8 @@ namespace FileAPI_VS2017.Controllers
                                                 status: DocumentProcessingStatus.Failed, 
                                                 code: -1);
             }
+
+            // TODO - this is stubbed, must call FAM to get status of file...
 
             return MakeListProcessingStatus(isError: false,
                                             message: "",
@@ -318,7 +278,7 @@ namespace FileAPI_VS2017.Controllers
         /// </summary>
         /// <param name="fileId"></param>
         /// <returns></returns>
-        [HttpGet("/GetFileResult")]
+        [HttpGet("GetFileResult")]
         public byte[] GetFileResult([FromQuery] string fileId)
         {
             return new byte[10];
@@ -331,17 +291,49 @@ namespace FileAPI_VS2017.Controllers
         /// </summary>
         /// <param name="textId"></param>
         /// <returns></returns>
-        [HttpGet("/GetTextResult")]
+        [HttpGet("GetTextResult")]
         public byte[] GetTextResult([FromQuery] string textId)
         {
             return new byte[10];
         }
 
+        /// <summary>
+        /// Gets the type of the submitted document (document classification)
+        /// </summary>
+        /// <param name="documentId"></param>
+        /// <returns></returns>
+        [HttpGet("GetDocumentType")]
+        public IActionResult GetDocumentType([FromQuery] string documentId)
+        {
+            // TODO - implement...
+            return Ok("abstract of judgement");
+        }
 
+        /// <summary>
+        /// Gets a result file - experimental!
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetFileResultEx")]
+        public async Task<FileStreamResult> GetFileResultEx()
+        {
+            try
+            {
+                var client = new HttpClient();
+                client.BaseAddress = new Uri("http://localhost:58926/");
+                var stream = await client.GetStreamAsync("wwwroot/uploads/SubmittedText.txt");
 
-
-
-
-
+                var mediaType = new Microsoft.Net.Http.Headers.MediaTypeHeaderValue("text /plain");
+                var fsr = new FileStreamResult(stream, mediaType)
+                {
+                    FileDownloadName = "column_dob.txt"
+                };
+                return fsr;
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine(Inv($"Exception: {ex.Message}"));
+                return new FileStreamResult(null, "");
+            }
+        }
     }
 }

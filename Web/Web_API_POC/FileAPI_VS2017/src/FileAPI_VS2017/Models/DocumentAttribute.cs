@@ -1,8 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Drawing;                   // for Point
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FileAPI_VS2017.Models
 {
@@ -30,7 +27,7 @@ namespace FileAPI_VS2017.Models
     /// <summary>
     /// enumeration that represents the relative confidence in a particular redacted element
     /// </summary>
-    public enum RedactionConfidence
+    public enum ConfidenceLevel
     {
         /// <summary>
         /// whenever the data item (attribute) is not a redaction type, then the confidence value is not relevant
@@ -50,7 +47,12 @@ namespace FileAPI_VS2017.Models
         /// <summary>
         /// low confidence
         /// </summary>
-        Low
+        Low,
+
+        /// <summary>
+        /// element was manually redacted
+        /// </summary>
+        Manual
     }
 
     /// <summary>
@@ -60,38 +62,78 @@ namespace FileAPI_VS2017.Models
     /// so that start and end determine a line, which defines a rectangle 
     /// when the height is applied.
     /// </summary>
-    public class SpatialLineZone
+    public class SpatialLineZone // page coordinates - raster zone
     {
         /// <summary>
-        /// Start Point (of type: System.Drawing.Point) 
+        /// The page number where the attribute exists, or -1 when the attribute doesn't have spatial info.
         /// </summary>
-        public Point Start { get; set; }
+        public int PageNumber { get; set; }
 
         /// <summary>
-        /// End Point
+        /// The text value of the zone
         /// </summary>
-        public Point End { get; set; }
+        public string Text { get; set; }
+
+        /// <summary>
+        /// left side of zone
+        /// </summary>
+        public int StartX { get; set; }
+
+        /// <summary>
+        /// top of zone 
+        /// </summary>
+        public int StartY { get; set; }
+
+        /// <summary>
+        /// right side of zone
+        /// </summary>
+        public int EndX { get; set; }
+
+        /// <summary>
+        /// bottom side of zone
+        /// </summary>
+        public int EndY { get; set; }
 
         /// <summary>
         /// The height of the bounding rect, relative to the Start point.
         /// </summary>
-        public uint Height { get; set; }
+        public int Height { get; set; }
     }
 
     /// <summary>
     /// The bounding rectangle that encloses the attribute
     /// </summary>
-    public class SpatialLineBounds
+    public class SpatialLineBounds // page coordinates
     {
         /// <summary>
-        /// the top-left corner of the bounding rectangle.
+        /// The start page number where the attribute exists, or -1 when the attribute doesn't have spatial info.
         /// </summary>
-        public Point TopLeft { get; set; }
+        public int PageNumber { get; set; }
 
         /// <summary>
-        /// The botton right corner of the bounding rectangle.
+        /// The text value of the zone
         /// </summary>
-        public Point BottonRight { get; set; }
+        public string Text { get; set; }
+
+        /// <summary>
+        /// the top of the bounding rectangle.
+        /// </summary>
+        public int Top { get; set; }
+
+        /// <summary>
+        /// the left edge of the bounding rectangle.
+        /// </summary>
+        public int Left { get; set; }
+
+        /// <summary>
+        /// The botton of the bounding rectangle.
+        /// </summary>
+        public int Botton { get; set; }
+
+        /// <summary>
+        /// The right edge of the bounding rectangle.
+        /// </summary>
+        public int Right { get; set; }
     }
 
     /// <summary>
@@ -102,12 +144,12 @@ namespace FileAPI_VS2017.Models
         /// <summary>
         /// The zone - includes skew
         /// </summary>
-        public SpatialLineZone Zone { get; set; }
+        public SpatialLineZone SpatialLineZone { get; set; }
 
         /// <summary>
         /// The bounds - the rectangular boundary that completely encloses the attribute
         /// </summary>
-        public SpatialLineBounds Bounds { get; set; }
+        public SpatialLineBounds SpatialLineBounds { get; set; }
     }
 
     /// <summary>
@@ -116,14 +158,13 @@ namespace FileAPI_VS2017.Models
     public class Position
     {
         /// <summary>
-        /// The page number where the attribute exists
+        /// a list of the pages that the attribute spans (if any)
         /// </summary>
-        public uint PageNumber { get; set; }
-
+        public List<int> Pages { get; set; }
         /// <summary>
-        /// The spatial information of the attribute on the page
+        /// The list of lines of spatial information for the attribute - may span pages
         /// </summary>
-        public SpatialLine LineInfo { get; set; }
+        public List<SpatialLine> LineInfo { get; set; }
     }
 
     /// <summary>
@@ -149,22 +190,28 @@ namespace FileAPI_VS2017.Models
         /// <summary>
         /// The average OCR recognition confidence of each character value in the defined attribute
         /// </summary>
-        public uint AverageCharacterConfidence { get; set; }
+        public int AverageCharacterConfidence { get; set; }
 
         /// <summary>
-        /// The type of the attribute - redaction, clue, or data
+        /// The confidence level of the redaction,
+        /// based on ConfidenceLevel enumeration, expressed as a string name.
         /// </summary>
-        public AttributeType AttributeTypeOf { get; set; }
+        public string ConfidenceLevel { get; set; }
 
         /// <summary>
-        /// The confidence level of the redaction
+        /// Some attributes do not have position info - in that case this will be false and the LineInfo
+        /// members will be empty.
         /// </summary>
-        public RedactionConfidence RedactionConfidenceLevel { get; set; }
+        public bool HasPositionInfo { get; set; }
 
         /// <summary>
         /// The spatial position information of the attribute, inculding the page number, bounding rect, and zonal information (bounds plus skew)
         /// </summary>
         public Position SpatialPosition { get; set; }
 
+        /// <summary>
+        /// child attributes, 0..N
+        /// </summary>
+        public List<DocumentAttribute> ChildAttributes { get; set; }
     }
 }

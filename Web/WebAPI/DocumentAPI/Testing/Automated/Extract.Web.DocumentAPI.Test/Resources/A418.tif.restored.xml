@@ -1,0 +1,1243 @@
+<FlexData>
+	<LabInfo>
+		<FullText AverageCharConfidence="86">N/A</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="86">N/A</LineText>
+			<SpatialLineZone StartX="1878" StartY="1612" EndX="2264" EndY="1617" Height="3041"/>
+			<SpatialLineBounds Top="92" Left="1858" Bottom="3136" Right="2283"/>
+		</SpatialLine>
+		<Address>
+			<FullText AverageCharConfidence="96">N/A</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="96">N/A</LineText>
+				<SpatialLineZone StartX="1099" StartY="230" EndX="1692" EndY="239" Height="73"/>
+				<SpatialLineBounds Top="194" Left="1098" Bottom="274" Right="1692"/>
+			</SpatialLine>
+			<Address1>
+				<FullText AverageCharConfidence="99">777 American Avenue</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="99">777 American Avenue</LineText>
+					<SpatialLineZone StartX="928" StartY="251" EndX="1285" EndY="257" Height="25"/>
+					<SpatialLineBounds Top="239" Left="927" Bottom="268" Right="1285"/>
+				</SpatialLine>
+			</Address1>
+			<City>
+				<FullText AverageCharConfidence="96">Waukesha</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="96">Waukesha</LineText>
+					<SpatialLineZone StartX="1324" StartY="256" EndX="1486" EndY="259" Height="23"/>
+					<SpatialLineBounds Top="245" Left="1323" Bottom="269" Right="1486"/>
+				</SpatialLine>
+			</City>
+			<State>
+				<FullText AverageCharConfidence="95">WI</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="95">WI</LineText>
+					<SpatialLineZone StartX="1525" StartY="259" EndX="1559" EndY="260" Height="21"/>
+					<SpatialLineBounds Top="249" Left="1524" Bottom="269" Right="1559"/>
+				</SpatialLine>
+			</State>
+			<ZipCode>
+				<FullText AverageCharConfidence="100">53188</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">53188</LineText>
+					<SpatialLineZone StartX="1601" StartY="262" EndX="1691" EndY="264" Height="23"/>
+					<SpatialLineBounds Top="251" Left="1600" Bottom="274" Right="1691"/>
+				</SpatialLine>
+			</ZipCode>
+		</Address>
+		<Name>
+			<FullText AverageCharConfidence="94">Memorial Hospital</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="94">Memorial Hospital</LineText>
+				<SpatialLineZone StartX="1149" StartY="206" EndX="1479" EndY="211" Height="29"/>
+				<SpatialLineBounds Top="192" Left="1148" Bottom="224" Right="1479"/>
+			</SpatialLine>
+		</Name>
+	</LabInfo>
+	<PatientInfo>
+		<FullText AverageCharConfidence="86">N/A</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="86">N/A</LineText>
+			<SpatialLineZone StartX="1878" StartY="1612" EndX="2264" EndY="1617" Height="3041"/>
+			<SpatialLineBounds Top="92" Left="1858" Bottom="3136" Right="2283"/>
+		</SpatialLine>
+		<DOB>
+			<FullText AverageCharConfidence="100">12/12/1970</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">12/12/1970</LineText>
+				<SpatialLineZone StartX="249" StartY="396" EndX="432" EndY="399" Height="29"/>
+				<SpatialLineBounds Top="382" Left="248" Bottom="412" Right="432"/>
+			</SpatialLine>
+		</DOB>
+		<Gender>
+			<FullText AverageCharConfidence="50">M</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="50">M</LineText>
+				<SpatialLineZone StartX="718" StartY="402" EndX="736" EndY="402" Height="19"/>
+				<SpatialLineBounds Top="393" Left="718" Bottom="411" Right="736"/>
+			</SpatialLine>
+		</Gender>
+		<Name>
+			<FullText AverageCharConfidence="100">DOE, Chad</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">DOE, Chad</LineText>
+				<SpatialLineZone StartX="323" StartY="348" EndX="490" EndY="351" Height="23"/>
+				<SpatialLineBounds Top="337" Left="322" Bottom="361" Right="490"/>
+			</SpatialLine>
+			<Last>
+				<FullText AverageCharConfidence="100">DOE</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">DOE</LineText>
+					<SpatialLineZone StartX="323" StartY="347" EndX="378" EndY="348" Height="21"/>
+					<SpatialLineBounds Top="337" Left="322" Bottom="357" Right="378"/>
+				</SpatialLine>
+			</Last>
+			<First>
+				<FullText AverageCharConfidence="100">Chad</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">Chad</LineText>
+					<SpatialLineZone StartX="416" StartY="349" EndX="490" EndY="351" Height="23"/>
+					<SpatialLineBounds Top="338" Left="415" Bottom="361" Right="490"/>
+				</SpatialLine>
+			</First>
+		</Name>
+	</PatientInfo>
+	<PhysicianInfo>
+		<FullText>N/A</FullText>
+		<OrderingPhysicianName>
+			<FullText AverageCharConfidence="100">DOE, ROBERT</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">DOE, ROBERT</LineText>
+				<SpatialLineZone StartX="2074" StartY="317" EndX="2276" EndY="320" Height="25"/>
+				<SpatialLineBounds Top="305" Left="2073" Bottom="331" Right="2276"/>
+			</SpatialLine>
+			<Last>
+				<FullText AverageCharConfidence="100">DOE</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">DOE</LineText>
+					<SpatialLineZone StartX="2074" StartY="319" EndX="2126" EndY="320" Height="19"/>
+					<SpatialLineBounds Top="310" Left="2073" Bottom="328" Right="2126"/>
+				</SpatialLine>
+			</Last>
+			<First>
+				<FullText AverageCharConfidence="100">ROBERT</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">ROBERT</LineText>
+					<SpatialLineZone StartX="2169" StartY="319" EndX="2276" EndY="320" Height="25"/>
+					<SpatialLineBounds Top="307" Left="2168" Bottom="331" Right="2276"/>
+				</SpatialLine>
+			</First>
+		</OrderingPhysicianName>
+		<OtherPhysicianName>
+			<FullText AverageCharConfidence="100">DOE, STEVE</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">DOE, STEVE</LineText>
+				<SpatialLineZone StartX="2075" StartY="368" EndX="2260" EndY="371" Height="21"/>
+				<SpatialLineBounds Top="358" Left="2074" Bottom="380" Right="2260"/>
+			</SpatialLine>
+			<Last>
+				<FullText AverageCharConfidence="100">DOE</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">DOE</LineText>
+					<SpatialLineZone StartX="2075" StartY="368" EndX="2127" EndY="369" Height="19"/>
+					<SpatialLineBounds Top="359" Left="2074" Bottom="377" Right="2127"/>
+				</SpatialLine>
+			</Last>
+			<First>
+				<FullText AverageCharConfidence="100">STEVE</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">STEVE</LineText>
+					<SpatialLineZone StartX="2169" StartY="370" EndX="2260" EndY="371" Height="21"/>
+					<SpatialLineBounds Top="360" Left="2168" Bottom="380" Right="2260"/>
+				</SpatialLine>
+			</First>
+		</OtherPhysicianName>
+	</PhysicianInfo>
+	<Test>
+		<FullText>N/A</FullText>
+		<CollectionDate>
+			<FullText AverageCharConfidence="100">09/09/2009</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">09/09/2009</LineText>
+				<SpatialLineZone StartX="1252" StartY="751" EndX="1627" EndY="757" Height="39"/>
+				<SpatialLineBounds Top="732" Left="1251" Bottom="775" Right="1627"/>
+			</SpatialLine>
+		</CollectionDate>
+		<CollectionTime>
+			<FullText AverageCharConfidence="100">09:00</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">09:00</LineText>
+				<SpatialLineZone StartX="1252" StartY="751" EndX="1627" EndY="757" Height="39"/>
+				<SpatialLineBounds Top="732" Left="1251" Bottom="775" Right="1627"/>
+			</SpatialLine>
+		</CollectionTime>
+		<Component>
+			<FullText AverageCharConfidence="100">GLUCOSE</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">GLUCOSE</LineText>
+				<SpatialLineZone StartX="254" StartY="836" EndX="426" EndY="839" Height="31"/>
+				<SpatialLineBounds Top="821" Left="253" Bottom="853" Right="426"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="88">MG/DL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="88">MG/DL</LineText>
+					<SpatialLineZone StartX="2178" StartY="866" EndX="2299" EndY="868" Height="37"/>
+					<SpatialLineBounds Top="848" Left="2177" Bottom="885" Right="2299"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">91</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">91</LineText>
+					<SpatialLineZone StartX="1051" StartY="849" EndX="1095" EndY="850" Height="27"/>
+					<SpatialLineBounds Top="836" Left="1050" Bottom="862" Right="1095"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="92">70-99</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="92">70-99</LineText>
+					<SpatialLineZone StartX="1733" StartY="859" EndX="1851" EndY="861" Height="27"/>
+					<SpatialLineBounds Top="846" Left="1732" Bottom="873" Right="1851"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>GLU</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">Glucose</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">Glucose</LineText>
+					<SpatialLineZone StartX="254" StartY="836" EndX="426" EndY="839" Height="31"/>
+					<SpatialLineBounds Top="821" Left="253" Bottom="853" Right="426"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Name>
+			<FullText>GLUCOSE</FullText>
+		</Name>
+		<OrderCode>
+			<FullText>GLU</FullText>
+		</OrderCode>
+	</Test>
+	<Test>
+		<FullText>N/A</FullText>
+		<CollectionDate>
+			<FullText AverageCharConfidence="100">09/09/2009</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">09/09/2009</LineText>
+				<SpatialLineZone StartX="1252" StartY="1001" EndX="1627" EndY="1007" Height="39"/>
+				<SpatialLineBounds Top="982" Left="1251" Bottom="1025" Right="1627"/>
+			</SpatialLine>
+		</CollectionDate>
+		<CollectionTime>
+			<FullText AverageCharConfidence="100">09:00</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">09:00</LineText>
+				<SpatialLineZone StartX="1252" StartY="1001" EndX="1627" EndY="1007" Height="39"/>
+				<SpatialLineBounds Top="982" Left="1251" Bottom="1025" Right="1627"/>
+			</SpatialLine>
+		</CollectionTime>
+		<Component>
+			<FullText AverageCharConfidence="66">HEMOGLOBIN A1C</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="66">HEMOGLOBIN A1C</LineText>
+				<SpatialLineZone StartX="250" StartY="1088" EndX="498" EndY="1092" Height="29"/>
+				<SpatialLineBounds Top="1074" Left="249" Bottom="1105" Right="498"/>
+			</SpatialLine>
+			<Flag>
+				<FullText AverageCharConfidence="80">H</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="80">H</LineText>
+					<SpatialLineZone StartX="1378" StartY="1103" EndX="1403" EndY="1103" Height="27"/>
+					<SpatialLineBounds Top="1090" Left="1378" Bottom="1116" Right="1403"/>
+				</SpatialLine>
+			</Flag>
+			<Units>
+				<FullText AverageCharConfidence="50">%</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="50">%</LineText>
+					<SpatialLineZone StartX="2177" StartY="1115" EndX="2197" EndY="1115" Height="29"/>
+					<SpatialLineBounds Top="1101" Left="2177" Bottom="1129" Right="2197"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">6.5</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">6.5</LineText>
+					<SpatialLineZone StartX="1049" StartY="1099" EndX="1117" EndY="1100" Height="27"/>
+					<SpatialLineBounds Top="1086" Left="1048" Bottom="1112" Right="1117"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="94">4.8-6.0</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="94">4.8-6.0</LineText>
+					<SpatialLineZone StartX="1729" StartY="1109" EndX="1897" EndY="1112" Height="27"/>
+					<SpatialLineBounds Top="1096" Left="1728" Bottom="1124" Right="1897"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>GLYH</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="65">HGBA1C-OMH</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="65">HGBA1C-OMH</LineText>
+					<SpatialLineZone StartX="250" StartY="1088" EndX="498" EndY="1092" Height="29"/>
+					<SpatialLineBounds Top="1074" Left="249" Bottom="1105" Right="498"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Name>
+			<FullText>GLYCOHEMOGLOBIN A1C</FullText>
+		</Name>
+		<OrderCode>
+			<FullText>GLYH</FullText>
+		</OrderCode>
+	</Test>
+	<Test>
+		<FullText>N/A</FullText>
+		<CollectionDate>
+			<FullText AverageCharConfidence="100">09/09/2009</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">09/09/2009</LineText>
+				<SpatialLineZone StartX="1248" StartY="1250" EndX="1623" EndY="1256" Height="39"/>
+				<SpatialLineBounds Top="1231" Left="1247" Bottom="1274" Right="1623"/>
+			</SpatialLine>
+		</CollectionDate>
+		<CollectionTime>
+			<FullText AverageCharConfidence="100">09:00</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">09:00</LineText>
+				<SpatialLineZone StartX="1248" StartY="1250" EndX="1623" EndY="1256" Height="39"/>
+				<SpatialLineBounds Top="1231" Left="1247" Bottom="1274" Right="1623"/>
+			</SpatialLine>
+		</CollectionTime>
+		<Component>
+			<FullText AverageCharConfidence="100">WBC</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">WBC</LineText>
+				<SpatialLineZone StartX="249" StartY="1337" EndX="321" EndY="1338" Height="27"/>
+				<SpatialLineBounds Top="1324" Left="248" Bottom="1350" Right="321"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="82">K/UL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="82">K/UL</LineText>
+					<SpatialLineZone StartX="2174" StartY="1367" EndX="2270" EndY="1368" Height="37"/>
+					<SpatialLineBounds Top="1349" Left="2173" Bottom="1385" Right="2270"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">4.85</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">4.85</LineText>
+					<SpatialLineZone StartX="1046" StartY="1350" EndX="1141" EndY="1351" Height="27"/>
+					<SpatialLineBounds Top="1337" Left="1045" Bottom="1363" Right="1141"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="95">4.0-10.8</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="95">4.0-10.8</LineText>
+					<SpatialLineZone StartX="1726" StartY="1359" EndX="1919" EndY="1362" Height="27"/>
+					<SpatialLineBounds Top="1346" Left="1725" Bottom="1374" Right="1919"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>WBC</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">WBC</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">WBC</LineText>
+					<SpatialLineZone StartX="249" StartY="1337" EndX="321" EndY="1338" Height="27"/>
+					<SpatialLineBounds Top="1324" Left="248" Bottom="1350" Right="321"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="96">RBC</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="96">RBC</LineText>
+				<SpatialLineZone StartX="248" StartY="1388" EndX="320" EndY="1389" Height="29"/>
+				<SpatialLineBounds Top="1374" Left="247" Bottom="1402" Right="320"/>
+			</SpatialLine>
+			<Flag>
+				<FullText AverageCharConfidence="80">L</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="80">L</LineText>
+					<SpatialLineZone StartX="1375" StartY="1403" EndX="1399" EndY="1403" Height="27"/>
+					<SpatialLineBounds Top="1390" Left="1375" Bottom="1416" Right="1399"/>
+				</SpatialLine>
+			</Flag>
+			<Units>
+				<FullText AverageCharConfidence="82">M/UL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="82">M/UL</LineText>
+					<SpatialLineZone StartX="2171" StartY="1417" EndX="2269" EndY="1418" Height="37"/>
+					<SpatialLineBounds Top="1399" Left="2170" Bottom="1435" Right="2269"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="92">4.36</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="92">4.36</LineText>
+					<SpatialLineZone StartX="1044" StartY="1399" EndX="1140" EndY="1400" Height="27"/>
+					<SpatialLineBounds Top="1386" Left="1043" Bottom="1412" Right="1140"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="90">4.5-6.1</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="90">4.5-6.1</LineText>
+					<SpatialLineZone StartX="1725" StartY="1409" EndX="1894" EndY="1412" Height="27"/>
+					<SpatialLineBounds Top="1396" Left="1724" Bottom="1424" Right="1894"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>RBC</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="96">RBC</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="96">RBC</LineText>
+					<SpatialLineZone StartX="248" StartY="1388" EndX="320" EndY="1389" Height="29"/>
+					<SpatialLineBounds Top="1374" Left="247" Bottom="1402" Right="320"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">HEMOGLOBIN</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">HEMOGLOBIN</LineText>
+				<SpatialLineZone StartX="248" StartY="1439" EndX="496" EndY="1443" Height="37"/>
+				<SpatialLineBounds Top="1421" Left="247" Bottom="1460" Right="496"/>
+			</SpatialLine>
+			<Flag>
+				<FullText AverageCharConfidence="80">L</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="80">L</LineText>
+					<SpatialLineZone StartX="1375" StartY="1453" EndX="1398" EndY="1453" Height="27"/>
+					<SpatialLineBounds Top="1440" Left="1375" Bottom="1466" Right="1398"/>
+				</SpatialLine>
+			</Flag>
+			<Units>
+				<FullText AverageCharConfidence="86">GM/DL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="86">GM/DL</LineText>
+					<SpatialLineZone StartX="2171" StartY="1467" EndX="2292" EndY="1469" Height="37"/>
+					<SpatialLineBounds Top="1449" Left="2170" Bottom="1486" Right="2292"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">12.7</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">12.7</LineText>
+					<SpatialLineZone StartX="1045" StartY="1449" EndX="1139" EndY="1450" Height="27"/>
+					<SpatialLineBounds Top="1436" Left="1044" Bottom="1462" Right="1139"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="94">14.0-17.0</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="94">14.0-17.0</LineText>
+					<SpatialLineZone StartX="1726" StartY="1460" EndX="1942" EndY="1463" Height="29"/>
+					<SpatialLineBounds Top="1446" Left="1725" Bottom="1476" Right="1942"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>HGB</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">Hemoglobin</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">Hemoglobin</LineText>
+					<SpatialLineZone StartX="248" StartY="1439" EndX="496" EndY="1443" Height="37"/>
+					<SpatialLineBounds Top="1421" Left="247" Bottom="1460" Right="496"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">HEMATOCRIT</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">HEMATOCRIT</LineText>
+				<SpatialLineZone StartX="247" StartY="1486" EndX="493" EndY="1490" Height="31"/>
+				<SpatialLineBounds Top="1471" Left="246" Bottom="1504" Right="493"/>
+			</SpatialLine>
+			<Flag>
+				<FullText AverageCharConfidence="80">L</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="80">L</LineText>
+					<SpatialLineZone StartX="1375" StartY="1503" EndX="1399" EndY="1503" Height="27"/>
+					<SpatialLineBounds Top="1490" Left="1375" Bottom="1516" Right="1399"/>
+				</SpatialLine>
+			</Flag>
+			<Value>
+				<FullText AverageCharConfidence="100">40.5</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">40.5</LineText>
+					<SpatialLineZone StartX="1045" StartY="1499" EndX="1140" EndY="1500" Height="27"/>
+					<SpatialLineBounds Top="1486" Left="1044" Bottom="1512" Right="1140"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="93">42.0-52.0</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="93">42.0-52.0</LineText>
+					<SpatialLineZone StartX="1725" StartY="1510" EndX="1942" EndY="1513" Height="29"/>
+					<SpatialLineBounds Top="1496" Left="1724" Bottom="1526" Right="1942"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>HCT</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">Hematocrit</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">Hematocrit</LineText>
+					<SpatialLineZone StartX="247" StartY="1486" EndX="493" EndY="1490" Height="31"/>
+					<SpatialLineBounds Top="1471" Left="246" Bottom="1504" Right="493"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">MCV</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">MCV</LineText>
+				<SpatialLineZone StartX="246" StartY="1538" EndX="321" EndY="1539" Height="27"/>
+				<SpatialLineBounds Top="1525" Left="245" Bottom="1551" Right="321"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="95">FL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="95">FL</LineText>
+					<SpatialLineZone StartX="2171" StartY="1567" EndX="2217" EndY="1568" Height="27"/>
+					<SpatialLineBounds Top="1554" Left="2170" Bottom="1580" Right="2217"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">92.9</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">92.9</LineText>
+					<SpatialLineZone StartX="1045" StartY="1549" EndX="1139" EndY="1550" Height="27"/>
+					<SpatialLineBounds Top="1536" Left="1044" Bottom="1562" Right="1139"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="88">81-99</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="88">81-99</LineText>
+					<SpatialLineZone StartX="1725" StartY="1560" EndX="1843" EndY="1562" Height="29"/>
+					<SpatialLineBounds Top="1546" Left="1724" Bottom="1575" Right="1843"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>MCV</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">MCV</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">MCV</LineText>
+					<SpatialLineZone StartX="246" StartY="1538" EndX="321" EndY="1539" Height="27"/>
+					<SpatialLineBounds Top="1525" Left="245" Bottom="1551" Right="321"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">MCH</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">MCH</LineText>
+				<SpatialLineZone StartX="245" StartY="1588" EndX="319" EndY="1589" Height="27"/>
+				<SpatialLineBounds Top="1575" Left="244" Bottom="1601" Right="319"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="95">PG</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="95">PG</LineText>
+					<SpatialLineZone StartX="2171" StartY="1617" EndX="2218" EndY="1618" Height="27"/>
+					<SpatialLineBounds Top="1604" Left="2170" Bottom="1630" Right="2218"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">29.1</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">29.1</LineText>
+					<SpatialLineZone StartX="1043" StartY="1600" EndX="1139" EndY="1601" Height="29"/>
+					<SpatialLineBounds Top="1586" Left="1042" Bottom="1614" Right="1139"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="92">27-33</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="92">27-33</LineText>
+					<SpatialLineZone StartX="1723" StartY="1610" EndX="1841" EndY="1612" Height="29"/>
+					<SpatialLineBounds Top="1596" Left="1722" Bottom="1625" Right="1841"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>MCH</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">MCH</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">MCH</LineText>
+					<SpatialLineZone StartX="245" StartY="1588" EndX="319" EndY="1589" Height="27"/>
+					<SpatialLineBounds Top="1575" Left="244" Bottom="1601" Right="319"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="97">MCHC</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="97">MCHC</LineText>
+				<SpatialLineZone StartX="246" StartY="1638" EndX="343" EndY="1640" Height="27"/>
+				<SpatialLineBounds Top="1625" Left="245" Bottom="1652" Right="343"/>
+			</SpatialLine>
+			<Flag>
+				<FullText AverageCharConfidence="70">L</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="70">L</LineText>
+					<SpatialLineZone StartX="1372" StartY="1654" EndX="1396" EndY="1654" Height="27"/>
+					<SpatialLineBounds Top="1641" Left="1372" Bottom="1667" Right="1396"/>
+				</SpatialLine>
+			</Flag>
+			<Units>
+				<FullText AverageCharConfidence="40">%</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="40">%</LineText>
+					<SpatialLineZone StartX="2171" StartY="1666" EndX="2189" EndY="1666" Height="29"/>
+					<SpatialLineBounds Top="1652" Left="2171" Bottom="1680" Right="2189"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">31.4</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">31.4</LineText>
+					<SpatialLineZone StartX="1043" StartY="1650" EndX="1137" EndY="1651" Height="27"/>
+					<SpatialLineBounds Top="1637" Left="1042" Bottom="1663" Right="1137"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="88">32-36</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="88">32-36</LineText>
+					<SpatialLineZone StartX="1723" StartY="1660" EndX="1842" EndY="1662" Height="29"/>
+					<SpatialLineBounds Top="1646" Left="1722" Bottom="1675" Right="1842"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>MCHC</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="97">MCHC</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="97">MCHC</LineText>
+					<SpatialLineZone StartX="246" StartY="1638" EndX="343" EndY="1640" Height="27"/>
+					<SpatialLineBounds Top="1625" Left="245" Bottom="1652" Right="343"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">PLT</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">PLT</LineText>
+				<SpatialLineZone StartX="248" StartY="1688" EndX="590" EndY="1693" Height="27"/>
+				<SpatialLineBounds Top="1675" Left="247" Bottom="1705" Right="590"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="82">K/UL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="82">K/UL</LineText>
+					<SpatialLineZone StartX="2170" StartY="1718" EndX="2266" EndY="1719" Height="39"/>
+					<SpatialLineBounds Top="1699" Left="2169" Bottom="1737" Right="2266"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">210</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">210</LineText>
+					<SpatialLineZone StartX="1043" StartY="1700" EndX="1113" EndY="1701" Height="27"/>
+					<SpatialLineBounds Top="1687" Left="1042" Bottom="1713" Right="1113"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="92">130-400</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="92">130-400</LineText>
+					<SpatialLineZone StartX="1724" StartY="1711" EndX="1891" EndY="1714" Height="29"/>
+					<SpatialLineBounds Top="1697" Left="1723" Bottom="1727" Right="1891"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>PLTC</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">Platelet Count</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">Platelet Count</LineText>
+					<SpatialLineZone StartX="248" StartY="1688" EndX="590" EndY="1693" Height="31"/>
+					<SpatialLineBounds Top="1673" Left="247" Bottom="1707" Right="590"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="82">RDWSD</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="82">RDWSD</LineText>
+				<SpatialLineZone StartX="245" StartY="1739" EndX="392" EndY="1741" Height="29"/>
+				<SpatialLineBounds Top="1725" Left="244" Bottom="1754" Right="392"/>
+			</SpatialLine>
+			<Flag>
+				<FullText AverageCharConfidence="80">H</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="80">H</LineText>
+					<SpatialLineZone StartX="1369" StartY="1754" EndX="1396" EndY="1754" Height="27"/>
+					<SpatialLineBounds Top="1741" Left="1369" Bottom="1767" Right="1396"/>
+				</SpatialLine>
+			</Flag>
+			<Units>
+				<FullText AverageCharConfidence="100">FL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">FL</LineText>
+					<SpatialLineZone StartX="2169" StartY="1768" EndX="2215" EndY="1769" Height="27"/>
+					<SpatialLineBounds Top="1755" Left="2168" Bottom="1781" Right="2215"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="95">60.1</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="95">60.1</LineText>
+					<SpatialLineZone StartX="1043" StartY="1750" EndX="1137" EndY="1751" Height="27"/>
+					<SpatialLineBounds Top="1737" Left="1042" Bottom="1763" Right="1137"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="92">37-53</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="92">37-53</LineText>
+					<SpatialLineZone StartX="1722" StartY="1761" EndX="1839" EndY="1763" Height="29"/>
+					<SpatialLineBounds Top="1747" Left="1721" Bottom="1776" Right="1839"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>RDWSD</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="80">RDW-SD</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="80">RDW-SD</LineText>
+					<SpatialLineZone StartX="245" StartY="1739" EndX="392" EndY="1741" Height="29"/>
+					<SpatialLineBounds Top="1725" Left="244" Bottom="1754" Right="392"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">MPV</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">MPV</LineText>
+				<SpatialLineZone StartX="244" StartY="1789" EndX="319" EndY="1790" Height="27"/>
+				<SpatialLineBounds Top="1776" Left="243" Bottom="1802" Right="319"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="100">FL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">FL</LineText>
+					<SpatialLineZone StartX="2168" StartY="1818" EndX="2215" EndY="1819" Height="27"/>
+					<SpatialLineBounds Top="1805" Left="2167" Bottom="1831" Right="2215"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">10.8</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">10.8</LineText>
+					<SpatialLineZone StartX="1043" StartY="1801" EndX="1136" EndY="1802" Height="29"/>
+					<SpatialLineBounds Top="1787" Left="1042" Bottom="1815" Right="1136"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="90">8-14</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="90">8-14</LineText>
+					<SpatialLineZone StartX="1723" StartY="1811" EndX="1815" EndY="1813" Height="27"/>
+					<SpatialLineBounds Top="1798" Left="1722" Bottom="1825" Right="1815"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>OFFPRE2</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">MPV</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">MPV</LineText>
+					<SpatialLineZone StartX="244" StartY="1789" EndX="319" EndY="1790" Height="27"/>
+					<SpatialLineBounds Top="1776" Left="243" Bottom="1802" Right="319"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">DIFF TYPE</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">DIFF TYPE</LineText>
+				<SpatialLineZone StartX="244" StartY="1838" EndX="716" EndY="1845" Height="31"/>
+				<SpatialLineBounds Top="1823" Left="243" Bottom="1859" Right="716"/>
+			</SpatialLine>
+			<Value>
+				<FullText AverageCharConfidence="100">AUTO DIFFERENTIAL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">AUTO DIFFERENTIAL</LineText>
+					<SpatialLineZone StartX="491" StartY="1893" EndX="913" EndY="1899" Height="27"/>
+					<SpatialLineBounds Top="1880" Left="490" Bottom="1911" Right="913"/>
+				</SpatialLine>
+			</Value>
+			<TestCode>
+				<FullText>TDIF</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">Differential Method</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">Differential Method</LineText>
+					<SpatialLineZone StartX="244" StartY="1837" EndX="716" EndY="1844" Height="31"/>
+					<SpatialLineBounds Top="1822" Left="243" Bottom="1858" Right="716"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="99">NEUTROPHIL</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="99">NEUTROPHIL</LineText>
+				<SpatialLineZone StartX="245" StartY="1942" EndX="737" EndY="1949" Height="37"/>
+				<SpatialLineBounds Top="1924" Left="244" Bottom="1966" Right="737"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="100">%</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">%</LineText>
+					<SpatialLineZone StartX="2168" StartY="1968" EndX="2186" EndY="1968" Height="29"/>
+					<SpatialLineBounds Top="1954" Left="2168" Bottom="1982" Right="2186"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">60.7</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">60.7</LineText>
+					<SpatialLineZone StartX="1042" StartY="1951" EndX="1136" EndY="1952" Height="27"/>
+					<SpatialLineBounds Top="1938" Left="1041" Bottom="1964" Right="1136"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="92">50-70</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="92">50-70</LineText>
+					<SpatialLineZone StartX="1720" StartY="1961" EndX="1838" EndY="1963" Height="27"/>
+					<SpatialLineBounds Top="1948" Left="1719" Bottom="1975" Right="1838"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>PNEUT</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="99">Segmented Neutrophil</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="99">Segmented Neutrophil</LineText>
+					<SpatialLineZone StartX="245" StartY="1942" EndX="737" EndY="1949" Height="39"/>
+					<SpatialLineBounds Top="1923" Left="244" Bottom="1967" Right="737"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">LYMPH</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">LYMPH</LineText>
+				<SpatialLineZone StartX="244" StartY="1993" EndX="488" EndY="1997" Height="33"/>
+				<SpatialLineBounds Top="1977" Left="243" Bottom="2012" Right="488"/>
+			</SpatialLine>
+			<Value>
+				<FullText AverageCharConfidence="100">25.4</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">25.4</LineText>
+					<SpatialLineZone StartX="1040" StartY="2001" EndX="1134" EndY="2002" Height="27"/>
+					<SpatialLineBounds Top="1988" Left="1039" Bottom="2014" Right="1134"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="92">20-40</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="92">20-40</LineText>
+					<SpatialLineZone StartX="1719" StartY="2011" EndX="1837" EndY="2013" Height="27"/>
+					<SpatialLineBounds Top="1998" Left="1718" Bottom="2025" Right="1837"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>PLYMS</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">Lymphocyte</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">Lymphocyte</LineText>
+					<SpatialLineZone StartX="244" StartY="1993" EndX="488" EndY="1997" Height="37"/>
+					<SpatialLineBounds Top="1975" Left="243" Bottom="2014" Right="488"/>
+				</SpatialLine>
+			</OriginalName>
+			<Units>
+				<FullText>%</FullText>
+			</Units>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">MONO</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">MONO</LineText>
+				<SpatialLineZone StartX="242" StartY="2044" EndX="438" EndY="2047" Height="35"/>
+				<SpatialLineBounds Top="2027" Left="241" Bottom="2063" Right="438"/>
+			</SpatialLine>
+			<Flag>
+				<FullText AverageCharConfidence="80">H</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="80">H</LineText>
+					<SpatialLineZone StartX="1364" StartY="2055" EndX="1392" EndY="2055" Height="27"/>
+					<SpatialLineBounds Top="2042" Left="1364" Bottom="2068" Right="1392"/>
+				</SpatialLine>
+			</Flag>
+			<Value>
+				<FullText AverageCharConfidence="100">11.8</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">11.8</LineText>
+					<SpatialLineZone StartX="1040" StartY="2051" EndX="1134" EndY="2052" Height="27"/>
+					<SpatialLineBounds Top="2038" Left="1039" Bottom="2064" Right="1134"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="86">0-8</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="86">0-8</LineText>
+					<SpatialLineZone StartX="1720" StartY="2062" EndX="1787" EndY="2063" Height="27"/>
+					<SpatialLineBounds Top="2049" Left="1719" Bottom="2075" Right="1787"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>PMON</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">Monocyte</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">Monocyte</LineText>
+					<SpatialLineZone StartX="242" StartY="2044" EndX="438" EndY="2047" Height="35"/>
+					<SpatialLineBounds Top="2027" Left="241" Bottom="2063" Right="438"/>
+				</SpatialLine>
+			</OriginalName>
+			<Units>
+				<FullText>%</FullText>
+			</Units>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="90">EOSIN</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="90">EOSIN</LineText>
+				<SpatialLineZone StartX="242" StartY="2088" EndX="487" EndY="2092" Height="29"/>
+				<SpatialLineBounds Top="2074" Left="241" Bottom="2105" Right="487"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="90">%</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="90">%</LineText>
+					<SpatialLineZone StartX="2166" StartY="2118" EndX="2185" EndY="2118" Height="29"/>
+					<SpatialLineBounds Top="2104" Left="2166" Bottom="2132" Right="2185"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="95">1.9</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="95">1.9</LineText>
+					<SpatialLineZone StartX="1040" StartY="2101" EndX="1109" EndY="2102" Height="27"/>
+					<SpatialLineBounds Top="2088" Left="1039" Bottom="2114" Right="1109"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="83">0-5</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="83">0-5</LineText>
+					<SpatialLineZone StartX="1720" StartY="2112" EndX="1787" EndY="2113" Height="27"/>
+					<SpatialLineBounds Top="2099" Left="1719" Bottom="2125" Right="1787"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>PEOS</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="95">Eosinophil</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="95">Eosinophil</LineText>
+					<SpatialLineZone StartX="242" StartY="2092" EndX="487" EndY="2096" Height="39"/>
+					<SpatialLineBounds Top="2073" Left="241" Bottom="2114" Right="487"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="97">BASO</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="97">BASO</LineText>
+				<SpatialLineZone StartX="241" StartY="2138" EndX="437" EndY="2141" Height="29"/>
+				<SpatialLineBounds Top="2124" Left="240" Bottom="2154" Right="437"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="100">%</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">%</LineText>
+					<SpatialLineZone StartX="2166" StartY="2168" EndX="2184" EndY="2168" Height="29"/>
+					<SpatialLineBounds Top="2154" Left="2166" Bottom="2182" Right="2184"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">0.2</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">0.2</LineText>
+					<SpatialLineZone StartX="1041" StartY="2151" EndX="1108" EndY="2152" Height="27"/>
+					<SpatialLineBounds Top="2138" Left="1040" Bottom="2164" Right="1108"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="86">0-2</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="86">0-2</LineText>
+					<SpatialLineZone StartX="1719" StartY="2161" EndX="1786" EndY="2162" Height="27"/>
+					<SpatialLineBounds Top="2148" Left="1718" Bottom="2174" Right="1786"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>PBASO</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="98">Basophil</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="98">Basophil</LineText>
+					<SpatialLineZone StartX="241" StartY="2142" EndX="437" EndY="2145" Height="37"/>
+					<SpatialLineBounds Top="2124" Left="240" Bottom="2162" Right="437"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="98">ABSOLUTE NEUTROPHIL</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="98">ABSOLUTE NEUTROPHIL</LineText>
+				<SpatialLineZone StartX="239" StartY="2192" EndX="735" EndY="2199" Height="39"/>
+				<SpatialLineBounds Top="2173" Left="238" Bottom="2217" Right="735"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="82">K/UL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="82">K/UL</LineText>
+					<SpatialLineZone StartX="2164" StartY="2219" EndX="2260" EndY="2220" Height="37"/>
+					<SpatialLineBounds Top="2201" Left="2163" Bottom="2237" Right="2260"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">2.95</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">2.95</LineText>
+					<SpatialLineZone StartX="1039" StartY="2201" EndX="1133" EndY="2202" Height="27"/>
+					<SpatialLineBounds Top="2188" Left="1038" Bottom="2214" Right="1133"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="92">2.4-7.56</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="92">2.4-7.56</LineText>
+					<SpatialLineZone StartX="1718" StartY="2212" EndX="1910" EndY="2215" Height="29"/>
+					<SpatialLineBounds Top="2198" Left="1717" Bottom="2228" Right="1910"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>ANEUT</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="98">Abs Neutrophil Count</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="98">Abs Neutrophil Count</LineText>
+					<SpatialLineZone StartX="239" StartY="2192" EndX="735" EndY="2199" Height="39"/>
+					<SpatialLineBounds Top="2173" Left="238" Bottom="2217" Right="735"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">ABSOLUTE LYMPH</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">ABSOLUTE LYMPH</LineText>
+				<SpatialLineZone StartX="239" StartY="2242" EndX="733" EndY="2249" Height="35"/>
+				<SpatialLineBounds Top="2225" Left="238" Bottom="2265" Right="733"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="80">K/UL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="80">K/UL</LineText>
+					<SpatialLineZone StartX="2162" StartY="2269" EndX="2259" EndY="2270" Height="37"/>
+					<SpatialLineBounds Top="2251" Left="2161" Bottom="2287" Right="2259"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">1.23</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">1.23</LineText>
+					<SpatialLineZone StartX="1038" StartY="2251" EndX="1131" EndY="2252" Height="27"/>
+					<SpatialLineBounds Top="2238" Left="1037" Bottom="2264" Right="1131"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="92">0.96-4.32</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="92">0.96-4.32</LineText>
+					<SpatialLineZone StartX="1717" StartY="2261" EndX="1932" EndY="2264" Height="27"/>
+					<SpatialLineBounds Top="2248" Left="1716" Bottom="2276" Right="1932"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>ALYMS</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">Abs Lymphocyte Count</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">Abs Lymphocyte Count</LineText>
+					<SpatialLineZone StartX="239" StartY="2242" EndX="733" EndY="2249" Height="37"/>
+					<SpatialLineBounds Top="2224" Left="238" Bottom="2266" Right="733"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">ABSOLUTE MONO</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">ABSOLUTE MONO</LineText>
+				<SpatialLineZone StartX="239" StartY="2292" EndX="535" EndY="2296" Height="37"/>
+				<SpatialLineBounds Top="2274" Left="238" Bottom="2313" Right="535"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="82">K/UL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="82">K/UL</LineText>
+					<SpatialLineZone StartX="2163" StartY="2319" EndX="2259" EndY="2320" Height="37"/>
+					<SpatialLineBounds Top="2301" Left="2162" Bottom="2337" Right="2259"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">0.57</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">0.57</LineText>
+					<SpatialLineZone StartX="1040" StartY="2301" EndX="1133" EndY="2302" Height="27"/>
+					<SpatialLineBounds Top="2288" Left="1039" Bottom="2314" Right="1133"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="93">0.00-0.60</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="93">0.00-0.60</LineText>
+					<SpatialLineZone StartX="1718" StartY="2311" EndX="1933" EndY="2314" Height="27"/>
+					<SpatialLineBounds Top="2298" Left="1717" Bottom="2326" Right="1933"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>AMON</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="100">Abs Monocyte</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">Abs Monocyte</LineText>
+					<SpatialLineZone StartX="239" StartY="2292" EndX="535" EndY="2296" Height="37"/>
+					<SpatialLineBounds Top="2274" Left="238" Bottom="2313" Right="535"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="100">ABSOLUTE EOS</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">ABSOLUTE EOS</LineText>
+				<SpatialLineZone StartX="238" StartY="2342" EndX="733" EndY="2349" Height="39"/>
+				<SpatialLineBounds Top="2323" Left="237" Bottom="2367" Right="733"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="80">K/UL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="80">K/UL</LineText>
+					<SpatialLineZone StartX="2162" StartY="2369" EndX="2258" EndY="2370" Height="37"/>
+					<SpatialLineBounds Top="2351" Left="2161" Bottom="2387" Right="2258"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">0.09</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">0.09</LineText>
+					<SpatialLineZone StartX="1039" StartY="2351" EndX="1133" EndY="2352" Height="27"/>
+					<SpatialLineBounds Top="2338" Left="1038" Bottom="2364" Right="1133"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="95">0.05-0.40</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="95">0.05-0.40</LineText>
+					<SpatialLineZone StartX="1718" StartY="2361" EndX="1933" EndY="2364" Height="27"/>
+					<SpatialLineBounds Top="2348" Left="1717" Bottom="2376" Right="1933"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>AEOS</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="99">Abs Eosinophil Count</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="99">Abs Eosinophil Count</LineText>
+					<SpatialLineZone StartX="238" StartY="2342" EndX="733" EndY="2349" Height="39"/>
+					<SpatialLineBounds Top="2323" Left="237" Bottom="2367" Right="733"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Component>
+			<FullText AverageCharConfidence="99">ABSOLUTE BASO</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="99">ABSOLUTE BASO</LineText>
+				<SpatialLineZone StartX="238" StartY="2388" EndX="682" EndY="2395" Height="31"/>
+				<SpatialLineBounds Top="2373" Left="237" Bottom="2409" Right="682"/>
+			</SpatialLine>
+			<Units>
+				<FullText AverageCharConfidence="85">K/UL</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="85">K/UL</LineText>
+					<SpatialLineZone StartX="2161" StartY="2420" EndX="2257" EndY="2421" Height="37"/>
+					<SpatialLineBounds Top="2402" Left="2160" Bottom="2438" Right="2257"/>
+				</SpatialLine>
+			</Units>
+			<Value>
+				<FullText AverageCharConfidence="100">0.01</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="100">0.01</LineText>
+					<SpatialLineZone StartX="1038" StartY="2401" EndX="1132" EndY="2402" Height="27"/>
+					<SpatialLineBounds Top="2388" Left="1037" Bottom="2414" Right="1132"/>
+				</SpatialLine>
+			</Value>
+			<Range>
+				<FullText AverageCharConfidence="94">0.00-0.10</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="94">0.00-0.10</LineText>
+					<SpatialLineZone StartX="1716" StartY="2412" EndX="1931" EndY="2415" Height="27"/>
+					<SpatialLineBounds Top="2399" Left="1715" Bottom="2427" Right="1931"/>
+				</SpatialLine>
+			</Range>
+			<TestCode>
+				<FullText>ABASO</FullText>
+			</TestCode>
+			<OriginalName>
+				<FullText AverageCharConfidence="99">Abs Basophil Count</FullText>
+				<SpatialLine PageNumber="1">
+					<LineText AverageCharConfidence="99">Abs Basophil Count</LineText>
+					<SpatialLineZone StartX="238" StartY="2392" EndX="682" EndY="2399" Height="39"/>
+					<SpatialLineBounds Top="2373" Left="237" Bottom="2417" Right="682"/>
+				</SpatialLine>
+			</OriginalName>
+		</Component>
+		<Name>
+			<FullText>CBC AND AUTO DIFFERENTIAL</FullText>
+		</Name>
+		<OrderCode>
+			<FullText>CBCA</FullText>
+		</OrderCode>
+	</Test>
+</FlexData>

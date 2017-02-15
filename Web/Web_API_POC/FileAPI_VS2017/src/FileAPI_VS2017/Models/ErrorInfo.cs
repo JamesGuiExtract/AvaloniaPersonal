@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace FileAPI_VS2017.Models
+﻿namespace FileAPI_VS2017.Models
 {
     // embed this into top-level returned POCO classes
     /// <summary>

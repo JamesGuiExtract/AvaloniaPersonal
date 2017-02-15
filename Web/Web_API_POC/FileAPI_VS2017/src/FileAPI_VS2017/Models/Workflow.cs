@@ -1,25 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace FileAPI_VS2017.Models
+﻿namespace FileAPI_VS2017.Models
 {
     /// <summary>
     /// Workflow data model
     /// </summary>
     public class Workflow
     {
+        /*
+        - Description
+- Entry action
+- Exit action
+- RunAfterResults action
+- Document folder
+- AttributeSetName
+        */
         /// <summary>
         /// Name of the workflow
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// get the status of the workflow
+        /// description of the workflow
         /// </summary>
-        /// <returns></returns>
-        public WorkflowStatus Status { get; set; }
+        public string Description { get; set; }
+
+        /// <summary>
+        /// the entry action for the workflow
+        /// </summary>
+        public string EntryAction { get; set; }
+
+        /// <summary>
+        /// The exit action for the workflow
+        /// </summary>
+        public string ExitAction { get; set; }
+
+        /// <summary>
+        /// the run-after-results action for the workflow
+        /// </summary>
+        public string RunAfterResultsAction { get; set; }
+
+        /// <summary>
+        /// The workflow document folder name
+        /// </summary>
+        public string DocumentFolder { get; set; }
+
+        /// <summary>
+        /// The workflow attribute set name
+        /// </summary>
+        public string AttributeSetName { get; set; }
 
         /// <summary>
         /// The Id of the Workflow, used to get by Id.
