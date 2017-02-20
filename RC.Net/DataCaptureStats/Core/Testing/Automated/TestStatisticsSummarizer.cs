@@ -250,65 +250,72 @@ namespace Extract.DataCaptureStats.Test
         {
             var expectedResult =
 @"<table class=""DataCaptureStats"">
-	<thead>
+	<caption>
+
+	</caption><thead>
 		<tr>
-			<th>Path</th><th>Expected</th><th>Correct</th><th>% Correct</th><th>Incorrect</th><th>ROCE</th>
+			<th>Path</th><th>F1-Score</th><th>Expected</th><th>Correct</th><th>% Correct (Recall)</th><th>Incorrect</th><th>Precision</th><th>ROCE</th>
 		</tr>
-	</thead><tr>
-		<th>(Summary)</th><td>16</td><td>14</td><td>87.5</td><td>1</td><td>14</td>
+	</thead><tfoot>
+		<tr>
+			<th>File count</th><td>1</td>
+		</tr>
+	</tfoot><tr>
+		<th>(Summary)</th><td>0.9032</td><td>16</td><td>14</td><td>87.50 %</td><td>1</td><td>93.33 %</td><td>14</td>
 	</tr><tr>
-		<th>PatientInfo (Summary)</th><td>4</td><td>4</td><td>100</td><td>0</td><td>NaN</td>
+		<th>PatientInfo (Summary)</th><td>1.0000</td><td>4</td><td>4</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>PatientInfo/DOB</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>PatientInfo/DOB</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>PatientInfo/Gender</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>PatientInfo/Gender</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>PatientInfo/Name (Summary)</th><td>2</td><td>2</td><td>100</td><td>0</td><td>NaN</td>
+		<th>PatientInfo/Name (Summary)</th><td>1.0000</td><td>2</td><td>2</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>PatientInfo/Name/First</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>PatientInfo/Name/First</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>PatientInfo/Name/Last</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>PatientInfo/Name/Last</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>PhysicianInfo (Summary)</th><td>2</td><td>1</td><td>50</td><td>0</td><td>NaN</td>
+		<th>PhysicianInfo (Summary)</th><td>0.6667</td><td>2</td><td>1</td><td>50.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>PhysicianInfo/OrderingPhysicianName (Summary)</th><td>2</td><td>1</td><td>50</td><td>0</td><td>NaN</td>
+		<th>PhysicianInfo/OrderingPhysicianName (Summary)</th><td>0.6667</td><td>2</td><td>1</td><td>50.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>PhysicianInfo/OrderingPhysicianName/First</th><td>1</td><td>0</td><td>0</td><td>0</td><td>NaN</td>
+		<th>PhysicianInfo/OrderingPhysicianName/First</th><td>0.0000</td><td>1</td><td>0</td><td>0.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>PhysicianInfo/OrderingPhysicianName/Last</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>PhysicianInfo/OrderingPhysicianName/Last</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>ResultDate</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>ResultDate</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>ResultTime</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>ResultTime</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>Test (Summary)</th><td>8</td><td>7</td><td>87.5</td><td>1</td><td>7</td>
+		<th>Test (Summary)</th><td>0.8750</td><td>8</td><td>7</td><td>87.50 %</td><td>1</td><td>87.50 %</td><td>7</td>
 	</tr><tr>
-		<th>Test/CollectionDate</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>Test/CollectionDate</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>Test/CollectionTime</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>Test/CollectionTime</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>Test/Component</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>Test/Component</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>Test/Component/Flag</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>Test/Component/Flag</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>Test/Component/Range</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>Test/Component/Range</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>Test/Component/Units</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>Test/Component/Units</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr><tr>
-		<th>Test/Component/Value</th><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td>
+		<th>Test/Component/Value</th><td>NaN</td><td>1</td><td>0</td><td>0.00 %</td><td>1</td><td>0.00 %</td><td>0</td>
 	</tr><tr>
-		<th>Test/Name</th><td>1</td><td>1</td><td>100</td><td>0</td><td>NaN</td>
+		<th>Test/Name</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
 	</tr>
 </table>";
 
             SetFiles("Resources.MultipleTopLevel.found.eav", "Resources.MultipleTopLevel.expected.eav");
             var result = AttributeTreeComparer.CompareAttributes(_expected, _found,
                 AttributeTreeComparer.DefaultIgnoreXPath + " | /*/LabInfo | /*/ResultStatus | /*/Test/LabInfo | /*/Test/EpicCode | /*/Test/Component/OriginalName",
-                AttributeTreeComparer.DefaultContainerXPath + " | /*/PatientInfo/Name | /*/PhysicianInfo/*" )
+                AttributeTreeComparer.DefaultContainerXPath + " | /*/PatientInfo/Name | /*/PhysicianInfo/*")
                 .AggregateStatistics()
-                .SummarizeStatistics()
-                .AccuracyDetailsToHtml();
-            Assert.AreEqual(expectedResult, result);
+                .SummarizeStatistics();
+            var group = new GroupStatistics(1, new string[0], new string[0], result);
+            var report = group.AccuracyDetailsToHtml();
+            Assert.AreEqual(expectedResult, report);
         }
 
         #endregion Tests

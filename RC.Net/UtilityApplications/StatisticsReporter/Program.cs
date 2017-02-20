@@ -5,16 +5,43 @@ using Extract.Utilities;
 using StatisticsReporter.Properties;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.UI;
+using GroupByCriterion = Extract.Utilities.Union<
+    StatisticsReporter.GroupByDBField,
+    StatisticsReporter.GroupByFoundXPath,
+    StatisticsReporter.GroupByExpectedXPath>;
 
 namespace StatisticsReporter
 {
     class Program
     {
+        /// <summary>
+        /// The default CSS style sheet (these settings can be overridden
+        /// by adding rules to the config file)
+        /// </summary>
+        private const string _DEFAULT_STYLE = @"
+            thead { background: DarkSeaGreen; }
+            tfoot { border-top: 2px solid gray; }
+            tr:nth-child(even) { background: #f2f2f2; }
+            table.ReportSettings th { text-align: left; }
+            table.ReportSettings td { text-align: left; }
+            table.DataCaptureStats
+            {
+              border-spacing: 10px;
+              border-collapse: collapse;
+            }
+            table.DataCaptureStats th { text-align: left; }
+            table.DataCaptureStats td { text-align: right; }
+            table.DataCaptureStats thead th { border-left: 2px solid gray; }
+            table.DataCaptureStats caption { text-align: left; }";
+			
         static void Main(string[] args)
         {
             ConfigSettings<Settings> ReportSettings = null;
@@ -34,7 +61,7 @@ namespace StatisticsReporter
                     throw new ExtractException("ELI41542", "Config file must be specified on the command line.");
                 }
 
-                string configFileName =  args[0];
+                string configFileName = args[0];
                 ReportSettings = new ConfigSettings<Settings>(configFileName);
 
                 // Verify that there are settings that make sense
@@ -42,7 +69,7 @@ namespace StatisticsReporter
 
                 // Transfer settings to the DataCapture settings
                 DataCaptureSettings dcSettings = new DataCaptureSettings();
-                
+
                 dcSettings.DatabaseName = ReportSettings.Settings.DatabaseName;
                 dcSettings.DatabaseServer = ReportSettings.Settings.DatabaseServerName;
                 dcSettings.IncludeFilesIfNoExpectedVOA = ReportSettings.Settings.IncludeFilesIfNoExpectedVoa;
@@ -51,6 +78,61 @@ namespace StatisticsReporter
                 dcSettings.FileSettings.XPathOfContainerOnlyAttributes = ReportSettings.Settings.XPathOfContainerOnlyAttributes;
                 dcSettings.ExpectedAttributeSetName = ReportSettings.Settings.ExpectedAttributeSetName;
                 dcSettings.FoundAttributeSetName = ReportSettings.Settings.FoundAttributeSetName;
+
+                // Set/validate the tagged criteria
+                try
+                {
+                    dcSettings.Tagged = ReportSettings.Settings.Tagged
+                        .Cast<string>()
+                        .Select(s =>
+                        {
+                            // This equals requirements of CFileProcessingDB::validateTagName()
+                            ExtractException.Assert("ELI41897", "Invalid tag name",
+                                Regex.IsMatch(s, @"\A\w[\w\s]{0,99}\z"));
+
+                            return s;
+                        }).ToList();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI41898");
+                }
+
+                // Set/validate the group-by criteria
+                try
+                {
+                    dcSettings.GroupByCriteria = ReportSettings.Settings.GroupByCriteria
+                        .Cast<string>()
+                        .Select(s =>
+                        {
+                            if (s.StartsWith("FoundXPath:", StringComparison.OrdinalIgnoreCase)
+                                && UtilityMethods.IsValidXPathExpression(s.Substring(11), throwException: true))
+                            {
+                                return new GroupByCriterion(new GroupByFoundXPath { XPath = s.Substring(11) });
+                            }
+
+                            if (s.StartsWith("ExpectedXPath:", StringComparison.OrdinalIgnoreCase)
+                                && UtilityMethods.IsValidXPathExpression(s.Substring(14), throwException: true))
+                            {
+                                return new GroupByCriterion(new GroupByExpectedXPath { XPath = s.Substring(14) });
+                            }
+
+                            GroupByDBField e = GroupByDBField.None;
+                            if (!Enum.TryParse<GroupByDBField>(s, out e) | e == GroupByDBField.None)
+                            {
+                                var ee = new ExtractException("ELI41842", "Unknown group-by criterion");
+                                ee.AddDebugData("Group by criterion", s, false);
+                                throw ee;
+                            }
+
+                            return new GroupByCriterion(e);
+                        })
+                        .ToList();
+                }
+                catch (Exception ex)
+                {
+                    throw new ExtractException("ELI41843", "Bad group-by criterion", ex);
+                }
 
                 range = ConvertDateTimeStrings(ReportSettings.Settings.StartDateTime, ReportSettings.Settings.EndDateTime);
                 dcSettings.StartDate = range.Item1;
@@ -81,22 +163,34 @@ namespace StatisticsReporter
                 Stopwatch timeToProcess = new Stopwatch();
                 timeToProcess.Start();
 
-                long fileCount = 0;
-
                 // Get the results for the per file comparisons
-                var Results = Statistics.ProcessData(out fileCount);
-                
-                // Aggregate the results
-                var AggrgatedResults = Results.AggregateStatistics();
+                var Results = Statistics.ProcessData();
 
-                // Summarize the data
-                var SummarizedResults = AggrgatedResults.SummarizeStatistics(ReportSettings.Settings.ErrorIfContainerOnlyConflict);
+                // Aggregate/summarize the results
+                foreach (var group in Results)
+                {
+                    var aggregated = group.AccuracyDetails.AggregateStatistics();
+                    var summarized = aggregated.SummarizeStatistics(ReportSettings.Settings.ErrorIfContainerOnlyConflict);
+                    group.AccuracyDetails = summarized;
+                }
 
-                // Get the Html page to save
-                string HtmlOutputPage = CreateHtmlPage(SummarizedResults.AccuracyDetailsToHtml(), ReportSettings, range, fileCount);
-                
-                // Save the data to the configured output file
-                File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, HtmlOutputPage);
+                if (ReportSettings.Settings.ReportOutputFileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+                {
+                    var statsData = Results.AccuracyDetailsToCsv(ReportSettings.Settings.SimpleOutput);
+
+                    // Save the data to the configured output file
+                    File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, statsData);
+                }
+                else
+                {
+                    var statsData = Results.Select(group => group.AccuracyDetailsToHtml(ReportSettings.Settings.SimpleOutput));
+
+                    // Get the Html page to save
+                    string HtmlOutputPage = CreateHtmlPage(statsData, ReportSettings, range);
+
+                    // Save the data to the configured output file
+                    File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, HtmlOutputPage);
+                }
 
                 // Stop the timer and write the elapsed time
                 timeToProcess.Stop();
@@ -110,7 +204,7 @@ namespace StatisticsReporter
                 {
                     if (ReportSettings != null && range != null)
                     {
-                        string HtmlOutput = CreateHtmlPage("", ReportSettings, range, 0);
+                        string HtmlOutput = CreateHtmlPage(Enumerable.Empty<string>(), ReportSettings, range);
                         // Save the data to the configured output file
 
                         File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, HtmlOutput);
@@ -196,7 +290,8 @@ namespace StatisticsReporter
         /// <param name="reportSettings">Instance of report settings used to generate report</param>
         /// <param name="range">The Tuple that contains the start and end DateTime for the report</param>
         /// <returns>String that is HTML formated page with the <paramref name="statsData"/> string and other page formatting</returns>
-        static string CreateHtmlPage(string statsData, ConfigSettings<Settings> reportSettings, Tuple<DateTime, DateTime> range, long fileCount)
+        static string CreateHtmlPage(IEnumerable<string> statsData, ConfigSettings<Settings> reportSettings,
+            Tuple<DateTime, DateTime> range)
         {
             // The order that settings should be displayed
             List<string> SettingsOrder = new List<string>
@@ -213,23 +308,24 @@ namespace StatisticsReporter
                 "XPathOfAttributesToIgnore",
                 "XPathOfContainerOnlyAttributes",
                 "ReportOutputFileName",
-                "ErrorIfContainerOnlyConflict"
+                "ErrorIfContainerOnlyConflict",
+                "Tagged",
+                "SimpleOutput"
             };
 
             var baseWriter = new StringWriter(CultureInfo.InvariantCulture);
             using (var writer = new HtmlTextWriter(baseWriter))
             {
                 writer.RenderBeginTag(HtmlTextWriterTag.Html);
-                
+
                 // Header for the Html
                 writer.RenderBeginTag(HtmlTextWriterTag.Head);
                 writer.AddAttribute(HtmlTextWriterAttribute.Type, "text/css");
                 writer.RenderBeginTag(HtmlTextWriterTag.Style);
-                writer.WriteLine("table.ReportSettings th { text-align: left; }");
-                writer.WriteLine("table.ReportSettings td { text-align: left; }");
-                writer.WriteLine("table.DataCaptureStats th { text-align: left; }");
-                writer.WriteLine("table.DataCaptureStats td { text-align: right; }");
-                writer.Write("thead { background: DarkSeaGreen; }");
+                // Default CSS
+                writer.WriteLine(_DEFAULT_STYLE);
+                // Optional, config-specified CSS
+                writer.Write(reportSettings.Settings.CSS);
                 writer.RenderEndTag();
                 writer.RenderEndTag();
 
@@ -254,7 +350,7 @@ namespace StatisticsReporter
                 {
                     // Get the setting with the setting name
                     SettingsPropertyValue setting = reportSettings.Settings.PropertyValues[settingName];
-                    
+
                     // If no setting with name was found log exception and continue
                     if (setting == null)
                     {
@@ -273,6 +369,10 @@ namespace StatisticsReporter
                     {
                         Value = String.Format(CultureInfo.CurrentCulture, "{0} ({1:MM/dd/yyyy hh:mm:ss tt})", setting.PropertyValue, range.Item2);
                     }
+                    else if (setting.Name.Equals("Tagged"))
+                    {
+                        Value = string.Join(", ", ((StringCollection)setting.PropertyValue).Cast<string>());
+                    }
                     else
                     {
                         Value = setting.PropertyValue.ToString();
@@ -287,17 +387,14 @@ namespace StatisticsReporter
                 writer.RenderBeginTag(HtmlTextWriterTag.Hr);
                 writer.RenderEndTag(); // Hr
 
-                 writer.Write(statsData);
+                foreach (var table in statsData)
+                {
+                    writer.Write(table);
 
-                // Add a line after the stats tables over the entire width of the pages
-                writer.AddAttribute(HtmlTextWriterAttribute.Width, "100%");
-                writer.RenderBeginTag(HtmlTextWriterTag.Hr);
-                writer.RenderEndTag(); // Hr
-
-                // Add the file count
-                writer.RenderBeginTag(HtmlTextWriterTag.P);
-                writer.WriteLine("Files processed : {0}", fileCount);
-                writer.RenderEndTag(); // p
+                    // Add space between tables
+                    writer.RenderBeginTag(HtmlTextWriterTag.P);
+                    writer.RenderEndTag(); // P
+                }
 
                 writer.RenderEndTag(); // Html
                 return baseWriter.ToString();

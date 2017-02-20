@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -7,6 +8,58 @@ using System.Web.UI;
 
 namespace Extract.DataCaptureStats
 {
+    /// <summary>
+    /// Class to hold statistics information for a group of files
+    /// </summary>
+    public class GroupStatistics
+    {
+        /// <summary>
+        /// Gets the file count of the group.
+        /// </summary>
+        public int FileCount { get; }
+
+        /// <summary>
+        /// Gets the array of the names of the group-by fields,
+        /// e.g., ExpectedUserName, //LabInfo/Name or FileName
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly")]
+        public string[] GroupByNames { get; }
+
+        /// <summary>
+        /// Gets the array of the values of the group-by fields,
+        /// e.g., nathaniel_heyer, EXTERNAL_LAB or c:\abc.123
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly")]
+        public string[] GroupByValues { get; }
+
+        /// <summary>
+        /// Gets or sets the accuracy detail collection for this group.
+        /// </summary>
+        public IEnumerable<AccuracyDetail> AccuracyDetails { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GroupStatistics"/> class.
+        /// </summary>
+        /// <param name="fileCount">The file count.</param>
+        /// <param name="groupByNames">The group-by field names.</param>
+        /// <param name="groupByValues">The group-by field values.</param>
+        /// <param name="accuracyDetails">The accuracy details.</param>
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly")]
+        public GroupStatistics(
+            int fileCount,
+            string[] groupByNames,
+            string[] groupByValues,
+            IEnumerable<AccuracyDetail> accuracyDetails)
+        {
+            FileCount = fileCount;
+            GroupByNames = groupByNames;
+            GroupByValues = groupByValues;
+            AccuracyDetails = accuracyDetails;
+        }
+    }
+
     /// <summary>
     /// Class to summarize aggregate data
     /// </summary>
@@ -17,6 +70,8 @@ namespace Extract.DataCaptureStats
         private static readonly IEqualityComparer<string> StringComparer = System.StringComparer.OrdinalIgnoreCase;
         private static readonly StringComparison StringComparison = System.StringComparison.OrdinalIgnoreCase;
         private static readonly CultureInfo CultureInfo = CultureInfo.InvariantCulture;
+
+        private static readonly string _CSV_DELIMITER = ",";
 
         #endregion Constants
 
@@ -45,16 +100,24 @@ namespace Extract.DataCaptureStats
         }
 
         /// <summary>
-        /// Generates an HTML report from summarized accuracy details.
+        /// Generates an HTML report from a group of summarized accuracy details.
         /// </summary>
-        /// <param name="statisticsToReport">The <see cref="IEnumerable{AccuracyDetail}"/> data to be used to build the report.</param>
+        /// <param name="group">The <see cref="GroupStatistics"/> data to be used to build the report.</param>
+        /// <param name="simpleOutput">if set to <c>true</c> then the only accuracy number that will be output is
+        /// the f1-score.</param>
         /// <returns>A string containing an html document representation of the data</returns>
-        public static string AccuracyDetailsToHtml(this IEnumerable<AccuracyDetail> statisticsToReport)
+        public static string AccuracyDetailsToHtml(this GroupStatistics group, bool simpleOutput = false)
         {
             try
             {
-                var summaryLookup = statisticsToReport.ToLookup(a => new { a.Path, a.Label });
-                var columns = new[] { "Path", "Expected", "Correct", "% Correct", "Incorrect", "ROCE" }.ToDictionary(s => s, _ => "");
+                var attributePaths = group.AccuracyDetails
+                    .Select(a => a.Path)
+                    .Distinct()
+                    .OrderBy(p => p)
+                    .ToList();
+                var attributeColumns = ExpandedAccuracy.GetFormattedFields(simpleOutput)
+                    .Select(kv => kv.Key).ToArray();
+                var summaryLookup = group.AccuracyDetails.ToLookup(a => new { a.Path, a.Label });
 
                 var baseWriter = new StringWriter(CultureInfo);
                 using (var writer = new HtmlTextWriter(baseWriter))
@@ -62,10 +125,26 @@ namespace Extract.DataCaptureStats
                     // Table
                     writer.AddAttribute(HtmlTextWriterAttribute.Class, "DataCaptureStats");
                     writer.RenderBeginTag(HtmlTextWriterTag.Table);
+                    writer.RenderBeginTag(HtmlTextWriterTag.Caption);
+                    // Write the group-by values as a caption
+                    for (int i = 0; i < group.GroupByNames.Length;)
+                    {
+                        var name = group.GroupByNames[i];
+                        var value = group.GroupByValues[i];
+                        writer.WriteLine(name + ": " + value);
+                        if (++i < group.GroupByNames.Length)
+                        {
+                            writer.RenderBeginTag(HtmlTextWriterTag.Br);
+                        }
+                    }
+                    writer.RenderEndTag();
                     // Header row
                     writer.RenderBeginTag(HtmlTextWriterTag.Thead);
                     writer.RenderBeginTag(HtmlTextWriterTag.Tr);
-                    foreach (var col in columns.Keys)
+                    writer.RenderBeginTag(HtmlTextWriterTag.Th);
+                    writer.Write("Path");
+                    writer.RenderEndTag();
+                    foreach (var col in attributeColumns)
                     {
                         writer.RenderBeginTag(HtmlTextWriterTag.Th);
                         writer.Write(col);
@@ -73,8 +152,20 @@ namespace Extract.DataCaptureStats
                     }
                     writer.RenderEndTag();
                     writer.RenderEndTag();
-                    // Other rows
-                    foreach (var p in statisticsToReport.Select(a => a.Path).Distinct().OrderBy(p => p))
+                    // Footer row
+                    writer.RenderBeginTag(HtmlTextWriterTag.Tfoot);
+                    writer.RenderBeginTag(HtmlTextWriterTag.Tr);
+                    writer.RenderBeginTag(HtmlTextWriterTag.Th);
+                    writer.Write("File count");
+                    writer.RenderEndTag();
+                    writer.RenderBeginTag(HtmlTextWriterTag.Td);
+                    writer.Write(string.Format(CultureInfo, "{0:N0}", group.FileCount));
+                    writer.RenderEndTag();
+                    writer.RenderEndTag();
+                    writer.RenderEndTag();
+
+                    // Attribute rows
+                    foreach (var p in attributePaths)
                     {
                         var expected = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Expected }]
                             .Sum(a => a.Value);
@@ -82,25 +173,22 @@ namespace Extract.DataCaptureStats
                             .Sum(a => a.Value);
                         var incorrect = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Incorrect }]
                             .Sum(a => a.Value);
-                        columns["Path"] = p;
-                        columns["Expected"] = expected.ToString(CultureInfo);
-                        columns["Correct"] = correct.ToString(CultureInfo);
-                        columns["% Correct"] = (expected == 0 ? double.NaN : Math.Round(correct * 100.0 / expected, 2))
-                            .ToString(CultureInfo);
-                        columns["Incorrect"] = incorrect.ToString(CultureInfo);
-                        columns["ROCE"] = (incorrect == 0 ? double.NaN : Math.Round((double)correct / incorrect, 2))
-                            .ToString(CultureInfo);
+
+                        var accuracy = new ExpandedAccuracy(expected, correct, incorrect);
 
                         // Write row header
                         writer.RenderBeginTag(HtmlTextWriterTag.Tr);
                         writer.RenderBeginTag(HtmlTextWriterTag.Th);
-                        writer.Write(columns["Path"]);
+                        writer.Write(p);
                         writer.RenderEndTag();
-                        // Write row data cells
-                        foreach (var col in columns.Values.Skip(1))
+
+                        // Write column data for this path
+                        IEnumerable<KeyValuePair<string, Func<ExpandedAccuracy, string>>>
+                            attributeColumnValues = ExpandedAccuracy.GetFormattedFields(simpleOutput);
+                        foreach (var col in attributeColumnValues)
                         {
                             writer.RenderBeginTag(HtmlTextWriterTag.Td);
-                            writer.Write(col);
+                            writer.Write(col.Value(accuracy));
                             writer.RenderEndTag();
                         }
                         writer.RenderEndTag(); // End row
@@ -113,6 +201,110 @@ namespace Extract.DataCaptureStats
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41532");
+            }
+        }
+
+        /// <summary>
+        /// Generates a CSV report from summarized accuracy details.
+        /// </summary>
+        /// <param name="group">The <see cref="GroupStatistics"/> data to be used to build the report.</param>
+        /// <param name="simpleOutput">if set to <c>true</c> then the only accuracy number that will be output is
+        /// the f1-score.</param>
+        /// <returns>A string containing an html document representation of the data</returns>
+        public static string AccuracyDetailsToCsv(this IEnumerable<GroupStatistics> statisticGroups,
+            bool simpleOutput = false)
+        {
+            try
+            {
+                if (!statisticGroups.Any())
+                {
+                    return "";
+                }
+
+                var groupByFieldNames = statisticGroups.First().GroupByNames;
+                var attributePaths = statisticGroups.SelectMany(g => g.AccuracyDetails)
+                    .Select(a => a.Path)
+                    .Distinct()
+                    .OrderBy(p => p)
+                    .ToList();
+                var attributeColumns = ExpandedAccuracy.GetFormattedFields(simpleOutput)
+                    .Select(kv => kv.Key).ToArray();
+
+                var headerRow = 
+                    // File Count
+                    Enumerable.Repeat("File count", 1)
+                    // Each path x each accuracy field
+                    .Concat(attributePaths.SelectMany(path => attributeColumns.Select(column =>
+                        path + "." + column)))
+                    // Each group-by field
+                    .Concat(groupByFieldNames)
+                    .ToArray();
+
+                var statisticsToReportList = statisticGroups.ToList();
+                var resultArray = new string[statisticsToReportList.Count + 1][];
+                resultArray[0] = headerRow;
+                int i = 0;
+                foreach(var group in statisticsToReportList)
+                {
+                    var row = resultArray[++i] = new string[headerRow.Length];
+                    var summaryLookup = group.AccuracyDetails.ToLookup(a => new { a.Path, a.Label });
+
+                    // Increment an offset value for each column written
+                    int offset = 0;
+
+                    // File count column
+                    row[offset++] = string.Format(CultureInfo, "{0:N0}", group.FileCount);
+
+                    // Attribute columns
+                    foreach (var p in attributePaths)
+                    {
+                        double expected = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Expected }]
+                            .Sum(a => a.Value);
+                        double correct = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Correct }]
+                            .Sum(a => a.Value);
+                        double incorrect = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Incorrect }]
+                            .Sum(a => a.Value);
+
+                        var accuracy = new ExpandedAccuracy(expected, correct, incorrect);
+
+                        // Write column data for this path
+                        IEnumerable<KeyValuePair<string, Func<ExpandedAccuracy, string>>>
+                            attributeColumnValues = ExpandedAccuracy.GetFormattedFields(simpleOutput);
+                        foreach (var col in attributeColumnValues)
+                        {
+                            row[offset++] = col.Value(accuracy);
+                        }
+                    }
+
+                    // Write the group-by columns
+                    foreach (var groupBy in group.GroupByValues)
+                    {
+                        row[offset++] = groupBy;
+                    }
+                }
+
+                // Convert each row to CSV
+                var csvRows = resultArray.Select(row =>
+                    string.Join(_CSV_DELIMITER, row.Select(cell =>
+                        {
+                            if (cell == null)
+                            {
+                                return "";
+                            }
+                            bool quote = cell.IndexOf(_CSV_DELIMITER, StringComparison.Ordinal) != -1
+                                || cell.IndexOfAny(new[] { '\r', '\n', '"' }) != -1;
+                            if (quote)
+                            {
+                                return "\"" + cell.Replace("\"", "\"\"") + "\"";
+                            }
+                            return cell;
+                        })));
+
+                return string.Join(Environment.NewLine, csvRows);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41847");
             }
         }
 
@@ -246,6 +438,112 @@ namespace Extract.DataCaptureStats
                     .Sum(path => _otherPaths[path][otherLabel].Sum(accuracyDetail => accuracyDetail.Value));
 
                 return new AccuracyDetail(otherLabel, summaryPath, value);
+            }
+        }
+
+        /// <summary>
+        /// Calculates and formats accuracy/error measurements
+        /// </summary>
+        private class ExpandedAccuracy
+        {
+            /// <summary>
+            /// An enumeration of accuracy field names and string-value-generating functions
+            /// </summary>
+            static KeyValuePair<string, Func<ExpandedAccuracy, string>>[] _allFields = {
+                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
+                    ("F1-Score", a => string.Format(CultureInfo, "{0:N4}", a.F1Score)),
+
+                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
+                    ("Expected", a => string.Format(CultureInfo, "{0:N0}", a.Expected)),
+
+                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
+                    ("Correct", a => string.Format(CultureInfo, "{0:N0}", a.Correct)),
+
+                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
+                    ("% Correct (Recall)", a => string.Format(CultureInfo, "{0:P2}", a.Recall)),
+
+                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
+                    ("Incorrect", a => string.Format(CultureInfo, "{0:N0}", a.Incorrect)),
+
+                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
+                    ("Precision", a => string.Format(CultureInfo, "{0:P2}", a.Precision)),
+
+                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
+                    ("ROCE", a => string.Format(CultureInfo, "{0:N0}", a.ROCE)) };
+
+            /// <summary>
+            /// True positives + false negatives
+            /// </summary>
+            public double Expected { get; }
+
+            /// <summary>
+            /// True positives
+            /// </summary>
+            public double Correct { get; }
+
+            /// <summary>
+            /// False positives
+            /// </summary>
+            public double Incorrect { get; }
+
+            /// <summary>
+            /// Correct / (Incorrect + Correct);
+            /// </summary>
+            public double Precision { get; }
+
+            /// <summary>
+            /// Expected / Correct;
+            /// </summary>
+            public double Recall { get; }
+
+            /// <summary>
+            /// The harmonic mean of Precision and Recall
+            /// </summary>
+            public double F1Score { get; }
+
+            /// <summary>
+            /// Correct / Incorrect
+            /// </summary>
+            public object ROCE { get; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ExpandedAccuracy"/> class.
+            /// </summary>
+            /// <param name="expected">The number of expected attributes (true positives + false negatives)</param>
+            /// <param name="correct">The number of correctly found attributes (true positives)</param>
+            /// <param name="incorrect">The number of incorrectly found attributes (false positives)</param>
+            public ExpandedAccuracy(double expected, double correct, double incorrect)
+            {
+                Expected = expected;
+                Correct = correct;
+                Incorrect = incorrect;
+                ROCE = incorrect == 0
+                    ? double.NaN
+                    : correct / incorrect;
+
+                Precision = incorrect + correct == 0
+                    ? 1
+                    : correct / (incorrect + correct);
+
+                Recall = expected + incorrect == 0
+                    ? 1
+                    : expected == 0
+                        ? double.NaN
+                        : correct / expected;
+
+                F1Score = 2 * Precision * Recall / (Precision + Recall);
+            }
+
+            /// <summary>
+            /// Gets an enumeration of accuracy field names and string-value-generating functions
+            /// </summary>
+            /// <param name="simpleOutput">if set to <c>true</c> then only the F1-Score will be present in the collection.</param>
+            /// <returns>The enumeration of names to functions</returns>
+            public static IEnumerable<KeyValuePair<string, Func<ExpandedAccuracy, string>>> GetFormattedFields(bool simpleOutput)
+            {
+                return simpleOutput
+                    ? _allFields.Take(1).ToArray()
+                    : _allFields;
             }
         }
     }

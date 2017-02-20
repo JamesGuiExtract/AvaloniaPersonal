@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
@@ -847,17 +848,36 @@ namespace Extract.Utilities
                     {
                         string settingName = setting.Name;
                         SettingElement xmlSetting = configSection.Settings.Get(settingName);
+                        SettingsProperty property = Settings.Properties[settingName];
                         if (xmlSetting != null)
                         {
-                            // Get the string version of the value to apply to this setting,
-                            // interpreted as XML and expanding tags as specified.
-                            string stringValue =
-                                xmlSetting.Value.ValueXml.GetNodeValue(TagUtility, false, true);
+                            if (property.PropertyType == typeof(StringCollection))
+                            {
+                                var sc = new StringCollection();
+                                foreach (var node in xmlSetting.Value.ValueXml.ChildNodes
+                                    .Cast<XmlNode>()
+                                    .Where(x => x.Name.Equals("ArrayOfString", StringComparison.OrdinalIgnoreCase))
+                                    .SingleOrDefault()?.ChildNodes
+                                    .Cast<XmlNode>()
+                                    .Where(x => x.Name.Equals("string", StringComparison.OrdinalIgnoreCase))
+                                    ?? Enumerable.Empty<XmlNode>())
+                                {
+                                    sc.Add(node.GetNodeValue(TagUtility, false, true));
+                                }
+                                Settings[settingName] = sc;
+                            }
+                            else
+                            {
+                                // Get the string version of the value to apply to this setting,
+                                // interpreted as XML and expanding tags as specified.
+                                string stringValue =
+                                    xmlSetting.Value.ValueXml.GetNodeValue(TagUtility, false, true);
 
-                            // Convert the string XML value to the appropriate type and apply the
-                            // value. GetNodeValue will have already expanded tags if appropriate,
-                            // so further expansion is never necessary.
-                            UpdatePropertyFromString(settingName, stringValue, false);
+                                // Convert the string XML value to the appropriate type and apply the
+                                // value. GetNodeValue will have already expanded tags if appropriate,
+                                // so further expansion is never necessary.
+                                UpdatePropertyFromString(settingName, stringValue, false);
+                            }
                         }
                     }
                 }
@@ -995,7 +1015,7 @@ namespace Extract.Utilities
                 // Check if there is an attribute on the node specifying whether to treat the string
                 // as literal XML.
                 bool valueIsXml = xmlDefault;
-                XmlAttribute xmlAttribute = node.Attributes.OfType<XmlAttribute>()
+                XmlAttribute xmlAttribute = node.Attributes?.OfType<XmlAttribute>()
                     .Where(attribute =>
                         attribute.Name.Equals("XML", StringComparison.OrdinalIgnoreCase))
                     .SingleOrDefault();
@@ -1008,7 +1028,7 @@ namespace Extract.Utilities
                 // Check if there is an attribute on the node specifying whether to expand any path
                 // tags or functions.
                 bool expandTags = expandTagsDefault;
-                xmlAttribute = node.Attributes.OfType<XmlAttribute>()
+                xmlAttribute = node.Attributes?.OfType<XmlAttribute>()
                     .Where(attribute =>
                         attribute.Name.Equals("expandTags", StringComparison.OrdinalIgnoreCase))
                     .SingleOrDefault();

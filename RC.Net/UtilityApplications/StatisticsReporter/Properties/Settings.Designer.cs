@@ -146,24 +146,24 @@ namespace StatisticsReporter.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("All")]
-        public string EndDateTime {
-            get {
-                return ((string)(this["EndDateTime"]));
-            }
-            set {
-                this["EndDateTime"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("All")]
         public string StartDateTime {
             get {
                 return ((string)(this["StartDateTime"]));
             }
             set {
                 this["StartDateTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("All")]
+        public string EndDateTime {
+            get {
+                return ((string)(this["EndDateTime"]));
+            }
+            set {
+                this["EndDateTime"] = value;
             }
         }
         
@@ -176,6 +176,52 @@ namespace StatisticsReporter.Properties {
             }
             set {
                 this["ErrorIfContainerOnlyConflict"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection GroupByCriteria {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["GroupByCriteria"]));
+            }
+            set {
+                this["GroupByCriteria"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CSS {
+            get {
+                return ((string)(this["CSS"]));
+            }
+            set {
+                this["CSS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SimpleOutput {
+            get {
+                return ((bool)(this["SimpleOutput"]));
+            }
+            set {
+                this["SimpleOutput"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection Tagged {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["Tagged"]));
+            }
+            set {
+                this["Tagged"] = value;
             }
         }
     }
