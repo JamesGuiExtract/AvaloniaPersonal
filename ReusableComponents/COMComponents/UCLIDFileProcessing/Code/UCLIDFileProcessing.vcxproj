@@ -306,6 +306,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="WorkflowDefinition.cpp" />
     <ClCompile Include="WorkItemRecord.cpp" />
     <ClCompile Include="WorkItemsPage.cpp" />
   </ItemGroup>
@@ -341,6 +342,7 @@
     <None Include="res\ProcessFiles.ico" />
     <None Include="res\SelectDocTagArrow.ico" />
     <None Include="res\toolbar.bmp" />
+    <None Include="WorkflowDefinition.rgs" />
     <None Include="WorkItemRecord.rgs" />
   </ItemGroup>
   <ItemGroup>
@@ -429,6 +431,7 @@
     <ClInclude Include="TaskEvent.h" />
     <ClInclude Include="TaskGrid.h" />
     <ClInclude Include="TaskInfoDlg.h" />
+    <ClInclude Include="WorkflowDefinition.h" />
     <ClInclude Include="WorkItemRecord.h" />
     <ClInclude Include="WorkItemsPage.h" />
   </ItemGroup>

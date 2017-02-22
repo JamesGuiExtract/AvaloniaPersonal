@@ -385,6 +385,23 @@ static const string gstrCREATE_PAGINATION =
 	"	[OriginalPage] INT NOT NULL, "
 	"	[FileTaskSessionID] INT NOT NULL)";
 
+static const string gstrCREATE_WORKFLOW_TYPE =
+	"CREATE TABLE [dbo].[WorkflowType]( "
+	"	[Code] NVARCHAR(1) NOT NULL CONSTRAINT [PK_WorkflowType] PRIMARY KEY CLUSTERED, "
+	"	[Meaning] NVARCHAR(100) NOT NULL)";
+
+static const string gstrCREATE_WORKFLOW =
+	"CREATE TABLE [dbo].[Workflow]( "
+	"	[ID] INT IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_Workflow] PRIMARY KEY CLUSTERED, "
+	"	[Name] NVARCHAR(100), "
+	"	[WorkflowTypeCode] NVARCHAR(1), "
+	"	[Description] NVARCHAR(MAX), "
+	"	[StartActionID] INT, "
+	"	[EndActionID] INT, "
+	"	[PostWorkflowActionID] INT, "
+	"	[DocumentFolder] NVARCHAR(255), "
+	"	[OutputAttributeSetID] BIGINT)";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -964,6 +981,36 @@ static const string gstrADD_PAGINATION_FILETASKSESSION_FK =
 	" REFERENCES [dbo].[FileTaskSession] ([ID])"
 	" ON UPDATE CASCADE "
 	" ON DELETE CASCADE ";
+
+static const string gstrADD_WORKFLOW_WORKFLOWTYPE_FK =
+	"ALTER TABLE [dbo].[Workflow]  "
+	" WITH CHECK ADD CONSTRAINT [FK_Workflow_WorkflowType] FOREIGN KEY([WorkflowTypeCode]) "
+	" REFERENCES [dbo].[WorkflowType] ([Code])"
+	" ON UPDATE CASCADE "
+	" ON DELETE CASCADE";
+
+static const string gstrADD_WORKFLOW_STARTACTION_FK =
+	"ALTER TABLE [dbo].[Workflow]  "
+	" WITH CHECK ADD CONSTRAINT [FK_Workflow_StartAction] FOREIGN KEY([StartActionID]) "
+	" REFERENCES [dbo].[Action] ([ID])"
+	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
+
+static const string gstrADD_WORKFLOW_ENDACTION_FK =
+	"ALTER TABLE [dbo].[Workflow]  "
+	" WITH CHECK ADD CONSTRAINT [FK_Workflow_EndAction] FOREIGN KEY([EndActionID]) "
+	" REFERENCES [dbo].[Action] ([ID])"
+	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
+
+static const string gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK =
+	"ALTER TABLE [dbo].[Workflow]  "
+	" WITH CHECK ADD CONSTRAINT [FK_Workflow_PostWorkflowAction] FOREIGN KEY([PostWorkflowActionID]) "
+	" REFERENCES [dbo].[Action] ([ID])"
+	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
+
+// NOTE: Foreign key for OutputAttributeSetID is added in AttributeDBMgr
 
 static const string gstrADD_DB_PROCEXECUTOR_ROLE =
 	"IF DATABASE_PRINCIPAL_ID('db_procexecutor') IS NULL \r\n"

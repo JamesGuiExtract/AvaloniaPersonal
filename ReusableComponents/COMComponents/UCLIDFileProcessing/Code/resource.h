@@ -266,6 +266,7 @@
 #define IDC_CURRENT_WORKITEM_LIST       2063
 #define IDD_DLG_WORKITEMS_PROP          2064
 #define IDC_STATIC_CURR_WORKITEMS       2065
+#define IDR_WORKFLOWDEFINITION			2066
 #define IDC_BTN_RUN                     32768
 #define IDC_BTN_STOP                    32769
 #define IDC_BTN_AUTO_SCROLL             32770
@@ -310,9 +311,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2066
+#define _APS_NEXT_RESOURCE_VALUE        2067
 #define _APS_NEXT_COMMAND_VALUE         32815
-#define _APS_NEXT_CONTROL_VALUE         2066
-#define _APS_NEXT_SYMED_VALUE           2066
+#define _APS_NEXT_CONTROL_VALUE         2067
+#define _APS_NEXT_SYMED_VALUE           2067
 #endif
 #endif

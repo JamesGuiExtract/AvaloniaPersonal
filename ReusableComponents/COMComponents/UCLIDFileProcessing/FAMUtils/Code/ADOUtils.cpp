@@ -1306,3 +1306,33 @@ FAMUTILS_API bool isNULL(const FieldsPtr& ipFields, const string& strFieldName)
 		throw ue;
 	}
 }
+//-------------------------------------------------------------------------------------------------
+void setFieldToNull(const FieldsPtr& ipFields, const string& strFieldName)
+{
+	// Use double try catch so that the field name can be added to the debug info
+	try
+	{
+		// Make user ipFields is not NULL
+		ASSERT_ARGUMENT("ELI41913", ipFields != __nullptr);
+
+		try
+		{
+			// Get the Field from the fields list
+			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
+			ASSERT_RESOURCE_ALLOCATION("ELI41914", ipItem != __nullptr);
+
+			variant_t vtItem;
+			vtItem.vt = VT_NULL;
+
+			// set the value to the variant
+			ipItem->Value = vtItem;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41915");
+	}
+	catch (UCLIDException& ue)
+	{
+		// Add FieldName to the debug info
+		ue.addDebugInfo("FieldName", strFieldName);
+		throw ue;
+	}
+}

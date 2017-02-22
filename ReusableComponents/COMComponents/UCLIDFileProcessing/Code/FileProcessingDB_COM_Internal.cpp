@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 142;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 143;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1559,6 +1559,46 @@ int UpdateToSchemaVersion142(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41817");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion143(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 143;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_WORKFLOW_TYPE);
+		vecQueries.push_back(gstrCREATE_WORKFLOW);
+		vecQueries.push_back(gstrADD_WORKFLOW_WORKFLOWTYPE_FK);
+		vecQueries.push_back(gstrADD_WORKFLOW_STARTACTION_FK);
+		vecQueries.push_back(gstrADD_WORKFLOW_ENDACTION_FK);
+		vecQueries.push_back(gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK);
+		// Foreign key for OutputAttributeSetID is added in AttributeDBMgr
+		vecQueries.push_back("INSERT INTO [WorkflowType] ([Code], [Meaning]) "
+			"VALUES('U', 'Undefined')");
+		vecQueries.push_back("INSERT INTO [WorkflowType] ([Code], [Meaning]) "
+			"VALUES('R', 'Redaction')");
+		vecQueries.push_back("INSERT INTO [WorkflowType] ([Code], [Meaning]) "
+			"VALUES('E', 'Extraction')");
+		vecQueries.push_back("INSERT INTO [WorkflowType] ([Code], [Meaning]) "
+			"VALUES('C', 'Classification')");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41911");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6617,7 +6657,10 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
-			ipProgressStatus->InitProgressStatus("Inspecting schema...", 0, 0, VARIANT_TRUE);
+			if (ipProgressStatus != nullptr)
+			{
+				ipProgressStatus->InitProgressStatus("Inspecting schema...", 0, 0, VARIANT_TRUE);
+			}
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -6699,7 +6742,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 139:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion140);
 				case 140:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion141);
 				case 141:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion142);
-				case 142:	break;
+				case 142:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion143);
+				case 143:	break;
 
 				default:
 					{
@@ -6773,8 +6817,11 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			nSchemaVersion = nOriginalSchemaVersion;
 			mapProductSpecificVersions.clear();
 
-			ipProgressStatus->InitProgressStatus(
-				"Updating database schema...", 0, nTotalStepCount, VARIANT_TRUE);
+			if (ipProgressStatus != nullptr)
+			{
+				ipProgressStatus->InitProgressStatus(
+					"Updating database schema...", 0, nTotalStepCount, VARIANT_TRUE);
+			}
 
 			int nFuncCount = vecUpdateFuncs.size();
 			for (int i = 0; i < nStageCount; i++)
@@ -6790,19 +6837,27 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				{
 					zMessage.Format("Updating database schema... (Step %i of %i)", i + 1, nStageCount);
 				}
-				ipProgressStatus->StartNextItemGroup(zMessage.GetString(), vecStepCounts[i]);
 
+				if (ipProgressStatus != nullptr)
+				{
+					ipProgressStatus->StartNextItemGroup(zMessage.GetString(), vecStepCounts[i]);
+				}
 
 				executeProdSpecificSchemaUpdateFuncs(ipConnection, ipProdSpecificMgrs,
-					nSchemaVersion, NULL, ipProgressStatus->SubProgressStatus,
+					nSchemaVersion, NULL,
+					(ipProgressStatus == nullptr) ? nullptr : ipProgressStatus->SubProgressStatus,
 					mapProductSpecificVersions);
 
 				if (i < nFuncCount)
 				{
-					nSchemaVersion = vecUpdateFuncs[i](ipConnection, NULL, ipProgressStatus->SubProgressStatus);
+					nSchemaVersion = vecUpdateFuncs[i](ipConnection, NULL, 
+						(ipProgressStatus == nullptr) ? nullptr : ipProgressStatus->SubProgressStatus);
 				}
 
-				ipProgressStatus->CompleteCurrentItemGroup();
+				if (ipProgressStatus != nullptr)
+				{
+					ipProgressStatus->CompleteCurrentItemGroup();
+				}
 			}
 
 			// Update last DB info change time since any schema update will have needed to update
@@ -9664,6 +9719,351 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 			return false;
 		}
 		ue.addDebugInfo("PaginatedFile", asString(bstrOutputFile));
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::AddWorkflow_Internal(bool bDBLocked, BSTR bstrName, EWorkflowType eType, long* pnID)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI41877", pnID != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+			const char* szWorkflowType = "U";
+			switch (eType)
+			{
+				case kUndefined: szWorkflowType = "U"; break;
+				case kRedaction: szWorkflowType = "R"; break;
+				case kExtraction: szWorkflowType = "E"; break;
+				case kClassification: szWorkflowType = "C"; break;
+				default: break;
+			}
+
+			executeCmdQuery(ipConnection,
+				Util::Format(
+					"INSERT INTO [Workflow] ([Name], [WorkflowTypeCode]) "
+					"	OUTPUT INSERTED.[ID]"
+					"	VALUES('%s', '%s')", asString(bstrName).c_str(), szWorkflowType)
+				, false, pnID);
+
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI41878");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41879");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		ue.addDebugInfo("WorkflowName", asString(bstrName));
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::DeleteWorkflow_Internal(bool bDBLocked, long nID)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+			long nDeletedCount = executeCmdQuery(ipConnection,
+				"DELETE FROM [Workflow] WHERE [ID] = " + asString(nID));
+
+			if (nDeletedCount == 0)
+			{
+				UCLIDException ue("ELI41892", "Failed to delete workflow");
+				ue.addDebugInfo("ID", nID);
+				throw ue;
+			}
+
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI41880");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41881");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		ue.addDebugInfo("WorkflowID", asString(nID));
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkflowDefinition_Internal(bool bDBLocked, long nID,
+	IWorkflowDefinition** ppWorkflowDefinition)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI41882", ppWorkflowDefinition != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			_RecordsetPtr ipWorkflowSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI41893", ipWorkflowSet != __nullptr);
+
+			string strQuery =
+				Util::Format(
+					"SELECT [ID] "
+					", [Name] "
+					", [WorkflowTypeCode] "
+					", [Description] "
+					", [StartActionID] "
+					", [EndActionID] "
+					", [PostWorkflowActionID] "
+					", [DocumentFolder] "
+					", [OutputAttributeSetID] "
+					"	FROM [Workflow]"
+					"	WHERE [ID] = %s", asString(nID).c_str());
+
+			ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+				adOpenStatic, adLockReadOnly, adCmdText);
+
+			if (asCppBool(ipWorkflowSet->adoEOF))
+			{
+				UCLIDException ue("ELI41894", "Failed to get workflow definition.");
+				ue.addDebugInfo("ID", nID);
+				throw ue;
+			}
+
+			FieldsPtr ipFields = ipWorkflowSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI41895", ipFields != __nullptr);
+
+			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition(CLSID_WorkflowDefinition);
+			ASSERT_RESOURCE_ALLOCATION("ELI41896", ipWorkflowDefinition != __nullptr);
+
+			ipWorkflowDefinition->ID = getLongField(ipFields, "ID");
+			ipWorkflowDefinition->Name = getStringField(ipFields, "Name").c_str();
+			char eWorkflowType = getStringField(ipFields, "WorkflowTypeCode").c_str()[0];
+			switch (eWorkflowType)
+			{
+				case 'U': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kUndefined; break;
+				case 'R': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kRedaction; break;
+				case 'E': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kExtraction; break;
+				case 'C': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kClassification; break;
+			}
+			ipWorkflowDefinition->Description = getStringField(ipFields, "Description").c_str();
+			ipWorkflowDefinition->StartAction = isNULL(ipFields, "StartActionID")
+				? _bstr_t("").Detach()
+				: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "StartActionID"))).Detach();
+			ipWorkflowDefinition->EndAction = isNULL(ipFields, "EndActionID")
+				? _bstr_t("").Detach()
+				: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "EndActionID"))).Detach();
+			ipWorkflowDefinition->PostWorkflowAction = isNULL(ipFields, "PostWorkflowActionID")
+				? _bstr_t("").Detach()
+				: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "PostWorkflowActionID"))).Detach();
+			ipWorkflowDefinition->DocumentFolder = getStringField(ipFields, "DocumentFolder").c_str();
+
+			if (isNULL(ipFields, "OutputAttributeSetID"))
+			{
+				ipWorkflowDefinition->OutputAttributeSet = _bstr_t("").Detach();
+			}
+			else
+			{
+				long long llAttributeSetID = getLongLongField(ipFields, "OutputAttributeSetID");
+
+				string strAttributeSetQuery = "SELECT [Description] FROM [dbo].[AttributeSetName] WHERE [ID]="
+					+ asString(llAttributeSetID);
+
+				_RecordsetPtr ipAttributeSetResult(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI41919", ipAttributeSetResult != __nullptr);
+
+				ipAttributeSetResult->Open(strAttributeSetQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+					adOpenStatic, adLockReadOnly, adCmdText);
+
+				ASSERT_RUNTIME_CONDITION("ELI41920", !asCppBool(ipAttributeSetResult->adoEOF),
+					"Unknown attribute set ID");
+
+				FieldsPtr ipAttributeSetFields = ipAttributeSetResult->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI41921", ipAttributeSetFields != __nullptr);
+
+				ipWorkflowDefinition->OutputAttributeSet =
+					get_bstr_t(getStringField(ipAttributeSetFields, "Description")).Detach();
+			}
+
+			*ppWorkflowDefinition = (IWorkflowDefinition*)ipWorkflowDefinition.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI41883");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41884");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		ue.addDebugInfo("WorkflowID", asString(nID));
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
+	IWorkflowDefinition* pWorkflowDefinition)
+{
+	try
+	{
+		try
+		{
+			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition(pWorkflowDefinition);
+			ASSERT_ARGUMENT("ELI41885", ipWorkflowDefinition != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+			_RecordsetPtr ipWorkflowSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI41916", ipWorkflowSet != __nullptr);
+
+			string strQuery =
+				Util::Format(
+					"SELECT [ID] "
+					", [Name] "
+					", [WorkflowTypeCode] "
+					", [Description] "
+					", [StartActionID] "
+					", [EndActionID] "
+					", [PostWorkflowActionID] "
+					", [DocumentFolder] "
+					", [OutputAttributeSetID] "
+					"	FROM [Workflow]"
+					"	WHERE [ID] = %s", asString(ipWorkflowDefinition->ID).c_str());
+
+			ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+				adOpenDynamic, adLockOptimistic, adCmdText);
+
+			if (asCppBool(ipWorkflowSet->adoEOF))
+			{
+				UCLIDException ue("ELI41917", "Failed to get workflow definition.");
+				ue.addDebugInfo("ID", ipWorkflowDefinition->ID);
+				throw ue;
+			}
+
+			FieldsPtr ipFields = ipWorkflowSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI41918", ipFields != __nullptr);
+
+			setStringField(ipFields, "Name", asString(ipWorkflowDefinition->Name));
+
+			switch (ipWorkflowDefinition->Type)
+			{
+				case UCLID_FILEPROCESSINGLib::kUndefined:	setStringField(ipFields, "WorkflowTypeCode", "U"); break;
+				case UCLID_FILEPROCESSINGLib::kRedaction:	setStringField(ipFields, "WorkflowTypeCode", "R"); break;
+				case UCLID_FILEPROCESSINGLib::kExtraction:	setStringField(ipFields, "WorkflowTypeCode", "E"); break;
+				case UCLID_FILEPROCESSINGLib::kClassification: setStringField(ipFields, "WorkflowTypeCode", "C"); break;
+			}
+			
+			setStringField(ipFields, "Description", asString(ipWorkflowDefinition->Description));
+
+			if (ipWorkflowDefinition->StartAction.length() == 0)
+			{
+				setFieldToNull(ipFields, "StartActionID");
+			}
+			else
+			{
+				setLongField(ipFields, "StartActionID",
+					getActionID(ipConnection, asString(ipWorkflowDefinition->StartAction)));
+			}
+
+			if (ipWorkflowDefinition->EndAction.length() == 0)
+			{
+				setFieldToNull(ipFields, "EndActionID");
+			}
+			else
+			{
+				setLongField(ipFields, "EndActionID",
+					getActionID(ipConnection, asString(ipWorkflowDefinition->EndAction)));
+			}
+
+			if (ipWorkflowDefinition->PostWorkflowAction.length() == 0)
+			{
+				setFieldToNull(ipFields, "PostWorkflowActionID");
+			}
+			else
+			{
+				setLongField(ipFields, "PostWorkflowActionID",
+					getActionID(ipConnection, asString(ipWorkflowDefinition->PostWorkflowAction)));
+			}
+			
+			setStringField(ipFields, "DocumentFolder", asString(ipWorkflowDefinition->DocumentFolder));
+			
+			string strOutputAttributeSet = asString(ipWorkflowDefinition->OutputAttributeSet);
+			if (strOutputAttributeSet.empty())
+			{
+				setFieldToNull(ipFields, "OutputAttributeSetID");
+			}
+			else
+			{
+				string strQuery = Util::Format("SELECT [ID] FROM [dbo].[AttributeSetName] WHERE [Description]='%s'",
+					strOutputAttributeSet.c_str());
+				long long llOutputAttributeSetID = 0;
+				executeCmdQuery(ipConnection, strQuery, "ID", false, &llOutputAttributeSetID);
+				setLongLongField(ipFields, "OutputAttributeSetID", llOutputAttributeSetID);
+			}
+			
+			ipWorkflowSet->Update();
+			
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI41886");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41887");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
 		throw ue;
 	}
 	return true;

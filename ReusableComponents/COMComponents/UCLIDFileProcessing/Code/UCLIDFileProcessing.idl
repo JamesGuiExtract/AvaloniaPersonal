@@ -178,6 +178,19 @@ library UCLID_FILEPROCESSINGLib
 		[helpstring("Total work items")] long lTotal;
 	} WorkItemGroupStatus;
 
+	typedef
+		[
+			uuid(46849A2C-C3B2-4A61-8577-531E7C4CA933),
+			helpstring("Workflow types")
+		]
+	enum EWorkflowType
+	{
+		kUndefined = 0,
+		kRedaction = 1,
+		kExtraction = 2,
+		kClassification = 3
+	} EWorkflowType;
+
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -688,6 +701,35 @@ library UCLID_FILEPROCESSINGLib
 
 		[propget, id(14), helpstring ("property RunningTaskDescription")] HRESULT RunningTaskDescription([out, retval] BSTR *pOutput);
 		[propput, id(14), helpstring ("property RunningTaskDescription")] HRESULT RunningTaskDescription([in] BSTR Input);
+	}
+
+	[
+		object,
+		uuid(B4011132-F37E-4274-88E4-D11173E1C579),
+		dual,
+		helpstring("IWorkflowDefinition Interface"),
+		pointer_default(unique)
+	]
+	interface IWorkflowDefinition : IDispatch
+	{
+		[propget, id(1), helpstring ("property ID")] HRESULT ID([out, retval] long* pnID);
+		[propput, id(1), helpstring ("property ID")] HRESULT ID([in] long nID);
+		[propget, id(2), helpstring ("property Name")] HRESULT Name([out, retval] BSTR* pName);
+		[propput, id(2), helpstring ("property Name")] HRESULT Name([in] BSTR Name);
+		[propget, id(3), helpstring ("property Type")] HRESULT Type([out, retval] EWorkflowType* pWorkflowType);
+		[propput, id(3), helpstring ("property Type")] HRESULT Type([in] EWorkflowType WorkflowType);
+		[propget, id(4), helpstring ("property Description")] HRESULT Description([out, retval] BSTR* pDescription);
+		[propput, id(4), helpstring ("property Description")] HRESULT Description([in] BSTR Description);
+		[propget, id(5), helpstring ("property StartAction")] HRESULT StartAction([out, retval] BSTR* pStartAction);
+		[propput, id(5), helpstring ("property StartAction")] HRESULT StartAction([in] BSTR StartAction);
+		[propget, id(6), helpstring ("property EndAction")] HRESULT EndAction([out, retval] BSTR* pEndAction);
+		[propput, id(6), helpstring ("property EndAction")] HRESULT EndAction([in] BSTR EndAction);
+		[propget, id(7), helpstring ("property PostWorkflowAction")] HRESULT PostWorkflowAction([out, retval] BSTR* pPostWorkflowAction);
+		[propput, id(7), helpstring ("property PostWorkflowAction")] HRESULT PostWorkflowAction([in] BSTR PostWorkflowAction);
+		[propget, id(8), helpstring ("property DocumentFolder")] HRESULT DocumentFolder([out, retval] BSTR* pDocumentFolder);
+		[propput, id(8), helpstring ("property DocumentFolder")] HRESULT DocumentFolder([in] BSTR DocumentFolder);
+		[propget, id(9), helpstring ("property OutputAttributeSet")] HRESULT OutputAttributeSet([out, retval] BSTR* pOutputAttributeSet);
+		[propput, id(9), helpstring ("property OutputAttributeSet")] HRESULT OutputAttributeSet([in] BSTR OutputAttributeSet);
 	}
 
 	[
@@ -1768,6 +1810,18 @@ library UCLID_FILEPROCESSINGLib
 		//			DateTimeStamp will also be applied.
 		[id(161), helpstring("methods UpdateFileTaskSession")] HRESULT UpdateFileTaskSession(
 			[in] long nFileTaskSessionID, [in] double dDuration, [in] double dOverheadTime);
+		// -----------------------------------------------------------------------------------------------
+		[id(162), helpstring("methods AddWorkflow")] HRESULT AddWorkflow(
+			[in] BSTR bstrName, [in] EWorkflowType eType, [out, retval] long* pnID);
+		// -----------------------------------------------------------------------------------------------
+		[id(163), helpstring("methods DeleteWorkflow")] HRESULT DeleteWorkflow(
+			[in] long nID);
+		// -----------------------------------------------------------------------------------------------
+		[id(164), helpstring("methods GetWorkflowDefinition")] HRESULT GetWorkflowDefinition(
+			[in] long nID, [out, retval] IWorkflowDefinition** ppWorkflowDefinition);
+		// -----------------------------------------------------------------------------------------------
+		[id(165), helpstring("methods SetWorkflowDefinition")] HRESULT SetWorkflowDefinition(
+			[in] IWorkflowDefinition* pWorkflowDefinition);
 	};
 
 	[
@@ -2624,5 +2678,12 @@ library UCLID_FILEPROCESSINGLib
 	coclass WorkItemRecord
 	{
 		[default] interface IWorkItemRecord;
+	};
+	[
+		uuid(AD638346-ADD9-453D-A9DB-6D620B3B17BD)
+	]
+	coclass WorkflowDefinition
+	{
+		[default] interface IWorkflowDefinition;
 	};
 };

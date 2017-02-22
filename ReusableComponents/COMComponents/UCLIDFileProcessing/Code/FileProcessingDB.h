@@ -81,6 +81,8 @@ static const string gstrFILE_TASK_SESSION="FileTaskSession";
 static const string gstrSECURE_COUNTER="SecureCounter";
 static const string gstrSECURE_COUNTER_VALUE_CHANGE="SecureCounterValueChange";
 static const string gstrPAGINATION="Pagination";
+static const string gstrWORKFLOW_TYPE = "WorkflowType";
+static const string gstrWORKFLOW = "Workflow";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -314,6 +316,10 @@ public:
 		EFilePriority ePriority, long* pnID);
 	STDMETHOD(AddPaginationHistory)(BSTR bstrOutputFile, IIUnknownVector* pSourcePageInfo,
 		long nFileTaskSessionID);
+	STDMETHOD(AddWorkflow)(BSTR bstrName, EWorkflowType eType, long* pnID);
+	STDMETHOD(DeleteWorkflow)(long nID);
+	STDMETHOD(GetWorkflowDefinition)(long nID, IWorkflowDefinition** ppWorkflowDefinition);
+	STDMETHOD(SetWorkflowDefinition)(IWorkflowDefinition* pWorkflowDefinition);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1252,6 +1258,10 @@ private:
 		EFilePriority ePriority, long* pnID);
 	bool AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrOutputFile, IIUnknownVector* pSourcePageInfo,
 		long nFileTaskSessionID);
+	bool AddWorkflow_Internal(bool bDBLocked, BSTR bstrName, EWorkflowType eType, long* pnID);
+	bool DeleteWorkflow_Internal(bool bDBLocked, long nID);
+	bool GetWorkflowDefinition_Internal(bool bDBLocked, long nID, IWorkflowDefinition** ppWorkflowDefinition);
+	bool SetWorkflowDefinition_Internal(bool bDBLocked, IWorkflowDefinition* pWorkflowDefinition);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

@@ -1,15 +1,16 @@
 ﻿using Extract.Licensing;
 using Extract.Utilities;
-using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using static System.FormattableString;
 
 namespace Extract.Database
 {
@@ -555,7 +556,7 @@ namespace Extract.Database
                     sortedColumnIndex = (dataGridView.SortedColumn == null)
                         ? -1
                         : dataGridView.SortedColumn.Index;
-                    sortOrder = (dataGridView.SortOrder == SortOrder.Descending)
+                    sortOrder = (dataGridView.SortOrder == System.Windows.Forms.SortOrder.Descending)
                         ? ListSortDirection.Descending
                         : ListSortDirection.Ascending;
                     columnWidths = dataGridView.Columns
@@ -617,6 +618,222 @@ namespace Extract.Database
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39338");
+            }
+        }
+
+        /// <summary>
+        /// Restores the specified <see paramref name="backupFileName"/> to the specified database
+        /// name on the local SQL instance.
+        /// </summary>
+        /// <param name="backupFileName">Name of the database backup file.</param>
+        /// <param name="databaseName">Name of the database to restore to.</param>
+        public static void RestoreDatabaseToLocalServer(string backupFileName, string databaseName)
+        {
+            try
+            {
+                using (var dbConnection = new SqlConnection(
+                        "Server=(local);Integrated Security=SSPI"))
+                {
+                    dbConnection.Open();
+
+                    string dataFolder = GetSqlFolder(dbConnection, dataFolder: true);
+                    string logFolder = GetSqlFolder(dbConnection, dataFolder: false);
+
+                    var parameters = new Dictionary<string, string>()
+                    {
+                        { "@BackupFile", backupFileName },
+                        { "@NewDatabaseName", databaseName },
+                        { "@DataFolder", dataFolder },
+                        { "@LogFolder", logFolder }
+                    };
+
+                    // This query is derived from: http://weblogs.sqlteam.com/dang/archive/2009/06/13.aspx
+                    string query = @"
+                        SET NOCOUNT ON;
+
+                        DECLARE @LogicalName nvarchar(128),
+                            @PhysicalName nvarchar(260),
+                            @PhysicalFolderName nvarchar(260),
+                            @PhysicalFileName nvarchar(260),
+                            @NewPhysicalName nvarchar(260),
+                            @NewLogicalName nvarchar(128),
+                            @RestoreStatement nvarchar(MAX),
+                            @FileType char(1),
+                            @ChangeLogicalNamesSql nvarchar(MAX),
+                            @Error int;
+
+                        DECLARE @FileList TABLE
+                        (
+                            LogicalName nvarchar(128) NOT NULL,
+                            PhysicalName nvarchar(260) NOT NULL,
+                            Type char(1) NOT NULL,
+                            FileGroupName nvarchar(120) NULL,
+                            Size numeric(20, 0) NOT NULL,
+                            MaxSize numeric(20, 0) NOT NULL,
+                            FileID bigint NULL,
+                            CreateLSN numeric(25, 0) NULL,
+                            DropLSN numeric(25, 0) NULL,
+                            UniqueID uniqueidentifier NULL,
+                            ReadOnlyLSN numeric(25, 0) NULL,
+                            ReadWriteLSN numeric(25, 0) NULL,
+                            BackupSizeInBytes bigint NULL,
+                            SourceBlockSize int NULL,
+                            FileGroupID int NULL,
+                            LogGroupGUID uniqueidentifier NULL,
+                            DifferentialBaseLSN numeric(25, 0)NULL,
+                            DifferentialBaseGUID uniqueidentifier NULL,
+                            IsReadOnly bit NULL,
+                            IsPresent bit NULL,
+                            TDEThumbprint varbinary(32) NULL
+                        );
+
+                        SET @Error = 0;
+
+                        --add trailing backslash to folder names if not already specified
+                        IF LEFT(REVERSE(@DataFolder), 1) <> '\' SET @DataFolder = @DataFolder + '\';
+                        IF LEFT(REVERSE(@LogFolder), 1) <> '\' SET @LogFolder = @LogFolder + '\';
+
+                        -- get info about the database files
+                        SET @RestoreStatement = N'RESTORE FILELISTONLY FROM DISK = ''' + @BackupFile + ''''
+                        INSERT INTO @FileList
+                            EXEC(@RestoreStatement);
+                                SET @Error = @@ERROR;
+                                IF @Error <> 0 GOTO Done;
+                                IF NOT EXISTS(SELECT * FROM @FileList) GOTO Done;
+
+                        --generate RESTORE DATABASE statement and ALTER DATABASE statements
+                        SET @ChangeLogicalNamesSql = '';
+                        SET @RestoreStatement = N'RESTORE DATABASE ' + QUOTENAME(@NewDatabaseName) + N' FROM DISK=''' + @BackupFile + ''' WITH FILE=1'
+                        DECLARE FileList CURSOR LOCAL STATIC READ_ONLY FOR
+                            SELECT
+                                Type AS FileType,
+                                LogicalName,
+                                --extract folder name from full path
+                                LEFT(PhysicalName,
+                                    LEN(LTRIM(RTRIM(PhysicalName))) -
+                                    CHARINDEX('\',
+                                    REVERSE(LTRIM(RTRIM(PhysicalName)))) + 1)
+                                    AS PhysicalFolderName,
+                                --extract file name from full path
+                                LTRIM(RTRIM(RIGHT(PhysicalName,
+                                    CHARINDEX('\',
+                                    REVERSE(PhysicalName)) - 1))) AS PhysicalFileName
+                        FROM @FileList;
+                        OPEN FileList;
+
+                        WHILE 1 = 1
+                        BEGIN
+                            FETCH NEXT FROM FileList INTO
+                                @FileType, @LogicalName, @PhysicalFolderName, @PhysicalFileName;
+                            IF @@FETCH_STATUS = -1 BREAK;
+
+                            SET @NewPhysicalName =
+                            CASE @FileType
+                                WHEN 'D' THEN
+                                    COALESCE(@DataFolder, @PhysicalFolderName) + '\' + @NewDatabaseName + '.mdf'
+                                WHEN 'L' THEN
+                                    COALESCE(@LogFolder, @PhysicalFolderName) + '\' + @NewDatabaseName + '_log.ldf'
+                            END;
+
+                            SET @NewLogicalName =
+                            CASE @FileType
+                                WHEN 'D' THEN @NewDatabaseName
+                                WHEN 'L' THEN @NewDatabaseName + '_log'
+                            END;
+
+                            IF @NewLogicalName <> @LogicalName
+                                SET @ChangeLogicalNamesSql = @ChangeLogicalNamesSql + N'ALTER DATABASE ' + QUOTENAME(@NewDatabaseName) + N'
+                                    MODIFY FILE (NAME = ''' + @LogicalName + N''', NEWNAME = ''' + @NewLogicalName + N'''); '
+
+                            -- add MOVE option as needed if folder and / or file names are changed
+                            IF @PhysicalFolderName +@PhysicalFileName <> @NewPhysicalName
+                            BEGIN
+                                SET @RestoreStatement = @RestoreStatement +
+                                      N',
+                                      MOVE ''' +
+                                      @LogicalName +
+                                      N''' TO ''' +
+                                      @NewPhysicalName +
+                                      N'''';
+                            END;
+                        END;
+
+                        CLOSE FileList;
+                        DEALLOCATE FileList;
+
+                        EXEC(@RestoreStatement);
+                        SET @Error = @@ERROR;
+                        IF @Error <> 0 GOTO Done;
+
+                        EXEC(@ChangeLogicalNamesSql);
+
+                        Done:";
+
+                    ExecuteDBQuery(dbConnection, query, parameters);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41906");
+            }
+        }
+
+        /// <summary>
+        /// Gets the default data or log folder for the specified SQL server connection.
+        /// </summary>
+        /// <param name="sqlConnection">The <see cref="DbConnection"/> for which the data or log
+        /// folder is needed.</param>
+        /// <param name="dataFolder"><c>true</c> to get the data folder; <c>false</c> to get the
+        /// log folder.</param>
+        /// <returns>The data or log folder.</returns>
+        public static string GetSqlFolder(DbConnection sqlConnection, bool dataFolder)
+        {
+            try
+            {
+                // This query is derived from: http://stackoverflow.com/a/12756990
+                string query = @"
+                    DECLARE @Default NVARCHAR(512)
+                    DECLARE @Master NVARCHAR(512)
+                    EXEC master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE',
+                        N'Software\Microsoft\MSSQLServer\MSSQLServer', "
+                        + Invariant($"{(dataFolder ? "N'DefaultData', " : "N'DefaultLog', ")}")
+                            + @" @Default OUTPUT
+                    EXEC master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE',
+                        N'Software\Microsoft\MSSQLServer\MSSQLServer\Parameters', "
+                        + Invariant($"{(dataFolder ? "N'SqlArg0', " : "N'SqlArg2', ")}")
+                            + @" @Master OUTPUT
+                    SELECT @Master = SUBSTRING(@Master, 3, 255)
+                    SELECT @Master = SUBSTRING(@Master, 1, LEN(@Master) - CHARINDEX('\', REVERSE(@Master)))
+                    SELECT ISNULL(@Default, @Master)";
+
+                return GetQueryResultsAsStringArray(sqlConnection, query)[0];
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41905");
+            }
+        }
+
+
+        /// <summary>
+        /// Drops the specified <see paramref="databaseName"/> from the local SQL instance.
+        /// </summary>
+        /// <param name="databaseName">Name of the database.</param>
+        public static void DropLocalDB(string databaseName)
+        {
+            try
+            {
+                using (var dbConnection = new SqlConnection(
+                        "Server=(local);Integrated Security=SSPI"))
+                {
+                    dbConnection.Open();
+
+                    ExecuteDBQuery(dbConnection, Invariant($"DROP DATABASE [{databaseName}]"));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41907");
             }
         }
 

@@ -1179,6 +1179,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 		// Retain the user tables if necessary
 		if (bRetainUserTables)
 		{
+			eraseFromVector(vecTables, gstrACTION);
 			eraseFromVector(vecTables, gstrDB_INFO);
 			eraseFromVector(vecTables, gstrFAM_TAG);
 			eraseFromVector(vecTables, gstrUSER_CREATED_COUNTER);
@@ -1187,6 +1188,8 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrDB_FILE_HANDLER);
 			eraseFromVector(vecTables, gstrDB_FEATURE);
 			eraseFromVector(vecTables, gstrMETADATA_FIELD);
+			eraseFromVector(vecTables, gstrWORKFLOW_TYPE);
+			eraseFromVector(vecTables, gstrWORKFLOW);
 		}
 
 		// Never drop these tables
@@ -1340,6 +1343,15 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_PAGINATION_ORIGINALFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_PAGINATION_FILETASKSESSION_FK);
 
+		if (bAddUserTables)
+		{
+			vecQueries.push_back(gstrADD_WORKFLOW_WORKFLOWTYPE_FK);
+			vecQueries.push_back(gstrADD_WORKFLOW_STARTACTION_FK);
+			vecQueries.push_back(gstrADD_WORKFLOW_ENDACTION_FK);
+			vecQueries.push_back(gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK);
+			// Foreign key for OutputAttributeSetID is added in AttributeDBMgr
+		}
+
 		// Don't create the FK between the Secure counter tables unless at least one
 		// of the SercureCounter tables had to be created
 		if (bAddSecureCounterTablesFK)
@@ -1440,6 +1452,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	// Add the user tables if necessary
 	if (bIncludeUserTables)
 	{
+		vecQueries.push_back(gstrCREATE_ACTION_TABLE);
 		vecQueries.push_back(gstrCREATE_DB_INFO_TABLE);
 		vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE);
 		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_TABLE);
@@ -1449,10 +1462,11 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_METADATA_FIELD_TABLE);
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER);
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
+		vecQueries.push_back(gstrCREATE_WORKFLOW_TYPE);
+		vecQueries.push_back(gstrCREATE_WORKFLOW);
 	}
 
 	// Add queries to create tables to the vector
-	vecQueries.push_back(gstrCREATE_ACTION_TABLE);
 	vecQueries.push_back(gstrCREATE_LOCK_TABLE);
 	vecQueries.push_back(gstrCREATE_ACTION_STATE_TABLE);
 	vecQueries.push_back(gstrCREATE_FAM_FILE_TABLE);
@@ -1556,6 +1570,18 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 			vector<string> vecFeatureDefinitionQueries = getFeatureDefinitionQueries();
 			vecQueries.insert(vecQueries.end(),
 				vecFeatureDefinitionQueries.begin(), vecFeatureDefinitionQueries.end());
+
+			vecQueries.push_back("INSERT INTO [WorkflowType] ([Code], [Meaning]) "
+				"VALUES('U', 'Undefined')");
+
+			vecQueries.push_back("INSERT INTO [WorkflowType] ([Code], [Meaning]) "
+				"VALUES('R', 'Redaction')");
+
+			vecQueries.push_back("INSERT INTO [WorkflowType] ([Code], [Meaning]) "
+				"VALUES('E', 'Extraction')");
+
+			vecQueries.push_back("INSERT INTO [WorkflowType] ([Code], [Meaning]) "
+				"VALUES('C', 'Classification')");
 		}
 
 		// Execute all of the queries
@@ -2864,6 +2890,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrSECURE_COUNTER);
 	vecTables.push_back(gstrSECURE_COUNTER_VALUE_CHANGE);
 	vecTables.push_back(gstrPAGINATION);
+	vecTables.push_back(gstrWORKFLOW_TYPE);
+	vecTables.push_back(gstrWORKFLOW);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -3622,27 +3650,6 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
-			// Get a list of the action names to preserve
-			vector<string> vecActionNames;
-			if (retainUserValues)
-			{
-				// Read all actions from the DB
-				IStrToStrMapPtr ipMapActions = getActions(ipConnection);
-				ASSERT_RESOURCE_ALLOCATION("ELI25184", ipMapActions != __nullptr);
-				IVariantVectorPtr ipActions = ipMapActions->GetKeys();
-				ASSERT_RESOURCE_ALLOCATION("ELI25185", ipActions != __nullptr);
-
-				// Iterate over the actions
-				long lSize = ipActions->Size;
-				vecActionNames.reserve(lSize);
-				for (int i = 0; i < lSize; i++)
-				{
-					// Get each action name and add it to the vector
-					_variant_t action = ipActions->Item[i];
-					vecActionNames.push_back( asString(action.bstrVal) );
-				}
-			}
-
 			string strAdminPW;
 
 			// Only get the admin password if we are not retaining user values and the
@@ -3668,12 +3675,6 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 
 			// Setup the tables that require initial values
 			initializeTableValues(!retainUserValues);
-
-			// Add any retained actions
-			for (unsigned int i = 0; i < vecActionNames.size(); i++)
-			{
-				defineNewAction(getDBConnection(), vecActionNames[i]);
-			}
 
 			// Add the admin user back with admin PW
 			if (!strAdminPW.empty())

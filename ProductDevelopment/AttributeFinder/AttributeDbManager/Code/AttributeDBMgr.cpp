@@ -37,7 +37,7 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 2;
+	const long glSCHEMA_VERSION = 3;
 	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
@@ -148,9 +148,22 @@ namespace
 		return queries;
 	}
 
+	VectorOfString GetSchema_v3(bool bAddUserTables)
+	{
+		VectorOfString queries = GetSchema_v2(bAddUserTables);
+
+		// Add FK_Workflow_OutputAttributeSet constraint that can't be added from IFileProcessingDB.
+		if (bAddUserTables)
+		{
+			queries.push_back(gstrADD_WORKFLOW_OUTPUTATTRIBUTESET_FK);
+		}
+
+		return queries;
+	}
+
 	VectorOfString GetCurrentSchema( bool bAddUserTables = true )
 	{
-		return GetSchema_v2( bAddUserTables );
+		return GetSchema_v3( bAddUserTables );
 	}
 
 
@@ -177,7 +190,7 @@ namespace
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38511");
 	}
-
+	//-------------------------------------------------------------------------------------------------
 	int UpdateToSchemaVersion2( _ConnectionPtr ipConnection, long* pnNumSteps )
 	{
 		try
@@ -199,10 +212,29 @@ namespace
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38888");
 	}
+	//-------------------------------------------------------------------------------------------------
+	int UpdateToSchemaVersion3(_ConnectionPtr ipConnection, long* pnNumSteps)
+	{
+		try
+		{
+			const int nNewSchemaVersion = 3;
 
-}		// end of anonymous namespace
-//-------------------------------------------------------------------------------------------------
+			if (pnNumSteps != __nullptr)
+			{
+				*pnNumSteps += 1;
+				return nNewSchemaVersion;
+			}
 
+			vector<string> queries;
+			queries.push_back(gstrADD_WORKFLOW_OUTPUTATTRIBUTESET_FK);
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
+			executeVectorOfSQL(ipConnection, queries);
+
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41922");
+	}
+}
 
 //-------------------------------------------------------------------------------------------------
 // CAttributeDBMgr
@@ -403,7 +435,7 @@ STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( IFileProcessingDB
 		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
 
 		VectorOfString tableNames = GetCurrentTableNames( asCppBool(bRetainUserTables) );
-		dropTablesInVector( ipDBConnection, tableNames );
+		dropTablesInVector(ipDBConnection, tableNames);
 
 		return S_OK;
 	}
@@ -536,6 +568,14 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				break;
 
 			case 2:
+				// Separated FAM workflows introduced
+				if (nFAMDBSchemaVersion == 143)
+				{
+					*pnProdSchemaVersion = UpdateToSchemaVersion3(ipConnection, pnNumSteps);
+				}
+				break;
+
+			case 3:
 				break;
 
 			default:

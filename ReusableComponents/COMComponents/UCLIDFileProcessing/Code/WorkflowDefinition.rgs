@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFileProcessing.WorkflowDefinition.1 = s 'WorkflowDefinition Class'
+	{
+		CLSID = s '{AD638346-ADD9-453D-A9DB-6D620B3B17BD}'
+	}
+	UCLIDFileProcessing.WorkflowDefinition = s 'WorkflowDefinition Class'
+	{
+		CLSID = s '{AD638346-ADD9-453D-A9DB-6D620B3B17BD}'
+		CurVer = s 'UCLIDFileProcessing.WorkflowDefinition.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {AD638346-ADD9-453D-A9DB-6D620B3B17BD} = s 'WorkflowDefinition Class'
+		{
+			ProgID = s 'UCLIDFileProcessing.WorkflowDefinition.1'
+			VersionIndependentProgID = s 'UCLIDFileProcessing.WorkflowDefinition'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{5FBC9199-D162-4F14-BAD9-090F6AB576C5}'
+		}
+	}
+}
