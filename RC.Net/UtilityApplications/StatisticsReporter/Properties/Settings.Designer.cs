@@ -204,24 +204,24 @@ namespace StatisticsReporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool SimpleOutput {
-            get {
-                return ((bool)(this["SimpleOutput"]));
-            }
-            set {
-                this["SimpleOutput"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.Collections.Specialized.StringCollection Tagged {
             get {
                 return ((global::System.Collections.Specialized.StringCollection)(this["Tagged"]));
             }
             set {
                 this["Tagged"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Extract Statistics Report")]
+        public string Header1 {
+            get {
+                return ((string)(this["Header1"]));
+            }
+            set {
+                this["Header1"] = value;
             }
         }
     }

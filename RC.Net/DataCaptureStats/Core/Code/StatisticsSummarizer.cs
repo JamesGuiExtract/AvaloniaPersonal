@@ -103,10 +103,8 @@ namespace Extract.DataCaptureStats
         /// Generates an HTML report from a group of summarized accuracy details.
         /// </summary>
         /// <param name="group">The <see cref="GroupStatistics"/> data to be used to build the report.</param>
-        /// <param name="simpleOutput">if set to <c>true</c> then the only accuracy number that will be output is
-        /// the f1-score.</param>
         /// <returns>A string containing an html document representation of the data</returns>
-        public static string AccuracyDetailsToHtml(this GroupStatistics group, bool simpleOutput = false)
+        public static string AccuracyDetailsToHtml(this GroupStatistics group)
         {
             try
             {
@@ -115,7 +113,7 @@ namespace Extract.DataCaptureStats
                     .Distinct()
                     .OrderBy(p => p)
                     .ToList();
-                var attributeColumns = ExpandedAccuracy.GetFormattedFields(simpleOutput)
+                var attributeColumns = ExpandedAccuracy.GetFormattedFields()
                     .Select(kv => kv.Key).ToArray();
                 var summaryLookup = group.AccuracyDetails.ToLookup(a => new { a.Path, a.Label });
 
@@ -134,7 +132,7 @@ namespace Extract.DataCaptureStats
                         writer.WriteLine(name + ": " + value);
                         if (++i < group.GroupByNames.Length)
                         {
-                            writer.RenderBeginTag(HtmlTextWriterTag.Br);
+                            writer.WriteFullBeginTag("br");
                         }
                     }
                     writer.RenderEndTag();
@@ -184,7 +182,7 @@ namespace Extract.DataCaptureStats
 
                         // Write column data for this path
                         IEnumerable<KeyValuePair<string, Func<ExpandedAccuracy, string>>>
-                            attributeColumnValues = ExpandedAccuracy.GetFormattedFields(simpleOutput);
+                            attributeColumnValues = ExpandedAccuracy.GetFormattedFields();
                         foreach (var col in attributeColumnValues)
                         {
                             writer.RenderBeginTag(HtmlTextWriterTag.Td);
@@ -208,11 +206,8 @@ namespace Extract.DataCaptureStats
         /// Generates a CSV report from summarized accuracy details.
         /// </summary>
         /// <param name="group">The <see cref="GroupStatistics"/> data to be used to build the report.</param>
-        /// <param name="simpleOutput">if set to <c>true</c> then the only accuracy number that will be output is
-        /// the f1-score.</param>
         /// <returns>A string containing an html document representation of the data</returns>
-        public static string AccuracyDetailsToCsv(this IEnumerable<GroupStatistics> statisticGroups,
-            bool simpleOutput = false)
+        public static string AccuracyDetailsToCsv(this IEnumerable<GroupStatistics> statisticGroups)
         {
             try
             {
@@ -227,17 +222,17 @@ namespace Extract.DataCaptureStats
                     .Distinct()
                     .OrderBy(p => p)
                     .ToList();
-                var attributeColumns = ExpandedAccuracy.GetFormattedFields(simpleOutput)
+                var attributeColumns = ExpandedAccuracy.GetFormattedFields()
                     .Select(kv => kv.Key).ToArray();
 
                 var headerRow = 
+                    // Each group-by field
+                    groupByFieldNames
                     // File Count
-                    Enumerable.Repeat("File count", 1)
+                    .Concat(Enumerable.Repeat("File count", 1))
                     // Each path x each accuracy field
                     .Concat(attributePaths.SelectMany(path => attributeColumns.Select(column =>
                         path + "." + column)))
-                    // Each group-by field
-                    .Concat(groupByFieldNames)
                     .ToArray();
 
                 var statisticsToReportList = statisticGroups.ToList();
@@ -252,34 +247,34 @@ namespace Extract.DataCaptureStats
                     // Increment an offset value for each column written
                     int offset = 0;
 
+                    // Write the group-by columns
+                    foreach (var groupBy in group.GroupByValues)
+                    {
+                        row[offset++] = groupBy;
+                    }
+
                     // File count column
                     row[offset++] = string.Format(CultureInfo, "{0:N0}", group.FileCount);
 
                     // Attribute columns
                     foreach (var p in attributePaths)
                     {
-                        double expected = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Expected }]
+                        int expected = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Expected }]
                             .Sum(a => a.Value);
-                        double correct = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Correct }]
+                        int correct = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Correct }]
                             .Sum(a => a.Value);
-                        double incorrect = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Incorrect }]
+                        int incorrect = summaryLookup[new { Path = p, Label = AccuracyDetailLabel.Incorrect }]
                             .Sum(a => a.Value);
 
                         var accuracy = new ExpandedAccuracy(expected, correct, incorrect);
 
                         // Write column data for this path
                         IEnumerable<KeyValuePair<string, Func<ExpandedAccuracy, string>>>
-                            attributeColumnValues = ExpandedAccuracy.GetFormattedFields(simpleOutput);
+                            attributeColumnValues = ExpandedAccuracy.GetFormattedFields();
                         foreach (var col in attributeColumnValues)
                         {
                             row[offset++] = col.Value(accuracy);
                         }
-                    }
-
-                    // Write the group-by columns
-                    foreach (var groupBy in group.GroupByValues)
-                    {
-                        row[offset++] = groupBy;
                     }
                 }
 
@@ -451,43 +446,55 @@ namespace Extract.DataCaptureStats
             /// </summary>
             static KeyValuePair<string, Func<ExpandedAccuracy, string>>[] _allFields = {
                 new KeyValuePair<string, Func<ExpandedAccuracy, string>>
-                    ("F1-Score", a => string.Format(CultureInfo, "{0:N4}", a.F1Score)),
-
-                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
                     ("Expected", a => string.Format(CultureInfo, "{0:N0}", a.Expected)),
 
                 new KeyValuePair<string, Func<ExpandedAccuracy, string>>
                     ("Correct", a => string.Format(CultureInfo, "{0:N0}", a.Correct)),
 
                 new KeyValuePair<string, Func<ExpandedAccuracy, string>>
-                    ("% Correct (Recall)", a => string.Format(CultureInfo, "{0:P2}", a.Recall)),
+                    ("Missing", a => string.Format(CultureInfo, "{0:N0}", a.Missing)),
 
                 new KeyValuePair<string, Func<ExpandedAccuracy, string>>
                     ("Incorrect", a => string.Format(CultureInfo, "{0:N0}", a.Incorrect)),
 
                 new KeyValuePair<string, Func<ExpandedAccuracy, string>>
+                    ("% Correct (Recall)", a => string.Format(CultureInfo, "{0:P2}", a.Recall)),
+
+                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
                     ("Precision", a => string.Format(CultureInfo, "{0:P2}", a.Precision)),
 
                 new KeyValuePair<string, Func<ExpandedAccuracy, string>>
-                    ("ROCE", a => string.Format(CultureInfo, "{0:N0}", a.ROCE)) };
+                    ("F1-Score", a => string.Format(CultureInfo, "{0:N4}", a.F1Score)),
+
+                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
+                    ("ROCE (C/I)", a => string.Format(CultureInfo, "{0:N2}", a.ROCE)),
+
+                new KeyValuePair<string, Func<ExpandedAccuracy, string>>
+                    ("EiF1 [2E/(1+EF)]", a => string.Format(CultureInfo, "{0:N2}", a.ExpectedInverseF1Score)),
+            };
 
             /// <summary>
             /// True positives + false negatives
             /// </summary>
-            public double Expected { get; }
+            public int Expected { get; }
 
             /// <summary>
             /// True positives
             /// </summary>
-            public double Correct { get; }
+            public int Correct { get; }
+
+            /// <summary>
+            /// False negatives
+            /// </summary>
+            public int Missing { get; }
 
             /// <summary>
             /// False positives
             /// </summary>
-            public double Incorrect { get; }
+            public int Incorrect { get; }
 
             /// <summary>
-            /// Correct / (Incorrect + Correct);
+            /// Correct / (Incorrect + Correct)
             /// </summary>
             public double Precision { get; }
 
@@ -504,46 +511,54 @@ namespace Extract.DataCaptureStats
             /// <summary>
             /// Correct / Incorrect
             /// </summary>
-            public object ROCE { get; }
+            public double ROCE { get; }
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="ExpandedAccuracy"/> class.
+            /// Harmonic mean of 1/F1Score and Expected
+            /// </summary>
+            public double ExpectedInverseF1Score { get; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ExpandedAccuracy" /> class.
             /// </summary>
             /// <param name="expected">The number of expected attributes (true positives + false negatives)</param>
             /// <param name="correct">The number of correctly found attributes (true positives)</param>
             /// <param name="incorrect">The number of incorrectly found attributes (false positives)</param>
-            public ExpandedAccuracy(double expected, double correct, double incorrect)
+            public ExpandedAccuracy(int expected, int correct, int incorrect)
             {
                 Expected = expected;
                 Correct = correct;
                 Incorrect = incorrect;
                 ROCE = incorrect == 0
                     ? double.NaN
-                    : correct / incorrect;
+                    : (double) correct / incorrect;
 
                 Precision = incorrect + correct == 0
                     ? 1
-                    : correct / (incorrect + correct);
+                    : (double) correct / (incorrect + correct);
 
                 Recall = expected + incorrect == 0
                     ? 1
                     : expected == 0
                         ? double.NaN
-                        : correct / expected;
+                        : (double) correct / expected;
 
-                F1Score = 2 * Precision * Recall / (Precision + Recall);
+                F1Score = Precision + Recall == 0
+                    ? 0
+                    : 2 * Precision * Recall / (Precision + Recall);
+
+                Missing = expected - correct;
+
+                ExpectedInverseF1Score = 2 * Expected / (1 + F1Score * Expected);
             }
 
             /// <summary>
             /// Gets an enumeration of accuracy field names and string-value-generating functions
             /// </summary>
-            /// <param name="simpleOutput">if set to <c>true</c> then only the F1-Score will be present in the collection.</param>
             /// <returns>The enumeration of names to functions</returns>
-            public static IEnumerable<KeyValuePair<string, Func<ExpandedAccuracy, string>>> GetFormattedFields(bool simpleOutput)
+            public static IEnumerable<KeyValuePair<string, Func<ExpandedAccuracy, string>>> GetFormattedFields()
             {
-                return simpleOutput
-                    ? _allFields.Take(1).ToArray()
-                    : _allFields;
+                return _allFields;
             }
         }
     }

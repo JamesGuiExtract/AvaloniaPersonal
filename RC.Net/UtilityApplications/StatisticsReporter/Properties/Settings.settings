@@ -47,11 +47,11 @@
     <Setting Name="CSS" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="SimpleOutput" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="Tagged" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Header1" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Extract Statistics Report</Value>
     </Setting>
   </Settings>
 </SettingsFile>

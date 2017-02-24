@@ -50,12 +50,17 @@ namespace StatisticsReporter
     /// <summary>
     /// Group by fields that are resolved by querying the expected or found VOA file
     /// </summary>
-    public class GroupByFoundXPath
+    public class GroupByXPath
     {
         /// <summary>
         /// Gets or sets the Xpath value.
         /// </summary>
         public string XPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the friendly name to be displayed in reports.
+        /// </summary>
+        public string Label { get; set; }
 
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
@@ -65,28 +70,19 @@ namespace StatisticsReporter
         /// </returns>
         public override string ToString()
         {
-            return "Found: " + XPath ?? "";
+            return string.IsNullOrWhiteSpace(Label) ? XPath : Label;
         }
     }
 
     /// <summary>
-    /// Group by fields that are resolved by querying the expected or found VOA file
+    /// Group by fields that are resolved by querying the expected VOA file
     /// </summary>
-    public class GroupByExpectedXPath
-    {
-        /// <summary>
-        /// Gets or sets the Xpath value.
-        /// </summary>
-        public string XPath { get; set; }
+    public class GroupByExpectedXPath : GroupByXPath { }
 
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        public override string ToString()
-        {
-            return "Expected: " + XPath ?? "";
-        }
-    }
+    /// <summary>
+    /// Group by fields that are resolved by querying the found VOA file
+    /// </summary>
+    public class GroupByFoundXPath : GroupByXPath { }
 
     /// <summary>
     /// Settings used by the per file action
@@ -510,7 +506,11 @@ namespace StatisticsReporter
                 }
 
                 // Group the results by the group-by value array and create GroupStatistics objects
-                string[] groupByNames = Settings.GroupByCriteria.Select(c => c.ToString()).ToArray();
+                string[] groupByNames = Settings.GroupByCriteria
+                    .Select(c => c.Match(e => e.ToReadableValue(),
+                        xpath => xpath.ToString(),
+                        xpath => xpath.ToString()))
+                    .ToArray();
                 return Results
                     .GroupBy(t => t.Item1, new GroupByComparer())
                     .Select(group =>

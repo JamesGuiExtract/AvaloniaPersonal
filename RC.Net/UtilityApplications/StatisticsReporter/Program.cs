@@ -27,6 +27,13 @@ namespace StatisticsReporter
         /// by adding rules to the config file)
         /// </summary>
         private const string _DEFAULT_STYLE = @"
+            heading summary { background: #f2f2f2; }
+                    H1 { font-size: 1.5em; }
+                    H3
+                    {
+                      font-size: 1em;
+                      font-weight: normal;
+                    }
             thead { background: DarkSeaGreen; }
             tfoot { border-top: 2px solid gray; }
             tr:nth-child(even) { background: #f2f2f2; }
@@ -36,6 +43,8 @@ namespace StatisticsReporter
             {
               border-spacing: 10px;
               border-collapse: collapse;
+              margin-top: 20px;
+              margin-bottom: 20px;
             }
             table.DataCaptureStats th { text-align: left; }
             table.DataCaptureStats td { text-align: right; }
@@ -83,7 +92,7 @@ namespace StatisticsReporter
                 try
                 {
                     dcSettings.Tagged = ReportSettings.Settings.Tagged
-                        .Cast<string>()
+                        ?.Cast<string>()
                         .Select(s =>
                         {
                             // This equals requirements of CFileProcessingDB::validateTagName()
@@ -91,7 +100,8 @@ namespace StatisticsReporter
                                 Regex.IsMatch(s, @"\A\w[\w\s]{0,99}\z"));
 
                             return s;
-                        }).ToList();
+                        }).ToList()
+                        ?? Enumerable.Empty<string>();
                 }
                 catch (Exception ex)
                 {
@@ -102,32 +112,57 @@ namespace StatisticsReporter
                 try
                 {
                     dcSettings.GroupByCriteria = ReportSettings.Settings.GroupByCriteria
-                        .Cast<string>()
+                        ?.Cast<string>()
                         .Select(s =>
                         {
-                            if (s.StartsWith("FoundXPath:", StringComparison.OrdinalIgnoreCase)
-                                && UtilityMethods.IsValidXPathExpression(s.Substring(11), throwException: true))
+                            using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser
+                                (new StringReader(s)) { Delimiters = new[] { "," } })
                             {
-                                return new GroupByCriterion(new GroupByFoundXPath { XPath = s.Substring(11) });
-                            }
+                                string[] tokens = csvReader.ReadFields();
+                                ExtractException.Assert("ELI41904", "At least two tokens are required (Label, GroupByCriterion)",
+                                    tokens.Length > 1);
 
-                            if (s.StartsWith("ExpectedXPath:", StringComparison.OrdinalIgnoreCase)
-                                && UtilityMethods.IsValidXPathExpression(s.Substring(14), throwException: true))
-                            {
-                                return new GroupByCriterion(new GroupByExpectedXPath { XPath = s.Substring(14) });
-                            }
+                                string label = tokens[0];
+                                string criterion = tokens[1];
+                                string additionalInfo = tokens.Length > 2 ? tokens[2] : null;
+                                if (additionalInfo != null
+                                    && criterion.Equals("ExpectedXPath", StringComparison.OrdinalIgnoreCase)
+                                    && UtilityMethods.IsValidXPathExpression(additionalInfo, throwException: true))
+                                {
+                                    return new GroupByCriterion(new GroupByExpectedXPath
+                                    {
+                                        Label = label,
+                                        XPath = additionalInfo
+                                    });
+                                }
+                                if (additionalInfo != null
+                                    && criterion.Equals("FoundXPath", StringComparison.OrdinalIgnoreCase)
+                                    && UtilityMethods.IsValidXPathExpression(additionalInfo, throwException: true))
+                                {
+                                    return new GroupByCriterion(new GroupByFoundXPath
+                                    {
+                                        Label = label,
+                                        XPath = additionalInfo
+                                    });
+                                }
 
-                            GroupByDBField e = GroupByDBField.None;
-                            if (!Enum.TryParse<GroupByDBField>(s, out e) | e == GroupByDBField.None)
-                            {
-                                var ee = new ExtractException("ELI41842", "Unknown group-by criterion");
-                                ee.AddDebugData("Group by criterion", s, false);
-                                throw ee;
+                                GroupByDBField e = GroupByDBField.None;
+                                if (!Enum.TryParse<GroupByDBField>(criterion, out e) | e == GroupByDBField.None)
+                                {
+                                    var ee = new ExtractException("ELI41842", "Unknown group-by criterion");
+                                    ee.AddDebugData("Group by criterion", criterion, false);
+                                    throw ee;
+                                }
+                                if (string.IsNullOrWhiteSpace(label))
+                                {
+                                    label = e.ToString();
+                                }
+                                e.SetReadableValue(label);
+                                return new GroupByCriterion(e);
                             }
-
-                            return new GroupByCriterion(e);
                         })
-                        .ToList();
+                        .ToList()
+                        ?? Enumerable.Empty<GroupByCriterion>();
                 }
                 catch (Exception ex)
                 {
@@ -169,24 +204,25 @@ namespace StatisticsReporter
                 // Aggregate/summarize the results
                 foreach (var group in Results)
                 {
-                    var aggregated = group.AccuracyDetails.AggregateStatistics();
-                    var summarized = aggregated.SummarizeStatistics(ReportSettings.Settings.ErrorIfContainerOnlyConflict);
-                    group.AccuracyDetails = summarized;
+                    group.AccuracyDetails =
+                        group.AccuracyDetails.AggregateStatistics()
+                        .SummarizeStatistics(ReportSettings.Settings.ErrorIfContainerOnlyConflict);
                 }
 
                 if (ReportSettings.Settings.ReportOutputFileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
                 {
-                    var statsData = Results.AccuracyDetailsToCsv(ReportSettings.Settings.SimpleOutput);
+                    var statsData = Results.AccuracyDetailsToCsv();
 
                     // Save the data to the configured output file
                     File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, statsData);
                 }
                 else
                 {
-                    var statsData = Results.Select(group => group.AccuracyDetailsToHtml(ReportSettings.Settings.SimpleOutput));
+                    var statsData = Results.Select(group => group.AccuracyDetailsToHtml());
+                    var groupByFieldLabels = Results.FirstOrDefault()?.GroupByNames ?? new string [0];
 
                     // Get the Html page to save
-                    string HtmlOutputPage = CreateHtmlPage(statsData, ReportSettings, range);
+                    string HtmlOutputPage = CreateHtmlPage(statsData, ReportSettings, range, groupByFieldLabels);
 
                     // Save the data to the configured output file
                     File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, HtmlOutputPage);
@@ -204,7 +240,7 @@ namespace StatisticsReporter
                 {
                     if (ReportSettings != null && range != null)
                     {
-                        string HtmlOutput = CreateHtmlPage(Enumerable.Empty<string>(), ReportSettings, range);
+                        string HtmlOutput = CreateHtmlPage(Enumerable.Empty<string>(), ReportSettings, range, new string[0]);
                         // Save the data to the configured output file
 
                         File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, HtmlOutput);
@@ -291,6 +327,90 @@ namespace StatisticsReporter
         /// <param name="range">The Tuple that contains the start and end DateTime for the report</param>
         /// <returns>String that is HTML formated page with the <paramref name="statsData"/> string and other page formatting</returns>
         static string CreateHtmlPage(IEnumerable<string> statsData, ConfigSettings<Settings> reportSettings,
+            Tuple<DateTime, DateTime> range, string[] groupByFieldLabels)
+        {
+            var baseWriter = new StringWriter(CultureInfo.InvariantCulture);
+            using (var writer = new HtmlTextWriter(baseWriter))
+            {
+                writer.RenderBeginTag(HtmlTextWriterTag.Html);
+
+                // Header for the Html
+                writer.RenderBeginTag(HtmlTextWriterTag.Head);
+                writer.AddAttribute(HtmlTextWriterAttribute.Type, "text/css");
+                writer.RenderBeginTag(HtmlTextWriterTag.Style);
+                // Default CSS
+                writer.WriteLine(_DEFAULT_STYLE);
+                // Optional, config-specified CSS
+                writer.Write(reportSettings.Settings.CSS);
+                writer.RenderEndTag();
+                writer.RenderEndTag();
+
+                // Write header
+                WriteHeading(writer, reportSettings, range, groupByFieldLabels);
+
+                // Write statistics tables
+                writer.WriteFullBeginTag("section class=\"Statistics\"");
+                var tables = statsData.ToList();
+                for (int i = 0; i < tables.Count; i++)
+                {
+                    writer.Write(tables[i]);
+
+                    // Add a line between the tables over the entire width of the pages
+                    if (i + 1 < tables.Count)
+                    {
+                        writer.AddAttribute(HtmlTextWriterAttribute.Class, "StatsTableSeparator");
+                        writer.AddAttribute(HtmlTextWriterAttribute.Width, "100%");
+                        writer.RenderBeginTag(HtmlTextWriterTag.Hr);
+                        writer.RenderEndTag(); // Hr
+                    }
+                }
+                writer.WriteEndTag("section");
+
+                writer.RenderEndTag(); // Html
+                return baseWriter.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Writes the heading section, including settings.
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="settings">The settings.</param>
+        /// <param name="range">The range.</param>
+        private static void WriteHeading(HtmlTextWriter writer, ConfigSettings<Settings> settings,
+            Tuple<DateTime, DateTime> range, string[] groupByFieldLabels)
+        {
+            var dateRange = string.Format(CultureInfo.CurrentCulture,
+                "Date range: {0:MM/dd/yyyy hh:mm:ss tt}\x2013{1:MM/dd/yyyy hh:mm:ss tt}", range.Item1, range.Item2);
+            var groupedBy = string.Format(CultureInfo.CurrentCulture,
+                "Statistics grouped by: {0}",
+                    string.Join("; ", groupByFieldLabels));
+            writer.WriteFullBeginTag("heading");
+            writer.WriteFullBeginTag("details");
+            writer.WriteFullBeginTag("summary");
+            writer.RenderBeginTag(HtmlTextWriterTag.H1);
+            writer.Write(settings.Settings.Header1);
+            writer.RenderEndTag(); // H1
+            writer.RenderBeginTag(HtmlTextWriterTag.H3);
+            writer.Write(dateRange);
+            writer.RenderEndTag(); // H3
+            writer.RenderBeginTag(HtmlTextWriterTag.H3);
+            writer.Write(groupedBy);
+            writer.RenderEndTag(); // H3
+            writer.WriteEndTag("summary");
+            WriteSettingsTable(writer, settings, range);
+            writer.WriteEndTag("details");
+            writer.WriteEndTag("heading");
+        }
+
+        /// <summary>
+        /// Writes the settings table.
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="reportSettings">The report settings.</param>
+        /// <param name="range">The date range.</param>
+        private static void WriteSettingsTable(HtmlTextWriter writer,
+            ConfigSettings<Settings> reportSettings,
             Tuple<DateTime, DateTime> range)
         {
             // The order that settings should be displayed
@@ -310,95 +430,69 @@ namespace StatisticsReporter
                 "ReportOutputFileName",
                 "ErrorIfContainerOnlyConflict",
                 "Tagged",
-                "SimpleOutput"
+                "GroupByCriteria",
             };
 
-            var baseWriter = new StringWriter(CultureInfo.InvariantCulture);
-            using (var writer = new HtmlTextWriter(baseWriter))
+            // Table for configuration
+            writer.AddAttribute(HtmlTextWriterAttribute.Class, "ReportSettings");
+            writer.RenderBeginTag(HtmlTextWriterTag.Table);
+
+            // Header row
+            writer.RenderBeginTag(HtmlTextWriterTag.Thead);
+            writer.RenderBeginTag(HtmlTextWriterTag.Tr);
+            writer.RenderBeginTag(HtmlTextWriterTag.Th);
+            writer.Write("Setting");
+            writer.RenderEndTag();// Th
+            writer.RenderBeginTag(HtmlTextWriterTag.Th);
+            writer.Write("Value");
+            writer.RenderEndTag();//Th
+            writer.RenderEndTag();//Tr
+            writer.RenderEndTag();//Thead
+
+            // Get the settings in order
+            foreach (string settingName in SettingsOrder)
             {
-                writer.RenderBeginTag(HtmlTextWriterTag.Html);
+                // Get the setting with the setting name
+                SettingsPropertyValue setting = reportSettings.Settings.PropertyValues[settingName];
 
-                // Header for the Html
-                writer.RenderBeginTag(HtmlTextWriterTag.Head);
-                writer.AddAttribute(HtmlTextWriterAttribute.Type, "text/css");
-                writer.RenderBeginTag(HtmlTextWriterTag.Style);
-                // Default CSS
-                writer.WriteLine(_DEFAULT_STYLE);
-                // Optional, config-specified CSS
-                writer.Write(reportSettings.Settings.CSS);
-                writer.RenderEndTag();
-                writer.RenderEndTag();
-
-                // Table for configuration
-                writer.AddAttribute(HtmlTextWriterAttribute.Class, "ReportSettings");
-                writer.RenderBeginTag(HtmlTextWriterTag.Table);
-
-                // Header row
-                writer.RenderBeginTag(HtmlTextWriterTag.Thead);
-                writer.RenderBeginTag(HtmlTextWriterTag.Tr);
-                writer.RenderBeginTag(HtmlTextWriterTag.Th);
-                writer.Write("Setting");
-                writer.RenderEndTag();// Th
-                writer.RenderBeginTag(HtmlTextWriterTag.Th);
-                writer.Write("Value");
-                writer.RenderEndTag();//Th
-                writer.RenderEndTag();//Tr
-                writer.RenderEndTag();//Thead
-
-                // Get the settings in order
-                foreach (string settingName in SettingsOrder)
+                // If no setting with name was found log exception and continue
+                if (setting == null)
                 {
-                    // Get the setting with the setting name
-                    SettingsPropertyValue setting = reportSettings.Settings.PropertyValues[settingName];
-
-                    // If no setting with name was found log exception and continue
-                    if (setting == null)
-                    {
-                        ExtractException ex = new ExtractException("ELI41585", "Setting was not found.");
-                        ex.AddDebugData("Setting", settingName, false);
-                        ex.Log();
-                        continue;
-                    }
-
-                    string Value;
-                    if (setting.Name.Equals("StartDateTime"))
-                    {
-                        Value = String.Format(CultureInfo.CurrentCulture, "{0} ({1:MM/dd/yyyy hh:mm:ss tt})", setting.PropertyValue, range.Item1);
-                    }
-                    else if (setting.Name.Equals("EndDateTime"))
-                    {
-                        Value = String.Format(CultureInfo.CurrentCulture, "{0} ({1:MM/dd/yyyy hh:mm:ss tt})", setting.PropertyValue, range.Item2);
-                    }
-                    else if (setting.Name.Equals("Tagged"))
-                    {
-                        Value = string.Join(", ", ((StringCollection)setting.PropertyValue).Cast<string>());
-                    }
-                    else
-                    {
-                        Value = setting.PropertyValue.ToString();
-                    }
-
-                    AddPropertyToHTML(writer, setting.Name, Value);
-                }
-                writer.RenderEndTag(); // table
-
-                // Add a line between the tables over the entire width of the pages
-                writer.AddAttribute(HtmlTextWriterAttribute.Width, "100%");
-                writer.RenderBeginTag(HtmlTextWriterTag.Hr);
-                writer.RenderEndTag(); // Hr
-
-                foreach (var table in statsData)
-                {
-                    writer.Write(table);
-
-                    // Add space between tables
-                    writer.RenderBeginTag(HtmlTextWriterTag.P);
-                    writer.RenderEndTag(); // P
+                    ExtractException ex = new ExtractException("ELI41585", "Setting was not found.");
+                    ex.AddDebugData("Setting", settingName, false);
+                    ex.Log();
+                    continue;
                 }
 
-                writer.RenderEndTag(); // Html
-                return baseWriter.ToString();
+                string Value;
+                if (setting.Name.Equals("StartDateTime"))
+                {
+                    Value = String.Format(CultureInfo.CurrentCulture, "{0} ({1:MM/dd/yyyy hh:mm:ss tt})", setting.PropertyValue, range.Item1);
+                }
+                else if (setting.Name.Equals("EndDateTime"))
+                {
+                    Value = String.Format(CultureInfo.CurrentCulture, "{0} ({1:MM/dd/yyyy hh:mm:ss tt})", setting.PropertyValue, range.Item2);
+                }
+                else if (setting.Name.Equals("Tagged"))
+                {
+                    Value = setting.PropertyValue == null
+                        ? ""
+                        : string.Join(", ", ((StringCollection)setting.PropertyValue).Cast<string>());
+                }
+                else if (setting.Name.Equals("GroupByCriteria"))
+                {
+                    Value =  setting.PropertyValue == null
+                        ? ""
+                        : string.Join("; ", ((StringCollection)setting.PropertyValue).Cast<string>());
+                }
+                else
+                {
+                    Value = setting.PropertyValue?.ToString() ?? "";
+                }
+
+                AddPropertyToHTML(writer, setting.Name, Value);
             }
+            writer.RenderEndTag(); // table
         }
 
         /// <summary>
