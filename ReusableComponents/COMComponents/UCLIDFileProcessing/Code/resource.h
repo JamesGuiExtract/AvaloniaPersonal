@@ -198,9 +198,8 @@
 #define IDC_EDIT_ADDITIONAL_CONN_STR_ATTR 1010
 #define IDC_BUTTON_DEFAULT				1011
 #define IDC_BUTTON_USE_CURRENT_CONTEXT  1012
-#define IDC_STATIC_CURRENT_CONTEXT_LABEL 1013
-#define IDC_STATIC_CURRENT_CONTEXT		1014
 #define IDC_BUTTON_SELECT_CONTEXT		1015
+#define IDC_STATIC_WORKFLOW_WARNING     1016
 // End Database Page ID's
 
 #define IDR_FILEPROCESSINGTASKEXECUTOR  2000
@@ -266,7 +265,11 @@
 #define IDC_CURRENT_WORKITEM_LIST       2063
 #define IDD_DLG_WORKITEMS_PROP          2064
 #define IDC_STATIC_CURR_WORKITEMS       2065
-#define IDR_WORKFLOWDEFINITION			2066
+#define IDR_WORKFLOWDEFINITION          2066
+#define IDC_CONTEXT_EDIT                2067
+#define IDC_WORKFLOW_COMBO              2068
+#define IDC_STATIC_WORKFLOW             2069
+#define IDC_STATIC_CONTEXT              2070
 #define IDC_BTN_RUN                     32768
 #define IDC_BTN_STOP                    32769
 #define IDC_BTN_AUTO_SCROLL             32770
@@ -305,15 +308,15 @@
 #define ID_FAM_MRU_FILE7                32811
 #define ID_FAM_MRU_FILE8                32812
 #define ID_MNU_FAM_MRU                  32813
-#define ID_TOOLS_EDITCUSTOMTAGS			32814
+#define ID_TOOLS_EDITCUSTOMTAGS         32814
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2067
+#define _APS_NEXT_RESOURCE_VALUE        2071
 #define _APS_NEXT_COMMAND_VALUE         32815
-#define _APS_NEXT_CONTROL_VALUE         2067
-#define _APS_NEXT_SYMED_VALUE           2067
+#define _APS_NEXT_CONTROL_VALUE         2071
+#define _APS_NEXT_SYMED_VALUE           2071
 #endif
 #endif

@@ -37,8 +37,8 @@ using namespace Extract::FAMDBAdmin;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const int giMIN_WINDOW_WIDTH = 700;
-const int giMIN_WINDOW_HEIGHT = 320;
+const int giMIN_WINDOW_WIDTH = 725;
+const int giMIN_WINDOW_HEIGHT = 340;
 const string gstrFILE_ACTION_MANAGER_FILENAME = "ProcessFiles.exe";
 const string gstrREPORT_VIEWER_EXE = "ReportViewer.exe";
 const string gstrTITLE = "File Action Manager Database Administration";
@@ -99,6 +99,8 @@ CFAMDBAdminDlg::~CFAMDBAdminDlg()
 void CFAMDBAdminDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_WORKFLOW_COMBO, m_comboBoxWorkflow);
+	DDX_Control(pDX, IDC_STATIC_WORKFLOW, m_staticWorkflowLabel);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
@@ -124,7 +126,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_MANAGE_TAGS, &CFAMDBAdminDlg::OnManageTags)
 	ON_COMMAND(ID_MANAGE_BATES_COUNTERS, &CFAMDBAdminDlg::OnManageBatesCounters)
 	ON_COMMAND(ID_MANAGE_USERS, &CFAMDBAdminDlg::OnManageLoginUsers)
-	ON_COMMAND(ID_MANAGE_ACTIONS, &CFAMDBAdminDlg::OnManageActions)
+	ON_COMMAND(ID_MANAGE_ACTIONS, &CFAMDBAdminDlg::OnManageWorkflowActions)
 	ON_COMMAND(ID_TOOLS_SETPRIORITY, &CFAMDBAdminDlg::OnToolsSetPriority)
 	ON_COMMAND(ID_TOOLS_REPORTS, &CFAMDBAdminDlg::OnToolsReports)
 	ON_COMMAND(ID_TOOLS_RECALCULATE_STATS, &CFAMDBAdminDlg::OnRecalculateStats)
@@ -132,6 +134,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_MANAGE_ATTRIBUTESETS, &CFAMDBAdminDlg::OnManageAttributeSets)
 	ON_COMMAND(ID_MANAGE_RULE_COUNTERS, &CFAMDBAdminDlg::OnManageRuleCounters)
 	//}}AFX_MSG_MAP
+	ON_CBN_SELCHANGE(IDC_WORKFLOW_COMBO, &CFAMDBAdminDlg::OnCbnSelchangeWorkflowCombo)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -149,9 +152,11 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 		// when the application's main window is not a dialog
 		SetIcon(m_hIcon, TRUE);			// Set big icon
 		SetIcon(m_hIcon, FALSE);		// Set small icon
-
+		
 		// Restore the dialog to the position it was in last time it was open.
 		m_windowMgr.RestoreWindowPosition();
+
+		positionWorkflowControls();
 
 		// Load and update the menu
 		loadMenu();
@@ -203,6 +208,9 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 				}
 			}
 		}
+		m_strCurrentWorkflow = gstrALL_WORKFLOWS;
+		m_nCurrentWorkflowID = -1;
+
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14870");
 
@@ -691,6 +699,7 @@ void CFAMDBAdminDlg::OnSize(UINT nType, int cx, int cy)
 		if (m_bInitialized)		
 		{
 			setPropPageSize();
+			positionWorkflowControls();
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16638");
@@ -832,7 +841,7 @@ void CFAMDBAdminDlg::OnManageLoginUsers()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29061");
 }
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnManageActions()
+void CFAMDBAdminDlg::OnManageWorkflowActions()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 
@@ -852,6 +861,7 @@ void CFAMDBAdminDlg::OnManageActions()
 			if (currentWindow)
 				currentWindow->ReleaseHandle();
 		}
+		loadWorkflowComboBox();
 
 		//Update the summary tab
 		UpdateSummaryTab();
@@ -947,6 +957,33 @@ void CFAMDBAdminDlg::OnManageRuleCounters()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39088");
 }
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnCbnSelchangeWorkflowCombo()
+{
+	try
+	{
+		CString cSelectedItem;
+		int index = m_comboBoxWorkflow.GetCurSel();
+		if (index >= 0)
+		{
+			m_comboBoxWorkflow.GetLBText(index, cSelectedItem);
+			m_strCurrentWorkflow = cSelectedItem;
+			m_nCurrentWorkflowID = m_comboBoxWorkflow.GetItemData(index);
+
+			if (m_nCurrentWorkflowID == -1)
+			{
+				m_ipFAMDB->ActiveWorkflow = "";
+			}
+			else
+			{
+				// Set the Active workflow for the database
+				m_ipFAMDB->ActiveWorkflow = get_bstr_t(m_strCurrentWorkflow);
+			}
+			UpdateSummaryTab();
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42073");
+}
 
 //-------------------------------------------------------------------------------------------------
 //INotifyDBConfigChanged
@@ -980,6 +1017,8 @@ void CFAMDBAdminDlg::OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
 
 		// Set the connection is good to true
 		m_bIsDBGood = true;
+		m_strCurrentWorkflow = gstrALL_WORKFLOWS;
+		loadWorkflowComboBox();
 	}
 	// Log exceptions so exception dialog doesn't come up before the FAMDBAdminDlg
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18173");
@@ -992,6 +1031,7 @@ void CFAMDBAdminDlg::OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
 		{
 			m_bDBSchemaIsNotCurrent = true;
 		}
+		m_comboBoxWorkflow.ResetContent();
 	}
 
 	// Get and set the status on the Database page
@@ -1077,6 +1117,8 @@ void CFAMDBAdminDlg::setPropPageSize()
 	CRect rectDlg;
 	GetClientRect(&rectDlg);
 	
+	rectDlg.bottom -= 30;
+
 	// Set the property sheet size to the size of the dialog client area
 	m_propSheet.resize(rectDlg);
 }
@@ -1193,4 +1235,66 @@ UINT CFAMDBAdminDlg::upgradeToCurrentSchemaThread(LPVOID pParam)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::loadWorkflowComboBox()
+{
+	// If the database connection is not in a good state there is nothing to do
+	if (!m_bIsDBGood || m_ipFAMDB == __nullptr)
+	{
+		return;
+	}
+	m_comboBoxWorkflow.ResetContent();
 
+	IStrToStrMapPtr ipWorkflows = m_ipFAMDB->GetWorkflows();
+	ASSERT_RESOURCE_ALLOCATION("ELI42072", ipWorkflows != __nullptr);
+
+	IIUnknownVectorPtr ipItemPairs = ipWorkflows->GetAllKeyValuePairs();
+
+	int numItems = ipItemPairs->Size();
+	for (int i = 0; i < numItems; i++)
+	{
+		IStringPairPtr ipCurrentActionPair = (IStringPairPtr)ipItemPairs->At(i);
+		int index = m_comboBoxWorkflow.AddString(ipCurrentActionPair->StringKey);
+		long lValue = asLong(ipCurrentActionPair->StringValue);
+		m_comboBoxWorkflow.SetItemData(index, lValue);
+
+		// Check for change current workflow id so if text has changed it will be selected correctly
+		if (m_nCurrentWorkflowID >= 0 && m_nCurrentWorkflowID == lValue)
+		{
+			m_strCurrentWorkflow = asString(ipCurrentActionPair->StringKey);
+		}
+	}
+	m_comboBoxWorkflow.InsertString(0, gstrALL_WORKFLOWS.c_str());
+	m_comboBoxWorkflow.SetItemData(0, -1);
+	int index = m_comboBoxWorkflow.FindStringExact(0, m_strCurrentWorkflow.c_str());
+	if (index < 0)
+	{ 
+		m_strCurrentWorkflow = gstrALL_WORKFLOWS;
+		m_nCurrentWorkflowID = -1;
+		index = 0;
+		m_ipFAMDB->ActiveWorkflow = "";
+	}
+	m_comboBoxWorkflow.SetCurSel(index);
+	if (index >= 0)
+	{
+		m_nCurrentWorkflowID = m_comboBoxWorkflow.GetItemData(index);
+	}
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::positionWorkflowControls()
+{
+	CRect rectDlg, labelRect, controlRect;
+	GetClientRect(rectDlg);
+
+	m_staticWorkflowLabel.GetWindowRect(labelRect);
+	ScreenToClient(labelRect);
+
+	labelRect.MoveToY(rectDlg.bottom - labelRect.Height() - 14);
+	m_staticWorkflowLabel.MoveWindow(labelRect);
+
+	m_comboBoxWorkflow.GetWindowRect(controlRect);
+	ScreenToClient(controlRect);
+	controlRect.MoveToY(rectDlg.bottom - controlRect.Height() - 9);
+	controlRect.right = rectDlg.right - 6;
+	m_comboBoxWorkflow.MoveWindow(controlRect);
+
+}

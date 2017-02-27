@@ -11,6 +11,7 @@
 #include <DatabasePage.h>
 
 #include <memory>
+#include "afxwin.h"
 
 using namespace std;
 
@@ -59,12 +60,13 @@ protected:
 	afx_msg void OnManageTags();
 	afx_msg void OnManageBatesCounters();
 	afx_msg void OnManageLoginUsers();
-	afx_msg void OnManageActions();
+	afx_msg void OnManageWorkflowActions();
 	afx_msg void OnToolsSetPriority();
 	afx_msg void OnRecalculateStats();
 	afx_msg void OnManageMetadataFields();
 	afx_msg void OnManageAttributeSets();
 	afx_msg void OnManageRuleCounters();
+	afx_msg void OnCbnSelchangeWorkflowCombo();
 	DECLARE_MESSAGE_MAP()
 
 	//INotifyDBConfigChanged
@@ -95,6 +97,10 @@ private:
 
 	DatabasePage m_propDatabasePage;
 	CFAMDBAdminSummaryDlg m_propSummaryPage;
+
+	// Combo box for workflow
+	CComboBox m_comboBoxWorkflow;
+	CStatic m_staticWorkflowLabel;
 
 	// The Database pointer obj to work with
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFAMDB;
@@ -129,6 +135,12 @@ private:
 	// Allows inspection of files in the database using the FAMFileInspector utility.
 	IFAMFileInspectorPtr m_ipFAMFileInspector;
 
+	// The current workflow
+	string m_strCurrentWorkflow;
+
+	// Contains the current workflow ID - used to identifying when a workflow has been renamed
+	long m_nCurrentWorkflowID;
+
 	//////////
 	//Methods
 	/////////
@@ -162,4 +174,10 @@ private:
 
 	// Attempts to upgrade the current database to the latest schema.
 	static UINT upgradeToCurrentSchemaThread(LPVOID pParam);
+
+	// Loads the workflow combo
+	void loadWorkflowComboBox();
+
+	// Positions the workflow combo and label
+	void positionWorkflowControls();
 };

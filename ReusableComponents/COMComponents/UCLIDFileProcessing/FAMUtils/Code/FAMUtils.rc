@@ -45,8 +45,7 @@ BEGIN
     LTEXT           "Connection Status",IDC_STATIC,7,97,59,8
     LTEXT           "This is the MASTER for the Database page any changes made to this template need to be copied to the other copies of this dialog in UCLIDFileProcessing and FAMDBAdmin projects.",IDC_STATIC,7,150,353,27,NOT WS_VISIBLE
     LTEXT           "Advanced Connection Properties",IDC_STATIC,7,68,105,8
-    LTEXT           "Current Context:",IDC_STATIC_CURRENT_CONTEXT_LABEL,7,183,51,8,SS_NOTIFY | NOT WS_VISIBLE
-    LTEXT           "",IDC_STATIC_CURRENT_CONTEXT,61,183,299,8,SS_NOTIFY | NOT WS_VISIBLE
+    LTEXT           "Workflow needs to be selected.",IDC_STATIC_WORKFLOW_WARNING,61,183,299,8,SS_NOTIFY | NOT WS_VISIBLE
 END
 
 IDD_DIALOG_SELECT DIALOGEX 0, 0, 199, 57

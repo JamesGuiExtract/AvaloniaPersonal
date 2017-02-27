@@ -1270,10 +1270,56 @@ STDMETHODIMP CFileProcessingManager::RefreshDBSettings()
 	{
 		refreshDatabaseSettings();
 		m_ipFPMDB->ResetDBConnection(VARIANT_FALSE);
+		m_ipFPMDB->ActiveWorkflow = m_strActiveWorkflow.c_str();
 				
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38307");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_ActiveWorkflow(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI42078", pVal != __nullptr);
+
+		// Needs to return the set ActiveWorkflow 
+		*pVal = get_bstr_t(m_strActiveWorkflow).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42079");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::put_ActiveWorkflow(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		string strNew = asString(newVal);
+		if (m_strActiveWorkflow != strNew)
+		{
+			m_strActiveWorkflow = strNew;
+			m_bDirty = true;
+		}
+		if (m_strActiveWorkflow == gstrALL_WORKFLOWS)
+		{
+			getFPMDB()->ActiveWorkflow = "";
+		}
+		else
+		{
+			getFPMDB()->ActiveWorkflow = get_bstr_t(m_strActiveWorkflow);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42077");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1574,6 +1620,7 @@ void CFileProcessingManager::clear()
 		m_strDBServer = "";
 		m_strDBName = "";
 		m_strAdvConnString = "";
+		m_strActiveWorkflow = "";
 
 		// reset the database config file
 		getFPMDB()->DatabaseServer = "";

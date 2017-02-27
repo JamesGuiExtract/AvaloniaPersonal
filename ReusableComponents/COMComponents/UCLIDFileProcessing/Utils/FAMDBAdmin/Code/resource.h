@@ -44,9 +44,8 @@
 #define IDC_EDIT_ADDITIONAL_CONN_STR_ATTR 1010
 #define IDC_BUTTON_DEFAULT              1011
 #define IDC_BUTTON_USE_CURRENT_CONTEXT  1012
-#define IDC_STATIC_CURRENT_CONTEXT_LABEL 1013
-#define IDC_STATIC_CURRENT_CONTEXT		1014
 #define IDC_BUTTON_SELECT_CONTEXT		1015
+#define IDC_STATIC_WORKFLOW_WARNING     1016
 // End Database Page ID's
 
 // This ID's are the same as in BaseUtils resource.h
@@ -146,6 +145,9 @@
 #define IDC_BTN_REMOVE_ATTRIBUTE_SET    2119
 #define IDC_BTN_HISTORY_ATTRIBUTE_SETS  2120
 #define IDC_BTN_REFRESH_ATTRIBUTE_SETS  2121
+#define IDC_WORKFLOW_COMBO              2122
+#define IDC_CONTEXT_EDIT                2123
+#define IDC_STATIC_WORKFLOW             2124
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
@@ -189,7 +191,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        148
 #define _APS_NEXT_COMMAND_VALUE         32812
-#define _APS_NEXT_CONTROL_VALUE         2122
+#define _APS_NEXT_CONTROL_VALUE         2125
 #define _APS_NEXT_SYMED_VALUE           2122
 #endif
 #endif

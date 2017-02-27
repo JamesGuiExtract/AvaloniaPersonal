@@ -6,6 +6,7 @@
 #include "FileProcessingDlg.h"
 #include "FileProcessingDlgActionPage.h"
 #include "HelperFunctions.h"
+#include "FAMUtilsConstants.h"
 
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
@@ -373,8 +374,11 @@ void FileProcessingDlgActionPage::refresh(bool bWarnIfActionNotFound)
 		m_zActionName = bResetPage ? "" : strActionName.c_str();
 		GetDlgItem(IDC_ACTION)->SetWindowText( m_zActionName );
 
+		string strActiveWorkflow = asString(getFPM()->ActiveWorkflow);
+		bool bQueuingAllowed = strActiveWorkflow != gstrALL_WORKFLOWS;
+
 		// Enable or disable three check boxes
-		m_btnQueue.EnableWindow(asMFCBool(!bResetPage));
+		m_btnQueue.EnableWindow(asMFCBool(!bResetPage && bQueuingAllowed));
 		m_btnProcess.EnableWindow(asMFCBool(!bResetPage));
 		m_btnDisplay.EnableWindow(asMFCBool(!bResetPage ));
 
@@ -423,9 +427,12 @@ void FileProcessingDlgActionPage::setEnabled(bool bEnabled)
 	}
 	else
 	{
+		string strActiveWorkflow = asString(getFPM()->ActiveWorkflow);
+		bool bQueuingAllowed = strActiveWorkflow != gstrALL_WORKFLOWS;
+
 		// Enable controls on action tab
 		m_btnSelectAction.EnableWindow(TRUE);
-		m_btnQueue.EnableWindow(asMFCBool(!m_zActionName.IsEmpty()));
+		m_btnQueue.EnableWindow(asMFCBool(!m_zActionName.IsEmpty() && bQueuingAllowed));
 		m_btnProcess.EnableWindow(asMFCBool(!m_zActionName.IsEmpty()));
 		m_btnDisplay.EnableWindow(asMFCBool(!m_zActionName.IsEmpty()));
 	}

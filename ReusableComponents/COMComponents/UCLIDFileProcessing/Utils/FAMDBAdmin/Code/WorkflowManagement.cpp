@@ -399,7 +399,9 @@ namespace Extract
 				{
 					ListItemPair ^selectedWorkflow = safe_cast<ListItemPair^>(workflowComboBox->SelectedItem);
 
-					promptAndSaveActionsForWorkFlow(selectedWorkflow);
+					saveActionsForWorkflow(selectedWorkflow);
+					workflowActionsDirty = false;
+					updateButtons();
 				}
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42044");
@@ -431,7 +433,7 @@ namespace Extract
 			actionsCheckedListBox->ValueMember = "ID";
 
 			// Get the actions from the database
-			IStrToStrMapPtr actions = _ipfamDatabase->GetActions();
+			IStrToStrMapPtr actions = _ipfamDatabase->GetAllActions();
 			ListCtrlHelper::LoadListCtrl(actionsCheckedListBox, actions);
 
 			// if there is no selected workflow there is nothing else to do

@@ -537,6 +537,9 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Refreshes the database settings so that if tags are being used the latest
 		//			values in the customDB are used
 		[id(58), helpstring("method RefreshDBSettings")] HRESULT RefreshDBSettings();
+		// PROMISE: Sets and Gets the currently active workflow
+		[propget, id(59), helpstring("property ActiveWorkflow ")] HRESULT ActiveWorkflow([out, retval] BSTR* pbstrWorkflowName);
+		[propput, id(59), helpstring("property ActiveWorkflow ")] HRESULT ActiveWorkflow([in] BSTR bstrWorkflowName);
 	};
 
 	[

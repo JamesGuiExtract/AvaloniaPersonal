@@ -106,3 +106,7 @@ const string gstrDATABASE_ACTION_TAG = "<ActionName>";
 
 // Date Format - used for inserting dates into database
 static const string& gstrDATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
+
+// All workflows string
+const string gstrALL_WORKFLOWS = "<All workflows>";
+

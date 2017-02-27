@@ -192,7 +192,8 @@ namespace Extract
 			// if this is an existing workflow just load the actions associated with the workflow
 			if (_workflowID < 0)
 			{
-				actions = _ipfamDatabase->GetActions();
+				// Get All actions from the database
+				actions = _ipfamDatabase->GetAllActions();
 			}
 			else
 			{

@@ -100,6 +100,8 @@ public:
 	STDMETHOD(put_AdvancedConnectionStringProperties)(BSTR newVal);
 	STDMETHOD(GetConfigurationWarnings)(BSTR *pbstrWarning);
 	STDMETHOD(RefreshDBSettings)();
+	STDMETHOD(get_ActiveWorkflow)(BSTR *pVal);
+	STDMETHOD(put_ActiveWorkflow)(BSTR newVal);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -205,6 +207,9 @@ private:
 	// and password validation can be skipped for the current machine, then any
 	// tasks that require admin access will be able to run without providing the admin password.
 	bool m_bIsAuthenticated;
+
+	// Store the currently active workflow
+	string m_strActiveWorkflow;
 
 	///////////
 	// Methods

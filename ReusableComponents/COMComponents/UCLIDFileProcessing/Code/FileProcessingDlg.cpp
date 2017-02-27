@@ -112,7 +112,8 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
  m_bProcessingSkippedFiles(false),
  m_bPaused(false),
  m_nNumberOfDocsToExecute(0),
- m_bUpdatingConnection(false)
+ m_bUpdatingConnection(false),
+ m_bWorkflowsDefined(false)
 {
 	try
 	{
@@ -183,6 +184,10 @@ void FileProcessingDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(FileProcessingDlg)
 	//}}AFX_DATA_MAP
+	DDX_Control(pDX, IDC_WORKFLOW_COMBO, m_comboBoxWorkflow);
+	DDX_Control(pDX, IDC_CONTEXT_EDIT, m_buttonContext);
+	DDX_Control(pDX, IDC_STATIC_WORKFLOW, m_staticWorkflowLabel);
+	DDX_Control(pDX, IDC_STATIC_CONTEXT, m_staticContextLabel);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(FileProcessingDlg, CDialog)
@@ -226,6 +231,8 @@ BEGIN_MESSAGE_MAP(FileProcessingDlg, CDialog)
 	ON_COMMAND(ID_TOOLS_EDITCUSTOMTAGS, &FileProcessingDlg::OnToolsEditCustomTags)
 	ON_COMMAND_RANGE(ID_FAM_MRU_FILE1, ID_FAM_MRU_FILE8, &FileProcessingDlg::OnSelectFAMMRUPopupMenu)
 	ON_NOTIFY(TBN_DROPDOWN, AFX_IDW_TOOLBAR, &FileProcessingDlg::OnToolbarDropDown)
+	ON_CBN_SELCHANGE(IDC_WORKFLOW_COMBO, &FileProcessingDlg::OnCbnSelchangeWorkflowCombo)
+	ON_BN_CLICKED(IDC_CONTEXT_EDIT, &FileProcessingDlg::OnBnClickedContextEdit)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -270,6 +277,9 @@ BOOL FileProcessingDlg::OnInitDialog()
 			// add all property pages - this will cause the status bar to be updated
 			// so this must happen after the status bar is created
 			createPropertyPages();
+
+			// Set the active workflow to empty string will be interpeted as <All Workflows>
+			getFPM()->ActiveWorkflow = "";
 
 			// create the database status icon updater object
 			m_apDatabaseStatusIconUpdater = unique_ptr<DatabaseStatusIconUpdater> 
@@ -325,6 +335,8 @@ BOOL FileProcessingDlg::OnInitDialog()
 			{
 				loadSettingsFromManager();
 			}
+
+			loadWorkflowComboBox();
 
 			// update the UI
 			updateMenuAndToolbar();
@@ -816,7 +828,8 @@ void FileProcessingDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 		// Minimum height to allow display of list
 		lpMMI->ptMinTrackSize.y = m_sizeMinimumPropPage.cy + 
 			giMIN_LISTBOX_PLUS_TOOLBAR_HEIGHT + 
-			GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CYCAPTION) + 1;
+			GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CYCAPTION) + 1 +
+			5;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08899")
 }
@@ -1674,6 +1687,37 @@ LRESULT FileProcessingDlg::OnWorkItemStatusChange(WPARAM wParam, LPARAM lParam)
 
 	return 0;
 }
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::OnCbnSelchangeWorkflowCombo()
+{
+	try
+	{
+		CString cSelectedItem;
+		int index = m_comboBoxWorkflow.GetCurSel();
+
+		// If there is no selection set workflow to blank
+		if (index < 0)
+		{
+			getFPM()->ActiveWorkflow = "";
+		}
+		else
+		{
+			m_comboBoxWorkflow.GetLBText(index, cSelectedItem);
+			getFPM()->ActiveWorkflow = get_bstr_t(cSelectedItem);
+		}
+		updateUIForCurrentDBStatus();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42075");
+}
+//--------------------------------------------------------------------------------------------------
+void FileProcessingDlg::OnBnClickedContextEdit()
+{
+	try
+	{
+		editCustomTags();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42076");
+}
 
 //--------------------------------------------------------------------------------------------------
 // INotifyDBConfigChanged class
@@ -1952,11 +1996,13 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	{
 		if (m_toolBar)
 		{
+			string strCurrWorkflow = getFPM()->ActiveWorkflow;
 			CString zStatusText = getFAMStatus();
-			if (zStatusText == "Ready")
+			if (zStatusText == "Ready" && (!m_bWorkflowsDefined || !strCurrWorkflow.empty()))
 			{
 				bEnableRun = true;
 			}
+			m_buttonContext.EnableWindow(bContextSelected);
 		}
 	}
 
@@ -1967,6 +2013,10 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_PAUSE, asMFCBool(bEnablePause) );
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_STOP, asMFCBool(bEnableStop) );
 	m_toolBar.GetToolBarCtrl().PressButton(IDC_BTN_PAUSE, asMFCBool(bProcessingPaused) );
+
+	// update workflow combo
+	m_comboBoxWorkflow.EnableWindow(asMFCBool(!bRunningStatus && m_bWorkflowsDefined));
+	m_buttonContext.EnableWindow(asMFCBool(!bRunningStatus && bContextSelected));
 
 	// Get the auto scrolling setting from registry
 	bool bAutoScroll = ma_pCfgMgr->getAutoScrolling();
@@ -2157,7 +2207,7 @@ void FileProcessingDlg::doResize()
 		// leave space below toolbar for lines from OnPaint()
 		rectPropSheet.top = rectToolBar.bottom + 2;
 		rectPropSheet.right = rectDlg.right - 5;
-		rectPropSheet.bottom = rectDlg.bottom - 8 - gnSTATUS_BAR_HEIGHT;
+		rectPropSheet.bottom = rectDlg.bottom - 8 - gnSTATUS_BAR_HEIGHT - 24;
 		m_propSheet.resize(rectPropSheet);
 		m_nCurrentBottomOfPropPage = rectPropSheet.bottom;
 
@@ -2179,6 +2229,8 @@ void FileProcessingDlg::doResize()
 
 		// Position the toolbar in the dialog
 		RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
+
+		positionWorkflowContextControls();
 	}
 
 	Invalidate();
@@ -2231,7 +2283,9 @@ void FileProcessingDlg::updateUI()
 
 	CString zStatusText, zCompletedProcessing, zCurrentlyProcessing,
 			zFailed, zPending, zSkipped, zTotal;
-
+	
+	updateDBConnectionStatus();
+	
 	if (m_bRunning)
 	{
 		if (m_strProcessingStateString.empty())
@@ -2264,8 +2318,6 @@ void FileProcessingDlg::updateUI()
 
 		updateMenuAndToolbar();
 	}
-
-	updateDBConnectionStatus();
 
 	// Display comma-separated numbers in status bar only if an Action has been selected (P13 #4355)
 	if (m_bDBConnectionReady && m_nCurrActionID != -1)
@@ -2342,6 +2394,8 @@ void FileProcessingDlg::updateUI()
 
 	// Update context related controls on the database tab.
 	m_propDatabasePage.setCurrentContextState(bFileSaved, isValidContext(), strActiveContext);
+	
+	m_buttonContext.SetWindowText(strActiveContext.c_str());
 }
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingDlg::isFAMReady()
@@ -2614,6 +2668,7 @@ void FileProcessingDlg::updateDBConnectionStatus()
 		catch (_com_error&) {} 
 		catch (UCLIDException&) {}
 	}
+	loadWorkflowComboBox();
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::loadSettingsFromManager()
@@ -2938,17 +2993,25 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 	// If the new database file connects to the database successfully the action tab should be displayed
 	if (m_bDBConnectionReady)
 	{
-		if (isPageDisplayed(kActionPage))
+		string strCurrWorkflow = getFPM()->ActiveWorkflow;
+		if (!m_bWorkflowsDefined || !strCurrWorkflow.empty())
 		{
-			// https://extract.atlassian.net/browse/ISSUE-12936
-			// If the action page was already displayed, refresh it rather than resetting the tabs
-			// entirely (which would cause the current tab to be reset to the action tab rather than
-			// the tab it is currently on).
-			m_propActionPage.refresh();
+			if (isPageDisplayed(kActionPage))
+			{
+				// https://extract.atlassian.net/browse/ISSUE-12936
+				// If the action page was already displayed, refresh it rather than resetting the tabs
+				// entirely (which would cause the current tab to be reset to the action tab rather than
+				// the tab it is currently on).
+				m_propActionPage.refresh();
+			}
+			else
+			{
+				setPages.insert(kActionPage);
+				updateTabs(setPages);
+			}
 		}
 		else
 		{
-			setPages.insert(kActionPage);
 			updateTabs(setPages);
 		}
 
@@ -3330,4 +3393,115 @@ ITagUtilityPtr FileProcessingDlg::getTagUtility()
 	ASSERT_RESOURCE_ALLOCATION("ELI39274", ipTagUtility != nullptr);
 
 	return ipTagUtility;
+}
+//--------------------------------------------------------------------------------------------------
+void FileProcessingDlg::loadWorkflowComboBox()
+{
+	m_comboBoxWorkflow.ResetContent();
+	
+	int index = -1;
+	string strCurrWorkflow = asString(getFPM()->ActiveWorkflow);
+
+	// If the database connection is not in a good state there is nothing to do
+	if (!m_bDBConnectionReady || m_pFPMDB == __nullptr)
+	{
+		m_comboBoxWorkflow.SetCurSel(index);
+		m_bWorkflowsDefined = false;
+		m_propDatabasePage.showWorkflowWarning((index == -1) && m_bWorkflowsDefined);
+		return;
+	}
+
+	IStrToStrMapPtr ipWorkflows = getDBPointer()->GetWorkflows();
+	ASSERT_RESOURCE_ALLOCATION("ELI42072", ipWorkflows != __nullptr);
+
+	IIUnknownVectorPtr ipItemPairs = ipWorkflows->GetAllKeyValuePairs();
+
+	int numItems = ipItemPairs->Size();
+
+	// Only add the all workflows option if there are workflows defined
+	if (numItems == 0)
+	{
+		m_bWorkflowsDefined = false;
+	}
+	else
+	{
+		m_bWorkflowsDefined = true;
+
+		// get the file supplying mgmt role
+		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipMgmtRole = getFPM()->FileSupplyingMgmtRole;
+		ASSERT_RESOURCE_ALLOCATION("ELI42120", ipMgmtRole != __nullptr);
+
+		// Do not add the all workflow option if the file supplying role
+		// is enabled
+		if (!asCppBool(ipMgmtRole->Enabled))
+		{
+			// Add the all workflows option
+			m_comboBoxWorkflow.InsertString(0, gstrALL_WORKFLOWS.c_str());
+			m_comboBoxWorkflow.SetItemData(0, -1);
+		}
+
+		for (int i = 0; i < numItems; i++)
+		{
+			IStringPairPtr ipCurrentActionPair = (IStringPairPtr)ipItemPairs->At(i);
+			index = m_comboBoxWorkflow.AddString(ipCurrentActionPair->StringKey);
+			long lValue = asLong(ipCurrentActionPair->StringValue);
+			m_comboBoxWorkflow.SetItemData(index, lValue);
+		}
+	}
+	if (strCurrWorkflow.empty())
+	{
+		index = -1;
+	}
+	else
+	{
+		index = m_comboBoxWorkflow.FindStringExact(0, strCurrWorkflow.c_str());
+		if (index < 0)
+		{
+			string strMsg = Util::Format("The workflow '%s' does not exist in the database.", strCurrWorkflow.c_str());
+
+			MessageBox(strMsg.c_str(), "Workflow does not exist.", MB_OK || MB_ICONEXCLAMATION);
+
+			getFPM()->ActiveWorkflow = "";
+		}
+	}
+	m_propDatabasePage.showWorkflowWarning((index == -1) && m_bWorkflowsDefined);
+	m_comboBoxWorkflow.SetCurSel(index);
+}
+//--------------------------------------------------------------------------------------------------
+
+void FileProcessingDlg::positionWorkflowContextControls()
+{
+	CRect rectDlg, labelWorkflowRect, workflowRect, labelContextRect, contextButtonRect;
+	GetClientRect(rectDlg);
+
+	// Get the rects for the workflow and context controls
+	m_staticWorkflowLabel.GetWindowRect(labelWorkflowRect);
+	ScreenToClient(labelWorkflowRect);
+	m_staticContextLabel.GetWindowRect(labelContextRect);
+	ScreenToClient(labelContextRect);
+	m_comboBoxWorkflow.GetWindowRect(workflowRect);
+	ScreenToClient(workflowRect);
+	m_buttonContext.GetWindowRect(contextButtonRect);
+	ScreenToClient(contextButtonRect);
+
+	// Position the workflow label
+	labelWorkflowRect.MoveToY(rectDlg.bottom - labelWorkflowRect.Height() - gnSTATUS_BAR_HEIGHT - 15);
+	m_staticWorkflowLabel.MoveWindow(labelWorkflowRect);
+
+	// Position the context buttons
+	contextButtonRect.MoveToXY(rectDlg.right - 6 - contextButtonRect.Width(),
+		rectDlg.bottom - contextButtonRect.Height() - gnSTATUS_BAR_HEIGHT - 10);
+	m_buttonContext.MoveWindow(contextButtonRect);
+
+	// Position the context label
+	labelContextRect.top = labelWorkflowRect.top;
+	labelContextRect.bottom = labelWorkflowRect.bottom;
+	labelContextRect.MoveToX(contextButtonRect.left - 1 - labelContextRect.Width());
+	m_staticContextLabel.MoveWindow(labelContextRect);
+
+	// position the workflow combo
+	workflowRect.left = labelWorkflowRect.right + 6;
+	workflowRect.right = labelContextRect.left - 6;
+	workflowRect.MoveToY(rectDlg.bottom - workflowRect.Height() - gnSTATUS_BAR_HEIGHT - 10);
+	m_comboBoxWorkflow.MoveWindow(workflowRect);
 }

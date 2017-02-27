@@ -27,6 +27,7 @@
 #include <MRUList.h>
 
 #include <set>
+#include "afxwin.h"
 
 using namespace std;
 
@@ -152,11 +153,13 @@ protected:
 	afx_msg void OnToolsEditCustomTags();
 	afx_msg void OnToolbarDropDown(NMHDR* pNMHDR, LRESULT *plr);
 	afx_msg void OnSelectFAMMRUPopupMenu(UINT nID);
+	afx_msg void OnCbnSelchangeWorkflowCombo();
+	afx_msg void OnBnClickedContextEdit();
 	BOOL OnToolTipNotify(UINT nID, NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
 
 private:
-	
+
 	/////////////
 	// Variables
 	/////////////
@@ -175,6 +178,19 @@ private:
 
 	// The status bar that will display processing information
 	CStatusBarCtrl m_statusBar;
+
+	// ComboBox for the workflows in selected database
+	CComboBox m_comboBoxWorkflow;
+
+	// Flag to indicate that workflows are defined in the database
+	bool m_bWorkflowsDefined;
+	
+	// Static labels for workflow and context
+	CStatic m_staticWorkflowLabel;
+	CStatic m_staticContextLabel;
+	
+	// Button that will display current context and allow you to edit it
+	CButton m_buttonContext;
 
 	// an object that helps keep the database status icon updated
 	unique_ptr<DatabaseStatusIconUpdater> m_apDatabaseStatusIconUpdater;
@@ -430,4 +446,10 @@ private:
 
 	// Retrieves get an ITagUtility interface pointer to m_ipFAMTagManager.
 	ITagUtilityPtr getTagUtility();
+
+	// Loads the workflow combo box from the database
+	void loadWorkflowComboBox();
+
+	// Positions the Workflow combo, labels and context button
+	void positionWorkflowContextControls();
 };

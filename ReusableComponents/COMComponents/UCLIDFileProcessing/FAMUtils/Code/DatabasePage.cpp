@@ -55,7 +55,7 @@ DatabasePage::DatabasePage()
 	m_bBrowseEnabled(true),
 	m_bShowDBServerTag(false),
 	m_bShowDBNameTag(false),
-	m_crContextTextColor(RGB(0,0,0) /* Black */)
+	m_crWorkflowWarningTextColor(RGB(255,0,0) /* Red */)
 {
 	try
 	{
@@ -84,8 +84,7 @@ void DatabasePage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_DB_SERVER, m_editDBServer);
 	DDX_Control(pDX, IDC_EDIT_DB_NAME, m_editDBName);
 	DDX_Control(pDX, IDC_EDIT_CONN_STR, m_editAdvConnStrProperties);
-	DDX_Control(pDX, IDC_STATIC_CURRENT_CONTEXT_LABEL, m_labelCurrentContextLabel);
-	DDX_Control(pDX, IDC_STATIC_CURRENT_CONTEXT, m_labelCurrentContext);
+	DDX_Control(pDX, IDC_STATIC_WORKFLOW_WARNING, m_labelWorkflowWarning);
 	DDX_Control(pDX, IDC_BUTTON_REFRESH, m_btnRefresh);
 	DDX_Control(pDX, IDC_BUTTON_SQL_SERVER_BROWSE, m_btnSqlServerBrowse);
 	DDX_Control(pDX, IDC_BUTTON_LAST_USED_DB, m_btnConnectLastUsedDB);
@@ -106,8 +105,6 @@ BEGIN_MESSAGE_MAP(DatabasePage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BUTTON_CONN_STR, &DatabasePage::OnBnClickedButtonAdvConnStrProperties)
 	ON_BN_CLICKED(IDC_BUTTON_USE_CURRENT_CONTEXT, &DatabasePage::OnBnClickedButtonUseCurrentContextDatabase)
 	ON_BN_CLICKED(IDC_BUTTON_SELECT_CONTEXT, &DatabasePage::OnBnClickedButtonSelectContext)
-	ON_BN_CLICKED(IDC_STATIC_CURRENT_CONTEXT_LABEL, &DatabasePage::OnBnClickedCurrentContextLabel)
-	ON_BN_CLICKED(IDC_STATIC_CURRENT_CONTEXT, &DatabasePage::OnBnClickedCurrentContextLabel)
 	ON_WM_CTLCOLOR()
 	ON_WM_SETCURSOR()
 END_MESSAGE_MAP()
@@ -126,14 +123,13 @@ BOOL DatabasePage::OnInitDialog()
 
 		// Call the setBrowsEnabled using the flag
 		setBrowseEnabled(m_bBrowseEnabled);
-
-		// Create an underline font for the current context label to indicate click-ability.
-		CFont *pFont = m_labelCurrentContext.GetFont();
-		LOGFONT lf; 
+		
+		CFont *pFont = m_labelWorkflowWarning.GetFont();
+		LOGFONT lf;
 		pFont->GetLogFont(&lf);
-		lf.lfUnderline = true;
-		m_contextLabelFont.CreateFontIndirect(&lf);
-		m_labelCurrentContext.SetFont(&m_contextLabelFont);
+		lf.lfHeight = lf.lfHeight + lf.lfHeight / 2;
+		m_fontWorkflowWarning.CreateFontIndirect(&lf);
+		m_labelWorkflowWarning.SetFont(&m_fontWorkflowWarning);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16161");
 	
@@ -230,7 +226,7 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 
 		int iLRMargin, iDistBetween, iBrowseBtnWidth, iRefreshBtnWidth;
 		CRect rectDlg, rectServer, rectBrowseBtn, rectRefreshBtn, rectConnectLastDBBtn,
-			rectCurrContextDBBtn, rectSelectContextBtn, rectCurrContextLabel;
+			rectCurrContextDBBtn, rectSelectContextBtn;
 
 		// Get the Pages client window
 		GetClientRect(&rectDlg);
@@ -253,10 +249,6 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 
 		m_btnConnectLastUsedDB.GetWindowRect(&rectCurrContextDBBtn);
 		ScreenToClient(&rectCurrContextDBBtn);
-
-		// Get the current context edit box size and position
-		m_labelCurrentContext.GetWindowRect(&rectCurrContextLabel);
-		ScreenToClient(&rectCurrContextLabel);
 
 		// Calculate the space to leave to the right and left
 		iLRMargin = rectServer.left - rectDlg.left;
@@ -338,8 +330,8 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 		rectSelectContextBtn.bottom = rectCurrContextDBBtn.bottom;
 		m_btnSelectContext.MoveWindow(rectSelectContextBtn);
 
-		// Size the Current context edit box
-		positionContextLabel();
+		// Size the workflow warning
+		positionWorkflowWarningLabel();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16160");
 }
@@ -478,38 +470,6 @@ void DatabasePage::OnBnClickedButtonSelectContext()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39299");
 }
 //-------------------------------------------------------------------------------------------------
-void DatabasePage::OnBnClickedCurrentContextLabel()
-{
-	try
-	{
-		// Send Control + E to use the FAM's shortcut to open context tags editor.
-		INPUT input = {0};
-		input.type = INPUT_KEYBOARD;
-
-		input.ki.dwFlags = 0; // key down
-
-		WORD vkey = VK_CONTROL; 
-		input.ki.wScan = MapVirtualKey(vkey, MAPVK_VK_TO_VSC);
-		input.ki.wVk = vkey;
-		SendInput(1, &input, sizeof(INPUT));
-
-		vkey = 'E'; 
-		input.ki.wScan = MapVirtualKey(vkey, MAPVK_VK_TO_VSC);
-		input.ki.wVk = vkey;
-		SendInput(1, &input, sizeof(INPUT));
-
-		input.ki.dwFlags = KEYEVENTF_KEYUP;
-
-		SendInput(1, &input, sizeof(INPUT));
-
-		vkey = VK_CONTROL; 
-		input.ki.wScan = MapVirtualKey(vkey, MAPVK_VK_TO_VSC);
-		input.ki.wVk = vkey;
-		SendInput(1, &input, sizeof(INPUT));
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38113");
-}
-//-------------------------------------------------------------------------------------------------
 HBRUSH DatabasePage::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
 	HBRUSH hbr = __nullptr;
@@ -519,40 +479,17 @@ HBRUSH DatabasePage::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		// Call the base
 		hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 
-		// if this is the edit current context control set the color
-		if (pWnd->GetDlgCtrlID() == m_labelCurrentContext.GetDlgCtrlID())
+		// if this is the workflow warning control set the color
+		if (pWnd->GetDlgCtrlID() == m_labelWorkflowWarning.GetDlgCtrlID())
 		{
-			// Set the text color to the current context control
-			pDC->SetTextColor(m_crContextTextColor);
+			// Set the text color to the workflow warning control
+			pDC->SetTextColor(m_crWorkflowWarningTextColor);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38095");
 
 	return hbr;
 }
-//-------------------------------------------------------------------------------------------------
-BOOL DatabasePage::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
-{
-	BOOL bResult = FALSE;
-
-	try
-	{
-		bResult = CDialog::OnSetCursor(pWnd, nHitTest, message);
-
-		// if this is the edit current context control set the color
-		if (pWnd->GetDlgCtrlID() == m_labelCurrentContextLabel.GetDlgCtrlID() ||
-			pWnd->GetDlgCtrlID() == m_labelCurrentContext.GetDlgCtrlID())
-		{
-			// Set the text color to the current context control
-			SetCursor(g_hHandCursor);
-			return TRUE;
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38114");
-
-	return bResult;
-}
-
 //-------------------------------------------------------------------------------------------------
 // Public methods
 //-------------------------------------------------------------------------------------------------
@@ -684,21 +621,6 @@ void DatabasePage::enableAllControls(bool bEnableAll)
 void DatabasePage::setCurrentContextState(bool bFPSSaved, bool bValidContext, 
 										  const string& strContextName)
 {
-	// Make sure the current context edit control is visible if there is a context to display.
-	int nShow = strContextName.empty() ? SW_HIDE : SW_SHOW;
-	m_labelCurrentContextLabel.ShowWindow(nShow);
-	m_labelCurrentContext.ShowWindow(nShow);
-
-	// set the text color that should be used for the edit control
-	m_crContextTextColor = bValidContext
-			?  RGB(0,0,255) /* Blue */
-			: RGB(255,0,0) /* Red */;
-
-	// set the text of the Current context edit control
-	m_labelCurrentContext.SetWindowText(strContextName.c_str());
-
-	positionContextLabel();
-
 	if (m_pNotifyDBConfigChangedObject != nullptr)
 	{
 		m_btnUseCurrentContextDatabase.EnableWindow(asMFCBool(bValidContext));
@@ -715,30 +637,32 @@ void DatabasePage::setCurrentContextState(bool bFPSSaved, bool bValidContext,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void DatabasePage::positionContextLabel()
+void DatabasePage::positionWorkflowWarningLabel()
 {
 	CString zText;
-	m_labelCurrentContext.GetWindowText(zText);
+	m_labelWorkflowWarning.GetWindowText(zText);
 
 	CClientDC dc(this);
-	CFont *pFont = dc.SelectObject(m_labelCurrentContext.GetFont());
+	CFont *pFont = dc.SelectObject(m_labelWorkflowWarning.GetFont());
 	dc.SelectObject(&pFont);
 	CSize textSize = dc.GetTextExtent(zText, zText.GetLength());
 
 	CRect rectPage, rectLabel;
 	GetClientRect(&rectPage);
-	m_labelCurrentContextLabel.GetWindowRect(&rectLabel);
+	m_labelWorkflowWarning.GetWindowRect(&rectLabel);
 	ScreenToClient(&rectLabel);
 	
-	rectLabel.top = rectPage.bottom - 5 - rectLabel.Height();
+	rectLabel.top = rectPage.bottom - 5 - textSize.cy;
 	rectLabel.bottom = rectPage.bottom - 5;
+	rectLabel.left = (rectPage.Width() - textSize.cx) / 2 - 1;
+	rectLabel.right = (rectPage.Width() + textSize.cx) / 2;
 
-	m_labelCurrentContextLabel.MoveWindow(&rectLabel);
-
-	rectLabel.left = rectLabel.right + 3;
-	rectLabel.right = rectLabel.left + textSize.cx;
-
-	m_labelCurrentContext.MoveWindow(&rectLabel);
+	m_labelWorkflowWarning.MoveWindow(&rectLabel);
+}
+//-------------------------------------------------------------------------------------------------
+void DatabasePage::showWorkflowWarning(bool bShow)
+{
+	m_labelWorkflowWarning.ShowWindow((bShow) ? SW_SHOW : SW_HIDE);
 }
 
 

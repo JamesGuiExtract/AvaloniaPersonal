@@ -424,8 +424,17 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 		// Get the stats for the current action both to trigger a stats update to ensure the most
 		// recent failures will be displayed, and also to warn the user if there are too many
 		// exceptions to display them all.
-		IActionStatisticsPtr ipActionStats = m_ipFAMDB->GetStats(
-			m_nContextMenuActionID, VARIANT_TRUE);
+		IActionStatisticsPtr ipActionStats;
+		string currentWorkflow = m_ipFAMDB->ActiveWorkflow;
+		if (currentWorkflow.empty())
+		{
+			string strActionName = asString(m_ipFAMDB->GetActionName(m_nContextMenuActionID));
+			ipActionStats = m_ipFAMDB->GetStatsAllWorkflows(strActionName.c_str(), VARIANT_TRUE);
+		}
+		else
+		{
+			ipActionStats = m_ipFAMDB->GetStats(m_nContextMenuActionID, VARIANT_TRUE);
+		}
 
 		long nFailedCount = ipActionStats->GetNumDocumentsFailed();
 		if (nFailedCount > 1000)
@@ -680,7 +689,16 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			// insert the action name into the list control
 			int nItem = m_listActions.InsertItem(i, strActionName.c_str());
 
-			IActionStatisticsPtr ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE);
+			IActionStatisticsPtr ipActionStats;
+			string currentWorkflow = m_ipFAMDB->ActiveWorkflow;
+			if (currentWorkflow.empty())
+			{
+				ipActionStats = m_ipFAMDB->GetStatsAllWorkflows(strActionName.c_str(), VARIANT_TRUE);
+			}
+			else
+			{
+				ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE);
+			}
 
 			long lPending, lCompleted, lSkipped, lFailed, lTotal;
 

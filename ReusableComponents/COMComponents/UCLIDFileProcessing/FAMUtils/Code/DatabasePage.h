@@ -91,6 +91,10 @@ public:
 	// bValidContext- true if valid context is currently selected.
 	// strContextName- The active context name.
 	void setCurrentContextState(bool bFPSSaved, bool bValidContext, const string& strContextName);
+
+	// PROMISE: To show or hide the workflow warning based on bShow
+	// bShow - true shows the warning - false hides the warnging
+	void showWorkflowWarning(bool bShow);
 	
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -107,9 +111,7 @@ protected:
 	afx_msg void OnBnClickedButtonAdvConnStrProperties();
 	afx_msg void OnBnClickedButtonUseCurrentContextDatabase();
 	afx_msg void OnBnClickedButtonSelectContext();
-	afx_msg void OnBnClickedCurrentContextLabel();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	virtual BOOL OnInitDialog();
 
 private:
@@ -131,9 +133,7 @@ private:
 	CEdit m_editDBName;
 	CEdit m_editAdvConnStrProperties;
 	CEdit m_editConnectStatus;
-	CStatic m_labelCurrentContextLabel;
-	CStatic m_labelCurrentContext;
-	CFont m_contextLabelFont;
+	CStatic m_labelWorkflowWarning;
 	CButton m_btnAdvConnStrProperties;
 	CButton m_btnRefresh;
 	CButton m_btnConnectLastUsedDB;
@@ -160,8 +160,11 @@ private:
 	// Registry Persistence managers
 	unique_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 
-	// Color of the text for the context
-	COLORREF m_crContextTextColor;
+	// Color of the text for the workflow warning
+	COLORREF m_crWorkflowWarningTextColor;
+
+	// Font used for the workflow warning
+	CFont m_fontWorkflowWarning;
 
 	// The Windows hand cursor.
 	static HCURSOR g_hHandCursor;
@@ -180,6 +183,6 @@ private:
 	// Applies a new database name setting (updates advanced connection properties if necessary).
 	void setDatabase(const string& strDatabase);
 
-	// Sizes and positions the current context label based on the current text value.
-	void positionContextLabel();
+	// Sizes and positions the Workflow warning label
+	void positionWorkflowWarningLabel();
 };
