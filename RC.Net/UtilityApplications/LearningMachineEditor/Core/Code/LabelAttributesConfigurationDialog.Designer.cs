@@ -32,6 +32,7 @@
             this.processButton = new System.Windows.Forms.Button();
             this.closeButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.onlyIfMatchOnSamePageCheckBox = new System.Windows.Forms.CheckBox();
             this.createEmptyLabelCheckBox = new System.Windows.Forms.CheckBox();
             this.duplicateButton = new System.Windows.Forms.Button();
             this.downButton = new Extract.Utilities.Forms.ExtractDownButton();
@@ -58,7 +59,7 @@
             // processButton
             // 
             this.processButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.processButton.Location = new System.Drawing.Point(7, 574);
+            this.processButton.Location = new System.Drawing.Point(7, 598);
             this.processButton.Name = "processButton";
             this.processButton.Size = new System.Drawing.Size(87, 23);
             this.processButton.TabIndex = 2;
@@ -70,7 +71,7 @@
             // 
             this.closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.closeButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.closeButton.Location = new System.Drawing.Point(462, 574);
+            this.closeButton.Location = new System.Drawing.Point(462, 598);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(87, 23);
             this.closeButton.TabIndex = 4;
@@ -82,6 +83,7 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.onlyIfMatchOnSamePageCheckBox);
             this.groupBox2.Controls.Add(this.createEmptyLabelCheckBox);
             this.groupBox2.Controls.Add(this.duplicateButton);
             this.groupBox2.Controls.Add(this.downButton);
@@ -91,17 +93,29 @@
             this.groupBox2.Controls.Add(this.addButton);
             this.groupBox2.Location = new System.Drawing.Point(7, 184);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(542, 384);
+            this.groupBox2.Size = new System.Drawing.Size(542, 408);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Label each attribute with the first definition where the matching source attribut" +
     "e overlaps it spatially";
             // 
+            // onlyIfMatchOnSamePageCheckBox
+            // 
+            this.onlyIfMatchOnSamePageCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.onlyIfMatchOnSamePageCheckBox.AutoSize = true;
+            this.onlyIfMatchOnSamePageCheckBox.Location = new System.Drawing.Point(10, 385);
+            this.onlyIfMatchOnSamePageCheckBox.Name = "onlyIfMatchOnSamePageCheckBox";
+            this.onlyIfMatchOnSamePageCheckBox.Size = new System.Drawing.Size(335, 17);
+            this.onlyIfMatchOnSamePageCheckBox.TabIndex = 7;
+            this.onlyIfMatchOnSamePageCheckBox.Text = "...only if all non-empty-categories have a match on the same page";
+            this.onlyIfMatchOnSamePageCheckBox.UseVisualStyleBackColor = true;
+            this.onlyIfMatchOnSamePageCheckBox.CheckedChanged += new System.EventHandler(this.HandleValueChanged);
+            // 
             // createEmptyLabelCheckBox
             // 
             this.createEmptyLabelCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.createEmptyLabelCheckBox.AutoSize = true;
-            this.createEmptyLabelCheckBox.Location = new System.Drawing.Point(10, 361);
+            this.createEmptyLabelCheckBox.Location = new System.Drawing.Point(10, 362);
             this.createEmptyLabelCheckBox.Name = "createEmptyLabelCheckBox";
             this.createEmptyLabelCheckBox.Size = new System.Drawing.Size(224, 17);
             this.createEmptyLabelCheckBox.TabIndex = 6;
@@ -112,7 +126,7 @@
             // duplicateButton
             // 
             this.duplicateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.duplicateButton.Location = new System.Drawing.Point(446, 55);
+            this.duplicateButton.Location = new System.Drawing.Point(434, 55);
             this.duplicateButton.Name = "duplicateButton";
             this.duplicateButton.Size = new System.Drawing.Size(87, 23);
             this.duplicateButton.TabIndex = 2;
@@ -124,7 +138,7 @@
             // 
             this.downButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.downButton.Image = ((System.Drawing.Image)(resources.GetObject("downButton.Image")));
-            this.downButton.Location = new System.Drawing.Point(498, 113);
+            this.downButton.Location = new System.Drawing.Point(486, 113);
             this.downButton.Name = "downButton";
             this.downButton.Size = new System.Drawing.Size(35, 35);
             this.downButton.TabIndex = 5;
@@ -135,7 +149,7 @@
             // 
             this.upButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.upButton.Image = ((System.Drawing.Image)(resources.GetObject("upButton.Image")));
-            this.upButton.Location = new System.Drawing.Point(446, 113);
+            this.upButton.Location = new System.Drawing.Point(434, 113);
             this.upButton.Name = "upButton";
             this.upButton.Size = new System.Drawing.Size(35, 35);
             this.upButton.TabIndex = 4;
@@ -160,7 +174,7 @@
             this.categoryAndQueryDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             this.categoryAndQueryDataGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.categoryAndQueryDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.categoryAndQueryDataGridView.Size = new System.Drawing.Size(422, 329);
+            this.categoryAndQueryDataGridView.Size = new System.Drawing.Size(410, 329);
             this.categoryAndQueryDataGridView.TabIndex = 0;
             this.categoryAndQueryDataGridView.TabStop = false;
             this.categoryAndQueryDataGridView.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleCategoryAndQueryDataGridView_RowEnter);
@@ -168,7 +182,7 @@
             // removeButton
             // 
             this.removeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.removeButton.Location = new System.Drawing.Point(446, 84);
+            this.removeButton.Location = new System.Drawing.Point(434, 84);
             this.removeButton.Name = "removeButton";
             this.removeButton.Size = new System.Drawing.Size(87, 23);
             this.removeButton.TabIndex = 3;
@@ -179,7 +193,7 @@
             // addButton
             // 
             this.addButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.addButton.Location = new System.Drawing.Point(446, 26);
+            this.addButton.Location = new System.Drawing.Point(434, 26);
             this.addButton.Name = "addButton";
             this.addButton.Size = new System.Drawing.Size(87, 23);
             this.addButton.TabIndex = 1;
@@ -211,7 +225,7 @@
             // 
             this.attributesToLabelPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.attributesToLabelPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("attributesToLabelPathTagsButton.Image")));
-            this.attributesToLabelPathTagsButton.Location = new System.Drawing.Point(510, 40);
+            this.attributesToLabelPathTagsButton.Location = new System.Drawing.Point(498, 40);
             this.attributesToLabelPathTagsButton.Name = "attributesToLabelPathTagsButton";
             this.attributesToLabelPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.attributesToLabelPathTagsButton.Size = new System.Drawing.Size(24, 24);
@@ -225,7 +239,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.attributesToLabelTextBox.Location = new System.Drawing.Point(9, 42);
             this.attributesToLabelTextBox.Name = "attributesToLabelTextBox";
-            this.attributesToLabelTextBox.Size = new System.Drawing.Size(495, 20);
+            this.attributesToLabelTextBox.Size = new System.Drawing.Size(483, 20);
             this.attributesToLabelTextBox.TabIndex = 0;
             this.attributesToLabelTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
@@ -242,7 +256,7 @@
             // 
             this.destinationTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.destinationTagButton.Image = ((System.Drawing.Image)(resources.GetObject("destinationTagButton.Image")));
-            this.destinationTagButton.Location = new System.Drawing.Point(510, 131);
+            this.destinationTagButton.Location = new System.Drawing.Point(498, 131);
             this.destinationTagButton.Name = "destinationTagButton";
             this.destinationTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.destinationTagButton.Size = new System.Drawing.Size(24, 24);
@@ -256,7 +270,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.destinationTextBox.Location = new System.Drawing.Point(9, 133);
             this.destinationTextBox.Name = "destinationTextBox";
-            this.destinationTextBox.Size = new System.Drawing.Size(495, 20);
+            this.destinationTextBox.Size = new System.Drawing.Size(483, 20);
             this.destinationTextBox.TabIndex = 4;
             this.destinationTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
@@ -273,7 +287,7 @@
             // 
             this.sourceOfLabelsPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.sourceOfLabelsPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("sourceOfLabelsPathTagButton.Image")));
-            this.sourceOfLabelsPathTagButton.Location = new System.Drawing.Point(510, 85);
+            this.sourceOfLabelsPathTagButton.Location = new System.Drawing.Point(498, 85);
             this.sourceOfLabelsPathTagButton.Name = "sourceOfLabelsPathTagButton";
             this.sourceOfLabelsPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.sourceOfLabelsPathTagButton.Size = new System.Drawing.Size(24, 24);
@@ -287,7 +301,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.sourceOfLabelsTextBox.Location = new System.Drawing.Point(9, 87);
             this.sourceOfLabelsTextBox.Name = "sourceOfLabelsTextBox";
-            this.sourceOfLabelsTextBox.Size = new System.Drawing.Size(495, 20);
+            this.sourceOfLabelsTextBox.Size = new System.Drawing.Size(483, 20);
             this.sourceOfLabelsTextBox.TabIndex = 2;
             this.sourceOfLabelsTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
@@ -303,7 +317,7 @@
             // revertButton
             // 
             this.revertButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.revertButton.Location = new System.Drawing.Point(369, 574);
+            this.revertButton.Location = new System.Drawing.Point(369, 598);
             this.revertButton.Name = "revertButton";
             this.revertButton.Size = new System.Drawing.Size(87, 23);
             this.revertButton.TabIndex = 3;
@@ -317,7 +331,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.closeButton;
-            this.ClientSize = new System.Drawing.Size(556, 604);
+            this.ClientSize = new System.Drawing.Size(556, 628);
             this.Controls.Add(this.revertButton);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
@@ -363,5 +377,6 @@
         private System.Windows.Forms.TextBox attributesToLabelTextBox;
         private Utilities.Forms.PathTagsButton attributesToLabelPathTagsButton;
         private System.Windows.Forms.Button revertButton;
+        private System.Windows.Forms.CheckBox onlyIfMatchOnSamePageCheckBox;
     }
 }

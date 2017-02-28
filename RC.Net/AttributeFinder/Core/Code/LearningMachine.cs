@@ -5,6 +5,7 @@ using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.CodeDom.Compiler;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -59,6 +60,16 @@ namespace Extract.AttributeFinder
         private static readonly string _UNKNOWN_CATEGORY = "Unknown";
 
         #endregion Constants
+
+        #region Static Fields
+
+        /// <summary>
+        /// Locks to prevent multiple threads from trying to load the same machine into cache
+        /// </summary>
+        static ConcurrentDictionary<string, object> _locks =
+            new ConcurrentDictionary<string, object>(StringComparer.Ordinal);
+
+        #endregion Static Fields
 
         #region Fields
 
@@ -834,6 +845,9 @@ namespace Extract.AttributeFinder
             string[] ussFiles, voaFiles, answersOrAnswerFiles;
             InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles, updateStatus, cancellationToken);
 
+            ExtractException.Assert("ELI41834", "No inputs available to train/test machine",
+                ussFiles.Length > 0);
+
             if (!Encoder.AreEncodingsComputed)
             {
                 Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles, updateStatus, cancellationToken);
@@ -1188,17 +1202,22 @@ namespace Extract.AttributeFinder
             try
             {
                 string fullPath = Path.GetFullPath(learningMachinePath);
-
-                ObjectCache cache = MemoryCache.Default;
-                var machine = cache[fullPath] as LearningMachine;
+                var cache = MemoryCache.Default;
+                var machine = cache.Get(fullPath) as LearningMachine;
                 if (machine == null)
                 {
-                    CacheItemPolicy policy = new CacheItemPolicy();
-                    policy.ChangeMonitors.Add(new HostFileChangeMonitor(new[] { fullPath }));
-                    machine = Load(fullPath);
-                    cache.Set(fullPath, machine, policy);
+                    lock (_locks.GetOrAdd(fullPath, _ => new object()))
+                    {
+                        machine = cache.Get(fullPath) as LearningMachine;
+                        if (machine == null)
+                        {
+                            CacheItemPolicy policy = new CacheItemPolicy();
+                            policy.ChangeMonitors.Add(new HostFileChangeMonitor(new[] { fullPath }));
+                            machine = Load(fullPath);
+                            cache.Set(fullPath, machine, policy);
+                        }
+                    }
                 }
-
                 machine.ComputeAnswer(document, attributeVector, preserveInputAttributes);
             }
             catch (Exception e)

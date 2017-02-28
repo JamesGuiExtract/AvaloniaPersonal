@@ -215,7 +215,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// A collection of distinct attribute values seen during configuration
         /// </summary>
-        public IEnumerable<string> DistinctValuesSeen
+        public IEnumerable<string> RecognizedValues
         {
             get
             {
@@ -235,7 +235,7 @@ namespace Extract.AttributeFinder
         {
             get
             {
-                return DistinctValuesSeen.Count();
+                return RecognizedValues.Count();
             }
         }
 
@@ -264,7 +264,7 @@ namespace Extract.AttributeFinder
             {
                 var clone = (SpatialStringFeatureVectorizer)MemberwiseClone();
 
-                var valuesSeen = DistinctValuesSeen.ToArray();
+                var valuesSeen = RecognizedValues.ToArray();
                 if (valuesSeen.Length > 0)
                 {
                     clone._bagOfWords = new Accord.MachineLearning.BagOfWords(valuesSeen);
@@ -274,6 +274,25 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39804");
+            }
+        }
+
+        /// <summary>
+        /// Limits bag of words to the top <see paramref="limit"/>terms.
+        /// </summary>
+        /// <param name="limit">The number of terms to limit to.</param>
+        public void LimitToTopTerms(int limit)
+        {
+            try
+            {
+                var topTerms = RecognizedValues.Take(limit).ToArray();
+                _bagOfWords = new Accord.MachineLearning.BagOfWords(topTerms);
+
+                NotifyPropertyChanged("DistinctValuesSeen");
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41836");
             }
         }
 
@@ -710,14 +729,14 @@ namespace Extract.AttributeFinder
             using (var reader = DirectoryReader.Open(directory, true))
             {
                 var searcher = new SimpleFacetedSearch(reader, "category");
-                Query query = new MatchAllDocsQuery();
-                var hits = searcher.Search(query);
-                int numberOfExamples = (int)hits.TotalHitCount;
-                int numberOfCategories = hits.HitsPerFacet.Length;
+                Query allDocsQuery = new MatchAllDocsQuery();
+                var allDocsHits = searcher.Search(allDocsQuery);
+                int numberOfExamples = (int)allDocsHits.TotalHitCount;
+                int numberOfCategories = allDocsHits.HitsPerFacet.Length;
 
                 // Store the number of documents for each category in order to normalize term frequency numbers
                 var documentsForCategory = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                foreach (var hitsPerFacet in hits.HitsPerFacet)
+                foreach (var hitsPerFacet in allDocsHits.HitsPerFacet)
                 {
                     documentsForCategory[hitsPerFacet.Name[0]] = (int)hitsPerFacet.HitCount;
                 }
@@ -729,11 +748,12 @@ namespace Extract.AttributeFinder
                     .Select(term =>
                     {
                         double augmentedTermFrequency = 0.0;
-                        query = new TermQuery(term);
-                        hits = searcher.Search(query);
-                        double categoryFrequency = hits.HitsPerFacet.Length;
-                        double documentFrequency = hits.TotalHitCount;
-                        foreach (var category in hits.HitsPerFacet)
+                        var query = new TermQuery(term);
+                        var hits = searcher.Search(query);
+                        var categoriesForTerm = hits.HitsPerFacet
+                            .Where(h => h.HitCount > 0)
+                            .ToList();
+                        foreach (var category in categoriesForTerm)
                         {
                             var categoryName = category.Name[0];
                             double tf = category.HitCount;
@@ -743,20 +763,19 @@ namespace Extract.AttributeFinder
                             double maxTf = documentsForCategory[categoryName];
                             augmentedTermFrequency += tf / maxTf;
                         }
-                        double inverseDocumentFrequency = Math.Log(numberOfExamples / documentFrequency);
-                        double inverseCategoryFrequency = Math.Log((numberOfCategories + 0.5) / categoryFrequency);
-
-                        // Use harmonic mean of inverse category frequency and inverse document frequency
-                        double idf = 2 * inverseDocumentFrequency * inverseCategoryFrequency
-                                     / (inverseDocumentFrequency + inverseCategoryFrequency);
-
-                        double tfidf = augmentedTermFrequency * idf;
                         updateStatus(new StatusArgs { StatusMessage = "Scoring Terms... Terms processed: {0:N0}", Int32Value = 1 });
-                        return new { tfidf, term };
+
+                        return new TermInfo(
+                            text: term.Text,
+                            termFrequency: augmentedTermFrequency,
+                            documentFrequency: hits.TotalHitCount,
+                            numberOfExamples: numberOfExamples,
+                            numberOfCategories: numberOfCategories);
                     })
-                    .OrderByDescending(pair => pair.tfidf)
+                    .OrderByDescending(termInfo => termInfo.TermFrequencyInverseDocumentFrequency)
+                    .ThenBy(o => o.Text)
                     .Take(MaxFeatures)
-                    .Select(t => t.term.Text)
+                    .Select(result => result.Text)
                     .ToArray();
 
                 cancellationToken.ThrowIfCancellationRequested();

@@ -1030,7 +1030,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         private void SetMultilabelSVMClassifierValues(LearningMachine learningMachine)
         {
             double complexity;
-            if (!double.TryParse(multiclassSvmComplexityTextBox.Text, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+            if (!double.TryParse(multilabelSvmComplexityTextBox.Text, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
                 CultureInfo.InvariantCulture, out complexity)
                 || complexity == 0)
             {
@@ -1428,7 +1428,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     using (new TemporaryWaitCursor())
                         tempEncoder = CurrentLearningMachine.Encoder.DeepClone();
 
-                    using (var win = new EditFeatures(tempEncoder))
+                    using (var win = new EditFeatures(tempEncoder,
+                        _fileName == _NEW_FILE_NAME ? null : Path.GetDirectoryName(_fileName)))
                     {
                         var result = win.ShowDialog();
 

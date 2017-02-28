@@ -270,12 +270,14 @@ namespace Extract.AttributeFinder
                     double[][] cvInputs = inputs.Submatrix(cvIdx);
                     int[] cvOutputs = outputs.Submatrix(cvIdx);
 
+                    var complexitiesTried = new Dictionary<double, double>();
                     Func<double, bool, double> search = (start, fineTune) =>
                     {
                         double bestScore = 0;
                         var previousBestComplexities = new List<double>();
                         var bestComplexities = new List<double>();
                         int i = 1;
+                        int decreasingRun = 0;
                         double startE = 0, endE = 0;
                         double midE = Math.Round(Math.Log(start, 2));
                         double step = 1;
@@ -308,8 +310,14 @@ namespace Extract.AttributeFinder
                             });
                             try
                             {
-                                TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
-                                double score = GetAccuracyScore(cvInputs, cvOutputs);
+                                double score = 0;
+                                bool alreadyDone = complexitiesTried.TryGetValue(complexity, out score);
+                                if (!alreadyDone)
+                                {
+                                    TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
+                                    score = GetAccuracyScore(cvInputs, cvOutputs);
+                                    complexitiesTried[complexity] = score;
+                                }
 
                                 updateStatus2(new StatusArgs
                                 {
@@ -317,7 +325,8 @@ namespace Extract.AttributeFinder
                                     ReplaceLastStatus = true,
                                     StatusMessage = String.Format(CultureInfo.CurrentCulture,
                                     fineTune
-                                        ? "Fine-tuning complexity value: Iteration {0}, C={1:N6}, CV accuracy={2:N4}"
+                                        ? alreadyDone ? "Fine-tuning complexity value: Iteration {0}, C={1:N6}, CV accuracy={2:N4} (already done)"
+                                                      : "Fine-tuning complexity value: Iteration {0}, C={1:N6}, CV accuracy={2:N4}"
                                         : "Choosing complexity value: Iteration {0}, C={1:N6}, CV accuracy={2:N4}",
                                     i,
                                     complexity,
@@ -332,6 +341,15 @@ namespace Extract.AttributeFinder
                                         bestComplexities = new List<double>();
                                     }
                                     bestComplexities.Add(complexity);
+                                    decreasingRun = 0;
+                                }
+                                else
+                                {
+                                    ++decreasingRun;
+                                    if (!fineTune && decreasingRun == 3)
+                                    {
+                                        break;
+                                    }
                                 }
                             }
                             catch (AggregateException ae)

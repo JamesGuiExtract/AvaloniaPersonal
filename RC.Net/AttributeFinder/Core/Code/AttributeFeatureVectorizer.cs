@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -37,7 +38,19 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Set of values seen during configuration
         /// </summary>
-        private HashSet<string> _distinctValuesSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private HashSet<string> _distinctValuesSeen = new HashSet<string>(StringComparer.Ordinal);
+
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // Non-serialized collections to track term frequency information in order to compute tf*idf score (used as a relevance heuristic)
+        // -------------------------------------------------------------------------------------------------------------------------------
+        [NonSerialized]
+        private Dictionary<string, Dictionary<string, int>> _termFrequency = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
+        [NonSerialized]
+        private HashSet<string> _categoriesSeen = new HashSet<string>(StringComparer.Ordinal);
+        [NonSerialized]
+        private HashSet<string> _documentsSeen = new HashSet<string>(StringComparer.Ordinal);
+        [NonSerialized]
+        private Dictionary<string, HashSet<string>> _termToDocument = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
 
         #endregion Fields
 
@@ -54,8 +67,7 @@ namespace Extract.AttributeFinder
             FeatureType = FeatureVectorizerType.Exists;
 
             // Set up initialization of the bag of words object for if/when it is used
-            _bagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
-                new Accord.MachineLearning.BagOfWords(DistinctValuesSeen.ToArray()));
+            _bagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() => CreateInitialBagOfWords());
         }
 
         #endregion Constructors
@@ -193,13 +205,27 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// A collection of distinct attribute values seen during configuration
+        /// A collection of distinct attribute values that this instance can utilize
         /// </summary>
-        public IEnumerable<string> DistinctValuesSeen
+        public IEnumerable<string> RecognizedValues
         {
             get
             {
-                return _distinctValuesSeen.OrderBy(s => s, StringComparer.OrdinalIgnoreCase);
+                switch (FeatureType)
+                {
+                    case FeatureVectorizerType.Exists:
+                        return Enumerable.Repeat("Present or not present", 1);
+                    case FeatureVectorizerType.Numeric:
+                        return Enumerable.Repeat(
+                            string.Format(CultureInfo.CurrentCulture,
+                                "{0:G4}\u2013{1:G4}", double.MinValue, double.MaxValue), 1);
+                    case FeatureVectorizerType.DiscreteTerms:
+                        return _bagOfWords.Value.CodeToString
+                            .OrderBy(p => p.Key)
+                            .Select(p => p.Value);
+                    default:
+                        return Enumerable.Empty<string>();
+                }
             }
         }
 
@@ -217,7 +243,7 @@ namespace Extract.AttributeFinder
                     case FeatureVectorizerType.Numeric:
                         return 2;
                     case FeatureVectorizerType.DiscreteTerms:
-                        return DistinctValuesSeen.Count() + 1;
+                        return RecognizedValues.Count() + 1;
                     default:
                         return 0;
                 }
@@ -237,12 +263,51 @@ namespace Extract.AttributeFinder
             try
             {
                 var clone = (AttributeFeatureVectorizer)MemberwiseClone();
-                clone._distinctValuesSeen = new HashSet<string>(_distinctValuesSeen);
+                clone._distinctValuesSeen = new HashSet<string>(_distinctValuesSeen, StringComparer.Ordinal);
+
+                clone._termFrequency = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
+                foreach (var kv in _termFrequency)
+                {
+                    clone._termFrequency[kv.Key] = new Dictionary<string, int>(kv.Value, StringComparer.Ordinal);
+                }
+
+                clone._termToDocument = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+                foreach (var kv in _termToDocument)
+                {
+                    clone._termToDocument[kv.Key] = new HashSet<string>(kv.Value, StringComparer.Ordinal);
+                }
+
+                clone._categoriesSeen = new HashSet<string>(_categoriesSeen, StringComparer.Ordinal);
+                clone._documentsSeen = new HashSet<string>(_documentsSeen, StringComparer.Ordinal);
+
                 return clone;
             }
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39813");
+            }
+        }
+
+        /// <summary>
+        /// Limits bag of words to the top <see paramref="limit"/>terms.
+        /// </summary>
+        /// <param name="limit">The number of terms to limit to.</param>
+        public void LimitToTopTerms(int limit)
+        {
+            try
+            {
+                if (FeatureType == FeatureVectorizerType.DiscreteTerms)
+                {
+                    var topTerms = RecognizedValues.Take(limit).ToArray();
+                    _bagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
+                        new Accord.MachineLearning.BagOfWords(topTerms));
+
+                    NotifyPropertyChanged("RecognizedValues");
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41824");
             }
         }
 
@@ -255,7 +320,7 @@ namespace Extract.AttributeFinder
         /// After this method has been run, this object will be ready to produce feature vectors
         /// </summary>
         /// <param name="protoFeatures">The values to consider when configuring.</param>
-        internal void ComputeEncodingsFromTrainingData(IEnumerable<string> protoFeatures)
+        internal void ComputeEncodingsFromTrainingData(IEnumerable<string> protoFeatures, string category, string docName)
         {
             try
             {
@@ -263,6 +328,19 @@ namespace Extract.AttributeFinder
                 foreach (var protoFeature in protoFeatures)
                 {
                     _distinctValuesSeen.Add(protoFeature);
+
+                    var tfForCategory = _termFrequency.GetOrAdd(category, () =>
+                        new Dictionary<string, int>(StringComparer.Ordinal));
+                    int tf = tfForCategory.GetOrAdd(protoFeature, () => 0);
+                    tfForCategory[protoFeature] = tf + 1;
+
+                    var documents = _termToDocument.GetOrAdd(protoFeature, () =>
+                        new HashSet<string>(StringComparer.Ordinal));
+                    documents.Add(docName);
+
+                    _documentsSeen.Add(docName);
+                    _categoriesSeen.Add(category);
+
                     double _;
                     if (Double.TryParse(protoFeature, out _))
                     {
@@ -300,7 +378,7 @@ namespace Extract.AttributeFinder
                 if (_bagOfWords.IsValueCreated)
                 {
                     _bagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
-                        new Accord.MachineLearning.BagOfWords(DistinctValuesSeen.ToArray()));
+                        CreateInitialBagOfWords());
                 }
             }
             catch (Exception e)
@@ -394,7 +472,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Whether this instance is equal to another.
         /// </summary>
-        /// <remarks>Does not compare counts of types of values seen. Only compares <see cref="DistinctValuesSeen"/> if
+        /// <remarks>Does not compare counts of types of values seen. Only compares <see cref="RecognizedValues"/> if
         /// <see cref="FeatureType"/> is <see cref="FeatureVectorizerType.DiscreteTerms"/></remarks>
         /// <param name="obj">The instance to compare with</param>
         /// <returns><see langword="true"/> if this instance has equal property values, else <see langword="false"/></returns>
@@ -411,7 +489,7 @@ namespace Extract.AttributeFinder
                 || other.FeatureType != FeatureType
                 || other.Name != Name
                 || FeatureType == FeatureVectorizerType.DiscreteTerms &&
-                   !other.DistinctValuesSeen.SequenceEqual(DistinctValuesSeen)
+                   !other.RecognizedValues.SequenceEqual(RecognizedValues)
                 )
             {
                 return false;
@@ -432,7 +510,7 @@ namespace Extract.AttributeFinder
                 .Hash(Name);
             if (FeatureType == FeatureVectorizerType.DiscreteTerms)
             {
-                foreach (var value in DistinctValuesSeen)
+                foreach (var value in RecognizedValues)
                 {
                     hash = hash.Hash(value);
                 }
@@ -462,6 +540,67 @@ namespace Extract.AttributeFinder
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// Called when deserialized
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            _termFrequency = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
+            _termToDocument = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+            _categoriesSeen = new HashSet<string>(StringComparer.Ordinal);
+            _documentsSeen = new HashSet<string>(StringComparer.Ordinal);
+        }
+
+        /// <summary>
+        /// Creates the BagOfWords object using a TFIDF-ordered collection of terms
+        /// </summary>
+        /// <returns></returns>
+        private Accord.MachineLearning.BagOfWords CreateInitialBagOfWords()
+        {
+            // _termFrequency, etc, data is not persisted but Lazy<T> objects are instantiated when they
+            // are serialized (I just discovered) so we will never get here when the collections are empty.
+            ExtractException.Assert("ELI41828", "Logic exception: No term-frequency data available", _termFrequency.Any());
+
+            int numberOfExamples = _documentsSeen.Count;
+            int numberOfCategories = _categoriesSeen.Count;
+            var categoryToMaxTermFrequency = _termFrequency.Select(categoryToTermFrequency =>
+                new
+                {
+                    category = categoryToTermFrequency.Key,
+                    maxTF = categoryToTermFrequency.Value.Values.Any()
+                            ? categoryToTermFrequency.Value.Values.Max()
+                            : 1
+                }).ToDictionary(o => o.category, o => o.maxTF, StringComparer.Ordinal);
+
+            var orderedTerms = _distinctValuesSeen.Select(term =>
+            {
+                double augmentedTermFrequency = 0.0;
+                foreach (var category in _termFrequency)
+                {
+                    var categoryName = category.Key;
+                    var tfForCategory = category.Value;
+                    int tf = 0;
+                    tfForCategory.TryGetValue(term, out tf);
+                    double maxTf = categoryToMaxTermFrequency[categoryName];
+                    augmentedTermFrequency += tf / maxTf;
+                }
+                return new TermInfo(
+                    text: term,
+                    termFrequency: augmentedTermFrequency,
+                    documentFrequency: _termToDocument[term].Count,
+                    numberOfExamples: numberOfExamples,
+                    numberOfCategories: numberOfCategories);
+            })
+            .OrderByDescending(termInfo => termInfo.TermFrequencyInverseDocumentFrequency)
+            .ThenBy(o => o.Text)
+            .Select(o => o.Text)
+            .ToArray();
+
+            return new Accord.MachineLearning.BagOfWords(orderedTerms);
         }
 
         #endregion Private Methods

@@ -70,6 +70,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -291,6 +292,7 @@
     <EmbeddedResource Include="Resources\LearningMachine\10.4.lm" />
     <EmbeddedResource Include="Resources\LearningMachine\DocClassifier.lm" />
     <EmbeddedResource Include="Resources\LearningMachine\AttributeClassifier.lm" />
+    <EmbeddedResource Include="Resources\LearningMachine\Large.lm" />
     <EmbeddedResource Include="Resources\LearningMachine\Paginator.lm" />
   </ItemGroup>
   <ItemGroup>
@@ -305,25 +307,35 @@
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example09.tif" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example10.tif" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example02.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example02.tif.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example03.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example03.tif.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example04.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example04.tif.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example05.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example05.tif.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example06.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example06.tif.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example07.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example07.tif.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example08.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example08.tif.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example09.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example09.tif.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example10.tif.uss" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example02.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example03.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example04.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example05.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example06.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example07.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example08.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example09.tif.voa" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example10.tif.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example02.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example03.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example04.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example05.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example06.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example07.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example08.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example09.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example10.tif.protofeatures.voa" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

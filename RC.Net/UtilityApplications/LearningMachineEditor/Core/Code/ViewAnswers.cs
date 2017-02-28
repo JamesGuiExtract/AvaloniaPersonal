@@ -134,6 +134,41 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
+        /// <summary>
+        /// Exports the collected DistinctValuesSeen values of the selected <see cref="IFeatureVectorizer"/>s
+        /// </summary>
+        /// <param name="distinct">if set to <c>true</c> then only distinct values will be exported, else
+        /// values that occur in more than one vectorizer will be repeated</param>
+        private void HandleExportFeatureVectorizerTerms_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var lines = _encoder.AnswerCodeToName
+                                .OrderBy(kv => kv.Key)
+                                .Select(kv => kv.Value);
+
+                using (var saveDialog = new SaveFileDialog())
+                {
+                    saveDialog.Filter = "Document classifier index file|*.idx|All files|*.*";
+                    saveDialog.FileName = "DocTypes.idx";
+                    if (!string.IsNullOrEmpty(_fileName))
+                    {
+                        saveDialog.InitialDirectory = Path.GetDirectoryName(_fileName);
+                    }
+
+                    var result = saveDialog.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        File.WriteAllLines(saveDialog.FileName, lines);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41841");
+            }
+        }
+
         #endregion Private Methods
     }
 }

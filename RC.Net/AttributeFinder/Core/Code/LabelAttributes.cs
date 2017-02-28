@@ -6,11 +6,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using UCLID_AFUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
+using UCLID_AFCORELib;
 
 namespace Extract.AttributeFinder
 {
@@ -22,6 +24,16 @@ namespace Extract.AttributeFinder
     [Obfuscation(Feature = "renaming", Exclude = true)]
     public class LabelAttributes
     {
+        #region Constants
+
+        /// <summary>
+        /// Current version.
+        /// Version 2: Add OnlyIfAllCategoriesMatchOnSamePage property and backing field
+        /// </summary>
+        const int _CURRENT_VERSION = 2;
+
+        #endregion Constants
+
         #region fields
 
         // Use one af utility object per thread to avoid COM issues
@@ -32,6 +44,16 @@ namespace Extract.AttributeFinder
         private string _sourceOfLabelsPath;
         private string _destinationPath;
         private bool _createEmptylabelForNonMatching;
+
+        [OptionalField(VersionAdded = 2)]
+        private bool _onlyIfAllCategoriesMatchOnSamePage;
+
+        /// <summary>
+        /// Persist the current version in case it is needed (but currently no check is done to avoid
+        /// breaking compatibility of the associated LearningMachine for the sake of this utility)
+        /// </summary>
+        [OptionalField(VersionAdded = 2)]
+        private int _version = _CURRENT_VERSION;
 
         #endregion fields
 
@@ -115,6 +137,22 @@ namespace Extract.AttributeFinder
             set
             {
                 _createEmptylabelForNonMatching = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to only create empty labels if all non-empty categories
+        /// match on the same page as the non-matching attribute
+        /// </summary>
+        public bool OnlyIfAllCategoriesMatchOnSamePage
+        {
+            get
+            {
+                return _onlyIfAllCategoriesMatchOnSamePage;
+            }
+            set
+            {
+                _onlyIfAllCategoriesMatchOnSamePage = value;
             }
         }
 
@@ -237,12 +275,32 @@ namespace Extract.AttributeFinder
                     return foundMatch;
                 });
 
+            bool foundMatchesForAllOnPage = false;
+            if (!foundMatch && OnlyIfAllCategoriesMatchOnSamePage)
+            {
+                foundMatchesForAllOnPage = CategoryQueryPairs
+                    .Where(pair => !string.IsNullOrEmpty(pair.Category))
+                    .All(pair =>
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        loopState.Stop();
+                    }
+
+                    return sourceOfLabels
+                        .FindAllOfType<ComAttribute>(pair.Query)
+                        .Any(candidate => AreOnSamePage(attributeToLabel, candidate));
+                });
+            }
+
             // Remove any existing labels
             _aFUtility.Value.QueryAttributes(attributeToLabel.SubAttributes,
                 LearningMachineDataEncoder.CategoryAttributeName, bRemoveMatches: true);
 
             // Label the attribute
-            if (foundMatch || CreateEmptyLabelForNonMatching)
+            if (foundMatch
+                || CreateEmptyLabelForNonMatching
+                    && (!OnlyIfAllCategoriesMatchOnSamePage || foundMatchesForAllOnPage))
             {
                 var category = string.Empty;
                 if (foundMatch)
@@ -284,6 +342,44 @@ namespace Extract.AttributeFinder
             }
         }
 
+        private static bool AreOnSamePage(ComAttribute a, ComAttribute b)
+        {
+            if (!(a.Value.HasSpatialInfo() && b.Value.HasSpatialInfo()))
+            {
+                return false;
+            }
+            else
+            {
+                return a.Value.GetFirstPageNumber() == b.Value.GetFirstPageNumber()
+                    && a.Value.GetLastPageNumber() == b.Value.GetLastPageNumber();
+            }
+        }
+
+        /// <summary>
+        /// Called when deserializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+            _onlyIfAllCategoriesMatchOnSamePage = false;
+        }
+
+        /// <summary>
+        /// Called when deserialized
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            if (_version > _CURRENT_VERSION)
+            {
+                (new ExtractException("ELI41827", "Loaded machine has a newer version of LabelAttributes settings. Some settings may not be correct."))
+                    .Display();
+            }
+            _version = _CURRENT_VERSION;
+        }
+
         #endregion Private Methods
 
         #region Overrides
@@ -306,6 +402,7 @@ namespace Extract.AttributeFinder
                 || other.SourceOfLabelsPath != SourceOfLabelsPath
                 || other.DestinationPath != DestinationPath
                 || other.CreateEmptyLabelForNonMatching != CreateEmptyLabelForNonMatching
+                || other.OnlyIfAllCategoriesMatchOnSamePage != OnlyIfAllCategoriesMatchOnSamePage
                 || !other.CategoryQueryPairs.SequenceEqual(CategoryQueryPairs))
             {
                 return false;
@@ -324,7 +421,8 @@ namespace Extract.AttributeFinder
                 .Hash(AttributesToLabelPath)
                 .Hash(SourceOfLabelsPath)
                 .Hash(DestinationPath)
-                .Hash(CreateEmptyLabelForNonMatching);
+                .Hash(CreateEmptyLabelForNonMatching)
+                .Hash(OnlyIfAllCategoriesMatchOnSamePage);
 
             foreach(var categoryQueryPair in CategoryQueryPairs)
             {

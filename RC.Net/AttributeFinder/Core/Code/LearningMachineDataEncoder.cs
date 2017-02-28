@@ -1,9 +1,9 @@
 ﻿using Extract.Utilities;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -111,7 +111,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// The string representation of the input examples that this vectorizer has been configured with.
         /// </summary>
-        IEnumerable<string> DistinctValuesSeen { get; }
+        IEnumerable<string> RecognizedValues { get; }
 
         /// <summary>
         /// The length of the feature vector that this vectorizer can produce.
@@ -133,6 +133,12 @@ namespace Extract.AttributeFinder
         /// <see cref="FeatureVectorLength"/> (if <see langword="true"/>) or of zero length (if <see langword="false"/>)
         /// </summary>
         bool Enabled { get; set; }
+
+        /// <summary>
+        /// Limits bag of words to the top <see paramref="limit"/>terms.
+        /// </summary>
+        /// <param name="limit">The number of terms to limit to.</param>
+        void LimitToTopTerms(int limit);
     }
 
     /// <summary>
@@ -601,6 +607,9 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                ExtractException.Assert("ELI41833", "No USS files available to compute encodings",
+                    ussFilePaths.Length > 0);
+
                 // Null or empty VOA collection is OK. Create empty collection if null to simplify code
                 if (inputVOAFilePaths == null)
                 {
@@ -971,15 +980,16 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Gets an enumeration of <see cref="NameToProtoFeaturesMap"/>s for attribute categorization from a VOA file
+        /// Gets an enumeration of <see cref="Tuple{string, NameToProtoFeaturesMap}"/>s for attribute categorization
+        /// from a VOA file. The string value of the tuple is the category of the attribute to which the protofeatures relate.
         /// </summary>
         /// <remarks>
         /// Only top-level attributes that are labeled (have an AttributeType subattribute) will be used.
         /// For this reason this method is only to be used during the training process. 
         /// </remarks>
         /// <param name="attributesFilePath">The path to the VOA or EAV file</param>
-        /// <returns>An enumeration of <see cref="NameToProtoFeaturesMap"/>s for attribute categorization</returns>
-        private IEnumerable<NameToProtoFeaturesMap> GetAttributesProtoFeatures(string attributesFilePath)
+        /// <returns>An enumeration of <see cref="Tuple{string, NameToProtoFeaturesMap}"/>s for attribute categorization</returns>
+        private IEnumerable<Tuple<string, NameToProtoFeaturesMap>>  GetAttributesProtoFeatures(string attributesFilePath)
         {
             try
             {
@@ -987,10 +997,19 @@ namespace Extract.AttributeFinder
                 attributes.ReportMemoryUsage();
                 var filteredAttributes = attributes
                     .ToIEnumerable<ComAttribute>()
-                    .Where(attribute =>
-                        AttributeMethods.GetAttributesByName(attribute.SubAttributes, CategoryAttributeName)
-                        .Any());
-                return GetAttributesProtoFeatures(filteredAttributes);
+                    .Select(attribute =>
+                    {
+                        string category = AttributeMethods
+                            .GetAttributesByName(attribute.SubAttributes, CategoryAttributeName)
+                            .FirstOrDefault()?.Value.String;
+                        return Tuple.Create(category, attribute);
+                    })
+                    .Where(t => t.Item1 != null);
+
+                return filteredAttributes
+                    .Select(categoryAttributePair =>
+                        Tuple.Create(categoryAttributePair.Item1,
+                        GetFilteredMapOfNamesToValues(categoryAttributePair.Item2.SubAttributes)));
             }
             catch (Exception e)
             {
@@ -1494,21 +1513,25 @@ namespace Extract.AttributeFinder
             }
 
             // Configure AttributeFeatureVectorizer collection
-            IEnumerable<NameToProtoFeaturesMap> protoFeatures = inputVOAFilePaths.Select(GetDocumentProtoFeatures);
+            var protoFeatures = inputVOAFilePaths.Select(path => new { path, protoFeatures = GetDocumentProtoFeatures(path) });
 
             Dictionary<string, AttributeFeatureVectorizer> vectorizerMap
                 = new Dictionary<string, AttributeFeatureVectorizer>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var example in protoFeatures)
+            foreach (var labeledExample in protoFeatures.Zip(answers,
+                (example, answer) => new { example.path, answer, example.protoFeatures }))
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                updateStatus2(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
+                updateStatus2(new StatusArgs { StatusMessage = "Documents processed: {0:N0}", Int32Value = 1 });
 
-                foreach (var group in example)
+                foreach (var group in labeledExample.protoFeatures)
                 {
                     string name = group.Key;
                     var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
-                    vectorizer.ComputeEncodingsFromTrainingData(group.Value);
+                    vectorizer.ComputeEncodingsFromTrainingData(
+                        protoFeatures: group.Value,
+                        category: labeledExample.answer,
+                        docName: labeledExample.path);
                 }
             }
             AttributeFeatureVectorizers = vectorizerMap.Values;
@@ -1550,22 +1573,39 @@ namespace Extract.AttributeFinder
             }
 
             // Configure AttributeFeatureVectorizer collection
-            IEnumerable<NameToProtoFeaturesMap> protoFeatures = inputVOAFilePaths.SelectMany(GetPaginationProtoFeatures);
+            IEnumerable<IEnumerable<NameToProtoFeaturesMap>> pagePairProtofeatureCollection =
+                inputVOAFilePaths.Select(GetPaginationProtoFeatures);
+
+            // Pass the page count of each image along so that missing pages in the answer VOA can be filled in
+            var pagePairProtofeaturesAndCategories = pagePairProtofeatureCollection.Zip(answerFiles, (pagePairs, answerFile) =>
+                {
+                    var answers = ExpandPaginationAnswerVOA(answerFile, pagePairs.Count() + 1);
+                    return pagePairs.Zip(answers, (pagePairProtofeatures, answer) =>
+                        new { answer, pagePairProtofeatures });
+                })
+                .SelectMany(answersForFile => answersForFile);
 
             Dictionary<string, AttributeFeatureVectorizer> vectorizerMap
                 = new Dictionary<string, AttributeFeatureVectorizer>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var example in protoFeatures)
+            // Count each page pair as a separate document for purposes of TF*IDF score
+            int exampleNumber = 0;
+            foreach (var labeledExample in pagePairProtofeaturesAndCategories)
             {
+                ++exampleNumber;
                 cancellationToken.ThrowIfCancellationRequested();
-                updateStatus2(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
 
-                foreach (var group in example)
+                foreach (var group in labeledExample.pagePairProtofeatures)
                 {
                     string name = group.Key;
                     var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
-                    vectorizer.ComputeEncodingsFromTrainingData(group.Value);
+                    vectorizer.ComputeEncodingsFromTrainingData(
+                        protoFeatures: group.Value,
+                        category: labeledExample.answer,
+                        docName: exampleNumber.ToString(CultureInfo.InvariantCulture));
                 }
+
+                updateStatus2(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
             }
             AttributeFeatureVectorizers = vectorizerMap.Values;
 
@@ -1622,23 +1662,32 @@ namespace Extract.AttributeFinder
             }
 
             // Configure AttributeFeatureVectorizer collection
-            IEnumerable<NameToProtoFeaturesMap> protoFeatures =
+            IEnumerable<Tuple<string, NameToProtoFeaturesMap>> categoryAndProtoFeaturesCollection =
                 labeledCandidateAttributesFiles.SelectMany(GetAttributesProtoFeatures);
 
             Dictionary<string, AttributeFeatureVectorizer> vectorizerMap
                 = new Dictionary<string, AttributeFeatureVectorizer>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var example in protoFeatures)
+            // Count each attribute as a separate document for purposes of TF*IDF score
+            int exampleNumber = 0;
+            foreach (var labeledExample in categoryAndProtoFeaturesCollection)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                updateStatus2(new StatusArgs { StatusMessage = "Attributes processed: {0:N0}", Int32Value = 1 });
+
+                ++exampleNumber;
+                var category = labeledExample.Item1;
+                var example = labeledExample.Item2;
 
                 foreach (var group in example)
                 {
                     string name = group.Key;
                     var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
-                    vectorizer.ComputeEncodingsFromTrainingData(group.Value);
+                    vectorizer.ComputeEncodingsFromTrainingData(
+                        protoFeatures: group.Value,
+                        category: category,
+                        docName: exampleNumber.ToString(CultureInfo.InvariantCulture));
                 }
+                updateStatus2(new StatusArgs { StatusMessage = "Attributes processed: {0:N0}", Int32Value = 1 });
             }
             AttributeFeatureVectorizers = vectorizerMap.Values;
 

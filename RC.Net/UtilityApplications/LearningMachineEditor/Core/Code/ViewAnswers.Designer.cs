@@ -37,6 +37,7 @@
             this.closeButton = new System.Windows.Forms.Button();
             this.compareToListButton = new System.Windows.Forms.Button();
             this.answerCategoriesDataGridView = new System.Windows.Forms.DataGridView();
+            this.exportButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.answerCategoriesDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -47,7 +48,7 @@
             this.closeButton.Location = new System.Drawing.Point(483, 600);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 23);
-            this.closeButton.TabIndex = 2;
+            this.closeButton.TabIndex = 3;
             this.closeButton.Text = "Close";
             this.closeButton.UseVisualStyleBackColor = true;
             // 
@@ -102,6 +103,17 @@
             this.answerCategoriesDataGridView.Size = new System.Drawing.Size(546, 576);
             this.answerCategoriesDataGridView.TabIndex = 0;
             // 
+            // exportButton
+            // 
+            this.exportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.exportButton.Location = new System.Drawing.Point(198, 600);
+            this.exportButton.Name = "exportButton";
+            this.exportButton.Size = new System.Drawing.Size(180, 23);
+            this.exportButton.TabIndex = 2;
+            this.exportButton.Text = "Export category names to a list...";
+            this.exportButton.UseVisualStyleBackColor = true;
+            this.exportButton.Click += new System.EventHandler(this.HandleExportFeatureVectorizerTerms_Click);
+            // 
             // ViewAnswers
             // 
             this.AcceptButton = this.closeButton;
@@ -109,6 +121,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.closeButton;
             this.ClientSize = new System.Drawing.Size(570, 635);
+            this.Controls.Add(this.exportButton);
             this.Controls.Add(this.answerCategoriesDataGridView);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.compareToListButton);
@@ -127,5 +140,6 @@
         private System.Windows.Forms.Button closeButton;
         private System.Windows.Forms.Button compareToListButton;
         private System.Windows.Forms.DataGridView answerCategoriesDataGridView;
+        private System.Windows.Forms.Button exportButton;
     }
 }

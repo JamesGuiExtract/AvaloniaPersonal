@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Extract.AttributeFinder;
+using Extract.Utilities.Forms;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Extract.AttributeFinder;
-using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.LearningMachineEditor
 {
@@ -21,6 +20,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         #region Fields
 
         private LearningMachineDataEncoder _encoder;
+        private string _workingDir;
+        private NumberSelector _numberSelector = new NumberSelector();
 
         #endregion Fields
 
@@ -30,14 +31,18 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// Creates a new instance
         /// </summary>
         /// <param name="encoder">The <see cref="LearningMachineDataEncoder"/> to be viewed/edited</param>
-        [SuppressMessage("Microsoft.Performance", "CA1801", Target="encoder")]
-        public EditFeatures(LearningMachineDataEncoder encoder)
+        [SuppressMessage("Microsoft.Performance", "CA1801", Target = "encoder")]
+        public EditFeatures(LearningMachineDataEncoder encoder, string workingDir)
         {
             try
             {
                 InitializeComponent();
+
                 _encoder = encoder;
+                _workingDir = workingDir ?? Environment.CurrentDirectory;
+
                 SetSummaryStatusText();
+
                 var featureVectorizers = new List<IFeatureVectorizer>();
                 if (encoder.AutoBagOfWords != null)
                 {
@@ -144,7 +149,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 var vectorizer = (IFeatureVectorizer)featureListDataGridView.Rows[e.RowIndex].DataBoundItem;
 
-                distinctValuesSeenListBox.DataSource = vectorizer.DistinctValuesSeen.ToList();
+                distinctValuesSeenListBox.DataSource = vectorizer.RecognizedValues.ToList();
                 var attributeVectorizer = vectorizer as AttributeFeatureVectorizer;
                 if (attributeVectorizer != null)
                 {
@@ -164,6 +169,213 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 ex.ExtractDisplay("ELI40041");
             }
         }
+
+        /// <summary>
+        /// Handles the Opening event of the distinctValuesSeenContextMenuStrip control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CancelEventArgs"/> instance containing the event data.</param>
+        private void HandleDistinctValuesSeenContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                distinctValuesSeenContextMenuStrip.Items["copyToolStripMenuItem"].Enabled =
+                    distinctValuesSeenListBox.SelectedItems.Count > 0;
+                distinctValuesSeenContextMenuStrip.Items["selectAllToolStripMenuItem"].Enabled =
+                    distinctValuesSeenListBox.Items.Count > 0;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41811");
+            }
+        }
+
+        /// <summary>
+        /// Handles the Opening event of the featureVectorizersContextMenuStrip control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CancelEventArgs"/> instance containing the event data.</param>
+        private void HandleFeatureVectorizersContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                var selectionCount = featureListDataGridView.SelectedRows.Count;
+                var enable = selectionCount < 1 ||
+                    featureListDataGridView.SelectedRows
+                    .Cast<DataGridViewRow>()
+                    .Select(row => row.DataBoundItem)
+                    .OfType<IFeatureVectorizer>()
+                    .Where(vectorizer => vectorizer.FeatureType == FeatureVectorizerType.DiscreteTerms)
+                    .Count() == selectionCount;
+
+                foreach (var item in featureVectorizersContextMenuStrip
+                    .Items
+                    .OfType<ToolStripMenuItem>())
+                {
+                    item.Enabled = enable;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41835");
+            }
+
+        }
+
+        /// <summary>
+        /// Handles the Click event of the copyToolStripMenuItem control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleCopyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Clipboard.SetText(
+                    string.Join(Environment.NewLine,
+                        distinctValuesSeenListBox.SelectedItems
+                        .Cast<object>()
+                        .Select(o => o.ToString())));
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41812");
+            }
+        }
+
+        /// <summary>
+        /// Handles the Click event of the selectAllToolStripMenuItem control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleSelectAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (new TemporaryWaitCursor())
+                {
+                    distinctValuesSeenListBox.BeginUpdate();
+                    foreach (int i in Enumerable.Range(0, distinctValuesSeenListBox.Items.Count))
+                    {
+                        distinctValuesSeenListBox.SetSelected(i, true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41813");
+            }
+            finally
+            {
+                distinctValuesSeenListBox.EndUpdate();
+            }
+        }
+
+        /// <summary>
+        /// Handles the Click event of the limitToTopToolStripMenuItem control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleLimitToTopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int numberOfRows = featureListDataGridView.SelectedRows.Count;
+                if (numberOfRows < 1)
+                {
+                    return;
+                }
+
+                if (_numberSelector != null
+                    && _numberSelector.ShowDialog() == DialogResult.OK)
+                {
+                    var vectorizers = featureListDataGridView.SelectedRows
+                        .Cast<DataGridViewRow>()
+                        .Select(row => row.DataBoundItem)
+                        .OfType<IFeatureVectorizer>()
+                        .Where(v => v.FeatureType == FeatureVectorizerType.DiscreteTerms);
+
+                    foreach (var vectorizer in vectorizers)
+                    {
+                        vectorizer.LimitToTopTerms(_numberSelector.Value);
+                    }
+
+                    // Refresh items
+                    ((BindingList<IFeatureVectorizer>)featureListDataGridView.DataSource).ResetBindings();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41813");
+            }
+        }
+
+        /// <summary>
+        /// Handles the Click event of the exportToFileToolStripMenuItem control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleExportToFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ExportFeatureVectorizerTerms(false);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41839");
+            }
+
+        }
+
+        /// <summary>
+        /// Handles the Click event of the exportToFileDistinctToolStripMenuItem control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleExportDistinctToFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ExportFeatureVectorizerTerms(true);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41839");
+            }
+        }
+
+        /// <summary>
+        /// Handles the MouseDown event of the featureListDataGridView control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
+        private void HandleFeatureListDataGridView_MouseDown(object sender, MouseEventArgs e)
+        {
+            // Handle row selection for right-click (left-click works automatically)
+            if (e.Button == MouseButtons.Left)
+            {
+                return;
+            }
+
+            // Do nothing if click is not in a row or if the row is already selected
+            var hti = featureListDataGridView.HitTest(e.X, e.Y);
+            if (hti.RowIndex < 0
+                || hti.RowIndex >= featureListDataGridView.Rows.Count
+                || featureListDataGridView.Rows[hti.RowIndex].Selected)
+            {
+                return;
+            }
+
+            // Clear current selection unless Control key is pressed
+            if ((ModifierKeys & Keys.Control) == 0)
+            {
+                featureListDataGridView.ClearSelection();
+            }
+
+            featureListDataGridView.Rows[hti.RowIndex].Selected = true;
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -187,7 +399,38 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
-        #endregion Private Methods
+        /// <summary>
+        /// Exports the collected DistinctValuesSeen values of the selected <see cref="IFeatureVectorizer"/>s
+        /// </summary>
+        /// <param name="distinct">if set to <c>true</c> then only distinct values will be exported, else
+        /// values that occur in more than one vectorizer will be repeated</param>
+        private void ExportFeatureVectorizerTerms(bool distinct)
+        {
+            var vectorizers = featureListDataGridView.SelectedRows
+                .Cast<DataGridViewRow>()
+                .Select(row => row.DataBoundItem)
+                .OfType<IFeatureVectorizer>();
 
+            var lines = vectorizers.SelectMany(v => v.RecognizedValues);
+            if (distinct)
+            {
+                lines = lines.Distinct();
+            }
+
+            using (var saveDialog = new SaveFileDialog())
+            {
+                saveDialog.Filter = "Text file|*.txt|All files|*.*";
+                saveDialog.FileName = "Export.txt";
+                saveDialog.InitialDirectory = _workingDir;
+
+                var result = saveDialog.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    File.WriteAllLines(saveDialog.FileName, lines);
+                }
+            }
+        }
+
+        #endregion Private Methods
     }
 }

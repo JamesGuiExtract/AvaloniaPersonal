@@ -39,7 +39,7 @@ namespace Extract.Utilities.Parsers.Test
         [Test]
         // Regex parser index out of bounds error with groups named after large numbers
         // https://extract.atlassian.net/browse/ISSUE-13902
-        public static void ISSUE_13902_HighNumberedGroup()
+        public static void Issue_13902_HighNumberedGroup()
         {
             var regexParser = new DotNetRegexParser();
             regexParser.Pattern = @"(.)(?'20'.)";

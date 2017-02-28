@@ -1,8 +1,11 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Utilities;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 
 namespace Extract.AttributeFinder.Test
@@ -279,12 +282,14 @@ namespace Extract.AttributeFinder.Test
         {
             _ussFiles = new string[10];
             _voaFiles = new string[10];
+            _voaFiles2 = new string[10];
             for (int i = 0; i < _ussFiles.Length; i++)
             {
                 var baseName = "Resources.LearningMachine.DocumentCategorization.Example{0:D2}.tif{1}";
                 _testFiles.GetFile(string.Format(CultureInfo.CurrentCulture, baseName, i+1, ""));
                 _ussFiles[i] = _testFiles.GetFile(string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".uss"));
                 _voaFiles[i] = _testFiles.GetFile(string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".voa"));
+                _voaFiles2[i] = _testFiles.GetFile(string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".protofeatures.voa"));
             }
             _categories = new string[]
             {
@@ -430,14 +435,14 @@ namespace Extract.AttributeFinder.Test
             var autoBoW = new SpatialStringFeatureVectorizer("1", 5, 2000);
             LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW);
             encoder.ComputeEncodings(_ussFiles, null, _categories);
-            var firstPageValues = autoBoW.DistinctValuesSeen;
+            var firstPageValues = autoBoW.RecognizedValues;
             Assert.AreEqual(2000, firstPageValues.Count());
 
             // Compare to all pages
             autoBoW.PagesToProcess = "";
             encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW);
             encoder.ComputeEncodings(_ussFiles, null, _categories);
-            var allPageValues = autoBoW.DistinctValuesSeen;
+            var allPageValues = autoBoW.RecognizedValues;
             Assert.AreEqual(2000, allPageValues.Count());
             CollectionAssert.AreNotEquivalent(firstPageValues, allPageValues);
 
@@ -445,7 +450,7 @@ namespace Extract.AttributeFinder.Test
             autoBoW.PagesToProcess = "100";
             encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW);
             encoder.ComputeEncodings(_ussFiles, null, _categories);
-            var pageOneHundredValues = autoBoW.DistinctValuesSeen;
+            var pageOneHundredValues = autoBoW.RecognizedValues;
             Assert.AreEqual(0, pageOneHundredValues.Count());
             Assert.AreEqual(0, encoder.FeatureVectorLength);
         }
@@ -681,7 +686,9 @@ namespace Extract.AttributeFinder.Test
             SetAttributeCategorizationFiles();
             LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
             encoder.ComputeEncodings(_ussFiles, _voaFiles, null);
-            Assert.AreEqual(199, encoder.FeatureVectorLength);
+            // More features than previous because vectorizers are now fully case-sensitive
+            // https://extract.atlassian.net/browse/ISSUE-14483
+            Assert.AreEqual(216, encoder.FeatureVectorLength);
 
             // There are three categories available
             Assert.AreEqual(3, encoder.AnswerNameToCode.Count);
@@ -701,7 +708,9 @@ namespace Extract.AttributeFinder.Test
             LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
             encoder.ComputeEncodings(_ussFiles, _voaFiles2, null);
             // Less features result because there are less candidates
-            Assert.AreEqual(73, encoder.FeatureVectorLength);
+            // More features than previous because vectorizers are now fully case-sensitive
+            // https://extract.atlassian.net/browse/ISSUE-14483
+            Assert.AreEqual(79, encoder.FeatureVectorLength);
 
             // There are still three categories available because the 'nothing' category is always available
             Assert.AreEqual(3, encoder.AnswerNameToCode.Count);
@@ -758,6 +767,147 @@ namespace Extract.AttributeFinder.Test
                 });
             // All attributes are considered for predicting because labels don't matter in this context
             Assert.AreEqual(134, featureVectors.Count());
+        }
+
+        // Specifically test that attribute feature vectorizers are fully case-sensitive
+        // https://extract.atlassian.net/browse/ISSUE-14483
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeFeatureVectorizersRespectCase()
+        {
+            SetAttributeCategorizationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, null);
+            Assert.Less(
+                encoder.AttributeFeatureVectorizers.Sum(v => v.RecognizedValues
+                                                              .Distinct(StringComparer.OrdinalIgnoreCase)
+                                                              .Count()),
+                encoder.AttributeFeatureVectorizers.Sum(v => v.RecognizedValues.Count()));
+        }
+
+        // Test that attribute feature vectorizers sort terms by tf*idf score
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeFeatureVectorizersOrderTermsByRelevance1()
+        {
+            SetAttributeCategorizationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, null);
+            var left = encoder.AttributeFeatureVectorizers.First(v => v.Name == "Left");
+            var terms = left.RecognizedValues.ToList();
+            var mostRelevant = terms.Take(10).ToList();
+            var leastRelevant = terms.Reverse<string>().Take(10).ToList();
+            CollectionAssert.AreEqual(
+                new[] { "Date", "DOB", "AM", "Collected", "R", "DOE", "COLLECTED", "DATE", "PRINTED", "ID" },
+                mostRelevant);
+
+            CollectionAssert.AreEqual(
+                new[] { "U", "Time", "thru", "Requested", "REPRINT", "REPORTED", "Refill", "r", "Processed", "PM" },
+                leastRelevant);
+        }
+
+        // Test that attribute feature vectorizers order of terms not dependant on input order
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeFeatureVectorizersOrderTermsByRelevance2()
+        {
+            SetAttributeCategorizationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, null);
+            var left = encoder.AttributeFeatureVectorizers.First(v => v.Name == "Left");
+            var terms = left.RecognizedValues.ToList();
+
+            var reversedUSSFiles = _ussFiles.Reverse().ToArray();
+            var reversedVOAFiles = _voaFiles.Reverse().ToArray();
+            encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
+            encoder.ComputeEncodings(reversedUSSFiles, reversedVOAFiles, null);
+            var terms2 = left.RecognizedValues.ToList();
+            CollectionAssert.AreEqual(terms, terms2);
+        }
+
+        // Pagination: Test that attribute feature vectorizers sort terms by tf*idf score
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeFeatureVectorizersOrderTermsByRelevance3()
+        {
+            SetPaginationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, null, "*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, _eavFiles);
+            var nameDiff01 = encoder.AttributeFeatureVectorizers.First(v => v.Name == "NameDiff01");
+            var terms = nameDiff01.RecognizedValues.ToList();
+            CollectionAssert.AreEqual(new[] { "3", "4", "8", "0", "10", "5" }, terms);
+        }
+
+        // Test that attribute feature vectorizers sort terms by tf*idf score after serialization/deserialization
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeFeatureVectorizersOrderTermsByRelevance4()
+        {
+            SetPaginationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, null, "*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, _eavFiles);
+            using (var stream = new System.IO.MemoryStream())
+            {
+                var serializer = new System.Runtime.Serialization.NetDataContractSerializer();
+                serializer.AssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple;
+                serializer.Serialize(stream, encoder);
+                stream.Flush();
+                stream.Position = 0;
+                encoder = (LearningMachineDataEncoder)serializer.Deserialize(stream);
+            }
+            var nameDiff01 = encoder.AttributeFeatureVectorizers.First(v => v.Name == "NameDiff01");
+            var terms = nameDiff01.RecognizedValues.ToList();
+            CollectionAssert.AreEqual(new[] { "3", "4", "8", "0", "10", "5" }, terms);
+        }
+
+        // DocumentCategorization: Test that attribute feature vectorizers sort terms by tf*idf score
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeFeatureVectorizersOrderTermsByRelevance5()
+        {
+            SetDocumentCategorizationFiles();
+            var autoBoW = new SpatialStringFeatureVectorizer("1", 5, 2000);
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW);
+            encoder.ComputeEncodings(_ussFiles, _voaFiles2, _categories);
+
+            // Compare top terms from the spatial string vectorizer with attribute vectorizer to check that the
+            // algorithms sort the same
+            var spatialStringVectorizer = encoder.AutoBagOfWords;
+            var attributeVectorizer = encoder.AttributeFeatureVectorizers.First();
+            CollectionAssert.AreEqual(
+                spatialStringVectorizer.RecognizedValues,
+                attributeVectorizer.RecognizedValues.Take(2000));
+        }
+
+        // DocumentCategorization: Test that attribute feature vectorizers sort terms by tf*idf score
+        // Test using less categories so that there are multiple documents per category
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeFeatureVectorizersOrderTermsByRelevance6()
+        {
+            SetDocumentCategorizationFiles();
+            _categories = new string[]
+            {
+                "Deed of Trust",
+                "Deed of Trust",
+                "Deed of Trust",
+                "Reconveyance",
+                "Deed",
+                "Deed",
+                "Deed",
+                "Deed of Trust",
+                "Deed of Trust",
+                "Notice of Federal Tax Lien"
+            };
+            var autoBoW = new SpatialStringFeatureVectorizer("1", 5, 2000);
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW);
+            encoder.ComputeEncodings(_ussFiles, _voaFiles2, _categories);
+
+            // Compare top terms from the spatial string vectorizer with attribute vectorizer to check that the
+            // algorithms sort the same
+            var spatialStringVectorizer = encoder.AutoBagOfWords;
+            var attributeVectorizer = encoder.AttributeFeatureVectorizers.First();
+            var spatialStringFeatures = spatialStringVectorizer.RecognizedValues.ToArray();
+            var attributeFeatures = attributeVectorizer.RecognizedValues.Take(2000).ToArray();
+
+            // There is a slight difference in the two collections. Probably a result of different max term-frequency since
+            // the attribute feature vectorizer can't rely on terms being unique per document
+            UtilityMethods.Swap(ref attributeFeatures[89], ref attributeFeatures[90]);
+
+            CollectionAssert.AreEqual(spatialStringFeatures, attributeFeatures);
         }
 
         #endregion Tests

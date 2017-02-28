@@ -65,7 +65,7 @@ namespace Extract.Utilities.Parsers.Test
         }
 
         [Test]
-        public static void SpecifiedNotLongEnoughTimeout_LeadingWhitespace()
+        public static void SpecifiedNotLongEnoughTimeout_LeadingWhiteSpace()
         {
             var regexParser = new DotNetRegexParser();
             regexParser.Pattern = @"

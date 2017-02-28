@@ -12,6 +12,9 @@ using UCLID_COMUTILSLib;
 using UCLID_AFUTILSLib;
 using UCLID_AFCORELib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
+using System.Threading;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Extract.AttributeFinder.Test
 {
@@ -272,12 +275,15 @@ namespace Extract.AttributeFinder.Test
                     AnswerPath = "<SourceDocName>.eav",
                     TrainingSetPercentage = 50
                 },
-                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
-                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false },
-                RandomNumberSeed = 10
+                // https://extract.atlassian.net/browse/ISSUE-14479
+                // Updated settings because new, TFIDF ordering of features changed the effects of the random initialization
+                // (Since using non-@Feature attributes meant patient names, e.g., were being learned as bag-of-word features)
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, attributeFilter: "*@Feature"),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = true },
+                RandomNumberSeed = 1
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.90);
+            Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.9);
             Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
         }
 
@@ -298,12 +304,15 @@ namespace Extract.AttributeFinder.Test
                     AnswerPath = "<SourceDocName>.eav",
                     TrainingSetPercentage = 50
                 },
-                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
-                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false },
-                RandomNumberSeed = 10
+                // https://extract.atlassian.net/browse/ISSUE-14479
+                // Updated settings because new, TFIDF ordering of features changed the effects of the random initialization
+                // (Using non-@Feature attributes meant patient names, e.g., were being learned as bag-of-word features)
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, attributeFilter: "*@Feature"),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = true },
+                RandomNumberSeed = 1
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.90);
+            Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.9);
             Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
         }
 
@@ -800,9 +809,12 @@ namespace Extract.AttributeFinder.Test
                     AnswerPath = "<SourceDocName>.eav",
                     TrainingSetPercentage = 50
                 },
-                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
-                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false },
-                RandomNumberSeed = 10
+                // https://extract.atlassian.net/browse/ISSUE-14479
+                // Updated settings because new, TFIDF ordering of features changed the effects of the random initialization
+                // (Using non-@Feature attributes meant patient names, e.g., were being learned as bag-of-word features)
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, attributeFilter: "*@Feature"),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = true },
+                RandomNumberSeed = 1
             };
             lm1.TrainMachine();
             lm1.Save(_savedMachinePath);
@@ -812,7 +824,7 @@ namespace Extract.AttributeFinder.Test
 
             // Test output
             var results = lm2.TestMachine();
-            Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.90);
+            Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.9);
             Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
         }
 
@@ -1071,6 +1083,76 @@ namespace Extract.AttributeFinder.Test
             long compressedSize = new FileInfo(path).Length;
 
             Assert.Less(compressedSize, uncompressedSize);
+        }
+
+        // Test multi-threaded access to a large machine
+        // https://extract.atlassian.net/browse/ISSUE-14474
+        [Test, Category("LearningMachine")]
+        public static void Test100ThreadSimultaneousAccess()
+        {
+            SetDocumentCategorizationFiles();
+            var spatialStrings = Directory.GetFiles(_inputFolder.Last(), "*.tif.uss", SearchOption.AllDirectories)
+                .Select(path =>
+                {
+                    var ss = new SpatialString();
+                    ss.LoadFrom(path, false);
+                    return ss;
+                }).ToList();
+            var machinePath = _testFiles.GetFile("Resources.LearningMachine.Large.lm");
+            var answers = new ConcurrentBag<KeyValuePair<int, string>>();
+            var exceptions = new ConcurrentBag<Exception>();
+            Action<object> compute = o =>
+            {
+                try
+                {
+                    var attrr = new IUnknownVector();
+                    var idx = (int)o % spatialStrings.Count;
+                    var ss = spatialStrings[idx];
+                    LearningMachine.ComputeAnswer(machinePath, ss, attrr, false);
+                    var doctype = ((IAttribute)attrr.At(0)).Value.String;
+                    answers.Add(new KeyValuePair<int, string>(idx, doctype));
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            };
+
+            var threads = Enumerable.Repeat<Func<Thread>>(
+                () => new Thread(new ParameterizedThreadStart(compute))
+                , spatialStrings.Count * 10)
+                .Select(f => f())
+                .ToList();
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            int i = 0;
+            foreach (var thread in threads)
+            {
+                thread.Start(i++);
+            }
+
+            foreach(var thread in threads)
+            {
+                thread.Join();
+            }
+            // Finished in less time than possible if loading 100 times
+            // (finishes in ~ 2 seconds on my dev machine)
+            Assert.Less(stopwatch.ElapsedMilliseconds, 5000);
+
+            // There were no exceptions (e.g., no out-of-memory issues with 100 62MB LMs)
+            CollectionAssert.IsEmpty(exceptions);
+            Assert.AreEqual(100, answers.Count);
+
+            // The answers aren't all the same
+            Assert.Greater(answers.Select(kv => kv.Value).Distinct().Count(), 1);
+
+            // The answer is consistent for each index (each input string)
+            foreach (var group in answers.GroupBy(kv => kv.Key))
+            {
+                Assert.AreEqual(10, group.Count());
+                group.Select(kv => kv.Value).Distinct().Single();
+            }
         }
 
         #endregion Tests

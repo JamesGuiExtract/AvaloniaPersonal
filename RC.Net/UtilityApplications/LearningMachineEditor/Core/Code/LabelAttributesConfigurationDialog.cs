@@ -194,6 +194,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 _labelAttributesSettings.SourceOfLabelsPath = sourceOfLabelsTextBox.Text;
                 _labelAttributesSettings.DestinationPath = destinationTextBox.Text;
                 _labelAttributesSettings.CreateEmptyLabelForNonMatching = createEmptyLabelCheckBox.Checked;
+                _labelAttributesSettings.OnlyIfAllCategoriesMatchOnSamePage = onlyIfMatchOnSamePageCheckBox.Checked;
 
                 UpdateButtonStates();
             }
@@ -333,11 +334,18 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void HandleRevertButton_Click(object sender, EventArgs e)
         {
-            _labelAttributesSettings = _editor.CurrentLearningMachine.LabelAttributesSettings
-                ?.DeepClone()
-                ?? new LabelAttributes();
+            try
+            {
+                _labelAttributesSettings = _editor.CurrentLearningMachine.LabelAttributesSettings
+                    ?.DeepClone()
+                    ?? new LabelAttributes();
 
-            SetControlValues();
+                SetControlValues();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI41820");
+            }
         }
 
         #endregion Event Handlers
@@ -368,6 +376,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 upButton.Enabled = currentRow > 0;
                 downButton.Enabled = currentRow < rowCount - 1;
+
+                onlyIfMatchOnSamePageCheckBox.Enabled = createEmptyLabelCheckBox.Checked;
             }
             catch (Exception ex)
             {
@@ -391,11 +401,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             sourceOfLabelsTextBox.Text = _labelAttributesSettings.SourceOfLabelsPath;
             destinationTextBox.Text = _labelAttributesSettings.DestinationPath;
             createEmptyLabelCheckBox.Checked = _labelAttributesSettings.CreateEmptyLabelForNonMatching;
+            onlyIfMatchOnSamePageCheckBox.Checked = _labelAttributesSettings.OnlyIfAllCategoriesMatchOnSamePage;
 
             _suspendUpdatesToSettingsObject = false;
         }
 
         #endregion Private Methods
-
     }
 }

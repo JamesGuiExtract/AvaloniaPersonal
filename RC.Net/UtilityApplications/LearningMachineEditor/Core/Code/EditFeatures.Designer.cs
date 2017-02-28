@@ -21,6 +21,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 components.Dispose();
             }
+            if (disposing && _numberSelector != null)
+            {
+                _numberSelector.Dispose();
+                _numberSelector = null;
+            }
             base.Dispose(disposing);
         }
 
@@ -32,18 +37,28 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.summaryStatusStrip = new System.Windows.Forms.StatusStrip();
             this.featureListDataGridView = new System.Windows.Forms.DataGridView();
+            this.featureVectorizersContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.limitToTopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.exportToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportToFileDistinctToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.featureDetailsTextBox = new System.Windows.Forms.TextBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.okButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.distinctValuesSeenListBox = new System.Windows.Forms.ListBox();
+            this.distinctValuesSeenContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -51,6 +66,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.featureListDataGridView)).BeginInit();
+            this.featureVectorizersContextMenuStrip.SuspendLayout();
+            this.distinctValuesSeenContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -98,38 +115,76 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.featureListDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.featureListDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.featureListDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.featureListDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.featureListDataGridView.DefaultCellStyle = dataGridViewCellStyle5;
+            this.featureListDataGridView.ContextMenuStrip = this.featureVectorizersContextMenuStrip;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.featureListDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             this.featureListDataGridView.Location = new System.Drawing.Point(3, 28);
-            this.featureListDataGridView.MultiSelect = false;
             this.featureListDataGridView.Name = "featureListDataGridView";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.featureListDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.featureListDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.featureListDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.featureListDataGridView.Size = new System.Drawing.Size(464, 542);
             this.featureListDataGridView.TabIndex = 1;
             this.featureListDataGridView.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleFeatureListDataGridView_RowEnter);
+            this.featureListDataGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HandleFeatureListDataGridView_MouseDown);
+            // 
+            // featureVectorizersContextMenuStrip
+            // 
+            this.featureVectorizersContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.limitToTopToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.exportToFileToolStripMenuItem,
+            this.exportToFileDistinctToolStripMenuItem});
+            this.featureVectorizersContextMenuStrip.Name = "featureVectorizersContextMenuStrip";
+            this.featureVectorizersContextMenuStrip.Size = new System.Drawing.Size(288, 76);
+            this.featureVectorizersContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.HandleFeatureVectorizersContextMenuStrip_Opening);
+            // 
+            // limitToTopToolStripMenuItem
+            // 
+            this.limitToTopToolStripMenuItem.Name = "limitToTopToolStripMenuItem";
+            this.limitToTopToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
+            this.limitToTopToolStripMenuItem.Text = "Limit selected to top terms...";
+            this.limitToTopToolStripMenuItem.Click += new System.EventHandler(this.HandleLimitToTopToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(284, 6);
+            // 
+            // exportToFileToolStripMenuItem
+            // 
+            this.exportToFileToolStripMenuItem.Name = "exportToFileToolStripMenuItem";
+            this.exportToFileToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
+            this.exportToFileToolStripMenuItem.Text = "Export values of selected to file...";
+            this.exportToFileToolStripMenuItem.Click += new System.EventHandler(this.HandleExportToFileToolStripMenuItem_Click);
+            // 
+            // exportToFileDistinctToolStripMenuItem
+            // 
+            this.exportToFileDistinctToolStripMenuItem.Name = "exportToFileDistinctToolStripMenuItem";
+            this.exportToFileDistinctToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
+            this.exportToFileDistinctToolStripMenuItem.Text = "Export distinct values of selected to file...";
+            this.exportToFileDistinctToolStripMenuItem.Click += new System.EventHandler(this.HandleExportDistinctToFileToolStripMenuItem_Click);
             // 
             // featureDetailsTextBox
             // 
@@ -166,9 +221,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(3, 50);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(102, 13);
+            this.label2.Size = new System.Drawing.Size(98, 13);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Distinct values seen";
+            this.label2.Text = "Recognized values";
             // 
             // label1
             // 
@@ -184,11 +239,44 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             this.distinctValuesSeenListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.distinctValuesSeenListBox.ContextMenuStrip = this.distinctValuesSeenContextMenuStrip;
             this.distinctValuesSeenListBox.FormattingEnabled = true;
             this.distinctValuesSeenListBox.Location = new System.Drawing.Point(6, 69);
             this.distinctValuesSeenListBox.Name = "distinctValuesSeenListBox";
+            this.distinctValuesSeenListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.distinctValuesSeenListBox.Size = new System.Drawing.Size(499, 459);
             this.distinctValuesSeenListBox.TabIndex = 3;
+            // 
+            // distinctValuesSeenContextMenuStrip
+            // 
+            this.distinctValuesSeenContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.selectAllToolStripMenuItem});
+            this.distinctValuesSeenContextMenuStrip.Name = "distinctValuesSeenContextMenuStrip";
+            this.distinctValuesSeenContextMenuStrip.Size = new System.Drawing.Size(165, 54);
+            this.distinctValuesSeenContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.HandleDistinctValuesSeenContextMenuStrip_Opening);
+            // 
+            // copyToolStripMenuItem
+            // 
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.copyToolStripMenuItem.Text = "Copy";
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.HandleCopyToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(161, 6);
+            // 
+            // selectAllToolStripMenuItem
+            // 
+            this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
+            this.selectAllToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.selectAllToolStripMenuItem.Text = "Select All";
+            this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.HandleSelectAllToolStripMenuItem_Click);
             // 
             // toolStripStatusLabel1
             // 
@@ -222,6 +310,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.featureListDataGridView)).EndInit();
+            this.featureVectorizersContextMenuStrip.ResumeLayout(false);
+            this.distinctValuesSeenContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -229,9 +319,6 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainer1;
-        //private System.Windows.Forms.DataGridViewCheckBoxColumn featureEnabled;
-        //private System.Windows.Forms.DataGridViewTextBoxColumn featureName;
-        //private System.Windows.Forms.DataGridViewComboBoxColumn featureType;
         private System.Windows.Forms.ListBox distinctValuesSeenListBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button cancelButton;
@@ -242,5 +329,14 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
         private System.Windows.Forms.DataGridView featureListDataGridView;
+        private System.Windows.Forms.ContextMenuStrip distinctValuesSeenContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip featureVectorizersContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem limitToTopToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem exportToFileDistinctToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportToFileToolStripMenuItem;
     }
 }
