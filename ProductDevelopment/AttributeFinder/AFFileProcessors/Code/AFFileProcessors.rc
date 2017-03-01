@@ -90,18 +90,24 @@ END
 //
 
 IDR_AFENGINEFILEPROCESSOR REGISTRY                "AFEngineFileProcessor.rgs"
+
 IDR_AFENGINEFILEPROCESSORPP REGISTRY                "AFEngineFileProcessorPP.rgs"
+
 IDR_AFCONVERTVOATOXMLTASK REGISTRY                "AFConvertVOAToXMLTask.rgs"
+
 IDR_AFCONVERTVOATOXMLTASKPP REGISTRY                "AFConvertVOAToXMLTaskPP.rgs"
+
 IDR_AFENHANCEOCRTASK    REGISTRY                "EnhanceOCRTask.rgs"
+
 IDR_AFENHANCEOCRTASKPP  REGISTRY                "EnhanceOCRTaskPP.rgs"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_AFENGINEFILEPROCESSORPP DIALOGEX 0, 0, 320, 192
+IDD_AFENGINEFILEPROCESSORPP DIALOGEX 0, 0, 320, 260
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x0
@@ -128,6 +134,13 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,161,200,12
     CONTROL         "Use cleaned image if available",IDC_CHK_USE_CLEAN_IMAGE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,174,120,12
+    GROUPBOX        "RuleSet Parallelization",IDC_STATIC,6,198,309,54
+    CONTROL         "No parallelization (each file will only use a single thread)",IDC_RADIO_NO_PARALLEL,
+                    "Button",BS_AUTORADIOBUTTON,12,210,189,10
+    CONTROL         "Polite parallelization (there will tend to be more files processing at once)",IDC_RADIO_POLITE_PARALLEL,
+                    "Button",BS_AUTORADIOBUTTON,12,222,238,10
+    CONTROL         "Greedy parallelization (large files will tend to use all possible threads)",IDC_RADIO_GREEDY_PARALLEL,
+                    "Button",BS_AUTORADIOBUTTON,12,234,228,10
 END
 
 IDD_AFCONVERTVOATOXMLTASKPP DIALOGEX 0, 0, 320, 55
@@ -190,7 +203,9 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON_INFO           ICON                    "..\\..\\..\\..\\ReusableComponents\\BaseUtils\\Code\\res\\icon_info.ico"
+
 IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -205,7 +220,7 @@ BEGIN
         LEFTMARGIN, 5
         RIGHTMARGIN, 316
         TOPMARGIN, 5
-        BOTTOMMARGIN, 154
+        BOTTOMMARGIN, 222
     END
 
     IDD_AFCONVERTVOATOXMLTASKPP, DIALOG
@@ -229,8 +244,22 @@ END
 //
 
 IDB_BITMAP_HALFTONE_SPECKLED BITMAP                  "res\\HalftoneSpeckled.bmp"
+
 IDB_BITMAP_ALIASED_DIFFUSE BITMAP                  "res\\AliasedDiffuse.bmp"
+
 IDB_BITMAP_SMUDGED      BITMAP                  "res\\Smudged.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_AFENGINEFILEPROCESSORPP AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

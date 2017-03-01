@@ -12,8 +12,8 @@
 #define IDR_AFCONVERTVOATOXMLTASK       114
 #define IDR_AFCONVERTVOATOXMLTASKPP     115
 #define IDD_AFCONVERTVOATOXMLTASKPP     116
-#define IDR_AFENHANCEOCRTASK			117
-#define IDR_AFENHANCEOCRTASKPP			118
+#define IDR_AFENHANCEOCRTASK            117
+#define IDR_AFENHANCEOCRTASKPP          118
 #define IDI_ICON_INFO                   201
 #define IDC_OUTPUT_IMAGE_NAME           202
 #define IDC_RULE_FILE                   203
@@ -66,14 +66,18 @@
 #define IDB_BITMAP_HALFTONE_SPECKLED    255
 #define IDB_BITMAP_ALIASED_DIFFUSE      256
 #define IDB_BITMAP_SMUDGED              257
+#define IDC_RADIO_NO_PARALLEL           258
+#define IDC_RADIO_POLITE_PARALLEL       259
+#define IDC_RADIO3                      260
+#define IDC_RADIO_GREEDY_PARALLEL       260
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        258
+#define _APS_NEXT_RESOURCE_VALUE        259
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         258
+#define _APS_NEXT_CONTROL_VALUE         261
 #define _APS_NEXT_SYMED_VALUE           119
 #endif
 #endif

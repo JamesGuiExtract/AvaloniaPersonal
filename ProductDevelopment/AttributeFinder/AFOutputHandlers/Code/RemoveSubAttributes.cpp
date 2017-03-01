@@ -322,7 +322,7 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 				{
 					PROFILE_RULE_OBJECT(asString(m_ipDataScorer->Description), "", ipDataScorer, 0);
 					
-					nScore = ipDataScorer->GetDataScore1(ipAttr);
+					nScore = ipDataScorer->GetDataScore1(ipAttr, pAFDoc);
 
 				}
 

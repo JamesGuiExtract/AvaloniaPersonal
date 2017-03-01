@@ -174,7 +174,8 @@ bool PatternFileInterpreter::foundPattern(IStringPatternMatcherPtr ipSPM,
 				PROFILE_RULE_OBJECT(asString(ipDataScorerObjWithDesc->Description), "", ipDataScorer, 0);
 
 				// get the score of the data
-				nThisDataScore = ipDataScorer->GetDataScore2(ipFoundAttributes);
+				// NOTE: not really ok to pass null AFDoc but this object is deprecated...
+				nThisDataScore = ipDataScorer->GetDataScore2(ipFoundAttributes, __nullptr);
 				
 				// if it does not meet the minimum standards, 
 				// ignore it

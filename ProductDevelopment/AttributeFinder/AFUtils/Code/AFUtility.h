@@ -240,8 +240,8 @@ private:
 	// methods to expand the various tags
 	// each of these methods can be called anytime.  They will expand
 	// the string after checking to see if the appropriate tag exists
-	void expandRSDFileDirTag(string& rstrInput);
-	void expandComponentDataDirTag(string& rstrInput);
+	void expandRSDFileDirTag(string& rstrInput, IAFDocumentPtr& ripDoc);
+	void expandComponentDataDirTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandRuleExecIDTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandSourceDocNameTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandDocTypeTag(string& rstrInput, IAFDocumentPtr& ripDoc);

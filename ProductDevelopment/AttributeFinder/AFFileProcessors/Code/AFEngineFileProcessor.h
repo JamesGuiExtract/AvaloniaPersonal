@@ -76,6 +76,8 @@ END_CATEGORY_MAP()
 	STDMETHOD(put_UseDataInputFile)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_DataInputFileName)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_DataInputFileName)(/*[in]*/ BSTR newVal);
+	STDMETHOD(get_ParallelRunMode)(/*[out, retval]*/ EParallelRunMode *pVal);
+	STDMETHOD(put_ParallelRunMode)(/*[in]*/ EParallelRunMode newVal);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -143,6 +145,8 @@ private:
 	bool m_bCounterDecrementFailed;
 
 	bool m_bDirty;
+
+	EParallelRunMode m_eParallelRunMode;
 
 	/////////////
 	// Methods

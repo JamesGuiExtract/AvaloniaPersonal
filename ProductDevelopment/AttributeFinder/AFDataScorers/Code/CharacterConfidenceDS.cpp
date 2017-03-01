@@ -48,7 +48,8 @@ STDMETHODIMP CCharacterConfidenceDS::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IDataScorer
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore1(IAttribute * pAttribute, LONG * pScore)
+STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore1(IAttribute * pAttribute, IAFDocument * pAFDoc,
+	LONG * pScore)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -70,7 +71,8 @@ STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore1(IAttribute * pAttribute, 
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29453")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore2(IIUnknownVector * pAttributes, LONG * pScore)
+STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore2(IIUnknownVector * pAttributes, IAFDocument * pAFDoc,
+	LONG * pScore)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 

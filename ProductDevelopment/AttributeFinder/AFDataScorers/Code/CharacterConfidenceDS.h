@@ -70,8 +70,8 @@ public:
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IDataScorer
-	STDMETHOD(raw_GetDataScore1)(IAttribute * pAttribute, LONG * pScore);
-	STDMETHOD(raw_GetDataScore2)(IIUnknownVector * pAttributes, LONG * pScore);
+	STDMETHOD(raw_GetDataScore1)(IAttribute * pAttribute, IAFDocument * pAFDoc, LONG * pScore);
+	STDMETHOD(raw_GetDataScore2)(IIUnknownVector * pAttributes, IAFDocument * pAFDoc, LONG * pScore);
 
 // ICategorizedComponent
 	STDMETHOD(raw_GetComponentDescription)(BSTR * pstrComponentDescription);

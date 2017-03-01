@@ -41,7 +41,7 @@ RegExPatternFileInterpreter& RegExPatternFileInterpreter::operator=(const RegExP
 //-------------------------------------------------------------------------------------------------
 bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpParser, 
 										  UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipREPMFinder,
-										  ISpatialStringPtr ipInputText,
+										  IAFDocumentPtr ipInputDoc,
 										  IIUnknownVectorPtr& ripAttributes,
 										  string& rstrPatternID)
 {
@@ -101,7 +101,7 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 				// The primary match doesn't matter (and may be zero-length); Use only the named groups.
 				// Method has been changed to return null if there was no match so don't assert allocation
 				// https://extract.atlassian.net/browse/ISSUE-14396
-				ipSearchResults = ipRegExpParser->FindNamedGroups(ipInputText->String, VARIANT_TRUE);
+				ipSearchResults = ipRegExpParser->FindNamedGroups(ipInputDoc->Text->String, VARIANT_TRUE);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33332");
 		}
@@ -125,7 +125,7 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 				ITokenPtr ipToken = ipSearchResults->At(i);
 				ASSERT_RESOURCE_ALLOCATION("ELI33366", ipToken != __nullptr);
 				
-				IAttributePtr ipAttribute = createAttribute(ipToken, ipInputText);
+				IAttributePtr ipAttribute = createAttribute(ipToken, ipInputDoc->Text);
 				ASSERT_RESOURCE_ALLOCATION("ELI33367", ipAttribute != __nullptr);
 
 				ipFoundAttributes->PushBack(ipAttribute);
@@ -149,7 +149,7 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 				PROFILE_RULE_OBJECT(asString(ipDataScorerObjWithDesc->Description), "", ipDataScorer, 0);
 
 				// get the score of the data
-				nThisDataScore = ipDataScorer->GetDataScore2(ipFoundAttributesCopy);
+				nThisDataScore = ipDataScorer->GetDataScore2(ipFoundAttributesCopy, ipInputDoc);
 				
 				// if it does not meet the minimum standards, 
 				// ignore it

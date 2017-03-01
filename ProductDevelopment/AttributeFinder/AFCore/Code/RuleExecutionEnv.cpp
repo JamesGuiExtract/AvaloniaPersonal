@@ -19,6 +19,7 @@ map<DWORD, string> CRuleExecutionEnv::m_mapThreadIDToAlternateComponentDataDir;
 CCriticalSection CRuleExecutionEnv::m_criticalSection;
 map<DWORD, string> CRuleExecutionEnv::m_mapThreadIDToRSDFileBeingEdited;
 bool CRuleExecutionEnv::m_bShouldAddAttributeHistory;
+bool CRuleExecutionEnv::m_bEnableParallelProcessing;
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -33,6 +34,8 @@ CRuleExecutionEnv::CRuleExecutionEnv()
 	// Setup Registry persistence item
 	ma_pSettingsCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 		new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrREG_ROOT_KEY ) );
+
+	updateSettingsFromRegistry();
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleExecutionEnv::InterfaceSupportsErrorInfo(REFIID riid)
@@ -78,11 +81,6 @@ STDMETHODIMP CRuleExecutionEnv::PushRSDFileName(BSTR strFileName, long *pnStackS
 		rThisThreadRSDFileStack.push(strFile);
 
 		long nStackSize = rThisThreadRSDFileStack.size();
-
-		if (nStackSize == 1)
-		{
-			updateSettingsFromRegistry();
-		}
 
 		// return the stack size
 		*pnStackSize = nStackSize;
@@ -302,6 +300,19 @@ STDMETHODIMP CRuleExecutionEnv::put_RSDFileBeingEdited(BSTR newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41783")
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleExecutionEnv::get_EnableParallelProcessing(VARIANT_BOOL *pbVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		*pbVal = asVariantBool(m_bEnableParallelProcessing);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42013")
+}
+//-------------------------------------------------------------------------------------------------
 stack<string>& CRuleExecutionEnv::getCurrentStack(bool bThrowExceptionIfStackEmpty)
 {
 	// protect the stack against simultaneous access
@@ -349,24 +360,39 @@ string& CRuleExecutionEnv::getAlternateComponentDataDir()
 void CRuleExecutionEnv::updateSettingsFromRegistry()
 {
 	// Only respect the add attribute history setting if the RDT is licensed
-	if (!LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS))
+	if (LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS))
 	{
-		return;
+		// Add attribute history
+		if (!ma_pSettingsCfgMgr->keyExists(gstrSETTINGS_SECTION, gstrAF_ADD_ATTRIBUTE_HISTORY_KEY))
+		{
+			ma_pSettingsCfgMgr->createKey(gstrSETTINGS_SECTION,
+				gstrAF_ADD_ATTRIBUTE_HISTORY_KEY, gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+
+			m_bShouldAddAttributeHistory = asCppBool(gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+		}
+		else
+		{
+			string strValue = ma_pSettingsCfgMgr->getKeyValue(gstrSETTINGS_SECTION,
+				gstrAF_ADD_ATTRIBUTE_HISTORY_KEY, gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+
+			m_bShouldAddAttributeHistory = asCppBool(strValue);
+		}
 	}
 
-	if (!ma_pSettingsCfgMgr->keyExists(gstrSETTINGS_SECTION, gstrAF_ADD_ATTRIBUTE_HISTORY_KEY))
+	// Enable parallel processing
+	if (!ma_pSettingsCfgMgr->keyExists(gstrSETTINGS_SECTION, gstrAF_ENABLE_PARALLEL_PROCESSING_KEY))
 	{
 		ma_pSettingsCfgMgr->createKey(gstrSETTINGS_SECTION,
-			gstrAF_ADD_ATTRIBUTE_HISTORY_KEY, gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+			gstrAF_ENABLE_PARALLEL_PROCESSING_KEY, gstrAF_DEFAULT_ENABLE_PARALLEL_PROCESSING);
 
-		m_bShouldAddAttributeHistory = asCppBool(gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+		m_bEnableParallelProcessing = asCppBool(gstrAF_DEFAULT_ENABLE_PARALLEL_PROCESSING);
 	}
 	else
 	{
 		string strValue = ma_pSettingsCfgMgr->getKeyValue(gstrSETTINGS_SECTION,
-			gstrAF_ADD_ATTRIBUTE_HISTORY_KEY, gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY);
+			gstrAF_ENABLE_PARALLEL_PROCESSING_KEY, gstrAF_DEFAULT_ENABLE_PARALLEL_PROCESSING);
 
-		m_bShouldAddAttributeHistory = asCppBool(strValue);
+		m_bEnableParallelProcessing = asCppBool(strValue);
 	}
 }
 //-------------------------------------------------------------------------------------------------

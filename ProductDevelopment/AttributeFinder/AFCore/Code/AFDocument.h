@@ -3,6 +3,7 @@
 #pragma once
 
 #include "resource.h"       // main symbols
+#include <string>
 
 /////////////////////////////////////////////////////////////////////////////
 // CAFDocument
@@ -12,7 +13,8 @@ class ATL_NO_VTABLE CAFDocument :
 	public ISupportErrorInfo,
 	public IDispatchImpl<IAFDocument, &IID_IAFDocument, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>
+	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
+	public IPersistStream
 {
 public:
 	CAFDocument();
@@ -31,6 +33,7 @@ BEGIN_COM_MAP(CAFDocument)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
+	COM_INTERFACE_ENTRY(IPersistStream)
 END_COM_MAP()
 
 public:
@@ -48,6 +51,19 @@ public:
 	STDMETHOD(put_Attribute)(/*[in]*/ IAttribute* newVal);
 	STDMETHOD(PartialClone)(VARIANT_BOOL vbCloneAttributes, VARIANT_BOOL vbCloneText,
 		IAFDocument **pAFDoc);
+	STDMETHOD(PushRSDFileName)(/*[in]*/ BSTR strFileName, 
+		/*[out, retval]*/ long *pnStackSize);
+	STDMETHOD(PopRSDFileName)(/*[out, retval]*/ long *pnStackSize);
+	STDMETHOD(get_RSDFileStack)(IVariantVector* *pVal);
+	STDMETHOD(put_RSDFileStack)(IVariantVector *newVal);
+	STDMETHOD(get_FKBVersion)(BSTR *pVal);
+	STDMETHOD(put_FKBVersion)(BSTR newVal);
+	STDMETHOD(get_AlternateComponentDataDir)(BSTR *pVal);
+	STDMETHOD(put_AlternateComponentDataDir)(BSTR newVal);
+	STDMETHOD(IsRSDFileExecuting)(BSTR bstrFileName, VARIANT_BOOL *pbValue);
+	STDMETHOD(GetCurrentRSDFileDir)(/*[out, retval]*/ BSTR *pstrRSDFileDir);
+	STDMETHOD(get_ParallelRunMode)(EParallelRunMode *pVal);
+	STDMETHOD(put_ParallelRunMode)(EParallelRunMode newVal);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown ** pObject);
@@ -56,13 +72,25 @@ public:
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL *pbValue);
 
+// IPersistStream
+	STDMETHOD(GetClassID)(CLSID *pClassID);
+	STDMETHOD(IsDirty)(void);
+	STDMETHOD(Load)(IStream *pStm);
+	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
+	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+
 private:
 	//////////
 	// Variables
 	//////////
 	UCLID_AFCORELib::IAttributePtr m_ipAttribute;
+	long m_nVersionNumber;
 	IStrToStrMapPtr m_ipStringTags;
 	IStrToObjectMapPtr m_ipObjectTags;
+	IVariantVectorPtr m_ipRSDFileStack;
+	std::string m_strFKBVersion;
+	std::string m_strAlternateComponentDataDir;
+	EParallelRunMode m_eParallelRunMode;
 
 	//////////
 	// Methods

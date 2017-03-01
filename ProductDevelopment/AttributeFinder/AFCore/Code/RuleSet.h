@@ -62,11 +62,15 @@ public:
 	STDMETHOD(ExecuteRulesOnText)(IAFDocument* pAFDoc, IVariantVector *pvecAttributeNames,
 		BSTR bstrAlternateComponentDataDir, IProgressStatus *pProgressStatus,
 		IIUnknownVector** pAttributes);
+	STDMETHOD(RunAttributeFinder)(IAFDocument* pAFDoc, BSTR bstrAttributeName,
+		BSTR bstrAlternateComponentDataDir,
+		IIUnknownVector** pAttributes);
 	STDMETHOD(Cleanup)();	
 	STDMETHOD(SaveTo)(BSTR strFullFileName, VARIANT_BOOL bClearDirty, VARIANT_BOOL* pbGUIDsRegenerated);
 	STDMETHOD(LoadFrom)(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlagToTrue);
 	STDMETHOD(get_AttributeNameToInfoMap)(IStrToObjectMap * *pVal);
 	STDMETHOD(put_AttributeNameToInfoMap)(IStrToObjectMap * newVal);
+	STDMETHOD(get_DefinedAttributeNames)(IVariantVector **pVal);
 	STDMETHOD(get_GlobalDocPreprocessor)(IObjectWithDescription **pVal);
 	STDMETHOD(put_GlobalDocPreprocessor)(IObjectWithDescription *newVal);
 	STDMETHOD(get_FileName)(BSTR *pVal);
@@ -238,7 +242,21 @@ private:
 	bool m_bDeepCopyInput;
 
 	UCLID_AFCORELib::IRuleExecutionEnvPtr m_ipRuleExecutionEnv;
+
+	// Parallel ruleset class used to run attribute finders in parallel per page
+	UCLID_AFCORELib::IParallelRuleSetPtr m_ipParallelRuleSet;
 	
+	// Struct to store progress data counts
+	struct ProgressDataItems
+	{
+		long nInitialization;
+		long nPreprocessor;
+		long nPerAttribute;
+		long nTotalAttribute;
+		long nOutputHandler;
+		long nTotal;
+	} m_sProgressCounts;
+
 	/////////////////
 	// Helper functions
 	/////////////////
@@ -317,7 +335,7 @@ private:
 
 	// Returns a IIUnknownVector of AFDocuments to process 
 	// if the Run mode is kPassInputVOAToOutput returns an empty vector
-	IIUnknownVectorPtr setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc);
+	IIUnknownVectorPtr setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, IIUnknownVectorPtr ipPages);
 
 	// if the run mode is kPassInputVOAToOutput will return attributes from AFDoc that
 	// is passed in modified based on the run mode flags
@@ -332,4 +350,29 @@ private:
 
 	// Checks the rule execution environment to see whether attribute history information should be added to attributes
 	bool shouldAddAttributeHistory();
+
+	// Checks the rule execution environment to see whether parallel processing is enabled (registry setting)
+	bool isParallelProcessingEnabled();
+
+	// Runs the document preprocessor, if there is one
+	void runGlobalDocPreprocessor(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc,
+		IProgressStatusPtr ipProgressStatus);
+
+	// Runs a single attribute finder (collection of rules)
+	IIUnknownVectorPtr runAttributeFinder(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, BSTR bstrAttributeName);
+
+	// Runs the named attribute finders
+	IIUnknownVectorPtr runAttributeFinders(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, IVariantVectorPtr ipAttributeName,
+		IProgressStatusPtr ipProgressStatus);
+
+	// Runs the output handler, if there is one
+	void runOutputHandler(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, IIUnknownVectorPtr ipAttributes,
+		IProgressStatusPtr ipProgressStatus);
+
+	// Initializes m_sProgressCounts. Number of total counts is adjusted for number of attributes, run-mode and number of documents
+	// (number of documents can be > 1 if run mode is per-page)
+	void calculateProgressItems(long nNumAttributesToRun, long nNumDocs);
+
+	// Checks version and internal-use flags, etc
+	void validateRunability();
 };

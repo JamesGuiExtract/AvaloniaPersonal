@@ -72,7 +72,7 @@ IDR_MAINFRAME           ICON                    "res\\RDTConfig.ico"
 // Dialog
 //
 
-IDD_RDTCONFIG_DIALOG DIALOGEX 0, 0, 255, 353
+IDD_RDTCONFIG_DIALOG DIALOGEX 0, 0, 309, 368
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "RDT Configuration"
@@ -87,34 +87,35 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,63,162,12
     CONTROL         "Enable logging in the Entity Name Data Scorer object",IDC_CHECK_ENDSLOG,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,77,188,12
-    CONTROL         "Add document tag with RuleID for rule that captured data when using the Grantor-Grantee Finder",IDC_CHECK_RULEIDTAG,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,92,183,19
     CONTROL         "Enable Auto Scrolling of the Test Logger windows as test runs",IDC_CHECK_SCROLLLOGGER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,113,228,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,91,228,12
     CONTROL         "Display X, Y percentages in Image Viewer",IDC_CHECK_SRW_PERCENT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,127,188,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,105,188,12
     CONTROL         "Automatically open image in VOA File Viewer",IDC_CHECK_AUTOOPENIMAGE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,141,188,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,119,188,12
     CONTROL         "Automatically expand attributes in Rule Tester",IDC_CHECK_AUTOEXPAND,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,155,188,12
-    CONTROL         "Enable rule set profiling",IDC_CHECK_ENABLE_PROFILING,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,170,188,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,133,188,12
     CONTROL         "Add attribute history info",IDC_CHECK_ADD_ATTRIBUTE_HISTORY_INFO,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,185,188,12
-    LTEXT           "Optional prefix for .dcc and .dat files",IDC_STATIC,7,203,145,10
-    COMBOBOX        IDC_COMBO_PREFIX,7,216,184,60,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Root folder for automated testing files",IDC_STATIC,7,236,145,10
-    COMBOBOX        IDC_COMBO_ROOT,7,249,184,60,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Browse...",IDC_BROWSE_ROOT,197,249,50,14
-    LTEXT           "Full path to component data (override of normal location)",IDC_STATIC,7,269,181,10
-    COMBOBOX        IDC_COMBO_COMPONENT,7,282,184,60,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Browse...",IDC_BROWSE_COMPONENT,197,282,50,14
-    LTEXT           "Diff tool command line ( will replace %1 and %2 with files to be compared.)",IDC_STATIC,6,301,234,8
-    EDITTEXT        IDC_EDIT_DIFF_COMMAND_LINE,7,313,240,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Restore Defaults",IDC_DEFAULTS,6,331,70,14
-    DEFPUSHBUTTON   "Apply",IDC_APPLY,83,331,50,14
-    PUSHBUTTON      "OK",IDOK,140,331,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,197,331,50,14
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,148,188,12
+    LTEXT           "Optional prefix for .dcc and .dat files",IDC_STATIC,7,222,145,10
+    COMBOBOX        IDC_COMBO_PREFIX,7,235,233,60,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Root folder for automated testing files",IDC_STATIC,7,255,145,10
+    COMBOBOX        IDC_COMBO_ROOT,7,268,233,60,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Browse...",IDC_BROWSE_ROOT,250,268,50,14
+    LTEXT           "Full path to component data (override of normal location)",IDC_STATIC,7,288,181,10
+    COMBOBOX        IDC_COMBO_COMPONENT,7,301,233,60,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Browse...",IDC_BROWSE_COMPONENT,250,301,50,14
+    LTEXT           "Diff tool command line ( will replace %1 and %2 with files to be compared.)",IDC_STATIC,6,320,234,8
+    EDITTEXT        IDC_EDIT_DIFF_COMMAND_LINE,7,332,293,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Restore Defaults",IDC_DEFAULTS,7,350,70,14
+    DEFPUSHBUTTON   "Apply",IDC_APPLY,136,350,50,14
+    PUSHBUTTON      "OK",IDOK,193,350,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,250,350,50,14
+    GROUPBOX        "Profiling or parallelization (NOTE: parallel setting is ignored when running rules from the FAM)",IDC_STATIC,2,164,304,54
+    CONTROL         "Neither",IDC_RADIO_NO_PARALLEL_NOR_PROFILE,"Button",BS_AUTORADIOBUTTON,7,177,39,10
+    CONTROL         "Run rules in parallel where possible",IDC_RADIO_PARALLEL,
+                    "Button",BS_AUTORADIOBUTTON,7,189,126,10
+    CONTROL         "Enable rule set profiling",IDC_RADIO_PROFILE,"Button",BS_AUTORADIOBUTTON,7,201,89,10
 END
 
 
@@ -167,9 +168,9 @@ BEGIN
     IDD_RDTCONFIG_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 247
+        RIGHTMARGIN, 301
         TOPMARGIN, 7
-        BOTTOMMARGIN, 350
+        BOTTOMMARGIN, 365
     END
 END
 #endif    // APSTUDIO_INVOKED

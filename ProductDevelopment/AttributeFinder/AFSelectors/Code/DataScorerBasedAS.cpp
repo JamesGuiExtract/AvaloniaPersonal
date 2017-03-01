@@ -234,6 +234,9 @@ STDMETHODIMP CDataScorerBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn,
 		// validate license
 		validateLicense();
 
+		IAFDocumentPtr ipAFDoc(pAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI41959", ipAFDoc != __nullptr);
+
 		// Put input vector into smart pointer and validate the arguments that are used.
 		IIUnknownVectorPtr ipIn( pAttrIn);
 		ASSERT_ARGUMENT("ELI29308", ipIn != __nullptr);
@@ -266,7 +269,7 @@ STDMETHODIMP CDataScorerBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn,
 			{
 				PROFILE_RULE_OBJECT(asString(m_ipDataScorer->Description), "", ipDataScorer, 0);
 
-				nScore = ipDataScorer->GetDataScore1(ipAttributeToScore);
+				nScore = ipDataScorer->GetDataScore1(ipAttributeToScore, ipAFDoc);
 			}
 
 			// Evaluate score for first condition

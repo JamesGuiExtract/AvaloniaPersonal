@@ -296,34 +296,25 @@ STDMETHODIMP CFindFromRSD::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 	{		
 		validateLicense();
 
+		IAFDocumentPtr ipAFDoc(pAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI10921", ipAFDoc != __nullptr);
+
 		// the specified RSD file may contain tags that need to be
 		// expanded - so expand any tags therein
 		AFTagManager tagMgr;
-		string strRSDFile = tagMgr.expandTagsAndFunctions(m_strRSDFileName, pAFDoc);
+		string strRSDFile = tagMgr.expandTagsAndFunctions(m_strRSDFileName, ipAFDoc);
 
 		// NOTE: The following check is to prevent infinite loops that
 		// for instance can be caused by a RSD file using itself as the splitter
 		// ensure that the ruleset is not already executing by checking 
-		// in the Rule Execution Environment
-		if (m_ipRuleExecutionEnv == __nullptr)
-		{
-			m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
-			ASSERT_RESOURCE_ALLOCATION("ELI19382", m_ipRuleExecutionEnv != __nullptr);
-		}
-
-		if (m_ipRuleExecutionEnv->IsRSDFileExecuting(strRSDFile.c_str()) ==
-			VARIANT_TRUE)
+		// the AFDoc stack
+		if (asCppBool(ipAFDoc->IsRSDFileExecuting(_bstr_t(strRSDFile.c_str()))))
 		{
 			UCLIDException ue("ELI19383", "Circular reference detected between RSD files in FindFromRSD object!");
 			ue.addDebugInfo("RSD File", strRSDFile);
 			throw ue;
 		}
 
-		// register a new rule execution session
-		IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
-		ASSERT_RESOURCE_ALLOCATION("ELI19384", ipSession != __nullptr);
-		ipSession->SetRSDFileName(strRSDFile.c_str());
-	
 		// Create the ruleset if necessary
 		if(m_cachedRuleSet.m_obj == NULL)
 		{	
@@ -334,10 +325,7 @@ STDMETHODIMP CFindFromRSD::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		// load/reload the ruleset if necessary
 		m_cachedRuleSet.loadObjectFromFile(strRSDFile);
 
-		// make a copy of the AFDocument for the doc to run on
-		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI10921", ipAFDoc != __nullptr);
-
+		// Make a copy of the AFDocument for the doc to run on.
 		// There is no need to clone the AFDoc attribute hierarchy which can only ever be modified
 		// if InputFinder is used and InputFinder will return a clone of the attributes, not the
 		// attributes themselves.

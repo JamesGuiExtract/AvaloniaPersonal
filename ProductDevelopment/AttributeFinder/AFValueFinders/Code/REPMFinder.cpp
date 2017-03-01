@@ -130,9 +130,6 @@ STDMETHODIMP CREPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pP
 		// load pattern file
 		loadPatternFile(strInput);
 
-		ISpatialStringPtr ipInputText = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI33227", ipInputText != __nullptr);
-
 		RegExPatternFileInterpreter patternInterpreter;
 
 		// get the pattern interpreter from the map if any
@@ -151,7 +148,7 @@ STDMETHODIMP CREPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pP
 		// for each pattern string, look for match
 		string strPatternID("");
 		UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipThis(this);
-		if (patternInterpreter.foundPattern(ipParser, ipThis, ipInputText,
+		if (patternInterpreter.foundPattern(ipParser, ipThis, ipAFDoc,
 			ipRetAttributes, strPatternID))
 		{
 			// store the rule that works in AFDocument if required

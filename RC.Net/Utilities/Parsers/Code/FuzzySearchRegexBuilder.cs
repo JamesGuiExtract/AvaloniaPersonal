@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Extract.Utilities.Parsers
 {
@@ -336,7 +337,22 @@ namespace Extract.Utilities.Parsers
         // A .NET regex quantifier (can be variable length and non-greedy)
         const string _QUANTIFIER = @"({\d+(,(\d+)?)?} | [?*+])\??";
 
+        const string _REPLACEMENT_PAIR_EXPRESSION = @"\((?'replace'" + RegexParsingPatterns.VALID_SEQUENCE
+            + @")=>(?'replacement'" + RegexParsingPatterns.VALID_SEQUENCE + @")\)";
+        const string _REPLACEMENTS_EXPRESSION = _REPLACEMENT_PAIR_EXPRESSION + @"(\s*" + _REPLACEMENT_PAIR_EXPRESSION + @")*";
+
         #endregion Constants
+
+        static ThreadLocal<Regex> _fuzzySearchRegex = new ThreadLocal<Regex>(() =>
+            new Regex(_FUZZY_SEARCH_EXPRESSION, _REGEX_OPTIONS));
+        static ThreadLocal<Regex> _prefixRegex = new ThreadLocal<Regex>(() =>
+            new Regex(_PREFIX, _REGEX_OPTIONS));
+        static ThreadLocal<Regex> _tokenRegex = new ThreadLocal<Regex>(() =>
+            new Regex(_TOKEN, _REGEX_OPTIONS));
+        static ThreadLocal<Regex> _subTokenRegex = new ThreadLocal<Regex>(() =>
+            new Regex(_SUB_TOKEN, _REGEX_OPTIONS));
+        static ThreadLocal<Regex> _replacementsRegex = new ThreadLocal<Regex>(() =>
+            new Regex(_REPLACEMENTS_EXPRESSION, _REGEX_OPTIONS));
 
         #region Public Methods
 
@@ -412,7 +428,7 @@ namespace Extract.Utilities.Parsers
                 int expansionPos = 0;
 
                 // Process each string within sourceRegex that matches the fuzzy search pattern.
-                MatchCollection matches = Regex.Matches(sourceRegex, _FUZZY_SEARCH_EXPRESSION, _REGEX_OPTIONS);
+                MatchCollection matches = _fuzzySearchRegex.Value.Matches(sourceRegex);
                 foreach (Match match in matches)
                 {
                     // Add to the result the part of sourceRegex prior to the start of the fuzzy
@@ -597,7 +613,7 @@ namespace Extract.Utilities.Parsers
                 string result = expandedSearchString.ToString();
 
                 ExtractException.Assert("ELI38826", "Unable to expand one or more fuzzy search patterns.",
-                    !Regex.IsMatch(result, _PREFIX, _REGEX_OPTIONS));
+                    !_prefixRegex.Value.IsMatch(result));
 
                 return result;
             }
@@ -839,7 +855,7 @@ namespace Extract.Utilities.Parsers
                 searchString = searchStringGroup.Value;
 
                 // Use the _TOKEN regex to split the search string into tokens.
-                MatchCollection matches = Regex.Matches(searchString, _TOKEN, _REGEX_OPTIONS);
+                MatchCollection matches = _tokenRegex.Value.Matches(searchString);
                 List<SearchToken> searchTokens = new List<SearchToken>(matches.Count);
 
                 // Generate a list of tokens that need to be escaped to avoid corrupting 
@@ -949,7 +965,7 @@ namespace Extract.Utilities.Parsers
                 tokenBuilder.Append("(");
                 searchStringToken = searchStringToken.Substring(1, searchStringToken.Length - 2);
 
-                foreach (Match subTokenMatch in Regex.Matches(searchStringToken, _SUB_TOKEN, _REGEX_OPTIONS))
+                foreach (Match subTokenMatch in _subTokenRegex.Value.Matches(searchStringToken))
                 {
                     string subToken = subTokenMatch.Groups["search_token"].Value;
                     string quantifier = subTokenMatch.Groups["quantifier"].Value;
@@ -990,10 +1006,6 @@ namespace Extract.Utilities.Parsers
         {
             try
             {
-                const string REPLACEMENT_PAIR_EXPRESSION = @"\((?'replace'" + RegexParsingPatterns.VALID_SEQUENCE
-                    + @")=>(?'replacement'" + RegexParsingPatterns.VALID_SEQUENCE + @")\)";
-                const string REPLACEMENTS_EXPRESSION = REPLACEMENT_PAIR_EXPRESSION + @"(\s*" + REPLACEMENT_PAIR_EXPRESSION + @")*";
-
                 // Create a new options instance.
                 FuzzySearchOptions options = new FuzzySearchOptions();
 
@@ -1096,7 +1108,7 @@ namespace Extract.Utilities.Parsers
                     // Replacement patterns are being specified.
                     else if (optionName.Equals("replacements", StringComparison.OrdinalIgnoreCase))
                     {
-                        Match replacements = Regex.Match(optionValue, REPLACEMENTS_EXPRESSION, _REGEX_OPTIONS);
+                        Match replacements = _replacementsRegex.Value.Match(optionValue);
                         if (!replacements.Success)
                         {
                             ExtractException ee = new ExtractException("ELI38853",

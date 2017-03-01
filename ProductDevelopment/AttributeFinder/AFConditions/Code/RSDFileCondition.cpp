@@ -146,28 +146,12 @@ STDMETHODIMP CRSDFileCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 		string strRSDFile = m_ipAFUtility->ExpandTags(m_strRSDFileName.c_str(),
 			pAFDoc);
 
-		// NOTE: The following check is to prevent infinite loops that
-		// for instance can be caused by a RSD file using itself as the splitter
-		// ensure that the ruleset is not already executing by checking 
-		// in the Rule Execution Environment
-		if (m_ipRuleExecutionEnv == __nullptr)
-		{
-			m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
-			ASSERT_RESOURCE_ALLOCATION("ELI10242", m_ipRuleExecutionEnv != __nullptr);
-		}
-
-		if (m_ipRuleExecutionEnv->IsRSDFileExecuting(strRSDFile.c_str()) ==
-			VARIANT_TRUE)
+		if (asCppBool(ipDocCopy->IsRSDFileExecuting(_bstr_t(strRSDFile.c_str()))))
 		{
 			UCLIDException ue("ELI10243", "Circular reference detected between RSD files in FindFromRSD object.");
 			ue.addDebugInfo("RSD File", strRSDFile);
 			throw ue;
 		}
-
-		// register a new rule execution session
-		IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
-		ASSERT_RESOURCE_ALLOCATION("ELI10244", ipSession != __nullptr);
-		ipSession->SetRSDFileName(strRSDFile.c_str());
 
 		// init rule set from current rsd file, performing any auto-encrypt actions
 		// as necessary

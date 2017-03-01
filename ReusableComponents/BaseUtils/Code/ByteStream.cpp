@@ -194,6 +194,7 @@ string ByteStream::asString() const
 		INIT_EXCEPTION_AND_TRACING("MLI00653");
 		try
 		{
+			strResult.reserve(m_ulLength * 2);
 			_lastCodePos = "10";
 
 			// write out each of the bytes as two characters
@@ -210,7 +211,6 @@ string ByteStream::asString() const
 				}
 
 				strResult += pszTemp;
-				_lastCodePos = "20_" + ::asString(i);
 			}
 			_lastCodePos = "30";
 		}

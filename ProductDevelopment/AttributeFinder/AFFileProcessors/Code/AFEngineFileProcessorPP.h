@@ -81,6 +81,9 @@ private:
 	ATLControls::CEdit m_editDataInputFileName;
 	ATLControls::CButton m_chkUseDataInputFile;
 	CImageButtonWithStyle m_btnDataInputSelectTag;
+	ATLControls::CButton m_radioNoParallel;
+	ATLControls::CButton m_radioPoliteParallel;
+	ATLControls::CButton m_radioGreedyParallel;
 
 	///////////
 	// Methods

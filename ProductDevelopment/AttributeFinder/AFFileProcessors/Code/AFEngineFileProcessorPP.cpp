@@ -153,6 +153,18 @@ STDMETHODIMP CAFEngineFileProcessorPP::Apply(void)
 				ocrType = kNoOCR;
 			}
 
+			// Set the default parallelization to polite
+			EParallelRunMode eParallelRunMode = kPoliteParallelization;
+
+			if (m_radioNoParallel.GetCheck() == BST_CHECKED)
+			{
+				eParallelRunMode = kNoParallelization;
+			}
+			else if (m_radioGreedyParallel.GetCheck() == BST_CHECKED)
+			{
+				eParallelRunMode = kGreedyParallelization;
+			}
+
 			// Store the rules file name
 			ipAFEFileProc->RuleSetFileName = bstrRulesFileName;
 
@@ -170,6 +182,9 @@ STDMETHODIMP CAFEngineFileProcessorPP::Apply(void)
 				asVariantBool(m_chkSaveOcrResults.GetCheck() == BST_CHECKED);
 			ipAFEFileProc->UseCleanedImage =
 				asVariantBool(m_chkUseCleanedImage.GetCheck() == BST_CHECKED);
+
+			// Store the parallelization mode
+			ipAFEFileProc->ParallelRunMode = (UCLID_AFCORELib::EParallelRunMode) eParallelRunMode;
 		}
 
 		SetDirty(FALSE);
@@ -207,6 +222,9 @@ LRESULT CAFEngineFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 		m_btnDataInputSelectTag.SubclassDlgItem(IDC_BTN_DOCTAGS_DATA_INPUT, CWnd::FromHandle(m_hWnd));
 		m_btnDataInputSelectTag.SetIcon(::LoadIcon(_Module.m_hInstResource,
 			MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
+		m_radioNoParallel = GetDlgItem(IDC_RADIO_NO_PARALLEL);
+		m_radioPoliteParallel = GetDlgItem(IDC_RADIO_POLITE_PARALLEL);
+		m_radioGreedyParallel = GetDlgItem(IDC_RADIO_GREEDY_PARALLEL);
 
 		UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipAFEFileProc = m_ppUnk[0];
 		if (ipAFEFileProc)
@@ -268,6 +286,25 @@ LRESULT CAFEngineFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 			m_radioAllPages.SetCheck(nCheckAll);
 			m_radioSpecificPages.SetCheck(nCheckSpecific);
 			m_radioOcrNone.SetCheck(nCheckNoOcr);
+
+			m_radioNoParallel.SetCheck(BST_UNCHECKED);
+			m_radioPoliteParallel.SetCheck(BST_UNCHECKED);
+			m_radioGreedyParallel.SetCheck(BST_UNCHECKED);
+			EParallelRunMode eParallelRunMode = (EParallelRunMode)ipAFEFileProc->ParallelRunMode;
+			switch (eParallelRunMode)
+			{
+				case kNoParallelization:
+					m_radioNoParallel.SetCheck(BST_CHECKED);
+					break;
+				case kPoliteParallelization:
+					m_radioPoliteParallel.SetCheck(BST_CHECKED);
+					break;
+				case kGreedyParallelization:
+					m_radioGreedyParallel.SetCheck(BST_CHECKED);
+					break;
+				default:
+					THROW_LOGIC_ERROR_EXCEPTION("ELI42042");
+			}
 		}
 
 		SetDirty(FALSE);

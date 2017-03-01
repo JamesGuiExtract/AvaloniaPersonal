@@ -97,7 +97,8 @@ STDMETHODIMP CEntityNameDataScorer::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IDataScorer
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore1(IAttribute * pAttribute, LONG * pScore)
+STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore1(IAttribute * pAttribute, IAFDocument * pAFDoc,
+	LONG * pScore)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	try
@@ -132,7 +133,8 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore1(IAttribute * pAttribute, L
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore2(IIUnknownVector * pAttributes, LONG * pScore)
+STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore2(IIUnknownVector * pAttributes, IAFDocument * pAFDoc,
+	LONG * pScore)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	try

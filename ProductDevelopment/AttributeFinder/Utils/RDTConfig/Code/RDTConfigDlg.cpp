@@ -110,13 +110,14 @@ void CRDTConfigDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_EFALOG, m_bEFALog);
 	DDX_Check(pDX, IDC_CHECK_ENDSLOG, m_bENDSLog);
 	DDX_Check(pDX, IDC_CHECK_LOADONCE, m_bLoadOnce);
-	DDX_Check(pDX, IDC_CHECK_RULEIDTAG, m_bRuleIDTag);
 	DDX_Check(pDX, IDC_CHECK_SCROLLLOGGER, m_bScrollLogger);
 	DDX_Check(pDX, IDC_CHECK_SRW_PERCENT, m_bDisplaySRWPercent);
 	DDX_Check(pDX, IDC_CHECK_AUTOOPENIMAGE, m_bAutoOpenImage);
 	DDX_Text(pDX, IDC_EDIT_DIFF_COMMAND_LINE, m_zDiffCommandLine);
 	DDX_Check(pDX, IDC_CHECK_AUTOEXPAND, m_bAutoExpandAttribute);
-	DDX_Check(pDX, IDC_CHECK_ENABLE_PROFILING, m_bEnableProfiling);
+	DDX_Check(pDX, IDC_RADIO_PROFILE, m_bEnableProfiling);
+	DDX_Check(pDX, IDC_RADIO_PARALLEL, m_bEnableParallelProcessing);
+	DDX_Check(pDX, IDC_RADIO_NO_PARALLEL_NOR_PROFILE, m_bNoParallelNorProfiling);
 	DDX_Check(pDX, IDC_CHECK_ADD_ATTRIBUTE_HISTORY_INFO, m_bAddAttributeHistory);
 	//}}AFX_DATA_MAP
 }
@@ -265,6 +266,10 @@ void CRDTConfigDlg::OnDefaults()
 	m_bEnableProfiling = FALSE;
 
 	m_bAddAttributeHistory = FALSE;
+
+	m_bEnableParallelProcessing = TRUE;
+
+	m_bNoParallelNorProfiling = FALSE;
 
 	// Set default for prefix
 	int iIndex = m_comboPrefix.FindString( -1, gstrEMPTY_DEFAULT.c_str() );
@@ -499,6 +504,17 @@ void CRDTConfigDlg::getRegistrySettings()
 
 	m_bEnableProfiling = asMFCBool(getEnableProfiling());
 
+	m_bEnableParallelProcessing = asMFCBool(getEnableParallelProcessing());
+
+	m_bNoParallelNorProfiling = !m_bEnableParallelProcessing && !m_bEnableProfiling;
+
+	// Unless the profiler is enhanced to handle parallel processing,
+	// the results will be innacurate so disable it if parallel processing is enabled
+	if (m_bEnableProfiling && m_bEnableParallelProcessing)
+	{
+		setEnableProfiling(m_bEnableProfiling = FALSE);
+	}
+
 	m_bAddAttributeHistory = asMFCBool(getAddAttributeHistory());
 
 	// Load MRU list items
@@ -667,6 +683,21 @@ bool CRDTConfigDlg::getEnableProfiling()
 	return asCppBool(strValue);
 }
 //-------------------------------------------------------------------------------------------------
+bool CRDTConfigDlg::getEnableParallelProcessing()
+{
+	if (!ma_pSettingsCfgMgr->keyExists(SETTINGS_SECTION, gstrAF_ENABLE_PARALLEL_PROCESSING_KEY))
+	{
+		ma_pSettingsCfgMgr->createKey(SETTINGS_SECTION, gstrAF_ENABLE_PARALLEL_PROCESSING_KEY,
+			gstrAF_DEFAULT_ENABLE_PARALLEL_PROCESSING);
+		return asCppBool(gstrAF_DEFAULT_ENABLE_PARALLEL_PROCESSING);
+	}
+
+	string strValue = ma_pSettingsCfgMgr->getKeyValue(SETTINGS_SECTION, gstrAF_ENABLE_PARALLEL_PROCESSING_KEY,
+		gstrAF_DEFAULT_ENABLE_PARALLEL_PROCESSING);
+
+	return asCppBool(strValue);
+}
+//-------------------------------------------------------------------------------------------------
 bool CRDTConfigDlg::getAddAttributeHistory()
 {
 	if (!ma_pSettingsCfgMgr->keyExists(SETTINGS_SECTION, gstrAF_ADD_ATTRIBUTE_HISTORY_KEY))
@@ -778,6 +809,8 @@ void CRDTConfigDlg::saveRegistrySettings()
 	setEnableProfiling(asCppBool(m_bEnableProfiling));
 	
 	setAddAttributeHistory(asCppBool(m_bAddAttributeHistory));
+
+	setEnableParallelProcessing(asCppBool(m_bEnableParallelProcessing));
 
 	////////////////////////////////////////////
 	// Write selected combobox items to registry
@@ -931,4 +964,9 @@ void CRDTConfigDlg::setAddAttributeHistory(bool bNewSetting)
 		bNewSetting ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------
-
+void CRDTConfigDlg::setEnableParallelProcessing(bool bNewSetting)
+{
+	ma_pSettingsCfgMgr->setKeyValue(SETTINGS_SECTION, gstrAF_ENABLE_PARALLEL_PROCESSING_KEY,
+		bNewSetting ? "1" : "0");
+}
+//-------------------------------------------------------------------------------------------------

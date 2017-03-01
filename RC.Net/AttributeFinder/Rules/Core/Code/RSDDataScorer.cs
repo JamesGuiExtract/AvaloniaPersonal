@@ -256,7 +256,7 @@ namespace Extract.AttributeFinder.Rules
                 scorer.RSDFileName = ruleSetFileName;
                 scorer.PrepareExpression(expression);
 
-                int score = scorer.GetDataScore2(ipAttributes);
+                int score = scorer.GetDataScore2(ipAttributes, null);
 
                 variables = scorer._variables;
 
@@ -277,7 +277,7 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="pAttribute">The <see cref="UCLID_AFCORELib.Attribute"/> to score.</param>
         /// <returns>The score as an <see langword="int"/>.</returns>
-        public int GetDataScore1(UCLID_AFCORELib.Attribute pAttribute)
+        public int GetDataScore1(UCLID_AFCORELib.Attribute pAttribute, AFDocument pAFDoc)
         {
             try 
 	        {
@@ -285,7 +285,7 @@ namespace Extract.AttributeFinder.Rules
                 // memory.
                 pAttribute.ReportMemoryUsage();
 
-                RuleSet ruleSet = LoadRuleSet(pAttribute);
+                RuleSet ruleSet = LoadRuleSet(pAFDoc);
 
                 IEnumerable<ComAttribute> foundAttributes = GetFoundAttributes(ruleSet, pAttribute);
 
@@ -317,7 +317,7 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="pAttributes">The <see cref="IUnknownVector"/> of
         /// <see cref="UCLID_AFCORELib.Attribute"/>s to score.</param>
         /// <returns>The score as an <see langword="int"/>.</returns>
-        public int GetDataScore2(IUnknownVector pAttributes)
+        public int GetDataScore2(IUnknownVector pAttributes, AFDocument pAFDoc)
         {
             try
             {
@@ -332,7 +332,7 @@ namespace Extract.AttributeFinder.Rules
                     pAttributes.ToIEnumerable<ComAttribute>();
                 if (sourceAttributes.Any())
                 {
-                    RuleSet ruleSet = LoadRuleSet(sourceAttributes.First());
+                    RuleSet ruleSet = LoadRuleSet(pAFDoc);
 
                     List<ComAttribute> foundAttributes = new List<ComAttribute>();
 
@@ -651,12 +651,9 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="pAttribute">A <see cref="ComAttribute"/> to provide context for expanding
         /// path tags.</param>
         /// <returns>The <see cref="RuleSet"/>.</returns>
-        RuleSet LoadRuleSet(UCLID_AFCORELib.Attribute pAttribute)
+        RuleSet LoadRuleSet(AFDocument pAFDoc)
         {
-            AFDocument afDoc = new AFDocument();
-            afDoc.Text = pAttribute.Value;
-
-            _pathTags.Document = afDoc;
+            _pathTags.Document = pAFDoc;
             string rsdFileName = _pathTags.Expand(_rsdFileName);
 
             RuleSet ruleSet = new RuleSet();

@@ -193,7 +193,7 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 		{
 			PROFILE_RULE_OBJECT("", "", m_ipDataScorer, 0);
 
-			nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
+			nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr, ipAFDoc );
 		}
 
 		if (ipFoundValue == __nullptr || findMERSKeyword ( strValueFound, nStartPos, nEndPos, ipParser ) 
@@ -210,7 +210,7 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 			{
 				PROFILE_RULE_OBJECT("", "", m_ipDataScorer, 0);
 
-				nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
+				nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr, ipAFDoc );
 			}
 
 			if (ipFoundValue == __nullptr || findMERSKeyword ( strValueFound, nStartPos, nEndPos, ipParser )
@@ -224,7 +224,7 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 				{
 					PROFILE_RULE_OBJECT("", "", m_ipDataScorer, 0);
 
-					nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
+					nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr, ipAFDoc );
 				}
 
 				if ( nDataScore < MINSCORE )

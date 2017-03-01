@@ -24,7 +24,8 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 // 2 - Added m_bUseCleanedImage option to object
 //     Also added support for ocr type: kNoOCR
 // 3 - Added m_bUseDataInputFile and m_strDataInputFileName
-const unsigned long gnCurrentVersion = 3;
+// 4 - Added m_eParallelRunMode
+const unsigned long gnCurrentVersion = 4;
 
 //-------------------------------------------------------------------------------------------------
 // CAFEngineFileProcessor
@@ -159,6 +160,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		ASSERT_RESOURCE_ALLOCATION("ELI19455", ipAFDoc != __nullptr);
 
 		_lastCodePos = "60";
+
+		ipAFDoc->ParallelRunMode = m_eParallelRunMode;
 
 		// If reading the USS file from disk, check for USS file
 		// default the need to OCR to true
@@ -775,6 +778,41 @@ STDMETHODIMP CAFEngineFileProcessor::put_DataInputFileName(BSTR newVal)
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFEngineFileProcessor::get_ParallelRunMode(EParallelRunMode *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		*pVal = m_eParallelRunMode;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42052")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFEngineFileProcessor::put_ParallelRunMode(EParallelRunMode newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_RUNTIME_CONDITION("ELI42063",
+			newVal >= kUnspecifiedParallelization
+			&& newVal <= kGreedyParallelization,
+			"ParallelRunMode value out of range");
+
+		m_eParallelRunMode = newVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42053")
+}
 
 //-------------------------------------------------------------------------------------------------
 // ICategorizedComponent
@@ -817,6 +855,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_CopyFrom(IUnknown *pObject)
 		m_bUseCleanedImage = asCppBool(ipSource->UseCleanedImage);
 		m_bUseDataInputFile = asCppBool(ipSource->UseDataInputFile);
 		m_strDataInputFileName = asString(ipSource->DataInputFileName);
+		m_eParallelRunMode = (EParallelRunMode)ipSource->ParallelRunMode;
 
 		// Set dirty flag since this object has changed
 		m_bDirty = true;
@@ -982,6 +1021,14 @@ STDMETHODIMP CAFEngineFileProcessor::Load(IStream *pStream)
 			dataReader >> m_strDataInputFileName;
 		}
 
+		m_eParallelRunMode = kNoParallelization;
+		if (nDataVersion >= 4)
+		{
+			long nTmp;
+			dataReader >> nTmp;
+			m_eParallelRunMode = (EParallelRunMode)nTmp;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -1021,6 +1068,8 @@ STDMETHODIMP CAFEngineFileProcessor::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bUseDataInputFile;
 		dataWriter << m_strDataInputFileName;
 
+		dataWriter << (long)m_eParallelRunMode;
+
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -1059,6 +1108,7 @@ void CAFEngineFileProcessor::clear()
 	m_bUseCleanedImage = true;
 	m_bUseDataInputFile = false;
 	m_strDataInputFileName = "<SourceDocName>.voa";
+	m_eParallelRunMode = kPoliteParallelization;
 }
 //-------------------------------------------------------------------------------------------------
 void CAFEngineFileProcessor::validateLicense()

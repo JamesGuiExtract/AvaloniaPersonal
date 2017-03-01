@@ -20,6 +20,7 @@ library UCLID_AFFILEPROCESSORSLib
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFILEPROCESSING.tlb");
 	importlib("..\..\AFValueModifiers\Code\AFValueModifiers.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
 
 	//////////////
 	// Enums
@@ -73,6 +74,8 @@ library UCLID_AFFILEPROCESSORSLib
 		// The VOA file to include as input attributes (attributes will be added as children to AFDocument::Attribute).
 		[propget, id(8), helpstring("property DataInputFileName")] HRESULT DataInputFileName([out, retval] BSTR *pVal);
 		[propput, id(8), helpstring("property DataInputFileName")] HRESULT DataInputFileName([in] BSTR newVal);
+		[propget, id(9), helpstring("property ParallelRunMode")] HRESULT ParallelRunMode([out, retval] EParallelRunMode *pVal);
+		[propput, id(9), helpstring("property ParallelRunMode")] HRESULT ParallelRunMode([in] EParallelRunMode newVal);
 	};
 
 	[

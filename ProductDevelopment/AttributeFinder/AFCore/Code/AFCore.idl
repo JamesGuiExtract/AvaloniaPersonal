@@ -65,6 +65,19 @@ library UCLID_AFCORELib
 		kRunPerPage = 2
 	} ERuleSetRunMode;
 			
+	typedef
+	[
+		uuid(DD8C3B29-B4B9-4DD2-B6C9-0A9BA8698DBC),
+		helpstring("Extract EParallelRunMode")
+	]
+	enum
+	{
+		kUnspecifiedParallelization = 0,
+		kNoParallelization = 1,
+		kPoliteParallelization = 2,
+		kGreedyParallelization = 3
+	} EParallelRunMode;
+
 	//////////////
 	// Interfaces
 	//////////////
@@ -125,6 +138,24 @@ library UCLID_AFCORELib
 		// is VARIANT_TRUE and clone the document Text only if bCloneText is VARIANT_TRUE).
 		[id(5), helpstring("method PartialClone")] HRESULT PartialClone([in] VARIANT_BOOL bCloneAttributes,
 			[in] VARIANT_BOOL bCloneText, [out, retval] IAFDocument **pAFDoc);
+		[id(6), helpstring("method PushRSDFileName")] HRESULT PushRSDFileName([in] BSTR strFileName,
+			[out, retval] long *pnStackSize);
+		[id(7), helpstring("method PopRSDFileName")] HRESULT PopRSDFileName([out, retval] long *pnStackSize);
+		[propget, id(8), helpstring("property RSDFileStack")] HRESULT RSDFileStack([out, retval] IVariantVector* *pVal);
+		[propput, id(8), helpstring("property RSDFileStack")] HRESULT RSDFileStack([in] IVariantVector *newVal);
+		//-----------------------------------------------------------------------------------------
+		// The FKB version to use. The FKB version can only be changed by the top-level rule.
+		[propget, id(9), helpstring("property FKBVersion")] HRESULT FKBVersion([out, retval] BSTR *pVal);
+		[propput, id(9), helpstring("property FKBVersion")] HRESULT FKBVersion([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// An alternate component data root directory to be used in addition to the default
+		// component data directory.
+		[propget, id(10), helpstring("property AlternateComponentDataDir")] HRESULT AlternateComponentDataDir([out, retval] BSTR *pVal);
+		[propput, id(10), helpstring("property AlternateComponentDataDir")] HRESULT AlternateComponentDataDir([in] BSTR newVal);
+		[id(11), helpstring("method IsRSDFileExecuting")] HRESULT IsRSDFileExecuting([in] BSTR strFileName, [out, retval] VARIANT_BOOL *pbValue);
+		[id(12), helpstring("method GetCurrentRSDFileDir")] HRESULT GetCurrentRSDFileDir([out, retval] BSTR *pstrRSDFileDir);
+		[propget, id(13), helpstring("property ParallelRunMode")] HRESULT ParallelRunMode([out, retval] EParallelRunMode *pVal);
+		[propput, id(13), helpstring("property ParallelRunMode")] HRESULT ParallelRunMode([in] EParallelRunMode newVal);
 	};
 	[
 		object,
@@ -462,6 +493,17 @@ library UCLID_AFCORELib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To flush any accumulated counts to the counters
 		[id(27), helpstring("method FlushCounters")] HRESULT FlushCounters();
+		//-----------------------------------------------------------------------------------------
+		// Run a single attribute finder by name
+		// Used by Extract.AttributeFinder.Rules.ParallelRuleSet
+		[id(28), helpstring("method RunAttributeFinder")] HRESULT RunAttributeFinder(
+			[in] IAFDocument* pAFDoc, BSTR bstrAttributeName, BSTR bstrAlternateComponentDataDir,
+			[out, retval] IIUnknownVector** pAttributes);
+		//-----------------------------------------------------------------------------------------
+		// Get the names of defined attribute (keys of the map of AttributeFindInfos)
+		// Used by Extract.AttributeFinder.Rules.ParallelRuleSet
+		[propget, id(29), helpstring("property DefinedAttributeNames")] HRESULT DefinedAttributeNames(
+			[out, retval] IVariantVector* *pVal);
 	};
 
 	[
@@ -523,6 +565,21 @@ library UCLID_AFCORELib
 			ESpatialEntity entityType);
 		[id(4), helpstring("method ShowAttributeHistory")] HRESULT ShowAttributeHistory(
 			[in] IAttribute *pAttribute, long nHandle);
+	}
+
+	[
+		object,
+		uuid(8A45E277-0A29-4300-B325-AD674D33ED54),
+		dual,
+		helpstring("IParallelRuleSet Interface"),
+		pointer_default(unique)
+	]
+	interface IParallelRuleSet : IDispatch
+	{
+		[id(1), helpstring("method RunAttributeFinders")] HRESULT RunAttributeFinders(
+			[in] IIUnknownVector *pDocuments, IRuleSet *pRuleSet, IVariantVector *pAttributeNames,
+			BSTR bstrParallelSemaphoreName, IProgressStatus *pProgressStatus,
+			[out, retval] IIUnknownVector* *pDocumentAttributes);
 	}
 
 	[
@@ -663,6 +720,7 @@ library UCLID_AFCORELib
 		[propget, id(8), helpstring("property ShouldAddAttributeHistory")] HRESULT ShouldAddAttributeHistory([out, retval] VARIANT_BOOL * pbVal);
 		[propget, id(9), helpstring("property RSDFileBeingEdited")] HRESULT RSDFileBeingEdited([out, retval] BSTR *pVal);
 		[propput, id(9), helpstring("property RSDFileBeingEdited")] HRESULT RSDFileBeingEdited([in] BSTR newVal);
+		[propget, id(10), helpstring("property EnableParallelProcessing")] HRESULT EnableParallelProcessing([out, retval] VARIANT_BOOL * pbVal);
 	};
 	
 	//---------------------------------------------------------------------------------------------
@@ -713,6 +771,7 @@ library UCLID_AFCORELib
 		//		100  is the best score
 		[id(1), helpstring("method GetDataScore1")] HRESULT GetDataScore1(
 			[in] IAttribute* pAttribute, 
+			[in] IAFDocument* pAFDoc, 
 			[out, retval] long* pScore );
 
 		// Method will return a long value of 0 to 100 as a score for the attributes passed
@@ -720,6 +779,7 @@ library UCLID_AFCORELib
 		//		100  is the best score
 		[id(2), helpstring("method GetDataScore2")] HRESULT GetDataScore2(
 			[in] IIUnknownVector* pAttributes,
+			[in] IAFDocument* pAFDoc, 
 			[out, retval] long* pScore );
 
 	};

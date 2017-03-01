@@ -401,7 +401,7 @@ void CEntityNameDataScorerTester::doSingleTest( long nExpectedScore, std::string
 		ipAttr->Value = ipValue;
 
 		// Get the attribute score
-		nCalculatedScore = ipENDS->GetDataScore1( ipAttr );
+		nCalculatedScore = ipENDS->GetDataScore1( ipAttr, __nullptr );
 
 		// Output results to logger
 		string strExpected = asString(nExpectedScore);
@@ -471,7 +471,7 @@ void CEntityNameDataScorerTester::doGroupTest( long nExpectedGroupScore, vector<
 		}
 
 		// Get the group score
-		nCalculatedScore = ipENDS->GetDataScore2( ipAttributes );
+		nCalculatedScore = ipENDS->GetDataScore2( ipAttributes, __nullptr );
 
 		// Log results to test logger
 		string strExpected = asString(nExpectedGroupScore);

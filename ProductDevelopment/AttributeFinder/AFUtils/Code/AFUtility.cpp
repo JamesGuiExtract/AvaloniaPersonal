@@ -1066,22 +1066,30 @@ STDMETHODIMP CAFUtility::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 // private / helper methods
 //-------------------------------------------------------------------------------------------------
-void CAFUtility::expandRSDFileDirTag(string& rstrInput)
+void CAFUtility::expandRSDFileDirTag(string& rstrInput,
+									 IAFDocumentPtr& ripDoc)
 {
 	// if the <RSDFileDir> tag exists in the input string
 	// make the corresponding substitution
 	if (rstrInput.find(strRSD_FILE_DIR_TAG) != string::npos)
 	{
-		// Get the rule execution environment
-		IRuleExecutionEnvPtr ipREE(CLSID_RuleExecutionEnv);
-		ASSERT_RESOURCE_ALLOCATION("ELI07461", ipREE != __nullptr);
+		// Try to get the currently executing rule file's directory from the AFDocument
+		string strDir = asString(ripDoc->GetCurrentRSDFileDir());
 
-		// get the currently executing rule file's directory
-		string strDir = asString(ipREE->GetCurrentRSDFileDir());
+		// Else get from REE
+		if (strDir.empty())
+		{
+			// Get the rule execution environment
+			IRuleExecutionEnvPtr ipREE(CLSID_RuleExecutionEnv);
+			ASSERT_RESOURCE_ALLOCATION("ELI07461", ipREE != __nullptr);
+
+			// get the currently executing rule file's directory
+			string strDir = asString(ipREE->GetCurrentRSDFileDir());
+		}
 
 		// if there is no current RSD file, this tag cannot
 		// be expanded.
-		if (strDir == "")
+		if (strDir.empty())
 		{
 			UCLIDException ue("ELI07500", "There is no current RSD file to expand the <RSDFileDir> tag.");
 			ue.addDebugInfo("strInput", rstrInput);
@@ -1273,15 +1281,26 @@ void CAFUtility::expandDocTypeTag(string& rstrInput,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CAFUtility::expandComponentDataDirTag(string& rstrInput)
+void CAFUtility::expandComponentDataDirTag(string& rstrInput,
+										   IAFDocumentPtr& ripDoc)
 {
 	// if the <ComponentDataDir> tag exists in the input string
 	// make the corresponding substitution
 	if (rstrInput.find(strCOMPONENT_DATA_DIR_TAG) != string::npos)
 	{
-		// get the Component Data Folder			
 		string strFolder;
-		getComponentDataFolder(strFolder);
+		// Get the Component Data Folder from the AFDoc if possible
+		IVariantVectorPtr rsdFileStack = ripDoc->RSDFileStack;
+		if (rsdFileStack != __nullptr && rsdFileStack->Size > 0)
+		{
+			strFolder = m_ipEngine->
+				GetComponentDataFolder2(ripDoc->FKBVersion, ripDoc->AlternateComponentDataDir);
+		}
+		else
+		{
+			// Else use the Rule Execution Env
+			getComponentDataFolder(strFolder);
+		}
 
 		// replace instances of the tag with the value
 		replaceVariable(rstrInput, strCOMPONENT_DATA_DIR_TAG , strFolder);
@@ -2341,11 +2360,11 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 		expandCustomFileTags(rstrInput, ipDoc);
 
 		// expand the various other tags
-		expandRSDFileDirTag(rstrInput);
+		expandRSDFileDirTag(rstrInput, ipDoc);
 		expandRuleExecIDTag(rstrInput, ipDoc);
 		expandSourceDocNameTag(rstrInput, ipDoc);
 		expandDocTypeTag(rstrInput, ipDoc);
-		expandComponentDataDirTag(rstrInput);
+		expandComponentDataDirTag(rstrInput, ipDoc);
 		expandAFDocTags(rstrInput, ipDoc);
 		expandCommonComponentsDir(rstrInput);
 

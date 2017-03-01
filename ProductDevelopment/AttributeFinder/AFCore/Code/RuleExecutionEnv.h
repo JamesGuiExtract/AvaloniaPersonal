@@ -54,6 +54,7 @@ public:
 	STDMETHOD(get_ShouldAddAttributeHistory)(VARIANT_BOOL *pbVal);
 	STDMETHOD(get_RSDFileBeingEdited)(BSTR *pVal);
 	STDMETHOD(put_RSDFileBeingEdited)(BSTR newVal);
+	STDMETHOD(get_EnableParallelProcessing)(VARIANT_BOOL *pbVal);
 private:
 	// member variable to keep track of which thread is
 	// associated which which RSD file
@@ -94,6 +95,10 @@ private:
 
 	// Whether rule objects should add history information to attributes (used for debugging)
 	static bool m_bShouldAddAttributeHistory;
+
+	// Whether rulesets are allowed to execute rules in parallel (is true then per-page mode rulesets
+	// and rulesets where multiple attributes are run at the same time will try to use multiple threads)
+	static bool m_bEnableParallelProcessing;
 
 	// Registry settings manager object (added for attribute history setting)
 	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;

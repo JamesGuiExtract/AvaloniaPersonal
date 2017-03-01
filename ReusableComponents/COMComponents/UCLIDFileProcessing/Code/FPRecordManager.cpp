@@ -348,6 +348,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 	}
 
 	unsigned long nSleepTime = 0;
+
 	do
 	{
 		// if the queue is discarded, then return false immediately
@@ -483,8 +484,21 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 				m_nNumberOfFilesProcessed++;
 			}
 
+			// Unlock before waiting so that other threads can update
+			lockGuard.Unlock();
+
 			// Acquire the semaphore before calling
 			Win32SemaphoreLockGuard lg(processSemaphore, true);
+
+			// Relock
+			lockGuard.Lock();
+
+			// Quit if the FAM has been stopped while waiting on the semaphore
+			if (processingQueueIsDiscarded())
+			{
+				continue;
+			}
+
 			changeState(task);
 
 			// After grabbing a file, put any delayed files back onto the front of the queue so

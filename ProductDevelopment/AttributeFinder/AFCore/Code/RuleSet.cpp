@@ -16,6 +16,7 @@
 #include <ComponentLicenseIDs.h>
 #include <VectorOperations.h>
 #include <MiscLeadUtils.h>
+#include <UPI.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -83,13 +84,16 @@ m_eRuleSetRunMode(kRunPerDocument),
 m_bInsertAttributesUnderParent(false),
 m_strInsertParentName(""),
 m_strInsertParentValue(""),
-m_bDeepCopyInput(false)
+m_bDeepCopyInput(false),
+m_ipParallelRuleSet(__nullptr),
+m_sProgressCounts()
 {
 	try
 	{
-		CSingleLock lg(&ms_criticalSectionConstruction, TRUE);
-
-		ms_referenceCount++;
+		{
+			CSingleLock lg(&ms_criticalSectionConstruction, TRUE);
+			ms_referenceCount++;
+		}
 
 		// If full RDT is not licensed, we may be able to preset a counter
 		if (!isRdtLicensed())
@@ -120,16 +124,18 @@ CRuleSet::~CRuleSet()
 
 	try
 	{
-		CSingleLock lg(&ms_criticalSectionConstruction, TRUE);
+		{
+			CSingleLock lg(&ms_criticalSectionConstruction, TRUE);
 
-		if (ms_referenceCount <= 0)
-		{
-			UCLIDException("ELI38721", "Failed RuleSet consistency check.").log();
-			ms_referenceCount = 0;
-		}
-		else
-		{
-			ms_referenceCount--;
+			if (ms_referenceCount <= 0)
+			{
+				UCLIDException("ELI38721", "Failed RuleSet consistency check.").log();
+				ms_referenceCount = 0;
+			}
+			else
+			{
+				ms_referenceCount--;
+			}
 		}
 
 		// Before releasing the connection to m_apSafeNetMgr, flush any accumulated values that have
@@ -300,44 +306,11 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 		{
 			try
 			{
-				// Throw exception if rule execution is not allowed [FlexIDSCore #3061]
-				if (!isRuleExecutionAllowed())
-				{
-					throw UCLIDException("ELI21520", 
-						"Rule execution is not allowed - make sure that a counter is selected.");
-				}
-
-				if (m_strFKBVersion.empty() && (isUsingCounter() || m_bSwipingRule))
-				{
-					throw UCLIDException("ELI33506", "An FKB version must be specified for a swiping rule or a "
-						"ruleset that decrements counters.");
-				}
+				// Check whether rule running is allowed
+				validateRunability();
 
 				// Wrap pvecAttributeNames in a smart pointer
 				IVariantVectorPtr ipvecAttributeNames = pvecAttributeNames;
-
-				// Get access to the names of attributes in the ruleset
-				IVariantVectorPtr ipAttributeNames = m_ipAttributeNameToInfoMap->GetKeys();
-				if (ipAttributeNames == __nullptr)
-				{
-					throw UCLIDException("ELI04375", "Unable to retrieve names of attributes from ruleset.");
-				}
-
-				// Create an AFDocument and pass it along to the attribute rule info
-				UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
-				ASSERT_ARGUMENT("ELI05874", ipAFDoc != __nullptr);
-
-				IIUnknownVectorPtr ipAFDocsToRun = setupRunMode(ipAFDoc);
-				ASSERT_RESOURCE_ALLOCATION("ELI39437", ipAFDocsToRun != __nullptr);
-
-				// Get the number of AFDocs that will need to run rules on
-				int nAFDocs = ipAFDocsToRun->Size();
-
-				// Determine the total number of attributes for which rules will need to be run
-				// The number of attributes need to be known now so that we can do a good job
-				// of providing progress information.
-				long nNumAttributesToRunRulesFor = (ipvecAttributeNames != __nullptr) ?
-					ipvecAttributeNames->Size : ipAttributeNames->Size;
 
 				// Wrap the progress status object in a smart pointer
 				IProgressStatusPtr ipProgressStatus(pProgressStatus);
@@ -346,51 +319,82 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				bool bEnabledDocumentPreprocessorExists = enabledDocumentPreprocessorExists();
 				bool bEnabledOutputHandlerExists = enabledOutputHandlerExists();
 
-				// Progress related constants
-				// NOTE: the constants below are weighted such that the time it takes to run the rules for an average attribute
-				// is approximately double the amount of time it takes to execute either the pre-processor or the output handler.
-				const long nNUM_PROGRESS_ITEMS_INITIALIZE = 1;
-				const long nNUM_PROGRESS_ITEMS_PRE_PROCESSOR = 1;
-				const long nNUM_PROGRESS_ITEMS_PER_ATTRIBUTE = 2;
-				const long nNUM_PROGRESS_ITEMS_ATTRIBUTES = nNumAttributesToRunRulesFor * nNUM_PROGRESS_ITEMS_PER_ATTRIBUTE;
-				const long nNUM_PROGRESS_ITEMS_OUTPUT_HANDLER = 1;
-				long nTOTAL_PROGRESS_ITEMS = nNUM_PROGRESS_ITEMS_INITIALIZE + // initializing is always going to happen
-					nNUM_PROGRESS_ITEMS_ATTRIBUTES * nAFDocs;
-				nTOTAL_PROGRESS_ITEMS += bEnabledDocumentPreprocessorExists ? nNUM_PROGRESS_ITEMS_PRE_PROCESSOR : 0;
-				nTOTAL_PROGRESS_ITEMS += bEnabledOutputHandlerExists ? nNUM_PROGRESS_ITEMS_OUTPUT_HANDLER : 0;
+				// Get access to the names of attributes in the ruleset
+				IVariantVectorPtr ipDefinedAttributeNames = m_ipAttributeNameToInfoMap->GetKeys();
+				if (ipDefinedAttributeNames == __nullptr)
+				{
+					throw UCLIDException("ELI04375", "Unable to retrieve names of attributes from ruleset.");
+				}
 
-				// Update the progress status
+				// Figure out which attributes will be run
+				IVariantVectorPtr ipAttributesToRun = (ipvecAttributeNames != __nullptr)
+					? ipvecAttributeNames
+					: ipDefinedAttributeNames;
+				long nNumAttributesToRunRulesFor = ipAttributesToRun->Size;
+
+				// Get AFDoc (and associated pages if RunMode is PerPage)
+				// Number of pages is used for progress status calculations
+				UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
+				ASSERT_ARGUMENT("ELI05874", ipAFDoc != __nullptr);
+
+				ISpatialStringPtr ipDocText(ipAFDoc->Text);
+				ASSERT_RESOURCE_ALLOCATION("ELI37086", ipDocText != __nullptr);
+
+				// This collection can be reused if there is no enabled preprocessor
+				IIUnknownVectorPtr ipPages;
+				long nNumDocs = 1;
+				if (m_eRuleSetRunMode == kRunPerPage)
+				{
+					ipPages = ipDocText->GetPages(VARIANT_TRUE, gstrDEFAULT_EMPTY_PAGE_STRING.c_str());
+					ASSERT_RESOURCE_ALLOCATION("ELI42019", ipPages != __nullptr);
+					long nNumDocs = ipPages->Size();
+				}
+
+				// Now have everything needed to start progress status before further initialization
 				if (ipProgressStatus)
 				{
-					ipProgressStatus->InitProgressStatus("", 0, nTOTAL_PROGRESS_ITEMS, VARIANT_TRUE);
-					ipProgressStatus->StartNextItemGroup("Initializing RuleSet execution...", nNUM_PROGRESS_ITEMS_INITIALIZE);
+					calculateProgressItems(nNumAttributesToRunRulesFor, ipPages->Size());
+
+					ipProgressStatus->InitProgressStatus("",
+						0, m_sProgressCounts.nTotal, VARIANT_TRUE);
+					ipProgressStatus->StartNextItemGroup("Initializing RuleSet execution...",
+						m_sProgressCounts.nInitialization);
 				}
 
-				// Only execute rules with version number >=4 when counter support was added
-				// for security reasons, don't store the number 4 in code...compute 4 as I minus E
-				char c1 = 'E';
-				char c2 = 'I';
-				if (m_nVersionNumber < (c2 - c1))
-				{
-					UCLIDException ue("ELI11653", "This version of the rule execution engine is not backward compatible with older rules.");
-					ue.addDebugInfo("VersionNumber", m_nVersionNumber);
-					throw ue;
-				}
-
-				// Record a new rule execution session
+				// Record a new rule execution session (Used by addCurrentRSDFileToDebugInfo())
 				UCLID_AFCORELib::IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
 				ASSERT_RESOURCE_ALLOCATION("ELI07493", ipSession != __nullptr);
-				long nStackSize = ipSession->SetRSDFileName(m_strFileName.c_str());
+				ipSession->SetRSDFileName(m_strFileName.c_str());
+
+				// Set current RSD in AFDoc (used in place of above REE to support multi-threading)
+				long nStackSize = ipAFDoc->PushRSDFileName(_bstr_t(m_strFileName.c_str()));
+
+				// Setup a PopRSDFileName call for when this block exits
+				shared_ptr<void> popRSD(__nullptr, [&](void*){ ipAFDoc->PopRSDFileName(); });
 
 				// [FlexIDSCore:5318]
 				// If an alternate component data directory root has been specified to be used in
 				// addition to the default component data directory, apply that directory.
 				if (!asString(bstrAlternateComponentDataDir).empty())
 				{
-					ipSession->SetAlternateComponentDataDir(bstrAlternateComponentDataDir);
+					ipAFDoc->AlternateComponentDataDir = bstrAlternateComponentDataDir;
 				}
 
-				// If the ruleset is marked as an to-be-used-internally ruleset, then ensure 
+				// If an FKB version is specified, apply it.
+				if (!m_strFKBVersion.empty())
+				{
+					ipAFDoc->FKBVersion = _bstr_t(m_strFKBVersion.c_str());
+				}
+				// If an FKB version is not specified, but this is a top level rule, clear any
+				// previously assigned FKB version. If there is a legacy FKB version
+				// installed and the component data directory is needed by the rule the legacy
+				// version will be implicitly assigned at that time.
+				else if (nStackSize == 1)
+				{
+					ipAFDoc->FKBVersion = "";
+				}
+
+				// If the ruleset is marked as a to-be-used-internally ruleset, then ensure 
 				// that stacksize > 1.
 				// Direct execution of internal-use rules now requires an RDT license [FlexIDSCore #3200]
 				if (m_bRuleSetOnlyForInternalUse && nStackSize == 1 && !isRdtLicensed())
@@ -399,35 +403,40 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					throw ue;
 				}
 
-				// If an FKB version is specified, apply it.
-				if (!m_strFKBVersion.empty())
-				{
-					ipSession->SetFKBVersion(m_strFKBVersion.c_str());
-				}
-				// If an FKB version is not specified, but this is a top level rule, clear any
-				// previously assigned FKB version on this thread. If there is a legacy FKB version
-				// installed and the component data directory is needed by the rule the legacy
-				// version will be implicitly assigned at that time.
-				else if (nStackSize == 1)
-				{
-					ipSession->SetFKBVersion("");
-				}
-
-				// Create a vector to keep all the attribute search results to return to caller later
-				IIUnknownVectorPtr ipFoundAttributes(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI04374", ipFoundAttributes != __nullptr);
-
 				// https://extract.atlassian.net/browse/ISSUE-12265
 				// Ensure the dimensions (in pixels) of each page as reported by the OCR engine
 				// match the page dimensions to be used by the rules so that redactions appear where
 				// they are supposed to appear.
 				if (nStackSize == 1)
 				{
-					ISpatialStringPtr ipDocText(ipAFDoc->Text);
-					ASSERT_RESOURCE_ALLOCATION("ELI37086", ipDocText != __nullptr);
-
 					ipDocText->ValidatePageDimensions();
 				}
+
+				// Determine whether rules should be run in parallel
+				bool bCanUseParallel = false;
+				bool bSharedSemaphoreExists = false;
+				if (ipAFDoc->ParallelRunMode == kUnspecifiedParallelization)
+				{
+					bCanUseParallel = isParallelProcessingEnabled();
+					if (bCanUseParallel)
+					{
+						ipAFDoc->ParallelRunMode = (UCLID_AFCORELib::EParallelRunMode)kPoliteParallelization;
+					}
+					else
+					{
+						ipAFDoc->ParallelRunMode = (UCLID_AFCORELib::EParallelRunMode)kNoParallelization;
+					}
+				}
+				else if (ipAFDoc->ParallelRunMode != kNoParallelization)
+				{
+					bCanUseParallel = true;
+					bSharedSemaphoreExists = true;
+				}
+
+
+				// Create a vector to keep all the attribute search results to return to caller later
+				IIUnknownVectorPtr ipFoundAttributes(CLSID_IUnknownVector);
+				ASSERT_RESOURCE_ALLOCATION("ELI04374", ipFoundAttributes != __nullptr);
 
 				// If any counters are set decrement them here
 				decrementCounters(ipAFDoc);
@@ -437,198 +446,105 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				{
 					ipFoundAttributes = passVOAToOutput(ipAFDoc);
 				}
-
-				// Try/catch for preprocessors
-				try
+				else
 				{
-					try
+					// Pre-process the doc if there's any preprocessor
+					// Do this _before_ setupRunMode
+					// https://extract.atlassian.net/browse/ISSUE-14455
+					if (bEnabledDocumentPreprocessorExists)
 					{
-						// Pre-process the doc if there's any preprocessor
-						if (bEnabledDocumentPreprocessorExists)
+						runGlobalDocPreprocessor(ipAFDoc, ipProgressStatus);
+
+						// Rebuild page collection after running preprocessors
+						if (ipPages != __nullptr)
 						{
-							// Update the progress status
-							if (ipProgressStatus)
-							{
-								ipProgressStatus->StartNextItemGroup(
-									"Executing the pre-processor rules...",
-									nNUM_PROGRESS_ITEMS_PRE_PROCESSOR);
-							}
+							ISpatialStringPtr ipDocText(ipAFDoc->Text);
+							ASSERT_RESOURCE_ALLOCATION("ELI42017", ipDocText != __nullptr);
 
-							// Create a pointer to the Sub-ProgressStatus object, depending upon
-							// whether the caller requested progress information
-							IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
-								__nullptr : ipProgressStatus->SubProgressStatus;
-
-							// Execute the document preprocessor
-							UCLID_AFCORELib::IDocumentPreprocessorPtr ipDocPreprocessor(m_ipDocPreprocessor->Object);
-							if (ipDocPreprocessor)
-							{
-								PROFILE_RULE_OBJECT(
-									asString(m_ipDocPreprocessor->Description), "", ipDocPreprocessor, 0)
-
-								ipDocPreprocessor->Process(ipAFDoc, ipSubProgressStatus);
-							}
+							// This collection can be reused if there is no enabled preprocessor
+							ipPages = ipDocText->GetPages(VARIANT_TRUE, gstrDEFAULT_EMPTY_PAGE_STRING.c_str());
+							ASSERT_RESOURCE_ALLOCATION("ELI42018", ipPages != __nullptr);
 						}
 					}
-					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32952");
-				}
-				catch (UCLIDException &ue)
-				{
-					if (m_bIgnorePreprocessorErrors)
+
+					IIUnknownVectorPtr ipAFDocsToRun = setupRunMode(ipAFDoc, ipPages);
+					ASSERT_RESOURCE_ALLOCATION("ELI39437", ipAFDocsToRun != __nullptr);
+
+					// Get the number of AFDocs that will need to run rules on
+					int nAFDocs = ipAFDocsToRun->Size();
+
+					IIUnknownVectorPtr ipResults(CLSID_IUnknownVector);
+					long nNumTasks = nAFDocs * nNumAttributesToRunRulesFor;
+					if (nNumTasks > 1 && bCanUseParallel)
 					{
-						ue.log();
+						// Assert that both parallel processing and profiling are not simultaneously enabled.
+						ASSERT_RUNTIME_CONDITION("ELI42055", !CRuleSetProfiler::ms_bEnabled,
+							"Rule set profiling does not work correctly with parallel processing enabled!");
+
+						_bstr_t bstrSemaphoreName = "";
+						// Create the parallel ruleset object if null
+						if (m_ipParallelRuleSet == __nullptr)
+						{
+							m_ipParallelRuleSet.CreateInstance("Extract.AttributeFinder.Rules.ParallelRuleSet");
+							ASSERT_RESOURCE_ALLOCATION("ELI41962", m_ipParallelRuleSet != __nullptr);
+						}
+						if (bSharedSemaphoreExists)
+						{
+							UPI upi = UPI::getCurrentProcessUPI();
+							bstrSemaphoreName = _bstr_t(upi.getProcessSemaphoreName().c_str());
+						}
+
+						ipResults = m_ipParallelRuleSet->RunAttributeFinders(ipAFDocsToRun, getThisAsCOMPtr(), ipvecAttributeNames,
+							bstrSemaphoreName, ipProgressStatus);
 					}
 					else
 					{
-						throw ue;
+						for (long i = 0; i < nAFDocs; ++i)
+						{
+							UCLID_AFCORELib::IAFDocumentPtr ipAFDoc = ipAFDocsToRun->At(i);
+							ipResults->PushBack(runAttributeFinders(ipAFDoc, ipAttributesToRun, ipProgressStatus));
+						}
 					}
-				}
-				
-				int nLastUsedPageNumber = 0;
-				for (int doc = 0; doc < nAFDocs; doc++)
-				{
-					UCLID_AFCORELib::IAFDocumentPtr ipCurrAFDoc = ipAFDocsToRun->At(doc);					
-					
-					IIUnknownVectorPtr ipFoundOnCurrent(CLSID_IUnknownVector);
-					ASSERT_RESOURCE_ALLOCATION("ELI39441", ipFoundOnCurrent != __nullptr);
-		
-					// Iterate through all the attributes and execute their associated rules
-					int iNumAttributeNames = ipAttributeNames->Size;
-					for (int i = 0; i < iNumAttributeNames; i++)
+
+					// Put results together
+					for (long i = 0; i < nAFDocs; ++i)
 					{
-						// get the attribute find info associated with the current attribute
-						_bstr_t _bstrAttributeName = ipAttributeNames->GetItem(i);
-
-						// Before continuing, make sure that either all the attributes were
-						// requested to be processed, or that the current attribute is one 
-						// among the list of attributes requested to be processed.
-						if (pvecAttributeNames != __nullptr && 
-							pvecAttributeNames->Contains(_bstrAttributeName) == VARIANT_FALSE)
+						int nLastUsedPageNumber = 0;
+						UCLID_AFCORELib::IAFDocumentPtr ipCurrAFDoc = ipAFDocsToRun->At(i);
+						IIUnknownVectorPtr ipFoundOnCurrent = ipResults->At(i);
+						if (m_bInsertAttributesUnderParent)
 						{
-							// skip processing this attribute
-							continue;
-						}
+							ISpatialStringPtr ipValue(CLSID_SpatialString);
 
-						// Update Progress Status
-						if (ipProgressStatus)
-						{
-							string strStatusText = "Executing rules for field " + asString(_bstrAttributeName) + string("...");
-							ipProgressStatus->StartNextItemGroup(strStatusText.c_str(), nNUM_PROGRESS_ITEMS_PER_ATTRIBUTE);
-						}
+							// if non-spatial just assume the page number is 1 + last used page number
+							int nPageNumber = nLastUsedPageNumber + 1;
+							int nLastPageNumber = nPageNumber;
 
-						// get the attribute finding information for the current attribute
-						UCLID_AFCORELib::IAttributeFindInfoPtr ipAttributeFindInfo = 
-							m_ipAttributeNameToInfoMap->GetValue(_bstrAttributeName);
-						if (ipAttributeFindInfo == __nullptr)
-						{
-							UCLIDException ue("ELI04376", "Unable to retrieve attribute rules info.");
-							string stdstrAttribute = _bstrAttributeName;
-							ue.addDebugInfo("Attribute", stdstrAttribute);
-							throw ue;
-						}
-
-						// Create a pointer to the Sub-ProgressStatus object, depending upon whether
-						// the caller requested progress information
-						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
-							__nullptr : ipProgressStatus->SubProgressStatus;
-
-						PROFILE_RULE_OBJECT(asString(_bstrAttributeName), "Attribute finder block",
-							ipAttributeFindInfo, 0)
-
-						// find all attributes values for the current attribute
-						IIUnknownVectorPtr ipAttributes = 
-							ipAttributeFindInfo->ExecuteRulesOnText(ipCurrAFDoc, ipSubProgressStatus);
-
-						// for each attribute that was found, update the "name" part of the
-						// attribute object to be the name of the current attribute
-						long nNumAttributes = ipAttributes->Size();
-						for (int j = 0; j < nNumAttributes; j++)
-						{
-							UCLID_AFCORELib::IAttributePtr ipAttribute = ipAttributes->At(j);
-							ipAttribute->Name = _bstrAttributeName;
-
-							// Update data object with trace info
-							if (shouldAddAttributeHistory())
+							// If the document has spatial info get the first and last page
+							if (ipCurrAFDoc->Text->HasSpatialInfo() == VARIANT_TRUE)
 							{
-								addAttributeHistoryInfo(ipAttribute, asString(_bstrAttributeName));
+								nPageNumber = ipCurrAFDoc->Text->GetFirstPageNumber();
+								nLastPageNumber = ipCurrAFDoc->Text->GetLastPageNumber();
 							}
+							nLastUsedPageNumber = nLastPageNumber;
+
+							// if the First and last page are the same use that page number otherwise
+							// use the word "All"
+							string strPageNumber = (nPageNumber == nLastPageNumber) ? asString(nPageNumber) : "All";
+							ipValue = createParentValueFromAFDocAttributes(ipCurrAFDoc, strPageNumber);
+
+							ipFoundAttributes->PushBack(createParentAttribute(m_strInsertParentName, ipValue, ipFoundOnCurrent));
 						}
-
-						// append results to the result vector of found attributes.
-						ipFoundOnCurrent->Append(ipAttributes);
-					}
-					if (m_bInsertAttributesUnderParent)
-					{
-						ISpatialStringPtr ipValue(CLSID_SpatialString);
-						
-						// if non-spatial just assume the page number is 1 + last used page number
-						int nPageNumber = nLastUsedPageNumber+1;
-						int nLastPageNumber = nPageNumber;
-
-						// If the document has spatial info get the first and last page
-						if (ipCurrAFDoc->Text->HasSpatialInfo() == VARIANT_TRUE)
+						else
 						{
-							nPageNumber = ipCurrAFDoc->Text->GetFirstPageNumber();
-							nLastPageNumber = ipCurrAFDoc->Text->GetLastPageNumber();
+							ipFoundAttributes->Append(ipFoundOnCurrent);
 						}
-						nLastUsedPageNumber = nLastPageNumber;
-
-						// if the First and last page are the same use that page number otherwise
-						// use the word "All"
-						string strPageNumber = (nPageNumber == nLastPageNumber) ? asString(nPageNumber) : "All";
-						ipValue =  createParentValueFromAFDocAttributes(ipCurrAFDoc, strPageNumber);
-
-						ipFoundAttributes->PushBack(createParentAttribute(m_strInsertParentName, ipValue, ipFoundOnCurrent));
-					}
-					else
-					{
-						ipFoundAttributes->Append(ipFoundOnCurrent);
 					}
 				}
 
-				// Try/catch for output handlers
-				try
+				if (bEnabledOutputHandlerExists)
 				{
-					try
-					{
-						// Pass the found attributes to a defined Output Handler
-						if (bEnabledOutputHandlerExists)
-						{
-							// Update the progress status
-							if (ipProgressStatus)
-							{
-								ipProgressStatus->StartNextItemGroup(
-									"Executing the output handler rules...",
-									nNUM_PROGRESS_ITEMS_OUTPUT_HANDLER);
-							}
-
-							// Execute the output hander
-							UCLID_AFCORELib::IOutputHandlerPtr ipOH( m_ipOutputHandler->Object );
-							if (ipOH)
-							{
-								// Create a pointer to the Sub-ProgressStatus object, depending upon
-								// whether the caller requested progress information
-								IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
-									__nullptr : ipProgressStatus->SubProgressStatus;
-
-								PROFILE_RULE_OBJECT(asString(m_ipOutputHandler->Description), "", ipOH, 0)
-
-								ipOH->ProcessOutput( ipFoundAttributes, ipAFDoc, ipSubProgressStatus );
-							}
-						}
-					}
-					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32953");
-				}
-				catch(UCLIDException& ue)
-				{
-					if (m_bIgnoreOutputHandlerErrors)
-					{
-						ue.log();
-					}
-					else
-					{
-						throw ue;
-					}
+					runOutputHandler(ipAFDoc, ipFoundAttributes, ipProgressStatus);
 				}
 
 				// Update the progress status
@@ -2163,6 +2079,57 @@ STDMETHODIMP CRuleSet::get_InstanceGUID(GUID *pVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33528")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::RunAttributeFinder(IAFDocument* pAFDoc, 
+										   BSTR bstrAttributeName,
+										   BSTR bstrAlternateComponentDataDir,
+										   IIUnknownVector **pAttributes)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Record a new rule execution session (Used by addCurrentRSDFileToDebugInfo())
+		UCLID_AFCORELib::IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
+		ASSERT_RESOURCE_ALLOCATION("ELI41977", ipSession != __nullptr);
+		ipSession->SetRSDFileName(m_strFileName.c_str());
+
+		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc = pAFDoc;
+
+		if (!asString(bstrAlternateComponentDataDir).empty())
+		{
+			ipAFDoc->AlternateComponentDataDir = bstrAlternateComponentDataDir;
+		}
+
+		IIUnknownVectorPtr ipFoundAttributes = runAttributeFinder(ipAFDoc, bstrAttributeName);
+
+		*pAttributes = ipFoundAttributes.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41961");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_DefinedAttributeNames(IVariantVector* *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		IVariantVectorPtr ipvecAttributeNames = m_ipAttributeNameToInfoMap->GetKeys();
+		ASSERT_RESOURCE_ALLOCATION("ELI42020", ipvecAttributeNames != __nullptr);
+
+		*pVal = ipvecAttributeNames.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42021")
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
@@ -2501,7 +2468,7 @@ UCLID_AFCORELib::IAttributePtr CRuleSet::createParentAttribute(string strName, I
 	return ipParent;
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CRuleSet::setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
+IIUnknownVectorPtr CRuleSet::setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, IIUnknownVectorPtr ipPages)
 {
 	IIUnknownVectorPtr ipAFDocsToRun(CLSID_IUnknownVector);
 	ASSERT_RESOURCE_ALLOCATION("ELI40369", ipAFDocsToRun != __nullptr);
@@ -2515,15 +2482,10 @@ IIUnknownVectorPtr CRuleSet::setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDo
 	}
 	else if (m_eRuleSetRunMode == kRunPerPage)
 	{
-		ISpatialStringPtr ipDocText = ipAFDoc->Text;
-		IIUnknownVectorPtr ipPages =  ipDocText->GetPages(VARIANT_TRUE, gstrDEFAULT_EMPTY_PAGE_STRING.c_str());
-
 		int nPages = ipPages->Size();
 		for (int i = 0; i < nPages; i++)
 		{
-			UCLID_AFCORELib::IAFDocumentPtr ipPageDoc(CLSID_AFDocument);
-			ipPageDoc->StringTags = ipAFDoc->StringTags;
-			ipPageDoc->ObjectTags = ipAFDoc->ObjectTags;
+			UCLID_AFCORELib::IAFDocumentPtr ipPageDoc = ipAFDoc->PartialClone(VARIANT_FALSE, VARIANT_FALSE);
 			ipPageDoc->Text = (ISpatialStringPtr) ipPages->At(i);
 			ipAFDocsToRun->PushBack(ipPageDoc);
 		}
@@ -2666,6 +2628,216 @@ void CRuleSet::addAttributeHistoryInfo(UCLID_AFCORELib::IAttributePtr ipAttribut
 		UCLID_AFCORELib::IAttributePtr ipSubattribute = ipSubattributes->At(i);
 		ASSERT_RESOURCE_ALLOCATION("ELI41768", ipSubattribute != __nullptr);
 		addAttributeHistoryInfo(ipSubattribute, strAttributeName);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+bool CRuleSet::isParallelProcessingEnabled()
+{
+	if (m_ipRuleExecutionEnv == __nullptr)
+	{
+		m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
+		ASSERT_RESOURCE_ALLOCATION("ELI42012", m_ipRuleExecutionEnv != __nullptr);
+	}
+	return asCppBool(m_ipRuleExecutionEnv->EnableParallelProcessing);
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSet::runGlobalDocPreprocessor(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, IProgressStatusPtr ipProgressStatus)
+{
+	// Try/catch for preprocessors
+	try
+	{
+		try
+		{
+			// Update the progress status
+			if (ipProgressStatus)
+			{
+				ipProgressStatus->StartNextItemGroup("Executing the pre-processor rules...",
+					m_sProgressCounts.nPreprocessor);
+			}
+
+			// Execute the document preprocessor
+			UCLID_AFCORELib::IDocumentPreprocessorPtr ipDocPreprocessor(m_ipDocPreprocessor->Object);
+			if (ipDocPreprocessor)
+			{
+				PROFILE_RULE_OBJECT(
+					asString(m_ipDocPreprocessor->Description), "", ipDocPreprocessor, 0)
+
+				ipDocPreprocessor->Process(ipAFDoc, __nullptr);
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32952");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (m_bIgnorePreprocessorErrors)
+		{
+			ue.log();
+		}
+		else
+		{
+			throw ue;
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CRuleSet::runAttributeFinder(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, BSTR bstrAttributeName)
+{
+	try
+	{
+		IIUnknownVectorPtr ipResults(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI39441", ipResults != __nullptr);
+
+		// Get access to the names of attributes in the ruleset
+		if (m_ipAttributeNameToInfoMap->Contains(bstrAttributeName))
+		{
+			// get the attribute finding information for the current attribute
+			UCLID_AFCORELib::IAttributeFindInfoPtr ipAttributeFindInfo =
+				m_ipAttributeNameToInfoMap->GetValue(bstrAttributeName);
+
+			if (ipAttributeFindInfo == __nullptr)
+			{
+				UCLIDException ue("ELI04376", "Unable to retrieve attribute rules info.");
+				string stdstrAttribute = asString(bstrAttributeName);
+				ue.addDebugInfo("Attribute", stdstrAttribute);
+				throw ue;
+			}
+
+			PROFILE_RULE_OBJECT(asString(bstrAttributeName), "Attribute finder block",
+				ipAttributeFindInfo, 0)
+
+				// find all attributes values for the current attribute
+				IIUnknownVectorPtr ipAttributes =
+				ipAttributeFindInfo->ExecuteRulesOnText(ipAFDoc, __nullptr);
+
+			// for each attribute that was found, update the "name" part of the
+			// attribute object to be the name of the current attribute
+			long nNumAttributes = ipAttributes->Size();
+			for (int j = 0; j < nNumAttributes; j++)
+			{
+				UCLID_AFCORELib::IAttributePtr ipAttribute = ipAttributes->At(j);
+				ipAttribute->Name = bstrAttributeName;
+
+				// Update data object with trace info
+				if (shouldAddAttributeHistory())
+				{
+					addAttributeHistoryInfo(ipAttribute, asString(bstrAttributeName));
+				}
+			}
+
+			// append results to the result vector of found attributes.
+			ipResults->Append(ipAttributes);
+		}
+		return ipResults;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42009");
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CRuleSet::runAttributeFinders(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc,
+	IVariantVectorPtr ipAttributeNames, IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		IIUnknownVectorPtr ipResults(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI42010", ipResults != __nullptr);
+
+		long nNumAttributesToRun = ipAttributeNames->Size;
+		for (long i = 0; i < nNumAttributesToRun; ++i)
+		{
+			_bstr_t bstrAttributeName = ipAttributeNames->Item[i];
+			if (ipProgressStatus != __nullptr)
+			{
+				string strStatusText = "Executing rules for field " + asString(bstrAttributeName) + "...";
+				ipProgressStatus->StartNextItemGroup(strStatusText.c_str(), m_sProgressCounts.nPerAttribute);
+			}
+
+			ipResults->Append(runAttributeFinder(ipAFDoc, bstrAttributeName));
+		}
+		return ipResults;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42011");
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSet::runOutputHandler(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, IIUnknownVectorPtr ipAttributes,
+	IProgressStatusPtr ipProgressStatus)
+{
+	// Try/catch for output handlers
+	try
+	{
+		try
+		{
+			// Update the progress status
+			if (ipProgressStatus)
+			{
+				ipProgressStatus->StartNextItemGroup("Executing the output handler rules...",
+					m_sProgressCounts.nOutputHandler);
+			}
+
+			// Execute the output hander
+			UCLID_AFCORELib::IOutputHandlerPtr ipOH( m_ipOutputHandler->Object );
+			if (ipOH)
+			{
+				PROFILE_RULE_OBJECT(asString(m_ipOutputHandler->Description), "", ipOH, 0)
+
+				ipOH->ProcessOutput( ipAttributes, ipAFDoc, __nullptr );
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32953");
+	}
+	catch(UCLIDException& ue)
+	{
+		if (m_bIgnoreOutputHandlerErrors)
+		{
+			ue.log();
+		}
+		else
+		{
+			throw ue;
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSet::calculateProgressItems(long nNumAttributesToRun, long nNumDocs)
+{
+	m_sProgressCounts.nInitialization = 1;
+	m_sProgressCounts.nPreprocessor = m_eRuleSetRunMode == kPassInputVOAToOutput
+		? 0 : enabledDocumentPreprocessorExists() ? 1 : 0;
+	m_sProgressCounts.nPerAttribute = m_eRuleSetRunMode == kPassInputVOAToOutput
+		? 0 : 2;
+	m_sProgressCounts.nTotalAttribute =
+		m_sProgressCounts.nPerAttribute * nNumAttributesToRun * nNumDocs;
+	m_sProgressCounts.nOutputHandler = enabledOutputHandlerExists()
+		? 1 : 0;
+	m_sProgressCounts.nTotal =
+		m_sProgressCounts.nInitialization
+		+ m_sProgressCounts.nPreprocessor
+		+ m_sProgressCounts.nTotalAttribute
+		+ m_sProgressCounts.nOutputHandler;
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSet::validateRunability()
+{
+	// Only execute rules with version number >=4 when counter support was added
+	// for security reasons, don't store the number 4 in code...compute 4 as I minus E
+	char c1 = 'E';
+	char c2 = 'I';
+	if (m_nVersionNumber < (c2 - c1))
+	{
+		UCLIDException ue("ELI11653", "This version of the rule execution engine is not backward compatible with older rules.");
+		ue.addDebugInfo("VersionNumber", m_nVersionNumber);
+		throw ue;
+	}
+
+	// Throw exception if rule execution is not allowed [FlexIDSCore #3061]
+	if (!isRuleExecutionAllowed())
+	{
+		throw UCLIDException("ELI21520", 
+			"Rule execution is not allowed - make sure that a counter is selected.");
+	}
+
+	if (m_strFKBVersion.empty() && (isUsingCounter() || m_bSwipingRule))
+	{
+		throw UCLIDException("ELI33506", "An FKB version must be specified for a swiping rule or a "
+			"ruleset that decrements counters.");
 	}
 }
 //-------------------------------------------------------------------------------------------------

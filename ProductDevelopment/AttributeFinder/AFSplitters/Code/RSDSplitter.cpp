@@ -191,51 +191,23 @@ STDMETHODIMP CRSDSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocumen
 		// NOTE: The following check is to prevent infinite loops that
 		// for instance can be caused by a RSD file using itself as the splitter
 		// ensure that the ruleset is not already executing by checking 
-		// in the Rule Execution Environment
-		if (m_ipRuleExecutionEnv == __nullptr)
-		{
-			m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
-			ASSERT_RESOURCE_ALLOCATION("ELI07489", m_ipRuleExecutionEnv != __nullptr);
-		}
-
-		if (m_ipRuleExecutionEnv->IsRSDFileExecuting(strRSDFile.c_str()) ==
-			VARIANT_TRUE)
+		// the AFDoc stack
+		if (asCppBool(ipAFDoc->IsRSDFileExecuting(_bstr_t(strRSDFile.c_str()))))
 		{
 			UCLIDException ue("ELI07490", "Circular reference detected between RSD files in RSDSplitter object!");
 			ue.addDebugInfo("RSD File", strRSDFile);
 			throw ue;
 		}
 
-		// register a new rule execution session
-		IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
-		ASSERT_RESOURCE_ALLOCATION("ELI07494", ipSession != __nullptr);
-		ipSession->SetRSDFileName(strRSDFile.c_str());
-
 		// get current attribute's value
 		IAttributePtr ipTopLevelAttribute(pAttribute);
 		ASSERT_RESOURCE_ALLOCATION("ELI19104", ipTopLevelAttribute != __nullptr);
-		IAFDocumentPtr ipAFSplitterDoc(CLSID_AFDocument);
+
+		// Copy the current AFDoc so that tags and RSD stack will be copied
+		IAFDocumentPtr ipAFSplitterDoc = ipAFDoc->PartialClone(VARIANT_FALSE, VARIANT_FALSE);
 		ASSERT_RESOURCE_ALLOCATION("ELI07618", ipAFSplitterDoc != __nullptr);
 
 		ipAFSplitterDoc->Attribute = ipTopLevelAttribute;
-
-		// [FlexIDSCore:2587]
-		// Copy the the document's string tags to the ipAFSplitterDoc the splitter will use.
-		ICopyableObjectPtr ipCopyable = ipAFDoc->StringTags;
-		ASSERT_RESOURCE_ALLOCATION("ELI32926", ipCopyable != __nullptr);
-		IStrToStrMapPtr ipStringTagCopy(ipCopyable->Clone());
-		ASSERT_RESOURCE_ALLOCATION("ELI32927", ipStringTagCopy != __nullptr);
-		
-		ipAFSplitterDoc->StringTags = ipStringTagCopy;
-
-		// [FlexIDSCore:2587]
-		// Copy the the document's object tags to the ipAFSplitterDoc the splitter will use.
-		ipCopyable = ipAFDoc->ObjectTags;
-		ASSERT_RESOURCE_ALLOCATION("ELI32928", ipCopyable != __nullptr);
-		IStrToObjectMapPtr ipObjectTagCopy(ipCopyable->Clone());
-		ASSERT_RESOURCE_ALLOCATION("ELI32929", ipObjectTagCopy != __nullptr);
-
-		ipAFSplitterDoc->ObjectTags = ipObjectTagCopy;
 
 		// pass the value into the rule set for further extraction
 		IIUnknownVectorPtr ipSubAttrValues 
@@ -252,10 +224,10 @@ STDMETHODIMP CRSDSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocumen
 			// store found sub attributes in the original attribute
 			ipTopLevelAttribute->SubAttributes = ipSubAttrValues;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05758")
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------

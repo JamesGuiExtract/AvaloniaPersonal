@@ -570,16 +570,19 @@ STDMETHODIMP CRegExprRule::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* 
 	{
 		validateLicense();
 
-		// make up an AFDocument
-		IAttributePtr	ipAttr( pAttribute );
+		IAFDocumentPtr ipOriginalInput(pOriginInput);
+		ASSERT_RESOURCE_ALLOCATION("ELI41958", ipOriginalInput != __nullptr);
+
+		// Make a new document with this attribute
+		IAttributePtr ipAttr( pAttribute );
 		ASSERT_RESOURCE_ALLOCATION("ELI09302", ipAttr != __nullptr);
+
+		IAFDocumentPtr ipAFDoc = ipOriginalInput->PartialClone(VARIANT_FALSE, VARIANT_FALSE);
+		ASSERT_RESOURCE_ALLOCATION("ELI06863", ipAFDoc != __nullptr);
+		ipAFDoc->Attribute = ipAttr;
 
 		ISpatialStringPtr ipAttrValue = ipAttr->Value;
 		ASSERT_RESOURCE_ALLOCATION("ELI06862", ipAttrValue != __nullptr);
-
-		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI06863", ipAFDoc != __nullptr);
-		ipAFDoc->Text = ipAttrValue;
 
 		// [FlexIDSCore:4744]
 		// It never makes sense for this rule, when used as a modifier, to return anything but the
@@ -593,6 +596,7 @@ STDMETHODIMP CRegExprRule::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* 
 			IAttributePtr ipAttribute(ipAttributes->At(0));
 			ASSERT_RESOURCE_ALLOCATION("ELI25956", ipAttribute != __nullptr);
 
+			// Copy the found value into the original value object
 			ISpatialStringPtr ipModifiedValue = ipAttribute->Value;
 			ASSERT_RESOURCE_ALLOCATION("ELI25957", ipModifiedValue != __nullptr);
 

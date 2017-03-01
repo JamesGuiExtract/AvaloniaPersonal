@@ -30,7 +30,7 @@ public:
 	// strPatternID - if match is found, the pattern ID of which is the match pattern
 	bool foundPattern(IRegularExprParserPtr ipRegExpParser, 
 					  UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipREPMFinder,
-					  ISpatialStringPtr ipInputText,
+					  IAFDocumentPtr ipInputDoc,
 					  IIUnknownVectorPtr& ripAttributes,
 					  string& rstrPatternID);
 

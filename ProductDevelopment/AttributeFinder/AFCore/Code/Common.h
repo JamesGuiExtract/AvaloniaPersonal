@@ -38,4 +38,7 @@ const std::string gstrAF_DEFAULT_PROFILE_RULES = "0";
 const std::string gstrAF_ADD_ATTRIBUTE_HISTORY_KEY = "AddAttributeHistory";
 const std::string gstrAF_DEFAULT_ADD_ATTRIBUTE_HISTORY = "0";
 
+const std::string gstrAF_ENABLE_PARALLEL_PROCESSING_KEY = "EnableParallelProcessing";
+const std::string gstrAF_DEFAULT_ENABLE_PARALLEL_PROCESSING = "1";
+
 const std::string gstrDEFAULT_EMPTY_PAGE_STRING = "___EMPTYPAGE___";

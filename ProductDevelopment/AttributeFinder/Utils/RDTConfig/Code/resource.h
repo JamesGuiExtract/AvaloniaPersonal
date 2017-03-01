@@ -8,6 +8,9 @@
 #define IDC_DEFAULTS                    6
 #define IDD_RDTCONFIG_DIALOG            102
 #define IDR_MAINFRAME                   128
+#define IDC_RADIO_NO_PARALLEL_NOR_PROFILE 258
+#define IDC_RADIO_PARALLEL              259
+#define IDC_RADIO_PROFILE               260
 #define IDC_CHECK_AUTOENCRYPT           1000
 #define IDC_CHECK_LOADONCE              1001
 #define IDC_CHECK_EFALOG                1002
