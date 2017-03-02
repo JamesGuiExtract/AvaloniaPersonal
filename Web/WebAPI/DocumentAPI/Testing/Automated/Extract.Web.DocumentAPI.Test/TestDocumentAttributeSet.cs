@@ -253,7 +253,7 @@ namespace Extract.Web.DocumentAPI.Test
         /// test LabDE documents
         /// </summary>
         #region Public Test Functions
-        [Test, Category("Interactive")]
+        [Test, Category("Automated")]
         public static void TestLabDE_DocumentAttributeSets()
         {
             try
@@ -266,14 +266,15 @@ namespace Extract.Web.DocumentAPI.Test
                     var fileId = kvpFileInfo.Key;
                     var fi = kvpFileInfo.Value;
 
-                    TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
+                    var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
+                    Assert.IsTrue(worked);
                 }
 
                 dbMgr.CloseAllDBConnections();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());                
             }
 
         }
@@ -281,7 +282,7 @@ namespace Extract.Web.DocumentAPI.Test
         /// <summary>
         /// test IDShield documents
         /// </summary>
-        [Test, Category("Interactive")]
+        [Test, Category("Automated")]
         public static void TestIDShield_DocumentAttributeSets()
         {
             try
@@ -294,21 +295,22 @@ namespace Extract.Web.DocumentAPI.Test
                     var fileId = kvpFileInfo.Key;
                     var fi = kvpFileInfo.Value;
 
-                    TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
+                    var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
+                    Assert.IsTrue(worked);
                 }
 
                 dbMgr.CloseAllDBConnections();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
             }
         }
 
         /// <summary>
         /// test FlexIndex documents
         /// </summary>
-        [Test, Category("Interactive")]
+        [Test, Category("Automated")]
         public static void TestFlexIndex_DocumentAttributeSets()
         {
             try
@@ -321,14 +323,15 @@ namespace Extract.Web.DocumentAPI.Test
                     var fileId = kvpFileInfo.Key;
                     var fi = kvpFileInfo.Value;
 
-                    TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
+                    var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
+                    Assert.IsTrue(worked);
                 }
 
                 dbMgr.CloseAllDBConnections();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
             }
         }
 
@@ -347,7 +350,7 @@ namespace Extract.Web.DocumentAPI.Test
             catch (Exception ex)
             {
                 Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
-                return null;
+                throw;
             }
         }
 
@@ -361,7 +364,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
             }
         }
 
@@ -375,41 +378,27 @@ namespace Extract.Web.DocumentAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
             }
         }
 
         static void AssertSame(string xmlName, string xmlValue, string attrName, string attrValue)
         {
-            try
-            {
-                Assert.IsTrue(attrValue.IsEquivalent(xmlValue),
-                                "{0} value: {1}, is not equivalent to: {2} value: {3}",
-                                xmlName,
-                                xmlValue,
-                                attrName,
-                                attrValue);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
-            }
+            Assert.IsTrue(attrValue.IsEquivalent(xmlValue),
+                            "{0} value: {1}, is not equivalent to: {2} value: {3}",
+                            xmlName,
+                            xmlValue,
+                            attrName,
+                            attrValue);
         }
 
         static void AssertNodeName(XmlNode node, string name)
         {
-            try
-            {
-                string nodeName = node.Name;
-                Assert.IsTrue(nodeName.IsEquivalent(name),
-                                "Node name test failed: expected: {0}, node is acutally named: {1}",
-                                name,
-                                nodeName);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
-            }
+            string nodeName = node.Name;
+            Assert.IsTrue(nodeName.IsEquivalent(name),
+                            "Node name test failed: expected: {0}, node is acutally named: {1}",
+                            name,
+                            nodeName);
         }
 
         static void TestSpatialLineBounds(XmlNode spatialLineBounds, SpatialLineBounds bounds, int i)
@@ -434,7 +423,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
             }
         }
 
@@ -497,7 +486,7 @@ namespace Extract.Web.DocumentAPI.Test
             catch (Exception ex)
             {
                 Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
-                return null;
+                throw;
             }
         }
 
@@ -518,7 +507,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
             }
         }
 
@@ -533,7 +522,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
             }
         }
 
@@ -560,7 +549,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
             }
         }
 
@@ -650,7 +639,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
             }
         }
 
@@ -677,7 +666,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
             }
 
             return true;
