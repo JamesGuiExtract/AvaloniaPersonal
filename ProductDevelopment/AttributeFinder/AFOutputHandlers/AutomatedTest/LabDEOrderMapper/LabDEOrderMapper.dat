@@ -78,3 +78,7 @@
 // Test 'do not perform second pass' option
 // https://extract.atlassian.net/browse/ISSUE-13794
 <TESTCASE>;Test27.rsd;test27.txt;;test27.eav
+
+// Filled requirement is respected when no merge takes place
+// https://extract.atlassian.net/browse/ISSUE-14551
+<TESTCASE>;Test28.rsd;test1.txt;;test28.eav

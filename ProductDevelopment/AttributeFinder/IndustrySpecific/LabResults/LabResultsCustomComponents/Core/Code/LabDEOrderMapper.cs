@@ -1598,6 +1598,7 @@ namespace Extract.LabResultsCustomComponents
                     var newPermutation = new OrderGroupingPermutation(newGroup);
                     newPermutation.ContainedGroups = new List<OrderGrouping>(currentPermutation.ContainedGroups);
                     currentPermutation = newPermutation;
+                    group = currentPermutation.CombinedGroup;
                 }
 
                 // Check mandatory requirement
