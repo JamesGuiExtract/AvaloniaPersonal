@@ -100,6 +100,6 @@
         /// <summary>
         /// the state of the specified workflow
         /// </summary>
-        public WorkflowState State { get; set; }
+        public string State { get; set; }
     }
 }

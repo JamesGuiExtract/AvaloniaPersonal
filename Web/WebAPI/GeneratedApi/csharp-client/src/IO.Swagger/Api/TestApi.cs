@@ -25,7 +25,7 @@ namespace IO.Swagger.Api
     {
         #region Synchronous Operations
         /// <summary>
-        /// 
+        /// Testing only - set the AttributeSetName, this allows testing Document.GetResultSet().
         /// </summary>
         /// <remarks>
         /// 
@@ -36,7 +36,7 @@ namespace IO.Swagger.Api
         void ApiTestSetAttributeSetNamePost (TestArgs arg = null);
 
         /// <summary>
-        /// 
+        /// Testing only - set the AttributeSetName, this allows testing Document.GetResultSet().
         /// </summary>
         /// <remarks>
         /// 
@@ -48,7 +48,7 @@ namespace IO.Swagger.Api
         #endregion Synchronous Operations
         #region Asynchronous Operations
         /// <summary>
-        /// 
+        /// Testing only - set the AttributeSetName, this allows testing Document.GetResultSet().
         /// </summary>
         /// <remarks>
         /// 
@@ -59,7 +59,7 @@ namespace IO.Swagger.Api
         System.Threading.Tasks.Task ApiTestSetAttributeSetNamePostAsync (TestArgs arg = null);
 
         /// <summary>
-        /// 
+        /// Testing only - set the AttributeSetName, this allows testing Document.GetResultSet().
         /// </summary>
         /// <remarks>
         /// 
@@ -181,7 +181,7 @@ namespace IO.Swagger.Api
         }
 
         /// <summary>
-        ///  
+        /// Testing only - set the AttributeSetName, this allows testing Document.GetResultSet(). 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="arg"> (optional)</param>
@@ -192,7 +192,7 @@ namespace IO.Swagger.Api
         }
 
         /// <summary>
-        ///  
+        /// Testing only - set the AttributeSetName, this allows testing Document.GetResultSet(). 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="arg"> (optional)</param>
@@ -256,7 +256,7 @@ namespace IO.Swagger.Api
         }
 
         /// <summary>
-        ///  
+        /// Testing only - set the AttributeSetName, this allows testing Document.GetResultSet(). 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="arg"> (optional)</param>
@@ -268,7 +268,7 @@ namespace IO.Swagger.Api
         }
 
         /// <summary>
-        ///  
+        /// Testing only - set the AttributeSetName, this allows testing Document.GetResultSet(). 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="arg"> (optional)</param>

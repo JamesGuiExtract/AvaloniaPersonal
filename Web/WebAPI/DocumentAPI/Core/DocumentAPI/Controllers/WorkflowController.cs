@@ -42,14 +42,14 @@ namespace DocumentAPI.Controllers
         //[HttpPost("/GetDefaultWorkflow")]
         //public IActionResult GetDefaultWorkflow([FromQuery] User user)
         [HttpGet("GetDefaultWorkflow/{username}")]
-        public IActionResult GetDefaultWorkflow(string username)
+        public string GetDefaultWorkflow(string username)
         {
             if (!ModelState.IsValid || String.IsNullOrEmpty(username))
             {
-                return BadRequest("Error: empty user name");
+                return "Error: empty user name";
             }
 
-            return new ObjectResult("Extract_Data");
+            return "Extract_Data";
         }
 
         /// <summary>
@@ -72,8 +72,9 @@ namespace DocumentAPI.Controllers
                 NumberFailed = 1,
                 NumberIgnored = 0,
                 NumberProcessing = 14,
-                State = WorkflowState.Running
+                State = Enum.GetName(typeof(WorkflowState), WorkflowState.Running)
             };
+
             return status;
         }
 
@@ -119,27 +120,6 @@ namespace DocumentAPI.Controllers
             };
 
             return new ObjectResult(workflow);
-        }
-
-        /// <summary>
-        /// Put handler - probably not needed (update) - unless we support management of workflows via this api
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="value"></param>
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        /// <summary>
-        /// Delete handler - probably not needed - unless we support management of workflows via this api
-        /// </summary>
-        /// <param name="id"></param>
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

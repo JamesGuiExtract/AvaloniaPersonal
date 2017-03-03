@@ -34,6 +34,12 @@
         /// <summary>
         /// The document has failed to process
         /// </summary>
-        Failed
+        Failed,
+
+        /// <summary>
+        /// The enum value is not applicable - i.e. getting the processing status failed.
+        /// In this case review the Error information.
+        /// </summary>
+        NotApplicable
     }
 }

@@ -32,8 +32,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="documentId"> (optional)</param>
-        /// <returns></returns>
-        void ApiDocumentGetDocumentTypeGet (string documentId = null);
+        /// <returns>string</returns>
+        string ApiDocumentGetDocumentTypeGet (string documentId = null);
 
         /// <summary>
         /// Gets the type of the submitted document (document classification)
@@ -43,8 +43,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="documentId"> (optional)</param>
-        /// <returns>ApiResponse of Object(void)</returns>
-        ApiResponse<Object> ApiDocumentGetDocumentTypeGetWithHttpInfo (string documentId = null);
+        /// <returns>ApiResponse of string</returns>
+        ApiResponse<string> ApiDocumentGetDocumentTypeGetWithHttpInfo (string documentId = null);
         /// <summary>
         /// Gets a result file - experimental!
         /// </summary>
@@ -198,8 +198,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="documentId"> (optional)</param>
-        /// <returns>Task of void</returns>
-        System.Threading.Tasks.Task ApiDocumentGetDocumentTypeGetAsync (string documentId = null);
+        /// <returns>Task of string</returns>
+        System.Threading.Tasks.Task<string> ApiDocumentGetDocumentTypeGetAsync (string documentId = null);
 
         /// <summary>
         /// Gets the type of the submitted document (document classification)
@@ -209,8 +209,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="documentId"> (optional)</param>
-        /// <returns>Task of ApiResponse</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> ApiDocumentGetDocumentTypeGetAsyncWithHttpInfo (string documentId = null);
+        /// <returns>Task of ApiResponse (string)</returns>
+        System.Threading.Tasks.Task<ApiResponse<string>> ApiDocumentGetDocumentTypeGetAsyncWithHttpInfo (string documentId = null);
         /// <summary>
         /// Gets a result file - experimental!
         /// </summary>
@@ -471,10 +471,11 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="documentId"> (optional)</param>
-        /// <returns></returns>
-        public void ApiDocumentGetDocumentTypeGet (string documentId = null)
+        /// <returns>string</returns>
+        public string ApiDocumentGetDocumentTypeGet (string documentId = null)
         {
-             ApiDocumentGetDocumentTypeGetWithHttpInfo(documentId);
+             ApiResponse<string> localVarResponse = ApiDocumentGetDocumentTypeGetWithHttpInfo(documentId);
+             return localVarResponse.Data;
         }
 
         /// <summary>
@@ -482,8 +483,8 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="documentId"> (optional)</param>
-        /// <returns>ApiResponse of Object(void)</returns>
-        public ApiResponse<Object> ApiDocumentGetDocumentTypeGetWithHttpInfo (string documentId = null)
+        /// <returns>ApiResponse of string</returns>
+        public ApiResponse< string > ApiDocumentGetDocumentTypeGetWithHttpInfo (string documentId = null)
         {
 
             var localVarPath = "/api/Document/GetDocumentType";
@@ -501,6 +502,9 @@ namespace IO.Swagger.Api
 
             // to determine the Accept header
             String[] localVarHttpHeaderAccepts = new String[] {
+                "text/plain", 
+                "application/json", 
+                "text/json"
             };
             String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
             if (localVarHttpHeaderAccept != null)
@@ -525,10 +529,10 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            
-            return new ApiResponse<Object>(localVarStatusCode,
+            return new ApiResponse<string>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
+                (string) Configuration.ApiClient.Deserialize(localVarResponse, typeof(string)));
+            
         }
 
         /// <summary>
@@ -536,10 +540,11 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="documentId"> (optional)</param>
-        /// <returns>Task of void</returns>
-        public async System.Threading.Tasks.Task ApiDocumentGetDocumentTypeGetAsync (string documentId = null)
+        /// <returns>Task of string</returns>
+        public async System.Threading.Tasks.Task<string> ApiDocumentGetDocumentTypeGetAsync (string documentId = null)
         {
-             await ApiDocumentGetDocumentTypeGetAsyncWithHttpInfo(documentId);
+             ApiResponse<string> localVarResponse = await ApiDocumentGetDocumentTypeGetAsyncWithHttpInfo(documentId);
+             return localVarResponse.Data;
 
         }
 
@@ -548,8 +553,8 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="documentId"> (optional)</param>
-        /// <returns>Task of ApiResponse</returns>
-        public async System.Threading.Tasks.Task<ApiResponse<Object>> ApiDocumentGetDocumentTypeGetAsyncWithHttpInfo (string documentId = null)
+        /// <returns>Task of ApiResponse (string)</returns>
+        public async System.Threading.Tasks.Task<ApiResponse<string>> ApiDocumentGetDocumentTypeGetAsyncWithHttpInfo (string documentId = null)
         {
 
             var localVarPath = "/api/Document/GetDocumentType";
@@ -567,6 +572,9 @@ namespace IO.Swagger.Api
 
             // to determine the Accept header
             String[] localVarHttpHeaderAccepts = new String[] {
+                "text/plain", 
+                "application/json", 
+                "text/json"
             };
             String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
             if (localVarHttpHeaderAccept != null)
@@ -591,10 +599,10 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            
-            return new ApiResponse<Object>(localVarStatusCode,
+            return new ApiResponse<string>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
+                (string) Configuration.ApiClient.Deserialize(localVarResponse, typeof(string)));
+            
         }
 
         /// <summary>

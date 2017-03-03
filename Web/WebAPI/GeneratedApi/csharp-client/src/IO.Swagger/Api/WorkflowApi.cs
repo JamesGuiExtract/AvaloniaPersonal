@@ -25,50 +25,6 @@ namespace IO.Swagger.Api
     {
         #region Synchronous Operations
         /// <summary>
-        /// Delete handler - probably not needed - unless we support management of workflows via this api
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        void ApiWorkflowByIdDelete (int? id);
-
-        /// <summary>
-        /// Delete handler - probably not needed - unless we support management of workflows via this api
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <returns>ApiResponse of Object(void)</returns>
-        ApiResponse<Object> ApiWorkflowByIdDeleteWithHttpInfo (int? id);
-        /// <summary>
-        /// Put handler - probably not needed (update) - unless we support management of workflows via this api
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <param name="value"> (optional)</param>
-        /// <returns></returns>
-        void ApiWorkflowByIdPut (int? id, string value = null);
-
-        /// <summary>
-        /// Put handler - probably not needed (update) - unless we support management of workflows via this api
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <param name="value"> (optional)</param>
-        /// <returns>ApiResponse of Object(void)</returns>
-        ApiResponse<Object> ApiWorkflowByIdPutWithHttpInfo (int? id, string value = null);
-        /// <summary>
         /// get default workflow for the specified user
         /// </summary>
         /// <remarks>
@@ -76,8 +32,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="username"></param>
-        /// <returns></returns>
-        void ApiWorkflowGetDefaultWorkflowByUsernameGet (string username);
+        /// <returns>string</returns>
+        string ApiWorkflowGetDefaultWorkflowByUsernameGet (string username);
 
         /// <summary>
         /// get default workflow for the specified user
@@ -87,8 +43,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="username"></param>
-        /// <returns>ApiResponse of Object(void)</returns>
-        ApiResponse<Object> ApiWorkflowGetDefaultWorkflowByUsernameGetWithHttpInfo (string username);
+        /// <returns>ApiResponse of string</returns>
+        ApiResponse<string> ApiWorkflowGetDefaultWorkflowByUsernameGetWithHttpInfo (string username);
         /// <summary>
         /// get status of specified workflow
         /// </summary>
@@ -153,50 +109,6 @@ namespace IO.Swagger.Api
         #endregion Synchronous Operations
         #region Asynchronous Operations
         /// <summary>
-        /// Delete handler - probably not needed - unless we support management of workflows via this api
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <returns>Task of void</returns>
-        System.Threading.Tasks.Task ApiWorkflowByIdDeleteAsync (int? id);
-
-        /// <summary>
-        /// Delete handler - probably not needed - unless we support management of workflows via this api
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <returns>Task of ApiResponse</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> ApiWorkflowByIdDeleteAsyncWithHttpInfo (int? id);
-        /// <summary>
-        /// Put handler - probably not needed (update) - unless we support management of workflows via this api
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <param name="value"> (optional)</param>
-        /// <returns>Task of void</returns>
-        System.Threading.Tasks.Task ApiWorkflowByIdPutAsync (int? id, string value = null);
-
-        /// <summary>
-        /// Put handler - probably not needed (update) - unless we support management of workflows via this api
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <param name="value"> (optional)</param>
-        /// <returns>Task of ApiResponse</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> ApiWorkflowByIdPutAsyncWithHttpInfo (int? id, string value = null);
-        /// <summary>
         /// get default workflow for the specified user
         /// </summary>
         /// <remarks>
@@ -204,8 +116,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="username"></param>
-        /// <returns>Task of void</returns>
-        System.Threading.Tasks.Task ApiWorkflowGetDefaultWorkflowByUsernameGetAsync (string username);
+        /// <returns>Task of string</returns>
+        System.Threading.Tasks.Task<string> ApiWorkflowGetDefaultWorkflowByUsernameGetAsync (string username);
 
         /// <summary>
         /// get default workflow for the specified user
@@ -215,8 +127,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="username"></param>
-        /// <returns>Task of ApiResponse</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> ApiWorkflowGetDefaultWorkflowByUsernameGetAsyncWithHttpInfo (string username);
+        /// <returns>Task of ApiResponse (string)</returns>
+        System.Threading.Tasks.Task<ApiResponse<string>> ApiWorkflowGetDefaultWorkflowByUsernameGetAsyncWithHttpInfo (string username);
         /// <summary>
         /// get status of specified workflow
         /// </summary>
@@ -391,303 +303,15 @@ namespace IO.Swagger.Api
         }
 
         /// <summary>
-        /// Delete handler - probably not needed - unless we support management of workflows via this api 
+        /// get default workflow for the specified user 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public void ApiWorkflowByIdDelete (int? id)
+        /// <param name="username"></param>
+        /// <returns>string</returns>
+        public string ApiWorkflowGetDefaultWorkflowByUsernameGet (string username)
         {
-             ApiWorkflowByIdDeleteWithHttpInfo(id);
-        }
-
-        /// <summary>
-        /// Delete handler - probably not needed - unless we support management of workflows via this api 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <returns>ApiResponse of Object(void)</returns>
-        public ApiResponse<Object> ApiWorkflowByIdDeleteWithHttpInfo (int? id)
-        {
-            // verify the required parameter 'id' is set
-            if (id == null)
-                throw new ApiException(400, "Missing required parameter 'id' when calling WorkflowApi->ApiWorkflowByIdDelete");
-
-            var localVarPath = "/api/Workflow/{id}";
-            var localVarPathParams = new Dictionary<String, String>();
-            var localVarQueryParams = new Dictionary<String, String>();
-            var localVarHeaderParams = new Dictionary<String, String>(Configuration.DefaultHeader);
-            var localVarFormParams = new Dictionary<String, String>();
-            var localVarFileParams = new Dictionary<String, FileParameter>();
-            Object localVarPostBody = null;
-
-            // to determine the Content-Type header
-            String[] localVarHttpContentTypes = new String[] {
-            };
-            String localVarHttpContentType = Configuration.ApiClient.SelectHeaderContentType(localVarHttpContentTypes);
-
-            // to determine the Accept header
-            String[] localVarHttpHeaderAccepts = new String[] {
-            };
-            String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
-            if (localVarHttpHeaderAccept != null)
-                localVarHeaderParams.Add("Accept", localVarHttpHeaderAccept);
-
-            // set "format" to json by default
-            // e.g. /pet/{petId}.{format} becomes /pet/{petId}.json
-            localVarPathParams.Add("format", "json");
-            if (id != null) localVarPathParams.Add("id", Configuration.ApiClient.ParameterToString(id)); // path parameter
-
-
-            // make the HTTP request
-            IRestResponse localVarResponse = (IRestResponse) Configuration.ApiClient.CallApi(localVarPath,
-                Method.DELETE, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarFileParams,
-                localVarPathParams, localVarHttpContentType);
-
-            int localVarStatusCode = (int) localVarResponse.StatusCode;
-
-            if (ExceptionFactory != null)
-            {
-                Exception exception = ExceptionFactory("ApiWorkflowByIdDelete", localVarResponse);
-                if (exception != null) throw exception;
-            }
-
-            
-            return new ApiResponse<Object>(localVarStatusCode,
-                localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
-        }
-
-        /// <summary>
-        /// Delete handler - probably not needed - unless we support management of workflows via this api 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <returns>Task of void</returns>
-        public async System.Threading.Tasks.Task ApiWorkflowByIdDeleteAsync (int? id)
-        {
-             await ApiWorkflowByIdDeleteAsyncWithHttpInfo(id);
-
-        }
-
-        /// <summary>
-        /// Delete handler - probably not needed - unless we support management of workflows via this api 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <returns>Task of ApiResponse</returns>
-        public async System.Threading.Tasks.Task<ApiResponse<Object>> ApiWorkflowByIdDeleteAsyncWithHttpInfo (int? id)
-        {
-            // verify the required parameter 'id' is set
-            if (id == null)
-                throw new ApiException(400, "Missing required parameter 'id' when calling WorkflowApi->ApiWorkflowByIdDelete");
-
-            var localVarPath = "/api/Workflow/{id}";
-            var localVarPathParams = new Dictionary<String, String>();
-            var localVarQueryParams = new Dictionary<String, String>();
-            var localVarHeaderParams = new Dictionary<String, String>(Configuration.DefaultHeader);
-            var localVarFormParams = new Dictionary<String, String>();
-            var localVarFileParams = new Dictionary<String, FileParameter>();
-            Object localVarPostBody = null;
-
-            // to determine the Content-Type header
-            String[] localVarHttpContentTypes = new String[] {
-            };
-            String localVarHttpContentType = Configuration.ApiClient.SelectHeaderContentType(localVarHttpContentTypes);
-
-            // to determine the Accept header
-            String[] localVarHttpHeaderAccepts = new String[] {
-            };
-            String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
-            if (localVarHttpHeaderAccept != null)
-                localVarHeaderParams.Add("Accept", localVarHttpHeaderAccept);
-
-            // set "format" to json by default
-            // e.g. /pet/{petId}.{format} becomes /pet/{petId}.json
-            localVarPathParams.Add("format", "json");
-            if (id != null) localVarPathParams.Add("id", Configuration.ApiClient.ParameterToString(id)); // path parameter
-
-
-            // make the HTTP request
-            IRestResponse localVarResponse = (IRestResponse) await Configuration.ApiClient.CallApiAsync(localVarPath,
-                Method.DELETE, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarFileParams,
-                localVarPathParams, localVarHttpContentType);
-
-            int localVarStatusCode = (int) localVarResponse.StatusCode;
-
-            if (ExceptionFactory != null)
-            {
-                Exception exception = ExceptionFactory("ApiWorkflowByIdDelete", localVarResponse);
-                if (exception != null) throw exception;
-            }
-
-            
-            return new ApiResponse<Object>(localVarStatusCode,
-                localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
-        }
-
-        /// <summary>
-        /// Put handler - probably not needed (update) - unless we support management of workflows via this api 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <param name="value"> (optional)</param>
-        /// <returns></returns>
-        public void ApiWorkflowByIdPut (int? id, string value = null)
-        {
-             ApiWorkflowByIdPutWithHttpInfo(id, value);
-        }
-
-        /// <summary>
-        /// Put handler - probably not needed (update) - unless we support management of workflows via this api 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <param name="value"> (optional)</param>
-        /// <returns>ApiResponse of Object(void)</returns>
-        public ApiResponse<Object> ApiWorkflowByIdPutWithHttpInfo (int? id, string value = null)
-        {
-            // verify the required parameter 'id' is set
-            if (id == null)
-                throw new ApiException(400, "Missing required parameter 'id' when calling WorkflowApi->ApiWorkflowByIdPut");
-
-            var localVarPath = "/api/Workflow/{id}";
-            var localVarPathParams = new Dictionary<String, String>();
-            var localVarQueryParams = new Dictionary<String, String>();
-            var localVarHeaderParams = new Dictionary<String, String>(Configuration.DefaultHeader);
-            var localVarFormParams = new Dictionary<String, String>();
-            var localVarFileParams = new Dictionary<String, FileParameter>();
-            Object localVarPostBody = null;
-
-            // to determine the Content-Type header
-            String[] localVarHttpContentTypes = new String[] {
-                "application/json", 
-                "text/json", 
-                "application/json-patch+json"
-            };
-            String localVarHttpContentType = Configuration.ApiClient.SelectHeaderContentType(localVarHttpContentTypes);
-
-            // to determine the Accept header
-            String[] localVarHttpHeaderAccepts = new String[] {
-            };
-            String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
-            if (localVarHttpHeaderAccept != null)
-                localVarHeaderParams.Add("Accept", localVarHttpHeaderAccept);
-
-            // set "format" to json by default
-            // e.g. /pet/{petId}.{format} becomes /pet/{petId}.json
-            localVarPathParams.Add("format", "json");
-            if (id != null) localVarPathParams.Add("id", Configuration.ApiClient.ParameterToString(id)); // path parameter
-            if (value != null && value.GetType() != typeof(byte[]))
-            {
-                localVarPostBody = Configuration.ApiClient.Serialize(value); // http body (model) parameter
-            }
-            else
-            {
-                localVarPostBody = value; // byte array
-            }
-
-
-            // make the HTTP request
-            IRestResponse localVarResponse = (IRestResponse) Configuration.ApiClient.CallApi(localVarPath,
-                Method.PUT, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarFileParams,
-                localVarPathParams, localVarHttpContentType);
-
-            int localVarStatusCode = (int) localVarResponse.StatusCode;
-
-            if (ExceptionFactory != null)
-            {
-                Exception exception = ExceptionFactory("ApiWorkflowByIdPut", localVarResponse);
-                if (exception != null) throw exception;
-            }
-
-            
-            return new ApiResponse<Object>(localVarStatusCode,
-                localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
-        }
-
-        /// <summary>
-        /// Put handler - probably not needed (update) - unless we support management of workflows via this api 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <param name="value"> (optional)</param>
-        /// <returns>Task of void</returns>
-        public async System.Threading.Tasks.Task ApiWorkflowByIdPutAsync (int? id, string value = null)
-        {
-             await ApiWorkflowByIdPutAsyncWithHttpInfo(id, value);
-
-        }
-
-        /// <summary>
-        /// Put handler - probably not needed (update) - unless we support management of workflows via this api 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="id"></param>
-        /// <param name="value"> (optional)</param>
-        /// <returns>Task of ApiResponse</returns>
-        public async System.Threading.Tasks.Task<ApiResponse<Object>> ApiWorkflowByIdPutAsyncWithHttpInfo (int? id, string value = null)
-        {
-            // verify the required parameter 'id' is set
-            if (id == null)
-                throw new ApiException(400, "Missing required parameter 'id' when calling WorkflowApi->ApiWorkflowByIdPut");
-
-            var localVarPath = "/api/Workflow/{id}";
-            var localVarPathParams = new Dictionary<String, String>();
-            var localVarQueryParams = new Dictionary<String, String>();
-            var localVarHeaderParams = new Dictionary<String, String>(Configuration.DefaultHeader);
-            var localVarFormParams = new Dictionary<String, String>();
-            var localVarFileParams = new Dictionary<String, FileParameter>();
-            Object localVarPostBody = null;
-
-            // to determine the Content-Type header
-            String[] localVarHttpContentTypes = new String[] {
-                "application/json", 
-                "text/json", 
-                "application/json-patch+json"
-            };
-            String localVarHttpContentType = Configuration.ApiClient.SelectHeaderContentType(localVarHttpContentTypes);
-
-            // to determine the Accept header
-            String[] localVarHttpHeaderAccepts = new String[] {
-            };
-            String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
-            if (localVarHttpHeaderAccept != null)
-                localVarHeaderParams.Add("Accept", localVarHttpHeaderAccept);
-
-            // set "format" to json by default
-            // e.g. /pet/{petId}.{format} becomes /pet/{petId}.json
-            localVarPathParams.Add("format", "json");
-            if (id != null) localVarPathParams.Add("id", Configuration.ApiClient.ParameterToString(id)); // path parameter
-            if (value != null && value.GetType() != typeof(byte[]))
-            {
-                localVarPostBody = Configuration.ApiClient.Serialize(value); // http body (model) parameter
-            }
-            else
-            {
-                localVarPostBody = value; // byte array
-            }
-
-
-            // make the HTTP request
-            IRestResponse localVarResponse = (IRestResponse) await Configuration.ApiClient.CallApiAsync(localVarPath,
-                Method.PUT, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarFileParams,
-                localVarPathParams, localVarHttpContentType);
-
-            int localVarStatusCode = (int) localVarResponse.StatusCode;
-
-            if (ExceptionFactory != null)
-            {
-                Exception exception = ExceptionFactory("ApiWorkflowByIdPut", localVarResponse);
-                if (exception != null) throw exception;
-            }
-
-            
-            return new ApiResponse<Object>(localVarStatusCode,
-                localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
+             ApiResponse<string> localVarResponse = ApiWorkflowGetDefaultWorkflowByUsernameGetWithHttpInfo(username);
+             return localVarResponse.Data;
         }
 
         /// <summary>
@@ -695,19 +319,8 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="username"></param>
-        /// <returns></returns>
-        public void ApiWorkflowGetDefaultWorkflowByUsernameGet (string username)
-        {
-             ApiWorkflowGetDefaultWorkflowByUsernameGetWithHttpInfo(username);
-        }
-
-        /// <summary>
-        /// get default workflow for the specified user 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="username"></param>
-        /// <returns>ApiResponse of Object(void)</returns>
-        public ApiResponse<Object> ApiWorkflowGetDefaultWorkflowByUsernameGetWithHttpInfo (string username)
+        /// <returns>ApiResponse of string</returns>
+        public ApiResponse< string > ApiWorkflowGetDefaultWorkflowByUsernameGetWithHttpInfo (string username)
         {
             // verify the required parameter 'username' is set
             if (username == null)
@@ -728,6 +341,9 @@ namespace IO.Swagger.Api
 
             // to determine the Accept header
             String[] localVarHttpHeaderAccepts = new String[] {
+                "text/plain", 
+                "application/json", 
+                "text/json"
             };
             String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
             if (localVarHttpHeaderAccept != null)
@@ -752,10 +368,10 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            
-            return new ApiResponse<Object>(localVarStatusCode,
+            return new ApiResponse<string>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
+                (string) Configuration.ApiClient.Deserialize(localVarResponse, typeof(string)));
+            
         }
 
         /// <summary>
@@ -763,10 +379,11 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="username"></param>
-        /// <returns>Task of void</returns>
-        public async System.Threading.Tasks.Task ApiWorkflowGetDefaultWorkflowByUsernameGetAsync (string username)
+        /// <returns>Task of string</returns>
+        public async System.Threading.Tasks.Task<string> ApiWorkflowGetDefaultWorkflowByUsernameGetAsync (string username)
         {
-             await ApiWorkflowGetDefaultWorkflowByUsernameGetAsyncWithHttpInfo(username);
+             ApiResponse<string> localVarResponse = await ApiWorkflowGetDefaultWorkflowByUsernameGetAsyncWithHttpInfo(username);
+             return localVarResponse.Data;
 
         }
 
@@ -775,8 +392,8 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="username"></param>
-        /// <returns>Task of ApiResponse</returns>
-        public async System.Threading.Tasks.Task<ApiResponse<Object>> ApiWorkflowGetDefaultWorkflowByUsernameGetAsyncWithHttpInfo (string username)
+        /// <returns>Task of ApiResponse (string)</returns>
+        public async System.Threading.Tasks.Task<ApiResponse<string>> ApiWorkflowGetDefaultWorkflowByUsernameGetAsyncWithHttpInfo (string username)
         {
             // verify the required parameter 'username' is set
             if (username == null)
@@ -797,6 +414,9 @@ namespace IO.Swagger.Api
 
             // to determine the Accept header
             String[] localVarHttpHeaderAccepts = new String[] {
+                "text/plain", 
+                "application/json", 
+                "text/json"
             };
             String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
             if (localVarHttpHeaderAccept != null)
@@ -821,10 +441,10 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            
-            return new ApiResponse<Object>(localVarStatusCode,
+            return new ApiResponse<string>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
+                (string) Configuration.ApiClient.Deserialize(localVarResponse, typeof(string)));
+            
         }
 
         /// <summary>

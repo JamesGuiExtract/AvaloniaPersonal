@@ -65,31 +65,6 @@ namespace IO.Swagger.Test
 
         
         /// <summary>
-        /// Test ApiWorkflowByIdDelete
-        /// </summary>
-        [Test]
-        public void ApiWorkflowByIdDeleteTest()
-        {
-            // TODO uncomment below to test the method and replace null with proper value
-            //int? id = null;
-            //instance.ApiWorkflowByIdDelete(id);
-            
-        }
-        
-        /// <summary>
-        /// Test ApiWorkflowByIdPut
-        /// </summary>
-        [Test]
-        public void ApiWorkflowByIdPutTest()
-        {
-            // TODO uncomment below to test the method and replace null with proper value
-            //int? id = null;
-            //string value = null;
-            //instance.ApiWorkflowByIdPut(id, value);
-            
-        }
-        
-        /// <summary>
         /// Test ApiWorkflowGetDefaultWorkflowByUsernameGet
         /// </summary>
         [Test]
@@ -97,8 +72,8 @@ namespace IO.Swagger.Test
         {
             // TODO uncomment below to test the method and replace null with proper value
             //string username = null;
-            //instance.ApiWorkflowGetDefaultWorkflowByUsernameGet(username);
-            
+            //var response = instance.ApiWorkflowGetDefaultWorkflowByUsernameGet(username);
+            //Assert.IsInstanceOf<string> (response, "response is string");
         }
         
         /// <summary>

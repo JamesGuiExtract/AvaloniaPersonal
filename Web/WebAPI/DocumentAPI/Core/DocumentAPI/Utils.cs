@@ -292,5 +292,63 @@ namespace DocumentAPI
                 _attributeSetName = value;
             }
         }
+
+        /// <summary>
+        /// makes a DocumentSubmitResult
+        /// </summary>
+        /// <param name="fileId">file id</param>
+        /// <param name="isError">true or false</param>
+        /// <param name="message">empty, or error message</param>
+        /// <param name="code">error code value, 0 (no error) or -1 (error)</param>
+        /// <param name="submitType">file or text submission type</param>
+        /// <returns></returns>
+        public static DocumentSubmitResult MakeDocumentSubmitResult(int fileId, 
+                                                                    bool isError = false, 
+                                                                    string message = "", 
+                                                                    int code = 0,
+                                                                    DocumentSubmitType submitType = DocumentSubmitType.File)
+        {
+            var errorInfo = MakeError(isError: isError, message: message, code: code);
+            DocumentSubmitResult result = new DocumentSubmitResult()
+            {
+                Id = Enum.GetName(typeof(DocumentSubmitType), submitType) + fileId.ToString(),
+                Error = errorInfo
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// routine to simplify making a ProcessingStatus instance
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="isError"></param>
+        /// <param name="message"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static ProcessingStatus MakeProcessingStatus(DocumentProcessingStatus status,
+                                                            bool isError = false,
+                                                            string message = "",
+                                                            int code = 0)
+        {
+            return new ProcessingStatus()
+            {
+                DocumentStatus = status,
+                Error = MakeError(isError, message, code)
+            };
+        }
+
+        /// <summary>
+        /// routine to simplify making a List of some type with a single item.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static List<T> MakeListOf<T>(T item)
+        {
+            List<T> listT = new List<T>();
+            listT.Add(item);
+
+            return listT;
+        }
     }
 }

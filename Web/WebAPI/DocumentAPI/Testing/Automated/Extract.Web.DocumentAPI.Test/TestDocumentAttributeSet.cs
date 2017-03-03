@@ -143,33 +143,9 @@ namespace Extract.Web.DocumentAPI.Test
             _testDbManager = new FAMTestDBManager<TestDocumentAttributeSet>();
             _testXmlFiles = new TestFileManager<TestDocumentAttributeSet>();
 
-            var webApiURL = ConfigurationManager.AppSettings["WebApiURL"];
-            if (!String.IsNullOrEmpty(webApiURL))
-            {
-                WebApiURL = webApiURL;
-            }
+            WebApiURL = Utils.GetWebServerURL(WebApiURL);
 
-            try
-            {
-                if (WebApiURL.Contains("localhost"))
-                {
-                    ProcessStartInfo psi = new ProcessStartInfo();
-                    psi.Arguments = "run";
-                    psi.UseShellExecute = false;
-                    psi.WorkingDirectory = @"C:\Engineering\Web\WebAPI\DocumentAPI\Core\DocumentAPI";
-                    psi.FileName = "dotnet.exe";
-                    psi.WindowStyle = ProcessWindowStyle.Hidden;
-                    psi.CreateNoWindow = true;
-                    Process.Start(psi);
-
-                    Thread.Sleep(10 * 1000);
-                    documentAPIInvoked = true;
-                }
-            }
-            catch(Exception ex)
-            {
-                Debug.WriteLine("Exception starting WebAPI: {0}", ex.Message);
-            }
+            documentAPIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: WebApiURL);
         }
 
         /// <summary>
@@ -182,14 +158,7 @@ namespace Extract.Web.DocumentAPI.Test
             {
                 if (documentAPIInvoked)
                 {
-                    ProcessStartInfo psi = new ProcessStartInfo();
-                    psi.Arguments = "/f /im DocumentAPI.exe";
-                    psi.UseShellExecute = false;
-                    psi.WorkingDirectory = @"C:\Engineering\Web\WebAPI\DocumentAPI\Core\DocumentAPI";
-                    psi.FileName = "taskkill.exe";
-                    psi.WindowStyle = ProcessWindowStyle.Hidden;
-                    psi.CreateNoWindow = true;
-                    Process.Start(psi);
+                    Utils.ShutdownWebServer(args: "/f /im DocumentAPI.exe");
                 }
             }
             catch (Exception ex)

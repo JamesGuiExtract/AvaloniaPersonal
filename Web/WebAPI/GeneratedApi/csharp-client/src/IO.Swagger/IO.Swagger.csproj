@@ -11,13 +11,14 @@ Contact: developers@extractsystems.com
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{ED4C6426-4068-4717-8DB1-402B4C508359}</ProjectGuid>
+    <ProjectGuid>{6873D477-3B5F-4672-993C-775E29C283B9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IO.Swagger</RootNamespace>
     <AssemblyName>IO.Swagger</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,7 +45,8 @@ Contact: developers@extractsystems.com
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="RestSharp, Version=100.0.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\..\RC.Net\APIs\RestSharpSigned.105.2.3\lib\net45\RestSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\RC.Net\APIs\RestSharpSigned.105.2.3\lib\net46\RestSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

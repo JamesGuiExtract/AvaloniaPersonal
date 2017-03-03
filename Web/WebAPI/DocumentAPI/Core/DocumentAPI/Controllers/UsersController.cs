@@ -66,24 +66,24 @@ namespace DocumentAPI.Controllers
         /// <summary>
         /// logout
         /// </summary>
-        /// <param name="user"></param>
         // DELETE api/User/logout
         [HttpDelete("Logout")]
-        public IActionResult Logout([FromBody] User user)
+        public IActionResult Logout()
         {
+            User user = new Models.User()
+            {
+                Username = "admin",
+                Password = "a",
+                LoggedIn = true
+            };
+
             User theUser;
             var foundUser = _userList.TryGetValue(user.Username, out theUser);
             if (!foundUser)
             {
                 return new NotFoundResult();
             }
-
-            bool passwordMatches = String.Compare(user.Password, theUser.Password, ignoreCase: false, culture: CultureInfo.InvariantCulture) == 0;
-            if (!passwordMatches)
-            {
-                return BadRequest("Error: Password doesn't match");
-            }
-
+            
             theUser.LoggedIn = false;
             return Ok("Logged out");
         }

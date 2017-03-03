@@ -34,13 +34,45 @@ namespace DocumentAPI.Controllers
     public class DocumentController : Controller
     {
         /// <summary>
-        /// Convert from a string Id to a file Id - for now this is trivial, later there may be another step.
+        /// Convert from a string Id to a file Id, removing optional File or Text preamble as necessary.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         private int ConvertIdToFileId(string id)
         {
-            int fileId = Convert.ToInt32(id);
+            Contract.Assert(!String.IsNullOrEmpty(id), "id is empty");
+
+            int startPosition;
+            string value;
+            string preamble;
+            if (id.Contains("File"))
+            {
+                preamble = "File";
+            }
+            else if (id.Contains("Text"))
+            {
+                preamble = "Text";
+            }
+            else
+            {
+                preamble = "";
+            }
+
+            if (!String.IsNullOrEmpty(preamble))
+            {
+                startPosition = id.IndexOf(preamble, startIndex: 0, comparisonType: StringComparison.OrdinalIgnoreCase);
+                value = id.Remove(startPosition, preamble.Length);
+                Contract.Assert(value.Length != 0, 
+                                "Removing {0}, from fileId resulted in zero length string, Id: {1}", 
+                                preamble,
+                                id);
+            }
+            else
+            {
+                value = id;
+            }
+
+            int fileId = Convert.ToInt32(value);
             return fileId;
         }
 
@@ -97,12 +129,6 @@ namespace DocumentAPI.Controllers
         {
             Contract.Assert(!String.IsNullOrEmpty(path) && !String.IsNullOrEmpty(filename), "Either path or filename is empty");
 
-            string fullname = Path.Combine(path, filename);
-            if (!System.IO.File.Exists(fullname))
-            {
-                return fullname;
-            }
-
             string nameOnly = Path.GetFileNameWithoutExtension(filename);
             string extension = Path.GetExtension(filename);
             string guid = Guid.NewGuid().ToString();
@@ -117,11 +143,12 @@ namespace DocumentAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("SubmitFile")]
-        public async Task<IActionResult> SubmitFile()
+        public async Task<DocumentSubmitResult> SubmitFile()
         {
             try
             {
-                string path = String.IsNullOrEmpty(environment.WebRootPath) ? "c:\\temp\\fileApi" : environment.WebRootPath;
+                Contract.Assert(!String.IsNullOrEmpty(environment.WebRootPath), "WebRootPath is null or empty");
+                string path = environment.WebRootPath;
                 var uploads = Path.Combine(path, "uploads");
                 if (!Directory.Exists(uploads))
                 {
@@ -131,7 +158,7 @@ namespace DocumentAPI.Controllers
                 string fileName = Request.Headers["X-FileName"];
                 if (String.IsNullOrEmpty(fileName))
                 {
-                    return BadRequest("Filename is empty");
+                    return MakeDocumentSubmitResult(fileId: -1, isError: true, message: "File name is empty", code: -1);
                 }
 
                 var fullPath = GetSafeFilename(uploads, fileName);
@@ -149,34 +176,33 @@ namespace DocumentAPI.Controllers
                         bool bAlreadyExists;
                         UCLID_FILEPROCESSINGLib.EActionStatus previousActionStatus;
 
-                        fileProcessingDB.AddFile(fullPath,                                                 // full path to file
-                                                 "A01_ExtractData",                                        // action name
-                                                 EFilePriority.kPriorityNormal,                            // file priority
-                                                 false,                                                    // force status change
-                                                 false,                                                    // file modified
-                                                 UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
-                                                 true,                                                     // skip page count
-                                                 out bAlreadyExists,                                       // returns whether file already existed
-                                                 out previousActionStatus);                                // returns the previous action status (if file already existed)
+                        var fileRecord = 
+                            fileProcessingDB.AddFile(fullPath,                                                 // full path to file
+                                                     "A01_ExtractData",                                        // action name - TODO - remove hard-coded name, use Worflow.EntryName when available
+                                                     EFilePriority.kPriorityNormal,                            // file priority
+                                                     false,                                                    // force status change
+                                                     false,                                                    // file modified
+                                                     UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
+                                                     true,                                                     // skip page count
+                                                     out bAlreadyExists,                                       // returns whether file already existed
+                                                     out previousActionStatus);                                // returns the previous action status (if file already existed)
 
-                        // TODO - need to get the FileID from FAM
+                        return MakeDocumentSubmitResult(fileId: fileRecord.FileID);
                     }
                     catch (Exception ex)
                     {
                         Log.WriteLine(Inv($"Error: {ex.Message}, resetting the fileProcessingDB"));
                         Utils.ResetFileProcessingDB();
 
-                        return BadRequest(ex.Message);
+                        return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
                     }
                 }
             }
             catch (Exception ex)
             {
                 Log.WriteLine(Inv($"Error: {ex.Message}"));
-                return BadRequest(ex.Message);
+                return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
             }
-
-            return new ObjectResult("Ok");
         }
 
         /// <summary>
@@ -185,16 +211,17 @@ namespace DocumentAPI.Controllers
         /// <param name="args"></param>
         /// <returns></returns>
         [HttpPost("SubmitText")]
-        public IActionResult SubmitText([FromBody]SubmitTextArgs args)
+        public DocumentSubmitResult SubmitText([FromBody]SubmitTextArgs args)
         {
             if (!ModelState.IsValid || String.IsNullOrEmpty(args.Text))
             {
-                return BadRequest("args.Text is empty");
+                return MakeDocumentSubmitResult(fileId: -1, isError: true, message: "File name is empty", code: -1);
             }
 
             try
             {
-                string path = String.IsNullOrEmpty(environment.WebRootPath) ? "c:\\temp\\fileApi" : environment.WebRootPath;
+                Contract.Assert(!String.IsNullOrEmpty(environment.WebRootPath), "WebRootPath is null or empty");
+                string path = environment.WebRootPath;
 
                 var uploads = Path.Combine(path, "uploads");
                 if (!Directory.Exists(uploads))
@@ -219,38 +246,59 @@ namespace DocumentAPI.Controllers
                         bool bAlreadyExists;
                         UCLID_FILEPROCESSINGLib.EActionStatus previousActionStatus;
 
-                        fileProcessingDB.AddFile(fullPath,                                                 // full path to file
-                                                 "A01_ExtractData",                                        // action name
-                                                 EFilePriority.kPriorityNormal,                            // file priority
-                                                 false,                                                    // force status change
-                                                 false,                                                    // file modified
-                                                 UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
-                                                 false,                                                    // skip page count
-                                                 out bAlreadyExists,                                       // returns whether file already existed
-                                                 out previousActionStatus);                                // returns the previous action status (if file already existed)
+                        var fileRecord = 
+                            fileProcessingDB.AddFile(fullPath,                                                 // full path to file
+                                                     "A01_ExtractData",                                        // action name
+                                                     EFilePriority.kPriorityNormal,                            // file priority
+                                                     false,                                                    // force status change
+                                                     false,                                                    // file modified
+                                                     UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
+                                                     true,                                                     // skip page count
+                                                     out bAlreadyExists,                                       // returns whether file already existed
+                                                     out previousActionStatus);                                // returns the previous action status (if file already existed)
 
-                        // TODO - need to get the FileID from FAM
+                        return MakeDocumentSubmitResult(fileId: fileRecord.FileID);
                     }
                     catch (Exception ex)
                     {
                         Log.WriteLine(Inv($"Error: {ex.Message}, resetting the fileProcessingDB"));
                         Utils.ResetFileProcessingDB();
 
-                        return BadRequest(ex.Message);
+                        return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
                     }
                 }
             }
             catch (Exception ex)
             {
                 Log.WriteLine(Inv($"Error: {ex.Message}"));
-                return BadRequest(ex.Message);
+                return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
             }
+        }
 
-            return new ObjectResult("Ok");  // TODO - need to send back a fileID here
+        DocumentProcessingStatus ConvertToStatus(EActionStatus actionStatus, int fileId)
+        {
+            switch (actionStatus)
+            {
+                case EActionStatus.kActionCompleted:
+                    return DocumentProcessingStatus.Done;
+
+                case EActionStatus.kActionFailed:
+                case EActionStatus.kActionSkipped:
+                    return DocumentProcessingStatus.Failed;
+
+                case EActionStatus.kActionPending:
+                case EActionStatus.kActionProcessing:
+                case EActionStatus.kActionUnattempted:
+                    return DocumentProcessingStatus.Processing;
+
+                default:
+                    Contract.Violated(Inv($"Unknown value: {Convert.ToInt32(actionStatus)} for EActionStatus, for FileID: {fileId}"));
+                    return DocumentProcessingStatus.Failed;
+            }
         }
 
         /// <summary>
-        /// get a list of 1..N processing status instances that corespond to the stringId of the submitted document
+        /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document
         /// </summary>
         /// <param name="stringId"></param>
         /// <returns></returns>
@@ -265,11 +313,30 @@ namespace DocumentAPI.Controllers
                                                 code: -1);
             }
 
-            // TODO - this is stubbed, must call FAM to get status of file...
+            try
+            {
+                // TODO - test this...
+                var fileProcessingDB = Utils.FileDbMgr;
+                Contract.Assert(fileProcessingDB != null, "fileProcessingDB is null, cannot submit text file to FAM queue");
 
-            return MakeListProcessingStatus(isError: false,
-                                            message: "",
-                                            status: DocumentProcessingStatus.Processing);
+                int fileId = ConvertIdToFileId(stringId);
+                var actionStatus = fileProcessingDB.GetFileStatus(fileId,
+                                                                  "A01_ExtractData",               // TODO - remove hard-wired name, use Workflow.EntryName when available
+                                                                  vbAttemptRevertIfLocked: false); // TODO - verify: is this correct?
+
+                var ps = MakeProcessingStatus(ConvertToStatus(actionStatus, fileId));
+                return MakeListOf(ps);                
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine(Inv($"Error: {ex.Message}"));
+
+                return MakeListOf(
+                            MakeProcessingStatus(DocumentProcessingStatus.NotApplicable,
+                                                 isError: true,
+                                                 message: ex.Message,
+                                                 code: -1));
+            }
         }
 
         // Add File GetFileResult(string fileId)
@@ -303,10 +370,10 @@ namespace DocumentAPI.Controllers
         /// <param name="documentId"></param>
         /// <returns></returns>
         [HttpGet("GetDocumentType")]
-        public IActionResult GetDocumentType([FromQuery] string documentId)
+        public string GetDocumentType([FromQuery] string documentId)
         {
             // TODO - implement...
-            return Ok("abstract of judgement");
+            return "abstract of judgement";
         }
 
         /// <summary>

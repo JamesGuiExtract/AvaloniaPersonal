@@ -72,8 +72,8 @@ namespace IO.Swagger.Test
         {
             // TODO uncomment below to test the method and replace null with proper value
             //string documentId = null;
-            //instance.ApiDocumentGetDocumentTypeGet(documentId);
-            
+            //var response = instance.ApiDocumentGetDocumentTypeGet(documentId);
+            //Assert.IsInstanceOf<string> (response, "response is string");
         }
         
         /// <summary>

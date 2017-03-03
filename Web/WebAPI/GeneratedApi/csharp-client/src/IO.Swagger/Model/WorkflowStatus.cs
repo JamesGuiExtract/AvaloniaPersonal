@@ -30,39 +30,6 @@ namespace IO.Swagger.Model
     public partial class WorkflowStatus :  IEquatable<WorkflowStatus>, IValidatableObject
     {
         /// <summary>
-        /// the state of the specified workflow
-        /// </summary>
-        /// <value>the state of the specified workflow</value>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public enum StateEnum
-        {
-            
-            /// <summary>
-            /// Enum Running for "Running"
-            /// </summary>
-            [EnumMember(Value = "Running")]
-            Running,
-            
-            /// <summary>
-            /// Enum Stopped for "Stopped"
-            /// </summary>
-            [EnumMember(Value = "Stopped")]
-            Stopped,
-            
-            /// <summary>
-            /// Enum Error for "Error"
-            /// </summary>
-            [EnumMember(Value = "Error")]
-            Error
-        }
-
-        /// <summary>
-        /// the state of the specified workflow
-        /// </summary>
-        /// <value>the state of the specified workflow</value>
-        [DataMember(Name="state", EmitDefaultValue=false)]
-        public StateEnum? State { get; set; }
-        /// <summary>
         /// Initializes a new instance of the <see cref="WorkflowStatus" /> class.
         /// </summary>
         /// <param name="Error">error information, when Error.ErrorOccurred &#x3D;&#x3D; true.</param>
@@ -71,7 +38,7 @@ namespace IO.Swagger.Model
         /// <param name="NumberFailed">number of documents that have failed.</param>
         /// <param name="NumberIgnored">number of documents that have been ignored.</param>
         /// <param name="State">the state of the specified workflow.</param>
-        public WorkflowStatus(ErrorInfo Error = default(ErrorInfo), int? NumberProcessing = default(int?), int? NumberDone = default(int?), int? NumberFailed = default(int?), int? NumberIgnored = default(int?), StateEnum? State = default(StateEnum?))
+        public WorkflowStatus(ErrorInfo Error = default(ErrorInfo), int? NumberProcessing = default(int?), int? NumberDone = default(int?), int? NumberFailed = default(int?), int? NumberIgnored = default(int?), string State = default(string))
         {
             this.Error = Error;
             this.NumberProcessing = NumberProcessing;
@@ -111,6 +78,12 @@ namespace IO.Swagger.Model
         /// <value>number of documents that have been ignored</value>
         [DataMember(Name="numberIgnored", EmitDefaultValue=false)]
         public int? NumberIgnored { get; set; }
+        /// <summary>
+        /// the state of the specified workflow
+        /// </summary>
+        /// <value>the state of the specified workflow</value>
+        [DataMember(Name="state", EmitDefaultValue=false)]
+        public string State { get; set; }
         /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
