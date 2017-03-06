@@ -62,7 +62,8 @@ BOOL CFAMDBAdminApp::InitInstance()
 	// This was changed to initialize as apartment threaded in April 2012 to solve a long delay
 	// when initializing an Oracle DB via the entity framework. However, this change breaks the
 	// schema update process which passes a progress status COM object to another thread.
-	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	// With the /clr switch this is not required as it will be applied with the setting in the project properties
+	//CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 	try
 	{

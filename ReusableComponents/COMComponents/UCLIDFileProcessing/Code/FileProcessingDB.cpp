@@ -3967,6 +3967,27 @@ STDMETHODIMP CFileProcessingDB::SetWorkflowDefinition(IWorkflowDefinition* pWork
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41891");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkflows(IStrToStrMap ** pmapWorkFlowNameToID)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetWorkflows_Internal(false, pmapWorkFlowNameToID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetWorkflows_Internal(true, pmapWorkFlowNameToID);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41932");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetWorkflowActions(long nID, IStrToStrMap** pmapActionNameToID)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());

@@ -320,6 +320,7 @@ public:
 	STDMETHOD(DeleteWorkflow)(long nID);
 	STDMETHOD(GetWorkflowDefinition)(long nID, IWorkflowDefinition** ppWorkflowDefinition);
 	STDMETHOD(SetWorkflowDefinition)(IWorkflowDefinition* pWorkflowDefinition);
+	STDMETHOD(GetWorkflows)(IStrToStrMap ** pmapWorkFlowNameToID);
 	STDMETHOD(GetWorkflowActions)(long nID, IStrToStrMap** pmapActionNameToID);
 	STDMETHOD(SetWorkflowActions)(long nID, IVariantVector* pActionList);
 	STDMETHOD(get_ActiveWorkflow)(BSTR* pbstrWorkflowName);
@@ -1288,6 +1289,7 @@ private:
 	bool DeleteWorkflow_Internal(bool bDBLocked, long nID);
 	bool GetWorkflowDefinition_Internal(bool bDBLocked, long nID, IWorkflowDefinition** ppWorkflowDefinition);
 	bool SetWorkflowDefinition_Internal(bool bDBLocked, IWorkflowDefinition* pWorkflowDefinition);
+	bool GetWorkflows_Internal(bool bDBLocked, IStrToStrMap ** pmapWorkFlowNameToID);
 	bool GetWorkflowActions_Internal(bool bDBLocked, long nID, IStrToStrMap ** pmapActionNameToID);
 	bool SetWorkflowActions_Internal(bool bDBLocked, long nID, IVariantVector* pActionList);
 	void InvalidatePreviousCachedInfoIfNecessary();

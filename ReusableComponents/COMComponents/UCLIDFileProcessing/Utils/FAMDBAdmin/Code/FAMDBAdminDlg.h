@@ -3,6 +3,7 @@
 
 #pragma once
 #include "FAMDBAdminSummaryDlg.h"
+#include "WorkflowManagement.h"
 
 #include <WindowPersistenceMgr.h>
 #include <FileProcessingConfigMgr.h>

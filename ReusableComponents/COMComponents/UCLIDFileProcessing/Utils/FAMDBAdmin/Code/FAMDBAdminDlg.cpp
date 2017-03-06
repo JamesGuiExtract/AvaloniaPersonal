@@ -14,7 +14,6 @@
 #include "..\..\..\code\FPCategories.h"
 #include "..\..\..\..\InputFunnel\IFCore\Code\IFCategories.h"
 #include "ManageUsersDlg.h"
-#include "ManageActionsDlg.h"
 #include "ManageMetadataFieldsDlg.h"
 #include "ManageAttributeSets.h"
 
@@ -31,6 +30,9 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+using namespace Extract::FAMDBAdmin;
+
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -836,11 +838,20 @@ void CFAMDBAdminDlg::OnManageActions()
 
 	try
 	{	
-		// Create a new Actions manager dialog
-		CManageActionsDlg dlg(m_ipFAMDB);
-
-		// Display the dialog
-		dlg.DoModal();
+		// Display the WorkflowManagement dialog
+		WorkflowManagement ^workFlow = gcnew WorkflowManagement(m_ipFAMDB, "");
+		NativeWindow ^currentWindow = __nullptr;
+		try
+		{
+			IntPtr managedHWND(this->GetSafeHwnd());
+			NativeWindow ^currentWindow = NativeWindow::FromHandle(managedHWND);
+			workFlow->ShowDialog(currentWindow);
+		}
+		finally
+		{
+			if (currentWindow)
+				currentWindow->ReleaseHandle();
+		}
 
 		//Update the summary tab
 		UpdateSummaryTab();

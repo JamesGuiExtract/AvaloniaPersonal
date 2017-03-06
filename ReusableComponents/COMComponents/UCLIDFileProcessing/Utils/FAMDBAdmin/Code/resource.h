@@ -9,7 +9,6 @@
 #define IDR_MENU_FAMDBADMIN             122
 #define IDD_FAMDBADMIN_DIALOG           123
 #define IDD_DLG_EXPORT_FILES            124
-#define IDD_DLG_ADD_ACTION              125
 #define IDD_DLG_RENAME_ACTION           127
 #define IDD_DLG_SET_ACTION_STATUS       128
 #define IDD_DLG_LOGIN                   129
@@ -55,7 +54,6 @@
 #define IDC_EDIT_LOGIN_PASSWORD         1032
 // End of BaseUtils ID's
 
-#define IDC_EDT_ACTION_NAME             2000
 #define IDC_RDSETTO                     2001
 #define IDC_RDCOPYFROM                  2002
 #define IDC_CMB_STATUS                  2003
@@ -189,7 +187,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        147
+#define _APS_NEXT_RESOURCE_VALUE        148
 #define _APS_NEXT_COMMAND_VALUE         32812
 #define _APS_NEXT_CONTROL_VALUE         2122
 #define _APS_NEXT_SYMED_VALUE           2122

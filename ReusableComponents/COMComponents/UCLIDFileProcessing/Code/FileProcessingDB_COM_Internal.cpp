@@ -10109,6 +10109,80 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 	}
 	return true;
 }
+
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkflows_Internal(bool bDBLocked,
+	IStrToStrMap ** pmapWorkFlowNameToID)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			// Create StrToStrMap to return the list of actions
+			// Create a pointer to a recordset
+			_RecordsetPtr ipWorkflowSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI41936", ipWorkflowSet != __nullptr);
+
+			// Query to get the workflow 
+			string strQuery = "SELECT ID, Name FROM dbo.Workflow";
+		
+			ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
+				adLockReadOnly, adCmdText);
+
+			// Create StrToStrMap to return the list of workflows
+			IStrToStrMapPtr ipWorkflows(CLSID_StrToStrMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI41937", ipWorkflows != __nullptr);
+
+			// Step through all records
+			while (ipWorkflowSet->adoEOF == VARIANT_FALSE)
+			{
+				// Get the fields from the workflows set
+				FieldsPtr ipFields = ipWorkflowSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI41938", ipFields != __nullptr);
+
+				// get the workflow name
+				string strWorkflowName = getStringField(ipFields, "Name");
+
+				// get the workflow ID
+				long lID = getLongField(ipFields, "ID");
+				string strID = asString(lID);
+
+				// Put the values in the StrToStrMap
+				ipWorkflows->Set(strWorkflowName.c_str(), strID.c_str());
+
+				// Move to the next record in the table
+				ipWorkflowSet->MoveNext();
+			}
+
+			// return the StrToStrMap containing all workflows
+			*pmapWorkFlowNameToID = ipWorkflows.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI41939");
+
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41933");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetWorkflowActions_Internal(bool bDBLocked, long nID,
 	IStrToStrMap** pmapActionNameToID)

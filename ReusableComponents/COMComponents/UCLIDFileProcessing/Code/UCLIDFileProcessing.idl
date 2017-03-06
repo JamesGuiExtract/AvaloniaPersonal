@@ -1827,6 +1827,9 @@ library UCLID_FILEPROCESSINGLib
 		[id(165), helpstring("methods SetWorkflowDefinition")] HRESULT SetWorkflowDefinition(
 			[in] IWorkflowDefinition* pWorkflowDefinition);
 		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Gets all of the workflow names with IDs
+		[id(166), helpstring("methods GetWorkflows")] HRESULT GetWorkflows([out, retval] IStrToStrMap ** pmapWorkFlowNameToID);
+		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Gets the actions associated with a workflow
 		[id(167), helpstring("methods GetWorkflowActions")] HRESULT GetWorkflowActions([in] long nID,
 			[out, retval] IStrToStrMap ** pmapActionNameToID);
