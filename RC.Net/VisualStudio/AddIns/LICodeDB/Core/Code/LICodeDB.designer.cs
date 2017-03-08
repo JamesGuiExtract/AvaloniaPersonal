@@ -22,7 +22,7 @@ namespace LICodeDB
 	using System;
 	
 	
-	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="EngineeringLICodeDB")]
+	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="EngineeringUtility")]
 	public partial class LICodeDBDataContext : System.Data.Linq.DataContext
 	{
 		
