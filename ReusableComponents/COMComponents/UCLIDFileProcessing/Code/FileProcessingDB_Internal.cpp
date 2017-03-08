@@ -1345,6 +1345,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 
 		if (bAddUserTables)
 		{
+			vecQueries.push_back(gstrADD_ACTION_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_WORKFLOW_WORKFLOWTYPE_FK);
 			vecQueries.push_back(gstrADD_WORKFLOW_STARTACTION_FK);
 			vecQueries.push_back(gstrADD_WORKFLOW_ENDACTION_FK);

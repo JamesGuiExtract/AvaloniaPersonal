@@ -1,6 +1,9 @@
-﻿using Extract.Testing.Utilities;
+﻿using Extract.Utilities;
+using Extract.Testing.Utilities;
 using NUnit.Framework;
+using System.Linq;
 using System.Runtime.InteropServices;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Database.Test
@@ -217,6 +220,58 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(outputDefinition.PostWorkflowAction == workflowDefinition.PostWorkflowAction);
                 Assert.That(outputDefinition.DocumentFolder == workflowDefinition.DocumentFolder);
                 Assert.That(outputDefinition.OutputAttributeSet == workflowDefinition.OutputAttributeSet);
+            }
+
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// <summary>
+        /// Tests adding and removing actions from a workflow.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void ManageWorkflowActions()
+        {
+            string testDbName = "Test_ManageWorkflowActions";
+
+            try
+            {
+                var fileProcessingDb = _testDbManager.GetDatabase("Resources.Demo_LabDE_Empty", testDbName);
+
+                int id = fileProcessingDb.AddWorkflow(testDbName, EWorkflowType.kUndefined);
+
+                IStrToStrMap workflowActionMap = fileProcessingDb.GetWorkflowActions(id);
+                Assert.That(workflowActionMap.Size == 0);
+
+                // Test adding three existing actions to workflow
+                var actionNames = new[] { "A01_ExtractData", "A02_Verify", "A03_QA" }; // In order of name
+                fileProcessingDb.SetWorkflowActions(id, actionNames.ToVariantVector());
+
+                workflowActionMap = fileProcessingDb.GetWorkflowActions(id);
+                var retrievedActions = workflowActionMap.ComToDictionary().Keys.OrderBy(name => name);
+                Assert.That(actionNames.SequenceEqual(retrievedActions));
+
+                // Test deleting 2 actions + adding one existing action and one new action to workflow
+                fileProcessingDb.DefineNewAction(testDbName);
+
+                actionNames = new[] { "A02_Verify", testDbName, "Z_AdminAction" }; // In order of name
+                fileProcessingDb.SetWorkflowActions(id, actionNames.ToVariantVector());
+
+                workflowActionMap = fileProcessingDb.GetWorkflowActions(id);
+                retrievedActions = workflowActionMap.ComToDictionary().Keys.OrderBy(name => name);
+                Assert.That(actionNames.SequenceEqual(retrievedActions));
+
+                // Confirm that action configuration is preserved if DB is cleared (retaining settings)
+                fileProcessingDb.Clear(true);
+
+                workflowActionMap = fileProcessingDb.GetWorkflowActions(id);
+                retrievedActions = workflowActionMap.ComToDictionary().Keys.OrderBy(name => name);
+                Assert.That(actionNames.SequenceEqual(retrievedActions));
+
+                // Confirm workflow can be deleted even if it has actions.
+                fileProcessingDb.DeleteWorkflow(id);
             }
 
             finally

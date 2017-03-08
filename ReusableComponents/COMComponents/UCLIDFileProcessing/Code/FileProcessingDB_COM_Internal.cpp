@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 143;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 144;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1600,6 +1600,41 @@ int UpdateToSchemaVersion143(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41911");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion144(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 144;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE dbo.[Action] ADD [WorkflowID] INT");
+		vecQueries.push_back("ALTER TABLE dbo.[Action] DROP CONSTRAINT [Action_ASCName_Unique]");
+		vecQueries.push_back("ALTER TABLE dbo.[Action] "
+			"ADD CONSTRAINT[IX_Action] UNIQUE([ASCName], [WorkflowID])");
+		vecQueries.push_back("ALTER TABLE dbo.[Action] "
+			"WITH CHECK ADD CONSTRAINT [FK_Action_Workflow] FOREIGN KEY([WorkflowID]) "
+			"REFERENCES [Workflow]([ID]) "
+			"ON UPDATE CASCADE "
+			"ON DELETE CASCADE");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41989");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -6743,7 +6778,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 140:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion141);
 				case 141:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion142);
 				case 142:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion143);
-				case 143:	break;
+				case 143:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion144);
+				case 144:	break;
 
 				default:
 					{
@@ -9856,7 +9892,7 @@ bool CFileProcessingDB::GetWorkflowDefinition_Internal(bool bDBLocked, long nID,
 					", [DocumentFolder] "
 					", [OutputAttributeSetID] "
 					"	FROM [Workflow]"
-					"	WHERE [ID] = %s", asString(nID).c_str());
+					"	WHERE [ID] = %i", nID);
 
 			ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
 				adOpenStatic, adLockReadOnly, adCmdText);
@@ -9977,7 +10013,7 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 					", [DocumentFolder] "
 					", [OutputAttributeSetID] "
 					"	FROM [Workflow]"
-					"	WHERE [ID] = %s", asString(ipWorkflowDefinition->ID).c_str());
+					"	WHERE [ID] = %i", ipWorkflowDefinition->ID);
 
 			ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
 				adOpenDynamic, adLockOptimistic, adCmdText);
@@ -10057,6 +10093,192 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 			END_CONNECTION_RETRY(ipConnection, "ELI41886");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41887");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkflowActions_Internal(bool bDBLocked, long nID,
+	IStrToStrMap** pmapActionNameToID)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI41990", pmapActionNameToID != __nullptr);
+
+			IStrToStrMapPtr ipActionNameToID(CLSID_StrToStrMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI41991", ipActionNameToID != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			_RecordsetPtr ipActionSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI41992", ipActionSet != __nullptr);
+
+			string strQuery =
+				Util::Format("SELECT [ID], [ASCName] "
+					"FROM dbo.[Action] "
+					"WHERE [WorkflowID] = %i", nID);
+
+			ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+				adOpenStatic, adLockReadOnly, adCmdText);
+
+			while (!asCppBool(ipActionSet->adoEOF))
+			{
+				FieldsPtr ipFields = ipActionSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI41993", ipFields != __nullptr);
+
+				ipActionNameToID->Set(
+					getStringField(ipFields, "ASCName").c_str(),
+					asString(getLongField(ipFields, "ID")).c_str());
+
+				ipActionSet->MoveNext();
+			}
+
+			*pmapActionNameToID = ipActionNameToID.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI41994");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41995");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		ue.addDebugInfo("WorkflowID", asString(nID));
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
+	IVariantVector* pActionList)
+{
+	try
+	{
+		try
+		{
+			IVariantVectorPtr ipActionList(pActionList);
+			ASSERT_ARGUMENT("ELI41996", ipActionList != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+			long nActionCount = ipActionList->Size;
+			vector<string> vecActionNames;
+			for (long i = 0; i < nActionCount; i++)
+			{
+				vecActionNames.push_back(asString(ipActionList->Item[i].bstrVal));
+			}
+			string strActionList = asString(vecActionNames, true, "','");
+
+			if (nActionCount > 0)
+			{
+				string strQueryActionsToAdd =
+					Util::Format("SELECT DISTINCT [Action].[ASCName] "
+						"FROM dbo.[Action] "
+						"LEFT JOIN [Action][T2] ON [Action].[ASCName] = [T2].[ASCName] AND[T2].[WorkflowID] = %i "
+						"WHERE [T2].[ASCName] IS NULL "
+						"AND [Action].[ASCName] IN ('%s')",
+						nID, strActionList.c_str());
+
+				_RecordsetPtr ipActionsToAdd(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI41997", ipActionsToAdd != __nullptr);
+
+				ipActionsToAdd->Open(strQueryActionsToAdd.c_str(),
+					_variant_t((IDispatch *)ipConnection, true),
+					adOpenStatic, adLockReadOnly, adCmdText);
+
+				while (!asCppBool(ipActionsToAdd->adoEOF))
+				{
+					FieldsPtr ipFields = ipActionsToAdd->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI41998", ipFields != __nullptr);
+
+					string strActionToAdd = getStringField(ipFields, "ASCName");
+
+					string strAddActionQuery =
+						Util::Format("INSERT INTO dbo.[Action] ([ASCName], [WorkflowID]) "
+							"VALUES ('%s', %i)", strActionToAdd .c_str(), nID);
+
+					executeCmdQuery(ipConnection, strAddActionQuery);
+
+					ipActionsToAdd->MoveNext();
+				}
+
+				ipActionsToAdd->Close();
+			}
+
+			string strQueryActionsToDelete =
+				Util::Format("SELECT DISTINCT [ASCName] "
+					"FROM dbo.[Action] "
+					"WHERE [WorkflowID] = %i "
+					"AND [ASCName] NOT IN ('%s')",
+					nID, strActionList.c_str());
+
+			_RecordsetPtr ipActionsToDelete(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI41999", ipActionsToDelete != __nullptr);
+
+			ipActionsToDelete->Open(strQueryActionsToDelete.c_str(),
+				_variant_t((IDispatch *)ipConnection, true),
+				adOpenStatic, adLockReadOnly, adCmdText);
+
+			vector<string> vecActionsToDelete;
+			while (!asCppBool(ipActionsToDelete->adoEOF))
+			{
+				FieldsPtr ipFields = ipActionsToDelete->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI42000", ipFields != __nullptr);
+
+				vecActionsToDelete.push_back(getStringField(ipFields, "ASCName"));
+
+				ipActionsToDelete->MoveNext();
+			}
+
+			ipActionsToDelete->Close();
+
+			if (vecActionsToDelete.size() > 0)
+			{
+				strActionList = asString(vecActionsToDelete, true, "','");
+
+				string strDeleteActionQuery =
+					Util::Format("DELETE FROM dbo.[Action] "
+						"WHERE [WorkflowID] = %i "
+						"AND [ASCName] IN ('%s')",
+						nID, strActionList.c_str());
+
+				long nAffectedRecs = executeCmdQuery(ipConnection, strDeleteActionQuery);
+				ASSERT_RUNTIME_CONDITION("ELI42001", nAffectedRecs = vecActionsToDelete.size(),
+					"Error deleting workflow actions.");
+			}
+
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI42002");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42003");
 	}
 	catch (UCLIDException &ue)
 	{

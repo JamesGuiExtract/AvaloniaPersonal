@@ -1811,17 +1811,29 @@ library UCLID_FILEPROCESSINGLib
 		[id(161), helpstring("methods UpdateFileTaskSession")] HRESULT UpdateFileTaskSession(
 			[in] long nFileTaskSessionID, [in] double dDuration, [in] double dOverheadTime);
 		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Adds a new workflow to the database
 		[id(162), helpstring("methods AddWorkflow")] HRESULT AddWorkflow(
 			[in] BSTR bstrName, [in] EWorkflowType eType, [out, retval] long* pnID);
 		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Deletes the specified workflow from the database
 		[id(163), helpstring("methods DeleteWorkflow")] HRESULT DeleteWorkflow(
 			[in] long nID);
 		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Gets the properties that define a workflow.
 		[id(164), helpstring("methods GetWorkflowDefinition")] HRESULT GetWorkflowDefinition(
 			[in] long nID, [out, retval] IWorkflowDefinition** ppWorkflowDefinition);
 		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Sets the properties that define the workflow.
 		[id(165), helpstring("methods SetWorkflowDefinition")] HRESULT SetWorkflowDefinition(
 			[in] IWorkflowDefinition* pWorkflowDefinition);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Gets the actions associated with a workflow
+		[id(167), helpstring("methods GetWorkflowActions")] HRESULT GetWorkflowActions([in] long nID,
+			[out, retval] IStrToStrMap ** pmapActionNameToID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Sets the actions associated with a workflow
+		[id(168), helpstring("methods SetWorkflowActions")] HRESULT SetWorkflowActions([in] long nID,
+			[in] IVariantVector* pActionList);
 	};
 
 	[

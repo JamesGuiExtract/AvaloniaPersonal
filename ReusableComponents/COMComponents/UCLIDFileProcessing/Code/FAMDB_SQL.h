@@ -13,8 +13,10 @@ static const string gstrMACHINE_ID_VAR = "<MachineID>";
 // Create Table SQL statements
 static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [dbo].[Action] "
 	"([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Action] PRIMARY KEY CLUSTERED, " 
-	"[ASCName] [nvarchar](50) NOT NULL CONSTRAINT [Action_ASCName_Unique] UNIQUE, "
-	"[Description] [nvarchar](255) NULL)";
+	"[ASCName] [nvarchar](50) NOT NULL, "
+	"[Description] [nvarchar](255) NULL, "
+	"[WorkflowID] [INT] NULL, "
+	"CONSTRAINT [IX_Action] UNIQUE NONCLUSTERED ([ASCName], [WorkflowID]))";
 
 static const string gstrCREATE_LOCK_TABLE = 
 	"CREATE TABLE [dbo].[LockTable]([LockName] [nvarchar](50) NOT NULL CONSTRAINT [PK_LockTable] PRIMARY KEY CLUSTERED,"
@@ -500,7 +502,14 @@ static const string gstrCREATE_PAGINATION_FILETASKSESSION_INDEX =
 	"CREATE NONCLUSTERED INDEX [IX_Pagination_FileTaskSession] ON "
 	"	[dbo].[Pagination] ([FileTaskSessionID])";
 
-	// Add foreign keys SQL
+// Add foreign keys SQL
+static const string gstrADD_ACTION_WORKFLOW_FK =
+	"ALTER TABLE dbo.[Action] "
+	"WITH CHECK ADD CONSTRAINT [FK_Action_Workflow] FOREIGN KEY([WorkflowID]) "
+	"REFERENCES [Workflow]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
 static const string gstrADD_STATISTICS_ACTION_FK = 
 	"ALTER TABLE [ActionStatistics]  "
 	"WITH CHECK ADD CONSTRAINT [FK_Statistics_Action] FOREIGN KEY([ActionID]) "

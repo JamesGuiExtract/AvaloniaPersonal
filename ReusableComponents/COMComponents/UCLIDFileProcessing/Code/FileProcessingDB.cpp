@@ -3950,6 +3950,48 @@ STDMETHODIMP CFileProcessingDB::SetWorkflowDefinition(IWorkflowDefinition* pWork
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41891");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkflowActions(long nID, IStrToStrMap** pmapActionNameToID)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetWorkflowActions_Internal(false, nID, pmapActionNameToID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetWorkflowActions_Internal(true, nID, pmapActionNameToID);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41987");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetWorkflowActions(long nID, IVariantVector* pActionList)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!SetWorkflowActions_Internal(false, nID, pActionList))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			SetWorkflowActions_Internal(true, nID, pActionList);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41988");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods
