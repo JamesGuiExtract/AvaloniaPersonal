@@ -1004,7 +1004,7 @@ library UCLID_FILEPROCESSINGLib
 		[id(21), helpstring("method CopyActionStatusFromAction")] HRESULT CopyActionStatusFromAction([in] long nFromAction, [in] long nToAction);
 
 		// PROMISE: To Rename an action
-		[id(22), helpstring("method RenameAction")] HRESULT RenameAction([in] long nActionID, [in] BSTR strNewActionName);
+		[id(22), helpstring("method RenameAction")] HRESULT RenameAction([in] BSTR strOldActionName, [in] BSTR strNewActionName);
 
 		// PROMISE: To output all of the FileName values found by the query strQuery to a file named strOutputFileName
 		//			and return the number of records that were exported
@@ -1057,7 +1057,7 @@ library UCLID_FILEPROCESSINGLib
 		
 		// PROMISE: To create a new database in the currently set DatabaseServer with the name bstrNewDBName
 		// REQUIRES: DatabaseServer property must be set to a valid database server.
-		[id(35), helpstring("method CreateNewDB")] HRESULT CreateNewDB([in] BSTR bstrNewDBName);
+		[id(35), helpstring("method CreateNewDB")] HRESULT CreateNewDB([in] BSTR bstrNewDBName, [in] BSTR bstrInitWithPassword);
 
 		// PROMISE: Connects to a database using the last configured database connection this process.
 		// NOTE: The connection may be for a database that has not actually been used yet this process.
@@ -1834,6 +1834,10 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Sets the actions associated with a workflow
 		[id(168), helpstring("methods SetWorkflowActions")] HRESULT SetWorkflowActions([in] long nID,
 			[in] IVariantVector* pActionList);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Sets the currently active workflow
+		[propget, id(169), helpstring("property ActiveWorkflow ")] HRESULT ActiveWorkflow([out, retval] BSTR* pbstrWorkflowName);
+		[propput, id(169), helpstring("property ActiveWorkflow ")] HRESULT ActiveWorkflow([in] BSTR bstrWorkflowName);
 	};
 
 	[

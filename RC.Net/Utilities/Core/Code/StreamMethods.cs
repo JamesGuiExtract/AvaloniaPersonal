@@ -4,7 +4,7 @@ using System.IO;
 namespace Extract.Utilities
 {
     /// <summary>
-    /// Utlities class containing common stream operations.
+    /// Utility class containing common stream operations.
     /// </summary>
     public static class StreamMethods
     {

@@ -85,6 +85,10 @@ namespace Extract.Testing.Utilities
                     // Create the temporary image file
                     tempFile = CreateTemporaryFile(resourceName, fileName);
 
+                    // I have run into at least one unit test where I periodically getting errors
+                    // stating the test file is missing or sharing violations.
+                    FileSystemMethods.WaitForFileToBeReadable(tempFile.FileName);
+
                     // Add the temporary file to the dictionary
                     _files.Add(resourceName, tempFile);
                 }

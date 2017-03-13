@@ -77,6 +77,7 @@ m_bWorkItemRevertInProgress(false),
 m_strEncryptedDatabaseID(""),
 m_bDatabaseIDValuesValidated(false),
 m_ipSecureCounters(__nullptr),
+m_strActiveWorkflow(""),
 m_nLastFAMFileID(0)
 {
 	try
@@ -557,7 +558,7 @@ STDMETHODIMP CFileProcessingDB::CopyActionStatusFromAction(long  nFromAction, lo
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14097");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionName)
+STDMETHODIMP CFileProcessingDB::RenameAction(BSTR bstrOldActionName, BSTR bstrNewActionName)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -565,12 +566,12 @@ STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionNa
 	{
 		validateLicense();
 
-		if (!RenameAction_Internal(false, nActionID, strNewActionName))
+		if (!RenameAction_Internal(false, bstrOldActionName, bstrNewActionName))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			RenameAction_Internal(true, nActionID, strNewActionName);
+			RenameAction_Internal(true, bstrOldActionName, bstrNewActionName);
 		}
 
 		return S_OK;
@@ -760,7 +761,7 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 
 		// [LegacyRCAndUtils:6168]
 		// Initialize the DB if it is blank
-		if (!initializeIfBlankDB())
+		if (!initializeIfBlankDB(false, ""))
 		{
 			// If the user chose not to initialize an empty database, treat as a cancelled login.
 			*pbLoginValid = VARIANT_FALSE;
@@ -1021,7 +1022,7 @@ STDMETHODIMP CFileProcessingDB::get_DatabaseName(BSTR* pVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17623");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
+STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWithPassword)
 {	
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1047,10 +1048,17 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 			throw ue;
 		}
 
+		string strInitWithPassword = asString(bstrInitWithPassword);
+
 		// [LegacyRCAndUtils:6168]
 		// Check for an existing, blank database.
 		if (isBlankDB())
 		{
+			if (!strInitWithPassword.empty())
+			{
+				initializeIfBlankDB(true, strInitWithPassword);
+			}
+
 			// If this is a blank database, return without an exception; this will result in
 			// ShowLogin being called and, therefore, the prompt to initialize the database.
 			return S_OK;
@@ -1098,8 +1106,16 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		// Close the connections
 		ipDBConnection->Close();
 
-		// Clear the new database to set up the tables
-		clear(false, true, false);
+		if (!strInitWithPassword.empty())
+		{
+			initializeIfBlankDB(true, strInitWithPassword);
+		}
+		else
+		{
+			// Clear the new database to set up the tables
+			clear(false, true, false);
+		}
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17469");
@@ -3991,6 +4007,43 @@ STDMETHODIMP CFileProcessingDB::SetWorkflowActions(long nID, IVariantVector* pAc
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41988");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_ActiveWorkflow(BSTR* pbstrWorkflowName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI42026", pbstrWorkflowName != __nullptr);
+
+		*pbstrWorkflowName = get_bstr_t(m_strActiveWorkflow).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42027");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::put_ActiveWorkflow(BSTR bstrWorkflowName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		if (m_nFAMSessionID != 0)
+		{
+			throw UCLIDException("ELI42030", "Cannot set workflow while a session is open.");
+		}
+
+		m_strActiveWorkflow = asString(bstrWorkflowName);
+
+		// Set the static server name
+		CSingleLock lock(&m_mutex, TRUE);
+		ms_strCurrServerName = m_strDatabaseServer;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42025");
 }
 
 //-------------------------------------------------------------------------------------------------

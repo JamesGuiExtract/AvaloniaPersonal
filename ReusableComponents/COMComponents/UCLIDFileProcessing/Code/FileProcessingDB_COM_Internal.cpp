@@ -1703,17 +1703,14 @@ bool CFileProcessingDB::DeleteAction_Internal(bool bDBLocked, BSTR strAction)
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				// Get the action ID and update the strActionName to stored value
-				long nActionID = getActionID(ipConnection, strActionName);
-
 				// Make sure processing is not active of this action
-				assertProcessingNotActiveForAction(bDBLocked, ipConnection, nActionID);
+				assertProcessingNotActiveForAction(bDBLocked, ipConnection, strActionName);
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 				// Delete the action
-				string strDeleteActionQuery = "DELETE FROM [Action] WHERE [ASCName] = '" + asString(strAction) + "'";
+				string strDeleteActionQuery = "DELETE FROM [Action] WHERE [ASCName] = '" + strActionName + "'";
 				executeCmdQuery(ipConnection, strDeleteActionQuery);
 
 				// Commit this transaction
@@ -1804,7 +1801,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
+			
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
@@ -1813,6 +1810,10 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
+				// Do not allow adding of files without ActiveWorkflow specified if at least one
+				// workflow has been defined.
+				validateWorkflowIsSet(ipConnection);
+				
 				_lastCodePos = "10";
 
 				// Create a pointer to a recordset
@@ -3217,7 +3218,7 @@ bool CFileProcessingDB::CopyActionStatusFromAction_Internal(bool bDBLocked, long
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::RenameAction_Internal(bool bDBLocked, long nActionID, BSTR strNewActionName)
+bool CFileProcessingDB::RenameAction_Internal(bool bDBLocked, BSTR bstrOldActionName, BSTR bstrNewActionName)
 {
 	try
 	{
@@ -3234,17 +3235,17 @@ bool CFileProcessingDB::RenameAction_Internal(bool bDBLocked, long nActionID, BS
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				// Make sure processing is not active of this action
-				assertProcessingNotActiveForAction(bDBLocked, ipConnection, nActionID);
-
 				// Convert action names to string
-				string strOld = getActionName(ipConnection, nActionID);
-				string strNew = asString(strNewActionName);
+				string strOld = asString(bstrOldActionName);
+				string strNew = asString(bstrNewActionName);
+
+				// Make sure processing is not active for this action
+				assertProcessingNotActiveForAction(bDBLocked, ipConnection, strOld);
 
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 				// Change the name of the action in the action table
-				string strSQL = "UPDATE Action SET ASCName = '" + strNew + "' WHERE ID = " + asString(nActionID);
+				string strSQL = "UPDATE [Action] SET [ASCName] = '" + strNew + "' WHERE [ASCName] = '" + strOld + "'";
 				executeCmdQuery(ipConnection, strSQL);
 
 				// Commit the transaction
@@ -6521,7 +6522,7 @@ bool CFileProcessingDB::AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActio
 					if (getDBInfoSetting(ipConnection, gstrAUTO_CREATE_ACTIONS, true) == "1")
 					{
 						// AutoCreateActions is set, create the action
-						*plId = addActionToRecordset(ipConnection, ipActionSet, strActionName);
+						*plId = addActionToRecordset(ipConnection, ipActionSet, strActionName, m_strActiveWorkflow);
 					}
 					else
 					{
@@ -10028,7 +10029,9 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 			FieldsPtr ipFields = ipWorkflowSet->Fields;
 			ASSERT_RESOURCE_ALLOCATION("ELI41918", ipFields != __nullptr);
 
-			setStringField(ipFields, "Name", asString(ipWorkflowDefinition->Name));
+			string strOldWorkflowName = getStringField(ipFields, "Name");
+
+			// Update workflow name last so that action ID lookup by workflow name is unambiguous.
 
 			switch (ipWorkflowDefinition->Type)
 			{
@@ -10047,7 +10050,7 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 			else
 			{
 				setLongField(ipFields, "StartActionID",
-					getActionID(ipConnection, asString(ipWorkflowDefinition->StartAction)));
+					getActionID(ipConnection, asString(ipWorkflowDefinition->StartAction), strOldWorkflowName));
 			}
 
 			if (ipWorkflowDefinition->EndAction.length() == 0)
@@ -10057,7 +10060,7 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 			else
 			{
 				setLongField(ipFields, "EndActionID",
-					getActionID(ipConnection, asString(ipWorkflowDefinition->EndAction)));
+					getActionID(ipConnection, asString(ipWorkflowDefinition->EndAction), strOldWorkflowName));
 			}
 
 			if (ipWorkflowDefinition->PostWorkflowAction.length() == 0)
@@ -10067,7 +10070,7 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 			else
 			{
 				setLongField(ipFields, "PostWorkflowActionID",
-					getActionID(ipConnection, asString(ipWorkflowDefinition->PostWorkflowAction)));
+					getActionID(ipConnection, asString(ipWorkflowDefinition->PostWorkflowAction), strOldWorkflowName));
 			}
 			
 			setStringField(ipFields, "DocumentFolder", asString(ipWorkflowDefinition->DocumentFolder));
@@ -10085,6 +10088,8 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 				executeCmdQuery(ipConnection, strQuery, "ID", false, &llOutputAttributeSetID);
 				setLongLongField(ipFields, "OutputAttributeSetID", llOutputAttributeSetID);
 			}
+
+			setStringField(ipFields, "Name", asString(ipWorkflowDefinition->Name));
 			
 			ipWorkflowSet->Update();
 			

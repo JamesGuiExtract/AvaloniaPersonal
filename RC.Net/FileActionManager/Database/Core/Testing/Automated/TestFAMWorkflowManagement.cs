@@ -1,6 +1,7 @@
-﻿using Extract.Utilities;
-using Extract.Testing.Utilities;
+﻿using Extract.Testing.Utilities;
+using Extract.Utilities;
 using NUnit.Framework;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using UCLID_COMUTILSLib;
@@ -15,10 +16,22 @@ namespace Extract.FileActionManager.Database.Test
     [TestFixture]
     public class TestFAMWorkflowManagement
     {
+        #region Constants
+
+        static readonly string _LABDE_EMPTY_DB = "Resources.Demo_LabDE_Empty";
+        static readonly string _LABDE_TEST_FILE = "Resources.A418.tif";
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
-        /// Manages the test images needed for testing.
+        /// Manages test files.
+        /// </summary>
+        static TestFileManager<TestFAMWorkflowManagement> _testFiles;
+
+        /// <summary>
+        /// Manages test FAM DBs.
         /// </summary>
         static FAMTestDBManager<TestFAMWorkflowManagement> _testDbManager;
 
@@ -34,6 +47,7 @@ namespace Extract.FileActionManager.Database.Test
         {
             GeneralMethods.TestSetup();
 
+            _testFiles = new TestFileManager<TestFAMWorkflowManagement>();
             _testDbManager = new FAMTestDBManager<TestFAMWorkflowManagement>();
         }
 
@@ -43,7 +57,12 @@ namespace Extract.FileActionManager.Database.Test
         [TestFixtureTearDown]
         public static void FinalCleanup()
         {
-            // Dispose of the test image manager
+            if (_testFiles != null)
+            {
+                _testFiles.Dispose();
+                _testFiles = null;
+            }
+
             if (_testDbManager != null)
             {
                 _testDbManager.Dispose();
@@ -65,10 +84,10 @@ namespace Extract.FileActionManager.Database.Test
 
             try
             {
-                var fileProcessingDb = _testDbManager.GetDatabase("Resources.Demo_LabDE_Empty", testDbName);
-                int id = fileProcessingDb.AddWorkflow(testDbName, EWorkflowType.kUndefined);
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
                 IWorkflowDefinition workflowDefiniton = fileProcessingDb.GetWorkflowDefinition(id);
-                Assert.That(workflowDefiniton.Name == testDbName);
+                Assert.That(workflowDefiniton.Name == "Workflow1");
             }
             finally
             {
@@ -86,10 +105,10 @@ namespace Extract.FileActionManager.Database.Test
 
             try
             {
-                var fileProcessingDb = _testDbManager.GetDatabase("Resources.Demo_LabDE_Empty", testDbName);
-                int id = fileProcessingDb.AddWorkflow(testDbName, EWorkflowType.kUndefined);
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
                 IWorkflowDefinition workflowDefiniton = fileProcessingDb.GetWorkflowDefinition(id);
-                Assert.That(workflowDefiniton.Name == testDbName);
+                Assert.That(workflowDefiniton.Name == "Workflow1");
 
                 fileProcessingDb.DeleteWorkflow(id);
 
@@ -111,12 +130,12 @@ namespace Extract.FileActionManager.Database.Test
 
             try
             {
-                var fileProcessingDb = _testDbManager.GetDatabase("Resources.Demo_LabDE_Empty", testDbName);
-                int id = fileProcessingDb.AddWorkflow(testDbName, EWorkflowType.kExtraction);
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kExtraction);
 
                 // Test initial Workflow property values
                 WorkflowDefinition outputDefinition = fileProcessingDb.GetWorkflowDefinition(id);
-                Assert.That(outputDefinition.Name == testDbName);
+                Assert.That(outputDefinition.Name == "Workflow1");
                 Assert.That(outputDefinition.Type == EWorkflowType.kExtraction);
                 Assert.That(string.IsNullOrEmpty(outputDefinition.Description));
                 Assert.That(string.IsNullOrEmpty(outputDefinition.StartAction));
@@ -125,10 +144,14 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(string.IsNullOrEmpty(outputDefinition.DocumentFolder));
                 Assert.That(string.IsNullOrEmpty(outputDefinition.OutputAttributeSet));
 
+                var actionNames = new[] { "A01_ExtractData", "A02_Verify", "Z_AdminAction" }
+                    .ToVariantVector();
+                fileProcessingDb.SetWorkflowActions(id, actionNames);
+
                 // Update workflow properties.
                 WorkflowDefinition workflowDefinition = new WorkflowDefinition();
                 workflowDefinition.ID = id;
-                workflowDefinition.Name = testDbName;
+                workflowDefinition.Name = "Workflow1";
                 workflowDefinition.Type = EWorkflowType.kClassification;
                 workflowDefinition.Description = "A test of FileProcessingDB.SetWorkflowDefinition.";
                 workflowDefinition.StartAction = "A01_ExtractData";
@@ -189,10 +212,14 @@ namespace Extract.FileActionManager.Database.Test
 
             try
             {
-                var fileProcessingDb = _testDbManager.GetDatabase("Resources.Demo_LabDE_Empty", testDbName);
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
                 // Create and configure workflow
-                int id = fileProcessingDb.AddWorkflow(testDbName, EWorkflowType.kExtraction);
+                int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kExtraction);
+
+                var actionNames = new[] { "A01_ExtractData", "A02_Verify", "Z_AdminAction" }
+                    .ToVariantVector();
+                fileProcessingDb.SetWorkflowActions(id, actionNames);
 
                 WorkflowDefinition workflowDefinition = new WorkflowDefinition();
                 workflowDefinition.ID = id;
@@ -238,9 +265,9 @@ namespace Extract.FileActionManager.Database.Test
 
             try
             {
-                var fileProcessingDb = _testDbManager.GetDatabase("Resources.Demo_LabDE_Empty", testDbName);
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
-                int id = fileProcessingDb.AddWorkflow(testDbName, EWorkflowType.kUndefined);
+                int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
 
                 IStrToStrMap workflowActionMap = fileProcessingDb.GetWorkflowActions(id);
                 Assert.That(workflowActionMap.Size == 0);
@@ -273,9 +300,140 @@ namespace Extract.FileActionManager.Database.Test
                 // Confirm workflow can be deleted even if it has actions.
                 fileProcessingDb.DeleteWorkflow(id);
             }
-
             finally
             {
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// <summary>
+        /// Tests adding, renaming and deleting actions both in an out of a workflow.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void EditActionsWithWorkflows()
+        {
+            string testDbName = "Test_EditActionsWithWorkflows";
+
+            try
+            {
+                var fileProcessingDb = _testDbManager.GetNewDatabase(testDbName);
+
+                int actionStart1 = fileProcessingDb.DefineNewAction("Start");
+
+                int workflowID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
+
+                // Check that GetActionID applies only to current workflow.
+                Assert.That(fileProcessingDb.GetActionID("Start") == actionStart1);
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                Assert.Throws<COMException>(() => fileProcessingDb.GetActionID("Start"));
+
+                // Despite active workflow being set, end should not yet be part of it.
+                int actionEnd1 = fileProcessingDb.DefineNewAction("End");
+                Assert.Throws<COMException>(() => fileProcessingDb.GetActionID("End"));
+
+                var workflowActions = new[] { "Start", "End" }.ToVariantVector();
+                fileProcessingDb.SetWorkflowActions(workflowID, workflowActions);
+
+                // Test that a separate action ID was assigned for the workflow
+                int actionStart2 = fileProcessingDb.GetActionID("Start");
+                Assert.That(actionStart1 != actionStart2);
+                int actionEnd2 = fileProcessingDb.GetActionID("End");
+                Assert.That(actionEnd1 != actionEnd2);
+
+                // Test renaming an action while an active workflow is set.
+                fileProcessingDb.RenameAction("Start", "Begin");
+                var newWorkflowActions = fileProcessingDb.GetWorkflowActions(workflowID)
+                    .ComToDictionary()
+                    .Keys
+                    .AsEnumerable<string>()
+                    .ToArray();
+                Assert.That(newWorkflowActions[0] == "Begin");
+                Assert.That(newWorkflowActions[1] == "End");
+
+                // Check that GetActions also returns the correct result per active workflow.
+                var actionDictionary = fileProcessingDb.GetActions().ComToDictionary();
+                Assert.That(actionDictionary.Count == 2);
+                Assert.That(actionDictionary["Begin"] == actionStart2.ToString(CultureInfo.InvariantCulture));
+                Assert.That(actionDictionary["End"] == actionEnd2.ToString(CultureInfo.InvariantCulture));
+
+                // Test deleting an action while an active workflow is set.
+                fileProcessingDb.DeleteAction("End");
+
+                // Ensure that we can look up action ID and name both with and without a workflow set.
+                Assert.That(fileProcessingDb.GetActionID("Begin") == actionStart2);
+                Assert.That(fileProcessingDb.GetActionName(actionStart2) == "Begin");
+                fileProcessingDb.ActiveWorkflow = "";
+                Assert.That(fileProcessingDb.GetActionID("Begin") == actionStart1);
+                Assert.That(fileProcessingDb.GetActionName(actionStart1) == "Begin");
+
+                // With no context, GetActions should not report workflow specific actions.
+                Assert.That(fileProcessingDb.GetActions().ComToDictionary().Keys.Single() == "Begin");
+
+                // After having deleted actions both with and without the active workflow set, make
+                // sure there are no actions left.
+                fileProcessingDb.DeleteAction("Begin");
+                Assert.That(fileProcessingDb.GetWorkflowActions(workflowID).Size == 0);
+                Assert.That(fileProcessingDb.GetActions().Size == 0);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// <summary>
+        /// Tests adding, renaming and deleting actions both in an out of a workflow.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void AddRemoveFilesWithWorkflows()
+        {
+            string testDbName = "Test_AddRemoveFilesWithWorkflows";
+            string actionName = "A01_ExtractData";
+
+            try
+            {
+                string testFileName = _testFiles.GetFile(_LABDE_TEST_FILE);
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+
+                int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
+                fileProcessingDb.SetWorkflowActions(id, new[] { actionName }.ToVariantVector());
+                int actionId1 = fileProcessingDb.GetActionID(actionName);
+
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", actionId1, true, false);
+
+                // Should not be able to queue a file without setting a workflow.
+                bool alreadyExists = false;
+                EActionStatus previousStatus = EActionStatus.kActionUnattempted;
+                Assert.Throws<COMException>(() => fileProcessingDb.AddFile(
+                    testFileName, actionName, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, true,
+                    out alreadyExists, out previousStatus));
+
+                // Should not be able to change workflow during an active FAM Session.
+                Assert.Throws<COMException>(() => fileProcessingDb.ActiveWorkflow = testDbName);
+
+                fileProcessingDb.RecordFAMSessionStop();
+
+                // Set active workflow which will correspond to a different action ID.
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                int actionId2 = fileProcessingDb.GetActionID(actionName);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", actionId2, true, false);
+
+                // We should now be able to add a file now that we have a workflow set.
+                fileProcessingDb.AddFile(
+                    testFileName, actionName, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, true,
+                    out alreadyExists, out previousStatus);
+
+                // The actionID associated with the workflow should have a file queued, but not the "NULL" workflow action.
+                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsPending == 0);
+                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsPending == 1);
+
+                // Test that after removing the file there are no longer any files pending on the workflow's action.
+                fileProcessingDb.RemoveFile(testFileName, actionName);
+                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsPending == 0);
+            }
+            finally
+            {
+                _testFiles.RemoveFile(_LABDE_TEST_FILE);
                 _testDbManager.RemoveDatabase(testDbName);
             }
         }

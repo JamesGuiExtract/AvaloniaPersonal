@@ -45,6 +45,47 @@ namespace Extract.FileActionManager.Database.Test
         #region Methods
 
         /// <summary>
+        /// Gets an IFileProcessingDB connection to a new FAM database created on the local database
+        /// instance. 
+        /// </summary>
+        /// <param name="databaseName">The name to give to the database.</param>
+        /// <returns>A <see cref="IFileProcessingDB"/> for the database.</returns>
+        public IFileProcessingDB GetNewDatabase(string databaseName)
+        {
+            try
+            {
+                IFileProcessingDB fileProcessingDb = null;
+                if (_activeDatabases.TryGetValue(databaseName, out fileProcessingDb))
+                {
+                    var ee = new ExtractException("ELI42028", "Database already exists");
+                    ee.AddDebugData("Database name", databaseName, false);
+                    throw ee;
+                }
+                else
+                {
+                    fileProcessingDb = new FileProcessingDB();
+                    _activeDatabases[databaseName] = fileProcessingDb;
+                    fileProcessingDb.DatabaseServer = "(local)";
+                    fileProcessingDb.CreateNewDB(databaseName, bstrInitWithPassword: "a");
+
+                    return fileProcessingDb;
+                }
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    RemoveDatabase(databaseName);
+                }
+                catch { }
+
+                var ee = ex.AsExtract("ELI42034");
+                ee.AddDebugData("Database", databaseName, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
         /// Gets an IFileProcessingDB connection to local database <see paramref="destinationDbName"/>
         /// as restored from the backup <see paramref="dbBackupResourceName"/>.
         /// </summary>

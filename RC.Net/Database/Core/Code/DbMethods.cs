@@ -687,19 +687,66 @@ namespace Extract.Database
                             TDEThumbprint varbinary(32) NULL
                         );
 
+                        DECLARE @FileList2016 TABLE
+                        (
+                            LogicalName nvarchar(128) NOT NULL,
+                            PhysicalName nvarchar(260) NOT NULL,
+                            Type char(1) NOT NULL,
+                            FileGroupName nvarchar(120) NULL,
+                            Size numeric(20, 0) NOT NULL,
+                            MaxSize numeric(20, 0) NOT NULL,
+                            FileID bigint NULL,
+                            CreateLSN numeric(25, 0) NULL,
+                            DropLSN numeric(25, 0) NULL,
+                            UniqueID uniqueidentifier NULL,
+                            ReadOnlyLSN numeric(25, 0) NULL,
+                            ReadWriteLSN numeric(25, 0) NULL,
+                            BackupSizeInBytes bigint NULL,
+                            SourceBlockSize int NULL,
+                            FileGroupID int NULL,
+                            LogGroupGUID uniqueidentifier NULL,
+                            DifferentialBaseLSN numeric(25, 0)NULL,
+                            DifferentialBaseGUID uniqueidentifier NULL,
+                            IsReadOnly bit NULL,
+                            IsPresent bit NULL,
+                            TDEThumbprint varbinary(32) NULL,
+	                        SnapshotUrl nvarchar(max) NULL
+                        );
+
                         SET @Error = 0;
 
                         --add trailing backslash to folder names if not already specified
                         IF LEFT(REVERSE(@DataFolder), 1) <> '\' SET @DataFolder = @DataFolder + '\';
                         IF LEFT(REVERSE(@LogFolder), 1) <> '\' SET @LogFolder = @LogFolder + '\';
 
+                        DECLARE @CompatabilityLevel INT
+                        SELECT @CompatabilityLevel = MAX(compatibility_level) FROM sys.databases
+
                         -- get info about the database files
                         SET @RestoreStatement = N'RESTORE FILELISTONLY FROM DISK = ''' + @BackupFile + ''''
-                        INSERT INTO @FileList
-                            EXEC(@RestoreStatement);
-                                SET @Error = @@ERROR;
-                                IF @Error <> 0 GOTO Done;
-                                IF NOT EXISTS(SELECT * FROM @FileList) GOTO Done;
+                        IF @CompatabilityLevel < 130 -- SQL version less than 2016
+                        BEGIN
+	                        INSERT INTO @FileList
+		                        EXEC(@RestoreStatement);
+			                        SET @Error = @@ERROR;
+			                        IF @Error <> 0 GOTO Done;
+			                        IF NOT EXISTS(SELECT * FROM @FileList) GOTO Done;
+                        END
+                        ELSE
+                        BEGIN
+	                        INSERT INTO @FileList2016
+		                        EXEC(@RestoreStatement);
+			                        SET @Error = @@ERROR;
+			                        IF @Error <> 0 GOTO Done;
+			                        IF NOT EXISTS(SELECT * FROM @FileList2016) GOTO Done;
+	
+	                        -- Transfer data into FileList minus the SnapshotUrl column that did not exist prior to 2016
+	                        INSERT INTO @FileList 
+		                        SELECT LogicalName, PhysicalName, Type, FileGroupName, Size, MaxSize, FileID, CreateLSN, DropLSN, UniqueID,
+			                        ReadOnlyLSN, ReadWriteLSN, BackupSizeInBytes, SourceBlockSize, FileGroupID, LogGroupGUID,
+			                        DifferentialBaseLSN, DifferentialBaseGUID, IsReadOnly, IsPresent, TDEThumbprint
+		                        FROM @FileList2016
+                        END
 
                         --generate RESTORE DATABASE statement and ALTER DATABASE statements
                         SET @ChangeLogicalNamesSql = '';

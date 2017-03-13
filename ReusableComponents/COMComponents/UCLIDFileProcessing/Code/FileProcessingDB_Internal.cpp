@@ -863,13 +863,49 @@ long CFileProcessingDB::getFileID(_ConnectionPtr ipConnection, string& rstrFileN
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26720");
 }
 //--------------------------------------------------------------------------------------------------
-long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& rstrActionName)
+long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, const string& strWorkflowName)
 {
 	try
 	{
-		return getKeyID(ipConnection, gstrACTION, "ASCName", string(rstrActionName), false);
+		string strQuery = "SELECT [ID] FROM [Workflow] WHERE [Workflow].[Name] = '" +
+			strWorkflowName + "'";
+
+		long nWorkflowID = 0;
+		return executeCmdQuery(ipConnection, strQuery, false, &nWorkflowID);
+
+		return nWorkflowID;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26721");
+}
+//--------------------------------------------------------------------------------------------------
+long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& strActionName)
+{
+	try
+	{
+		return getActionID(ipConnection, strActionName, m_strActiveWorkflow);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42035");
+}
+//--------------------------------------------------------------------------------------------------
+long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& strActionName, const string& strWorkflow)
+{
+	try
+	{
+		string strQuery =  Util::Format(
+			"SELECT [Action].[ID] FROM [Action] "
+			"	LEFT JOIN [WorkFlow] ON [WorkflowID] = [Workflow].[ID]"
+			"	WHERE [ASCName] = '%s' AND [Workflow].[Name] %s",
+				strActionName.c_str(),
+				(strWorkflow.empty()
+					? "IS NULL"
+					: " = '" + strWorkflow + "'").c_str());
+		
+		long nActionID = 0;
+		executeCmdQuery(ipConnection, strQuery, false, &nActionID);
+
+		return nActionID;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42036");
 }
 //--------------------------------------------------------------------------------------------------
 string CFileProcessingDB::getActionName(_ConnectionPtr ipConnection, long nActionID)
@@ -909,7 +945,9 @@ _RecordsetPtr CFileProcessingDB::getActionSet(_ConnectionPtr ipConnection, const
 	ASSERT_RESOURCE_ALLOCATION("ELI29155", ipActionSet != __nullptr);
 
 	// Setup select statement to open Action Table
-	string strActionSelect = "SELECT ID, ASCName FROM Action WHERE ASCName = '" + strAction + "'";
+	string strActionSelect = "SELECT [ID], [ASCName], [WorkflowID] "
+		"FROM [Action] "
+		"WHERE [ASCName] = '" + strAction + "'";
 
 	// Open the Action table in the database
 	ipActionSet->Open(strActionSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), 
@@ -918,19 +956,26 @@ _RecordsetPtr CFileProcessingDB::getActionSet(_ConnectionPtr ipConnection, const
 	return ipActionSet;
 }
 //--------------------------------------------------------------------------------------------------
-long CFileProcessingDB::addActionToRecordset(_ConnectionPtr ipConnection, 
-											 _RecordsetPtr ipRecordset, const string &strAction)
+long CFileProcessingDB::addActionToRecordset(_ConnectionPtr ipConnection, _RecordsetPtr ipRecordset,
+											 const string &strAction, const string &strWorkflow)
 {
 	try
 	{
-		// Add a new record
+		// Add a workflow independent action regardless.
 		ipRecordset->AddNew();
-
-		// Set the values of the ASCName field
 		setStringField(ipRecordset->Fields, "ASCName", strAction);
-
-		// Add the record to the Action Table
 		ipRecordset->Update();
+
+		// If a workflow is specified, add a workflow specific action.
+		if (!strWorkflow.empty())
+		{
+			ipRecordset->AddNew();
+			setStringField(ipRecordset->Fields, "ASCName", strAction);
+
+			long nWorkflowID = getWorkflowID(ipConnection, strWorkflow);
+			setLongField(ipRecordset->Fields, "WorkflowID", nWorkflowID);
+			ipRecordset->Update();
+		}
 
 		// Get the ID of the new Action
 		// [LegacyRCAndUtils:6154]
@@ -2232,7 +2277,6 @@ int CFileProcessingDB::getDBSchemaVersion()
 	// return the Schema version
 	return m_iDBSchemaVersion;
 }
-
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::validateDBSchemaVersion()
 {
@@ -2287,6 +2331,21 @@ void CFileProcessingDB::validateDBSchemaVersion()
 			// If we reached this point without and exception being thrown, all installed and
 			// licensed product specific DB components have up-to-data schema versions.
 			m_bProductSpecificDBSchemasAreValid = true;
+		}
+	}
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::validateWorkflowIsSet(_ConnectionPtr ipConnection)
+{
+	if (m_strActiveWorkflow.empty())
+	{
+		string strQuery = "SELECT COUNT(*) AS [ID] FROM dbo.[Workflow]";
+		long nWorkflowCount = 0;
+		executeCmdQuery(ipConnection, strQuery, false, &nWorkflowCount);
+
+		if (nWorkflowCount > 0)
+		{
+			throw new UCLIDException("ELI42029", "Workflow has not been set.");
 		}
 	}
 }
@@ -2817,7 +2876,7 @@ bool CFileProcessingDB::isBlankDB()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33400");
 }
 //--------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::initializeIfBlankDB()
+bool CFileProcessingDB::initializeIfBlankDB(bool initWithoutPrompt, string strAdminPassword)
 {
 	try
 	{
@@ -2826,19 +2885,32 @@ bool CFileProcessingDB::initializeIfBlankDB()
 		// If blank flag is set clear the database
 		if (bBlank)
 		{
-			// Default to using the desktop as the parent for the messagebox below
-			HWND hParent = getAppMainWndHandle();
-
-			int iResult = ::MessageBox(hParent,
-				"This database exists but has not been initialized for use.\r\n\r\n"
-				"Do you wish to initialize it now?", "Initialize Database?", MB_YESNO);
-			if (iResult == IDYES)
+			if (initWithoutPrompt)
 			{
 				clear(false, true, false);
+
+				strAdminPassword = gstrADMIN_USER + strAdminPassword;
+				encryptAndStoreUserNamePassword(strAdminPassword, true, false);
+
 				return true;
 			}
+			else
+			{
+				// Default to using the desktop as the parent for the messagebox below
+				HWND hParent = getAppMainWndHandle();
 
-			return false;
+				int iResult = ::MessageBox(hParent,
+					"This database exists but has not been initialized for use.\r\n\r\n"
+					"Do you wish to initialize it now?", "Initialize Database?", MB_YESNO);
+				if (iResult == IDYES)
+				{
+					clear(false, true, false);
+
+					return true;
+				}
+
+				return false;
+			}
 		}
 
 		return true;
@@ -3826,7 +3898,7 @@ long CFileProcessingDB::defineNewAction(_ConnectionPtr ipConnection, const strin
 		}
 
 		// Create a new action and return its ID
-		return addActionToRecordset(ipConnection, ipActionSet, strActionName);
+		return addActionToRecordset(ipConnection, ipActionSet, strActionName, "");
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29681");
 }
@@ -4900,7 +4972,7 @@ _RecordsetPtr CFileProcessingDB::getFileActionStatusSet(_ConnectionPtr& ipConnec
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _ConnectionPtr ipConnection, 
-	const long &lActionID)
+	const string &strActionName)
 {
 	// If the ActiveFAM table does not exist nothing is processing so return
 	if (!doesTableExist(ipConnection, gstrACTIVE_FAM))
@@ -4918,8 +4990,6 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 		tgRevert.CommitTrans();
 	}
 
-	string strActionID = asString(lActionID);
-
 	// Check for active processing for the action
 	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI31589", ipProcessingSet != __nullptr);
@@ -4927,7 +4997,9 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	// Open recordset with ActiveFAM records that show processing on the action
 	string strSQL = "SELECT [UPI] FROM [FAMSession] "
 		"INNER JOIN [ActiveFAM] ON [FAMSessionID] = [FAMSession].[ID] "
-		"WHERE [ActionID] = " + strActionID;
+		"INNER JOIN [Action] ON [ActionID] = [Action].[ID] "
+		"WHERE [ASCName] = '" + strActionName + "'";
+
 	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 		adLockReadOnly, adCmdText);
 
@@ -4936,7 +5008,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	{
 		// Since processing is occurring need to throw an exception.
 		UCLIDException ue("ELI30547", "Processing is active for this action.");
-		ue.addDebugInfo("ActionID",strActionID);
+		ue.addDebugInfo("Action", strActionName);
 		FieldsPtr ipFields = ipProcessingSet->Fields;
 		if (ipFields != __nullptr)
 		{

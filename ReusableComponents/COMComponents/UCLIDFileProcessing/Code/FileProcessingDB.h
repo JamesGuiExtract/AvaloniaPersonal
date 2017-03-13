@@ -153,7 +153,7 @@ public:
 	STDMETHOD(GetStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(Clear)(VARIANT_BOOL vbRetainUserValues);
 	STDMETHOD(CopyActionStatusFromAction)(long  nFromAction, long nToAction);
-	STDMETHOD(RenameAction)(long  nActionID, BSTR strNewActionName);
+	STDMETHOD(RenameAction)(BSTR bstrOldActionName, BSTR bstrNewActionNam);
 	STDMETHOD(ExportFileList)(BSTR strQuery, BSTR strOutputFileName,
 		IRandomMathCondition* pRandomCondition,long* pnNumRecordsOutput);
 	STDMETHOD(ResetDBLock)(void);
@@ -170,7 +170,7 @@ public:
 	STDMETHOD(put_DatabaseServer)(BSTR newVal);
 	STDMETHOD(get_DatabaseName)(BSTR* pVal);
 	STDMETHOD(put_DatabaseName)(BSTR newVal);
-	STDMETHOD(CreateNewDB)(BSTR bstrNewDBName);
+	STDMETHOD(CreateNewDB)(BSTR bstrNewDBName, BSTR bstrInitWithPassword);
 	STDMETHOD(CreateNew80DB)(BSTR bstrNewDBName);
 	STDMETHOD(ConnectLastUsedDBThisProcess)();
 	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue,
@@ -322,6 +322,8 @@ public:
 	STDMETHOD(SetWorkflowDefinition)(IWorkflowDefinition* pWorkflowDefinition);
 	STDMETHOD(GetWorkflowActions)(long nID, IStrToStrMap** pmapActionNameToID);
 	STDMETHOD(SetWorkflowActions)(long nID, IVariantVector* pActionList);
+	STDMETHOD(get_ActiveWorkflow)(BSTR* pbstrWorkflowName);
+	STDMETHOD(put_ActiveWorkflow)(BSTR bstrWorkflowName);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -499,7 +501,7 @@ private:
 	bool m_bAllowRestartableProcessing;
 
 	bool m_bStoreDBInfoChangeHistory;
-
+	
 	IMiscUtilsPtr m_ipMiscUtils;
 
 	// Events used for the ping and statistics maintenance threads.
@@ -525,6 +527,8 @@ private:
 
 	// Indicates that a work item revert is in progress
 	volatile bool m_bWorkItemRevertInProgress;
+
+	string m_strActiveWorkflow;
 
 	// Indicates whether retries will be attempted per the CommandTimeout DBInfo setting if a query
 	// times out.
@@ -571,7 +575,10 @@ private:
 	//		 must be called outside of an active transaction.
 	//		bDBLocked - indicates if the database is locked, this is needed because the auto revert
 	//		requires the database to be locked.
-	void assertProcessingNotActiveForAction(bool bDBLocked, _ConnectionPtr ipConnection, const long &lActionID);
+	//		If workflows are defined, this will check the action for all workflows, not just the active
+	//		workflow.
+	void assertProcessingNotActiveForAction(bool bDBLocked, _ConnectionPtr ipConnection,
+		const string &strActionName);
 
 	// PROMISE: Throws an exception if processing is active on any action.
 	// NOTE: If Auto revert is enabled the files will be reverted in a transaction, so this
@@ -643,9 +650,19 @@ private:
 		long nActionID, const string &strToState, const string &strException, const string &strComment, 
 		const string &strWhereClause, const string &strTopClause);
 
+	// PROMISE: To return the ID for the given provided workflow name.
+	long getWorkflowID(_ConnectionPtr ipConnection, const string& strWorkflowName);
+
 	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match
 	//			the action name stored in the database using the connection object provided.
-	long getActionID(_ConnectionPtr ipConnection, const string& rstrActionName);
+	//			NOTE: This will be the action ID unassociated with workflows if workflows are present.
+	long getActionID(_ConnectionPtr ipConnection, const string& strActionName);
+
+	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match
+	//			the action name stored in the database using the connection object provided.
+	//			NOTE: This will be the action ID associated with the specified workflow. If strWorkflow is empty, 
+	//			it will return the ID of the action unassociated with workflows.
+	long getActionID(_ConnectionPtr ipConnection, const string& strActionName, const string& strWorkflow);
 
 	// PROMISE: To return the Action name for the given ID using the connection object provided;
 	string getActionName(_ConnectionPtr ipConnection, long nActionID);
@@ -656,8 +673,10 @@ private:
 
 	// PROMISE: Adds an action with the specified name to the specified record set. Returns 
 	// the action ID of the newly created action.
+	// NOTE: If strWorkflow is not empty, a second Action row will be added where the action is
+	// associated with the specified workflow.
 	long addActionToRecordset(_ConnectionPtr ipConnection, _RecordsetPtr ipRecordset, 
-		const string &strAction);
+		const string &strAction, const string &strWorkflow);
 
 	// PROMISE: To return the ID from the FAMFile table for the given File name and
 	// modify strFileName to match the file name stored in the database using the connection provided.
@@ -812,6 +831,9 @@ private:
 	// Throws and exception if the DBSchemaVersion in the DB is different from the current DBSchemaVersion
 	void validateDBSchemaVersion();
 
+	// Throws an exception if at least one workflow has been defined, but no ActiveWorkflow is currently set.
+	void validateWorkflowIsSet(_ConnectionPtr ipConnection);
+
 	// Returns the this pointer as a IFileProcssingDBPtr COM pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr getThisAsCOMPtr();
 
@@ -827,7 +849,9 @@ private:
 	// Checks for blank database and if it is blank will clear the database to set it up.
 	// Returns true if the database is not blank or it was initialized.
 	// Returns false if the user was prompted to initialize the database, but declined.
-	bool initializeIfBlankDB();
+	// initWithoutPrompt-	If true, the database will be initialized with the specified strAdminPassword.
+	//						If false, a prompt will be displayed for the admin password following initialization.
+	bool initializeIfBlankDB(bool initWithoutPrompt, string strAdminPassword);
 
 	// Fills the rvecTables vector with the Extract Tables
 	void getExpectedTables(vector<string>& rvecTables);
@@ -1141,7 +1165,7 @@ private:
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);
 	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
 	bool CopyActionStatusFromAction_Internal(bool bDBLocked, long  nFromAction, long nToAction);
-	bool RenameAction_Internal(bool bDBLocked, long nActionID, BSTR strNewActionName);
+	bool RenameAction_Internal(bool bDBLocked, BSTR bstrOldActionName, BSTR bstrNewActionNam);
 	bool Clear_Internal(bool bDBLocked, VARIANT_BOOL vbRetainUserValues);
 	bool ExportFileList_Internal(bool bDBLocked, BSTR strQuery, BSTR strOutputFileName,
 		IRandomMathCondition* pRandomCondition, long *pnNumRecordsOutput);

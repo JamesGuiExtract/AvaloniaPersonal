@@ -1483,6 +1483,26 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Waits for the specified <see paramref="fileName"/> to be present and readable. Intended for use
+        /// immediately following a method that creates or writes to a file.
+        /// </summary>
+        public static void WaitForFileToBeReadable(string fileName)
+        {
+            try
+            {
+                FileSystemMethods.PerformFileOperationWithRetry(() =>
+                    {
+                        using (FileStream stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
+                        { }
+                    }, false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI42031");
+            }
+        }
+
         #endregion Methods
     }
 }

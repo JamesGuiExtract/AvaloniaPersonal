@@ -193,7 +193,7 @@ void SelectDBDialog::OnOK()
 		if ( m_eOptionsDatabaseGroup == kCreateNew )
 		{
 			// Create the database
-			m_ipFAMDB->CreateNewDB(m_zDBName.operator LPCSTR());
+			m_ipFAMDB->CreateNewDB(m_zDBName.operator LPCSTR(), "");
 		}
 
 		// Try to login to the database and display Admin window

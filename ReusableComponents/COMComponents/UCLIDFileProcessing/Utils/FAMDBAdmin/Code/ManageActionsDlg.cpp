@@ -242,7 +242,7 @@ void CManageActionsDlg::OnBtnRename()
 				if (strOldName != strNewName)
 				{
 					// Call RenameAction to rename the action
-					m_ipFAMDB->RenameAction(dwID, _bstr_t(strNewName.c_str()));
+					m_ipFAMDB->RenameAction(_bstr_t(strOldName.c_str()), _bstr_t(strNewName.c_str()));
 					uex.addDebugInfo("Old Action Name", strOldName);
 					uex.addDebugInfo("New Action Name", strNewName);
 

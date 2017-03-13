@@ -402,7 +402,8 @@ static const string gstrCREATE_WORKFLOW =
 	"	[EndActionID] INT, "
 	"	[PostWorkflowActionID] INT, "
 	"	[DocumentFolder] NVARCHAR(255), "
-	"	[OutputAttributeSetID] BIGINT)";
+	"	[OutputAttributeSetID] BIGINT, "
+	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
