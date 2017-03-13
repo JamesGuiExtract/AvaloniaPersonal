@@ -50,7 +50,6 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-   
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -64,7 +63,6 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-   
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -187,7 +185,7 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>call CommonDebugPostBuild.bat "$(TargetPath)"
-call "$(DevEnvDir)..\tools\vsvars32.bat"
+CALL "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvars32.bat"
 editbin /largeaddressaware "$(TargetPath)"
 sn -Ra "$(TargetPath)" "$(TargetDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk"</PostBuildEvent>
   </PropertyGroup>
