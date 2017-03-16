@@ -227,7 +227,7 @@ public:
 	STDMETHOD(OffsetUserCounter)(BSTR bstrCounterName, LONGLONG llOffsetValue, LONGLONG* pllNewValue);
 	STDMETHOD(RegisterActiveFAM)();
 	STDMETHOD(UnregisterActiveFAM)();
-	STDMETHOD(RecordFAMSessionStart)(BSTR bstrFPSFileName, long lActionID, VARIANT_BOOL vbQueuing,
+	STDMETHOD(RecordFAMSessionStart)(BSTR bstrFPSFileName, BSTR bstrActionName, VARIANT_BOOL vbQueuing,
 		VARIANT_BOOL vbProcessing);
 	STDMETHOD(RecordFAMSessionStop)();
 	STDMETHOD(RecordInputEvent)(BSTR bstrTimeStamp, long nActionID, long nEventCount,
@@ -325,6 +325,9 @@ public:
 	STDMETHOD(SetWorkflowActions)(long nID, IVariantVector* pActionList);
 	STDMETHOD(get_ActiveWorkflow)(BSTR* pbstrWorkflowName);
 	STDMETHOD(put_ActiveWorkflow)(BSTR bstrWorkflowName);
+	STDMETHOD(get_ActiveActionID)(long* pnActionID);
+	STDMETHOD(GetStatsAllWorkflows)(BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
+	STDMETHOD(GetAllActions)(IStrToStrMap** pmapActionNameToID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -417,6 +420,18 @@ private:
 
 	// The action ID this instance is currently registered against.
 	volatile int m_nActiveActionID;
+
+	// The currently active workflow. Empty when workflows are not being used or processing an action
+	// across all workflows.
+	string m_strActiveWorkflow;
+
+	// Indicates whether workflows are being used for processing. If true, all actions processed
+	// will have an associated WorkflowID. If false, all actions will have a NULL workflow ID.
+	volatile bool m_bUsingWorkflows;
+
+	// Indicates whether an action is being processed across all workflows. This will be true
+	// when m_bUsingWorkflows is true and m_strActiveWorkflow empty.
+	volatile bool m_bRunningAllWorkflows;
 
 	// Keeps track of the last time this instance checked stats.
 	CTime m_timeLastStatsCheck;
@@ -528,8 +543,6 @@ private:
 
 	// Indicates that a work item revert is in progress
 	volatile bool m_bWorkItemRevertInProgress;
-
-	string m_strActiveWorkflow;
 
 	// Indicates whether retries will be attempted per the CommandTimeout DBInfo setting if a query
 	// times out.
@@ -665,19 +678,22 @@ private:
 	//			it will return the ID of the action unassociated with workflows.
 	long getActionID(_ConnectionPtr ipConnection, const string& strActionName, const string& strWorkflow);
 
+	// The same as getActionID, except if the specified action does not exist in the current workflow,
+	// rather than throwing an error, 0 will be returned.
+	long getActionIDNoThrow(_ConnectionPtr ipConnection, const string& strActionName, const string& strWorkflow);
+
+	// Returns a comma-delimited list of IDs to process in the currently active workflow (if any).
+	// In most cases this will be a single action ID, the exception being cases where
+	// m_bRunningAllWorkflows is true.
+	string getActionIDsForActiveWorkflow(_ConnectionPtr ipConnection, const string& strActionName);
+
 	// PROMISE: To return the Action name for the given ID using the connection object provided;
 	string getActionName(_ConnectionPtr ipConnection, long nActionID);
 
-	// PROMISE: To return a record set containing the action with the specified name. The record 
-	// set will be empty if no such action exists.
-	_RecordsetPtr getActionSet(_ConnectionPtr ipConnection, const string &strAction);
-
-	// PROMISE: Adds an action with the specified name to the specified record set. Returns 
-	// the action ID of the newly created action.
+	// PROMISE: Adds an action with the specified name. Returns the action ID of the newly created action.
 	// NOTE: If strWorkflow is not empty, a second Action row will be added where the action is
 	// associated with the specified workflow.
-	long addActionToRecordset(_ConnectionPtr ipConnection, _RecordsetPtr ipRecordset, 
-		const string &strAction, const string &strWorkflow);
+	long addAction(_ConnectionPtr ipConnection, const string &strAction, const string &strWorkflow);
 
 	// PROMISE: To return the ID from the FAMFile table for the given File name and
 	// modify strFileName to match the file name stored in the database using the connection provided.
@@ -832,8 +848,9 @@ private:
 	// Throws and exception if the DBSchemaVersion in the DB is different from the current DBSchemaVersion
 	void validateDBSchemaVersion();
 
-	// Throws an exception if at least one workflow has been defined, but no ActiveWorkflow is currently set.
-	void validateWorkflowIsSet(_ConnectionPtr ipConnection);
+	// Assigns m_nActiveActionID, m_bUsingWorkflows, and m_bRunningAllWorkflows based on the
+	// current workflow and strActionName.
+	void setActiveAction(_ConnectionPtr ipConnection, const string& strActionName);
 
 	// Returns the this pointer as a IFileProcssingDBPtr COM pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr getThisAsCOMPtr();
@@ -932,7 +949,7 @@ private:
 	void init80DB();
 
 	// Internal getActions
-	IStrToStrMapPtr getActions(_ConnectionPtr ipConnection);
+	IStrToStrMapPtr getActions(_ConnectionPtr ipConnection, const string& strWorkflow = "");
 
 	// Internal define new action function
 	long defineNewAction(_ConnectionPtr ipConnection, const string& strActionName);
@@ -1038,13 +1055,14 @@ private:
 	// strAllowedCurrentStatus is not empty, the function will throw an exception if the current
 	// action status code is not part of the specified string.
 	// REQUIRE:	The query must return the following columns from the FAMFile table:
-	//			SELECT ID, FileName, Pages, FileSize, Priority and the action status for the
-	//			current action from the FileActionStatus table.
+	//			SELECT ID, FileName, Pages, FileSize, Priority, the action status and the action ID
+	//			for the current action from the FileActionStatus table.
 	//			if bDBLocked is false and there are files that need to be reverted an exception
 	//			will be thrown.
 	// RETURNS: A vector of IFileRecords for the files that were set to processing.
 	IIUnknownVectorPtr setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
-		const string& strSelectSQL, long nActionID, const string& strAllowedCurrentStatus);
+		const string& strSelectSQL, const string& strActionName, const string& strActionIDs,
+		const string& strAllowedCurrentStatus);
 
 	// Gets a set containing the File ID's for all files that are skipped for the specified action
 	set<long> getSkippedFilesForAction(const _ConnectionPtr& ipConnection, long nActionId);
@@ -1220,7 +1238,7 @@ private:
 	bool IsUserCounterValid_Internal(bool bDBLocked, BSTR bstrCounterName, VARIANT_BOOL* pbCounterValid);
 	bool OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCounterName, LONGLONG llOffsetValue,
 		LONGLONG* pllNewValue);
-	bool RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstrFPSFileName, long lActionID,
+	bool RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstrFPSFileName, BSTR bstrActionName,
 		VARIANT_BOOL vbQueuing, VARIANT_BOOL vbProcessing);
 	bool RecordFAMSessionStop_Internal(bool bDBLocked);
 	bool RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeStamp, long nActionID,
@@ -1292,6 +1310,8 @@ private:
 	bool GetWorkflows_Internal(bool bDBLocked, IStrToStrMap ** pmapWorkFlowNameToID);
 	bool GetWorkflowActions_Internal(bool bDBLocked, long nID, IStrToStrMap ** pmapActionNameToID);
 	bool SetWorkflowActions_Internal(bool bDBLocked, long nID, IVariantVector* pActionList);
+	bool GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
+	bool GetAllActions_Internal(bool bDBLocked, IStrToStrMap** pmapActionNameToID);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

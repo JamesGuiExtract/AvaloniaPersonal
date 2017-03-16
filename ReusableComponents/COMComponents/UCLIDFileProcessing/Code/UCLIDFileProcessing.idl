@@ -730,6 +730,8 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(8), helpstring ("property DocumentFolder")] HRESULT DocumentFolder([in] BSTR DocumentFolder);
 		[propget, id(9), helpstring ("property OutputAttributeSet")] HRESULT OutputAttributeSet([out, retval] BSTR* pOutputAttributeSet);
 		[propput, id(9), helpstring ("property OutputAttributeSet")] HRESULT OutputAttributeSet([in] BSTR OutputAttributeSet);
+		[propget, id(10), helpstring ("property OutputFileMetadataField")] HRESULT OutputFileMetadataField([out, retval] BSTR* pOutputAttributeSet);
+		[propput, id(10), helpstring ("property OutputFileMetadataField")] HRESULT OutputFileMetadataField([in] BSTR OutputAttributeSet);
 	}
 
 	[
@@ -819,6 +821,7 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(26), helpstring("property NumPagesPending")] HRESULT NumPagesPending([in] long newVal);
 		[propget, id(27), helpstring("property NumBytesPending")] HRESULT NumBytesPending([out, retval] LONGLONG* pVal);
 		[propput, id(27), helpstring("property NumBytesPending")] HRESULT NumBytesPending([in] LONGLONG newVal);
+		[id(28), helpstring("method AddStatistics")] HRESULT AddStatistics([in] IActionStatistics *pActionStats);
 	};
 
 	[
@@ -1326,7 +1329,7 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To record the start time for the current FAM session
 		[id(81), helpstring("method RecordFAMSessionStart")] HRESULT RecordFAMSessionStart(
-			[in] BSTR bstrFPSFileName, [in] long lActionID, [in] VARIANT_BOOL vbQueuing,
+			[in] BSTR bstrFPSFileName, [in] BSTR bstrActionName, [in] VARIANT_BOOL vbQueuing,
 			[in] VARIANT_BOOL vbProcessing);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To record the stop time for the current FAM session
@@ -1841,6 +1844,21 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Sets the currently active workflow
 		[propget, id(169), helpstring("property ActiveWorkflow ")] HRESULT ActiveWorkflow([out, retval] BSTR* pbstrWorkflowName);
 		[propput, id(169), helpstring("property ActiveWorkflow ")] HRESULT ActiveWorkflow([in] BSTR bstrWorkflowName);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Gets the ID of the currently active action
+		[propget, id(170), helpstring("property ActiveActionID ")] HRESULT ActiveActionID([out, retval] long* pnActionID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To return a IActionStistics pointer that contains the current stats for the specified action
+		//			in all workflows.
+		//			NOTE: This may count the same file twice if a file has been added to more than one workflow.
+		[id(171), helpstring("method GetStatsAllWorkflows")] HRESULT GetStatsAllWorkflows([in] BSTR bstrActionName,
+			[in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE:	To return a StringToLong map of all actions in the DB independent of workflow and their
+		//			corresponding IDs in the database. The IDs will be instances that are not associated with
+		//			any workflow.
+		[id(172), helpstring("method GetAllActions")] HRESULT GetAllActions(
+			[out, retval] IStrToStrMap ** pmapActionNameToID);
 	};
 
 	[

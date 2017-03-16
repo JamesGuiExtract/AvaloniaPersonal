@@ -403,6 +403,7 @@ static const string gstrCREATE_WORKFLOW =
 	"	[PostWorkflowActionID] INT, "
 	"	[DocumentFolder] NVARCHAR(255), "
 	"	[OutputAttributeSetID] BIGINT, "
+	"	[OutputFileMetadataFieldID] INT, "
 	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
 // Create table indexes SQL
@@ -1022,6 +1023,13 @@ static const string gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK =
 
 // NOTE: Foreign key for OutputAttributeSetID is added in AttributeDBMgr
 
+static const string gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK =
+	"ALTER TABLE [dbo].[Workflow]  "
+	" WITH CHECK ADD CONSTRAINT [FK_Workflow_OutputFileMetadataFieldID] FOREIGN KEY([OutputFileMetadataFieldID]) "
+	" REFERENCES [dbo].[MetadataField] ([ID])"
+	" ON UPDATE CASCADE " 
+	" ON DELETE CASCADE"; 
+
 static const string gstrADD_DB_PROCEXECUTOR_ROLE =
 	"IF DATABASE_PRINCIPAL_ID('db_procexecutor') IS NULL \r\n"
 	"BEGIN\r\n"
@@ -1253,7 +1261,7 @@ static const string gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA =
 // Query used to get the files to process and add the appropriate items to LockedFile and FAST 
 // Variables that need to be replaced:
 //		<SelectFilesToProcessQuery> - The complete query that will select the files to process
-//		<ActionID> - The ID of the action being processed
+//		<ActionIDs> - A comma delimited list of IDs for the actions being processed
 //		<UserID> - ID for the files are being processed under
 //		<MachineID> - ID for the machine processing the files
 //		<ActiveFAMID> - ID of the active FAM session
@@ -1265,32 +1273,33 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 	"	[FileSize] [bigint] NOT NULL, \r\n"
 	"	[Pages] [int] NOT NULL, \r\n"
 	"	[Priority] [int] NOT NULL, \r\n"
+	"	[ActionID] [int] NOT NULL, \r\n"
 	"	[ASC_From] [nvarchar](1) NOT NULL \r\n"
 	"); \r\n"
 	"SET NOCOUNT ON \r\n"
 	"BEGIN TRY \r\n"
 	"	UPDATE FileActionStatus Set ActionStatus = 'R'  \r\n"
-	"	OUTPUT ATABLE.ID, ATABLE.FileName, ATABLE.FileSize, ATABLE.Pages, ATABLE.Priority, deleted.ActionStatus INTO @OutputTableVar \r\n"
+	"	OUTPUT ATABLE.ID, ATABLE.FileName, ATABLE.FileSize, ATABLE.Pages, ATABLE.Priority, ATABLE.ActionId, deleted.ActionStatus INTO @OutputTableVar \r\n"
 	"	FROM  \r\n"
 	"	( \r\n"
 	"		<SelectFilesToProcessQuery> ) AS ATABLE  \r\n"
-	"	INNER JOIN FileActionStatus on FileActionStatus.FileID = ATABLE.ID AND FileActionStatus.ActionID = <ActionID>  \r\n"
+	"	INNER JOIN FileActionStatus on FileActionStatus.FileID = ATABLE.ID AND FileActionStatus.ActionID IN (<ActionIDs>)  \r\n"
 	"	WHERE ATABLE.ActionStatus <> 'R'; \r\n"
 	"	IF (1 = <RecordFASTEntry>) BEGIN"
 	//	If a file that is currently unattempted is being moved to processing, first add a FAST table
 	//	entry from U->P before adding a record from P -> R
-	"		INSERT INTO FileActionStateTransition (FileID, ActionID,  ASC_From, ASC_To,  \r\n"
+	"		INSERT INTO FileActionStateTransition (FileID, ActionID, ASC_From, ASC_To,  \r\n"
 	"			DateTimeStamp, FAMUserID, MachineID, Exception, Comment) \r\n"
-	"		SELECT id, <ActionID> as ActionID, 'U', 'P' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
+	"		SELECT id, ActionID, 'U', 'P' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
 	"			<UserID> as UserID, <MachineID> as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar \r\n"
 	"			WHERE ASC_From = 'U'; \r\n"
 	"		INSERT INTO FileActionStateTransition (FileID, ActionID,  ASC_From, ASC_To,  \r\n"
 	"			DateTimeStamp, FAMUserID, MachineID, Exception, Comment) \r\n"
-	"		SELECT id, <ActionID> as ActionID, CASE WHEN ASC_From = 'U' THEN 'P' ELSE ASC_From END, 'R' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
+	"		SELECT id, ActionID, CASE WHEN ASC_From = 'U' THEN 'P' ELSE ASC_From END, 'R' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
 	"			<UserID> as UserID, <MachineID> as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar \r\n"
 	"	END; \r\n"
 	"	INSERT INTO LockedFile(FileID,ActionID,ActiveFAMID,StatusBeforeLock) \r\n"
-	"		SELECT ID, <ActionID> as ActionID, <ActiveFAMID> AS ActiveFAMID, ASC_From AS StatusBeforeLock FROM @OutputTableVar; \r\n"
+	"		SELECT ID, ActionID, <ActiveFAMID> AS ActiveFAMID, ASC_From AS StatusBeforeLock FROM @OutputTableVar; \r\n"
 	"	SET NOCOUNT OFF \r\n"
 	"END TRY \r\n"
 	"BEGIN CATCH"

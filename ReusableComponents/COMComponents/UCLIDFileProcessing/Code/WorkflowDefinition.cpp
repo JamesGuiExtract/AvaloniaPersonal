@@ -297,3 +297,30 @@ STDMETHODIMP CWorkflowDefinition::put_OutputAttributeSet(BSTR OutputAttributeSet
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkflowDefinition::get_OutputFileMetadataField(BSTR *pOutputFileMetadataField)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI42046", pOutputFileMetadataField != __nullptr);
+
+		*pOutputFileMetadataField = _bstr_t(m_strOutputFileMetadataField.c_str()).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42047");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkflowDefinition::put_OutputFileMetadataField(BSTR OutputFileMetadataField)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_strOutputFileMetadataField = asString(OutputFileMetadataField);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42048");
+
+	return S_OK;
+}

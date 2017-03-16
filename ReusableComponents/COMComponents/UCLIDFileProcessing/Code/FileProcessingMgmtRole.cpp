@@ -621,7 +621,7 @@ STDMETHODIMP CFileProcessingMgmtRole::CheckoutForProcessing(long nFileID,
 		}
 		else
 		{
-			// No process currently has the field; request the FPRecordManger to lock it for
+			// No process currently has the file; request the FPRecordManger to lock it for
 			// processing and add it to the internal queue.
 			bResult = m_pRecordMgr->checkoutForProcessing(nFileID,
 				asCppBool(vbAllowQueuedStatusOverride), pPrevStatus);

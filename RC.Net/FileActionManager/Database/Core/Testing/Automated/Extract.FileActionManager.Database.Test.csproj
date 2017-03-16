@@ -196,7 +196,11 @@
     <EmbeddedResource Include="Resources\Demo_LabDE_Empty" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\A418.tif" />
+    <EmbeddedResource Include="Resources\TestImage001.tif" />
+    <EmbeddedResource Include="Resources\TestImage002.tif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\TestImage003.tif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

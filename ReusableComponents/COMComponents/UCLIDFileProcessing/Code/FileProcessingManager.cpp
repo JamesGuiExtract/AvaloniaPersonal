@@ -197,7 +197,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		string strExpandedAction = getExpandedActionName();
 
 		// Validate that the action name exists in the database (auto-create if that setting is set)
-		long lActionId = getFPMDB()->AutoCreateAction(strExpandedAction.c_str());
+		getFPMDB()->AutoCreateAction(strExpandedAction.c_str());
 
 		// start the processing
 		m_bPaused = false;
@@ -235,9 +235,8 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipProcessingActionMgmtRole =
 			getActionMgmtRole(m_ipFPMgmtRole);
 		
-		getFPMDB()->RecordFAMSessionStart(m_strFPSFileName.c_str(), lActionId,
+		getFPMDB()->RecordFAMSessionStart(m_strFPSFileName.c_str(), strExpandedAction.c_str(),
 			ipSupplyingActionMgmtRole->Enabled, ipProcessingActionMgmtRole->Enabled);
-		
 		
 		// Register this FAM as active (allows for files stuck processing to be reverted)
 		m_ipFPMDB->RegisterActiveFAM();
@@ -252,9 +251,10 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			// start the file supplying
 			if (ipSupplyingActionMgmtRole->Enabled == VARIANT_TRUE)
 			{
-				ipSupplyingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
-					(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager, ipThis,
-					m_strFPSFileName.c_str());
+				ipSupplyingActionMgmtRole->Start(m_ipFPMDB, m_ipFPMDB->ActiveActionID,
+					strExpandedAction.c_str(),
+					(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager,
+					ipThis, m_strFPSFileName.c_str());
 
 				// Set flag indicating that supplying was started
 				m_bSupplying = true;
@@ -282,7 +282,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 				{
 					m_ipFPMgmtRole->OkToStopWhenQueueIsEmpty = m_bSupplying ? VARIANT_FALSE : VARIANT_TRUE;
 
-					ipProcessingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
+					ipProcessingActionMgmtRole->Start(m_ipFPMDB, m_ipFPMDB->ActiveActionID, strExpandedAction.c_str(),
 						(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager,
 						ipThis, m_strFPSFileName.c_str());
 				}
@@ -1054,11 +1054,8 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				// Validate that the action name exists in the database (auto-create if that setting is set)
 				getFPMDB()->AutoCreateAction(bstrActionName);
 
-				// Register as an active FAM (allows for stuck files to be reverted)
-				long nActionId = getFPMDB()->GetActionID(bstrActionName);
-
 				getFPMDB()->RecordFAMSessionStart(
-					m_strFPSFileName.c_str(), nActionId, vbQueue, vbProcess);
+					m_strFPSFileName.c_str(), bstrActionName, vbQueue, vbProcess);
 
 				getFPMDB()->RegisterActiveFAM();
 

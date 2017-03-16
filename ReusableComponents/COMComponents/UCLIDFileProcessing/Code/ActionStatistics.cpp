@@ -761,6 +761,56 @@ STDMETHODIMP CActionStatistics::SetPending(long lNumDocsPending, long lNumPagesP
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30741")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CActionStatistics::AddStatistics(IActionStatistics *pActionStats)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats(pActionStats);
+		ASSERT_RESOURCE_ALLOCATION("ELI42069", ipActionStats != __nullptr);
+
+		long nNumDocuments;
+		long nNumDocumentsPending;
+		long nNumDocumentsComplete;
+		long nNumDocumentsFailed;
+		long nNumDocumentsSkipped;
+		long nNumPages;
+		long nNumPagesPending;
+		long nNumPagesComplete;
+		long nNumPagesFailed;
+		long nNumPagesSkipped;
+		long long llNumBytes;
+		long long llNumBytesPending;
+		long long llNumBytesComplete;
+		long long llNumBytesFailed;
+		long long llNumBytesSkipped;
+		ipActionStats->GetAllStatistics(&nNumDocuments, &nNumDocumentsPending, &nNumDocumentsComplete,
+			&nNumDocumentsFailed, &nNumDocumentsSkipped, &nNumPages, &nNumPagesPending, &nNumPagesComplete,
+			&nNumPagesFailed, &nNumPagesSkipped, &llNumBytes, &llNumBytesPending, &llNumBytesComplete,
+			&llNumBytesFailed, &llNumBytesSkipped);
+
+		m_nNumDocuments += nNumDocuments;
+		m_nNumDocumentsPending += nNumDocumentsPending;
+		m_nNumDocumentsComplete += nNumDocumentsComplete;
+		m_nNumDocumentsFailed += nNumDocumentsFailed;
+		m_nNumDocumentsSkipped += nNumDocumentsSkipped;
+		m_nNumPages += nNumPages;
+		m_nNumPagesPending += nNumPagesPending;
+		m_nNumPagesComplete += nNumPagesComplete;
+		m_nNumPagesFailed += nNumPagesFailed;
+		m_nNumPagesSkipped += nNumPagesSkipped;
+		m_llNumBytes += llNumBytes;
+		m_llNumBytesPending += llNumBytesPending;
+		m_llNumBytesComplete += llNumBytesComplete;
+		m_llNumBytesFailed += llNumBytesFailed;
+		m_llNumBytesSkipped += llNumBytesSkipped;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42068")
+}
 
 //-------------------------------------------------------------------------------------------------
 // ICopyableObject Methods

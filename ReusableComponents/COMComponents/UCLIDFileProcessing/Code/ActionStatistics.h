@@ -105,6 +105,7 @@ public:
 	STDMETHOD(GetPending)(long* plNumDocsPending, long* plNumPagesPending,
 		LONGLONG* pllNumBytesPending);
 	STDMETHOD(SetPending)(long lNumDocsPending, long lNumPagesPending, LONGLONG llNumBytesPending);
+	STDMETHOD(AddStatistics)(IActionStatistics *pActionStats);
 	
 	// ICopyableObject Methods
 	STDMETHOD(raw_Clone)(IUnknown * * pObject);

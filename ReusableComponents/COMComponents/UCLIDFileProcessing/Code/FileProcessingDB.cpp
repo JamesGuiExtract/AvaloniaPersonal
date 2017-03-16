@@ -78,6 +78,8 @@ m_strEncryptedDatabaseID(""),
 m_bDatabaseIDValuesValidated(false),
 m_ipSecureCounters(__nullptr),
 m_strActiveWorkflow(""),
+m_bUsingWorkflows(false),
+m_bRunningAllWorkflows(false),
 m_nLastFAMFileID(0)
 {
 	try
@@ -2165,7 +2167,7 @@ STDMETHODIMP CFileProcessingDB::OffsetUserCounter(BSTR bstrCounterName, LONGLONG
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27817");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RecordFAMSessionStart(BSTR bstrFPSFileName, long lActionID,
+STDMETHODIMP CFileProcessingDB::RecordFAMSessionStart(BSTR bstrFPSFileName, BSTR bstrActionName,
 												VARIANT_BOOL vbQueuing, VARIANT_BOOL vbProcessing)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -2177,7 +2179,7 @@ STDMETHODIMP CFileProcessingDB::RecordFAMSessionStart(BSTR bstrFPSFileName, long
 		// [LegacyRCAndUtils:6154]
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-		RecordFAMSessionStart_Internal(true, bstrFPSFileName, lActionID, vbQueuing, vbProcessing);
+		RecordFAMSessionStart_Internal(true, bstrFPSFileName, bstrActionName, vbQueuing, vbProcessing);
 
 		return S_OK;
 	}
@@ -4058,13 +4060,67 @@ STDMETHODIMP CFileProcessingDB::put_ActiveWorkflow(BSTR bstrWorkflowName)
 
 		m_strActiveWorkflow = asString(bstrWorkflowName);
 
-		// Set the static server name
-		CSingleLock lock(&m_mutex, TRUE);
-		ms_strCurrServerName = m_strDatabaseServer;
-
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42025");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_ActiveActionID(long* pnActionID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI42083", pnActionID != __nullptr);
+
+		*pnActionID = m_nActiveActionID;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42084");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetStatsAllWorkflows(BSTR bstrActionName, VARIANT_BOOL vbForceUpdate,
+													 IActionStatistics** pStats)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetStatsAllWorkflows_Internal(false, bstrActionName, vbForceUpdate, pStats))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetStatsAllWorkflows_Internal(true, bstrActionName, vbForceUpdate, pStats);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42085");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetAllActions(IStrToStrMap** pmapActionNameToID)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetAllActions_Internal(false, pmapActionNameToID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetAllActions_Internal(true, pmapActionNameToID);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42085");
 }
 
 //-------------------------------------------------------------------------------------------------

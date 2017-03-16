@@ -871,7 +871,7 @@ long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, const string&
 			strWorkflowName + "'";
 
 		long nWorkflowID = 0;
-		return executeCmdQuery(ipConnection, strQuery, false, &nWorkflowID);
+		executeCmdQuery(ipConnection, strQuery, false, &nWorkflowID);
 
 		return nWorkflowID;
 	}
@@ -908,6 +908,78 @@ long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& s
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42036");
 }
 //--------------------------------------------------------------------------------------------------
+long CFileProcessingDB::getActionIDNoThrow(_ConnectionPtr ipConnection, const string& strActionName,
+										   const string& strWorkflow)
+{
+	try
+	{
+		// This query will always return a row-- it will return -1 when no matching action is present.
+		string strQuery = Util::Format(
+			"SELECT COALESCE(MAX([Action].[ID]), -1) AS [ID] FROM [Action] "
+			"	LEFT JOIN [WorkFlow] ON [WorkflowID] = [Workflow].[ID]"
+			"	WHERE [ASCName] = '%s' AND [Workflow].[Name] %s",
+			strActionName.c_str(),
+			(strWorkflow.empty()
+				? "IS NULL"
+				: " = '" + strWorkflow + "'").c_str());
+
+		long nActionID = -1;
+		executeCmdQuery(ipConnection, strQuery, false, &nActionID);
+
+		return nActionID;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42067");
+}
+//--------------------------------------------------------------------------------------------------
+string CFileProcessingDB::getActionIDsForActiveWorkflow(_ConnectionPtr ipConnection, const string& strActionName)
+{
+	try
+	{
+		string strActionIDs;
+
+		// If processing on all workflows for this action
+		if (m_strActiveWorkflow.empty())
+		{
+			// Create a pointer to a recordset
+			_RecordsetPtr ipActionSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI42080", ipActionSet != __nullptr);
+			
+			string strQuery = Util::Format(
+				"SELECT [Action].[ID] AS [ID] FROM [Action]"
+				"	WHERE [ASCName] = '%s'", strActionName.c_str());
+
+			// Open the Action table in the database
+			ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+				adOpenDynamic, adLockOptimistic, adCmdText);
+
+			while (ipActionSet->adoEOF == VARIANT_FALSE)
+			{
+				if (!strActionIDs.empty())
+				{
+					strActionIDs += ",";
+				}
+
+				FieldsPtr ipFields = ipActionSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI42081", ipFields != __nullptr);
+
+				long nActionID = getLongField(ipFields, "ID");
+
+				strActionIDs += asString(nActionID);
+
+				ipActionSet->MoveNext();
+			}
+		}
+		// Running a specific workflow
+		else
+		{
+			strActionIDs = asString(getActionID(ipConnection, strActionName, m_strActiveWorkflow));
+		}
+
+		return strActionIDs;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42082");
+}
+//--------------------------------------------------------------------------------------------------
 string CFileProcessingDB::getActionName(_ConnectionPtr ipConnection, long nActionID)
 {
 	try
@@ -938,51 +1010,31 @@ string CFileProcessingDB::getActionName(_ConnectionPtr ipConnection, long nActio
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26722");
 }
 //--------------------------------------------------------------------------------------------------
-_RecordsetPtr CFileProcessingDB::getActionSet(_ConnectionPtr ipConnection, const string &strAction)
-{
-	// Create a pointer to a recordset
-	_RecordsetPtr ipActionSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI29155", ipActionSet != __nullptr);
-
-	// Setup select statement to open Action Table
-	string strActionSelect = "SELECT [ID], [ASCName], [WorkflowID] "
-		"FROM [Action] "
-		"WHERE [ASCName] = '" + strAction + "'";
-
-	// Open the Action table in the database
-	ipActionSet->Open(strActionSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), 
-		adOpenDynamic, adLockOptimistic, adCmdText);
-
-	return ipActionSet;
-}
-//--------------------------------------------------------------------------------------------------
-long CFileProcessingDB::addActionToRecordset(_ConnectionPtr ipConnection, _RecordsetPtr ipRecordset,
-											 const string &strAction, const string &strWorkflow)
+long CFileProcessingDB::addAction(_ConnectionPtr ipConnection, const string &strAction,
+								  const string &strWorkflow)
 {
 	try
-	{
-		// Add a workflow independent action regardless.
-		ipRecordset->AddNew();
-		setStringField(ipRecordset->Fields, "ASCName", strAction);
-		ipRecordset->Update();
+	{	
+		long lActionId = 0;
 
-		// If a workflow is specified, add a workflow specific action.
-		if (!strWorkflow.empty())
+		// If no workflow, add a workflow independent action
+		if (strWorkflow.empty())
 		{
-			ipRecordset->AddNew();
-			setStringField(ipRecordset->Fields, "ASCName", strAction);
-
-			long nWorkflowID = getWorkflowID(ipConnection, strWorkflow);
-			setLongField(ipRecordset->Fields, "WorkflowID", nWorkflowID);
-			ipRecordset->Update();
+			string strQuery = "INSERT INTO [Action] ([ASCName]) "
+				"OUTPUT INSERTED.ID "
+				"VALUES ('" + strAction + "')";
+			executeCmdQuery(ipConnection, strQuery, false, &lActionId);
 		}
-
-		// Get the ID of the new Action
-		// [LegacyRCAndUtils:6154]
-		// Since IDENT_CURRENT can return the wrong ID when multiple processes are updating the
-		// same table and there is a known bug with SCOPE_IDENTITY() and @@IDENTITY, re-query to
-		// get the ID of the newly added action.
-		long lActionId = getActionID(ipConnection, strAction);
+		// If a workflow is specified, add a workflow specific action. A separate call with
+		// strWorkflow == "" may be needed to create the base workflow-independent action.
+		else
+		{
+			long nWorkflowID = getWorkflowID(ipConnection, strWorkflow);
+			string strQuery = Util::Format("INSERT INTO [Action] ([ASCName], [WorkflowID]) "
+				"OUTPUT INSERTED.ID "
+				"VALUES ('%s', %d)", strAction.c_str(), nWorkflowID);
+			executeCmdQuery(ipConnection, strQuery, false, &lActionId);
+		}
 
 		return lActionId;
 	}
@@ -1396,6 +1448,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			vecQueries.push_back(gstrADD_WORKFLOW_ENDACTION_FK);
 			vecQueries.push_back(gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK);
 			// Foreign key for OutputAttributeSetID is added in AttributeDBMgr
+			vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
 		}
 
 		// Don't create the FK between the Secure counter tables unless at least one
@@ -2335,18 +2388,46 @@ void CFileProcessingDB::validateDBSchemaVersion()
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::validateWorkflowIsSet(_ConnectionPtr ipConnection)
+void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const string& strActionName)
 {
-	if (m_strActiveWorkflow.empty())
+	try
 	{
-		string strQuery = "SELECT COUNT(*) AS [ID] FROM dbo.[Workflow]";
-		long nWorkflowCount = 0;
-		executeCmdQuery(ipConnection, strQuery, false, &nWorkflowCount);
-
-		if (nWorkflowCount > 0)
+		try
 		{
-			throw new UCLIDException("ELI42029", "Workflow has not been set.");
+			m_nActiveActionID = getActionID(ipConnection, strActionName, m_strActiveWorkflow);
+
+			long nWorkflowActionCount = 0;
+			string strWorkflowActionQuery = Util::Format(
+				"SELECT COUNT(*) AS [ID] FROM [Action] WHERE [ASCName] = '%s' AND [WorkflowID] IS NOT NULL",
+				strActionName.c_str());
+			executeCmdQuery(ipConnection, strWorkflowActionQuery, false, &nWorkflowActionCount);
+			m_bUsingWorkflows = (nWorkflowActionCount > 0);
+			m_bRunningAllWorkflows = (m_bUsingWorkflows && m_strActiveWorkflow == "");
+
+			if (m_bUsingWorkflows)
+			{
+				long nExternalWorkflowFiles = 0;
+				string strExternalFilesQuery = Util::Format(
+					"SELECT COUNT(*) AS [ID] FROM [FileActionStatus] WHERE [ActionID] = '%d'",
+					m_nActiveActionID);
+				executeCmdQuery(ipConnection, strExternalFilesQuery, false, &nWorkflowActionCount);
+				
+				if (nExternalWorkflowFiles > 0)
+				{
+					UCLIDException ue("ELI42092", "Error initializing FAM session; "
+						"database files exist external to defined workflows.");
+					ue.addDebugInfo("Action", strActionName);
+					throw ue;
+				}
+			}
 		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42093")
+	}
+	catch (UCLIDException& ue)
+	{
+		m_nActiveActionID = -1;
+
+		throw ue;
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -3836,7 +3917,8 @@ void CFileProcessingDB::init80DB()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection)
+IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection,
+										      const string& strWorkflow/* =""*/)
 {
 	try
 	{
@@ -3844,9 +3926,17 @@ IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection)
 		_RecordsetPtr ipActionSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI13530", ipActionSet != __nullptr);
 
+		string strQuery = "SELECT * FROM [Action] WHERE [WorkFlowID] IS NULL";
+		if (!strWorkflow.empty())
+		{
+			long nWorkflowID = getWorkflowID(ipConnection, strWorkflow);
+			strQuery = "SELECT * FROM [Action] WHERE [WorkflowID] = " + 
+				asString(nWorkflowID);
+		}
+
 		// Open the Action table
-		ipActionSet->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdTableDirect);
+		ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
+			adLockReadOnly, adCmdText);
 
 		// Create StrToStrMap to return the list of actions
 		IStrToStrMapPtr ipActions(CLSID_StrToStrMap);
@@ -3882,12 +3972,10 @@ long CFileProcessingDB::defineNewAction(_ConnectionPtr ipConnection, const strin
 {
 	try
 	{
-		// Create a pointer to a recordset containing the action
-		_RecordsetPtr ipActionSet = getActionSet(ipConnection, strActionName);
-		ASSERT_RESOURCE_ALLOCATION("ELI13517", ipActionSet != __nullptr);
+		long nActionID = getActionIDNoThrow(ipConnection, strActionName, "");
 
 		// Check to see if action exists
-		if (ipActionSet->adoEOF == VARIANT_FALSE)
+		if (nActionID > 0)
 		{
 			// Build error string (P13 #3931)
 			CString zText;
@@ -3898,7 +3986,7 @@ long CFileProcessingDB::defineNewAction(_ConnectionPtr ipConnection, const strin
 		}
 
 		// Create a new action and return its ID
-		return addActionToRecordset(ipConnection, ipActionSet, strActionName, "");
+		return addAction(ipConnection, strActionName, "");
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29681");
 }
@@ -4387,7 +4475,7 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 
 							// Check that an update is needed before any attempt at locking the DB.
 							nActionID = pDB->m_nActiveActionID;
-							if (nActionID >= 0 && 
+							if (nActionID >= 0 &&
 								pDB->isStatisticsUpdateFromDeltaNeeded(ipConnection, nActionID))
 							{
 								// A Lock is needed to update the ActionStatistics table.
@@ -4750,7 +4838,8 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 //--------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
 														   const string& strSelectSQL,
-														   long nActionID,
+														   const string& strActionName,
+														   const string& strActionIDs,
 														   const string& strAllowedCurrentStatus)
 {
 	// Declare query string so that if there is an exception the query can be added to debug info
@@ -4796,16 +4885,13 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						// has completed successfully.
 						vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> tempFileVector;
 
-						// Action Column to change
-						string strActionName = getActionName(ipConnection, nActionID);
-
 						// Setup query that will set the action status to processing and update the FAST and
 						// LockedFile records
 						strQuery = gstrGET_FILES_TO_PROCESS_QUERY;
 
 						// Replace the variable to set up the query
 						replaceVariable(strQuery, "<SelectFilesToProcessQuery>", strSelectSQL);
-						replaceVariable(strQuery, "<ActionID>", asString(nActionID));
+						replaceVariable(strQuery, "<ActionIDs>", strActionIDs);
 						replaceVariable(strQuery, "<UserID>", asString(getFAMUserID(ipConnection)));
 						replaceVariable(strQuery, "<MachineID>", asString(getMachineID(ipConnection)));
 						replaceVariable(strQuery, "<ActiveFAMID>", asString(m_nActiveFAMID));
@@ -4840,6 +4926,8 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 							tempFileVector.push_back(ipFileRecord);
 
 							string strFileID = asString(ipFileRecord->FileID);
+
+							long nActionID = getLongField(ipFields, "ActionID");
 
 							// Get the previous state
 							string strFileFromState = getStringField(ipFields, "ASC_From");
