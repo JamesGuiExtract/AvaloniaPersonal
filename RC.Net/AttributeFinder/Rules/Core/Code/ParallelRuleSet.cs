@@ -234,8 +234,8 @@ namespace Extract.AttributeFinder.Rules
                                             _miscUtils.Value.GetObjectFromStringizedByteStream(task.Result);
                                     });
 
-                                    deserializeTasks.Add(task2);
                                     resultTasks[docNum][attrNum] = task2;
+                                    deserializeTasks.Add(task2);
                                 });
                             // Increment the number of tasks to expect
                             ++totalDeserializeTasks;
@@ -277,7 +277,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI41960");
+                throw ex.CreateComVisible("ELI41960", "Error in RunAttributeFinders");
             }
             finally
             {
@@ -522,8 +522,15 @@ namespace Extract.AttributeFinder.Rules
                             ReleaseAllShared();
                         }
                         catch { }
-                        _globalSemaphore.Dispose();
-                        _localSemaphore.Dispose();
+
+                        if (_globalSemaphore != null)
+                        {
+                            _globalSemaphore.Dispose();
+                        }
+                        if (_localSemaphore != null)
+                        {
+                            _localSemaphore.Dispose();
+                        }
                     }
 
                     disposedValue = true;
