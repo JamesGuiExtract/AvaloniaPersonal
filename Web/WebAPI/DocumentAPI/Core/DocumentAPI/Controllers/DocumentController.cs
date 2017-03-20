@@ -383,6 +383,7 @@ namespace DocumentAPI.Controllers
         /// <param name="Id">the file id, as a string. Often prepended with "Text" or "File"</param>
         /// <returns>the original image file associated with the file id</returns>
         [HttpGet("GetSourceFile/{Id}")]
+        [Produces(typeof(PhysicalFileResult))]
         public IActionResult GetSourceFile(string Id)
         {
             string filename = "";
@@ -457,37 +458,11 @@ namespace DocumentAPI.Controllers
         /// <param name="documentId"></param>
         /// <returns></returns>
         [HttpGet("GetDocumentType")]
+        [Produces(typeof(String))]
         public string GetDocumentType([FromQuery] string documentId)
         {
             // TODO - implement...
             return "abstract of judgement";
-        }
-
-        /// <summary>
-        /// Gets a result file - experimental!
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("GetFileResultEx")]
-        public async Task<FileStreamResult> GetFileResultEx()
-        {
-            try
-            {
-                var client = new HttpClient();
-                client.BaseAddress = new Uri("http://localhost:58926/");
-                var stream = await client.GetStreamAsync("wwwroot/uploads/SubmittedText.txt");
-
-                var mediaType = new Microsoft.Net.Http.Headers.MediaTypeHeaderValue("text /plain");
-                var fsr = new FileStreamResult(stream, mediaType)
-                {
-                    FileDownloadName = "column_dob.txt"
-                };
-                return fsr;
-            }
-            catch (Exception ex)
-            {
-                Log.WriteLine(Inv($"Exception: {ex.Message}"));
-                return new FileStreamResult(null, "");
-            }
         }
     }
 }

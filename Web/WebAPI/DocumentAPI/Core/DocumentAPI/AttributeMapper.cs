@@ -39,8 +39,6 @@ namespace DocumentAPI
         /// For IDShield there is some moderate translation of the name that is performed here.
         /// </summary>
         /// <param name="originalName">attribute name</param>
-        // TODO - near future, add some validation code that ensures that the user workflow type corresponds to IDShield 
-        // iff the Attribute set is an IDShield type.
         private static string DetermineName(string originalName)
         {
             var name = originalName;
@@ -218,6 +216,7 @@ namespace DocumentAPI
             IUnknownVector lines = spatialString.GetLines();
             Contract.Assert(lines != null, "null return from SpatialString.GetLines, spatial string: {0}", spatialString.String);
 
+            SortedSet<int> setOfPages = new SortedSet<int>();
             var lineCount = lines.Size();
             if (lineCount > 0)
             {
@@ -237,8 +236,13 @@ namespace DocumentAPI
                     position.LineInfo.AddRange(spatialLine);
 
                     var pages = spatialLine.Select(sl => sl.SpatialLineBounds.PageNumber);
-                    position.Pages.AddRange(pages);
+                    foreach (var page in pages)
+                    {
+                        setOfPages.Add(page);
+                    }
                 }
+
+                position.Pages = setOfPages.ToList();
             }
 
             return position;
