@@ -97,22 +97,18 @@ namespace Extract.Office.Utilities.OfficeToTif
 
                     process.StartInfo.Arguments = tempArgs.FileName.Quote();
                     var version = OfficeMethods.CheckOfficeVersion();
-                    switch (version)
+                    if (version < 0)
                     {
-                        case -1:
-                            throw new ExtractException("ELI31102", "Office is not installed.");
-
-                            // Office 2007 - 12, Office 2010 - 14
-                        case 12:
-                        case 14:
-                            process.StartInfo.FileName = _OFFICE_2007_CONVERTER;
-                            break;
-
-                        default:
-                            var ee = new ExtractException("ELI31101", "Unrecognized office version.");
-                            ee.AddDebugData("Office Version", version, false);
-                            throw ee;
+                        throw new ExtractException("ELI31102", "Office is not installed.");
                     }
+                    else if (version < 12)
+                    {
+                        var ee = new ExtractException("ELI31101", "Unrecognized office version.");
+                        ee.AddDebugData("Office Version", version, false);
+                        throw ee;
+                    }
+
+                    process.StartInfo.FileName = _OFFICE_2007_CONVERTER;
                     process.Start();
                     process.WaitForExit();
 
