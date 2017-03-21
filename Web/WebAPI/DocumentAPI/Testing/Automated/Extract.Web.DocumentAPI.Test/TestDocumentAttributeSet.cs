@@ -1,18 +1,18 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-using System.Threading;
-using System.Xml;
-
-using NUnit.Framework;
-using IO.Swagger.Api;
-using IO.Swagger.Model;
-
+﻿using DocumentAPI;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
-using UCLID_FILEPROCESSINGLib;                      // NOTE: this IS used despite the IDE showing that it isn't...
+using IO.Swagger.Api;
+using IO.Swagger.Model;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Xml;
+using UCLID_AFCORELib;
+using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.Web.DocumentAPI.Test
 {
@@ -220,6 +220,21 @@ namespace Extract.Web.DocumentAPI.Test
         /// test LabDE documents
         /// </summary>
         #region Public Test Functions
+
+        [Test, Category("Automated")]
+        public static void TestManyLineAttribute()
+        {
+            var voa = new IUnknownVector();
+            var ss = new SpatialString();
+            ss.LoadFrom(@"C:\Engineering\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.pdf.uss", false);
+            var attr = new AttributeClass { Name = "Manual", Value = ss };
+            voa.PushBack(attr);
+
+            var docAttrr = AttributeMapper.MapAttributesToDocumentAttributeSet(voa);
+            Assert.AreEqual(0, docAttrr.Attributes.Where(a =>
+                a.SpatialPosition.Pages.Count != a.SpatialPosition.Pages.Distinct().Count()).Count());
+        }
+
         [Test, Category("Automated")]
         public static void TestLabDE_DocumentAttributeSets()
         {
