@@ -353,7 +353,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				// Now have everything needed to start progress status before further initialization
 				if (ipProgressStatus)
 				{
-					calculateProgressItems(nNumAttributesToRunRulesFor, ipPages->Size());
+					calculateProgressItems(nNumAttributesToRunRulesFor, nNumDocs);
 
 					ipProgressStatus->InitProgressStatus("",
 						0, m_sProgressCounts.nTotal, VARIANT_TRUE);
