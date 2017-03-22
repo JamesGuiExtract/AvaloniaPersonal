@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using static DocumentAPI.Utils;
+using Microsoft.AspNetCore.Mvc;
 using System;
 
 
@@ -19,15 +19,26 @@ namespace DocumentAPI.Controllers
         [HttpPost("SetDatabaseServer/{id}")]
         public IActionResult SetDatabaseServer(string id)
         {
-            if (!ModelState.IsValid || String.IsNullOrEmpty(id))
+            try
             {
-                return BadRequest("id cannot be empty");
-            }
+                if (!ModelState.IsValid || String.IsNullOrEmpty(id))
+                {
+                    var message = "id cannot be empty";
+                    Log.WriteLine(message);
+                    return BadRequest(message);
+                }
 
-            Utils.DatabaseServer = id;
-            Utils.ResetAttributeMgr();
-            Utils.ResetFileProcessingDB();
-            return Ok("id");
+                Utils.DatabaseServer = id;
+                Utils.ResetAttributeMgr();
+                Utils.ResetFileProcessingDB();
+                return Ok("id");
+            }
+            catch (Exception ex)
+            {
+                var message = Inv($"Exception: {ex.Message}, while getting ASFF for fileId: {id}, resetting attribute manager");
+                Log.WriteLine(message);
+                return BadRequest(message);
+            }
         }
 
         /// <summary>
@@ -38,15 +49,26 @@ namespace DocumentAPI.Controllers
         [HttpPost("SetDatabaseName/{id}")]
         public IActionResult SetDatabaseName(string id)
         {
-            if (!ModelState.IsValid || String.IsNullOrEmpty(id))
+            try
             {
-                return BadRequest("id cannot be empty");
-            }
+                if (!ModelState.IsValid || String.IsNullOrEmpty(id))
+                {
+                    var message = "id cannot be empty";
+                    Log.WriteLine(message);
+                    return BadRequest(message);
+                }
 
-            Utils.DatabaseName = id;
-            Utils.ResetAttributeMgr();
-            Utils.ResetFileProcessingDB();
-            return Ok("id");
+                Utils.DatabaseName = id;
+                Utils.ResetAttributeMgr();
+                Utils.ResetFileProcessingDB();
+                return Ok("id");
+            }
+            catch (Exception ex)
+            {
+                var message = Inv($"Exception: {ex.Message}, while getting ASFF for fileId: {id}, resetting attribute manager");
+                Log.WriteLine(message);
+                return BadRequest(message);
+            }
         }
     }
 }

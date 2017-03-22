@@ -51,30 +51,38 @@ namespace Extract.Web.DocumentAPI.Test
         /// <param name="workingFolder"></param>
         public static void StartHiddenProcess(string processName, string args = "", string workingFolder = "")
         {
-            ProcessStartInfo psi = new ProcessStartInfo();
-            psi.Arguments = args;
-            psi.UseShellExecute = false;
-            psi.WorkingDirectory = workingFolder;
-            psi.FileName = processName;
-            psi.WindowStyle = ProcessWindowStyle.Hidden;
-            psi.CreateNoWindow = true;
-            Process.Start(psi);
-        }
-
-        /// <summary>
-        /// get the web server URL - from configuration if it exists, else use the specified default value
-        /// </summary>
-        /// <param name="defaultWebServerURL"></param>
-        /// <returns></returns>
-        public static string GetWebServerURL(string defaultWebServerURL)
-        {
-            var webApiURL = ConfigurationManager.AppSettings["WebApiURL"];
-            if (String.IsNullOrEmpty(webApiURL))
+            try
             {
-                webApiURL = defaultWebServerURL;
-            }
+                ProcessStartInfo psi = new ProcessStartInfo();
+                psi.Arguments = args;
+                psi.UseShellExecute = false;            // WARNING: if true must use STA! Also affects WorkingDirectory.
+                psi.WorkingDirectory = workingFolder;
+                psi.FileName = processName;
+                psi.WindowStyle = ProcessWindowStyle.Hidden;
+                psi.CreateNoWindow = true;
+                var process = Process.Start(psi);
 
-            return webApiURL;
+                Assert.IsTrue(process != null,
+                              "Failed to start Process: {0}, args: {1}, working folder: {2}",
+                              processName,
+                              args,
+                              workingFolder);
+
+                Assert.IsTrue(!process.HasExited,
+                              "Process has exited already, process: {0}, args: {1}, working folder: {2}",
+                              processName,
+                              args,
+                              workingFolder);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception: {0}, starting process: {1}, args: {2}, working folder: {3}",
+                                ex.Message,
+                                processName,
+                                args,
+                                workingFolder);
+                throw;
+            }
         }
 
         /// <summary>
@@ -89,9 +97,10 @@ namespace Extract.Web.DocumentAPI.Test
             {
                 if (webApiURL.Contains("localhost"))
                 {
+                    var extendedArgs = $"run -p {workingDirectory}\\DocumentAPI.csproj";
                     Utils.StartHiddenProcess(processName: "dotnet.exe",
-                         args: "run",
-                         workingFolder: workingDirectory);
+                         args: extendedArgs,
+                         workingFolder: "");
 
                     Thread.Sleep(2 * 1000);
                     return true;
@@ -102,7 +111,7 @@ namespace Extract.Web.DocumentAPI.Test
             catch (Exception ex)
             {
                 Debug.WriteLine("Exception starting WebAPI: {0}", ex.Message);
-                return false;
+                throw;
             }
         }
 
@@ -135,7 +144,7 @@ namespace Extract.Web.DocumentAPI.Test
         }
 
         /// <summary>
-        /// get the folder where hte web api resides.
+        /// get the folder where the web api resides.
         /// </summary>
         public static string GetWebApiFolder
         {

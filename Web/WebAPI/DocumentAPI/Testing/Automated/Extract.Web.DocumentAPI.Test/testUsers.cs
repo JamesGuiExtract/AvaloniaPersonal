@@ -39,7 +39,6 @@ namespace Extract.Web.DocumentAPI.Test
         [TestFixtureSetUp]
         public static void Setup()
         {
-            WebApiURL = Utils.GetWebServerURL(WebApiURL);
             APIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: WebApiURL);
         }
 

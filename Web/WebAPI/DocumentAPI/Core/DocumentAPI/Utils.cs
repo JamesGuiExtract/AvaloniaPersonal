@@ -131,6 +131,8 @@ namespace DocumentAPI
                             FAMDBUtils dbUtils = new FAMDBUtils();
                             Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
                             _fileProcessingDB = (FileProcessingDB)Activator.CreateInstance(mgrType);
+
+                            _fileProcessingDB.ResetDBConnection(bResetCredentials: false);
                         }
                         catch (Exception ex)
                         {

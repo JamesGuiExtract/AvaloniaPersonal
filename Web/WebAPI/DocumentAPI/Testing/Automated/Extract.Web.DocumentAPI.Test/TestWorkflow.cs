@@ -60,8 +60,6 @@ namespace Extract.Web.DocumentAPI.Test
 
             _testDbManager = new FAMTestDBManager<TestDocumentAttributeSet>();
 
-            WebApiURL = Utils.GetWebServerURL(WebApiURL);
-
             documentAPIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: WebApiURL);
 
             _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);

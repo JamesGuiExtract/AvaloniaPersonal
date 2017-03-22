@@ -52,9 +52,8 @@ namespace IO.Swagger.Api
         /// 
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="user"> (optional)</param>
         /// <returns></returns>
-        void ApiUsersLogoutDelete (User user = null);
+        void ApiUsersLogoutDelete ();
 
         /// <summary>
         /// logout
@@ -63,9 +62,8 @@ namespace IO.Swagger.Api
         /// 
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="user"> (optional)</param>
         /// <returns>ApiResponse of Object(void)</returns>
-        ApiResponse<Object> ApiUsersLogoutDeleteWithHttpInfo (User user = null);
+        ApiResponse<Object> ApiUsersLogoutDeleteWithHttpInfo ();
         /// <summary>
         /// Get user claims
         /// </summary>
@@ -117,9 +115,8 @@ namespace IO.Swagger.Api
         /// 
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="user"> (optional)</param>
         /// <returns>Task of void</returns>
-        System.Threading.Tasks.Task ApiUsersLogoutDeleteAsync (User user = null);
+        System.Threading.Tasks.Task ApiUsersLogoutDeleteAsync ();
 
         /// <summary>
         /// logout
@@ -128,9 +125,8 @@ namespace IO.Swagger.Api
         /// 
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="user"> (optional)</param>
         /// <returns>Task of ApiResponse</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> ApiUsersLogoutDeleteAsyncWithHttpInfo (User user = null);
+        System.Threading.Tasks.Task<ApiResponse<Object>> ApiUsersLogoutDeleteAsyncWithHttpInfo ();
         /// <summary>
         /// Get user claims
         /// </summary>
@@ -419,20 +415,18 @@ namespace IO.Swagger.Api
         /// logout 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="user"> (optional)</param>
         /// <returns></returns>
-        public void ApiUsersLogoutDelete (User user = null)
+        public void ApiUsersLogoutDelete ()
         {
-             ApiUsersLogoutDeleteWithHttpInfo(user);
+             ApiUsersLogoutDeleteWithHttpInfo();
         }
 
         /// <summary>
         /// logout 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="user"> (optional)</param>
         /// <returns>ApiResponse of Object(void)</returns>
-        public ApiResponse<Object> ApiUsersLogoutDeleteWithHttpInfo (User user = null)
+        public ApiResponse<Object> ApiUsersLogoutDeleteWithHttpInfo ()
         {
 
             var localVarPath = "/api/Users/Logout";
@@ -445,9 +439,6 @@ namespace IO.Swagger.Api
 
             // to determine the Content-Type header
             String[] localVarHttpContentTypes = new String[] {
-                "application/json", 
-                "text/json", 
-                "application/json-patch+json"
             };
             String localVarHttpContentType = Configuration.ApiClient.SelectHeaderContentType(localVarHttpContentTypes);
 
@@ -461,14 +452,6 @@ namespace IO.Swagger.Api
             // set "format" to json by default
             // e.g. /pet/{petId}.{format} becomes /pet/{petId}.json
             localVarPathParams.Add("format", "json");
-            if (user != null && user.GetType() != typeof(byte[]))
-            {
-                localVarPostBody = Configuration.ApiClient.Serialize(user); // http body (model) parameter
-            }
-            else
-            {
-                localVarPostBody = user; // byte array
-            }
 
 
             // make the HTTP request
@@ -494,11 +477,10 @@ namespace IO.Swagger.Api
         /// logout 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="user"> (optional)</param>
         /// <returns>Task of void</returns>
-        public async System.Threading.Tasks.Task ApiUsersLogoutDeleteAsync (User user = null)
+        public async System.Threading.Tasks.Task ApiUsersLogoutDeleteAsync ()
         {
-             await ApiUsersLogoutDeleteAsyncWithHttpInfo(user);
+             await ApiUsersLogoutDeleteAsyncWithHttpInfo();
 
         }
 
@@ -506,9 +488,8 @@ namespace IO.Swagger.Api
         /// logout 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="user"> (optional)</param>
         /// <returns>Task of ApiResponse</returns>
-        public async System.Threading.Tasks.Task<ApiResponse<Object>> ApiUsersLogoutDeleteAsyncWithHttpInfo (User user = null)
+        public async System.Threading.Tasks.Task<ApiResponse<Object>> ApiUsersLogoutDeleteAsyncWithHttpInfo ()
         {
 
             var localVarPath = "/api/Users/Logout";
@@ -521,9 +502,6 @@ namespace IO.Swagger.Api
 
             // to determine the Content-Type header
             String[] localVarHttpContentTypes = new String[] {
-                "application/json", 
-                "text/json", 
-                "application/json-patch+json"
             };
             String localVarHttpContentType = Configuration.ApiClient.SelectHeaderContentType(localVarHttpContentTypes);
 
@@ -537,14 +515,6 @@ namespace IO.Swagger.Api
             // set "format" to json by default
             // e.g. /pet/{petId}.{format} becomes /pet/{petId}.json
             localVarPathParams.Add("format", "json");
-            if (user != null && user.GetType() != typeof(byte[]))
-            {
-                localVarPostBody = Configuration.ApiClient.Serialize(user); // http body (model) parameter
-            }
-            else
-            {
-                localVarPostBody = user; // byte array
-            }
 
 
             // make the HTTP request

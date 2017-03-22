@@ -53,7 +53,13 @@ namespace IO.Swagger.Model
             /// Enum Failed for "Failed"
             /// </summary>
             [EnumMember(Value = "Failed")]
-            Failed
+            Failed,
+            
+            /// <summary>
+            /// Enum NotApplicable for "NotApplicable"
+            /// </summary>
+            [EnumMember(Value = "NotApplicable")]
+            NotApplicable
         }
 
         /// <summary>

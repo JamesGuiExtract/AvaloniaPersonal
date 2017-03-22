@@ -436,9 +436,10 @@ namespace DocumentAPI.Controllers
         /// <param name="fileId"></param>
         /// <returns></returns>
         [HttpGet("GetFileResult")]
-        public byte[] GetFileResult([FromQuery] string fileId)
+        [Produces(typeof(PhysicalFileResult))]
+        public IActionResult GetFileResult([FromQuery] string fileId)
         {
-            return new byte[10];
+            return Ok("stubbed");
         }
 
         /// <summary>
@@ -447,9 +448,10 @@ namespace DocumentAPI.Controllers
         /// <param name="textId"></param>
         /// <returns></returns>
         [HttpGet("GetTextResult")]
-        public byte[] GetTextResult([FromQuery] string textId)
+        [Produces(typeof(PhysicalFileResult))]
+        public IActionResult GetTextResult([FromQuery] string textId)
         {
-            return new byte[10];
+            return Ok("stubbed");
         }
 
         /// <summary>

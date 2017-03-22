@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using static DocumentAPI.Utils;
+using Microsoft.AspNetCore.Mvc;
 using System;
 
 
@@ -29,13 +29,24 @@ namespace DocumentAPI.Controllers
         [HttpPost("SetAttributeSetName")]
         public IActionResult SetAttributeSetName([FromBody]TestArgs arg)
         {
-            if (!ModelState.IsValid || String.IsNullOrEmpty(arg.Name))
+            try
             {
-                return BadRequest("name cannot be empty");
-            }
+                if (!ModelState.IsValid || String.IsNullOrEmpty(arg.Name))
+                {
+                    var message = "name cannot be empty";
+                    Log.WriteLine(message);
+                    return BadRequest(message);
+                }
 
-            Utils.AttributeSetName = arg.Name;
-            return Ok(arg);
+                Utils.AttributeSetName = arg.Name;
+                return Ok(arg);
+            }
+            catch (Exception ex)
+            {
+                var message = Inv($"Exception: {ex.Message}, setting attribute set name to: {arg.Name}");
+                Log.WriteLine(message);
+                return BadRequest(message);
+            }
         }
     }
 }

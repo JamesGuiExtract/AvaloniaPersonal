@@ -143,8 +143,6 @@ namespace Extract.Web.DocumentAPI.Test
             _testDbManager = new FAMTestDBManager<TestDocumentAttributeSet>();
             _testXmlFiles = new TestFileManager<TestDocumentAttributeSet>();
 
-            WebApiURL = Utils.GetWebServerURL(WebApiURL);
-
             documentAPIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: WebApiURL);
         }
 
@@ -330,6 +328,19 @@ namespace Extract.Web.DocumentAPI.Test
                 Assert.IsFalse(String.IsNullOrEmpty(WebApiURL));
                 var dbApi = new IO.Swagger.Api.DatabaseApi(basePath: WebApiURL);
                 dbApi.ApiDatabaseSetDatabaseNameByIdPost(id: dbName);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+            }
+        }
+
+        static void SetDatabaseServer()
+        {
+            try
+            {
+                var dbApi = new IO.Swagger.Api.DatabaseApi(basePath: WebApiURL);
+                dbApi.ApiDatabaseSetDatabaseServerByIdPost(id: "(local)");
             }
             catch (Exception ex)
             {
@@ -572,7 +583,7 @@ namespace Extract.Web.DocumentAPI.Test
                             // last node at the nesting level of the spatialLine node - not the sub elements
                             lastNode = spatialLineNode;
 
-                            TestSpatialLinePageNumber(spatialLineNode, docAttr.SpatialPosition.Pages[i], i);
+                            TestSpatialLinePageNumber(spatialLineNode, docAttr.SpatialPosition.LineInfo[i].SpatialLineZone.PageNumber, i);
 
                             if (spatialLineNode.ChildNodes.Count == 0)
                             {
@@ -648,6 +659,7 @@ namespace Extract.Web.DocumentAPI.Test
         {
             try
             {
+                SetDatabaseServer();
                 SetDatabase(dbName);
                 SetAttributeSetName(attributeSetName);
                 DocumentAttributeSet das = GetDocumentResultSet(fileId);

@@ -70,4 +70,7 @@ Contact: developers@extractsystems.com
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MsBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)..\..\DocumentAPI\Testing\Automated\Extract.Web.DocumentAPI.Test\ClientApi\*.dll</PostBuildEvent>
+  </PropertyGroup>
 </Project>

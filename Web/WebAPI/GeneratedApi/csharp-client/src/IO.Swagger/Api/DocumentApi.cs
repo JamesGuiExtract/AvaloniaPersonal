@@ -46,25 +46,6 @@ namespace IO.Swagger.Api
         /// <returns>ApiResponse of string</returns>
         ApiResponse<string> ApiDocumentGetDocumentTypeGetWithHttpInfo (string documentId = null);
         /// <summary>
-        /// Gets a result file - experimental!
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns></returns>
-        void ApiDocumentGetFileResultExGet ();
-
-        /// <summary>
-        /// Gets a result file - experimental!
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>ApiResponse of Object(void)</returns>
-        ApiResponse<Object> ApiDocumentGetFileResultExGetWithHttpInfo ();
-        /// <summary>
         /// Gets a result file for the specified input document
         /// </summary>
         /// <remarks>
@@ -72,8 +53,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="fileId"> (optional)</param>
-        /// <returns>byte[]</returns>
-        byte[] ApiDocumentGetFileResultGet (string fileId = null);
+        /// <returns>PhysicalFileResult</returns>
+        PhysicalFileResult ApiDocumentGetFileResultGet (string fileId = null);
 
         /// <summary>
         /// Gets a result file for the specified input document
@@ -83,8 +64,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="fileId"> (optional)</param>
-        /// <returns>ApiResponse of byte[]</returns>
-        ApiResponse<byte[]> ApiDocumentGetFileResultGetWithHttpInfo (string fileId = null);
+        /// <returns>ApiResponse of PhysicalFileResult</returns>
+        ApiResponse<PhysicalFileResult> ApiDocumentGetFileResultGetWithHttpInfo (string fileId = null);
         /// <summary>
         /// Gets result set for a submitted file that has finished processing
         /// </summary>
@@ -107,7 +88,28 @@ namespace IO.Swagger.Api
         /// <returns>ApiResponse of DocumentAttributeSet</returns>
         ApiResponse<DocumentAttributeSet> ApiDocumentGetResultSetByIdGetWithHttpInfo (string id);
         /// <summary>
-        /// get a list of 1..N processing status instances that corespond to the stringId of the submitted document
+        /// get the original source file associated with the file id
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
+        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">the file id, as a string. Often prepended with \&quot;Text\&quot; or \&quot;File\&quot;</param>
+        /// <returns>PhysicalFileResult</returns>
+        PhysicalFileResult ApiDocumentGetSourceFileByIdGet (string id);
+
+        /// <summary>
+        /// get the original source file associated with the file id
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
+        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">the file id, as a string. Often prepended with \&quot;Text\&quot; or \&quot;File\&quot;</param>
+        /// <returns>ApiResponse of PhysicalFileResult</returns>
+        ApiResponse<PhysicalFileResult> ApiDocumentGetSourceFileByIdGetWithHttpInfo (string id);
+        /// <summary>
+        /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document
         /// </summary>
         /// <remarks>
         /// 
@@ -118,7 +120,7 @@ namespace IO.Swagger.Api
         List<ProcessingStatus> ApiDocumentGetStatusGet (string stringId = null);
 
         /// <summary>
-        /// get a list of 1..N processing status instances that corespond to the stringId of the submitted document
+        /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document
         /// </summary>
         /// <remarks>
         /// 
@@ -135,8 +137,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="textId"> (optional)</param>
-        /// <returns>byte[]</returns>
-        byte[] ApiDocumentGetTextResultGet (string textId = null);
+        /// <returns>PhysicalFileResult</returns>
+        PhysicalFileResult ApiDocumentGetTextResultGet (string textId = null);
 
         /// <summary>
         /// Gets a text result for a specified input document
@@ -146,8 +148,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="textId"> (optional)</param>
-        /// <returns>ApiResponse of byte[]</returns>
-        ApiResponse<byte[]> ApiDocumentGetTextResultGetWithHttpInfo (string textId = null);
+        /// <returns>ApiResponse of PhysicalFileResult</returns>
+        ApiResponse<PhysicalFileResult> ApiDocumentGetTextResultGetWithHttpInfo (string textId = null);
         /// <summary>
         /// Upload 1 to N files for document processing
         /// </summary>
@@ -155,8 +157,8 @@ namespace IO.Swagger.Api
         /// 
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns></returns>
-        void ApiDocumentSubmitFilePost ();
+        /// <returns>DocumentSubmitResult</returns>
+        DocumentSubmitResult ApiDocumentSubmitFilePost ();
 
         /// <summary>
         /// Upload 1 to N files for document processing
@@ -165,8 +167,8 @@ namespace IO.Swagger.Api
         /// 
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>ApiResponse of Object(void)</returns>
-        ApiResponse<Object> ApiDocumentSubmitFilePostWithHttpInfo ();
+        /// <returns>ApiResponse of DocumentSubmitResult</returns>
+        ApiResponse<DocumentSubmitResult> ApiDocumentSubmitFilePostWithHttpInfo ();
         /// <summary>
         /// submit text for processing
         /// </summary>
@@ -175,8 +177,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="args"> (optional)</param>
-        /// <returns></returns>
-        void ApiDocumentSubmitTextPost (SubmitTextArgs args = null);
+        /// <returns>DocumentSubmitResult</returns>
+        DocumentSubmitResult ApiDocumentSubmitTextPost (SubmitTextArgs args = null);
 
         /// <summary>
         /// submit text for processing
@@ -186,8 +188,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="args"> (optional)</param>
-        /// <returns>ApiResponse of Object(void)</returns>
-        ApiResponse<Object> ApiDocumentSubmitTextPostWithHttpInfo (SubmitTextArgs args = null);
+        /// <returns>ApiResponse of DocumentSubmitResult</returns>
+        ApiResponse<DocumentSubmitResult> ApiDocumentSubmitTextPostWithHttpInfo (SubmitTextArgs args = null);
         #endregion Synchronous Operations
         #region Asynchronous Operations
         /// <summary>
@@ -212,25 +214,6 @@ namespace IO.Swagger.Api
         /// <returns>Task of ApiResponse (string)</returns>
         System.Threading.Tasks.Task<ApiResponse<string>> ApiDocumentGetDocumentTypeGetAsyncWithHttpInfo (string documentId = null);
         /// <summary>
-        /// Gets a result file - experimental!
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>Task of void</returns>
-        System.Threading.Tasks.Task ApiDocumentGetFileResultExGetAsync ();
-
-        /// <summary>
-        /// Gets a result file - experimental!
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>Task of ApiResponse</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> ApiDocumentGetFileResultExGetAsyncWithHttpInfo ();
-        /// <summary>
         /// Gets a result file for the specified input document
         /// </summary>
         /// <remarks>
@@ -238,8 +221,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="fileId"> (optional)</param>
-        /// <returns>Task of byte[]</returns>
-        System.Threading.Tasks.Task<byte[]> ApiDocumentGetFileResultGetAsync (string fileId = null);
+        /// <returns>Task of PhysicalFileResult</returns>
+        System.Threading.Tasks.Task<PhysicalFileResult> ApiDocumentGetFileResultGetAsync (string fileId = null);
 
         /// <summary>
         /// Gets a result file for the specified input document
@@ -249,8 +232,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="fileId"> (optional)</param>
-        /// <returns>Task of ApiResponse (byte[])</returns>
-        System.Threading.Tasks.Task<ApiResponse<byte[]>> ApiDocumentGetFileResultGetAsyncWithHttpInfo (string fileId = null);
+        /// <returns>Task of ApiResponse (PhysicalFileResult)</returns>
+        System.Threading.Tasks.Task<ApiResponse<PhysicalFileResult>> ApiDocumentGetFileResultGetAsyncWithHttpInfo (string fileId = null);
         /// <summary>
         /// Gets result set for a submitted file that has finished processing
         /// </summary>
@@ -273,7 +256,28 @@ namespace IO.Swagger.Api
         /// <returns>Task of ApiResponse (DocumentAttributeSet)</returns>
         System.Threading.Tasks.Task<ApiResponse<DocumentAttributeSet>> ApiDocumentGetResultSetByIdGetAsyncWithHttpInfo (string id);
         /// <summary>
-        /// get a list of 1..N processing status instances that corespond to the stringId of the submitted document
+        /// get the original source file associated with the file id
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
+        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">the file id, as a string. Often prepended with \&quot;Text\&quot; or \&quot;File\&quot;</param>
+        /// <returns>Task of PhysicalFileResult</returns>
+        System.Threading.Tasks.Task<PhysicalFileResult> ApiDocumentGetSourceFileByIdGetAsync (string id);
+
+        /// <summary>
+        /// get the original source file associated with the file id
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
+        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">the file id, as a string. Often prepended with \&quot;Text\&quot; or \&quot;File\&quot;</param>
+        /// <returns>Task of ApiResponse (PhysicalFileResult)</returns>
+        System.Threading.Tasks.Task<ApiResponse<PhysicalFileResult>> ApiDocumentGetSourceFileByIdGetAsyncWithHttpInfo (string id);
+        /// <summary>
+        /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document
         /// </summary>
         /// <remarks>
         /// 
@@ -284,7 +288,7 @@ namespace IO.Swagger.Api
         System.Threading.Tasks.Task<List<ProcessingStatus>> ApiDocumentGetStatusGetAsync (string stringId = null);
 
         /// <summary>
-        /// get a list of 1..N processing status instances that corespond to the stringId of the submitted document
+        /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document
         /// </summary>
         /// <remarks>
         /// 
@@ -301,8 +305,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="textId"> (optional)</param>
-        /// <returns>Task of byte[]</returns>
-        System.Threading.Tasks.Task<byte[]> ApiDocumentGetTextResultGetAsync (string textId = null);
+        /// <returns>Task of PhysicalFileResult</returns>
+        System.Threading.Tasks.Task<PhysicalFileResult> ApiDocumentGetTextResultGetAsync (string textId = null);
 
         /// <summary>
         /// Gets a text result for a specified input document
@@ -312,8 +316,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="textId"> (optional)</param>
-        /// <returns>Task of ApiResponse (byte[])</returns>
-        System.Threading.Tasks.Task<ApiResponse<byte[]>> ApiDocumentGetTextResultGetAsyncWithHttpInfo (string textId = null);
+        /// <returns>Task of ApiResponse (PhysicalFileResult)</returns>
+        System.Threading.Tasks.Task<ApiResponse<PhysicalFileResult>> ApiDocumentGetTextResultGetAsyncWithHttpInfo (string textId = null);
         /// <summary>
         /// Upload 1 to N files for document processing
         /// </summary>
@@ -321,8 +325,8 @@ namespace IO.Swagger.Api
         /// 
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>Task of void</returns>
-        System.Threading.Tasks.Task ApiDocumentSubmitFilePostAsync ();
+        /// <returns>Task of DocumentSubmitResult</returns>
+        System.Threading.Tasks.Task<DocumentSubmitResult> ApiDocumentSubmitFilePostAsync ();
 
         /// <summary>
         /// Upload 1 to N files for document processing
@@ -331,8 +335,8 @@ namespace IO.Swagger.Api
         /// 
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>Task of ApiResponse</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> ApiDocumentSubmitFilePostAsyncWithHttpInfo ();
+        /// <returns>Task of ApiResponse (DocumentSubmitResult)</returns>
+        System.Threading.Tasks.Task<ApiResponse<DocumentSubmitResult>> ApiDocumentSubmitFilePostAsyncWithHttpInfo ();
         /// <summary>
         /// submit text for processing
         /// </summary>
@@ -341,8 +345,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="args"> (optional)</param>
-        /// <returns>Task of void</returns>
-        System.Threading.Tasks.Task ApiDocumentSubmitTextPostAsync (SubmitTextArgs args = null);
+        /// <returns>Task of DocumentSubmitResult</returns>
+        System.Threading.Tasks.Task<DocumentSubmitResult> ApiDocumentSubmitTextPostAsync (SubmitTextArgs args = null);
 
         /// <summary>
         /// submit text for processing
@@ -352,8 +356,8 @@ namespace IO.Swagger.Api
         /// </remarks>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="args"> (optional)</param>
-        /// <returns>Task of ApiResponse</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> ApiDocumentSubmitTextPostAsyncWithHttpInfo (SubmitTextArgs args = null);
+        /// <returns>Task of ApiResponse (DocumentSubmitResult)</returns>
+        System.Threading.Tasks.Task<ApiResponse<DocumentSubmitResult>> ApiDocumentSubmitTextPostAsyncWithHttpInfo (SubmitTextArgs args = null);
         #endregion Asynchronous Operations
     }
 
@@ -606,139 +610,14 @@ namespace IO.Swagger.Api
         }
 
         /// <summary>
-        /// Gets a result file - experimental! 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns></returns>
-        public void ApiDocumentGetFileResultExGet ()
-        {
-             ApiDocumentGetFileResultExGetWithHttpInfo();
-        }
-
-        /// <summary>
-        /// Gets a result file - experimental! 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>ApiResponse of Object(void)</returns>
-        public ApiResponse<Object> ApiDocumentGetFileResultExGetWithHttpInfo ()
-        {
-
-            var localVarPath = "/api/Document/GetFileResultEx";
-            var localVarPathParams = new Dictionary<String, String>();
-            var localVarQueryParams = new Dictionary<String, String>();
-            var localVarHeaderParams = new Dictionary<String, String>(Configuration.DefaultHeader);
-            var localVarFormParams = new Dictionary<String, String>();
-            var localVarFileParams = new Dictionary<String, FileParameter>();
-            Object localVarPostBody = null;
-
-            // to determine the Content-Type header
-            String[] localVarHttpContentTypes = new String[] {
-            };
-            String localVarHttpContentType = Configuration.ApiClient.SelectHeaderContentType(localVarHttpContentTypes);
-
-            // to determine the Accept header
-            String[] localVarHttpHeaderAccepts = new String[] {
-            };
-            String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
-            if (localVarHttpHeaderAccept != null)
-                localVarHeaderParams.Add("Accept", localVarHttpHeaderAccept);
-
-            // set "format" to json by default
-            // e.g. /pet/{petId}.{format} becomes /pet/{petId}.json
-            localVarPathParams.Add("format", "json");
-
-
-            // make the HTTP request
-            IRestResponse localVarResponse = (IRestResponse) Configuration.ApiClient.CallApi(localVarPath,
-                Method.GET, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarFileParams,
-                localVarPathParams, localVarHttpContentType);
-
-            int localVarStatusCode = (int) localVarResponse.StatusCode;
-
-            if (ExceptionFactory != null)
-            {
-                Exception exception = ExceptionFactory("ApiDocumentGetFileResultExGet", localVarResponse);
-                if (exception != null) throw exception;
-            }
-
-            
-            return new ApiResponse<Object>(localVarStatusCode,
-                localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
-        }
-
-        /// <summary>
-        /// Gets a result file - experimental! 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>Task of void</returns>
-        public async System.Threading.Tasks.Task ApiDocumentGetFileResultExGetAsync ()
-        {
-             await ApiDocumentGetFileResultExGetAsyncWithHttpInfo();
-
-        }
-
-        /// <summary>
-        /// Gets a result file - experimental! 
-        /// </summary>
-        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>Task of ApiResponse</returns>
-        public async System.Threading.Tasks.Task<ApiResponse<Object>> ApiDocumentGetFileResultExGetAsyncWithHttpInfo ()
-        {
-
-            var localVarPath = "/api/Document/GetFileResultEx";
-            var localVarPathParams = new Dictionary<String, String>();
-            var localVarQueryParams = new Dictionary<String, String>();
-            var localVarHeaderParams = new Dictionary<String, String>(Configuration.DefaultHeader);
-            var localVarFormParams = new Dictionary<String, String>();
-            var localVarFileParams = new Dictionary<String, FileParameter>();
-            Object localVarPostBody = null;
-
-            // to determine the Content-Type header
-            String[] localVarHttpContentTypes = new String[] {
-            };
-            String localVarHttpContentType = Configuration.ApiClient.SelectHeaderContentType(localVarHttpContentTypes);
-
-            // to determine the Accept header
-            String[] localVarHttpHeaderAccepts = new String[] {
-            };
-            String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
-            if (localVarHttpHeaderAccept != null)
-                localVarHeaderParams.Add("Accept", localVarHttpHeaderAccept);
-
-            // set "format" to json by default
-            // e.g. /pet/{petId}.{format} becomes /pet/{petId}.json
-            localVarPathParams.Add("format", "json");
-
-
-            // make the HTTP request
-            IRestResponse localVarResponse = (IRestResponse) await Configuration.ApiClient.CallApiAsync(localVarPath,
-                Method.GET, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarFileParams,
-                localVarPathParams, localVarHttpContentType);
-
-            int localVarStatusCode = (int) localVarResponse.StatusCode;
-
-            if (ExceptionFactory != null)
-            {
-                Exception exception = ExceptionFactory("ApiDocumentGetFileResultExGet", localVarResponse);
-                if (exception != null) throw exception;
-            }
-
-            
-            return new ApiResponse<Object>(localVarStatusCode,
-                localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
-        }
-
-        /// <summary>
         /// Gets a result file for the specified input document 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="fileId"> (optional)</param>
-        /// <returns>byte[]</returns>
-        public byte[] ApiDocumentGetFileResultGet (string fileId = null)
+        /// <returns>PhysicalFileResult</returns>
+        public PhysicalFileResult ApiDocumentGetFileResultGet (string fileId = null)
         {
-             ApiResponse<byte[]> localVarResponse = ApiDocumentGetFileResultGetWithHttpInfo(fileId);
+             ApiResponse<PhysicalFileResult> localVarResponse = ApiDocumentGetFileResultGetWithHttpInfo(fileId);
              return localVarResponse.Data;
         }
 
@@ -747,8 +626,8 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="fileId"> (optional)</param>
-        /// <returns>ApiResponse of byte[]</returns>
-        public ApiResponse< byte[] > ApiDocumentGetFileResultGetWithHttpInfo (string fileId = null)
+        /// <returns>ApiResponse of PhysicalFileResult</returns>
+        public ApiResponse< PhysicalFileResult > ApiDocumentGetFileResultGetWithHttpInfo (string fileId = null)
         {
 
             var localVarPath = "/api/Document/GetFileResult";
@@ -793,9 +672,9 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            return new ApiResponse<byte[]>(localVarStatusCode,
+            return new ApiResponse<PhysicalFileResult>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                (byte[]) Configuration.ApiClient.Deserialize(localVarResponse, typeof(byte[])));
+                (PhysicalFileResult) Configuration.ApiClient.Deserialize(localVarResponse, typeof(PhysicalFileResult)));
             
         }
 
@@ -804,10 +683,10 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="fileId"> (optional)</param>
-        /// <returns>Task of byte[]</returns>
-        public async System.Threading.Tasks.Task<byte[]> ApiDocumentGetFileResultGetAsync (string fileId = null)
+        /// <returns>Task of PhysicalFileResult</returns>
+        public async System.Threading.Tasks.Task<PhysicalFileResult> ApiDocumentGetFileResultGetAsync (string fileId = null)
         {
-             ApiResponse<byte[]> localVarResponse = await ApiDocumentGetFileResultGetAsyncWithHttpInfo(fileId);
+             ApiResponse<PhysicalFileResult> localVarResponse = await ApiDocumentGetFileResultGetAsyncWithHttpInfo(fileId);
              return localVarResponse.Data;
 
         }
@@ -817,8 +696,8 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="fileId"> (optional)</param>
-        /// <returns>Task of ApiResponse (byte[])</returns>
-        public async System.Threading.Tasks.Task<ApiResponse<byte[]>> ApiDocumentGetFileResultGetAsyncWithHttpInfo (string fileId = null)
+        /// <returns>Task of ApiResponse (PhysicalFileResult)</returns>
+        public async System.Threading.Tasks.Task<ApiResponse<PhysicalFileResult>> ApiDocumentGetFileResultGetAsyncWithHttpInfo (string fileId = null)
         {
 
             var localVarPath = "/api/Document/GetFileResult";
@@ -863,9 +742,9 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            return new ApiResponse<byte[]>(localVarStatusCode,
+            return new ApiResponse<PhysicalFileResult>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                (byte[]) Configuration.ApiClient.Deserialize(localVarResponse, typeof(byte[])));
+                (PhysicalFileResult) Configuration.ApiClient.Deserialize(localVarResponse, typeof(PhysicalFileResult)));
             
         }
 
@@ -1015,7 +894,152 @@ namespace IO.Swagger.Api
         }
 
         /// <summary>
-        /// get a list of 1..N processing status instances that corespond to the stringId of the submitted document 
+        /// get the original source file associated with the file id 
+        /// </summary>
+        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">the file id, as a string. Often prepended with \&quot;Text\&quot; or \&quot;File\&quot;</param>
+        /// <returns>PhysicalFileResult</returns>
+        public PhysicalFileResult ApiDocumentGetSourceFileByIdGet (string id)
+        {
+             ApiResponse<PhysicalFileResult> localVarResponse = ApiDocumentGetSourceFileByIdGetWithHttpInfo(id);
+             return localVarResponse.Data;
+        }
+
+        /// <summary>
+        /// get the original source file associated with the file id 
+        /// </summary>
+        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">the file id, as a string. Often prepended with \&quot;Text\&quot; or \&quot;File\&quot;</param>
+        /// <returns>ApiResponse of PhysicalFileResult</returns>
+        public ApiResponse< PhysicalFileResult > ApiDocumentGetSourceFileByIdGetWithHttpInfo (string id)
+        {
+            // verify the required parameter 'id' is set
+            if (id == null)
+                throw new ApiException(400, "Missing required parameter 'id' when calling DocumentApi->ApiDocumentGetSourceFileByIdGet");
+
+            var localVarPath = "/api/Document/GetSourceFile/{Id}";
+            var localVarPathParams = new Dictionary<String, String>();
+            var localVarQueryParams = new Dictionary<String, String>();
+            var localVarHeaderParams = new Dictionary<String, String>(Configuration.DefaultHeader);
+            var localVarFormParams = new Dictionary<String, String>();
+            var localVarFileParams = new Dictionary<String, FileParameter>();
+            Object localVarPostBody = null;
+
+            // to determine the Content-Type header
+            String[] localVarHttpContentTypes = new String[] {
+            };
+            String localVarHttpContentType = Configuration.ApiClient.SelectHeaderContentType(localVarHttpContentTypes);
+
+            // to determine the Accept header
+            String[] localVarHttpHeaderAccepts = new String[] {
+                "text/plain", 
+                "application/json", 
+                "text/json"
+            };
+            String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
+            if (localVarHttpHeaderAccept != null)
+                localVarHeaderParams.Add("Accept", localVarHttpHeaderAccept);
+
+            // set "format" to json by default
+            // e.g. /pet/{petId}.{format} becomes /pet/{petId}.json
+            localVarPathParams.Add("format", "json");
+            if (id != null) localVarPathParams.Add("Id", Configuration.ApiClient.ParameterToString(id)); // path parameter
+
+
+            // make the HTTP request
+            IRestResponse localVarResponse = (IRestResponse) Configuration.ApiClient.CallApi(localVarPath,
+                Method.GET, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarFileParams,
+                localVarPathParams, localVarHttpContentType);
+
+            int localVarStatusCode = (int) localVarResponse.StatusCode;
+
+            if (ExceptionFactory != null)
+            {
+                Exception exception = ExceptionFactory("ApiDocumentGetSourceFileByIdGet", localVarResponse);
+                if (exception != null) throw exception;
+            }
+
+            return new ApiResponse<PhysicalFileResult>(localVarStatusCode,
+                localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
+                (PhysicalFileResult) Configuration.ApiClient.Deserialize(localVarResponse, typeof(PhysicalFileResult)));
+            
+        }
+
+        /// <summary>
+        /// get the original source file associated with the file id 
+        /// </summary>
+        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">the file id, as a string. Often prepended with \&quot;Text\&quot; or \&quot;File\&quot;</param>
+        /// <returns>Task of PhysicalFileResult</returns>
+        public async System.Threading.Tasks.Task<PhysicalFileResult> ApiDocumentGetSourceFileByIdGetAsync (string id)
+        {
+             ApiResponse<PhysicalFileResult> localVarResponse = await ApiDocumentGetSourceFileByIdGetAsyncWithHttpInfo(id);
+             return localVarResponse.Data;
+
+        }
+
+        /// <summary>
+        /// get the original source file associated with the file id 
+        /// </summary>
+        /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">the file id, as a string. Often prepended with \&quot;Text\&quot; or \&quot;File\&quot;</param>
+        /// <returns>Task of ApiResponse (PhysicalFileResult)</returns>
+        public async System.Threading.Tasks.Task<ApiResponse<PhysicalFileResult>> ApiDocumentGetSourceFileByIdGetAsyncWithHttpInfo (string id)
+        {
+            // verify the required parameter 'id' is set
+            if (id == null)
+                throw new ApiException(400, "Missing required parameter 'id' when calling DocumentApi->ApiDocumentGetSourceFileByIdGet");
+
+            var localVarPath = "/api/Document/GetSourceFile/{Id}";
+            var localVarPathParams = new Dictionary<String, String>();
+            var localVarQueryParams = new Dictionary<String, String>();
+            var localVarHeaderParams = new Dictionary<String, String>(Configuration.DefaultHeader);
+            var localVarFormParams = new Dictionary<String, String>();
+            var localVarFileParams = new Dictionary<String, FileParameter>();
+            Object localVarPostBody = null;
+
+            // to determine the Content-Type header
+            String[] localVarHttpContentTypes = new String[] {
+            };
+            String localVarHttpContentType = Configuration.ApiClient.SelectHeaderContentType(localVarHttpContentTypes);
+
+            // to determine the Accept header
+            String[] localVarHttpHeaderAccepts = new String[] {
+                "text/plain", 
+                "application/json", 
+                "text/json"
+            };
+            String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
+            if (localVarHttpHeaderAccept != null)
+                localVarHeaderParams.Add("Accept", localVarHttpHeaderAccept);
+
+            // set "format" to json by default
+            // e.g. /pet/{petId}.{format} becomes /pet/{petId}.json
+            localVarPathParams.Add("format", "json");
+            if (id != null) localVarPathParams.Add("Id", Configuration.ApiClient.ParameterToString(id)); // path parameter
+
+
+            // make the HTTP request
+            IRestResponse localVarResponse = (IRestResponse) await Configuration.ApiClient.CallApiAsync(localVarPath,
+                Method.GET, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarFileParams,
+                localVarPathParams, localVarHttpContentType);
+
+            int localVarStatusCode = (int) localVarResponse.StatusCode;
+
+            if (ExceptionFactory != null)
+            {
+                Exception exception = ExceptionFactory("ApiDocumentGetSourceFileByIdGet", localVarResponse);
+                if (exception != null) throw exception;
+            }
+
+            return new ApiResponse<PhysicalFileResult>(localVarStatusCode,
+                localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
+                (PhysicalFileResult) Configuration.ApiClient.Deserialize(localVarResponse, typeof(PhysicalFileResult)));
+            
+        }
+
+        /// <summary>
+        /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="stringId"> (optional)</param>
@@ -1027,7 +1051,7 @@ namespace IO.Swagger.Api
         }
 
         /// <summary>
-        /// get a list of 1..N processing status instances that corespond to the stringId of the submitted document 
+        /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="stringId"> (optional)</param>
@@ -1084,7 +1108,7 @@ namespace IO.Swagger.Api
         }
 
         /// <summary>
-        /// get a list of 1..N processing status instances that corespond to the stringId of the submitted document 
+        /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="stringId"> (optional)</param>
@@ -1097,7 +1121,7 @@ namespace IO.Swagger.Api
         }
 
         /// <summary>
-        /// get a list of 1..N processing status instances that corespond to the stringId of the submitted document 
+        /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="stringId"> (optional)</param>
@@ -1158,10 +1182,10 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="textId"> (optional)</param>
-        /// <returns>byte[]</returns>
-        public byte[] ApiDocumentGetTextResultGet (string textId = null)
+        /// <returns>PhysicalFileResult</returns>
+        public PhysicalFileResult ApiDocumentGetTextResultGet (string textId = null)
         {
-             ApiResponse<byte[]> localVarResponse = ApiDocumentGetTextResultGetWithHttpInfo(textId);
+             ApiResponse<PhysicalFileResult> localVarResponse = ApiDocumentGetTextResultGetWithHttpInfo(textId);
              return localVarResponse.Data;
         }
 
@@ -1170,8 +1194,8 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="textId"> (optional)</param>
-        /// <returns>ApiResponse of byte[]</returns>
-        public ApiResponse< byte[] > ApiDocumentGetTextResultGetWithHttpInfo (string textId = null)
+        /// <returns>ApiResponse of PhysicalFileResult</returns>
+        public ApiResponse< PhysicalFileResult > ApiDocumentGetTextResultGetWithHttpInfo (string textId = null)
         {
 
             var localVarPath = "/api/Document/GetTextResult";
@@ -1216,9 +1240,9 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            return new ApiResponse<byte[]>(localVarStatusCode,
+            return new ApiResponse<PhysicalFileResult>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                (byte[]) Configuration.ApiClient.Deserialize(localVarResponse, typeof(byte[])));
+                (PhysicalFileResult) Configuration.ApiClient.Deserialize(localVarResponse, typeof(PhysicalFileResult)));
             
         }
 
@@ -1227,10 +1251,10 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="textId"> (optional)</param>
-        /// <returns>Task of byte[]</returns>
-        public async System.Threading.Tasks.Task<byte[]> ApiDocumentGetTextResultGetAsync (string textId = null)
+        /// <returns>Task of PhysicalFileResult</returns>
+        public async System.Threading.Tasks.Task<PhysicalFileResult> ApiDocumentGetTextResultGetAsync (string textId = null)
         {
-             ApiResponse<byte[]> localVarResponse = await ApiDocumentGetTextResultGetAsyncWithHttpInfo(textId);
+             ApiResponse<PhysicalFileResult> localVarResponse = await ApiDocumentGetTextResultGetAsyncWithHttpInfo(textId);
              return localVarResponse.Data;
 
         }
@@ -1240,8 +1264,8 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="textId"> (optional)</param>
-        /// <returns>Task of ApiResponse (byte[])</returns>
-        public async System.Threading.Tasks.Task<ApiResponse<byte[]>> ApiDocumentGetTextResultGetAsyncWithHttpInfo (string textId = null)
+        /// <returns>Task of ApiResponse (PhysicalFileResult)</returns>
+        public async System.Threading.Tasks.Task<ApiResponse<PhysicalFileResult>> ApiDocumentGetTextResultGetAsyncWithHttpInfo (string textId = null)
         {
 
             var localVarPath = "/api/Document/GetTextResult";
@@ -1286,9 +1310,9 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            return new ApiResponse<byte[]>(localVarStatusCode,
+            return new ApiResponse<PhysicalFileResult>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                (byte[]) Configuration.ApiClient.Deserialize(localVarResponse, typeof(byte[])));
+                (PhysicalFileResult) Configuration.ApiClient.Deserialize(localVarResponse, typeof(PhysicalFileResult)));
             
         }
 
@@ -1296,18 +1320,19 @@ namespace IO.Swagger.Api
         /// Upload 1 to N files for document processing 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns></returns>
-        public void ApiDocumentSubmitFilePost ()
+        /// <returns>DocumentSubmitResult</returns>
+        public DocumentSubmitResult ApiDocumentSubmitFilePost ()
         {
-             ApiDocumentSubmitFilePostWithHttpInfo();
+             ApiResponse<DocumentSubmitResult> localVarResponse = ApiDocumentSubmitFilePostWithHttpInfo();
+             return localVarResponse.Data;
         }
 
         /// <summary>
         /// Upload 1 to N files for document processing 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>ApiResponse of Object(void)</returns>
-        public ApiResponse<Object> ApiDocumentSubmitFilePostWithHttpInfo ()
+        /// <returns>ApiResponse of DocumentSubmitResult</returns>
+        public ApiResponse< DocumentSubmitResult > ApiDocumentSubmitFilePostWithHttpInfo ()
         {
 
             var localVarPath = "/api/Document/SubmitFile";
@@ -1325,6 +1350,9 @@ namespace IO.Swagger.Api
 
             // to determine the Accept header
             String[] localVarHttpHeaderAccepts = new String[] {
+                "text/plain", 
+                "application/json", 
+                "text/json"
             };
             String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
             if (localVarHttpHeaderAccept != null)
@@ -1348,20 +1376,21 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            
-            return new ApiResponse<Object>(localVarStatusCode,
+            return new ApiResponse<DocumentSubmitResult>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
+                (DocumentSubmitResult) Configuration.ApiClient.Deserialize(localVarResponse, typeof(DocumentSubmitResult)));
+            
         }
 
         /// <summary>
         /// Upload 1 to N files for document processing 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>Task of void</returns>
-        public async System.Threading.Tasks.Task ApiDocumentSubmitFilePostAsync ()
+        /// <returns>Task of DocumentSubmitResult</returns>
+        public async System.Threading.Tasks.Task<DocumentSubmitResult> ApiDocumentSubmitFilePostAsync ()
         {
-             await ApiDocumentSubmitFilePostAsyncWithHttpInfo();
+             ApiResponse<DocumentSubmitResult> localVarResponse = await ApiDocumentSubmitFilePostAsyncWithHttpInfo();
+             return localVarResponse.Data;
 
         }
 
@@ -1369,8 +1398,8 @@ namespace IO.Swagger.Api
         /// Upload 1 to N files for document processing 
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <returns>Task of ApiResponse</returns>
-        public async System.Threading.Tasks.Task<ApiResponse<Object>> ApiDocumentSubmitFilePostAsyncWithHttpInfo ()
+        /// <returns>Task of ApiResponse (DocumentSubmitResult)</returns>
+        public async System.Threading.Tasks.Task<ApiResponse<DocumentSubmitResult>> ApiDocumentSubmitFilePostAsyncWithHttpInfo ()
         {
 
             var localVarPath = "/api/Document/SubmitFile";
@@ -1388,6 +1417,9 @@ namespace IO.Swagger.Api
 
             // to determine the Accept header
             String[] localVarHttpHeaderAccepts = new String[] {
+                "text/plain", 
+                "application/json", 
+                "text/json"
             };
             String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
             if (localVarHttpHeaderAccept != null)
@@ -1411,10 +1443,10 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            
-            return new ApiResponse<Object>(localVarStatusCode,
+            return new ApiResponse<DocumentSubmitResult>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
+                (DocumentSubmitResult) Configuration.ApiClient.Deserialize(localVarResponse, typeof(DocumentSubmitResult)));
+            
         }
 
         /// <summary>
@@ -1422,10 +1454,11 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="args"> (optional)</param>
-        /// <returns></returns>
-        public void ApiDocumentSubmitTextPost (SubmitTextArgs args = null)
+        /// <returns>DocumentSubmitResult</returns>
+        public DocumentSubmitResult ApiDocumentSubmitTextPost (SubmitTextArgs args = null)
         {
-             ApiDocumentSubmitTextPostWithHttpInfo(args);
+             ApiResponse<DocumentSubmitResult> localVarResponse = ApiDocumentSubmitTextPostWithHttpInfo(args);
+             return localVarResponse.Data;
         }
 
         /// <summary>
@@ -1433,8 +1466,8 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="args"> (optional)</param>
-        /// <returns>ApiResponse of Object(void)</returns>
-        public ApiResponse<Object> ApiDocumentSubmitTextPostWithHttpInfo (SubmitTextArgs args = null)
+        /// <returns>ApiResponse of DocumentSubmitResult</returns>
+        public ApiResponse< DocumentSubmitResult > ApiDocumentSubmitTextPostWithHttpInfo (SubmitTextArgs args = null)
         {
 
             var localVarPath = "/api/Document/SubmitText";
@@ -1455,6 +1488,9 @@ namespace IO.Swagger.Api
 
             // to determine the Accept header
             String[] localVarHttpHeaderAccepts = new String[] {
+                "text/plain", 
+                "application/json", 
+                "text/json"
             };
             String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
             if (localVarHttpHeaderAccept != null)
@@ -1486,10 +1522,10 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            
-            return new ApiResponse<Object>(localVarStatusCode,
+            return new ApiResponse<DocumentSubmitResult>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
+                (DocumentSubmitResult) Configuration.ApiClient.Deserialize(localVarResponse, typeof(DocumentSubmitResult)));
+            
         }
 
         /// <summary>
@@ -1497,10 +1533,11 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="args"> (optional)</param>
-        /// <returns>Task of void</returns>
-        public async System.Threading.Tasks.Task ApiDocumentSubmitTextPostAsync (SubmitTextArgs args = null)
+        /// <returns>Task of DocumentSubmitResult</returns>
+        public async System.Threading.Tasks.Task<DocumentSubmitResult> ApiDocumentSubmitTextPostAsync (SubmitTextArgs args = null)
         {
-             await ApiDocumentSubmitTextPostAsyncWithHttpInfo(args);
+             ApiResponse<DocumentSubmitResult> localVarResponse = await ApiDocumentSubmitTextPostAsyncWithHttpInfo(args);
+             return localVarResponse.Data;
 
         }
 
@@ -1509,8 +1546,8 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <exception cref="IO.Swagger.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="args"> (optional)</param>
-        /// <returns>Task of ApiResponse</returns>
-        public async System.Threading.Tasks.Task<ApiResponse<Object>> ApiDocumentSubmitTextPostAsyncWithHttpInfo (SubmitTextArgs args = null)
+        /// <returns>Task of ApiResponse (DocumentSubmitResult)</returns>
+        public async System.Threading.Tasks.Task<ApiResponse<DocumentSubmitResult>> ApiDocumentSubmitTextPostAsyncWithHttpInfo (SubmitTextArgs args = null)
         {
 
             var localVarPath = "/api/Document/SubmitText";
@@ -1531,6 +1568,9 @@ namespace IO.Swagger.Api
 
             // to determine the Accept header
             String[] localVarHttpHeaderAccepts = new String[] {
+                "text/plain", 
+                "application/json", 
+                "text/json"
             };
             String localVarHttpHeaderAccept = Configuration.ApiClient.SelectHeaderAccept(localVarHttpHeaderAccepts);
             if (localVarHttpHeaderAccept != null)
@@ -1562,10 +1602,10 @@ namespace IO.Swagger.Api
                 if (exception != null) throw exception;
             }
 
-            
-            return new ApiResponse<Object>(localVarStatusCode,
+            return new ApiResponse<DocumentSubmitResult>(localVarStatusCode,
                 localVarResponse.Headers.ToDictionary(x => x.Name, x => x.Value.ToString()),
-                null);
+                (DocumentSubmitResult) Configuration.ApiClient.Deserialize(localVarResponse, typeof(DocumentSubmitResult)));
+            
         }
 
     }
