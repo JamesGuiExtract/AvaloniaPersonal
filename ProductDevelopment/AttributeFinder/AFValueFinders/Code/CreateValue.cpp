@@ -16,6 +16,7 @@
 #include <ComponentLicenseIDs.h>
 
 #include <io.h>
+#include <regex>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -197,12 +198,43 @@ STDMETHODIMP CCreateValue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 
 			ipAttributes->PushBack(ipAttribute);
 		}
+		// Expanding was not successful so handle special case
+		// where the value is exactly one object tag.
+		// This takes care of expanding arbitrary object tags
+		// as well as multiple DocType tags
+		// https://extract.atlassian.net/browse/ISSUE-9752
+		else
+		{
+			string pattern = "^<(\\w+)>$";
+			regex rgxObjectTag(pattern);
+			smatch subMatches;
+			if (regex_match(m_strValue, subMatches, rgxObjectTag))
+			{				
+				// Submatch #1 is the first parenthetical group, which is the tag name
+				_bstr_t bstrTag = _bstr_t(subMatches[1].str().c_str());
+				IVariantVectorPtr ipvecValues = ipAFDoc->ObjectTags->TryGetValue(bstrTag);
+				if (ipvecValues != __nullptr)
+				{
+					for (long i = 0; i < ipvecValues->Size; ++i)
+					{
+						IAttributePtr ipAttribute(CLSID_Attribute);
+						ISpatialStringPtr ipSS(CLSID_SpatialString);
+						ipSS->CreateNonSpatialString(_bstr_t(ipvecValues->Item[i]),
+							ipAFDoc->Text->SourceDocName);
+						ipAttribute->Value = ipSS;
+						ipAttribute->Type = _bstr_t(m_strType.c_str());
+						ipAttributes->PushBack(ipAttribute);
+					}
+				}
+			}
+		}
+
+
 		// return the vector
 		*pAttributes = ipAttributes.Detach();
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09847");
-	
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 // IPersistStream

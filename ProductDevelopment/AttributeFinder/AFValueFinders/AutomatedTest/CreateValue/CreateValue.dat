@@ -3,3 +3,6 @@
 
 //test2 Set attribute value to input document name, and type to "My Type"
 <TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 Test expanding an object tag that has multiple values
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
