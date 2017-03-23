@@ -7,6 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using UCLID_AFCORELib;
+using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.AttributeFinder.Test
 {
@@ -312,7 +315,8 @@ namespace Extract.AttributeFinder.Test
         {
             int expectedFeatureVectorLength = 11;
             SetDocumentCategorizationFiles();
-            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, attributeFilter:"DocumentType");
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(
+                LearningMachineUsage.DocumentCategorization, attributeFilter:"DocumentType");
             encoder.ComputeEncodings(_ussFiles, _voaFiles, _categories);
             Assert.AreEqual(expectedFeatureVectorLength, encoder.FeatureVectorLength);
 
@@ -830,6 +834,9 @@ namespace Extract.AttributeFinder.Test
             LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, null, "*@Feature");
             encoder.ComputeEncodings(_ussFiles, _voaFiles, _eavFiles);
             var nameDiff01 = encoder.AttributeFeatureVectorizers.First(v => v.Name == "NameDiff01");
+            Assert.That(nameDiff01.FeatureType == FeatureVectorizerType.Numeric);
+            // Change to discrete terms type so that the recognized values ordering can be checked
+            nameDiff01.FeatureType = FeatureVectorizerType.DiscreteTerms;
             var terms = nameDiff01.RecognizedValues.ToList();
             CollectionAssert.AreEqual(new[] { "3", "4", "8", "0", "10", "5" }, terms);
         }
@@ -851,17 +858,24 @@ namespace Extract.AttributeFinder.Test
                 encoder = (LearningMachineDataEncoder)serializer.Deserialize(stream);
             }
             var nameDiff01 = encoder.AttributeFeatureVectorizers.First(v => v.Name == "NameDiff01");
+            Assert.That(nameDiff01.FeatureType == FeatureVectorizerType.Numeric);
+            // Change to discrete terms type so that the recognized values ordering can be checked
+            nameDiff01.FeatureType = FeatureVectorizerType.DiscreteTerms;
             var terms = nameDiff01.RecognizedValues.ToList();
             CollectionAssert.AreEqual(new[] { "3", "4", "8", "0", "10", "5" }, terms);
         }
 
         // DocumentCategorization: Test that attribute feature vectorizers sort terms by tf*idf score
+        // Also tests new attributeVectorizerMaxFeatures property
         [Test, Category("LearningMachineDataEncoder")]
         public static void AttributeFeatureVectorizersOrderTermsByRelevance5()
         {
             SetDocumentCategorizationFiles();
             var autoBoW = new SpatialStringFeatureVectorizer("1", 5, 2000);
-            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW);
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(
+                LearningMachineUsage.DocumentCategorization, autoBoW,
+                attributeFilter: null, negateFilter: false,
+                attributeVectorizerMaxFeatures: 2000);
             encoder.ComputeEncodings(_ussFiles, _voaFiles2, _categories);
 
             // Compare top terms from the spatial string vectorizer with attribute vectorizer to check that the
@@ -870,7 +884,7 @@ namespace Extract.AttributeFinder.Test
             var attributeVectorizer = encoder.AttributeFeatureVectorizers.First();
             CollectionAssert.AreEqual(
                 spatialStringVectorizer.RecognizedValues,
-                attributeVectorizer.RecognizedValues.Take(2000));
+                attributeVectorizer.RecognizedValues);
         }
 
         // DocumentCategorization: Test that attribute feature vectorizers sort terms by tf*idf score
@@ -893,7 +907,10 @@ namespace Extract.AttributeFinder.Test
                 "Notice of Federal Tax Lien"
             };
             var autoBoW = new SpatialStringFeatureVectorizer("1", 5, 2000);
-            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW);
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(
+                LearningMachineUsage.DocumentCategorization, autoBoW,
+                attributeFilter: null, negateFilter: false,
+                attributeVectorizerMaxFeatures: 2000);
             encoder.ComputeEncodings(_ussFiles, _voaFiles2, _categories);
 
             // Compare top terms from the spatial string vectorizer with attribute vectorizer to check that the
@@ -908,6 +925,46 @@ namespace Extract.AttributeFinder.Test
             UtilityMethods.Swap(ref attributeFeatures[89], ref attributeFeatures[90]);
 
             CollectionAssert.AreEqual(spatialStringFeatures, attributeFeatures);
+        }
+
+        // Test that tokenizing works the same as auto-b-o-w
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void AttributeFeatureVectorizerTokenization()
+        {
+            SetDocumentCategorizationFiles();
+            var autoBoW = new SpatialStringFeatureVectorizer("", 5, 2000);
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(
+                LearningMachineUsage.DocumentCategorization, autoBoW,
+                attributeFilter: null, negateFilter: false,
+                attributeVectorizerMaxFeatures: 2000,
+                attributesToTokenize: "*",
+                attributeVectorizerShingleSize: 5);
+
+            var voaFiles = _ussFiles.Select(ussFile =>
+            {
+                var voa = new IUnknownVector();
+                var ss = new SpatialString();
+                ss.LoadFrom(ussFile, false);
+                var attr = new AttributeClass { Name = "DocText", Value = ss };
+                voa.PushBack(attr);
+                var voaName = ussFile + ".voa";
+                voa.SaveTo(voaName, false, null);
+                return voaName;
+            }).ToArray();
+            encoder.ComputeEncodings(_ussFiles, voaFiles, _categories);
+
+            foreach(var voaFile in voaFiles)
+            {
+                FileSystemMethods.DeleteFile(voaFile);
+            }
+
+            // Compare top terms from the spatial string vectorizer with attribute vectorizer to
+            // confirm that the tokinizer works
+            var spatialStringVectorizer = encoder.AutoBagOfWords;
+            var attributeVectorizer = encoder.AttributeFeatureVectorizers.First();
+            CollectionAssert.AreEqual(
+                spatialStringVectorizer.RecognizedValues.ToArray(),
+                attributeVectorizer.RecognizedValues.ToArray());
         }
 
         #endregion Tests

@@ -93,6 +93,13 @@
             this.documentCategorizationCsvTrainingPercentageTextBox = new System.Windows.Forms.TextBox();
             this.documentCategorizationCsvLabel = new System.Windows.Forms.Label();
             this.featureConfigurationTabPage = new System.Windows.Forms.TabPage();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.maxFeaturesPerVectorizerTextBox = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.maxShingleSizeForAttributeFeaturesTextBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.attributesToTokenizeFilterTextBox = new System.Windows.Forms.TextBox();
+            this.tokenizeAttributesFilterCheckBox = new System.Windows.Forms.CheckBox();
             this.useFeatureAttributeFilterLabel = new System.Windows.Forms.Label();
             this.attributeFeatureFilterComboBox = new System.Windows.Forms.ComboBox();
             this.attributeFeatureFilterTextBox = new System.Windows.Forms.TextBox();
@@ -149,6 +156,7 @@
             this.paginationInputPanel.SuspendLayout();
             this.documentCategorizationCsvInputPanel.SuspendLayout();
             this.featureConfigurationTabPage.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.autoBagOfWordsGroupBox.SuspendLayout();
             this.machineConfigurationTabPage.SuspendLayout();
             this.multilabelSvmPanel.SuspendLayout();
@@ -163,7 +171,7 @@
             this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 711);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1840, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1362, 22);
             this.statusStrip1.TabIndex = 3;
             // 
             // toolStripStatusLabel1
@@ -183,7 +191,7 @@
             this.configurationTabControl.Location = new System.Drawing.Point(0, 5);
             this.configurationTabControl.Name = "configurationTabControl";
             this.configurationTabControl.SelectedIndex = 0;
-            this.configurationTabControl.Size = new System.Drawing.Size(1840, 674);
+            this.configurationTabControl.Size = new System.Drawing.Size(1362, 674);
             this.configurationTabControl.TabIndex = 0;
             this.configurationTabControl.SelectedIndexChanged += new System.EventHandler(this.HandleConfigurationTabControl_SelectedIndexChanged);
             // 
@@ -194,7 +202,7 @@
             this.inputConfigurationTabPage.Location = new System.Drawing.Point(4, 22);
             this.inputConfigurationTabPage.Name = "inputConfigurationTabPage";
             this.inputConfigurationTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.inputConfigurationTabPage.Size = new System.Drawing.Size(1832, 648);
+            this.inputConfigurationTabPage.Size = new System.Drawing.Size(1354, 648);
             this.inputConfigurationTabPage.TabIndex = 0;
             this.inputConfigurationTabPage.Text = "Input configuration";
             this.inputConfigurationTabPage.UseVisualStyleBackColor = true;
@@ -208,7 +216,7 @@
             this.machineUsageGroupBox.Controls.Add(this.documentCategorizationRadioButton);
             this.machineUsageGroupBox.Location = new System.Drawing.Point(3, 6);
             this.machineUsageGroupBox.Name = "machineUsageGroupBox";
-            this.machineUsageGroupBox.Size = new System.Drawing.Size(1824, 90);
+            this.machineUsageGroupBox.Size = new System.Drawing.Size(1346, 90);
             this.machineUsageGroupBox.TabIndex = 0;
             this.machineUsageGroupBox.TabStop = false;
             this.machineUsageGroupBox.Text = "Machine learning engine usage";
@@ -262,7 +270,7 @@
             this.inputConfigurationGroupBox.Controls.Add(this.documentCategorizationCsvInputPanel);
             this.inputConfigurationGroupBox.Location = new System.Drawing.Point(3, 98);
             this.inputConfigurationGroupBox.Name = "inputConfigurationGroupBox";
-            this.inputConfigurationGroupBox.Size = new System.Drawing.Size(1824, 544);
+            this.inputConfigurationGroupBox.Size = new System.Drawing.Size(1346, 544);
             this.inputConfigurationGroupBox.TabIndex = 1;
             this.inputConfigurationGroupBox.TabStop = false;
             this.inputConfigurationGroupBox.Text = "Training/testing files";
@@ -864,10 +872,7 @@
             // 
             // featureConfigurationTabPage
             // 
-            this.featureConfigurationTabPage.Controls.Add(this.useFeatureAttributeFilterLabel);
-            this.featureConfigurationTabPage.Controls.Add(this.attributeFeatureFilterComboBox);
-            this.featureConfigurationTabPage.Controls.Add(this.attributeFeatureFilterTextBox);
-            this.featureConfigurationTabPage.Controls.Add(this.useAttributeFeatureFilterCheckBox);
+            this.featureConfigurationTabPage.Controls.Add(this.groupBox1);
             this.featureConfigurationTabPage.Controls.Add(this.viewAnswerListButton);
             this.featureConfigurationTabPage.Controls.Add(this.computeFeaturesButton);
             this.featureConfigurationTabPage.Controls.Add(this.editFeaturesButton);
@@ -875,39 +880,125 @@
             this.featureConfigurationTabPage.Location = new System.Drawing.Point(4, 22);
             this.featureConfigurationTabPage.Name = "featureConfigurationTabPage";
             this.featureConfigurationTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.featureConfigurationTabPage.Size = new System.Drawing.Size(1832, 648);
+            this.featureConfigurationTabPage.Size = new System.Drawing.Size(1354, 648);
             this.featureConfigurationTabPage.TabIndex = 1;
             this.featureConfigurationTabPage.Text = "Feature configuration";
             this.featureConfigurationTabPage.UseVisualStyleBackColor = true;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.maxFeaturesPerVectorizerTextBox);
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.maxShingleSizeForAttributeFeaturesTextBox);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.attributesToTokenizeFilterTextBox);
+            this.groupBox1.Controls.Add(this.tokenizeAttributesFilterCheckBox);
+            this.groupBox1.Controls.Add(this.useFeatureAttributeFilterLabel);
+            this.groupBox1.Controls.Add(this.attributeFeatureFilterComboBox);
+            this.groupBox1.Controls.Add(this.attributeFeatureFilterTextBox);
+            this.groupBox1.Controls.Add(this.useAttributeFeatureFilterCheckBox);
+            this.groupBox1.Location = new System.Drawing.Point(3, 102);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(1345, 267);
+            this.groupBox1.TabIndex = 2;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Attribute feature vectorizers";
+            // 
+            // maxFeaturesPerVectorizerTextBox
+            // 
+            this.maxFeaturesPerVectorizerTextBox.Location = new System.Drawing.Point(10, 113);
+            this.maxFeaturesPerVectorizerTextBox.Name = "maxFeaturesPerVectorizerTextBox";
+            this.maxFeaturesPerVectorizerTextBox.Size = new System.Drawing.Size(132, 20);
+            this.maxFeaturesPerVectorizerTextBox.TabIndex = 5;
+            this.maxFeaturesPerVectorizerTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.maxFeaturesPerVectorizerTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.maxFeaturesPerVectorizerTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(7, 94);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(135, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Max features per vectorizer";
+            // 
+            // maxShingleSizeForAttributeFeaturesTextBox
+            // 
+            this.maxShingleSizeForAttributeFeaturesTextBox.Location = new System.Drawing.Point(10, 235);
+            this.maxShingleSizeForAttributeFeaturesTextBox.Name = "maxShingleSizeForAttributeFeaturesTextBox";
+            this.maxShingleSizeForAttributeFeaturesTextBox.Size = new System.Drawing.Size(26, 20);
+            this.maxShingleSizeForAttributeFeaturesTextBox.TabIndex = 9;
+            this.maxShingleSizeForAttributeFeaturesTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.maxShingleSizeForAttributeFeaturesTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.maxShingleSizeForAttributeFeaturesTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(8, 216);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(84, 13);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "Max shingle size";
+            // 
+            // attributesToTokenizeFilterTextBox
+            // 
+            this.attributesToTokenizeFilterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.attributesToTokenizeFilterTextBox.Enabled = false;
+            this.attributesToTokenizeFilterTextBox.Location = new System.Drawing.Point(10, 165);
+            this.attributesToTokenizeFilterTextBox.Multiline = true;
+            this.attributesToTokenizeFilterTextBox.Name = "attributesToTokenizeFilterTextBox";
+            this.attributesToTokenizeFilterTextBox.Size = new System.Drawing.Size(1323, 44);
+            this.attributesToTokenizeFilterTextBox.TabIndex = 7;
+            this.attributesToTokenizeFilterTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.attributesToTokenizeFilterTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            // 
+            // tokenizeAttributesFilterCheckBox
+            // 
+            this.tokenizeAttributesFilterCheckBox.AutoSize = true;
+            this.tokenizeAttributesFilterCheckBox.Checked = true;
+            this.tokenizeAttributesFilterCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tokenizeAttributesFilterCheckBox.Location = new System.Drawing.Point(10, 142);
+            this.tokenizeAttributesFilterCheckBox.Name = "tokenizeAttributesFilterCheckBox";
+            this.tokenizeAttributesFilterCheckBox.Size = new System.Drawing.Size(330, 17);
+            this.tokenizeAttributesFilterCheckBox.TabIndex = 6;
+            this.tokenizeAttributesFilterCheckBox.Text = "Tokenize/make shingles from the attributes that match this query";
+            this.tokenizeAttributesFilterCheckBox.UseVisualStyleBackColor = true;
+            this.tokenizeAttributesFilterCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            // 
             // useFeatureAttributeFilterLabel
             // 
             this.useFeatureAttributeFilterLabel.AutoSize = true;
-            this.useFeatureAttributeFilterLabel.Location = new System.Drawing.Point(243, 103);
+            this.useFeatureAttributeFilterLabel.Location = new System.Drawing.Point(247, 21);
             this.useFeatureAttributeFilterLabel.Name = "useFeatureAttributeFilterLabel";
             this.useFeatureAttributeFilterLabel.Size = new System.Drawing.Size(52, 13);
-            this.useFeatureAttributeFilterLabel.TabIndex = 3;
+            this.useFeatureAttributeFilterLabel.TabIndex = 2;
             this.useFeatureAttributeFilterLabel.Text = "this query";
             // 
             // attributeFeatureFilterComboBox
             // 
             this.attributeFeatureFilterComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.attributeFeatureFilterComboBox.FormattingEnabled = true;
-            this.attributeFeatureFilterComboBox.Location = new System.Drawing.Point(160, 100);
+            this.attributeFeatureFilterComboBox.Location = new System.Drawing.Point(164, 18);
             this.attributeFeatureFilterComboBox.Name = "attributeFeatureFilterComboBox";
             this.attributeFeatureFilterComboBox.Size = new System.Drawing.Size(77, 21);
-            this.attributeFeatureFilterComboBox.TabIndex = 2;
+            this.attributeFeatureFilterComboBox.TabIndex = 1;
+            this.attributeFeatureFilterComboBox.SelectedIndexChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // attributeFeatureFilterTextBox
             // 
             this.attributeFeatureFilterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.attributeFeatureFilterTextBox.Enabled = false;
-            this.attributeFeatureFilterTextBox.Location = new System.Drawing.Point(3, 125);
+            this.attributeFeatureFilterTextBox.Location = new System.Drawing.Point(10, 43);
             this.attributeFeatureFilterTextBox.Multiline = true;
             this.attributeFeatureFilterTextBox.Name = "attributeFeatureFilterTextBox";
-            this.attributeFeatureFilterTextBox.Size = new System.Drawing.Size(1824, 44);
-            this.attributeFeatureFilterTextBox.TabIndex = 4;
+            this.attributeFeatureFilterTextBox.Size = new System.Drawing.Size(1323, 44);
+            this.attributeFeatureFilterTextBox.TabIndex = 3;
             this.attributeFeatureFilterTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             this.attributeFeatureFilterTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
@@ -916,10 +1007,10 @@
             this.useAttributeFeatureFilterCheckBox.AutoSize = true;
             this.useAttributeFeatureFilterCheckBox.Checked = true;
             this.useAttributeFeatureFilterCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.useAttributeFeatureFilterCheckBox.Location = new System.Drawing.Point(6, 102);
+            this.useAttributeFeatureFilterCheckBox.Location = new System.Drawing.Point(10, 20);
             this.useAttributeFeatureFilterCheckBox.Name = "useAttributeFeatureFilterCheckBox";
             this.useAttributeFeatureFilterCheckBox.Size = new System.Drawing.Size(134, 17);
-            this.useAttributeFeatureFilterCheckBox.TabIndex = 1;
+            this.useAttributeFeatureFilterCheckBox.TabIndex = 0;
             this.useAttributeFeatureFilterCheckBox.Text = "Only use attributes that";
             this.useAttributeFeatureFilterCheckBox.UseVisualStyleBackColor = true;
             this.useAttributeFeatureFilterCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
@@ -928,20 +1019,20 @@
             // 
             this.viewAnswerListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.viewAnswerListButton.Enabled = false;
-            this.viewAnswerListButton.Location = new System.Drawing.Point(1723, 184);
+            this.viewAnswerListButton.Location = new System.Drawing.Point(1245, 385);
             this.viewAnswerListButton.Name = "viewAnswerListButton";
             this.viewAnswerListButton.Size = new System.Drawing.Size(101, 23);
-            this.viewAnswerListButton.TabIndex = 7;
+            this.viewAnswerListButton.TabIndex = 0;
             this.viewAnswerListButton.Text = "View answer list...";
             this.viewAnswerListButton.UseVisualStyleBackColor = true;
             this.viewAnswerListButton.Click += new System.EventHandler(this.HandleViewAnswerListButton_Click);
             // 
             // computeFeaturesButton
             // 
-            this.computeFeaturesButton.Location = new System.Drawing.Point(8, 184);
+            this.computeFeaturesButton.Location = new System.Drawing.Point(7, 385);
             this.computeFeaturesButton.Name = "computeFeaturesButton";
             this.computeFeaturesButton.Size = new System.Drawing.Size(101, 23);
-            this.computeFeaturesButton.TabIndex = 5;
+            this.computeFeaturesButton.TabIndex = 3;
             this.computeFeaturesButton.Text = "Compute features";
             this.computeFeaturesButton.UseVisualStyleBackColor = true;
             this.computeFeaturesButton.Click += new System.EventHandler(this.HandleComputeFeaturesButton_Click);
@@ -950,10 +1041,10 @@
             // 
             this.editFeaturesButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.editFeaturesButton.Enabled = false;
-            this.editFeaturesButton.Location = new System.Drawing.Point(1616, 184);
+            this.editFeaturesButton.Location = new System.Drawing.Point(1138, 385);
             this.editFeaturesButton.Name = "editFeaturesButton";
             this.editFeaturesButton.Size = new System.Drawing.Size(101, 23);
-            this.editFeaturesButton.TabIndex = 6;
+            this.editFeaturesButton.TabIndex = 4;
             this.editFeaturesButton.Text = "Edit feature list...";
             this.editFeaturesButton.UseVisualStyleBackColor = true;
             this.editFeaturesButton.Click += new System.EventHandler(this.HandleEditFeaturesButton_Click);
@@ -971,8 +1062,8 @@
             this.autoBagOfWordsGroupBox.Controls.Add(this.useAutoBagOfWordsCheckBox);
             this.autoBagOfWordsGroupBox.Location = new System.Drawing.Point(3, 6);
             this.autoBagOfWordsGroupBox.Name = "autoBagOfWordsGroupBox";
-            this.autoBagOfWordsGroupBox.Size = new System.Drawing.Size(1824, 90);
-            this.autoBagOfWordsGroupBox.TabIndex = 0;
+            this.autoBagOfWordsGroupBox.Size = new System.Drawing.Size(1346, 90);
+            this.autoBagOfWordsGroupBox.TabIndex = 1;
             this.autoBagOfWordsGroupBox.TabStop = false;
             this.autoBagOfWordsGroupBox.Text = "Auto-BoW";
             // 
@@ -1060,7 +1151,7 @@
             this.machineConfigurationTabPage.Location = new System.Drawing.Point(4, 22);
             this.machineConfigurationTabPage.Name = "machineConfigurationTabPage";
             this.machineConfigurationTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.machineConfigurationTabPage.Size = new System.Drawing.Size(1832, 648);
+            this.machineConfigurationTabPage.Size = new System.Drawing.Size(1354, 648);
             this.machineConfigurationTabPage.TabIndex = 2;
             this.machineConfigurationTabPage.Text = "Machine configuration";
             this.machineConfigurationTabPage.UseVisualStyleBackColor = true;
@@ -1331,7 +1422,7 @@
             // saveMachineAsButton
             // 
             this.saveMachineAsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveMachineAsButton.Location = new System.Drawing.Point(1775, 683);
+            this.saveMachineAsButton.Location = new System.Drawing.Point(1297, 683);
             this.saveMachineAsButton.Name = "saveMachineAsButton";
             this.saveMachineAsButton.Size = new System.Drawing.Size(60, 23);
             this.saveMachineAsButton.TabIndex = 5;
@@ -1358,7 +1449,7 @@
             // openMachineButton
             // 
             this.openMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.openMachineButton.Location = new System.Drawing.Point(1643, 683);
+            this.openMachineButton.Location = new System.Drawing.Point(1165, 683);
             this.openMachineButton.Name = "openMachineButton";
             this.openMachineButton.Size = new System.Drawing.Size(60, 23);
             this.openMachineButton.TabIndex = 3;
@@ -1369,7 +1460,7 @@
             // saveMachineButton
             // 
             this.saveMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveMachineButton.Location = new System.Drawing.Point(1709, 683);
+            this.saveMachineButton.Location = new System.Drawing.Point(1231, 683);
             this.saveMachineButton.Name = "saveMachineButton";
             this.saveMachineButton.Size = new System.Drawing.Size(60, 23);
             this.saveMachineButton.TabIndex = 4;
@@ -1380,7 +1471,7 @@
             // newMachineButton
             // 
             this.newMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.newMachineButton.Location = new System.Drawing.Point(1577, 683);
+            this.newMachineButton.Location = new System.Drawing.Point(1099, 683);
             this.newMachineButton.Name = "newMachineButton";
             this.newMachineButton.Size = new System.Drawing.Size(60, 23);
             this.newMachineButton.TabIndex = 2;
@@ -1394,7 +1485,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1840, 733);
+            this.ClientSize = new System.Drawing.Size(1362, 733);
             this.Controls.Add(this.newMachineButton);
             this.Controls.Add(this.saveMachineButton);
             this.Controls.Add(this.configurationTabControl);
@@ -1424,7 +1515,8 @@
             this.documentCategorizationCsvInputPanel.ResumeLayout(false);
             this.documentCategorizationCsvInputPanel.PerformLayout();
             this.featureConfigurationTabPage.ResumeLayout(false);
-            this.featureConfigurationTabPage.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.autoBagOfWordsGroupBox.ResumeLayout(false);
             this.autoBagOfWordsGroupBox.PerformLayout();
             this.machineConfigurationTabPage.ResumeLayout(false);
@@ -1521,8 +1613,6 @@
         private System.Windows.Forms.Button saveMachineAsButton;
         private System.Windows.Forms.Button trainTestButton;
         private System.Windows.Forms.Button viewAnswerListButton;
-        private System.Windows.Forms.TextBox attributeFeatureFilterTextBox;
-        private System.Windows.Forms.CheckBox useAttributeFeatureFilterCheckBox;
         private System.Windows.Forms.Label documentCategorizationFolderFeatureVoaLabel;
         private Extract.Utilities.Forms.PathTagsButton documentCategorizationFolderFeatureVoaPathTagButton;
         private System.Windows.Forms.TextBox documentCategorizationFolderFeatureVoaTextBox;
@@ -1532,8 +1622,6 @@
         private System.Windows.Forms.TextBox paginationAnswerVoaTextBox;
         private Extract.Utilities.Forms.PathTagsButton paginationAnswerVoaPathTagButton;
         private System.Windows.Forms.Label paginationAnswerVoaLabel;
-        private System.Windows.Forms.ComboBox attributeFeatureFilterComboBox;
-        private System.Windows.Forms.Label useFeatureAttributeFilterLabel;
         private System.Windows.Forms.ErrorProvider configurationErrorProvider;
         private System.Windows.Forms.Button openMachineButton;
         private System.Windows.Forms.Button saveMachineButton;
@@ -1551,6 +1639,17 @@
         private Utilities.Forms.BrowseButton attributeCategorizationFileListOrFolderBrowseButton;
         private System.Windows.Forms.TextBox attributeCategorizationFileListOrFolderTextBox;
         private System.Windows.Forms.RadioButton attributeCategorizationRadioButton;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TextBox maxFeaturesPerVectorizerTextBox;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox maxShingleSizeForAttributeFeaturesTextBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox attributesToTokenizeFilterTextBox;
+        private System.Windows.Forms.CheckBox tokenizeAttributesFilterCheckBox;
+        private System.Windows.Forms.Label useFeatureAttributeFilterLabel;
+        private System.Windows.Forms.ComboBox attributeFeatureFilterComboBox;
+        private System.Windows.Forms.TextBox attributeFeatureFilterTextBox;
+        private System.Windows.Forms.CheckBox useAttributeFeatureFilterCheckBox;
     }
 }
 

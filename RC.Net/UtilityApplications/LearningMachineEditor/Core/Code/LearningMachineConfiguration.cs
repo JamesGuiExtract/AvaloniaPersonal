@@ -611,6 +611,14 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 attributeFeatureFilterComboBox.SelectedItem = encoder.NegateFilter ? _DO_NOT_MATCH : _MATCH;
                 attributeFeatureFilterTextBox.Text = encoder.AttributeFilter ?? "";
 
+                maxFeaturesPerVectorizerTextBox.Text =
+                    encoder.AttributeVectorizerMaxFeatures.ToString(CultureInfo.CurrentCulture);
+
+                tokenizeAttributesFilterCheckBox.Checked = !string.IsNullOrWhiteSpace(encoder.AttributesToTokenizeFilter);
+                attributesToTokenizeFilterTextBox.Text = encoder.AttributesToTokenizeFilter ?? "";
+                maxShingleSizeForAttributeFeaturesTextBox.Text =
+                    encoder.AttributeVectorizerShingleSize.ToString(CultureInfo.CurrentCulture);
+
                 // Set machine controls
                 machineTypeComboBox.SelectEnumValue(CurrentLearningMachine.MachineType);
                 if (CurrentLearningMachine.MachineType == LearningMachineType.ActivationNetwork)
@@ -906,7 +914,36 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 negateFilter = (string)attributeFeatureFilterComboBox.SelectedItem == _DO_NOT_MATCH;
             }
-            learningMachine.Encoder = new LearningMachineDataEncoder(usage, autoBoW, attributeFilter, negateFilter);
+
+            int maxAttributeVectorizerFeatures;
+            if (!int.TryParse(this.maxFeaturesPerVectorizerTextBox.Text, NumberStyles.Integer, CultureInfo.InvariantCulture,
+                out maxAttributeVectorizerFeatures)
+                || maxAttributeVectorizerFeatures < 1)
+            {
+                maxFeaturesPerVectorizerTextBox.SetError(configurationErrorProvider, "Max features value must be an integer greater than zero");
+                _valid = false;
+            }
+
+            string attributesToTokenize = null;
+            int shingleSizeForTokens = 1;
+            if (tokenizeAttributesFilterCheckBox.Checked)
+            {
+                // Trim any whitespace from query
+                attributesToTokenize = string.Join("", attributesToTokenizeFilterTextBox.Text.Split(
+                    new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+
+                if (!int.TryParse(maxShingleSizeForAttributeFeaturesTextBox.Text,
+                    NumberStyles.Integer, CultureInfo.InvariantCulture, out shingleSizeForTokens)
+                    || shingleSizeForTokens < 1)
+                {
+                    maxShingleSizeForAttributeFeaturesTextBox.SetError(configurationErrorProvider,
+                        "Shingle size must be an integer greater than zero");
+                    _valid = false;
+                }
+            }
+
+            learningMachine.Encoder = new LearningMachineDataEncoder(usage, autoBoW, attributeFilter,
+                negateFilter, maxAttributeVectorizerFeatures, attributesToTokenize, shingleSizeForTokens);
         }
 
         /// <summary>
@@ -1145,6 +1182,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
             attributeFeatureFilterTextBox.Enabled = useAttributeFeatureFilterCheckBox.Checked;
             attributeFeatureFilterComboBox.Enabled = useAttributeFeatureFilterCheckBox.Checked;
+
+            attributesToTokenizeFilterTextBox.Enabled = tokenizeAttributesFilterCheckBox.Checked;
+            maxShingleSizeForAttributeFeaturesTextBox.Enabled = tokenizeAttributesFilterCheckBox.Checked;
 
             // Machine panels
             var machineType = machineTypeComboBox.ToEnumValue<LearningMachineType>();

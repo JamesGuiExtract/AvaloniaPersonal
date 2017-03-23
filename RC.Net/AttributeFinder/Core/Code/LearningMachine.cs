@@ -40,8 +40,9 @@ namespace Extract.AttributeFinder
         /// Current version.
         /// Version 2: Add LearningMachineUsage.AttributeCategorization
         ///            Add LabelAttributesSettings property and backing field
+        /// Version 3: Add versioning to LearningMachineDataEncoder
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         // Encryption password for serialization, renamed to obfuscate purpose
         private static readonly byte[] _CONVERGENCE_MATRIX = new byte[64]
@@ -937,6 +938,44 @@ namespace Extract.AttributeFinder
             {
                 _labelAttributesPersistedSettings = null;
             }
+
+            // Since v1 of LearningMachineDataEncoder had no versioning, this object's version
+            // was incremented at the same time versioning was added to that object so as to prevent
+            // incompatible usage.
+            // But, in order to allow for use in older software when possible, decrease the version if this object
+            // is compatible with the previous version
+            if (_CURRENT_VERSION == 3)
+            {
+                if (IsCompatibleWithVersion(2))
+                {
+                    _version = 2;
+                }
+            }
+        }
+
+        [OnSerialized]
+        private void OnSerialized(StreamingContext context)
+        {
+            // Reset the version that may have been decremented for serialization
+            _version = _CURRENT_VERSION;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is safe (won't behave differently)
+        /// if used by software that is unaware of features added in <see cref="_version" />
+        /// </summary>
+        /// <param name="version">The version in question.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is compatible with the specified version
+        /// </returns>
+        internal bool IsCompatibleWithVersion(int version)
+        {
+            if (_version == 3 && version == 2)
+            {
+                // LearningMachineDataEncoder v1 corresponds to LearningMachine v2
+                return Encoder.IsCompatibleWithVersion(1);
+            }
+            return _version <= version;
         }
 
         /// <summary>
@@ -958,8 +997,10 @@ namespace Extract.AttributeFinder
         private void OnDeserialized(StreamingContext context)
         {
             // Don't support loading newer versions
-            ExtractException.Assert("ELI40071", "Cannot load newer version", _version <= _CURRENT_VERSION,
-                "Current version", _CURRENT_VERSION, "Version to load", _version);
+            ExtractException.Assert("ELI40071", "Cannot load newer LearningMachine",
+                _version <= _CURRENT_VERSION,
+                "Current version", _CURRENT_VERSION,
+                "Version to load", _version);
 
             // Update version number
             _version = _CURRENT_VERSION;

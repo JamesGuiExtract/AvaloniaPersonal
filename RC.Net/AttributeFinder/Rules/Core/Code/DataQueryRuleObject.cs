@@ -218,7 +218,7 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="dataQueryRuleObject">The <see cref="DataQueryRuleObject"/> from which
         /// settings should be copied.</param>
-        public DataQueryRuleObject(DataQueryRuleObject dataQueryRuleObject)
+        public DataQueryRuleObject(DataQueryRuleObject dataQueryRuleObject) : this()
         {
             try
             {

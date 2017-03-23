@@ -14,6 +14,8 @@ using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
+using UCLID_AFCORELib;
+using System.Runtime.Serialization;
 
 namespace Extract.AttributeFinder
 {
@@ -150,16 +152,61 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Constructs a new instance from a collection of <see cref="ComAttribute"/>s
+        /// <param name="attributes">The <see cref="ComAttribute"/>s that will be used
+        /// to generate a mapping of names to values.</param>
         /// </summary>
         public NameToProtoFeaturesMap(IEnumerable<ComAttribute> attributes = null)
         {
             if (attributes != null)
             {
-                _nameToFeatureValues = attributes
-                    .GroupBy(a => a.Name)
-                    .ToDictionary(g => g.Key,
-                                  g => g.Select(a => a.Value.String).ToList(),
-                                  StringComparer.OrdinalIgnoreCase);
+                _nameToFeatureValues = MakeDictionary(attributes);
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new instance from a collection of <see cref="ComAttribute"/>s
+        /// <param name="attributes">The <see cref="ComAttribute"/>s that will be used
+        /// to generate a mapping of names to values.</param>
+        /// <param name="queryForAttributesToTokenize">The AFQuery to be used to divide
+        /// the input into attributes to tokenize and attributes to use the values of
+        /// in their entirety</param>
+        /// <param name="shingleSize">The size of word-n-grams to make out of any tokens</param>
+        /// </summary>
+        public NameToProtoFeaturesMap(IEnumerable<ComAttribute> attributes,
+            string queryForAttributesToTokenize, int shingleSize)
+        {
+            if (attributes != null)
+            {
+                if (string.IsNullOrEmpty(queryForAttributesToTokenize))
+                {
+                    _nameToFeatureValues = MakeDictionary(attributes);
+                }
+                else
+                {
+                    var afutil = new AFUtilityClass();
+                    var attributesVector = attributes.ToIUnknownVector();
+                    var attributesToTokenize = afutil.QueryAttributes(attributesVector,
+                        queryForAttributesToTokenize, bRemoveMatches: true)
+                        .ToIEnumerable<ComAttribute>();
+
+                    if (!attributesToTokenize.Any())
+                    {
+                        _nameToFeatureValues = MakeDictionary(attributes);
+                    }
+                    else
+                    {
+                        _nameToFeatureValues = MakeDictionary(attributesVector.ToIEnumerable<ComAttribute>());
+
+                        var tokenizer = new SpatialStringFeatureVectorizer(null, shingleSize, -1);
+                        foreach (var attribute in attributesToTokenize)
+                        {
+                            var text = attribute.Value.String;
+                            var values = _nameToFeatureValues.GetOrAdd(attribute.Name,
+                                () => new List<string>());
+                            values.AddRange(tokenizer.GetTerms(text));
+                        }
+                    }
+                }
             }
         }
 
@@ -191,6 +238,15 @@ namespace Extract.AttributeFinder
             }
             return _nameToFeatureValues.GetEnumerator();
         }
+
+        private Dictionary<string, List<string>> MakeDictionary(IEnumerable<ComAttribute> attributes)
+        {
+            return attributes
+                .GroupBy(a => a.Name)
+                .ToDictionary(g => g.Key,
+                              g => g.Select(a => a.Value.String).ToList(),
+                              StringComparer.OrdinalIgnoreCase);
+        }
     }
 
     /// <summary>
@@ -204,6 +260,13 @@ namespace Extract.AttributeFinder
     {
 
         #region Constants
+
+        /// <summary>
+        /// Current version.
+        /// Version 2: Add AttributesToTokenizeFilter property and backing field
+        ///            Add AttributeFeatureShingleSize property and backing field
+        /// </summary>
+        const int _CURRENT_VERSION = 2;
 
         // Used for document categorization.
         // Used to represent categories that are in testing data but not in training data.
@@ -240,6 +303,13 @@ namespace Extract.AttributeFinder
         #region Fields
 
         /// <summary>
+        /// Persist the current version to prevent the use of newer versions of this object from
+        /// being used incorrectly on an older software version.
+        /// </summary>
+        [OptionalField(VersionAdded = 2)]
+        private int _version = _CURRENT_VERSION;
+
+        /// <summary>
         /// <see cref="IAFUtility"/> to be used by this thread to resolve attribute queries
         /// </summary>
         private static readonly ThreadLocal<IAFUtility> _afUtility = new ThreadLocal<IAFUtility>(() => new AFUtilityClass());
@@ -258,6 +328,15 @@ namespace Extract.AttributeFinder
         private string _attributeFilter;
         private bool _negateFilter;
         private LearningMachineUsage _machineUsage;
+
+        [OptionalField(VersionAdded = 2)]
+        private string _attributesToTokenizeFilter;
+
+        [OptionalField(VersionAdded = 2)]
+        private int _attributeVectorizerShingleSize;
+
+        [OptionalField(VersionAdded = 2)]
+        private int _attributeVectorizerMaxFeatures;
 
         #endregion Fields
 
@@ -379,6 +458,22 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Gets/sets the AFQuery to select which proto-feature attributes will be tokenized.
+        /// If <see langword="null"/> then no attributes will be tokenized.
+        /// </summary>
+        public string AttributesToTokenizeFilter
+        {
+            get
+            {
+                return _attributesToTokenizeFilter;
+            }
+            set
+            {
+                _attributesToTokenizeFilter = value;
+            }
+        }
+
+        /// <summary>
         /// Gets/sets whether to use only attributes that are not selected by
         /// <see cref="AttributeFilter"/> for proto-features
         /// </summary>
@@ -394,6 +489,37 @@ namespace Extract.AttributeFinder
                 {
                     _negateFilter = value;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets the max shingle (word n-gram) size to be used for tokenized
+        /// attribute features.
+        /// </summary>
+        public int AttributeVectorizerShingleSize
+        {
+            get
+            {
+                return _attributeVectorizerShingleSize;
+            }
+            set
+            {
+                _attributeVectorizerShingleSize = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets the maximum number of features (distinct values seen) to retain per attribute feature vectorizer.
+        /// </summary>
+        public int AttributeVectorizerMaxFeatures
+        {
+            get
+            {
+                return _attributeVectorizerMaxFeatures;
+            }
+            set
+            {
+                _attributeVectorizerMaxFeatures = value;
             }
         }
 
@@ -437,16 +563,20 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="LearningMachineDataEncoder"/>
+        /// Creates an instance of <see cref="LearningMachineDataEncoder" />
         /// </summary>
-        /// <param name="usage">The <see cref="LearningMachineUsage"/> for this instance.</param>
-        /// <param name="autoBagOfWords">The optional <see cref="SpatialStringFeatureVectorizer"/> for this instance.</param>
-        /// <param name="attributeFilter">AFQuery to select proto-feature attributes. If <see langword="null"/>
+        /// <param name="usage">The <see cref="LearningMachineUsage" /> for this instance.</param>
+        /// <param name="autoBagOfWords">The optional <see cref="SpatialStringFeatureVectorizer" /> for this instance.</param>
+        /// <param name="attributeFilter">AFQuery to select proto-feature attributes. If <see langword="null" />
         /// then all attributes will be used.</param>
         /// <param name="negateFilter">Whether to use only attributes that are not selected by
-        /// <see paramref="attributeFilter"/> for proto-features</param>
+        /// <see paramref="attributeFilter" /> for proto-features</param>
+        /// <param name="attributeVectorizerMaxFeatures">The max number of terms retained for each attribute vectorizer.</param>
+        /// <param name="attributesToTokenize">A query used to select a subset of attributes to be tokenized and converted into shingles.</param>
+        /// <param name="attributeVectorizerShingleSize">The maximum size of word-n-grams to be derived from attribute vectorizer tokens.</param>
         public LearningMachineDataEncoder(LearningMachineUsage usage, SpatialStringFeatureVectorizer autoBagOfWords = null,
-            string attributeFilter = null, bool negateFilter = false)
+            string attributeFilter = null, bool negateFilter = false, int attributeVectorizerMaxFeatures = 500,
+            string attributesToTokenize = null, int attributeVectorizerShingleSize = 1)
         {
             MachineUsage = usage;
             AutoBagOfWords = autoBagOfWords;
@@ -455,6 +585,9 @@ namespace Extract.AttributeFinder
             NegateFilter = negateFilter;
             AnswerCodeToName = new Dictionary<int, string>();
             AnswerNameToCode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            AttributeVectorizerMaxFeatures = attributeVectorizerMaxFeatures;
+            AttributesToTokenizeFilter = attributesToTokenize;
+            AttributeVectorizerShingleSize = attributeVectorizerShingleSize;
         }
 
         #endregion Constructors
@@ -642,6 +775,12 @@ namespace Extract.AttributeFinder
                     throw new ExtractException("ELI39539", "Unsupported LearningMachineUsage: " + MachineUsage.ToString());
                 }
                 ExtractException.Assert("ELI39693", "Unable to successfully compute encodings", AreEncodingsComputed);
+
+                foreach(var vectorizer in AttributeFeatureVectorizers)
+                {
+                    vectorizer.LimitToTopTerms(AttributeVectorizerMaxFeatures);
+                }
+
                 updateStatus(new StatusArgs
                 {
                     StatusMessage = "Feature vector length: {0:N0}",
@@ -797,6 +936,9 @@ namespace Extract.AttributeFinder
                     || other.AutoBagOfWords != null && !other.AutoBagOfWords.IsConfigurationEqualTo(AutoBagOfWords)
                     || other.MachineUsage != MachineUsage
                     || other.NegateFilter != NegateFilter
+                    || other.AttributeVectorizerMaxFeatures != AttributeVectorizerMaxFeatures
+                    || other.AttributesToTokenizeFilter != AttributesToTokenizeFilter
+                    || other.AttributeVectorizerShingleSize != AttributeVectorizerShingleSize
                     || other.AreEncodingsComputed && AreEncodingsComputed &&
                         (  !other.AttributeFeatureVectorizers.SequenceEqual(AttributeFeatureVectorizers)
                         || other.AutoBagOfWords != null && !other.AutoBagOfWords.Equals(AutoBagOfWords)
@@ -1650,8 +1792,14 @@ namespace Extract.AttributeFinder
             }
             else
             {
+                updateStatus(new StatusArgs { StatusMessage = "Collecting labels from VOAs:" });
                 answers = labeledCandidateAttributesFiles
-                    .SelectMany(CollectLabelsFromLabeledCandidateAttributesFile)
+                    .SelectMany(voa =>
+                    {
+                        var labels = CollectLabelsFromLabeledCandidateAttributesFile(voa);
+                        updateStatus(new StatusArgs { StatusMessage = "Files processed: {0:N0}", Int32Value = 1, Indent = 1 });
+                        return labels;
+                    })
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();
             }
@@ -1773,7 +1921,61 @@ namespace Extract.AttributeFinder
         /// <returns>A <see cref="NameToProtoFeaturesMap"/> built from the filtered <see cref="ComAttribute"/>s</returns>
         private NameToProtoFeaturesMap GetFilteredMapOfNamesToValues(IUnknownVector protoFeatures)
         {
-            return new NameToProtoFeaturesMap(FilterProtoFeatures(protoFeatures));
+            var filtered = FilterProtoFeatures(protoFeatures);
+
+            if (string.IsNullOrEmpty(AttributesToTokenizeFilter))
+            {
+                return new NameToProtoFeaturesMap(filtered);
+            }
+            else
+            {
+                return new NameToProtoFeaturesMap(filtered, AttributesToTokenizeFilter, AttributeVectorizerShingleSize);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is safe (won't behave differently)
+        /// if used by software that is unaware of features added in <see cref="_version" />
+        /// </summary>
+        /// <param name="version">The version in question.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is compatible with the specified version
+        /// </returns>
+        internal bool IsCompatibleWithVersion(int version)
+        {
+            if (_version == 2 && version == 1)
+            {
+                return string.IsNullOrEmpty(AttributesToTokenizeFilter);
+            }
+            return _version <= version;
+        }
+
+        /// <summary>
+        /// Called when deserializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+            // Set optional fields
+            _attributeVectorizerMaxFeatures = Int32.MaxValue;
+            _attributesToTokenizeFilter = null;
+            _attributeVectorizerShingleSize = 1;
+        }
+
+        /// <summary>
+        /// Called when deserialized
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            ExtractException.Assert("ELI42074", "Cannot load newer LearningMachineDataEncoder",
+                _version <= _CURRENT_VERSION,
+                "Current version", _CURRENT_VERSION,
+                "Version to load", _version);
+
+            _version = _CURRENT_VERSION;
         }
 
         #endregion Private Methods

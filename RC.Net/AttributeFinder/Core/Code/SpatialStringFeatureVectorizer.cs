@@ -794,7 +794,7 @@ namespace Extract.AttributeFinder
         private TokenFilter GetTokenStream(string input)
         {
             var reader = new System.IO.StringReader(input.ToUpper(System.Globalization.CultureInfo.InvariantCulture));
-            var tokenizer = new Lucene.Net.Analysis.Standard.StandardTokenizer(Lucene.Net.Util.Version.LUCENE_30, reader);
+            var tokenizer = new StandardTokenizer(Lucene.Net.Util.Version.LUCENE_30, reader);
             var stdFilter = new StandardFilter(tokenizer);
             var lengthFilter = new LengthFilter(stdFilter, 2, 500);
             TokenFilter shingleFilter = lengthFilter;
@@ -811,7 +811,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="input">The source text.</param>
         /// <returns>An enumeration of distinct, upper-case string values</returns>
-        private IEnumerable<string> GetTerms(string input)
+        internal IEnumerable<string> GetTerms(string input)
         {
             using(var stream = GetTokenStream(input))
             while(stream.IncrementToken())
