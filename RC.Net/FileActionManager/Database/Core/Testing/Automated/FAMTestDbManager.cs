@@ -123,10 +123,6 @@ namespace Extract.FileActionManager.Database.Test
                     fileProcessingDb.DatabaseName = destinationDBName;
                     fileProcessingDb.UpgradeToCurrentSchema(null);
 
-                    // After an update it is necessary to reset the DB connections, or all downstream 
-                    // accesses to DB will fail.
-                    fileProcessingDb.ResetDBConnection(bResetCredentials: false);
-
                     return fileProcessingDb;
                 }
             }

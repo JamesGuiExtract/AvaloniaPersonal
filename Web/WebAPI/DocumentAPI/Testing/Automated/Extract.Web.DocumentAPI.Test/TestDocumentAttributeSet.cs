@@ -112,14 +112,6 @@ namespace Extract.Web.DocumentAPI.Test
         static FAMTestDBManager<TestDocumentAttributeSet> _testDbManager;
 
         /// <summary>
-        /// These three bools track whether a specific DB has been attached; if so the specified
-        /// database is removed in tear down function.
-        /// </summary>
-        static bool usedDbLabDE;
-        static bool usedDbFlexIndex;
-        static bool usedDbIDShield;
-
-        /// <summary>
         /// If this test invokes the web service, then on tear down this flag is used to signal that
         /// condition and shut down the service.
         /// </summary>
@@ -157,48 +149,12 @@ namespace Extract.Web.DocumentAPI.Test
                 if (documentAPIInvoked)
                 {
                     Utils.ShutdownWebServer(args: "/f /im DocumentAPI.exe");
+                    documentAPIInvoked = false;
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Exception ending WebAPI: {0}", ex.Message);
-            }
-
-            try
-            {
-                if (usedDbLabDE)
-                {
-                    _testDbManager.RemoveDatabase(DbLabDE);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Exception: {0}, removing database: {1}", ex.Message, DbLabDE);
-            }
-
-            try
-            {
-                if (usedDbIDShield)
-                {
-                    _testDbManager.RemoveDatabase(DbIDShield);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Exception: {0}, removing database: {1}", ex.Message, DbIDShield);
-            }
-
-            try
-            {
-                if (usedDbFlexIndex)
-                {
-                    _testDbManager.RemoveDatabase(DbFlexIndex);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Exception: {0}, removing database: {1}", ex.Message, DbFlexIndex);
             }
 
             if (_testDbManager != null)
@@ -224,15 +180,26 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void TestManyLineAttribute()
         {
-            var voa = new IUnknownVector();
-            var ss = new SpatialString();
-            ss.LoadFrom(@"C:\Engineering\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.pdf.uss", false);
-            var attr = new AttributeClass { Name = "Manual", Value = ss };
-            voa.PushBack(attr);
+            try
+            {
+                var voa = new IUnknownVector();
+                var ss = new SpatialString();
+                string tempUssFileName = _testXmlFiles.GetFile("Resources.Image1.pdf.uss");
+                Assert.That(File.Exists(tempUssFileName));
 
-            var docAttrr = AttributeMapper.MapAttributesToDocumentAttributeSet(voa);
-            Assert.AreEqual(0, docAttrr.Attributes.Where(a =>
-                a.SpatialPosition.Pages.Count != a.SpatialPosition.Pages.Distinct().Count()).Count());
+                ss.LoadFrom(tempUssFileName, bSetDirtyFlagToTrue: false);
+                var attr = new AttributeClass { Name = "Manual", Value = ss };
+                voa.PushBack(attr);
+
+                var docAttrr = AttributeMapper.MapAttributesToDocumentAttributeSet(voa);
+                Assert.AreEqual(0, docAttrr.Attributes.Where(a =>
+                    a.SpatialPosition.Pages.Count != a.SpatialPosition.Pages.Distinct().Count()).Count());
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception reported: {0}", ex.Message);
+                throw;
+            }
         }
 
         [Test, Category("Automated")]
@@ -240,8 +207,7 @@ namespace Extract.Web.DocumentAPI.Test
         {
             try
             {
-                var dbMgr = _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
-                usedDbLabDE = true;
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
 
                 foreach (var kvpFileInfo in LabDEFileIdToFileInfo)
                 {
@@ -251,14 +217,15 @@ namespace Extract.Web.DocumentAPI.Test
                     var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
                     Assert.IsTrue(worked);
                 }
-
-                dbMgr.CloseAllDBConnections();
             }
             catch (Exception ex)
             {
                 Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());                
             }
-
+            finally
+            {                
+                _testDbManager.RemoveDatabase("Resources.Demo_LabDE.bak");
+            }
         }
 
         /// <summary>
@@ -269,8 +236,7 @@ namespace Extract.Web.DocumentAPI.Test
         {
             try
             {
-                var dbMgr = _testDbManager.GetDatabase("Resources.Demo_IDShield.bak", DbIDShield);
-                usedDbIDShield = true;
+                _testDbManager.GetDatabase("Resources.Demo_IDShield.bak", DbIDShield);
 
                 foreach (var kvpFileInfo in IDShieldFileIdToFileInfo)
                 {
@@ -280,12 +246,14 @@ namespace Extract.Web.DocumentAPI.Test
                     var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
                     Assert.IsTrue(worked);
                 }
-
-                dbMgr.CloseAllDBConnections();
             }
             catch (Exception ex)
             {
                 Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase("Resources.Demo_IDShield.bak");
             }
         }
 
@@ -297,8 +265,7 @@ namespace Extract.Web.DocumentAPI.Test
         {
             try
             {
-                var dbMgr = _testDbManager.GetDatabase("Resources.Demo_FlexIndex.bak", DbFlexIndex);
-                usedDbFlexIndex = true;
+                _testDbManager.GetDatabase("Resources.Demo_FlexIndex.bak", DbFlexIndex);
 
                 foreach (var kvpFileInfo in FlexIndexFileIdToFileInfo)
                 {
@@ -308,12 +275,14 @@ namespace Extract.Web.DocumentAPI.Test
                     var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
                     Assert.IsTrue(worked);
                 }
-
-                dbMgr.CloseAllDBConnections();
             }
             catch (Exception ex)
             {
                 Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase("Resources.Demo_FlexIndex.bak");
             }
         }
 

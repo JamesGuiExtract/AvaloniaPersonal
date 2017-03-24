@@ -57,13 +57,6 @@
     <Reference Include="DocumentAPI">
       <HintPath>..\..\..\Core\DocumentAPI\bin\Debug\net46\win7-x86\DocumentAPI.exe</HintPath>
     </Reference>
-    <Reference Include="Extract.FileActionManager.Database.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Testing\Automated\obj\Debug\Extract.FileActionManager.Database.Test.dll</HintPath>
-    </Reference>
-    <Reference Include="Extract.Testing.Utilities">
-      <HintPath>..\..\..\..\..\..\Binaries\Debug\Extract.Testing.Utilities.dll</HintPath>
-    </Reference>
     <Reference Include="IO.Swagger, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>ClientApi\IO.Swagger.dll</HintPath>
@@ -94,6 +87,7 @@
     <EmbeddedResource Include="Resources\Demo_FlexIndex.bak" />
     <EmbeddedResource Include="Resources\Demo_IDShield.bak" />
     <EmbeddedResource Include="Resources\Demo_LabDE.bak" />
+    <EmbeddedResource Include="Resources\Image1.pdf.uss" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">
@@ -186,6 +180,14 @@
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
       <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
       <Name>Extract.AttributeFinder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
+      <Project>{f3314bbe-b008-488d-a2e0-351c49d914d7}</Project>
+      <Name>Extract.Testing.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
+      <Project>{6b284a4d-132c-4fe4-858f-06a9c476b19b}</Project>
+      <Name>Extract.FileActionManager.Database.Test</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
