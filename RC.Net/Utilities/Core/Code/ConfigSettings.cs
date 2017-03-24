@@ -925,17 +925,34 @@ namespace Extract.Utilities
                 if (node.Name.Equals("Member", StringComparison.OrdinalIgnoreCase))
                 {
                     string memberName = GetXmlNameAttribute(node);
-                    FieldInfo field = objectType.GetField(memberName,
+
+                    bool isField = true;
+                    MemberInfo member = objectType.GetField(memberName,
                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                    if (field == null || !field.GetType().IsClass)
+                    // If not a field, try as a property
+                    if (member == null)
+                    {
+                        isField = false;
+                        member = objectType.GetProperty(memberName,
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    }
+
+                    if (member == null || !member.GetType().IsClass)
                     {
                         ExtractException ee = new ExtractException("ELI28806", "Unknown member!");
                         ee.AddDebugData("Member name", memberName, false);
                         throw ee;
                     }
 
-                    ProcessObjectSettings(node.ChildNodes, field.GetValue(instance));
+                    if (isField)
+                    {
+                        ProcessObjectSettings(node.ChildNodes, ((FieldInfo)member).GetValue(instance));
+                    }
+                    else
+                    {
+                        ProcessObjectSettings(node.ChildNodes, ((PropertyInfo)member).GetValue(instance));
+                    }
                 }
                 // Apply the specified setting to its corresponding object property.
                 else if (node.Name.Equals("Property", StringComparison.OrdinalIgnoreCase))

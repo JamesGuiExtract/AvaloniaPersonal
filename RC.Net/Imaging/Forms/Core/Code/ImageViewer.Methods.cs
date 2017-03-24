@@ -213,6 +213,17 @@ namespace Extract.Imaging.Forms
                 // [IDSD:193] Convert to the full path name otherwise OCR will fail
                 fileName = Path.GetFullPath(fileName);
 
+                // If a fit mode is not specified keep track of current zoom info
+                // if available [ISSUE-14135]
+                ZoomInfo customZoomInfo = new ZoomInfo();
+                bool applyPreviousZoom = false;
+                if (MaintainZoomLevelForNewPages &&
+                    _fitMode == FitMode.None && _pageNumber > 0)
+                {
+                    customZoomInfo = _imagePages[_pageNumber - 1].ZoomInfo;
+                    applyPreviousZoom = true;
+                }
+
                 // Check if this is a USS file
                 // [DNRCAU #478]
                 if (Path.GetExtension(fileName).Equals(".uss", StringComparison.OrdinalIgnoreCase))
@@ -309,9 +320,14 @@ namespace Extract.Imaging.Forms
                         // Store the image file name
                         _imageFile = fileName;
 
-                        // If a fit mode is not specified, display the whole page 
-                        // [DotNetRCAndUtils #102]
-                        if (_fitMode == FitMode.None)
+                        // If a fit mode is not specified use the zoom level of the previous image,
+                        // if available [ISSUE-14135],
+                        // else display the whole page [DotNetRCAndUtils #102]
+                        if (applyPreviousZoom)
+                        {
+                            SetZoomInfo(customZoomInfo, false, false, false);
+                        }
+                        else if (_fitMode == FitMode.None)
                         {
                             ShowFitToPage();
                         }

@@ -1700,6 +1700,17 @@ namespace Extract.Imaging.Forms
                     UpdateZoom(true, false);
                 }
 
+                // If a fit mode is not specified keep track of current zoom info
+                // if available [ISSUE-14135]
+                ZoomInfo customZoomInfo = new ZoomInfo();
+                bool applyPreviousZoom = false;
+                if (MaintainZoomLevelForNewPages &&
+                    _fitMode == FitMode.None && _pageNumber > 0)
+                {
+                    customZoomInfo = _imagePages[_pageNumber - 1].ZoomInfo;
+                    applyPreviousZoom = true;
+                }
+
                 // Go to the specified page
                 ShowPageImage(pageNumber);
 
@@ -1712,9 +1723,17 @@ namespace Extract.Imaging.Forms
                         // Update the zoom history
                         updateZoomHistory = true;
 
-                        // If this is the first time the page is viewed, display the whole page
-                        // [DotNetRCAndUtils #102]
-                        ShowFitToPage();
+                        // If this is the first time the page is viewed, use the zoom level
+                        // from the previously displayed page if available [ISSUE-14135],
+                        // else display the whole page [DotNetRCAndUtils #102]
+                        if (applyPreviousZoom)
+                        {
+                            SetZoomInfo(customZoomInfo, false, false, false);
+                        }
+                        else
+                        {
+                            ShowFitToPage();
+                        }
 
                         // Call ShowFitToPage/ShowFitToWidth to ensure the current ScaleFactor
                         // matches the fit mode for the page.
@@ -2728,6 +2747,20 @@ namespace Extract.Imaging.Forms
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets whether to mainain current, custom zoom level for pages that have
+        /// not been shown yet (has no effect if there is a <see cref="FitMode"/> in use.
+        /// </summary>
+        /// <value>
+        /// If <c>true</c> then the current zoom level will be applied to new images/pages else
+        /// if <c>false</c> then new pages will be entirely shown (as with <see cref="FitMode.FitToPage"/>).
+        /// </value>
+        public bool MaintainZoomLevelForNewPages
+        {
+            get;
+            set;
+        } = true;
 
         #endregion Properties
 
