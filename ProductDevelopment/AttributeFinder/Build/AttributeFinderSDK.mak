@@ -52,8 +52,6 @@ InternalUseBuildFilesArchive=M:\ProductDevelopment\AttributeFinder\Archive\Inter
 
 RedactionDemoBuildDir=$(AFRootDirectory)\Utils\RedactionDemo\Build
 
-NetDMSRootDir=$(PDRootDir)\AFIntegrations\NetDMS
-
 LabDEBuildDir=$(PDRootDir)\DataEntry\LabDE\Build
 
 DeveloperLicensing=I:\Common\Engineering\Tools\SecureClients\COMLicense_Developer\Current
@@ -209,15 +207,6 @@ CreateLabDEInstall:
 	@CD "$(LabDEBuildDir)"
     @nmake /F LabDE.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(LabDEVersion)" DoEverything
 	
-CreateNetDMSInstall:
-	@Echo Creating NetDMS install...
-	@IF NOT EXIST "$(IntegrationsSetupFiles)\NetDMSIntegrationInstall" MKDIR "$(IntegrationsSetupFiles)\NetDMSIntegrationInstall"
-	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSExporter.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\Exporter"
-	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSUtilities.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\ProgramFiles"
-	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSCustomComponents.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\ProgramFiles"
-	@COPY "$(BinariesFolder)\Interop.Weak.*.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\ProgramFiles"
-	@XCOPY "$(NetDMSRootDir)\NetDMSIntegrationInstall\*.*" "$(IntegrationsSetupFiles)\NetDMSIntegrationInstall" /v /s /e /y
-	
 CopySilentInstallsDir:
 	@ECHO Copying SilentInstalls folder
 	@IF NOT EXIST "$(OtherSetupFiles)\SilentInstalls" MKDIR "$(OtherSetupFiles)\SilentInstalls"
@@ -256,7 +245,7 @@ CopyFilesToInternalUse:
 	@COPY  "$(BinariesFolder)\*.dll" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\*.xml" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CopyIDShieldSilentInstall CreateFLEXIndexDSInstall CopyFLEXIndexSilentInstall CreateLabDEInstall CreateNetDMSInstall CopySilentInstallsDir CopyFilesToInternalUse
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CopyIDShieldSilentInstall CreateFLEXIndexDSInstall CopyFLEXIndexSilentInstall CreateLabDEInstall CopySilentInstallsDir CopyFilesToInternalUse
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 

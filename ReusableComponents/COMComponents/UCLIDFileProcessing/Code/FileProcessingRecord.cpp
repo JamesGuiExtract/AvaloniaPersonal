@@ -275,7 +275,7 @@ CTime FileProcessingRecord::getErrorTaskStartTime() const
 //-------------------------------------------------------------------------------------------------
 string FileProcessingRecord::getFileName() const
 {
-	if (m_lfrFileRcd.FileRecord == NULL)
+	if (m_lfrFileRcd.FileRecord == __nullptr)
 	{
 		UCLIDException ue("ELI14211", "File record is not set.");
 		throw ue;
@@ -287,7 +287,7 @@ string FileProcessingRecord::getFileName() const
 //-------------------------------------------------------------------------------------------------
 long FileProcessingRecord::getFileID() const
 {
-	if (m_lfrFileRcd.FileRecord == NULL)
+	if (m_lfrFileRcd.FileRecord == __nullptr)
 	{
 		UCLIDException ue("ELI14212", "File record is not set.");
 		throw ue;
@@ -297,7 +297,7 @@ long FileProcessingRecord::getFileID() const
 //-------------------------------------------------------------------------------------------------
 long FileProcessingRecord::getActionID() const
 {
-	if (m_lfrFileRcd.FileRecord == NULL)
+	if (m_lfrFileRcd.FileRecord == __nullptr)
 	{
 		UCLIDException ue("ELI26738", "File record is not set.");
 		throw ue;
@@ -308,7 +308,7 @@ long FileProcessingRecord::getActionID() const
 //-------------------------------------------------------------------------------------------------
 long long FileProcessingRecord::getFileSize() const
 {
-	if (m_lfrFileRcd.FileRecord == NULL)
+	if (m_lfrFileRcd.FileRecord == __nullptr)
 	{
 		UCLIDException ue("ELI14252", "File record is not set.");
 		throw ue;
@@ -318,7 +318,7 @@ long long FileProcessingRecord::getFileSize() const
 //-------------------------------------------------------------------------------------------------
 long FileProcessingRecord::getNumberOfPages() const
 {
-	if (m_lfrFileRcd.FileRecord == NULL)
+	if (m_lfrFileRcd.FileRecord == __nullptr)
 	{
 		UCLIDException ue("ELI14253", "File record is not set.");
 		throw ue;
@@ -328,7 +328,7 @@ long FileProcessingRecord::getNumberOfPages() const
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::EFilePriority FileProcessingRecord::getPriority() const
 {
-	if (m_lfrFileRcd.FileRecord == NULL)
+	if (m_lfrFileRcd.FileRecord == __nullptr)
 	{
 		UCLIDException ue("ELI27648", "File record is not set.");
 		throw ue;
@@ -348,12 +348,23 @@ UCLID_FILEPROCESSINGLib::EActionStatus FileProcessingRecord::getFallbackStatus()
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingRecord::getAllowedQueuedStatusOverride() const
 {
-	if (m_lfrFileRcd.FileRecord == NULL)
+	if (m_lfrFileRcd.FileRecord == __nullptr)
 	{
 		UCLIDException ue("ELI39576", "File record is not set.");
 		throw ue;
 	}
 	return m_lfrFileRcd.AllowedQueuedStatusOverride;
+}
+//-------------------------------------------------------------------------------------------------
+long FileProcessingRecord::getWorkflowID() const
+{
+	if (m_lfrFileRcd.FileRecord == __nullptr)
+	{
+		UCLIDException ue("ELI42147", "File record is not set.");
+		throw ue;
+	}
+
+	return m_lfrFileRcd.WorkflowID;
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileRecordPtr FileProcessingRecord::getFileRecord() 

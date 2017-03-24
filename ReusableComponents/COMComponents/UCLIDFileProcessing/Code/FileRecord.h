@@ -59,13 +59,15 @@ public:
 	STDMETHOD(get_ActionID)(LONG* pVal);
 	STDMETHOD(put_ActionID)(LONG newVal);
 	STDMETHOD(GetFileData)(LONG* plFileID, LONG* plActionID, BSTR* pbstrFileName,
-		LONGLONG* pllFileSize, LONG* plPages, EFilePriority* pePriority);
+		LONGLONG* pllFileSize, LONG* plPages, EFilePriority* pePriority, LONG *plWorkflowID);
 	STDMETHOD(SetFileData)(LONG lFileID, LONG lActionID, BSTR bstrFileName,
-		LONGLONG llFileSize, LONG lPages, EFilePriority ePriority);
+		LONGLONG llFileSize, LONG lPages, EFilePriority ePriority, LONG lWorkflowID);
 	STDMETHOD(get_Priority)(EFilePriority* pePriority);
 	STDMETHOD(put_Priority)(EFilePriority ePriority);
 	STDMETHOD(get_FallbackStatus)(EActionStatus* peaFallbackStatus);
 	STDMETHOD(put_FallbackStatus)(EActionStatus eaFallbackStatus);
+	STDMETHOD(get_WorkflowID)(LONG* pVal);
+	STDMETHOD(put_WorkflowID)(LONG newVal);
 
 private:
 
@@ -77,6 +79,7 @@ private:
 	long m_lPages;
 	UCLID_FILEPROCESSINGLib::EFilePriority m_ePriority;
 	UCLID_FILEPROCESSINGLib::EActionStatus m_eaFallbackStatus;
+	long m_lWorkflowID;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileRecord), CFileRecord)

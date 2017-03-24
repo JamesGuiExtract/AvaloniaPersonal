@@ -245,7 +245,8 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 }
 //--------------------------------------------------------------------------------------------------
 EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection, long nFileID, 
-													string strAction, const string& strState,
+													string strAction, long nWorkflowID,
+													const string& strState,
 													const string& strException,
 													bool bQueueChangeIfProcessing,
 													bool bAllowQueuedStatusOverride,
@@ -277,7 +278,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		if (!strAction.empty() && nActionID == -1)
 		{	
 			_lastCodePos = "30";
-			nActionID = getActionID(ipConnection, strAction);
+			nActionID = getActionID(ipConnection, strAction, nWorkflowID);
 		}
 		else if (strAction.empty() && nActionID != -1)
 		{
@@ -595,13 +596,13 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setStatusForFile(_ConnectionPtr ipConnection, long nFileID, string strAction,
-	EActionStatus eStatus, bool bQueueChangeIfProcessing, bool bAllowQueuedStatusOverride,
-	EActionStatus *poldStatus)
+	long nWorkflowID, EActionStatus eStatus, bool bQueueChangeIfProcessing,
+	bool bAllowQueuedStatusOverride, EActionStatus *poldStatus)
 {
 	try
 	{
 		// Change the status for the given file and return the previous state
-		EActionStatus oldStatus = setFileActionState(ipConnection, nFileID, strAction,
+		EActionStatus oldStatus = setFileActionState(ipConnection, nFileID, strAction, nWorkflowID,
 			asStatusString(eStatus), "", bQueueChangeIfProcessing, bAllowQueuedStatusOverride);
 
 		if (poldStatus != __nullptr)
@@ -878,6 +879,35 @@ long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, const string&
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26721");
 }
 //--------------------------------------------------------------------------------------------------
+long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, long nActionID)
+{
+	try
+	{
+		string strQuery = "SELECT [WorkflowID] FROM [Action] WHERE [ID] = '" +
+			asString(nActionID) + "'";
+
+		_RecordsetPtr ipActionSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI42144", ipActionSet != __nullptr);
+		
+		ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenStatic, adLockOptimistic, adCmdText);
+
+		if (ipActionSet->adoEOF == VARIANT_FALSE)
+		{
+			FieldsPtr ipFields = ipActionSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI42145", ipFields != __nullptr);
+
+			if (!isNULL(ipFields, "WorkflowID"))
+			{
+				return getLongField(ipFields, "WorkflowID");
+			}
+		}
+
+		return -1;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42103");
+}
+//--------------------------------------------------------------------------------------------------
 long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& strActionName)
 {
 	try
@@ -885,6 +915,29 @@ long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& s
 		return getActionID(ipConnection, strActionName, m_strActiveWorkflow);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42035");
+}
+//--------------------------------------------------------------------------------------------------
+long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& strActionName,
+									long nWorkflowID)
+{
+	try
+	{
+		if (nWorkflowID <= 0)
+		{
+			return getActionID(ipConnection, strActionName, m_strActiveWorkflow);
+		}
+		else
+		{
+			string strQuery = Util::Format(
+				"SELECT [ID] FROM [Action] WHERE [ASCName] = '%s' AND [WorkflowID] = %d",
+				strActionName.c_str(), nWorkflowID);
+
+			long nActionID = 0;
+			executeCmdQuery(ipConnection, strQuery, false, &nActionID);
+			return nActionID;
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42146");
 }
 //--------------------------------------------------------------------------------------------------
 long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& strActionName, const string& strWorkflow)
@@ -2040,14 +2093,14 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 
 	// Attempt to get the file data
 	LONGLONG llOldFileSize(-1), llNewFileSize(-1);
-	long lOldPages(-1), lNewPages(-1), lTempFileID(-1), lTempActionID(-1);
+	long lOldPages(-1), lNewPages(-1), lTempFileID(-1), lTempActionID(-1), lTempWorkflowID(-1);
 	UCLID_FILEPROCESSINGLib::EFilePriority ePriority(
 		(UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault);
 	_bstr_t bstrTemp;
 	if (ipOldRecord != __nullptr)
 	{
 		ipOldRecord->GetFileData(&lTempFileID, &lTempActionID, bstrTemp.GetAddress(),
-			&llOldFileSize, &lOldPages, &ePriority);
+			&llOldFileSize, &lOldPages, &ePriority, &lTempWorkflowID);
 	}
 	if (ipNewRecord != __nullptr)
 	{
@@ -2060,7 +2113,7 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 		else
 		{
 			ipNewRecord->GetFileData(&lTempFileID, &lTempActionID, bstrTemp.GetAddress(),
-				&llNewFileSize, &lNewPages, &ePriority);
+				&llNewFileSize, &lNewPages, &ePriority, &lTempWorkflowID);
 		}
 	}
 
@@ -2815,11 +2868,11 @@ UCLID_FILEPROCESSINGLib::IFileRecordPtr CFileProcessingDB::getFileRecordFromFiel
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 	ASSERT_RESOURCE_ALLOCATION("ELI17027", ipFileRecord != __nullptr);
 	
-	// Set the file data from the fields collection (set ActionID to 0)
+	// Set the file data from the fields collection (set ActionID and WorkflowID to 0)
 	ipFileRecord->SetFileData(getLongField(ipFields, "ID"), 0,
 		getStringField(ipFields, "FileName").c_str(), getLongLongField(ipFields, "FileSize"),
 		getLongField(ipFields, "Pages"), (UCLID_FILEPROCESSINGLib::EFilePriority)
-		(bGetPriority ? getLongField(ipFields, "Priority") : 0));
+		(bGetPriority ? getLongField(ipFields, "Priority") : 0), 0);
 
 	return ipFileRecord;
 }
@@ -2834,13 +2887,13 @@ void CFileProcessingDB::setFieldsFromFileRecord(const FieldsPtr& ipFields,
 	ASSERT_ARGUMENT("ELI17032", ipFileRecord != __nullptr);
 	
 	// Get the file data
-	long lFileID(-1), lActionID(-1), lNumPages(-1);
+	long lFileID(-1), lActionID(-1), lNumPages(-1), lWorkflowID(-1);
 	LONGLONG llFileSize(-1);
 	UCLID_FILEPROCESSINGLib::EFilePriority ePriority(
 		(UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault);
 	_bstr_t bstrFileName;
 	ipFileRecord->GetFileData(&lFileID, &lActionID, bstrFileName.GetAddress(),
-		&llFileSize, &lNumPages, &ePriority);
+		&llFileSize, &lNumPages, &ePriority, &lWorkflowID);
 
 	// set the file name field
 	setStringField(ipFields, "FileName", asString(bstrFileName));
@@ -4204,7 +4257,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			// Pass bAllowQueuedStatusOverride so that any queued changes for files that were
 			// processing when the FAM crashed are applied now.
 			setFileActionState(ipConnection, getLongField(ipFields, "FileID"), 
-				strActionName, strRevertToStatus, 
+				strActionName, -1, strRevertToStatus, 
 				"", false, true, getLongField(ipFields, "ActionID"), false, strFASTComment);
 
 			ipFileSet->MoveNext();
@@ -4839,7 +4892,6 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
 														   const string& strSelectSQL,
 														   const string& strActionName,
-														   const string& strActionIDs,
 														   const string& strAllowedCurrentStatus)
 {
 	// Declare query string so that if there is an exception the query can be added to debug info
@@ -4891,7 +4943,6 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 
 						// Replace the variable to set up the query
 						replaceVariable(strQuery, "<SelectFilesToProcessQuery>", strSelectSQL);
-						replaceVariable(strQuery, "<ActionIDs>", strActionIDs);
 						replaceVariable(strQuery, "<UserID>", asString(getFAMUserID(ipConnection)));
 						replaceVariable(strQuery, "<MachineID>", asString(getMachineID(ipConnection)));
 						replaceVariable(strQuery, "<ActiveFAMID>", asString(m_nActiveFAMID));
@@ -4928,6 +4979,8 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 							string strFileID = asString(ipFileRecord->FileID);
 
 							long nActionID = getLongField(ipFields, "ActionID");
+
+							ipFileRecord->WorkflowID = getWorkflowID(ipConnection, nActionID);
 
 							// Get the previous state
 							string strFileFromState = getStringField(ipFields, "ASC_From");
@@ -6306,4 +6359,148 @@ string  CFileProcessingDB::getDatabaseIDUpdateQuery(DatabaseIDValues databaseID)
 	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_VALUE, strNewEncryptedDBID);
 
 	return strUpdateDBInfoQuery;
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDefinition(
+	_ConnectionPtr ipConnection, long nID)
+{
+	_RecordsetPtr ipWorkflowSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI41893", ipWorkflowSet != __nullptr);
+
+	string strQuery =
+		Util::Format(
+			"SELECT [ID] "
+			", [Name] "
+			", [WorkflowTypeCode] "
+			", [Description] "
+			", [StartActionID] "
+			", [EndActionID] "
+			", [PostWorkflowActionID] "
+			", [DocumentFolder] "
+			", [OutputAttributeSetID] "
+			", [OutputFileMetadataFieldID] "
+			"	FROM [Workflow]"
+			"	WHERE [ID] = %i", nID);
+
+	ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+		adOpenStatic, adLockReadOnly, adCmdText);
+
+	if (asCppBool(ipWorkflowSet->adoEOF))
+	{
+		UCLIDException ue("ELI41894", "Failed to get workflow definition.");
+		ue.addDebugInfo("ID", nID);
+		throw ue;
+	}
+
+	FieldsPtr ipFields = ipWorkflowSet->Fields;
+	ASSERT_RESOURCE_ALLOCATION("ELI41895", ipFields != __nullptr);
+
+	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition(CLSID_WorkflowDefinition);
+	ASSERT_RESOURCE_ALLOCATION("ELI41896", ipWorkflowDefinition != __nullptr);
+
+	ipWorkflowDefinition->ID = getLongField(ipFields, "ID");
+	ipWorkflowDefinition->Name = getStringField(ipFields, "Name").c_str();
+	char eWorkflowType = getStringField(ipFields, "WorkflowTypeCode").c_str()[0];
+	switch (eWorkflowType)
+	{
+	case 'U': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kUndefined; break;
+	case 'R': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kRedaction; break;
+	case 'E': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kExtraction; break;
+	case 'C': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kClassification; break;
+	}
+	ipWorkflowDefinition->Description = getStringField(ipFields, "Description").c_str();
+	ipWorkflowDefinition->StartAction = isNULL(ipFields, "StartActionID")
+		? _bstr_t("").Detach()
+		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "StartActionID")));
+	ipWorkflowDefinition->EndAction = isNULL(ipFields, "EndActionID")
+		? _bstr_t("").Detach()
+		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "EndActionID")));
+	ipWorkflowDefinition->PostWorkflowAction = isNULL(ipFields, "PostWorkflowActionID")
+		? _bstr_t("").Detach()
+		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "PostWorkflowActionID")));
+	ipWorkflowDefinition->DocumentFolder = getStringField(ipFields, "DocumentFolder").c_str();
+
+	if (isNULL(ipFields, "OutputAttributeSetID"))
+	{
+		ipWorkflowDefinition->OutputAttributeSet = "";
+	}
+	else
+	{
+		long long llAttributeSetID = getLongLongField(ipFields, "OutputAttributeSetID");
+
+		string strAttributeSetQuery = "SELECT [Description] FROM [dbo].[AttributeSetName] WHERE [ID]="
+			+ asString(llAttributeSetID);
+
+		_RecordsetPtr ipAttributeSetResult(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI41919", ipAttributeSetResult != __nullptr);
+
+		ipAttributeSetResult->Open(strAttributeSetQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenStatic, adLockReadOnly, adCmdText);
+
+		ASSERT_RUNTIME_CONDITION("ELI41920", !asCppBool(ipAttributeSetResult->adoEOF),
+			"Unknown attribute set ID");
+
+		FieldsPtr ipAttributeSetFields = ipAttributeSetResult->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI41921", ipAttributeSetFields != __nullptr);
+
+		ipWorkflowDefinition->OutputAttributeSet =
+			get_bstr_t(getStringField(ipAttributeSetFields, "Description"));
+	}
+
+	if (isNULL(ipFields, "OutputFileMetadataFieldID"))
+	{
+		ipWorkflowDefinition->OutputFileMetadataField = "";
+	}
+	else
+	{
+		long lMetadataFieldID = getLongField(ipFields, "OutputFileMetadataFieldID");
+
+		string strMetadataFieldQuery = "SELECT [Name] FROM [dbo].[MetadataField] WHERE [ID] = "
+			+ asString(lMetadataFieldID);
+
+		_RecordsetPtr ipMetadataFieldResult(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI42049", ipMetadataFieldResult != __nullptr);
+
+		ipMetadataFieldResult->Open(strMetadataFieldQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenStatic, adLockReadOnly, adCmdText);
+
+		ASSERT_RUNTIME_CONDITION("ELI42050", !asCppBool(ipMetadataFieldResult->adoEOF),
+			"Unknown metadata field ID");
+
+		FieldsPtr ipMetadataFieldFields = ipMetadataFieldResult->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI42051", ipMetadataFieldFields != __nullptr);
+
+		ipWorkflowDefinition->OutputFileMetadataField =
+			get_bstr_t(getStringField(ipMetadataFieldFields, "Name"));
+	}
+
+	return ipWorkflowDefinition;
+}
+//-------------------------------------------------------------------------------------------------
+map<string, long> CFileProcessingDB::getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID)
+{
+	map<string, long> mapWorkflowActions;
+
+	_RecordsetPtr ipActionSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI41992", ipActionSet != __nullptr);
+
+	string strQuery =
+		Util::Format("SELECT [ID], [ASCName] "
+			"FROM dbo.[Action] "
+			"WHERE [WorkflowID] = %i", nWorkflowID);
+
+	ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+		adOpenStatic, adLockReadOnly, adCmdText);
+
+	while (!asCppBool(ipActionSet->adoEOF))
+	{
+		FieldsPtr ipFields = ipActionSet->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI41993", ipFields != __nullptr);
+
+		mapWorkflowActions[getStringField(ipFields, "ASCName")] = getLongField(ipFields, "ID");
+
+		ipActionSet->MoveNext();
+	}
+
+	return mapWorkflowActions;
 }

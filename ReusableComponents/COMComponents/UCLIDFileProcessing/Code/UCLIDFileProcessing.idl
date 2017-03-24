@@ -18,7 +18,7 @@ library UCLID_FILEPROCESSINGLib
 	importlib("stdole2.tlb");
 	importlib("..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
 	importlib("..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
-	importlib("Common Files\System\ADO\msado27.tlb");
+	importlib("Common Files\System\ADO\msado28.tlb");
 	importlib("..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb");
 	
 	/////////////////////////
@@ -848,10 +848,12 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(5), helpstring("property ActionID")] HRESULT ActionID([in] LONG pVal);
 		[id(6), helpstring("method GetFileData")] HRESULT GetFileData(
 			[out] LONG* plFileID, [out] LONG* plActionID, [out] BSTR* pbstrFileName,
-			[out] LONGLONG* pllFileSize, [out] LONG* plPages, [out] EFilePriority* pePriority);
+			[out] LONGLONG* pllFileSize, [out] LONG* plPages, [out] EFilePriority* pePriority,
+			[out] LONG* plWorkflowID);
 		[id(7), helpstring("method SetFileData")] HRESULT SetFileData(
 			[in] LONG lFileID, [in] LONG lActionID, [in] BSTR bstrFileName,
-			[in] LONGLONG llFileSize, [in] LONG lPages, [in] EFilePriority ePriority);
+			[in] LONGLONG llFileSize, [in] LONG lPages, [in] EFilePriority ePriority,
+			[in] LONG lWorkflowID);
 		[propget, id(8), helpstring("property Priority")] HRESULT Priority(
 			[out, retval] EFilePriority* pePriority);
 		[propput, id(8), helpstring("property Priority")] HRESULT Priority(
@@ -862,6 +864,8 @@ library UCLID_FILEPROCESSINGLib
 			[out, retval] EActionStatus* peaFallbackStatus);
 		[propput, id(9), helpstring("property FallbackStatus")] HRESULT FallbackStatus(
 			[in] EActionStatus eaFallbackStatus);
+		[propget, id(10), helpstring("property WorkflowID")] HRESULT WorkflowID([out, retval] LONG* pVal);
+		[propput, id(10), helpstring("property WorkflowID")] HRESULT WorkflowID([in] LONG newVal);
 	};
 
 	[
@@ -917,7 +921,7 @@ library UCLID_FILEPROCESSINGLib
 		//			if the bSkipPageCount is VARIANT_TRUE
 		//				When files are queued, no attempt will be made to check the page count.
 		// 
-		[id(4), helpstring("method AddFile")] HRESULT AddFile([in] BSTR strFile, [in] BSTR strAction, 
+		[id(4), helpstring("method AddFile")] HRESULT AddFile([in] BSTR strFile, [in] BSTR strAction, [in] long nWorkflowID,
 			[in] EFilePriority ePriority, [in] VARIANT_BOOL bForceStatusChange, [in] VARIANT_BOOL bFileModified, 
 			[in] EActionStatus eNewStatus, [in] VARIANT_BOOL bSkipPageCount, [out] VARIANT_BOOL* pbAlreadyExists,
 			[out] EActionStatus* pPrevStatus, [out, retval] IFileRecord** ppFileRecord);
@@ -936,16 +940,17 @@ library UCLID_FILEPROCESSINGLib
 		// Methods related to setting / getting file status
 		// -----------------------------------------------------------------------------------------------
 		[id(6), helpstring("method NotifyFileProcessed")] HRESULT NotifyFileProcessed([in] long nFileID, 
-			[in] BSTR strAction, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
+			[in] BSTR strAction, [in] long nWorkflowID, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 		[id(7), helpstring("method NotifyFileFailed")] HRESULT NotifyFileFailed([in] long nFileID, 
-			[in] BSTR strAction, [in] BSTR strException, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
+			[in] BSTR strAction, [in] long nWorkflowID, [in] BSTR strException,
+			[in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 		// For the SetFileStatusTo methods, if vbAllowQueuedStatusOverride is VARIANT_TRUE and the
 		// QueuedActionStatusChange table has a pending change for the file, that change will be applied.
 		// If vbAllowQueuedStatusOverride is VARIANT_FALSE, the QueuedActionStatusChange will be ignored.
 		[id(8), helpstring("method SetFileStatusToPending")] HRESULT SetFileStatusToPending([in] long nFileID, 
-			[in] BSTR strAction, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
+			[in] BSTR strAction, /*[in] long nWorkflowID, */[in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 		[id(9), helpstring("method SetFileStatusToUnattempted")] HRESULT SetFileStatusToUnattempted([in] long nFileID, 
-			[in] BSTR strAction, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
+			[in] BSTR strAction, /*[in] long nWorkflowID, */[in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 		[id(10), helpstring("method GetFileStatus")] HRESULT GetFileStatus([in] long nFileID, [in] BSTR strAction,
 			[in] VARIANT_BOOL vbAttemptRevertIfLocked, [out, retval] EActionStatus* pStatus);
 
@@ -974,7 +979,7 @@ library UCLID_FILEPROCESSINGLib
 		//			vbAllowQueuedStatusOverride is VARIANT_FALSE, the QueuedActionStatusChange will be
 		//			ignored and the status will be set to eStatus.
 		[id(13), helpstring("method SetStatusForFile")] HRESULT SetStatusForFile([in] long nID, [in] BSTR strAction, 
-			[in] EActionStatus eStatus, [in] VARIANT_BOOL vbQueueChangeIfProcessing,
+			[in] long nWorkflowID, [in] EActionStatus eStatus, [in] VARIANT_BOOL vbQueueChangeIfProcessing,
 			[in] VARIANT_BOOL vbAllowQueuedStatusOverride, [out] EActionStatus* poldStatus);
 
 
@@ -1130,7 +1135,7 @@ library UCLID_FILEPROCESSINGLib
 			[in] long nActionID, [out, retval] BSTR* pbstrActionName);
 		// -----------------------------------------------------------------------------------------------
 		[id(46), helpstring("method NotifyFileSkipped")] HRESULT NotifyFileSkipped([in] long nFileID,
-			[in] long nActionID, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
+			[in] BSTR bstrAction, [in] LONG nWorkflowID, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to comment strings
@@ -1862,6 +1867,16 @@ library UCLID_FILEPROCESSINGLib
 		//			any workflow.
 		[id(172), helpstring("method GetAllActions")] HRESULT GetAllActions(
 			[out, retval] IStrToStrMap ** pmapActionNameToID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Gets the status of a file in a workflow where status is defined as:
+		//			Whereas X = the primary actions in a workflow (excludes and actions that do not logically
+		//				fall between StartAction and EndAction
+		//			Processing = (EndAction <> Failed/Skipped) and (any action X is either pending or processing)
+		//			Failed = (EndAction <> Complete) and (any action X is failed)
+		//			Unattempted = (EndAction <> Complete) and (no X actions  are pending / processing)
+		//			Completed = (EndAction = Compete) and (no action X is pending or processing)
+		[id(173), helpstring("method GetWorkflowStatus")] HRESULT GetWorkflowStatus(
+			[in] long nFileID, [out, retval] EActionStatus* peaStatus);
 	};
 
 	[
@@ -2148,6 +2163,12 @@ library UCLID_FILEPROCESSINGLib
 		//			if not currently configured to send an email upon failure.
 		[propget, id(18), helpstring("property ErrorEmailTask")] HRESULT ErrorEmailTask([out, retval] IErrorEmailTask** pVal);
 		[propput, id(18), helpstring("property ErrorEmailTask")] HRESULT ErrorEmailTask([in] IErrorEmailTask * newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Indicates whether processing has completed.
+		// NOTE:	This method flag is set to false as processing is started and only indicates true
+		//			after at least one file has processed. If the process is configured to keep processing as
+		//			files are queued, but no files ever are, this flag will remain false.
+		[propget, id(19), helpstring("property HasProcessingCompleted")] HRESULT HasProcessingCompleted([out, retval] VARIANT_BOOL* pVal);
 	};
 
 	[

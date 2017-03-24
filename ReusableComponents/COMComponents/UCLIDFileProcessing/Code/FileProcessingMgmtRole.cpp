@@ -165,6 +165,7 @@ CFileProcessingMgmtRole::CFileProcessingMgmtRole()
   m_ipRoleNotifyFAM(NULL),
   m_threadDataSemaphore(2,2),
   m_bProcessing(false),
+  m_bHasProcessingCompleted(false),
   m_bProcessingSingleFile(false),
   m_ipProcessingSingleFileRecord(__nullptr),
   m_upProcessingSingleFileTask(__nullptr),
@@ -265,6 +266,8 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB* pDB, long lAction
 		ASSERT_ARGUMENT("ELI14301", m_ipFileProcessingTasks != __nullptr);
 		ASSERT_ARGUMENT("ELI14302", m_ipFileProcessingTasks->Size() > 0);
 		ASSERT_ARGUMENT("ELI14344", m_pRecordMgr != __nullptr);
+
+		m_bHasProcessingCompleted = false;
 
 		m_strFpsFile = asString(bstrFpsFileName);
 
@@ -1783,6 +1786,22 @@ STDMETHODIMP CFileProcessingMgmtRole::put_ErrorEmailTask(IErrorEmailTask *newVal
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_HasProcessingCompleted(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI42134", pVal != __nullptr)
+
+		// Don't create an email task until needed.
+		*pVal = asVariantBool(m_bHasProcessingCompleted);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42133")
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
@@ -2092,6 +2111,8 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 			bool bProcessingActive;
 			if (!m_pRecordMgr->pop(task, false, parallelSemaphore, &bProcessingActive))
 			{
+				m_bHasProcessingCompleted = m_pRecordMgr->areAnyFilesActive();
+
 				// If not, and processing is no longer active, end the processing loop.
 				if (!bProcessingActive)
 				{
@@ -2132,6 +2153,8 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 					return;
 				}
 			}
+
+			m_bHasProcessingCompleted = false;
 
 			// we now have a valid task that we need to process
 			try

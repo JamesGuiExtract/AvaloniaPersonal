@@ -195,6 +195,7 @@ public:
 	STDMETHOD(put_SendErrorEmail)(VARIANT_BOOL newVal);
 	STDMETHOD(get_ErrorEmailTask)(IErrorEmailTask** pVal);
 	STDMETHOD(put_ErrorEmailTask)(IErrorEmailTask* newVal);
+	STDMETHOD(get_HasProcessingCompleted)(VARIANT_BOOL* pVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID* pClassID);
@@ -240,6 +241,12 @@ private:
 
 	// A flag to indicate the process in on going
 	volatile bool m_bProcessing;
+
+	// Indicates whether processing has completed.
+	// NOTE: This method flag is set to false as processing is started and only indicates true
+	// after at least one file has processed. If the process is configured to keep processing as
+	// files are queued, but no files ever are, this flag will remain false.
+	volatile bool m_bHasProcessingCompleted;
 
 	// A flag to indicate a single file is currently being processed via ProcessSingleFile
 	volatile bool m_bProcessingSingleFile;

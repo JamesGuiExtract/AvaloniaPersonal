@@ -1068,7 +1068,7 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 					// If queueing, attempt to add the file to the database.
 					VARIANT_BOOL vbAlreadyExists;
 					UCLID_FILEPROCESSINGLib::EActionStatus easOriginal;
-					ipFileRecord = getFPMDB()->AddFile(bstrSourceDocName, bstrActionName,
+					ipFileRecord = getFPMDB()->AddFile(bstrSourceDocName, bstrActionName, -1, 
 						(UCLID_FILEPROCESSINGLib::EFilePriority)eFilePriority, vbForceProcessing,
 						VARIANT_FALSE, UCLID_FILEPROCESSINGLib::kActionPending,
 						(m_ipFSMgmtRole == __nullptr) ? VARIANT_FALSE : m_ipFSMgmtRole->SkipPageCount,

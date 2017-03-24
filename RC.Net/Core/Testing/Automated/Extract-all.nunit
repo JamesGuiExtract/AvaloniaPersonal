@@ -4,7 +4,6 @@
     <assembly path="Extract.AttributeFinder.OutputHandlers.Test.dll" />
     <assembly path="Extract.AttributeFinder.Test.dll" />
     <assembly path="Extract.DataCaptureStats.Test.dll" />
-    <assembly path="Extract.DataEntry.DEP.StandardLabDE.Test.dll" />
     <assembly path="Extract.DataEntry.LabDE.Test.dll" />
     <assembly path="Extract.DataEntry.Test.dll" />
     <assembly path="Extract.Encryption.Test.dll" />

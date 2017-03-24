@@ -928,7 +928,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     EActionStatus oldStatus;
                     FileProcessingDB.SetStatusForFile(fileID,
-                        _settings.OutputAction, EActionStatus.kActionPending, false, true, out oldStatus);
+                        _settings.OutputAction, -1, EActionStatus.kActionPending, false, true, out oldStatus);
                 }
 
                 // Produce a uss file for the paginated document using the uss data from the
@@ -1470,7 +1470,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     EActionStatus oldStatus;
                     FileProcessingDB.SetStatusForFile(sourceFileID,
-                        targetAction, EActionStatus.kActionPending, false, true, out oldStatus);
+                        targetAction, -1, EActionStatus.kActionPending, false, true, out oldStatus);
                 }
             }
 

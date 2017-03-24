@@ -21,7 +21,7 @@ library UCLID_LABDECPPCUSTOMCOMPONENTSLib
 	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
 	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFILEPROCESSING.tlb");
 	importlib("..\..\..\..\AFCore\Code\AFCore.tlb");
-	importlib("Common Files\System\ADO\msado27.tlb");
+	importlib("Common Files\System\ADO\msado28.tlb");
 
 	[
 		object,

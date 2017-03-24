@@ -687,7 +687,7 @@ library UCLID_FILEPROCESSORSLib
 	]
 	coclass SleepTask
 	{
-		[default] interface IManageTagsTask;
+		[default] interface ISleepTask;
 		interface ICategorizedComponent;
 		interface ICopyableObject;
 		interface IFileProcessingTask;

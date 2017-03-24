@@ -347,7 +347,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 					// double-catch-pattern to identify the actual target filename
 					// in the error report - see the addDebugInfo() below.
 					VARIANT_BOOL bAlreadyExists = VARIANT_FALSE;
-					ipDB->AddFile(comFileName, strActionName.c_str(), kPriorityDefault,
+					ipDB->AddFile(comFileName, strActionName.c_str(), ipFileRecord->WorkflowID, kPriorityDefault,
 						VARIANT_TRUE, VARIANT_FALSE, m_eActionStatus, VARIANT_FALSE, &bAlreadyExists,
 						&ePrevStatus);
 				}
@@ -364,8 +364,8 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 			// Pass VARIANT_TRUE for vbQueueChangeIfProcessing so that if the file is currently
 			// processing, an action status change is queued up so that once processing is
 			// finished, m_eActionStatus will be applied at that time. 
-			ipDB->SetStatusForFile(nFileID, strActionName.c_str(), m_eActionStatus, VARIANT_TRUE,
-				VARIANT_FALSE, &ePrevStatus);
+			ipDB->SetStatusForFile(nFileID, strActionName.c_str(), ipFileRecord->WorkflowID,
+				m_eActionStatus, VARIANT_TRUE, VARIANT_FALSE, &ePrevStatus);
 		}
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15116")

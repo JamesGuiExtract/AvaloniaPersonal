@@ -31,7 +31,7 @@
 
 #include <MemLeakDetection.h>
 
-#import "Common Files\System\ADO\msado27.tlb" rename("EOF", "adoEOF")
+#import "Common Files\System\ADO\msado28.tlb" rename("EOF", "adoEOF")
 using namespace ADODB;
 
 #import "..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids 

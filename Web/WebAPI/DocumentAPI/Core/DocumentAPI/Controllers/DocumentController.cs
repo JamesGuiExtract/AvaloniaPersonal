@@ -181,6 +181,7 @@ namespace DocumentAPI.Controllers
                         var fileRecord = 
                             fileProcessingDB.AddFile(fullPath,                                                 // full path to file
                                                      "A01_ExtractData",                                        // action name - TODO - remove hard-coded name, use Worflow.EntryName when available
+                                                     -1,
                                                      EFilePriority.kPriorityNormal,                            // file priority
                                                      false,                                                    // force status change
                                                      false,                                                    // file modified
@@ -254,6 +255,7 @@ namespace DocumentAPI.Controllers
                         var fileRecord = 
                             fileProcessingDB.AddFile(fullPath,                                                 // full path to file
                                                      "A01_ExtractData",                                        // action name
+                                                     -1,
                                                      EFilePriority.kPriorityNormal,                            // file priority
                                                      false,                                                    // force status change
                                                      false,                                                    // file modified

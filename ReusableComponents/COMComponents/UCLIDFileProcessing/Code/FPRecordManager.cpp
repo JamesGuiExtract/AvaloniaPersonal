@@ -151,7 +151,7 @@ void FPRecordManager::discardProcessingQueue()
 		// Set vbAllowQueuedStatusOverride to true.
 		UCLID_FILEPROCESSINGLib::EActionStatus eaOldStatus =
 			(UCLID_FILEPROCESSINGLib::EActionStatus)kActionUnattempted;
-		m_ipFPMDB->SetStatusForFile(task.getFileID(), m_strAction.c_str(),
+		m_ipFPMDB->SetStatusForFile(task.getFileID(), m_strAction.c_str(), task.getWorkflowID(),
 			task.getFallbackStatus(), VARIANT_FALSE, VARIANT_TRUE, &eaOldStatus);
 	}
 
@@ -881,6 +881,7 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 		long nRemoveTaskId = -1;
 		FileProcessingRecord oldTask;
 		long nTaskID = task.getFileID();
+		long nWorkflowID = task.getWorkflowID();
 		_lastCodePos = "20";
 
 		// Try to get the existing task
@@ -994,7 +995,7 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 				{
 					_lastCodePos = "210";
 					// Notify the DB that the file was processed
-					m_ipFPMDB->NotifyFileProcessed(nTaskID, m_strAction.c_str(),
+					m_ipFPMDB->NotifyFileProcessed(nTaskID, m_strAction.c_str(), nWorkflowID,
 						asVariantBool(task.getAllowedQueuedStatusOverride()));
 					m_nNumberOfFilesProcessedSuccessfully++;
 				}
@@ -1002,15 +1003,15 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 				{
 					_lastCodePos = "220";
 					// Notify the DB that the file failed to process
-					m_ipFPMDB->NotifyFileFailed(nTaskID, m_strAction.c_str(), task.m_strException.c_str(),
-						asVariantBool(task.getAllowedQueuedStatusOverride()));
+					m_ipFPMDB->NotifyFileFailed(nTaskID, m_strAction.c_str(), nWorkflowID, 
+						task.m_strException.c_str(), asVariantBool(task.getAllowedQueuedStatusOverride()));
 
 					m_nNumberOfFilesFailed++;
 				}
 				else if ( eNewStatus == kRecordSkipped )
 				{
 					_lastCodePos = "225";
-					m_ipFPMDB->NotifyFileSkipped(nTaskID, m_nActionID,
+					m_ipFPMDB->NotifyFileSkipped(nTaskID, m_strAction.c_str(), nWorkflowID,
 						asVariantBool(task.getAllowedQueuedStatusOverride()));
 					m_nNumberOfFilesProcessedSuccessfully++;
 				}
@@ -1041,7 +1042,7 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 				// Set vbAllowQueuedStatusOverride to true.
 				UCLID_FILEPROCESSINGLib::EActionStatus eaOldStatus =
 					(UCLID_FILEPROCESSINGLib::EActionStatus)kActionUnattempted;
-				m_ipFPMDB->SetStatusForFile(nTaskID, m_strAction.c_str(), task.getFallbackStatus(),
+				m_ipFPMDB->SetStatusForFile(nTaskID, m_strAction.c_str(), nWorkflowID, task.getFallbackStatus(),
 					VARIANT_FALSE, VARIANT_TRUE, &eaOldStatus);
 				_lastCodePos = "290";
 			}
@@ -1429,7 +1430,7 @@ void FPRecordManager::changeState(const FPWorkItem& workItem)
 {
 	// there are only two state changes I am wanting
 	// kWorkUnitPending to kworkUnitProcessing
-	// KWorkUnitProcessing to either kWorkUnitCompleted or kWorkUnitFaild
+	// KWorkUnitProcessing to either kWorkUnitCompleted or kWorkUnitFailed
 	FPWorkItem oldWorkItem;
 	EWorkItemStatus eOldStatus = kWorkUnitPending;
 	EWorkItemStatus newStatus = workItem.m_status;
@@ -1460,7 +1461,6 @@ void FPRecordManager::changeState(const FPWorkItem& workItem)
 	{
 		m_mapWorkItems[nWorkItemID] = workItem;
 	}
-
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::SendStatusMessage(HWND hWnd, const FPWorkItem *pWorkItem,
@@ -1608,6 +1608,28 @@ bool  FPRecordManager::areFilesProcessingWithParallelize()
 		// If there is at least one record return true
 		return ipRecordSet->RecordCount > 0;
 	}
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+bool FPRecordManager::areAnyFilesActive()
+{
+	CSingleLock lockGuard(&m_readTaskMapMutex, TRUE);
+
+	if (!m_queDelayedTasks.empty())
+	{
+		return true;
+	}
+
+	for (TaskMap::iterator it = m_mapTasks.begin(); it != m_mapTasks.end(); it++)
+	{
+		// Only erase if its status is not pending or current 
+		ERecordStatus eStatus = it->second.m_eStatus;
+		if (eStatus == kRecordCurrent || eStatus == kRecordPending)
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 //-------------------------------------------------------------------------------------------------

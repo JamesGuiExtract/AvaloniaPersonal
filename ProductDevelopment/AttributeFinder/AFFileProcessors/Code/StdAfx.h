@@ -52,7 +52,7 @@ using namespace UCLID_AFOUTPUTHANDLERSLib;
 #import "..\..\AFValueModifiers\Code\AFValueModifiers.tlb" named_guids
 using namespace UCLID_AFVALUEMODIFIERSLib;
 
-#import "Common Files\System\ADO\msado27.tlb" \
+#import "Common Files\System\ADO\msado28.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 

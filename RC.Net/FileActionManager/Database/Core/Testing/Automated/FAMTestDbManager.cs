@@ -1,10 +1,12 @@
 ﻿using Extract.Database;
+using Extract.Utilities;
 using Extract.Testing.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Database.Test
@@ -27,7 +29,7 @@ namespace Extract.FileActionManager.Database.Test
         /// <summary>
         /// The FAM databases being actively managed by this instance.
         /// </summary>
-        Dictionary<string, IFileProcessingDB> _activeDatabases = new Dictionary<string, IFileProcessingDB>();
+        Dictionary<string, FileProcessingDB> _activeDatabases = new Dictionary<string, FileProcessingDB>();
 
         #endregion Fields
 
@@ -54,7 +56,7 @@ namespace Extract.FileActionManager.Database.Test
         {
             try
             {
-                IFileProcessingDB fileProcessingDb = null;
+                FileProcessingDB fileProcessingDb = null;
                 if (_activeDatabases.TryGetValue(databaseName, out fileProcessingDb))
                 {
                     var ee = new ExtractException("ELI42028", "Database already exists");
@@ -91,13 +93,13 @@ namespace Extract.FileActionManager.Database.Test
         /// </summary>
         /// <param name="dbBackupResourceName">The database backup as an embedded resource.</param>
         /// <param name="destinationDBName">The name the database should be restored to.</param>
-        public IFileProcessingDB GetDatabase(string dbBackupResourceName, string destinationDBName)
+        public FileProcessingDB GetDatabase(string dbBackupResourceName, string destinationDBName)
         {
             string backupDbFile = null;
 
             try
             {
-                IFileProcessingDB fileProcessingDb = null;
+                FileProcessingDB fileProcessingDb = null;
                 if (_activeDatabases.TryGetValue(destinationDBName, out fileProcessingDb))
                 {
                     return fileProcessingDb;
@@ -105,7 +107,7 @@ namespace Extract.FileActionManager.Database.Test
                 else
                 {
                     backupDbFile = _backupFileManager.GetFile(dbBackupResourceName);
-                    
+
                     // In most cases SQL server will not have access to the file; giving access to
                     // all users will allow it access.
                     FileSecurity fSecurity = File.GetAccessControl(backupDbFile);
@@ -146,7 +148,7 @@ namespace Extract.FileActionManager.Database.Test
         /// <param name="databaseName">Name of the database.</param>
         public void RemoveDatabase(string databaseName)
         {
-            IFileProcessingDB fileProcessingDb = null;
+            FileProcessingDB fileProcessingDb = null;
             ExtractException ee = null;
 
             // First try to close all DB connections for the FileProcessingDb instance
@@ -233,6 +235,134 @@ namespace Extract.FileActionManager.Database.Test
             }
 
             // No unmanaged resources
+        }
+
+        #endregion IDisposable Members
+    }
+
+    /// <summary>
+    /// Creates a FAM processing session for use in unit tests.
+    /// <para><b>WARNING</b></para>
+    /// When there are problems that occur within one of these sessions, the symptoms have at times
+    /// been unintuitive. Rather than seeing a relevant exception, I have seen the session become
+    /// deadlocked or license related errors.
+    /// If a test fails or hangs that is using FAMProcessingSession, check the extract exception log,
+    /// run the same setup with and actual FAM or attach a debugger to find the root cause.
+    /// </summary>
+    /// <seealso cref="System.IDisposable" />
+    [CLSCompliant(false)]
+    public class FAMProcessingSession : IDisposable
+    {
+        FileProcessingManager _fileProcessingManager;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FAMProcessingSession"/> class.
+        /// </summary>
+        /// <param name="fileProcessingDb">The <see cref="IFileProcessingDB"/>.
+        /// NOTE: This DB is used only for connection info; the FileProcessingManager create it's
+        /// own instance.</param>
+        /// <param name="actionName">Name of the action to process.</param>
+        /// <param name="workflowName">Name of the workflow to process within or empty for all workflows.</param>
+        /// <param name="fileProcessingTask">The <see cref="IFileProcessingTask"/> to be executed.</param>
+        /// <param name="threadCount">The number threads to use.</param>
+        /// <param name="filesToGrabCount">The number files to grab at a time from the DB.</param>
+        /// <param name="keepProcessing"><c>true</c> if processing should continue as files are added, or
+        /// <c>false</c> to stop processing as soon as the queue is empty.</param>
+        public FAMProcessingSession(IFileProcessingDB fileProcessingDB, string actionName, string workflowName,
+            IFileProcessingTask fileProcessingTask, int threadCount, int filesToGrabCount, bool keepProcessing)
+        {
+            try
+            {
+                _fileProcessingManager = new FileProcessingManager();
+                _fileProcessingManager.DatabaseServer = fileProcessingDB.DatabaseServer;
+                _fileProcessingManager.DatabaseName = fileProcessingDB.DatabaseName;
+                _fileProcessingManager.ActionName = actionName;
+                _fileProcessingManager.ActiveWorkflow = workflowName;
+                _fileProcessingManager.MaxFilesFromDB = filesToGrabCount;
+                _fileProcessingManager.FileProcessingMgmtRole.NumThreads = threadCount;
+                _fileProcessingManager.FileProcessingMgmtRole.KeepProcessingAsAdded = keepProcessing;
+
+                var descriptor = new ObjectWithDescription();
+                descriptor.Object = fileProcessingTask;
+
+                var tasksVector = new[] { descriptor }.ToIUnknownVector<ObjectWithDescription>();
+
+                _fileProcessingManager.FileProcessingMgmtRole.FileProcessors = tasksVector;
+                var fileActionMgmtRole = (IFileActionMgmtRole)_fileProcessingManager.FileProcessingMgmtRole;
+                fileActionMgmtRole.Enabled = true;
+
+                _fileProcessingManager.StartProcessing();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI42132");
+            }
+        }
+
+        /// <summary>
+        /// Blocks until processing has completed (queue is empty).
+        /// <para><b>NOTE</b></para>
+        /// This method assumes files are to be queued. If the session is configured to keep
+        /// processing as files are queued, it will stop as soon as a files are queued then process.
+        /// However, if no files are ever queued, the call will block forever.
+        /// </summary>
+        public void WaitForProcessingToComplete()
+        {
+            try
+            {
+                while (_fileProcessingManager.ProcessingStarted &&
+                        _fileProcessingManager.FileProcessingMgmtRole != null &&
+                        !_fileProcessingManager.FileProcessingMgmtRole.HasProcessingCompleted)
+                {
+                    System.Threading.Thread.Sleep(200);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI42131");
+            }
+        }
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="FAMProcessingSession"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <overloads>Releases resources used by the <see cref="FAMProcessingSession"/>.</overloads>
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="FAMProcessingSession"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                try
+                {
+                    if (_fileProcessingManager != null &&
+                        _fileProcessingManager.ProcessingStarted)
+                    {
+                        _fileProcessingManager.StopProcessing();
+                        while (_fileProcessingManager.ProcessingStarted)
+                        {
+                            System.Threading.Thread.Sleep(200);
+                        }
+                    }
+
+                    // For reasons that aren't entirely clear to me, without this call to clear
+                    // subsequent FAM sessions fail.
+                    _fileProcessingManager.Clear();
+                    _fileProcessingManager = null;
+                }
+                catch { }
+            }
         }
 
         #endregion IDisposable Members

@@ -133,6 +133,9 @@ public:
 	//			processing.
 	bool getAllowedQueuedStatusOverride() const;
 	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Gets the workflow ID this record is associated with.
+	long getWorkflowID() const;
+	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the underlying file record
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecord();
 
@@ -153,10 +156,12 @@ private:
 		long NumberOfPages;
 		bool AllowedQueuedStatusOverride;
 		UCLID_FILEPROCESSINGLib::EFilePriority Priority;
+		long WorkflowID;
 
 		LocalFileRecord() : FileRecord(NULL), FileID(-1), ActionID(-1),
 			FileSize(-1), NumberOfPages(-1), AllowedQueuedStatusOverride(true),
-			Priority((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault)
+			Priority((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault),
+			WorkflowID(-1)
 		{
 		}
 
@@ -179,7 +184,7 @@ private:
 				// Get the data from the ipRecord object
 				_bstr_t bstrFileName;
 				ipRecord->GetFileData(&FileID, &ActionID, bstrFileName.GetAddress(),
-					&FileSize, &NumberOfPages, &Priority);
+					&FileSize, &NumberOfPages, &Priority, &WorkflowID);
 
 				// Store the record
 				FileRecord = ipRecord;

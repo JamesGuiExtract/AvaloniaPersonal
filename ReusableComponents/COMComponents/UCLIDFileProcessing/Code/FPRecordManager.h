@@ -219,6 +219,9 @@ public:
 	// PROMISE: Set the flag to only retrieve work items for files being processed in the current
 	// instance
 	void setRestrictToFAMSessionID(bool bRestrictToFAMSessionID);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Indicates whether any files are either processing or are queued to be processed.
+	bool areAnyFilesActive();
 
 private:
 

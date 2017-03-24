@@ -124,14 +124,15 @@ public:
 	STDMETHOD(DefineNewAction)(BSTR strAction, long* pnID);
 	STDMETHOD(DeleteAction)(BSTR strAction);
 	STDMETHOD(GetActions)(IStrToStrMap** pmapActionNameToID);
-	STDMETHOD(AddFile)(BSTR strFile, BSTR strAction, EFilePriority ePriority,
+	STDMETHOD(AddFile)(BSTR strFile, BSTR strAction, long nWorkflowID, EFilePriority ePriority,
 		VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified, EActionStatus eNewStatus, 
 		VARIANT_BOOL bSkipPageCount, VARIANT_BOOL* pbAlreadyExists, EActionStatus* pPrevStatus,
 		IFileRecord** ppFileRecord);
 	STDMETHOD(RemoveFile)(BSTR strFile, BSTR strAction);
 	STDMETHOD(RemoveFolder)(BSTR strFolder, BSTR strAction);
-	STDMETHOD(NotifyFileProcessed)(long nFileID, BSTR strAction, VARIANT_BOOL vbAllowQueuedStatusOverride);
-	STDMETHOD(NotifyFileFailed)(long nFileID, BSTR strAction, BSTR strException,
+	STDMETHOD(NotifyFileProcessed)(long nFileID, BSTR strAction, LONG nWorkflowID,
+		VARIANT_BOOL vbAllowQueuedStatusOverride);
+	STDMETHOD(NotifyFileFailed)(long nFileID, BSTR strAction, LONG nWorkflowID, BSTR strException,
 		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(SetFileStatusToPending)(long nFileID, BSTR strAction,
 		VARIANT_BOOL vbAllowQueuedStatusOverride);
@@ -145,7 +146,7 @@ public:
 		long nToActionID, EActionStatus eToStatus, BSTR bstrSkippedFromUserName, long nFromActionID,
 		long* pnNumRecordsModified);
 	STDMETHOD(SetStatusForAllFiles)(BSTR strAction, EActionStatus eStatus);
-	STDMETHOD(SetStatusForFile)(long nID, BSTR strAction, EActionStatus eStatus, 
+	STDMETHOD(SetStatusForFile)(long nID, BSTR strAction, long nWorkflowID, EActionStatus eStatus, 
 		VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus* poldStatus);
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
@@ -185,7 +186,7 @@ public:
 	STDMETHOD(AsStatusName)(EActionStatus eaStatus, BSTR *pbstrStatusName);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* pnFileID);
 	STDMETHOD(GetActionName)(long nActionID, BSTR* pbstrActionName);
-	STDMETHOD(NotifyFileSkipped)(long nFileID, long nActionID,
+	STDMETHOD(NotifyFileSkipped)(long nFileID, BSTR bstrAction, long nWorkflowID,
 		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(SetFileActionComment)(long nFileID, long nActionID, BSTR bstrComment);
 	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
@@ -328,6 +329,7 @@ public:
 	STDMETHOD(get_ActiveActionID)(long* pnActionID);
 	STDMETHOD(GetStatsAllWorkflows)(BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(GetAllActions)(IStrToStrMap** pmapActionNameToID);
+	STDMETHOD(GetWorkflowStatus)(long nFileID, EActionStatus* peaStatus);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -667,13 +669,20 @@ private:
 	// PROMISE: To return the ID for the given provided workflow name.
 	long getWorkflowID(_ConnectionPtr ipConnection, const string& strWorkflowName);
 
+	// PROMISE: To get the workflowID associated with the specified ActionID
+	long getWorkflowID(_ConnectionPtr ipConnection, long nActionID);
+
 	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match
 	//			the action name stored in the database using the connection object provided.
 	//			NOTE: This will be the action ID unassociated with workflows if workflows are present.
 	long getActionID(_ConnectionPtr ipConnection, const string& strActionName);
 
-	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match
-	//			the action name stored in the database using the connection object provided.
+	// PROMISE:	To return the ID from the Action table from the given strActionName for the specified workflow ID
+	//			NOTE: This will be the action ID associated with the specified workflow. If nWorkflow is -1, 
+	//			it will return the ID of the currently active workflow. If -1 and no workflow is active, the
+	//			ID of the action unassociated with workflows will be returned.
+	long getActionID(_ConnectionPtr ipConnection, const string& strActionName, long nWorkflow);
+	// PROMISE:	To return the ID from the Action table from the given strActionName for the specified workflow name
 	//			NOTE: This will be the action ID associated with the specified workflow. If strWorkflow is empty, 
 	//			it will return the ID of the action unassociated with workflows.
 	long getActionID(_ConnectionPtr ipConnection, const string& strActionName, const string& strWorkflow);
@@ -708,6 +717,8 @@ private:
 	// PROMISE:	 To set the given File's action state for the action given by strAction to the 
 	//			state in strState and returns the old state using the connection object provided.
 	// NOTE:	The outer scope should always lock the DB if required and create transaction if required
+	//			nWorkflowID should be used to change the file in a particular workflow; If -1,
+	//			the action status will be changed in the active workflow (if one is set).
 	//			If bRemovePreviousSkipped is true and strState == "S" then the skipped file table
 	//			will be updated for the file with the information for the current user and process.
 	//			If bRemovePreviousSkipped is false and strState == "S" the FAMSessionID will be updated,
@@ -720,7 +731,7 @@ private:
 	//			bAllowQueuedStatusOverride is false, the QueuedActionStatusChange will be ignored
 	//			and the status will be set to strState.
 	EActionStatus setFileActionState(_ConnectionPtr ipConnection, long nFileID,
-		string strAction, const string& strState, const string& strException,
+		string strAction, long nWorkflowID, const string& strState, const string& strException,
 		bool bQueueChangeIfProcessing, bool bAllowQueuedStatusOverride, long nActionID = -1,
 		bool bRemovePreviousSkipped = false, const string& strFASTComment = "");
 
@@ -734,6 +745,8 @@ private:
 
 	// A helper function for SetFileActionState that sets the status for the specified file ID to
 	// the specified state on the specified action.
+	// nWorkflowID should be used to change the file in a particular workflow; If - 1,
+	// the action status will be changed in the active workflow (if one is set).
 	// If bQueueChangeIfProcessing is true and the file is currently in the processing state on the
 	// specified action, the new state will be queued via the QueuedActionStatusChange table such
 	// that when it is done processing it will be moved into that state.
@@ -742,8 +755,8 @@ private:
 	// the QueuedActionStatusChange will be ignored and the status will be set to strState.
 	// poldStatus will return the previous action status of the document if not null.
 	void setStatusForFile(_ConnectionPtr ipConnection, long nFileID,  string strAction,
-		EActionStatus eStatus, bool bQueueChangeIfProcessing, bool bAllowQueuedStatusOverride,
-		EActionStatus *poldStatus = __nullptr);
+		long nWorkflowID, EActionStatus eStatus, bool bQueueChangeIfProcessing,
+		bool bAllowQueuedStatusOverride, EActionStatus *poldStatus = __nullptr);
 
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
 	void reCalculateStats(_ConnectionPtr ipConnection, long nActionID);
@@ -1061,7 +1074,7 @@ private:
 	//			will be thrown.
 	// RETURNS: A vector of IFileRecords for the files that were set to processing.
 	IIUnknownVectorPtr setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
-		const string& strSelectSQL, const string& strActionName, const string& strActionIDs,
+		const string& strSelectSQL, const string& strActionName,
 		const string& strAllowedCurrentStatus);
 
 	// Gets a set containing the File ID's for all files that are skipped for the specified action
@@ -1148,35 +1161,41 @@ private:
 	// Method to update DatabaseID and Secure Counter tables after schema updated to 142
 	void updateDatabaseIDAndSecureCounterTablesSchema142(_ConnectionPtr ipConnection);
 
+	// Gets the specified workflow definition
+	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr getWorkflowDefinition(_ConnectionPtr ipConnection, long nID);
+
+	// Gets a map of all workflow names and IDs.
+	map<string, long> getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID);
+
 	void validateLicense();
 
 	// Internal implementation methods
 	bool DefineNewAction_Internal(bool bDBLocked, BSTR strAction, long* pnID);
 	bool DeleteAction_Internal(bool bDBLocked, BSTR strAction);
 	bool GetActions_Internal(bool bDBLocked, IStrToStrMap * * pmapActionNameToID);
-	bool AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR strAction, EFilePriority ePriority,
-		VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified,
+	bool AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR strAction, long nWorkflowID,
+		EFilePriority ePriority, VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified,
 		EActionStatus eNewStatus, VARIANT_BOOL bSkipPageCount, VARIANT_BOOL * pbAlreadyExists,
 		EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord);
 	bool RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR strAction);
-	bool NotifyFileProcessed_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
+	bool NotifyFileProcessed_Internal(bool bDBLocked, long nFileID,  BSTR strAction, long nWorkflowID,
 		VARIANT_BOOL vbAllowQueuedStatusOverride);
-	bool NotifyFileFailed_Internal(bool bDBLocked, long nFileID,  BSTR strAction,  BSTR strException,
-		VARIANT_BOOL vbAllowQueuedStatusOverride);
+	bool NotifyFileFailed_Internal(bool bDBLocked, long nFileID,  BSTR strAction, long nWorkflowID,
+		BSTR strException, VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool SetFileStatusToPending_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
-		VARIANT_BOOL vbAllowQueuedStatusOverride);
-	bool SetFileStatusToUnattempted_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
-		VARIANT_BOOL vbAllowQueuedStatusOverride);
+		/*long nWorkflowID,*/ VARIANT_BOOL vbAllowQueuedStatusOverride);
+	bool SetFileStatusToUnattempted_Internal(bool bDBLocked, long nFileID,  BSTR strAction, 
+		/*long nWorkflowID,*/ VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool SetFileStatusToSkipped_Internal(bool bDBLocked, long nFileID, BSTR strAction,
-		VARIANT_BOOL bRemovePreviousSkipped, VARIANT_BOOL vbAllowQueuedStatusOverride);
+		VARIANT_BOOL bRemovePreviousSkipped, /*long nWorkflowID,*/ VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool GetFileStatus_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
 		VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus);
 	bool SearchAndModifyFileStatus_Internal(bool bDBLocked,  
 		long nWhereActionID,  EActionStatus eWhereStatus,  long nToActionID, EActionStatus eToStatus,
 		BSTR bstrSkippedFromUserName, long nFromActionID, long * pnNumRecordsModified);
 	bool SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAction,  EActionStatus eStatus);
-	bool SetStatusForFile_Internal(bool bDBLocked, long nID,  BSTR strAction,  EActionStatus eStatus,  
-		VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
+	bool SetStatusForFile_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID,
+		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus * poldStatus);
 	bool GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
@@ -1196,7 +1215,7 @@ private:
 	bool GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQuery, _Recordset** ppVal);
 	bool GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, long *pnFileID);
 	bool GetActionName_Internal(bool bDBLocked, long nActionID, BSTR *pbstrActionName);
-	bool NotifyFileSkipped_Internal(bool bDBLocked, long nFileID, long nActionID,
+	bool NotifyFileSkipped_Internal(bool bDBLocked, long nFileID, BSTR bstrAction, long nWorkflowID,
 		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool SetFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID, BSTR bstrComment);
 	bool GetFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID, 
@@ -1312,6 +1331,7 @@ private:
 	bool SetWorkflowActions_Internal(bool bDBLocked, long nID, IVariantVector* pActionList);
 	bool GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
 	bool GetAllActions_Internal(bool bDBLocked, IStrToStrMap** pmapActionNameToID);
+	bool GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

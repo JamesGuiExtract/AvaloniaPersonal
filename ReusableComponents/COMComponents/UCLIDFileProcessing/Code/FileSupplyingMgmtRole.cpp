@@ -897,7 +897,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 			UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 			ipFileRecord = getFPMDB()->AddFile(bstrSimplifiedName, m_strAction.c_str(), 
-				ePriority, vbForceProcessing, VARIANT_FALSE,
+				-1, ePriority, vbForceProcessing, VARIANT_FALSE,
 				UCLID_FILEPROCESSINGLib::kActionPending, asVariantBool(m_bSkipPageCount),
 				&vbAlreadyExists, &easPrev );	
 
@@ -1091,7 +1091,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 			{
 				// Add the new filename to the db
 				ipFileRecord = getFPMDB()->AddFile(bstrNewSimplifiedName, m_strAction.c_str(), 
-					ePriority, ipFSData->ForceProcessing, VARIANT_FALSE,
+					-1, ePriority, ipFSData->ForceProcessing, VARIANT_FALSE,
 					UCLID_FILEPROCESSINGLib::kActionPending, asVariantBool(m_bSkipPageCount),
 					&bAlreadyExists, &easPrev );		
 				bIsAdded = true;
@@ -1193,7 +1193,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 			VARIANT_BOOL bAlreadyExists;
 			UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 			ipFileRecord = getFPMDB()->AddFile(bstrSimplifiedName, m_strAction.c_str(),
-				ePriority, ipFSData->ForceProcessing, VARIANT_TRUE,
+				-1, ePriority, ipFSData->ForceProcessing, VARIANT_TRUE,
 				UCLID_FILEPROCESSINGLib::kActionPending, asVariantBool(m_bSkipPageCount),
 				&bAlreadyExists, &easPrev );
 		

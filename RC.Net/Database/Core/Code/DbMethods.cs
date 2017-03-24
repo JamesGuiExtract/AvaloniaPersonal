@@ -631,6 +631,11 @@ namespace Extract.Database
         {
             try
             {
+                // NOTE: If the specified backup file contains multiple backup sets, this method
+                // will restore the earliest version, not the latest. To use the latest version, 
+                // a separate "RESTORE HEADERONLY" needs to be run to find the latest version and
+                // then that needs to be specified instead of in the "WITH FILE=x" clause below.
+
                 using (var dbConnection = new SqlConnection(
                         "Server=(local);Integrated Security=SSPI"))
                 {

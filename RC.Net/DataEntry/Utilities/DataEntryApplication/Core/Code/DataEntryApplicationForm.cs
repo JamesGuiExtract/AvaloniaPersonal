@@ -3156,7 +3156,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         EActionStatus oldStatus;
                         FileProcessingDB.SetStatusForFile(fileID,
-                            _settings.PaginationSettings.PaginationOutputAction,
+                            _settings.PaginationSettings.PaginationOutputAction, -1,
                             EActionStatus.kActionPending, false, false, out oldStatus);
                     }
                 }
@@ -3215,7 +3215,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         EActionStatus oldStatus;
                         FileProcessingDB.SetStatusForFile(_fileId,
-                            _settings.PaginationSettings.PaginationOutputAction,
+                            _settings.PaginationSettings.PaginationOutputAction, -1,
                             EActionStatus.kActionPending, false, false, out oldStatus);
                     }
                 }
@@ -3226,7 +3226,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     EActionStatus oldStatus;
                     FileProcessingDB.SetStatusForFile(_fileId,
-                        _settings.PaginationSettings.PaginationSourceAction,
+                        _settings.PaginationSettings.PaginationSourceAction, -1,
                         EActionStatus.kActionPending, false, true, out oldStatus);
                 }
 

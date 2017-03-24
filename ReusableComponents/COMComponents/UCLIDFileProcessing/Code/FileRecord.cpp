@@ -17,7 +17,8 @@ m_lFileID(0),
 m_llFileSize(0),
 m_lPages(0),
 m_ePriority((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault),
-m_eaFallbackStatus((UCLID_FILEPROCESSINGLib::EActionStatus)kActionPending)
+m_eaFallbackStatus((UCLID_FILEPROCESSINGLib::EActionStatus)kActionPending),
+m_lWorkflowID(0)
 {
 }
 
@@ -176,7 +177,7 @@ STDMETHODIMP CFileRecord::put_ActionID(LONG newVal)
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileRecord::GetFileData(LONG *plFileID, LONG *plActionID, BSTR *pbstrFileName,
 									  LONGLONG *pllFileSize, LONG *plPages,
-									  EFilePriority *pePriority)
+									  EFilePriority *pePriority, LONG *plWorkflowID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -189,6 +190,7 @@ STDMETHODIMP CFileRecord::GetFileData(LONG *plFileID, LONG *plActionID, BSTR *pb
 		ASSERT_ARGUMENT("ELI26747", pllFileSize != __nullptr);
 		ASSERT_ARGUMENT("ELI26748", plPages != __nullptr);
 		ASSERT_ARGUMENT("ELI27649", pePriority != __nullptr);
+		ASSERT_ARGUMENT("ELI42102", plWorkflowID != __nullptr);
 
 		// Copy the values
 		*plFileID = m_lFileID;
@@ -197,6 +199,7 @@ STDMETHODIMP CFileRecord::GetFileData(LONG *plFileID, LONG *plActionID, BSTR *pb
 		*pllFileSize = m_llFileSize;
 		*plPages = m_lPages;
 		*pePriority = (EFilePriority) m_ePriority;
+		*plWorkflowID = m_lWorkflowID;
 
 		return S_OK;
 	}
@@ -204,7 +207,8 @@ STDMETHODIMP CFileRecord::GetFileData(LONG *plFileID, LONG *plActionID, BSTR *pb
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileRecord::SetFileData(LONG lFileID, LONG lActionID, BSTR bstrFileName,
-									  LONGLONG llFileSize, LONG lPages, EFilePriority ePriority)
+									  LONGLONG llFileSize, LONG lPages, EFilePriority ePriority,
+									  LONG lWorkflowID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -217,6 +221,7 @@ STDMETHODIMP CFileRecord::SetFileData(LONG lFileID, LONG lActionID, BSTR bstrFil
 		m_llFileSize = llFileSize;
 		m_lPages = lPages;
 		m_ePriority = (UCLID_FILEPROCESSINGLib::EFilePriority) ePriority;
+		m_lWorkflowID = lWorkflowID;
 
 		return S_OK;
 	}
@@ -275,5 +280,33 @@ STDMETHODIMP CFileRecord::put_FallbackStatus(EActionStatus eaFallbackStatus)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37487");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileRecord::get_WorkflowID(LONG* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI42099", pVal != __nullptr);
+
+		*pVal = m_lWorkflowID;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42100");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileRecord::put_WorkflowID(LONG newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_lWorkflowID = newVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42101");
 }
 //-------------------------------------------------------------------------------------------------

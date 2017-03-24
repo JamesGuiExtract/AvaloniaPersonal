@@ -1071,7 +1071,7 @@ namespace Extract.DataEntry.LabDE
                 // Make as complete in the current action.
                 EActionStatus oldStatus;
                 FileProcessingDB.SetStatusForFile(fileId,
-                    DataEntryApplication.DatabaseActionName, newStatus, true, false, out oldStatus);
+                    DataEntryApplication.DatabaseActionName, -1, newStatus, true, false, out oldStatus);
 
                 // Apply any specified tag.
                 if (!string.IsNullOrWhiteSpace(tagNameToApply))

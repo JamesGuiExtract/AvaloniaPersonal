@@ -1812,7 +1812,8 @@ bool CFileProcessingDB::GetAllActions_Internal(bool bDBLocked, IStrToStrMap** pm
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR strAction, EFilePriority ePriority,
+bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR strAction, long nWorkflowID,
+										EFilePriority ePriority,
 										VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified,
 										EActionStatus eNewStatus, VARIANT_BOOL bSkipPageCount,
 										VARIANT_BOOL * pbAlreadyExists, EActionStatus *pPrevStatus,
@@ -1831,7 +1832,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 			// Open a recordset that contain only the record (if it exists) with the given filename
 			string strFileSQL = "SELECT * FROM FAMFile WHERE FileName = '" + strFileName + "'";
-
+			
 			// put the unaltered file name back in the strFileName variable
 			strFileName = asString(strFile);
 
@@ -1851,7 +1852,16 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				validateDBSchemaVersion();
 
 				// Do not allow adding of files to all workflows via AddFile.
-				ASSERT_RUNTIME_CONDITION("ELI42029", !m_bRunningAllWorkflows, "Workflow has not been set.");
+				ASSERT_RUNTIME_CONDITION("ELI42029", nWorkflowID > 0 || !m_bRunningAllWorkflows,
+					"Workflow has not been set.");
+
+				if (nWorkflowID <= 0 && m_bUsingWorkflows)
+				{
+					nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
+				}
+
+				string strActionName = asString(strAction);
+				long nActionID = getActionID(ipConnection, strActionName, nWorkflowID);
 				
 				_lastCodePos = "10";
 
@@ -1865,7 +1875,9 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				_lastCodePos = "30";
 
 				// Check whether the file already exists in the database
-				*pbAlreadyExists = asVariantBool(ipFileSet->adoEOF == VARIANT_FALSE);
+				bool bAlreadyExists = ipFileSet->adoEOF == VARIANT_FALSE;
+				// .. and whether it has been used in the workflow (rest of check below)
+				bool bAlreadyExistsInWorkflow = bAlreadyExists && !m_bUsingWorkflows;
 
 				// Initialize the id
 				long nID = 0;
@@ -1873,18 +1885,13 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
 
-				// Set the action name from the parameter
-				string strActionName = asString(strAction);
-
-				// Get the action ID and update the strActionName to stored value
-				long nActionID = getActionID(ipConnection, strActionName);
 				_lastCodePos = "45";
 
 				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord = __nullptr;
 				FieldsPtr ipFields = __nullptr;
 
 				// if the file is in the FAMFile table get the ID
-				if (asCppBool(*pbAlreadyExists))
+				if (bAlreadyExists)
 				{
 					// Get the fields from the file set
 					ipFields = ipFileSet->Fields;
@@ -1896,7 +1903,21 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 					// Set the Current file Records ID
 					nID = ipOldRecord->FileID;
+
+					if (m_bUsingWorkflows)
+					{
+						string strFileInWorkflowSQL = Util::Format("SELECT COUNT(*) AS [ID] FROM [FileActionStatus] "
+							"INNER JOIN [Action] ON [ActionID] = [Action].[ID] "
+							"WHERE [FileID] = %d AND [WorkflowID] = %d", nID, nWorkflowID);
+
+						long nCount = 0;
+						executeCmdQuery(ipConnection, strFileInWorkflowSQL, false, &nCount);
+
+						bAlreadyExistsInWorkflow = (nCount > 0);
+					}
 				}
+
+				*pbAlreadyExists = asVariantBool(bAlreadyExistsInWorkflow);
 
 				// Get the FileActionStatus recordset with the status of the file for the action
 				// NOTE: if nID = 0 or File status is unattempted for the action the recordset will be empty
@@ -1905,7 +1926,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					asEActionStatus(getStringField(ipFileActionStatusSet->Fields, "ActionStatus")) : kActionUnattempted;
 
 				// Check if the existing file is currently from an active pagination process
-				if (asCppBool(*pbAlreadyExists) && isFileInPagination(ipConnection, nID))
+				if (bAlreadyExists && isFileInPagination(ipConnection, nID))
 				{
 					// Update QueueEvent table if enabled
 					if (m_bUpdateQueueEventTable)
@@ -1964,14 +1985,14 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 				// Update the new file record with the file data
 				ipNewFileRecord->SetFileData(-1, nActionID, strFileName.c_str(),
-					llFileSize, nPages, (UCLID_FILEPROCESSINGLib::EFilePriority) ePriority);
+					llFileSize, nPages, (UCLID_FILEPROCESSINGLib::EFilePriority) ePriority, nWorkflowID);
 
 				_lastCodePos = "50";
 
 				string strNewStatus = asStatusString(eNewStatus);
 
 				// If file did not already exist then add a new record to the database
-				if (*pbAlreadyExists == VARIANT_FALSE)
+				if (!bAlreadyExists)
 				{
 					// Add new record
 					ipFileSet->AddNew();
@@ -2058,7 +2079,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					{
 						// Call setStatusForFile to handle updating all tables related to the status
 						// change, as appropriate.
-						setStatusForFile(ipConnection, nID, strActionName, kActionPending, true, false);
+						setStatusForFile(ipConnection, nID, strActionName, -1, kActionPending, true, false);
 
 						_lastCodePos = "110";
 
@@ -2241,6 +2262,7 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
+													 long nWorkflowID,
 													 VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	try
@@ -2262,8 +2284,8 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 
 				// change the given files state to completed unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "", false,
-					asCppBool(vbAllowQueuedStatusOverride));
+				setFileActionState(ipConnection, nFileID, asString(strAction), nWorkflowID, "C",
+					"", false, asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
 
@@ -2287,8 +2309,8 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  BSTR strAction,  
-												  BSTR strException,
+bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked, long nFileID,  BSTR strAction,  
+												  long nWorkflowID, BSTR strException,
 												  VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	try
@@ -2314,8 +2336,8 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 
 				// change the given files state to Failed unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, asString(strAction), "F", strLogString, false,
-					asCppBool(vbAllowQueuedStatusOverride));
+				setFileActionState(ipConnection, nFileID, asString(strAction), nWorkflowID, "F",
+					strLogString, false, asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
 
@@ -2354,7 +2376,7 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
 				
 				// change the given files state to Pending
-				setFileActionState(ipConnection, nFileID, asString(strAction), "P", "", 
+				setFileActionState(ipConnection, nFileID, asString(strAction), -1, "P", "", 
 					false, asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
@@ -2396,7 +2418,7 @@ bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
 
 				// change the given files state to unattempted
-				setFileActionState(ipConnection, nFileID, asString(strAction), "U", "",
+				setFileActionState(ipConnection, nFileID, asString(strAction), -1, "U", "",
 					false, asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
@@ -2436,7 +2458,7 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
 
 			// Change the given files state to Skipped
-			setFileActionState(ipConnection, nFileID, asString(strAction), "S", "",
+			setFileActionState(ipConnection, nFileID, asString(strAction), -1, "S", "",
 				false, asCppBool(vbAllowQueuedStatusOverride), -1, asCppBool(bRemovePreviousSkipped));
 
 			tg.CommitTrans();
@@ -2636,8 +2658,8 @@ bool CFileProcessingDB::SearchAndModifyFileStatus_Internal(bool bDBLocked,
 						strToStatus = getStringField(ipFields, "WhereActionStatus");
 					}
 
-					setFileActionState(ipConnection, nFileID, strToAction, strToStatus, "", false,
-						false, nToActionID, true);
+					setFileActionState(ipConnection, nFileID, strToAction, -1, strToStatus, "",
+						false, false, nToActionID, true);
 
 					// Update modified records count
 					nRecordsModified++;
@@ -2799,7 +2821,7 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BSTR strAction,
-												  EActionStatus eStatus,  
+												  long nWorkflowID, EActionStatus eStatus,  
 												  VARIANT_BOOL vbQueueChangeIfProcessing,
 												  VARIANT_BOOL vbAllowQueuedStatusOverride,
 												  EActionStatus * poldStatus)
@@ -2821,7 +2843,7 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
 
-			setStatusForFile(ipConnection, nID, asString(strAction), eStatus,
+			setStatusForFile(ipConnection, nID, asString(strAction), nWorkflowID, eStatus,
 				asCppBool(vbQueueChangeIfProcessing), asCppBool(vbAllowQueuedStatusOverride),
 				poldStatus);
 
@@ -2960,7 +2982,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				// The previous status of the files to process is expected to be either pending or
 				// skipped.
 				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-					bDBLocked, ipConnection, strSelectSQL, strActionName, strActionIDs, "PS");
+					bDBLocked, ipConnection, strSelectSQL, strActionName, "PS");
 				*pvecFileRecords = ipFiles.Detach();
 			END_CONNECTION_RETRY(ipConnection, "ELI30377");
 		}
@@ -3036,7 +3058,7 @@ bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, 
 
 			// Perform all processing related to setting a file as processing.
 			IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-				bDBLocked, ipConnection, strSelectSQL, strActionName, strActionIDs, "");
+				bDBLocked, ipConnection, strSelectSQL, strActionName, /*strActionIDs,*/ "");
 
 			if (ipFiles->Size() == 0)
 			{
@@ -3798,7 +3820,8 @@ bool CFileProcessingDB::GetActionName_Internal(bool bDBLocked, long nActionID, B
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID, long nActionID,
+bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID, BSTR bstrAction,
+												   long nWorkflowID,
 												   VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	try
@@ -3813,15 +3836,15 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 				ipConnection = getDBConnection();
 
 				// Get the action name
-				string strActionName = getActionName(ipConnection, nActionID);
+				string strActionName = asString(bstrAction);
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
 
 				// Set the file state to skipped unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, strActionName, "S", "", false,
-					asCppBool(vbAllowQueuedStatusOverride), nActionID);
+				setFileActionState(ipConnection, nFileID, strActionName, nWorkflowID, "S", "", false,
+					asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
 
@@ -5136,7 +5159,7 @@ bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVari
 					// Set the file action state
 					// This call should not be made from file processing and the new state should
 					// overrule any pending state for the file in the QueuedActionStatusChange table.
-					setFileActionState(ipConnection, nFileID, strToAction, strStatus, "", false,
+					setFileActionState(ipConnection, nFileID, strToAction, -1, strStatus, "", false,
 						false, nToActionID);
 
 					// Move to next record
@@ -6772,7 +6795,7 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 				// The previous status of the files to process is expected to be either pending or
 				// skipped.
 				string strActionName = getActionName(ipConnection, nActionID);
-				setFilesToProcessing(bDBLocked, ipConnection, strSelectSQL, strActionName, asString(nActionID), "PS");
+				setFilesToProcessing(bDBLocked, ipConnection, strSelectSQL, strActionName, /*asString(nActionID),*/ "PS");
 
 			END_CONNECTION_RETRY(ipConnection, "ELI30389");
 		}
@@ -9992,115 +10015,8 @@ bool CFileProcessingDB::GetWorkflowDefinition_Internal(bool bDBLocked, long nID,
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			_RecordsetPtr ipWorkflowSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI41893", ipWorkflowSet != __nullptr);
-
-			string strQuery =
-				Util::Format(
-					"SELECT [ID] "
-					", [Name] "
-					", [WorkflowTypeCode] "
-					", [Description] "
-					", [StartActionID] "
-					", [EndActionID] "
-					", [PostWorkflowActionID] "
-					", [DocumentFolder] "
-					", [OutputAttributeSetID] "
-					", [OutputFileMetadataFieldID] "
-					"	FROM [Workflow]"
-					"	WHERE [ID] = %i", nID);
-
-			ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-				adOpenStatic, adLockReadOnly, adCmdText);
-
-			if (asCppBool(ipWorkflowSet->adoEOF))
-			{
-				UCLIDException ue("ELI41894", "Failed to get workflow definition.");
-				ue.addDebugInfo("ID", nID);
-				throw ue;
-			}
-
-			FieldsPtr ipFields = ipWorkflowSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI41895", ipFields != __nullptr);
-
-			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition(CLSID_WorkflowDefinition);
-			ASSERT_RESOURCE_ALLOCATION("ELI41896", ipWorkflowDefinition != __nullptr);
-
-			ipWorkflowDefinition->ID = getLongField(ipFields, "ID");
-			ipWorkflowDefinition->Name = getStringField(ipFields, "Name").c_str();
-			char eWorkflowType = getStringField(ipFields, "WorkflowTypeCode").c_str()[0];
-			switch (eWorkflowType)
-			{
-				case 'U': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kUndefined; break;
-				case 'R': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kRedaction; break;
-				case 'E': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kExtraction; break;
-				case 'C': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kClassification; break;
-			}
-			ipWorkflowDefinition->Description = getStringField(ipFields, "Description").c_str();
-			ipWorkflowDefinition->StartAction = isNULL(ipFields, "StartActionID")
-				? _bstr_t("").Detach()
-				: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "StartActionID")));
-			ipWorkflowDefinition->EndAction = isNULL(ipFields, "EndActionID")
-				? _bstr_t("").Detach()
-				: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "EndActionID")));
-			ipWorkflowDefinition->PostWorkflowAction = isNULL(ipFields, "PostWorkflowActionID")
-				? _bstr_t("").Detach()
-				: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "PostWorkflowActionID")));
-			ipWorkflowDefinition->DocumentFolder = getStringField(ipFields, "DocumentFolder").c_str();
-
-			if (isNULL(ipFields, "OutputAttributeSetID"))
-			{
-				ipWorkflowDefinition->OutputAttributeSet = "";
-			}
-			else
-			{
-				long long llAttributeSetID = getLongLongField(ipFields, "OutputAttributeSetID");
-
-				string strAttributeSetQuery = "SELECT [Description] FROM [dbo].[AttributeSetName] WHERE [ID]="
-					+ asString(llAttributeSetID);
-
-				_RecordsetPtr ipAttributeSetResult(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI41919", ipAttributeSetResult != __nullptr);
-
-				ipAttributeSetResult->Open(strAttributeSetQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenStatic, adLockReadOnly, adCmdText);
-
-				ASSERT_RUNTIME_CONDITION("ELI41920", !asCppBool(ipAttributeSetResult->adoEOF),
-					"Unknown attribute set ID");
-
-				FieldsPtr ipAttributeSetFields = ipAttributeSetResult->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI41921", ipAttributeSetFields != __nullptr);
-
-				ipWorkflowDefinition->OutputAttributeSet =
-					get_bstr_t(getStringField(ipAttributeSetFields, "Description"));
-			}
-
-			if (isNULL(ipFields, "OutputFileMetadataFieldID"))
-			{
-				ipWorkflowDefinition->OutputFileMetadataField = "";
-			}
-			else
-			{
-				long lMetadataFieldID = getLongField(ipFields, "OutputFileMetadataFieldID");
-
-				string strMetadataFieldQuery = "SELECT [Name] FROM [dbo].[MetadataField] WHERE [ID] = "
-					+ asString(lMetadataFieldID);
-
-				_RecordsetPtr ipMetadataFieldResult(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI42049", ipMetadataFieldResult != __nullptr);
-
-				ipMetadataFieldResult->Open(strMetadataFieldQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenStatic, adLockReadOnly, adCmdText);
-
-				ASSERT_RUNTIME_CONDITION("ELI42050", !asCppBool(ipMetadataFieldResult->adoEOF),
-					"Unknown metadata field ID");
-
-				FieldsPtr ipMetadataFieldFields = ipMetadataFieldResult->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI42051", ipMetadataFieldFields != __nullptr);
-
-				ipWorkflowDefinition->OutputFileMetadataField =
-					get_bstr_t(getStringField(ipMetadataFieldFields, "Name"));
-			}
+			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
+				getWorkflowDefinition(ipConnection, nID);
 
 			*ppWorkflowDefinition = (IWorkflowDefinition*)ipWorkflowDefinition.Detach();
 
@@ -10350,9 +10266,6 @@ bool CFileProcessingDB::GetWorkflowActions_Internal(bool bDBLocked, long nID,
 		{
 			ASSERT_ARGUMENT("ELI41990", pmapActionNameToID != __nullptr);
 
-			IStrToStrMapPtr ipActionNameToID(CLSID_StrToStrMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI41991", ipActionNameToID != __nullptr);
-
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
@@ -10362,27 +10275,13 @@ bool CFileProcessingDB::GetWorkflowActions_Internal(bool bDBLocked, long nID,
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			_RecordsetPtr ipActionSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI41992", ipActionSet != __nullptr);
+			IStrToStrMapPtr ipActionNameToID(CLSID_StrToStrMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI41991", ipActionNameToID != __nullptr);
 
-			string strQuery =
-				Util::Format("SELECT [ID], [ASCName] "
-					"FROM dbo.[Action] "
-					"WHERE [WorkflowID] = %i", nID);
-
-			ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-				adOpenStatic, adLockReadOnly, adCmdText);
-
-			while (!asCppBool(ipActionSet->adoEOF))
+			map<string, long> mapWorkflowActions = getWorkflowActions(ipConnection, nID);
+			for each (pair<string, int> item in mapWorkflowActions)
 			{
-				FieldsPtr ipFields = ipActionSet->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI41993", ipFields != __nullptr);
-
-				ipActionNameToID->Set(
-					getStringField(ipFields, "ASCName").c_str(),
-					asString(getLongField(ipFields, "ID")).c_str());
-
-				ipActionSet->MoveNext();
+				ipActionNameToID->Set(item.first.c_str(), asString(item.second).c_str());
 			}
 
 			*pmapActionNameToID = ipActionNameToID.Detach();
@@ -10524,5 +10423,116 @@ bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
 		}
 		throw ue;
 	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI42136", peaStatus != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			long nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
+
+			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
+				getWorkflowDefinition(ipConnection, nWorkflowID);
+			ASSERT_RESOURCE_ALLOCATION("ELI42137", ipConnection != __nullptr);
+
+			long nPostWorkflowActionID = -1;
+			if (ipWorkflowDefinition->PostWorkflowAction.length() > 0)
+			{
+				nPostWorkflowActionID = getActionID(ipConnection,
+					asString(ipWorkflowDefinition->PostWorkflowAction));
+			}
+
+			// TODO: A more deterministic way of specifying the "primary" actions in a workflow.
+			// For now, all actions in the workflow except for the post-workflow action.
+			vector<string> vecIncludedActionIDs;
+			map<string, long> mapWorkflowActions = getWorkflowActions(ipConnection, nWorkflowID);
+			for each (pair<string, long> item in mapWorkflowActions)
+			{
+				if (item.second != nPostWorkflowActionID)
+				{
+					vecIncludedActionIDs.push_back(asString(item.second));
+				}
+			}
+
+			string strActionIDs = asString(vecIncludedActionIDs, true, ",");
+			string strAggregateStatus = Util::Format(
+				"SELECT * FROM "
+				"( "
+				"	SELECT [FileID], [ActionStatus] FROM [FileActionStatus] "
+				"		WHERE [FileID] = %d AND [ActionID] IN (%s) "
+				") AS T "
+				"PIVOT "
+				"( "
+				"	COUNT([FileID]) "
+				"	FOR [ActionStatus] IN (P, R, S, F, C) "
+				") AS PVT ", 
+				nFileID, strActionIDs.c_str());
+
+			_RecordsetPtr ipAggregateStatuses(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI42138", ipAggregateStatuses);
+
+			ipAggregateStatuses->Open(strAggregateStatus.c_str(), _variant_t((IDispatch *)ipConnection, true),
+				adOpenStatic, adLockOptimistic, adCmdText);
+			FieldsPtr ipAggregateStatusFields = ipAggregateStatuses->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI42139", ipAggregateStatusFields != __nullptr);
+
+			string strEndAction = asString(ipWorkflowDefinition->EndAction);
+			long nEndActionID = getActionID(ipConnection, strEndAction);
+			_RecordsetPtr ipEndActionStatus = getFileActionStatusSet(ipConnection, nFileID, nEndActionID);
+			ASSERT_RESOURCE_ALLOCATION("ELI42140", ipEndActionStatus != __nullptr);
+			
+			string endActionStatus = "U";
+			if (ipEndActionStatus->adoEOF == VARIANT_FALSE)
+			{
+				FieldsPtr ipEndActionStatusFields = ipEndActionStatus->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI42141", ipEndActionStatusFields != __nullptr);
+
+				endActionStatus = getStringField(ipEndActionStatusFields, "ActionStatus");
+			}
+
+			if (endActionStatus != "F" && endActionStatus != "S" &&
+				(getLongField(ipAggregateStatusFields, "P") > 0 || getLongField(ipAggregateStatusFields, "R") > 0))
+			{
+				*peaStatus = kActionProcessing;
+			}
+			else if (endActionStatus == "C")
+			{
+				*peaStatus = kActionCompleted;
+			}
+			else if (getLongField(ipAggregateStatusFields, "F") > 0)
+			{
+				*peaStatus = kActionFailed;
+			}
+			else
+			{
+				*peaStatus = kActionUnattempted;
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI42142");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42143");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
 	return true;
 }

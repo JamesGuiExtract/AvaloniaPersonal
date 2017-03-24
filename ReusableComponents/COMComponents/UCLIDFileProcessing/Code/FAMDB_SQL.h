@@ -1261,7 +1261,6 @@ static const string gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA =
 // Query used to get the files to process and add the appropriate items to LockedFile and FAST 
 // Variables that need to be replaced:
 //		<SelectFilesToProcessQuery> - The complete query that will select the files to process
-//		<ActionIDs> - A comma delimited list of IDs for the actions being processed
 //		<UserID> - ID for the files are being processed under
 //		<MachineID> - ID for the machine processing the files
 //		<ActiveFAMID> - ID of the active FAM session
@@ -1283,7 +1282,7 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 	"	FROM  \r\n"
 	"	( \r\n"
 	"		<SelectFilesToProcessQuery> ) AS ATABLE  \r\n"
-	"	INNER JOIN FileActionStatus on FileActionStatus.FileID = ATABLE.ID AND FileActionStatus.ActionID IN (<ActionIDs>)  \r\n"
+	"	INNER JOIN FileActionStatus on FileActionStatus.FileID = ATABLE.ID AND FileActionStatus.ActionID = ATABLE.ActionID \r\n"
 	"	WHERE ATABLE.ActionStatus <> 'R'; \r\n"
 	"	IF (1 = <RecordFASTEntry>) BEGIN"
 	//	If a file that is currently unattempted is being moved to processing, first add a FAST table
