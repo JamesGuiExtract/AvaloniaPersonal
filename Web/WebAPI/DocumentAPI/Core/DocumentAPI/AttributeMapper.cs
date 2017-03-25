@@ -325,8 +325,6 @@ namespace DocumentAPI
                                     i, 
                                     attributes.Size());
 
-                    Log.WriteLine(Inv($"mapping attribute named: {attr.Name}"));
-
                     var docAttr = MapAttribute(attr);
                     rootDocAttrSet.Attributes.Add(docAttr);
                 }

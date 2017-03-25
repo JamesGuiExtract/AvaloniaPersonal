@@ -42,7 +42,7 @@ namespace DocumentAPI
                 {
                     logPath = env.ContentRootPath + "\\Logs";
                 }
-                Log.Create(logPath);
+
                 Log.WriteLine("DocumentAPI started");
                 loggingEnabled = true;
 
@@ -65,6 +65,12 @@ namespace DocumentAPI
                 if (!string.IsNullOrEmpty(attrSetName))
                 { 
                     Utils.AttributeSetName = attrSetName;
+                }
+
+                var defaultWorkflow = Configuration["DefaultWorkflow"];
+                if (!string.IsNullOrEmpty(defaultWorkflow))
+                {
+                    Utils.DefaultWorkflow = defaultWorkflow;
                 }
 
                 Utils.environment = env;

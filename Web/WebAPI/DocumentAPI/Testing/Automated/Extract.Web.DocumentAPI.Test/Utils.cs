@@ -153,5 +153,15 @@ namespace Extract.Web.DocumentAPI.Test
                 return @"C:\Engineering\Web\WebAPI\DocumentAPI\Core\DocumentAPI";
             }
         }
+
+        public static string WebApiURL
+        {
+            get
+            {
+                // When run from VS, DocumentAPI uses the port 58926 (as configured). When exec'd using dotnet,
+                // port 5000 is the default port.
+                return "http://localhost:5000";
+            }
+        }
     }
 }

@@ -37,10 +37,6 @@ namespace Extract.Web.DocumentAPI.Test
         /// </summary>
         static FAMTestDBManager<TestDocumentAttributeSet> _testDbManager;
 
-        // When run from VS, DocumentAPI uses the port 58926 (as configured). When exec'd using dotnet,
-        // port 5000 is the default port.
-        static string WebApiURL = "http://localhost:5000";
-
         /// <summary>
         /// If this test invokes the web service, then on tear down this flag is used to signal that
         /// condition and shut down the service.
@@ -60,12 +56,12 @@ namespace Extract.Web.DocumentAPI.Test
 
             _testDbManager = new FAMTestDBManager<TestDocumentAttributeSet>();
 
-            documentAPIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: WebApiURL);
+            documentAPIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: Utils.WebApiURL);
 
             _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
             usedDbLabDE = true;
 
-            Utils.SetDatabase(DbLabDE, WebApiURL);
+            Utils.SetDatabase(DbLabDE, Utils.WebApiURL);
         }
 
         [TestFixtureTearDown]
@@ -97,7 +93,7 @@ namespace Extract.Web.DocumentAPI.Test
                 // TODO - this will be removed later
                 MockWorkflowsForLabDE();
 
-                var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: WebApiURL);
+                var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: Utils.WebApiURL);
                 var names = wfApi.ApiWorkflowGetWorkflowsGet();
                 Assert.IsTrue(names.Count == 4);
 
@@ -118,7 +114,7 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetDefaultWorkflow()
         {
-            var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: WebApiURL);
+            var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: Utils.WebApiURL);
             var defaultWf = wfApi.ApiWorkflowGetDefaultWorkflowByUsernameGet("John Doe");
             Assert.IsTrue(defaultWf.IsEquivalent("Extract_Data"));
         }
@@ -145,7 +141,7 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetWorkflowStatus()
         {
-            var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: WebApiURL);
+            var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: Utils.WebApiURL);
             var status = wfApi.ApiWorkflowGetWorkflowStatusByWorkflowNameGet("Extract Data");
 
             Assert.IsTrue(status.Error.ErrorOccurred == false);
@@ -176,7 +172,7 @@ namespace Extract.Web.DocumentAPI.Test
         {
             Assert.IsFalse(workflow == null);
 
-            var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: WebApiURL);
+            var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: Utils.WebApiURL);
             wfApi.ApiWorkflowPost(workflow);
         }
 

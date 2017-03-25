@@ -54,9 +54,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocumentAPI">
-      <HintPath>..\..\..\Core\DocumentAPI\bin\Debug\net46\win7-x86\DocumentAPI.exe</HintPath>
-    </Reference>
     <Reference Include="IO.Swagger, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>ClientApi\IO.Swagger.dll</HintPath>
@@ -188,6 +185,10 @@
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
       <Project>{6b284a4d-132c-4fe4-858f-06a9c476b19b}</Project>
       <Name>Extract.FileActionManager.Database.Test</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Core\DocumentAPI\DocumentAPI.csproj">
+      <Project>{d18e4b70-2d88-4730-a72c-ccc9fd58d516}</Project>
+      <Name>DocumentAPI</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

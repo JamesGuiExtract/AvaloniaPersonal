@@ -18,6 +18,9 @@
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Extract">
+      <HintPath>..\..\..\..\..\Binaries\Debug\Extract.dll</HintPath>
+    </Reference>
     <Reference Include="Extract.Licensing">
       <HintPath>..\..\..\..\..\..\..\..\Engineering\Binaries\Debug\Extract.Licensing.dll</HintPath>
     </Reference>
@@ -42,6 +45,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.1" />

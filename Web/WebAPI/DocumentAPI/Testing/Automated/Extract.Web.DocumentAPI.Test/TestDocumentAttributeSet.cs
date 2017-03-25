@@ -117,10 +117,6 @@ namespace Extract.Web.DocumentAPI.Test
         /// </summary>
         static bool documentAPIInvoked;
 
-        // When run from VS, DocumentAPI uses the port 58926 (as configured). When exec'd using dotnet,
-        // port 5000 is the default port.
-        static string WebApiURL = "http://localhost:5000";
-
         #endregion Fields
 
         #region Setup and Teardown
@@ -135,7 +131,7 @@ namespace Extract.Web.DocumentAPI.Test
             _testDbManager = new FAMTestDBManager<TestDocumentAttributeSet>();
             _testXmlFiles = new TestFileManager<TestDocumentAttributeSet>();
 
-            documentAPIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: WebApiURL);
+            documentAPIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: Utils.WebApiURL);
         }
 
         /// <summary>
@@ -294,8 +290,8 @@ namespace Extract.Web.DocumentAPI.Test
         {
             try
             {
-                Assert.IsFalse(String.IsNullOrEmpty(WebApiURL));
-                var document = new DocumentApi(WebApiURL);
+                Assert.IsFalse(String.IsNullOrEmpty(Utils.WebApiURL));
+                var document = new DocumentApi(Utils.WebApiURL);
                 return document.ApiDocumentGetResultSetByIdGet(fileId.ToString());
             }
             catch (Exception ex)
@@ -309,8 +305,8 @@ namespace Extract.Web.DocumentAPI.Test
         {
             try
             {
-                Assert.IsFalse(String.IsNullOrEmpty(WebApiURL));
-                var dbApi = new IO.Swagger.Api.DatabaseApi(basePath: WebApiURL);
+                Assert.IsFalse(String.IsNullOrEmpty(Utils.WebApiURL));
+                var dbApi = new IO.Swagger.Api.DatabaseApi(basePath: Utils.WebApiURL);
                 dbApi.ApiDatabaseSetDatabaseNameByIdPost(id: dbName);
             }
             catch (Exception ex)
@@ -323,7 +319,7 @@ namespace Extract.Web.DocumentAPI.Test
         {
             try
             {
-                var dbApi = new IO.Swagger.Api.DatabaseApi(basePath: WebApiURL);
+                var dbApi = new IO.Swagger.Api.DatabaseApi(basePath: Utils.WebApiURL);
                 dbApi.ApiDatabaseSetDatabaseServerByIdPost(id: "(local)");
             }
             catch (Exception ex)
@@ -336,8 +332,8 @@ namespace Extract.Web.DocumentAPI.Test
         {
             try
             {
-                Assert.IsFalse(String.IsNullOrEmpty(WebApiURL));
-                var testApi = new TestApi(basePath: WebApiURL);
+                Assert.IsFalse(String.IsNullOrEmpty(Utils.WebApiURL));
+                var testApi = new TestApi(basePath: Utils.WebApiURL);
                 testApi.ApiTestSetAttributeSetNamePost(new TestArgs() { Name = name });
             }
             catch (Exception ex)

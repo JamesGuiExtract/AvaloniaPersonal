@@ -1,11 +1,12 @@
 ﻿using DocumentAPI.Models;
+using Extract;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;                        // FileStream
-using System.Net.Http;                  // for HttpClient
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 using static DocumentAPI.Utils;
 
@@ -111,10 +112,12 @@ namespace DocumentAPI.Controllers
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Exception: {ex.Message}, while getting ASFF for fileId: {id}, resetting attribute manager"));
+                var ee = ex.AsExtract("ELI42106");
+                ee.AddDebugData("Web API method", GetMethodName(), encrypt: false);
+                Log.WriteLine(ee);
                 Utils.ResetAttributeMgr();
 
-                return MakeDocumentAttributeSetError(ex.Message);
+                return MakeDocumentAttributeSetError(ee.Message);
             }
         }
 
@@ -190,10 +193,13 @@ namespace DocumentAPI.Controllers
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(Inv($"Error: {ex.Message}, resetting the fileProcessingDB"));
+                        var ee = ex.AsExtract("ELI42107");
+                        ee.AddDebugData("Web API Method", GetMethodName(), encrypt: false);
+                        Log.WriteLine(ee);
+
                         Utils.ResetFileProcessingDB();
 
-                        return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
+                        return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ee.Message, code: -1);
                     }
                 }
             }
@@ -260,10 +266,13 @@ namespace DocumentAPI.Controllers
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(Inv($"Error: {ex.Message}, resetting the fileProcessingDB"));
+                        var ee = ex.AsExtract("ELI42108");
+                        ee.AddDebugData("Web API Method", GetMethodName(), encrypt: false);
+                        Log.WriteLine(ee);
+
                         Utils.ResetFileProcessingDB();
 
-                        return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
+                        return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ee.Message, code: -1);
                     }
                 }
             }
@@ -318,11 +327,30 @@ namespace DocumentAPI.Controllers
                 Contract.Assert(fileProcessingDB != null, "fileProcessingDB is null, cannot submit text file to FAM queue");
 
                 int fileId = ConvertIdToFileId(stringId);
-                var actionStatus = fileProcessingDB.GetFileStatus(fileId,
-                                                                  "A01_ExtractData",               // TODO - remove hard-wired name, use Workflow.EntryName when available
-                                                                  vbAttemptRevertIfLocked: false); // TODO - verify: is this correct?
+                EActionStatus status = EActionStatus.kActionFailed;
 
-                var ps = MakeProcessingStatus(ConvertToStatus(actionStatus, fileId));
+                try
+                {
+                    status = fileProcessingDB.GetFileStatus(fileId,
+                                                            "A01_ExtractData",               // TODO - remove hard-wired name, use Workflow.EntryName when available
+                                                            vbAttemptRevertIfLocked: false); // TODO - verify: is this correct?
+                }
+                catch (Exception ex)
+                {
+                    var ee = ex.AsExtract("ELI42109");
+                    ee.AddDebugData("Web API Method", GetMethodName(), encrypt: false);
+                    Log.WriteLine(ee);
+                    
+                    Utils.ResetFileProcessingDB();
+
+                    return MakeListOf(
+                                MakeProcessingStatus(DocumentProcessingStatus.NotApplicable,
+                                                     isError: true,
+                                                     message: ee.Message,
+                                                     code: -1));
+                }
+
+                var ps = MakeProcessingStatus(ConvertToStatus(status, fileId));
                 return MakeListOf(ps);                
             }
             catch (Exception ex)
@@ -398,11 +426,13 @@ namespace DocumentAPI.Controllers
             }
             catch (Exception ex)
             {
-                var message = Inv($"Exception: {ex.Message}, while getting filename from fileId, for fileId: {Id}, resetting fileProcessingDb manager");
+                var ee = ex.AsExtract("ELI42110");
+                ee.AddDebugData("Web API Method", GetMethodName(), encrypt: false);
+                Log.WriteLine(ee);
 
-                Log.WriteLine(message);
                 Utils.ResetFileProcessingDB();
 
+                var message = ee.Message + ", " + $"while getting filename from fileId: {Id}";
                 return BadRequest(message);
             }
 
@@ -412,7 +442,9 @@ namespace DocumentAPI.Controllers
 
                 if (!System.IO.File.Exists(filename))
                 {
-                    return NotFound(Inv($"The file: {filename}, does not exist"));
+                    var message = Inv($"The file: {filename}, does not exist");
+                    Log.WriteLine(message);
+                    return NotFound(message);
                 }
 
                 var fileContentType = FileContentType(filename);
@@ -424,7 +456,6 @@ namespace DocumentAPI.Controllers
             catch (Exception ex)
             {
                 var message = Inv($"Exception: {ex.Message}, while returning file: {filename}, for fileId: {Id}");
-
                 Log.WriteLine(message);
                 return BadRequest(message);
             }
@@ -448,10 +479,10 @@ namespace DocumentAPI.Controllers
         /// <param name="textId"></param>
         /// <returns></returns>
         [HttpGet("GetTextResult")]
-        [Produces(typeof(PhysicalFileResult))]
-        public IActionResult GetTextResult([FromQuery] string textId)
+        [Produces(typeof(String))]
+        public string GetTextResult([FromQuery] string textId)
         {
-            return Ok("stubbed");
+            return "stubbed";
         }
 
         /// <summary>

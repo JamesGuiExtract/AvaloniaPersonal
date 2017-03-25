@@ -23,10 +23,6 @@ namespace Extract.Web.DocumentAPI.Test
 
         #region Fields
 
-        // When run from VS, DocumentAPI uses the port 58926 (as configured). When exec'd using dotnet,
-        // port 5000 is the default port.
-        static string WebApiURL = "http://localhost:5000";
-
         /// <summary>
         /// tracks whether the web service was invoked or not
         /// </summary>
@@ -39,7 +35,7 @@ namespace Extract.Web.DocumentAPI.Test
         [TestFixtureSetUp]
         public static void Setup()
         {
-            APIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: WebApiURL);
+            APIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: Utils.WebApiURL);
         }
 
 
@@ -64,7 +60,7 @@ namespace Extract.Web.DocumentAPI.Test
         {
             try
             {
-                var usersApi = new IO.Swagger.Api.UsersApi(basePath: WebApiURL);
+                var usersApi = new IO.Swagger.Api.UsersApi(basePath: Utils.WebApiURL);
                 var user = new IO.Swagger.Model.User()
                 {
                     Username = "admin",
@@ -89,7 +85,7 @@ namespace Extract.Web.DocumentAPI.Test
             {
                 Test_Login();
 
-                var usersApi = new IO.Swagger.Api.UsersApi(basePath: WebApiURL);
+                var usersApi = new IO.Swagger.Api.UsersApi(basePath: Utils.WebApiURL);
                 usersApi.ApiUsersLogoutDelete();
             }
             catch (Exception ex)

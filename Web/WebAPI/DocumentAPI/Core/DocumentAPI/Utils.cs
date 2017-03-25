@@ -1,10 +1,12 @@
 ﻿using AttributeDbMgrComponentsLib;
 using DocumentAPI.Models;
+using Extract;
 using Microsoft.AspNetCore.Hosting;     // for IHostingEnvironment
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UCLID_FILEPROCESSINGLib;
 
 namespace DocumentAPI
@@ -20,6 +22,7 @@ namespace DocumentAPI
         private static string _databaseServer;
         private static string _databaseName;
         private static string _attributeSetName = "Attr";
+        private static string _defaultWorkflow;
 
         private static object _fileProcessingDbLock = new Object();
         private static object _attributeDbMgrLock = new Object();
@@ -168,6 +171,7 @@ namespace DocumentAPI
             lock (_fileProcessingDbLock)
             {
                 _fileProcessingDB = null;
+                Log.WriteLine("reset fileProcessingDB", "ELI42112");
             }
         }
 
@@ -209,6 +213,7 @@ namespace DocumentAPI
             lock (_attributeDbMgrLock)
             {
                 _attributeDbMgr = null;
+                Log.WriteLine("resetting attributeDBMgr", "ELI42113");
             }
         }
 
@@ -225,6 +230,7 @@ namespace DocumentAPI
             {
                 Contract.Assert(!String.IsNullOrEmpty(value), "DatabaseServer cannot be set to empty");
                 _databaseServer = value;
+                Log.WriteLine(Inv($"reset DB server to: {value}"), "ELI42114");
             }
         }
 
@@ -242,6 +248,7 @@ namespace DocumentAPI
             {
                 Contract.Assert(!String.IsNullOrEmpty(value), "DatabaseName cannot be set to empty");
                 _databaseName = value;
+                Log.WriteLine(Inv($"reset DB to: {value}"), "ELI42115");
             }
         }
         
@@ -310,6 +317,26 @@ namespace DocumentAPI
             {
                 Contract.Assert(!String.IsNullOrEmpty(value), "AttributeSetName cannot be set to empty");
                 _attributeSetName = value;
+                Log.WriteLine(Inv($"resetting attributesetName to: {value}"), "ELI42116");
+            }
+        }
+
+        /// <summary>
+        /// the default workflow value - currently only the web server has a "default" workflow, the workflow
+        /// it has been statically configured to use through the configuration input file.
+        /// </summary>
+        public static string DefaultWorkflow
+        {
+            get
+            {
+                Contract.Assert(!String.IsNullOrEmpty(_defaultWorkflow), "DefaultWorkflow is empty");
+                return _defaultWorkflow;
+            }
+            set
+            {
+                Contract.Assert(!String.IsNullOrEmpty(value), "DefaultWorkflow cannot be set to empty");
+                _defaultWorkflow = value;
+                Log.WriteLine(Inv($"resetting default workflow to: {value}"), "ELI42117");
             }
         }
 
@@ -367,5 +394,16 @@ namespace DocumentAPI
         {
             return new List<T> { item };
         }
+
+        /// <summary>
+        /// returns the method name of the caller - do NOT set the default argument!
+        /// </summary>
+        /// <param name="caller">do not set this!</param>
+        /// <returns></returns>
+        public static string GetMethodName([CallerMemberName] string caller = null)
+        {
+            return caller;
+        }
+
     }
 }

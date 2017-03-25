@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFConditions", "..\..\..\AFConditions\Code\AFConditions.vcxproj", "{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -766,6 +766,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataCaptureStats.Test", "..\..\..\..\..\RC.Net\DataCaptureStats\Core\Testing\Automated\Extract.DataCaptureStats.Test.csproj", "{5E5368E3-ABD2-4A4C-8E96-A28647FB3944}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Web.DocumentAPI.Test", "..\..\..\..\..\Web\WebAPI\DocumentAPI\Testing\Automated\Extract.Web.DocumentAPI.Test\Extract.Web.DocumentAPI.Test.csproj", "{E769CBBA-485E-4DE4-9776-623DADB6D9EB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516} = {D18E4B70-2D88-4730-A72C-CCC9FD58D516}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentAPI", "..\..\..\..\..\Web\WebAPI\DocumentAPI\Core\DocumentAPI\DocumentAPI.csproj", "{D18E4B70-2D88-4730-A72C-CCC9FD58D516}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -4099,6 +4104,30 @@ Global
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Template|Win32.Build.0 = Release|x86
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Template|x86.ActiveCfg = Release|x86
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Template|x86.Build.0 = Release|x86
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Debug|Win32.Build.0 = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Debug|x86.Build.0 = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Release|Win32.ActiveCfg = Release|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Release|Win32.Build.0 = Release|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Release|x86.ActiveCfg = Release|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Release|x86.Build.0 = Release|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Template|Win32.Build.0 = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Template|x86.ActiveCfg = Debug|Any CPU
+		{D18E4B70-2D88-4730-A72C-CCC9FD58D516}.Template|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
