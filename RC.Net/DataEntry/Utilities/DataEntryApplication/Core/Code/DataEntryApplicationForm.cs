@@ -1298,6 +1298,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // launch maximized.
                         WindowState = FormWindowState.Maximized;
                     }
+                    else
+                    {
+                        WindowState = FormWindowState.Normal;
+                    }
                 }
 
                 _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;

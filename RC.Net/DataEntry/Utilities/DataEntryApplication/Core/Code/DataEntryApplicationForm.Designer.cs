@@ -1236,6 +1236,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this.MainMenuStrip = this._menuStrip;
             this.Name = "DataEntryApplicationForm";
             this.Text = "Data Entry Application";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this._splitContainer.Panel1.ResumeLayout(false);
             this._splitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).EndInit();
