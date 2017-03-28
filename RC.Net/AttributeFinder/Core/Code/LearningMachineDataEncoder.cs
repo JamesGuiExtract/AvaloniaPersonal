@@ -239,7 +239,8 @@ namespace Extract.AttributeFinder
             return _nameToFeatureValues.GetEnumerator();
         }
 
-        private Dictionary<string, List<string>> MakeDictionary(IEnumerable<ComAttribute> attributes)
+        // Initialize map of name-to-values
+        static Dictionary<string, List<string>> MakeDictionary(IEnumerable<ComAttribute> attributes)
         {
             return attributes
                 .GroupBy(a => a.Name)
