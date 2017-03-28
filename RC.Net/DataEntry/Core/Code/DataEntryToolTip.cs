@@ -302,6 +302,17 @@ namespace Extract.DataEntry
                 }
             }
 
+            /// <summary>
+            /// The smallest rectangle containing the TextLayerObject in ImageViewer coordinates.
+            /// </summary>
+            public Rectangle NormalizedBounds
+            {
+                get
+                {
+                    return _normalizedBounds;
+                }
+            }
+
             #endregion Properties
 
             #region IComparable Members
@@ -385,7 +396,7 @@ namespace Extract.DataEntry
                     // of the _maximumExtent.
                     if (_horizontal)
                     {
-                        return _maximumExtent.Right - _end;
+                        return _maximumExtent.Right - _end - GetErrorIconPadding();
                     }
                     else
                     {
@@ -527,16 +538,14 @@ namespace Extract.DataEntry
                     }
 
                     // Calculate the initial anchorpoint for the tooltip 
-                    double toolTipRotation;
                     _highlightAnchorPoint = GetAnchorPoint(pageOfRasterZones,
                         highlightAnchorAlignment, tooltipStandoffAngle,
-                        (int)_host.Config.Settings.TooltipFontSize, out toolTipRotation);
+                        (int)_host.Config.Settings.TooltipFontSize,
+                        out double toolTipRotation, out RectangleF bounds);
 
-                    // TODO: This isn't the most efficient means of calculating the highlight's
-                    // center position given the work that's already been done in the previous call.
-                    Point highlightCenterPoint = GetAnchorPoint(pageOfRasterZones,
+                    Point highlightCenterPoint = GetAnchorPoint(bounds, toolTipRotation,
                         highlightCenterAlignment, tooltipStandoffAngle,
-                        (int)_host.Config.Settings.TooltipFontSize, out toolTipRotation);
+                        (int)_host.Config.Settings.TooltipFontSize);
 
                     // Create the TextLayerObject
                     _textLayerObject = new TextLayerObject(_host.ImageViewer, _page,
@@ -868,7 +877,23 @@ namespace Extract.DataEntry
             /// <see paramref="nextToolTip"/>.</returns>
             int GetSeparation(DataEntryToolTip nextToolTip)
             {
-                return nextToolTip._start - _end;
+                return nextToolTip._start - _end - GetErrorIconPadding();
+            }
+
+            /// <summary>
+            /// Gets the amount of additional width needed for an error icon to be displayed
+            /// </summary>
+            /// <returns>The size of an error icon and padding if this tooltip will have an error
+            /// icon, else 0 if this attribute will not have an error icon</returns>
+            int GetErrorIconPadding()
+            {
+                if (AttributeStatusInfo.GetDataValidity(_attribute) != DataValidity.Invalid ||
+                    AttributeStatusInfo.GetHintType(_attribute) == HintType.Indirect)
+                {
+                    return 0;
+                }
+
+                return _host.GetPageIconSize(_page).Width + (int)(_host.Config.Settings.TooltipFontSize * 2);
             }
 
             /// <summary>
@@ -910,7 +935,7 @@ namespace Extract.DataEntry
                         // If necessary, shift the previous tooltip back as well to prevent overlap.
                         if (_previousTooltip != null)
                         {
-                            int overlap = _previousTooltip._end - _start;
+                            int overlap = -_previousTooltip.GetSeparation(this);
 
                             if (overlap > 0)
                             {
@@ -931,6 +956,11 @@ namespace Extract.DataEntry
                     transform.Rotate(_textLayerObject.Orientation);
                     transform.TransformVectors(offsetPoint);
                     _textLayerObject.Offset(offsetPoint[0], false);
+
+                    // Recreate the normalized bounds
+                    PointF rotationPoint = new PointF(0, 0);
+                    _normalizedBounds = GeometryMethods.RotateRectangle(
+                        _textLayerObject.GetBounds(), _referenceOrientation, rotationPoint);
                 }
             }
 

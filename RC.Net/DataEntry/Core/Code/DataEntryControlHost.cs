@@ -2125,7 +2125,6 @@ namespace Extract.DataEntry
                     foreach (IAttribute attribute in tooltipAttributes)
                     {
                         RemoveAttributeToolTip(attribute);
-                        
                     }
 
                     // [DataEntry:821]
@@ -3895,17 +3894,6 @@ namespace Extract.DataEntry
 
                 _dataValidity = newDataValidity;
 
-                // Remove the image viewer error icon if the data is now valid.
-                if (e.DataValidity != DataValidity.Invalid)
-                {
-                    RemoveAttributeErrorIcon(e.Attribute);
-                }
-                // Add an image viewer error icon if the data is now invalid.
-                else
-                {
-                    CreateAttributeErrorIcon(e.Attribute, _dataEntryApp.ShowAllHighlights);
-                }
-
                 DrawHighlights(false);
             }
             catch (Exception ex)
@@ -4287,10 +4275,19 @@ namespace Extract.DataEntry
                     // Show or hide all highlights as appropriate.
                     foreach (IAttribute attribute in _attributeHighlights.Keys)
                     {
+                        bool selected = _displayedAttributeHighlights.ContainsKey(attribute);
+
                         // If _showAllHighlights is being set to true, show the highlight
                         // (unless it is an indirect hint).
                         if (_dataEntryApp.ShowAllHighlights)
                         {
+                            if (!selected && !_temporarilyHidingTooltips)
+                            {
+                                // Create a new error icon so that its position will
+                                // be based off of the attribute, not a tooltip
+                                CreateAttributeErrorIcon(attribute, true);
+                            }
+
                             if (AttributeStatusInfo.HasSpatialInfo(attribute, true))
                             {
                                 ShowAttributeHighlights(attribute, true);
@@ -4298,7 +4295,7 @@ namespace Extract.DataEntry
                         }
                         // Hide all other attributes as long as they are not part of the active
                         // selection.
-                        else if (!_displayedAttributeHighlights.ContainsKey(attribute))
+                        else if (!selected)
                         {
                             ShowAttributeHighlights(attribute, false);
                         }
@@ -4800,9 +4797,6 @@ namespace Extract.DataEntry
                         _displayedAttributeHighlights.Remove(attribute);
                     }
 
-                    // Display the attribute's error icon (if it has one).
-                    ShowErrorIcon(attribute, true);
-
                     // Display a tooltip if directed to by the control and if possible.
                     if (!_temporarilyHidingTooltips &&
                         AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect &&
@@ -4814,6 +4808,9 @@ namespace Extract.DataEntry
                     else
                     {
                         RemoveAttributeToolTip(attribute);
+
+                        // Recreate the error icon so that it is no longer based on the tooltip
+                        CreateAttributeErrorIcon(attribute, !_temporarilyHidingTooltips);
                     }
 
                     // Make each highlight for an active attribute visible.
@@ -4900,6 +4897,7 @@ namespace Extract.DataEntry
                         _hoverToolTip = new DataEntryToolTip(this, _hoverAttribute, true, null);
 
                         ImageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject, false);
+                        CreateAttributeErrorIcon(_hoverAttribute, true, _hoverToolTip);
                     }
                 }
 
@@ -4917,6 +4915,9 @@ namespace Extract.DataEntry
 
                         // But remove tooltips for all attributes not currently active
                         RemoveAttributeToolTip(attribute);
+
+                        // Recreate the error icon so that it is no longer based on the tooltip
+                        CreateAttributeErrorIcon(attribute, !_temporarilyHidingTooltips);
                     }
                     else
                     {
@@ -6775,9 +6776,6 @@ namespace Extract.DataEntry
                 _highlightAttributes[highlight] = attribute;
                 ImageViewer.LayerObjects.Add(highlight, false);
             }
-
-            // Create an error icon for the attribute if the value is currently invalid
-            CreateAttributeErrorIcon(attribute, makeVisible);
         }
 
         /// <summary>
@@ -7058,6 +7056,12 @@ namespace Extract.DataEntry
             {
                 ImageViewer.LayerObjects.MoveToTop(_hoverToolTip.TextLayerObject);
             }
+
+            // Create error icons now that tooltips exist
+            foreach (IAttribute attribute in _attributeToolTips.Keys)
+            {
+                CreateAttributeErrorIcon(attribute, true);
+            }
         }
 
         /// <summary>
@@ -7256,7 +7260,7 @@ namespace Extract.DataEntry
         /// potentially be associated with. Must not be <see langword="null"/>.</param>
         /// <param name="makeVisible"><see langword="true"/> to make the icon visible right away or
         /// <see langword="false"/> if the icon should be invisible initially.</param>
-        void CreateAttributeErrorIcon(IAttribute attribute, bool makeVisible)
+        void CreateAttributeErrorIcon(IAttribute attribute, bool makeVisible, DataEntryToolTip toolTip = null)
         {
             ExtractException.Assert("ELI25699", "Null argument exception!", attribute != null);
 
@@ -7271,41 +7275,63 @@ namespace Extract.DataEntry
                 return;
             }
 
-            // Groups the attribute's raster zones by page.
-            Dictionary<int, List<RasterZone>> rasterZonesByPage =
-                GetAttributeRasterZonesByPage(attribute, false);
-
-            // Create an error icon for each page on which the attribute is present.
-            foreach (int page in rasterZonesByPage.Keys)
+            // If there is no tooltip for this attribute then anchor the error icon the
+            // attribute's raster zones (one anchor point per page), else anchor to the tooltip
+            var anchorPoints = new List<(int page, Point anchorPoint, double rotation)>();
+            if (toolTip == null && !_attributeToolTips.TryGetValue(attribute, out toolTip)
+                || toolTip == null)
             {
-                List<RasterZone> rasterZones = rasterZonesByPage[page];
+                // Groups the attribute's raster zones by page.
+                Dictionary<int, List<RasterZone>> rasterZonesByPage =
+                    GetAttributeRasterZonesByPage(attribute, false);
 
-                // The anchor point for the error icon should be to the right of attribute.
-                double errorIconRotation;
-                Point errorIconAnchorPoint = GetAnchorPoint(rasterZones, AnchorAlignment.Right, 90,
-                    (int)Config.Settings.TooltipFontSize, out errorIconRotation);
+                // Create an error icon for each page on which the attribute is present.
+                foreach (int page in rasterZonesByPage.Keys)
+                {
+                    List<RasterZone> rasterZones = rasterZonesByPage[page];
 
+                    // The anchor point for the error icon should be to the right of attribute.
+                    var point = GetAnchorPoint(rasterZones, AnchorAlignment.Right, 90,
+                        (int)Config.Settings.TooltipFontSize, out double errorIconRotation, out var _);
+
+                    anchorPoints.Add((page, point, errorIconRotation));
+                }
+            }
+            else
+            {
+                var bounds = toolTip.NormalizedBounds;
+                var layerObject = toolTip.TextLayerObject;
+                var page = layerObject.PageNumber;
+                var orientation = layerObject.Orientation;
+
+                // The anchor point for the error icon should be to the right of attribute's tooltip.
+                var point = GetAnchorPoint(bounds, orientation, AnchorAlignment.Right, 90,
+                    (int)Config.Settings.TooltipFontSize);
+                anchorPoints.Add((page, point, orientation));
+            }
+
+            var errorIconsForAttribute = _attributeErrorIcons.GetOrAdd(attribute, () =>
+                new List<ImageLayerObject>());
+
+            foreach (var (page, point, rotation) in anchorPoints)
+            {
                 // Create the error icon
                 ImageLayerObject errorIcon = new ImageLayerObject(ImageViewer, page,
-                    "", errorIconAnchorPoint, AnchorAlignment.Left, 
-                    Properties.Resources.LargeErrorIcon, GetPageIconSize(page), 
-                    (float)errorIconRotation);
-                errorIcon.Selectable = false;
-                errorIcon.Visible = makeVisible;
-                errorIcon.CanRender = false;
-
+                    "", point, AnchorAlignment.Left,
+                    Properties.Resources.LargeErrorIcon, GetPageIconSize(page),
+                    (float)rotation)
+                {
+                    Selectable = false,
+                    Visible = makeVisible,
+                    CanRender = false
+                };
                 ImageViewer.LayerObjects.Add(errorIcon, false);
 
                 // NOTE: For now I think the cases where the error icon would extend off-page are so
                 // rare that it's not worth handling. But this would be where such a check should
                 // be made (see ShowAttributeToolTip).
 
-                if (!_attributeErrorIcons.ContainsKey(attribute))
-                {
-                    _attributeErrorIcons[attribute] = new List<ImageLayerObject>();
-                }
-
-                _attributeErrorIcons[attribute].Add(errorIcon);
+                errorIconsForAttribute.Add(errorIcon);
             }
         }
 
@@ -7329,15 +7355,15 @@ namespace Extract.DataEntry
         /// orientation of the raster zones.  This will be the average rotation of the zones unless
         /// it is sufficiently close to level, in which case the angle will be rounded off to
         /// improve the appearance of the associated <see cref="AnchoredObject"/>.</param>
+        /// <param name="bounds">The angled bounding box calculated for the <see paramref="rasterZones"/></param>
         /// <returns>A <see cref="Point"/> to use as the anchor for an <see cref="AnchoredObject"/>.
         /// </returns>
         static Point GetAnchorPoint(
             IList<RasterZone> rasterZones, AnchorAlignment anchorAlignment, double anchorOffsetAngle,
-            int standoffDistance, out double anchoredObjectRotation)
+            int standoffDistance, out double anchoredObjectRotation, out RectangleF bounds)
         {
-            double averageRotation;
-            RectangleF bounds =
-                RasterZone.GetAngledBoundingRectangle(rasterZones, out averageRotation);
+            bounds =
+                RasterZone.GetAngledBoundingRectangle(rasterZones, out double averageRotation);
 
             // Based on the raster zones' dimensions, calculate how far from level the raster zones
             // can be and still have a level tooltip before the tooltip would overlap with one of the
@@ -7361,6 +7387,30 @@ namespace Extract.DataEntry
                 anchoredObjectRotation = averageRotation;
             }
 
+            return GetAnchorPoint(bounds, averageRotation, anchorAlignment, anchorOffsetAngle,
+                standoffDistance);
+        }
+
+        /// <summary>
+        /// Finds an anchor point to use to attach an <see cref="AnchoredObject"/> to the specified
+        /// <see cref="RectangleF"/>.
+        /// </summary>
+        /// <param name="bounds">The <see cref="RectangleF"/> for which the anchor point is needed.</param>
+        /// <param name="anchorAlignment">The point location along the supplied bounds
+        /// on which the anchor point should be based. The alignment will be relative to
+        /// the value of <see paramref="rotation"/> (i.e., if the rotation is 180,
+        /// anchorAlignment.Top would result in an anchor point at the bottom of the rectange as it
+        /// appear on the page.</param>
+        /// <param name="anchorOffsetAngle">The anchor point will be offset from the anchorAlignment
+        /// position at this angle. (relative to the rectangle's orientation, not the page)</param>
+        /// <param name="standoffDistance">The number of image pixels away from the bounds of the
+        /// the anchor point should be.</param>
+        /// <returns>A <see cref="Point"/> to use as the anchor for an <see cref="AnchoredObject"/>.
+        /// </returns>
+        static Point GetAnchorPoint(
+            RectangleF bounds, double rotation, AnchorAlignment anchorAlignment, double anchorOffsetAngle,
+            int standoffDistance)
+        {
             // Find the reference location for the anchor point using the specified AnchorAlignment.
             Point[] anchorPoint = { Point.Round(bounds.Location) };
 
@@ -7405,12 +7455,11 @@ namespace Extract.DataEntry
 
                 // Rotate the anchor point back into the image coordinate system.
                 transform.Reset();
-                transform.Rotate((float)averageRotation);
+                transform.Rotate((float)rotation);
                 transform.TransformPoints(anchorPoint);
             }
 
             return anchorPoint[0];
-
         }
 
         /// <summary>
@@ -7728,7 +7777,7 @@ namespace Extract.DataEntry
         /// to hide it.</param>
         void ShowAttributeHighlights(IAttribute attribute, bool show)
         {
-            ShowErrorIcon(attribute, show);
+            ShowErrorIcon(attribute, show && !_temporarilyHidingTooltips);
 
             List<CompositeHighlightLayerObject> highlightList;
             if (_attributeHighlights.TryGetValue(attribute, out highlightList))
