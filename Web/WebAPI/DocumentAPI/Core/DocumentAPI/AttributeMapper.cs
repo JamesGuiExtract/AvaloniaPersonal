@@ -7,6 +7,7 @@ using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using static DocumentAPI.Utils;
 
+using WorkflowType = UCLID_FILEPROCESSINGLib.EWorkflowType;
 
 namespace DocumentAPI
 {
@@ -15,12 +16,26 @@ namespace DocumentAPI
     /// </summary>
     public class AttributeMapper
     {
+        IUnknownVector _attributes;
+        WorkflowType _workflowType;
+
+        /// <summary>
+        /// CTOR
+        /// </summary>
+        /// <param name="attributes">attribute set to map to DocumentAttributeSet</param>
+        /// <param name="workflowType">type of workflow</param>
+        public AttributeMapper(IUnknownVector attributes, WorkflowType workflowType)
+        {
+            _attributes = attributes;
+            _workflowType = workflowType;
+        }
+
         /// <summary>
         /// Is the attribute name an IDShield name?
         /// </summary>
         /// <param name="name">name value</param>
         /// <returns>true iff it is an IDShield name</returns>
-        private static bool IsIdShieldName(string name)
+        static private bool IsIdShieldName(string name)
         {
             if (name.IsEquivalent("HCData") ||
                 name.IsEquivalent("MCData") ||
@@ -38,10 +53,10 @@ namespace DocumentAPI
         /// For IDShield there is some moderate translation of the name that is performed here.
         /// </summary>
         /// <param name="originalName">attribute name</param>
-        private static string DetermineName(string originalName)
+        private string DetermineName(string originalName)
         {
             var name = originalName;
-            if (IsIdShieldName(name))
+            if (IsIdShieldName(name) || _workflowType == WorkflowType.kRedaction)
             {
                 if (name.IsEquivalent("HCData") ||
                     name.IsEquivalent("MCData") ||
@@ -61,23 +76,7 @@ namespace DocumentAPI
             return name;
         }
 
-        /// <summary>
-        /// Determines type of attribute - note that ORIGINAL name is passed to this routine
-        /// Based on AttributeType, but expressed as a string for read-ability
-        /// </summary>
-        /// <param name="originalName">original Attribute.Name</param>
-        /// <returns></returns>
-        private static string TypeOfAttribute(string originalName)
-        {
-            if (IsIdShieldName(originalName))
-            {
-                return Enum.GetName(typeof(AttributeType), AttributeType.Redaction);
-            }
-
-            return Enum.GetName(typeof(AttributeType), AttributeType.Data);
-        }
-
-        private static Dictionary<string, string> mapRedactionConfidenceValues = 
+        private static  Dictionary<string, string> mapRedactionConfidenceValues = 
             new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
             {
                 {"HCData", Enum.GetName(typeof(ConfidenceLevel), ConfidenceLevel.High) },
@@ -91,8 +90,8 @@ namespace DocumentAPI
         /// Note that this is based on ConfidenceLevel enumeration, but returned as the string name
         /// </summary>
         /// <param name="originalName">original Attribute.Name</param>
-        /// <returns></returns>
-        private static string DetermineRedactionConfidence(string originalName)
+        /// <returns>confidence level string</returns>
+        static private string DetermineRedactionConfidence(string originalName)
         {
             string confidence;
             var found = mapRedactionConfidenceValues.TryGetValue(originalName, out confidence);
@@ -111,7 +110,7 @@ namespace DocumentAPI
         /// <param name="zone">the associated rasterZone</param>
         /// <param name="pageInfo">PageInfo for this zone</param>
         /// <returns>a populated SpatialLineBounds instance</returns>
-        private static SpatialLineBounds MakeSpatialLineBounds(SpatialString spatialString, 
+        static private SpatialLineBounds MakeSpatialLineBounds(SpatialString spatialString, 
                                                                RasterZone zone, 
                                                                SpatialPageInfo pageInfo)
         {
@@ -140,7 +139,7 @@ namespace DocumentAPI
         /// <param name="rasterZone">a RasterZone instance</param>
         /// <param name="spatialStringValue">text of the spatial string</param>
         /// <returns>a SpatialLineZone instance</returns>
-        private static SpatialLineZone MakeSpatialZone(RasterZone rasterZone, string spatialStringValue)
+        static private SpatialLineZone MakeSpatialZone(RasterZone rasterZone, string spatialStringValue)
         {
             int startX = 0, startY = 0, endX = 0, endY = 0, height = 0, page = 0;
             rasterZone.GetData(ref startX, ref startY, ref endX, ref endY, ref height, ref page);
@@ -163,7 +162,7 @@ namespace DocumentAPI
         /// </summary>
         /// <param name="spatialString">a SpatialString object</param>
         /// <returns>a populated SpatialLine list</returns>
-        private static List<SpatialLine> MakeLineInfo(SpatialString spatialString)
+        static private List<SpatialLine> MakeLineInfo(SpatialString spatialString)
         {
             var lines = new List<SpatialLine>();
             if (!spatialString.HasSpatialInfo())
@@ -208,7 +207,7 @@ namespace DocumentAPI
         /// </summary>
         /// <param name="spatialString">a SpatialString object</param>
         /// <returns>Position object</returns>
-        private static Position SetSpatialPosition(SpatialString spatialString)
+        static private Position SetSpatialPosition(SpatialString spatialString)
         {
             Position position = new Position();
 
@@ -252,7 +251,7 @@ namespace DocumentAPI
         /// </summary>
         /// <param name="attr">Attribute instance</param>
         /// <returns>DocumentAttribute object</returns>
-        private static DocumentAttribute MapAttribute(IAttribute attr)
+        private DocumentAttribute MapAttribute(IAttribute attr)
         {
             var docAttr = new DocumentAttribute();
 
@@ -306,9 +305,8 @@ namespace DocumentAPI
         /// <summary>
         /// map IUnknownVector (of iAttribute) to a document attribute set.
         /// </summary>
-        /// <param name="attributes">IUnknownVector of IAttribute(s)</param>
         /// <returns>corresponding DocumentAttributeSet</returns>
-        public static DocumentAttributeSet MapAttributesToDocumentAttributeSet(IUnknownVector attributes)
+        public DocumentAttributeSet MapAttributesToDocumentAttributeSet()
         {
             IAttribute attr = null;
 
@@ -317,13 +315,13 @@ namespace DocumentAPI
                 var rootDocAttrSet = new DocumentAttributeSet();
                 rootDocAttrSet.Attributes = new List<DocumentAttribute>();
 
-                for (int i = 0; i < attributes.Size(); ++i)
+                for (int i = 0; i < _attributes.Size(); ++i)
                 {
-                    attr = (IAttribute)attributes.At(i);
+                    attr = (IAttribute)_attributes.At(i);
                     Contract.Assert(attr != null, 
                                     "Invalid top-level attribute at index: {0}, unknownVector.Size: {1}", 
                                     i, 
-                                    attributes.Size());
+                                    _attributes.Size());
 
                     var docAttr = MapAttribute(attr);
                     rootDocAttrSet.Attributes.Add(docAttr);

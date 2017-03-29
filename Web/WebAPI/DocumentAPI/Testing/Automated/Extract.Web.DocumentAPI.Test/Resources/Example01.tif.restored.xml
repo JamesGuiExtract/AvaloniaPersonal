@@ -1,4 +1,235 @@
-<FlexData><ConsiderationAmount><FullText AverageCharConfidence="100">192800.00</FullText><SpatialLine PageNumber="2"><LineText AverageCharConfidence="100">192800.00</LineText><SpatialLineZone StartX="559" StartY="1276" EndX="741" EndY="1276" Height="33"/><SpatialLineBounds Top="1260" Left="559" Bottom="1292" Right="741"/></SpatialLine></ConsiderationAmount><DocumentType><FullText>Deed of Trust</FullText></DocumentType><LegalDescription><FullText AverageCharConfidence="100">n.a.</FullText><SpatialLine PageNumber="3"><LineText AverageCharConfidence="100">n.a.</LineText><SpatialLineZone StartX="409" StartY="1818" EndX="2194" EndY="1818" Height="35"/><SpatialLineBounds Top="1801" Left="409" Bottom="1835" Right="2194"/></SpatialLine><FullText><FullText AverageCharConfidence="99">LOT 123, ARBOR OAKS NO. 2, IN THE COUNTY OF WASHINGTON AND STATE OF OREGON</FullText><SpatialLine PageNumber="3"><LineText AverageCharConfidence="99">LOT 123, ARBOR OAKS NO. 2, IN THE COUNTY OF WASHINGTON AND STATE OF OREGON</LineText><SpatialLineZone StartX="409" StartY="1820" EndX="2194" EndY="1820" Height="39"/><SpatialLineBounds Top="1801" Left="409" Bottom="1839" Right="2194"/></SpatialLine></FullText><Lot FieldType="FULL"><FullText AverageCharConfidence="100">123</FullText><SpatialLine PageNumber="3"><LineText AverageCharConfidence="100">123</LineText><SpatialLineZone StartX="510" StartY="1817" EndX="564" EndY="1817" Height="33"/><SpatialLineBounds Top="1801" Left="510" Bottom="1833" Right="564"/></SpatialLine></Lot><Subdivision><FullText AverageCharConfidence="97">ARBOR OAKS NO. 2</FullText><SpatialLine PageNumber="3"><LineText AverageCharConfidence="97">ARBOR OAKS NO. 2</LineText><SpatialLineZone StartX="590" StartY="1817" EndX="977" EndY="1817" Height="33"/><SpatialLineBounds Top="1801" Left="590" Bottom="1833" Right="977"/></SpatialLine></Subdivision></LegalDescription><Party><FullText AverageCharConfidence="100">n.a.</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="100">n.a.</LineText><SpatialLineZone StartX="754" StartY="2322" EndX="918" EndY="2322" Height="33"/><SpatialLineBounds Top="2306" Left="754" Bottom="2338" Right="918"/></SpatialLine><First><FullText AverageCharConfidence="100">Jane</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="100">Jane</LineText><SpatialLineZone StartX="754" StartY="2322" EndX="834" EndY="2322" Height="33"/><SpatialLineBounds Top="2306" Left="754" Bottom="2338" Right="834"/></SpatialLine></First><LastOrCompany><FullText AverageCharConfidence="100">Doe</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="100">Doe</LineText><SpatialLineZone StartX="850" StartY="2322" EndX="918" EndY="2322" Height="33"/><SpatialLineBounds Top="2306" Left="850" Bottom="2338" Right="918"/></SpatialLine></LastOrCompany><PersonCompanyTrust><FullText>Person</FullText></PersonCompanyTrust><PartyType><FullText>Trustor</FullText></PartyType><MappedTo><FullText>Grantor</FullText></MappedTo></Party><Party><FullText AverageCharConfidence="100">n.a.</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="100">n.a.</LineText><SpatialLineZone StartX="704" StartY="2820" EndX="1024" EndY="2820" Height="39"/><SpatialLineBounds Top="2801" Left="704" Bottom="2839" Right="1024"/></SpatialLine><PersonCompanyTrust><FullText>Company</FullText></PersonCompanyTrust><LastOrCompany><FullText AverageCharConfidence="99">CitiMortgage, Inc.</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="99">CitiMortgage, Inc.</LineText><SpatialLineZone StartX="704" StartY="2820" EndX="1024" EndY="2820" Height="41"/><SpatialLineBounds Top="2800" Left="704" Bottom="2840" Right="1024"/></SpatialLine></LastOrCompany><PartyType><FullText>Beneficiary</FullText></PartyType><MappedTo><FullText>Grantee</FullText></MappedTo></Party><Party><FullText AverageCharConfidence="100">n.a.</FullText><SpatialLine PageNumber="2"><LineText AverageCharConfidence="100">n.a.</LineText><SpatialLineZone StartX="698" StartY="929" EndX="1493" EndY="929" Height="33"/><SpatialLineBounds Top="913" Left="698" Bottom="945" Right="1493"/></SpatialLine><PersonCompanyTrust><FullText>Company</FullText></PersonCompanyTrust><LastOrCompany><FullText AverageCharConfidence="99">Mortgage Electronic Registration Systems, Inc.</FullText><SpatialLine PageNumber="2"><LineText AverageCharConfidence="99">Mortgage Electronic Registration Systems, Inc.</LineText><SpatialLineZone StartX="698" StartY="933" EndX="1493" EndY="933" Height="43"/><SpatialLineBounds Top="912" Left="698" Bottom="954" Right="1493"/></SpatialLine></LastOrCompany><PartyType><FullText>Beneficiary</FullText></PartyType><MappedTo><FullText>Grantee</FullText></MappedTo></Party><Party><FullText AverageCharConfidence="100">n.a.</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="100">n.a.</LineText><SpatialLineZone StartX="701" StartY="3119" EndX="1236" EndY="3119" Height="43"/><SpatialLineBounds Top="3098" Left="701" Bottom="3140" Right="1236"/></SpatialLine><PersonCompanyTrust><FullText>Company</FullText></PersonCompanyTrust><LastOrCompany><FullText AverageCharConfidence="99">First American Title Company</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="99">First American Title Company</LineText><SpatialLineZone StartX="701" StartY="3118" EndX="1236" EndY="3118" Height="43"/><SpatialLineBounds Top="3097" Left="701" Bottom="3139" Right="1236"/></SpatialLine></LastOrCompany><PartyType><FullText>Trustee</FullText></PartyType><MappedTo><FullText>Grantee</FullText></MappedTo></Party><ReturnAddress><FullText AverageCharConfidence="97">CitiMortgage, Inc.
+<FlexData>
+	<ConsiderationAmount>
+		<FullText AverageCharConfidence="100">192800.00</FullText>
+		<SpatialLine PageNumber="2">
+			<LineText AverageCharConfidence="100">192800.00</LineText>
+			<SpatialLineZone StartX="559" StartY="1276" EndX="741" EndY="1276" Height="33"/>
+			<SpatialLineBounds Top="1260" Left="559" Bottom="1292" Right="741"/>
+		</SpatialLine>
+	</ConsiderationAmount>
+	<DocumentType>
+		<FullText>Deed of Trust</FullText>
+	</DocumentType>
+	<LegalDescription>
+		<FullText AverageCharConfidence="100">n.a.</FullText>
+		<SpatialLine PageNumber="3">
+			<LineText AverageCharConfidence="100">n.a.</LineText>
+			<SpatialLineZone StartX="409" StartY="1818" EndX="2194" EndY="1818" Height="35"/>
+			<SpatialLineBounds Top="1801" Left="409" Bottom="1835" Right="2194"/>
+		</SpatialLine>
+		<FullText>
+			<FullText AverageCharConfidence="99">LOT 123, ARBOR OAKS NO. 2, IN THE COUNTY OF WASHINGTON AND STATE OF OREGON</FullText>
+			<SpatialLine PageNumber="3">
+				<LineText AverageCharConfidence="99">LOT 123, ARBOR OAKS NO. 2, IN THE COUNTY OF WASHINGTON AND STATE OF OREGON</LineText>
+				<SpatialLineZone StartX="409" StartY="1820" EndX="2194" EndY="1820" Height="39"/>
+				<SpatialLineBounds Top="1801" Left="409" Bottom="1839" Right="2194"/>
+			</SpatialLine>
+		</FullText>
+		<Lot FieldType="FULL">
+			<FullText AverageCharConfidence="100">123</FullText>
+			<SpatialLine PageNumber="3">
+				<LineText AverageCharConfidence="100">123</LineText>
+				<SpatialLineZone StartX="510" StartY="1817" EndX="564" EndY="1817" Height="33"/>
+				<SpatialLineBounds Top="1801" Left="510" Bottom="1833" Right="564"/>
+			</SpatialLine>
+			<Lot1>
+				<FullText AverageCharConfidence="100">123</FullText>
+				<SpatialLine PageNumber="3">
+					<LineText AverageCharConfidence="100">123</LineText>
+					<SpatialLineZone StartX="510" StartY="1817" EndX="564" EndY="1817" Height="33"/>
+					<SpatialLineBounds Top="1801" Left="510" Bottom="1833" Right="564"/>
+				</SpatialLine>
+			</Lot1>
+		</Lot>
+		<Subdivision>
+			<FullText AverageCharConfidence="97">ARBOR OAKS NO. 2</FullText>
+			<SpatialLine PageNumber="3">
+				<LineText AverageCharConfidence="97">ARBOR OAKS NO. 2</LineText>
+				<SpatialLineZone StartX="590" StartY="1817" EndX="977" EndY="1817" Height="33"/>
+				<SpatialLineBounds Top="1801" Left="590" Bottom="1833" Right="977"/>
+			</SpatialLine>
+		</Subdivision>
+	</LegalDescription>
+	<Party>
+		<FullText AverageCharConfidence="100">n.a.</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">n.a.</LineText>
+			<SpatialLineZone StartX="754" StartY="2322" EndX="918" EndY="2322" Height="33"/>
+			<SpatialLineBounds Top="2306" Left="754" Bottom="2338" Right="918"/>
+		</SpatialLine>
+		<First>
+			<FullText AverageCharConfidence="100">Jane</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">Jane</LineText>
+				<SpatialLineZone StartX="754" StartY="2322" EndX="834" EndY="2322" Height="33"/>
+				<SpatialLineBounds Top="2306" Left="754" Bottom="2338" Right="834"/>
+			</SpatialLine>
+		</First>
+		<LastOrCompany>
+			<FullText AverageCharConfidence="100">Doe</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">Doe</LineText>
+				<SpatialLineZone StartX="850" StartY="2322" EndX="918" EndY="2322" Height="33"/>
+				<SpatialLineBounds Top="2306" Left="850" Bottom="2338" Right="918"/>
+			</SpatialLine>
+		</LastOrCompany>
+		<PersonCompanyTrust>
+			<FullText>Person</FullText>
+		</PersonCompanyTrust>
+		<PartyType>
+			<FullText>Trustor</FullText>
+		</PartyType>
+		<MappedTo>
+			<FullText>Grantor</FullText>
+		</MappedTo>
+	</Party>
+	<Party>
+		<FullText AverageCharConfidence="100">n.a.</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">n.a.</LineText>
+			<SpatialLineZone StartX="704" StartY="2820" EndX="1024" EndY="2820" Height="39"/>
+			<SpatialLineBounds Top="2801" Left="704" Bottom="2839" Right="1024"/>
+		</SpatialLine>
+		<PersonCompanyTrust>
+			<FullText>Company</FullText>
+		</PersonCompanyTrust>
+		<LastOrCompany>
+			<FullText AverageCharConfidence="99">CitiMortgage, Inc.</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="99">CitiMortgage, Inc.</LineText>
+				<SpatialLineZone StartX="704" StartY="2820" EndX="1024" EndY="2820" Height="41"/>
+				<SpatialLineBounds Top="2800" Left="704" Bottom="2840" Right="1024"/>
+			</SpatialLine>
+		</LastOrCompany>
+		<PartyType>
+			<FullText>Beneficiary</FullText>
+		</PartyType>
+		<MappedTo>
+			<FullText>Grantee</FullText>
+		</MappedTo>
+	</Party>
+	<Party>
+		<FullText AverageCharConfidence="100">n.a.</FullText>
+		<SpatialLine PageNumber="2">
+			<LineText AverageCharConfidence="100">n.a.</LineText>
+			<SpatialLineZone StartX="698" StartY="929" EndX="1493" EndY="929" Height="33"/>
+			<SpatialLineBounds Top="913" Left="698" Bottom="945" Right="1493"/>
+		</SpatialLine>
+		<PersonCompanyTrust>
+			<FullText>Company</FullText>
+		</PersonCompanyTrust>
+		<LastOrCompany>
+			<FullText AverageCharConfidence="99">Mortgage Electronic Registration Systems, Inc.</FullText>
+			<SpatialLine PageNumber="2">
+				<LineText AverageCharConfidence="99">Mortgage Electronic Registration Systems, Inc.</LineText>
+				<SpatialLineZone StartX="698" StartY="933" EndX="1493" EndY="933" Height="43"/>
+				<SpatialLineBounds Top="912" Left="698" Bottom="954" Right="1493"/>
+			</SpatialLine>
+		</LastOrCompany>
+		<PartyType>
+			<FullText>Beneficiary</FullText>
+		</PartyType>
+		<MappedTo>
+			<FullText>Grantee</FullText>
+		</MappedTo>
+	</Party>
+	<Party>
+		<FullText AverageCharConfidence="100">n.a.</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">n.a.</LineText>
+			<SpatialLineZone StartX="701" StartY="3119" EndX="1236" EndY="3119" Height="43"/>
+			<SpatialLineBounds Top="3098" Left="701" Bottom="3140" Right="1236"/>
+		</SpatialLine>
+		<PersonCompanyTrust>
+			<FullText>Company</FullText>
+		</PersonCompanyTrust>
+		<LastOrCompany>
+			<FullText AverageCharConfidence="99">First American Title Company</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="99">First American Title Company</LineText>
+				<SpatialLineZone StartX="701" StartY="3118" EndX="1236" EndY="3118" Height="43"/>
+				<SpatialLineBounds Top="3097" Left="701" Bottom="3139" Right="1236"/>
+			</SpatialLine>
+		</LastOrCompany>
+		<PartyType>
+			<FullText>Trustee</FullText>
+		</PartyType>
+		<MappedTo>
+			<FullText>Grantee</FullText>
+		</MappedTo>
+	</Party>
+	<ReturnAddress>
+		<FullText AverageCharConfidence="97">CitiMortgage, Inc.
 Attn: Document Processing
 P.O. Box 790021
-St Louis, MO 63179-0021</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="97">CitiMortgage, Inc.</LineText><SpatialLineZone StartX="414" StartY="1230" EndX="734" EndY="1230" Height="41"/><SpatialLineBounds Top="1210" Left="414" Bottom="1250" Right="734"/></SpatialLine><SpatialLine PageNumber="1"><LineText AverageCharConfidence="100">Attn: Document Processing</LineText><SpatialLineZone StartX="413" StartY="1280" EndX="886" EndY="1280" Height="41"/><SpatialLineBounds Top="1260" Left="413" Bottom="1300" Right="886"/></SpatialLine><SpatialLine PageNumber="1"><LineText AverageCharConfidence="97">P.O. Box 790021</LineText><SpatialLineZone StartX="412" StartY="1327" EndX="703" EndY="1327" Height="33"/><SpatialLineBounds Top="1311" Left="412" Bottom="1343" Right="703"/></SpatialLine><SpatialLine PageNumber="1"><LineText AverageCharConfidence="95">St Louis, MO 63179-0021</LineText><SpatialLineZone StartX="415" StartY="1379" EndX="869" EndY="1379" Height="39"/><SpatialLineBounds Top="1360" Left="415" Bottom="1398" Right="869"/></SpatialLine><Recipient1><FullText AverageCharConfidence="97">CitiMortgage, Inc.</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="97">CitiMortgage, Inc.</LineText><SpatialLineZone StartX="414" StartY="1230" EndX="734" EndY="1230" Height="41"/><SpatialLineBounds Top="1210" Left="414" Bottom="1250" Right="734"/></SpatialLine></Recipient1><Recipient2><FullText AverageCharConfidence="100">Attn: Document Processing</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="100">Attn: Document Processing</LineText><SpatialLineZone StartX="413" StartY="1280" EndX="886" EndY="1280" Height="41"/><SpatialLineBounds Top="1260" Left="413" Bottom="1300" Right="886"/></SpatialLine></Recipient2><Address1><FullText AverageCharConfidence="97">P.O. Box 790021</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="97">P.O. Box 790021</LineText><SpatialLineZone StartX="412" StartY="1327" EndX="703" EndY="1327" Height="33"/><SpatialLineBounds Top="1311" Left="412" Bottom="1343" Right="703"/></SpatialLine></Address1><City><FullText AverageCharConfidence="98">St Louis</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="98">St Louis</LineText><SpatialLineZone StartX="415" StartY="1376" EndX="560" EndY="1376" Height="33"/><SpatialLineBounds Top="1360" Left="415" Bottom="1392" Right="560"/></SpatialLine></City><State><FullText AverageCharConfidence="100">MO</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="100">MO</LineText><SpatialLineZone StartX="584" StartY="1376" EndX="652" EndY="1376" Height="31"/><SpatialLineBounds Top="1361" Left="584" Bottom="1391" Right="652"/></SpatialLine></State><ZipCode><FullText AverageCharConfidence="92">63179-0021</FullText><SpatialLine PageNumber="1"><LineText AverageCharConfidence="92">63179-0021</LineText><SpatialLineZone StartX="678" StartY="1377" EndX="869" EndY="1377" Height="33"/><SpatialLineBounds Top="1361" Left="678" Bottom="1393" Right="869"/></SpatialLine></ZipCode></ReturnAddress></FlexData>
+St Louis, MO 63179-0021</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="97">CitiMortgage, Inc.</LineText>
+			<SpatialLineZone StartX="414" StartY="1230" EndX="734" EndY="1230" Height="41"/>
+			<SpatialLineBounds Top="1210" Left="414" Bottom="1250" Right="734"/>
+		</SpatialLine>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">Attn: Document Processing</LineText>
+			<SpatialLineZone StartX="413" StartY="1280" EndX="886" EndY="1280" Height="41"/>
+			<SpatialLineBounds Top="1260" Left="413" Bottom="1300" Right="886"/>
+		</SpatialLine>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="97">P.O. Box 790021</LineText>
+			<SpatialLineZone StartX="412" StartY="1327" EndX="703" EndY="1327" Height="33"/>
+			<SpatialLineBounds Top="1311" Left="412" Bottom="1343" Right="703"/>
+		</SpatialLine>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="95">St Louis, MO 63179-0021</LineText>
+			<SpatialLineZone StartX="415" StartY="1379" EndX="869" EndY="1379" Height="39"/>
+			<SpatialLineBounds Top="1360" Left="415" Bottom="1398" Right="869"/>
+		</SpatialLine>
+		<Recipient1>
+			<FullText AverageCharConfidence="97">CitiMortgage, Inc.</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="97">CitiMortgage, Inc.</LineText>
+				<SpatialLineZone StartX="414" StartY="1230" EndX="734" EndY="1230" Height="41"/>
+				<SpatialLineBounds Top="1210" Left="414" Bottom="1250" Right="734"/>
+			</SpatialLine>
+		</Recipient1>
+		<Recipient2>
+			<FullText AverageCharConfidence="100">Attn: Document Processing</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">Attn: Document Processing</LineText>
+				<SpatialLineZone StartX="413" StartY="1280" EndX="886" EndY="1280" Height="41"/>
+				<SpatialLineBounds Top="1260" Left="413" Bottom="1300" Right="886"/>
+			</SpatialLine>
+		</Recipient2>
+		<Address1>
+			<FullText AverageCharConfidence="97">P.O. Box 790021</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="97">P.O. Box 790021</LineText>
+				<SpatialLineZone StartX="412" StartY="1327" EndX="703" EndY="1327" Height="33"/>
+				<SpatialLineBounds Top="1311" Left="412" Bottom="1343" Right="703"/>
+			</SpatialLine>
+		</Address1>
+		<City>
+			<FullText AverageCharConfidence="98">St Louis</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="98">St Louis</LineText>
+				<SpatialLineZone StartX="415" StartY="1376" EndX="560" EndY="1376" Height="33"/>
+				<SpatialLineBounds Top="1360" Left="415" Bottom="1392" Right="560"/>
+			</SpatialLine>
+		</City>
+		<State>
+			<FullText AverageCharConfidence="100">MO</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">MO</LineText>
+				<SpatialLineZone StartX="584" StartY="1376" EndX="652" EndY="1376" Height="31"/>
+				<SpatialLineBounds Top="1361" Left="584" Bottom="1391" Right="652"/>
+			</SpatialLine>
+		</State>
+		<ZipCode>
+			<FullText AverageCharConfidence="92">63179-0021</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="92">63179-0021</LineText>
+				<SpatialLineZone StartX="678" StartY="1377" EndX="869" EndY="1377" Height="33"/>
+				<SpatialLineBounds Top="1361" Left="678" Bottom="1393" Right="869"/>
+			</SpatialLine>
+		</ZipCode>
+	</ReturnAddress>
+</FlexData>

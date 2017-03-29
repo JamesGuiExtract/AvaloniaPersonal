@@ -1,18 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-using System.Threading;
-using System.Xml;
-
-using NUnit.Framework;
-using IO.Swagger.Api;
-using IO.Swagger.Model;
+﻿
+using DocumentAPI.Models;
 
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
-using UCLID_FILEPROCESSINGLib;
+using NUnit.Framework;
+using System;
+
+using WorkflowType = UCLID_FILEPROCESSINGLib.EWorkflowType;
 
 namespace Extract.Web.DocumentAPI.Test
 {
@@ -27,6 +21,7 @@ namespace Extract.Web.DocumentAPI.Test
         /// attached to the local database server, as needed for tests.
         /// </summary>
         static readonly string DbLabDE = "Demo_LabDE_Temp";
+
         #endregion Constants
 
         #region Fields
@@ -36,14 +31,6 @@ namespace Extract.Web.DocumentAPI.Test
         /// to the local database server. 
         /// </summary>
         static FAMTestDBManager<TestDocumentAttributeSet> _testDbManager;
-
-        /// <summary>
-        /// If this test invokes the web service, then on tear down this flag is used to signal that
-        /// condition and shut down the service.
-        /// </summary>
-        static bool documentAPIInvoked;
-
-        static bool usedDbLabDE;
 
         #endregion Fields
 
@@ -55,27 +42,16 @@ namespace Extract.Web.DocumentAPI.Test
             GeneralMethods.TestSetup();
 
             _testDbManager = new FAMTestDBManager<TestDocumentAttributeSet>();
-
-            documentAPIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: Utils.WebApiURL);
-
-            _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
-            usedDbLabDE = true;
-
-            Utils.SetDatabase(DbLabDE, Utils.WebApiURL);
         }
 
         [TestFixtureTearDown]
         public static void FinalCleanup()
         {
-            if (documentAPIInvoked)
-            {
-                Utils.ShutdownWebServer(args: "/f /im DocumentAPI.exe");
-            }
-
-            if (usedDbLabDE)
+            if (_testDbManager != null)
             {
                 _testDbManager.Dispose();
             }
+
         }
 
         #endregion Setup and Teardown
@@ -86,116 +62,48 @@ namespace Extract.Web.DocumentAPI.Test
         /// basic test that list of current workflows can be retrieved
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_GetWorkflows()
+        public static void Test_GetDefaultWorkflow()
         {
+            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
+
             try
             {
-                // TODO - this will be removed later
-                MockWorkflowsForLabDE();
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
 
-                var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: Utils.WebApiURL);
-                var names = wfApi.ApiWorkflowGetWorkflowsGet();
-                Assert.IsTrue(names.Count == 4);
+                var c = Utils.SetDefaultApiContext();
+                var fileApi = FileApiMgr.GetInterface(c);
+                db = fileApi.Interface;
 
-                Assert.IsTrue(!String.IsNullOrEmpty(names.Find(name => name.IsEquivalent("Extract Data"))));
-                Assert.IsTrue(!String.IsNullOrEmpty(names.Find(name => name.IsEquivalent("Verify"))));
-                Assert.IsTrue(!String.IsNullOrEmpty(names.Find(name => name.IsEquivalent("QA"))));
-                Assert.IsTrue(!String.IsNullOrEmpty(names.Find(name => name.IsEquivalent("View Non Lab"))));
+                try
+                {
+                    var workflow = fileApi.GetWorkflow;
+                    Assert.IsTrue(workflow != null, "Couldn't get default workflow");
+                    Assert.IsTrue(workflow.Name.IsEquivalent("CourtOffice"), "Incorrect value for name: {0}", workflow.Name);
+                    Assert.IsTrue(workflow.Id == 1, "Incorrect value for Id: {0}", workflow.Id);
+                    Assert.IsTrue(workflow.StartAction.IsEquivalent("A01_ExtractData"), "Incorrect value for startAction: {0}", workflow.StartAction);
+                    Assert.IsTrue(workflow.OutputAttributeSet.IsEquivalent("DataFoundByRules"), "Incorrect value for OutputAttributeSet: {0}", workflow.OutputAttributeSet);
+                    Assert.IsTrue(workflow.Type == WorkflowType.kExtraction, "Incorrect value for Type: {0}", workflow.Type);
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+                finally
+                {
+                   fileApi.InUse = false;
+                }
             }
             catch (Exception ex)
             {
                 Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
             }
-        }
+            finally
+            {
 
-        /// <summary>
-        /// test to get expected default workflow
-        /// </summary>
-        [Test, Category("Automated")]
-        public static void Test_GetDefaultWorkflow()
-        {
-            var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: Utils.WebApiURL);
-            var defaultWf = wfApi.ApiWorkflowGetDefaultWorkflowByUsernameGet("John Doe");
-            Assert.IsTrue(defaultWf.IsEquivalent("Extract_Data"));
-        }
-
-        /*
-        Mocked workflowStatus values:
-		{
-		"error": {
-			"errorOccurred": false,
-			"message": null,
-			"code": 0
-		},
-		"numberProcessing": 14,
-		"numberDone": 5,
-		"numberFailed": 1,
-		"numberIgnored": 0,
-		"state": 1
-		}
-        */
-        /// <summary>
-        /// Test of workflow status
-        /// TODO - in the near future this will be more extensive
-        /// </summary>
-        [Test, Category("Automated")]
-        public static void Test_GetWorkflowStatus()
-        {
-            var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: Utils.WebApiURL);
-            var status = wfApi.ApiWorkflowGetWorkflowStatusByWorkflowNameGet("Extract Data");
-
-            Assert.IsTrue(status.Error.ErrorOccurred == false);
-            Assert.IsTrue(status.Error.Code == 0);
-            Assert.IsTrue(status.NumberProcessing == 14);
-            Assert.IsTrue(status.NumberDone == 5);
-            Assert.IsTrue(status.NumberFailed == 1);
-            Assert.IsTrue(status.NumberIgnored == 0);
-            Assert.IsTrue(status.State.IsEquivalent("Running"));
-
-            // TODO (future)- 2) add a file to the workflow
-
-            // TODO (future)- 3) verify that the workflow changes predictably
+                _testDbManager.RemoveDatabase(DbLabDE);
+            }
         }
 
         #endregion Public Test Functions
-
-        static List<String> WorkflowGetWorkflows(string webApiUrl)
-        {
-            Assert.IsFalse(String.IsNullOrEmpty(webApiUrl));
-
-            var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: webApiUrl);
-            var wfNames = wfApi.ApiWorkflowGetWorkflowsGet();
-            return wfNames;
-        }
-
-        static void AddWorkflow(Workflow workflow)
-        {
-            Assert.IsFalse(workflow == null);
-
-            var wfApi = new IO.Swagger.Api.WorkflowApi(basePath: Utils.WebApiURL);
-            wfApi.ApiWorkflowPost(workflow);
-        }
-
-        static void MockWorkflowsForLabDE()
-        {
-            AddWorkflow(MakeWorkflow("Extract Data", 1));
-            AddWorkflow(MakeWorkflow("Verify", 2));
-            AddWorkflow(MakeWorkflow("QA", 3));
-            AddWorkflow(MakeWorkflow("View Non Lab", 4));
-        }
-
-        static Workflow MakeWorkflow(string name, int index)
-        {
-            var sIndex = index.ToString();
-            var testWf = new IO.Swagger.Model.Workflow(Name: name,
-                                                       Description: "Describe_" + name,
-                                                       EntryAction: "entry_" + name,
-                                                       ExitAction: "cleanup_" + name,
-                                                       RunAfterResultsAction: "runAfter_" + name,
-                                                       DocumentFolder: "docFolder_" + name,
-                                                       AttributeSetName: "asn_" + name,
-                                                       Id: index);
-            return testWf;
-        }
     }
 }

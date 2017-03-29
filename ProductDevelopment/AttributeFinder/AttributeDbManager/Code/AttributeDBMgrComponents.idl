@@ -51,7 +51,7 @@ library AttributeDbMgrComponentsLib
 		[id(3), helpstring("method GetAttributeSetForFile")] 
 		HRESULT GetAttributeSetForFile([in] long fileID, 
 									   [in] BSTR attributeSetName,
-									   [in] long relativeIndex,
+									   [in] long relativeIndex, VARIANT_BOOL closeConnection,
 									   [out, retval]IIUnknownVector** pAttributes);
 
 		[id(4), helpstring("method CreateNewAttributeSetName")] 

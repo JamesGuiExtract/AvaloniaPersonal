@@ -13,7 +13,17 @@ namespace DocumentAPI.Controllers
         /// <summary>
         /// Name argument
         /// </summary>
-        public string Name { get; set; }
+        public string DatabaseServerName { get; set; }
+
+        /// <summary>
+        /// database name
+        /// </summary>
+        public string DatabaseName { get; set; }
+
+        /// <summary>
+        /// workflow name
+        /// </summary>
+        public string WorkflowName { get; set; }
     }
     /// <summary>
     /// Test controller - for testing only, and probably temporary as well
@@ -24,26 +34,40 @@ namespace DocumentAPI.Controllers
         /// <summary>
         /// Testing only - set the AttributeSetName, this allows testing Document.GetResultSet().
         /// </summary>
-        /// <param name="arg"></param>
-        /// <returns></returns>
-        [HttpPost("SetAttributeSetName")]
-        public IActionResult SetAttributeSetName([FromBody]TestArgs arg)
+        /// <param name="args">TestArgs instance, all elements must be non-empty</param>
+        /// <returns>IActionResult containing the input args</returns>
+        [HttpPost("SetApiContext")]
+        public IActionResult SetApiContext([FromBody]TestArgs args)
         {
             try
             {
-                if (!ModelState.IsValid || String.IsNullOrEmpty(arg.Name))
+                if (String.IsNullOrEmpty(args.DatabaseServerName))
                 {
-                    var message = "name cannot be empty";
+                    var message = "database server name cannot be empty";
                     Log.WriteLine(message);
                     return BadRequest(message);
                 }
 
-                Utils.AttributeSetName = arg.Name;
-                return Ok(arg);
+                if (String.IsNullOrEmpty(args.DatabaseName))
+                {
+                    var message = "database name cannot be empty";
+                    Log.WriteLine(message);
+                    return BadRequest(message);
+                }
+
+                if (String.IsNullOrEmpty(args.WorkflowName) )
+                {
+                    var message = "workflow name cannot be empty";
+                    Log.WriteLine(message);
+                    return BadRequest(message);
+                }
+
+                Utils.SetCurrentApiContext(args.DatabaseServerName, args.DatabaseName, args.WorkflowName);
+                return Ok(args);
             }
             catch (Exception ex)
             {
-                var message = Inv($"Exception: {ex.Message}, setting attribute set name to: {arg.Name}");
+                var message = Inv($"Exception: {ex.Message}, setting API context");
                 Log.WriteLine(message);
                 return BadRequest(message);
             }

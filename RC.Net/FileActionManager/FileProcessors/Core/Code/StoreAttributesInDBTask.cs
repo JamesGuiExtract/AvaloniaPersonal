@@ -571,7 +571,8 @@ namespace Extract.FileActionManager.FileProcessors
                     IUnknownVector voaData = _attributeDBManager.GetAttributeSetForFile(
                                                                 pFileRecord.FileID,
                                                                 expandedAttrSetName,
-                                                                MOST_RECENT_ATTRIBUTE);
+                                                                MOST_RECENT_ATTRIBUTE,
+                                                                false);
 
                     voaData.SaveTo(voaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
                     voaData.ReportMemoryUsage();

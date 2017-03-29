@@ -93,6 +93,7 @@ public:
 	STDMETHOD(GetAttributeSetForFile)(long nFileID,
 									  BSTR bstrAttributeSetName,
 									  long nRelativeIndex,
+									  VARIANT_BOOL vbCloseConnection,
 									  IIUnknownVector** pAttributes);
 
 	STDMETHOD(CreateNewAttributeSetName)(BSTR name,

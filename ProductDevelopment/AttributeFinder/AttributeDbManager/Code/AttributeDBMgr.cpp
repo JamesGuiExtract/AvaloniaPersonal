@@ -176,7 +176,7 @@ namespace
 		{
 			const int nNewSchemaVersion = 1;
 
-			if (pnNumSteps != nullptr)
+			if (pnNumSteps != __nullptr)
 			{
 				*pnNumSteps += 3;
 				return nNewSchemaVersion;
@@ -197,7 +197,7 @@ namespace
 		{
 			const int nNewSchemaVersion = 2;
 
-			if (pnNumSteps != nullptr)
+			if (pnNumSteps != __nullptr)
 			{
 				*pnNumSteps += 3;
 				return nNewSchemaVersion;
@@ -240,8 +240,8 @@ namespace
 // CAttributeDBMgr
 //-------------------------------------------------------------------------------------------------
 CAttributeDBMgr::CAttributeDBMgr()
-: m_ipFAMDB(nullptr)
-, m_ipDBConnection(nullptr)
+: m_ipFAMDB(__nullptr)
+, m_ipDBConnection(__nullptr)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
 {
@@ -251,8 +251,8 @@ CAttributeDBMgr::~CAttributeDBMgr()
 {
 	try
 	{
-		m_ipFAMDB = nullptr;
-		m_ipDBConnection = nullptr;
+		m_ipFAMDB = __nullptr;
+		m_ipDBConnection = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38516");
 }
@@ -267,8 +267,8 @@ void CAttributeDBMgr::FinalRelease()
 	try
 	{
 		// Release COM objects before the object is destructed
-		m_ipFAMDB = nullptr;
-		m_ipDBConnection = nullptr;
+		m_ipFAMDB = __nullptr;
+		m_ipDBConnection = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38517");
 }
@@ -303,7 +303,7 @@ STDMETHODIMP CAttributeDBMgr::raw_GetComponentDescription(BSTR* pstrComponentDes
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI38518", pstrComponentDescription != nullptr);
+		ASSERT_ARGUMENT("ELI38518", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t(gstrDESCRIPTION.c_str()).Detach();
 
@@ -321,7 +321,7 @@ STDMETHODIMP CAttributeDBMgr::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI38520", pbValue != nullptr);
+		ASSERT_ARGUMENT("ELI38520", pbValue != __nullptr);
 
 		try
 		{
@@ -354,11 +354,11 @@ STDMETHODIMP CAttributeDBMgr::raw_AddProductSpecificSchema( IFileProcessingDB* p
 
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI38522", ipDB != nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI38522", ipDB != __nullptr);
 
 		// Create the connection object
 		_ConnectionPtr ipDBConnection(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI38523", ipDBConnection != nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI38523", ipDBConnection != __nullptr);
 
 		string strDatabaseServer = asString(ipDB->DatabaseServer);
 		string strDatabaseName = asString(ipDB->DatabaseName);
@@ -404,11 +404,11 @@ STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( IFileProcessingDB
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI38525", pbSchemaExists != nullptr);
+		ASSERT_ARGUMENT("ELI38525", pbSchemaExists != __nullptr);
 
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI38526", ipDB != nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI38526", ipDB != __nullptr);
 
 		auto value = asString( ipDB->GetDBInfoSetting( gstrSCHEMA_VERSION_NAME.c_str(),
 													   VARIANT_FALSE) );
@@ -424,7 +424,7 @@ STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( IFileProcessingDB
 
 		// Create the connection object
 		ADODB::_ConnectionPtr ipDBConnection( __uuidof( Connection ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI38527", ipDBConnection != nullptr );
+		ASSERT_RESOURCE_ALLOCATION( "ELI38527", ipDBConnection != __nullptr );
 
 		string strDatabaseServer = asString(ipDB->DatabaseServer);
 		string strDatabaseName = asString(ipDB->DatabaseName);
@@ -454,7 +454,7 @@ STDMETHODIMP CAttributeDBMgr::raw_ValidateSchema( IFileProcessingDB* pDB )
 			m_ipFAMDB->GetConnectionRetrySettings( &m_nNumberOfRetries, &m_dRetryTimeout );
 
 			// Reset the database connection
-			m_ipDBConnection = nullptr;
+			m_ipDBConnection = __nullptr;
 		}
 
 		validateSchemaVersion();
@@ -473,7 +473,7 @@ STDMETHODIMP CAttributeDBMgr::raw_GetDBInfoRows(IVariantVector** ppDBInfoRows)
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		IVariantVectorPtr ipDBInfoRows(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI38530", ipDBInfoRows != nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI38530", ipDBInfoRows != __nullptr);
 
 		map<string, string> mapDBInfoValues = getDBInfoDefaultValues();
 		auto iterDBInfoValues = mapDBInfoValues.begin();
@@ -497,7 +497,7 @@ STDMETHODIMP CAttributeDBMgr::raw_GetTables(IVariantVector** ppTables)
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		IVariantVectorPtr ipTables(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI38532", ipTables != nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI38532", ipTables != __nullptr);
 
 		VectorOfString vecTablesNames = GetCurrentTableNames();
 		auto iter = vecTablesNames.begin();
@@ -526,12 +526,12 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_ARGUMENT("ELI38534", ipDB != nullptr);
+		ASSERT_ARGUMENT("ELI38534", ipDB != __nullptr);
 
 		_ConnectionPtr ipConnection(pConnection);
-		ASSERT_ARGUMENT("ELI38535", ipConnection != nullptr);
+		ASSERT_ARGUMENT("ELI38535", ipConnection != __nullptr);
 
-		ASSERT_ARGUMENT("ELI38536", pnProdSchemaVersion != nullptr);
+		ASSERT_ARGUMENT("ELI38536", pnProdSchemaVersion != __nullptr);
 
 		if (*pnProdSchemaVersion == 0)
 		{
@@ -600,7 +600,7 @@ STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 	try
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
-		ASSERT_ARGUMENT("ELI38541", newVal != nullptr);
+		ASSERT_ARGUMENT("ELI38541", newVal != __nullptr);
 
 		// Only update if it is a new value
 		if (m_ipFAMDB != newVal)
@@ -609,7 +609,7 @@ STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 			m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
 
 			// Reset the database connection
-			m_ipDBConnection = nullptr;
+			m_ipDBConnection = __nullptr;
 		}
 		return S_OK;
 	}
@@ -621,7 +621,7 @@ STDMETHODIMP CAttributeDBMgr::get_FAMDB(IFileProcessingDB** retVal)
 	try
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
-		ASSERT_ARGUMENT("ELI41635", retVal != nullptr);
+		ASSERT_ARGUMENT("ELI41635", retVal != __nullptr);
 
 		IFileProcessingDBPtr ipTemp = m_ipFAMDB;
 		*retVal = ipTemp.Detach();
@@ -731,7 +731,7 @@ namespace
 		std::string attributeType = SqlSanitizeInput(asString(ipAttribute->GetType()));
 
 		IIdentifiableObjectPtr ipIdentifiable(ipAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI38642", nullptr != ipIdentifiable);
+		ASSERT_RESOURCE_ALLOCATION("ELI38642", __nullptr != ipIdentifiable);
 		std::string guid = asString(ipIdentifiable->InstanceGUID);
 
 		std::string insert;
@@ -822,7 +822,7 @@ namespace
 
 	std::string GetInsertRasterZoneStatement( IRasterZonePtr ipZone )
 	{
-		ILongRectanglePtr ipRect = ipZone->GetRectangularBounds( nullptr );
+		ILongRectanglePtr ipRect = ipZone->GetRectangularBounds( __nullptr );
 		int top = ipRect->Top;
 		int left = ipRect->Left;
 		int bottom = ipRect->Bottom;
@@ -901,7 +901,7 @@ namespace
 	TPtr AssignComPtr( TPtr ipInstance, const std::string& eliCode )
 	{
 		TPtr instance = ipInstance;
-		ASSERT_RESOURCE_ALLOCATION( eliCode, nullptr != instance );
+		ASSERT_RESOURCE_ALLOCATION( eliCode, __nullptr != instance );
 		return instance;
 	}
 
@@ -917,7 +917,7 @@ namespace
 	TPtr MakeIPtr( const GUID& clsId, const std::string& eliCode )
 	{
 		TPtr pT(clsId);
-		ASSERT_RESOURCE_ALLOCATION( eliCode, nullptr != pT );
+		ASSERT_RESOURCE_ALLOCATION( eliCode, __nullptr != pT );
 
 		return pT;
 	}
@@ -936,7 +936,7 @@ namespace
 
 	ADODB::_RecordsetPtr ExecuteCmd( const std::string& cmd, ADODB::_ConnectionPtr ipConnection )
 	{
-		return ipConnection->Execute( cmd.c_str(), nullptr, adCmdText );
+		return ipConnection->Execute( cmd.c_str(), __nullptr, adCmdText );
 	}
 
 	FieldsPtr GetFieldsForQuery( const std::string& query, ADODB::_ConnectionPtr ipConnection )
@@ -1028,7 +1028,7 @@ void CAttributeDBMgr::SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownV
 										  llRootASFF_ID );
 
 		ADODB::_RecordsetPtr ipASFF( __uuidof(Recordset) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI38804", nullptr != ipASFF );
+		ASSERT_RESOURCE_ALLOCATION( "ELI38804", __nullptr != ipASFF );
 
 		auto connectParam = _variant_t( (IDispatch*)ipConnection, true );
 		ipASFF->Open( query.c_str(),
@@ -1116,7 +1116,7 @@ std::string CAttributeDBMgr::buildStoreAttributeDataQuery( _ConnectionPtr ipConn
 		if ( bHasSpatialInfo && true == bStoreRasterZone )
 		{
 			strInsertQuery += insertRasterZonePreamble;
-			IIUnknownVectorPtr ipZones = ipValue->GetOriginalImageRasterZones();	// NOTE: can't return nullptr, throws
+			IIUnknownVectorPtr ipZones = ipValue->GetOriginalImageRasterZones();	// NOTE: can't return __nullptr, throws
 			for ( long index = 0; index < ipZones->Size(); ++index )
 			{
 				IRasterZonePtr ipZone = AssignComPtr( ipZones->At(index), "ELI38669" );
@@ -1151,21 +1151,21 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 		try
 		{
 			IIUnknownVectorPtr ipAttributes(pAttributes);
-			ASSERT_RESOURCE_ALLOCATION("ELI38959", ipAttributes != nullptr);
-			ASSERT_ARGUMENT("ELI38553", pAttributes != nullptr);
+			ASSERT_RESOURCE_ALLOCATION("ELI38959", ipAttributes != __nullptr);
+			ASSERT_ARGUMENT("ELI38553", pAttributes != __nullptr);
 			ASSERT_ARGUMENT("ELI38554", nFileTaskSessionID > 0 );
 
 			std::string strSetName = SqlSanitizeInput(asString(bstrAttributeSetName));
 
 			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-			_ConnectionPtr ipConnection = nullptr;
+			_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_ADO_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
 			ipConnection = getDBConnection();
 
-			TransactionGuard tg( ipConnection, adXactRepeatableRead, nullptr );
+			TransactionGuard tg( ipConnection, adXactRepeatableRead, __nullptr );
 
 			longlong llSetNameID = GetAttributeSetID( strSetName, ipConnection );
 			auto strInsertRootASFF = GetInsertRootASFFStatement( llSetNameID, nFileTaskSessionID );
@@ -1248,10 +1248,10 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 		try
 		{
 			ASSERT_ARGUMENT("ELI38618", relativeIndex != 0);
-			ASSERT_ARGUMENT("ELI38668", ppAttributes != nullptr);
+			ASSERT_ARGUMENT("ELI38668", ppAttributes != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-			_ConnectionPtr ipConnection = nullptr;
+			_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_ADO_CONNECTION_RETRY();
 
@@ -1263,7 +1263,7 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 #ifdef UNCOMPRESSED_STREAM
 			FieldsPtr ipFields = GetFieldsForQuery( strQuery, ipConnection );
 			IIUnknownVectorPtr ipAttributes = getIPersistObjFromField( ipFields, "VOA" );
-			ASSERT_RESOURCE_ALLOCATION("ELI39173", ipAttributes != nullptr);
+			ASSERT_RESOURCE_ALLOCATION("ELI39173", ipAttributes != __nullptr);
 
 			*ppAttributes = ipAttributes.Detach();
 #endif
@@ -1278,7 +1278,7 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 			saData2.Attach(ZipUtil::DecompressAttributes(saData));
 
 			IIUnknownVectorPtr ipAttributes = readObjFromSAFEARRAY(saData2);
-			ASSERT_RESOURCE_ALLOCATION("ELI39172", ipAttributes != nullptr);
+			ASSERT_RESOURCE_ALLOCATION("ELI39172", ipAttributes != __nullptr);
 
 			*ppAttributes = ipAttributes.Detach();
 #endif
@@ -1309,10 +1309,20 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(long fileID,
 													 BSTR attributeSetName,
 													 long relativeIndex,
+													 VARIANT_BOOL vbCloseConnection,
 													 IIUnknownVector** ppAttributes)
 {
 	try
 	{
+		// Set connection to null on end of scope if requested to close it
+		shared_ptr<void> closeConnection(__nullptr, [&](void*)
+		{
+			if (asCppBool(vbCloseConnection))
+			{
+				m_ipDBConnection = __nullptr;
+			}
+		});
+
 		const bool bDbNotLocked = false;
 		auto bRet = GetAttributeSetForFile_Internal( bDbNotLocked,
 													 fileID,
@@ -1341,8 +1351,8 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR name,
 {
 	try
 	{
-		ASSERT_ARGUMENT( "ELI38630", name != nullptr );
-		ASSERT_ARGUMENT( "ELI38676", pAttributeSetNameID != nullptr );
+		ASSERT_ARGUMENT( "ELI38630", name != __nullptr );
+		ASSERT_ARGUMENT( "ELI38676", pAttributeSetNameID != __nullptr );
 
 		std::string newName( SqlSanitizeInput(asString(name)) );
 		std::string cmd( Util::Format( "INSERT INTO [dbo].[AttributeSetName] "
@@ -1362,8 +1372,8 @@ STDMETHODIMP CAttributeDBMgr::RenameAttributeSetName(BSTR attributeSetName,
 {
 	try
 	{
-		ASSERT_ARGUMENT( "ELI38627", attributeSetName != nullptr );
-		ASSERT_ARGUMENT( "ELI38628", newName != nullptr );
+		ASSERT_ARGUMENT( "ELI38627", attributeSetName != __nullptr );
+		ASSERT_ARGUMENT( "ELI38628", newName != __nullptr );
 
 		std::string currentName( SqlSanitizeInput(asString(attributeSetName)) );
 		std::string changeNameTo( SqlSanitizeInput(asString(newName)) );
@@ -1384,7 +1394,7 @@ STDMETHODIMP CAttributeDBMgr::DeleteAttributeSetName(BSTR attributeSetName)
 {
 	try
 	{
-		ASSERT_ARGUMENT( "ELI38624", attributeSetName != nullptr );
+		ASSERT_ARGUMENT( "ELI38624", attributeSetName != __nullptr );
 
 		std::string name( SqlSanitizeInput(asString(attributeSetName)) );
 		ASSERT_ARGUMENT( "ELI38625", !name.empty() );
@@ -1404,7 +1414,7 @@ STDMETHODIMP CAttributeDBMgr::GetAllAttributeSetNames(IStrToStrMap** ippNames)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI38617", nullptr != ippNames);
+		ASSERT_ARGUMENT("ELI38617", __nullptr != ippNames);
 		auto ipAttributeSetNames = MakeIPtr<IStrToStrMapPtr>(CLSID_StrToStrMap, "ELI38621");
 
 		std::string query( "SELECT [ID], [Description] FROM [dbo].[AttributeSetName];" );
@@ -1434,7 +1444,7 @@ STDMETHODIMP CAttributeDBMgr::GetAllAttributeSetNames(IStrToStrMap** ippNames)
 ADODB::_ConnectionPtr CAttributeDBMgr::getDBConnection(bool bReset)
 {
 	// If the FAMDB is not set throw an exception
-	if (m_ipFAMDB == nullptr)
+	if (m_ipFAMDB == __nullptr)
 	{
 		UCLIDException ue("ELI38542",
 			"FAMDB pointer has not been initialized! Unable to open connection.");
@@ -1459,10 +1469,10 @@ ADODB::_ConnectionPtr CAttributeDBMgr::getDBConnection(bool bReset)
 	}
 
 	// Check if connection has been created
-	if (m_ipDBConnection == nullptr)
+	if (m_ipDBConnection == __nullptr)
 	{
 		m_ipDBConnection.CreateInstance(__uuidof( Connection));
-		ASSERT_RESOURCE_ALLOCATION("ELI38543", m_ipDBConnection != nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI38543", m_ipDBConnection != __nullptr);
 	}
 
 	// if closed and Database server and database name are defined,  open the database connection
@@ -1491,7 +1501,7 @@ void CAttributeDBMgr::validateLicense()
 //-------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::validateSchemaVersion()
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI38545", m_ipFAMDB != nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI38545", m_ipFAMDB != __nullptr);
 
 	// Get the Version from the FAMDB DBInfo table
 	auto value = asString( m_ipFAMDB->GetDBInfoSetting( gstrSCHEMA_VERSION_NAME.c_str(),

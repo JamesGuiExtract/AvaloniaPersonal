@@ -12,7 +12,7 @@ namespace DocumentAPI
         /// <summary>
         /// Main - program entry point
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">currently no supported command line arguments</param>
         public static void Main(string[] args)
         {
             var host = new WebHostBuilder()

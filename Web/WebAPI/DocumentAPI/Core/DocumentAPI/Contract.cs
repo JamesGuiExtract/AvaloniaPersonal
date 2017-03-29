@@ -16,7 +16,10 @@ namespace DocumentAPI
         /// <param name="condition">condition that must be true</param>
         /// <param name="statement">a format string</param>
         /// <param name="args">optional arguments for the format string</param>
-        public static void Assert(bool condition, string statement, params object[] args)
+        public static void Assert(bool condition, 
+                                  string statement, 
+                                  params object[] args)
+
         {
             if (!condition)
             {
@@ -30,7 +33,7 @@ namespace DocumentAPI
         /// <summary>
         /// contract has been violated
         /// </summary>
-        /// <param name="statement"></param>
+        /// <param name="statement">description of the contract violation</param>
         public static void Violated(string statement)
         {
             Log.WriteLine(statement);

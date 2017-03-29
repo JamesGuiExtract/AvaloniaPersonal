@@ -17,21 +17,14 @@ namespace DocumentAPI.Models
         /// </summary>
         public string Password { get; set; }
 
-        /*
         /// <summary>
-        /// Identifier value used by Get by Id
+        /// user-specified workflow name that overrides the default workflow
         /// </summary>
-        public int Id { get; set; }
-        */
+        public string WorkflowName { get; set; }
 
         /// <summary>
         /// the claims associated with this user
         /// </summary>
         public List<Claim> Claims = new List<Claim>();
-
-        /// <summary>
-        /// tracks whether this user is logged in or not.
-        /// </summary>
-        public bool LoggedIn { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using AttributeDbMgrComponentsLib;
-using DocumentAPI.Models;
+﻿using DocumentAPI.Models;
 using Extract;
 using Microsoft.AspNetCore.Hosting;     // for IHostingEnvironment
 using System;
@@ -7,7 +6,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using UCLID_FILEPROCESSINGLib;
 
 namespace DocumentAPI
 {
@@ -16,16 +14,9 @@ namespace DocumentAPI
     /// </summary>
     public static class Utils
     {
-        private static FileProcessingDB _fileProcessingDB = null;
-        private static AttributeDBMgr _attributeDbMgr = null;
         private static IHostingEnvironment _environment = null;
-        private static string _databaseServer;
-        private static string _databaseName;
-        private static string _attributeSetName = "Attr";
-        private static string _defaultWorkflow;
-
-        private static object _fileProcessingDbLock = new Object();
-        private static object _attributeDbMgrLock = new Object();
+        private static ApiContext _currentApiContext = null;
+        private static object _apiContextLock = new Object();
 
         /// <summary>
         /// Inv - short form of Invariant. Normally I would use the full name, but in this case the 
@@ -33,7 +24,7 @@ namespace DocumentAPI
         /// function does is prevent FXCop warnings!
         /// </summary>
         /// <param name="strings">strings - one or more strings to format</param>
-        /// <returns></returns>
+        /// <returns>string</returns>
         public static string Inv(params FormattableString[] strings)
         {
             return string.Join("", strings.Select(str => FormattableString.Invariant(str)));
@@ -42,10 +33,10 @@ namespace DocumentAPI
         /// <summary>
         /// make an error info instance
         /// </summary>
-        /// <param name="isError"></param>
-        /// <param name="message"></param>
-        /// <param name="code"></param>
-        /// <returns></returns>
+        /// <param name="isError">true or false</param>
+        /// <param name="message">error message</param>
+        /// <param name="code">error code (-1 for error, 0 for no error)</param>
+        /// <returns>error info instance</returns>
         public static ErrorInfo MakeError(bool isError, string message = "", int code = 0)
         {
             return new ErrorInfo
@@ -59,11 +50,11 @@ namespace DocumentAPI
         /// <summary>
         /// Make a list of Processing status, with one ProcessingStatus element.
         /// </summary>
-        /// <param name="isError"></param>
-        /// <param name="message"></param>
-        /// <param name="status"></param>
-        /// <param name="code"></param>
-        /// <returns></returns>
+        /// <param name="isError">true if error</param>
+        /// <param name="message">error mesasge</param>
+        /// <param name="status">document processing status instance</param>
+        /// <param name="code">error code (-1 for error, 0 for no errror)</param>
+        /// <returns>list of ProcessingStatus objects</returns>
         public static List<ProcessingStatus> MakeListProcessingStatus(bool isError, 
                                                                       string message, 
                                                                       DocumentProcessingStatus status,
@@ -84,8 +75,8 @@ namespace DocumentAPI
         /// <summary>
         /// makes a document attribute set for returning an error
         /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
+        /// <param name="message">error mesasge</param>
+        /// <returns>DocumentAttributeSet instance with the error info set</returns>
         public static DocumentAttributeSet MakeDocumentAttributeSetError(string message)
         {
             return new DocumentAttributeSet
@@ -104,8 +95,8 @@ namespace DocumentAPI
         /// <summary>
         /// make a document attribute set for a successful return case
         /// </summary>
-        /// <param name="documentAttribute"></param>
-        /// <returns></returns>
+        /// <param name="documentAttribute">document attribute to embed into DocumentAttributeSet</param>
+        /// <returns>DocumentAttributeSet with specified content embedded</returns>
         public static DocumentAttributeSet MakeDocumentAttributeSet(DocumentAttribute documentAttribute)
         {
             var lda = new List<DocumentAttribute>();
@@ -118,140 +109,6 @@ namespace DocumentAPI
             };
         }
 
-        /// <summary>
-        /// constructs (if necessary) and returns a fileProcessingDB instance
-        /// </summary>
-        public static FileProcessingDB FileDbMgr
-        {
-            get
-            {
-                lock (_fileProcessingDbLock)
-                {
-                    if (_fileProcessingDB == null)
-                    {
-                        try
-                        {
-                            FAMDBUtils dbUtils = new FAMDBUtils();
-                            Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
-                            _fileProcessingDB = (FileProcessingDB)Activator.CreateInstance(mgrType);
-
-                            _fileProcessingDB.ResetDBConnection(bResetCredentials: false);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.WriteLine(Inv($"Exception creating FileProcessingDB instance: {ex.Message}"));
-                            throw;
-                        }
-
-                        Contract.Assert(_fileProcessingDB != null, "Failed to create FileProcessingDB instance");
-
-                        try
-                        {
-                            _fileProcessingDB.DatabaseServer = DatabaseServer;
-                            _fileProcessingDB.DatabaseName = DatabaseName;
-                        }
-                        catch (Exception exp)
-                        {
-                            Log.WriteLine(Inv($"Exception setting FileProcessingDB DB context: {exp.Message}"));
-                            throw;
-                        }
-                    }
-
-                    return _fileProcessingDB;
-                }
-            }
-        }
-
-        /// <summary>
-        /// In case of a critical error using the file processing db interface, reset it.
-        /// The intent is to allow the Web API to recover from a critical FAM error.
-        /// </summary>
-        public static void ResetFileProcessingDB()
-        {
-            lock (_fileProcessingDbLock)
-            {
-                _fileProcessingDB = null;
-                Log.WriteLine("reset fileProcessingDB", "ELI42112");
-            }
-        }
-
-        /// <summary>
-        /// constructs (if necessary) and returns an AttributeDBMgr instance
-        /// </summary>
-        public static AttributeDBMgr AttrDbMgr
-        {
-            get
-            {
-                lock (_attributeDbMgrLock)
-                {
-                    if (_attributeDbMgr == null)
-                    {
-                        try
-                        {
-                            _attributeDbMgr = new AttributeDBMgr();
-                            Contract.Assert(_attributeDbMgr != null, "Failure to create attributeDbMgr!");
-
-                            _attributeDbMgr.FAMDB = FileDbMgr;
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.WriteLine(Inv($"Exception creating AttributeDBMgr: {ex.Message}"));
-                            throw;
-                        }
-                    }
-
-                    return _attributeDbMgr;
-                }
-            }
-        }
-
-        /// <summary>
-        /// reset the attribute manager - intended to allow recovery on critical error using interface...
-        /// </summary>
-        public static void ResetAttributeMgr()
-        {
-            lock (_attributeDbMgrLock)
-            {
-                _attributeDbMgr = null;
-                Log.WriteLine("resetting attributeDBMgr", "ELI42113");
-            }
-        }
-
-        /// <summary>
-        /// the name of the database server
-        /// </summary>
-        public static string DatabaseServer
-        {   get
-            {
-                Contract.Assert(!String.IsNullOrEmpty(_databaseServer), "DatabaseServer cannot be empty.");
-                return _databaseServer;
-            }
-            set
-            {
-                Contract.Assert(!String.IsNullOrEmpty(value), "DatabaseServer cannot be set to empty");
-                _databaseServer = value;
-                Log.WriteLine(Inv($"reset DB server to: {value}"), "ELI42114");
-            }
-        }
-
-        /// <summary>
-        /// The name of the database to use
-        /// </summary>
-        public static string DatabaseName
-        {
-            get
-            {
-                Contract.Assert(!String.IsNullOrEmpty(_databaseName), "DatabaseName cannot be empty");
-                return _databaseName;
-            }
-            set
-            {
-                Contract.Assert(!String.IsNullOrEmpty(value), "DatabaseName cannot be set to empty");
-                _databaseName = value;
-                Log.WriteLine(Inv($"reset DB to: {value}"), "ELI42115");
-            }
-        }
-        
         /// <summary>
         /// environment getter/setter
         /// </summary>
@@ -275,10 +132,10 @@ namespace DocumentAPI
         /// String compare made easier to use and read...
         /// Note that this always uses CultureInfo.InvariantCulture
         /// </summary>
-        /// <param name="s1"></param>
-        /// <param name="s2"></param>
-        /// <param name="ignoreCase"></param>
-        /// <returns></returns>
+        /// <param name="s1">string 1 - the "this" parameter</param>
+        /// <param name="s2">the string to compare "this" too</param>
+        /// <param name="ignoreCase">true to ignore case</param>
+        /// <returns>true if string matches</returns>
         public static bool IsEquivalent(this string s1, 
                                         string s2, 
                                         bool ignoreCase = true)
@@ -292,52 +149,13 @@ namespace DocumentAPI
         /// <summary>
         /// make a default initialized SpatialLineZone
         /// </summary>
-        /// <returns></returns>
+        /// <returns>a default SpatialLineZone</returns>
         public static SpatialLineZone MakeDefaultSpatialLineZone()
         {
             return new SpatialLineZone()
             {
                 PageNumber = -1
             };
-        }
-
-        /// <summary>
-        /// TODO - remove this...
-        /// A place to hold the attribute set name - this is temporary until workflows are implemented...
-        /// </summary>
-        public static string AttributeSetName
-        {
-            get
-            {
-                Contract.Assert(!String.IsNullOrEmpty(_attributeSetName), "AttributeSetName is empty");
-                return _attributeSetName;
-            }
-
-            set
-            {
-                Contract.Assert(!String.IsNullOrEmpty(value), "AttributeSetName cannot be set to empty");
-                _attributeSetName = value;
-                Log.WriteLine(Inv($"resetting attributesetName to: {value}"), "ELI42116");
-            }
-        }
-
-        /// <summary>
-        /// the default workflow value - currently only the web server has a "default" workflow, the workflow
-        /// it has been statically configured to use through the configuration input file.
-        /// </summary>
-        public static string DefaultWorkflow
-        {
-            get
-            {
-                Contract.Assert(!String.IsNullOrEmpty(_defaultWorkflow), "DefaultWorkflow is empty");
-                return _defaultWorkflow;
-            }
-            set
-            {
-                Contract.Assert(!String.IsNullOrEmpty(value), "DefaultWorkflow cannot be set to empty");
-                _defaultWorkflow = value;
-                Log.WriteLine(Inv($"resetting default workflow to: {value}"), "ELI42117");
-            }
         }
 
         /// <summary>
@@ -348,18 +166,17 @@ namespace DocumentAPI
         /// <param name="message">empty, or error message</param>
         /// <param name="code">error code value, 0 (no error) or -1 (error)</param>
         /// <param name="submitType">file or text submission type</param>
-        /// <returns></returns>
+        /// <returns>completed DocumentSubmitResult object</returns>
         public static DocumentSubmitResult MakeDocumentSubmitResult(int fileId, 
                                                                     bool isError = false, 
                                                                     string message = "", 
                                                                     int code = 0,
                                                                     DocumentSubmitType submitType = DocumentSubmitType.File)
         {
-            var errorInfo = MakeError(isError: isError, message: message, code: code);
             DocumentSubmitResult result = new DocumentSubmitResult()
             {
                 Id = Enum.GetName(typeof(DocumentSubmitType), submitType) + fileId.ToString(),
-                Error = errorInfo
+                Error = MakeError(isError: isError, message: message, code: code)
             };
 
             return result;
@@ -372,7 +189,7 @@ namespace DocumentAPI
         /// <param name="isError">true if error, false otherwise, defaults to false</param>
         /// <param name="message">error message, defaults to empty</param>
         /// <param name="code">error code, defaults to zero (no error)</param>
-        /// <returns></returns>
+        /// <returns>completed ProcessingStatus object</returns>
         public static ProcessingStatus MakeProcessingStatus(DocumentProcessingStatus status,
                                                             bool isError = false,
                                                             string message = "",
@@ -399,11 +216,86 @@ namespace DocumentAPI
         /// returns the method name of the caller - do NOT set the default argument!
         /// </summary>
         /// <param name="caller">do not set this!</param>
-        /// <returns></returns>
+        /// <returns>the method name of the caller</returns>
         public static string GetMethodName([CallerMemberName] string caller = null)
         {
             return caller;
         }
 
+        /// <summary>
+        /// makes a TextResult object
+        /// </summary>
+        /// <param name="text">text of the TextResult</param>
+        /// <param name="isError">true if error</param>
+        /// <param name="errorMessage">error message</param>
+        /// <returns>completed TextResult object</returns>
+        public static TextResult MakeTextResult(string text, bool isError = false, string errorMessage = "")
+        {
+            return new TextResult
+            {
+                Text = text,
+                Error = MakeError(isError, errorMessage, isError == true ? -1 : 0)
+            };
+        }
+
+        /// <summary>
+        /// get the current api context
+        /// </summary>
+        public static ApiContext CurrentApiContext
+        {
+            get
+            {
+                lock (_apiContextLock)
+                {
+                    Contract.Assert(_currentApiContext != null, "Default API context is not set");
+                    return _currentApiContext;
+                }
+            }
+        }
+
+        /// <summary>
+        /// set the default API context instance
+        /// </summary>
+        /// <param name="databaseServerName">database server name</param>
+        /// <param name="databaseName">database name</param>
+        /// <param name="workflowName">workflow name</param>
+        public static void SetCurrentApiContext(string databaseServerName, string databaseName, string workflowName)
+        {
+            try
+            {
+                lock (_apiContextLock)
+                {
+                    _currentApiContext = new ApiContext(databaseServerName, databaseName, workflowName);
+                    FileApiMgr.MakeInterface(_currentApiContext);
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI42161");
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// set the default API context instance - an overload of above for convenience
+        /// NOTE: this overload is used only by nunit tests currently
+        /// </summary>
+        /// <param name="apiContext"></param>
+        public static void SetCurrentApiContext(ApiContext apiContext)
+        {
+            try
+            {
+                lock (_apiContextLock)
+                {
+                    _currentApiContext = apiContext;
+                    FileApiMgr.MakeInterface(apiContext);
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI42165");
+                throw ee;
+            }
+        }
     }
 }

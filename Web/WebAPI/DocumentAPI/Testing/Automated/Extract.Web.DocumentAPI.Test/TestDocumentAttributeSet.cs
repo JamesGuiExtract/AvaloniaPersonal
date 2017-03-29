@@ -1,8 +1,7 @@
-﻿using DocumentAPI;
+﻿using AttributeDbMgrComponentsLib;
+using DocumentAPI;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
-using IO.Swagger.Api;
-using IO.Swagger.Model;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -13,6 +12,9 @@ using System.Xml;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
+
+using ApiUtils = DocumentAPI.Utils;
+using DocumentAPI.Models;
 
 namespace Extract.Web.DocumentAPI.Test
 {
@@ -63,7 +65,7 @@ namespace Extract.Web.DocumentAPI.Test
         static Dictionary<int, FileInfo> LabDEFileIdToFileInfo = new Dictionary<int, FileInfo>
         {
             {1, new FileInfo {XmlFile = "Resources.A418.tif.restored.xml", DatabaseName = DbLabDE, AttributeSetName = "DataFoundByRules" } },
-            {11, new FileInfo {XmlFile = "Resources.K151.tif.restored.xml", DatabaseName = DbLabDE, AttributeSetName = "DataFoundByRules" } }
+            {12, new FileInfo {XmlFile = "Resources.K151.tif.restored.xml", DatabaseName = DbLabDE, AttributeSetName = "DataFoundByRules" } }
         };
 
         static Dictionary<int, FileInfo> IDShieldFileIdToFileInfo = new Dictionary<int, FileInfo>
@@ -111,11 +113,7 @@ namespace Extract.Web.DocumentAPI.Test
         /// </summary>
         static FAMTestDBManager<TestDocumentAttributeSet> _testDbManager;
 
-        /// <summary>
-        /// If this test invokes the web service, then on tear down this flag is used to signal that
-        /// condition and shut down the service.
-        /// </summary>
-        static bool documentAPIInvoked;
+        static string _currentDatabaseName;
 
         #endregion Fields
 
@@ -130,8 +128,6 @@ namespace Extract.Web.DocumentAPI.Test
 
             _testDbManager = new FAMTestDBManager<TestDocumentAttributeSet>();
             _testXmlFiles = new TestFileManager<TestDocumentAttributeSet>();
-
-            documentAPIInvoked = Utils.StartWebServer(workingDirectory: Utils.GetWebApiFolder, webApiURL: Utils.WebApiURL);
         }
 
         /// <summary>
@@ -140,19 +136,6 @@ namespace Extract.Web.DocumentAPI.Test
         [TestFixtureTearDown]
         public static void FinalCleanup()
         {
-            try
-            {
-                if (documentAPIInvoked)
-                {
-                    Utils.ShutdownWebServer(args: "/f /im DocumentAPI.exe");
-                    documentAPIInvoked = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Exception ending WebAPI: {0}", ex.Message);
-            }
-
             if (_testDbManager != null)
             {
                 _testDbManager.Dispose();
@@ -187,7 +170,8 @@ namespace Extract.Web.DocumentAPI.Test
                 var attr = new AttributeClass { Name = "Manual", Value = ss };
                 voa.PushBack(attr);
 
-                var docAttrr = AttributeMapper.MapAttributesToDocumentAttributeSet(voa);
+                var mapper = new AttributeMapper(voa, UCLID_FILEPROCESSINGLib.EWorkflowType.kExtraction);
+                var docAttrr = mapper.MapAttributesToDocumentAttributeSet();
                 Assert.AreEqual(0, docAttrr.Attributes.Where(a =>
                     a.SpatialPosition.Pages.Count != a.SpatialPosition.Pages.Distinct().Count()).Count());
             }
@@ -204,6 +188,7 @@ namespace Extract.Web.DocumentAPI.Test
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+                _currentDatabaseName = DbLabDE;
 
                 foreach (var kvpFileInfo in LabDEFileIdToFileInfo)
                 {
@@ -220,7 +205,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {                
-                _testDbManager.RemoveDatabase("Resources.Demo_LabDE.bak");
+                _testDbManager.RemoveDatabase(DbLabDE);
             }
         }
 
@@ -233,6 +218,7 @@ namespace Extract.Web.DocumentAPI.Test
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_IDShield.bak", DbIDShield);
+                _currentDatabaseName = DbIDShield;
 
                 foreach (var kvpFileInfo in IDShieldFileIdToFileInfo)
                 {
@@ -249,7 +235,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase("Resources.Demo_IDShield.bak");
+                _testDbManager.RemoveDatabase(DbIDShield);
             }
         }
 
@@ -262,6 +248,7 @@ namespace Extract.Web.DocumentAPI.Test
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_FlexIndex.bak", DbFlexIndex);
+                _currentDatabaseName = DbFlexIndex;
 
                 foreach (var kvpFileInfo in FlexIndexFileIdToFileInfo)
                 {
@@ -278,7 +265,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase("Resources.Demo_FlexIndex.bak");
+                _testDbManager.RemoveDatabase(DbFlexIndex);
             }
         }
 
@@ -288,59 +275,32 @@ namespace Extract.Web.DocumentAPI.Test
 
         static DocumentAttributeSet GetDocumentResultSet(int fileId)
         {
+            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
+
             try
             {
-                Assert.IsFalse(String.IsNullOrEmpty(Utils.WebApiURL));
-                var document = new DocumentApi(Utils.WebApiURL);
-                return document.ApiDocumentGetResultSetByIdGet(fileId.ToString());
+                var c = Utils.SetDefaultApiContext(_currentDatabaseName);
+                var inf = FileApiMgr.GetInterface(c);
+                inf.InUse = false;
+                db = inf.Interface;
+
+                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                {
+                    Assert.IsTrue(data != null, "null DocumentData reference");
+                    return data.GetDocumentResultSet(fileId.ToString());
+                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
                 throw;
             }
-        }
-
-        static void SetDatabase(string dbName)
-        {
-            try
+            finally
             {
-                Assert.IsFalse(String.IsNullOrEmpty(Utils.WebApiURL));
-                var dbApi = new IO.Swagger.Api.DatabaseApi(basePath: Utils.WebApiURL);
-                dbApi.ApiDatabaseSetDatabaseNameByIdPost(id: dbName);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                db.CloseAllDBConnections();
             }
         }
 
-        static void SetDatabaseServer()
-        {
-            try
-            {
-                var dbApi = new IO.Swagger.Api.DatabaseApi(basePath: Utils.WebApiURL);
-                dbApi.ApiDatabaseSetDatabaseServerByIdPost(id: "(local)");
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
-            }
-        }
-
-        static void SetAttributeSetName(string name)
-        {
-            try
-            {
-                Assert.IsFalse(String.IsNullOrEmpty(Utils.WebApiURL));
-                var testApi = new TestApi(basePath: Utils.WebApiURL);
-                testApi.ApiTestSetAttributeSetNamePost(new TestArgs() { Name = name });
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
-            }
-        }
 
         static void AssertSame(string xmlName, string xmlValue, string attrName, string attrValue)
         {
@@ -634,15 +594,12 @@ namespace Extract.Web.DocumentAPI.Test
             return true;
         }
 
-
         static bool TestFile(int fileId, string dbName, string xmlFile, string attributeSetName)
         {
             try
             {
-                SetDatabaseServer();
-                SetDatabase(dbName);
-                SetAttributeSetName(attributeSetName);
                 DocumentAttributeSet das = GetDocumentResultSet(fileId);
+                Assert.IsTrue(das.Attributes != null, "Didn't get attributes");
 
                 string testXmlFile = _testXmlFiles.GetFile(xmlFile);
                 Assert.That(File.Exists(testXmlFile));
@@ -655,7 +612,6 @@ namespace Extract.Web.DocumentAPI.Test
                 return false;
             }
         }
-
 
         #endregion Private functions
     }
