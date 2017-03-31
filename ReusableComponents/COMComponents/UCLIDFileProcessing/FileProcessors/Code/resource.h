@@ -170,6 +170,8 @@
 #define IDC_EDIT_DOCUMENT_NAME          312
 #define IDC_RADIO_QUEUE_FILE            313
 #define IDC_RADIO_REPORT_ERROR          314
+#define IDC_COMBO_WORKFLOW              316
+#define IDC_STATIC_WORKFLOW             317
 
 // Next default values for new objects
 // 
@@ -177,7 +179,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        155
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         315
+#define _APS_NEXT_CONTROL_VALUE         318
 #define _APS_NEXT_SYMED_VALUE           145
 #endif
 #endif

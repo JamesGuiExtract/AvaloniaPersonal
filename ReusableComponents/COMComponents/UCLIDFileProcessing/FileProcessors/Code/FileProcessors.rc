@@ -90,27 +90,49 @@ END
 //
 
 IDR_OCRFILEPROCESSOR    REGISTRY                "OCRFileProcessor.rgs"
+
 IDR_OCRFILEPROCESSORPP  REGISTRY                "OCRFileProcessorPP.rgs"
+
 IDR_COPYMOVEDELETEFILEPROCESSOR REGISTRY                "CopyMoveDeleteFileProcessor.rgs"
+
 IDR_COPYMOVEDELETEFILEPROCESSORPP REGISTRY                "CopyMoveDeleteFileProcessorPP.rgs"
+
 IDR_LAUNCHAPPFILEPROCESSOR REGISTRY                "LaunchAppFileProcessor.rgs"
+
 IDR_LAUNCHAPPFILEPROCESSORPP REGISTRY                "LaunchAppFileProcessorPP.rgs"
+
 IDR_SETACTIONSTATUSFILEPROCESSOR REGISTRY                "SetActionStatusFileProcessor.rgs"
+
 IDR_SETACTIONSTATUSFILEPROCESSORPP REGISTRY                "SetActionStatusFileProcessorPP.rgs"
+
 IDR_CONDITIONALTASK     REGISTRY                "ConditionalTask.rgs"
+
 IDR_CONDITIONALTASKPP   REGISTRY                "ConditionalTaskPP.rgs"
+
 IDR_CLEANUPIMAGEFILEPROCESSOR REGISTRY                "CleanupImageFileProcessor.rgs"
+
 IDR_CLEANUPIMAGEFILEPROCESSORPP REGISTRY                "CleanupImageFileProcessorPP.rgs"
+
 IDR_CONVERT_TO_PDF_TASK REGISTRY                "ConvertToPDFTask.rgs"
+
 IDR_PROPPAGE_CONVERT_TO_PDF_TASK REGISTRY                "ConvertToPDFTaskPP.rgs"
+
 IDR_ADD_WATERMARK_TASK  REGISTRY                "AddWatermarkTask.rgs"
+
 IDR_ADD_WATERMARK_TASKPP REGISTRY                "AddWatermarkTaskPP.rgs"
+
 IDR_ARCHIVE_RESTORE_TASK REGISTRY                "ArchiveRestoreTask.rgs"
+
 IDR_ARCHIVE_RESTORE_TASKPP REGISTRY                "ArchiveRestoreTaskPP.rgs"
+
 IDR_MANAGE_TAGS_TASK    REGISTRY                "ManageTagsTask.rgs"
+
 IDR_MANAGE_TAGS_TASKPP  REGISTRY                "ManageTagsTaskPP.rgs"
+
 IDR_SLEEP_TASK          REGISTRY                "SleepTask.rgs"
+
 IDR_SLEEP_TASKPP        REGISTRY                "SleepTaskPP.rgs"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -192,23 +214,25 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,105,168,10
 END
 
-IDD_SETACTIONSTATUSFILEPROCESSORPP DIALOGEX 0, 0, 350, 104
+IDD_SETACTIONSTATUSFILEPROCESSORPP DIALOGEX 0, 0, 350, 126
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     LTEXT           "For the file",IDC_STATIC,6,5,66,9
-    EDITTEXT        IDC_EDIT_DOCUMENT_NAME,6,17,300,14,ES_AUTOHSCROLL
-    PUSHBUTTON      ">",IDC_BTN_DOCUMENT_TAG,309,17,10,14,BS_ICON
-    PUSHBUTTON      "...",IDC_BTN_FILE_SELECTOR,322,17,17,14,BS_ICON
-    LTEXT           "Set the status of the action",IDC_STATIC,6,39,90,9
-    COMBOBOX        IDC_COMBO_ACTION,96,38,150,68,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      ">",IDC_BTN_ACTION_TAG,250,37,10,14,BS_ICON
-    LTEXT           "to",IDC_STATIC,263,40,8,9
-    COMBOBOX        IDC_COMBO_STATUS,273,38,66,66,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "If the file does not exist in the database:",IDC_STATIC,6,55,333,43
-    CONTROL         "Report an error",IDC_RADIO_REPORT_ERROR,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,17,68,78,10
-    CONTROL         "Queue the file",IDC_RADIO_QUEUE_FILE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,17,82,90,10
+    EDITTEXT        IDC_EDIT_DOCUMENT_NAME,6,17,304,14,ES_AUTOHSCROLL
+    PUSHBUTTON      ">",IDC_BTN_DOCUMENT_TAG,312,17,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_FILE_SELECTOR,324,17,17,14,BS_ICON
+    LTEXT           "In the workflow",IDC_STATIC_WORKFLOW,7,40,49,8
+    COMBOBOX        IDC_COMBO_WORKFLOW,58,37,283,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Set the status of the action",IDC_STATIC,7,57,90,9
+    COMBOBOX        IDC_COMBO_ACTION,97,56,150,68,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      ">",IDC_BTN_ACTION_TAG,251,55,10,14,BS_ICON
+    LTEXT           "to",IDC_STATIC,265,57,8,9
+    COMBOBOX        IDC_COMBO_STATUS,275,56,66,66,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "If the file does not exist in the database:",IDC_STATIC,7,75,333,43
+    CONTROL         "Report an error",IDC_RADIO_REPORT_ERROR,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,89,78,10
+    CONTROL         "Queue the file",IDC_RADIO_QUEUE_FILE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,103,90,10
 END
 
 IDD_CONDITIONALTASKPP DIALOGEX 0, 0, 256, 254
@@ -360,9 +384,13 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
+
 IDI_ICON_UP             ICON                    "..\\..\\Code\\res\\icon_up.ico"
+
 IDI_ICON_DOWN           ICON                    "..\\..\\Code\\res\\icon_down.ico"
+
 IDI_ICON_INFO           ICON                    "..\\..\\..\\..\\BaseUtils\\Code\\res\\icon_info_middle.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -395,7 +423,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 344
         TOPMARGIN, 5
-        BOTTOMMARGIN, 97
+        BOTTOMMARGIN, 119
     END
 
     IDD_CONDITIONALTASKPP, DIALOG
@@ -444,6 +472,17 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Cancel",                      IDC_CONTEXT_CANCEL
     END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SETACTIONSTATUSFILEPROCESSORPP AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 

@@ -1270,7 +1270,14 @@ STDMETHODIMP CFileProcessingManager::RefreshDBSettings()
 	{
 		refreshDatabaseSettings();
 		m_ipFPMDB->ResetDBConnection(VARIANT_FALSE);
-		m_ipFPMDB->ActiveWorkflow = m_strActiveWorkflow.c_str();
+		if (m_strActiveWorkflow == gstrALL_WORKFLOWS)
+		{
+			m_ipFPMDB->ActiveWorkflow = "";
+		}
+		else
+		{
+			m_ipFPMDB->ActiveWorkflow = m_strActiveWorkflow.c_str();
+		}
 				
 		return S_OK;
 	}

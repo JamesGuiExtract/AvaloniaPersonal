@@ -41,8 +41,9 @@ public:
         COMMAND_HANDLER(IDC_BTN_ACTION_TAG, BN_CLICKED, OnClickedBtnActionTag)
         COMMAND_HANDLER(IDC_BTN_DOCUMENT_TAG, BN_CLICKED, OnBnClickedBtnDocumentTag)
         COMMAND_HANDLER(IDC_BTN_FILE_SELECTOR, BN_CLICKED, OnBnClickedBtnFileSelector)
+		COMMAND_HANDLER(IDC_COMBO_WORKFLOW, CBN_SELENDOK, OnCbnSelendokComboWorkflow)
         REFLECT_NOTIFICATIONS()
-    END_MSG_MAP()
+	END_MSG_MAP()
 
     // IPropertyPage
     STDMETHOD(Apply)(void);
@@ -55,13 +56,19 @@ private:
 
     LRESULT OnBnClickedBtnDocumentTag(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
     LRESULT OnBnClickedBtnFileSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnCbnSelendokComboWorkflow(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
     // Gets the user-specified name of the action
     string getActionName();
     string GetDocumentName();
 
+	void loadActionCombo(string strActionName);
+
     // Action name selection
     DWORD m_dwActionSel;
+
+	// Workflow selection
+	DWORD m_dwWorkflowSel;
 
     // UI controls
     ATLControls::CComboBox m_cmbActionName;
@@ -76,6 +83,11 @@ private:
 
     ATLControls::CButton m_radioBtnReportError;
     ATLControls::CButton m_radioBtnQueueFiles;
+
+	ATLControls::CComboBox m_cmbWorkflow;
+
+	// This will be created using the ConnectLastUsedDBThisProcess
+	IFileProcessingDBPtr m_ipFAMDB;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(SetActionStatusFileProcessorPP), CSetActionStatusFileProcessorPP)

@@ -8,12 +8,14 @@
 #include <cpputil.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <FAMUtilsConstants.h>
 
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
 // static const long gnCURRENT_VERSION = 1;     -- original version
-static const long gnCURRENT_VERSION = 2;        // updated 8/12/2015 - added document name
+//static const long gnCURRENT_VERSION = 2;        // updated 8/12/2015 - added document name
+static const long gnCURRENT_VERSION = 3;        // Added workflow
 static const long gnVERSION_2 = 2;
 
 const std::string strSOURCE_DOC_NAME_TAG = "<SourceDocName>";
@@ -26,7 +28,8 @@ m_bDirty(false),
 m_eActionStatus(kActionPending), 
 m_strActionName(""),
 m_documentName(strSOURCE_DOC_NAME_TAG),
-m_reportErrorWhenFileNotQueued(true)
+m_reportErrorWhenFileNotQueued(true),
+m_strWorkflow(gstrCURRENT_WORKFLOW)
 {
     try
     {
@@ -251,7 +254,41 @@ STDMETHODIMP CSetActionStatusFileProcessor::put_ReportErrorWhenFileNotQueued(VAR
     return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSetActionStatusFileProcessor::get_Workflow(BSTR *pbstrRetVal)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
+    try
+    {
+        // Check license
+        validateLicense();
+
+        *pbstrRetVal = _bstr_t(m_strWorkflow.c_str()).Detach();
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42125");
+
+    return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSetActionStatusFileProcessor::put_Workflow(BSTR bstrNewVal)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+    try 
+    {
+        // Check license
+        validateLicense();
+
+        // update action name
+		m_strWorkflow = asString(bstrNewVal);
+
+        // set dirty flag to true
+        m_bDirty = true;
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42127");
+
+    return S_OK;
+}
 
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTask
@@ -292,6 +329,18 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 
         IFileRecordPtr ipFileRecord(pFileRecord);
         ASSERT_ARGUMENT("ELI31342", ipFileRecord != __nullptr);
+
+		long nWorkflowId = ipFileRecord->WorkflowID;
+		
+		// Set the target workflow
+		if (m_strWorkflow != gstrCURRENT_WORKFLOW)
+		{
+			string strWorkflow = m_strWorkflow;
+
+			// Get the workflow id
+			IStrToStrMapPtr ipWorkflows = ipDB->GetWorkflows();
+			nWorkflowId = asLong(ipWorkflows->GetValue(get_bstr_t(strWorkflow)));
+		}
 
         // Default to successful completion
         *pResult = kProcessingSuccessful;
@@ -347,7 +396,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 					// double-catch-pattern to identify the actual target filename
 					// in the error report - see the addDebugInfo() below.
 					VARIANT_BOOL bAlreadyExists = VARIANT_FALSE;
-					ipDB->AddFile(comFileName, strActionName.c_str(), ipFileRecord->WorkflowID, kPriorityDefault,
+					ipDB->AddFile(comFileName, strActionName.c_str(), nWorkflowId, kPriorityDefault,
 						VARIANT_TRUE, VARIANT_FALSE, m_eActionStatus, VARIANT_FALSE, &bAlreadyExists,
 						&ePrevStatus);
 				}
@@ -364,7 +413,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 			// Pass VARIANT_TRUE for vbQueueChangeIfProcessing so that if the file is currently
 			// processing, an action status change is queued up so that once processing is
 			// finished, m_eActionStatus will be applied at that time. 
-			ipDB->SetStatusForFile(nFileID, strActionName.c_str(), ipFileRecord->WorkflowID,
+			ipDB->SetStatusForFile(nFileID, strActionName.c_str(), nWorkflowId,
 				m_eActionStatus, VARIANT_TRUE, VARIANT_FALSE, &ePrevStatus);
 		}
     }
@@ -515,6 +564,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_CopyFrom(IUnknown *pObject)
 
         m_documentName = ipCopyFrom->DocumentName;
         m_reportErrorWhenFileNotQueued = asCppBool(ipCopyFrom->ReportErrorWhenFileNotQueued);
+		m_strWorkflow = asString(ipCopyFrom->Workflow);
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15108");
 
@@ -616,6 +666,12 @@ STDMETHODIMP CSetActionStatusFileProcessor::Load(IStream *pStream)
             dataReader >> m_reportErrorWhenFileNotQueued;
         }
 
+		// Read the workflow
+		if (nDataVersion >= 3)
+		{
+			dataReader >> m_strWorkflow;
+		}
+
         // Clear the dirty flag as we've loaded a fresh object
         m_bDirty = false;
     }
@@ -644,6 +700,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::Save(IStream *pStream, BOOL fClearDi
 
         dataWriter << m_documentName;
         dataWriter << m_reportErrorWhenFileNotQueued;
+		dataWriter << m_strWorkflow;
 
         dataWriter.flushToByteStream();
 
@@ -706,6 +763,7 @@ void CSetActionStatusFileProcessor::ResetMemberVariables()
 	m_strActionName = "";
 	m_documentName = strSOURCE_DOC_NAME_TAG;
 	m_reportErrorWhenFileNotQueued = true;
+	m_strWorkflow = gstrCURRENT_WORKFLOW;
 }
 
 

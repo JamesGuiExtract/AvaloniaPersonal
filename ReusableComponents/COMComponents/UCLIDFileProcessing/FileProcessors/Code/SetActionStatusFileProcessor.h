@@ -71,6 +71,8 @@ public:
     STDMETHOD(put_DocumentName)(/*[in]*/ BSTR bstrNewVal);
     STDMETHOD(get_ReportErrorWhenFileNotQueued)(/*[out, retval]*/ VARIANT_BOOL* pbVal);
     STDMETHOD(put_ReportErrorWhenFileNotQueued)(/*[in]*/ VARIANT_BOOL bVal);
+	STDMETHOD(get_Workflow)(/*[out, retval]*/ BSTR *pbVal);
+	STDMETHOD(put_Workflow)(/*[in]*/ BSTR bVal);
 
 // IFileProcessingTask
     STDMETHOD(raw_Init)(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB *pDB,
@@ -117,6 +119,9 @@ private:
     std::string m_documentName;
 
     bool m_reportErrorWhenFileNotQueued;
+
+	// This has the current workflow to use - could have the value <Current Workflow>
+	std::string m_strWorkflow;
 
     // method to validate license
     void validateLicense();

@@ -7,6 +7,7 @@
 #include <UCLIDException.h>
 #include <COMUtils.h>
 #include <DocTagUtils.h>
+#include <FAMUtilsConstants.h>
 
 // other constants
 const int giNUM_VALID_STATUSES = 5;
@@ -21,7 +22,8 @@ extern const char* gpszPDF_FILE_EXTS;
 // CSetActionStatusFileProcessorPP
 //-------------------------------------------------------------------------------------------------
 CSetActionStatusFileProcessorPP::CSetActionStatusFileProcessorPP(): 
-m_dwActionSel(0)
+m_dwActionSel(0),
+m_dwWorkflowSel(0)
 {
     try
     {
@@ -106,9 +108,27 @@ STDMETHODIMP CSetActionStatusFileProcessorPP::Apply()
 
             ipFP->ActionStatus = gVALID_ACTION_STATUSES[iActionStatusIndex];
 
-            // apply radiobuttons setting
+            // apply radio buttons setting
             bool reportError = BST_CHECKED == m_radioBtnReportError.GetCheck();
             ipFP->ReportErrorWhenFileNotQueued = asVariantBool(reportError);
+
+			// Set the workflow in the database
+			int index = m_cmbWorkflow.GetCurSel();
+			if (index > 0)
+			{
+				CString zValue;
+				m_cmbWorkflow.GetWindowText(zValue);
+				ipFP->Workflow = (LPCSTR)zValue;
+				if (MessageBox("Workflow is set to something other than <Current workflow>. Are you sure?",
+					"Workflow configuration", MB_YESNO | MB_ICONQUESTION) == IDNO)
+				{
+					return S_FALSE;
+				}
+			}
+			else
+			{
+				ipFP->Workflow = "";
+			}
         }
 
         SetDirty(FALSE);
@@ -130,7 +150,7 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 
     try
     {
-        // get the underlying objet
+        // get the underlying object
         UCLID_FILEPROCESSORSLib::ISetActionStatusFileProcessorPtr ipSetActionStatusFP = m_ppUnk[0];
 
         if (ipSetActionStatusFP != __nullptr)
@@ -178,56 +198,23 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
             IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
             ASSERT_RESOURCE_ALLOCATION("ELI34523", ipFAMDBUtils != __nullptr);
     
-            IFileProcessingDBPtr ipDB(ipFAMDBUtils->GetFAMDBProgId().operator LPCSTR());
-            ASSERT_RESOURCE_ALLOCATION("ELI15131", ipDB != __nullptr);
+			m_ipFAMDB.CreateInstance(CLSID_FileProcessingDB);
+            ASSERT_RESOURCE_ALLOCATION("ELI15131", m_ipFAMDB != __nullptr);
 
             // Connect database using last used settings in this instance
-            ipDB->ConnectLastUsedDBThisProcess();
+			m_ipFAMDB->ConnectLastUsedDBThisProcess();
 
-            // add entries to the combo box for actions
-            IStrToStrMapPtr ipActionIDToNameMap = ipDB->GetActions();
-            ASSERT_RESOURCE_ALLOCATION("ELI15132", ipActionIDToNameMap != __nullptr);
-
-            long lSize = ipActionIDToNameMap->Size;
-            for (long i = 0; i < lSize; i++)
-            {
-                CComBSTR bstrKey, bstrValue;
-                ipActionIDToNameMap->GetKeyValue(i, &bstrKey, &bstrValue);
-                m_cmbActionName.AddString(asString(bstrKey).c_str());
-            }
-
-            // Ensure at least one action exists
-            if(m_cmbActionName.GetCount() > 0)
-            {
-                // Check if an action has been specified.
-                if(strActionName.empty())
-                {
-                    // No action was specified. Select the first action by default.
-                    m_cmbActionName.SetCurSel(0);
-                }
-                else
-                {
-                    // An action was specified. Find it by name from the list. [P13 #4967]
-                    int iIndex = m_cmbActionName.FindStringExact(-1, strActionName.c_str());
-                    if(iIndex == CB_ERR)
-                    {
-                        m_cmbActionName.SetWindowText(strActionName.c_str());
-
-                        if (strActionName.find('$') == string::npos)
-                        {
-                            // If the action is not found, display an error message. [P13 #4966] 
-                            MessageBox(
-                                ("Action not found: " + strActionName + ". Please specify a new action.").c_str(), 
-                                "Error", MB_OK | MB_ICONEXCLAMATION);
-                        }
-                    }
-                    else
-                    {
-                        // Select the current action.
-                        m_cmbActionName.SetCurSel(iIndex);
-                    }
-                }
-            }
+			// Set the workflow on this database - this will cause the actions to be retrieved for the
+			// the current workflow
+			string strWorkflow = asString(ipSetActionStatusFP->Workflow);
+			if (strWorkflow == gstrCURRENT_WORKFLOW)
+			{
+				m_ipFAMDB->ActiveWorkflow = "";
+			}
+			else
+			{
+				m_ipFAMDB->ActiveWorkflow = ipSetActionStatusFP->Workflow;
+			}
 
             // select the action status associated with this object, or select "Pending"
             // as the default
@@ -235,6 +222,44 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
             {
                 m_cmbActionStatus.SetCurSel(iDefaultActionStatusIndex);
             }
+
+			// Set up workflow
+			m_cmbWorkflow = GetDlgItem(IDC_COMBO_WORKFLOW);
+
+			// add entries to the combo box for workflow
+			IStrToStrMapPtr ipWorkflowIDToNameMap = m_ipFAMDB->GetWorkflows();
+			ASSERT_RESOURCE_ALLOCATION("ELI15132", ipWorkflowIDToNameMap != __nullptr);
+
+			long lSize = ipWorkflowIDToNameMap->Size;
+			for (long i = 0; i < lSize; i++)
+			{
+				CComBSTR bstrKey, bstrValue;
+				ipWorkflowIDToNameMap->GetKeyValue(i, &bstrKey, &bstrValue);
+				int index = m_cmbWorkflow.AddString(asString(bstrKey).c_str());
+				m_cmbWorkflow.SetDlgItemInt(index, asLong(asString(bstrValue)));
+			}
+
+			if (lSize > 0)
+			{
+				m_cmbWorkflow.InsertString(0, gstrCURRENT_WORKFLOW.c_str());
+				if (strWorkflow.empty())
+				{
+					m_cmbWorkflow.SetCurSel(0);
+				}
+				else
+				{
+					int iIndex = m_cmbWorkflow.FindStringExact(-1, strWorkflow.c_str());
+					m_cmbWorkflow.SetCurSel(iIndex);
+				}
+			}
+			else
+			{
+				// Disable the workflow items since they are not defined in the database
+				m_cmbWorkflow.EnableWindow(FALSE);
+				ATLControls::CStatic workflowLabel = GetDlgItem(IDC_STATIC_WORKFLOW);
+				workflowLabel.EnableWindow(FALSE);
+			}
+			loadActionCombo(strActionName);
 
             // Setup radio buttons - "If the file does not exist in the database:"
             // * Report an error - default
@@ -351,4 +376,80 @@ LRESULT CSetActionStatusFileProcessorPP::OnBnClickedBtnFileSelector(WORD /*wNoti
     CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38448");
 
     return 0;
+}
+
+
+LRESULT CSetActionStatusFileProcessorPP::OnCbnSelendokComboWorkflow(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	try
+	{
+		// Set the workflow in the database
+		int index = m_cmbWorkflow.GetCurSel();
+		if (index > 0)
+		{
+			CString zValue;
+			m_cmbWorkflow.GetWindowText(zValue);
+			m_ipFAMDB->ActiveWorkflow = (LPCSTR)zValue;
+		}
+		else
+		{
+			m_ipFAMDB->ActiveWorkflow = "";
+		}
+
+		// Get the current selection 
+		loadActionCombo(getActionName());
+		return 0;
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42128");
+
+}
+
+void CSetActionStatusFileProcessorPP::loadActionCombo(string strActionName)
+{
+	m_cmbActionName.ResetContent();
+
+	// add entries to the combo box for actions
+	IStrToStrMapPtr ipActionIDToNameMap = m_ipFAMDB->GetActions();
+	ASSERT_RESOURCE_ALLOCATION("ELI15132", ipActionIDToNameMap != __nullptr);
+
+	long lSize = ipActionIDToNameMap->Size;
+	for (long i = 0; i < lSize; i++)
+	{
+		CComBSTR bstrKey, bstrValue;
+		ipActionIDToNameMap->GetKeyValue(i, &bstrKey, &bstrValue);
+		m_cmbActionName.AddString(asString(bstrKey).c_str());
+	}
+
+	// Ensure at least one action exists
+	if (m_cmbActionName.GetCount() > 0)
+	{
+		// Check if an action has been specified.
+		if (strActionName.empty())
+		{
+			// No action was specified. Select the first action by default.
+			m_cmbActionName.SetCurSel(0);
+		}
+		else
+		{
+			// An action was specified. Find it by name from the list. [P13 #4967]
+			int iIndex = m_cmbActionName.FindStringExact(-1, strActionName.c_str());
+			if (iIndex == CB_ERR)
+			{
+				m_cmbActionName.SetWindowText(strActionName.c_str());
+
+				if (strActionName.find('$') == string::npos)
+				{
+					// If the action is not found, display an error message. [P13 #4966] 
+					MessageBox(
+						("Action not found: " + strActionName + ". Please specify a new action.").c_str(),
+						"Error", MB_OK | MB_ICONEXCLAMATION);
+				}
+			}
+			else
+			{
+				// Select the current action.
+				m_cmbActionName.SetCurSel(iIndex);
+			}
+		}
+	}
 }

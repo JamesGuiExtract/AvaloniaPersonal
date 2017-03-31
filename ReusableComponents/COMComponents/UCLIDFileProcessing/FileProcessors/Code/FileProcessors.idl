@@ -218,6 +218,9 @@ library UCLID_FILEPROCESSORSLib
 
 		[propget, id(4), helpstring("property ReportError")] HRESULT ReportErrorWhenFileNotQueued([out, retval] VARIANT_BOOL *pbVal);
 		[propput, id(4), helpstring("property ReportError")] HRESULT ReportErrorWhenFileNotQueued([in] VARIANT_BOOL bVal);
+		
+		[propget, id(5), helpstring("property Workflow")] HRESULT Workflow([out, retval] BSTR *pstrRetVal);
+		[propput, id(5), helpstring("property Workflow")] HRESULT Workflow([in] BSTR strNewVal);
 	};
 
 	[

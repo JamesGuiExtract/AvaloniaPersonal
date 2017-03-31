@@ -32,7 +32,6 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-   
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -68,6 +67,7 @@
   <ItemGroup>
     <Compile Include="FileProcessingTaskTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestSetActionStatusFileProcessor.cs" />
     <Compile Include="TestValidateXmlTask.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +82,14 @@
     <ProjectReference Include="..\..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
+      <Project>{6b284a4d-132c-4fe4-858f-06a9c476b19b}</Project>
+      <Name>Extract.FileActionManager.Database.Test</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Code\Extract.FileActionManager.FileProcessors.csproj">
       <Project>{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}</Project>
@@ -118,6 +126,15 @@
     </COMReference>
     <COMReference Include="UCLID_FILEPROCESSINGLib">
       <Guid>{5FBC9199-D162-4F14-BAD9-090F6AB576C5}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_FILEPROCESSORSLib">
+      <Guid>{961EB40F-4291-4EB7-B615-FAB2ABD620CE}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
