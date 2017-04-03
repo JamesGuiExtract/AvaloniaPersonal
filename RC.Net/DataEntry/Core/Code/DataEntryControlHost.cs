@@ -6942,6 +6942,14 @@ namespace Extract.DataEntry
             {
                 _attributeToolTips[attribute] = null;
             }
+            else
+            {
+                // Recreate the error icon so that it is based on the attribute
+                // highlight instead of the non-existent tool-tip (this takes care
+                // of the case that a value was deleted without deleting the
+                // highlight spatial info, e.g., by back-spacing)
+                CreateAttributeErrorIcon(attribute, true);
+            }
         }
 
         /// <summary>

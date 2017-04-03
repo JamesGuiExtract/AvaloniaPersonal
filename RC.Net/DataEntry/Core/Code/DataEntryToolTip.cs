@@ -877,7 +877,7 @@ namespace Extract.DataEntry
             /// <see paramref="nextToolTip"/>.</returns>
             int GetSeparation(DataEntryToolTip nextToolTip)
             {
-                return nextToolTip._start - _end - GetErrorIconPadding();
+                return nextToolTip._start - _end - (_horizontal ? GetErrorIconPadding() : 0);
             }
 
             /// <summary>
