@@ -68,12 +68,6 @@
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Extract">
-      <HintPath>..\..\..\..\..\Binaries\Debug\Extract.dll</HintPath>
-    </Reference>
-    <Reference Include="Extract.Licensing">
-      <HintPath>..\..\..\..\..\..\..\..\Engineering\Binaries\Debug\Extract.Licensing.dll</HintPath>
-    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="Microsoft.CSharp" />
@@ -94,6 +88,9 @@
     <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="1.1.0" />
     <PackageReference Include="Swashbuckle" Version="6.0.0-beta902" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Core\Code\Extract.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="app.config">
