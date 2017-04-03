@@ -14,6 +14,56 @@
     <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <COMReference Include="UCLID_FILEPROCESSINGLib.dll">
+      <Guid>5fbc9199-d162-4f14-bad9-090f6ab576c5</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
+    <COMReference Include="AttributeDbMgrComponentsLib.dll">
+      <Guid>0df6db5b-f788-42fc-ae9e-ef19caa78d38</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
+    <COMReference Include="UCLID_AFCORELib.dll">
+      <Guid>69d40760-8162-4822-85d6-c10b02044e9d</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
+    <COMReference Include="UCLID_COMLMLib.dll">
+      <Guid>a71ee8cd-a2c1-4c5b-a593-12ff4931c820</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib.dll">
+      <Guid>fa0a706c-13a8-4bf8-8dc7-9f61dd5a8a14</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib.dll">
+      <Guid>d73f62a5-9e9f-4a65-9690-491af2f77faa</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="wwwroot\" />
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
@@ -23,24 +73,6 @@
     </Reference>
     <Reference Include="Extract.Licensing">
       <HintPath>..\..\..\..\..\..\..\..\Engineering\Binaries\Debug\Extract.Licensing.dll</HintPath>
-    </Reference>
-    <Reference Include="Interop.AttributeDbMgrComponentsLib">
-      <HintPath>..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\obj\Debug\Interop.AttributeDbMgrComponentsLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Interop.UCLID_AFCORELib">
-      <HintPath>..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\obj\Debug\Interop.UCLID_AFCORELib.dll</HintPath>
-    </Reference>
-    <Reference Include="Interop.UCLID_COMLMLib">
-      <HintPath>..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\obj\Debug\Interop.UCLID_COMLMLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Interop.UCLID_COMUTILSLib">
-      <HintPath>..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\obj\Debug\Interop.UCLID_COMUTILSLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Interop.UCLID_FILEPROCESSINGLib">
-      <HintPath>..\..\..\..\..\..\..\..\Engineering\Binaries\Debug\Interop.UCLID_FILEPROCESSINGLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Interop.UCLID_RASTERANDOCRMGMTLib">
-      <HintPath>..\..\..\..\..\Binaries\Debug\Interop.UCLID_RASTERANDOCRMGMTLib.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
