@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Extract.Licensing;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Extract.Utilities
 {
@@ -129,6 +130,18 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Method to deconstruct a <see cref="KeyValuePair{TKey, TValue}"/>.
+        /// This enables more concise iteration over a <see cref="Dictionary{TKey, TValue}"/>,
+        /// e.g., foreach(var (key, value) in dictionary)
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
+        public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> tuple,
+            out TKey key, out TValue value)
+        {
+            key = tuple.Key;
+            value = tuple.Value;
+        }
 
         #endregion Methods
 
