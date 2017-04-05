@@ -338,7 +338,8 @@ namespace Extract.DataCaptureStats
                 MakeContainerAndOtherMaps(statisticsToSummarize.ToList());
 
                 ExtractException.Assert("ELI41529", "There was a container-only/non-container-only conflict for an attribute path",
-                    !throwIfConflict || !_conflictingPaths.Any(), "Conflicting paths", _conflictingPaths);
+                    !throwIfConflict || !_conflictingPaths.Any(), "Conflicting paths",
+                    string.Join(Environment.NewLine, _conflictingPaths));
 
                 var newPaths = new List<AccuracyDetail>();
                 foreach (var path in _containerOnlyPaths.Values.Select(a => a.Path).Concat(Enumerable.Repeat("", 1)))

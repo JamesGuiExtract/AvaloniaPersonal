@@ -193,6 +193,7 @@ namespace Extract.DataCaptureStats.Test
         }
 
         // Non-container-only and container-only result in an exception
+        // Ensure the exception contains useful information about the conflict (i.e., the paths)
         [Test, Category("StatisticsSummarizer")]
         public static void TestContainerXPath1()
         {
@@ -207,7 +208,13 @@ namespace Extract.DataCaptureStats.Test
 
             var result = perFileResults.AggregateStatistics();
 
-            Assert.Throws<ExtractException>(() => result.SummarizeStatistics());
+            var ex = Assert.Throws<ExtractException>(() => result.SummarizeStatistics());
+
+            // Statistics Reporter: Helpful container conflict exception info is hidden
+            // https://extract.atlassian.net/browse/ISSUE-14408_
+            Assert.That(ex.Data.Contains("Conflicting paths"));
+            Assert.That((new List<string>()).GetType().IsSerializable);
+            Assert.AreEqual("Test", ex.Data["Conflicting paths"].AsString());
         }
 
         // Non-container-only and container-only result in asterisks
@@ -248,64 +255,7 @@ namespace Extract.DataCaptureStats.Test
         [Test, Category("StatisticsSummarizer")]
         public static void TestHtmlFormatting()
         {
-            var expectedResult =
-@"<table class=""DataCaptureStats"">
-	<caption>
-
-	</caption><thead>
-		<tr>
-			<th>Path</th><th>F1-Score</th><th>Expected</th><th>Correct</th><th>% Correct (Recall)</th><th>Incorrect</th><th>Precision</th><th>ROCE</th>
-		</tr>
-	</thead><tfoot>
-		<tr>
-			<th>File count</th><td>1</td>
-		</tr>
-	</tfoot><tr>
-		<th>(Summary)</th><td>0.9032</td><td>16</td><td>14</td><td>87.50 %</td><td>1</td><td>93.33 %</td><td>14</td>
-	</tr><tr>
-		<th>PatientInfo (Summary)</th><td>1.0000</td><td>4</td><td>4</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>PatientInfo/DOB</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>PatientInfo/Gender</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>PatientInfo/Name (Summary)</th><td>1.0000</td><td>2</td><td>2</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>PatientInfo/Name/First</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>PatientInfo/Name/Last</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>PhysicianInfo (Summary)</th><td>0.6667</td><td>2</td><td>1</td><td>50.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>PhysicianInfo/OrderingPhysicianName (Summary)</th><td>0.6667</td><td>2</td><td>1</td><td>50.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>PhysicianInfo/OrderingPhysicianName/First</th><td>0.0000</td><td>1</td><td>0</td><td>0.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>PhysicianInfo/OrderingPhysicianName/Last</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>ResultDate</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>ResultTime</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>Test (Summary)</th><td>0.8750</td><td>8</td><td>7</td><td>87.50 %</td><td>1</td><td>87.50 %</td><td>7</td>
-	</tr><tr>
-		<th>Test/CollectionDate</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>Test/CollectionTime</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>Test/Component</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>Test/Component/Flag</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>Test/Component/Range</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>Test/Component/Units</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr><tr>
-		<th>Test/Component/Value</th><td>NaN</td><td>1</td><td>0</td><td>0.00 %</td><td>1</td><td>0.00 %</td><td>0</td>
-	</tr><tr>
-		<th>Test/Name</th><td>1.0000</td><td>1</td><td>1</td><td>100.00 %</td><td>0</td><td>100.00 %</td><td>NaN</td>
-	</tr>
-</table>";
+            var expectedPrefix = @"<table class=""DataCaptureStats"">";
 
             SetFiles("Resources.MultipleTopLevel.found.eav", "Resources.MultipleTopLevel.expected.eav");
             var result = AttributeTreeComparer.CompareAttributes(_expected, _found,
@@ -315,7 +265,7 @@ namespace Extract.DataCaptureStats.Test
                 .SummarizeStatistics();
             var group = new GroupStatistics(1, new string[0], new string[0], result);
             var report = group.AccuracyDetailsToHtml();
-            Assert.AreEqual(expectedResult, report);
+            Assert.AreEqual(expectedPrefix, report.Substring(0, expectedPrefix.Length));
         }
 
         #endregion Tests
