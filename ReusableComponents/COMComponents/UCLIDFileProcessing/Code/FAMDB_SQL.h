@@ -406,6 +406,12 @@ static const string gstrCREATE_WORKFLOW =
 	"	[OutputFileMetadataFieldID] INT, "
 	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
+static const string gstrCREATE_WORKFLOWFILE =
+	"CREATE TABLE dbo.[WorkflowFile]( "
+	"	[WorkflowID] INT NOT NULL, "
+	"	[FileID] INT NOT NULL, "
+	"	CONSTRAINT [PK_WorkflowFile] PRIMARY KEY CLUSTERED ([WorkflowID], [FileID]));";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -1030,6 +1036,20 @@ static const string gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK =
 	" ON UPDATE CASCADE " 
 	" ON DELETE CASCADE"; 
 
+static const string gstrADD_WORKFLOWFILE_WORKFLOW_FK =
+	"ALTER TABLE dbo.[WorkflowFile] "
+	"WITH CHECK ADD CONSTRAINT [FK_WorkflowFile_Workflow] FOREIGN KEY([WorkflowID]) "
+	"REFERENCES [Workflow]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_WORKFLOWFILE_FAMFILE_FK =
+	"ALTER TABLE dbo.[WorkflowFile] "
+	"WITH CHECK ADD CONSTRAINT [FK_WorkflowFile_File] FOREIGN KEY([FileID]) "
+	"REFERENCES [FAMFile]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
 static const string gstrADD_DB_PROCEXECUTOR_ROLE =
 	"IF DATABASE_PRINCIPAL_ID('db_procexecutor') IS NULL \r\n"
 	"BEGIN\r\n"
@@ -1419,7 +1439,9 @@ const string gstrFAST_TOTAL_FAMFILE_QUERY = "SELECT SUM (row_count) AS " + gstrT
 // This query can take some time to run on a large DB, but will work for any database user with read
 // permissions.
 const string gstrSTANDARD_TOTAL_FAMFILE_QUERY = "SELECT COUNT(*) AS " + gstrTOTAL_FILECOUNT_FIELD +
-	" FROM [FAMFile]";
+" FROM [FAMFile]";
+const string gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY = "SELECT COUNT(*) AS " + gstrTOTAL_FILECOUNT_FIELD +
+	" FROM [WorkflowFile] WHERE [WorkflowID] = <WorkflowID>";
 const string gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE = "SELECT COUNT(*) AS \"" + 
 	gstrTOTAL_FILECOUNT_FIELD + "\" FROM \"FAMFile\"";
 // Queries for all currently enabled features.
@@ -1668,3 +1690,83 @@ static const string gstrALTER_PAGINATION_ALLOW_NULL_DESTPAGE =
 
 static const string gstrALTER_SECURE_COUNTER_VALUE_LAST_UPDATED_TIME =
 "ALTER TABLE dbo.SecureCounterValueChange ALTER COLUMN LastUpdatedTime datetimeoffset";
+
+static const string gstrGET_WORKFLOW_STATUS =
+// SET NOCOUNT ON is needed to prevent "operation is not allowed when the object is closed"
+// errors using this query.
+"SET NOCOUNT ON \r\n"
+"BEGIN TRY \r\n"
+
+"DECLARE @workflowFileIDs TABLE (FileID INT) \r\n"
+"DECLARE @workflowStatuses TABLE \r\n"
+"	(P INT, R INT, S INT, F INT, C INT, \r\n"
+"	 EndStatus NVARCHAR(1), WorkflowStatus NVARCHAR(1)) \r\n"
+
+"INSERT INTO @workflowFileIDs (FileID) \r\n"
+"	SELECT DISTINCT [FileID] \r\n"
+"		FROM [WorkflowFile] \r\n"
+"			WHERE [WorkflowID] = <WorkflowID> \r\n"
+"			AND (<FileID> < 1 OR <FileID> = [FileID]) \r\n"
+
+"DECLARE @fileID INT \r\n"
+"DECLARE @endStatus NVARCHAR(1) \r\n"
+"DECLARE fileCursor CURSOR FOR SELECT [FileID] FROM @workflowFileIDs \r\n"
+"OPEN fileCursor \r\n"
+
+// For each file, populate status counts (P, R, S, F, C) + end action status into @workflowStatuses
+"FETCH NEXT FROM fileCursor INTO @fileID \r\n"
+"WHILE @@FETCH_STATUS = 0 \r\n"
+"BEGIN \r\n"
+"	SELECT @endStatus = [ActionStatus] \r\n"
+"		FROM [FileActionStatus] \r\n"
+"		WHERE [FileID] = @fileID AND [ActionID] = <EndActionID>; \r\n"
+
+"	INSERT INTO @workflowStatuses (P, R, S, F, C, EndStatus) \r\n"
+"	SELECT *, @endStatus FROM \r\n"
+"	( \r\n"
+"		SELECT [FileID], [ActionStatus] FROM [FileActionStatus] \r\n"
+"			WHERE [FileID] = @fileID AND [ActionID] IN (<ActionIDs>) \r\n"
+"	) AS T \r\n"
+"	PIVOT \r\n"
+"	( \r\n"
+"		COUNT( [FileID]) \r\n"
+"		FOR [ActionStatus] IN(P, R, S, F, C) \r\n"
+"	) AS PVT \r\n"
+
+"FETCH NEXT FROM fileCursor INTO @fileID \r\n"
+"END \r\n"
+
+"CLOSE fileCursor \r\n"
+"DEALLOCATE fileCursor \r\n"
+
+// Processing = ("End" action <> Failed/Skipped) and any other action is either pending or processing.
+"UPDATE @workflowStatuses \r\n"
+"SET [WorkflowStatus] = 'R' \r\n"
+"WHERE ([EndStatus] IS NULL OR \r\n"
+"	([EndStatus] <> 'F' AND [EndStatus] <> 'S')) \r\n"
+"AND( [P] > 0 OR [R] > 0) \r\n"
+
+// Complete = ("End" action = Complete) and (no action is pending or processing)
+"UPDATE @workflowStatuses \r\n"
+"SET [WorkflowStatus] = 'C' \r\n"
+"WHERE [WorkflowStatus] IS NULL \r\n"
+"AND [EndStatus] = 'C' \r\n"
+
+// Failed = ("End" action <> Complete) and (any action is failed)
+"UPDATE @workflowStatuses \r\n"
+"SET [WorkflowStatus] = 'F' \r\n"
+"WHERE [WorkflowStatus] IS NULL \r\n"
+"AND [F] > 0 \r\n"
+
+"SELECT \r\n"
+"	COALESCE([WorkflowStatus], 'U') AS [Status], COUNT(*) AS [Count] \r\n"
+"	FROM @workflowStatuses \r\n"
+"	GROUP BY [WorkflowStatus] \r\n"
+
+// Ensure NOCOUNT is set back to off
+"SET NOCOUNT OFF \r\n"
+"END TRY \r\n"
+"BEGIN CATCH \r\n"
+"SET NOCOUNT OFF \r\n"
+"END CATCH";
+

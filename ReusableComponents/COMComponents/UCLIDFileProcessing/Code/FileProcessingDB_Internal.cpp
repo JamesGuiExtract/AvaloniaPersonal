@@ -466,6 +466,17 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					"(FileID, ActionID, ActionStatus, Priority) "
 					" VALUES (" + asString(nFileID) + ", " + asString(nActionID) + ", '" + strNewState + "', " +
 					asString(ipCurrRecord->Priority) + ")");
+
+				// If a workflow was specified, record the file as having been active in this workflow.
+				if (nWorkflowID > 0)
+				{
+					executeCmdQuery(ipConnection, Util::Format(
+						"IF NOT EXISTS ( \r\n"
+						"	SELECT * FROM [WorkflowFile] WHERE [WorkflowID] = %d AND [FileID] = %d) \r\n"
+						"BEGIN \r\n"
+						"	INSERT INTO [WorkflowFile] ([WorkflowID], [FileID]) VALUES (%d,%d) \r\n"
+						"END", nWorkflowID, nFileID, nWorkflowID, nFileID));
+				}
 			}
 
 			_lastCodePos = "180";
@@ -1340,6 +1351,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrMETADATA_FIELD);
 			eraseFromVector(vecTables, gstrWORKFLOW_TYPE);
 			eraseFromVector(vecTables, gstrWORKFLOW);
+			eraseFromVector(vecTables, gstrWORKFLOW_FILE);
 		}
 
 		// Never drop these tables
@@ -1502,6 +1514,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			vecQueries.push_back(gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK);
 			// Foreign key for OutputAttributeSetID is added in AttributeDBMgr
 			vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
+			vecQueries.push_back(gstrADD_WORKFLOWFILE_WORKFLOW_FK);
+			vecQueries.push_back(gstrADD_WORKFLOWFILE_FAMFILE_FK);
 		}
 
 		// Don't create the FK between the Secure counter tables unless at least one
@@ -1616,6 +1630,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
 		vecQueries.push_back(gstrCREATE_WORKFLOW_TYPE);
 		vecQueries.push_back(gstrCREATE_WORKFLOW);
+		vecQueries.push_back(gstrCREATE_WORKFLOWFILE);
 	}
 
 	// Add queries to create tables to the vector
@@ -3099,6 +3114,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrPAGINATION);
 	vecTables.push_back(gstrWORKFLOW_TYPE);
 	vecTables.push_back(gstrWORKFLOW);
+	vecTables.push_back(gstrWORKFLOW_FILE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -6503,4 +6519,74 @@ map<string, long> CFileProcessingDB::getWorkflowActions(_ConnectionPtr ipConnect
 	}
 
 	return mapWorkflowActions;
+}
+//-------------------------------------------------------------------------------------------------
+map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
+{
+	map<string, long> mapStatuses;
+
+	// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+	ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+	BEGIN_CONNECTION_RETRY();
+
+		ipConnection = getDBConnection();
+		validateDBSchemaVersion();
+
+		long nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
+
+		UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
+			getWorkflowDefinition(ipConnection, nWorkflowID);
+		ASSERT_RESOURCE_ALLOCATION("ELI42137", ipConnection != __nullptr);
+
+		long nPostWorkflowActionID = -1;
+		if (ipWorkflowDefinition->PostWorkflowAction.length() > 0)
+		{
+			nPostWorkflowActionID = getActionID(ipConnection,
+				asString(ipWorkflowDefinition->PostWorkflowAction));
+		}
+
+		// TODO: A more deterministic way of specifying the "primary" actions in a workflow.
+		// For now, all actions in the workflow except for the post-workflow action.
+		vector<string> vecIncludedActionIDs;
+		map<string, long> mapWorkflowActions = getWorkflowActions(ipConnection, nWorkflowID);
+		for each (pair<string, long> item in mapWorkflowActions)
+		{
+			if (item.second != nPostWorkflowActionID)
+			{
+				vecIncludedActionIDs.push_back(asString(item.second));
+			}
+		}
+
+		string strActionIDs = asString(vecIncludedActionIDs, true, ",");
+		string strEndAction = asString(ipWorkflowDefinition->EndAction);
+		long nEndActionID = getActionID(ipConnection, strEndAction);
+
+		string strQuery = gstrGET_WORKFLOW_STATUS;
+		replaceVariable(strQuery, "<FileID>", asString(nFileID));
+		replaceVariable(strQuery, "<WorkflowID>", asString(nWorkflowID));
+		replaceVariable(strQuery, "<ActionIDs>", strActionIDs);
+		replaceVariable(strQuery, "<EndActionID>", asString(nEndActionID));
+
+		_RecordsetPtr ipWorkflowStatus(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI42138", ipWorkflowStatus);
+
+		ipWorkflowStatus->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+		while (ipWorkflowStatus->adoEOF == VARIANT_FALSE)
+		{
+			FieldsPtr ipFields = ipWorkflowStatus->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI42139", ipFields != __nullptr);
+
+			string strStatus = getStringField(ipFields, "Status");
+			long nCount = getLongField(ipFields, "Count");
+			mapStatuses[strStatus] = nCount;
+
+			ipWorkflowStatus->MoveNext();
+		}
+
+	END_CONNECTION_RETRY(ipConnection, "ELI42142");
+
+	return mapStatuses;
 }

@@ -80,7 +80,8 @@ m_ipSecureCounters(__nullptr),
 m_strActiveWorkflow(""),
 m_bUsingWorkflows(false),
 m_bRunningAllWorkflows(false),
-m_nLastFAMFileID(0)
+m_nLastFAMFileID(0),
+m_bDeniedFastCountPermission(false)
 {
 	try
 	{
@@ -4144,6 +4145,28 @@ STDMETHODIMP CFileProcessingDB::GetWorkflowStatus(long nFileID, EActionStatus* p
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42135");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkflowStatusAllFiles(long *pnUnattempted, long *pnProcessing,
+														  long *pnCompleted, long *pnFailed)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetWorkflowStatusAllFiles_Internal(false, pnUnattempted, pnProcessing, pnCompleted, pnFailed))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetWorkflowStatusAllFiles_Internal(true, pnUnattempted, pnProcessing, pnCompleted, pnFailed);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42153");
 }
 
 //-------------------------------------------------------------------------------------------------

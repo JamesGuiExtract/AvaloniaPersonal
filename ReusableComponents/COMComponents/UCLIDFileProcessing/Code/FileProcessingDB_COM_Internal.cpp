@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 144;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 145;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1635,7 +1635,34 @@ int UpdateToSchemaVersion144(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41989");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion145(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 145;
 
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_WORKFLOWFILE);
+		vecQueries.push_back(gstrADD_WORKFLOWFILE_WORKFLOW_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWFILE_FAMFILE_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42168");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -1906,8 +1933,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 					if (m_bUsingWorkflows)
 					{
-						string strFileInWorkflowSQL = Util::Format("SELECT COUNT(*) AS [ID] FROM [FileActionStatus] "
-							"INNER JOIN [Action] ON [ActionID] = [Action].[ID] "
+						string strFileInWorkflowSQL = Util::Format("SELECT COUNT(*) AS [ID] FROM [WorkflowFile] "
 							"WHERE [FileID] = %d AND [WorkflowID] = %d", nID, nWorkflowID);
 
 						long nCount = 0;
@@ -2112,6 +2138,14 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 				// Set the new file Record ID to nID;
 				ipNewFileRecord->FileID = nID;
+
+				// If a workflow is being used, record this file as being part of the workflow
+				if (!bAlreadyExistsInWorkflow && nWorkflowID > 0)
+				{
+					executeCmdQuery(ipConnection, Util::Format(
+						"INSERT INTO [WorkflowFile] ([WorkflowID], [FileID]) VALUES (%d,%d)",
+						nWorkflowID, nID));
+				}
 
 				_lastCodePos = "155";
 
@@ -6917,7 +6951,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 141:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion142);
 				case 142:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion143);
 				case 143:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion144);
-				case 144:	break;
+				case 144:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion145);
+				case 145:	break;
 
 				default:
 					{
@@ -7405,6 +7440,7 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 		try
 		{
 			bool bUseOracle = asCppBool(bUseOracleSyntax);
+			bool bGotFastCount = false;
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -7426,7 +7462,18 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 			}
 			else
 			{
-				if (!m_bDeniedFastCountPermission)
+				// Can't use a fast count if workflows are involved; need to use the WorkflowFile table.
+				if (!m_strActiveWorkflow.empty())
+				{
+					long nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
+					string strCountQuery = gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY;
+					replaceVariable(strCountQuery, "<WorkflowID>", asString(nWorkflowID));
+
+					ipResultSet->Open(strCountQuery.c_str(),
+						_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
+						adCmdText);
+				}
+				else if (!m_bDeniedFastCountPermission)
 				{
 					try
 					{
@@ -7438,6 +7485,8 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 								_variant_t((IDispatch *)ipConnection, true), adOpenStatic,
 								adLockReadOnly, adCmdText);
 							ASSERT_RESOURCE_ALLOCATION("ELI35762", ipResultSet != __nullptr);
+
+							bGotFastCount = true;
 						}
 						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35763");
 					}
@@ -7472,9 +7521,9 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 			if (ipResultSet->adoEOF != VARIANT_TRUE)
 			{
 				// get the file count (value type depends on which file count query executed.
-				*pnFileCount = !bUseOracle && m_bDeniedFastCountPermission
-					? (long long)getLongField(ipResultSet->Fields, gstrTOTAL_FILECOUNT_FIELD)
-					: getLongLongField(ipResultSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
+				*pnFileCount = bGotFastCount
+					? getLongLongField(ipResultSet->Fields, gstrTOTAL_FILECOUNT_FIELD)
+					: (long long)getLongField(ipResultSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
 			}
 			else
 			{
@@ -10434,94 +10483,22 @@ bool CFileProcessingDB::GetWorkflowStatus_Internal(bool bDBLocked, long nFileID,
 		{
 			ASSERT_ARGUMENT("ELI42136", peaStatus != __nullptr);
 
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-			BEGIN_CONNECTION_RETRY();
-
-			ipConnection = getDBConnection();
-			validateDBSchemaVersion();
-
-			long nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
-
-			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
-				getWorkflowDefinition(ipConnection, nWorkflowID);
-			ASSERT_RESOURCE_ALLOCATION("ELI42137", ipConnection != __nullptr);
-
-			long nPostWorkflowActionID = -1;
-			if (ipWorkflowDefinition->PostWorkflowAction.length() > 0)
-			{
-				nPostWorkflowActionID = getActionID(ipConnection,
-					asString(ipWorkflowDefinition->PostWorkflowAction));
-			}
-
-			// TODO: A more deterministic way of specifying the "primary" actions in a workflow.
-			// For now, all actions in the workflow except for the post-workflow action.
-			vector<string> vecIncludedActionIDs;
-			map<string, long> mapWorkflowActions = getWorkflowActions(ipConnection, nWorkflowID);
-			for each (pair<string, long> item in mapWorkflowActions)
-			{
-				if (item.second != nPostWorkflowActionID)
-				{
-					vecIncludedActionIDs.push_back(asString(item.second));
-				}
-			}
-
-			string strActionIDs = asString(vecIncludedActionIDs, true, ",");
-			string strAggregateStatus = Util::Format(
-				"SELECT * FROM "
-				"( "
-				"	SELECT [FileID], [ActionStatus] FROM [FileActionStatus] "
-				"		WHERE [FileID] = %d AND [ActionID] IN (%s) "
-				") AS T "
-				"PIVOT "
-				"( "
-				"	COUNT([FileID]) "
-				"	FOR [ActionStatus] IN (P, R, S, F, C) "
-				") AS PVT ", 
-				nFileID, strActionIDs.c_str());
-
-			_RecordsetPtr ipAggregateStatuses(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI42138", ipAggregateStatuses);
-
-			ipAggregateStatuses->Open(strAggregateStatus.c_str(), _variant_t((IDispatch *)ipConnection, true),
-				adOpenStatic, adLockOptimistic, adCmdText);
-			FieldsPtr ipAggregateStatusFields = ipAggregateStatuses->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI42139", ipAggregateStatusFields != __nullptr);
-
-			string strEndAction = asString(ipWorkflowDefinition->EndAction);
-			long nEndActionID = getActionID(ipConnection, strEndAction);
-			_RecordsetPtr ipEndActionStatus = getFileActionStatusSet(ipConnection, nFileID, nEndActionID);
-			ASSERT_RESOURCE_ALLOCATION("ELI42140", ipEndActionStatus != __nullptr);
-			
-			string endActionStatus = "U";
-			if (ipEndActionStatus->adoEOF == VARIANT_FALSE)
-			{
-				FieldsPtr ipEndActionStatusFields = ipEndActionStatus->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI42141", ipEndActionStatusFields != __nullptr);
-
-				endActionStatus = getStringField(ipEndActionStatusFields, "ActionStatus");
-			}
-
-			if (endActionStatus != "F" && endActionStatus != "S" &&
-				(getLongField(ipAggregateStatusFields, "P") > 0 || getLongField(ipAggregateStatusFields, "R") > 0))
-			{
-				*peaStatus = kActionProcessing;
-			}
-			else if (endActionStatus == "C")
-			{
-				*peaStatus = kActionCompleted;
-			}
-			else if (getLongField(ipAggregateStatusFields, "F") > 0)
-			{
-				*peaStatus = kActionFailed;
-			}
-			else
+			map<string, long> mapStatuses = getWorkflowStatus(nFileID);
+			if (mapStatuses.empty())
 			{
 				*peaStatus = kActionUnattempted;
 			}
-
-			END_CONNECTION_RETRY(ipConnection, "ELI42142");
+			else
+			{
+				switch (mapStatuses.begin()->first[0])
+				{
+					case 'R': *peaStatus = kActionProcessing; break;
+					case 'C': *peaStatus = kActionCompleted; break;
+					case 'F': *peaStatus = kActionFailed; break;
+					
+					default: *peaStatus = kActionUnattempted;
+				}
+			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42143");
 	}
@@ -10536,3 +10513,47 @@ bool CFileProcessingDB::GetWorkflowStatus_Internal(bool bDBLocked, long nFileID,
 
 	return true;
 }
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkflowStatusAllFiles_Internal(bool bDBLocked, long *pnUnattempted, 
+											long *pnProcessing, long *pnCompleted, long *pnFailed)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI42154", pnUnattempted != __nullptr);
+			ASSERT_ARGUMENT("ELI42155", pnProcessing != __nullptr);
+			ASSERT_ARGUMENT("ELI42156", pnCompleted != __nullptr);
+			ASSERT_ARGUMENT("ELI42157", pnFailed != __nullptr);
+
+			*pnUnattempted = 0;
+			*pnProcessing = 0;
+			*pnCompleted = 0;
+			*pnFailed = 0;
+
+			map<string, long> mapStatuses = getWorkflowStatus(-1);
+			for each (auto iter in mapStatuses)
+			{
+				switch (iter.first[0])
+				{
+					case 'U': *pnUnattempted = iter.second; break;
+					case 'R': *pnProcessing = iter.second; break;
+					case 'C': *pnCompleted = iter.second; break;
+					case 'F': *pnFailed = iter.second; break;
+				}
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42158");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------

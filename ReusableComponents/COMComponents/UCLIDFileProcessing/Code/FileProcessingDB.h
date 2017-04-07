@@ -83,6 +83,7 @@ static const string gstrSECURE_COUNTER_VALUE_CHANGE="SecureCounterValueChange";
 static const string gstrPAGINATION="Pagination";
 static const string gstrWORKFLOW_TYPE = "WorkflowType";
 static const string gstrWORKFLOW = "Workflow";
+static const string gstrWORKFLOW_FILE = "WorkflowFile";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -330,6 +331,7 @@ public:
 	STDMETHOD(GetStatsAllWorkflows)(BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(GetAllActions)(IStrToStrMap** pmapActionNameToID);
 	STDMETHOD(GetWorkflowStatus)(long nFileID, EActionStatus* peaStatus);
+	STDMETHOD(GetWorkflowStatusAllFiles)(long *pnUnattempted, long *pnProcessing, long *pnCompleted, long *pnFailed);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1167,6 +1169,10 @@ private:
 	// Gets a map of all workflow names and IDs.
 	map<string, long> getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID);
 
+	// Gets the status of a file in a workflow or all files in a workflow if nFileID = -1.
+	// Return value is a map of ActionStatus codes (R, F, C, U) to their respective counts.
+	map<string, long> getWorkflowStatus(long nFileID);
+
 	void validateLicense();
 
 	// Internal implementation methods
@@ -1332,6 +1338,8 @@ private:
 	bool GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
 	bool GetAllActions_Internal(bool bDBLocked, IStrToStrMap** pmapActionNameToID);
 	bool GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus);
+	bool GetWorkflowStatusAllFiles_Internal(bool bDBLocked, long *pnUnattempted, long *pnProcessing,
+		long *pnCompleted, long *pnFailed);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

@@ -1877,6 +1877,16 @@ library UCLID_FILEPROCESSINGLib
 		//			Completed = (EndAction = Compete) and (no action X is pending or processing)
 		[id(173), helpstring("method GetWorkflowStatus")] HRESULT GetWorkflowStatus(
 			[in] long nFileID, [out, retval] EActionStatus* peaStatus);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Gets the status of all files in a workflow where status is defined as:
+		//			Whereas X = the primary actions in a workflow (excludes and actions that do not logically
+		//				fall between StartAction and EndAction
+		//			Processing = (EndAction <> Failed/Skipped) and (any action X is either pending or processing)
+		//			Failed = (EndAction <> Complete) and (any action X is failed)
+		//			Unattempted = (EndAction <> Complete) and (no X actions  are pending / processing)
+		//			Completed = (EndAction = Compete) and (no action X is pending or processing)
+		[id(174), helpstring("method GetWorkflowStatusAllFiles")] HRESULT GetWorkflowStatusAllFiles(
+			[out] long *pnUnattempted, [out] long *pnProcessing, [out] long *pnCompleted, [out] long *pnFailed);
 	};
 
 	[
