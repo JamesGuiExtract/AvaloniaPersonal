@@ -3003,8 +3003,8 @@ bool CSplitRegionIntoContentAreas::loadPageBitmap(IAFDocumentPtr ipDoc, long nPa
 				case kRotRight: dRotation += 270; break;
 			}
 
-			m_apPageBitmap.reset(new LeadToolsBitmap(asString(ipPageText->SourceDocName), nPage, 
-				-dRotation));
+			m_apPageBitmap.reset(new LeadToolsBitmap(asString(ipPageText->SourceDocName), nPage,
+				-dRotation, 1, false));
 			ASSERT_RESOURCE_ALLOCATION("ELI22124", m_apPageBitmap.get() != __nullptr);
 
 			m_rectCurrentPage.SetRect(0, 0,

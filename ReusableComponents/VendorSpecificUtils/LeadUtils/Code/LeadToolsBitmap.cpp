@@ -18,7 +18,8 @@ const COLORREF gnCOLOR_BLACK = RGB(0, 0, 0);
 // LeadToolsBitmap
 //-------------------------------------------------------------------------------------------------
 LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ulPage, 
-								 double dRotation/* = 0*/, int nBitsPerPixel/* = 1*/)
+								 double dRotation/* = 0*/, int nBitsPerPixel/* = 1*/,
+								 bool bUseDithering/* = true*/)
 : m_bitmapFreeer(m_hBitmap, true)
 , m_strImageFileName(strImageFileName)
 {
@@ -29,11 +30,22 @@ LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ul
 		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
 		lfo.PageNumber = ulPage;
 
-		// Load the image using the specified number of bits per pixel.
+		// Load the image using the original bits per pixel so as to not be affected by currently
+		// configured dithering method
+		// https://extract.atlassian.net/browse/ISSUE-14596
+		const long nORIGINAL_PIXEL_DEPTH = 0;
 		L_INT nRet = L_LoadBitmap((char*) m_strImageFileName.c_str(), &m_hBitmap, 
-			sizeof(BITMAPHANDLE), nBitsPerPixel, ORDER_RGB, &lfo, &m_FileInfo);
+			sizeof(BITMAPHANDLE), nORIGINAL_PIXEL_DEPTH, ORDER_RGB, &lfo, &m_FileInfo);
 		throwExceptionIfNotSuccess(nRet, "ELI22243", 
 			"Internal error: Unable to load image.", m_strImageFileName);
+
+		// Convert to specified bpp
+		const long nDEFAULT_NUMBER_OF_COLORS = 0;
+		L_UINT flags = CRF_FIXEDPALETTE | (bUseDithering ? CRF_ORDEREDDITHERING : CRF_NODITHERING);
+		nRet = L_ColorResBitmap(&m_hBitmap, &m_hBitmap, sizeof(BITMAPHANDLE), nBitsPerPixel, flags,
+			 NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
+		throwExceptionIfNotSuccess(nRet, "ELI42166", 
+			"Internal error: Unable to convert image to specified bits-per-pixel!", strImageFileName);
 
 		// ViewPerspective appears to be valid in situations where ELO_IGNOREVIEWPERSPECTIVE
 		// does not work.  (For instance bmps can be loaded with a valid BOTTOM_LEFT view perspective,
