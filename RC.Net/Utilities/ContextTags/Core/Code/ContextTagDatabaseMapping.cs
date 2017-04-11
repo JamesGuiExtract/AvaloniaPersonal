@@ -141,6 +141,17 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
+        /// Indicates that Dispose has been called on this instance. Used to prevent logic
+        /// exceptions from being displayed while the editor is being closed.
+        /// https://extract.atlassian.net/browse/ISSUE-14429
+        /// </summary>
+        public bool IsDisposed
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
         /// Gets or the name of the context that is mapped to the specified
         /// <see paramref="directory"/>.
         /// </summary>
@@ -161,6 +172,16 @@ namespace Extract.Utilities.ContextTags
             {
                 throw ex.AsExtract("ELI38175");
             }
+        }
+
+        /// <summary>
+        /// Set IsDisposed. Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            IsDisposed = true;
+            base.Dispose(disposing);
         }
     }
 

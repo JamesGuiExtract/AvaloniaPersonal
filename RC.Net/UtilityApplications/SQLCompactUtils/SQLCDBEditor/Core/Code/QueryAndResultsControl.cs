@@ -177,6 +177,13 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         readonly bool _inDesignMode;
 
+        /// <summary>
+        /// Indicates that Dispose has been called on this instance. Used to prevent logic exceptions
+        /// while the editor is closing.
+        /// https://extract.atlassian.net/browse/ISSUE-14429
+        /// </summary>
+        bool _isDisposed;
+
         #endregion Fields
 
         #region Constructors
@@ -1414,6 +1421,8 @@ namespace Extract.SQLCDBEditor
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
+            _isDisposed = true;
+
             if (disposing)
             {
                 if (_plugin != null)
@@ -1984,6 +1993,11 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
+                if (_isDisposed)
+                {
+                    return;
+                }
+
                 ExtractException.Assert("ELI38226","Internal logic error", UsingPluginBindingSource);
 
                 // If there is an active data error for this row, do not allow the user to move on

@@ -396,6 +396,11 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
+                if (_database.IsDisposed)
+                {
+                    return null;
+                }
+
                 var contextValues = _database.TagValue
                     .Where(tagValue => tagValue.ContextID == context.ID);
 
@@ -423,6 +428,11 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
+                if (_database.IsDisposed)
+                {
+                    return;
+                }
+
                 var targetValue = _database.TagValue
                     .Where(tagValue =>
                         tagValue.TagID == row.CustomTag.ID &&
