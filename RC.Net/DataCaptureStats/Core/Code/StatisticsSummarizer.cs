@@ -129,7 +129,7 @@ namespace Extract.DataCaptureStats
                     {
                         var name = group.GroupByNames[i];
                         var value = group.GroupByValues[i];
-                        writer.WriteLine(name + ": " + value);
+                        writer.WriteEncodedText(name + ": " + value + Environment.NewLine);
                         if (++i < group.GroupByNames.Length)
                         {
                             writer.WriteFullBeginTag("br");
@@ -145,7 +145,7 @@ namespace Extract.DataCaptureStats
                     foreach (var col in attributeColumns)
                     {
                         writer.RenderBeginTag(HtmlTextWriterTag.Th);
-                        writer.Write(col);
+                        writer.WriteEncodedText(col);
                         writer.RenderEndTag();
                     }
                     writer.RenderEndTag();
@@ -157,7 +157,7 @@ namespace Extract.DataCaptureStats
                     writer.Write("File count");
                     writer.RenderEndTag();
                     writer.RenderBeginTag(HtmlTextWriterTag.Td);
-                    writer.Write(string.Format(CultureInfo, "{0:N0}", group.FileCount));
+                    writer.WriteEncodedText(string.Format(CultureInfo, "{0:N0}", group.FileCount));
                     writer.RenderEndTag();
                     writer.RenderEndTag();
                     writer.RenderEndTag();
@@ -177,7 +177,7 @@ namespace Extract.DataCaptureStats
                         // Write row header
                         writer.RenderBeginTag(HtmlTextWriterTag.Tr);
                         writer.RenderBeginTag(HtmlTextWriterTag.Th);
-                        writer.Write(p);
+                        writer.WriteEncodedText(p);
                         writer.RenderEndTag();
 
                         // Write column data for this path
@@ -186,7 +186,7 @@ namespace Extract.DataCaptureStats
                         foreach (var col in attributeColumnValues)
                         {
                             writer.RenderBeginTag(HtmlTextWriterTag.Td);
-                            writer.Write(col.Value(accuracy));
+                            writer.WriteEncodedText(col.Value(accuracy));
                             writer.RenderEndTag();
                         }
                         writer.RenderEndTag(); // End row

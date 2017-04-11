@@ -381,7 +381,7 @@ namespace StatisticsReporter
             Tuple<DateTime, DateTime> range, string[] groupByFieldLabels)
         {
             var dateRange = string.Format(CultureInfo.CurrentCulture,
-                "Date range: {0:MM/dd/yyyy hh:mm:ss tt}\x2013{1:MM/dd/yyyy hh:mm:ss tt}", range.Item1, range.Item2);
+                "Date range: {0:MM/dd/yyyy hh:mm:ss tt}&ndash;{1:MM/dd/yyyy hh:mm:ss tt}", range.Item1, range.Item2);
             var groupedBy = string.Format(CultureInfo.CurrentCulture,
                 "Statistics grouped by: {0}",
                     string.Join("; ", groupByFieldLabels));
@@ -389,13 +389,13 @@ namespace StatisticsReporter
             writer.WriteFullBeginTag("details");
             writer.WriteFullBeginTag("summary");
             writer.RenderBeginTag(HtmlTextWriterTag.H1);
-            writer.Write(settings.Settings.Header1);
+            writer.WriteEncodedText(settings.Settings.Header1);
             writer.RenderEndTag(); // H1
             writer.RenderBeginTag(HtmlTextWriterTag.H3);
             writer.Write(dateRange);
             writer.RenderEndTag(); // H3
             writer.RenderBeginTag(HtmlTextWriterTag.H3);
-            writer.Write(groupedBy);
+            writer.WriteEncodedText(groupedBy);
             writer.RenderEndTag(); // H3
             writer.WriteEndTag("summary");
             WriteSettingsTable(writer, settings, range);
@@ -505,10 +505,10 @@ namespace StatisticsReporter
         {
             writer.RenderBeginTag(HtmlTextWriterTag.Tr);
             writer.RenderBeginTag(HtmlTextWriterTag.Th);
-            writer.Write(propertyName);
+            writer.WriteEncodedText(propertyName);
             writer.RenderEndTag(); //Th
             writer.RenderBeginTag(HtmlTextWriterTag.Td);
-            writer.Write(propertyValue);
+            writer.WriteEncodedText(propertyValue);
             writer.RenderEndTag(); //Td
             writer.RenderEndTag(); //Tr
         }
