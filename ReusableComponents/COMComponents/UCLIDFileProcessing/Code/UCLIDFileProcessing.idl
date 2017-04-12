@@ -1887,6 +1887,12 @@ library UCLID_FILEPROCESSINGLib
 		//			Completed = (EndAction = Compete) and (no action X is pending or processing)
 		[id(174), helpstring("method GetWorkflowStatusAllFiles")] HRESULT GetWorkflowStatusAllFiles(
 			[out] long *pnUnattempted, [out] long *pnProcessing, [out] long *pnCompleted, [out] long *pnFailed);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Logs into the database with the specified username and password.
+		//			If the username and/or password are not valid, the call will throw and exception.
+		// NOTE:	This method cannot be used to login with a user that does not have a password set.
+		[id(175), helpstring("method LoginUser")] HRESULT LoginUser([in] BSTR bstrUserName, [in]BSTR bstrPassword);
+
 	};
 
 	[

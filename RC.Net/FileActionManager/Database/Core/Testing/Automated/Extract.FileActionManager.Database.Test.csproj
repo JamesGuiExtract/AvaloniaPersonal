@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FAMTestDBManager.cs" />
+    <Compile Include="TestFAMDBConfig.cs" />
     <Compile Include="TestFAMFileProcessing.cs" />
     <Compile Include="TestFAMWorkflowManagement.cs" />
     <Compile Include="TestFAMServiceDatabaseManager.cs" />

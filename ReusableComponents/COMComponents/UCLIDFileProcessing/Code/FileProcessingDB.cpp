@@ -4168,6 +4168,41 @@ STDMETHODIMP CFileProcessingDB::GetWorkflowStatusAllFiles(long *pnUnattempted, l
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42153");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::LoginUser(BSTR bstrUserName, BSTR bstrPassword)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	string strPreviousUserName = m_strFAMUserName;
+
+	try
+	{
+		validateLicense();
+
+		try
+		{
+			m_strFAMUserName = asString(bstrUserName);
+
+			string strStoredPW;
+			bool bUserExists = getEncryptedPWFromDB(strStoredPW, false);
+
+			if (!bUserExists || strStoredPW.empty() || !isPasswordValid(asString(bstrPassword), false))
+			{
+				UCLIDException ue("ELI42171", "Invalid username or password");
+				ue.addDebugInfo("Username", m_strFAMUserName, true);
+				throw ue;
+			}
+		}
+		catch (...)
+		{
+			m_strFAMUserName = strPreviousUserName;
+			throw;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42170");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

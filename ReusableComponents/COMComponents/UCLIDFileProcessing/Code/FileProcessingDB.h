@@ -332,6 +332,7 @@ public:
 	STDMETHOD(GetAllActions)(IStrToStrMap** pmapActionNameToID);
 	STDMETHOD(GetWorkflowStatus)(long nFileID, EActionStatus* peaStatus);
 	STDMETHOD(GetWorkflowStatusAllFiles)(long *pnUnattempted, long *pnProcessing, long *pnCompleted, long *pnFailed);
+	STDMETHOD(LoginUser)(BSTR bstrUserName, BSTR bstrPassword);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
