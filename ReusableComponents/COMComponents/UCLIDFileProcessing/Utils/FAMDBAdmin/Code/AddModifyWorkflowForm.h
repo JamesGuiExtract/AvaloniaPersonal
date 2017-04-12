@@ -112,6 +112,9 @@ namespace Extract {
 			// Loads the attribute sets into the OutputAttributeSetCombo
 			Void loadOutputAttributeSetCombo();
 
+			// Loads the metadata fields into the outputFileMetadataFieldCombo
+			Void loadOutputFileMetadataFieldCombo();
+
 #pragma endregion
 
 #pragma region Variables
@@ -154,6 +157,8 @@ namespace Extract {
 		private: System::Windows::Forms::Button^  okButton;
 		private: System::Windows::Forms::Button^  cancelButton;
 		private: System::Windows::Forms::ComboBox^  outputAttributeSetComboBox;
+private: System::Windows::Forms::Label^  label7;
+private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 
 
 		private:
@@ -187,12 +192,14 @@ namespace Extract {
 				this->okButton = (gcnew System::Windows::Forms::Button());
 				this->cancelButton = (gcnew System::Windows::Forms::Button());
 				this->outputAttributeSetComboBox = (gcnew System::Windows::Forms::ComboBox());
+				this->label7 = (gcnew System::Windows::Forms::Label());
+				this->outputFileMetadataFieldComboBox = (gcnew System::Windows::Forms::ComboBox());
 				this->SuspendLayout();
 				// 
 				// workflowNameLabel
 				// 
 				this->workflowNameLabel->AutoSize = true;
-				this->workflowNameLabel->Location = System::Drawing::Point(13, 16);
+				this->workflowNameLabel->Location = System::Drawing::Point(10, 13);
 				this->workflowNameLabel->Name = L"workflowNameLabel";
 				this->workflowNameLabel->Size = System::Drawing::Size(35, 13);
 				this->workflowNameLabel->TabIndex = 0;
@@ -200,7 +207,7 @@ namespace Extract {
 				// 
 				// workflowNameTextBox
 				// 
-				this->workflowNameTextBox->Location = System::Drawing::Point(126, 12);
+				this->workflowNameTextBox->Location = System::Drawing::Point(142, 9);
 				this->workflowNameTextBox->Name = L"workflowNameTextBox";
 				this->workflowNameTextBox->Size = System::Drawing::Size(239, 20);
 				this->workflowNameTextBox->TabIndex = 1;
@@ -208,7 +215,7 @@ namespace Extract {
 				// label1
 				// 
 				this->label1->AutoSize = true;
-				this->label1->Location = System::Drawing::Point(13, 43);
+				this->label1->Location = System::Drawing::Point(10, 39);
 				this->label1->Name = L"label1";
 				this->label1->Size = System::Drawing::Size(75, 13);
 				this->label1->TabIndex = 2;
@@ -218,7 +225,7 @@ namespace Extract {
 				// 
 				this->workFlowTypeComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->workFlowTypeComboBox->FormattingEnabled = true;
-				this->workFlowTypeComboBox->Location = System::Drawing::Point(126, 39);
+				this->workFlowTypeComboBox->Location = System::Drawing::Point(142, 35);
 				this->workFlowTypeComboBox->Name = L"workFlowTypeComboBox";
 				this->workFlowTypeComboBox->Size = System::Drawing::Size(119, 21);
 				this->workFlowTypeComboBox->TabIndex = 2;
@@ -226,7 +233,7 @@ namespace Extract {
 				// descriptionLabel
 				// 
 				this->descriptionLabel->AutoSize = true;
-				this->descriptionLabel->Location = System::Drawing::Point(13, 67);
+				this->descriptionLabel->Location = System::Drawing::Point(10, 62);
 				this->descriptionLabel->Name = L"descriptionLabel";
 				this->descriptionLabel->Size = System::Drawing::Size(60, 13);
 				this->descriptionLabel->TabIndex = 0;
@@ -236,16 +243,16 @@ namespace Extract {
 				// 
 				this->descriptionTextBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
 					| System::Windows::Forms::AnchorStyles::Right));
-				this->descriptionTextBox->Location = System::Drawing::Point(126, 67);
+				this->descriptionTextBox->Location = System::Drawing::Point(142, 62);
 				this->descriptionTextBox->Multiline = true;
 				this->descriptionTextBox->Name = L"descriptionTextBox";
-				this->descriptionTextBox->Size = System::Drawing::Size(447, 90);
+				this->descriptionTextBox->Size = System::Drawing::Size(428, 90);
 				this->descriptionTextBox->TabIndex = 3;
 				// 
 				// label2
 				// 
 				this->label2->AutoSize = true;
-				this->label2->Location = System::Drawing::Point(13, 168);
+				this->label2->Location = System::Drawing::Point(10, 162);
 				this->label2->Name = L"label2";
 				this->label2->Size = System::Drawing::Size(61, 13);
 				this->label2->TabIndex = 4;
@@ -254,7 +261,7 @@ namespace Extract {
 				// label3
 				// 
 				this->label3->AutoSize = true;
-				this->label3->Location = System::Drawing::Point(15, 196);
+				this->label3->Location = System::Drawing::Point(12, 189);
 				this->label3->Name = L"label3";
 				this->label3->Size = System::Drawing::Size(58, 13);
 				this->label3->TabIndex = 4;
@@ -263,7 +270,7 @@ namespace Extract {
 				// label4
 				// 
 				this->label4->AutoSize = true;
-				this->label4->Location = System::Drawing::Point(12, 224);
+				this->label4->Location = System::Drawing::Point(9, 216);
 				this->label4->Name = L"label4";
 				this->label4->Size = System::Drawing::Size(105, 13);
 				this->label4->TabIndex = 4;
@@ -273,7 +280,7 @@ namespace Extract {
 				// 
 				this->startActionComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->startActionComboBox->FormattingEnabled = true;
-				this->startActionComboBox->Location = System::Drawing::Point(126, 164);
+				this->startActionComboBox->Location = System::Drawing::Point(142, 158);
 				this->startActionComboBox->Name = L"startActionComboBox";
 				this->startActionComboBox->Size = System::Drawing::Size(239, 21);
 				this->startActionComboBox->TabIndex = 4;
@@ -282,7 +289,7 @@ namespace Extract {
 				// 
 				this->endActionComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->endActionComboBox->FormattingEnabled = true;
-				this->endActionComboBox->Location = System::Drawing::Point(126, 192);
+				this->endActionComboBox->Location = System::Drawing::Point(142, 185);
 				this->endActionComboBox->Name = L"endActionComboBox";
 				this->endActionComboBox->Size = System::Drawing::Size(239, 21);
 				this->endActionComboBox->TabIndex = 5;
@@ -291,7 +298,7 @@ namespace Extract {
 				// 
 				this->postWorkflowActionComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->postWorkflowActionComboBox->FormattingEnabled = true;
-				this->postWorkflowActionComboBox->Location = System::Drawing::Point(126, 220);
+				this->postWorkflowActionComboBox->Location = System::Drawing::Point(142, 212);
 				this->postWorkflowActionComboBox->Name = L"postWorkflowActionComboBox";
 				this->postWorkflowActionComboBox->Size = System::Drawing::Size(239, 21);
 				this->postWorkflowActionComboBox->TabIndex = 6;
@@ -299,7 +306,7 @@ namespace Extract {
 				// label5
 				// 
 				this->label5->AutoSize = true;
-				this->label5->Location = System::Drawing::Point(13, 252);
+				this->label5->Location = System::Drawing::Point(10, 243);
 				this->label5->Name = L"label5";
 				this->label5->Size = System::Drawing::Size(85, 13);
 				this->label5->TabIndex = 6;
@@ -309,15 +316,15 @@ namespace Extract {
 				// 
 				this->documentFolderTextBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
 					| System::Windows::Forms::AnchorStyles::Right));
-				this->documentFolderTextBox->Location = System::Drawing::Point(126, 248);
+				this->documentFolderTextBox->Location = System::Drawing::Point(142, 239);
 				this->documentFolderTextBox->Name = L"documentFolderTextBox";
-				this->documentFolderTextBox->Size = System::Drawing::Size(447, 20);
+				this->documentFolderTextBox->Size = System::Drawing::Size(428, 20);
 				this->documentFolderTextBox->TabIndex = 7;
 				// 
 				// label6
 				// 
 				this->label6->AutoSize = true;
-				this->label6->Location = System::Drawing::Point(13, 279);
+				this->label6->Location = System::Drawing::Point(10, 269);
 				this->label6->Name = L"label6";
 				this->label6->Size = System::Drawing::Size(97, 13);
 				this->label6->TabIndex = 6;
@@ -326,7 +333,7 @@ namespace Extract {
 				// okButton
 				// 
 				this->okButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->okButton->Location = System::Drawing::Point(417, 306);
+				this->okButton->Location = System::Drawing::Point(414, 319);
 				this->okButton->Name = L"okButton";
 				this->okButton->Size = System::Drawing::Size(75, 23);
 				this->okButton->TabIndex = 8;
@@ -339,7 +346,7 @@ namespace Extract {
 				this->cancelButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->cancelButton->CausesValidation = false;
 				this->cancelButton->DialogResult = System::Windows::Forms::DialogResult::Cancel;
-				this->cancelButton->Location = System::Drawing::Point(498, 306);
+				this->cancelButton->Location = System::Drawing::Point(495, 319);
 				this->cancelButton->Name = L"cancelButton";
 				this->cancelButton->Size = System::Drawing::Size(75, 23);
 				this->cancelButton->TabIndex = 9;
@@ -352,10 +359,30 @@ namespace Extract {
 					| System::Windows::Forms::AnchorStyles::Right));
 				this->outputAttributeSetComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->outputAttributeSetComboBox->FormattingEnabled = true;
-				this->outputAttributeSetComboBox->Location = System::Drawing::Point(126, 275);
+				this->outputAttributeSetComboBox->Location = System::Drawing::Point(142, 265);
 				this->outputAttributeSetComboBox->Name = L"outputAttributeSetComboBox";
-				this->outputAttributeSetComboBox->Size = System::Drawing::Size(447, 21);
+				this->outputAttributeSetComboBox->Size = System::Drawing::Size(428, 21);
 				this->outputAttributeSetComboBox->TabIndex = 8;
+				// 
+				// label7
+				// 
+				this->label7->AutoSize = true;
+				this->label7->Location = System::Drawing::Point(12, 296);
+				this->label7->Name = L"label7";
+				this->label7->Size = System::Drawing::Size(124, 13);
+				this->label7->TabIndex = 10;
+				this->label7->Text = L"Output file metadata field";
+				// 
+				// outputFileMetadataFieldComboBox
+				// 
+				this->outputFileMetadataFieldComboBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
+					| System::Windows::Forms::AnchorStyles::Right));
+				this->outputFileMetadataFieldComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
+				this->outputFileMetadataFieldComboBox->FormattingEnabled = true;
+				this->outputFileMetadataFieldComboBox->Location = System::Drawing::Point(142, 292);
+				this->outputFileMetadataFieldComboBox->Name = L"outputFileMetadataFieldComboBox";
+				this->outputFileMetadataFieldComboBox->Size = System::Drawing::Size(427, 21);
+				this->outputFileMetadataFieldComboBox->TabIndex = 11;
 				// 
 				// AddModifyWorkflowForm
 				// 
@@ -363,7 +390,9 @@ namespace Extract {
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->cancelButton;
-				this->ClientSize = System::Drawing::Size(581, 337);
+				this->ClientSize = System::Drawing::Size(581, 351);
+				this->Controls->Add(this->outputFileMetadataFieldComboBox);
+				this->Controls->Add(this->label7);
 				this->Controls->Add(this->outputAttributeSetComboBox);
 				this->Controls->Add(this->cancelButton);
 				this->Controls->Add(this->okButton);
@@ -384,7 +413,7 @@ namespace Extract {
 				this->Controls->Add(this->workflowNameLabel);
 				this->MaximizeBox = false;
 				this->MinimizeBox = false;
-				this->MinimumSize = System::Drawing::Size(597, 376);
+				this->MinimumSize = System::Drawing::Size(597, 374);
 				this->Name = L"AddModifyWorkflowForm";
 				this->ShowIcon = false;
 				this->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;

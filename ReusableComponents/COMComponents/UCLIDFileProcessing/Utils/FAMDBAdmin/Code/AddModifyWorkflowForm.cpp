@@ -70,6 +70,7 @@ namespace Extract
 				loadActionComboLists();
 				loadWorkFlowTypeCombo();
 				loadOutputAttributeSetCombo();
+				loadOutputFileMetadataFieldCombo();
 				loadWorkflow();
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41952");
@@ -83,6 +84,14 @@ namespace Extract
 				DialogResult = System::Windows::Forms::DialogResult::None;
 
 				marshal_context context;
+
+				// Verify that the name is not empty
+				if (String::IsNullOrEmpty(workflowNameTextBox->Text))
+				{
+					System::Windows::Forms::MessageBox::Show("Workflow name cannot be empty.");
+					workflowNameTextBox->Focus();
+					return;
+				}
 				ipWorkflowDefinition->Name = context.marshal_as<BSTR>(workflowNameTextBox->Text);
 				ipWorkflowDefinition->Description = context.marshal_as<BSTR>(descriptionTextBox->Text);
 
@@ -132,6 +141,11 @@ namespace Extract
 					ipWorkflowDefinition->OutputAttributeSet = context.marshal_as<BSTR>(selected->Name);
 				}
 				ipWorkflowDefinition->DocumentFolder = context.marshal_as<BSTR>(documentFolderTextBox->Text);
+
+				if (outputFileMetadataFieldComboBox->SelectedIndex >= 0)
+				{
+					ipWorkflowDefinition->OutputFileMetadataField = context.marshal_as<BSTR>((String^)outputFileMetadataFieldComboBox->SelectedItem);
+				}
 				
 				// This is a new workflow so add it to the database and set actions to what ever is selected
 				// in the combo boxes
@@ -181,6 +195,9 @@ namespace Extract
 
 				value = marshal_as<String^>(ipWorkflowDefinition->OutputAttributeSet);
 				outputAttributeSetComboBox->SelectedIndex = outputAttributeSetComboBox->FindStringExact(value);
+
+				value = marshal_as<String^>(ipWorkflowDefinition->OutputFileMetadataField);
+				outputFileMetadataFieldComboBox->SelectedIndex = outputFileMetadataFieldComboBox->FindStringExact(value);
 			}
 		}
 
@@ -255,6 +272,17 @@ namespace Extract
 			// Empty item at the first index
 			outputAttributeSetComboBox->Items->Insert(0, gcnew ListItemPair("", 0));
 		
+		}
+
+		Void Extract::FAMDBAdmin::AddModifyWorkflowForm::loadOutputFileMetadataFieldCombo()
+		{
+			outputFileMetadataFieldComboBox->Items->Clear();
+
+			IVariantVectorPtr ipMetadataFieldNames = _ipfamDatabase->GetMetadataFieldNames();
+			ListCtrlHelper::LoadListCtrl(outputFileMetadataFieldComboBox, ipMetadataFieldNames);
+
+			// Empty item at the first index
+			outputFileMetadataFieldComboBox->Items->Insert(0, "");
 		}
 
 #pragma endregion

@@ -97,6 +97,21 @@ namespace Extract {
 				}
 			}
 
+			// Loads a ComboBox list with values from IVariantVector
+			static void LoadListCtrl(ComboBox ^listCtrl, IVariantVectorPtr values)
+			{
+				// Clear the list so it can be reloaded
+				listCtrl->Items->Clear();
+
+				int numItems = values->Size;
+				for (int i = 0; i < numItems; i++)
+				{
+					_variant_t v = values->Item[i];
+					String ^newItem = marshal_as<String^>((_bstr_t)v);
+					listCtrl->Items->Add(newItem);
+				}
+			}
+
 #pragma endregion
 
 		};

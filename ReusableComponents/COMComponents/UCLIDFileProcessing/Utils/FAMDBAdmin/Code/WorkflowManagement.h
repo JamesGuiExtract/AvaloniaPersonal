@@ -207,7 +207,7 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 					| System::Windows::Forms::AnchorStyles::Right));
 				this->workflowComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->workflowComboBox->FormattingEnabled = true;
-				this->workflowComboBox->Location = System::Drawing::Point(6, 19);
+				this->workflowComboBox->Location = System::Drawing::Point(7, 20);
 				this->workflowComboBox->Name = L"workflowComboBox";
 				this->workflowComboBox->Size = System::Drawing::Size(323, 21);
 				this->workflowComboBox->TabIndex = 0;
@@ -216,7 +216,7 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// deleteWorkflowButton
 				// 
 				this->deleteWorkflowButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Right));
-				this->deleteWorkflowButton->Location = System::Drawing::Point(224, 44);
+				this->deleteWorkflowButton->Location = System::Drawing::Point(225, 47);
 				this->deleteWorkflowButton->Name = L"deleteWorkflowButton";
 				this->deleteWorkflowButton->Size = System::Drawing::Size(105, 23);
 				this->deleteWorkflowButton->TabIndex = 2;
@@ -226,12 +226,11 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// 
 				// actionsCheckedListBox
 				// 
-				this->actionsCheckedListBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
-					| System::Windows::Forms::AnchorStyles::Left)
+				this->actionsCheckedListBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
 					| System::Windows::Forms::AnchorStyles::Right));
 				this->actionsCheckedListBox->CheckOnClick = true;
 				this->actionsCheckedListBox->FormattingEnabled = true;
-				this->actionsCheckedListBox->Location = System::Drawing::Point(6, 16);
+				this->actionsCheckedListBox->Location = System::Drawing::Point(7, 19);
 				this->actionsCheckedListBox->Name = L"actionsCheckedListBox";
 				this->actionsCheckedListBox->Size = System::Drawing::Size(323, 244);
 				this->actionsCheckedListBox->TabIndex = 4;
@@ -241,7 +240,7 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// addActionButton
 				// 
 				this->addActionButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-				this->addActionButton->Location = System::Drawing::Point(6, 266);
+				this->addActionButton->Location = System::Drawing::Point(6, 268);
 				this->addActionButton->Name = L"addActionButton";
 				this->addActionButton->Size = System::Drawing::Size(105, 23);
 				this->addActionButton->TabIndex = 5;
@@ -252,7 +251,7 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// deleteActionButton
 				// 
 				this->deleteActionButton->Anchor = System::Windows::Forms::AnchorStyles::Bottom;
-				this->deleteActionButton->Location = System::Drawing::Point(115, 266);
+				this->deleteActionButton->Location = System::Drawing::Point(115, 268);
 				this->deleteActionButton->Name = L"deleteActionButton";
 				this->deleteActionButton->Size = System::Drawing::Size(105, 23);
 				this->deleteActionButton->TabIndex = 6;
@@ -263,7 +262,7 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// renameActionButton
 				// 
 				this->renameActionButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->renameActionButton->Location = System::Drawing::Point(224, 266);
+				this->renameActionButton->Location = System::Drawing::Point(224, 268);
 				this->renameActionButton->Name = L"renameActionButton";
 				this->renameActionButton->Size = System::Drawing::Size(105, 23);
 				this->renameActionButton->TabIndex = 7;
@@ -275,7 +274,7 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// 
 				this->closeButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->closeButton->DialogResult = System::Windows::Forms::DialogResult::OK;
-				this->closeButton->Location = System::Drawing::Point(236, 386);
+				this->closeButton->Location = System::Drawing::Point(238, 399);
 				this->closeButton->Name = L"closeButton";
 				this->closeButton->Size = System::Drawing::Size(105, 23);
 				this->closeButton->TabIndex = 9;
@@ -285,7 +284,7 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// modifyWorkflowButton
 				// 
 				this->modifyWorkflowButton->Anchor = System::Windows::Forms::AnchorStyles::Top;
-				this->modifyWorkflowButton->Location = System::Drawing::Point(115, 44);
+				this->modifyWorkflowButton->Location = System::Drawing::Point(116, 47);
 				this->modifyWorkflowButton->Name = L"modifyWorkflowButton";
 				this->modifyWorkflowButton->Size = System::Drawing::Size(105, 23);
 				this->modifyWorkflowButton->TabIndex = 1;
@@ -297,7 +296,7 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// 
 				this->saveChangesButton->Anchor = System::Windows::Forms::AnchorStyles::Bottom;
 				this->saveChangesButton->Enabled = false;
-				this->saveChangesButton->Location = System::Drawing::Point(127, 386);
+				this->saveChangesButton->Location = System::Drawing::Point(129, 399);
 				this->saveChangesButton->Name = L"saveChangesButton";
 				this->saveChangesButton->Size = System::Drawing::Size(105, 23);
 				this->saveChangesButton->TabIndex = 8;
@@ -307,7 +306,7 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// 
 				// addWorkflowButton
 				// 
-				this->addWorkflowButton->Location = System::Drawing::Point(6, 44);
+				this->addWorkflowButton->Location = System::Drawing::Point(7, 47);
 				this->addWorkflowButton->Name = L"addWorkflowButton";
 				this->addWorkflowButton->Size = System::Drawing::Size(105, 23);
 				this->addWorkflowButton->TabIndex = 1;
@@ -323,24 +322,22 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				this->workflowGroupBox->Controls->Add(this->workflowComboBox);
 				this->workflowGroupBox->Controls->Add(this->deleteWorkflowButton);
 				this->workflowGroupBox->Controls->Add(this->modifyWorkflowButton);
-				this->workflowGroupBox->Location = System::Drawing::Point(12, 12);
+				this->workflowGroupBox->Location = System::Drawing::Point(14, 12);
 				this->workflowGroupBox->Name = L"workflowGroupBox";
-				this->workflowGroupBox->Size = System::Drawing::Size(335, 72);
+				this->workflowGroupBox->Size = System::Drawing::Size(338, 80);
 				this->workflowGroupBox->TabIndex = 10;
 				this->workflowGroupBox->TabStop = false;
 				this->workflowGroupBox->Text = L"Workflow";
 				// 
 				// actionsGroupBox
 				// 
-				this->actionsGroupBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
-					| System::Windows::Forms::AnchorStyles::Left));
 				this->actionsGroupBox->Controls->Add(this->actionsCheckedListBox);
 				this->actionsGroupBox->Controls->Add(this->renameActionButton);
 				this->actionsGroupBox->Controls->Add(this->addActionButton);
 				this->actionsGroupBox->Controls->Add(this->deleteActionButton);
-				this->actionsGroupBox->Location = System::Drawing::Point(12, 90);
+				this->actionsGroupBox->Location = System::Drawing::Point(14, 96);
 				this->actionsGroupBox->Name = L"actionsGroupBox";
-				this->actionsGroupBox->Size = System::Drawing::Size(335, 294);
+				this->actionsGroupBox->Size = System::Drawing::Size(338, 300);
 				this->actionsGroupBox->TabIndex = 11;
 				this->actionsGroupBox->TabStop = false;
 				this->actionsGroupBox->Text = L"Actions";
@@ -349,7 +346,8 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// 
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-				this->ClientSize = System::Drawing::Size(359, 417);
+				this->CancelButton = this->closeButton;
+				this->ClientSize = System::Drawing::Size(362, 431);
 				this->Controls->Add(this->saveChangesButton);
 				this->Controls->Add(this->closeButton);
 				this->Controls->Add(this->workflowGroupBox);
