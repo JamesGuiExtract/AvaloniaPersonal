@@ -848,7 +848,7 @@ void CFAMDBAdminDlg::OnManageWorkflowActions()
 	try
 	{	
 		// Display the WorkflowManagement dialog
-		WorkflowManagement ^workFlow = gcnew WorkflowManagement(m_ipFAMDB, "");
+		WorkflowManagement ^workFlow = gcnew WorkflowManagement(m_ipFAMDB, marshal_as<String^>( m_strCurrentWorkflow));
 		NativeWindow ^currentWindow = __nullptr;
 		try
 		{
