@@ -205,6 +205,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\A418.tif" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ResultText.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

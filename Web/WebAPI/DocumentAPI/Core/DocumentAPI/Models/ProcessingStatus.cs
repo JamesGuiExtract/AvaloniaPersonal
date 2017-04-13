@@ -11,9 +11,14 @@
         public ErrorInfo Error { get; set; }
 
         /// <summary>
-        /// status of submitted document
+        /// status (code value) of submitted document
         /// </summary>
         public DocumentProcessingStatus DocumentStatus { get; set; }
+
+        /// <summary>
+        /// text name of status of submitted document
+        /// </summary>
+        public string StatusText { get; set; }
     }
 
     /// <summary>

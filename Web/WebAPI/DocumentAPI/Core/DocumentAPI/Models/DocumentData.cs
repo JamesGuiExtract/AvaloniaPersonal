@@ -345,13 +345,7 @@ namespace DocumentAPI.Models
 
                 try
                 {
-                    status = fileProcessingDB.GetFileStatus(fileId,
-                                                            workflow.StartAction,
-                                                            vbAttemptRevertIfLocked: false);
-                    /*
-                    TODO - remove above and enable this code instead (Note that the API might be different):
-                    status = fileProcessingDB.GetWorkflowStatus(fileId, workflow.StartAction);
-                    */
+                    status = fileProcessingDB.GetWorkflowStatus(fileId);
                 }
                 catch (Exception ex)
                 {
@@ -393,17 +387,13 @@ namespace DocumentAPI.Models
                     return DocumentProcessingStatus.Done;
 
                 case EActionStatus.kActionFailed:
-                case EActionStatus.kActionSkipped:
                     return DocumentProcessingStatus.Failed;
 
-                case EActionStatus.kActionPending:
                 case EActionStatus.kActionProcessing:
-                case EActionStatus.kActionUnattempted:
                     return DocumentProcessingStatus.Processing;
 
                 default:
-                    Contract.Violated(Inv($"Unknown value: {Convert.ToInt32(actionStatus)} for EActionStatus, for FileID: {fileId}"));
-                    return DocumentProcessingStatus.Failed;
+                    return DocumentProcessingStatus.NotApplicable;
             }
         }
 

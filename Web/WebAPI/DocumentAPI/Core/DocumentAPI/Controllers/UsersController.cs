@@ -33,7 +33,8 @@ namespace DocumentAPI.Controllers
                 return BadRequest("Password is empty");
             }
 
-            if (UserData.MatchUser(user))
+            var userData = new UserData(FileApiMgr.GetInterface(Utils.CurrentApiContext));
+            if (userData.MatchUser(user))
             {
                 return Ok("Logged in");
             }

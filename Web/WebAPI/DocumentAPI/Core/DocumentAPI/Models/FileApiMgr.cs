@@ -102,5 +102,11 @@ namespace DocumentAPI.Models
 
             return null;
         }
+
+        public static void ReleaseAll()
+        {
+            _interfaces.Clear();
+        }
+
     }
 }

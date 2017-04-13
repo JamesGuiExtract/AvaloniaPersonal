@@ -5,7 +5,7 @@ using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
-
+using System.Runtime.InteropServices;
 using WorkflowType = UCLID_FILEPROCESSINGLib.EWorkflowType;
 
 namespace Extract.Web.DocumentAPI.Test
@@ -84,7 +84,7 @@ namespace Extract.Web.DocumentAPI.Test
                     Assert.IsTrue(workflow.OutputAttributeSet.IsEquivalent("DataFoundByRules"), "Incorrect value for OutputAttributeSet: {0}", workflow.OutputAttributeSet);
                     Assert.IsTrue(workflow.Type == WorkflowType.kExtraction, "Incorrect value for Type: {0}", workflow.Type);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     throw;
                 }
@@ -99,10 +99,60 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
+                _testDbManager.RemoveDatabase(DbLabDE);
+            }
+        }
+
+        /// <summary>
+        /// basic test that list of current workflows can be retrieved
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void Test_GetWorkflowStatus()
+        {
+            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
+
+            try
+            {
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+
+                var c = Utils.SetDefaultApiContext();
+                var fileApi = FileApiMgr.GetInterface(c);
+                db = fileApi.Interface;
+
+                try
+                {
+                    var workflowStatus = WorkflowData.GetWorkflowStatus("");
+                    Assert.IsTrue(workflowStatus.Error.ErrorOccurred == true, "status should have the error flag set and does not");
+
+                    workflowStatus = WorkflowData.GetWorkflowStatus("InvalidWorkflow");
+                    Assert.IsTrue(workflowStatus.Error.ErrorOccurred == true, "status should have the error flag set and does not");
+
+                    workflowStatus = WorkflowData.GetWorkflowStatus("CourtOffice");
+                    Assert.IsTrue(workflowStatus.Error.ErrorOccurred == false, "status should NOT have the error flag set and it is");
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    fileApi.InUse = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                Marshal.FinalReleaseComObject(db);
+                GC.Collect();
 
                 _testDbManager.RemoveDatabase(DbLabDE);
             }
         }
+
 
         #endregion Public Test Functions
     }

@@ -63,7 +63,8 @@ namespace DocumentAPI
             var ps = new ProcessingStatus
             {
                 Error = MakeError(isError, message, code: 0),
-                DocumentStatus = status
+                DocumentStatus = status,
+                StatusText = Enum.GetName(typeof(DocumentProcessingStatus), status)
             };
 
             List<ProcessingStatus> lps = new List<ProcessingStatus>();
@@ -106,6 +107,21 @@ namespace DocumentAPI
             {
                 Error = MakeError(isError: false),
                 Attributes = lda
+            };
+        }
+
+        /// <summary>
+        /// makes a WorkflowStatus with an error message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns>a workflow status instance with the error info set</returns>
+        public static WorkflowStatus MakeWorkflowStatusError(string message)
+        {
+            return new WorkflowStatus
+            {
+                Error = Utils.MakeError(isError: true,
+                                        message: message,
+                                        code: -1)
             };
         }
 

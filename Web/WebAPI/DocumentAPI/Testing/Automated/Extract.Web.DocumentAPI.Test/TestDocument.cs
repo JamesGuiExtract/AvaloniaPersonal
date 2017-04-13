@@ -5,6 +5,8 @@ using NUnit.Framework;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Data.SqlClient;
+using System.Runtime.InteropServices;
 using ApiUtils = DocumentAPI.Utils;
 
 namespace Extract.Web.DocumentAPI.Test
@@ -65,16 +67,11 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_SubmitFile()
         {
-            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
-
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
 
-                var c = Utils.SetDefaultApiContext();
-                var inf = FileApiMgr.GetInterface(c);
-                inf.InUse = false;
-                db = inf.Interface;
+                Utils.SetDefaultApiContext();
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 var stream = new FileStream(filename, FileMode.Open);
@@ -110,7 +107,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
-                db.CloseAllDBConnections();
+                FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(DbLabDE);
             }
         }
@@ -121,16 +118,11 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_SubmitText()
         {
-            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
-
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
 
-                var c = Utils.SetDefaultApiContext();
-                var inf = FileApiMgr.GetInterface(c);
-                inf.InUse = false;
-                db = inf.Interface;
+                Utils.SetDefaultApiContext();
 
                 var result = DocumentData.SubmitText("Document 1, SSN: 111-22-3333, DOB: 10-04-1999").Result;
                 var fileId = DocumentData.ConvertIdToFileId(result.Id);
@@ -148,31 +140,63 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
-                db.CloseAllDBConnections();
+                FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(DbLabDE);
+            }
+        }
+
+        static void UpdateWorkflowFileTable()
+        {
+            try
+            {
+                using (var cmd = new SqlCommand())
+                {
+                    // NOTE: "Pooling=false;" keeps the connection from being pooled, and 
+                    // allows the conneciton to REALLY close, so the DB can be removed later.
+                    string connectionString = "Server=(local);Database=Demo_LabDE_Temp;Trusted_Connection=True;Pooling=false;";
+                    using (var conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        cmd.Connection = conn;
+                        cmd.CommandText = "INSERT INTO [dbo].[WorkflowFile] VALUES " +
+                                          "(1, 1), " +
+                                          "(1, 2), " +
+                                          "(1, 3), " +
+                                          "(1, 4), " +
+                                          "(1, 5), " +
+                                          "(1, 6), " +
+                                          "(1, 7), " +
+                                          "(1, 8), " +
+                                          "(1, 9), " +
+                                          "(1, 10);";
+
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error: {0}", ex.Message);
             }
         }
 
         [Test, Category("Automated")]
         public static void Test_GetStatus()
         {
-            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
-
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+                UpdateWorkflowFileTable();
 
-                var c = Utils.SetDefaultApiContext();
-                var inf = FileApiMgr.GetInterface(c);
-                inf.InUse = false;
-                db = inf.Interface;
+                Utils.SetDefaultApiContext();
 
-                for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
+                for (int i = 1; i <= 10; ++i)
                 {
                     var result = DocumentData.GetStatus(stringId: i.ToString());
                     Assert.IsTrue(result.Count > 0, "Empty result was returned");
                     var status = result[0];
-                    Assert.IsTrue(status.DocumentStatus == DocumentProcessingStatus.Done, "Unexpected processing state");
+                    Assert.IsTrue(status.DocumentStatus == DocumentProcessingStatus.Processing, "Unexpected processing state");
                 }
             }
             catch (Exception ex)
@@ -182,7 +206,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
-                db.CloseAllDBConnections();
+                FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(DbLabDE);
             }
         }
@@ -194,16 +218,11 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetFileResult()
         {
-            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
-
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
 
-                var c = Utils.SetDefaultApiContext();
-                var inf = FileApiMgr.GetInterface(c);
-                inf.InUse = false;
-                db = inf.Interface;
+                Utils.SetDefaultApiContext();
                 
                 for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                 {
@@ -220,31 +239,54 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
-                db.CloseAllDBConnections();
+                FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(DbLabDE);
             }
         }
 
+        static void SetupTextResultTest(string filename)
+        {
+            try
+            {
+                using (var cmd = new SqlCommand())
+                {
+                    // NOTE: "Pooling=false;" keeps the connection from being pooled, and 
+                    // allows the conneciton to REALLY close, so the DB can be removed later.
+                    string connectionString = "Server=(local);Database=Demo_LabDE_Temp;Trusted_Connection=True;Pooling=false;";
+                    using (var conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        cmd.Connection = conn;
+
+                        cmd.CommandText = ApiUtils.Inv($"UPDATE [dbo].[FileMetadataFieldValue] SET Value='{filename}' ") +
+                                                       "WHERE [FileID]=1 AND [MetadataFieldID]=6;";
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error: {0}", ex.Message);
+            }
+        }
+
+
         [Test, Category("Automated")]
         public static void Test_GetTextResult()
         {
-            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
-
             try
-            {
+            {   
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
 
-                var c = Utils.SetDefaultApiContext();
-                var inf = FileApiMgr.GetInterface(c);
-                inf.InUse = false;
-                db = inf.Interface;
+                var filename = _testFiles.GetFile("Resources.ResultText.txt");
+                SetupTextResultTest(filename);
 
-                for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
-                {
-                    var result = DocumentData.GetTextResult(textId: i.ToString()).Result;
-                    Assert.IsTrue(result.Error.ErrorOccurred == false, "error is indicated");
-                    Assert.IsTrue(String.IsNullOrEmpty(result.Error.Message), "error, message: {0}", result.Error.Message);
-                }
+                Utils.SetDefaultApiContext();
+
+                var result = DocumentData.GetTextResult(textId: "1").Result;
+                Assert.IsTrue(result.Error.ErrorOccurred == false, "error is indicated");
+                Assert.IsTrue(String.IsNullOrEmpty(result.Error.Message), "error, message: {0}", result.Error.Message);
             }
             catch (Exception ex)
             {
@@ -253,7 +295,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
-                db.CloseAllDBConnections();
+                FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(DbLabDE);
             }
         }
@@ -261,16 +303,11 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetDocumentType()
         {
-            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
-
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
 
-                var c = Utils.SetDefaultApiContext();
-                var inf = FileApiMgr.GetInterface(c);
-                inf.InUse = false;
-                db = inf.Interface;
+                Utils.SetDefaultApiContext();
 
                 for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                 {
@@ -300,7 +337,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
-                db.CloseAllDBConnections();
+                FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(DbLabDE);
             }
         }

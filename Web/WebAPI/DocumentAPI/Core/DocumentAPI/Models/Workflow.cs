@@ -243,27 +243,6 @@ namespace DocumentAPI.Models
     }
 
     /// <summary>
-    /// State of the workflow - running, stopped, or error
-    /// </summary>
-    public enum WorkflowState
-    {
-        /// <summary>
-        /// running
-        /// </summary>
-        Running = 1,
-
-        /// <summary>
-        /// stopped
-        /// </summary>
-        Stopped,
-
-        /// <summary>
-        /// error
-        /// </summary>
-        Error
-    }
-
-    /// <summary>
     /// overall status information of a workflow
     /// </summary>
     public class WorkflowStatus
@@ -276,26 +255,21 @@ namespace DocumentAPI.Models
         /// <summary>
         /// number of documents processing
         /// </summary>
-        public uint NumberProcessing { get; set; }
+        public int NumberProcessing { get; set; }
 
         /// <summary>
         /// number of documents done processing
         /// </summary>
-        public uint NumberDone { get; set; }
+        public int NumberDone { get; set; }
 
         /// <summary>
         /// number of documents that have failed
         /// </summary>
-        public uint NumberFailed { get; set; }
+        public int NumberFailed { get; set; }
 
         /// <summary>
-        /// number of documents that have been ignored
+        /// number of documents unattempted
         /// </summary>
-        public uint NumberIgnored { get; set; }
-
-        /// <summary>
-        /// the state of the specified workflow
-        /// </summary>
-        public string State { get; set; }
+        public int NumberUnattempted { get; set; }
     }
 }

@@ -124,17 +124,11 @@ namespace DocumentAPI
         {
             try
             {
+                /*
                 if (env.IsDevelopment())
                 {
-                    // For development only, add a default user account.
-                    var user = new User()
-                    {
-                        Username = "admin",
-                        Password = "a"
-                    };
-
-                    UserData.AddMockUser(user);
                 }
+                */
 
                 app.UseMvc();
 
