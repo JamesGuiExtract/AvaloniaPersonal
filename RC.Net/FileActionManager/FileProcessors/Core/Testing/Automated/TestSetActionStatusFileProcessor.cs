@@ -91,8 +91,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
                     var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
 
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask,
-                        threadCount: 1, filesToGrabCount: 1, keepProcessing: false))
+                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }
@@ -152,8 +151,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                     // Press the file
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask,
-                        threadCount: 1, filesToGrabCount: 1, keepProcessing: false))
+                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }
@@ -224,8 +222,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                     // Process the file
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask,
-                        threadCount: 1, filesToGrabCount: 1, keepProcessing: false))
+                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }
@@ -300,8 +297,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                     // Process first action on workflow1
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "Workflow1", setStatusTask,
-                        threadCount: 1, filesToGrabCount: 1, keepProcessing: false))
+                        fileProcessingDb, _FIRST_ACTION, "Workflow1", setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }
@@ -381,8 +377,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                     // Process all workflows
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask,
-                        threadCount: 1, filesToGrabCount: 1, keepProcessing: false))
+                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }
@@ -464,8 +459,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                     // Process files for all workflows
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask,
-                        threadCount: 1, filesToGrabCount: 1, keepProcessing: false))
+                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }

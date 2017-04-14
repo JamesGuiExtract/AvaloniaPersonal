@@ -2,12 +2,14 @@
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
-using UCLID_COMUTILSLib;
+using System.Threading;
+using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_FILEPROCESSORSLib;
+
+using static System.FormattableString;
 
 namespace Extract.FileActionManager.Database.Test
 {
@@ -789,8 +791,7 @@ namespace Extract.FileActionManager.Database.Test
                 var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, "A01_ExtractData", "", setStatusTask,
-                    threadCount: 1, filesToGrabCount: 1, keepProcessing: false))
+                    fileProcessingDb, "A01_ExtractData", "", setStatusTask))
                 {
                     famSession.WaitForProcessingToComplete();
                 }
@@ -812,7 +813,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 using (var famSession = new FAMProcessingSession(
                     fileProcessingDb, "A01_ExtractData", "", setStatusTask,
-                    threadCount: 2, filesToGrabCount: 2, keepProcessing: false))
+                    threadCount: 2, filesToGrabCount: 2))
                 {
                     famSession.WaitForProcessingToComplete();
                 }
@@ -880,8 +881,7 @@ namespace Extract.FileActionManager.Database.Test
                 var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, "A01_ExtractData", "Workflow1", setStatusTask,
-                    threadCount: 1, filesToGrabCount: 1, keepProcessing: false))
+                    fileProcessingDb, "A01_ExtractData", "Workflow1", setStatusTask))
                 {
                     famSession.WaitForProcessingToComplete();
                 }                
@@ -908,8 +908,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStats(extractAction2, false).NumDocumentsPending == 1);
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, "A01_ExtractData", "", setStatusTask,
-                    threadCount: 1, filesToGrabCount: 1, keepProcessing: false))
+                    fileProcessingDb, "A01_ExtractData", "", setStatusTask))
                 {
                     famSession.WaitForProcessingToComplete();
                 }
@@ -922,6 +921,101 @@ namespace Extract.FileActionManager.Database.Test
             {
                 _testFiles.RemoveFile(_LABDE_TEST_FILE1);
                 _testFiles.RemoveFile(_LABDE_TEST_FILE2);
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// <summary>
+        /// Tests that when the same file is queued to multiple workflows, it will process
+        /// separately for each workflow but never in more than one workflow at the same time.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void SameFileMultipleWorkflows()
+        {
+            GeneralMethods.TestSetup();
+
+            _testFiles = new TestFileManager<TestFAMFileProcessing>();
+            _testDbManager = new FAMTestDBManager<TestFAMFileProcessing>();
+
+            string testDbName = "Test_FileProcessingManagerWithWorkflows";
+
+            try
+            {
+                int threadCount = 4;
+                var threadReadyEvent = new CountdownEvent(threadCount);
+                var startProcessingEvent = new ManualResetEvent(false);
+
+                string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
+                FileProcessingDB fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+
+                // Create a separate workflow for each thread and queue the same file to each workflow.
+                for (int i = 1; i <= threadCount; i++)
+                {
+                    string workflowName = Invariant($"Workflow{i}");
+                    int workflowID = fileProcessingDb.AddWorkflow(workflowName, EWorkflowType.kUndefined);
+                    fileProcessingDb.SetWorkflowActions(workflowID, new[] { "A01_ExtractData" }.ToVariantVector());
+
+                    fileProcessingDb.AddFile(testFileName1, "A01_ExtractData", workflowID, EFilePriority.kPriorityNormal,
+                        false, false, EActionStatus.kActionPending, false, out bool alreadyExists, out EActionStatus previousStatus);
+                }
+
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsPending == threadCount);
+
+                // Each processing thread will try to process a file in one of the created workflows.
+                Action processingThreadAction = () =>
+                {
+                    var sleepTaskConfig = new SleepTask();
+                    sleepTaskConfig.SleepTime = 1;
+                    sleepTaskConfig.TimeUnits = ESleepTimeUnitType.kSleepSeconds;
+                    var sleepTask = (IFileProcessingTask)sleepTaskConfig;
+
+                    // Wait until all threads are ready before starting processing to help ensure
+                    // all workflows will be competing for the file simultaneously.
+                    threadReadyEvent.Signal();
+                    startProcessingEvent.WaitOne();
+
+                    using (var famSession = new FAMProcessingSession(
+                        fileProcessingDb, "A01_ExtractData", "", sleepTask,
+                        threadCount: 1, filesToGrabCount: 1, keepProcessing: false, docsToProcess: 1))
+                    {
+                        int processed = famSession.WaitForProcessingToComplete();
+                        Assert.That(processed == 1);
+                    }
+                };
+
+                // Launch the processing threads
+                //Assert.That(Task.Factory.Scheduler.MaximumConcurrencyLevel >= (threadCount + 1));
+                var tasks = Enumerable
+                    .Range(0, threadCount)
+                    .Select(x => Task.Factory.StartNew(processingThreadAction))
+                    .ToArray();
+
+                // In order to ensure as much as possible that all processing threads are competing
+                // to processing the same file, wait until all processing threads are active before
+                // allowing them to commence processing. If all threads haven't started in 1 second
+                // it is not likely multithreading is happening to a degree that will allow for a
+                // good test.
+                Assert.That(threadReadyEvent.Wait(1000));
+                startProcessingEvent.Set();
+
+                // Check 10 times per sec to ensure that there is never any more than 1 file
+                // processing at a time (that the file is not being simultaneously processed in
+                // more than one workflow)
+                do
+                {
+                    var stats = fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false);
+                    int processing = stats.NumDocumentsPending + stats.NumDocumentsComplete;
+
+                    Assert.That(processing >= (threadCount - 1));
+                }
+                while (!Task.WaitAll(tasks, 100));
+
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsPending == 0);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsComplete == threadCount);
+            }
+            finally
+            {
+                _testFiles.RemoveFile(_LABDE_TEST_FILE1);
                 try
                 {
                     _testDbManager.RemoveDatabase(testDbName);

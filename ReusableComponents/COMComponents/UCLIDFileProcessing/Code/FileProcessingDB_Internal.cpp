@@ -2384,7 +2384,7 @@ int CFileProcessingDB::getDBSchemaVersion()
 	{
 		return m_iDBSchemaVersion;
 	}
-	
+
 	// Get all of the settings from the DBInfo
 	loadDBInfoSettings(getDBConnection());
 
@@ -4238,9 +4238,8 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 	try
 	{
 		// Setup Setting Query
-		string strSQL = "SELECT [LockedFile].[FileID], [Action].[ID] as ActionID, StatusBeforeLock, ASCName "
+		string strSQL = "SELECT [LockedFile].[FileID], [LockedFile].[ActionID], StatusBeforeLock, [ActionName] "
 			" FROM LockedFile "
-			" INNER JOIN [Action] ON [LockedFile].[ActionID] = [Action].[ID]"
 			" INNER JOIN [FileActionStatus] ON [LockedFile].[ActionID] = [FileActionStatus].[ActionID]"
 			"	AND [LockedFile].[FileID] = [FileActionStatus].[FileID]"
 			" WHERE [LockedFile].[ActiveFAMID] = " + asString(nActiveFAMID) +
@@ -4263,7 +4262,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			FieldsPtr ipFields = ipFileSet->Fields;
 
 			// Get the action name and previous status
-			string strActionName = getStringField(ipFields, "ASCName");
+			string strActionName = getStringField(ipFields, "ActionName");
 			string strRevertToStatus = getStringField(ipFields, "StatusBeforeLock");
 
 			// Add to the count

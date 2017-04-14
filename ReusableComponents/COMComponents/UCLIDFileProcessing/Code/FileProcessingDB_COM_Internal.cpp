@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 145;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 146;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1663,6 +1663,36 @@ int UpdateToSchemaVersion145(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42168");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion146(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 146;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE dbo.[LockedFile] DROP CONSTRAINT [PK_LockedFile]");
+		vecQueries.push_back("ALTER TABLE dbo.[LockedFile] ADD [ActionName] NVARCHAR(50) NOT NULL");
+		vecQueries.push_back("ALTER TABLE dbo.[LockedFile] "
+			"ADD CONSTRAINT [PK_LockedFile] PRIMARY KEY CLUSTERED ([FileID], [ActionName])");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42183");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -1933,6 +1963,8 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 					if (m_bUsingWorkflows)
 					{
+						// NOTE: If the workflow/file pair is not yet in [WorkflowFile], it will be
+						// added as part of setStatusForFile below.
 						string strFileInWorkflowSQL = Util::Format("SELECT COUNT(*) AS [ID] FROM [WorkflowFile] "
 							"WHERE [FileID] = %d AND [WorkflowID] = %d", nID, nWorkflowID);
 
@@ -2090,6 +2122,15 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 						addSkipFileRecord(ipConnection, nID, nActionID);
 					}
 
+					// In the case that the file did exist in the DB, but not the workflow, the
+					// [WorkflowFile] row will be added as part of the setStatusForFile call.
+					if (!bAlreadyExistsInWorkflow && nWorkflowID > 0)
+					{
+						executeCmdQuery(ipConnection, Util::Format(
+							"INSERT INTO [WorkflowFile] ([WorkflowID], [FileID]) VALUES (%d,%d)",
+							nWorkflowID, nID));
+					}
+
 					_lastCodePos = "87";
 
 					// update the statistics
@@ -2105,7 +2146,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					{
 						// Call setStatusForFile to handle updating all tables related to the status
 						// change, as appropriate.
-						setStatusForFile(ipConnection, nID, strActionName, -1, kActionPending, true, false);
+						setStatusForFile(ipConnection, nID, strActionName, nWorkflowID, kActionPending, true, false);
 
 						_lastCodePos = "110";
 
@@ -2138,14 +2179,6 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 				// Set the new file Record ID to nID;
 				ipNewFileRecord->FileID = nID;
-
-				// If a workflow is being used, record this file as being part of the workflow
-				if (!bAlreadyExistsInWorkflow && nWorkflowID > 0)
-				{
-					executeCmdQuery(ipConnection, Util::Format(
-						"INSERT INTO [WorkflowFile] ([WorkflowID], [FileID]) VALUES (%d,%d)",
-						nWorkflowID, nID));
-				}
 
 				_lastCodePos = "155";
 
@@ -3242,9 +3275,15 @@ bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrA
 			_RecordsetPtr ipActionSet(__uuidof(Recordset));
 			ASSERT_RESOURCE_ALLOCATION("ELI42086", ipActionSet != __nullptr);
 
-			string strQuery = "SELECT * FROM [Action]"
-				"	WHERE [ASCName] = '" + strActionName + "'" +
-				"	AND [WorkFlowID] IS NOT NULL";
+			long nWorkflowActionCount = 0;
+			executeCmdQuery(ipConnection, 
+				"SELECT COUNT(*) AS [ID] FROM [Action] WHERE [WorkflowID] IS NOT NULL",
+				false, &nWorkflowActionCount);
+
+			string strQuery = Util::Format("SELECT * FROM [Action] WHERE [ASCName] = '%s' "
+				"AND [WorkFlowID] IS %s",
+				strActionName.c_str(),
+				(nWorkflowActionCount > 0) ? "NOT NULL" : "NULL");
 
 			// Open the Action table
 			ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
@@ -6952,7 +6991,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 142:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion143);
 				case 143:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion144);
 				case 144:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion145);
-				case 145:	break;
+				case 145:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion146);
+				case 146:	break;
 
 				default:
 					{
