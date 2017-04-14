@@ -37,7 +37,8 @@ m_isDBConnectionReady(false),
 m_nNumberOfFilesToExecute(0),
 m_bCancelling(false),
 m_bIsAuthenticated(false),
-m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
+m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB),
+m_strActiveWorkflow("")
 {
 	try
 	{

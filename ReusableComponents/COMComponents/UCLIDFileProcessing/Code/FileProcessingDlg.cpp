@@ -278,9 +278,6 @@ BOOL FileProcessingDlg::OnInitDialog()
 			// so this must happen after the status bar is created
 			createPropertyPages();
 
-			// Set the active workflow to empty string will be interpeted as <All Workflows>
-			getFPM()->ActiveWorkflow = "";
-
 			// create the database status icon updater object
 			m_apDatabaseStatusIconUpdater = unique_ptr<DatabaseStatusIconUpdater> 
 				(new DatabaseStatusIconUpdater(m_statusBar, gnDB_CONNECTION_STATUS_PANE_ID, this));
