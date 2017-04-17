@@ -533,6 +533,9 @@ namespace Extract.Utilities.ContextTags
                         switch (version)
                         {
                             case 1:
+                                UpdateFromVersion1SchemaToVersion2();
+                                break;
+                            case 2:
                                 break;
 
                             default:
@@ -574,5 +577,53 @@ namespace Extract.Utilities.ContextTags
         }
 
         #endregion IDatabaseSchemaManager Members
+
+        #region Database Schema Update Methods
+
+        /// <summary>
+        /// Updates from version 1 schema to version 2
+        /// </summary>
+        private void UpdateFromVersion1SchemaToVersion2()
+        {
+            using (var currentDb = new ContextTagDatabase(_databaseFile))
+            {
+                if (currentDb.Connection.State != ConnectionState.Open)
+                {
+                    currentDb.Connection.Open();
+                }
+                using (var trans = currentDb.Connection.BeginTransaction())
+                {
+                    try
+                    {
+                        currentDb.ExecuteCommand("ALTER TABLE TagValue DROP CONSTRAINT PK_TagValue");
+                        currentDb.ExecuteCommand("ALTER TABLE TagValue ADD COLUMN Workflow NVARCHAR(100) NOT NULL DEFAULT ''");
+                        currentDb.ExecuteCommand("ALTER TABLE TagValue ADD CONSTRAINT PK_TagValue PRIMARY KEY([ContextID], [TagID], [Workflow])");
+
+                        // Update the schema version to 2
+                        var setting = currentDb.Settings
+                            .Where(s => s.Name == ContextTagsDBSchemaVersionKey)
+                            .FirstOrDefault();
+                        if (setting.Value == null)
+                        {
+                            var ee = new ExtractException("ELI43186",
+                                "No Context tag db schema version key found.");
+                            ee.AddDebugData("Database File", _databaseFile, false);
+                            throw ee;
+                        }
+                        setting.Value = "2";
+                        currentDb.SubmitChanges(ConflictMode.FailOnFirstConflict);
+                        trans.Commit();
+                    }
+                    catch(Exception ex)
+                    {
+                        trans.Rollback();
+                        throw ex.AsExtract("ELI43185");
+                    }
+                }
+            }
+        }
+        
+        #endregion
+
     }
 }

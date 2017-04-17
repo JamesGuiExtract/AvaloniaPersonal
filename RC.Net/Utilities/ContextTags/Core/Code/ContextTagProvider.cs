@@ -48,9 +48,11 @@ namespace Extract.Utilities.ContextTags
 
         /// <summary>
         /// Keeps track of the value for all tags in the current context.
+        /// Primary key is workflow name
+        /// Secondary key is tag name
         /// </summary>
-        Dictionary<string, string> _tagValues =
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, Dictionary<string, string>> _workflowTagValues =
+            new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// A cached <see cref="VariantVector"/> for each thread that calls into GetTagNames.
@@ -163,7 +165,8 @@ namespace Extract.Utilities.ContextTags
                     VariantVector tagNamesVector;
                     if (!_tagNamesVectors.TryGetValue(Thread.CurrentThread.ManagedThreadId, out tagNamesVector))
                     {
-                        tagNamesVector = _tagValues.Keys.ToVariantVector();
+                        // The "" workflow has all the tag names
+                        tagNamesVector = _workflowTagValues[""].Keys.ToVariantVector();
                         _tagNamesVectors[Thread.CurrentThread.ManagedThreadId] = tagNamesVector;
                     }
 
@@ -183,17 +186,24 @@ namespace Extract.Utilities.ContextTags
         /// Gets the value for the specified tag in the <see cref="ActiveContext"/>.
         /// </summary>
         /// <param name="tagName">Name of the tag.</param>
+        /// <param name="workflow">Workflow tag value to get</param>
         /// <returns>The value for the specified tag in the <see cref="ActiveContext"/>.</returns>
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
-        public string GetTagValue(string tagName)
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "1#")]
+        public string GetTagValue(string tagName, string workflow)
         {
             try 
 	        {
                 lock (_lock)
                 {
-                    return _tagValues[tagName];
+                    // If the workflow is a key return tag value for that workflow
+                    if (!_workflowTagValues.ContainsKey(workflow))
+                    {
+                        workflow = "";
+                    }
+                    return _workflowTagValues[workflow][tagName];
                 }
-	        }
+            }
 	        catch (Exception ex)
 	        {
                 var ee = ex.AsExtract("ELI37962");
@@ -255,10 +265,12 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Gets the tags that have not been defined values in the current context.
+        /// Gets the tags that have not been defined in the current context.
         /// </summary>
+        /// <param name="workflow">Workflow for the undefined tags</param>
         /// <returns>The tags that have not been defined values in the current context.</returns>
-        public VariantVector GetUndefinedTags()
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
+        public VariantVector GetUndefinedTags(string workflow)
         {
             try 
 	        {
@@ -267,13 +279,17 @@ namespace Extract.Utilities.ContextTags
                     return new VariantVector();
                 }
 
-                return _tagValues
-                    .Where(tag => string.IsNullOrWhiteSpace(tag.Value) && 
+                if (!_workflowTagValues.ContainsKey(workflow))
+                {
+                    workflow = "";
+                }
+                return _workflowTagValues[workflow]
+                    .Where(tag => string.IsNullOrWhiteSpace(tag.Value) &&
                         !tag.Key.Equals(_EDIT_CUSTOM_TAGS_LABEL, StringComparison.OrdinalIgnoreCase))
                     .Select(tag => tag.Key)
                     .ToVariantVector();
-	        }
-	        catch (Exception ex)
+            }
+            catch (Exception ex)
 	        {
 		        throw ex.CreateComVisible("ELI38094", "Failed to check tag values.");
 	        }
@@ -294,12 +310,61 @@ namespace Extract.Utilities.ContextTags
             }
         }
 
+        /// <summary>
+        /// Returns a VariantVector of workflows that have defined tag values
+        /// </summary>
+        /// <returns>VariantVector of workflows that have defined tag values</returns>
+        public VariantVector GetWorkflowsThatHaveValues()
+        {
+            try
+            {
+                return _workflowTagValues.Keys.ToVariantVector();
+            }
+            catch(Exception ex)
+            {
+                throw ex.CreateComVisible("ELI43226", "Failed to get workflows with context tag values.");
+            }
+        }
+
+        /// <summary>
+        /// Gets the StrToStrMap that contains the context tag names and value pairs for the workflow
+		/// if the workflow is not defined it will return the default tags
+        /// </summary>
+        /// <param name="workflow">The workflow to return pairs for</param>
+        /// <returns>StrToStrMap of ContextTagNames with their value</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
+        public StrToStrMap GetTagValuePairsForWorkflow(string workflow)
+        {
+            try
+            {
+                if (!_workflowTagValues.ContainsKey(workflow))
+                {
+                    workflow = "";
+                }
+                var tagValues = _workflowTagValues[workflow];
+
+                StrToStrMap mapOfContextTags = new StrToStrMap();
+                mapOfContextTags.CaseSensitive = false;
+
+                foreach (var entry in tagValues)
+                {
+                    mapOfContextTags.Set(entry.Key, entry.Value);
+                }
+
+                return mapOfContextTags;
+            }
+            catch(Exception ex)
+            {
+                throw ex.CreateComVisible("ELI43231", "Failed to get context tag values for workflow.");
+            }
+        }
+
         #endregion IContextTagProvider
 
         #region Private Members
 
         /// <summary>
-        /// Initializes <see cref="_tagValues"/> with the tags for the specified
+        /// Initializes <see cref="_workflowTagValues"/> with the tags for the specified
         /// <see paramref="contextPath"/>.
         /// </summary>
         /// <param name="contextPath">The path for which the context-specific tags are to be loaded.
@@ -310,7 +375,7 @@ namespace Extract.Utilities.ContextTags
         {
             lock (_lock)
             {
-                _tagValues.Clear();
+                _workflowTagValues.Clear();
                 _tagNamesVectors.Clear();
 
                 // Clear the active context
@@ -321,13 +386,16 @@ namespace Extract.Utilities.ContextTags
                 {
                     return false;
                 }
+                
+                // Always add the default - this may get removed later but if there are not tags defined this needs to exist
+                _workflowTagValues.Add("", new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
 
                 // If _SETTING_FILENAME doesn't exist, there is nothing more to do.
                 string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
                 if (!File.Exists(settingFileName))
                 {
                     // Even if there are no custom tags available, provide the option to edit.
-                    _tagValues.Add(_EDIT_CUSTOM_TAGS_LABEL, "");
+                    _workflowTagValues[""].Add(_EDIT_CUSTOM_TAGS_LABEL, "");
                     return false;
                 }
 
@@ -361,12 +429,45 @@ namespace Extract.Utilities.ContextTags
                         {
                             // The row that is mapped to the new row in a DataGridView can end up being
                             // persisted. Ignore any unnamed custom tags.
-                            _tagValues = database.TagValue
+
+                            // Get the workflows
+                            var workflows = database.TagValue
                                 .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
                                     tagValue.CustomTag.Name != "")
-                                .OrderBy(tagValue => tagValue.CustomTag.Name)
-                                .ToDictionary(tagValue => 
-                                    tagValue.CustomTag.Name, tagValue => tagValue.Value);
+                                .Select(w => w.Workflow)
+                                .Distinct().ToList();
+                            
+                            // Get dictionary of values for each workflow
+                            foreach (string workflow in workflows)
+                            {
+                                // Get the values that are for the current workflow
+                                var workflowValues = database.TagValue
+                                    .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
+                                        tagValue.CustomTag.Name != "" && tagValue.Workflow == workflow)
+                                    .Select(tagValue => new { tagValue.CustomTag.Name, tagValue.Value })
+                                    .Distinct();
+
+                                var definedTags = workflowValues.Select(v => v.Name);
+
+                                if (!string.IsNullOrEmpty(workflow))
+                                {
+                                    _workflowTagValues.Remove(workflow);
+                                    _workflowTagValues[workflow] = workflowValues
+                                        .Union(database.TagValue
+                                        .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
+                                            tagValue.CustomTag.Name != "" && !definedTags.Contains(tagValue.CustomTag.Name) && tagValue.Workflow == "")
+                                        .Select(tagValue => new { tagValue.CustomTag.Name, tagValue.Value })
+                                        .Distinct())
+                                        .ToDictionary(tagValue =>
+                                            tagValue.Name, tagValue => tagValue.Value, StringComparer.OrdinalIgnoreCase);
+                                }
+                                else
+                                {
+                                    _workflowTagValues.Remove(workflow);
+                                    _workflowTagValues[workflow] = workflowValues.ToDictionary(tagValue =>
+                                        tagValue.Name, tagValue => tagValue.Value, StringComparer.OrdinalIgnoreCase);
+                                }
+                            }
                         }
                         else
                         {
@@ -377,7 +478,7 @@ namespace Extract.Utilities.ContextTags
                    }
                 }
 
-                _tagValues.Add(_EDIT_CUSTOM_TAGS_LABEL, "");
+                _workflowTagValues[""].Add(_EDIT_CUSTOM_TAGS_LABEL, "");
 
                 return databasePopulated;
             }

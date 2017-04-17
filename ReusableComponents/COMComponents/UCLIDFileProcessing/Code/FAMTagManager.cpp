@@ -21,6 +21,7 @@ const string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
 const string strDATABASE_SERVER_TAG = "<DatabaseServer>";
 const string strDATABASE_NAME_TAG = "<DatabaseName>";
 const string strDATABASE_ACTION_TAG = "<ActionName>";
+const string strWORKFLOW_TAG = "<Workflow>";
 const string strMRU_MUTEX_NAME = "ExtractContextMRURegistryMutex";
 
 //--------------------------------------------------------------------------------------------------
@@ -30,15 +31,16 @@ string CFAMTagManager::ms_strFPSDir;
 string CFAMTagManager::ms_strFPSFileName;
 CMutex CFAMTagManager::ms_mutex;
 IContextTagProviderPtr CFAMTagManager::ms_ipContextTagProvider;
-map<string, string> CFAMTagManager::ms_mapContextTags;
+map<stringCSIS, map<stringCSIS, stringCSIS>> CFAMTagManager::ms_mapWorkflowContextTags;
 
 //--------------------------------------------------------------------------------------------------
 // CFAMTagManager
 //--------------------------------------------------------------------------------------------------
 CFAMTagManager::CFAMTagManager()
-: m_ipMiscUtils(CLSID_MiscUtils)
-, m_bAlwaysShowDatabaseTags(false)
-, m_mutexMRU(FALSE,strMRU_MUTEX_NAME.c_str())
+	: m_ipMiscUtils(CLSID_MiscUtils)
+	, m_bAlwaysShowDatabaseTags(false)
+	, m_mutexMRU(FALSE, strMRU_MUTEX_NAME.c_str())
+	, m_strWorkflow("")
 {
 	ASSERT_RESOURCE_ALLOCATION("ELI35226", m_ipMiscUtils != __nullptr);
 
@@ -554,7 +556,7 @@ STDMETHODIMP CFAMTagManager::ValidateConfiguration(BSTR bstrDatabaseServer, BSTR
 		ASSERT_ARGUMENT("ELI38106", bstrDatabaseName != __nullptr);
 		ASSERT_ARGUMENT("ELI38107", pbstrWarning != __nullptr);
 
-		IVariantVectorPtr ipUndefinedTags = ms_ipContextTagProvider->GetUndefinedTags();
+		IVariantVectorPtr ipUndefinedTags = ms_ipContextTagProvider->GetUndefinedTags(m_strWorkflow.c_str());
 		ASSERT_RESOURCE_ALLOCATION("ELI38097", ipUndefinedTags != __nullptr);
 
 		long nUndefinedTagCount = ipUndefinedTags->Size;
@@ -740,6 +742,38 @@ STDMETHODIMP CFAMTagManager::RefreshContextTags()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39273");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::get_Workflow(BSTR *strWorkflow)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI43223", strWorkflow != __nullptr);
+
+		CSingleLock lock(&ms_mutex, TRUE);
+		*strWorkflow = _bstr_t(m_strWorkflow.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43224");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::put_Workflow(BSTR strWorkflow)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		CSingleLock lock(&ms_mutex, TRUE);
+		m_strWorkflow = asString(strWorkflow);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43225");
+}
 
 //--------------------------------------------------------------------------------------------------
 // ILicensedComponent
@@ -836,9 +870,16 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 	// Expand these before the built-in tags so that built-in tags can be used within custom
 	// environment tags.
 	CSingleLock lock(&ms_mutex, TRUE);
-	if (!ms_mapContextTags.empty())
+	if (!ms_mapWorkflowContextTags.empty())
 	{
-		long nTagCount = ms_mapContextTags.size();
+		// Workflow being asked for may not have entries in the context tag provider so change to default values(workflow="")
+		stringCSIS workflowToUse = m_strWorkflow;
+		if (ms_mapWorkflowContextTags.find(m_strWorkflow) == ms_mapWorkflowContextTags.end())
+		{
+			workflowToUse = "";
+		}
+		
+		long nTagCount = ms_mapWorkflowContextTags[workflowToUse].size();
 		
 		// In order to allow custom tags to contain other custom tags (e.g., <OutputImage> could be
 		// defined as <OutputPath>\$FileOf(<SourceDocName>)), continue iterate tag expansion as long
@@ -848,7 +889,7 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 		{
 			string strOriginal = rstrInput;
 
-			for each (pair<string, string> contextTag in ms_mapContextTags)
+			for each (pair<stringCSIS, stringCSIS> contextTag in ms_mapWorkflowContextTags[workflowToUse])
 			{
 				replaceVariable(rstrInput, contextTag.first, contextTag.second);
 			}
@@ -982,16 +1023,31 @@ void CFAMTagManager::refreshContextTags()
 	// Cache the context the tag values to avoid frequent COM calls which also tend to leak
 	// memory since the returned VariantVector type is not currently supported by the
 	// ReportMemoryUsage framework.
-	ms_mapContextTags.clear();
-	IVariantVectorPtr ipTagNames = ms_ipContextTagProvider->GetTagNames();
-	ASSERT_RESOURCE_ALLOCATION("ELI37905", ipTagNames != __nullptr);
+	ms_mapWorkflowContextTags.clear();
 
-	long nTagCount = ipTagNames->Size;
-	for (long i = 0; i < nTagCount; i++)
+	// Get the workflows that have values
+	IVariantVectorPtr ipWorkflows =  ms_ipContextTagProvider->GetWorkflowsThatHaveValues();
+
+	long nNumberOfWorkflows = ipWorkflows->Size;
+	for (long n = 0; n < nNumberOfWorkflows; n++)
 	{
-		string strName = asString(ipTagNames->Item[i].bstrVal);
-		string strValue = ms_ipContextTagProvider->GetTagValue(ipTagNames->Item[i].bstrVal);
-		ms_mapContextTags[strName] = strValue;
+		variant_t vtWorkflow = ipWorkflows->Item[n];
+
+		stringCSIS strWorkflow(asString(vtWorkflow.bstrVal), false);
+		
+		IStrToStrMapPtr ipContextNameValuePairs = ms_ipContextTagProvider->GetTagValuePairsForWorkflow(vtWorkflow.bstrVal);
+
+		IIUnknownVectorPtr ipContextPairs = ipContextNameValuePairs->GetAllKeyValuePairs();
+		long nTagCount = ipContextPairs->Size();
+		for (long i = 0; i < nTagCount; i++)
+		{
+			IStringPairPtr ipPair = ipContextPairs->At(i);
+			
+			stringCSIS strName(asString(ipPair->StringKey), false);
+			stringCSIS strValue(asString(ipPair->StringValue), false);
+
+			ms_mapWorkflowContextTags[strWorkflow][strName] = strValue;
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------

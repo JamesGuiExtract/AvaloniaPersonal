@@ -2,10 +2,13 @@
 using Extract.SQLCDBEditor;
 using Extract.Utilities.Forms;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Linq;
 using System.Windows.Forms;
+using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.Utilities.ContextTags
 {
@@ -63,9 +66,24 @@ namespace Extract.Utilities.ContextTags
         Button _addDatabaseTagsButton;
 
         /// <summary>
+        /// Combo box to select workflow values to display/edit
+        /// </summary>
+        ComboBox _workflowComboBox;
+
+        /// <summary>
+        /// Label for the workflow combo
+        /// </summary>
+        Label _workflowLabel;
+
+        /// <summary>
         /// Indicates if the host is in design mode or not.
         /// </summary>
         readonly bool _inDesignMode;
+
+        /// <summary>
+        /// Dictionary to hold the workflows for the combo box
+        /// </summary>
+        List<String> _workflows;
 
         #endregion Fields
 
@@ -185,6 +203,21 @@ namespace Extract.Utilities.ContextTags
                 _addDatabaseTagsButton = pluginManager.GetNewButton();
                 _addDatabaseTagsButton.Text = "Add Database Tags";
                 _addDatabaseTagsButton.Click += HandleAddDatabaseTagsButton_Click;
+
+                _workflowComboBox = new ComboBox();
+                _workflowComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+                _workflowLabel = new Label();
+                _workflowLabel.Text = "Workflow:";
+                _workflowLabel.Visible = false;
+                pluginManager.AddControlToPluginToolStrip(_workflowLabel);
+                _workflowLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+                _workflowComboBox.Width += _workflowComboBox.Width;
+                _workflowComboBox.Visible = false;
+                pluginManager.AddControlToPluginToolStrip(_workflowComboBox);
+
+                pluginManager.DataChanged += HandlePluginManager_DataChanged;
+
+                UpdateWorkflowCombo();
             }
             catch (Exception ex)
             {
@@ -223,22 +256,27 @@ namespace Extract.Utilities.ContextTags
                     _database = new ContextTagDatabase(_connection);
                 }
 
-                // In cases where the data has been modified via the database and not the table, 
-                // a simple refresh of _contextTagsView seems to allow for a situation where the
-                // data is apparently not in sync with the DB and DataGridView.OnRowEnter will
-                // trigger an exception "index -1 does not have a value". While I am not sure what
-                // is specifically wrong, always re-creating _contextTagsView avoids the issue.
-                if (_contextTagsView != null)
+				// Initialize or refresh data in the context tags view
+				// Previously there was an issue with refresh that caused exception
+				// the ContextTagsEditorViewCollection Refresh method has been modified to 
+				// fix this problem
+                if (_contextTagsView == null)
                 {
-                    _contextTagsView.Dispose();
+                    _contextTagsView = new ContextTagsEditorViewCollection(_database, _workflowComboBox?.Text ?? "");
+                    _contextTagsView.DataChanged += HandleContextTagsView_DataChanged;
                 }
-                _contextTagsView = new ContextTagsEditorViewCollection(_database);
-                _contextTagsView.DataChanged += HandleContextTagsView_DataChanged;
+                else
+                {
+                    _contextTagsView.ActiveWorkflow = _workflowComboBox?.Text ?? "";
+                    _contextTagsView.Refresh();
+                }
 
                 // The AllowNew set needs to come after Refresh; if AllowNew is set before the data
                 // is initialized via the refresh call, errors will result as a the DataGridView is
                 // initialized. 
                 _contextTagsView.AllowNew = true;
+
+                UpdateWorkflowCombo();
             }
             catch (Exception ex)
             {
@@ -371,6 +409,41 @@ namespace Extract.Utilities.ContextTags
             }
         }
 
+        /// <summary>
+        /// Handles the DataChanged event from Plugin manager
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="DataChangedEventArgs"/> instance containing the event data</param>
+        void HandlePluginManager_DataChanged(object sender, DataChangedEventArgs e)
+        {
+            try
+            {
+                UpdateWorkflowCombo();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI43273");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ComboBox.SelectionChangeCommitted"/> event of the <see cref="_workflowComboBox"/>. 
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleWorkflowComboBox_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            try
+            {
+                RefreshData();
+            }
+            catch (Exception ex)
+            {
+
+                ex.ExtractDisplay("ELI43268");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -401,6 +474,116 @@ namespace Extract.Utilities.ContextTags
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI38042");
+            }
+        }
+
+        /// <summary>
+        /// Sets the _workflows member variable to contain a list of workflows obtained from
+		/// all the databases that have been defined with the DatabaseServer and DatabaseName tags
+		/// and also include any workflows that are currently used in the Context tags database file
+        /// </summary>
+        void GetWorkflows()
+        {
+            _workflows = new List<string>();
+
+            // Add the workflows that are already in the database
+            var workflowsInContextDB = _database.TagValue
+                .Where(w => w.Workflow != "")
+                .Select(s => s.Workflow)
+                .Distinct();
+
+            _workflows.AddRange(workflowsInContextDB);
+
+            var DatabaseServerTagID = _database.CustomTag
+                .Where(t => t.Name == _DATABASE_SERVER_TAG)
+                .Select(s => s.ID)
+                .SingleOrDefault();
+            var DatabaseNameTagID = _database.CustomTag
+                .Where(t => t.Name == _DATABASE_NAME_TAG)
+                .Select(s => s.ID)
+                .SingleOrDefault();
+
+            // if either DatabaseServerTag or DatabaseNameTag are not defined there are no workflows
+            if (DatabaseServerTagID == 0 || DatabaseNameTagID == 0)
+            {
+                return;
+            }
+
+            // Get the all the context id's
+            var ContextIDs = _database.Context.Select(c => c.ID).Distinct();
+
+            // For each context ID get the database name and database Server (if it exists)
+            foreach (var contextID in ContextIDs)
+            {
+                string databaseServer = _database.TagValue
+                    .Where(t => t.TagID == DatabaseServerTagID && t.ContextID == contextID)
+                    .Select(t => t.Value)
+                    .SingleOrDefault();
+                string databaseName = _database.TagValue
+                  .Where(t => t.TagID == DatabaseNameTagID && t.ContextID == contextID)
+                  .Select(t => t.Value)
+                  .SingleOrDefault();
+
+                if (String.IsNullOrWhiteSpace(databaseServer) || String.IsNullOrWhiteSpace(databaseName))
+                {
+                    continue;
+                }
+
+                // This adds the values from the database assigned to the context 
+                try
+                {
+                    FileProcessingDB famDB = new FileProcessingDB();
+                    famDB.DatabaseServer = databaseServer;
+                    famDB.DatabaseName = databaseName;
+                    famDB.ResetDBConnection(false);
+                    StrToStrMap workflowMap =  famDB.GetWorkflows();
+                    var workflowsToAdd = workflowMap.ComToDictionary()
+                        .Select(w => w.Key)
+                        .Except(_workflows, StringComparer.CurrentCultureIgnoreCase);
+                    _workflows.AddRange(workflowsToAdd);
+                }
+                catch(Exception ex)
+                {
+                    ex.ExtractLog("ELI42184");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the workflow combo for the current values in _workflows if the list is empty 
+		/// the label and combobox will be hidden otherwise will be made visible and contain
+		/// the values that are in _workflows
+        /// </summary>
+        private void UpdateWorkflowCombo()
+        {
+            if (_workflowComboBox == null)
+            {
+                return;
+            }
+            _workflowComboBox.SelectionChangeCommitted -= HandleWorkflowComboBox_SelectionChangeCommitted;
+            GetWorkflows();
+            if (_workflows.Count > 0)
+            {
+                string selected = _workflowComboBox.SelectedItem as string;
+                _workflowComboBox.Items.Clear();
+                _workflowLabel.Visible = true;
+                _workflowComboBox.Visible = true;
+                _workflowComboBox.Items.Insert(0, "");
+                _workflowComboBox.Items.AddRange(_workflows.ToArray());
+                int indexToSelect = 0;
+                if (!String.IsNullOrEmpty(selected))
+                {
+                    indexToSelect = _workflowComboBox.FindStringExact(selected);
+                    indexToSelect = (indexToSelect < 0) ? 0 : indexToSelect;
+                }
+                _workflowComboBox.SelectedIndex = indexToSelect;
+                _workflowComboBox.SelectionChangeCommitted += HandleWorkflowComboBox_SelectionChangeCommitted;
+            }
+            else
+            {
+                _workflowComboBox.Items.Clear();
+                _workflowComboBox.Visible = false;
+                _workflowLabel.Visible = false;
             }
         }
 

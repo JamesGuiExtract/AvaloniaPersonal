@@ -28,6 +28,21 @@ namespace Extract.Utilities.ContextTags
         static HashSet<ContextTagDatabase> _promptedForCrossContextEdit =
             new HashSet<ContextTagDatabase>();
 
+        /// <summary>
+        /// Constant string for the database server tag.
+        /// </summary>
+        static readonly string DatabaseServerTag = "<DatabaseServer>";
+
+        /// <summary>
+        /// Constant string for the database name tag.
+        /// </summary>
+        static readonly string DatabaseNameTag = "<DatabaseName>";
+
+        /// <summary>
+        /// Constant string for the all workflows tag
+        /// </summary>
+        static readonly string AllWorkflowsTag = "<All workflows>";
+
         #endregion Constants
 
         #region Fields
@@ -54,7 +69,66 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         CustomTagTableV1 _customTag;
 
+        /// <summary>
+        /// The current workflow that is being edited.
+		/// default is "" use ActiveWorkflow to access this
+        /// </summary>
+        static string _workflow = "";
+
+		/// <summary>
+		/// Object to lock when using _workflow string
+		/// </summary>
+        static readonly object _workflowLock = new object();
+
         #endregion Fields
+
+		#region Properties
+
+        /// <summary>
+        /// Property to access the current _workflow field with locking
+        /// </summary>
+        static public string ActiveWorkflow
+        {
+            get
+            {
+                try
+                {
+                    lock (_workflowLock)
+                    {
+                        return _workflow;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI43269");
+                }
+            }
+            set
+            {
+                try
+                {
+                    lock (_workflowLock)
+                    {
+                        if (value == AllWorkflowsTag)
+                        {
+                            _workflow = "";
+                        }
+                        else
+                        {
+                            _workflow = value;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    throw ex.AsExtract("ELI43270");
+                }
+            }
+        }
+
+		#endregion Properties
 
         #region Constructors
 
@@ -85,7 +159,8 @@ namespace Extract.Utilities.ContextTags
         /// <param name="database"></param>
         /// <param name="customTag">The <see cref="CustomTagTableV1"/> row represented by this
         /// instance.</param>
-        public ContextTagsEditorViewRow(ContextTagDatabase database, CustomTagTableV1 customTag)
+        /// <param name="workflow">Workflow that is currently active</param>
+        public ContextTagsEditorViewRow(ContextTagDatabase database, CustomTagTableV1 customTag, string workflow)
         {
             try
             {
@@ -94,6 +169,8 @@ namespace Extract.Utilities.ContextTags
                     _OBJECT_NAME);
 
                 ExtractException.Assert("ELI37992", "Null argument exception", database != null);
+
+                ActiveWorkflow = workflow;
 
                 SetDatabase(database);
 
@@ -143,10 +220,13 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         /// <param name="database">The <see cref="ContextTagDatabase"/> instance associated with
         /// this row.</param>
-        public void Initialize(ContextTagDatabase database)
+        /// <param name="workflow">The currently active workflow</param>
+        public void Initialize(ContextTagDatabase database, string workflow)
         {
             try
             {
+                ActiveWorkflow = workflow;
+
                 SetDatabase(database);
 
                 // Do not attempt to commit any data to the database for this row as part of
@@ -271,13 +351,27 @@ namespace Extract.Utilities.ContextTags
                     // for all the contexts.
                     _database.SubmitChanges();
 
+                    // Use a local version of ActiveWorkflow to eliminate the locking in the loop
+                    string workflowForValue = ActiveWorkflow;
+
                     foreach (var context in _database.Context)
                     {
-                        var tagValue = new TagValueTableV1();
+                        var tagValue = new TagValueTableV2();
                         tagValue.ContextID = context.ID;
                         tagValue.TagID = _customTag.ID;
+                        tagValue.Workflow = workflowForValue;
                         tagValue.Value = "";
                         _database.TagValue.InsertOnSubmit(tagValue);
+                        
+                        if (!string.IsNullOrEmpty(workflowForValue))
+                        {
+                            tagValue = new TagValueTableV2();
+                            tagValue.ContextID = context.ID;
+                            tagValue.TagID = _customTag.ID;
+                            tagValue.Workflow = "";
+                            tagValue.Value = "";
+                            _database.TagValue.InsertOnSubmit(tagValue);
+                        }
                     }
                     _database.SubmitChanges();
 
@@ -404,10 +498,15 @@ namespace Extract.Utilities.ContextTags
                 var contextValues = _database.TagValue
                     .Where(tagValue => tagValue.ContextID == context.ID);
 
-                return contextValues
-                    .Where(tagValue => tagValue.TagID == row.CustomTag.ID)
+                var workflowContextValues = contextValues
+                    .Where(tagValue => tagValue.TagID == row.CustomTag.ID && tagValue.Workflow == ActiveWorkflow)
                     .Select(tagValue => tagValue.Value)
                     .SingleOrDefault();
+
+                return workflowContextValues ??  contextValues
+                     .Where(tagValue => tagValue.TagID == row.CustomTag.ID && tagValue.Workflow == "")
+                     .Select(tagValue => tagValue.Value)
+                     .SingleOrDefault();
             }
             catch (Exception ex)
             {
@@ -433,17 +532,26 @@ namespace Extract.Utilities.ContextTags
                     return;
                 }
 
+                bool IsDatabaseTag = row.CustomTag.Name == DatabaseServerTag || row.CustomTag.Name == DatabaseNameTag;
+
+                string workflowForValue = "";
+                if (!IsDatabaseTag && !string.IsNullOrEmpty(ActiveWorkflow))
+                {
+                    workflowForValue = ActiveWorkflow;
+                }
                 var targetValue = _database.TagValue
                     .Where(tagValue =>
                         tagValue.TagID == row.CustomTag.ID &&
-                        tagValue.ContextID == context.ID)
+                        tagValue.ContextID == context.ID &&
+                        tagValue.Workflow == workflowForValue)
                     .SingleOrDefault();
 
                 if (targetValue == null)
                 {
-                    targetValue = new TagValueTableV1();
+                    targetValue = new TagValueTableV2();
                     targetValue.ContextID = context.ID;
                     targetValue.TagID = row.CustomTag.ID;
+                    targetValue.Workflow = workflowForValue;
                     targetValue.Value = "";
                     _database.TagValue.InsertOnSubmit(targetValue);
                 }

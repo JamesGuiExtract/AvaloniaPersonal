@@ -1395,21 +1395,32 @@ library UCLID_COMUTILSLib
 		//			the current environment or "face". (i.e., "Test" vs. "Prod")
 		[id(3), helpstring("method GetTagNames")] HRESULT GetTagNames([out, retval] IVariantVector** ppTags);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To retrieve the value for the specified tag in the current environment.
+		// PURPOSE: To retrieve the value for the specified tag in the current environment for the
+		//			given workflow, if bstrWorkflow is "" then default values are returned
 		[id(4), helpstring("method GetTagValue")] HRESULT GetTagValue(
-			[in] BSTR bstrTagName, [out, retval] BSTR* pbstrTagValue);
+			[in] BSTR bstrTagName, [in] BSTR bstrWorkflow, [out, retval] BSTR* pbstrTagValue);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Displays a UI to edit the available tags for the current ContextPath.
 		//			If hParentWindow is not null, the tag editing UI will be displayed modally
 		//			to hParentWindow; otherwise the editor window will be modeless.
 		[id(5), helpstring("method EditTags")] HRESULT EditTags([in] long hParentWindow);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Gets any tag names for values that have not been defined in the active context.
+		// PURPOSE: Gets any tag names for values that have not been defined in the active context and workflow.
 		//			Returns an empty list if there is no active context.
-		[id(6), helpstring("method GetUndefinedTags")] HRESULT GetUndefinedTags([out, retval] IVariantVector** ppTags);
+		[id(6), helpstring("method GetUndefinedTags")] HRESULT GetUndefinedTags([in] BSTR bstrWorkflow, 
+			[out, retval] IVariantVector** ppTags);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Reloads the custom tag values from storage
 		[id(7), helpstring("method RefreshTags")] HRESULT RefreshTags();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets the workflow names of all the workflows that have values defined
+		[id(8), helpstring("method GetWorkflowsThatHaveValues")] HRESULT GetWorkflowsThatHaveValues(
+			[out, retval] IVariantVector **ppWorkflows);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets the tag value pairs for the given workflow - this give all tags a value 
+		//			using the default value if there is not a value assigned for the given workflow
+		[id(9), helpstring("method GetTagValuePairsForWorkflow")] HRESULT GetTagValuePairsForWorkflow(
+			[in] BSTR bstrWorkflow, [out, retval] IStrToStrMap **ppTagValuePairs);
 	}
 
 	//---------------------------------------------------------------------------------------------

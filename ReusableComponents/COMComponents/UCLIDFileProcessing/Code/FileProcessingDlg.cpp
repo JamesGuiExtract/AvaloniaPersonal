@@ -3305,15 +3305,30 @@ bool FileProcessingDlg::displayRecentContextSelection()
 
 	for(long i = 0; i < nSize; i++)
 	{
-		string strPath = m_upContextMRUList->at(i);
-		m_ipContextTags->ContextPath = strPath.c_str();
-		string strContext = asString(m_ipContextTags->ActiveContext);
-		if (isValidContext(strContext))
+		string strPath;
+		try
 		{
-			string strContextOption = Util::Format("%s (%s)", 
-				strContext.c_str(), strPath.c_str());
-			mapContextOptions[strContextOption] = strPath;
-			vecContexts.push_back(strContextOption);
+			try
+			{
+				strPath = m_upContextMRUList->at(i);
+				m_ipContextTags->ContextPath = strPath.c_str();
+				string strContext = asString(m_ipContextTags->ActiveContext);
+				if (isValidContext(strContext))
+				{
+					string strContextOption = Util::Format("%s (%s)",
+						strContext.c_str(), strPath.c_str());
+					mapContextOptions[strContextOption] = strPath;
+					vecContexts.push_back(strContextOption);
+				}
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43271")
+		}
+		catch (UCLIDException &ue)
+		{
+			UCLIDException newUE("ELI43272", "Unable to load context for display.", ue);
+			newUE.addDebugInfo("ContextPath", strPath, false);
+			newUE.addPossibleResolution("This may have been logged when attempting to load an older version of the ContextTags.sdf file.");
+			newUE.log();
 		}
 	}
 

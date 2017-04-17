@@ -19,7 +19,7 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// The current schema version for the context-specific tag database
         /// </summary>
-        public static readonly int CurrentSchemaVersion = 1;
+        public static readonly int CurrentSchemaVersion = 2;
 
         /// <summary>
         /// The connection string as of the last call to <see cref="DatabaseDirectory"/>. Used to
@@ -90,11 +90,11 @@ namespace Extract.Utilities.ContextTags
         /// Gets or sets the TagValue table.
         /// </summary>
         /// <value>The TagValue table</value>
-        public Table<TagValueTableV1> TagValue
+        public Table<TagValueTableV2> TagValue
         {
             get
             {
-                return GetTable<TagValueTableV1>();
+                return GetTable<TagValueTableV2>();
             }
         }
 
@@ -188,6 +188,106 @@ namespace Extract.Utilities.ContextTags
     #endregion AllVersions
 
     #region Version1
+
+    /// <summary>
+    /// DataContext for the context-specific tag database. Use this connection to get the settings
+    /// table and get the current SchemaVersion
+    /// </summary>
+    public class ContextTagDatabaseV1 : DataContext
+    {
+        /// <summary>
+        /// The current schema version for the context-specific tag database
+        /// </summary>
+        public static readonly int CurrentSchemaVersion = 1;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContextTagDatabase"/> class.
+        /// </summary>
+        /// <param name="fileName">The Sql compact file name.</param>
+        public ContextTagDatabaseV1(string fileName) :
+            base(SqlCompactMethods.BuildDBConnectionString(fileName))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContextTagDatabase"/> class.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public ContextTagDatabaseV1(DbConnection connection)
+            : base(connection)
+        {
+        }
+
+        /// <summary>
+        /// Gets or sets the settings table.
+        /// </summary>
+        /// <value>The settings table.</value>
+        public Table<Settings> Settings
+        {
+            get
+            {
+                return GetTable<Settings>();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Context table.
+        /// </summary>
+        /// <value>The Context table</value>
+        public Table<ContextTableV1> Context
+        {
+            get
+            {
+                return GetTable<ContextTableV1>();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the CustomTag table.
+        /// </summary>
+        /// <value>The CustomTag table</value>
+        public Table<CustomTagTableV1> CustomTag
+        {
+            get
+            {
+                return GetTable<CustomTagTableV1>();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the TagValue table.
+        /// </summary>
+        /// <value>The TagValue table</value>
+        public Table<TagValueTableV1> TagValue
+        {
+            get
+            {
+                return GetTable<TagValueTableV1>();
+            }
+        }
+
+
+        /// <summary>
+        /// Indicates that Dispose has been called on this instance. Used to prevent logic
+        /// exceptions from being displayed while the editor is being closed.
+        /// https://extract.atlassian.net/browse/ISSUE-14429
+        /// </summary>
+        public bool IsDisposed
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Set IsDisposed. Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            IsDisposed = true;
+            base.Dispose(disposing);
+        }
+    }
 
     /// <summary>
     /// Table mapping for the version 1 schema Context table
@@ -323,4 +423,97 @@ namespace Extract.Utilities.ContextTags
     }
 
     #endregion Version1
+
+    #region Version2
+
+    /// <summary>
+    /// Table mapping for the version 2 schema TagValue table
+    /// </summary>
+    [Table(Name = "TagValue")]
+    public class TagValueTableV2
+    {
+        /// <summary>
+        /// Foreign key relation to the Context table.
+        /// </summary>
+        EntityRef<ContextTableV1> _context;
+
+        /// <summary>
+        /// Foreign key relation to the CustomTag table.
+        /// </summary>
+        EntityRef<CustomTagTableV1> _customTag;
+
+        /// <summary>
+        /// Gets or sets the ID of the context for this tag value.
+        /// </summary>
+        /// <value>The ID of the context for this tag value.</value>
+        [Column(IsPrimaryKey = true, DbType = "INT NOT NULL")]
+        public int ContextID { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ID of the tag for this tag value.
+        /// </summary>
+        /// <value>The ID of the tag for this tag value.</value>
+        [Column(IsPrimaryKey = true, DbType = "INT NOT NULL")]
+        public int TagID { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Column(IsPrimaryKey = true, DbType = "NVARCHAR(100) NOT NULL DEFAULT ''")]
+        public string Workflow { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value for this context and tag combination.
+        /// </summary>
+        /// <value>The value for this context and tag combination.</value>
+        [Column(DbType = "NVARCHAR(400) NOT NULL")]
+        public string Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Context the foreign key relation.
+        /// </summary>
+        // Note that the DeleteRule of Cascade seems to be ineffective here. I think a corresponding
+        // EntitySet association is needed on the Context table with the DeleteRule, but that got
+        // complicated by the fact that this table uses a composite foreign key.
+        // For now there is code in ContextTagDatabaseManager to manually re-added the association
+        // via a query to work around this issue.
+        [Association(Name = "FK_TagValue_Context", Storage = "_context", ThisKey = "ContextID",
+            OtherKey = "ID", IsForeignKey = true, DeleteRule = "Cascade")]
+        public ContextTableV1 Context
+        {
+            get
+            {
+                return _context.Entity;
+            }
+            set
+            {
+                _context.Entity = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the CustomTag foreign key relation.
+        /// </summary>
+        // Note that the DeleteRule of Cascade seems to be ineffective here. I think a corresponding
+        // EntitySet association is needed on the CustomTag table with the DeleteRule, but that got
+        // complicated by the fact that this table uses a composite foreign key.
+        // For now there is code in ContextTagDatabaseManager to manually re-added the association
+        // via a query to work around this issue.
+        [Association(Name = "FK_TagValue_CustomTag", Storage = "_customTag", ThisKey = "TagID",
+            OtherKey = "ID", IsForeignKey = true, DeleteRule = "Cascade")]
+        public CustomTagTableV1 CustomTag
+        {
+            get
+            {
+                return _customTag.Entity;
+            }
+            set
+            {
+                _customTag.Entity = value;
+            }
+        }
+    }
+
+    #endregion Version2
+
 }

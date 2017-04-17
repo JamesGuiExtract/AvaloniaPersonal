@@ -2366,6 +2366,9 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Refreshes context tag info based on current FPSFileDir from ContextTags.sdf.
 		[id(17), helpstring("method RefreshContextTags")] HRESULT RefreshContextTags();
+		// PURPOSE: Sets and gets the Current workflow
+		[propget, id(18), helpstring("property Workflow")] HRESULT Workflow([out, retval] BSTR *strWorkflow);
+		[propput, id(18), helpstring("property Workflow")] HRESULT Workflow([in] BSTR strWorkflow);
 	};
 
 	[

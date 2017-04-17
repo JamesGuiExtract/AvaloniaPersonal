@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <StringCSIS.h>
 
 class IConfigurationSettingsPersistenceMgr;
 class MRUList;
@@ -85,6 +86,8 @@ public:
 	STDMETHOD(get_ActionName)(BSTR *strActionName);
 	STDMETHOD(put_ActionName)(BSTR strActionName);
 	STDMETHOD(RefreshContextTags)();
+	STDMETHOD(get_Workflow)(BSTR *strWorkflow);
+	STDMETHOD(put_Workflow)(BSTR strWorkflow);
 
 private:
 
@@ -103,7 +106,7 @@ private:
 	static IContextTagProviderPtr ms_ipContextTagProvider;
 
 	// A cache of the tag values from ms_ipContextTagProvider.
-	static map<string, string> ms_mapContextTags;
+	static map<stringCSIS, map<stringCSIS, stringCSIS>> ms_mapWorkflowContextTags;
 
 	// Controls access to the above static variables.
 	static CMutex ms_mutex;
@@ -118,6 +121,7 @@ private:
 	string m_strDatabaseServer;
 	string m_strDatabaseName;
 	string m_strDatabaseAction;
+	string m_strWorkflow;
 
 	// Programmatically added path tags.
 	map<string, string> m_mapAddedTags;	

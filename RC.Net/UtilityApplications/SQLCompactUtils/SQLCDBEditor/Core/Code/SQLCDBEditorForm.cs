@@ -190,6 +190,11 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         readonly bool _inDesignMode;
 
+        /// <summary>
+        /// Flag to indicate that a schema update is in progress
+        /// </summary>
+        bool _updatingSchema = false;
+
         #endregion Fields
 
         #region Constructors
@@ -2078,7 +2083,12 @@ namespace Extract.SQLCDBEditor
                         .Cast<SQLCDBEditorPlugin>())
                     {
                         var pluginControl = new QueryAndResultsControl(plugin);
-                        OpenTableOrQuery(pluginControl, true, false);
+
+                        // If the schema is being updated don't load the tables
+                        if (!_updatingSchema)
+                        {
+                            OpenTableOrQuery(pluginControl, true, false);
+                        }
                         _pluginList.Add(pluginControl);
                     }
                 }
@@ -2168,6 +2178,7 @@ namespace Extract.SQLCDBEditor
                     MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0);
                 if (result == DialogResult.Yes)
                 {
+                    _updatingSchema = true;
                     // Invoking the method here so that the update can be started after
                     // this method finishes execution
                     this.SafeBeginInvoke("ELI35348", () => { UpdateToCurrentSchema(); });
@@ -2440,8 +2451,6 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                var databaseType = _connection.GetType();
-
                 // Store the db name and close the open database
                 string tempName = _databaseFileName;
                 CloseDatabase();
@@ -2452,7 +2461,7 @@ namespace Extract.SQLCDBEditor
                 {
                     var tempTask = Task.Factory.StartNew(() =>
                     {
-                        using (var connection = (DbConnection)Activator.CreateInstance(databaseType))
+                        using (var connection = new SqlCeConnection(SqlCompactMethods.BuildDBConnectionString(tempName, true)))
                         {
                             _schemaManager.SetDatabaseConnection(connection);
                             try
@@ -2498,7 +2507,7 @@ namespace Extract.SQLCDBEditor
                     MessageBox.Show(this, "Database has been updated to current schema.",
                         "Database Updated", MessageBoxButtons.OK, MessageBoxIcon.Information,
                         MessageBoxDefaultButton.Button1, 0);
-
+                    _updatingSchema = false;
                     OpenDatabase(tempName);
                 });
             }

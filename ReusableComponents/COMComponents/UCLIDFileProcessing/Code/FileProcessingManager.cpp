@@ -184,6 +184,8 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			}
 		}
 
+		m_ipFAMTagManager->Workflow = m_ipFPMDB->ActiveWorkflow;
+
 		// Verifies that the tag manager has all necessary info to expand tags during processing.
 		BSTR pbstrWarning = m_ipFAMTagManager->ValidateConfiguration(
 			m_strDBServer.c_str(), m_strDBName.c_str());

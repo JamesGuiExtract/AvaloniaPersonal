@@ -48,13 +48,23 @@ namespace Extract.Utilities.ContextTags
 
         #endregion Fields
 
+        #region Properties
+
+        /// <summary>
+        /// Workflow that is currently active
+        /// </summary>
+        public string ActiveWorkflow { get; set; }
+
+        #endregion Properties
+        
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContextTagsEditorViewCollection"/> class.
         /// </summary>
         /// <param name="database">The database.</param>
-        public ContextTagsEditorViewCollection(ContextTagDatabase database)
+        /// <param name="workflow">The workflow to use</param>
+        public ContextTagsEditorViewCollection(ContextTagDatabase database, string workflow)
         {
             try
             {
@@ -63,8 +73,9 @@ namespace Extract.Utilities.ContextTags
                     _OBJECT_NAME);
 
                 _database = database;
+                ActiveWorkflow = workflow;
 
-                _defaultViewRow = new ContextTagsEditorViewRow(database, null);
+                _defaultViewRow = new ContextTagsEditorViewRow(database, null, ActiveWorkflow);
 
                 // Handle any adds/deletes from _contextRows to be able to initialize or delete
                 // corresponding data from the database.
@@ -100,13 +111,26 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
+                // Remove the event handler for collection changed while updating the displayed data
+                // this keeps the save button in SQLDBEditor from being enabled when changing
+                // the workflow combo box selection
+                _contextRows.CollectionChanged -= HandleContextRows_CollectionChanged;
+
                 Clear();
 
                 LoadData();
+
+                // Refresh data from the database
+                CurrencyManager.Refresh();
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38004");
+            }
+            finally
+            {
+                _contextRows.CollectionChanged += HandleContextRows_CollectionChanged;
+
             }
         }
 
@@ -250,6 +274,7 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
+                ContextTagsEditorViewRow.ActiveWorkflow = ActiveWorkflow;
                 _contextRows.Add(item);
             }
             catch (Exception ex)
@@ -426,7 +451,7 @@ namespace Extract.Utilities.ContextTags
                 {
                     foreach (var row in e.NewItems.Cast<ContextTagsEditorViewRow>())
                     {
-                        row.Initialize(_database);
+                        row.Initialize(_database, ActiveWorkflow);
                         dataChanged = true;
                         row.DataChanged += HandleRow_DataChanged;
                     }
@@ -491,13 +516,13 @@ namespace Extract.Utilities.ContextTags
 
                 // _defaultViewRow will be used to describe the collection's properties independent
                 // of specific rows in the collection.
-                _defaultViewRow = new ContextTagsEditorViewRow(_database, null);
+                _defaultViewRow = new ContextTagsEditorViewRow(_database, null, ActiveWorkflow);
 
                 foreach (var customTag in _database.CustomTag)
                 {
                     // The row that is mapped to the new row in a DataGridView can end up being
                     // persisted. Ignore and delete any unnamed custom tags on load.
-                    var row = new ContextTagsEditorViewRow(_database, customTag);
+                    var row = new ContextTagsEditorViewRow(_database, customTag, ActiveWorkflow);
                     if (string.IsNullOrWhiteSpace(customTag.Name))
                     {
                         row.Delete();

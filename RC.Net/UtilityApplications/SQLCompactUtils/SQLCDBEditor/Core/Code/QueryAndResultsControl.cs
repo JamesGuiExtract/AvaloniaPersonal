@@ -1304,6 +1304,23 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
+        /// Adds the given control to the _buttonsFlowLayoutPanel
+        /// </summary>
+        /// <param name="control">The control to add to the _buttonsFlowLayoutPanel</param>
+        public void AddControlToPluginToolStrip(Control control)
+        {
+            try
+            {
+                _buttonsFlowLayoutPanel.Controls.Add(control);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex.AsExtract("ELI42182");
+            }
+        }
+
+        /// <summary>
         /// Causes the results of the <see cref="SQLCDBEditorPlugin.Query"/> to be refreshed.
         /// </summary>
         public void RefreshQueryResults()
