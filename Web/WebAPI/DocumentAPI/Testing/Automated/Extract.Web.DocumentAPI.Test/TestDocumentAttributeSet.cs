@@ -275,14 +275,9 @@ namespace Extract.Web.DocumentAPI.Test
 
         static DocumentAttributeSet GetDocumentResultSet(int fileId)
         {
-            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
-
             try
             {
-                var c = Utils.SetDefaultApiContext(_currentDatabaseName);
-                var inf = FileApiMgr.GetInterface(c);
-                inf.InUse = false;
-                db = inf.Interface;
+                Utils.SetDefaultApiContext(_currentDatabaseName);
 
                 using (var data = new DocumentData(ApiUtils.CurrentApiContext))
                 {
@@ -297,7 +292,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
-                db.CloseAllDBConnections();
+                FileApiMgr.ReleaseAll();
             }
         }
 
@@ -316,7 +311,7 @@ namespace Extract.Web.DocumentAPI.Test
         {
             string nodeName = node.Name;
             Assert.IsTrue(nodeName.IsEquivalent(name),
-                            "Node name test failed: expected: {0}, node is acutally named: {1}",
+                            "Node name test failed: expected: {0}, node is actually named: {1}",
                             name,
                             nodeName);
         }

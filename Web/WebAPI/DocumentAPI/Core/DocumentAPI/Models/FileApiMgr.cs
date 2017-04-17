@@ -103,8 +103,15 @@ namespace DocumentAPI.Models
             return null;
         }
 
+        /// <summary>
+        /// Use for unit testing to close all DB connections
+        /// </summary>
         public static void ReleaseAll()
         {
+            foreach (var inf in _interfaces)
+            {
+                inf.Interface.CloseAllDBConnections();
+            }
             _interfaces.Clear();
         }
 

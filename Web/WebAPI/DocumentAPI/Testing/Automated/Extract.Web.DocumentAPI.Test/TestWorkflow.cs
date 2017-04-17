@@ -64,15 +64,12 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetDefaultWorkflow()
         {
-            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
-
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
 
                 var c = Utils.SetDefaultApiContext();
                 var fileApi = FileApiMgr.GetInterface(c);
-                db = fileApi.Interface;
 
                 try
                 {
@@ -88,10 +85,6 @@ namespace Extract.Web.DocumentAPI.Test
                 {
                     throw;
                 }
-                finally
-                {
-                   fileApi.InUse = false;
-                }
             }
             catch (Exception ex)
             {
@@ -99,6 +92,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
             finally
             {
+                FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(DbLabDE);
             }
         }
@@ -109,15 +103,12 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetWorkflowStatus()
         {
-            UCLID_FILEPROCESSINGLib.FileProcessingDB db = null;
-
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
 
                 var c = Utils.SetDefaultApiContext();
-                var fileApi = FileApiMgr.GetInterface(c);
-                db = fileApi.Interface;
+                FileApiMgr.GetInterface(c);
 
                 try
                 {
@@ -134,10 +125,6 @@ namespace Extract.Web.DocumentAPI.Test
                 {
                     throw;
                 }
-                finally
-                {
-                    fileApi.InUse = false;
-                }
             }
             catch (Exception ex)
             {
@@ -146,9 +133,6 @@ namespace Extract.Web.DocumentAPI.Test
             finally
             {
                 FileApiMgr.ReleaseAll();
-                Marshal.FinalReleaseComObject(db);
-                GC.Collect();
-
                 _testDbManager.RemoveDatabase(DbLabDE);
             }
         }

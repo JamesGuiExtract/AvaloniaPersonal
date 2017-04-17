@@ -56,6 +56,13 @@ namespace DocumentAPI.Models
             }
             catch (Exception exp)
             {
+                // Close DB connection
+                try
+                {
+                    _fileProcessingDB.CloseAllDBConnections();
+                }
+                catch { }
+
                 Log.WriteLine(Inv($"Exception setting FileProcessingDB DB context: {exp.Message}"));
                 throw;
             }
