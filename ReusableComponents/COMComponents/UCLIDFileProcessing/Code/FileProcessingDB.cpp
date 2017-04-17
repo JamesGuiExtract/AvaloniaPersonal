@@ -37,6 +37,7 @@ std::string CFileProcessingDB::ms_strCurrServerName = "";
 std::string CFileProcessingDB::ms_strCurrDBName = "";
 std::string CFileProcessingDB::ms_strCurrAdvConnProperties = "";
 std::string CFileProcessingDB::ms_strLastUsedAdvConnStr = "";
+std::string CFileProcessingDB::ms_strLastWorkflow = "";
 
 CMutex CFileProcessingDB::ms_mutexPingDBLock;
 CMutex CFileProcessingDB::ms_mutexSpecialLoggingLock;
@@ -78,8 +79,9 @@ m_strEncryptedDatabaseID(""),
 m_bDatabaseIDValuesValidated(false),
 m_ipSecureCounters(__nullptr),
 m_strActiveWorkflow(""),
-m_bUsingWorkflows(false),
+m_bUsingWorkflowsForCurrentAction(false),
 m_bRunningAllWorkflows(false),
+m_nWorkflowActionIDCheck(-1),
 m_nLastFAMFileID(0),
 m_bDeniedFastCountPermission(false),
 m_ipFAMTagManager(__nullptr)
@@ -406,32 +408,6 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13550");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus(long nWhereActionID,  EActionStatus eWhereStatus,  
-														  long nToActionID, EActionStatus eToStatus,
-														  BSTR bstrSkippedFromUserName, 
-														  long nFromActionID, long * pnNumRecordsModified)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		// Check License
-		validateLicense();
-
-		if (!SearchAndModifyFileStatus_Internal(false, nWhereActionID, eWhereStatus, nToActionID, eToStatus,
-			bstrSkippedFromUserName, nFromActionID, pnNumRecordsModified))
-		{
-			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-
-			SearchAndModifyFileStatus_Internal(true, nWhereActionID, eWhereStatus, nToActionID, eToStatus,
-				bstrSkippedFromUserName, nFromActionID, pnNumRecordsModified);
-		}
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13565");
-}
-//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionStatus eStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -440,6 +416,12 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 	{
 		// Check License
 		validateLicense();
+
+		if (eStatus == kActionFailed)
+		{
+			UCLIDException ue("ELI30375", "Transition to Failed state is not allowed.");
+			throw ue;
+		}
 
 		if (!SetStatusForAllFiles_Internal(false, strAction,  eStatus))
 		{
@@ -1198,6 +1180,7 @@ STDMETHODIMP CFileProcessingDB::ConnectLastUsedDBThisProcess()
 		m_strDatabaseServer = ms_strCurrServerName;
 		m_strDatabaseName  = ms_strCurrDBName;
 		m_strAdvConnStrProperties = ms_strCurrAdvConnProperties;
+		m_strActiveWorkflow = ms_strLastWorkflow;
 
 		resetDBConnection();
 		return S_OK;
@@ -1782,32 +1765,6 @@ STDMETHODIMP CFileProcessingDB::AllowDynamicTagCreation(VARIANT_BOOL* pvbVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27380");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTagNames,
-														  VARIANT_BOOL vbAndOperation,
-														  long nToActionID,
-														  EActionStatus eaNewStatus,
-														  long nFromActionID)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		validateLicense();
-
-		if (!SetStatusForFilesWithTags_Internal(false, pvecTagNames, vbAndOperation, 
-			nToActionID, eaNewStatus, nFromActionID))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-			
-			SetStatusForFilesWithTags_Internal(true, pvecTagNames, vbAndOperation, 
-			nToActionID, eaNewStatus, nFromActionID);
-		} 
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27431");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetPriorities(IVariantVector** ppvecPriorities)
@@ -4065,7 +4022,9 @@ STDMETHODIMP CFileProcessingDB::put_ActiveWorkflow(BSTR bstrWorkflowName)
 			throw UCLIDException("ELI42030", "Cannot set workflow while a session is open.");
 		}
 
+		CSingleLock lock(&m_mutex, TRUE);
 		m_strActiveWorkflow = asString(bstrWorkflowName);
+		ms_strLastWorkflow = m_strActiveWorkflow;
 
 		return S_OK;
 	}
@@ -4206,6 +4165,21 @@ STDMETHODIMP CFileProcessingDB::LoginUser(BSTR bstrUserName, BSTR bstrPassword)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42170");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_RunningAllWorkflows(VARIANT_BOOL *pRunningAllWorkflows)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI43206", pRunningAllWorkflows != __nullptr);
+
+		*pRunningAllWorkflows = asVariantBool(m_bRunningAllWorkflows);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43207");
 }
 
 //-------------------------------------------------------------------------------------------------

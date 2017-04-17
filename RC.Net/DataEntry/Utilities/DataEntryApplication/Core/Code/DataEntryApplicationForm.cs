@@ -1314,6 +1314,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (!_standAloneMode && _settings.PaginationEnabled)
                 {
+                    ExtractException.Assert("ELI43208",
+                        "Pagination cannot be performed for more than one workflow at a time.",
+                        !FileProcessingDB.RunningAllWorkflows);
+
                     ValidationPaginationActions();
 
                     LoadPaginationDocumentDataPanel();

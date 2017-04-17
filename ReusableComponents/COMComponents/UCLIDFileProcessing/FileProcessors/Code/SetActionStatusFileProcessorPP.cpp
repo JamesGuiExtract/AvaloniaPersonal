@@ -398,10 +398,10 @@ LRESULT CSetActionStatusFileProcessorPP::OnCbnSelendokComboWorkflow(WORD /*wNoti
 
 		// Get the current selection 
 		loadActionCombo(getActionName());
-		return 0;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42128");
 
+	return 0;
 }
 
 void CSetActionStatusFileProcessorPP::loadActionCombo(string strActionName)

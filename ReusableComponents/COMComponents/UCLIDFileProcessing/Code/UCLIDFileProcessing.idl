@@ -956,12 +956,7 @@ library UCLID_FILEPROCESSINGLib
 		[id(10), helpstring("method GetFileStatus")] HRESULT GetFileStatus([in] long nFileID, [in] BSTR strAction,
 			[in] VARIANT_BOOL vbAttemptRevertIfLocked, [out, retval] EActionStatus* pStatus);
 
-		// PROMISE: To find all of the records that have the status of eFromStatus in the nFromActionID action and change
-		//			the status of the nToActionID action to eToStatus and update the FileActionStateTransistion table.
-		[id(11), helpstring("method SearchAndModifyFileStatus")] HRESULT SearchAndModifyFileStatus(
-			[in] long nWhereActionID, [in] EActionStatus eWhereStatus, [in] long  nToActionID, 
-			[in] EActionStatus eToStatus, [in] BSTR bstrSkippedFromUserName, [in] long nFromActionID,
-			[out, retval] long* pnNumRecordsModified);
+		// id(11): Removed unused SearchAndModifyFileStatus
 
 		[id(12), helpstring("method SetStatusForAllFiles")] HRESULT SetStatusForAllFiles([in] BSTR strAction, 
 			[in] EActionStatus eStatus);
@@ -1247,12 +1242,7 @@ library UCLID_FILEPROCESSINGLib
 		[id(63), helpstring("method AllowDynamicTagCreation")] HRESULT AllowDynamicTagCreation(
 			[out, retval] VARIANT_BOOL* pvbVal);
 		// -----------------------------------------------------------------------------------------------
-		// PURPOSE: To set the status for files based on a collection of tags.  If nFromActionID == -1
-		//			then all files with be set to eaNewStatus, if nFromActionID != -1 then each
-		//			file will have its status copied from nFromAction.
-		[id(64), helpstring("method SetStatusForFilesWithTags")] HRESULT SetStatusForFilesWithTags(
-			[in] IVariantVector* pvecTagNames, [in] VARIANT_BOOL vbAndOperation, [in] long nToActionID,
-			[in] EActionStatus eaNewStatus, [in] long nFromActionID);
+		// id(64) Removed unused SetStatusForFilesWithTags
 
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to file priority
@@ -1894,7 +1884,10 @@ library UCLID_FILEPROCESSINGLib
 		//			If the username and/or password are not valid, the call will throw and exception.
 		// NOTE:	This method cannot be used to login with a user that does not have a password set.
 		[id(175), helpstring("method LoginUser")] HRESULT LoginUser([in] BSTR bstrUserName, [in]BSTR bstrPassword);
-
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Gets whether the currently processing FAM is configured to be running all workflows in
+		//			a database with workflows defined.
+		[propget, id(176), helpstring("method RunningAllWorkflows")] HRESULT RunningAllWorkflows([out, retval] VARIANT_BOOL *pRunningAllWorkflows);
 	};
 
 	[

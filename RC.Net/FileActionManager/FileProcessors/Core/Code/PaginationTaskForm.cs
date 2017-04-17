@@ -532,6 +532,10 @@ namespace Extract.FileActionManager.FileProcessors
                 // https://extract.atlassian.net/browse/ISSUE-12830
                 UserConfigChecker.EnsureValidUserConfigFile();
 
+                ExtractException.Assert("ELI43205",
+                    "Pagination cannot be performed for more than one workflow at a time.",
+                    !FileProcessingDB.RunningAllWorkflows);
+
                 base.OnLoad(e);
 
                 // Establish image viewer connections prior to calling base.OnLoad which will

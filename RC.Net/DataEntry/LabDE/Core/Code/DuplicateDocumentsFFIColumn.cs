@@ -452,6 +452,10 @@ namespace Extract.DataEntry.LabDE
                         ExtractException.Assert("ELI37591",
                             "Duplicate documents cannot be presented in the current context.",
                             DataEntryApplication.FileRequestHandler != null);
+
+                        ExtractException.Assert("ELI43209",
+                            "Duplicate document handling cannot be performed for more than one workflow at a time.",
+                            !FileProcessingDB.RunningAllWorkflows);
                     }
                 }
                 catch (Exception ex)

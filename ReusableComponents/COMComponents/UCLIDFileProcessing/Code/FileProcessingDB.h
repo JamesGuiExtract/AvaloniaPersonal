@@ -143,9 +143,6 @@ public:
 		VARIANT_BOOL bRemovePreviousSkipped, VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(GetFileStatus)(long nFileID, BSTR strAction, VARIANT_BOOL vbAttemptRevertIfLocked,
 		EActionStatus* pStatus);
-	STDMETHOD(SearchAndModifyFileStatus)(long nWhereActionID, EActionStatus eWhereStatus, 
-		long nToActionID, EActionStatus eToStatus, BSTR bstrSkippedFromUserName, long nFromActionID,
-		long* pnNumRecordsModified);
 	STDMETHOD(SetStatusForAllFiles)(BSTR strAction, EActionStatus eStatus);
 	STDMETHOD(SetStatusForFile)(long nID, BSTR strAction, long nWorkflowID, EActionStatus eStatus, 
 		VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
@@ -208,8 +205,6 @@ public:
 		IVariantVector** ppvecFileIDs);
 	STDMETHOD(GetTagsOnFile)(long nFileID, IVariantVector** ppvecTagNames);
 	STDMETHOD(AllowDynamicTagCreation)(VARIANT_BOOL* pvbVal);
-	STDMETHOD(SetStatusForFilesWithTags)(IVariantVector* pvecTagNames, VARIANT_BOOL vbAndOperation,
-		long nToActionID, EActionStatus eaNewStatus, long nFromActionID);
 	STDMETHOD(GetPriorities)(IVariantVector** ppvecPriorities);
 	STDMETHOD(AsPriorityString)(EFilePriority ePriority, BSTR* pbstrPriority);
 	STDMETHOD(AsEFilePriority)(BSTR bstrPriority, EFilePriority* pePriority);
@@ -333,6 +328,7 @@ public:
 	STDMETHOD(GetWorkflowStatus)(long nFileID, EActionStatus* peaStatus);
 	STDMETHOD(GetWorkflowStatusAllFiles)(long *pnUnattempted, long *pnProcessing, long *pnCompleted, long *pnFailed);
 	STDMETHOD(LoginUser)(BSTR bstrUserName, BSTR bstrPassword);
+	STDMETHOD(get_RunningAllWorkflows)(VARIANT_BOOL *pRunningAllWorkflows);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -430,13 +426,18 @@ private:
 	// across all workflows.
 	string m_strActiveWorkflow;
 
-	// Indicates whether workflows are being used for processing. If true, all actions processed
-	// will have an associated WorkflowID. If false, all actions will have a NULL workflow ID.
-	volatile bool m_bUsingWorkflows;
+	// Indicates whether workflows are being used for processing within the context of the current action.
+	volatile bool m_bUsingWorkflowsForCurrentAction;
 
 	// Indicates whether an action is being processed across all workflows. This will be true
-	// when m_bUsingWorkflows is true and m_strActiveWorkflow empty.
+	// when m_bUsingWorkflowsForCurrentAction is true and m_strActiveWorkflow empty.
 	volatile bool m_bRunningAllWorkflows;
+	
+	// An ID indicating whether any workflows are currently in use anywhere in the database.
+	// -1 indicates a check has not been made for workflows, 0 means a check has been made, but
+	// there are no active workflows and > 0 means there are active workflows.
+	// NOTE: This property should not be checked directly; instead databaseHasWorkflows() should be used.
+	volatile long m_nWorkflowActionIDCheck;
 
 	// Keeps track of the last time this instance checked stats.
 	CTime m_timeLastStatsCheck;
@@ -472,6 +473,9 @@ private:
 
 	// The last connection string that was used by this process.
 	static string ms_strLastUsedAdvConnStr;
+
+	// The last workflow that was used by this process.
+	static string ms_strLastWorkflow;
 
 	// Contains the timeout for query execution
 	int m_iCommandTimeout;
@@ -868,7 +872,7 @@ private:
 	// Throws and exception if the DBSchemaVersion in the DB is different from the current DBSchemaVersion
 	void validateDBSchemaVersion();
 
-	// Assigns m_nActiveActionID, m_bUsingWorkflows, and m_bRunningAllWorkflows based on the
+	// Assigns m_nActiveActionID, m_bUsingWorkflowsForCurrentAction, and m_bRunningAllWorkflows based on the
 	// current workflow and strActionName.
 	void setActiveAction(_ConnectionPtr ipConnection, const string& strActionName);
 
@@ -1174,9 +1178,25 @@ private:
 	// Gets a map of all workflow names and IDs.
 	map<string, long> getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID);
 
+	vector<pair<string, string>> getWorkflowNamesAndIDs(_ConnectionPtr ipConnection);
+
 	// Gets the status of a file in a workflow or all files in a workflow if nFileID = -1.
 	// Return value is a map of ActionStatus codes (R, F, C, U) to their respective counts.
 	map<string, long> getWorkflowStatus(long nFileID);
+
+	// Indicates whether any workflows are currently in use anywhere in the database.
+	bool databaseHasWorkflows(_ConnectionPtr ipConnection);
+
+	// Helper function for SetStatusForAllFiles COM method that may be called once per workflow when
+	// called for <All workflows>
+	void setStatusForAllFiles(_ConnectionPtr ipConnection, const string& strAction, EActionStatus eStatus);
+
+	// Helper function for ModifyActionStatusForQuery COM method that may be called once per workflow when
+	// called for <All workflows>
+	void modifyActionStatusForQuery(_ConnectionPtr ipConnection, string strQueryFrom, string strToAction,
+		string strNewStatus, string strFromAction,
+		UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition,
+		long* pnNumRecordsModified);
 
 	// Sets the value of the output file name metadata field based on the workflow configuration
 	void initOutputFileMetadataFieldValue(_ConnectionPtr ipConnection, long nFileID, string strFileName, long nWorkflowID);
@@ -1207,9 +1227,6 @@ private:
 		VARIANT_BOOL bRemovePreviousSkipped, /*long nWorkflowID,*/ VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool GetFileStatus_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
 		VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus);
-	bool SearchAndModifyFileStatus_Internal(bool bDBLocked,  
-		long nWhereActionID,  EActionStatus eWhereStatus,  long nToActionID, EActionStatus eToStatus,
-		BSTR bstrSkippedFromUserName, long nFromActionID, long * pnNumRecordsModified);
 	bool SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAction,  EActionStatus eStatus);
 	bool SetStatusForFile_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID,
 		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
@@ -1256,8 +1273,6 @@ private:
 		VARIANT_BOOL vbAndOperation, IVariantVector** ppvecFileIDs);
 	bool GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVariantVector** ppvecTagNames);
 	bool AllowDynamicTagCreation_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal);
-	bool SetStatusForFilesWithTags_Internal(bool bDBLocked, IVariantVector *pvecTagNames,
-		VARIANT_BOOL vbAndOperation, long nToActionID, EActionStatus eaNewStatus, long nFromActionID);
 	bool ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQuery, long* pnRecordsAffected);
 	bool ExecuteCommandReturnLongLongResult_Internal( bool bDBLocked, BSTR bstrQuery, 
 		long* pnRecordsAffected, BSTR bstrResultColumnName, long long* pResult );

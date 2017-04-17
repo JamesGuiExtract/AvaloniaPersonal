@@ -1120,9 +1120,9 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 
 		// Create the from string
 		string strFrom = " FROM FAMFile LEFT JOIN FileActionStatus "
-			" ON FAMFile.ID = FileActionStatus.FileID AND FileActionStatus.ActionID = " + 
+			" ON FAMFile.ID = FileActionStatus.FileID AND FileActionStatus.ActionID = " +
 			asString(nActionID) + " " + strWhereClause;
-
+		
 		// if the strException string is empty NULL should be added to the db
 		string strNewException = (strException.empty()) ? "NULL": "'" + strException + "'";
 
@@ -1199,6 +1199,7 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 				m_lFAMUserID = 0;
 				m_lMachineID = 0;
 				m_bDeniedFastCountPermission = false;
+				m_nWorkflowActionIDCheck = -1;
 
 				// Set the status of the connection to not connected
 				m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
@@ -2468,10 +2469,11 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 				"SELECT COUNT(*) AS [ID] FROM [Action] WHERE [ASCName] = '%s' AND [WorkflowID] IS NOT NULL",
 				strActionName.c_str());
 			executeCmdQuery(ipConnection, strWorkflowActionQuery, false, &nWorkflowActionCount);
-			m_bUsingWorkflows = (nWorkflowActionCount > 0);
-			m_bRunningAllWorkflows = (m_bUsingWorkflows && m_strActiveWorkflow == "");
+			m_bUsingWorkflowsForCurrentAction = (nWorkflowActionCount > 0);
+			m_bRunningAllWorkflows = (m_bUsingWorkflowsForCurrentAction && m_strActiveWorkflow == "");
+			m_nWorkflowActionIDCheck = -1;
 
-			if (m_bUsingWorkflows)
+			if (m_bUsingWorkflowsForCurrentAction)
 			{
 				long nExternalWorkflowFiles = 0;
 				string strExternalFilesQuery = Util::Format(
@@ -3818,6 +3820,8 @@ void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 		{
 			m_bLoggedInAsAdmin = false;
 		}
+
+		m_nWorkflowActionIDCheck = -1;
 
 		// Reset the Current connection status to not connected
 		m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
@@ -6524,6 +6528,43 @@ map<string, long> CFileProcessingDB::getWorkflowActions(_ConnectionPtr ipConnect
 	return mapWorkflowActions;
 }
 //-------------------------------------------------------------------------------------------------
+vector<pair<string, string>> CFileProcessingDB::getWorkflowNamesAndIDs(_ConnectionPtr ipConnection)
+{
+	vector<pair<string, string>> vecNamesAndIDs;
+
+	// Create a pointer to a recordset
+	_RecordsetPtr ipWorkflowSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI41936", ipWorkflowSet != __nullptr);
+
+	// Query to get the workflow 
+	string strQuery = "SELECT ID, Name FROM dbo.Workflow";
+		
+	ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
+		adLockReadOnly, adCmdText);
+
+	// Step through all records
+	while (ipWorkflowSet->adoEOF == VARIANT_FALSE)
+	{
+		// Get the fields from the workflows set
+		FieldsPtr ipFields = ipWorkflowSet->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI41938", ipFields != __nullptr);
+
+		// get the workflow name
+		string strWorkflowName = getStringField(ipFields, "Name");
+
+		// get the workflow ID
+		long lID = getLongField(ipFields, "ID");
+		string strID = asString(lID);
+
+		vecNamesAndIDs.push_back(pair<string, string>(strWorkflowName, strID));
+
+		// Move to the next record in the table
+		ipWorkflowSet->MoveNext();
+	}
+
+	return vecNamesAndIDs;
+}
+//-------------------------------------------------------------------------------------------------
 map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 {
 	map<string, long> mapStatuses;
@@ -6594,6 +6635,270 @@ map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 	return mapStatuses;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::databaseHasWorkflows(_ConnectionPtr ipConnection)
+{
+	if (m_nWorkflowActionIDCheck < 0)
+	{
+		CSingleLock lg(&m_mutex, TRUE);
+
+		if (m_nWorkflowActionIDCheck < 0)
+		{
+			string strQuery =
+				"SELECT COALESCE(MAX([ActionID]), 0) AS [ID] FROM \r\n"
+				"(\r\n"
+				"	SELECT TOP 1[ActionID] FROM[FileActionStatus] \r\n"
+				"	INNER JOIN[Action] ON[ActionID] = [Action].[ID] \r\n"
+				"	WHERE[WorkflowID] IS NOT NULL \r\n"
+				") T";
+
+			long nWorkflowActionIDCheck = -1;
+			executeCmdQuery(ipConnection, strQuery, false, &nWorkflowActionIDCheck);
+			m_nWorkflowActionIDCheck = nWorkflowActionIDCheck;
+		}
+	}
+
+	return m_nWorkflowActionIDCheck > 0;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const string& strAction,
+	EActionStatus eStatus)
+{
+	long nWorkflowId = -1;
+	if (!m_strActiveWorkflow.empty())
+	{
+		nWorkflowId = getWorkflowID(ipConnection, m_strActiveWorkflow);
+	}
+
+	// Get the action ID and update the strActionName to stored value
+	long nActionID = getActionID(ipConnection, strAction);
+
+	string strActionStatus = asStatusString(eStatus);
+
+	// Only want to change the status that is different from status that is being changed to
+	string strWhere = " WHERE ActionStatus  <> '" + strActionStatus + "'";
+
+	// Get the action ID as a string
+	string strActionID = asString(nActionID);
+
+	// Remove any records from the skipped file table that where skipped for this action
+	string strDeleteSkippedSQL = "DELETE FROM [SkippedFile] WHERE ActionID = " + strActionID;
+	executeCmdQuery(ipConnection, strDeleteSkippedSQL);
+
+	// Remove any records in the LockedFile table for status changing from Processing to pending
+	string strDeleteLockedFiles = "DELETE FROM [LockedFile] WHERE ActionID = " + strActionID;
+	executeCmdQuery(ipConnection, strDeleteLockedFiles);
+
+	// There are no cases where this method should not just ignore all pending entries in
+	// [QueuedActionStatusChange] for the selected files.
+	string strUpdateQueuedActionStatusChange =
+		"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
+		"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + strActionID;
+	executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange);
+
+	// If setting files to skipped, need to add skipped record for each file
+	if (eStatus == kActionSkipped)
+	{
+		// Get the current user name
+		string strUserName = getCurrentUserName();
+
+		// Add all files to the skipped table for this action
+		string strSQL = "INSERT INTO [SkippedFile] ([FileID], [ActionID], [UserName]) ";
+		strSQL += (nWorkflowId > 0)
+			? Util::Format(
+				"(SELECT [FileID] AS ID, %d AS ActionID, '%s' AS UserName FROM [WorkflowFile] WHERE [WorkflowID] = %d)",
+				nActionID, strUserName.c_str(), nWorkflowId)
+			: Util::Format(
+				"(SELECT [ID], %d AS ActionID, '%s' AS UserName FROM [FAMFile])",
+				nActionID, strUserName.c_str());
+		executeCmdQuery(ipConnection, strSQL);
+	}
+
+	// Add the transition records
+	addASTransFromSelect(ipConnection, strAction, nActionID, strActionStatus,
+		"", "", strWhere, "");
+
+	// if the new status is Unattempted
+	if (eStatus == kActionUnattempted)
+	{
+		string strDeleteStatus = "DELETE FROM FileActionStatus "
+			" WHERE ActionID = " + strActionID;
+		executeCmdQuery(ipConnection, strDeleteStatus);
+	}
+	else
+	{
+		// Update status of existing records
+		string strUpdateStatus = "UPDATE FileActionStatus SET ActionStatus = '" +
+			strActionStatus + "' "
+			"FROM FileActionStatus INNER JOIN FAMFile ON FileActionStatus.FileID = FAMFile.ID AND "
+			"FileActionStatus.ActionID = " + strActionID;
+		if (nWorkflowId > 0)
+		{
+			strUpdateStatus +=
+				" INNER JOIN [WorkflowFile] ON [FileActionStatus].[FileID] = [WorkflowFile].[FileID]" +
+				Util::Format(" AND [WorkflowID] = %d", nWorkflowId);
+		}
+		executeCmdQuery(ipConnection, strUpdateStatus);
+
+		// Insert new records where previous status was 'U'
+		string strInsertStatus = "INSERT INTO FileActionStatus "
+			"(FileID, ActionID, ActionStatus, Priority) "
+			" SELECT FAMFile.ID, " + strActionID + " as ActionID, '" +
+			strActionStatus + "' AS ActionStatus, "
+			"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority "
+			"FROM FAMFile ";
+		if (nWorkflowId > 0)
+		{
+			strInsertStatus +=
+				Util::Format(
+					"INNER JOIN [WorkflowFile] ON [FAMFile].[ID] = [WorkflowFile].[FileID] AND [WorkflowID] = %d ",
+					nWorkflowId);
+		}
+		strInsertStatus += Util::Format(
+			"LEFT JOIN FileActionStatus ON [FAMFile].[ID] = FileActionStatus.FileID"
+			"	AND FileActionStatus.ActionID = %d "
+			"WHERE FileActionStatus.ActionID IS NULL", nActionID);
+		executeCmdQuery(ipConnection, strInsertStatus);
+	}
+
+	// If going to complete status and AutoDeleteFileActionComments == true then
+	// clear the file action comments
+	if (eStatus == kActionCompleted && m_bAutoDeleteFileActionComment)
+	{
+		clearFileActionComment(ipConnection, -1, nActionID);
+	}
+
+	// update the stats
+	reCalculateStats(ipConnection, nActionID);
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::modifyActionStatusForQuery(_ConnectionPtr ipConnection, string strQueryFrom,
+	string strToAction, string strNewStatus, string strFromAction,
+	UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition, long* pnNumRecordsModified)
+{
+	_RecordsetPtr ipFileSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != __nullptr);
+
+	if (!m_strActiveWorkflow.empty())
+	{
+		long nWorkflowId = getWorkflowID(ipConnection, m_strActiveWorkflow);
+
+		strQueryFrom += Util::Format(" \r\n"
+			"INTERSECT "
+			"SELECT [FileID] AS [ID] FROM [WorkflowFile] \r\n"
+			"	WHERE [WorkflowID] = %d", nWorkflowId);
+	}
+
+	// Open the file set
+	ipFileSet->Open(strQueryFrom.c_str(), _variant_t((IDispatch*)ipConnection, true),
+		adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+	// Create an empty file record object for the random condition.
+	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
+	ipFileRecord->Name = "";
+	ipFileRecord->FileID = 0;
+
+	bool bFromSpecified = !strFromAction.empty();
+	long nToActionID = getActionID(ipConnection, strToAction);
+	long nFromActionID = bFromSpecified
+		? getActionID(ipConnection, strFromAction)
+		: 0;
+
+	// Get the list of file ID's to modify
+	long &nNumRecordsModified = *pnNumRecordsModified;
+	vector<long> vecFileIds;
+	while (ipFileSet->adoEOF == VARIANT_FALSE)
+	{
+		if (ipRandomCondition == __nullptr || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
+		{
+			// Get the file ID
+			vecFileIds.push_back(getLongField(ipFileSet->Fields, "ID"));
+
+			nNumRecordsModified++;
+		}
+
+		// Move to next record
+		ipFileSet->MoveNext();
+	}
+	ipFileSet->Close();
+
+	// Action id to change
+	string strToActionID = asString(nToActionID);
+
+	// Loop through the file Ids to change in groups of 10000 populating the SetFileActionData
+	size_t count = vecFileIds.size();
+	size_t i = 0;
+	string strSelectQuery;
+	if (!bFromSpecified)
+	{
+		strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
+			"COALESCE (ToFAS.Priority, FAMFile.Priority) AS Priority, "
+			"COALESCE (ToFAS.ActionStatus, 'U') AS ToActionStatus "
+			"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
+			"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID;
+	}
+	else
+	{
+		strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
+			"COALESCE(ToFAS.Priority, FAMFile.Priority) AS Priority, "
+			"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus, "
+			"COALESCE(FromFAS.ActionStatus, 'U') AS FromActionStatus "
+			"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
+			"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID +
+			" LEFT JOIN FileActionStatus as FromFAS ON FAMFile.ID = FromFAS.FileID AND "
+			"FromFAS.ActionID = " + asString(nFromActionID);
+	}
+	while (i < count)
+	{
+		map<string, vector<SetFileActionData>> mapFromStatusToId;
+
+		string strQuery = strSelectQuery + " WHERE FAMFile.ID IN (";
+		string strFileIds = asString(vecFileIds[i++]);
+		for (int j = 1; i < count && j < 10000; j++)
+		{
+			strFileIds += ", " + asString(vecFileIds[i++]);
+		}
+		strQuery += strFileIds;
+		strQuery += ")";
+		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+		// Loop through each record
+		while (ipFileSet->adoEOF == VARIANT_FALSE)
+		{
+			FieldsPtr ipFields = ipFileSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI30383", ipFields != __nullptr);
+
+			long nFileID = getLongField(ipFields, "ID");
+			EActionStatus oldStatus = asEActionStatus(getStringField(ipFields, "ToActionStatus"));
+
+			// If copying from an action, get the status for the action
+			if (bFromSpecified)
+			{
+				strNewStatus = getStringField(ipFields, "FromActionStatus");
+			}
+
+			mapFromStatusToId[strNewStatus].push_back(SetFileActionData(nFileID,
+				getFileRecordFromFields(ipFields, false), oldStatus));
+
+			ipFileSet->MoveNext();
+		}
+		ipFileSet->Close();
+
+		// Set the file action state for each vector of file data
+		for (map<string, vector<SetFileActionData>>::iterator it = mapFromStatusToId.begin();
+			it != mapFromStatusToId.end(); it++)
+		{
+			setFileActionState(ipConnection, it->second, strToAction, it->first);
+		}
+	}
+
+	// Set the return value if it is specified
+	if (pnNumRecordsModified != __nullptr)
+	{
+		*pnNumRecordsModified += nNumRecordsModified;
+	}
+}
+//-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setMetadataFieldValue(_ConnectionPtr connection, long nFileID,
 	string strMetadataFieldName, string strMetadataFieldValue)
 {
@@ -6614,7 +6919,7 @@ void CFileProcessingDB::setMetadataFieldValue(_ConnectionPtr connection, long nF
 	executeCmdQuery(connection, strQuery);
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::initOutputFileMetadataFieldValue(_ConnectionPtr ipConnection, 
+void CFileProcessingDB::initOutputFileMetadataFieldValue(_ConnectionPtr ipConnection,
 	long nFileID, string strFileName, long nWorkflowID)
 {
 	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
@@ -6625,7 +6930,7 @@ void CFileProcessingDB::initOutputFileMetadataFieldValue(_ConnectionPtr ipConnec
 	string strPath = ipWorkflowDefinition->OutputFilePathInitializationFunction;
 	if (!strOutputFileMetadataField.empty() && !strPath.empty())
 	{
-		string strExpandedPath = 
+		string strExpandedPath =
 			asString(m_ipFAMTagManager->ExpandTagsAndFunctions(strPath.c_str(), strFileName.c_str()));
 
 		setMetadataFieldValue(ipConnection, nFileID, strOutputFileMetadataField, strExpandedPath);

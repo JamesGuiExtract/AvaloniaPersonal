@@ -22,6 +22,7 @@
 #include <stringCSIS.h>
 #include <EncryptionEngine.h>
 #include <StringTokenizer.h>
+#include <ValueRestorer.h>
 
 #include <string>
 #include <stack>
@@ -1915,12 +1916,13 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				ASSERT_RUNTIME_CONDITION("ELI42029", nWorkflowID > 0 || !m_bRunningAllWorkflows,
 					"Workflow has not been set.");
 
-				if (nWorkflowID <= 0 && m_bUsingWorkflows)
+				if (nWorkflowID <= 0 && m_bUsingWorkflowsForCurrentAction)
 				{
 					nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
 				}
 
 				string strActionName = asString(strAction);
+
 				long nActionID = getActionID(ipConnection, strActionName, nWorkflowID);
 				
 				_lastCodePos = "10";
@@ -1937,7 +1939,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				// Check whether the file already exists in the database
 				bool bAlreadyExists = ipFileSet->adoEOF == VARIANT_FALSE;
 				// .. and whether it has been used in the workflow (rest of check below)
-				bool bAlreadyExistsInWorkflow = bAlreadyExists && !m_bUsingWorkflows;
+				bool bAlreadyExistsInWorkflow = bAlreadyExists && (nWorkflowID <= 0);
 
 				// Initialize the id
 				long nID = 0;
@@ -1964,7 +1966,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					// Set the Current file Records ID
 					nID = ipOldRecord->FileID;
 
-					if (m_bUsingWorkflows)
+					if (nWorkflowID > 0)
 					{
 						// NOTE: If the workflow/file pair is not yet in [WorkflowFile], it will be
 						// added as part of setStatusForFile below.
@@ -2149,7 +2151,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					{
 						// Call setStatusForFile to handle updating all tables related to the status
 						// change, as appropriate.
-						setStatusForFile(ipConnection, nID, strActionName, nWorkflowID, kActionPending, true, false);
+						setStatusForFile(ipConnection, nID, strActionName, nWorkflowID, eNewStatus, true, false);
 
 						_lastCodePos = "110";
 
@@ -2194,7 +2196,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 				_lastCodePos = "160";
 
-				if (m_bUsingWorkflows && !bAlreadyExistsInWorkflow)
+				if (m_bUsingWorkflowsForCurrentAction && !bAlreadyExistsInWorkflow)
 				{
 					initOutputFileMetadataFieldValue(ipConnection, nID, asString(strFile), nWorkflowID);
 				}
@@ -2640,131 +2642,6 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::SearchAndModifyFileStatus_Internal(bool bDBLocked,
-	long nWhereActionID,  EActionStatus eWhereStatus,  
-	long nToActionID, EActionStatus eToStatus,
-	BSTR bstrSkippedFromUserName, 
-	long nFromActionID, long * pnNumRecordsModified)
-{
-	try
-	{
-		try
-		{
-			// Changing an Action status to failed should only be done on an individual file bases
-			if (eToStatus == kActionFailed)
-			{
-				UCLIDException ue ("ELI30372", "Cannot change status Failed.");
-				throw ue;
-			}
-
-			// If the to status is not skipped, the from status is the same as the to status
-			// and the Action ids are the same, there is nothing to do
-			// If setting skipped status the skipped file table needs to be updated
-			if (eToStatus != kActionSkipped
-				&& eWhereStatus == eToStatus
-				&& nToActionID == nWhereActionID)
-			{
-				// nothing to do
-				return true;
-			}
-
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-			BEGIN_CONNECTION_RETRY();
-
-				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
-
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
-
-				string strToAction = getActionName(ipConnection, nToActionID);
-
-				// Create string to use for Where action ID
-				string strWhereActionID = asString(nWhereActionID);
-
-				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactIsolated, &m_mutex);
-
-				string strSQL = "SELECT FAMFile.ID AS FAMFileID, COALESCE(ActionStatus, 'U') AS WhereActionStatus ";
-
-				strSQL += " FROM FAMFile LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID"
-					" AND ActionID = " + strWhereActionID;
-
-				string strWhere = " WHERE (WhereActionStatus = '"
-					+ asStatusString(eWhereStatus) + "'";
-
-				// Where status is skipped, need to add inner join to skip file table
-				if (eWhereStatus == kActionSkipped)
-				{
-					strSQL += " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID ";
-					strWhere += " AND SkippedFile.ActionID = " + strWhereActionID;
-					string strUser = asString(bstrSkippedFromUserName);
-					if (!strUser.empty())
-					{
-						strWhere += " AND SkippedFile.UserName = '" + strUser + "'";
-					}
-				}
-
-				// Close the where clause and add it to the SQL statement
-				strWhere += ")";
-				strSQL += strWhere;
-
-				// Get the to status as a string
-				string strToStatus = asStatusString(eToStatus);
-
-				// Get a recordset to fill with the File IDs
-				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI30373", ipFileSet != __nullptr);
-
-				// Open the recordset
-				ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenForwardOnly, adLockReadOnly, adCmdText);
-
-				// Modify each files status (count the number of records modified)
-				long nRecordsModified = 0;
-				while(ipFileSet->adoEOF == VARIANT_FALSE)
-				{
-					FieldsPtr ipFields = ipFileSet->Fields;
-					long nFileID = getLongField(ipFields, "FAMFileID");
-					if (nFromActionID > 0)
-					{
-						strToStatus = getStringField(ipFields, "WhereActionStatus");
-					}
-
-					setFileActionState(ipConnection, nFileID, strToAction, -1, strToStatus, "",
-						false, false, nToActionID, true);
-
-					// Update modified records count
-					nRecordsModified++;
-
-					// Move to next record
-					ipFileSet->MoveNext();
-				}
-
-				// Set the return value
-				*pnNumRecordsModified = nRecordsModified;
-
-				// Commit the changes
-				tg.CommitTrans();
-
-			END_CONNECTION_RETRY(ipConnection, "ELI30374");
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30641");
-	}
-	catch(UCLIDException &ue)
-	{
-		if (!bDBLocked)
-		{
-			return false;
-		}
-		throw ue;
-	}
-
-	return true;
-}
-//-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAction,  EActionStatus eStatus)
 {
 	try
@@ -2776,105 +2653,39 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 
 			BEGIN_CONNECTION_RETRY();
 
+				// The following code depends on the fact that m_strActiveWorkflow won't change in
+				// the midst of this call.
+				CSingleLock lock(&m_mutex, TRUE);
+
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				if (eStatus == kActionFailed)
-				{
-					UCLIDException ue ("ELI30375", "Transition to Failed state is not allowed.");
-					throw ue;
-				}
+				// Begin a transaction
+				TransactionGuard tg(ipConnection, adXactIsolated, &m_mutex);
 
 				// Set the action name from the parameter
 				string strActionName = asString(strAction);
 
-				// Get the action ID and update the strActionName to stored value
-				long nActionID = getActionID(ipConnection, strActionName);
-
-				string strActionStatus = asStatusString(eStatus);
-
-				// Only want to change the status that is different from status that is being changed to
-				string strWhere = " WHERE ActionStatus  <> '" + strActionStatus + "'";
-
-				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactIsolated, &m_mutex);
-
-				// Get the action ID as a string
-				string strActionID = asString(nActionID);
-
-				// Remove any records from the skipped file table that where skipped for this action
-				string strDeleteSkippedSQL = "DELETE FROM [SkippedFile] WHERE ActionID = " + strActionID;
-				executeCmdQuery(ipConnection, strDeleteSkippedSQL);
-
-				// Remove any records in the LockedFile table for status changing from Processing to pending
-				string strDeleteLockedFiles = "DELETE FROM [LockedFile] WHERE ActionID = " + strActionID;
-				executeCmdQuery(ipConnection, strDeleteLockedFiles);
-
-				// There are no cases where this method should not just ignore all pending entries in
-				// [QueuedActionStatusChange] for the selected files.
-				string strUpdateQueuedActionStatusChange =
-					"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
-					"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + strActionID;
-				executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange);
-
-				// If setting files to skipped, need to add skipped record for each file
-				if (eStatus == kActionSkipped)
+				if (m_strActiveWorkflow.empty() && databaseHasWorkflows(ipConnection))
 				{
-					// Get the current user name
-					string strUserName = getCurrentUserName();
+					ValueRestorer<string> restorer(m_strActiveWorkflow, "");
 
-					// Add all files to the skipped table for this action
-					string strSQL = "INSERT INTO [SkippedFile] ([FileID], [ActionID], [UserName]) "
-						"(SELECT [ID], " + strActionID + " AS ActionID, '" + strUserName
-						+ "' AS UserName FROM [FAMFile])";
-					executeCmdQuery(ipConnection, strSQL);
-				}
+					vector<pair<string, string>> vecWorkflowNamesAndIDs = getWorkflowNamesAndIDs(ipConnection);
 
-				// Add the transition records
-				addASTransFromSelect(ipConnection, strActionName, nActionID, strActionStatus,
-					"", "", strWhere, "");
+					for each (pair<string, string> strWorkflow in vecWorkflowNamesAndIDs)
+					{
+						m_strActiveWorkflow = strWorkflow.first;
 
-				// if the new status is Unattempted
-				if (eStatus == kActionUnattempted)
-				{
-					string strDeleteStatus = "DELETE FROM FileActionStatus "
-						" WHERE ActionID = " + strActionID;
-					executeCmdQuery(ipConnection, strDeleteStatus);
+						setStatusForAllFiles(ipConnection, strActionName, eStatus);
+					}
 				}
 				else
 				{
-					// Update status of existing records
-					string strUpdateStatus = "UPDATE FileActionStatus SET ActionStatus = '" + 
-						strActionStatus + "' "
-						"FROM FileActionStatus INNER JOIN FAMFile ON FileID = FAMFile.ID AND "
-						"FileActionStatus.ActionID = " + strActionID;
-					executeCmdQuery(ipConnection, strUpdateStatus);
-
-					// Insert new records where previous status was 'U'
-					string strInsertStatus = "INSERT INTO FileActionStatus "
-						"(FileID, ActionID, ActionStatus, Priority) "
-						" SELECT FAMFile.ID, " + strActionID + " as ActionID, '" +
-						strActionStatus + "' AS ActionStatus, "
-						"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority "
-						"FROM FAMFile LEFT JOIN FileActionStatus ON "
-						"FAMFile.ID = FileActionStatus.FileID AND "
-						"FileActionStatus.ActionID = " + strActionID +
-						" WHERE FileActionStatus.ActionID IS NULL ";
-					executeCmdQuery(ipConnection, strInsertStatus);
+					setStatusForAllFiles(ipConnection, strActionName, eStatus);
 				}
-
-				// If going to complete status and AutoDeleteFileActionComments == true then
-				// clear the file action comments
-				if (eStatus == kActionCompleted && m_bAutoDeleteFileActionComment)
-				{
-					clearFileActionComment(ipConnection, -1, nActionID);
-				}
-
-				// update the stats
-				reCalculateStats(ipConnection, nActionID);
 
 				// Commit the changes
 				tg.CommitTrans();
@@ -4161,129 +3972,46 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 
 			BEGIN_CONNECTION_RETRY();
 
+				// The following code depends on the fact that m_strActiveWorkflow won't change in
+				// the midst of this call.
+				CSingleLock lock(&m_mutex, TRUE);
+
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
-
-				// Determine the source of the new status
-				string strFromAction = asString(bstrFromAction);
-				bool bFromSpecified = !strFromAction.empty();
-				string strStatus = "";
-				long nFromActionID = 0;
-				if (bFromSpecified)
-				{
-					nFromActionID = getActionID(ipConnection, strFromAction);
-				}
-				else
-				{
-					// Get the new status as a string
-					strStatus = asStatusString(eaStatus);
-				}
-
+				
 				validateDBSchemaVersion();
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactIsolated, &m_mutex);
 
-				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != __nullptr);
-
-				// Open the file set
-				ipFileSet->Open(strQueryFrom.c_str(), _variant_t((IDispatch*)ipConnection, true),
-					adOpenForwardOnly, adLockReadOnly, adCmdText);
-
-				// Create an empty file record object for the random condition.
-				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
-				ipFileRecord->Name = "";
-				ipFileRecord->FileID = 0;
-
-				// Get the list of file ID's to modify
 				long nNumRecordsModified = 0;
-				vector<long> vecFileIds;
-				while (ipFileSet->adoEOF == VARIANT_FALSE)
+				string strFromAction = asString(bstrFromAction);
+				string strStatus = "";
+				if (strFromAction.empty())
 				{
-					if (ipRandomCondition == __nullptr || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
-					{
-						// Get the file ID
-						vecFileIds.push_back(getLongField(ipFileSet->Fields, "ID"));
-
-						nNumRecordsModified++;
-					}
-
-					// Move to next record
-					ipFileSet->MoveNext();
+					strStatus = asStatusString(eaStatus);
 				}
-				ipFileSet->Close();
 
-				// Action id to change
-				long nToActionID = getActionID(ipConnection, strToAction);
-				string strToActionID = asString(nToActionID);
-
-				// Loop through the file Ids to change in groups of 10000 populating the SetFileActionData
-				size_t count = vecFileIds.size();
-				size_t i = 0;
-				string strSelectQuery;
-				if (!bFromSpecified)
+				if (m_strActiveWorkflow.empty() && databaseHasWorkflows(ipConnection))
 				{
-					strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
-						"COALESCE (ToFAS.Priority, FAMFile.Priority) AS Priority, "
-						"COALESCE (ToFAS.ActionStatus, 'U') AS ToActionStatus "
-						"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
-						"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID;
+					ValueRestorer<string> restorer(m_strActiveWorkflow, "");
+
+					vector<pair<string, string>> vecWorkflowNamesAndIDs = getWorkflowNamesAndIDs(ipConnection);
+
+					for each (pair<string, string> strWorkflow in vecWorkflowNamesAndIDs)
+					{
+						// modifyActionStatusForQuery will run in the context of m_strActiveWorkflow.
+						// Repeat the call for each workflow.
+						m_strActiveWorkflow = strWorkflow.first;
+
+						modifyActionStatusForQuery(ipConnection, strQueryFrom, strToAction, strStatus,
+							strFromAction, ipRandomCondition, &nNumRecordsModified);
+					}
 				}
 				else
 				{
-					strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
-						"COALESCE(ToFAS.Priority, FAMFile.Priority) AS Priority, "
-						"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus, "
-						"COALESCE(FromFAS.ActionStatus, 'U') AS FromActionStatus "
-						"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
-						"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID +
-						" LEFT JOIN FileActionStatus as FromFAS ON FAMFile.ID = FromFAS.FileID AND "
-						"FromFAS.ActionID = " + asString(nFromActionID);
-				}
-				while (i < count)
-				{
-					map<string, vector<SetFileActionData>> mapFromStatusToId;
-
-					string strQuery = strSelectQuery + " WHERE FAMFile.ID IN (";
-					string strFileIds = asString(vecFileIds[i++]);
-					for (int j=1; i < count && j < 10000; j++)
-					{
-						strFileIds += ", " + asString(vecFileIds[i++]);
-					}
-					strQuery += strFileIds;
-					strQuery += ")";
-					ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
-						adOpenForwardOnly, adLockReadOnly, adCmdText);
-
-					// Loop through each record
-					while (ipFileSet->adoEOF == VARIANT_FALSE)
-					{
-						FieldsPtr ipFields = ipFileSet->Fields;
-						ASSERT_RESOURCE_ALLOCATION("ELI30383", ipFields != __nullptr);
-
-						long nFileID = getLongField(ipFields, "ID");
-						EActionStatus oldStatus = asEActionStatus(getStringField(ipFields, "ToActionStatus"));
-
-						// If copying from an action, get the status for the action
-						if (bFromSpecified)
-						{
-							strStatus = getStringField(ipFields, "FromActionStatus");
-						}
-
-						mapFromStatusToId[strStatus].push_back(SetFileActionData(nFileID,
-							getFileRecordFromFields(ipFields, false), oldStatus));
-
-						ipFileSet->MoveNext();
-					}
-					ipFileSet->Close();
-
-					// Set the file action state for each vector of file data
-					for(map<string, vector<SetFileActionData>>::iterator it = mapFromStatusToId.begin();
-						it != mapFromStatusToId.end(); it++)
-					{
-						setFileActionState(ipConnection, it->second, strToAction, it->first); 
-					}
+					modifyActionStatusForQuery(ipConnection, strQueryFrom, strToAction, strStatus,
+						strFromAction, ipRandomCondition, &nNumRecordsModified);
 				}
 
 				// Commit the transaction
@@ -5131,128 +4859,6 @@ bool CFileProcessingDB::GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVa
 			*ppvecTagNames = ipVecTagNames.Detach();
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30682");
-	}
-	catch(UCLIDException &ue)
-	{
-		if (!bDBLocked)
-		{
-			return false;
-		}
-		throw ue;
-	}
-	return true;
-}
-//-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVariantVector *pvecTagNames,
-														  VARIANT_BOOL vbAndOperation,
-														  long nToActionID,
-														  EActionStatus eaNewStatus,
-														  long nFromActionID)
-{
-	try
-	{
-		try
-		{
-			IVariantVectorPtr ipVecTagNames(pvecTagNames);
-			ASSERT_ARGUMENT("ELI30385", ipVecTagNames != __nullptr);
-
-			long lSize = ipVecTagNames->Size;
-
-			// If no tags specified do nothing
-			if (lSize == 0)
-			{
-				return true;
-			}
-
-			string strConjunction = asCppBool(vbAndOperation) ? "\nINTERSECT\n" : "\nUNION\n";
-
-			string strQuery = gstrQUERY_FILES_WITH_TAGS;
-			replaceVariable(strQuery, gstrTAG_NAME_VALUE, asString(ipVecTagNames->GetItem(0).bstrVal));
-
-			for (long i=1; i < lSize; i++)
-			{
-				string strTagName = asString(ipVecTagNames->GetItem(i).bstrVal);
-				if (!strTagName.empty())
-				{
-					string strTemp = gstrQUERY_FILES_WITH_TAGS;
-					replaceVariable(strTemp, gstrTAG_NAME_VALUE,
-						asString(ipVecTagNames->GetItem(i).bstrVal));
-					strQuery += strConjunction + strTemp;
-				}
-			}
-
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-			BEGIN_CONNECTION_RETRY();
-
-				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
-
-				bool bFromAction = nFromActionID != -1;
-				string strStatus = "";
-				string strFromAction = "";
-				if (bFromAction)
-				{
-					replaceVariable(strQuery, gstrTAG_QUERY_SELECT,
-						"[FAMFile].[ID], COALESCE(ActionStatus, 'U' AS ActionStatus");
-					replaceVariable(strQuery, "<ActionStatusJoin>", 
-						"LEFT JOIN FileActionStatus ON FileTag.FileID = FileActionStatus.FileID "
-						"AND FileActionStatus.ActionID = " + asString(nFromActionID));
-				}
-				else
-				{
-					replaceVariable(strQuery, gstrTAG_QUERY_SELECT, "[FAMFile].[ID]");
-					replaceVariable(strQuery, "<ActionStatusJoin>", "");
-
-					// Get the new status as a string
-					strStatus = asStatusString(eaNewStatus);
-				}
-
-				// Get the action name 
-				string strToAction = getActionName(ipConnection, nToActionID);
-
-				// Set the transaction guard
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
-
-				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI30386", ipFileSet != __nullptr);
-
-				// Open the file set
-				ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
-					adOpenForwardOnly, adLockReadOnly, adCmdText);
-
-				// Loop through each record
-				while (ipFileSet->adoEOF == VARIANT_FALSE)
-				{
-					FieldsPtr ipFields = ipFileSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI30387", ipFields != __nullptr);
-
-					// Get the file ID
-					long nFileID = getLongField(ipFields, "ID");
-
-					// If copying from an action, get the status for the action
-					if (bFromAction)
-					{
-						strStatus = getStringField(ipFields, "ActionStatus");
-					}
-
-					// Set the file action state
-					// This call should not be made from file processing and the new state should
-					// overrule any pending state for the file in the QueuedActionStatusChange table.
-					setFileActionState(ipConnection, nFileID, strToAction, -1, strStatus, "", false,
-						false, nToActionID);
-
-					// Move to next record
-					ipFileSet->MoveNext();
-				}
-
-				// Commit the transaction
-				tg.CommitTrans();
-
-			END_CONNECTION_RETRY(ipConnection, "ELI30388");
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30686");
 	}
 	catch(UCLIDException &ue)
 	{
@@ -10288,40 +9894,14 @@ bool CFileProcessingDB::GetWorkflows_Internal(bool bDBLocked,
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
 
-			// Create StrToStrMap to return the list of actions
-			// Create a pointer to a recordset
-			_RecordsetPtr ipWorkflowSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI41936", ipWorkflowSet != __nullptr);
-
-			// Query to get the workflow 
-			string strQuery = "SELECT ID, Name FROM dbo.Workflow";
-		
-			ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
-				adLockReadOnly, adCmdText);
-
 			// Create StrToStrMap to return the list of workflows
 			IStrToStrMapPtr ipWorkflows(CLSID_StrToStrMap);
 			ASSERT_RESOURCE_ALLOCATION("ELI41937", ipWorkflows != __nullptr);
 
-			// Step through all records
-			while (ipWorkflowSet->adoEOF == VARIANT_FALSE)
+			for each(pair<string, string> workflow in getWorkflowNamesAndIDs(ipConnection))
 			{
-				// Get the fields from the workflows set
-				FieldsPtr ipFields = ipWorkflowSet->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI41938", ipFields != __nullptr);
-
-				// get the workflow name
-				string strWorkflowName = getStringField(ipFields, "Name");
-
-				// get the workflow ID
-				long lID = getLongField(ipFields, "ID");
-				string strID = asString(lID);
-
 				// Put the values in the StrToStrMap
-				ipWorkflows->Set(strWorkflowName.c_str(), strID.c_str());
-
-				// Move to the next record in the table
-				ipWorkflowSet->MoveNext();
+				ipWorkflows->Set(workflow.first.c_str(), workflow.second.c_str());
 			}
 
 			// return the StrToStrMap containing all workflows

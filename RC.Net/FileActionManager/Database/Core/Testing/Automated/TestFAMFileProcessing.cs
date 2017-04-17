@@ -14,7 +14,7 @@ using static System.FormattableString;
 namespace Extract.FileActionManager.Database.Test
 {
     /// <summary>
-    /// Testing class for the workflow management related methods in IFileProcessingDB.
+    /// Testing class for methods used for file processing in IFileProcessingDB.
     /// </summary>
     [Category("TestFAMFileProcessing")]
     [TestFixture]
@@ -28,6 +28,17 @@ namespace Extract.FileActionManager.Database.Test
         static readonly string _LABDE_TEST_FILE1 = "Resources.TestImage001.tif";
         static readonly string _LABDE_TEST_FILE2 = "Resources.TestImage002.tif";
         static readonly string _LABDE_TEST_FILE3 = "Resources.TestImage003.tif";
+
+        static readonly string _ACTION1 = "Action1";
+        static readonly string _ACTION2 = "Action2";
+        static readonly string _ACTION3 = "Action3";
+
+        static readonly string _LABDE_ACTION1 = "A01_ExtractData";
+        static readonly string _LABDE_ACTION2 = "A02_Verify";
+        static readonly string _LABDE_ACTION3 = "A03_QA";
+        static readonly string _LABDE_ACTION4 = "A04_SendToEMR";
+
+        static readonly string _CLEANUP_ACTION = "Cleanup";
 
         #endregion Constants
 
@@ -89,27 +100,26 @@ namespace Extract.FileActionManager.Database.Test
         public static void AddRemoveFiles()
         {
             string testDbName = "Test_AddRemoveFiles";
-            string actionName = "A01_ExtractData";
 
             try
             {
                 string testFileName = _testFiles.GetFile(_LABDE_TEST_FILE1);
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
-                int actionId = fileProcessingDb.GetActionID(actionName);
+                int actionId = fileProcessingDb.GetActionID(_LABDE_ACTION1);
 
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", actionName, true, false);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
 
                 var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, actionName, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false, 
+                    testFileName, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
                     EActionStatus.kActionPending, true, out bool t1, out EActionStatus t2);
                 int fileId = fileRecord.FileID;
 
-                fileProcessingDb.SetFileStatusToPending(fileId, actionName, false);
+                fileProcessingDb.SetFileStatusToPending(fileId, _LABDE_ACTION1, false);
 
                 Assert.That(fileProcessingDb.GetStats(actionId, false).NumDocumentsPending == 1);
 
-                fileProcessingDb.RemoveFile(testFileName, actionName);
+                fileProcessingDb.RemoveFile(testFileName, _LABDE_ACTION1);
 
                 Assert.That(fileProcessingDb.GetStats(actionId, false).NumDocumentsPending == 0);
             }
@@ -127,7 +137,6 @@ namespace Extract.FileActionManager.Database.Test
         public static void AddRemoveFilesWithWorkflows()
         {
             string testDbName = "Test_AddRemoveFilesWithWorkflows";
-            string actionName = "A01_ExtractData";
 
             try
             {
@@ -135,16 +144,16 @@ namespace Extract.FileActionManager.Database.Test
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
                 int workflowId = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowId, new[] { actionName }.ToVariantVector());
-                int actionId = fileProcessingDb.GetActionID(actionName);
+                fileProcessingDb.SetWorkflowActions(workflowId, new[] { _LABDE_ACTION1 }.ToVariantVector());
+                int actionId = fileProcessingDb.GetActionID(_LABDE_ACTION1);
 
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", actionName, true, false);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
 
                 // Should not be able to queue a file without setting a workflow
                 bool alreadyExists = false;
                 EActionStatus previousStatus = EActionStatus.kActionUnattempted;
                 Assert.Throws<COMException>(() => fileProcessingDb.AddFile(
-                    testFileName, actionName, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
+                    testFileName, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
                     EActionStatus.kActionPending, true, out alreadyExists, out previousStatus));
 
                 // Should not be able to change workflow during an active FAM Session.
@@ -154,40 +163,40 @@ namespace Extract.FileActionManager.Database.Test
 
                 // Set active workflow which will correspond to a different action ID.
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
-                int actionIdWorkflow1 = fileProcessingDb.GetActionID(actionName);
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", actionName, true, true);
+                int actionIdWorkflow1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, true);
 
                 // We should now be able to add a file now that we have a workflow set. (Even though
                 // the workflow ID is not specified, active workflow should be assumed)
                 var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, actionName, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
+                    testFileName, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
                     EActionStatus.kActionPending, true, out alreadyExists, out previousStatus);
                 int fileId = fileRecord.FileID;
 
                 fileProcessingDb.RecordFAMSessionStop();
 
                 workflowId = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowId, new[] { actionName }.ToVariantVector());
+                fileProcessingDb.SetWorkflowActions(workflowId, new[] { _LABDE_ACTION1 }.ToVariantVector());
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
-                int actionIdWorkflow2 = fileProcessingDb.GetActionID(actionName);
+                int actionIdWorkflow2 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
 
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", actionName, false, true);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, false, true);
 
-                fileProcessingDb.SetFileStatusToPending(fileId, actionName, false);
+                fileProcessingDb.SetFileStatusToPending(fileId, _LABDE_ACTION1, false);
 
                 // The actionID associated with the workflow should have a file queued, but not the "NULL" workflow action.
                 Assert.That(fileProcessingDb.GetStats(actionId, false).NumDocumentsPending == 0);
                 Assert.That(fileProcessingDb.GetStats(actionIdWorkflow1, false).NumDocumentsPending == 1);
                 Assert.That(fileProcessingDb.GetStats(actionIdWorkflow2, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(actionName, false).NumDocumentsPending == 2); // The file will be counted separately in each workflow
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 2); // The file will be counted separately in each workflow
 
                 // Test that after removing the file there are no longer any files pending on the workflow's action.
-                fileProcessingDb.RemoveFile(testFileName, actionName);
+                fileProcessingDb.RemoveFile(testFileName, _LABDE_ACTION1);
 
                 Assert.That(fileProcessingDb.GetStats(actionId, false).NumDocumentsPending == 0);
                 Assert.That(fileProcessingDb.GetStats(actionIdWorkflow1, false).NumDocumentsPending == 1);
                 Assert.That(fileProcessingDb.GetStats(actionIdWorkflow2, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(actionName, false).NumDocumentsPending == 1);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 1);
             }
             finally
             {
@@ -209,36 +218,36 @@ namespace Extract.FileActionManager.Database.Test
                 string testFileName = _testFiles.GetFile(_LABDE_TEST_FILE1);
                 var fileProcessingDb = _testDbManager.GetNewDatabase(testDbName);
 
-                fileProcessingDb.DefineNewAction("Action1");
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "Action1", true, false);
+                fileProcessingDb.DefineNewAction(_ACTION1);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION1, true, false);
 
                 bool alreadyExists = false;
                 EActionStatus previousStatus = EActionStatus.kActionUnattempted;
-                var fileRecord = fileProcessingDb.AddFile(testFileName, "Action1", _CURRENT_WORKFLOW,
+                var fileRecord = fileProcessingDb.AddFile(testFileName, _ACTION1, _CURRENT_WORKFLOW,
                     EFilePriority.kPriorityNormal, true, false, EActionStatus.kActionPending, true,
                     out alreadyExists, out previousStatus);
                 int fileId = fileRecord.FileID;
 
                 // Without having yet set AutoCreateActions setting to true, AutoCreateActions should
                 // fail and we should not be able to queue to an action that does not exist
-                Assert.Throws<COMException>(() => fileProcessingDb.AutoCreateAction("Action2"));
+                Assert.Throws<COMException>(() => fileProcessingDb.AutoCreateAction(_ACTION2));
                 Assert.Throws<COMException>(() =>
-                    fileProcessingDb.SetStatusForFile(fileId, "Action2", _CURRENT_WORKFLOW,
+                    fileProcessingDb.SetStatusForFile(fileId, _ACTION2, _CURRENT_WORKFLOW,
                     EActionStatus.kActionPending, true, false, out previousStatus));
 
                 // Turn on auto-create actions.
                 fileProcessingDb.RecordFAMSessionStop();
                 fileProcessingDb.ExecuteCommandQuery("UPDATE [DBInfo] SET [Value] = '1' WHERE [Name] = 'AutoCreateActions'");
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "Action1", true, false);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION1, true, false);
 
-                fileProcessingDb.AutoCreateAction("Action2");
-                fileProcessingDb.SetStatusForFile(fileId, "Action2", _CURRENT_WORKFLOW,
+                fileProcessingDb.AutoCreateAction(_ACTION2);
+                fileProcessingDb.SetStatusForFile(fileId, _ACTION2, _CURRENT_WORKFLOW,
                     EActionStatus.kActionPending, true, false, out previousStatus);
 
-                int actionID = fileProcessingDb.GetActionID("Action1");
+                int actionID = fileProcessingDb.GetActionID(_ACTION1);
                 Assert.That(fileProcessingDb.GetStats(actionID, false).NumDocumentsPending == 1);
 
-                actionID = fileProcessingDb.GetActionID("Action2");
+                actionID = fileProcessingDb.GetActionID(_ACTION2);
                 Assert.That(fileProcessingDb.GetStats(actionID, false).NumDocumentsPending == 1);
             }
             finally
@@ -261,16 +270,16 @@ namespace Extract.FileActionManager.Database.Test
                 string testFileName = _testFiles.GetFile(_LABDE_TEST_FILE1);
                 var fileProcessingDb = _testDbManager.GetNewDatabase(testDbName);
 
-                fileProcessingDb.DefineNewAction("Action1");
-                fileProcessingDb.DefineNewAction("Action2");
+                fileProcessingDb.DefineNewAction(_ACTION1);
+                fileProcessingDb.DefineNewAction(_ACTION2);
                 int workflowID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowID, new[] { "Action1" }.ToVariantVector());
+                fileProcessingDb.SetWorkflowActions(workflowID, new[] { _ACTION1 }.ToVariantVector());
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "Action1", true, false);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION1, true, false);
 
                 bool alreadyExists = false;
                 EActionStatus previousStatus = EActionStatus.kActionUnattempted;
-                var fileRecord = fileProcessingDb.AddFile(testFileName, "Action1", workflowID,
+                var fileRecord = fileProcessingDb.AddFile(testFileName, _ACTION1, workflowID,
                     EFilePriority.kPriorityNormal, true, false, EActionStatus.kActionPending, true,
                     out alreadyExists, out previousStatus);
                 int fileId = fileRecord.FileID;
@@ -278,31 +287,31 @@ namespace Extract.FileActionManager.Database.Test
                 // Without having yet set AutoCreateActions setting to true, AutoCreateActions should
                 // fail and we should not be able to queue to an action that does not exist in the
                 // workflow (whether or not it exists as whole).
-                Assert.Throws<COMException>(() => fileProcessingDb.AutoCreateAction("Action2"));
+                Assert.Throws<COMException>(() => fileProcessingDb.AutoCreateAction(_ACTION2));
                 Assert.Throws<COMException>(() =>
-                    fileProcessingDb.SetStatusForFile(fileId, "Action2", workflowID, EActionStatus.kActionPending, true, false, out previousStatus));
+                    fileProcessingDb.SetStatusForFile(fileId, _ACTION2, workflowID, EActionStatus.kActionPending, true, false, out previousStatus));
 
                 // Turn on auto-create actions.
                 fileProcessingDb.RecordFAMSessionStop();
                 fileProcessingDb.ExecuteCommandQuery("UPDATE [DBInfo] SET [Value] = '1' WHERE [Name] = 'AutoCreateActions'");
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "Action1", true, false);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION1, true, false);
 
                 // Test creating an using an action that already exists in a different workflow.
-                fileProcessingDb.AutoCreateAction("Action2");
-                fileProcessingDb.SetStatusForFile(fileId, "Action2", workflowID, EActionStatus.kActionPending, true, false, out previousStatus);
+                fileProcessingDb.AutoCreateAction(_ACTION2);
+                fileProcessingDb.SetStatusForFile(fileId, _ACTION2, workflowID, EActionStatus.kActionPending, true, false, out previousStatus);
 
                 // Test creating an using an action that didn't already exist in a different workflow.
-                fileProcessingDb.AutoCreateAction("Action3");
-                fileProcessingDb.SetStatusForFile(fileId, "Action3", workflowID, EActionStatus.kActionPending, true, false, out previousStatus);
+                fileProcessingDb.AutoCreateAction(_ACTION3);
+                fileProcessingDb.SetStatusForFile(fileId, _ACTION3, workflowID, EActionStatus.kActionPending, true, false, out previousStatus);
 
                 // Action 1
-                int actionID = fileProcessingDb.GetActionID("Action1");
+                int actionID = fileProcessingDb.GetActionID(_ACTION1);
                 Assert.That(fileProcessingDb.GetStats(actionID, false).NumDocumentsPending == 1);
 
-                actionID = fileProcessingDb.GetActionID("Action2");
+                actionID = fileProcessingDb.GetActionID(_ACTION2);
                 Assert.That(fileProcessingDb.GetStats(actionID, false).NumDocumentsPending == 1);
 
-                actionID = fileProcessingDb.GetActionID("Action3");
+                actionID = fileProcessingDb.GetActionID(_ACTION3);
                 Assert.That(fileProcessingDb.GetStats(actionID, false).NumDocumentsPending == 1);
             }
             finally
@@ -328,46 +337,46 @@ namespace Extract.FileActionManager.Database.Test
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
                 int workflow1ID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflow1ID, new[] { "A01_ExtractData", "A02_Verify" }.ToVariantVector());
+                fileProcessingDb.SetWorkflowActions(workflow1ID, new[] { _LABDE_ACTION1, _LABDE_ACTION2 }.ToVariantVector());
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
-                int actionExtract1 = fileProcessingDb.GetActionID("A01_ExtractData");
-                int actionVerify1 = fileProcessingDb.GetActionID("A02_Verify");
+                int actionExtract1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+                int actionVerify1 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
 
                 int workflow2ID = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflow2ID, new[] { "A02_Verify", "A03_QA" }.ToVariantVector());
+                fileProcessingDb.SetWorkflowActions(workflow2ID, new[] { _LABDE_ACTION2, _LABDE_ACTION3 }.ToVariantVector());
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
-                int actionVerify2 = fileProcessingDb.GetActionID("A02_Verify");
-                int actionQA2 = fileProcessingDb.GetActionID("A03_QA");
+                int actionVerify2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
+                int actionQA2 = fileProcessingDb.GetActionID(_LABDE_ACTION3);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
-                fileProcessingDb.RecordFAMSessionStart("ExtractData.fps", "A01_ExtractData", true, false);
+                fileProcessingDb.RecordFAMSessionStart("ExtractData.fps", _LABDE_ACTION1, true, false);
 
-                // Workflow1: File 1 to Pending in A01_ExtractData and Complete in A02_Verify
+                // Workflow1: File 1 to Pending in _LABDE_ACTION1 and Complete in _LABDE_ACTION2
                 bool alreadyExists = false;
                 EActionStatus previousStatus = EActionStatus.kActionUnattempted;
-                var fileRecord = fileProcessingDb.AddFile(testFileName1, "A01_ExtractData", workflow1ID,
+                var fileRecord = fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflow1ID,
                     EFilePriority.kPriorityNormal, true, false, EActionStatus.kActionPending, false,
                     out alreadyExists, out previousStatus);
                 int fileId = fileRecord.FileID;
-                fileProcessingDb.SetStatusForFile(fileId, "A02_Verify", workflow1ID, EActionStatus.kActionCompleted, false, false, out previousStatus);
+                fileProcessingDb.SetStatusForFile(fileId, _LABDE_ACTION2, workflow1ID, EActionStatus.kActionCompleted, false, false, out previousStatus);
 
                 fileProcessingDb.RecordFAMSessionStop();
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "A02_Verify", true, false);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION2, true, false);
 
                 // Workflow2: 
-                // File 1, 2 and 3 to Pending in A02_Verify
-                // File 3 to Skipped in A03_QA
+                // File 1, 2 and 3 to Pending in _LABDE_ACTION2
+                // File 3 to Skipped in _LABDE_ACTION3
                 // File 3 to Failed in NewAction
-                fileProcessingDb.SetStatusForFile(fileId, "A02_Verify", workflow2ID, EActionStatus.kActionPending, false, false, out previousStatus);
-                fileRecord = fileProcessingDb.AddFile(testFileName2, "A02_Verify", workflow2ID,
+                fileProcessingDb.SetStatusForFile(fileId, _LABDE_ACTION2, workflow2ID, EActionStatus.kActionPending, false, false, out previousStatus);
+                fileRecord = fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION2, workflow2ID,
                     EFilePriority.kPriorityNormal, true, false, EActionStatus.kActionPending, false,
                     out alreadyExists, out previousStatus);
-                fileRecord = fileProcessingDb.AddFile(testFileName3, "A02_Verify", workflow2ID,
+                fileRecord = fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION2, workflow2ID,
                     EFilePriority.kPriorityNormal, true, false, EActionStatus.kActionPending, false,
                     out alreadyExists, out previousStatus);
                 fileId = fileRecord.FileID;
-                fileProcessingDb.SetStatusForFile(fileId, "A03_QA", workflow2ID, EActionStatus.kActionSkipped, false, false, out previousStatus);
+                fileProcessingDb.SetStatusForFile(fileId, _LABDE_ACTION3, workflow2ID, EActionStatus.kActionSkipped, false, false, out previousStatus);
 
                 fileProcessingDb.ExecuteCommandQuery("UPDATE [DBInfo] SET [Value] = '1' WHERE [Name] = 'AutoCreateActions'");
                 int newAction2 = fileProcessingDb.AutoCreateAction("NewAction");
@@ -404,22 +413,22 @@ namespace Extract.FileActionManager.Database.Test
                     Assert.That(fileProcessingDb.GetStats(newAction2, false).NumPages == 4);
 
                     // Check combined stats for both workflows.
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsPending == 1);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumPagesPending == 1);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocuments == 1);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumPages == 1);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumDocumentsPending == 3); // File 1 has been counted twice
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumPagesPending == 6);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumDocumentsComplete == 1);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumPagesComplete == 1);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumDocumentsFailed == 0);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumPagesFailed == 0);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumDocuments == 4); // File 1 has been counted twice
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumPages == 7);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A03_QA", false).NumDocumentsSkipped == 1);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A03_QA", false).NumPagesSkipped == 4);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A03_QA", false).NumDocuments == 1);
-                    Assert.That(fileProcessingDb.GetStatsAllWorkflows("A03_QA", false).NumPages == 4);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 1);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumPagesPending == 1);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocuments == 1);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumPages == 1);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 3); // File 1 has been counted twice
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumPagesPending == 6);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsComplete == 1);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumPagesComplete == 1);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsFailed == 0);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumPagesFailed == 0);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocuments == 4); // File 1 has been counted twice
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumPages == 7);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 1);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumPagesSkipped == 4);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocuments == 1);
+                    Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumPages == 4);
                     Assert.That(fileProcessingDb.GetStatsAllWorkflows("NewAction", false).NumDocumentsFailed == 1);
                     Assert.That(fileProcessingDb.GetStatsAllWorkflows("NewAction", false).NumPagesFailed == 4);
                     Assert.That(fileProcessingDb.GetStatsAllWorkflows("NewAction", false).NumDocuments == 1);
@@ -467,38 +476,38 @@ namespace Extract.FileActionManager.Database.Test
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
                 // Start processing
-                int extractAction = fileProcessingDb.GetActionID("A01_ExtractData");
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "A01_ExtractData", true, false);
+                int extractAction = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
                 fileProcessingDb.RegisterActiveFAM();
 
-                // Queue file 1 and 2 to pending in A01_ExtractData, file 3 to skipped.
+                // Queue file 1 and 2 to pending in _LABDE_ACTION1, file 3 to skipped.
                 bool alreadyExists = false;
                 EActionStatus previousStatus;
-                var fileRecord = fileProcessingDb.AddFile(testFileName1, "A01_ExtractData",
+                var fileRecord = fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1,
                     _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, true,
                     EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
                 int fileId1 = fileRecord.FileID;
-                fileRecord = fileProcessingDb.AddFile(testFileName2, "A01_ExtractData",
+                fileRecord = fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1,
                     _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, true,
                     EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
                 int fileId2 = fileRecord.FileID;
-                fileRecord = fileProcessingDb.AddFile(testFileName3, "A01_ExtractData",
+                fileRecord = fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION1,
                     _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, true,
                     EActionStatus.kActionSkipped, false, out alreadyExists, out previousStatus);
                 int fileId3 = fileRecord.FileID;
 
                 // Check that we get just the pending files
-                var files = fileProcessingDb.GetFilesToProcess("A01_ExtractData", 10, false, "")
+                var files = fileProcessingDb.GetFilesToProcess(_LABDE_ACTION1, 10, false, "")
                     .ToIEnumerable<IFileRecord>()
                     .Select(record => record.FileID);
-                Assert.That(files.SequenceEqual(new []{ fileId1, fileId2 }));
+                Assert.That(files.SequenceEqual(new[] { fileId1, fileId2 }));
 
                 // Simulate one file completing and the other being skipped.
-                fileProcessingDb.NotifyFileProcessed(fileId1, "A01_ExtractData", _CURRENT_WORKFLOW, true);
-                fileProcessingDb.NotifyFileSkipped(fileId2, "A01_ExtractData", _CURRENT_WORKFLOW, true);
+                fileProcessingDb.NotifyFileProcessed(fileId1, _LABDE_ACTION1, _CURRENT_WORKFLOW, true);
+                fileProcessingDb.NotifyFileSkipped(fileId2, _LABDE_ACTION1, _CURRENT_WORKFLOW, true);
 
                 // Ensure GetFilesToProcess will not grab the skipped files in the same session.
-                files = fileProcessingDb.GetFilesToProcess("A01_ExtractData", 10, true, "")
+                files = fileProcessingDb.GetFilesToProcess(_LABDE_ACTION1, 10, true, "")
                     .ToIEnumerable<IFileRecord>()
                     .Select(record => record.FileID);
                 Assert.That(files.Count() == 0);
@@ -506,18 +515,18 @@ namespace Extract.FileActionManager.Database.Test
                 // Start a new FAM session
                 fileProcessingDb.UnregisterActiveFAM();
                 fileProcessingDb.RecordFAMSessionStop();
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "A01_ExtractData", true, false);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
                 fileProcessingDb.RegisterActiveFAM();
 
                 // Now we should get the skipped files.
-                files = fileProcessingDb.GetFilesToProcess("A01_ExtractData", 10, true, "")
+                files = fileProcessingDb.GetFilesToProcess(_LABDE_ACTION1, 10, true, "")
                     .ToIEnumerable<IFileRecord>()
                     .Select(record => record.FileID);
                 Assert.That(files.SequenceEqual(new[] { fileId2, fileId3 }));
 
                 var ee = new ExtractException("ELI42152", "Test");
-                fileProcessingDb.NotifyFileFailed(fileId2, "A01_ExtractData", _CURRENT_WORKFLOW, ee.AsStringizedByteStream(), true);
-                fileProcessingDb.NotifyFileSkipped(fileId3, "A01_ExtractData", _CURRENT_WORKFLOW, true);
+                fileProcessingDb.NotifyFileFailed(fileId2, _LABDE_ACTION1, _CURRENT_WORKFLOW, ee.AsStringizedByteStream(), true);
+                fileProcessingDb.NotifyFileSkipped(fileId3, _LABDE_ACTION1, _CURRENT_WORKFLOW, true);
 
                 Assert.That(fileProcessingDb.GetStats(extractAction, false).NumDocumentsPending == 0);
                 Assert.That(fileProcessingDb.GetStats(extractAction, false).NumDocumentsSkipped == 1);
@@ -549,76 +558,76 @@ namespace Extract.FileActionManager.Database.Test
 
                 int workflowID1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
                 fileProcessingDb.SetWorkflowActions(workflowID1,
-                    new[] { "A01_ExtractData", "A02_Verify" }.ToVariantVector());
+                    new[] { _LABDE_ACTION1, _LABDE_ACTION2 }.ToVariantVector());
                 int workflowID2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
                 fileProcessingDb.SetWorkflowActions(workflowID2,
-                    new[] { "A01_ExtractData", "A02_Verify" }.ToVariantVector());
+                    new[] { _LABDE_ACTION1, _LABDE_ACTION2 }.ToVariantVector());
 
                 // Start processing in Workflow 1
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
-                int extractActionId1 = fileProcessingDb.GetActionID("A01_ExtractData");
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "A01_ExtractData", true, false);
+                int extractActionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
                 fileProcessingDb.RegisterActiveFAM();
 
-                // In Workflow 1, queue file 1 to pending in A01_ExtractData, and check that
+                // In Workflow 1, queue file 1 to pending in _LABDE_ACTION1, and check that
                 // GetFilesToProcess grabs it.
                 bool alreadyExists = false;
                 EActionStatus previousStatus;
-                var fileRecord = fileProcessingDb.AddFile(testFileName1, "A01_ExtractData",
+                var fileRecord = fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1,
                     workflowID1, EFilePriority.kPriorityNormal, false, true,
                     EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
                 int fileId1 = fileRecord.FileID;
-                int fileToProcessId = fileProcessingDb.GetFilesToProcess("A01_ExtractData", 10, false, "")
+                int fileToProcessId = fileProcessingDb.GetFilesToProcess(_LABDE_ACTION1, 10, false, "")
                     .ToIEnumerable<IFileRecord>()
                     .Single()
                     .FileID;
                 Assert.That(fileId1 == fileToProcessId);
 
                 // Set to pending for both actions in Workflow 1 for later tests.
-                fileProcessingDb.SetFileStatusToPending(fileId1, "A01_ExtractData", false);
-                fileProcessingDb.SetFileStatusToPending(fileId1, "A02_Verify", false);
+                fileProcessingDb.SetFileStatusToPending(fileId1, _LABDE_ACTION1, false);
+                fileProcessingDb.SetFileStatusToPending(fileId1, _LABDE_ACTION2, false);
 
                 // Start processing in Workflow 2
                 fileProcessingDb.UnregisterActiveFAM();
                 fileProcessingDb.RecordFAMSessionStop();
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
-                int extractActionId2 = fileProcessingDb.GetActionID("A01_ExtractData");
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "A02_Verify", true, false);
+                int extractActionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION2, true, false);
                 fileProcessingDb.RegisterActiveFAM();
 
                 // Check that though there is a file pending in Workflow1, GetFilesToProcess won't
                 // grab it for workflow2.
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetFilesToProcess("A02_Verify", 10, false, "").Size() == 0);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 1);
+                Assert.That(fileProcessingDb.GetFilesToProcess(_LABDE_ACTION2, 10, false, "").Size() == 0);
 
-                // In Workflow2, queue file1 for A02_Verify, stats now report 2 files pending
+                // In Workflow2, queue file1 for _LABDE_ACTION2, stats now report 2 files pending
                 // (really same file in both workflows), then confirm GetFilesToProcess grabs only the file for
                 // Workflow2.
-                fileProcessingDb.AddFile(testFileName1, "A02_Verify", workflowID2, EFilePriority.kPriorityNormal,
+                fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION2, workflowID2, EFilePriority.kPriorityNormal,
                     false, true, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumDocumentsPending == 2);
-                fileToProcessId = fileProcessingDb.GetFilesToProcess("A02_Verify", 10, false, "")
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 2);
+                fileToProcessId = fileProcessingDb.GetFilesToProcess(_LABDE_ACTION2, 10, false, "")
                     .ToIEnumerable<IFileRecord>()
                     .Single()
                     .FileID;
                 Assert.That(fileId1 == fileToProcessId);
-                fileProcessingDb.NotifyFileProcessed(fileId1, "A02_Verify", workflowID2, false);
+                fileProcessingDb.NotifyFileProcessed(fileId1, _LABDE_ACTION2, workflowID2, false);
 
-                // In Workflow2, queue file 2 for A01_ExtractData
-                fileRecord = fileProcessingDb.AddFile(testFileName2, "A01_ExtractData", workflowID2,
+                // In Workflow2, queue file 2 for _LABDE_ACTION1
+                fileRecord = fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, workflowID2,
                     EFilePriority.kPriorityNormal, false, true,
                     EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
                 int fileId2 = fileRecord.FileID;
 
-                // Start processing in A01_ExtractData for all workflows
+                // Start processing in _LABDE_ACTION1 for all workflows
                 fileProcessingDb.UnregisterActiveFAM();
                 fileProcessingDb.RecordFAMSessionStop();
                 fileProcessingDb.ActiveWorkflow = "";
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "A01_ExtractData", true, false);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
                 fileProcessingDb.RegisterActiveFAM();
 
                 // Ensure files from both workflows are grabbed for processing.
-                var fileIDs = fileProcessingDb.GetFilesToProcess("A01_ExtractData", 10, false, "")
+                var fileIDs = fileProcessingDb.GetFilesToProcess(_LABDE_ACTION1, 10, false, "")
                     .ToIEnumerable<FileRecord>()
                     .Select(r => r.FileID)
                     .ToArray();
@@ -627,18 +636,18 @@ namespace Extract.FileActionManager.Database.Test
 
                 // Simulate one file completing and the other failing. Ensure they move the correct statuses
                 // in the correct workflows.
-                fileProcessingDb.NotifyFileSkipped(fileId1, "A01_ExtractData", workflowID1, true);
+                fileProcessingDb.NotifyFileSkipped(fileId1, _LABDE_ACTION1, workflowID1, true);
                 var ee = new ExtractException("ELI42098", "Test");
-                fileProcessingDb.NotifyFileFailed(fileId2, "A01_ExtractData", workflowID2, ee.AsStringizedByteStream(), true);
+                fileProcessingDb.NotifyFileFailed(fileId2, _LABDE_ACTION1, workflowID2, ee.AsStringizedByteStream(), true);
 
                 Assert.That(fileProcessingDb.GetStats(extractActionId1, false).NumDocumentsSkipped == 1);
                 Assert.That(fileProcessingDb.GetStats(extractActionId1, false).NumDocumentsFailed == 0);
                 Assert.That(fileProcessingDb.GetStats(extractActionId2, false).NumDocumentsSkipped == 0);
                 Assert.That(fileProcessingDb.GetStats(extractActionId2, false).NumDocumentsFailed == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsSkipped == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsFailed == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumDocumentsComplete == 1);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 0);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsSkipped == 1);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsFailed == 1);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsComplete == 1);
             }
             finally
             {
@@ -662,38 +671,38 @@ namespace Extract.FileActionManager.Database.Test
                 string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
                 string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
-                fileProcessingDb.DefineNewAction("A04_SendToEMR");
-                fileProcessingDb.DefineNewAction("Cleanup");
+                fileProcessingDb.DefineNewAction(_LABDE_ACTION4);
+                fileProcessingDb.DefineNewAction(_CLEANUP_ACTION);
 
                 int workflowID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kExtraction);
                 fileProcessingDb.SetWorkflowActions(workflowID,
-                    new[] { "A01_ExtractData", "A02_Verify", "A03_QA", "A04_SendToEMR", "Cleanup" }.ToVariantVector());
+                    new[] { _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3, _LABDE_ACTION4, _CLEANUP_ACTION }.ToVariantVector());
                 WorkflowDefinition workflow = fileProcessingDb.GetWorkflowDefinition(workflowID);
-                workflow.StartAction = "A01_ExtractData";
-                workflow.EndAction = "A04_SendToEMR";
-                workflow.PostWorkflowAction = "Cleanup";
+                workflow.StartAction = _LABDE_ACTION1;
+                workflow.EndAction = _LABDE_ACTION4;
+                workflow.PostWorkflowAction = _CLEANUP_ACTION;
                 fileProcessingDb.SetWorkflowDefinition(workflow);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", "A01_ExtractData", true, true);
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, true);
                 fileProcessingDb.RegisterActiveFAM();
 
-                // File 1 pending in A01_ExtractData
-                // File 2 complete in A01_ExtractData and pending in A02_Verify
-                // File 3 failed in A01_ExtractData
+                // File 1 pending in _LABDE_ACTION1
+                // File 2 complete in _LABDE_ACTION1 and pending in _LABDE_ACTION2
+                // File 3 failed in _LABDE_ACTION1
                 bool alreadyExists = false;
                 EActionStatus previousStatus;
-                var fileRecord = fileProcessingDb.AddFile(testFileName1, "A01_ExtractData", workflowID,
+                var fileRecord = fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID,
                     EFilePriority.kPriorityNormal, false, true,
                     EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
                 int fileId1 = fileRecord.FileID;
-                fileRecord = fileProcessingDb.AddFile(testFileName2, "A01_ExtractData", workflowID,
+                fileRecord = fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, workflowID,
                     EFilePriority.kPriorityNormal, false, true,
                     EActionStatus.kActionCompleted, false, out alreadyExists, out previousStatus);
                 int fileId2 = fileRecord.FileID;
-                fileProcessingDb.SetStatusForFile(fileId2, "A02_Verify", _CURRENT_WORKFLOW,
+                fileProcessingDb.SetStatusForFile(fileId2, _LABDE_ACTION2, _CURRENT_WORKFLOW,
                     EActionStatus.kActionPending, false, false, out previousStatus);
-                fileRecord = fileProcessingDb.AddFile(testFileName3, "A01_ExtractData", workflowID,
+                fileRecord = fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION1, workflowID,
                     EFilePriority.kPriorityNormal, false, true,
                     EActionStatus.kActionFailed, false, out alreadyExists, out previousStatus);
                 int fileId3 = fileRecord.FileID;
@@ -708,18 +717,18 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(completed == 0);
                 Assert.That(failed == 1);
 
-                // File 1 complete in A01_ExtractData and skipped in A02_Verify
-                // File 2 complete in A01_ExtractData and A02_Verify, processing in A04_SendToEMR
-                // File 3 failed in A01_ExtractData and A04_SendToEMR
-                fileProcessingDb.SetStatusForFile(fileId1, "A01_ExtractData", _CURRENT_WORKFLOW,
+                // File 1 complete in _LABDE_ACTION1 and skipped in _LABDE_ACTION2
+                // File 2 complete in _LABDE_ACTION1 and _LABDE_ACTION2, processing in _LABDE_ACTION4
+                // File 3 failed in _LABDE_ACTION1 and _LABDE_ACTION4
+                fileProcessingDb.SetStatusForFile(fileId1, _LABDE_ACTION1, _CURRENT_WORKFLOW,
                     EActionStatus.kActionCompleted, false, false, out previousStatus);
-                fileProcessingDb.SetStatusForFile(fileId1, "A02_Verify", _CURRENT_WORKFLOW,
+                fileProcessingDb.SetStatusForFile(fileId1, _LABDE_ACTION2, _CURRENT_WORKFLOW,
                     EActionStatus.kActionSkipped, false, false, out previousStatus);
-                fileProcessingDb.SetStatusForFile(fileId2, "A02_Verify", _CURRENT_WORKFLOW,
+                fileProcessingDb.SetStatusForFile(fileId2, _LABDE_ACTION2, _CURRENT_WORKFLOW,
                    EActionStatus.kActionCompleted, false, false, out previousStatus);
-                fileProcessingDb.SetStatusForFile(fileId2, "A04_SendToEMR", _CURRENT_WORKFLOW,
+                fileProcessingDb.SetStatusForFile(fileId2, _LABDE_ACTION4, _CURRENT_WORKFLOW,
                     EActionStatus.kActionProcessing, false, false, out previousStatus);
-                fileProcessingDb.SetStatusForFile(fileId3, "A04_SendToEMR", _CURRENT_WORKFLOW,
+                fileProcessingDb.SetStatusForFile(fileId3, _LABDE_ACTION4, _CURRENT_WORKFLOW,
                     EActionStatus.kActionFailed, false, false, out previousStatus);
 
                 Assert.That(fileProcessingDb.GetWorkflowStatus(fileId1) == EActionStatus.kActionUnattempted);
@@ -732,10 +741,10 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(completed == 0);
                 Assert.That(failed == 1);
 
-                // File 2 complete in A04_SendToEMR, pending in Cleanup.
-                fileProcessingDb.SetStatusForFile(fileId2, "A04_SendToEMR", _CURRENT_WORKFLOW,
+                // File 2 complete in _LABDE_ACTION4, pending in Cleanup.
+                fileProcessingDb.SetStatusForFile(fileId2, _LABDE_ACTION4, _CURRENT_WORKFLOW,
                     EActionStatus.kActionCompleted, false, false, out previousStatus);
-                fileProcessingDb.SetStatusForFile(fileId2, "Cleanup", _CURRENT_WORKFLOW,
+                fileProcessingDb.SetStatusForFile(fileId2, _CLEANUP_ACTION, _CURRENT_WORKFLOW,
                     EActionStatus.kActionPending, false, false, out previousStatus);
 
                 Assert.That(fileProcessingDb.GetWorkflowStatus(fileId2) == EActionStatus.kActionCompleted);
@@ -775,23 +784,23 @@ namespace Extract.FileActionManager.Database.Test
                 string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
                 FileProcessingDB fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
-                int extractAction = fileProcessingDb.GetActionID("A01_ExtractData");
-                int verifyAction = fileProcessingDb.GetActionID("A02_Verify");
+                int extractAction = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+                int verifyAction = fileProcessingDb.GetActionID(_LABDE_ACTION2);
 
                 // Queue and process a file
                 bool alreadyExists = false;
                 EActionStatus previousStatus;
-                fileProcessingDb.AddFile(testFileName1, "A01_ExtractData", _CURRENT_WORKFLOW,
+                fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, _CURRENT_WORKFLOW,
                     EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
                     out alreadyExists, out previousStatus);
 
                 var setStatusTaskConfig = new SetActionStatusFileProcessor();
-                setStatusTaskConfig.ActionName = "A02_Verify";
+                setStatusTaskConfig.ActionName = _LABDE_ACTION2;
                 setStatusTaskConfig.ActionStatus = (int)EActionStatus.kActionPending;
                 var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, "A01_ExtractData", "", setStatusTask))
+                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask))
                 {
                     famSession.WaitForProcessingToComplete();
                 }
@@ -802,17 +811,17 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStats(verifyAction, false).NumDocumentsPending == 1);
 
                 // Queue another 2 more files, test that they can both be processed at once.
-                fileProcessingDb.AddFile(testFileName2, "A01_ExtractData", _CURRENT_WORKFLOW,
+                fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, _CURRENT_WORKFLOW,
                     EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
                     out alreadyExists, out previousStatus);
-                fileProcessingDb.AddFile(testFileName3, "A01_ExtractData", _CURRENT_WORKFLOW,
+                fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION1, _CURRENT_WORKFLOW,
                     EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
                     out alreadyExists, out previousStatus);
 
                 Assert.That(fileProcessingDb.GetStats(extractAction, false).NumDocumentsPending == 2);
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, "A01_ExtractData", "", setStatusTask,
+                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
                     threadCount: 2, filesToGrabCount: 2))
                 {
                     famSession.WaitForProcessingToComplete();
@@ -826,14 +835,7 @@ namespace Extract.FileActionManager.Database.Test
                 _testFiles.RemoveFile(_LABDE_TEST_FILE1);
                 _testFiles.RemoveFile(_LABDE_TEST_FILE2);
                 _testFiles.RemoveFile(_LABDE_TEST_FILE3);
-                try
-                {
-                    _testDbManager.RemoveDatabase(testDbName);
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI42151");
-                }
+                _testDbManager.RemoveDatabase(testDbName);
             }
         }
 
@@ -858,64 +860,64 @@ namespace Extract.FileActionManager.Database.Test
 
                 // Create 2 workflows
                 int workflowID1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowID1, new[] { "A01_ExtractData", "A02_Verify" }.ToVariantVector());
+                fileProcessingDb.SetWorkflowActions(workflowID1, new[] { _LABDE_ACTION1, _LABDE_ACTION2 }.ToVariantVector());
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
-                int extractAction1 = fileProcessingDb.GetActionID("A01_ExtractData");
+                int extractAction1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
 
                 int workflowID2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowID2, new[] { "A01_ExtractData", "A02_Verify" }.ToVariantVector());
+                fileProcessingDb.SetWorkflowActions(workflowID2, new[] { _LABDE_ACTION1, _LABDE_ACTION2 }.ToVariantVector());
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
-                int extractAction2 = fileProcessingDb.GetActionID("A01_ExtractData");
-                int verifyAction2 = fileProcessingDb.GetActionID("A02_Verify");
+                int extractAction2 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+                int verifyAction2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
 
                 // Queue and process a file in workflow 1
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 bool alreadyExists = false;
                 EActionStatus previousStatus;
-                fileProcessingDb.AddFile(testFileName1, "A01_ExtractData", workflowID1, EFilePriority.kPriorityNormal,
+                fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
                     false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
 
                 var setStatusTaskConfig = new SetActionStatusFileProcessor();
-                setStatusTaskConfig.ActionName = "A02_Verify";
+                setStatusTaskConfig.ActionName = _LABDE_ACTION2;
                 setStatusTaskConfig.ActionStatus = (int)EActionStatus.kActionPending;
                 var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, "A01_ExtractData", "Workflow1", setStatusTask))
+                    fileProcessingDb, _LABDE_ACTION1, "Workflow1", setStatusTask))
                 {
                     famSession.WaitForProcessingToComplete();
-                }                
+                }
 
                 // Ensure file has processed only in the context of workflow 1 (including where it gets set to pending
                 // in the next action)
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsComplete == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumDocumentsPending == 1);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 0);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete == 1);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 1);
 
                 Assert.That(fileProcessingDb.GetStats(extractAction2, false).NumDocumentsComplete == 0);
                 Assert.That(fileProcessingDb.GetStats(verifyAction2, false).NumDocumentsPending == 0);
 
                 // Queue another file to workflow1, then the original file to workflow2, then test that both
                 // processing in a session configured to run on all workflows
-                fileProcessingDb.AddFile(testFileName2, "A01_ExtractData", workflowID1, EFilePriority.kPriorityNormal,
+                fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
                     false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
-                fileProcessingDb.AddFile(testFileName1, "A01_ExtractData", workflowID2, EFilePriority.kPriorityNormal,
+                fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID2, EFilePriority.kPriorityNormal,
                     false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
 
                 Assert.That(fileProcessingDb.GetStats(extractAction1, false).NumDocumentsPending == 1);
                 Assert.That(fileProcessingDb.GetStats(extractAction2, false).NumDocumentsPending == 1);
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, "A01_ExtractData", "", setStatusTask))
+                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask))
                 {
                     famSession.WaitForProcessingToComplete();
                 }
 
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsComplete == 3);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A02_Verify", false).NumDocumentsPending == 3);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 0);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete == 3);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 3);
             }
             finally
             {
@@ -953,13 +955,13 @@ namespace Extract.FileActionManager.Database.Test
                 {
                     string workflowName = Invariant($"Workflow{i}");
                     int workflowID = fileProcessingDb.AddWorkflow(workflowName, EWorkflowType.kUndefined);
-                    fileProcessingDb.SetWorkflowActions(workflowID, new[] { "A01_ExtractData" }.ToVariantVector());
+                    fileProcessingDb.SetWorkflowActions(workflowID, new[] { _LABDE_ACTION1 }.ToVariantVector());
 
-                    fileProcessingDb.AddFile(testFileName1, "A01_ExtractData", workflowID, EFilePriority.kPriorityNormal,
+                    fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID, EFilePriority.kPriorityNormal,
                         false, false, EActionStatus.kActionPending, false, out bool alreadyExists, out EActionStatus previousStatus);
                 }
 
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsPending == threadCount);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == threadCount);
 
                 // Each processing thread will try to process a file in one of the created workflows.
                 Action processingThreadAction = () =>
@@ -975,7 +977,7 @@ namespace Extract.FileActionManager.Database.Test
                     startProcessingEvent.WaitOne();
 
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, "A01_ExtractData", "", sleepTask,
+                        fileProcessingDb, _LABDE_ACTION1, "", sleepTask,
                         threadCount: 1, filesToGrabCount: 1, keepProcessing: false, docsToProcess: 1))
                     {
                         int processed = famSession.WaitForProcessingToComplete();
@@ -1003,27 +1005,20 @@ namespace Extract.FileActionManager.Database.Test
                 // more than one workflow)
                 do
                 {
-                    var stats = fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false);
+                    var stats = fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false);
                     int processing = stats.NumDocumentsPending + stats.NumDocumentsComplete;
 
                     Assert.That(processing >= (threadCount - 1));
                 }
                 while (!Task.WaitAll(tasks, 100));
 
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows("A01_ExtractData", false).NumDocumentsComplete == threadCount);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 0);
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete == threadCount);
             }
             finally
             {
                 _testFiles.RemoveFile(_LABDE_TEST_FILE1);
-                try
-                {
-                    _testDbManager.RemoveDatabase(testDbName);
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI42130");
-                }
+                _testDbManager.RemoveDatabase(testDbName);
             }
         }
 
