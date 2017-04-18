@@ -31,6 +31,15 @@ namespace DocumentAPI
         }
 
         /// <summary>
+        /// Special function that exists only so token provider can log to UEX file.
+        /// </summary>
+        /// <param name="text">text to write to the log</param>
+        public static void WriteOneLine(string text)
+        {
+            WriteLine(text);
+        }
+
+        /// <summary>
         /// write extract exception to a log
         /// </summary>
         /// <param name="ee">ExtractException to write</param>
@@ -47,6 +56,15 @@ namespace DocumentAPI
             ee.AddDebugData(debugDataName: "Source file", debugDataValue: filePath, encrypt: false);
             ee.AddDebugData(debugDataName: "Line number", debugDataValue: sourceLineNumber, encrypt: false);
             ee.Log();
+        }
+
+        /// <summary>
+        /// special function that exists only so token provider can log an ExtractException to the UEX log.
+        /// </summary>
+        /// <param name="ee">extract exception to log</param>
+        public static void WriteOneLineEE(ExtractException ee)
+        {
+            WriteLine(ee);
         }
     }
 }

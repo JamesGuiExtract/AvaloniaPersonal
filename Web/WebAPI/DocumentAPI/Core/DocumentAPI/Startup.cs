@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;              // for HttpNoContentOutp
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
+using SimpleTokenProvider;
 using Swashbuckle.Swagger.Model;
 using System;
 using System.IO;
@@ -15,7 +16,7 @@ namespace DocumentAPI
     /// <summary>
     /// Startup class
     /// </summary>
-    public class Startup
+    public partial class Startup
     {
         /// <summary>
         /// CTOR for Startup class
@@ -34,6 +35,11 @@ namespace DocumentAPI
                     .AddEnvironmentVariables();
 
                 Configuration = builder.Build();
+
+                // VERY IMPORTANT - get the private encryption key value from the environment variable where it is stored.
+                // This must be set, or the service must shut down.
+                _secretKey = Configuration.GetValue(typeof(string), "WebAPI_Private")?.ToString();
+                Contract.Assert(_secretKey != null, "Failed to load required value from WebAPI_Private environment variable");
 
                 InitializeDefaultValues();
 
@@ -66,9 +72,9 @@ namespace DocumentAPI
                 // Add framework services.
                 services.AddMvc(options =>
                 {
-                // Remove the HttpNoContentOutputFormatter, so that null object will be represented
-                // in JSON (as "null"), instead of returning http error "204 No Content" response
-                options.OutputFormatters.RemoveType<HttpNoContentOutputFormatter>();
+                    // Remove the HttpNoContentOutputFormatter, so that null object will be represented
+                    // in JSON (as "null"), instead of returning http error "204 No Content" response
+                    options.OutputFormatters.RemoveType<HttpNoContentOutputFormatter>();
                 });
 
                 // Add the API Model
@@ -129,6 +135,9 @@ namespace DocumentAPI
                 {
                 }
                 */
+
+                // configure authorization and token creation this server provides
+                ConfigureAuth(app);
 
                 app.UseMvc();
 

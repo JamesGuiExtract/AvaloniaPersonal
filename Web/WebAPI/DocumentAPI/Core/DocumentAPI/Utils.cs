@@ -270,6 +270,16 @@ namespace DocumentAPI
         }
 
         /// <summary>
+        /// This is a little adapter function to allow the token provider to be configured to get the current API context.
+        /// </summary>
+        /// <returns></returns>
+        public static Tuple<string, string, string> GetCurrentApiContext()
+        {
+            var context = CurrentApiContext;
+            return Tuple.Create(context.DatabaseServerName, context.DatabaseName, context.WorkflowName);
+        }
+
+        /// <summary>
         /// set the default API context instance
         /// </summary>
         /// <param name="databaseServerName">database server name</param>

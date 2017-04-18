@@ -1,14 +1,13 @@
 ﻿using DocumentAPI.Models;
-using Extract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using static DocumentAPI.Utils;
 
 namespace DocumentAPI.Controllers
 {
     /// <summary>
     /// workflow controller
     /// </summary>
+    [Authorize]
     [Route("api/[controller]")]
     public class WorkflowController : Controller
     {

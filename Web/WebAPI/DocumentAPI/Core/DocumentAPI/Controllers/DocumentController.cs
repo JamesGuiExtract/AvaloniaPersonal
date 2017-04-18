@@ -1,5 +1,6 @@
 ﻿using Extract;
 using DocumentAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,7 @@ namespace DocumentAPI.Controllers
     /// <summary>
     /// The Document API class
     /// </summary>
+    [Authorize]
     [Route("api/[controller]")]
     public class DocumentController : Controller
     {

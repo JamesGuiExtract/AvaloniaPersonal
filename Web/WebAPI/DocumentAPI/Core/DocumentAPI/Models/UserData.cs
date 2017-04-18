@@ -52,6 +52,10 @@ namespace DocumentAPI.Models
 
                 return false;
             }
+            finally
+            {
+                _fileApi.InUse = false;
+            }
         }
 
         /// <summary>
