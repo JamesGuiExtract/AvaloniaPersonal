@@ -563,7 +563,11 @@ namespace Extract.AttributeFinder
         {
             // _termFrequency, etc, data is not persisted but Lazy<T> objects are instantiated when they
             // are serialized (I just discovered) so we will never get here when the collections are empty.
-            ExtractException.Assert("ELI41828", "Logic exception: No term-frequency data available", _termFrequency.Any());
+            // However, if there have been zero values seen (e.g., only empty or 1-char-long values are tokenized)
+            // then there won't be any terms and thus no term frequency data
+            // https://extract.atlassian.net/browse/ISSUE-14611
+            ExtractException.Assert("ELI41828", "Logic exception: No term-frequency data available",
+                !_distinctValuesSeen.Any() || _termFrequency.Any());
 
             int numberOfExamples = _documentsSeen.Count;
             int numberOfCategories = _categoriesSeen.Count;

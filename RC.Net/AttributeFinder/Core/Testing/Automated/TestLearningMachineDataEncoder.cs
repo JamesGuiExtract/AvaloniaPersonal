@@ -967,6 +967,52 @@ namespace Extract.AttributeFinder.Test
                 attributeVectorizer.RecognizedValues.ToArray());
         }
 
+        // Test that attribute features can have zero values seen without exception
+        // https://extract.atlassian.net/browse/ISSUE-14611
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void Issue14611()
+        {
+            SetDocumentCategorizationFiles();
+            var voaFiles = _ussFiles.Select((ussFile, i) =>
+            {
+                var voa = new IUnknownVector();
+                var ss = new SpatialString();
+                ss.LoadFrom(ussFile, false);
+                var attr = new AttributeClass { Name = "DocText", Value = ss };
+                voa.PushBack(attr);
+                if (i % 2 == 0)
+                {
+                    ss = new SpatialString();
+                    attr = new AttributeClass { Name = "Even", Value = ss };
+                    voa.PushBack(attr);
+                }
+                var voaName = ussFile + ".voa";
+                voa.SaveTo(voaName, false, null);
+                return voaName;
+            }).ToArray();
+
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(
+                LearningMachineUsage.DocumentCategorization, null,
+                attributeFilter: null, negateFilter: false,
+                attributeVectorizerMaxFeatures: 2000,
+                attributesToTokenize: "*",
+                attributeVectorizerShingleSize: 5);
+
+            encoder.ComputeEncodings(_ussFiles, voaFiles, _categories);
+
+            using (var stream = new System.IO.MemoryStream())
+            {
+                var serializer = new System.Runtime.Serialization.NetDataContractSerializer()
+                {
+                    AssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple
+                };
+                serializer.Serialize(stream, encoder);
+                stream.Flush();
+                stream.Position = 0;
+                encoder = (LearningMachineDataEncoder)serializer.Deserialize(stream);
+            }
+        }
+
         #endregion Tests
     }
 }
