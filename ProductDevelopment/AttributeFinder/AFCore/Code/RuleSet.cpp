@@ -1188,7 +1188,7 @@ STDMETHODIMP CRuleSet::put_RuleExecutionCounters(IIUnknownVector *pNewVal)
 		
 		// Force configured counter info to be re-initialized on next use to take into account the
 		// provided rule execution counters.
-		m_apmapCounters.reset(nullptr);
+		m_apmapCounters.reset(__nullptr);
 		m_bDirty = true;
 
 		return S_OK;
@@ -1554,6 +1554,8 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 		m_bUseDocsRedactionCounter = false;
 		m_bUsePagesIndexingCounter = false;
 		bool bHasCustomCounters = false;
+		m_ipCustomCounters = __nullptr;
+		m_apmapCounters.reset(__nullptr);
 
 		// by default rulesets can be used internally or externally
 		m_bRuleSetOnlyForInternalUse = false;
