@@ -6394,6 +6394,7 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 			", [DocumentFolder] "
 			", [OutputAttributeSetID] "
 			", [OutputFileMetadataFieldID] "
+			", [OutputFilePathInitializationFunction] "
 			"	FROM [Workflow]"
 			"	WHERE [ID] = %i", nID);
 
@@ -6425,13 +6426,13 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 	}
 	ipWorkflowDefinition->Description = getStringField(ipFields, "Description").c_str();
 	ipWorkflowDefinition->StartAction = isNULL(ipFields, "StartActionID")
-		? _bstr_t("").Detach()
+		? ""
 		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "StartActionID")));
 	ipWorkflowDefinition->EndAction = isNULL(ipFields, "EndActionID")
-		? _bstr_t("").Detach()
+		? ""
 		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "EndActionID")));
 	ipWorkflowDefinition->PostWorkflowAction = isNULL(ipFields, "PostWorkflowActionID")
-		? _bstr_t("").Detach()
+		? ""
 		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "PostWorkflowActionID")));
 	ipWorkflowDefinition->DocumentFolder = getStringField(ipFields, "DocumentFolder").c_str();
 
@@ -6489,6 +6490,10 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 			get_bstr_t(getStringField(ipMetadataFieldFields, "Name"));
 	}
 
+	ipWorkflowDefinition->OutputFilePathInitializationFunction = isNULL(ipFields, "OutputFilePathInitializationFunction")
+		? ""
+		: (_bstr_t)ipFields->Item["OutputFilePathInitializationFunction"]->GetValue();
+
 	return ipWorkflowDefinition;
 }
 //-------------------------------------------------------------------------------------------------
@@ -6536,7 +6541,7 @@ map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 
 		UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
 			getWorkflowDefinition(ipConnection, nWorkflowID);
-		ASSERT_RESOURCE_ALLOCATION("ELI42137", ipConnection != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI42137", ipWorkflowDefinition != __nullptr);
 
 		long nPostWorkflowActionID = -1;
 		if (ipWorkflowDefinition->PostWorkflowAction.length() > 0)
@@ -6588,4 +6593,42 @@ map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 	END_CONNECTION_RETRY(ipConnection, "ELI42142");
 
 	return mapStatuses;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::setMetadataFieldValue(_ConnectionPtr connection, long nFileID,
+	string strMetadataFieldName, string strMetadataFieldValue)
+{
+	replaceVariable(strMetadataFieldValue, "'", "''");
+	string strFileID = asString(nFileID);
+	string strQuery =
+		"DECLARE @fieldID INT "
+		"SELECT @fieldID = [ID] FROM [MetadataField] "
+		"	WHERE [Name] = '" + strMetadataFieldName + "' "
+
+		"IF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = " + strFileID + " AND [MetadataFieldID] = @fieldID) "
+		"	UPDATE [FileMetadataFieldValue] SET [Value] = '" + strMetadataFieldValue + "' "
+		"		WHERE [FileID] = " + strFileID + " AND [MetadataFieldID] = @fieldID "
+		"ELSE "
+		"	INSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value]) "
+		"		VALUES ("+strFileID+", @fieldID, '" + strMetadataFieldValue + "')";
+
+	executeCmdQuery(connection, strQuery);
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::initOutputFileMetadataFieldValue(_ConnectionPtr ipConnection, 
+	long nFileID, string strFileName, long nWorkflowID)
+{
+	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
+		getWorkflowDefinition(ipConnection, nWorkflowID);
+	ASSERT_RESOURCE_ALLOCATION("ELI43187", ipWorkflowDefinition != __nullptr);
+
+	string strOutputFileMetadataField = ipWorkflowDefinition->OutputFileMetadataField;
+	string strPath = ipWorkflowDefinition->OutputFilePathInitializationFunction;
+	if (!strOutputFileMetadataField.empty() && !strPath.empty())
+	{
+		string strExpandedPath = 
+			asString(m_ipFAMTagManager->ExpandTagsAndFunctions(strPath.c_str(), strFileName.c_str()));
+
+		setMetadataFieldValue(ipConnection, nFileID, strOutputFileMetadataField, strExpandedPath);
+	}
 }

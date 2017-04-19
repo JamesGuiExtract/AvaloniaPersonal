@@ -81,7 +81,8 @@ m_strActiveWorkflow(""),
 m_bUsingWorkflows(false),
 m_bRunningAllWorkflows(false),
 m_nLastFAMFileID(0),
-m_bDeniedFastCountPermission(false)
+m_bDeniedFastCountPermission(false),
+m_ipFAMTagManager(CLSID_FAMTagManager)
 {
 	try
 	{

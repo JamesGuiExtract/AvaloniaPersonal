@@ -163,7 +163,7 @@ static const string gstrCREATE_LOCKED_FILE_TABLE =
 	"[ActionID] [int] NOT NULL, "
 	"[StatusBeforeLock] [nvarchar](1) NOT NULL, "
 	"[ActiveFAMID] [int] NOT NULL, "
-	"[ActionName] [int] NOT NULL, "
+	"[ActionName] NVARCHAR(50) NOT NULL, "
 	"CONSTRAINT [PK_LockedFile] PRIMARY KEY CLUSTERED ([FileID], [ActionName]))";
 
 static const string gstrCREATE_USER_CREATED_COUNTER_TABLE =
@@ -405,6 +405,7 @@ static const string gstrCREATE_WORKFLOW =
 	"	[DocumentFolder] NVARCHAR(255), "
 	"	[OutputAttributeSetID] BIGINT, "
 	"	[OutputFileMetadataFieldID] INT, "
+	"	[OutputFilePathInitializationFunction] NVARCHAR(255) NULL, "
 	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
 static const string gstrCREATE_WORKFLOWFILE =

@@ -735,6 +735,8 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(9), helpstring ("property OutputAttributeSet")] HRESULT OutputAttributeSet([in] BSTR OutputAttributeSet);
 		[propget, id(10), helpstring ("property OutputFileMetadataField")] HRESULT OutputFileMetadataField([out, retval] BSTR* pOutputAttributeSet);
 		[propput, id(10), helpstring ("property OutputFileMetadataField")] HRESULT OutputFileMetadataField([in] BSTR OutputAttributeSet);
+		[propget, id(11), helpstring ("property OutputFilePathInitializationFunction")] HRESULT OutputFilePathInitializationFunction([out, retval] BSTR* pVal);
+		[propput, id(11), helpstring ("property OutputFilePathInitializationFunction")] HRESULT OutputFilePathInitializationFunction([in] BSTR newVal);
 	}
 
 	[

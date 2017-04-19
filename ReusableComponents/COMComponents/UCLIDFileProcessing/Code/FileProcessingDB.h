@@ -582,6 +582,10 @@ private:
 	// which returns the last ID that was used.
 	long m_nLastFAMFileID;
 
+	// Used to expand path tags in a workflow's OutputFilePathInitializationFunction
+	// Used in initOutputFileMetadataFieldValue()
+	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr m_ipFAMTagManager;
+
 	//-------------------------------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------------------------------
@@ -1173,6 +1177,12 @@ private:
 	// Gets the status of a file in a workflow or all files in a workflow if nFileID = -1.
 	// Return value is a map of ActionStatus codes (R, F, C, U) to their respective counts.
 	map<string, long> getWorkflowStatus(long nFileID);
+
+	// Sets the value of the output file name metadata field based on the workflow configuration
+	void initOutputFileMetadataFieldValue(_ConnectionPtr ipConnection, long nFileID, string strFileName, long nWorkflowID);
+	
+	// Sets the value of a metadata field
+	void setMetadataFieldValue(_ConnectionPtr connection, long fileID, string metadataFieldName, string metadataFieldValue);
 
 	void validateLicense();
 

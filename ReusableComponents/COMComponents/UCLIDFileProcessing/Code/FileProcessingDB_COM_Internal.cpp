@@ -1578,7 +1578,7 @@ int UpdateToSchemaVersion143(_ConnectionPtr ipConnection,
 		vector<string> vecQueries;
 
 		vecQueries.push_back(gstrCREATE_WORKFLOW_TYPE);
-		vecQueries.push_back(gstrCREATE_WORKFLOW);
+		vecQueries.push_back(gstrCREATE_WORKFLOW_LEGACY);
 		vecQueries.push_back(gstrADD_WORKFLOW_WORKFLOWTYPE_FK);
 		vecQueries.push_back(gstrADD_WORKFLOW_STARTACTION_FK);
 		vecQueries.push_back(gstrADD_WORKFLOW_ENDACTION_FK);
@@ -1684,6 +1684,8 @@ int UpdateToSchemaVersion146(_ConnectionPtr ipConnection,
 		vecQueries.push_back("ALTER TABLE dbo.[LockedFile] ADD [ActionName] NVARCHAR(50) NOT NULL");
 		vecQueries.push_back("ALTER TABLE dbo.[LockedFile] "
 			"ADD CONSTRAINT [PK_LockedFile] PRIMARY KEY CLUSTERED ([FileID], [ActionName])");
+		vecQueries.push_back("ALTER TABLE dbo.[Workflow]"
+			" ADD [OutputFilePathInitializationFunction] NVARCHAR(255) NULL");
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -1692,6 +1694,7 @@ int UpdateToSchemaVersion146(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42183");
 }
+//-------------------------------------------------------------------------------------------------
 
 
 //-------------------------------------------------------------------------------------------------
@@ -1984,7 +1987,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					asEActionStatus(getStringField(ipFileActionStatusSet->Fields, "ActionStatus")) : kActionUnattempted;
 
 				// Check if the existing file is currently from an active pagination process
-				if (bAlreadyExists && isFileInPagination(ipConnection, nID))
+				if (bAlreadyExistsInWorkflow && isFileInPagination(ipConnection, nID))
 				{
 					// Update QueueEvent table if enabled
 					if (m_bUpdateQueueEventTable)
@@ -1992,8 +1995,8 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 						// add a new QueueEvent record 
 						addQueueEventRecord(ipConnection, nID, nActionID, asString(strFile), (bFileModified == VARIANT_TRUE) ? "M":"A");
 
-					// Commit the changes to the database
-					tg.CommitTrans();
+						// Commit the changes to the database
+						tg.CommitTrans();
 					}
 					*ppFileRecord = (IFileRecord*)ipOldRecord.Detach();
 					return true;
@@ -2190,6 +2193,11 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				}
 
 				_lastCodePos = "160";
+
+				if (m_bUsingWorkflows && !bAlreadyExistsInWorkflow)
+				{
+					initOutputFileMetadataFieldValue(ipConnection, nID, asString(strFile), nWorkflowID);
+				}
 
 				// Commit the changes to the database
 				tg.CommitTrans();
@@ -8735,22 +8743,6 @@ bool CFileProcessingDB::SetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
-			string strQuery =
-				"DECLARE @fieldID INT "
-				"SELECT @fieldID = [ID] FROM [MetadataField] "
-				"	WHERE [Name] = '<MetadataFieldName>' "
-
-				"IF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = <FileID> AND [MetadataFieldID] = @fieldID) "
-				"	UPDATE [FileMetadataFieldValue] SET [Value] = '<MetadataFieldValue>' "
-				"		WHERE [FileID] = <FileID> AND [MetadataFieldID] = @fieldID "
-				"ELSE "
-				"	INSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value]) "
-				"		VALUES (<FileID>, @fieldID, '<MetadataFieldValue>')";
-
-			replaceVariable(strQuery, "<FileID>", asString(nFileID));
-			replaceVariable(strQuery, "<MetadataFieldName>", asString(bstrMetadataFieldName));
-			replaceVariable(strQuery, "<MetadataFieldValue>", asString(bstrMetadataFieldValue));
-
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
@@ -8761,7 +8753,8 @@ bool CFileProcessingDB::SetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
 
-				ipConnection->Execute(strQuery.c_str(), NULL, adCmdText);
+				setMetadataFieldValue(ipConnection, nFileID,
+					asString(bstrMetadataFieldName), asString(bstrMetadataFieldValue));
 
 				tg.CommitTrans();
 
@@ -10161,6 +10154,7 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 					", [DocumentFolder] "
 					", [OutputAttributeSetID] "
 					", [OutputFileMetadataFieldID] "
+					", [OutputFilePathInitializationFunction] "
 					"	FROM [Workflow]"
 					"	WHERE [ID] = %i", ipWorkflowDefinition->ID);
 
@@ -10250,6 +10244,9 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 				executeCmdQuery(ipConnection, strQuery, false, &lOutputFileMetadataFieldID);
 				setLongField(ipFields, "OutputFileMetadataFieldID", lOutputFileMetadataFieldID);
 			}
+
+			setStringField(ipFields, "OutputFilePathInitializationFunction",
+				asString(ipWorkflowDefinition->OutputFilePathInitializationFunction));
 
 			setStringField(ipFields, "Name", asString(ipWorkflowDefinition->Name));
 

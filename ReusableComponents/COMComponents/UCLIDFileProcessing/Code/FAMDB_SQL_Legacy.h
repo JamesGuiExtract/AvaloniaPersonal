@@ -165,3 +165,18 @@ static const string gstrCREATE_PAGINATION_LEGACY =
 static const string gstrCREATE_PAGINATION_DESTFILE_INDEX_LEGACY =
 	"CREATE UNIQUE NONCLUSTERED INDEX [IX_Pagination_DestFile] ON "
 	"	[dbo].[Pagination] ([DestFileID], [DestPage])";
+
+// Used for schema versions 143 - 146
+static const string gstrCREATE_WORKFLOW_LEGACY =
+	"CREATE TABLE [dbo].[Workflow]( "
+	"	[ID] INT IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_Workflow] PRIMARY KEY CLUSTERED, "
+	"	[Name] NVARCHAR(100), "
+	"	[WorkflowTypeCode] NVARCHAR(1), "
+	"	[Description] NVARCHAR(MAX), "
+	"	[StartActionID] INT, "
+	"	[EndActionID] INT, "
+	"	[PostWorkflowActionID] INT, "
+	"	[DocumentFolder] NVARCHAR(255), "
+	"	[OutputAttributeSetID] BIGINT, "
+	"	[OutputFileMetadataFieldID] INT, "
+	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";

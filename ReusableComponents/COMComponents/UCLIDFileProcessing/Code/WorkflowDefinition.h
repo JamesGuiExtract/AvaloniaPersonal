@@ -69,6 +69,8 @@ public:
 	STDMETHOD(put_OutputAttributeSet)(BSTR OutputAttributeSet);
 	STDMETHOD(get_OutputFileMetadataField)(BSTR* pOutputFileMetadataField);
 	STDMETHOD(put_OutputFileMetadataField)(BSTR OutputFileMetadataField);
+	STDMETHOD(get_OutputFilePathInitializationFunction)(BSTR* pVal);
+	STDMETHOD(put_OutputFilePathInitializationFunction)(BSTR newVal);
 
 private:
 
@@ -83,6 +85,7 @@ private:
 	string m_strDocumentFolder;
 	string m_strOutputAttributeSet;
 	string m_strOutputFileMetadataField;
+	string m_strOutputFilePathInitializationFunction;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(WorkflowDefinition), CWorkflowDefinition)
