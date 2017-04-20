@@ -157,8 +157,11 @@ namespace Extract {
 		private: System::Windows::Forms::Button^  okButton;
 		private: System::Windows::Forms::Button^  cancelButton;
 		private: System::Windows::Forms::ComboBox^  outputAttributeSetComboBox;
-private: System::Windows::Forms::Label^  label7;
-private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
+		private: System::Windows::Forms::Label^  label7;
+		private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
+		private: System::Windows::Forms::TextBox^  outputFilePathInitializationFunctionTextBox;
+		private: System::Windows::Forms::Label^  label8;
+		private: System::Windows::Forms::GroupBox^  groupBox1;
 
 
 		private:
@@ -194,6 +197,10 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->outputAttributeSetComboBox = (gcnew System::Windows::Forms::ComboBox());
 				this->label7 = (gcnew System::Windows::Forms::Label());
 				this->outputFileMetadataFieldComboBox = (gcnew System::Windows::Forms::ComboBox());
+				this->outputFilePathInitializationFunctionTextBox = (gcnew System::Windows::Forms::TextBox());
+				this->label8 = (gcnew System::Windows::Forms::Label());
+				this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+				this->groupBox1->SuspendLayout();
 				this->SuspendLayout();
 				// 
 				// workflowNameLabel
@@ -228,7 +235,7 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->workFlowTypeComboBox->Location = System::Drawing::Point(142, 35);
 				this->workFlowTypeComboBox->Name = L"workFlowTypeComboBox";
 				this->workFlowTypeComboBox->Size = System::Drawing::Size(119, 21);
-				this->workFlowTypeComboBox->TabIndex = 2;
+				this->workFlowTypeComboBox->TabIndex = 3;
 				// 
 				// descriptionLabel
 				// 
@@ -236,7 +243,7 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->descriptionLabel->Location = System::Drawing::Point(10, 62);
 				this->descriptionLabel->Name = L"descriptionLabel";
 				this->descriptionLabel->Size = System::Drawing::Size(60, 13);
-				this->descriptionLabel->TabIndex = 0;
+				this->descriptionLabel->TabIndex = 4;
 				this->descriptionLabel->Text = L"Description";
 				// 
 				// descriptionTextBox
@@ -247,7 +254,7 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->descriptionTextBox->Multiline = true;
 				this->descriptionTextBox->Name = L"descriptionTextBox";
 				this->descriptionTextBox->Size = System::Drawing::Size(428, 90);
-				this->descriptionTextBox->TabIndex = 3;
+				this->descriptionTextBox->TabIndex = 5;
 				// 
 				// label2
 				// 
@@ -255,25 +262,25 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->label2->Location = System::Drawing::Point(10, 162);
 				this->label2->Name = L"label2";
 				this->label2->Size = System::Drawing::Size(61, 13);
-				this->label2->TabIndex = 4;
+				this->label2->TabIndex = 6;
 				this->label2->Text = L"Start action";
 				// 
 				// label3
 				// 
 				this->label3->AutoSize = true;
-				this->label3->Location = System::Drawing::Point(12, 189);
+				this->label3->Location = System::Drawing::Point(10, 189);
 				this->label3->Name = L"label3";
 				this->label3->Size = System::Drawing::Size(58, 13);
-				this->label3->TabIndex = 4;
+				this->label3->TabIndex = 8;
 				this->label3->Text = L"End action";
 				// 
 				// label4
 				// 
 				this->label4->AutoSize = true;
-				this->label4->Location = System::Drawing::Point(9, 216);
+				this->label4->Location = System::Drawing::Point(10, 216);
 				this->label4->Name = L"label4";
 				this->label4->Size = System::Drawing::Size(105, 13);
-				this->label4->TabIndex = 4;
+				this->label4->TabIndex = 10;
 				this->label4->Text = L"Post workflow action";
 				// 
 				// startActionComboBox
@@ -283,7 +290,7 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->startActionComboBox->Location = System::Drawing::Point(142, 158);
 				this->startActionComboBox->Name = L"startActionComboBox";
 				this->startActionComboBox->Size = System::Drawing::Size(239, 21);
-				this->startActionComboBox->TabIndex = 4;
+				this->startActionComboBox->TabIndex = 7;
 				// 
 				// endActionComboBox
 				// 
@@ -292,7 +299,7 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->endActionComboBox->Location = System::Drawing::Point(142, 185);
 				this->endActionComboBox->Name = L"endActionComboBox";
 				this->endActionComboBox->Size = System::Drawing::Size(239, 21);
-				this->endActionComboBox->TabIndex = 5;
+				this->endActionComboBox->TabIndex = 9;
 				// 
 				// postWorkflowActionComboBox
 				// 
@@ -301,7 +308,7 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->postWorkflowActionComboBox->Location = System::Drawing::Point(142, 212);
 				this->postWorkflowActionComboBox->Name = L"postWorkflowActionComboBox";
 				this->postWorkflowActionComboBox->Size = System::Drawing::Size(239, 21);
-				this->postWorkflowActionComboBox->TabIndex = 6;
+				this->postWorkflowActionComboBox->TabIndex = 11;
 				// 
 				// label5
 				// 
@@ -309,7 +316,7 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->label5->Location = System::Drawing::Point(10, 243);
 				this->label5->Name = L"label5";
 				this->label5->Size = System::Drawing::Size(85, 13);
-				this->label5->TabIndex = 6;
+				this->label5->TabIndex = 12;
 				this->label5->Text = L"Document folder";
 				// 
 				// documentFolderTextBox
@@ -319,24 +326,24 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->documentFolderTextBox->Location = System::Drawing::Point(142, 239);
 				this->documentFolderTextBox->Name = L"documentFolderTextBox";
 				this->documentFolderTextBox->Size = System::Drawing::Size(428, 20);
-				this->documentFolderTextBox->TabIndex = 7;
+				this->documentFolderTextBox->TabIndex = 13;
 				// 
 				// label6
 				// 
 				this->label6->AutoSize = true;
-				this->label6->Location = System::Drawing::Point(10, 269);
+				this->label6->Location = System::Drawing::Point(10, 270);
 				this->label6->Name = L"label6";
 				this->label6->Size = System::Drawing::Size(97, 13);
-				this->label6->TabIndex = 6;
+				this->label6->TabIndex = 14;
 				this->label6->Text = L"Output attribute set";
 				// 
 				// okButton
 				// 
 				this->okButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->okButton->Location = System::Drawing::Point(414, 319);
+				this->okButton->Location = System::Drawing::Point(414, 393);
 				this->okButton->Name = L"okButton";
 				this->okButton->Size = System::Drawing::Size(75, 23);
-				this->okButton->TabIndex = 8;
+				this->okButton->TabIndex = 17;
 				this->okButton->Text = L"O&K";
 				this->okButton->UseVisualStyleBackColor = true;
 				this->okButton->Click += gcnew System::EventHandler(this, &AddModifyWorkflowForm::HandleOkButton_Click);
@@ -346,10 +353,10 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->cancelButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->cancelButton->CausesValidation = false;
 				this->cancelButton->DialogResult = System::Windows::Forms::DialogResult::Cancel;
-				this->cancelButton->Location = System::Drawing::Point(495, 319);
+				this->cancelButton->Location = System::Drawing::Point(495, 393);
 				this->cancelButton->Name = L"cancelButton";
 				this->cancelButton->Size = System::Drawing::Size(75, 23);
-				this->cancelButton->TabIndex = 9;
+				this->cancelButton->TabIndex = 18;
 				this->cancelButton->Text = L"&Cancel";
 				this->cancelButton->UseVisualStyleBackColor = true;
 				// 
@@ -359,19 +366,19 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 					| System::Windows::Forms::AnchorStyles::Right));
 				this->outputAttributeSetComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->outputAttributeSetComboBox->FormattingEnabled = true;
-				this->outputAttributeSetComboBox->Location = System::Drawing::Point(142, 265);
+				this->outputAttributeSetComboBox->Location = System::Drawing::Point(142, 266);
 				this->outputAttributeSetComboBox->Name = L"outputAttributeSetComboBox";
-				this->outputAttributeSetComboBox->Size = System::Drawing::Size(428, 21);
-				this->outputAttributeSetComboBox->TabIndex = 8;
+				this->outputAttributeSetComboBox->Size = System::Drawing::Size(408, 21);
+				this->outputAttributeSetComboBox->TabIndex = 15;
 				// 
 				// label7
 				// 
 				this->label7->AutoSize = true;
-				this->label7->Location = System::Drawing::Point(12, 296);
+				this->label7->Location = System::Drawing::Point(10, 25);
 				this->label7->Name = L"label7";
-				this->label7->Size = System::Drawing::Size(124, 13);
+				this->label7->Size = System::Drawing::Size(74, 13);
 				this->label7->TabIndex = 10;
-				this->label7->Text = L"Output file metadata field";
+				this->label7->Text = L"Metadata field";
 				// 
 				// outputFileMetadataFieldComboBox
 				// 
@@ -379,10 +386,44 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 					| System::Windows::Forms::AnchorStyles::Right));
 				this->outputFileMetadataFieldComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->outputFileMetadataFieldComboBox->FormattingEnabled = true;
-				this->outputFileMetadataFieldComboBox->Location = System::Drawing::Point(142, 292);
+				this->outputFileMetadataFieldComboBox->Location = System::Drawing::Point(130, 22);
 				this->outputFileMetadataFieldComboBox->Name = L"outputFileMetadataFieldComboBox";
-				this->outputFileMetadataFieldComboBox->Size = System::Drawing::Size(427, 21);
+				this->outputFileMetadataFieldComboBox->Size = System::Drawing::Size(414, 21);
 				this->outputFileMetadataFieldComboBox->TabIndex = 11;
+				// 
+				// outputFilePathInitializationFunctionTextBox
+				// 
+				this->outputFilePathInitializationFunctionTextBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
+					| System::Windows::Forms::AnchorStyles::Right));
+				this->outputFilePathInitializationFunctionTextBox->Location = System::Drawing::Point(130, 49);
+				this->outputFilePathInitializationFunctionTextBox->Name = L"outputFilePathInitializationFunctionTextBox";
+				this->outputFilePathInitializationFunctionTextBox->Size = System::Drawing::Size(415, 20);
+				this->outputFilePathInitializationFunctionTextBox->TabIndex = 13;
+				this->outputFilePathInitializationFunctionTextBox->Text = L"<SourceDocName>.voa";
+				// 
+				// label8
+				// 
+				this->label8->AutoSize = true;
+				this->label8->Location = System::Drawing::Point(10, 52);
+				this->label8->Name = L"label8";
+				this->label8->Size = System::Drawing::Size(101, 13);
+				this->label8->TabIndex = 12;
+				this->label8->Text = L"Initial value function";
+				// 
+				// groupBox1
+				// 
+				this->groupBox1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
+					| System::Windows::Forms::AnchorStyles::Right));
+				this->groupBox1->Controls->Add(this->label8);
+				this->groupBox1->Controls->Add(this->outputFilePathInitializationFunctionTextBox);
+				this->groupBox1->Controls->Add(this->outputFileMetadataFieldComboBox);
+				this->groupBox1->Controls->Add(this->label7);
+				this->groupBox1->Location = System::Drawing::Point(12, 297);
+				this->groupBox1->Name = L"groupBox1";
+				this->groupBox1->Size = System::Drawing::Size(557, 84);
+				this->groupBox1->TabIndex = 16;
+				this->groupBox1->TabStop = false;
+				this->groupBox1->Text = L"Output file path configuration";
 				// 
 				// AddModifyWorkflowForm
 				// 
@@ -390,13 +431,12 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->cancelButton;
-				this->ClientSize = System::Drawing::Size(581, 351);
-				this->Controls->Add(this->outputFileMetadataFieldComboBox);
-				this->Controls->Add(this->label7);
-				this->Controls->Add(this->outputAttributeSetComboBox);
+				this->ClientSize = System::Drawing::Size(581, 425);
+				this->Controls->Add(this->groupBox1);
 				this->Controls->Add(this->cancelButton);
-				this->Controls->Add(this->okButton);
 				this->Controls->Add(this->label6);
+				this->Controls->Add(this->outputAttributeSetComboBox);
+				this->Controls->Add(this->okButton);
 				this->Controls->Add(this->documentFolderTextBox);
 				this->Controls->Add(this->label5);
 				this->Controls->Add(this->postWorkflowActionComboBox);
@@ -413,12 +453,14 @@ private: System::Windows::Forms::ComboBox^  outputFileMetadataFieldComboBox;
 				this->Controls->Add(this->workflowNameLabel);
 				this->MaximizeBox = false;
 				this->MinimizeBox = false;
-				this->MinimumSize = System::Drawing::Size(597, 374);
+				this->MinimumSize = System::Drawing::Size(597, 464);
 				this->Name = L"AddModifyWorkflowForm";
 				this->ShowIcon = false;
 				this->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
 				this->Text = L"Add/Modify Workflow";
 				this->Load += gcnew System::EventHandler(this, &AddModifyWorkflowForm::HandleAddModifyWorkflowForm_Load);
+				this->groupBox1->ResumeLayout(false);
+				this->groupBox1->PerformLayout();
 				this->ResumeLayout(false);
 				this->PerformLayout();
 

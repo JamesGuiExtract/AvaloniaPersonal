@@ -161,6 +161,9 @@ namespace Extract
 					}
 				}
 
+				ipWorkflowDefinition->OutputFilePathInitializationFunction =
+					context.marshal_as<BSTR>(outputFilePathInitializationFunctionTextBox->Text);
+
 				// Update the workflow definition
 				_ipfamDatabase->SetWorkflowDefinition(ipWorkflowDefinition);
 
@@ -198,6 +201,9 @@ namespace Extract
 
 				value = marshal_as<String^>(ipWorkflowDefinition->OutputFileMetadataField);
 				outputFileMetadataFieldComboBox->SelectedIndex = outputFileMetadataFieldComboBox->FindStringExact(value);
+
+				outputFilePathInitializationFunctionTextBox->Text =
+					marshal_as<String ^>(ipWorkflowDefinition->OutputFilePathInitializationFunction);
 			}
 		}
 
