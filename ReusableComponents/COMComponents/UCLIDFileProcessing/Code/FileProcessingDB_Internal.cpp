@@ -1351,7 +1351,6 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrMETADATA_FIELD);
 			eraseFromVector(vecTables, gstrWORKFLOW_TYPE);
 			eraseFromVector(vecTables, gstrWORKFLOW);
-			eraseFromVector(vecTables, gstrWORKFLOW_FILE);
 		}
 
 		// Never drop these tables
@@ -1504,6 +1503,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_PAGINATION_DESTFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_PAGINATION_ORIGINALFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_PAGINATION_FILETASKSESSION_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWFILE_FAMFILE_FK);
 
 		if (bAddUserTables)
 		{
@@ -1515,7 +1515,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			// Foreign key for OutputAttributeSetID is added in AttributeDBMgr
 			vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
 			vecQueries.push_back(gstrADD_WORKFLOWFILE_WORKFLOW_FK);
-			vecQueries.push_back(gstrADD_WORKFLOWFILE_FAMFILE_FK);
 		}
 
 		// Don't create the FK between the Secure counter tables unless at least one
@@ -1630,7 +1629,6 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
 		vecQueries.push_back(gstrCREATE_WORKFLOW_TYPE);
 		vecQueries.push_back(gstrCREATE_WORKFLOW);
-		vecQueries.push_back(gstrCREATE_WORKFLOWFILE);
 	}
 
 	// Add queries to create tables to the vector
@@ -1666,6 +1664,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_TASK_CLASS);
 	vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION);
 	vecQueries.push_back(gstrCREATE_PAGINATION);
+	vecQueries.push_back(gstrCREATE_WORKFLOWFILE);
 
 	return vecQueries;
 }
