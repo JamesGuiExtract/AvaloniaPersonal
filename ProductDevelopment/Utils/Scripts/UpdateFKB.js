@@ -55,8 +55,8 @@ function main(args) {
 
     var rsdFiles = getFiles(root, true).filter(function(f){return f.Name.match(/\.rsd$/i)});
 
-    var ruleset = new ActiveXObject("UCLIDAFCore.RuleSet");
     for (var i=0; i < rsdFiles.length; i++) {
+        var ruleset = new ActiveXObject("UCLIDAFCore.RuleSet");
         var rsdfilename = rsdFiles[i];
         try {
             ruleset.LoadFrom(rsdfilename, true);
@@ -524,6 +524,30 @@ function readAllText(fname) {
             return ("");
         else
             return (f.ReadAll());
+    }
+    finally {
+        f.Close();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+// Read all lines from the file (enables reading more from binary files since readAllText will stop
+// at EOF chars
+//--------------------------------------------------------------------------------------------------
+function readLines(fname) {
+    // Open the file
+    try {
+        var f = fso.OpenTextFile(fname, 1);
+    }
+    catch(err) {
+        handleScriptError("ELI42118", "Unable to open input file!", err, "FileName", fname);
+    }
+    try {
+        var ret = [];
+        // Read from the file
+        while (!f.AtEndOfStream)
+            ret.push(f.ReadLine());
+        return ret;
     }
     finally {
         f.Close();
