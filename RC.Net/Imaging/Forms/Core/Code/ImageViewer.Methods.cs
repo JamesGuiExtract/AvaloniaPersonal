@@ -255,15 +255,24 @@ namespace Extract.Imaging.Forms
                 }
 
                 var ussFileName = fileName + ".uss";
+                _spatialPageInfos = null;
                 if (File.Exists(ussFileName))
                 {
-                    var spatialString = new SpatialString();
-                    spatialString.LoadFrom(ussFileName, false);
-                    _spatialPageInfos = spatialString.SpatialPageInfos;
-                }
-                else
-                {
-                    _spatialPageInfos = null;
+                    // Ignore problems loading the uss file, treat same as missing
+                    try
+                    {
+                        var spatialString = new SpatialString();
+                        spatialString.LoadFrom(ussFileName, false);
+
+                        if (spatialString.HasSpatialInfo())
+                        {
+                            _spatialPageInfos = spatialString.SpatialPageInfos;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        (new ExtractException("ELI43200", "Could not load uss file for auto-rotation", ex)).Log();
+                    }
                 }
 
                 // Raise the opening image event
