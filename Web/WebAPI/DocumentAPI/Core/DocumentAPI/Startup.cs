@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Formatters;              // for HttpNoContentOutp
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
-using SimpleTokenProvider;
 using Swashbuckle.Swagger.Model;
 using System;
 using System.IO;
@@ -110,6 +109,9 @@ namespace DocumentAPI
 
                     options.IncludeXmlComments(xmlPath);
                     options.DescribeAllEnumsAsStrings();
+
+                    // Enables swagger gen to recognize [Authorize] attributes on controllers and actions
+                    options.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
                 });
 
                 services.Configure<ServerOptions>(Configuration);

@@ -323,5 +323,29 @@ namespace DocumentAPI
                 throw ee;
             }
         }
+
+
+        /// <summary>
+        /// the JWT Issuer (iss: )
+        /// </summary>
+        public static string Issuer
+        {
+            get
+            {
+                return "DocumentAPIv1";
+            }
+        }
+
+        /// <summary>
+        /// the JWT Audience (aud: )
+        /// </summary>
+        public static string Audience
+        {
+            get
+            {
+                return "ESWebClients";
+            }
+        }
+            
     }
 }
