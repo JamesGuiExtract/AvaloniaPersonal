@@ -82,7 +82,7 @@ m_bUsingWorkflows(false),
 m_bRunningAllWorkflows(false),
 m_nLastFAMFileID(0),
 m_bDeniedFastCountPermission(false),
-m_ipFAMTagManager(CLSID_FAMTagManager)
+m_ipFAMTagManager(__nullptr)
 {
 	try
 	{
@@ -93,6 +93,9 @@ m_ipFAMTagManager(CLSID_FAMTagManager)
 			// Load the license files
 			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		}
+
+		m_ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
+		ASSERT_RESOURCE_ALLOCATION("ELI43201", m_ipFAMTagManager != __nullptr);
 
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
 		ASSERT_RESOURCE_ALLOCATION("ELI29457", m_ipMiscUtils != __nullptr);
