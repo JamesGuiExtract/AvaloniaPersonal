@@ -347,7 +347,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				{
 					ipPages = ipDocText->GetPages(VARIANT_TRUE, gstrDEFAULT_EMPTY_PAGE_STRING.c_str());
 					ASSERT_RESOURCE_ALLOCATION("ELI42019", ipPages != __nullptr);
-					long nNumDocs = ipPages->Size();
+					nNumDocs = ipPages->Size();
 				}
 
 				// Now have everything needed to start progress status before further initialization
