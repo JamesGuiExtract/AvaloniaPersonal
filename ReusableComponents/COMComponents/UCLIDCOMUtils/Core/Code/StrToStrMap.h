@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <comdef.h>
+#include <stringCSIS.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CStrToStrMap
@@ -57,6 +58,8 @@ public:
 	STDMETHOD(MergeKeyValue)(/*[in]*/ BSTR bstrKey, /*[in]*/ BSTR bstrValue, 
 		/*[in]*/ EMergeMethod eMergeMethod);
 	STDMETHOD(GetAllKeyValuePairs)(IIUnknownVector** ppPairs);
+	STDMETHOD(get_CaseSensitive)(VARIANT_BOOL *pbVal);
+	STDMETHOD(put_CaseSensitive)(VARIANT_BOOL bVal);
 
 //IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -73,7 +76,10 @@ private:
 	//////////////
 	// Variables
 	//////////////
-	std::map<std::string, std::string> m_mapKeyToValue;
+	std::map<stringCSIS, std::string> m_mapKeyToValue;
+
+	// flag to indicate case sensitivity
+	bool m_bCaseSensitive;
 
 	// flag to indicate if this object's state has changed since the last 
 	// save-to-stream operation

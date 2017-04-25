@@ -335,11 +335,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 		// Set the target workflow
 		if (m_strWorkflow != gstrCURRENT_WORKFLOW)
 		{
-			string strWorkflow = m_strWorkflow;
-
-			// Get the workflow id
-			IStrToStrMapPtr ipWorkflows = ipDB->GetWorkflows();
-			nWorkflowId = asLong(ipWorkflows->GetValue(get_bstr_t(strWorkflow)));
+			nWorkflowId = ipDB->GetWorkflowID(m_strWorkflow.c_str());
 		}
 
         // Default to successful completion

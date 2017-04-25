@@ -4181,6 +4181,52 @@ STDMETHODIMP CFileProcessingDB::get_RunningAllWorkflows(VARIANT_BOOL *pRunningAl
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43207");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkflowID(BSTR bstrWorkflowName, long *pnID)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI43214", pnID != __nullptr);
+
+		if (!GetWorkflowID_Internal(false, bstrWorkflowName, pnID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetWorkflowID_Internal(true, bstrWorkflowName, pnID);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43215");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::IsFileInWorkflow(long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI43216", pbIsInWorkflow != __nullptr);
+
+		if (!IsFileInWorkflow_Internal(false, nFileID, nWorkflowID, pbIsInWorkflow))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			IsFileInWorkflow_Internal(true, nFileID, nWorkflowID, pbIsInWorkflow);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43217");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

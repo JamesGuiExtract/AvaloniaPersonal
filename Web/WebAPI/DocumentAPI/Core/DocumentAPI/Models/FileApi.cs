@@ -145,24 +145,13 @@ namespace DocumentAPI.Models
         {
             try
             {
-                var mappedWorkflows = Interface.GetWorkflows();
-                for (int i = 0; i < mappedWorkflows.Size; ++i)
-                {
-                    // key is the name and the value is the ID
-                    mappedWorkflows.GetKeyValue(i, pstrKey: out string name, pstrValue: out string id);
+                int Id = Interface.GetWorkflowID(workflowName);
 
-                    if (name.IsEquivalent(workflowName))
-                    {
-                        var bRet = Int32.TryParse(id, result: out int Id);
-                        Contract.Assert(bRet, "Failed to convert id: {0}, to an int", id);
+                var definition = Interface.GetWorkflowDefinition(Id);
+                Contract.Assert(definition != null, "Failed to get workflow definition for Id: {0}", Id);
 
-                        var definition = Interface.GetWorkflowDefinition(Id);
-                        Contract.Assert(definition != null, "Failed to get workflow definition for Id: {0}", Id);
-
-                        var workflow = new Workflow(definition, DatabaseServer, DatabaseName);
-                        return workflow;
-                    }
-                }
+                var workflow = new Workflow(definition, DatabaseServer, DatabaseName);
+                return workflow;
 
                 Contract.Violated(Inv($"Workflow named: {workflowName}, not found, database server: {DatabaseServer}, database name: {DatabaseName}"));
                 return null;

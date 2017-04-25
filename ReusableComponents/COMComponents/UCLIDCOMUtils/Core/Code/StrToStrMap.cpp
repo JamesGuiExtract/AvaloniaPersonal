@@ -23,14 +23,16 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CaseSensitive
+const unsigned long gnCurrentVersion = 2;
 const long gnMAX_MERGE_COUNT = 1000;
 
 //-------------------------------------------------------------------------------------------------
 // CStrToStrMap
 //-------------------------------------------------------------------------------------------------
 CStrToStrMap::CStrToStrMap()
-: m_bDirty(false)
+: m_bCaseSensitive(true)
+, m_bDirty(false)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -73,7 +75,8 @@ STDMETHODIMP CStrToStrMap::Set(BSTR key, BSTR value)
 	{
 		validateLicense();
 		
-		m_mapKeyToValue[asString(key)] = asString(value);
+		stringCSIS csisKey(asString(key), m_bCaseSensitive);
+		m_mapKeyToValue[csisKey] = asString(value);
 
 		m_bDirty = true;
 	}
@@ -90,9 +93,9 @@ STDMETHODIMP CStrToStrMap::GetValue(BSTR key, BSTR *pValue)
 	{
 		validateLicense();
 		
-		string stdstrKey = asString( key );
+		stringCSIS csisKey(asString(key), m_bCaseSensitive);
 
-		map<string, string>::iterator it = m_mapKeyToValue.find(stdstrKey);
+		map<stringCSIS, string>::iterator it = m_mapKeyToValue.find(csisKey);
 		if (it != m_mapKeyToValue.end())
 		{
 			*pValue = _bstr_t(it->second.c_str()).Detach();
@@ -100,7 +103,7 @@ STDMETHODIMP CStrToStrMap::GetValue(BSTR key, BSTR *pValue)
 		else
 		{
 			UCLIDException ue("ELI04260", "Map does not contain the specific key!");
-			ue.addDebugInfo("Key", stdstrKey);
+			ue.addDebugInfo("Key", asString(key));
 			throw ue;
 		}
 	}
@@ -119,9 +122,9 @@ STDMETHODIMP CStrToStrMap::Contains(BSTR key, VARIANT_BOOL *bFound)
 		
 		ASSERT_ARGUMENT("ELI28401", bFound != __nullptr);
 
-		string stdstrKey = asString( key );
+		stringCSIS csisKey(asString(key), m_bCaseSensitive);
 
-		*bFound = asVariantBool(m_mapKeyToValue.find(stdstrKey) != m_mapKeyToValue.end());
+		*bFound = asVariantBool(m_mapKeyToValue.find(csisKey) != m_mapKeyToValue.end());
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04255");
 
@@ -136,9 +139,9 @@ STDMETHODIMP CStrToStrMap::RemoveItem(BSTR key)
 	{
 		validateLicense();
 		
-		string stdstrKey = asString( key );
+		stringCSIS csisKey(asString(key), m_bCaseSensitive);
 
-		map<string, string>::iterator it = m_mapKeyToValue.find(stdstrKey);
+		map<stringCSIS, string>::iterator it = m_mapKeyToValue.find(csisKey);
 		if (it != m_mapKeyToValue.end())
 		{
 			m_mapKeyToValue.erase(it);
@@ -182,7 +185,7 @@ STDMETHODIMP CStrToStrMap::GetKeys(IVariantVector **pKeys)
 			throw UCLIDException("ELI04372", "Unable to create VariantVector object!");
 		}
 
-		map<string, string>::iterator it = m_mapKeyToValue.begin();
+		map<stringCSIS, string>::iterator it = m_mapKeyToValue.begin();
 		for (; it != m_mapKeyToValue.end(); it++)
 		{
 			ipKeys->PushBack(it->first.c_str());
@@ -234,7 +237,7 @@ STDMETHODIMP CStrToStrMap::GetKeyValue(long nIndex, BSTR *pstrKey, BSTR *pstrVal
 		}
 
 		// find the entry of the map at the specified index and return the key/value
-		map<string, string>::iterator iter = m_mapKeyToValue.begin();
+		map<stringCSIS, string>::iterator iter = m_mapKeyToValue.begin();
 		for (int i = 0; i < nIndex; i++)
 		{
 			iter++;
@@ -248,7 +251,7 @@ STDMETHODIMP CStrToStrMap::GetKeyValue(long nIndex, BSTR *pstrKey, BSTR *pstrVal
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CStrToStrMap::RenameKey(BSTR strKey, BSTR strNewKeyName)
+STDMETHODIMP CStrToStrMap::RenameKey(BSTR bstrKey, BSTR bstrNewKeyName)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -257,33 +260,35 @@ STDMETHODIMP CStrToStrMap::RenameKey(BSTR strKey, BSTR strNewKeyName)
 		// validate the license first
 		validateLicense();
 		
-		string stdstrKey = asString( strKey );
-		string stdstrNewKeyName = asString( strNewKeyName );
+		string strKey = asString(bstrKey);
+		stringCSIS csisKey(strKey, m_bCaseSensitive);
+		string strNewKeyName = asString(bstrNewKeyName);
+		stringCSIS csisNewKey(asString(bstrNewKeyName), m_bCaseSensitive);
 
 		// only process this request if the new key and the old key are different
-		if (stdstrKey != stdstrNewKeyName)
+		if (csisKey != csisNewKey)
 		{
 			// ensure that the specified key is valid
-			map<string, string>::iterator iter1 = m_mapKeyToValue.find(stdstrKey);
+			map<stringCSIS, string>::iterator iter1 = m_mapKeyToValue.find(csisKey);
 			if (iter1 == m_mapKeyToValue.end())
 			{
 				UCLIDException ue("ELI04530", "Invalid map key!");
-				ue.addDebugInfo("Key", stdstrKey);
+				ue.addDebugInfo("Key", strKey);
 				throw ue;
 			}
 
 			// ensure that the new key is not already in the map
-			map<string, string>::iterator iter2 = m_mapKeyToValue.find(stdstrNewKeyName);
+			map<stringCSIS, string>::iterator iter2 = m_mapKeyToValue.find(csisNewKey);
 			if (iter2 != m_mapKeyToValue.end())
 			{
 				UCLIDException ue("ELI04531", "Specified key already exists in map!");
-				ue.addDebugInfo("Old Key", stdstrKey);
-				ue.addDebugInfo("New Key", stdstrNewKeyName);
+				ue.addDebugInfo("Old Key", strKey);
+				ue.addDebugInfo("New Key", strNewKeyName);
 				throw ue;
 			}
 
 			// add the new entry to the map
-			m_mapKeyToValue[stdstrNewKeyName] = iter1->second;
+			m_mapKeyToValue[csisNewKey] = iter1->second;
 
 			// remove the original entry from the map
 			m_mapKeyToValue.erase(iter1);
@@ -357,7 +362,7 @@ STDMETHODIMP CStrToStrMap::GetAllKeyValuePairs(IIUnknownVector** ppPairs)
 
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipPairs(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI31904", ipPairs != __nullptr);
-		for(map<string, string>::iterator it = m_mapKeyToValue.begin();
+		for(map<stringCSIS, string>::iterator it = m_mapKeyToValue.begin();
 			it != m_mapKeyToValue.end(); it++)
 		{
 			UCLID_COMUTILSLib::IStringPairPtr ipPair(CLSID_StringPair);
@@ -372,6 +377,39 @@ STDMETHODIMP CStrToStrMap::GetAllKeyValuePairs(IIUnknownVector** ppPairs)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31906");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CStrToStrMap::get_CaseSensitive(VARIANT_BOOL *pbVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+		try
+	{
+		ASSERT_ARGUMENT("ELI43212", pbVal != __nullptr);
+
+		*pbVal = asVariantBool(m_bCaseSensitive);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43213");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CStrToStrMap::put_CaseSensitive(VARIANT_BOOL bVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		bool bCaseSensitive = asCppBool(bVal);
+		ASSERT_RUNTIME_CONDITION("ELI43210",
+			(m_bCaseSensitive == bCaseSensitive) || (m_mapKeyToValue.size() == 0),
+			"Cannot alter map case-sensitivity while populated.");
+
+		m_bCaseSensitive = asCppBool(bVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43211");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -425,6 +463,8 @@ STDMETHODIMP CStrToStrMap::Load(IStream *pStream)
 		// read the number of entries to the stream
 		long nNumEntries = 0;
 
+		m_bCaseSensitive = true;
+
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
 		pStream->Read(&nDataLength, sizeof(nDataLength), NULL);
@@ -450,6 +490,10 @@ STDMETHODIMP CStrToStrMap::Load(IStream *pStream)
 		{
 			dataReader >> nNumEntries;
 		}
+		if (nDataVersion >= 2)
+		{
+			dataReader >> m_bCaseSensitive;
+		}
 
 		// for each map entry, read from the stream the name of the entry
 		// as well as the value 
@@ -463,8 +507,8 @@ STDMETHODIMP CStrToStrMap::Load(IStream *pStream)
 			bstrValue.ReadFromStream(pStream);
 
 			// store the key/value pair to the map
-			string strKey = asString(bstrKey);
-			m_mapKeyToValue[strKey] = asString(bstrValue);
+			stringCSIS stdstrKey(asString(bstrKey), m_bCaseSensitive);
+			m_mapKeyToValue[stdstrKey] = asString(bstrValue);
 		}
 
 		// set the dirty flag to false as we've just loaded the object
@@ -493,6 +537,7 @@ STDMETHODIMP CStrToStrMap::Save(IStream *pStream, BOOL fClearDirty)
 		// write the number of entries to the stream
 		long nNumEntries = m_mapKeyToValue.size();
 		dataWriter << nNumEntries;
+		dataWriter << m_bCaseSensitive;
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -502,7 +547,7 @@ STDMETHODIMP CStrToStrMap::Save(IStream *pStream, BOOL fClearDirty)
 
 		// for each map entry, write to the stream the name of the entry
 		// and the value
-		map<string, string>::iterator iter;
+		map<stringCSIS, string>::iterator iter;
 		for (iter = m_mapKeyToValue.begin(); iter != m_mapKeyToValue.end(); iter++)
 		{
 			// write the key to the stream
@@ -547,12 +592,15 @@ STDMETHODIMP CStrToStrMap::CopyFrom(IUnknown * pObject)
 
 		clear();
 
+		m_bCaseSensitive = asCppBool(ipSource->CaseSensitive);
+
 		long lSize = ipSource->Size;
 		for(long i = 0; i < lSize; i++)
 		{
 			CComBSTR bstrKey, bstrValue;
 			ipSource->GetKeyValue(i, &bstrKey, &bstrValue);
-			m_mapKeyToValue[asString(bstrKey)] = asString(bstrValue);
+			stringCSIS csisKey(asString(bstrKey), m_bCaseSensitive);
+			m_mapKeyToValue[csisKey] = asString(bstrValue);
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08211");
@@ -594,6 +642,8 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 	string strKey = asString(bstrKey);
 	ASSERT_ARGUMENT("ELI20191", !strKey.empty());
 
+	stringCSIS csisKey(strKey, m_bCaseSensitive);
+
 	string strValue = asString(bstrValue);
 
 	switch (eMergeMethod)
@@ -601,9 +651,9 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 	case kKeepOriginal:
 		{
 			// Only add the new mapping if there is not already a value at this key
-			if (m_mapKeyToValue.find(strKey) == m_mapKeyToValue.end())
+			if (m_mapKeyToValue.find(csisKey) == m_mapKeyToValue.end())
 			{
-				m_mapKeyToValue[strKey] = strValue;
+				m_mapKeyToValue[csisKey] = strValue;
 			}
 		}
 		break;
@@ -611,7 +661,7 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 	case kOverwriteOriginal:
 		{
 			// Always add the new mapping regardless of whether there is already a value at this key
-			m_mapKeyToValue[strKey] = strValue;
+			m_mapKeyToValue[csisKey] = strValue;
 		}
 		break;
 
@@ -635,8 +685,10 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 			// where i is iterated until we find a key that is not already in the map 
 			for (int i = 1; i < gnMAX_MERGE_COUNT; i++)
 			{
+				csisKey = stringCSIS(strKey, m_bCaseSensitive);
+
 				// Search the map for the key
-				map<string, string>::iterator it = m_mapKeyToValue.find(strKey);
+				map<stringCSIS, string>::iterator it = m_mapKeyToValue.find(csisKey);
 
 				// If we didn't find the key then we can break from the loop and set the
 				// value
@@ -657,7 +709,7 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 			}
 
 			// Store the new value at the unique keyname we have created
-			m_mapKeyToValue[strKey] = strValue;
+			m_mapKeyToValue[csisKey] = strValue;
 		}
 		break;
 	}
@@ -665,6 +717,7 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 //-------------------------------------------------------------------------------------------------
 void CStrToStrMap::clear()
 {
+	m_bCaseSensitive = true;
 	m_mapKeyToValue.clear();
 
 	m_bDirty = true;

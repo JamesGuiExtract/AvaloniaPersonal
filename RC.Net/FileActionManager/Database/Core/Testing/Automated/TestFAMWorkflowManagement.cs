@@ -76,7 +76,8 @@ namespace Extract.FileActionManager.Database.Test
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
                 int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
                 IWorkflowDefinition workflowDefiniton = fileProcessingDb.GetWorkflowDefinition(id);
-                Assert.That(workflowDefiniton.Name == "Workflow1");
+
+                Assert.AreEqual(workflowDefiniton.Name, "Workflow1");
             }
             finally
             {
@@ -102,6 +103,47 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb.DeleteWorkflow(id);
 
                 Assert.Throws<COMException>(() => fileProcessingDb.GetWorkflowDefinition(id));
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// <summary>
+        /// Tests GetWorkflowID and GetWorkflows
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void GetWorkflowsAndIds()
+        {
+            string testDbName = "Test_GetWorkflowsAndIds";
+
+            try
+            {
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+
+                int id1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
+                IWorkflowDefinition workflowDefiniton1 = fileProcessingDb.GetWorkflowDefinition(id1);
+
+                Assert.AreEqual(id1, workflowDefiniton1.ID);
+                Assert.AreEqual(id1, fileProcessingDb.GetWorkflowID("Workflow1"));
+                Assert.AreEqual(id1, fileProcessingDb.GetWorkflowID("workflow1"));
+
+                int id2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
+                IWorkflowDefinition workflowDefiniton2 = fileProcessingDb.GetWorkflowDefinition(id2);
+
+                Assert.AreEqual(id2, workflowDefiniton2.ID);
+                Assert.AreEqual(id2, fileProcessingDb.GetWorkflowID("Workflow2"));
+                Assert.AreEqual(id2, fileProcessingDb.GetWorkflowID("WoRkFlOw2"));
+
+                Assert.AreEqual(-1, fileProcessingDb.GetWorkflowID(""));
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                Assert.AreEqual(id2, fileProcessingDb.GetWorkflowID(""));
+
+                var workflows = fileProcessingDb.GetWorkflows();
+                Assert.AreEqual(workflows.Size, 2);
+                Assert.AreEqual(id1.AsString(), workflows.GetValue("Workflow1"));
+                Assert.AreEqual(id2.AsString(), workflows.GetValue("WORKFLOW2"));
             }
             finally
             {

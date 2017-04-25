@@ -1888,6 +1888,19 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Gets whether the currently processing FAM is configured to be running all workflows in
 		//			a database with workflows defined.
 		[propget, id(176), helpstring("method RunningAllWorkflows")] HRESULT RunningAllWorkflows([out, retval] VARIANT_BOOL *pRunningAllWorkflows);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Returns the ID for the specified workflow name.
+		//			If the specified workflow name is blank, the ID of the current workflow will be returned.
+		//			If the specified workflow name is blank and no workflow is active, -1 will be returned.
+		//			If the specified workflow name is not found (case-insensitive) an exception will be thrown.
+		[id(177), helpstring("method GetWorkflowID")] HRESULT GetWorkflowID([in] BSTR bstrWorkflowName,
+			[out, retval] long *pnID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Indicates whether the specified file is in the specified workflow.
+		//			If the specified workflow ID is -1, the current workflow will be tested.
+		//			If there are no workflows defined, the result will indicate whether the file ID is present in the DB.
+		[id(178), helpstring("method IsFileInWorkflow")] HRESULT IsFileInWorkflow([in] long nFileID,
+			[in] long nWorkflowID, [out, retval] VARIANT_BOOL *pbIsInWorkflow);
 	};
 
 	[

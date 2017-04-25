@@ -143,8 +143,8 @@ namespace Extract.FileActionManager.Database.Test
                 string testFileName = _testFiles.GetFile(_LABDE_TEST_FILE1);
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
-                int workflowId = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowId, new[] { _LABDE_ACTION1 }.ToVariantVector());
+                int workflowId1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
+                fileProcessingDb.SetWorkflowActions(workflowId1, new[] { _LABDE_ACTION1 }.ToVariantVector());
                 int actionId = fileProcessingDb.GetActionID(_LABDE_ACTION1);
 
                 fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
@@ -175,10 +175,14 @@ namespace Extract.FileActionManager.Database.Test
 
                 fileProcessingDb.RecordFAMSessionStop();
 
-                workflowId = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowId, new[] { _LABDE_ACTION1 }.ToVariantVector());
+                int workflowId2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
+                fileProcessingDb.SetWorkflowActions(workflowId2, new[] { _LABDE_ACTION1 }.ToVariantVector());
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
                 int actionIdWorkflow2 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+
+                Assert.IsFalse(fileProcessingDb.IsFileInWorkflow(fileId, -1));
+                Assert.IsTrue(fileProcessingDb.IsFileInWorkflow(fileId, workflowId1));
+                Assert.IsFalse(fileProcessingDb.IsFileInWorkflow(fileId, workflowId2));
 
                 fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, false, true);
 

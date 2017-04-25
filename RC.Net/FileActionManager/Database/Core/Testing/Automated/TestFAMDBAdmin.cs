@@ -167,7 +167,7 @@ namespace Extract.FileActionManager.Database.Test
                     "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'",
                     _LABDE_ACTION3, EActionStatus.kActionPending, "", null);
 
-                // Statuses after ModifyActionStatusForQuery in Workflow 2
+                // Updated statuses
                 //            |  P  |  R  |  S  |  C  |  F 
                 //   Action 1                     1,2           
                 //   Action 2   1                  2
@@ -181,7 +181,7 @@ namespace Extract.FileActionManager.Database.Test
                     "SELECT [ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3",
                     _LABDE_ACTION2, EActionStatus.kActionSkipped, "", null);
 
-                // Statuses after ModifyActionStatusForQuery for all workflows
+                // Updated statuses
                 //            |  P  |  R  |  S  |  C  |  F 
                 //   Action 1                     1,2           
                 //   Action 2   1           2,3       
@@ -436,7 +436,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION2, EActionStatus.kActionPending);
 
-                // Statuses after SetStatusForAllFiles in Workflow 2
+                // Updated statuses
                 //            |  P  |  R  |  S  |  C  |  F 
                 //   Action 1                     1,2           
                 //   Action 2  1,2,3
@@ -447,7 +447,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionSkipped);
 
-                // Statuses after SetStatusForAllFiles in all workflows
+                // Updated statuses
                 //            |  P  |  R  |  S  |  C  |  F 
                 //   Action 1              1,2,3
                 //   Action 2  1,2,3

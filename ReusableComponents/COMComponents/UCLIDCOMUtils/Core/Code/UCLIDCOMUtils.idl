@@ -551,6 +551,11 @@ library UCLID_COMUTILSLib
 		//			entire collection.
 		[id(12), helpstring("method GetAllKeyValuePairs")] HRESULT GetAllKeyValuePairs(
 			[out, retval] IIUnknownVector** ppPairs);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Indicates whether key lookups in this map should be case-sensitive.
+		[propget, id(13), helpstring("property CaseSensitive")] HRESULT CaseSensitive([out, retval] VARIANT_BOOL *pbVal);
+		[propput, id(13), helpstring("property CaseSensitive")] HRESULT CaseSensitive([in] VARIANT_BOOL bVal);
 	};
 	[
 		object,

@@ -67,18 +67,7 @@ namespace DocumentAPI.Models
         {
             try
             {
-                var mappedWorkflows = _fileApi.Interface.GetWorkflows();
-                for (int i = 0; i < mappedWorkflows.Size; ++i)
-                {
-                    // key is the name and the value is the ID
-                    mappedWorkflows.GetKeyValue(i, pstrKey: out string name, pstrValue: out string id);
-                    if (name.IsEquivalent(workflowName))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
+                return (_fileApi.Interface.GetWorkflowID(workflowName) > 0);
             }
             catch (Exception ex)
             {

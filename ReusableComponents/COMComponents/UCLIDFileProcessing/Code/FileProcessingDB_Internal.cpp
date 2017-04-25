@@ -875,10 +875,20 @@ long CFileProcessingDB::getFileID(_ConnectionPtr ipConnection, string& rstrFileN
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26720");
 }
 //--------------------------------------------------------------------------------------------------
-long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, const string& strWorkflowName)
+long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, string strWorkflowName)
 {
 	try
 	{
+		if (strWorkflowName.empty())
+		{
+			strWorkflowName = m_strActiveWorkflow;
+		}
+
+		if (strWorkflowName.empty())
+		{
+			return -1;
+		}
+
 		string strQuery = "SELECT [ID] FROM [Workflow] WHERE [Workflow].[Name] = '" +
 			strWorkflowName + "'";
 
@@ -917,6 +927,30 @@ long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, long nActionI
 		return -1;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42103");
+}
+//--------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, long nFileID, long nWorkflowID)
+{
+	try
+	{
+		if (nWorkflowID <= 0 && databaseHasWorkflows(ipConnection))
+		{
+			nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
+		}
+
+		string strQuery = (nWorkflowID > 0)
+			? Util::Format("SELECT COUNT(*) AS [ID] FROM [WorkflowFile] "
+				"WHERE [FileID] = %d AND [WorkflowID] = %d", nFileID, nWorkflowID)
+			: Util::Format(
+				"SELECT COUNT([ID]) AS [ID] FROM [FAMFile] WHERE [ID] = %d",
+				nFileID);
+
+		long nCount = 0;
+		executeCmdQuery(ipConnection, strQuery, false, &nCount);
+
+		return nCount > 0;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43218");
 }
 //--------------------------------------------------------------------------------------------------
 long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& strActionName)
@@ -4013,6 +4047,8 @@ IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection,
 		// Create StrToStrMap to return the list of actions
 		IStrToStrMapPtr ipActions(CLSID_StrToStrMap);
 		ASSERT_RESOURCE_ALLOCATION("ELI29687", ipActions != __nullptr);
+
+		ipActions->CaseSensitive = VARIANT_FALSE;
 
 		// Step through all records
 		while (ipActionSet->adoEOF == VARIANT_FALSE)

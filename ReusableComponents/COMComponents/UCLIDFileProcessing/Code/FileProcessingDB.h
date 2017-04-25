@@ -329,6 +329,8 @@ public:
 	STDMETHOD(GetWorkflowStatusAllFiles)(long *pnUnattempted, long *pnProcessing, long *pnCompleted, long *pnFailed);
 	STDMETHOD(LoginUser)(BSTR bstrUserName, BSTR bstrPassword);
 	STDMETHOD(get_RunningAllWorkflows)(VARIANT_BOOL *pRunningAllWorkflows);
+	STDMETHOD(GetWorkflowID)(BSTR bstrWorkflowName, long *pnID);
+	STDMETHOD(IsFileInWorkflow)(long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -678,10 +680,15 @@ private:
 		const string &strWhereClause, const string &strTopClause);
 
 	// PROMISE: To return the ID for the given provided workflow name.
-	long getWorkflowID(_ConnectionPtr ipConnection, const string& strWorkflowName);
+	long getWorkflowID(_ConnectionPtr ipConnection, string strWorkflowName);
 
 	// PROMISE: To get the workflowID associated with the specified ActionID
 	long getWorkflowID(_ConnectionPtr ipConnection, long nActionID);
+
+	// Indicates whether the specified file is in the specified workflow.
+	// If the specified workflow ID is -1, the current workflow will be tested.
+	// If there are no workflows defined, the result will indicate whether the file ID is present in the DB.
+	bool isFileInWorkflow(_ConnectionPtr ipConnection, long nFileID, long nWorkflowID);
 
 	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match
 	//			the action name stored in the database using the connection object provided.
@@ -1366,6 +1373,8 @@ private:
 	bool GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus);
 	bool GetWorkflowStatusAllFiles_Internal(bool bDBLocked, long *pnUnattempted, long *pnProcessing,
 		long *pnCompleted, long *pnFailed);
+	bool GetWorkflowID_Internal(bool bDBLocked, BSTR bstrWorkflowName, long *pnID);
+	bool IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

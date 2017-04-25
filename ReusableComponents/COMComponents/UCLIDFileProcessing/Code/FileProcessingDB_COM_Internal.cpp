@@ -1970,13 +1970,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					{
 						// NOTE: If the workflow/file pair is not yet in [WorkflowFile], it will be
 						// added as part of setStatusForFile below.
-						string strFileInWorkflowSQL = Util::Format("SELECT COUNT(*) AS [ID] FROM [WorkflowFile] "
-							"WHERE [FileID] = %d AND [WorkflowID] = %d", nID, nWorkflowID);
-
-						long nCount = 0;
-						executeCmdQuery(ipConnection, strFileInWorkflowSQL, false, &nCount);
-
-						bAlreadyExistsInWorkflow = (nCount > 0);
+						bAlreadyExistsInWorkflow = isFileInWorkflow(ipConnection, nID, nWorkflowID);
 					}
 				}
 
@@ -4050,6 +4044,8 @@ bool CFileProcessingDB::GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags)
 			IStrToStrMapPtr ipTagToDesc(CLSID_StrToStrMap);
 			ASSERT_RESOURCE_ALLOCATION("ELI27330", ipTagToDesc != __nullptr);
 
+			ipTagToDesc->CaseSensitive = VARIANT_FALSE;
+
 			// Create query to get the tags and descriptions
 			string strQuery = "SELECT [TagName], [TagDescription] FROM [Tag]";
 
@@ -5561,6 +5557,8 @@ bool CFileProcessingDB::GetUserCounterNamesAndValues_Internal(bool bDBLocked, IS
 			IStrToStrMapPtr ipmapUserCounters(CLSID_StrToStrMap);
 			ASSERT_RESOURCE_ALLOCATION("ELI27780", ipmapUserCounters != __nullptr);
 
+			ipmapUserCounters->CaseSensitive = VARIANT_FALSE;
+
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
@@ -6009,6 +6007,8 @@ bool CFileProcessingDB::GetLoginUsers_Internal(bool bDBLocked, IStrToStrMap**  p
 				// Create map to return results
 				IStrToStrMapPtr ipUsers(CLSID_StrToStrMap);
 				ASSERT_RESOURCE_ALLOCATION("ELI29039", ipUsers != __nullptr);
+
+				ipUsers->CaseSensitive = VARIANT_FALSE;
 
 				// Step through all records
 				while (ipLoginSet->adoEOF == VARIANT_FALSE)
@@ -6857,6 +6857,8 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 
 			IStrToStrMapPtr ipSettings(CLSID_StrToStrMap);
 			ASSERT_RESOURCE_ALLOCATION("ELI31896", ipSettings != __nullptr);
+
+			ipSettings->CaseSensitive = VARIANT_FALSE;
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -9897,6 +9899,8 @@ bool CFileProcessingDB::GetWorkflows_Internal(bool bDBLocked,
 			// Create StrToStrMap to return the list of workflows
 			IStrToStrMapPtr ipWorkflows(CLSID_StrToStrMap);
 			ASSERT_RESOURCE_ALLOCATION("ELI41937", ipWorkflows != __nullptr);
+			
+			ipWorkflows->CaseSensitive = VARIANT_FALSE;
 
 			for each(pair<string, string> workflow in getWorkflowNamesAndIDs(ipConnection))
 			{
@@ -9943,6 +9947,8 @@ bool CFileProcessingDB::GetWorkflowActions_Internal(bool bDBLocked, long nID,
 
 			IStrToStrMapPtr ipActionNameToID(CLSID_StrToStrMap);
 			ASSERT_RESOURCE_ALLOCATION("ELI41991", ipActionNameToID != __nullptr);
+			
+			ipActionNameToID->CaseSensitive = VARIANT_FALSE;
 
 			map<string, long> mapWorkflowActions = getWorkflowActions(ipConnection, nID);
 			for each (pair<string, int> item in mapWorkflowActions)
@@ -10161,6 +10167,69 @@ bool CFileProcessingDB::GetWorkflowStatusAllFiles_Internal(bool bDBLocked, long 
 			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42158");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkflowID_Internal(bool bDBLocked, BSTR bstrWorkflowName, long *pnID)
+{
+	try
+	{
+		try
+		{
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				ipConnection = getDBConnection();
+				validateDBSchemaVersion();
+
+				*pnID = getWorkflowID(ipConnection, asString(bstrWorkflowName));
+
+			END_CONNECTION_RETRY(ipConnection, "ELI43219");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43220");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, long nWorkflowID,
+	VARIANT_BOOL *pbIsInWorkflow)
+{
+	try
+	{
+		try
+		{
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			*pbIsInWorkflow = asVariantBool(isFileInWorkflow(ipConnection, nFileID, nWorkflowID));
+
+			END_CONNECTION_RETRY(ipConnection, "ELI43221");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43222");
 	}
 	catch (UCLIDException &ue)
 	{
