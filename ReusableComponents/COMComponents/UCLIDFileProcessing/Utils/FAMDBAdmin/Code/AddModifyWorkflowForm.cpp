@@ -85,14 +85,19 @@ namespace Extract
 
 				marshal_context context;
 
+				// Trim leading and trailing whitespace from the workflow name
+				String ^workflowName = workflowNameTextBox->Text->Trim();
+
 				// Verify that the name is not empty
-				if (String::IsNullOrEmpty(workflowNameTextBox->Text))
+				if (String::IsNullOrWhiteSpace(workflowName))
 				{
 					System::Windows::Forms::MessageBox::Show("Workflow name cannot be empty.");
 					workflowNameTextBox->Focus();
 					return;
 				}
-				ipWorkflowDefinition->Name = context.marshal_as<BSTR>(workflowNameTextBox->Text);
+				ipWorkflowDefinition->Name = context.marshal_as<BSTR>(workflowName);
+
+				// Set the description
 				ipWorkflowDefinition->Description = context.marshal_as<BSTR>(descriptionTextBox->Text);
 
 				// Used to add the actions that are part of the definition to the workflow
