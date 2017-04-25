@@ -36,14 +36,14 @@ namespace DocumentAPI.Controllers
         [ProducesResponseType(typeof(DocumentAttributeSet), 200)] 
         public DocumentAttributeSet GetResultSet(string id)
         {
-            if (!ModelState.IsValid || String.IsNullOrEmpty(id))
+            if (!ModelState.IsValid || String.IsNullOrWhiteSpace(id))
             {
                 Log.WriteLine("string id is empty");
                 return MakeDocumentAttributeSetError("id argument cannot be empty");
             }
 
             // using ensures that the underlying FileApi.InUse flag is cleared on exit
-            using (var data = new DocumentData(Utils.CurrentApiContext))
+            using (var data = new DocumentData(ClaimsToContext(User), useAttributeDbMgr: true))
             {
                 return data.GetDocumentResultSet(id);
             }
@@ -60,12 +60,16 @@ namespace DocumentAPI.Controllers
             try
             {
                 string fileName = Request?.Headers["X-FileName"];
-                Contract.Assert(String.IsNullOrEmpty(fileName), "Filename cannot be empty");
+                Contract.Assert(String.IsNullOrWhiteSpace(fileName), "Filename cannot be empty");
 
                 // Request.Body is type FrameRequestStream, inherits from Stream, which is also the parent of FileStream
                 Stream fileStream = (Stream)Request.Body;
+                Contract.Assert(fileStream != null, "Null filestream");
 
-                return await DocumentData.SubmitFile(fileName, fileStream);
+                using (var data = new DocumentData(ClaimsToContext(User)))
+                {
+                    return await data.SubmitFile(fileName, fileStream);
+                }
             }
             catch (Exception ex)
             {
@@ -83,12 +87,15 @@ namespace DocumentAPI.Controllers
         [HttpPost("SubmitText")]
         public async Task<DocumentSubmitResult> SubmitText([FromBody]SubmitTextArgs args)
         {
-            if (!ModelState.IsValid || String.IsNullOrEmpty(args.Text))
+            if (!ModelState.IsValid || String.IsNullOrWhiteSpace(args.Text))
             {
                 return MakeDocumentSubmitResult(fileId: -1, isError: true, message: "File name is empty", code: -1);
             }
 
-            return await DocumentData.SubmitText(args.Text);
+            using (var data = new DocumentData(ClaimsToContext(User)))
+            {
+                return await data.SubmitText(args.Text);
+            }
         }
 
         /// <summary>
@@ -99,7 +106,7 @@ namespace DocumentAPI.Controllers
         [HttpGet("GetStatus")]
         public List<ProcessingStatus> GetStatus([FromQuery] string stringId)
         {
-            if (String.IsNullOrEmpty(stringId))
+            if (String.IsNullOrWhiteSpace(stringId))
             {
                 return MakeListProcessingStatus(isError: true, 
                                                 message: "stringId argument is empty", 
@@ -107,7 +114,10 @@ namespace DocumentAPI.Controllers
                                                 code: -1);
             }
 
-            return DocumentData.GetStatus(stringId);
+            var data = new DocumentData(ClaimsToContext(User));
+            {
+                return data.GetStatus(stringId);
+            }
         }
 
         /// <summary>
@@ -124,10 +134,10 @@ namespace DocumentAPI.Controllers
         /// </remarks>
         static string FileContentType(string filename)
         {
-            Contract.Assert(!String.IsNullOrEmpty(filename), "bad argument - empty string");
+            Contract.Assert(!String.IsNullOrWhiteSpace(filename), "bad argument - empty string");
 
             var ext = Path.GetExtension(filename);
-            Contract.Assert(!String.IsNullOrEmpty(ext), "extension is empty - filename: {0}", filename);
+            Contract.Assert(!String.IsNullOrWhiteSpace(ext), "extension is empty - filename: {0}", filename);
 
             if (ext.IsEquivalent(".tif") || ext.IsEquivalent(".tiff"))
             {
@@ -149,9 +159,11 @@ namespace DocumentAPI.Controllers
             {
                 return "text/plain";
             }
-
-            Contract.Violated(Inv($"Unsupported extension requested, filename: {filename}"));
-            return "";
+            else
+            {
+                // for VOA, USS, or ?
+                return "application/octet-stream";
+            }
         }
 
         /// <summary>
@@ -167,13 +179,18 @@ namespace DocumentAPI.Controllers
 
             try
             {
-                var (fileName, errorMsg, error) = DocumentData.GetSourceFileName(Id);
+                using (var data = new DocumentData(ClaimsToContext(User)))
+                {
+                    var (fileName, errorMsg, error) = data.GetSourceFileName(Id);
 
-                var fileContentType = FileContentType(fileName);
-                var fileDownloadName = Path.GetFileName(fileName);
-                Contract.Assert(!String.IsNullOrEmpty(fileDownloadName), "path.GetFileName returned empty value for filename: {0}", fileName);
+                    var fileContentType = FileContentType(fileName);
+                    var fileDownloadName = Path.GetFileName(fileName);
+                    Contract.Assert(!String.IsNullOrWhiteSpace(fileDownloadName), 
+                                    "path.GetFileName returned empty value for filename: {0}", 
+                                    fileName);
 
-                return PhysicalFile(fileName, fileContentType, fileDownloadName);
+                    return PhysicalFile(fileName, fileContentType, fileDownloadName);
+                }
             }
             catch (Exception ex)
             {
@@ -194,23 +211,28 @@ namespace DocumentAPI.Controllers
         public IActionResult GetFileResult(string id)
         {
             try
-            { 
-                var (filename, isError, errMessage) = DocumentData.GetResult(id);
-                if (isError)
+            {
+                using (var data = new DocumentData(ClaimsToContext(User)))
                 {
-                    return BadRequest(errMessage);
+                    var (filename, isError, errMessage) = data.GetResult(id);
+                    if (isError)
+                    {
+                        return BadRequest(errMessage);
+                    }
+
+                    var fileContentType = FileContentType(filename);
+                    var fileDownloadName = Path.GetFileName(filename);
+                    Contract.Assert(!String.IsNullOrWhiteSpace(fileDownloadName), 
+                                    "path.GetFileName returned empty value for filename: {0}", 
+                                    filename);
+
+                    if (!System.IO.File.Exists(filename))
+                    {
+                        return BadRequest(Inv($"result file: {filename}, not found"));
+                    }
+
+                    return PhysicalFile(filename, fileContentType, fileDownloadName);
                 }
-
-                var fileContentType = FileContentType(filename);
-                var fileDownloadName = Path.GetFileName(filename);
-                Contract.Assert(!String.IsNullOrEmpty(fileDownloadName), "path.GetFileName returned empty value for filename: {0}", filename);
-
-                if (!System.IO.File.Exists(filename))
-                {
-                    return BadRequest(Inv($"result file: {filename}, not found"));
-                }
-
-                return PhysicalFile(filename, fileContentType, fileDownloadName);
             }
             catch (Exception ex)
             {
@@ -229,7 +251,10 @@ namespace DocumentAPI.Controllers
         [Produces(typeof(TextResult))]
         public async Task<TextResult> GetTextResult([FromQuery] string textId)
         {
-            return await DocumentData.GetTextResult(textId);
+            using (var data = new DocumentData(ClaimsToContext(User)))
+            {
+                return await data.GetTextResult(textId);
+            }
         }
 
         /// <summary>
@@ -241,7 +266,7 @@ namespace DocumentAPI.Controllers
         [Produces(typeof(String))]
         public string GetDocumentType(string id)
         {
-            using (var data = new DocumentData(Utils.CurrentApiContext))
+            using (var data = new DocumentData(ClaimsToContext(User)))
             {
                 return data.GetDocumentType(id);
             }

@@ -64,20 +64,20 @@ namespace Extract.Web.DocumentAPI.Test
         /// </summary>
         static Dictionary<int, FileInfo> LabDEFileIdToFileInfo = new Dictionary<int, FileInfo>
         {
-            {1, new FileInfo {XmlFile = "Resources.A418.tif.restored.xml", DatabaseName = DbLabDE, AttributeSetName = "DataFoundByRules" } },
-            {12, new FileInfo {XmlFile = "Resources.K151.tif.restored.xml", DatabaseName = DbLabDE, AttributeSetName = "DataFoundByRules" } }
+            {1, new FileInfo {XmlFile = "Resources.A418.tif.restored.xml", DatabaseName = DbLabDE + "1", AttributeSetName = "DataFoundByRules" } },
+            {12, new FileInfo {XmlFile = "Resources.K151.tif.restored.xml", DatabaseName = DbLabDE + "2", AttributeSetName = "DataFoundByRules" } }
         };
 
         static Dictionary<int, FileInfo> IDShieldFileIdToFileInfo = new Dictionary<int, FileInfo>
         {
-            {2, new FileInfo {XmlFile = "Resources.TestImage002.tif.restored.xml", DatabaseName = DbIDShield, AttributeSetName = "Attr" } },
-            {3, new FileInfo {XmlFile = "Resources.TestImage003.tif.restored.xml", DatabaseName = DbIDShield, AttributeSetName = "Attr" } }
+            {2, new FileInfo {XmlFile = "Resources.TestImage002.tif.restored.xml", DatabaseName = DbIDShield + "1", AttributeSetName = "Attr" } },
+            {3, new FileInfo {XmlFile = "Resources.TestImage003.tif.restored.xml", DatabaseName = DbIDShield + "2", AttributeSetName = "Attr" } }
         };
 
         static Dictionary<int, FileInfo> FlexIndexFileIdToFileInfo = new Dictionary<int, FileInfo>
         {
-            {1, new FileInfo {XmlFile = "Resources.Example01.tif.restored.xml", DatabaseName = DbFlexIndex, AttributeSetName = "Attr"} },
-            {3, new FileInfo {XmlFile = "Resources.Example03.tif.restored.xml", DatabaseName = DbFlexIndex, AttributeSetName = "Attr"} }
+            {1, new FileInfo {XmlFile = "Resources.Example01.tif.restored.xml", DatabaseName = DbFlexIndex + "1", AttributeSetName = "Attr"} },
+            {3, new FileInfo {XmlFile = "Resources.Example03.tif.restored.xml", DatabaseName = DbFlexIndex + "2", AttributeSetName = "Attr"} }
         };
 
         // Index for FulllText node, always the zeroeth child node of parent nodes.
@@ -112,8 +112,6 @@ namespace Extract.Web.DocumentAPI.Test
         /// to the local database server. 
         /// </summary>
         static FAMTestDBManager<TestDocumentAttributeSet> _testDbManager;
-
-        static string _currentDatabaseName;
 
         #endregion Fields
 
@@ -185,27 +183,28 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void TestLabDE_DocumentAttributeSets()
         {
+            string currentDatabaseName = null;
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
-                _currentDatabaseName = DbLabDE;
-
                 foreach (var kvpFileInfo in LabDEFileIdToFileInfo)
                 {
                     var fileId = kvpFileInfo.Key;
                     var fi = kvpFileInfo.Value;
+                    currentDatabaseName = fi.DatabaseName;
+                    _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", currentDatabaseName);
 
                     var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
+
+                    FileApiMgr.ReleaseAll();
+                    _testDbManager.RemoveDatabase(currentDatabaseName);
+
                     Assert.IsTrue(worked);
                 }
             }
             catch (Exception ex)
             {
                 Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());                
-            }
-            finally
-            {                
-                _testDbManager.RemoveDatabase(DbLabDE);
             }
         }
 
@@ -215,27 +214,28 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void TestIDShield_DocumentAttributeSets()
         {
+            string currentDatabaseName = null;
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_IDShield.bak", DbIDShield);
-                _currentDatabaseName = DbIDShield;
-
                 foreach (var kvpFileInfo in IDShieldFileIdToFileInfo)
                 {
                     var fileId = kvpFileInfo.Key;
                     var fi = kvpFileInfo.Value;
+                    currentDatabaseName = fi.DatabaseName;
+                    _testDbManager.GetDatabase("Resources.Demo_IDShield.bak", currentDatabaseName);
 
                     var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
+
+                    FileApiMgr.ReleaseAll();
+                    _testDbManager.RemoveDatabase(currentDatabaseName);
+
                     Assert.IsTrue(worked);
                 }
             }
             catch (Exception ex)
             {
                 Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
-            }
-            finally
-            {
-                _testDbManager.RemoveDatabase(DbIDShield);
             }
         }
 
@@ -245,17 +245,22 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void TestFlexIndex_DocumentAttributeSets()
         {
+            string currentDatabaseName = null;
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_FlexIndex.bak", DbFlexIndex);
-                _currentDatabaseName = DbFlexIndex;
-
                 foreach (var kvpFileInfo in FlexIndexFileIdToFileInfo)
                 {
                     var fileId = kvpFileInfo.Key;
                     var fi = kvpFileInfo.Value;
+                    currentDatabaseName = fi.DatabaseName;
+                    _testDbManager.GetDatabase("Resources.Demo_FlexIndex.bak", currentDatabaseName);
 
                     var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
+
+                    FileApiMgr.ReleaseAll();
+                    _testDbManager.RemoveDatabase(currentDatabaseName);
+
                     Assert.IsTrue(worked);
                 }
             }
@@ -263,23 +268,19 @@ namespace Extract.Web.DocumentAPI.Test
             {
                 Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
             }
-            finally
-            {
-                _testDbManager.RemoveDatabase(DbFlexIndex);
-            }
         }
 
         #endregion Public Test Functions
 
         #region Private functions
 
-        static DocumentAttributeSet GetDocumentResultSet(int fileId)
+        static DocumentAttributeSet GetDocumentResultSet(int fileId, string dbName)
         {
             try
             {
-                Utils.SetDefaultApiContext(_currentDatabaseName);
+                Utils.SetDefaultApiContext(dbName);
 
-                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                using (var data = new DocumentData(ApiUtils.CurrentApiContext, useAttributeDbMgr: true))
                 {
                     Assert.IsTrue(data != null, "null DocumentData reference");
                     return data.GetDocumentResultSet(fileId.ToString());
@@ -593,7 +594,7 @@ namespace Extract.Web.DocumentAPI.Test
         {
             try
             {
-                DocumentAttributeSet das = GetDocumentResultSet(fileId);
+                DocumentAttributeSet das = GetDocumentResultSet(fileId, dbName);
                 Assert.IsTrue(das.Attributes != null, "Didn't get attributes");
 
                 string testXmlFile = _testXmlFiles.GetFile(xmlFile);

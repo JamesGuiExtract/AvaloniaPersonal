@@ -37,19 +37,22 @@ namespace DocumentAPI.Controllers
             {
                 return BadRequest("null Model.User");
             }
-            if (String.IsNullOrEmpty(user.Username))
+            if (String.IsNullOrWhiteSpace(user.Username))
             {
                 return BadRequest("Username is empty");
             }
-            if (String.IsNullOrEmpty(user.Password))
+            if (String.IsNullOrWhiteSpace(user.Password))
             {
                 return BadRequest("Password is empty");
             }
 
-            var userData = new UserData(FileApiMgr.GetInterface(Utils.CurrentApiContext));
+            // The user may have specified a workflow - if so then ensure that the API context uses
+            // the specified workflow.
+            var context = LoginContext(user.WorkflowName);
+            var userData = new UserData(FileApiMgr.GetInterface(context));
             if (userData.MatchUser(user))
             {
-                var token = GenerateToken(user);
+                var token = GenerateToken(user, context);
                 return Ok(token);
             }
 
@@ -60,35 +63,26 @@ namespace DocumentAPI.Controllers
         /// This method creates a JWT
         /// </summary>
         /// <param name="user">the User DTO instance</param>
+        /// <param name="context">the user's context</param>
         /// <returns>JSON-encoded JWT</returns>
-        private string GenerateToken(User user)
+        private string GenerateToken(User user, ApiContext context)
         {
             try
             {
-                String username = user.Username;
-                String password = user.Password;
-                String workflowName = user.WorkflowName;
-
                 var now = DateTime.UtcNow;
 
-                var apiContext = CurrentApiContext;
-
-                // Preserve user-specified workflow if it exists.
-                var namedWorkflow = !String.IsNullOrEmpty(workflowName) ? workflowName : apiContext.WorkflowName;
-
                 // Specifically add the jti (nonce), iat (issued timestamp), and sub (subject/user) claims.
-                // You can add other claims here, if you want:
                 var claims = new Claim[]
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, username),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
 
                     // Add custom claims. The database info is from the current context, while the workflow name may be 
                     // from the user login request.
-                    new Claim("DatabaseServerName", apiContext.DatabaseServerName),
-                    new Claim("DatabaseName", apiContext.DatabaseName),
-                    new Claim("WorkflowName", namedWorkflow)
+                    new Claim("DatabaseServerName", context.DatabaseServerName),
+                    new Claim("DatabaseName", context.DatabaseName),
+                    new Claim("WorkflowName", context.WorkflowName)
                 };
 
                 // Create the JWT and write it to a string

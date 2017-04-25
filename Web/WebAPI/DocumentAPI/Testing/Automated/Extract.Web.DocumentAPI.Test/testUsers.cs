@@ -61,11 +61,13 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_Login()
         {
+            string dbName = DbLabDE + "10";
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                var c = Utils.SetDefaultApiContext();
+                var c = Utils.SetDefaultApiContext(dbName);
                 var fileApi = FileApiMgr.GetInterface(c);
 
                 try
@@ -91,7 +93,7 @@ namespace Extract.Web.DocumentAPI.Test
             finally
             {
                 FileApiMgr.ReleaseAll();
-                _testDbManager.RemoveDatabase(DbLabDE);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 

@@ -6,6 +6,7 @@ using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
 using System.Runtime.InteropServices;
+using ApiUtils = DocumentAPI.Utils;
 using WorkflowType = UCLID_FILEPROCESSINGLib.EWorkflowType;
 
 namespace Extract.Web.DocumentAPI.Test
@@ -64,11 +65,13 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetDefaultWorkflow()
         {
+            string dbName = DbLabDE + "11";
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                var c = Utils.SetDefaultApiContext();
+                var c = Utils.SetDefaultApiContext(dbName);
                 var fileApi = FileApiMgr.GetInterface(c);
 
                 try
@@ -93,7 +96,7 @@ namespace Extract.Web.DocumentAPI.Test
             finally
             {
                 FileApiMgr.ReleaseAll();
-                _testDbManager.RemoveDatabase(DbLabDE);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -103,22 +106,24 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetWorkflowStatus()
         {
+            string dbName = DbLabDE + "12";
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                var c = Utils.SetDefaultApiContext();
+                var c = Utils.SetDefaultApiContext(dbName);
                 FileApiMgr.GetInterface(c);
 
                 try
                 {
-                    var workflowStatus = WorkflowData.GetWorkflowStatus("");
+                    var workflowStatus = WorkflowData.GetWorkflowStatus("", ApiUtils.CurrentApiContext);
                     Assert.IsTrue(workflowStatus.Error.ErrorOccurred == true, "status should have the error flag set and does not");
 
-                    workflowStatus = WorkflowData.GetWorkflowStatus("InvalidWorkflow");
+                    workflowStatus = WorkflowData.GetWorkflowStatus("InvalidWorkflow", ApiUtils.CurrentApiContext);
                     Assert.IsTrue(workflowStatus.Error.ErrorOccurred == true, "status should have the error flag set and does not");
 
-                    workflowStatus = WorkflowData.GetWorkflowStatus("CourtOffice");
+                    workflowStatus = WorkflowData.GetWorkflowStatus("CourtOffice", ApiUtils.CurrentApiContext);
                     Assert.IsTrue(workflowStatus.Error.ErrorOccurred == false, "status should NOT have the error flag set and it is");
                 }
                 catch (Exception)
@@ -133,7 +138,7 @@ namespace Extract.Web.DocumentAPI.Test
             finally
             {
                 FileApiMgr.ReleaseAll();
-                _testDbManager.RemoveDatabase(DbLabDE);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 

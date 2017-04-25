@@ -41,21 +41,21 @@ namespace DocumentAPI.Controllers
         {
             try
             {
-                if (String.IsNullOrEmpty(args.DatabaseServerName))
+                if (String.IsNullOrWhiteSpace(args.DatabaseServerName))
                 {
                     var message = "database server name cannot be empty";
                     Log.WriteLine(message);
                     return BadRequest(message);
                 }
 
-                if (String.IsNullOrEmpty(args.DatabaseName))
+                if (String.IsNullOrWhiteSpace(args.DatabaseName))
                 {
                     var message = "database name cannot be empty";
                     Log.WriteLine(message);
                     return BadRequest(message);
                 }
 
-                if (String.IsNullOrEmpty(args.WorkflowName) )
+                if (String.IsNullOrWhiteSpace(args.WorkflowName) )
                 {
                     var message = "workflow name cannot be empty";
                     Log.WriteLine(message);

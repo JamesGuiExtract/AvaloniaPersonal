@@ -1,13 +1,8 @@
-﻿using System;
-using System.Configuration;
-using System.Diagnostics;
+﻿using DocumentAPI.Models;
+using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Threading;
-
-using NUnit.Framework;
 using ApiUtils = DocumentAPI.Utils;
-using DocumentAPI.Models;
 
 namespace Extract.Web.DocumentAPI.Test
 {
@@ -52,7 +47,7 @@ namespace Extract.Web.DocumentAPI.Test
         /// <param name="databaseName"></param>
         /// <param name="databaseServer"></param>
         /// <param name="workflowName"></param>
-        public static ApiContext SetDefaultApiContext(string databaseName = DbDemoLabDE, 
+        public static ApiContext SetDefaultApiContext(string databaseName, 
                                                       string databaseServer = "(local)", 
                                                       string workflowName = "CourtOffice")
         {

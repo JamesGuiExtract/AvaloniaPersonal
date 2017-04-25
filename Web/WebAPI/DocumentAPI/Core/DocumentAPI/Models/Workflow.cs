@@ -46,12 +46,12 @@ namespace DocumentAPI.Models
         {
             get
             {
-                Contract.Assert(!String.IsNullOrEmpty(_name), "Attempt to get: {0}, bad value: {1}", GetMethodName(), _name);
+                Contract.Assert(!String.IsNullOrWhiteSpace(_name), "Attempt to get: {0}, bad value: {1}", GetMethodName(), _name);
                 return _name;
             }
             private set
             {
-                Contract.Assert(!String.IsNullOrEmpty(value), "Attempt to set: {0}, to bad value: {1}", GetMethodName(), value);
+                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set: {0}, to bad value: {1}", GetMethodName(), value);
                 _name = value;
             }
         }
@@ -147,7 +147,7 @@ namespace DocumentAPI.Models
             }
             private set
             {
-                Contract.Assert(!String.IsNullOrEmpty(value), "DocumentFolder is a required value and cannot be empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(value), "DocumentFolder is a required value and cannot be empty");
                 _documentFolder = value;
             }
         }
@@ -163,7 +163,7 @@ namespace DocumentAPI.Models
             }
             private set
             {
-                Contract.Assert(!String.IsNullOrEmpty(value), "OutputAttributeSet is a required value and cannot be empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(value), "OutputAttributeSet is a required value and cannot be empty");
                 _outputAttributeSet = value;
             }
         }
@@ -191,12 +191,12 @@ namespace DocumentAPI.Models
         {
             get
             {
-                Contract.Assert(!String.IsNullOrEmpty(_databaseServerName), "DatabaseServerName is empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(_databaseServerName), "DatabaseServerName is empty");
                 return _databaseServerName;
             }
             private set
             {
-                Contract.Assert(!String.IsNullOrEmpty(value), "Attempt to set DatabaseServerName to an empty value");
+                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set DatabaseServerName to an empty value");
                 _databaseServerName = value;
             }
         }
@@ -208,12 +208,12 @@ namespace DocumentAPI.Models
         {
             get
             {
-                Contract.Assert(!String.IsNullOrEmpty(_databaseName), "DatabaseName is empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(_databaseName), "DatabaseName is empty");
                 return _databaseName;
             }
             private set
             {
-                Contract.Assert(!String.IsNullOrEmpty(value), "Attempt to set DatabaseName to an empty value");
+                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set DatabaseName to an empty value");
                 _databaseName = value;
             }
         }

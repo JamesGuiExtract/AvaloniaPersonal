@@ -38,7 +38,7 @@ namespace DocumentAPI.Models
 
                 // Here when login worked - now check the Workflow name
                 var workflowName = user.WorkflowName;
-                if (!String.IsNullOrEmpty(workflowName))
+                if (!String.IsNullOrWhiteSpace(workflowName))
                 {
                     return FindAssociatedWorkflow(workflowName);
                 }

@@ -67,38 +67,43 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_SubmitFile()
         {
+            string dbName = DbLabDE + "3";
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                Utils.SetDefaultApiContext();
+                Utils.SetDefaultApiContext(dbName);
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 var stream = new FileStream(filename, FileMode.Open);
 
-                var result = DocumentData.SubmitFile(filename, stream).Result;
-                Assert.IsTrue(result != null, "Null result returned from submitfile");
+                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                {
+                    var result = data.SubmitFile(filename, stream).Result;
+                    Assert.IsTrue(result != null, "Null result returned from submitfile");
 
-                var fileId = DocumentData.ConvertIdToFileId(result.Id);
-                Assert.IsTrue(fileId > 0, "Bad value for fileId: {0}", fileId);
-                Assert.IsTrue(result.Error.ErrorOccurred == false, "An error has been signaled");
+                    var fileId = DocumentData.ConvertIdToFileId(result.Id);
+                    Assert.IsTrue(fileId > 0, "Bad value for fileId: {0}", fileId);
+                    Assert.IsTrue(result.Error.ErrorOccurred == false, "An error has been signaled");
 
-                // It is OK to re-submit - the web service writes a unique filename, based on the submitted filename,
-                // so test this as well.
-                var result2 = DocumentData.SubmitFile(filename, stream).Result;
-                Assert.IsTrue(result2 != null, "Null result returned from second submitfile");
+                    // It is OK to re-submit - the web service writes a unique filename, based on the 
+                    // submitted filename, so test this as well.
+                    var result2 = data.SubmitFile(filename, stream).Result;
+                    Assert.IsTrue(result2 != null, "Null result returned from second submitfile");
 
-                var (sourceFilename, errMsg, err) = DocumentData.GetSourceFileName(result.Id);
-                Assert.IsTrue(err != true, "Error signaled by GetSourceFileName, fileId: {0}", result.Id);
-                Assert.IsTrue(String.IsNullOrEmpty(errMsg), "An error message was returned: {0}", errMsg);
+                    var (sourceFilename, errMsg, err) = data.GetSourceFileName(result.Id);
+                    Assert.IsTrue(err != true, "Error signaled by GetSourceFileName, fileId: {0}", result.Id);
+                    Assert.IsTrue(String.IsNullOrEmpty(errMsg), "An error message was returned: {0}", errMsg);
 
-                // Can't directly test that filenames are equivalent, because the web service takes the base filename
-                // and adds a GUID to it, so test that the returned filename contains the original filename.
-                var originalFilename = Path.GetFileNameWithoutExtension(filename);
-                Assert.IsTrue(sourceFilename.Contains(originalFilename),
-                              "source filename: {0}, not equal to original filename: {1}",
-                              sourceFilename,
-                              filename);
+                    // Can't directly test that filenames are equivalent, because the web service takes the base filename
+                    // and adds a GUID to it, so test that the returned filename contains the original filename.
+                    var originalFilename = Path.GetFileNameWithoutExtension(filename);
+                    Assert.IsTrue(sourceFilename.Contains(originalFilename),
+                                  "source filename: {0}, not equal to original filename: {1}",
+                                  sourceFilename,
+                                  filename);
+                }
             }
             catch (Exception ex)
             {
@@ -108,7 +113,7 @@ namespace Extract.Web.DocumentAPI.Test
             finally
             {
                 FileApiMgr.ReleaseAll();
-                _testDbManager.RemoveDatabase(DbLabDE);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -118,20 +123,25 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_SubmitText()
         {
+            string dbName = DbLabDE + "4";
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                Utils.SetDefaultApiContext();
+                Utils.SetDefaultApiContext(dbName);
 
-                var result = DocumentData.SubmitText("Document 1, SSN: 111-22-3333, DOB: 10-04-1999").Result;
-                var fileId = DocumentData.ConvertIdToFileId(result.Id);
-                Assert.IsTrue(fileId > 0, "Bad value for fileId: {0}", fileId);
-                Assert.IsTrue(result.Error.ErrorOccurred == false, "An error has been signaled");
+                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                {
+                    var result = data.SubmitText("Document 1, SSN: 111-22-3333, DOB: 10-04-1999").Result;
+                    var fileId = DocumentData.ConvertIdToFileId(result.Id);
+                    Assert.IsTrue(fileId > 0, "Bad value for fileId: {0}", fileId);
+                    Assert.IsTrue(result.Error.ErrorOccurred == false, "An error has been signaled");
 
-                var (sourceFilename, errMsg, err) = DocumentData.GetSourceFileName(result.Id);
-                Assert.IsTrue(err != true, "Error signaled by GetSourceFileName, fileId: {0}", result.Id);
-                Assert.IsTrue(String.IsNullOrEmpty(errMsg), "An error message was returned: {0}", errMsg);
+                    var (sourceFilename, errMsg, err) = data.GetSourceFileName(result.Id);
+                    Assert.IsTrue(err != true, "Error signaled by GetSourceFileName, fileId: {0}", result.Id);
+                    Assert.IsTrue(String.IsNullOrEmpty(errMsg), "An error message was returned: {0}", errMsg);
+                }
             }
             catch (Exception ex)
             {
@@ -141,11 +151,11 @@ namespace Extract.Web.DocumentAPI.Test
             finally
             {
                 FileApiMgr.ReleaseAll();
-                _testDbManager.RemoveDatabase(DbLabDE);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
-        static void UpdateWorkflowFileTable()
+        static void UpdateWorkflowFileTable(string dbName)
         {
             try
             {
@@ -153,7 +163,7 @@ namespace Extract.Web.DocumentAPI.Test
                 {
                     // NOTE: "Pooling=false;" keeps the connection from being pooled, and 
                     // allows the conneciton to REALLY close, so the DB can be removed later.
-                    string connectionString = "Server=(local);Database=Demo_LabDE_Temp;Trusted_Connection=True;Pooling=false;";
+                    string connectionString = "Server=(local);Database=" + dbName + ";Trusted_Connection=True;Pooling=false;";
                     using (var conn = new SqlConnection(connectionString))
                     {
                         conn.Open();
@@ -184,19 +194,25 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetStatus()
         {
+            string dbName = DbLabDE + "5";
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
-                UpdateWorkflowFileTable();
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
+                UpdateWorkflowFileTable(dbName);
 
-                Utils.SetDefaultApiContext();
+                Utils.SetDefaultApiContext(dbName);
 
-                for (int i = 1; i <= 10; ++i)
+                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
                 {
-                    var result = DocumentData.GetStatus(stringId: i.ToString());
-                    Assert.IsTrue(result.Count > 0, "Empty result was returned");
-                    var status = result[0];
-                    Assert.IsTrue(status.DocumentStatus == DocumentProcessingStatus.Processing, "Unexpected processing state");
+                    for (int i = 1; i <= 10; ++i)
+                    {
+                        var result = data.GetStatus(stringId: i.ToString());
+                        Assert.IsTrue(result.Count > 0, "Empty result was returned");
+                        var status = result[0];
+                        Assert.IsTrue(status.DocumentStatus == DocumentProcessingStatus.Processing, 
+                                      "Unexpected processing state");
+                    }
                 }
             }
             catch (Exception ex)
@@ -207,7 +223,7 @@ namespace Extract.Web.DocumentAPI.Test
             finally
             {
                 FileApiMgr.ReleaseAll();
-                _testDbManager.RemoveDatabase(DbLabDE);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -218,18 +234,23 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetFileResult()
         {
+            string dbName = DbLabDE + "6";
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                Utils.SetDefaultApiContext();
-                
-                for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
+                Utils.SetDefaultApiContext(dbName);
+
+                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
                 {
-                    var (filename, isError, errMessage) = DocumentData.GetResult(id: i.ToString());
-                    Assert.IsTrue(!String.IsNullOrEmpty(filename), "Empty filename returned");
-                    Assert.IsTrue(!isError, "An error was signaled");
-                    Assert.IsTrue(String.IsNullOrEmpty(errMessage), "An error message was returned");
+                    for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
+                    {
+                        var (filename, isError, errMessage) = data.GetResult(id: i.ToString());
+                        Assert.IsTrue(!String.IsNullOrEmpty(filename), "Empty filename returned");
+                        Assert.IsTrue(!isError, "An error was signaled");
+                        Assert.IsTrue(String.IsNullOrEmpty(errMessage), "An error message was returned");
+                    }
                 }
             }
             catch (Exception ex)
@@ -240,11 +261,11 @@ namespace Extract.Web.DocumentAPI.Test
             finally
             {
                 FileApiMgr.ReleaseAll();
-                _testDbManager.RemoveDatabase(DbLabDE);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
-        static void SetupTextResultTest(string filename)
+        static void SetupTextResultTest(string filename, string dbName)
         {
             try
             {
@@ -252,7 +273,7 @@ namespace Extract.Web.DocumentAPI.Test
                 {
                     // NOTE: "Pooling=false;" keeps the connection from being pooled, and 
                     // allows the conneciton to REALLY close, so the DB can be removed later.
-                    string connectionString = "Server=(local);Database=Demo_LabDE_Temp;Trusted_Connection=True;Pooling=false;";
+                    string connectionString = "Server=(local);Database=" + dbName + ";Trusted_Connection=True;Pooling=false;";
                     using (var conn = new SqlConnection(connectionString))
                     {
                         conn.Open();
@@ -275,18 +296,23 @@ namespace Extract.Web.DocumentAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetTextResult()
         {
+            string dbName = DbLabDE + "8";
+
             try
             {   
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
                 var filename = _testFiles.GetFile("Resources.ResultText.txt");
-                SetupTextResultTest(filename);
+                SetupTextResultTest(filename, dbName);
 
-                Utils.SetDefaultApiContext();
+                Utils.SetDefaultApiContext(dbName);
 
-                var result = DocumentData.GetTextResult(textId: "1").Result;
-                Assert.IsTrue(result.Error.ErrorOccurred == false, "error is indicated");
-                Assert.IsTrue(String.IsNullOrEmpty(result.Error.Message), "error, message: {0}", result.Error.Message);
+                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                {
+                    var result = data.GetTextResult(textId: "1").Result;
+                    Assert.IsTrue(result.Error.ErrorOccurred == false, "error is indicated");
+                    Assert.IsTrue(String.IsNullOrEmpty(result.Error.Message), "error, message: {0}", result.Error.Message);
+                }
             }
             catch (Exception ex)
             {
@@ -296,36 +322,38 @@ namespace Extract.Web.DocumentAPI.Test
             finally
             {
                 FileApiMgr.ReleaseAll();
-                _testDbManager.RemoveDatabase(DbLabDE);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
         [Test, Category("Automated")]
         public static void Test_GetDocumentType()
         {
+            string dbName = DbLabDE + "9";
+
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", DbLabDE);
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                Utils.SetDefaultApiContext();
+                Utils.SetDefaultApiContext(dbName);
 
-                for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
+                using (var data = new DocumentData(ApiUtils.CurrentApiContext, useAttributeDbMgr: true))
                 {
-                    using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                    for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                     {
-                        var docType = data.GetDocumentType(id: i.ToString());
-                        Assert.IsTrue(!String.IsNullOrEmpty(docType));
+                         var docType = data.GetDocumentType(id: i.ToString());
+                         Assert.IsTrue(!String.IsNullOrEmpty(docType));
 
-                        switch (i)
-                        {
-                            case 6:
-                            case 8:
-                                Assert.IsTrue(docType.IsEquivalent("NonLab"), "Document type expected to be NonLab, is: {0}", docType);
-                                break;
+                         switch (i)
+                         {
+                             case 6:
+                             case 8:
+                                 Assert.IsTrue(docType.IsEquivalent("NonLab"), "Document type expected to be NonLab, is: {0}", docType);
+                                 break;
 
-                            default:
-                                Assert.IsTrue(docType.IsEquivalent("Unknown"), "Document type expected to be Unknown, is: {0}", docType);
-                                break;
+                             default:
+                                 Assert.IsTrue(docType.IsEquivalent("Unknown"), "Document type expected to be Unknown, is: {0}", docType);
+                                 break;
                         }
                     }
                 }
@@ -338,7 +366,7 @@ namespace Extract.Web.DocumentAPI.Test
             finally
             {
                 FileApiMgr.ReleaseAll();
-                _testDbManager.RemoveDatabase(DbLabDE);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 

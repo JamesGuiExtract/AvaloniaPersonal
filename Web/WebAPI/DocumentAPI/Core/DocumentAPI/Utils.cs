@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 
 namespace DocumentAPI
 {
@@ -270,16 +271,6 @@ namespace DocumentAPI
         }
 
         /// <summary>
-        /// This is a little adapter function to allow the token provider to be configured to get the current API context.
-        /// </summary>
-        /// <returns></returns>
-        public static Tuple<string, string, string> GetCurrentApiContext()
-        {
-            var context = CurrentApiContext;
-            return Tuple.Create(context.DatabaseServerName, context.DatabaseName, context.WorkflowName);
-        }
-
-        /// <summary>
         /// set the default API context instance
         /// </summary>
         /// <param name="databaseServerName">database server name</param>
@@ -346,6 +337,43 @@ namespace DocumentAPI
                 return "ESWebClients";
             }
         }
-            
+
+        /// <summary>
+        /// create an ApiContext object from Claims.
+        /// The JWT is expected to have non-empty values for all of the API context members
+        /// NOTE: This function is only intended for use by Controller methods
+        /// </summary>
+        /// <param name="user">the Controller.User instance</param>
+        /// <returns> an API context object</returns>
+        public static ApiContext ClaimsToContext(ClaimsPrincipal user)
+        {
+            var workflowName  = user.Claims.Where(claim => claim.Type == "WorkflowName").Select(claim => claim.Value).First();
+            var databaseServerName = user.Claims.Where(claim => claim.Type == "DatabaseServerName").Select(claim => claim.Value).First();
+            var databaseName = user.Claims.Where(claim => claim.Type == "DatabaseName").Select(claim => claim.Value).First();
+
+            Contract.Assert(!String.IsNullOrWhiteSpace(databaseServerName), "Database server name is empty, from Claims");
+            Contract.Assert(!String.IsNullOrWhiteSpace(databaseName), "Database name is empty, from Claims");
+            Contract.Assert(!String.IsNullOrWhiteSpace(workflowName), "Workflow name is empty, from Claims");
+
+            return new ApiContext(databaseServerName, databaseName, workflowName);
+        }
+
+        /// <summary>
+        /// create an ApiContext object.
+        /// </summary>
+        /// <param name="workflowName">the user-specified workflow name</param>
+        /// <returns> an API context object</returns>
+        public static ApiContext LoginContext(string workflowName)
+        {
+            // Get the current API context once to ensure thread safety.
+            var context = CurrentApiContext;
+
+            var databaseServerName = context.DatabaseServerName;
+            var databaseName = context.DatabaseName;
+
+            var namedWorkflow = !String.IsNullOrWhiteSpace(workflowName) ? workflowName : context.WorkflowName;
+
+            return new ApiContext(databaseServerName, databaseName, namedWorkflow);
+        }
     }
 }

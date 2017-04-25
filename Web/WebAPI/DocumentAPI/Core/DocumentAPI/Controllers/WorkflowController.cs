@@ -1,4 +1,5 @@
 ﻿using DocumentAPI.Models;
+using static DocumentAPI.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,11 +16,11 @@ namespace DocumentAPI.Controllers
         /// get status of specified workflow
         /// </summary>
         /// <param name="workflowName"></param>
-        /// <returns></returns>
+        /// <returns>a workflow status object</returns>
         [HttpGet("GetWorkflowStatus/{workflowName}")]
         public WorkflowStatus GetWorkflowStatus(string workflowName)
         {
-            return WorkflowData.GetWorkflowStatus(workflowName);
+            return WorkflowData.GetWorkflowStatus(workflowName, ClaimsToContext(User));
         }
     }
 }

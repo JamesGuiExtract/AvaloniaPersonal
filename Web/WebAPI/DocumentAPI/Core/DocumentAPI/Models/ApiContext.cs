@@ -37,12 +37,12 @@ namespace DocumentAPI.Models
         {
             get
             {
-                Contract.Assert(!String.IsNullOrEmpty(_databaseServerName), "Database server name is empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(_databaseServerName), "Database server name is empty");
                 return _databaseServerName;
             }
             set
             {
-                Contract.Assert(!String.IsNullOrEmpty(value), "Attempt to set an empty database server name");
+                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set an empty database server name");
                 _databaseServerName = value;
             }
         }
@@ -54,12 +54,12 @@ namespace DocumentAPI.Models
         {
             get
             {
-                Contract.Assert(!String.IsNullOrEmpty(_databaseName), "Database name is empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(_databaseName), "Database name is empty");
                 return _databaseName;
             }
             set
             {
-                Contract.Assert(!String.IsNullOrEmpty(value), "Attempt to set an empty database name");
+                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set an empty database name");
                 _databaseName = value;
             }
         }
@@ -71,12 +71,12 @@ namespace DocumentAPI.Models
         {
             get
             {
-                Contract.Assert(!String.IsNullOrEmpty(_workflowName), "Workflow name is empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(_workflowName), "Workflow name is empty");
                 return _workflowName;
             }
             set
             {
-                Contract.Assert(!String.IsNullOrEmpty(value), "Attempt to set an empty workflow name");
+                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set an empty workflow name");
                 _workflowName = value;
             }
         }

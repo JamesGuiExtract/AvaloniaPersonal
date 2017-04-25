@@ -13,23 +13,23 @@ namespace DocumentAPI.Models
         /// get the workflow status
         /// </summary>
         /// <param name="workflowName">workflow name</param>
+        /// <param name="apiContext">User's API context</param>
         /// <returns>WorkflowStatus object</returns>
-        public static WorkflowStatus GetWorkflowStatus(string workflowName)
+        public static WorkflowStatus GetWorkflowStatus(string workflowName, ApiContext apiContext)
         {
             FileApi fileApi = null;
 
             try
             {
-                if (String.IsNullOrEmpty(workflowName))
+                if (String.IsNullOrWhiteSpace(workflowName))
                 {
                     return MakeWorkflowStatusError("workFlowName argument is empty");
                 }
 
-                // The workflow name specified might be the name used in the current api context, 
+                // The workflow name specified might be the name used in the (user-specified) api context, 
                 // or it could be a different workflow name. Treat it as if it were different; if not,
                 // no problem. If the workflowName specified is not valid, this will be determined
                 // by FileApiMgr.GetInterface below.
-                var apiContext = CurrentApiContext;
                 var context = new ApiContext(apiContext.DatabaseServerName, apiContext.DatabaseName, workflowName);
     
                 // Two possibilites here: 

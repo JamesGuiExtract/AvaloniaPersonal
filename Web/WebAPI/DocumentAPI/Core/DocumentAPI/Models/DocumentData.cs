@@ -19,7 +19,6 @@ namespace DocumentAPI.Models
     /// </summary>
     public sealed class DocumentData: IDisposable
     {
-        ApiContext _apiContext;
         AttributeDBMgr _attributeDbMgr;
         FileApi _fileApi;
 
@@ -27,19 +26,24 @@ namespace DocumentAPI.Models
         /// CTOR - this should be used only inside a using statement, so the fileApi in-use flag can be cleared.
         /// </summary>
         /// <Comment>Any use of the CTOR MUST be inside a using statement, to ensure Dispose() is called!</Comment>
-        /// <param name="apiContext">context instance</param>
-        public DocumentData(ApiContext apiContext)
+        /// <param name="userContext">user's context instance (from the JWT claims)</param>
+        /// <param name="useAttributeDbMgr">defaults to false. Set this to true to create the attribute manager
+        /// (only needed for calls to GetDocumentResultSet and GetDocumentType)</param>
+        public DocumentData(ApiContext userContext, bool useAttributeDbMgr = false)
         {
             try
             {
-                Contract.Assert(apiContext != null, "attempted to set a null API context");
-                _apiContext = apiContext;
-                _fileApi = FileApiMgr.GetInterface(apiContext);
-                _attributeDbMgr = new AttributeDBMgr();
-                Contract.Assert(_attributeDbMgr != null, "Failure to create attributeDbMgr!");
+                // NOTE: By setting _fileApi using the userContext, which comes directly from the JWT Claims, then
+                // all references to context values on _fileApi are context values from the JWT.
+                _fileApi = FileApiMgr.GetInterface(userContext);
 
-                _attributeDbMgr.FAMDB = _fileApi.Interface;
+                if (useAttributeDbMgr)
+                {
+                    _attributeDbMgr = new AttributeDBMgr();
+                    Contract.Assert(_attributeDbMgr != null, "Failure to create attributeDbMgr!");
 
+                    _attributeDbMgr.FAMDB = _fileApi.Interface;
+                }
             }
             catch (Exception ex)
             {
@@ -55,7 +59,6 @@ namespace DocumentAPI.Models
         /// </summary>
         public void Dispose()
         {
-            _apiContext = null;
             _attributeDbMgr = null;
             
             // Allow the fileApi object to be reused by clearing the InUse flag.
@@ -67,6 +70,7 @@ namespace DocumentAPI.Models
         /// get the document attribute set
         /// </summary>
         /// <returns>DocumentAttributeSet instance, including error info iff there is an error</returns>
+        /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
         public DocumentAttributeSet GetDocumentResultSet(string id)
         {
             try
@@ -88,7 +92,8 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="id">file id</param>
         /// <returns>IUnknownVector (attribute)</returns>
-        public IUnknownVector GetAttributeSetForFile(string id)
+        /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
+        IUnknownVector GetAttributeSetForFile(string id)
         {
             try
             {
@@ -96,6 +101,11 @@ namespace DocumentAPI.Models
                 const int mostRecentSet = -1;
 
                 var attrSetName = _fileApi.GetWorkflow.OutputAttributeSet;
+
+                Contract.Assert(!String.IsNullOrWhiteSpace(attrSetName), 
+                                "the workflow: {0}, has OutputAttributeSet that is empty", 
+                                _fileApi.GetWorkflow.Name);
+                Contract.Assert(_attributeDbMgr != null, "_attributeDbMgr is null");
 
                 var results = _attributeDbMgr.GetAttributeSetForFile(fileID: fileId,
                                                                      attributeSetName: attrSetName,
@@ -120,11 +130,13 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="id">file id</param>
         /// <returns>file Id (integer)</returns>
+        /// <remarks>This is public so that a unit test can use it; 
+        /// otherwise this function is only referenced from this class.</remarks>
         static public int ConvertIdToFileId(string id)
         {
             try
             {
-                Contract.Assert(!String.IsNullOrEmpty(id), "id is empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(id), "id is empty");
 
                 int startPosition;
                 string value;
@@ -138,7 +150,7 @@ namespace DocumentAPI.Models
                     preamble = "Text";
                 }
 
-                if (!String.IsNullOrEmpty(preamble))
+                if (!String.IsNullOrWhiteSpace(preamble))
                 {
                     startPosition = id.IndexOf(preamble, startIndex: 0, comparisonType: StringComparison.OrdinalIgnoreCase);
                     value = id.Remove(startPosition, preamble.Length);
@@ -171,20 +183,18 @@ namespace DocumentAPI.Models
         /// <param name="fileName">file name</param>
         /// <param name="fileStream">filestream object</param>
         /// <returns>DocumentSubmitResult instance that contains error info iff an error occurs</returns>
-        static public async  Task<DocumentSubmitResult> SubmitFile(string fileName, Stream fileStream)
+        public async Task<DocumentSubmitResult> SubmitFile(string fileName, Stream fileStream)
         {
-            var fileApi = FileApiMgr.GetInterface(Utils.CurrentApiContext);
-
             try
             {
-                if (String.IsNullOrEmpty(fileName))
+                if (String.IsNullOrWhiteSpace(fileName))
                 {
                     return MakeDocumentSubmitResult(fileId: -1, isError: true, message: "File name is empty", code: -1);
                 }
 
-                var workflow = fileApi.GetWorkflow;
+                var workflow = _fileApi.GetWorkflow;
                 var uploads = workflow.DocumentFolder;
-                Contract.Assert(!String.IsNullOrEmpty(uploads), "folder path is null or empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(uploads), "folder path is null or empty");
 
                 if (!Directory.Exists(uploads))
                 {
@@ -199,17 +209,12 @@ namespace DocumentAPI.Models
                     fs.Close();
                 }
 
-                return AddFile(fileApi, fullPath, "ELI42148");
+                return AddFile(fullPath, "ELI42148");
             }
             catch (Exception ex)
             {
                 Log.WriteLine(Inv($"Error: {ex.Message}"));
                 return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
-            }
-            finally
-            {
-                // return the fileApi object to the pool
-                fileApi.InUse = false;
             }
         }
 
@@ -221,9 +226,11 @@ namespace DocumentAPI.Models
         /// <param name="path">The path of the file</param>
         /// <param name="filename">The (base) name of the file, including extension</param>
         /// <returns>a filename that can be used safely</returns>
-        public static string GetSafeFilename(string path, string filename)
+        static string GetSafeFilename(string path, string filename)
         {
-            Contract.Assert(!String.IsNullOrEmpty(path) && !String.IsNullOrEmpty(filename), "Either path or filename is empty");
+            Contract.Assert(!String.IsNullOrWhiteSpace(path) && 
+                            !String.IsNullOrWhiteSpace(filename), 
+                            "Either path or filename is empty");
 
             string nameOnly = Path.GetFileNameWithoutExtension(filename);
             string extension = Path.GetExtension(filename);
@@ -237,23 +244,21 @@ namespace DocumentAPI.Models
         /// <summary>
         /// Add file - this encapsulates fileProcessingDB.AddFile
         /// </summary>
-        /// <param name="fileApi">file API, contains all the API context and workflow</param>
         /// <param name="fullPath">path + filename - path is expected to exist at this point</param>
         /// <param name="eliCode">eliCode from caller</param>
         /// <param name="submitType">File or Text - affects the return value: [File|Text]+Id</param>
         /// <param name="caller">Set by runtime - do NOT pass this argument!</param>
         /// <returns>DocumentSubmitresult instance that contains error info iff an error has occurred</returns>
-        static public DocumentSubmitResult AddFile(FileApi fileApi,
-                                                   string fullPath,
-                                                   string eliCode,
-                                                   DocumentSubmitType submitType = DocumentSubmitType.File,
-                                                   [CallerMemberName] string caller = null)
+        public DocumentSubmitResult AddFile(string fullPath,
+                                            string eliCode,
+                                            DocumentSubmitType submitType = DocumentSubmitType.File,
+                                            [CallerMemberName] string caller = null)
         {
             try
             {
                 // Now add the file to the FAM queue
-                var fileProcessingDB = fileApi.Interface;
-                var workflow = fileApi.GetWorkflow;
+                var fileProcessingDB = _fileApi.Interface;
+                var workflow = _fileApi.GetWorkflow;
 
                 var fileRecord =
                     fileProcessingDB.AddFile(fullPath,                                                 // full path to file
@@ -288,15 +293,13 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="submittedText">text to submit</param>
         /// <returns>DocumentSubmitResult instance that contains error info iff an error occurs</returns>
-        static public async Task<DocumentSubmitResult> SubmitText(string submittedText)
+        public async Task<DocumentSubmitResult> SubmitText(string submittedText)
         {
-            var fileApi = FileApiMgr.GetInterface(Utils.CurrentApiContext);
-
             try
             {
-                var workflow = fileApi.GetWorkflow; 
+                var workflow = _fileApi.GetWorkflow; 
                 var uploads = workflow.DocumentFolder;
-                Contract.Assert(!String.IsNullOrEmpty(uploads), "folder path is null or empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(uploads), "folder path is null or empty");
 
                 if (!Directory.Exists(uploads))
                 {
@@ -312,16 +315,12 @@ namespace DocumentAPI.Models
                     fs.Close();
                 }
 
-                return AddFile(fileApi, fullPath, "ELI42108", DocumentSubmitType.Text);
+                return AddFile(fullPath, "ELI42108", DocumentSubmitType.Text);
             }
             catch (Exception ex)
             {
                 Log.WriteLine(Inv($"Error: {ex.Message}"));
                 return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
-            }
-            finally
-            {
-                fileApi.InUse = false;
             }
         }
 
@@ -330,18 +329,14 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="stringId">file id</param>
         /// <returns>List of ProcessingStatus, can contain error info</returns>
-        static public List<ProcessingStatus> GetStatus(string stringId)
+        public List<ProcessingStatus> GetStatus(string stringId)
         {
-            var fileApi = FileApiMgr.GetInterface(Utils.CurrentApiContext);
-
             try
             {
-                var fileProcessingDB = fileApi.Interface;
-                Contract.Assert(fileProcessingDB != null, "fileProcessingDB is null, cannot submit text file to FAM queue");
+                var fileProcessingDB = _fileApi.Interface;
 
-                int fileId = DocumentData.ConvertIdToFileId(stringId);
+                int fileId = ConvertIdToFileId(stringId);
                 EActionStatus status = EActionStatus.kActionFailed;
-                var workflow = fileApi.GetWorkflow;
 
                 try
                 {
@@ -372,10 +367,6 @@ namespace DocumentAPI.Models
                                                  message: ex.Message,
                                                  code: -1));
             }
-            finally
-            {
-                fileApi.InUse = false;
-            }
         }
 
 
@@ -402,14 +393,13 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="Id">file id</param>
         /// <returns>the full path + filename of the original source file</returns>
-        static public (string filename, string errorMessage, bool error) GetSourceFileName(string Id)
+        public (string filename, string errorMessage, bool error) GetSourceFileName(string Id)
         {
             string filename = "";
-            var fileApi = FileApiMgr.GetInterface(Utils.CurrentApiContext);
 
             try
             {
-                var fileProcessingDB = fileApi.Interface;
+                var fileProcessingDB = _fileApi.Interface;
                 Contract.Assert(fileProcessingDB != null, "null fileProcessingDb, cannot add file to FAM queue");
 
                 var fileId = ConvertIdToFileId(Id);
@@ -423,14 +413,10 @@ namespace DocumentAPI.Models
                 var message = ee.Message + ", " + Inv($"while getting filename from fileId: {Id}");
                 return (filename: "", errorMessage: message, error: true);
             }
-            finally
-            {
-                fileApi.InUse = false;
-            }
 
             try
             {
-                Contract.Assert(!String.IsNullOrEmpty(filename), "Error getting the filename for fileId: {0}", Id);
+                Contract.Assert(!String.IsNullOrWhiteSpace(filename), "Error getting the filename for fileId: {0}", Id);
 
                 if (!System.IO.File.Exists(filename))
                 {
@@ -454,18 +440,17 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="id">the database file id to use</param>
         /// <returns>returns a tuple of filename, error flag, error message</returns>
-        static public (string filename, bool error, string errorMessage) GetResult(string id)
+        public (string filename, bool error, string errorMessage) GetResult(string id)
         {
             var fileId = DocumentData.ConvertIdToFileId(id);
-            var fileApi = FileApiMgr.GetInterface(Utils.CurrentApiContext);
-            var getFileTag = fileApi.GetWorkflow.OutputFileMetadataField;
-            Contract.Assert(!String.IsNullOrEmpty(getFileTag), "Workflow does not have a defined OutputFileMetaDataField");
+            var getFileTag = _fileApi.GetWorkflow.OutputFileMetadataField;
+            Contract.Assert(!String.IsNullOrWhiteSpace(getFileTag), "Workflow does not have a defined OutputFileMetaDataField");
 
             string filename = "";
 
             try
             {
-                filename = fileApi.Interface.GetMetadataFieldValue(fileId, getFileTag);
+                filename = _fileApi.Interface.GetMetadataFieldValue(fileId, getFileTag);
             }
             catch (Exception ex)
             {
@@ -476,12 +461,8 @@ namespace DocumentAPI.Models
 
                 return (filename, error: true, errorMessage: ee.Message);
             }
-            finally
-            {
-                fileApi.InUse = false;
-            }
 
-            if (String.IsNullOrEmpty(filename))
+            if (String.IsNullOrWhiteSpace(filename))
             {
                 return (filename: "", error: true, errorMessage: Inv($"No result file exists for id: {id}"));
             }
@@ -494,7 +475,7 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="textId">file id</param>
         /// <returns>TextResult instance, may contain error info</returns>
-        static public async Task<TextResult> GetTextResult(string textId)
+        public async Task<TextResult> GetTextResult(string textId)
         {
             try
             {
@@ -545,6 +526,7 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="attributes">UnknwonVector containing atribute</param>
         /// <returns>returns the value of the DocumentType attribute, or "Unknown"</returns>
+        /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
         static string GetDocumentType(IIUnknownVector attributes)
         {
             try
