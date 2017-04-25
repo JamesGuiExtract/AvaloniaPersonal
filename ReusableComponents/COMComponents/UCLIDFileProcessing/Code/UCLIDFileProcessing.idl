@@ -1942,6 +1942,13 @@ library UCLID_FILEPROCESSINGLib
 		//			nSourceWorkflowID = -1 will be to only move files that have not been assigned to any workflow
 		[id(185), helpstring("method MoveFilesToWorkflowFromQuery")] HRESULT MoveFilesToWorkflowFromQuery(
 			[in] BSTR bstrQuery, [in] long nSourceWorkflowID, [in] long nDestWorkflowID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Gets the value of first attribute matching the specified attribute path in the
+		//			specified attribute set for the specified file or blank if the specified attribute
+		//			does not exist in the database.
+		[id(186), helpstring("method GetAttributeValue")] HRESULT GetAttributeValue(
+			[in] BSTR bstrSourceDocName, [in] BSTR bstrAttributeSetName, [in] BSTR bstrAttributePath,
+			[out, retval] BSTR* pbstrValue);
 	};
 
 	[
@@ -2407,12 +2414,21 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Refreshes context tag info based on current FPSFileDir from ContextTags.sdf.
 		[id(17), helpstring("method RefreshContextTags")] HRESULT RefreshContextTags();
+		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Sets and gets the Current workflow
 		[propget, id(18), helpstring("property Workflow")] HRESULT Workflow([out, retval] BSTR *strWorkflow);
 		[propput, id(18), helpstring("property Workflow")] HRESULT Workflow([in] BSTR strWorkflow);
+		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Returns a cloned FAMTagManager that has the workflow set to the workflow provided
 		[id(19), helpstring("method GetFAMTagManagerWithWorkflow")] HRESULT GetFAMTagManagerWithWorkflow(
 			[in] BSTR bstrWorkflow, [out, retval] IFAMTagManager** ppFAMTagManager);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Provides the FileProcessingDB instance that is used to expand $Metadata path
+		// tag functions.
+		[propget, id(20), helpstring("property FAMDB")] HRESULT FAMDB([out, retval] IFileProcessingDB** ppFAMDB);
+		[propput, id(20), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* pFAMDB);
+
+
 	};
 
 	[

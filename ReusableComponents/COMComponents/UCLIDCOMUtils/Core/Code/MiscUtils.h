@@ -3,10 +3,11 @@
 #pragma once
 
 #include "resource.h"       // main symbols
-#include <memory>
+#include "TextFunctionExpander.h"
 #include <IConfigurationSettingsPersistenceMgr.h>
 #include <afxmt.h>
 
+#include <memory>
 #include <string>
 #include <map>
 using namespace std;
@@ -45,6 +46,8 @@ public:
 // ITagUtility
 	STDMETHOD(ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
+	STDMETHOD(ExpandFunction)(BSTR bstrFunctionName, IVariantVector *pArgs,
+		BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput);
 	STDMETHOD(GetBuiltInTags)(IVariantVector** ppTags);
 	STDMETHOD(GetCustomFileTags)(IVariantVector** ppTags);
 	STDMETHOD(GetAllTags)(IVariantVector** ppTags);
@@ -137,4 +140,7 @@ private:
 
 	// persistence mgr
 	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apSettings;
+
+	// Implements core tag/function expansion implementation.
+	TextFunctionExpander _textFunctionExpander;
 };

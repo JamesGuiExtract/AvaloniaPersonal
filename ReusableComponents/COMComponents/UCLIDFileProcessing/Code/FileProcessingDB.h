@@ -342,6 +342,8 @@ public:
 	STDMETHOD(get_ConnectionRetryTimeout)(long *pnVal);
 	STDMETHOD(SetNewPassword)(BSTR bstrUserName, VARIANT_BOOL* pbSuccess);
 	STDMETHOD(MoveFilesToWorkflowFromQuery)(BSTR bstrQuery, long nSourceWorkflowID, long nDestWorkflowID);
+	STDMETHOD(GetAttributeValue)(BSTR bstrSourceDocName, BSTR bstrAttributeSetName, BSTR bstrAttributePath,
+		BSTR* pbstrValue);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1439,6 +1441,8 @@ private:
 	bool GetWorkflowNameFromActionID_Internal(bool bDBLocked, long nActionID, BSTR* pbstrWorkflowName);
 	bool GetActionIDForWorkflow_Internal(bool bDBLocked, BSTR bstrActionName, long nWorkflowID, long* pnActionID);
 	bool MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BSTR bstrQuery, long nSourceWorkflowID,  long nDestWorkflowID);
+	bool GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSourceDocName, BSTR bstrAttributeSetName, BSTR bstrAttributePath,
+		BSTR* pbstrValue);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

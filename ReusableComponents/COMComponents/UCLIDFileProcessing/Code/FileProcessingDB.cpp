@@ -4400,9 +4400,7 @@ STDMETHODIMP CFileProcessingDB::SetNewPassword(BSTR bstrUserName, VARIANT_BOOL* 
 STDMETHODIMP CFileProcessingDB::MoveFilesToWorkflowFromQuery(BSTR bstrQuery, long nSourceWorkflowID, 
 	long nDestWorkflowID)
 {
-		AFX_MANAGE_STATE(AfxGetAppModuleState());
-
-
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
 	try
 	{
@@ -4420,6 +4418,29 @@ STDMETHODIMP CFileProcessingDB::MoveFilesToWorkflowFromQuery(BSTR bstrQuery, lon
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43404");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetAttributeValue(BSTR bstrSourceDocName, BSTR bstrAttributeSetName,
+												  BSTR bstrAttributePath, BSTR* pbstrValue)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetAttributeValue_Internal(false, bstrSourceDocName, bstrAttributeSetName, bstrAttributePath, pbstrValue))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetAttributeValue_Internal(true, bstrSourceDocName, bstrAttributeSetName, bstrAttributePath, pbstrValue);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43529");
 }
 
 //-------------------------------------------------------------------------------------------------

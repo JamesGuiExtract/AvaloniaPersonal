@@ -2504,6 +2504,11 @@ UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr CFileProcessingMgmtRole::getFAMTagMan
 {
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipTagManager = m_pFAMTagManager;
 	ASSERT_RESOURCE_ALLOCATION("ELI14401", ipTagManager != __nullptr);
+
+	// While the tag manager would initialize its own FAMDB instance if necessary, it is more
+	// efficient to give it access to the instance we already have.
+	ipTagManager->FAMDB = getFPMDB();
+
 	return ipTagManager;
 }
 //-------------------------------------------------------------------------------------------------

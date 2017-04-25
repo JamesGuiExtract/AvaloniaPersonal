@@ -425,7 +425,8 @@ namespace Extract.Utilities.Forms
                     }
 
                     // Add the function tags
-                    foreach (string function in PathTags.FormattedFunctionNames)
+                    foreach (string function in PathTags.FormattedFunctionNames
+                        .OrderBy(func => func))
                     {
                         items.Add(new ToolStripMenuItem(function));
                     }

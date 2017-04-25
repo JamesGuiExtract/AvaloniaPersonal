@@ -54,6 +54,8 @@ public:
 		BSTR* pbstrOutput);
 	STDMETHOD(raw_ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData,
 		BSTR *pbstrOutput);
+	STDMETHOD(raw_ExpandFunction)(BSTR bstrFunctionName, IVariantVector *pArgs,
+		BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput);
 	STDMETHOD(raw_GetBuiltInTags)(IVariantVector** ppTags);
 	STDMETHOD(raw_GetCustomFileTags)(IVariantVector** ppTags);
 	STDMETHOD(raw_GetAllTags)(IVariantVector** ppTags);

@@ -67,6 +67,8 @@ public:
 	STDMETHOD(raw_EditCustomTags)(long hParentWindow);
 	STDMETHOD(raw_AddTag)(BSTR bstrTagName, BSTR bstrTagValue);
 	STDMETHOD(raw_GetAddedTags)(IIUnknownVector **ppStringPairTags);
+	STDMETHOD(raw_ExpandFunction)(BSTR bstrFunctionName, IVariantVector *pArgs,
+		BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput);
 
 // IFAMTagManager
 	STDMETHOD(get_FPSFileDir)(BSTR *strFPSDir);
@@ -92,6 +94,8 @@ public:
 	STDMETHOD(get_Workflow)(BSTR *strWorkflow);
 	STDMETHOD(put_Workflow)(BSTR strWorkflow);
 	STDMETHOD(GetFAMTagManagerWithWorkflow)(BSTR bstrWorkflow, IFAMTagManager** ppFAMTagManager);
+	STDMETHOD(get_FAMDB)(IFileProcessingDB** ppFAMDB);
+	STDMETHOD(put_FAMDB)(IFileProcessingDB* pFAMDB);
 	
 	// ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown * * pObject);
@@ -140,6 +144,9 @@ private:
 	// pointer to the utility object to use for path function expansion.
 	IMiscUtilsPtr m_ipMiscUtils;
 
+	// IFileProcessingDB instance used to evaluate the $Metadata function.
+	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFAMDB;
+
 	// Used to maintain MRU list for recent contexts
 	unique_ptr<IConfigurationSettingsPersistenceMgr> m_upUserCfgMgr;
 	unique_ptr<MRUList> m_upContextMRUList;
@@ -155,6 +162,10 @@ private:
 		std::vector<std::string>& rvecTagNames) const;
 
 	void expandTags(std::string &strInput, const std::string &strSourceDocName);
+
+	//string expandAttributeFunction(const string& strFunction, const string& strSourceDocName,
+	//	const string& strAttributeSetName, const string& strMetadataFieldName);
+	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr getFAMDB();
 
 	// Refreshes context tag info based on current FPSFileDir from ContextTags.sdf.
 	void refreshContextTags();

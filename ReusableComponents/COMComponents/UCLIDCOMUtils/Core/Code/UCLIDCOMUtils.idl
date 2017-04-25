@@ -1373,6 +1373,11 @@ library UCLID_COMUTILSLib
 		[id(9), helpstring("method AddTag")] HRESULT AddTag([in] BSTR bstrTagName, [in] BSTR bstrTagValue);
 		// PURPOSE: To return an IIUnknownVector containing StringPair objects for all tags added using AddTag
 		[id(10), helpstring("method GetAddedTags")] HRESULT GetAddedTags([out, retval] IIUnknownVector **ppStringPairTags);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Expands any functions custom to this ITagUtility implementation.
+		[id(11), helpstring("method ExpandFunction")] HRESULT ExpandFunction([in] BSTR bstrFunctionName,
+			[in] IVariantVector *pArgs, [in] BSTR bstrSourceDocName, [in] IUnknown *pData, 
+			[out, retval] BSTR *pbstrOutput);
 	}	
 
 	[

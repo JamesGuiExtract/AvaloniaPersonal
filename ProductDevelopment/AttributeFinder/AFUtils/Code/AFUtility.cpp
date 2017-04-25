@@ -421,6 +421,24 @@ STDMETHODIMP CAFUtility::raw_ExpandTags(BSTR strInput, BSTR bstrSourceDocName, I
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::raw_ExpandFunction(BSTR bstrFunctionName, IVariantVector *pArgs,
+	BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI43488", pbstrOutput != __nullptr);
+
+		*pbstrOutput = _bstr_t().Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43489");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFUtility::ExpandTags(BSTR strInput, IAFDocument *pDoc, BSTR *pstrOutput)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());

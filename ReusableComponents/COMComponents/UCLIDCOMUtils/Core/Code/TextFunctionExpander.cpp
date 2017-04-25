@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "UCLIDCOMUtils.h"
 #include "TextFunctionExpander.h"
 
 #include <cpputil.h>
@@ -180,7 +181,7 @@ TextFunctionExpander::TextFunctionExpander()
 }
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandFunctions(const string& str,
-	UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, BSTR bstrSourceDocName, IUnknown *pData) const
+	UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, BSTR bstrSourceDocName, IUnknown *pData)
 {
 	try
 	{
@@ -206,7 +207,7 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 			// If necessary, find the beginning of the next function if there is one
 			if (bSearchForNextFunc)
 			{
-				ulFuncStart = findNextFunction(str, ulSearchPos, strNextFunction, strNextFuncToken);
+				ulFuncStart = findNextFunction(str, ulSearchPos, strNextFunction, strNextFuncToken, ipTagUtility);
 
 				// Don't bother searching again until the found function is processed.
 				bSearchForNextFunc = false;
@@ -305,7 +306,10 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 				// parameters and, therefore, its argument needs to be searched for the argument
 				// delimiter token.
 				nestedScope.bAcceptsMultipleArgs =
-					(g_mapParameters[nestedScope.strFunction].find(',') != string::npos);
+					(g_mapParameters[nestedScope.strFunction].find(',') != string::npos) ||
+					// Rather that make separate COM calls to determine if multiple arguments are
+					// expected, for efficiency, assume they are for custom functions.
+					g_mapParameters[nestedScope.strFunction].empty();
 				stackScopeData.push(nestedScope);
 				
 				// Now that we've created a scope for this function, we will need to look for the
@@ -452,8 +456,18 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 					}
 					else
 					{
-						UCLIDException ue("ELI11769", "Invalid Text Function!");
-						throw ue;
+						UCLID_COMUTILSLib::IVariantVectorPtr ipArgs(CLSID_VariantVector);
+						ASSERT_RESOURCE_ALLOCATION("ELI43528", ipArgs != __nullptr);
+
+						for each (string strArg in currentScope.vecExpandedArgs)
+						{
+							ipArgs->PushBack(strArg.c_str());
+						}
+
+						_bstr_t bstrExpandedValue = ipTagUtility->ExpandFunction(
+							currentScope.strFunction.c_str(), ipArgs, bstrSourceDocName, pData);
+
+						strFuncResult += asString(bstrExpandedValue);
 					}
 				}
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35255");
@@ -488,22 +502,25 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 }
 //-------------------------------------------------------------------------------------------------
 int TextFunctionExpander::findNextFunction(const string& str, unsigned long ulSearchPos,
-	string &rstrFunction, string &rstrToken) const
+	string &rstrFunction, string &rstrToken, UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility)
 {
 	// find the beginning of the next function if there is one
 	unsigned long ulFuncStart = str.find('$', ulSearchPos);
 
 	while (ulFuncStart != string::npos)
 	{
+		// Initialize additional functions made available from the provided tag utility.
+		getFunctions(ipTagUtility);
+
 		// check if the location begins with one of the functions
-		unsigned int nNumFunctions = g_vecFunctions.size();
+		unsigned int nNumFunctions = m_vecFunctions.size();
 		for ( unsigned int i = 0; i < nNumFunctions ; i++ )
 		{
-			unsigned long ulNamePos = str.find(g_vecFunctions[i], ulFuncStart + 1);
+			unsigned long ulNamePos = str.find(m_vecFunctions[i], ulFuncStart + 1);
 			if (ulNamePos == ulFuncStart + 1)
 			{
 				// Set the function
-				rstrFunction = g_vecFunctions[i];
+				rstrFunction = m_vecFunctions[i];
 
 				// Check for {}
 				unsigned long ulBracketPos = ulNamePos + rstrFunction.length();
@@ -553,6 +570,19 @@ int TextFunctionExpander::findNextFunction(const string& str, unsigned long ulSe
 	}
 
 	return ulFuncStart;
+}
+//-------------------------------------------------------------------------------------------------
+void TextFunctionExpander::getFunctions(UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility)
+{
+	if (m_vecFunctions.empty())
+	{
+		UCLID_COMUTILSLib::IVariantVectorPtr ipFunctions = ipTagUtility->GetFunctionNames();
+		long nCount = ipFunctions->Size;
+		for (long i = 0; i < nCount; i++)
+		{
+			m_vecFunctions.push_back(asString(ipFunctions->Item[i].bstrVal));
+		}
+	}
 }
 //-------------------------------------------------------------------------------------------------
 const vector<string>& TextFunctionExpander::getAvailableFunctions() const
@@ -1241,4 +1271,3 @@ const string TextFunctionExpander::expandUpperCase(const string& str) const
 	makeUpperCase(strRet);
 	return strRet;
 }
-//-------------------------------------------------------------------------------------------------

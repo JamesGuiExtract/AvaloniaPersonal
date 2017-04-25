@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -155,6 +156,7 @@ static const CString ChooseDocTag(const T &ipTagUtility, const U &btnTagButton, 
 		{
 			vecFunctions.push_back(asString(ipFunctionNames->Item[i].bstrVal));
 		}
+		sort(vecFunctions.begin(), vecFunctions.end());
 
 		vector<string> vecFormattedFunctions;
 		IVariantVectorPtr ipFormattedFunctionNames = ipTagUtility->GetFormattedFunctionNames();
@@ -163,6 +165,7 @@ static const CString ChooseDocTag(const T &ipTagUtility, const U &btnTagButton, 
 		{
 			vecFormattedFunctions.push_back(asString(ipFormattedFunctionNames->Item[i].bstrVal));
 		}
+		sort(vecFormattedFunctions.begin(), vecFormattedFunctions.end());
 
 		addVectors(vecChoices, vecFormattedFunctions);
 

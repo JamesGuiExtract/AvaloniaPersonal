@@ -152,6 +152,63 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
+        /// <summary>
+        /// Gets or sets the database server with which this instance is associated.
+        /// </summary>
+        /// <value>
+        /// The database server with which this instance is associated.
+        /// </value>
+        public string DatabaseServer
+        {
+            get
+            {
+                return _famTagManager.DatabaseServer;
+            }
+
+            set
+            {
+                _famTagManager.DatabaseServer = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the database with which this instance is associated.
+        /// </summary>
+        /// <value>
+        /// The name of the database with which this instance is associated.
+        /// </value>
+        public string DatabaseName
+        {
+            get
+            {
+                return _famTagManager.DatabaseName;
+            }
+
+            set
+            {
+                _famTagManager.DatabaseName = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the name of workflow currently in use.
+        /// </summary>
+        /// <value>
+        /// The name of workflow currently in use.
+        /// </value>
+        public string Workflow
+        {
+            get
+            {
+                return _famTagManager.Workflow;
+            }
+
+            set
+            {
+                _famTagManager.Workflow = value;
+            }
+        }
+
         #endregion Properties
     }
 }

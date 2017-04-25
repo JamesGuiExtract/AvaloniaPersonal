@@ -3,7 +3,6 @@
 #include "stdafx.h"
 #include "UCLIDCOMUtils.h"
 #include "MiscUtils.h"
-#include "TextFunctionExpander.h"
 
 #include <ExtractMFCUtils.h>
 #include <cpputil.h>
@@ -1016,9 +1015,8 @@ STDMETHODIMP CMiscUtils::GetExpandedTags(BSTR bstrString, BSTR bstrSourceDocName
 		string strString = asString(bstrString);
 
 		// Expand the tag functions
-		TextFunctionExpander tfe;
-		string strExpanded =
-			tfe.expandFunctions(strString, getThisAsCOMPtr(), bstrSourceDocName, __nullptr); 
+		string strExpanded = _textFunctionExpander.expandFunctions(
+			strString, getThisAsCOMPtr(), bstrSourceDocName, __nullptr);
 
 		// Return the result
 		*pbstrExpanded = _bstr_t(strExpanded.c_str()).Detach();
@@ -1035,8 +1033,7 @@ STDMETHODIMP CMiscUtils::GetFunctionNames(IVariantVector** ppFunctionNames)
 	try
 	{
 		// Get the available expansion functions
-		TextFunctionExpander tfe;
-		vector<string> vecFunctions = tfe.getAvailableFunctions();
+		vector<string> vecFunctions = _textFunctionExpander.getAvailableFunctions();
 		
 		// Populate an IVariantVector of BSTRs
 		UCLID_COMUTILSLib::IVariantVectorPtr ipFunctions(CLSID_VariantVector);
@@ -1061,9 +1058,8 @@ STDMETHODIMP CMiscUtils::GetFormattedFunctionNames(IVariantVector** ppFunctionNa
 	try
 	{
 		// Get the available expansion functions
-		TextFunctionExpander tfe;
-		vector<string> vecFunctions = tfe.getAvailableFunctions();
-		tfe.formatFunctions(vecFunctions);
+		vector<string> vecFunctions = _textFunctionExpander.getAvailableFunctions();
+		_textFunctionExpander.formatFunctions(vecFunctions);
 		
 		// Populate an IVariantVector of BSTRs
 		UCLID_COMUTILSLib::IVariantVectorPtr ipFunctions(CLSID_VariantVector);
@@ -1243,8 +1239,8 @@ STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSourceD
 		string strInput = asString(bstrInput);
 
 		// Get the available expansion functions
-		TextFunctionExpander tfe;
-		string strOutput = tfe.expandFunctions(strInput, ipTagUtility, bstrSourceDocName, pData);
+		string strOutput =
+			_textFunctionExpander.expandFunctions(strInput, ipTagUtility, bstrSourceDocName, pData);
 
 		// Return the result
 		*pbstrOutput = _bstr_t(strOutput.c_str()).Detach();
@@ -1252,6 +1248,24 @@ STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSourceD
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35209");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::ExpandFunction(BSTR bstrFunctionName, IVariantVector *pArgs,
+	BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI43490", pbstrOutput != __nullptr);
+
+		*pbstrOutput = _bstr_t().Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43491");
+
+	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput,
@@ -1273,8 +1287,8 @@ STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput,
 		string strInput = asString(bstrInput);
 
 		// Get the available expansion functions
-		TextFunctionExpander tfe;
-		string strOutput = tfe.expandFunctions(strInput, ipTagUtility, bstrSourceDocName, pData);
+		string strOutput = _textFunctionExpander.expandFunctions(
+			strInput, ipTagUtility, bstrSourceDocName, pData);
 
 		// Expand any tags that were not nested within functions.
 		strOutput = asString(ipTagUtility->ExpandTags(strOutput.c_str(), bstrSourceDocName, pData));

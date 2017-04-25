@@ -23,6 +23,10 @@ const string strDATABASE_NAME_TAG = "<DatabaseName>";
 const string strDATABASE_ACTION_TAG = "<ActionName>";
 const string strWORKFLOW_TAG = "<Workflow>";
 const string strMRU_MUTEX_NAME = "ExtractContextMRURegistryMutex";
+const string strMETADATA = "Metadata";
+const string strMETADATA_FORMATTED = "$Metadata(file, field name)";
+const string strATTRIBUTE = "Attribute";
+const string strATTRIBUTE_FORMATTED = "$Attribute(file, set name, path)";
 
 //--------------------------------------------------------------------------------------------------
 // Statics
@@ -41,6 +45,7 @@ CFAMTagManager::CFAMTagManager()
 	, m_bAlwaysShowDatabaseTags(false)
 	, m_mutexMRU(FALSE, strMRU_MUTEX_NAME.c_str())
 	, m_strWorkflow("")
+, m_ipFAMDB(__nullptr)
 {
 	ASSERT_RESOURCE_ALLOCATION("ELI35226", m_ipMiscUtils != __nullptr);
 
@@ -64,6 +69,7 @@ CFAMTagManager::~CFAMTagManager()
 	try
 	{
 		m_ipMiscUtils = __nullptr;
+		m_ipFAMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16523");
 }
@@ -379,6 +385,9 @@ STDMETHODIMP CFAMTagManager::raw_GetFunctionNames(IVariantVector** ppFunctionNam
 		IVariantVectorPtr ipFunctions = ipTagUtility->GetFunctionNames();
 		ASSERT_RESOURCE_ALLOCATION("ELI35235", ipFunctions != __nullptr);
 
+		ipFunctions->PushBack(strMETADATA.c_str());
+		ipFunctions->PushBack(strATTRIBUTE.c_str());
+
 		*ppFunctionNames = ipFunctions.Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35236");
@@ -399,6 +408,9 @@ STDMETHODIMP CFAMTagManager::raw_GetFormattedFunctionNames(IVariantVector** ppFu
 
 		IVariantVectorPtr ipFunctions = ipTagUtility->GetFormattedFunctionNames();
 		ASSERT_RESOURCE_ALLOCATION("ELI35239", ipFunctions != __nullptr);
+
+		ipFunctions->PushBack(strMETADATA_FORMATTED.c_str());
+		ipFunctions->PushBack(strATTRIBUTE_FORMATTED.c_str());
 
 		*ppFunctionNames = ipFunctions.Detach();
 	}
@@ -478,6 +490,53 @@ STDMETHODIMP CFAMTagManager::raw_GetAddedTags(IIUnknownVector **ppStringPairTags
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43286");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::raw_ExpandFunction(BSTR bstrFunctionName, IVariantVector *pArgs,
+	BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI43492", pArgs != __nullptr);
+		ASSERT_ARGUMENT("ELI43493", pbstrOutput != __nullptr);
+
+		validateLicense();
+
+		IVariantVectorPtr ipArgs(pArgs);
+		ASSERT_RESOURCE_ALLOCATION("ELI43494", ipArgs != __nullptr);
+
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB = getFAMDB();
+
+
+		string strFunctionName = asString(bstrFunctionName);
+		if (_strcmpi(strFunctionName.c_str(), strMETADATA.c_str()) == 0)
+		{
+			ASSERT_RUNTIME_CONDITION("ELI43495", ipArgs->Size == 2,
+				"The $" + strMETADATA + " path tag function requires two arguments");
+
+			long nFileID = ipFAMDB->GetFileID(ipArgs->Item[0].bstrVal);
+			_bstr_t bstrOutput = ipFAMDB->GetMetadataFieldValue(nFileID, ipArgs->Item[1].bstrVal);
+			*pbstrOutput = bstrOutput.Detach();
+		}
+		else if(_strcmpi(strFunctionName.c_str(), strATTRIBUTE.c_str()) == 0)
+		{
+			ASSERT_RUNTIME_CONDITION("ELI43495", ipArgs->Size == 3,
+				"The $" + strATTRIBUTE + " path tag function requires three arguments.");
+
+			_bstr_t bstrOutput = ipFAMDB->GetAttributeValue(
+				ipArgs->Item[0].bstrVal, ipArgs->Item[1].bstrVal, ipArgs->Item[2].bstrVal);
+			*pbstrOutput = bstrOutput.Detach();
+		}
+		else
+		{
+			*pbstrOutput = _bstr_t().Detach();;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43497");
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMTagManager::StringContainsInvalidTags(BSTR strInput, VARIANT_BOOL *pbValue)
@@ -673,7 +732,7 @@ STDMETHODIMP CFAMTagManager::get_DatabaseServer(BSTR *strDatabaseServer)
 
 		CSingleLock lock(&ms_criticalsection, TRUE);
 		*strDatabaseServer = _bstr_t(m_strDatabaseServer.c_str()).Detach();
-		
+
 		return S_OK;		
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38305");
@@ -688,6 +747,8 @@ STDMETHODIMP CFAMTagManager::put_DatabaseServer(BSTR strDatabaseServer)
 
 		CSingleLock lock(&ms_criticalsection, TRUE);
 		m_strDatabaseServer = asString(strDatabaseServer);
+
+		m_ipFAMDB = __nullptr;
 
 		return S_OK;
 	}
@@ -720,6 +781,8 @@ STDMETHODIMP CFAMTagManager::put_DatabaseName(BSTR strDatabaseName)
 
 		CSingleLock lock(&ms_criticalsection, TRUE);
 		m_strDatabaseName = asString(strDatabaseName);
+
+		m_ipFAMDB = __nullptr;
 
 		return S_OK;
 	}
@@ -818,15 +881,47 @@ STDMETHODIMP CFAMTagManager::GetFAMTagManagerWithWorkflow(BSTR bstrWorkflow, IFA
 		ASSERT_RESOURCE_ALLOCATION("ELI43295", ipThis != __nullptr);
 
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipNew = ipThis->Clone();
+		ipNew->FAMDB = m_ipFAMDB;
 		ipNew->Workflow = _bstr_t(bstrWorkflow);
-
+		
 		*ppFAMTagManager = (IFAMTagManager *) ipNew.Detach();
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43294");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::get_FAMDB(IFileProcessingDB** ppFAMDB)
+{
+	try
+	{
+		// Check license
+		validateLicense();
 
+		ASSERT_ARGUMENT("ELI43485", ppFAMDB != __nullptr);
+
+		CSingleLock lock(&ms_criticalsection, TRUE);
+		*ppFAMDB = (IFileProcessingDB*)m_ipFAMDB.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43486");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::put_FAMDB(IFileProcessingDB* pFAMDB)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		CSingleLock lock(&ms_criticalsection, TRUE);
+		m_ipFAMDB = pFAMDB;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43487");
+}
 
 //--------------------------------------------------------------------------------------------------
 // ILicensedComponent
@@ -1177,6 +1272,25 @@ void CFAMTagManager::refreshContextTags()
 			ms_mapWorkflowContextTags[strWorkflow][strName] = strValue;
 		}
 	}
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFAMTagManager::getFAMDB()
+{
+	if (m_ipFAMDB == __nullptr)
+	{
+		m_ipFAMDB.CreateInstance(CLSID_FileProcessingDB);
+		ASSERT_RESOURCE_ALLOCATION("ELI43496", m_ipFAMDB != __nullptr);
+
+		string strServer = m_strDatabaseServer;
+		expandTags(strServer, "");
+		m_ipFAMDB->DatabaseServer = strServer.c_str();
+
+		string strDatabase = m_strDatabaseName;
+		expandTags(strDatabase, "");
+		m_ipFAMDB->DatabaseName = strDatabase.c_str();
+	}
+
+	return m_ipFAMDB;
 }
 //-------------------------------------------------------------------------------------------------
 void CFAMTagManager::validateLicense()

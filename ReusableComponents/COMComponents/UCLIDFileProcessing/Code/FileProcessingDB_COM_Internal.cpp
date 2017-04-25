@@ -10860,3 +10860,55 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSourceDocName,
+								BSTR bstrAttributeSetName, BSTR bstrAttributePath, BSTR* pbstrValue)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI43518", pbstrValue != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			_RecordsetPtr ipResult(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI43521", ipResult != __nullptr);
+
+			string strQuery = gstrGET_ATTRIBUTE_VALUE;
+			replaceVariable(strQuery, "<SourceDocName>", asString(bstrSourceDocName));
+			replaceVariable(strQuery, "<AttributeSetName>", asString(bstrAttributeSetName));
+			replaceVariable(strQuery, "<AttributePath>", asString(bstrAttributePath));
+
+			ipResult->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
+				adLockReadOnly, adCmdText);
+
+			if (!asCppBool(ipResult->adoEOF))
+			{
+				string strAttributeValue = getStringField(ipResult->Fields, "Value");
+				*pbstrValue = _bstr_t(strAttributeValue.c_str()).Detach();
+			}
+			else
+			{
+				*pbstrValue = _bstr_t("").Detach();
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI43519");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43520");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}

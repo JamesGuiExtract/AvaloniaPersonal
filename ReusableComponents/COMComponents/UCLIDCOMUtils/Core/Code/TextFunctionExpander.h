@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
 #include <afxmt.h>
 
 using namespace std;
@@ -27,14 +28,14 @@ public:
 	//			All arguments must be valid for their function
 	// PROMISE: 
 	const string expandFunctions(const string& str,
-		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, BSTR bstrSourceDocName, IUnknown *pData) const;
+		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, BSTR bstrSourceDocName, IUnknown *pData);
 
 	// PURPOSE: Returns the position of the next path tag function in str to expand starting at or
 	//			following ulSearchPos.
 	//			If found, rstrFunction returns the name of the function and rstrToken returns
 	//			the token to be used to delimit separate parameters.
 	int findNextFunction(const string& str, unsigned long ulSearchPos, string &rstrFunction,
-		string &rstrToken) const;
+		string &rstrToken, UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility);
 
 	// PURPOSE: to return a list of all functions that 
 	//			this method supports i.e. "dirof", "fileof", "extof"
@@ -129,4 +130,10 @@ private:
 
 	// Random object used for "$RandomAlphaNumeric()" calls
 	static Random ms_Rand;
+
+	// The functions available including functions custom to the current ITagUtility implementation
+	vector<string> m_vecFunctions;
+
+	// Populates m_vecFunctions including any custom functions in ITagUtility.
+	void getFunctions(UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility);
 };

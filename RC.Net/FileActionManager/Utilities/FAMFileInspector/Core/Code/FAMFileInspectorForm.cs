@@ -1,5 +1,6 @@
 ﻿using ADODB;
 using Extract.Drawing;
+using Extract.FileActionManager.Forms;
 using Extract.FileActionManager.Utilities.Properties;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
@@ -4328,7 +4329,13 @@ namespace Extract.FileActionManager.Utilities
                     try
                     {
                         // Expand the command line arguments using path tags/functions.
-                        SourceDocumentPathTags pathTags = new SourceDocumentPathTags(fileName);
+                        FileActionManagerPathTags pathTags = new FileActionManagerPathTags(null, fileName);
+                        if (UseDatabaseMode)
+                        {
+                            pathTags.DatabaseServer = _fileProcessingDB.DatabaseServer;
+                            pathTags.DatabaseName = _fileProcessingDB.DatabaseName;
+                            pathTags.Workflow = FileProcessingDB.ActiveWorkflow;
+                        }
 
                         string applicationPath = fileHanderItem.ApplicationPath;
                         if (!string.IsNullOrEmpty(applicationPath))
