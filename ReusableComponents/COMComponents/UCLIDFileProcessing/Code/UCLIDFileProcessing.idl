@@ -1547,7 +1547,7 @@ library UCLID_FILEPROCESSINGLib
 		//			be returned
 		// NOTE:	The FileName property in the WorkItem returned will be set to the current FileName
 		//			in the database for the FileID for the WorkItemGroup
-		[id(120), helpstring("method GetWorkItemToProcess")] HRESULT GetWorkItemToProcess([in] long nActionID,
+		[id(120), helpstring("method GetWorkItemToProcess")] HRESULT GetWorkItemToProcess([in] BSTR bstrActionName,
 			[in] VARIANT_BOOL vbRestrictToFAMSession, [out, retval] IWorkItemRecord **ppWorkItem);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set the status of the nWorkItemID to failed
@@ -1623,7 +1623,7 @@ library UCLID_FILEPROCESSINGLib
 		// NOTE:	Work items associated with a work item group with an empty string as the UPI
 		//			will not be included. This is to limit processing of work items that are not 
 		//			associated with a Work item group that is currently active.
-		[id(133), helpstring("method GetWorkItemsToProcess")] HRESULT GetWorkItemsToProcess([in] long nActionID,
+		[id(133), helpstring("method GetWorkItemsToProcess")] HRESULT GetWorkItemsToProcess([in] BSTR bstrActionName,
 			[in] VARIANT_BOOL vbRestrictToFAMSession, 
 			[in] long nMaxWorkItemsToReturn,
 			[in] EFilePriority eMinPriority,

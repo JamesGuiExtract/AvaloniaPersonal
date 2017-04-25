@@ -2928,7 +2928,7 @@ STDMETHODIMP CFileProcessingDB::AddWorkItems(long nWorkItemGroupID, IIUnknownVec
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36894");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetWorkItemToProcess(long nActionID,
+STDMETHODIMP CFileProcessingDB::GetWorkItemToProcess(BSTR bstrActionName,
 								VARIANT_BOOL vbRestrictToFAMSession, IWorkItemRecord **pWorkItem)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -2936,12 +2936,14 @@ STDMETHODIMP CFileProcessingDB::GetWorkItemToProcess(long nActionID,
 	try
 	{
 		validateLicense();
+
+		string strActionName = asString(bstrActionName);
 		
-		if (!GetWorkItemToProcess_Internal(false, nActionID, vbRestrictToFAMSession, pWorkItem))
+		if (!GetWorkItemToProcess_Internal(false, strActionName, vbRestrictToFAMSession, pWorkItem))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
-			GetWorkItemToProcess_Internal(true, nActionID, vbRestrictToFAMSession, pWorkItem);
+			GetWorkItemToProcess_Internal(true, strActionName, vbRestrictToFAMSession, pWorkItem);
 		}
 
 		return S_OK;
@@ -3234,7 +3236,7 @@ STDMETHODIMP CFileProcessingDB::SetFallbackStatus(IFileRecord* pFileRecord,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37459");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetWorkItemsToProcess(long nActionID, VARIANT_BOOL vbRestrictToFAMSessionID, 
+STDMETHODIMP CFileProcessingDB::GetWorkItemsToProcess(BSTR bstrActionName, VARIANT_BOOL vbRestrictToFAMSessionID, 
 			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **pWorkItems)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -3243,13 +3245,15 @@ STDMETHODIMP CFileProcessingDB::GetWorkItemsToProcess(long nActionID, VARIANT_BO
 	{
 		validateLicense();
 
-		if (!GetWorkItemsToProcess_Internal(false, nActionID, vbRestrictToFAMSessionID,
+		string strActionName = asString(bstrActionName);
+
+		if (!GetWorkItemsToProcess_Internal(false, strActionName, vbRestrictToFAMSessionID,
 			nMaxWorkItemsToReturn, eMinPriority, pWorkItems))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
 
-			GetWorkItemsToProcess_Internal(true, nActionID, vbRestrictToFAMSessionID,
+			GetWorkItemsToProcess_Internal(true, strActionName, vbRestrictToFAMSessionID,
 				nMaxWorkItemsToReturn, eMinPriority, pWorkItems);
 		}
 

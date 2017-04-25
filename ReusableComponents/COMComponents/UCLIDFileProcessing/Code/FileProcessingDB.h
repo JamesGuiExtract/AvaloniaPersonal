@@ -268,7 +268,7 @@ public:
 	STDMETHOD(GetWorkItemsForGroup)(long nWorkItemGroupID, long nStartPos, long nCount, IIUnknownVector **pWorkItems);
 	STDMETHOD(GetWorkItemGroupStatus)(long nWorkItemGroupID, WorkItemGroupStatus *pWorkGroupStatus,
 		EWorkItemStatus *pStatus);
-	STDMETHOD(GetWorkItemToProcess)(long nActionID, VARIANT_BOOL vbRestrictToFAMSession, IWorkItemRecord **ppWorkItem);
+	STDMETHOD(GetWorkItemToProcess)(BSTR bstrActionName, VARIANT_BOOL vbRestrictToFAMSession, IWorkItemRecord **ppWorkItem);
 	STDMETHOD(NotifyWorkItemFailed)(long nWorkItemID, BSTR stringizedException);
 	STDMETHOD(NotifyWorkItemCompleted)(long nWorkItemID);
 	STDMETHOD(GetWorkGroupData)(long WorkItemGroupID, long *pnNumberOfWorkItems, BSTR *pstringizedTask);
@@ -282,7 +282,7 @@ public:
 	STDMETHOD(GetFileSetFileNames)(BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
 	STDMETHOD(GetFileToProcess)(long nFileID, BSTR strAction, IFileRecord** ppFileRecord);
 	STDMETHOD(SetFallbackStatus)(IFileRecord* pFileRecord, EActionStatus eaFallbackStatus);
-	STDMETHOD(GetWorkItemsToProcess)(long nActionID, VARIANT_BOOL vbRestrictToFAMSessionID, 
+	STDMETHOD(GetWorkItemsToProcess)(BSTR bstrActionName, VARIANT_BOOL vbRestrictToFAMSessionID, 
 			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems);
 	STDMETHOD(SetWorkItemToPending)(long nWorkItemID);
 	STDMETHOD(GetFailedWorkItemsForGroup)(long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
@@ -1126,9 +1126,9 @@ private:
 		IProgressStatusPtr ipProgressStatus, map<string, long> &rmapProductSpecificVersions);
 
 	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr getWorkItemFromFields(const FieldsPtr& ipFields);
-	IIUnknownVectorPtr setWorkItemsToProcessing(bool bDBLocked, long nActionID, long nNumberToGet,
+	IIUnknownVectorPtr setWorkItemsToProcessing(bool bDBLocked, string strActionName, long nNumberToGet,
 		bool bRestrictToFAMSessionID, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection);
-	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr setWorkItemToProcessing(bool bDBLocked, long nActionID, 
+	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr setWorkItemToProcessing(bool bDBLocked, string strActionName, 
 		bool bRestrictToFAMSessionID, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection);
 
 	// Checks for new Product Specific DB managers
@@ -1327,7 +1327,7 @@ private:
 	bool GetWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, long nStartPos, long nCount, IIUnknownVector **ppWorkItems);
 	bool GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWorkItemGroupID,
 		WorkItemGroupStatus *pWorkGroupStatus, EWorkItemStatus *pStatus);
-	bool GetWorkItemToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToFAMSession, IWorkItemRecord **ppWorkItem);
+	bool GetWorkItemToProcess_Internal(bool bDBLocked, string strActionName, VARIANT_BOOL vbRestrictToFAMSession, IWorkItemRecord **ppWorkItem);
 	bool NotifyWorkItemFailed_Internal(bool bDBLocked, long nWorkItemID, BSTR strizedException);
 	bool NotifyWorkItemCompleted_Internal(bool bDBLocked, long nWorkItemID);
 	bool GetWorkGroupData_Internal(bool bDBLocked, long WorkItemGroupID, long *pnNumberOfWorkItems, BSTR *pstringizedTask);
@@ -1337,7 +1337,7 @@ private:
 	bool SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long WorkItemID, IUnknown *pBinaryOutput);
 	bool GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
 	bool SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* pFileRecord, EActionStatus eaFallbackStatus);
-	bool GetWorkItemsToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToFAMSessionID, 
+	bool GetWorkItemsToProcess_Internal(bool bDBLocked, string strActionName, VARIANT_BOOL vbRestrictToFAMSessionID, 
 			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems);
 	bool SetWorkItemToPending_Internal(bool bDBLocked, long nWorkItemID);
 	bool GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, IIUnknownVector **ppWorkItems);

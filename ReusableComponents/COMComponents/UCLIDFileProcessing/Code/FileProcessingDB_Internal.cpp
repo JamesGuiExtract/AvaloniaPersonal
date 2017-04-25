@@ -184,7 +184,8 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 
 		// This is used when processing state changes to "U", "C", "F" and if restartable processing
 		// is turned off "P"
-		string strDeleteWorkItemGroup = "DELETE FROM WorkItemGroup WHERE ActionID = " + asString(nActionID)
+		string strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strAction);
+		string strDeleteWorkItemGroup = "DELETE FROM WorkItemGroup WHERE ActionID IN (" + strActionIDs + ")"
 			+ " AND FileID IN (";
 
 		// Execute the queries in groups of 10000 File IDs
@@ -570,8 +571,9 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			// only delete if new status is 'U', 'C' or 'F'
 			if ((!m_bAllowRestartableProcessing && strNewState == "P") || strNewState == "U" || strNewState == "C" || strNewState == "F")
 			{
+				string strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strAction);
 				string strDeleteWorkItemGroupQuery = "DELETE FROM WorkItemGroup WHERE FileID = " + asString(nFileID)
-					+ " AND ActionID = " + asString(nActionID);
+					+ " AND ActionID IN (" + strActionIDs + ")";
 				executeCmdQuery(ipConnection, strDeleteWorkItemGroupQuery);
 			}
 
@@ -5702,10 +5704,10 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::getWorkItemFromFi
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::setWorkItemToProcessing(bool bDBLocked, 
-	long nActionID, bool bRestrictToFAMSessionID, EFilePriority eMinPriority,
+	string strActionName, bool bRestrictToFAMSessionID, EFilePriority eMinPriority,
 	const _ConnectionPtr &ipConnection)
 {
-	IIUnknownVectorPtr ipWorkItems = setWorkItemsToProcessing(bDBLocked, nActionID, 1,
+	IIUnknownVectorPtr ipWorkItems = setWorkItemsToProcessing(bDBLocked, strActionName, 1,
 		bRestrictToFAMSessionID, kPriorityDefault, ipConnection);
 	ASSERT_RESOURCE_ALLOCATION("ELI37421", ipWorkItems != __nullptr);
 
@@ -5717,7 +5719,7 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::setWorkItemToProc
 	return ipWorkItems->At(0);
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, long nActionID, 
+IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, string strActionName, 
 	long nNumberToGet, bool bRestrictToFAMSessionID, EFilePriority eMinPriority,
 	const _ConnectionPtr &ipConnection)
 {
@@ -5740,7 +5742,8 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, l
 
 			// Set to the query to get workitems to process
 			strQuery = gstrGET_WORK_ITEM_TO_PROCESS;
-			replaceVariable(strQuery, "<ActionID>", asString(nActionID));
+			string strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strActionName);
+			replaceVariable(strQuery, "<ActionIDs>", strActionIDs);
 			replaceVariable(strQuery, "<FAMSessionID>", strFAMSessionID);
 			replaceVariable(strQuery, "<GroupFAMSessionID>",
 				(bRestrictToFAMSessionID) ? strFAMSessionID : "");

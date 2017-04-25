@@ -1538,7 +1538,7 @@ long FPRecordManager::loadWorkItemsFromDB(long nNumToLoad, UCLID_FILEPROCESSINGL
 	CSingleLock lg(&m_queWorkItemsMutex, TRUE);
 
 	IIUnknownVectorPtr ipWorkItems = 
-		m_ipFPMDB->GetWorkItemsToProcess(m_nActionID, asVariantBool(m_bRestrictToCurrentFAMSessionID), 
+		m_ipFPMDB->GetWorkItemsToProcess(get_bstr_t(m_strAction), asVariantBool(m_bRestrictToCurrentFAMSessionID), 
 			nNumToLoad, eMinPriority);
 
 	numberWorkItemsLoaded = ipWorkItems->Size();

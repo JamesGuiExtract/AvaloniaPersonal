@@ -7636,7 +7636,7 @@ bool CFileProcessingDB::AddWorkItems_Internal(bool bDBLocked, long nWorkItemGrou
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetWorkItemToProcess_Internal(bool bDBLocked, long nActionID,
+bool CFileProcessingDB::GetWorkItemToProcess_Internal(bool bDBLocked, string strActionName,
 	VARIANT_BOOL vbRestrictToFAMSession, IWorkItemRecord **ppWorkItem)
 {
 	try
@@ -7657,7 +7657,7 @@ bool CFileProcessingDB::GetWorkItemToProcess_Internal(bool bDBLocked, long nActi
 				validateDBSchemaVersion();
 
 				UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = 
-					setWorkItemToProcessing(bDBLocked, nActionID,
+					setWorkItemToProcessing(bDBLocked, strActionName,
 					asCppBool(vbRestrictToFAMSession), kPriorityDefault, ipConnection);
 
 				*ppWorkItem = (IWorkItemRecord *)ipWorkItem.Detach();
@@ -8182,7 +8182,7 @@ bool CFileProcessingDB::SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* 
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetWorkItemsToProcess_Internal(bool bDBLocked, long nActionID,
+bool CFileProcessingDB::GetWorkItemsToProcess_Internal(bool bDBLocked, string strActionName,
 	VARIANT_BOOL vbRestrictToFAMSessionID, long nMaxWorkItemsToReturn, EFilePriority eMinPriority,
 	IIUnknownVector **ppWorkItems)
 {
@@ -8204,7 +8204,7 @@ bool CFileProcessingDB::GetWorkItemsToProcess_Internal(bool bDBLocked, long nAct
 				validateDBSchemaVersion();
 
 				IIUnknownVectorPtr ipWorkItems = 
-					setWorkItemsToProcessing(bDBLocked, nActionID, nMaxWorkItemsToReturn, 
+					setWorkItemsToProcessing(bDBLocked, strActionName, nMaxWorkItemsToReturn, 
 						asCppBool(vbRestrictToFAMSessionID), eMinPriority, ipConnection);
 
 				*ppWorkItems = (IIUnknownVector *)ipWorkItems.Detach();
