@@ -265,14 +265,14 @@ namespace Extract.FileActionManager.Database.Test
         /// <param name="workflowName">Name of the workflow to process within or empty for all workflows.</param>
         /// <param name="fileProcessingTask">The <see cref="IFileProcessingTask"/> to be executed.</param>
         /// <param name="threadCount">The number threads to use.</param>
-        /// <param name="filesToGrabCount">The number files to grab at a time from the DB.</param>
+        /// <param name="filesToGrab">The number files to grab at a time from the DB.</param>
         /// <param name="keepProcessing"><c>true</c> if processing should continue as files are added, or
         /// <c>false</c> to stop processing as soon as the queue is empty.</param>
         /// <param name="docsToProcess">The number of files to process before the processing session should
-        /// automatically stop or zero if the process should not automatically stop afte rprocessing a set
+        /// automatically stop or zero if the process should not automatically stop after processing a set
         /// number of files.</param>
         public FAMProcessingSession(IFileProcessingDB fileProcessingDB, string actionName, string workflowName,
-            IFileProcessingTask fileProcessingTask, int threadCount = 1, int filesToGrabCount = 1,
+            IFileProcessingTask fileProcessingTask, int threadCount = 1, int filesToGrab = 1,
             bool keepProcessing = false, int docsToProcess = 0)
         {
             try
@@ -282,7 +282,7 @@ namespace Extract.FileActionManager.Database.Test
                 _fileProcessingManager.DatabaseName = fileProcessingDB.DatabaseName;
                 _fileProcessingManager.ActionName = actionName;
                 _fileProcessingManager.ActiveWorkflow = workflowName;
-                _fileProcessingManager.MaxFilesFromDB = filesToGrabCount;
+                _fileProcessingManager.MaxFilesFromDB = filesToGrab;
                 _fileProcessingManager.FileProcessingMgmtRole.NumThreads = threadCount;
                 _fileProcessingManager.FileProcessingMgmtRole.KeepProcessingAsAdded = keepProcessing;
                 _fileProcessingManager.NumberOfDocsToProcess = docsToProcess;
@@ -310,6 +310,9 @@ namespace Extract.FileActionManager.Database.Test
         /// This method assumes files are to be queued. If the session is configured to keep
         /// processing as files are queued, it will stop as soon as a files are queued then process.
         /// However, if no files are ever queued, the call will block forever.
+        /// <para><b>NOTE2</b></para>
+        /// There seems to be a bug with this method that allows it to return before processing is
+        /// actually complete when running a multi-threaded instance.
         /// </summary>
         /// <returns>The number of files that were successfully processed.</returns>
         public int WaitForProcessingToComplete()

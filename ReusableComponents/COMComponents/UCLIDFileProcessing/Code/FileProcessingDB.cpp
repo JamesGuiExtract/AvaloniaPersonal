@@ -628,7 +628,7 @@ STDMETHODIMP CFileProcessingDB::ResetDBLock(void)
 		ipConnection = getDBConnection();
 
 		// The mutex only needs to be locked while the data is being obtained
-		CSingleLock lock(&m_mutex, TRUE);
+		CSingleLock lock(&m_criticalSection, TRUE);
 
 		// Check License
 		validateLicense();
@@ -936,7 +936,7 @@ STDMETHODIMP CFileProcessingDB::GetCurrentConnectionStatus(BSTR* pVal)
 		string strResult = m_strCurrentConnectionStatus;
 		if (strResult == gstrNOT_CONNECTED)
 		{
-			CSingleLock lg(&m_mutex, TRUE);
+			CSingleLock lg(&m_criticalSection, TRUE);
 			strResult = m_strCurrentConnectionStatus;
 		}
 
@@ -957,7 +957,7 @@ STDMETHODIMP CFileProcessingDB::put_DatabaseServer(BSTR newVal)
 		m_strDatabaseServer = asString(newVal);
 
 		// Set the static server name
-		CSingleLock lock(&m_mutex, TRUE);
+		CSingleLock lock(&m_criticalSection, TRUE);
 		ms_strCurrServerName = m_strDatabaseServer;
 		
 		return S_OK;
@@ -989,7 +989,7 @@ STDMETHODIMP CFileProcessingDB::put_DatabaseName(BSTR newVal)
 		m_strDatabaseName = asString(newVal);
 
 		// Set the  static Database name
-		CSingleLock lock(&m_mutex, TRUE);
+		CSingleLock lock(&m_criticalSection, TRUE);
 		ms_strCurrDBName = m_strDatabaseName;
 
 		return S_OK;
@@ -1086,7 +1086,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 				ipDBConnection->Close();
 
 				DWORD dwThreadID = GetCurrentThreadId();
-				CSingleLock lg(&m_mutex, TRUE);
+				CSingleLock lg(&m_criticalSection, TRUE);
 				m_mapThreadIDtoDBConnections.erase(dwThreadID);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41507")
@@ -1174,7 +1174,7 @@ STDMETHODIMP CFileProcessingDB::ConnectLastUsedDBThisProcess()
 
 	try
 	{
-		CSingleLock lock(&m_mutex, TRUE);
+		CSingleLock lock(&m_criticalSection, TRUE);
 
 		// Set the active settings to the saved static settings
 		m_strDatabaseServer = ms_strCurrServerName;
@@ -2652,7 +2652,7 @@ STDMETHODIMP CFileProcessingDB::put_AdvancedConnectionStringProperties(BSTR newV
 		m_strAdvConnStrProperties = asString(newVal);
 
 		// Set the static advanced connection string properties.
-		CSingleLock lock(&m_mutex, TRUE);
+		CSingleLock lock(&m_criticalSection, TRUE);
 		ms_strCurrAdvConnProperties = m_strAdvConnStrProperties;
 
 		return S_OK;
@@ -2825,6 +2825,7 @@ STDMETHODIMP CFileProcessingDB::DuplicateConnection(IFileProcessingDB *pConnecti
 		ipThis->DatabaseName = ipConnectionSource->DatabaseName;
 		ipThis->AdvancedConnectionStringProperties =
 			ipConnectionSource->AdvancedConnectionStringProperties;
+		ipThis->ActiveWorkflow = ipConnectionSource->ActiveWorkflow;
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		_ConnectionPtr ipConnection = __nullptr;
@@ -3358,7 +3359,7 @@ STDMETHODIMP CFileProcessingDB::GetLastConnectionStringConfiguredThisProcess(BST
 		
 		ASSERT_ARGUMENT("ELI37874", pbstrConnectionString != __nullptr);
 
-		CSingleLock lock(&m_mutex, TRUE);
+		CSingleLock lock(&m_criticalSection, TRUE);
 		string strConnectionString = createConnectionString(
 			ms_strCurrServerName, ms_strCurrDBName, ms_strCurrAdvConnProperties);
 
@@ -4008,7 +4009,8 @@ STDMETHODIMP CFileProcessingDB::get_ActiveWorkflow(BSTR* pbstrWorkflowName)
 	{
 		ASSERT_ARGUMENT("ELI42026", pbstrWorkflowName != __nullptr);
 
-		*pbstrWorkflowName = get_bstr_t(m_strActiveWorkflow).Detach();
+		string strActiveWorkflow = getActiveWorkflow();
+		*pbstrWorkflowName = get_bstr_t(strActiveWorkflow).Detach();
 
 		return S_OK;
 	}
@@ -4026,7 +4028,7 @@ STDMETHODIMP CFileProcessingDB::put_ActiveWorkflow(BSTR bstrWorkflowName)
 			throw UCLIDException("ELI42030", "Cannot set workflow while a session is open.");
 		}
 
-		CSingleLock lock(&m_mutex, TRUE);
+		CSingleLock lock(&m_criticalSection, TRUE);
 		m_strActiveWorkflow = asString(bstrWorkflowName);
 		ms_strLastWorkflow = m_strActiveWorkflow;
 
@@ -4230,6 +4232,30 @@ STDMETHODIMP CFileProcessingDB::IsFileInWorkflow(long nFileID, long nWorkflowID,
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43217");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_UsingWorkflows(VARIANT_BOOL *pbUsingWorkflows)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI43227", pbUsingWorkflows != __nullptr);
+
+		if (!GetUsingWorkflows_Internal(false, pbUsingWorkflows))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetUsingWorkflows_Internal(true, pbUsingWorkflows);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43228");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -48,40 +48,20 @@ const string gstrFAILED_FILES_EXCEPTIONS_QUERY =
 	"	INNER JOIN FileActionStateTransition"
 	"		ON FileActionStateTransition.ID ="
 	"		("
-	"			SELECT MAX(ID) FROM FileActionStateTransition"
+	"			SELECT MAX(FileActionStateTransition.ID) FROM FileActionStateTransition"
+	"				INNER JOIN Action ON FileActionStateTransition.ActionID = Action.ID"
 	"				WHERE FAMFile.ID = FileActionStateTransition.FileID"
-	"					AND ActionID = <ActionID>"
+	"					AND ASCName = '<Action>'"
+	"					AND <WorkflowID> = -1 OR [WorkflowID] = <WorkflowID>"
 	"		)"
 	"	INNER JOIN Machine ON FileActionStateTransition.MachineID = Machine.ID"
 	"	INNER JOIN FAMUser ON FileActionStateTransition.FAMUserID = FAMUser.ID"
+	"	INNER JOIN Action ON FileActionStatus.ActionID = Action.ID"
 	"	WHERE FileActionStatus.ActionStatus = 'F'"
-	"		AND FileActionStatus.ActionID = <ActionID>"
+	"		AND ASCName = '<Action>'"
 	"		AND FileActionStateTransition.Asc_To = 'F'"
 	"		AND FileActionStateTransition.Exception IS NOT NULL"
 	"	ORDER BY DateTimeStamp DESC";
-
-const string gstrFAILED_FILES_EXCEPTIONS_QUERY_ORACLE = 
-	"SELECT  \"MachineName\", \"UserName\", \"DateTimeStamp\", \"Exception\" FROM"
-	"(SELECT  \"MachineName\", \"UserName\", \"DateTimeStamp\", \"Exception\",  "
-	"		RANK() OVER (ORDER BY \"DateTimeStamp\" DESC) TimeRank"
-	"	FROM \"FAMFile\""
-	"	INNER JOIN \"FileActionStatus\" ON \"FAMFile\".\"ID\" = \"FileActionStatus\".\"FileID\""
-	"	INNER JOIN \"FileActionStateTransition\""
-	"		ON \"FileActionStateTransition\".\"ID\" ="
-	"		("
-	"			SELECT MAX(\"ID\") FROM \"FileActionStateTransition\""
-	"				WHERE \"FAMFile\".\"ID\" = \"FileActionStateTransition\".\"FileID\""
-	"					AND \"ActionID\" = <ActionID>"
-	"		)"
-	"	INNER JOIN \"Machine\" ON \"FileActionStateTransition\".\"MachineID\" = \"Machine\".\"ID\""
-	"	INNER JOIN \"FAMUser\" ON \"FileActionStateTransition\".\"FAMUserID\" = \"FAMUser\".\"ID\""
-	"	WHERE \"FileActionStatus\".\"ActionStatus\" = 'F'"
-	"		AND \"FileActionStatus\".\"ActionID\" = <ActionID>"
-	"		AND \"FileActionStateTransition\".\"ASC_To\" = 'F'"
-	"		AND \"FileActionStateTransition\".\"Exception\" IS NOT NULL)"
-    "  WHERE TimeRank <= 1000"
-	"	ORDER BY \"DateTimeStamp\" DESC";
-
 
 //--------------------------------------------------------------------------------------------------
 // FAMDBAdminSummary dialog
@@ -308,9 +288,15 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 		// If there is a valid selection...
 		if (pNMItemActivate->iItem >= 0 && pNMItemActivate->iSubItem >= 0)
 		{
-			string strContextActionName = m_listActions.GetItemText(pNMItemActivate->iItem, 0);
-			m_nContextMenuActionID = m_ipFAMDB->GetActionID(strContextActionName.c_str());
+			m_strContextMenuAction = m_listActions.GetItemText(pNMItemActivate->iItem, 0);
 			string strActionStatus = gmapCOLUMN_STATUS[pNMItemActivate->iSubItem][0];
+
+			if (pNMItemActivate->iSubItem == giUNATTEMPTED_COLUMN &&
+				asCppBool(m_ipFAMDB->UsingWorkflows) && 
+				m_ipFAMDB->ActiveWorkflow.length() == 0)
+			{ 
+				return;
+			}
 
 			// If there is not an associated action status code, the click occured in the row header or
 			// totals column.
@@ -329,7 +315,7 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 				}
 				pContextMenu = menu.GetSubMenu(0);
 			}
-			// If there is an associated action status code, the click corresponsds to a specific
+			// If there is an associated action status code, the click corresponds to a specific
 			// action status.
 			else 
 			{
@@ -340,7 +326,7 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 				EActionStatus esStatus = m_ipFAMDB->AsEActionStatus(strActionStatus.c_str());
 				m_ipContextMenuFileSelector->Reset();
 				m_ipContextMenuFileSelector->AddActionStatusCondition(m_ipFAMDB,
-					m_nContextMenuActionID, esStatus);
+					m_strContextMenuAction.c_str(), esStatus);
 
 				menu.LoadMenu(IDR_MENU_SUMMARY_CONTEXT);
 				pContextMenu = menu.GetSubMenu(0);
@@ -428,12 +414,12 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 		string currentWorkflow = m_ipFAMDB->ActiveWorkflow;
 		if (currentWorkflow.empty())
 		{
-			string strActionName = asString(m_ipFAMDB->GetActionName(m_nContextMenuActionID));
-			ipActionStats = m_ipFAMDB->GetStatsAllWorkflows(strActionName.c_str(), VARIANT_TRUE);
+			ipActionStats = m_ipFAMDB->GetStatsAllWorkflows(m_strContextMenuAction.c_str(), VARIANT_TRUE);
 		}
 		else
 		{
-			ipActionStats = m_ipFAMDB->GetStats(m_nContextMenuActionID, VARIANT_TRUE);
+			long nActionID = m_ipFAMDB->GetActionID(m_strContextMenuAction.c_str());
+			ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE);
 		}
 
 		long nFailedCount = ipActionStats->GetNumDocumentsFailed();
@@ -450,11 +436,9 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 
 		// Build and execute the query to retrieve the exceptions
 		string strQuery = gstrFAILED_FILES_EXCEPTIONS_QUERY;
-		if (m_bUseOracleSyntax)
-		{
-			strQuery = gstrFAILED_FILES_EXCEPTIONS_QUERY_ORACLE;
-		}
-		replaceVariable(strQuery, "<ActionID>", asString(m_nContextMenuActionID));
+		replaceVariable(strQuery, "<Action>", m_strContextMenuAction);
+		long nWorkflowID = m_ipFAMDB->GetWorkflowID(m_ipFAMDB->ActiveWorkflow);
+		replaceVariable(strQuery, "<WorkflowID>", asString(nWorkflowID));
 
 		_RecordsetPtr ipRecordSet = m_ipFAMDB->GetResultsForQuery(strQuery.c_str());
 		ASSERT_RESOURCE_ALLOCATION("ELI32291", ipRecordSet != __nullptr);
@@ -536,10 +520,8 @@ void CFAMDBAdminSummaryDlg::OnContextCopyActionName()
 {
 	try
 	{
-		string strActionName = asString(m_ipFAMDB->GetActionName(m_nContextMenuActionID));
-
 		ClipboardManager clipboardManager(this);
-		clipboardManager.writeText(strActionName);
+		clipboardManager.writeText(m_strContextMenuAction);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37286");
 }
@@ -730,8 +712,15 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			}
 
 			// fill in the grid row
-			m_listActions.SetItemText(nItem, giUNATTEMPTED_COLUMN, 
-				commaFormatNumber((long long) lUnattempted).c_str());
+			if (asCppBool(m_ipFAMDB->UsingWorkflows) && m_ipFAMDB->ActiveWorkflow.length() == 0)
+			{
+				m_listActions.SetItemText(nItem, giUNATTEMPTED_COLUMN, "n/a");
+			}
+			else
+			{
+				m_listActions.SetItemText(nItem, giUNATTEMPTED_COLUMN,
+					commaFormatNumber((long long)lUnattempted).c_str());
+			}
 			m_listActions.SetItemText(nItem, giPENDING_COLUMN,
 				commaFormatNumber((long long) lPending).c_str());
 			m_listActions.SetItemText(nItem, giPROCESSING_COLUMN,

@@ -14,7 +14,7 @@ CCriticalSection TransactionGuard::m_sCSExistingTrans;
 // TransactionGuard
 //-------------------------------------------------------------------------------------------------
 TransactionGuard::TransactionGuard(ADODB::_ConnectionPtr ipConnection,
-	IsolationLevelEnum isolationLevel, CMutex *pMutex)
+	IsolationLevelEnum isolationLevel, CCriticalSection *pCriticalSection)
 : m_ipConnection(ipConnection)
 , m_bTransactionStarted(false)
 , m_bNestedTransaction(false)
@@ -46,9 +46,9 @@ TransactionGuard::TransactionGuard(ADODB::_ConnectionPtr ipConnection,
 			}
 		}
 
-		if (pMutex != __nullptr)
+		if (pCriticalSection != __nullptr)
 		{
-			m_upLock.reset(new CSingleLock(pMutex, TRUE));
+			m_upLock.reset(new CSingleLock(pCriticalSection, TRUE));
 		}
 
 		ipConnection->IsolationLevel = isolationLevel;

@@ -82,5 +82,14 @@ public:
 	string buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
 					  const string& strSelect, string strOrderByClause);
 
+	// Builds a select query with the specified values selected for the current settings
+	// in the specified workflow.
+	// NOTE: strSelect should contain only the values to be selected by the query, for
+	// example strSelect = "FAMFile.ID, FAMFile.FileName" or
+	// strSelect = "FAMFile.ID, FAMFile.Priority", etc
+	// NOTE2: It can be assumed that the FAMFile table will be included in the query.
+	string buildQueryForWorkflow(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
+		const string& strSelect, long nWorkflowID);
+
 	UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr getRandomCondition();
 };

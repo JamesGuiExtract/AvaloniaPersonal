@@ -67,7 +67,7 @@ void CFileProcessingDB::closeDBConnection()
 {
 	// Lock mutex to keep other instances from running code that may cause the
 	// connection to be reset
-	CSingleLock lg(&m_mutex, TRUE);
+	CSingleLock lg(&m_criticalSection, TRUE);
 
 	// Get the current thread ID
 	DWORD dwThreadID = GetCurrentThreadId();
@@ -883,7 +883,7 @@ long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, string strWor
 	{
 		if (strWorkflowName.empty())
 		{
-			strWorkflowName = m_strActiveWorkflow;
+			strWorkflowName = getActiveWorkflow();
 		}
 
 		if (strWorkflowName.empty())
@@ -935,9 +935,9 @@ bool CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, long nFile
 {
 	try
 	{
-		if (nWorkflowID <= 0 && databaseHasWorkflows(ipConnection))
+		if (nWorkflowID <= 0 && databaseUsingWorkflows(ipConnection))
 		{
-			nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
+			nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
 		}
 
 		string strQuery = (nWorkflowID > 0)
@@ -955,11 +955,18 @@ bool CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, long nFile
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43218");
 }
 //--------------------------------------------------------------------------------------------------
+string CFileProcessingDB::getActiveWorkflow()
+{
+	CSingleLock lock(&m_criticalSection, TRUE);
+
+	return m_strActiveWorkflow;
+}
+//--------------------------------------------------------------------------------------------------
 long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& strActionName)
 {
 	try
 	{
-		return getActionID(ipConnection, strActionName, m_strActiveWorkflow);
+		return getActionID(ipConnection, strActionName, getActiveWorkflow());
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42035");
 }
@@ -971,7 +978,7 @@ long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& s
 	{
 		if (nWorkflowID <= 0)
 		{
-			return getActionID(ipConnection, strActionName, m_strActiveWorkflow);
+			return getActionID(ipConnection, strActionName, getActiveWorkflow());
 		}
 		else
 		{
@@ -1037,8 +1044,10 @@ string CFileProcessingDB::getActionIDsForActiveWorkflow(_ConnectionPtr ipConnect
 	{
 		string strActionIDs;
 
+		string strActiveWorkflow = getActiveWorkflow();
+
 		// If processing on all workflows for this action
-		if (m_strActiveWorkflow.empty())
+		if (strActiveWorkflow.empty())
 		{
 			// Create a pointer to a recordset
 			_RecordsetPtr ipActionSet(__uuidof(Recordset));
@@ -1072,7 +1081,7 @@ string CFileProcessingDB::getActionIDsForActiveWorkflow(_ConnectionPtr ipConnect
 		// Running a specific workflow
 		else
 		{
-			strActionIDs = asString(getActionID(ipConnection, strActionName, m_strActiveWorkflow));
+			strActionIDs = asString(getActionID(ipConnection, strActionName, strActiveWorkflow));
 		}
 
 		return strActionIDs;
@@ -1201,7 +1210,7 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 
 			// Lock mutex to keep other instances from running code that may cause the
 			// connection to be reset
-			CSingleLock lg(&m_mutex, TRUE);
+			CSingleLock lg(&m_criticalSection, TRUE);
 
 			map<DWORD, _ConnectionPtr>::iterator it;
 			it = m_mapThreadIDtoDBConnections.find(dwThreadID);
@@ -2498,7 +2507,8 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 	{
 		try
 		{
-			m_nActiveActionID = getActionID(ipConnection, strActionName, m_strActiveWorkflow);
+			string strActiveWorkflow = getActiveWorkflow();
+			m_nActiveActionID = getActionID(ipConnection, strActionName, strActiveWorkflow);
 
 			long nWorkflowActionCount = 0;
 			string strWorkflowActionQuery = Util::Format(
@@ -2506,7 +2516,7 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 				strActionName.c_str());
 			executeCmdQuery(ipConnection, strWorkflowActionQuery, false, &nWorkflowActionCount);
 			m_bUsingWorkflowsForCurrentAction = (nWorkflowActionCount > 0);
-			m_bRunningAllWorkflows = (m_bUsingWorkflowsForCurrentAction && m_strActiveWorkflow == "");
+			m_bRunningAllWorkflows = (m_bUsingWorkflowsForCurrentAction && strActiveWorkflow == "");
 			m_nWorkflowActionIDCheck = -1;
 
 			if (m_bUsingWorkflowsForCurrentAction)
@@ -2591,7 +2601,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 				}
 
 				// Lock while updating the lock table and m_bDBLocked variable
-				CSingleLock lock2(&m_mutex, TRUE);
+				CSingleLock lock2(&m_criticalSection, TRUE);
 
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
@@ -2687,7 +2697,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 			bool bAllConnectionsClosed = false;
 			if (!bConnectionGood)
 			{
-				CSingleLock lock(&m_mutex, TRUE);
+				CSingleLock lock(&m_criticalSection, TRUE);
 				bAllConnectionsClosed = (m_mapThreadIDtoDBConnections.size() == 0);
 			}
 
@@ -2784,7 +2794,7 @@ bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseA
 	{
 		// Open the Login Table
 		// Lock the mutex for this instance
-		CSingleLock lock(&m_mutex, TRUE);
+		CSingleLock lock(&m_criticalSection, TRUE);
 
 		// Create a pointer to a recordset
 		_RecordsetPtr ipLoginSet(__uuidof(Recordset));
@@ -2830,7 +2840,7 @@ void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strEncry
 	string strUser = bUseAdmin ? gstrADMIN_USER : m_strFAMUserName;
 
 	// Lock the mutex for this instance
-	CSingleLock lock(&m_mutex, TRUE);
+	CSingleLock lock(&m_criticalSection, TRUE);
 
 	// Create a pointer to a recordset
 	_RecordsetPtr ipLoginSet(__uuidof(Recordset));
@@ -3178,7 +3188,7 @@ long CFileProcessingDB::getMachineID(_ConnectionPtr ipConnection)
 	// if the m_lMachineID == 0, get the id from the database
 	if (m_lMachineID == 0)
 	{
-		CSingleLock lg(&m_mutex, TRUE);
+		CSingleLock lg(&m_criticalSection, TRUE);
 		m_lMachineID = getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName);
 	}
 	return m_lMachineID;
@@ -3189,7 +3199,7 @@ long CFileProcessingDB::getFAMUserID(_ConnectionPtr ipConnection)
 	// if the m_lFAMUserID == 0, get the id from the database
 	if (m_lFAMUserID == 0)
 	{
-		CSingleLock lg(&m_mutex, TRUE);
+		CSingleLock lg(&m_criticalSection, TRUE);
 		m_lFAMUserID = getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName);
 	}
 	return m_lFAMUserID;
@@ -3763,7 +3773,7 @@ void CFileProcessingDB::resetDBConnection()
 	{
 		_lastCodePos = "10";
 
-		CSingleLock lock(&m_mutex, TRUE);
+		CSingleLock lock(&m_criticalSection, TRUE);
 
 		bool bDBSpecified = (!m_strDatabaseServer.empty() && !m_strDatabaseName.empty());
 
@@ -3810,7 +3820,7 @@ void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 	INIT_EXCEPTION_AND_TRACING("MLI03275");
 	try
 	{
-		CSingleLock lock(&m_mutex, TRUE);
+		CSingleLock lock(&m_criticalSection, TRUE);
 		
 		_lastCodePos = "20";
 		
@@ -3907,7 +3917,7 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 				checkDatabaseIDValid(ipConnection, false);
 			}
 
-			CSingleLock lock(&m_mutex, TRUE);
+			CSingleLock lock(&m_criticalSection, TRUE);
 
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
@@ -3991,7 +4001,7 @@ void CFileProcessingDB::init80DB()
 			// Get the connection pointer
 			_ConnectionPtr ipConnection = getDBConnection();
 
-			CSingleLock lock(&m_mutex, TRUE);
+			CSingleLock lock(&m_criticalSection, TRUE);
 
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
@@ -4964,7 +4974,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			if (!m_bRevertInProgress)
 			{
 				// Begin a transaction
-				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				// Revert files
 				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
@@ -4983,7 +4993,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			while (!bTransactionSuccessful)
 			{
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				try
 				{
@@ -4999,6 +5009,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 
 						// Replace the variable to set up the query
 						replaceVariable(strQuery, "<SelectFilesToProcessQuery>", strSelectSQL);
+						replaceVariable(strQuery, "<ActionName>", strActionName);
 						replaceVariable(strQuery, "<UserID>", asString(getFAMUserID(ipConnection)));
 						replaceVariable(strQuery, "<MachineID>", asString(getMachineID(ipConnection)));
 						replaceVariable(strQuery, "<ActiveFAMID>", asString(m_nActiveFAMID));
@@ -5180,7 +5191,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	// Run the revert method before checking for in processing file
 	{
 		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
@@ -5229,7 +5240,7 @@ bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 	// Run the revert method before checking for in processing file
 	{
 		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
@@ -5761,7 +5772,7 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, s
 				try
 				{
 					// Begin a transaction
-					TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);	
+					TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 					try
 					{
@@ -5837,7 +5848,7 @@ void CFileProcessingDB::revertTimedOutWorkItems(bool bDBLocked, const _Connectio
 		try
 		{
 			// Begin a transaction
-			TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
+			TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
 			string strQuery = gstrRESET_TIMEDOUT_WORK_ITEM_QUERY;
 			replaceVariable(strQuery, "<TimeOutInSeconds>", asString(m_nAutoRevertTimeOutInMinutes * 60));
 
@@ -6616,7 +6627,7 @@ map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 		ipConnection = getDBConnection();
 		validateDBSchemaVersion();
 
-		long nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
+		long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
 
 		UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
 			getWorkflowDefinition(ipConnection, nWorkflowID);
@@ -6674,20 +6685,20 @@ map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 	return mapStatuses;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::databaseHasWorkflows(_ConnectionPtr ipConnection)
+bool CFileProcessingDB::databaseUsingWorkflows(_ConnectionPtr ipConnection)
 {
 	if (m_nWorkflowActionIDCheck < 0)
 	{
-		CSingleLock lg(&m_mutex, TRUE);
+		CSingleLock lg(&m_criticalSection, TRUE);
 
 		if (m_nWorkflowActionIDCheck < 0)
 		{
 			string strQuery =
 				"SELECT COALESCE(MAX([ActionID]), 0) AS [ID] FROM \r\n"
 				"(\r\n"
-				"	SELECT TOP 1[ActionID] FROM[FileActionStatus] \r\n"
-				"	INNER JOIN[Action] ON[ActionID] = [Action].[ID] \r\n"
-				"	WHERE[WorkflowID] IS NOT NULL \r\n"
+				"	SELECT TOP 1 [ActionID] FROM [FileActionStatus] \r\n"
+				"	INNER JOIN [Action] ON [ActionID] = [Action].[ID] \r\n"
+				"	WHERE [WorkflowID] IS NOT NULL \r\n"
 				") T";
 
 			long nWorkflowActionIDCheck = -1;
@@ -6703,9 +6714,10 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 	EActionStatus eStatus)
 {
 	long nWorkflowId = -1;
-	if (!m_strActiveWorkflow.empty())
+	string strActiveWorkflow = getActiveWorkflow();
+	if (!strActiveWorkflow.empty())
 	{
-		nWorkflowId = getWorkflowID(ipConnection, m_strActiveWorkflow);
+		nWorkflowId = getWorkflowID(ipConnection, strActiveWorkflow);
 	}
 
 	// Get the action ID and update the strActionName to stored value
@@ -6817,9 +6829,10 @@ void CFileProcessingDB::modifyActionStatusForQuery(_ConnectionPtr ipConnection, 
 	_RecordsetPtr ipFileSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != __nullptr);
 
-	if (!m_strActiveWorkflow.empty())
+	string strActiveWorkflow = getActiveWorkflow();
+	if (!strActiveWorkflow.empty())
 	{
-		long nWorkflowId = getWorkflowID(ipConnection, m_strActiveWorkflow);
+		long nWorkflowId = getWorkflowID(ipConnection, strActiveWorkflow);
 
 		strQueryFrom += Util::Format(" \r\n"
 			"INTERSECT "

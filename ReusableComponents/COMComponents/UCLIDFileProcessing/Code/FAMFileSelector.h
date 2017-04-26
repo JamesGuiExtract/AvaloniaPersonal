@@ -37,7 +37,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 // IFAMFileSelector
 	STDMETHOD(Configure)(IFileProcessingDB *pFAMDB, BSTR bstrSectionHeader,
 		BSTR bstrQueryLabel, VARIANT_BOOL* pbNewSettingsApplied);
-	STDMETHOD(AddActionStatusCondition)(IFileProcessingDB *pFAMDB, long nActionID,
+	STDMETHOD(AddActionStatusCondition)(IFileProcessingDB *pFAMDB, BSTR bstrAction,
 		EActionStatus eStatus);
 	STDMETHOD(AddQueryCondition)(BSTR bstrQuery);
 	STDMETHOD(AddFileSetCondition)(BSTR bstrFileSet);

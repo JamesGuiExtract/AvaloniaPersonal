@@ -74,7 +74,7 @@ STDMETHODIMP CFAMFileSelector::Configure(IFileProcessingDB *pFAMDB,
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMFileSelector::AddActionStatusCondition(IFileProcessingDB *pFAMDB,
-	long nActionID, EActionStatus eStatus)
+	BSTR bstrAction, EActionStatus eStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -86,8 +86,7 @@ STDMETHODIMP CFAMFileSelector::AddActionStatusCondition(IFileProcessingDB *pFAMD
 		ASSERT_ARGUMENT("ELI35696", ipFAMDB != __nullptr);
 
 		ActionStatusCondition* pCondition = new ActionStatusCondition();
-		pCondition->setActionID(nActionID);		
-		pCondition->setAction(asString(ipFAMDB->GetActionName(nActionID)));
+		pCondition->setAction(asString(bstrAction));
 		pCondition->setStatus(eStatus);
 		string strStatusString =
 			asString(ipFAMDB->AsStatusName((UCLID_FILEPROCESSINGLib::EActionStatus)eStatus));

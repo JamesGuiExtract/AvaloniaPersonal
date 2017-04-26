@@ -58,7 +58,7 @@ string SpecifiedFilesCondition::getSummaryString(bool bFirstCondition)
 }
 //--------------------------------------------------------------------------------------------------
 string SpecifiedFilesCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipFAMDB, 
-									 const string& strSelect)
+									 const string& strSelect, long nWorkflowID)
 {
 	string strQuery;
 	switch (m_eFileListSource)

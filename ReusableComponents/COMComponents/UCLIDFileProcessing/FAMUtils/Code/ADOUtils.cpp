@@ -777,6 +777,8 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQ
 {
 	ASSERT_ARGUMENT("ELI18818", ipDBConnection != __nullptr);
 
+	_RecordsetPtr ipResult(__nullptr);
+
 	variant_t vtRecordsAffected = 0L;
 	try
 	{
@@ -789,8 +791,7 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQ
 			}
 			else
 			{
-				_RecordsetPtr ipResult = 
-					ipDBConnection->Execute(strSQLQuery.c_str(), __nullptr, adCmdUnknown);
+				ipResult = ipDBConnection->Execute(strSQLQuery.c_str(), __nullptr, adCmdUnknown);
 				ASSERT_RESOURCE_ALLOCATION("ELI34111", ipResult != __nullptr);
 
 				// If pnOutputID is provided, it is assumed the query will return a single record
@@ -804,6 +805,12 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQ
 	catch(UCLIDException& ue)
 	{
 		ue.addDebugInfo("SQL", strSQLQuery, true);
+
+		if (ipResult != __nullptr)
+		{
+			UCLIDException uexOuter = UCLIDException("ELI43266", "Record not found", ue);
+			ue = uexOuter;
+		}
 
 		if (!bDisplayExceptions)
 		{

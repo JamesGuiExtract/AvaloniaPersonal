@@ -331,6 +331,7 @@ public:
 	STDMETHOD(get_RunningAllWorkflows)(VARIANT_BOOL *pRunningAllWorkflows);
 	STDMETHOD(GetWorkflowID)(BSTR bstrWorkflowName, long *pnID);
 	STDMETHOD(IsFileInWorkflow)(long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
+	STDMETHOD(get_UsingWorkflows)(VARIANT_BOOL *pbUsingWorkflows);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -369,8 +370,9 @@ private:
 	// Map that contains the open connection for each thread.
 	map<DWORD, _ConnectionPtr> m_mapThreadIDtoDBConnections;
 
-	// Mutex is locked only inside of the get connection method
-	CMutex m_mutex;
+	// For synchronization of connections, active workflow, and other resources that are otherwise
+	// not thread-safe
+	CCriticalSection m_criticalSection;
 
 	// Ensure only one thread per process is trying to ping the database at once to avoid the chance
 	// of pingDB failing because multiple threads in the same process are trying to add or update
@@ -426,6 +428,8 @@ private:
 
 	// The currently active workflow. Empty when workflows are not being used or processing an action
 	// across all workflows.
+	// Use getActiveWorkflow rather than checking this variable directly in order to synchronize access
+	// except in cases where m_criticalSection is locked.
 	string m_strActiveWorkflow;
 
 	// Indicates whether workflows are being used for processing within the context of the current action.
@@ -438,7 +442,7 @@ private:
 	// An ID indicating whether any workflows are currently in use anywhere in the database.
 	// -1 indicates a check has not been made for workflows, 0 means a check has been made, but
 	// there are no active workflows and > 0 means there are active workflows.
-	// NOTE: This property should not be checked directly; instead databaseHasWorkflows() should be used.
+	// NOTE: This property should not be checked directly; instead databaseUsingWorkflows() should be used.
 	volatile long m_nWorkflowActionIDCheck;
 
 	// Keeps track of the last time this instance checked stats.
@@ -689,6 +693,10 @@ private:
 	// If the specified workflow ID is -1, the current workflow will be tested.
 	// If there are no workflows defined, the result will indicate whether the file ID is present in the DB.
 	bool isFileInWorkflow(_ConnectionPtr ipConnection, long nFileID, long nWorkflowID);
+
+	// Gets the currently active workflow. Should be checked instead of m_strActiveWorkflow in order
+	// to synchronize access.
+	string getActiveWorkflow();
 
 	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match
 	//			the action name stored in the database using the connection object provided.
@@ -1192,7 +1200,7 @@ private:
 	map<string, long> getWorkflowStatus(long nFileID);
 
 	// Indicates whether any workflows are currently in use anywhere in the database.
-	bool databaseHasWorkflows(_ConnectionPtr ipConnection);
+	bool databaseUsingWorkflows(_ConnectionPtr ipConnection);
 
 	// Helper function for SetStatusForAllFiles COM method that may be called once per workflow when
 	// called for <All workflows>
@@ -1375,6 +1383,7 @@ private:
 		long *pnCompleted, long *pnFailed);
 	bool GetWorkflowID_Internal(bool bDBLocked, BSTR bstrWorkflowName, long *pnID);
 	bool IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
+	bool GetUsingWorkflows_Internal(bool bDBLocked, VARIANT_BOOL *pbUsingWorkflows);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 
@@ -1399,7 +1408,7 @@ OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)
 		bool bRetrySuccess = false; \
 		do \
 		{ \
-			CSingleLock retryLock(&m_mutex, TRUE); \
+			CSingleLock retryLock(&m_criticalSection, TRUE); \
 			try \
 			{\
 				try\

@@ -26,6 +26,6 @@ public:
 	// strSelect = "FAMFile.ID, FAMFile.Priority", etc
 	// NOTE2: It can be assumed that the FAMFile table will be included in the query.
 	virtual string buildQuery(const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipFAMDB,
-		const string& strSelect) abstract;
+		const string& strSelect, long nWorkflowID) abstract;
 };
 

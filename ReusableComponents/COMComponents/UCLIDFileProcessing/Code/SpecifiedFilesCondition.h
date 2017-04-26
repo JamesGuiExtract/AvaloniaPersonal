@@ -33,7 +33,7 @@ public:
 	// strSelect = "FAMFile.ID, FAMFile.Priority", etc
 	// NOTE2: It can be assumed that the FAMFile table will be included in the query.
 	string buildQuery(const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipFAMDB,
-		const string& strSelect);
+		const string& strSelect, long nWorkflowID);
 
 	void setUseSpecifiedFiles() { m_eFileListSource = eSpecifiedFiles; }
 	bool getUseSpecifiedFiles() { return m_eFileListSource == eSpecifiedFiles; }

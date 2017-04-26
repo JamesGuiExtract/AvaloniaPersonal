@@ -223,28 +223,11 @@ namespace Extract.FileActionManager.Utilities
         /// condition should be applied.</param>
         static void ApplyActionStatusCondition(FAMFileInspectorForm famFileInspectorForm)
         {   
-            int actionId = -1;
             EActionStatus status = EActionStatus.kActionUnattempted;
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(_actionName))
-                {
-                    actionId = famFileInspectorForm.FileProcessingDB.GetActionID(_actionName);
-                }
-            }
-            catch (Exception ex)
-            {
-                var ee = new ExtractException("ELI36098",
-                    "Unable to apply action status condition: Invalid action name", ex);
-                ee.AddDebugData("Action", _actionName, false);
-                ee.Display();
-                return;
-            }
-
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(_actionName))
+                if (!string.IsNullOrWhiteSpace(_actionStatus))
                 {
                     status = famFileInspectorForm.FileProcessingDB.AsEActionStatus(_actionStatus);
                 }
@@ -263,7 +246,7 @@ namespace Extract.FileActionManager.Utilities
                 if (!string.IsNullOrWhiteSpace(_actionName))
                 {
                     famFileInspectorForm.FileSelector.AddActionStatusCondition(
-                        famFileInspectorForm.FileProcessingDB, actionId, status);
+                        famFileInspectorForm.FileProcessingDB, _actionName, status);
                 }
             }
             catch (Exception ex)

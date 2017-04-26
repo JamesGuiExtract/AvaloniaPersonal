@@ -52,8 +52,10 @@ string FilePriorityCondition::getSummaryString(bool bFirstCondition)
 }
 //--------------------------------------------------------------------------------------------------
 string FilePriorityCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipFAMDB, 
-										 const string& strSelect)
+										 const string& strSelect, long nWorkflowID)
 {
+	// Currently there is no workflow-specific priorities.
+
 	string strQuery = "SELECT " + strSelect + " FROM FAMFile WHERE FAMFile.Priority = "
 		+ asString((long)m_ePriority);
 

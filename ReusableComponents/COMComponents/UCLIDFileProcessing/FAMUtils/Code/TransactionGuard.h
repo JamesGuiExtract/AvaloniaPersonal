@@ -31,13 +31,13 @@ public:
 	//			NOTE: Take care when using elevated isolation levels, however, as doing so can create
 	//			deadlock situations.
 	//			[FlexIDSCore:5244], [DataEntry:1212]
-	//			Specify pMutex for any transactions that are repeatable read or isolated when that
-	//			mutex that has the potential to be locked during the transaction. Otherwise, if the
-	//			transaction is started, then another thread locks the mutex before the one in the
+	//			Specify pCriticalSection for any transactions that are repeatable read or isolated when
+	//			that mutex that has the potential to be locked during the transaction. Otherwise, if
+	//			the transaction is started, then another thread locks the mutex before the one in the
 	//			transaction, it can lead to a deadlock as the database causes the other thread to
 	//			wait on the active repeatable read transaction.
 	TransactionGuard(ADODB::_ConnectionPtr ipConnection, IsolationLevelEnum isolationLevel,
-		CMutex *pMutex);
+		CCriticalSection *pCriticalSection);
 
 	// PROMISE: To Rollback a started transaction if it has not been committed
 	~TransactionGuard();

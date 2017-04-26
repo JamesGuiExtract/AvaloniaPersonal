@@ -152,17 +152,19 @@ void reverseOrderByClause(string& strOrderByClause)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
-									  const string& strSelect, string strOrderByClause)
+string SelectFileSettings::buildQueryForWorkflow(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
+											   const string& strSelect, long nWorkflowID)
 {
-	ASSERT_ARGUMENT("ELI27722", ipFAMDB != __nullptr);
-	
-	string strQueryPart1 = "SELECT DISTINCT " + strSelect + " FROM ";
 	string strQuery;
 
 	if (m_vecConditions.empty())
 	{
-		strQuery = strQueryPart1 + "FAMFile";
+		strQuery = "SELECT DISTINCT " + strSelect + " FROM [FAMFile]";
+		if (nWorkflowID > 0)
+		{
+			strQuery += "INNER JOIN [WorkflowFile] ON [FAMFile].[ID] = [FileID] "
+				"AND [WorkflowID] = " + asString(nWorkflowID);
+		}
 	}
 	else
 	{
@@ -173,17 +175,71 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 				strQuery += m_bAnd ? "\r\nINTERSECT\r\n" : "\r\nUNION\r\n";
 			}
 
-			strQuery += m_vecConditions[i]->buildQuery(ipFAMDB, strSelect);
+			strQuery += m_vecConditions[i]->buildQuery(ipFAMDB, strSelect, nWorkflowID);
+		}
+	}
+
+	return strQuery;
+}
+//--------------------------------------------------------------------------------------------------
+string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
+									  const string& strSelect, string strOrderByClause)
+{
+	ASSERT_ARGUMENT("ELI27722", ipFAMDB != __nullptr);
+	
+	string strQueryPart1 = "SELECT DISTINCT " + strSelect + " FROM ";
+	
+	string strQuery;
+
+	long nWorkflowID = ipFAMDB->GetWorkflowID("");
+	if (nWorkflowID > 0)
+	{
+		string strInnerQuery = buildQueryForWorkflow(ipFAMDB, strSelect, nWorkflowID);
+		strQuery = Util::Format(
+			"SELECT %s FROM (\r\n%s\r\n) AS [FAMFile] \r\n"
+			"	INNER JOIN [WorkflowFile] ON [FAMFile].[ID] = [WorkflowFile].[FileID] \r\n"
+			"		AND [WorkflowID] = %d",
+			strSelect.c_str(), strInnerQuery.c_str(), nWorkflowID);
+	}
+	else
+	{
+		IStrToStrMapPtr mapWorkflows = ipFAMDB->GetWorkflows();
+		long nWorkflowCount = mapWorkflows->Size;
+		if (nWorkflowCount > 0)
+		{
+			for (long i = 0; i < nWorkflowCount; i++)
+			{
+				if (i > 0)
+				{
+					strQuery += "\r\nUNION\r\n";
+				}
+
+				BSTR bstrKey;
+				BSTR bstrValue;
+				mapWorkflows->raw_GetKeyValue(i, &bstrKey, &bstrValue);
+				nWorkflowID = asLong(bstrValue);
+				string strInnerQuery = buildQueryForWorkflow(ipFAMDB, strSelect, nWorkflowID);
+
+				strQuery += Util::Format(
+					"SELECT %s FROM (\r\n%s\r\n) AS [FAMFile] \r\n"
+					"	INNER JOIN [WorkflowFile] ON [FAMFile].[ID] = [WorkflowFile].[FileID] \r\n"
+					"		AND [WorkflowID] = %d",
+					strSelect.c_str(), strInnerQuery.c_str(), nWorkflowID);
+			}
+		}
+		else
+		{
+			strQuery = buildQueryForWorkflow(ipFAMDB, strSelect, -1);
 		}
 	}
 
 	if (m_bLimitToSubset && m_bSubsetIsRandom)
 	{
 		// If choosing a random subset by specifying the number of files to select, use the query
-		// parts generated thus far to create a proceedure which will randomly select the specified
+		// parts generated thus far to create a procedure which will randomly select the specified
 		// number of results from the query while preserving the order which would have resulted
 		// from the original query.
-		// This proceedure has 3 limitations regarding strSelect:
+		// This procedure has 3 limitations regarding strSelect:
 		// 1) strSelect cannot be "*" if none of the select columns are an identity column (in which
 		//	  case, an extra "RowNumber" column will be returned.
 		// 2) If strSelect specifies a column with the identity property, the resulting row order

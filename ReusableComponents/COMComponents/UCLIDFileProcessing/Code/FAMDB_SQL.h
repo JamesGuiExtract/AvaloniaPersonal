@@ -1299,13 +1299,22 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 "); \r\n"
 "SET NOCOUNT ON \r\n"
 "BEGIN TRY \r\n"
-"	UPDATE FileActionStatus Set ActionStatus = 'R'  \r\n"
+// Use table expression to group files by ID to avoid selecting the same file twice if queued in
+// multiple workflows simultaneously. FileRepetition will be > 1 for any cases where a file ID is
+// being returned beyond to first instance in this result set.
+"   WITH SelectedFiles AS \r\n"
+"	( \r\n"
+"		SELECT ID, FileName, FileSize, Pages, Priority, ActionStatus, ActionId, \r\n"
+"			ROW_NUMBER() OVER (PARTITION BY ID ORDER BY ActionID ASC) AS FileRepetition \r\n"
+"		FROM ( <SelectFilesToProcessQuery> ) T \r\n"
+"	) \r\n"
+"	UPDATE FileActionStatus Set ActionStatus = 'R' \r\n"
 "	OUTPUT ATABLE.ID, ATABLE.FileName, ATABLE.FileSize, ATABLE.Pages, ATABLE.Priority, ATABLE.ActionId, deleted.ActionStatus INTO @OutputTableVar \r\n"
 "	FROM  \r\n"
-"	( \r\n"
-"		<SelectFilesToProcessQuery> ) AS ATABLE  \r\n"
+"		SelectedFiles ATABLE  \r\n"
 "	INNER JOIN FileActionStatus on FileActionStatus.FileID = ATABLE.ID AND FileActionStatus.ActionID = ATABLE.ActionID \r\n"
-"	WHERE ATABLE.ActionStatus <> 'R'; \r\n"
+"	LEFT JOIN LockedFile ON FileActionStatus.FileID = LockedFile.FileID AND LockedFile.ActionName = '<ActionName>' \r\n"
+"	WHERE ATABLE.ActionStatus <> 'R' AND LockedFile.FileID IS NULL AND ATABLE.FileRepetition = 1; \r\n"
 "	IF (1 = <RecordFASTEntry>) BEGIN"
 //	If a file that is currently unattempted is being moved to processing, first add a FAST table
 //	entry from U->P before adding a record from P -> R

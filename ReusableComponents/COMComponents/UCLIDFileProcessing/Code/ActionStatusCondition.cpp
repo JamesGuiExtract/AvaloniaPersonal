@@ -3,6 +3,7 @@
 #include "ActionStatusConditionDlg.h"
 
 #include <UCLIDException.h>
+#include <COMUtils.h>
 
 //--------------------------------------------------------------------------------------------------
 // ActionStatusCondition
@@ -53,17 +54,30 @@ string ActionStatusCondition::getSummaryString(bool bFirstCondition)
 }
 //--------------------------------------------------------------------------------------------------
 string ActionStatusCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipFAMDB,
-										 const string& strSelect)
+										 const string& strSelect, long nWorkflowID)
 {
 	ASSERT_ARGUMENT("ELI33785", ipFAMDB != __nullptr);
 	
 	string strQuery = "SELECT " + strSelect + " FROM FAMFile ";
 
+	long nActionID = 0;
+	if (nWorkflowID > 0)
+	{
+		auto mapActions = ipFAMDB->GetWorkflowActions(nWorkflowID);
+		nActionID = (mapActions->Contains(m_strAction.c_str()))
+			? asLong(mapActions->GetValue(m_strAction.c_str()))
+			: -1;
+	}
+	else
+	{
+		nActionID = ipFAMDB->GetActionID(m_strAction.c_str());
+	}
+
 	// Check if comparing skipped status
 	if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionSkipped)
 	{
 		strQuery += "INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE "
-			"(SkippedFile.ActionID = " + asString(m_nActionID);
+			"(SkippedFile.ActionID = " + asString(nActionID);
 		string strUser = m_strUser;
 		if (strUser != gstrANY_USER)
 		{
@@ -77,7 +91,7 @@ string ActionStatusCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFilePro
 		string strStatus = ipFAMDB->AsStatusString((UCLID_FILEPROCESSINGLib::EActionStatus)m_nStatus);
 
 		strQuery += " LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
-                " AND FileActionStatus.ActionID = " + asString(m_nActionID);
+			" AND FileActionStatus.ActionID = " + asString(nActionID);
         strQuery += " WHERE (";
 
         // [LRCAU #5942] - Files are no longer marked as unattempted due to the

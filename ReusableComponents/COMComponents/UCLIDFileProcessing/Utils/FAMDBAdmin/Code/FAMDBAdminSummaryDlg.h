@@ -74,8 +74,8 @@ private:
 	// Allows inspection of files in the database using the FAMFileInspector utility.
 	IFAMFileInspectorPtr m_ipFAMFileInspector;
 
-	// The action ID and count associated with the context menu click location.
-	long m_nContextMenuActionID;
+	// The action and count associated with the context menu click location.
+	string m_strContextMenuAction;
 	string m_strContextMenuCount;
 
 	// Indicates if the queries used should use OracleSyntax

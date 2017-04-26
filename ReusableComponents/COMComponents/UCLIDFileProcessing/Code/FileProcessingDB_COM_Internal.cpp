@@ -1811,7 +1811,7 @@ bool CFileProcessingDB::GetActions_Internal(bool bDBLocked, IStrToStrMap * * pma
 				validateDBSchemaVersion();
 
 				// Create StrToStrMap to return the list of actions
-				IStrToStrMapPtr ipActions = getActions(ipConnection, m_strActiveWorkflow);
+				IStrToStrMapPtr ipActions = getActions(ipConnection, getActiveWorkflow());
 				ASSERT_RESOURCE_ALLOCATION("ELI13529", ipActions != __nullptr);
 
 				// return the StrToStrMap containing all actions
@@ -1918,7 +1918,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 				if (nWorkflowID <= 0 && m_bUsingWorkflowsForCurrentAction)
 				{
-					nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
+					nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
 				}
 
 				string strActionName = asString(strAction);
@@ -1945,7 +1945,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				long nID = 0;
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				_lastCodePos = "45";
 
@@ -2252,7 +2252,7 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 					adLockOptimistic, adCmdText);
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				// Setup action name and action id
 				string strActionName = asString(strAction);
@@ -2351,7 +2351,7 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 				ipConnection = getDBConnection();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				// change the given files state to completed unless there is a pending state in the
 				// QueuedActionStatusChange table.
@@ -2397,7 +2397,7 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked, long nFileID, 
 				ipConnection = getDBConnection();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				// [LegacyRCAndUtils:6054]
 				// Store the full log string which contains additional info which may be useful.
@@ -2444,7 +2444,7 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 				ipConnection = getDBConnection();
 				
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 				
 				// change the given files state to Pending
 				setFileActionState(ipConnection, nFileID, asString(strAction), -1, "P", "", 
@@ -2486,7 +2486,7 @@ bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long
 				ipConnection = getDBConnection();;
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				// change the given files state to unattempted
 				setFileActionState(ipConnection, nFileID, asString(strAction), -1, "U", "",
@@ -2526,7 +2526,7 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 			ipConnection = getDBConnection();
 
 			// Begin a transaction
-			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 			// Change the given files state to Skipped
 			setFileActionState(ipConnection, nFileID, asString(strAction), -1, "S", "",
@@ -2598,7 +2598,7 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 					if (*pStatus == kActionProcessing && asCppBool(vbAttemptRevertIfLocked))
 					{
 						// Begin a transaction
-						TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+						TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 						revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
@@ -2647,9 +2647,8 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 
 			BEGIN_CONNECTION_RETRY();
 
-				// The following code depends on the fact that m_strActiveWorkflow won't change in
-				// the midst of this call.
-				CSingleLock lock(&m_mutex, TRUE);
+				
+				CSingleLock lock(&m_criticalSection, TRUE);
 
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
@@ -2658,12 +2657,14 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactIsolated, &m_mutex);
+				// The following code depends on the fact that m_strActiveWorkflow won't change in
+				// the midst of this call; m_criticalSection guarantees that.
+				TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
 
 				// Set the action name from the parameter
 				string strActionName = asString(strAction);
 
-				if (m_strActiveWorkflow.empty() && databaseHasWorkflows(ipConnection))
+				if (m_strActiveWorkflow.empty() && databaseUsingWorkflows(ipConnection))
 				{
 					ValueRestorer<string> restorer(m_strActiveWorkflow, "");
 
@@ -2721,7 +2722,7 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 			ipConnection = getDBConnection();
 
 			// Begin a transaction
-			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 			setStatusForFile(ipConnection, nID, asString(strAction), nWorkflowID, eStatus,
 				asCppBool(vbQueueChangeIfProcessing), asCppBool(vbAllowQueuedStatusOverride),
@@ -3020,7 +3021,7 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 					")";
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				// add transition records to the database
 				addASTransFromSelect(ipConnection, strActionName, nActionID, "U", "", "", strWhere, "");
@@ -3208,7 +3209,7 @@ bool CFileProcessingDB::CopyActionStatusFromAction_Internal(bool bDBLocked, long
 				string strFrom = getActionName(ipConnection, nFromAction);
 				string strTo = getActionName(ipConnection, nToAction);
 
-				TransactionGuard tg(ipConnection, adXactIsolated, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
 
 				// Copy Action status and only update the FAST table if required
 				copyActionStatus(ipConnection, strFrom, strTo, m_bUpdateFASTTable, nToAction);
@@ -3725,7 +3726,7 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 				string strActionName = asString(bstrAction);
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				// Set the file state to skipped unless there is a pending state in the
 				// QueuedActionStatusChange table.
@@ -3966,17 +3967,15 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 
 			BEGIN_CONNECTION_RETRY();
 
-				// The following code depends on the fact that m_strActiveWorkflow won't change in
-				// the midst of this call.
-				CSingleLock lock(&m_mutex, TRUE);
-
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 				
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactIsolated, &m_mutex);
+				// The following code depends on the fact that m_strActiveWorkflow won't change in
+				// the midst of this call; m_criticalSection guarantees that
+				TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
 
 				long nNumRecordsModified = 0;
 				string strFromAction = asString(bstrFromAction);
@@ -3986,7 +3985,7 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 					strStatus = asStatusString(eaStatus);
 				}
 
-				if (m_strActiveWorkflow.empty() && databaseHasWorkflows(ipConnection))
+				if (m_strActiveWorkflow.empty() && databaseUsingWorkflows(ipConnection))
 				{
 					ValueRestorer<string> restorer(m_strActiveWorkflow, "");
 
@@ -3994,6 +3993,12 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 
 					for each (pair<string, string> strWorkflow in vecWorkflowNamesAndIDs)
 					{
+						if (getActionIDNoThrow(ipConnection, strToAction, strWorkflow.first) <= 0)
+						{
+							// If the target action does no exist in the workflow, there is nothing to do.
+							continue;
+						}
+
 						// modifyActionStatusForQuery will run in the context of m_strActiveWorkflow.
 						// Repeat the call for each workflow.
 						m_strActiveWorkflow = strWorkflow.first;
@@ -5002,7 +5007,7 @@ bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 			m_bFAMRegistered = false;
 
 			// Set the transaction guard
-			TransactionGuard tg(getDBConnection(), adXactRepeatableRead, &m_mutex);
+			TransactionGuard tg(getDBConnection(), adXactRepeatableRead, &m_criticalSection);
 
 			// Make sure there are no linked records in the LockedFile table 
 			// and if there are records reset there status to StatusBeforeLock if there current
@@ -5696,7 +5701,7 @@ bool CFileProcessingDB::OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 				validateDBSchemaVersion();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				// Recordset to get the counters and values from
 				_RecordsetPtr ipCounterSet(__uuidof(Recordset));
@@ -6332,7 +6337,9 @@ bool CFileProcessingDB::AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActio
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
-				*plId = getActionIDNoThrow(ipConnection, strActionName, m_strActiveWorkflow);
+				string strActiveWorkflow = getActiveWorkflow();
+
+				*plId = getActionIDNoThrow(ipConnection, strActionName, strActiveWorkflow);
 
 				// Check if the action is not yet created
 				if (*plId <= 0)
@@ -6342,7 +6349,7 @@ bool CFileProcessingDB::AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActio
 					{
 						// If the action was added into a particular workflow, make sure the base
 						// action exists as well.
-						if (!m_strActiveWorkflow.empty())
+						if (!strActiveWorkflow.empty())
 						{
 							if (getActionIDNoThrow(ipConnection, strActionName, "") <= 0)
 							{
@@ -6350,7 +6357,7 @@ bool CFileProcessingDB::AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActio
 							}
 						}
 
-						*plId = addAction(ipConnection, strActionName, m_strActiveWorkflow);
+						*plId = addAction(ipConnection, strActionName, strActiveWorkflow);
 					}
 					else
 					{
@@ -7118,10 +7125,12 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 			}
 			else
 			{
+				string strActiveWorkflow = getActiveWorkflow();
+
 				// Can't use a fast count if workflows are involved; need to use the WorkflowFile table.
-				if (!m_strActiveWorkflow.empty())
+				if (!strActiveWorkflow.empty())
 				{
-					long nWorkflowID = getWorkflowID(ipConnection, m_strActiveWorkflow);
+					long nWorkflowID = getWorkflowID(ipConnection, strActiveWorkflow);
 					string strCountQuery = gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY;
 					replaceVariable(strCountQuery, "<WorkflowID>", asString(nWorkflowID));
 
@@ -7514,7 +7523,7 @@ bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFile
 				}
 
 				// Create new WorkItemGroup and WorkItem records
-				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_criticalSection);
 
 				executeCmdQuery(ipConnection, strAddWorkItemGroupSQL, false, pnWorkItemGroupID);
 
@@ -7573,7 +7582,7 @@ bool CFileProcessingDB::AddWorkItems_Internal(bool bDBLocked, long nWorkItemGrou
 				}
 	
 				// Create new WorkItemGroup and WorkItem records
-				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_criticalSection);
 
 				string strWorkItemGroupID = asString(nWorkItemGroupID);
 
@@ -7698,7 +7707,7 @@ bool CFileProcessingDB::NotifyWorkItemFailed_Internal(bool bDBLocked, long nWork
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_criticalSection);
 
 				executeCmdQuery(ipConnection, strUpdateToFailed);
 
@@ -7738,7 +7747,7 @@ bool CFileProcessingDB::NotifyWorkItemCompleted_Internal(bool bDBLocked, long nW
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_criticalSection);
 
 				executeCmdQuery(ipConnection, strUpdateToComplete);
 
@@ -7845,7 +7854,7 @@ bool CFileProcessingDB::SaveWorkItemOutput_Internal(bool bDBLocked, long WorkIte
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_criticalSection);
 
 				executeCmdQuery(ipConnection, strUpdateQuery);
 
@@ -7917,7 +7926,7 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 
 					*pnWorkItemGroupID = getLongField(ipFields, "ID");
 
-					TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+					TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_criticalSection);
 					// need to update the FAMSessionID to the current FAMSessionID
 					string setFAMSessionID = 
 						"UPDATE WorkItemGroup SET FAMSessionID = " + asString(m_nFAMSessionID) + 
@@ -7967,7 +7976,7 @@ bool CFileProcessingDB::SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long W
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_criticalSection);
 				
 				// Create a pointer to a recordset
 				_RecordsetPtr ipWorkItemSet(__uuidof(Recordset));
@@ -8129,7 +8138,7 @@ bool CFileProcessingDB::SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
 
-			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 			// Create a pointer to a recordset
 			_RecordsetPtr ipFileSet(__uuidof(Recordset));
@@ -8244,7 +8253,7 @@ bool CFileProcessingDB::SetWorkItemToPending_Internal(bool bDBLocked, long nWork
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_criticalSection);
 
 				ipConnection->Execute(strQuery.c_str(), NULL, adCmdText);
 
@@ -8359,7 +8368,7 @@ bool CFileProcessingDB::SetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				setMetadataFieldValue(ipConnection, nFileID,
 					asString(bstrMetadataFieldName), asString(bstrMetadataFieldValue));
@@ -8991,7 +9000,7 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 				bool bValid = checkDatabaseIDValid(ipConnection, false);
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 				string strApplyResult;
 
 				try
@@ -9152,7 +9161,7 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				// Open the Action table
 				ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
@@ -9474,7 +9483,7 @@ bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, l
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				long nID = -1;
 				executeCmdQuery(ipConnection, strSQL, false, &nID);
@@ -9565,7 +9574,7 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				executeCmdQuery(ipConnection, strSQL);
 
@@ -9605,7 +9614,7 @@ bool CFileProcessingDB::AddWorkflow_Internal(bool bDBLocked, BSTR bstrName, EWor
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 			const char* szWorkflowType = "U";
 			switch (eType)
@@ -9657,7 +9666,7 @@ bool CFileProcessingDB::DeleteWorkflow_Internal(bool bDBLocked, long nID)
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 			long nDeletedCount = executeCmdQuery(ipConnection,
 				"DELETE FROM [Workflow] WHERE [ID] = " + asString(nID));
@@ -9745,7 +9754,7 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 			_RecordsetPtr ipWorkflowSet(__uuidof(Recordset));
 			ASSERT_RESOURCE_ALLOCATION("ELI41916", ipWorkflowSet != __nullptr);
@@ -9993,7 +10002,7 @@ bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 			long nActionCount = ipActionList->Size;
 			vector<string> vecActionNames;
@@ -10230,6 +10239,36 @@ bool CFileProcessingDB::IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, 
 			END_CONNECTION_RETRY(ipConnection, "ELI43221");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43222");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetUsingWorkflows_Internal(bool bDBLocked, VARIANT_BOOL *pbUsingWorkflows)
+{
+	try
+	{
+		try
+		{
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+
+			*pbUsingWorkflows = asVariantBool(databaseUsingWorkflows(ipConnection));
+
+			END_CONNECTION_RETRY(ipConnection, "ELI43229");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43230");
 	}
 	catch (UCLIDException &ue)
 	{

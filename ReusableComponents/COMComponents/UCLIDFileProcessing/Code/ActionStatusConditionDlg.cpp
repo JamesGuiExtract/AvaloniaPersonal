@@ -203,7 +203,6 @@ bool ActionStatusConditionDlg::saveSettings()
 
 		// Set the action from name and ID
 		m_settings.setAction((LPCSTR) zTemp);
-		m_settings.setActionID(lFromActionID);
 
 		// Get the status ID for the action from which we will copy the status to the selected action
 		int iFromStatusID = m_comboFilesUnderStatus.GetCurSel();

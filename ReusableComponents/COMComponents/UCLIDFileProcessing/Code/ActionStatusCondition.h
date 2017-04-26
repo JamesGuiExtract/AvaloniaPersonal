@@ -36,13 +36,10 @@ public:
 	// strSelect = "FAMFile.ID, FAMFile.Priority", etc
 	// NOTE2: It can be assumed that the FAMFile table will be included in the query.
 	string buildQuery(const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipFAMDB,
-		const string& strSelect);
+		const string& strSelect, long nWorkflowID);
 
 	void setAction(const string& strAction) { m_strAction = strAction; }
 	string getAction() { return m_strAction; }
-
-	void setActionID(long nActionID) { m_nActionID = nActionID; }
-	long getActionID() { return m_nActionID; }
 
 	void setStatus(long nStatus) { m_nStatus = nStatus; }
 	long getStatus() { return m_nStatus; }
@@ -60,7 +57,6 @@ private:
 	////////////////
 
 	string m_strAction; // The action name
-	long m_nActionID; // The action ID
 	long m_nStatus; // The status for the specified action
 	string m_strStatus; // The status as a string
 	string m_strUser; // The user (specified if choosing skipped files)

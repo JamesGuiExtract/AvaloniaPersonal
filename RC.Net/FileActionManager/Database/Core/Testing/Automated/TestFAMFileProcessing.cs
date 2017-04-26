@@ -147,6 +147,9 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb.SetWorkflowActions(workflowId1, new[] { _LABDE_ACTION1 }.ToVariantVector());
                 int actionId = fileProcessingDb.GetActionID(_LABDE_ACTION1);
 
+                // While a workflow has been defined, it is not yet being used.
+                Assert.IsFalse(fileProcessingDb.UsingWorkflows);
+
                 fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
 
                 // Should not be able to queue a file without setting a workflow
@@ -174,6 +177,9 @@ namespace Extract.FileActionManager.Database.Test
                 int fileId = fileRecord.FileID;
 
                 fileProcessingDb.RecordFAMSessionStop();
+
+                // A workflow is now being used.
+                Assert.IsTrue(fileProcessingDb.UsingWorkflows);
 
                 int workflowId2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
                 fileProcessingDb.SetWorkflowActions(workflowId2, new[] { _LABDE_ACTION1 }.ToVariantVector());
@@ -826,7 +832,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 using (var famSession = new FAMProcessingSession(
                     fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
-                    threadCount: 2, filesToGrabCount: 2))
+                    threadCount: 2, filesToGrab: 2))
                 {
                     famSession.WaitForProcessingToComplete();
                 }
@@ -894,12 +900,12 @@ namespace Extract.FileActionManager.Database.Test
 
                 // Ensure file has processed only in the context of workflow 1 (including where it gets set to pending
                 // in the next action)
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 1);
+                Assert.AreEqual(0, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending);
+                Assert.AreEqual(1, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete);
+                Assert.AreEqual(1, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending);
 
-                Assert.That(fileProcessingDb.GetStats(extractAction2, false).NumDocumentsComplete == 0);
-                Assert.That(fileProcessingDb.GetStats(verifyAction2, false).NumDocumentsPending == 0);
+                Assert.AreEqual(0, fileProcessingDb.GetStats(extractAction2, false).NumDocumentsComplete);
+                Assert.AreEqual(0, fileProcessingDb.GetStats(verifyAction2, false).NumDocumentsPending);
 
                 // Queue another file to workflow1, then the original file to workflow2, then test that both
                 // processing in a session configured to run on all workflows
@@ -910,8 +916,8 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID2, EFilePriority.kPriorityNormal,
                     false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
 
-                Assert.That(fileProcessingDb.GetStats(extractAction1, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStats(extractAction2, false).NumDocumentsPending == 1);
+                Assert.AreEqual(1, fileProcessingDb.GetStats(extractAction1, false).NumDocumentsPending);
+                Assert.AreEqual(1, fileProcessingDb.GetStats(extractAction2, false).NumDocumentsPending);
 
                 using (var famSession = new FAMProcessingSession(
                     fileProcessingDb, _LABDE_ACTION1, "", setStatusTask))
@@ -919,9 +925,40 @@ namespace Extract.FileActionManager.Database.Test
                     famSession.WaitForProcessingToComplete();
                 }
 
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete == 3);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 3);
+                Assert.AreEqual(0, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending);
+                Assert.AreEqual(3, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete);
+                Assert.AreEqual(3, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending);
+
+                fileProcessingDb.ActiveWorkflow = "";
+                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending);
+                Assert.AreEqual(3, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending);
+
+                var sleepTaskConfig = new SleepTask();
+                sleepTaskConfig.SleepTime = 1;
+                sleepTaskConfig.TimeUnits = ESleepTimeUnitType.kSleepSeconds;
+                var sleepTask  = (IFileProcessingTask)sleepTaskConfig;
+
+                // Ensure that if the same file is queued in multiple workflows, get files to process handles 
+                // simultaneously (which would cause an error). Keep processing needs to be set to true because
+                // the check for more files will not return anything while one instance of file 1 is processing
+                // and the other is pending.
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "", sleepTask,
+                    threadCount: 3, filesToGrab: 3, keepProcessing: true, docsToProcess: 3))
+                {
+                    System.Threading.Thread.Sleep(500);
+
+                    // Initially, processing should grab only 1 of the two pending instances of file 1.
+                    Assert.AreEqual(1, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending);
+
+                    famSession.WaitForProcessingToComplete();
+                    // There seem to be a bug with WaitForProcessingToComplete that is causing it to
+                    // return before processing is actually complete. Sleep as a work-around.
+                    System.Threading.Thread.Sleep(1000);
+                }
+
+                Assert.AreEqual(0, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending);
+                Assert.AreEqual(3, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete);
             }
             finally
             {
@@ -982,7 +1019,7 @@ namespace Extract.FileActionManager.Database.Test
 
                     using (var famSession = new FAMProcessingSession(
                         fileProcessingDb, _LABDE_ACTION1, "", sleepTask,
-                        threadCount: 1, filesToGrabCount: 1, keepProcessing: false, docsToProcess: 1))
+                        threadCount: 1, filesToGrab: 1, keepProcessing: true, docsToProcess: 1))
                     {
                         int processed = famSession.WaitForProcessingToComplete();
                         Assert.That(processed == 1);
