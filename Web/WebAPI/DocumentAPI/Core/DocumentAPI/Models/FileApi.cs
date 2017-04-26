@@ -152,9 +152,6 @@ namespace DocumentAPI.Models
 
                 var workflow = new Workflow(definition, DatabaseServer, DatabaseName);
                 return workflow;
-
-                Contract.Violated(Inv($"Workflow named: {workflowName}, not found, database server: {DatabaseServer}, database name: {DatabaseName}"));
-                return null;
             }
             catch (Exception ex)
             {
