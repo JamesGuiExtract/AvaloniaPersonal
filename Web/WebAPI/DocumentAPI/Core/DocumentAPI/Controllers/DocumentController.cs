@@ -266,7 +266,7 @@ namespace DocumentAPI.Controllers
         [Produces(typeof(String))]
         public string GetDocumentType(string id)
         {
-            using (var data = new DocumentData(ClaimsToContext(User)))
+            using (var data = new DocumentData(ClaimsToContext(User), useAttributeDbMgr: true))
             {
                 return data.GetDocumentType(id);
             }
