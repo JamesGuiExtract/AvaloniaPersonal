@@ -38,7 +38,7 @@ namespace DocumentAPI.Controllers
         {
             if (!ModelState.IsValid || String.IsNullOrWhiteSpace(id))
             {
-                Log.WriteLine("string id is empty");
+                Log.WriteLine("string id is empty", "ELI43235");
                 return MakeDocumentAttributeSetError("id argument cannot be empty");
             }
 
@@ -195,7 +195,7 @@ namespace DocumentAPI.Controllers
             catch (Exception ex)
             {
                 var message = Inv($"Exception: {ex.Message}, while returning file: {filename}, for fileId: {Id}");
-                Log.WriteLine(message);
+                Log.WriteLine(message, "ELI43236");
                 return BadRequest(message);
             }
         }
@@ -237,7 +237,7 @@ namespace DocumentAPI.Controllers
             catch (Exception ex)
             {
                 var message = Inv($"Exception: {ex.Message}, while returning file for fileId: {id}");
-                Log.WriteLine(message);
+                Log.WriteLine(message, "ELI43237");
                 return BadRequest(message);
             }
         }

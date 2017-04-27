@@ -35,10 +35,16 @@ namespace DocumentAPI.Models
 
                     var fa = new FileApi(apiContext, setInUse: true);
                     _interfaces.Add(fa);
-                    Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"));
+                    Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"), "ELI43251");
 
                     return fa;
                 }
+            }
+            catch (ExtractException)
+            {
+                // Don't log here - if the exception is already an ExtractException, then it has already been logged,
+                // so this avoids double-logging from FileApi.MakeAssociatedWorkflow.
+                throw;
             }
             catch (Exception ex)
             {
@@ -68,7 +74,7 @@ namespace DocumentAPI.Models
                     {
                         var fa = new FileApi(apiContext, setInUse: false);
                         _interfaces.Add(fa);
-                        Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"));
+                        Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"), "ELI43252");
                     }
                 }
             }

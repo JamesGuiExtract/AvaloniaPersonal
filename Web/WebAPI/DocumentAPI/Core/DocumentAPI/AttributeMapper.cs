@@ -297,7 +297,7 @@ namespace DocumentAPI
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Exception: {ex.Message}, while processing attribute: {docAttr.Name}"));
+                Log.WriteLine(Inv($"Exception: {ex.Message}, while processing attribute: {docAttr.Name}"), "ELI43253");
                 throw;
             }
         }
@@ -333,11 +333,11 @@ namespace DocumentAPI
             {
                 if (attr != null)
                 {
-                    Log.WriteLine(Inv($"Exception: {ex.Message}, while processing attribute: {attr.Name}"));
+                    Log.WriteLine(Inv($"Exception: {ex.Message}, while processing attribute: {attr.Name}"), "ELI43254");
                 }
                 else
                 {
-                    Log.WriteLine(Inv($"Exception: {ex.Message}, while processing attribute (null)"));
+                    Log.WriteLine(Inv($"Exception: {ex.Message}, while processing attribute (null)"), "ELI43255");
                 }
 
                 return MakeDocumentAttributeSetError(ex.Message);

@@ -213,7 +213,7 @@ namespace DocumentAPI.Models
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Error: {ex.Message}"));
+                Log.WriteLine(Inv($"Error: {ex.Message}"), "ELI43242");
                 return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
             }
         }
@@ -319,7 +319,7 @@ namespace DocumentAPI.Models
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Error: {ex.Message}"));
+                Log.WriteLine(Inv($"Error: {ex.Message}"), "ELI43243");
                 return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
             }
         }
@@ -359,7 +359,7 @@ namespace DocumentAPI.Models
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Error: {ex.Message}"));
+                Log.WriteLine(Inv($"Error: {ex.Message}"), "ELI43244");
 
                 return MakeListOf(
                             MakeProcessingStatus(DocumentProcessingStatus.NotApplicable,
@@ -421,7 +421,7 @@ namespace DocumentAPI.Models
                 if (!System.IO.File.Exists(filename))
                 {
                     var message = Inv($"The file: {filename}, does not exist");
-                    Log.WriteLine(message);
+                    Log.WriteLine(message, "ELI43245");
                     return (filename: "", errorMessage: message, error: true);
                 }
 
@@ -430,7 +430,7 @@ namespace DocumentAPI.Models
             catch (Exception ex)
             {
                 var message = Inv($"Exception: {ex.Message}, while returning file: {filename}, for fileId: {Id}");
-                Log.WriteLine(message);
+                Log.WriteLine(message, "ELI43246");
                 return (filename: "", errorMessage: message, error: true);
             }
         }
@@ -497,7 +497,7 @@ namespace DocumentAPI.Models
             catch (Exception ex)
             {
                 var message = Inv($"Exception: {ex.Message}, while returning text for textId: {textId}");
-                Log.WriteLine(message);
+                Log.WriteLine(message, "ELI43247");
                 return MakeTextResult(text: "", isError: true, errorMessage: message);
             }
         }
@@ -513,7 +513,7 @@ namespace DocumentAPI.Models
             if (results == null)
             {
                 var message = Inv($"results retrieval failed for Id: {id}, attributeSetName: {_fileApi.GetWorkflow.OutputAttributeSet}");
-                Log.WriteLine(message);
+                Log.WriteLine(message, "ELI43248");
 
                 return "Unknown";
             }

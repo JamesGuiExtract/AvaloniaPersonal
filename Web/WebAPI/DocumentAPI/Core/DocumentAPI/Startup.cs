@@ -25,7 +25,7 @@ namespace DocumentAPI
         {
             try
             {
-                Log.WriteLine("DocumentAPI started");
+                Log.WriteLine("DocumentAPI started", "ELI43258");
 
                 var builder = new ConfigurationBuilder()
                     .SetBasePath(env.ContentRootPath)
@@ -46,7 +46,7 @@ namespace DocumentAPI
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Exception reported: {ex.Message}"));
+                Log.WriteLine(Inv($"Exception reported: {ex.Message}"), "ELI43259");
 
                 // Any exception here should cause the service to not start.
                 throw;
@@ -118,7 +118,7 @@ namespace DocumentAPI
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Exception reported: {ex.Message}"));
+                Log.WriteLine(Inv($"Exception reported: {ex.Message}"), "ELI43260");
             }
         }
 
@@ -148,7 +148,7 @@ namespace DocumentAPI
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Exception reported: {ex.Message}"));
+                Log.WriteLine(Inv($"Exception reported: {ex.Message}"), "ELI43261");
             }
         }
 

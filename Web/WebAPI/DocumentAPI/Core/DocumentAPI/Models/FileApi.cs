@@ -33,7 +33,7 @@ namespace DocumentAPI.Models
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Exception creating FileProcessingDB instance: {ex.Message}"));
+                Log.WriteLine(Inv($"Exception creating FileProcessingDB instance: {ex.Message}"), "ELI43249");
                 throw;
             }
 
@@ -52,7 +52,7 @@ namespace DocumentAPI.Models
                 Log.WriteLine("Created a new FileApi object, " +
                               Inv($"for workflowName: {WorkflowName}, ",
                               $"DatabaseServerName: {DatabaseServer}, ",
-                              $"DatabaseName: {DatabaseName}"));
+                              $"DatabaseName: {DatabaseName}"), "ELI43250");
             }
             catch (Exception exp)
             {
@@ -63,8 +63,14 @@ namespace DocumentAPI.Models
                 }
                 catch { }
 
-                Log.WriteLine(Inv($"Exception setting FileProcessingDB DB context: {exp.Message}"));
-                throw;
+                var ee = exp.AsExtract("ELI43264");
+                ee.AddDebugData("Message", "Exception reported from MakeAssociatedWorkflow", encrypt: false);
+                ee.AddDebugData("Workflow name", WorkflowName, encrypt: false);
+                ee.AddDebugData("Database server name", DatabaseServer, encrypt: false);
+                ee.AddDebugData("Database name", DatabaseName, encrypt: false);
+
+                Log.WriteLine(ee);
+                throw ee;
             }
         }
 
@@ -145,13 +151,30 @@ namespace DocumentAPI.Models
         {
             try
             {
-                int Id = Interface.GetWorkflowID(workflowName);
+                int Id = -1;
+                try
+                {
+                    Id = Interface.GetWorkflowID(workflowName);
+                }
+                catch (Exception ex)
+                {
+                    Log.WriteLine(Inv($"Invalid workflow name: {workflowName}"), "ELI43233");
+                    throw ex.AsExtract("ELI43263");
+                }
+
+                Contract.Assert(Id > 0, "Invalid workflow name: {0}", workflowName);
 
                 var definition = Interface.GetWorkflowDefinition(Id);
                 Contract.Assert(definition != null, "Failed to get workflow definition for Id: {0}", Id);
 
                 var workflow = new Workflow(definition, DatabaseServer, DatabaseName);
                 return workflow;
+            }
+            catch (ExtractException)
+            {
+                // Don't log the returned exception here, as it is either already logged, or in the case of an
+                // ADO exception from the FileProcessingDB, it is not very informative.
+                throw;
             }
             catch (Exception ex)
             {

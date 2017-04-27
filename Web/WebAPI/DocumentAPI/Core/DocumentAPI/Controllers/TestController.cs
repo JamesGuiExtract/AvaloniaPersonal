@@ -44,21 +44,21 @@ namespace DocumentAPI.Controllers
                 if (String.IsNullOrWhiteSpace(args.DatabaseServerName))
                 {
                     var message = "database server name cannot be empty";
-                    Log.WriteLine(message);
+                    Log.WriteLine(message, "ELI43238");
                     return BadRequest(message);
                 }
 
                 if (String.IsNullOrWhiteSpace(args.DatabaseName))
                 {
                     var message = "database name cannot be empty";
-                    Log.WriteLine(message);
+                    Log.WriteLine(message, "ELI43239");
                     return BadRequest(message);
                 }
 
                 if (String.IsNullOrWhiteSpace(args.WorkflowName) )
                 {
                     var message = "workflow name cannot be empty";
-                    Log.WriteLine(message);
+                    Log.WriteLine(message, "ELI43240");
                     return BadRequest(message);
                 }
 
@@ -68,7 +68,7 @@ namespace DocumentAPI.Controllers
             catch (Exception ex)
             {
                 var message = Inv($"Exception: {ex.Message}, setting API context");
-                Log.WriteLine(message);
+                Log.WriteLine(message, "ELI43241");
                 return BadRequest(message);
             }
         }

@@ -24,7 +24,7 @@ namespace DocumentAPI
             if (!condition)
             {
                 var issue = String.Format(statement, args);
-                Log.WriteLine(issue);
+                Log.WriteLine(issue, "ELI43256");
 
                 throw new InvalidOperationException(issue);
             }
@@ -36,7 +36,7 @@ namespace DocumentAPI
         /// <param name="statement">description of the contract violation</param>
         public static void Violated(string statement)
         {
-            Log.WriteLine(statement);
+            Log.WriteLine(statement, "ELI43257");
             throw new InvalidOperationException(statement);
         }
     }
