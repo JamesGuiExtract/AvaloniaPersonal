@@ -30,34 +30,18 @@ LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ul
 		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
 		lfo.PageNumber = ulPage;
 
-		// Load the image using the original bits per pixel so as to not be affected by currently
+		// Load the image using the original bits per pixel and then convert so as to not be affected by currently
 		// configured dithering method
 		// https://extract.atlassian.net/browse/ISSUE-14596
-		const long nORIGINAL_PIXEL_DEPTH = 0;
-		L_INT nRet = L_LoadBitmap((char*) m_strImageFileName.c_str(), &m_hBitmap, 
-			sizeof(BITMAPHANDLE), nORIGINAL_PIXEL_DEPTH, ORDER_RGB, &lfo, &m_FileInfo);
-		throwExceptionIfNotSuccess(nRet, "ELI22243", 
-			"Internal error: Unable to load image.", m_strImageFileName);
+		loadImagePage(m_strImageFileName, m_hBitmap, m_FileInfo, lfo);
 
 		// Convert to specified bpp
 		const long nDEFAULT_NUMBER_OF_COLORS = 0;
 		L_UINT flags = CRF_FIXEDPALETTE | (bUseDithering ? CRF_ORDEREDDITHERING : CRF_NODITHERING);
-		nRet = L_ColorResBitmap(&m_hBitmap, &m_hBitmap, sizeof(BITMAPHANDLE), nBitsPerPixel, flags,
+		L_INT nRet = L_ColorResBitmap(&m_hBitmap, &m_hBitmap, sizeof(BITMAPHANDLE), nBitsPerPixel, flags,
 			 NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
 		throwExceptionIfNotSuccess(nRet, "ELI42166", 
 			"Internal error: Unable to convert image to specified bits-per-pixel!", strImageFileName);
-
-		// ViewPerspective appears to be valid in situations where ELO_IGNOREVIEWPERSPECTIVE
-		// does not work.  (For instance bmps can be loaded with a valid BOTTOM_LEFT view perspective,
-		// but ELO_IGNOREVIEWPERSPECTIVE will not ignore that view perspective).  For that reason, 
-		// compensate for view perspective.  It's important to use m_FileInfo's ViewPerspective here
-		// rather than m_hBitmap's.  
-		if (m_FileInfo.ViewPerspective != TOP_LEFT)
-		{
-			nRet = L_ChangeBitmapViewPerspective(&m_hBitmap, &m_hBitmap, sizeof(BITMAPHANDLE), TOP_LEFT);
-			throwExceptionIfNotSuccess(nRet, "ELI22244", 
-				"Internal error: ChangeBitmapViewPerspective operation failed.", m_strImageFileName); 
-		}
 
 		// L_RotateBitmap takes the rotation degrees in hundredths of a degree.  Convert
 		// to hundredths of a degree

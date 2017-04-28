@@ -1714,17 +1714,13 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 	// Load the image in its original bits-per-pixel color depth so that current default-dithering
 	// method doesn't affect how the image is loaded.
 	// https://extract.atlassian.net/browse/ISSUE-13210
-	const long nORIGINAL_PIXEL_DEPTH = 0;
-	L_INT nRet = L_LoadBitmap((char*) strImageFileName.c_str(), &hBitmap, sizeof(BITMAPHANDLE),
-		nORIGINAL_PIXEL_DEPTH, ORDER_RGB, &lfo, &fileInfo);
-	throwExceptionIfNotSuccess(nRet, "ELI19845", 
-		"Internal error: Unable to load image!", strImageFileName);
+	loadImagePage(strImageFileName, hBitmap, fileInfo, lfo);
 
 	// Convert to bitonal since LeadTool's line finding only works on 1 bit images.
 	// No dithering gives better results than the default (ordered?) dither method
 	// https://extract.atlassian.net/browse/ISSUE-13210
 	const long nDEFAULT_NUMBER_OF_COLORS = 0;
-	nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), 1, CRF_NODITHERING | CRF_FIXEDPALETTE,
+	L_INT nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), 1, CRF_NODITHERING | CRF_FIXEDPALETTE,
 		 NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
 	throwExceptionIfNotSuccess(nRet, "ELI38459", 
 		"Internal error: Unable to convert image to bi-tonal!", strImageFileName);

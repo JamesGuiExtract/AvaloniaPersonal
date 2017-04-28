@@ -1275,12 +1275,9 @@ void getImagesInOutputDirectory(string strOut, multimap<L_INT, L_INT>& rmmapFile
 
 						if (isImageFileExtension(strExt) || isNumericExtension(strExt))
 						{
-							FILEINFO flInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-
 							// get the file info for the image
-							throwExceptionIfNotSuccess(L_FileInfo(_bstr_t(strFileName.c_str()), 
-								&flInfo, sizeof(flInfo), 0, NULL), "ELI20327", 
-								"Failed to load file info", strFileName);
+							FILEINFO flInfo;
+							getFileInformation(strFileName, false, flInfo);
 
 							// add the information to the multimap
 							rmmapFileTypes.insert(
@@ -1358,12 +1355,8 @@ void getUniqueImageFilesAndCopyToOutputDirectory(string strRoot, const string& s
 
 						if (isImageFileExtension(strExt) || isNumericExtension(strExt))
 						{
-							FILEINFO flInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-
-							// get the file info for the image
-							throwExceptionIfNotSuccess(L_FileInfo(_bstr_t(strFileName.c_str()), 
-								&flInfo, sizeof(flInfo), 0, NULL), "ELI20204", 
-								"Failed to load file info", strFileName);
+							FILEINFO flInfo;
+							getFileInformation(strFileName, false, flInfo);
 
 							// update the file type counts
 							rmapFileTypeCount[flInfo.Format][flInfo.BitsPerPixel]++;

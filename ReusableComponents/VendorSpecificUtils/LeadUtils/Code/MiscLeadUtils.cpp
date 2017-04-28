@@ -993,12 +993,16 @@ void confirmImageAreas(const string& strImageFileName,
 			LeadToolsBitmapFreeer freer(hBitmap);
 
 			// Load the bitmap (loadImagePage contains file access retry logic)
+			loadImagePage(strImageFileName, hBitmap, fileInfo, lfo);
+
 			// [FlexIDSCore:5198]
-			// Load page as a bitonal image; otherwise found pixel color may differ slightly from
+			// Convert page to a bitonal image; otherwise found pixel color may differ slightly from
 			// the expected pixel color (sometimes due to compression, other times I'm not clear
 			// why).
-			nRet = L_LoadBitmap((L_CHAR*)strImageFileName.c_str(), &hBitmap, sizeof(BITMAPHANDLE),
-				 1, ORDER_RGB, &lfo, &fileInfo);
+			const long nDEFAULT_NUMBER_OF_COLORS = 0;
+			L_UINT flags = CRF_FIXEDPALETTE | CRF_NODITHERING;
+			L_INT nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), 1, flags,
+				 NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
 			throwExceptionIfNotSuccess(nRet, "ELI35342", "Could not load image page.",
 				strImageFileName);
 
@@ -1222,13 +1226,11 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 			LeadToolsBitmapFreeer freer(hTmpBmp);
 
 			// Set flags to get file information when loading bitmap
-			L_INT nRet = L_LoadBitmap( (char*)strPage.c_str(), &hTmpBmp, 
-				sizeof(BITMAPHANDLE), 0, ORDER_RGB, NULL, 0);
-			throwExceptionIfNotSuccess(nRet, "ELI09044", "Unable to load bitmap.", strPage);
+			loadImagePage(strPage, 1, hTmpBmp, false);
 
 			// Save the page to the multipage image using the format of the first page of the image
 			sfOptions.PageNumber = i + 1;
-			nRet = L_SaveBitmap(pszOutput, &hTmpBmp, fileInfo.Format, 
+			L_INT nRet = L_SaveBitmap(pszOutput, &hTmpBmp, fileInfo.Format, 
 				fileInfo.BitsPerPixel, nCompression, &sfOptions);
 			throwExceptionIfNotSuccess(nRet, "ELI09045",
 				"Unable to insert page in image.", strPage);
@@ -1273,9 +1275,46 @@ void getFileInformation(const string& strImageFileName, bool bIncludePageCount, 
 		char* pszFileName = (char*)strImageFileName.c_str();
 		while (nNumFailedAttempts < gnNUMBER_ATTEMPTS_BEFORE_FAIL)
 		{
+			DWORD dwStartIndex = 0;
+			if (getExtensionFromFullPath(strImageFileName, true) == ".pdf")
+			{
+				dwStartIndex = getPDFStartIndex(strImageFileName);
+			}
 
-			nRet = L_FileInfo(pszFileName, &rFileInfo, sizeof(FILEINFO), flags, pLFO);
+			L_VOID *hInfo;
+			L_UCHAR cBuf[1024];
+			L_INT nRead = sizeof(cBuf);
+			DWORD dwNumOfBytesRead=0;
+			CHandle hFile(CreateFile(pszFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL));
 
+			if (dwStartIndex > 0)
+			{
+				SetFilePointer( hFile, dwStartIndex, __nullptr, FILE_BEGIN ); 
+			}
+
+			nRet = L_StartFeedInfo (&hInfo, &rFileInfo, sizeof(FILEINFO), flags, pLFO);
+			if (nRet == SUCCESS)
+			{
+				while (true)
+				{
+					if (!ReadFile(hFile, cBuf, nRead, &dwNumOfBytesRead, __nullptr))
+					{
+						nRet = ERROR_FILE_READ;
+						break;
+					}
+					if (dwNumOfBytesRead == 0)
+					{
+						break;
+					}
+					nRet = L_FeedInfo(hInfo, cBuf, dwNumOfBytesRead);
+					if (nRet != SUCCESS) // SUCCESS_ABORT, enough info provided, or an error
+					{
+						break;
+					}
+				}
+				nRet = L_StopFeedInfo(hInfo);
+			}
+								
 			// Check result
 			if (nRet == SUCCESS)
 			{
@@ -2001,8 +2040,15 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
 			while (nNumFailedAttempts < iRetryCount)
 			{
 
-				nRet = L_LoadBitmap(pszImageFile, &rBitmap, sizeof(BITMAPHANDLE), 0,
-					ORDER_RGB, &lfo, &rFileInfo);
+				DWORD dwStartIndex = 0;
+				if (getExtensionFromFullPath(strImageFileName, true) == ".pdf")
+				{
+					dwStartIndex = getPDFStartIndex(strImageFileName);
+				}
+				CHandle hFile(CreateFile(pszImageFile, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL));
+				DWORD dwFileSize = GetFileSize(hFile, NULL) - dwStartIndex;
+				nRet = L_LoadFileOffset((L_HFILE)hFile.operator HANDLE(), dwStartIndex, dwFileSize, &rBitmap, sizeof(BITMAPHANDLE), 0,
+					ORDER_RGB, LOADFILE_ALLOCATE | LOADFILE_STORE, NULL, NULL, &lfo, &rFileInfo);
 
 				// Check result
 				if (nRet == SUCCESS)
@@ -2056,6 +2102,32 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
 		ue.addDebugInfo("Page Number", lfo.PageNumber);
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+DWORD getPDFStartIndex(const string& strFileName)
+{
+	CHandle hFile(CreateFile(strFileName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL));
+	// Allow up to 1KB prefix
+	const int nMaxPrefix = 1024;
+	char cBuf[nMaxPrefix + 4];
+	DWORD dwNumOfBytesRead;
+	if (!ReadFile(hFile, cBuf, sizeof(cBuf), &dwNumOfBytesRead, NULL)
+		|| dwNumOfBytesRead < 4)
+	{
+		return 0;
+	}
+	int nMaxStartIndex = dwNumOfBytesRead - 4;
+	for (int i = 0; i < nMaxStartIndex; ++i)
+	{
+		if (cBuf[i] == '%'
+			&& cBuf[i+1] == 'P'
+			&& cBuf[i+2] == 'D'
+			&& cBuf[i+3] == 'F')
+		{
+			return i;
+		}
+	}
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
 void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO& flInfo,

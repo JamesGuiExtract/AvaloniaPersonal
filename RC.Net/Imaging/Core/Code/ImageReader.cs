@@ -46,6 +46,16 @@ namespace Extract.Imaging
         FileStream _stream;
 
         /// <summary>
+        /// The position in the stream at which the image begins
+        /// </summary>
+        long _startOfImage;
+
+        /// <summary>
+        /// The length in bytes of the image portion of the stream
+        /// </summary>
+        long _lengthOfImage;
+
+        /// <summary>
         /// The page count of the image being read.
         /// </summary>
         readonly int _pageCount;
@@ -102,6 +112,41 @@ namespace Extract.Imaging
                 FileSystemMethods.PerformFileOperationWithRetry(() =>
                     _stream = File.Open(fileName, FileMode.Open, FileAccess.Read, sharing), true);
 
+                _startOfImage = 0;
+                _lengthOfImage = _stream.Length;
+
+                // Find the start of the PDF, since LEADTOOLS has problems with some images
+                // when there is a prefix before the start tag
+                // https://extract.atlassian.net/browse/ISSUE-14637
+                if (fileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                {
+                    const int MAX_PREFIX = 1024;
+                    var buf = new byte[MAX_PREFIX + 4];
+                    int totalBytesRead = _stream.Read(buf, 0, buf.Length);
+                    int maxStartIndex = totalBytesRead - 4;
+                    bool foundStart = false;
+                    for (int i = 0; i < maxStartIndex; ++i)
+                    {
+                        if (buf[i] == '%'
+                            && buf[i + 1] == 'P'
+                            && buf[i + 2] == 'D'
+                            && buf[i + 3] == 'F')
+                        {
+                            foundStart = true;
+                            _startOfImage = i;
+                            _lengthOfImage -= _startOfImage;
+                            break;
+                        }
+                    }
+
+                    // If not able to find the start prefix, reset the stream to the beginning
+                    // and hope for the best
+                    if (!foundStart)
+                    {
+                        _startOfImage = 0;
+                    }
+                }
+
                 // Log that the image reader was created if necessary
                 if (RegistryManager.LogFileLocking)
                 {
@@ -126,6 +171,7 @@ namespace Extract.Imaging
                         // violations.
                         FileSystemMethods.PerformFileOperationWithRetry(() =>
                         {
+                            _stream.Position = _startOfImage;
                             using (CodecsImageInfo info = _codecs.GetInformation(_stream, true))
                             {
                                 pageCount = info.TotalPages;
@@ -154,6 +200,10 @@ namespace Extract.Imaging
                 } while (true);
 
                 IsPdf = ImageMethods.IsPdf(_format);
+
+                // Make sure to reset the stream position to the beginning so that
+                // calls to _codecs.Load that pass in an offset work correctly
+                _stream.Position = 0;
             }
             catch (Exception ex)
             {
@@ -226,9 +276,9 @@ namespace Extract.Imaging
                         // image, allow retries for any windows error code, not just sharing
                         // violations.
                         FileSystemMethods.PerformFileOperationWithRetry(() =>
-                            image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
-                                pageNumber, pageNumber),
-                                false);
+                            image = _codecs.Load(_stream, _startOfImage, _lengthOfImage, 0, CodecsLoadByteOrder.BgrOrGray,
+                                pageNumber, pageNumber)
+                        , false);
 
                         _loadedImages[pageNumber] = image;
                     }
@@ -272,9 +322,9 @@ namespace Extract.Imaging
                         // image, allow retries for any windows error code, not just sharing
                         // violations.
                         FileSystemMethods.PerformFileOperationWithRetry(() =>
-                            image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
-                                pageNumber, pageNumber),
-                                false);
+                            image = _codecs.Load(_stream, _startOfImage, _lengthOfImage, 0, CodecsLoadByteOrder.BgrOrGray,
+                                pageNumber, pageNumber)
+                        , false);
 
                         return image;
                     }
@@ -314,8 +364,11 @@ namespace Extract.Imaging
                 int width = (int)(properties.Width * scale);
                 int height = (int)(properties.Height * scale);
 
-                return _codecs.Load(_fileName, width, height, 24, RasterSizeFlags.Bicubic,
-                    CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber); 
+                // There is no overload that resizes _and_ loads from an offset but
+                // setting the position of the stream seems to work
+                _stream.Position = _startOfImage;
+                return _codecs.Load(_stream, width, height, 24, RasterSizeFlags.Bicubic,
+                    CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber);
             }
             catch (Exception ex)
             {
@@ -324,6 +377,12 @@ namespace Extract.Imaging
                 ee.AddDebugData("Image file", _fileName, false);
                 ee.AddDebugData("Page", pageNumber, false);
                 throw ee;
+            }
+            finally
+            {
+                // Make sure to reset the stream position to the beginning so that
+                // calls to _codecs.Load that pass in an offset work correctly
+                _stream.Position = 0;
             }
         }
 
@@ -360,11 +419,23 @@ namespace Extract.Imaging
         /// <paramref name="pageNumber"/>.</returns>
         ImagePageProperties GetPageProperties(int pageNumber)
         {
-            // TODO: Cache image info?
-            lock (_lock)
-            using (CodecsImageInfo info = _codecs.GetInformation(_stream, false, pageNumber))
+            try
             {
-                return new ImagePageProperties(info);
+                // TODO: Cache image info?
+                lock (_lock)
+                {
+                    _stream.Position = _startOfImage;
+                    using (CodecsImageInfo info = _codecs.GetInformation(_stream, false, pageNumber))
+                    {
+                        return new ImagePageProperties(info);
+                    }
+                }
+            }
+            finally
+            {
+                // Make sure to reset the stream position to the beginning so that
+                // calls to _codecs.Load that pass in an offset work correctly
+                _stream.Position = 0;
             }
         }
 
@@ -416,9 +487,9 @@ namespace Extract.Imaging
                         // image, allow retries for any windows error code, not just sharing
                         // violations.
                         FileSystemMethods.PerformFileOperationWithRetry(() =>
-                            image = _codecs.Load(
-                                _stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber),
-                            false);
+                            image = _codecs.Load(_stream, _startOfImage, _lengthOfImage, 1, CodecsLoadByteOrder.BgrOrGray,
+                                pageNumber, pageNumber)
+                        , false);
                         var probe = new PixelProbe(image);
                         image = null;
                         _currentProbe = new Tuple<int, PixelProbe>(pageNumber, probe);

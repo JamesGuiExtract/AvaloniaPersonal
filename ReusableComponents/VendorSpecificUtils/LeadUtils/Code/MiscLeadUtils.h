@@ -392,6 +392,8 @@ LEADUTILS_API void createLeadDC(HDC& hDC, BITMAPHANDLE& hBitmap);
 LEADUTILS_API void deleteLeadDC(HDC& hDC);
 //-------------------------------------------------------------------------------------------------
 
+LEADUTILS_API DWORD getPDFStartIndex(const string& strFileName);
+
 //-------------------------------------------------------------------------------------------------
 // Sets the PDF save options for the current thread to the specified settings
 // Reverts the settings when the class is destructed
