@@ -75,6 +75,9 @@ namespace DocumentAPI.Models
         {
             try
             {
+                int fileId = ConvertIdToFileId(id);
+                AssertFileInWorkflow(fileId);
+
                 var results = GetAttributeSetForFile(id);
                 var mapper = new AttributeMapper(results, _fileApi.GetWorkflow.Type);
                 return mapper.MapAttributesToDocumentAttributeSet();
@@ -83,7 +86,8 @@ namespace DocumentAPI.Models
             {
                 var ee = ex.AsExtract("ELI42124");
                 Log.WriteLine(ee);
-                throw ee;
+
+                return MakeDocumentAttributeSetError(ee.Message);
             }
         }
 
@@ -98,6 +102,8 @@ namespace DocumentAPI.Models
             try
             {
                 var fileId = ConvertIdToFileId(id);
+                AssertFileInWorkflow(fileId);
+
                 const int mostRecentSet = -1;
 
                 var attrSetName = _fileApi.GetWorkflow.OutputAttributeSet;
@@ -121,7 +127,7 @@ namespace DocumentAPI.Models
                 ee.AddDebugData("Workflow", _fileApi.GetWorkflow.Name, encrypt: false);
                 Log.WriteLine(ee);
 
-                return null;
+                throw ee;
             }
         }
 
@@ -259,6 +265,9 @@ namespace DocumentAPI.Models
                 // Now add the file to the FAM queue
                 var fileProcessingDB = _fileApi.Interface;
                 var workflow = _fileApi.GetWorkflow;
+                Contract.Assert(!String.IsNullOrWhiteSpace(workflow.StartAction), 
+                                "The workflow: {0}, must have a Start action", 
+                                _fileApi.WorkflowName);
 
                 var fileRecord =
                     fileProcessingDB.AddFile(fullPath,                                                 // full path to file
@@ -333,14 +342,14 @@ namespace DocumentAPI.Models
         {
             try
             {
-                var fileProcessingDB = _fileApi.Interface;
-
                 int fileId = ConvertIdToFileId(stringId);
+                AssertFileInWorkflow(fileId);
+
                 EActionStatus status = EActionStatus.kActionFailed;
 
                 try
                 {
-                    status = fileProcessingDB.GetWorkflowStatus(fileId);
+                    status = _fileApi.Interface.GetWorkflowStatus(fileId);
                 }
                 catch (Exception ex)
                 {
@@ -399,11 +408,10 @@ namespace DocumentAPI.Models
 
             try
             {
-                var fileProcessingDB = _fileApi.Interface;
-                Contract.Assert(fileProcessingDB != null, "null fileProcessingDb, cannot add file to FAM queue");
-
                 var fileId = ConvertIdToFileId(Id);
-                filename = fileProcessingDB.GetFileNameFromFileID(fileId);
+                AssertFileInWorkflow(fileId);
+
+                filename = _fileApi.Interface.GetFileNameFromFileID(fileId);
             }
             catch (Exception ex)
             {
@@ -442,15 +450,40 @@ namespace DocumentAPI.Models
         /// <returns>returns a tuple of filename, error flag, error message</returns>
         public (string filename, bool error, string errorMessage) GetResult(string id)
         {
-            var fileId = DocumentData.ConvertIdToFileId(id);
-            var getFileTag = _fileApi.GetWorkflow.OutputFileMetadataField;
-            Contract.Assert(!String.IsNullOrWhiteSpace(getFileTag), "Workflow does not have a defined OutputFileMetaDataField");
-
             string filename = "";
+            int fileId = -1;
+            string getFileTag = "";
 
             try
             {
-                filename = _fileApi.Interface.GetMetadataFieldValue(fileId, getFileTag);
+                fileId = ConvertIdToFileId(id);
+                AssertFileInWorkflow(fileId);
+
+                getFileTag = _fileApi.GetWorkflow.OutputFileMetadataField;
+                Contract.Assert(!String.IsNullOrWhiteSpace(getFileTag), "Workflow does not have a defined OutputFileMetaDataField");
+
+                var fieldResult = _fileApi.Interface.GetMetadataFieldValue(fileId, getFileTag);
+                Contract.Assert(!String.IsNullOrWhiteSpace(fieldResult), "Retrieved an empty metaDataField result for fileID: {0}", fileId);
+
+                // The value most probably contains one or more tags, so expand the tag(s) here.
+                var tagMgr = new FAMTagManager();
+                Contract.Assert(tagMgr != null, "FAM Tag Manager creation failed");
+
+                // Need the original SourceDocName, so look it up.
+                var sourceDocName = _fileApi.Interface.GetFileNameFromFileID(fileId);
+                Contract.Assert(!String.IsNullOrWhiteSpace(sourceDocName), "Retrieved an empty filename for FileID: {0}", fileId);
+
+                filename = tagMgr.ExpandTagsAndFunctions(fieldResult, sourceDocName);
+                Contract.Assert(!String.IsNullOrWhiteSpace(filename),
+                                "Failed to expand tag(s) for input: {0}, SourceDocName: {1}",
+                                fieldResult,
+                                sourceDocName);
+
+                var postAction = _fileApi.GetWorkflow.PostWorkflowAction;
+                if (!String.IsNullOrWhiteSpace(postAction))
+                {
+                    _fileApi.Interface.SetFileStatusToPending(fileId, postAction, vbAllowQueuedStatusOverride: false);
+                }
             }
             catch (Exception ex)
             {
@@ -460,11 +493,6 @@ namespace DocumentAPI.Models
                 Log.WriteLine(ee);
 
                 return (filename, error: true, errorMessage: ee.Message);
-            }
-
-            if (String.IsNullOrWhiteSpace(filename))
-            {
-                return (filename: "", error: true, errorMessage: Inv($"No result file exists for id: {id}"));
             }
 
             return (filename, error: false, errorMessage: "");
@@ -505,20 +533,19 @@ namespace DocumentAPI.Models
         /// <summary>
         /// GetDocumentType (API) implementation
         /// </summary>
-        /// <param name="id">file id</param>
+        /// <param name="id">file Id</param>
         /// <returns>document type (string)</returns>
         public string GetDocumentType(string id)
         {
-            var results = GetAttributeSetForFile(id);
-            if (results == null)
+            try
             {
-                var message = Inv($"results retrieval failed for Id: {id}, attributeSetName: {_fileApi.GetWorkflow.OutputAttributeSet}");
-                Log.WriteLine(message, "ELI43248");
-
-                return "Unknown";
+                var results = GetAttributeSetForFile(id);
+                return GetDocumentType(results);
             }
-
-            return GetDocumentType(results);
+            catch (ExtractException ee)
+            {
+                return ee.Message;
+            }
         }
 
         /// <summary>
@@ -548,9 +575,23 @@ namespace DocumentAPI.Models
                 var ee = ex.AsExtract("ELI42121");
                 Log.WriteLine(ee);
 
-                return "Unknown";
+                throw ee;
             }
         }
 
+        /// <summary>
+        /// Utility method to enforce that the specified fileId is contained by the workflow
+        /// </summary>
+        /// <param name="fileId">file Id to test for inclusion</param>
+        /// <remarks>the result of this method is an exception iff fileId is not a member of the workflow</remarks>
+        void AssertFileInWorkflow(int fileId)
+        {
+            bool isInWorkflow =  _fileApi.Interface.IsFileInWorkflow(fileId, _fileApi.GetWorkflow.Id);
+
+            Contract.Assert(isInWorkflow,
+                            "The specified file Id: {0}, is not in the workflow: {1}",
+                            fileId,
+                            _fileApi.WorkflowName);
+        }
     }
 }

@@ -74,7 +74,7 @@ namespace DocumentAPI.Controllers
             catch (Exception ex)
             {
                 Log.WriteLine(ex.AsExtract("ELI42149"));
-                return MakeDocumentSubmitResult(fileId: -1, isError: true, code: -1);
+                return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
             }
         }
 
@@ -182,6 +182,10 @@ namespace DocumentAPI.Controllers
                 using (var data = new DocumentData(ClaimsToContext(User)))
                 {
                     var (fileName, errorMsg, error) = data.GetSourceFileName(Id);
+                    if (error)
+                    {
+                        return BadRequest(errorMsg);
+                    }
 
                     var fileContentType = FileContentType(fileName);
                     var fileDownloadName = Path.GetFileName(fileName);

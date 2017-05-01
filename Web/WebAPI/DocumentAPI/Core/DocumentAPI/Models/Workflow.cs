@@ -64,14 +64,10 @@ namespace DocumentAPI.Models
             get
             {
                 int iType = (int)_type;
-                Contract.Assert(iType >= 0 && iType < 4, "attempt to get Type, bad value: {0}", iType);
                 return _type;
             }
             private set
             {
-                int iType = (int)value;
-                Contract.Assert(iType >= 0 && iType < 4, "attempt to set Type to bad value: {0}", iType);
-
                 _type = value;
             }
         }
@@ -137,7 +133,7 @@ namespace DocumentAPI.Models
         }
 
         /// <summary>
-        /// The workflow document folder name
+        /// The workflow document folder name - this value is optional
         /// </summary>
         public string DocumentFolder
         {
@@ -147,7 +143,6 @@ namespace DocumentAPI.Models
             }
             private set
             {
-                Contract.Assert(!String.IsNullOrWhiteSpace(value), "DocumentFolder is a required value and cannot be empty");
                 _documentFolder = value;
             }
         }

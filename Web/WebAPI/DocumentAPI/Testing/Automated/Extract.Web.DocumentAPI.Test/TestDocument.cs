@@ -155,7 +155,7 @@ namespace Extract.Web.DocumentAPI.Test
             }
         }
 
-        static void UpdateWorkflowFileTable(string dbName)
+        public static void ModifyTable(string dbName, string command)
         {
             try
             {
@@ -167,20 +167,11 @@ namespace Extract.Web.DocumentAPI.Test
                     using (var conn = new SqlConnection(connectionString))
                     {
                         conn.Open();
-                        cmd.Connection = conn;
-                        cmd.CommandText = "INSERT INTO [dbo].[WorkflowFile] VALUES " +
-                                          "(1, 1), " +
-                                          "(1, 2), " +
-                                          "(1, 3), " +
-                                          "(1, 4), " +
-                                          "(1, 5), " +
-                                          "(1, 6), " +
-                                          "(1, 7), " +
-                                          "(1, 8), " +
-                                          "(1, 9), " +
-                                          "(1, 10);";
 
+                        cmd.Connection = conn;
+                        cmd.CommandText = command;
                         cmd.ExecuteNonQuery();
+
                         conn.Close();
                     }
                 }
@@ -189,6 +180,46 @@ namespace Extract.Web.DocumentAPI.Test
             {
                 Debug.WriteLine("Error: {0}", ex.Message);
             }
+        }
+
+        static void UpdateWorkflowFileTable(string dbName)
+        {
+            string command = "INSERT INTO [dbo].[WorkflowFile] VALUES " +
+                             "(1, 1), " +
+                             "(1, 2), " +
+                             "(1, 3), " +
+                             "(1, 4), " +
+                             "(1, 5), " +
+                             "(1, 6), " +
+                             "(1, 7), " +
+                             "(1, 8), " +
+                             "(1, 9), " +
+                             "(1, 10), " +
+                             "(1, 11), " +
+                             "(1, 12), " +
+                             "(1, 13), " +
+                             "(1, 14), " +
+                             "(1, 15), " +
+                             "(1, 16), " +
+                             "(1, 17), " +
+                             "(1, 18);";
+
+            ModifyTable(dbName, command);
+        }
+
+        static void UpdateMetadataFieldValueTable(string dbName)
+        {
+            string command = "UPDATE [dbo].[FileMetadataFieldValue] " +
+                             "SET[Value] = '<SourceDocName>.result.tif' " +
+                             "WHERE[MetadataFieldID] = 6;";
+
+            ModifyTable(dbName, command);
+        }
+
+        static void UpdateWorkflowPostWorkflowAction(string dbName)
+        {
+            string command = "UPDATE[dbo].[Workflow] SET[PostWorkflowActionID] = 16 WHERE[Name] = 'CourtOffice'";
+            ModifyTable(dbName, command);
         }
 
         [Test, Category("Automated")]
@@ -227,7 +258,6 @@ namespace Extract.Web.DocumentAPI.Test
             }
         }
 
-
         /// <summary>
         /// Test GetFileResulot - note that this tests the internal GetResult() function
         /// </summary>
@@ -239,6 +269,9 @@ namespace Extract.Web.DocumentAPI.Test
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
+                UpdateWorkflowFileTable(dbName);
+                UpdateMetadataFieldValueTable(dbName);
+                UpdateWorkflowPostWorkflowAction(dbName);
 
                 Utils.SetDefaultApiContext(dbName);
 
@@ -267,29 +300,9 @@ namespace Extract.Web.DocumentAPI.Test
 
         static void SetupTextResultTest(string filename, string dbName)
         {
-            try
-            {
-                using (var cmd = new SqlCommand())
-                {
-                    // NOTE: "Pooling=false;" keeps the connection from being pooled, and 
-                    // allows the conneciton to REALLY close, so the DB can be removed later.
-                    string connectionString = "Server=(local);Database=" + dbName + ";Trusted_Connection=True;Pooling=false;";
-                    using (var conn = new SqlConnection(connectionString))
-                    {
-                        conn.Open();
-                        cmd.Connection = conn;
-
-                        cmd.CommandText = ApiUtils.Inv($"UPDATE [dbo].[FileMetadataFieldValue] SET Value='{filename}' ") +
-                                                       "WHERE [FileID]=1 AND [MetadataFieldID]=6;";
-                        cmd.ExecuteNonQuery();
-                        conn.Close();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Error: {0}", ex.Message);
-            }
+            string command = ApiUtils.Inv($"UPDATE [dbo].[FileMetadataFieldValue] SET Value='{filename}' ") +
+                                          "WHERE [FileID]=1 AND [MetadataFieldID]=6;";
+            ModifyTable(dbName, command);
         }
 
 
@@ -301,6 +314,8 @@ namespace Extract.Web.DocumentAPI.Test
             try
             {   
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
+                UpdateWorkflowFileTable(dbName);
+                UpdateWorkflowPostWorkflowAction(dbName);
 
                 var filename = _testFiles.GetFile("Resources.ResultText.txt");
                 SetupTextResultTest(filename, dbName);
@@ -334,6 +349,7 @@ namespace Extract.Web.DocumentAPI.Test
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
+                UpdateWorkflowFileTable(dbName);
 
                 Utils.SetDefaultApiContext(dbName);
 

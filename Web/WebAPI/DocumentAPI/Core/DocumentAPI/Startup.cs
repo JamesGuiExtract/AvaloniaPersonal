@@ -35,11 +35,6 @@ namespace DocumentAPI
 
                 Configuration = builder.Build();
 
-                // VERY IMPORTANT - get the private encryption key value from the environment variable where it is stored.
-                // This must be set, or the service must shut down.
-                _secretKey = Configuration.GetValue(typeof(string), "WebAPI_Private")?.ToString();
-                Contract.Assert(_secretKey != null, "Failed to load required value from WebAPI_Private environment variable");
-
                 InitializeDefaultValues();
 
                 Utils.environment = env;
@@ -157,11 +152,31 @@ namespace DocumentAPI
         /// </summary>
         void InitializeDefaultValues()
         {
+            // VERY IMPORTANT - get the private encryption key value from the environment variable where it is stored.
+            // This must be set, or the service must shut down.
+            // NOTE: The more elaborate:
+            //_secretKey = Configuration.GetValue(typeof(string), "WebAPI_Private")?.ToString();
+            // has been documented as being capable of reading values of environment variables. However I have discovered
+            // that the indexer method just reads the value from whatever available configuration source has been
+            // configured. So the easier-to-read indexer method will get the value from appsettings, or env.
+            _secretKey = Configuration["WebAPI_Private"];
+            Contract.Assert(!String.IsNullOrWhiteSpace(_secretKey), "Failed to load required value from WebAPI_Private environment variable");
+
             var databaseServer = Configuration["DatabaseServer"];
             var databaseName = Configuration["DatabaseName"];
             var workflowName = Configuration["DefaultWorkflow"];
 
             Utils.SetCurrentApiContext(databaseServer, databaseName, workflowName);
+
+            // "Applying" the context values at startup is a convenient way of ensuring that the configured context is
+            // correct, as any problems will be asserted and logged, and the service will exit from starting up, so it
+            // will be obvious that there is a configuration issue. Apply is the default behavior; it can be explicitly
+            // switched off.
+            var applyContextOnStartup = Configuration["ApplyContextOnStartup"];
+            if (String.IsNullOrWhiteSpace(applyContextOnStartup) || applyContextOnStartup.IsEquivalent("true"))
+            {
+                Utils.ApplyCurrentApiContext();
+            }
         }
     }
 }

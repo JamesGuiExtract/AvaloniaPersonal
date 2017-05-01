@@ -63,6 +63,8 @@ namespace DocumentAPI.Controllers
                 }
 
                 Utils.SetCurrentApiContext(args.DatabaseServerName, args.DatabaseName, args.WorkflowName);
+                Utils.ApplyCurrentApiContext();
+
                 return Ok(args);
             }
             catch (Exception ex)

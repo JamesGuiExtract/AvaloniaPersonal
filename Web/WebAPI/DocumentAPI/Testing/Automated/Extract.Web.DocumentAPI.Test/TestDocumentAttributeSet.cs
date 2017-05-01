@@ -193,6 +193,7 @@ namespace Extract.Web.DocumentAPI.Test
                     var fi = kvpFileInfo.Value;
                     currentDatabaseName = fi.DatabaseName;
                     _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", currentDatabaseName);
+                    UpdateWorkflowFile(currentDatabaseName, fileId);
 
                     var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
 
@@ -224,6 +225,7 @@ namespace Extract.Web.DocumentAPI.Test
                     var fi = kvpFileInfo.Value;
                     currentDatabaseName = fi.DatabaseName;
                     _testDbManager.GetDatabase("Resources.Demo_IDShield.bak", currentDatabaseName);
+                    UpdateWorkflowFile(currentDatabaseName, fileId);
 
                     var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
 
@@ -255,6 +257,7 @@ namespace Extract.Web.DocumentAPI.Test
                     var fi = kvpFileInfo.Value;
                     currentDatabaseName = fi.DatabaseName;
                     _testDbManager.GetDatabase("Resources.Demo_FlexIndex.bak", currentDatabaseName);
+                    UpdateWorkflowFile(currentDatabaseName, fileId, workflowId: 4);
 
                     var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
 
@@ -588,6 +591,12 @@ namespace Extract.Web.DocumentAPI.Test
             }
 
             return true;
+        }
+
+        static void UpdateWorkflowFile(string dbName, int fileId, int workflowId = 1)
+        {
+            string command = ApiUtils.Inv($"INSERT INTO [dbo].[WorkflowFile] VALUES ({workflowId}, {fileId});");
+            TestDocument.ModifyTable(dbName, command);
         }
 
         static bool TestFile(int fileId, string dbName, string xmlFile, string attributeSetName)

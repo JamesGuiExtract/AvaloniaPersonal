@@ -283,7 +283,6 @@ namespace DocumentAPI
                 lock (_apiContextLock)
                 {
                     _currentApiContext = new ApiContext(databaseServerName, databaseName, workflowName);
-                    FileApiMgr.MakeInterface(_currentApiContext);
                 }
             }
             catch (Exception ex)
@@ -305,12 +304,31 @@ namespace DocumentAPI
                 lock (_apiContextLock)
                 {
                     _currentApiContext = apiContext;
-                    FileApiMgr.MakeInterface(apiContext);
                 }
             }
             catch (Exception ex)
             {
                 var ee = ex.AsExtract("ELI42165");
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// "apply" the current API context - this creates a FileApi member using the context, useful for
+        /// checking that the named workflow actually exists in the configured DatabaseServer/Database.
+        /// </summary>
+        public static void ApplyCurrentApiContext()
+        {
+            try
+            {
+                lock (_apiContextLock)
+                {
+                    FileApiMgr.MakeInterface(CurrentApiContext);
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI43274");
                 throw ee;
             }
         }

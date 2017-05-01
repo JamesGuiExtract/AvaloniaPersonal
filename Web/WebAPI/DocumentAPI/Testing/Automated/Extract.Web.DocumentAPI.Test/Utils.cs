@@ -53,6 +53,7 @@ namespace Extract.Web.DocumentAPI.Test
         {
             var apiContext = new ApiContext(databaseServer, databaseName, workflowName);
             ApiUtils.SetCurrentApiContext(apiContext);
+            ApiUtils.ApplyCurrentApiContext();
 
             return apiContext;
         }
