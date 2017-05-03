@@ -90,6 +90,9 @@ namespace Extract.Utilities.ContextTags
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI37898",
                     _OBJECT_NAME);
+
+                // Always add the default - this may get removed later but if there are not tags defined this needs to exist
+                _workflowTagValues.Add("", new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
             }
             catch (Exception ex)
             {
@@ -377,6 +380,9 @@ namespace Extract.Utilities.ContextTags
             {
                 _workflowTagValues.Clear();
                 _tagNamesVectors.Clear();
+ 
+                // Always add the default - this may get removed later but if there are not tags defined this needs to exist
+                _workflowTagValues.Add("", new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
 
                 // Clear the active context
                 _activeContext = "";
@@ -387,9 +393,6 @@ namespace Extract.Utilities.ContextTags
                     return false;
                 }
                 
-                // Always add the default - this may get removed later but if there are not tags defined this needs to exist
-                _workflowTagValues.Add("", new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
-
                 // If _SETTING_FILENAME doesn't exist, there is nothing more to do.
                 string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
                 if (!File.Exists(settingFileName))
