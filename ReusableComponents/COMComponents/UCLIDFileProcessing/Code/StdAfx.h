@@ -48,7 +48,4 @@ using namespace ADODB;
 #import "..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
 using namespace Extract_Interfaces;
 
-#import "..\..\..\..\RC.Net\Utilities\ContextTags\Core\Code\Extract.Utilities.ContextTags.tlb" named_guids
-using namespace Extract_Utilities_ContextTags;
-
 #import "UCLIDFileProcessing.tlb" 
