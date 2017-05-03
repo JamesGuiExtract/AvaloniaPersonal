@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 146;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 147;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1696,7 +1696,32 @@ int UpdateToSchemaVersion146(_ConnectionPtr ipConnection,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42183");
 }
 //-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion147(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 147;
 
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE dbo.[Action] ADD[MainSequence] BIT NULL");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43302");
+}
+//-------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -6609,7 +6634,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 143:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion144);
 				case 144:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion145);
 				case 145:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion146);
-				case 146:	break;
+				case 146:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion147);
+				case 147:	break;
 
 				default:
 					{
@@ -9933,13 +9959,13 @@ bool CFileProcessingDB::GetWorkflows_Internal(bool bDBLocked,
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetWorkflowActions_Internal(bool bDBLocked, long nID,
-	IStrToStrMap** pmapActionNameToID)
+													IIUnknownVector** pvecActions)
 {
 	try
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI41990", pmapActionNameToID != __nullptr);
+			ASSERT_ARGUMENT("ELI41990", pvecActions != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -9950,18 +9976,23 @@ bool CFileProcessingDB::GetWorkflowActions_Internal(bool bDBLocked, long nID,
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			IStrToStrMapPtr ipActionNameToID(CLSID_StrToStrMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI41991", ipActionNameToID != __nullptr);
-			
-			ipActionNameToID->CaseSensitive = VARIANT_FALSE;
+			IIUnknownVectorPtr ipActions(CLSID_IUnknownVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI41991", ipActions != __nullptr);
 
-			map<string, long> mapWorkflowActions = getWorkflowActions(ipConnection, nID);
-			for each (pair<string, int> item in mapWorkflowActions)
+			vector<tuple<long, string, bool>> vecWorkflowActions = getWorkflowActions(ipConnection, nID);
+			for each (tuple<long, string, bool> item in vecWorkflowActions)
 			{
-				ipActionNameToID->Set(item.first.c_str(), asString(item.second).c_str());
+				IVariantVectorPtr ipProperties(CLSID_VariantVector);
+				ASSERT_RESOURCE_ALLOCATION("ELI43303", ipProperties != __nullptr);
+
+				ipProperties->PushBack(get<0>(item));
+				ipProperties->PushBack(get<1>(item).c_str());
+				ipProperties->PushBack(asVariantBool(get<2>(item)));
+
+				ipActions->PushBack(ipProperties);
 			}
 
-			*pmapActionNameToID = ipActionNameToID.Detach();
+			*pvecActions = ipActions.Detach();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI41994");
 		}
@@ -9980,13 +10011,13 @@ bool CFileProcessingDB::GetWorkflowActions_Internal(bool bDBLocked, long nID,
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
-	IVariantVector* pActionList)
+	IIUnknownVector* pActionList)
 {
 	try
 	{
 		try
 		{
-			IVariantVectorPtr ipActionList(pActionList);
+			IIUnknownVectorPtr ipActionList(pActionList);
 			ASSERT_ARGUMENT("ELI41996", ipActionList != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
@@ -10000,11 +10031,21 @@ bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
-			long nActionCount = ipActionList->Size;
+			long nActionCount = ipActionList->Size();
 			vector<string> vecActionNames;
+			vector<string> vecMainSequenceActions;
 			for (long i = 0; i < nActionCount; i++)
 			{
-				vecActionNames.push_back(asString(ipActionList->Item[i].bstrVal));
+				IVariantVectorPtr ipActionInfo = ipActionList->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI43305", ipActionInfo != __nullptr);
+
+				string strName = asString(ipActionInfo->Item[0].bstrVal);
+				vecActionNames.push_back(strName);
+
+				if (asCppBool(ipActionInfo->Item[1].boolVal))
+				{
+					vecMainSequenceActions.push_back(strName);
+				}
 			}
 			string strActionList = asString(vecActionNames, true, "','");
 
@@ -10082,8 +10123,23 @@ bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
 						nID, strActionList.c_str());
 
 				long nAffectedRecs = executeCmdQuery(ipConnection, strDeleteActionQuery);
-				ASSERT_RUNTIME_CONDITION("ELI42001", nAffectedRecs = vecActionsToDelete.size(),
+				ASSERT_RUNTIME_CONDITION("ELI42001", nAffectedRecs = nActionCount,
 					"Error deleting workflow actions.");
+			}
+
+			if (nActionCount > 0)
+			{
+				string strMainSequenceActions = asString(vecMainSequenceActions, true, "','");
+
+				string strUpdateMainSequenceQuery =
+					Util::Format("UPDATE dbo.[Action] "
+						"SET [MainSequence] = CASE WHEN ([ASCName] IN ('%s')) THEN 1 ELSE 0 END "
+						"WHERE [WorkflowID] = %i ",
+						strMainSequenceActions.c_str(), nID);
+
+				long nAffectedRecs = executeCmdQuery(ipConnection, strUpdateMainSequenceQuery);
+				ASSERT_RUNTIME_CONDITION("ELI43306", nAffectedRecs = nActionCount,
+					"Error updating workflow actions.");
 			}
 
 			tg.CommitTrans();
@@ -10327,6 +10383,41 @@ bool CFileProcessingDB::GetWorkflowNameFromActionID_Internal(bool bDBLocked, lon
 		throw ue;
 	}
 
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetActionIDForWorkflow_Internal(bool bDBLocked, BSTR bstrActionName,
+														long nWorkflowID, long* pnActionID)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI43312", pnActionID != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Get the action ID
+			*pnActionID = getActionID(ipConnection, asString(bstrActionName), nWorkflowID);
+
+			END_CONNECTION_RETRY(ipConnection, "ELI43313");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43314");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
 	return true;
 }
 //-------------------------------------------------------------------------------------------------

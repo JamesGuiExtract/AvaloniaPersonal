@@ -433,7 +433,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_documentDataPanel != null)
                         {
                             _documentDataPanel.PageLoadRequest -= HandleDocumentDataPanel_PageLoadRequest;
-                            _documentDataPanel.PanelControl.Leave -= HandlePanelControl_Leave;
+                            if (_documentDataPanel.PanelControl != null)
+                            {
+                                _documentDataPanel.PanelControl.Leave -= HandlePanelControl_Leave;
+                            }
                         }
 
                         _documentDataPanel = value;
@@ -441,7 +444,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_documentDataPanel != null)
                         {
                             _documentDataPanel.PageLoadRequest += HandleDocumentDataPanel_PageLoadRequest;
-                            _documentDataPanel.PanelControl.Leave += HandlePanelControl_Leave;
+                            if (_documentDataPanel.PanelControl != null)
+                            {
+                                _documentDataPanel.PanelControl.Leave += HandlePanelControl_Leave;
+                            }
                         }
                     }
                 }

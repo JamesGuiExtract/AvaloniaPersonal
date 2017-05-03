@@ -52,7 +52,7 @@ namespace Extract.FileActionManager.Database.Test
         /// </summary>
         /// <param name="databaseName">The name to give to the database.</param>
         /// <returns>A <see cref="IFileProcessingDB"/> for the database.</returns>
-        public IFileProcessingDB GetNewDatabase(string databaseName)
+        public FileProcessingDB GetNewDatabase(string databaseName)
         {
             try
             {

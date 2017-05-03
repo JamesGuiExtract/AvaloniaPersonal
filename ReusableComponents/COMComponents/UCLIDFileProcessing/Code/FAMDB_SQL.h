@@ -16,6 +16,7 @@ static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [dbo].[Action] "
 	"[ASCName] [nvarchar](50) NOT NULL, "
 	"[Description] [nvarchar](255) NULL, "
 	"[WorkflowID] [INT] NULL, "
+	"[MainSequence] [BIT] NULL, "
 	"CONSTRAINT [IX_Action] UNIQUE NONCLUSTERED ([ASCName], [WorkflowID]))";
 
 static const string gstrCREATE_LOCK_TABLE = 

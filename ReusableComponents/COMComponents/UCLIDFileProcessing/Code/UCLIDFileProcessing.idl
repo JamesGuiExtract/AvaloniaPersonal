@@ -1833,13 +1833,20 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Gets all of the workflow names with IDs
 		[id(166), helpstring("methods GetWorkflows")] HRESULT GetWorkflows([out, retval] IStrToStrMap ** pmapWorkFlowNameToID);
 		// -----------------------------------------------------------------------------------------------
-		// PROMISE: Gets the actions associated with a workflow
+		// PROMISE: Gets the actions associated with a workflow. Each action will be represented as a
+		//			VariantVector with three values each:
+		//			1: long ID
+		//			2: BSTR Name
+		//			3: VARIANT_BOOL MainSequence
 		[id(167), helpstring("methods GetWorkflowActions")] HRESULT GetWorkflowActions([in] long nID,
-			[out, retval] IStrToStrMap ** pmapActionNameToID);
+			[out, retval] IIUnknownVector ** pvecActions);
 		// -----------------------------------------------------------------------------------------------
-		// PROMISE: Sets the actions associated with a workflow
+		// PROMISE: Sets the actions associated with a workflow. Each action specified should be a
+		//			VariantVector with 2 values each:
+		//			1: BSTR Name
+		//			2: VARIANT_BOOL MainSequence
 		[id(168), helpstring("methods SetWorkflowActions")] HRESULT SetWorkflowActions([in] long nID,
-			[in] IVariantVector* pActionList);
+			[in] IIUnknownVector* pActionList);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Sets the currently active workflow
 		[propget, id(169), helpstring("property ActiveWorkflow ")] HRESULT ActiveWorkflow([out, retval] BSTR* pbstrWorkflowName);
@@ -1908,6 +1915,11 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Gets the workflow name associated with the ActionID
 		[id(180), helpstring("method GetWorkflowNameFromActionID")] HRESULT GetWorkflowNameFromActionID(
 			[in] long nActionID, [out, retval] BSTR* pbstrWorkflowName);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To return the ActionID for the given action name in the specified workflow.
+		//			-1 will be returned if the action does not exist in the specified workflow.
+		[id(181), helpstring("method GetActionIDForWorkflow")] HRESULT GetActionIDForWorkflow([in] BSTR bstrActionName, [in] long nWorkflowID,
+			[out, retval]long* pnActionID);
 	};
 
 	[

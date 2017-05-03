@@ -391,7 +391,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Attributes that have been modified in the _paginationDocumentDataPanel and need to be
         /// refreshed in the DEP.
         /// </summary>
-        HashSet<IAttribute> _paginagionAttributesToRefresh = new HashSet<IAttribute>();
+        HashSet<IAttribute> _paginationAttributesToRefresh = new HashSet<IAttribute>();
 
         /// <summary>
         /// Keeps track of suggested pagination output that was accepted and should be loaded ahead
@@ -2960,7 +2960,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     // Refresh any attributes that were modified in the _paginationDocumentDataPanel
                     // so that it's value stays in sync.
-                    foreach (IAttribute attribute in _paginagionAttributesToRefresh)
+                    foreach (IAttribute attribute in _paginationAttributesToRefresh
+                        .Where(attribute => attribute != null))
                     {
                         AttributeStatusInfo.SetValue(attribute, attribute.Value, true, true);
                         var owningControl = AttributeStatusInfo.GetOwningControl(attribute);
@@ -2970,7 +2971,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
                     }
 
-                    _paginagionAttributesToRefresh.Clear();
+                    _paginationAttributesToRefresh.Clear();
 
                     // https://extract.atlassian.net/browse/ISSUE-14265
                     // If the current image was never opened in the main date entry verification
@@ -3292,7 +3293,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                _paginagionAttributesToRefresh.Add(e.ModifiedAttribute);
+                _paginationAttributesToRefresh.Add(e.ModifiedAttribute);
 
                 // This event is registered only for the active document's data an not for any other
                 // document displayed in the pagination panel this will not block the modified

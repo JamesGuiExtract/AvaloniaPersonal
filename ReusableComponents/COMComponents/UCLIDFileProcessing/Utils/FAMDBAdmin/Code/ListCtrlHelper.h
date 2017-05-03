@@ -77,26 +77,6 @@ namespace Extract {
 				}
 			}
 
-			// Loads a CheckedListBox list with values from IStrToStrMap
-			static void LoadListCtrl(CheckedListBox ^listCtrl, IStrToStrMapPtr values)
-			{
-				// Clear the list so it can be reloaded
-				listCtrl->Items->Clear();
-				listCtrl->DisplayMember = "Name";
-				listCtrl->ValueMember = "ID";
-
-				IIUnknownVectorPtr itemPairs = values->GetAllKeyValuePairs();
-
-				int numItems = itemPairs->Size();
-				for (int i = 0; i < numItems; i++)
-				{
-					IStringPairPtr currentActionPair = (IStringPairPtr)itemPairs->At(i);
-					ListItemPair ^newItem = gcnew ListItemPair(currentActionPair);
-
-					listCtrl->Items->Add(newItem);
-				}
-			}
-
 			// Loads a ComboBox list with values from IVariantVector
 			static void LoadListCtrl(ComboBox ^listCtrl, IVariantVectorPtr values)
 			{

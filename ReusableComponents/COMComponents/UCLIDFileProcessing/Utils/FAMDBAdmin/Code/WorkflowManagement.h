@@ -9,6 +9,7 @@ namespace Extract {
 		using namespace System;
 		using namespace System::ComponentModel;
 		using namespace System::Collections;
+		using namespace System::Collections::Generic;
 		using namespace System::Windows::Forms;
 		using namespace System::Data;
 		using namespace System::Drawing;
@@ -71,8 +72,8 @@ namespace Extract {
 			// Form closing event handler
 			Void HandleWorkflowManagement_FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e);
 
-			// Handle the CheckedListBox mouse click so that box is only checked when it is clicked on
-			Void HandleActionsCheckedListBox_MouseClick(System::Object^  sender, MouseEventArgs^ e);
+			// Handle the case that either the included or main sequence check boxes has been clicked.
+			void HandleCellContentClick(System::Object ^sender, System::Windows::Forms::DataGridViewCellEventArgs ^e);
 
 #pragma endregion
 
@@ -84,11 +85,22 @@ namespace Extract {
 			// Checks the boxes in the actions list that are associated with the current workflow
 			Void setActionChecksForCurrentWorkflow();
 
+			// Adds a label to actions that fulfill key steps in the workflow (Start, End, Finalize)
+			Void setActionStepsForCurrentWorkflow();
+
+			// Gets the ID for the currently selected workflow.
+			int getSelectedWorkflowId();
+
+			// Toggle the state of the action grid checkbox indicating whether an action is included
+			// in the workflow
+			Void toggleActionIncluded(DataGridViewRow ^row);
+
+			// Toggle the state of the action grid checkbox indicating whether an included action is
+			// part of the main sequence for the workflow.
+			Void toggleMainSequenceAction(DataGridViewRow ^row);
+
 			// Updates the status of the buttons (enables/disables)
 			Void updateButtons();
-
-			// Checks the box for the given action
-			Void checkAction(System::String ^ action);
 
 			// Loads the workflow combo which also checks the actions for the workflow
 			Void loadWorkflowCombo();
@@ -109,12 +121,27 @@ namespace Extract {
 
 			// The name of the current workflow
 			String^ _currentWorkflow;
-		private: System::Windows::Forms::Button^  addWorkflowButton;
 
-		private: System::Windows::Forms::GroupBox^  workflowGroupBox;
-		private: System::Windows::Forms::GroupBox^  actionsGroupBox;
+			// The set of action names that to this point have been at some point included in the
+			// current workflow. This is tracked in order to know when to default the main sequence
+			// checkbox to checked (vs keeping it the same value it had been previously).
+			HashSet<String ^> _initializedActions;
 
+			private: System::Windows::Forms::Button^  addWorkflowButton;
+			private: System::Windows::Forms::GroupBox^  workflowGroupBox;
+			private: System::Windows::Forms::GroupBox^  actionsGroupBox;
+			private: System::Windows::Forms::DataGridView^  actionsGridView; 
+			private: System::Windows::Forms::DataGridViewTextBoxColumn^  ActionIDColumn;
+			private: System::Windows::Forms::DataGridViewCheckBoxColumn^  ActionIncludedColumn;
+			private: System::Windows::Forms::DataGridViewTextBoxColumn^  ActionNameColumn;
+			private: System::Windows::Forms::DataGridViewTextBoxColumn^  ActionStepColumn;
+			private: System::Windows::Forms::DataGridViewCheckBoxColumn^  ActionMainSequenceColumn;
 
+			static int ActionIDColumnIndex = 0;
+			static int ActionIncludedColumnIndex = 1;
+			static int ActionNameColumnIndex = 2;
+			static int ActionStepColumnIndex = 3;
+			static int ActionMainSequenceColumnIndex = 4;
 
 			// used for internal access to fam database
 			property IFileProcessingDBPtr _ipfamDatabase
@@ -165,14 +192,14 @@ namespace Extract {
 
 			System::Windows::Forms::Button^  deleteWorkflowButton;
 
-			System::Windows::Forms::CheckedListBox^  actionsCheckedListBox;
+
 
 
 			System::Windows::Forms::Button^  addActionButton;
 			System::Windows::Forms::Button^  deleteActionButton;
 			System::Windows::Forms::Button^  renameActionButton;
 			System::Windows::Forms::Button^  closeButton;
-private: System::Windows::Forms::Button^  modifyWorkflowButton;
+			System::Windows::Forms::Button^  modifyWorkflowButton;
 
 			System::Windows::Forms::Button^  saveChangesButton;
 
@@ -185,9 +212,13 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 			/// </summary>
 			void InitializeComponent(void)
 			{
+				System::Windows::Forms::DataGridViewCellStyle^  dataGridViewCellStyle1 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
+				System::Windows::Forms::DataGridViewCellStyle^  dataGridViewCellStyle4 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
+				System::Windows::Forms::DataGridViewCellStyle^  dataGridViewCellStyle5 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
+				System::Windows::Forms::DataGridViewCellStyle^  dataGridViewCellStyle2 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
+				System::Windows::Forms::DataGridViewCellStyle^  dataGridViewCellStyle3 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
 				this->workflowComboBox = (gcnew System::Windows::Forms::ComboBox());
 				this->deleteWorkflowButton = (gcnew System::Windows::Forms::Button());
-				this->actionsCheckedListBox = (gcnew System::Windows::Forms::CheckedListBox());
 				this->addActionButton = (gcnew System::Windows::Forms::Button());
 				this->deleteActionButton = (gcnew System::Windows::Forms::Button());
 				this->renameActionButton = (gcnew System::Windows::Forms::Button());
@@ -197,8 +228,15 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				this->addWorkflowButton = (gcnew System::Windows::Forms::Button());
 				this->workflowGroupBox = (gcnew System::Windows::Forms::GroupBox());
 				this->actionsGroupBox = (gcnew System::Windows::Forms::GroupBox());
+				this->actionsGridView = (gcnew System::Windows::Forms::DataGridView());
+				this->ActionIDColumn = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+				this->ActionIncludedColumn = (gcnew System::Windows::Forms::DataGridViewCheckBoxColumn());
+				this->ActionNameColumn = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+				this->ActionStepColumn = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+				this->ActionMainSequenceColumn = (gcnew System::Windows::Forms::DataGridViewCheckBoxColumn());
 				this->workflowGroupBox->SuspendLayout();
 				this->actionsGroupBox->SuspendLayout();
+				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->actionsGridView))->BeginInit();
 				this->SuspendLayout();
 				// 
 				// workflowComboBox
@@ -209,40 +247,27 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				this->workflowComboBox->FormattingEnabled = true;
 				this->workflowComboBox->Location = System::Drawing::Point(7, 20);
 				this->workflowComboBox->Name = L"workflowComboBox";
-				this->workflowComboBox->Size = System::Drawing::Size(323, 21);
+				this->workflowComboBox->Size = System::Drawing::Size(366, 21);
 				this->workflowComboBox->TabIndex = 0;
 				this->workflowComboBox->SelectionChangeCommitted += gcnew System::EventHandler(this, &WorkflowManagement::HandleWorkflowSelectionChangeCommitted);
 				// 
 				// deleteWorkflowButton
 				// 
 				this->deleteWorkflowButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Right));
-				this->deleteWorkflowButton->Location = System::Drawing::Point(225, 47);
+				this->deleteWorkflowButton->Location = System::Drawing::Point(255, 47);
 				this->deleteWorkflowButton->Name = L"deleteWorkflowButton";
-				this->deleteWorkflowButton->Size = System::Drawing::Size(105, 23);
+				this->deleteWorkflowButton->Size = System::Drawing::Size(118, 23);
 				this->deleteWorkflowButton->TabIndex = 2;
 				this->deleteWorkflowButton->Text = L"Delete";
 				this->deleteWorkflowButton->UseVisualStyleBackColor = true;
 				this->deleteWorkflowButton->Click += gcnew System::EventHandler(this, &WorkflowManagement::HandleDeleteWorkflowButton_Click);
-				// 
-				// actionsCheckedListBox
-				// 
-				this->actionsCheckedListBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
-					| System::Windows::Forms::AnchorStyles::Right));
-				this->actionsCheckedListBox->CheckOnClick = true;
-				this->actionsCheckedListBox->FormattingEnabled = true;
-				this->actionsCheckedListBox->Location = System::Drawing::Point(7, 19);
-				this->actionsCheckedListBox->Name = L"actionsCheckedListBox";
-				this->actionsCheckedListBox->Size = System::Drawing::Size(323, 244);
-				this->actionsCheckedListBox->TabIndex = 4;
-				this->actionsCheckedListBox->ItemCheck += gcnew System::Windows::Forms::ItemCheckEventHandler(this, &WorkflowManagement::HandleActionsCheckedListBox_ItemCheck);
-				this->actionsCheckedListBox->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &WorkflowManagement::HandleActionsCheckedListBox_MouseClick);
 				// 
 				// addActionButton
 				// 
 				this->addActionButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 				this->addActionButton->Location = System::Drawing::Point(6, 268);
 				this->addActionButton->Name = L"addActionButton";
-				this->addActionButton->Size = System::Drawing::Size(105, 23);
+				this->addActionButton->Size = System::Drawing::Size(118, 23);
 				this->addActionButton->TabIndex = 5;
 				this->addActionButton->Text = L"Add";
 				this->addActionButton->UseVisualStyleBackColor = true;
@@ -251,9 +276,9 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// deleteActionButton
 				// 
 				this->deleteActionButton->Anchor = System::Windows::Forms::AnchorStyles::Bottom;
-				this->deleteActionButton->Location = System::Drawing::Point(115, 268);
+				this->deleteActionButton->Location = System::Drawing::Point(131, 268);
 				this->deleteActionButton->Name = L"deleteActionButton";
-				this->deleteActionButton->Size = System::Drawing::Size(105, 23);
+				this->deleteActionButton->Size = System::Drawing::Size(118, 23);
 				this->deleteActionButton->TabIndex = 6;
 				this->deleteActionButton->Text = L"Delete";
 				this->deleteActionButton->UseVisualStyleBackColor = true;
@@ -262,9 +287,9 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// renameActionButton
 				// 
 				this->renameActionButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->renameActionButton->Location = System::Drawing::Point(224, 268);
+				this->renameActionButton->Location = System::Drawing::Point(255, 268);
 				this->renameActionButton->Name = L"renameActionButton";
-				this->renameActionButton->Size = System::Drawing::Size(105, 23);
+				this->renameActionButton->Size = System::Drawing::Size(118, 23);
 				this->renameActionButton->TabIndex = 7;
 				this->renameActionButton->Text = L"Rename";
 				this->renameActionButton->UseVisualStyleBackColor = true;
@@ -274,9 +299,9 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// 
 				this->closeButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->closeButton->DialogResult = System::Windows::Forms::DialogResult::OK;
-				this->closeButton->Location = System::Drawing::Point(238, 399);
+				this->closeButton->Location = System::Drawing::Point(281, 399);
 				this->closeButton->Name = L"closeButton";
-				this->closeButton->Size = System::Drawing::Size(105, 23);
+				this->closeButton->Size = System::Drawing::Size(118, 23);
 				this->closeButton->TabIndex = 9;
 				this->closeButton->Text = L"Close";
 				this->closeButton->UseVisualStyleBackColor = true;
@@ -284,9 +309,9 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// modifyWorkflowButton
 				// 
 				this->modifyWorkflowButton->Anchor = System::Windows::Forms::AnchorStyles::Top;
-				this->modifyWorkflowButton->Location = System::Drawing::Point(116, 47);
+				this->modifyWorkflowButton->Location = System::Drawing::Point(131, 47);
 				this->modifyWorkflowButton->Name = L"modifyWorkflowButton";
-				this->modifyWorkflowButton->Size = System::Drawing::Size(105, 23);
+				this->modifyWorkflowButton->Size = System::Drawing::Size(118, 23);
 				this->modifyWorkflowButton->TabIndex = 1;
 				this->modifyWorkflowButton->Text = L"Modify";
 				this->modifyWorkflowButton->UseVisualStyleBackColor = true;
@@ -296,9 +321,9 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// 
 				this->saveChangesButton->Anchor = System::Windows::Forms::AnchorStyles::Bottom;
 				this->saveChangesButton->Enabled = false;
-				this->saveChangesButton->Location = System::Drawing::Point(129, 399);
+				this->saveChangesButton->Location = System::Drawing::Point(157, 399);
 				this->saveChangesButton->Name = L"saveChangesButton";
-				this->saveChangesButton->Size = System::Drawing::Size(105, 23);
+				this->saveChangesButton->Size = System::Drawing::Size(118, 23);
 				this->saveChangesButton->TabIndex = 8;
 				this->saveChangesButton->Text = L"Save";
 				this->saveChangesButton->UseVisualStyleBackColor = true;
@@ -308,7 +333,7 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// 
 				this->addWorkflowButton->Location = System::Drawing::Point(7, 47);
 				this->addWorkflowButton->Name = L"addWorkflowButton";
-				this->addWorkflowButton->Size = System::Drawing::Size(105, 23);
+				this->addWorkflowButton->Size = System::Drawing::Size(118, 23);
 				this->addWorkflowButton->TabIndex = 1;
 				this->addWorkflowButton->Text = L"Add";
 				this->addWorkflowButton->UseVisualStyleBackColor = true;
@@ -316,38 +341,147 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				// 
 				// workflowGroupBox
 				// 
-				this->workflowGroupBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
-					| System::Windows::Forms::AnchorStyles::Left));
+				this->workflowGroupBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
+					| System::Windows::Forms::AnchorStyles::Left)
+					| System::Windows::Forms::AnchorStyles::Right));
 				this->workflowGroupBox->Controls->Add(this->addWorkflowButton);
 				this->workflowGroupBox->Controls->Add(this->workflowComboBox);
 				this->workflowGroupBox->Controls->Add(this->deleteWorkflowButton);
 				this->workflowGroupBox->Controls->Add(this->modifyWorkflowButton);
 				this->workflowGroupBox->Location = System::Drawing::Point(14, 12);
 				this->workflowGroupBox->Name = L"workflowGroupBox";
-				this->workflowGroupBox->Size = System::Drawing::Size(338, 80);
+				this->workflowGroupBox->Size = System::Drawing::Size(381, 80);
 				this->workflowGroupBox->TabIndex = 10;
 				this->workflowGroupBox->TabStop = false;
 				this->workflowGroupBox->Text = L"Workflow";
 				// 
 				// actionsGroupBox
 				// 
-				this->actionsGroupBox->Controls->Add(this->actionsCheckedListBox);
+				this->actionsGroupBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
+					| System::Windows::Forms::AnchorStyles::Left)
+					| System::Windows::Forms::AnchorStyles::Right));
+				this->actionsGroupBox->Controls->Add(this->actionsGridView);
 				this->actionsGroupBox->Controls->Add(this->renameActionButton);
 				this->actionsGroupBox->Controls->Add(this->addActionButton);
 				this->actionsGroupBox->Controls->Add(this->deleteActionButton);
 				this->actionsGroupBox->Location = System::Drawing::Point(14, 96);
 				this->actionsGroupBox->Name = L"actionsGroupBox";
-				this->actionsGroupBox->Size = System::Drawing::Size(338, 300);
+				this->actionsGroupBox->Size = System::Drawing::Size(381, 300);
 				this->actionsGroupBox->TabIndex = 11;
 				this->actionsGroupBox->TabStop = false;
 				this->actionsGroupBox->Text = L"Actions";
+				// 
+				// actionsGridView
+				// 
+				this->actionsGridView->AllowUserToAddRows = false;
+				this->actionsGridView->AllowUserToDeleteRows = false;
+				this->actionsGridView->AllowUserToResizeColumns = false;
+				this->actionsGridView->AllowUserToResizeRows = false;
+				this->actionsGridView->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
+					| System::Windows::Forms::AnchorStyles::Left)
+					| System::Windows::Forms::AnchorStyles::Right));
+				this->actionsGridView->BackgroundColor = System::Drawing::Color::White;
+				this->actionsGridView->CellBorderStyle = System::Windows::Forms::DataGridViewCellBorderStyle::None;
+				this->actionsGridView->ClipboardCopyMode = System::Windows::Forms::DataGridViewClipboardCopyMode::EnableWithoutHeaderText;
+				this->actionsGridView->ColumnHeadersBorderStyle = System::Windows::Forms::DataGridViewHeaderBorderStyle::None;
+				dataGridViewCellStyle1->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
+				dataGridViewCellStyle1->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(196)),
+					static_cast<System::Int32>(static_cast<System::Byte>(216)), static_cast<System::Int32>(static_cast<System::Byte>(242)));
+				dataGridViewCellStyle1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular,
+					System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+				dataGridViewCellStyle1->ForeColor = System::Drawing::SystemColors::WindowText;
+				dataGridViewCellStyle1->SelectionBackColor = System::Drawing::SystemColors::Highlight;
+				dataGridViewCellStyle1->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
+				dataGridViewCellStyle1->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
+				this->actionsGridView->ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+				this->actionsGridView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
+				this->actionsGridView->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(5) {
+					this->ActionIDColumn,
+						this->ActionIncludedColumn, this->ActionNameColumn, this->ActionStepColumn, this->ActionMainSequenceColumn
+				});
+				dataGridViewCellStyle4->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
+				dataGridViewCellStyle4->BackColor = System::Drawing::SystemColors::Window;
+				dataGridViewCellStyle4->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular,
+					System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+				dataGridViewCellStyle4->ForeColor = System::Drawing::SystemColors::ControlText;
+				dataGridViewCellStyle4->SelectionBackColor = System::Drawing::SystemColors::Highlight;
+				dataGridViewCellStyle4->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
+				dataGridViewCellStyle4->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
+				this->actionsGridView->DefaultCellStyle = dataGridViewCellStyle4;
+				this->actionsGridView->EditMode = System::Windows::Forms::DataGridViewEditMode::EditProgrammatically;
+				this->actionsGridView->EnableHeadersVisualStyles = false;
+				this->actionsGridView->GridColor = System::Drawing::Color::White;
+				this->actionsGridView->Location = System::Drawing::Point(7, 19);
+				this->actionsGridView->MultiSelect = false;
+				this->actionsGridView->Name = L"actionsGridView";
+				dataGridViewCellStyle5->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
+				dataGridViewCellStyle5->BackColor = System::Drawing::SystemColors::Control;
+				dataGridViewCellStyle5->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular,
+					System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+				dataGridViewCellStyle5->ForeColor = System::Drawing::SystemColors::WindowText;
+				dataGridViewCellStyle5->SelectionBackColor = System::Drawing::SystemColors::Highlight;
+				dataGridViewCellStyle5->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
+				dataGridViewCellStyle5->WrapMode = System::Windows::Forms::DataGridViewTriState::True;
+				this->actionsGridView->RowHeadersDefaultCellStyle = dataGridViewCellStyle5;
+				this->actionsGridView->RowHeadersVisible = false;
+				this->actionsGridView->RowTemplate->Height = 18;
+				this->actionsGridView->SelectionMode = System::Windows::Forms::DataGridViewSelectionMode::FullRowSelect;
+				this->actionsGridView->ShowCellErrors = false;
+				this->actionsGridView->ShowCellToolTips = false;
+				this->actionsGridView->ShowEditingIcon = false;
+				this->actionsGridView->ShowRowErrors = false;
+				this->actionsGridView->Size = System::Drawing::Size(365, 243);
+				this->actionsGridView->TabIndex = 4;
+				this->actionsGridView->CellContentClick += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &WorkflowManagement::HandleCellContentClick);
+				// 
+				// ActionIDColumn
+				// 
+				this->ActionIDColumn->HeaderText = L"";
+				this->ActionIDColumn->Name = L"ActionIDColumn";
+				this->ActionIDColumn->Visible = false;
+				// 
+				// ActionIncludedColumn
+				// 
+				this->ActionIncludedColumn->AutoSizeMode = System::Windows::Forms::DataGridViewAutoSizeColumnMode::None;
+				dataGridViewCellStyle2->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
+				dataGridViewCellStyle2->NullValue = false;
+				dataGridViewCellStyle2->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
+				this->ActionIncludedColumn->DefaultCellStyle = dataGridViewCellStyle2;
+				this->ActionIncludedColumn->HeaderText = L"";
+				this->ActionIncludedColumn->MinimumWidth = 20;
+				this->ActionIncludedColumn->Name = L"ActionIncludedColumn";
+				this->ActionIncludedColumn->Width = 20;
+				// 
+				// ActionNameColumn
+				// 
+				this->ActionNameColumn->AutoSizeMode = System::Windows::Forms::DataGridViewAutoSizeColumnMode::Fill;
+				this->ActionNameColumn->HeaderText = L"Name";
+				this->ActionNameColumn->Name = L"ActionNameColumn";
+				// 
+				// ActionStepColumn
+				// 
+				this->ActionStepColumn->AutoSizeMode = System::Windows::Forms::DataGridViewAutoSizeColumnMode::DisplayedCells;
+				dataGridViewCellStyle3->ForeColor = System::Drawing::SystemColors::GrayText;
+				dataGridViewCellStyle3->SelectionForeColor = System::Drawing::SystemColors::GrayText;
+				this->ActionStepColumn->DefaultCellStyle = dataGridViewCellStyle3;
+				this->ActionStepColumn->HeaderText = L"";
+				this->ActionStepColumn->Name = L"ActionStepColumn";
+				this->ActionStepColumn->Width = 17;
+				// 
+				// ActionMainSequenceColumn
+				// 
+				this->ActionMainSequenceColumn->AutoSizeMode = System::Windows::Forms::DataGridViewAutoSizeColumnMode::None;
+				this->ActionMainSequenceColumn->HeaderText = L"Main sequence";
+				this->ActionMainSequenceColumn->MinimumWidth = 90;
+				this->ActionMainSequenceColumn->Name = L"ActionMainSequenceColumn";
+				this->ActionMainSequenceColumn->Width = 90;
 				// 
 				// WorkflowManagement
 				// 
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->closeButton;
-				this->ClientSize = System::Drawing::Size(362, 431);
+				this->ClientSize = System::Drawing::Size(405, 431);
 				this->Controls->Add(this->saveChangesButton);
 				this->Controls->Add(this->closeButton);
 				this->Controls->Add(this->workflowGroupBox);
@@ -358,18 +492,20 @@ private: System::Windows::Forms::Button^  modifyWorkflowButton;
 				this->MinimumSize = System::Drawing::Size(375, 456);
 				this->Name = L"WorkflowManagement";
 				this->ShowIcon = false;
+				this->ShowInTaskbar = false;
 				this->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
 				this->Text = L"Workflow Management";
 				this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &WorkflowManagement::HandleWorkflowManagement_FormClosing);
 				this->Load += gcnew System::EventHandler(this, &WorkflowManagement::HandleWorkflowManagement_Load);
 				this->workflowGroupBox->ResumeLayout(false);
 				this->actionsGroupBox->ResumeLayout(false);
+				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->actionsGridView))->EndInit();
 				this->ResumeLayout(false);
 
 			}
 #pragma endregion
 
-
 };
 	};
 }
+

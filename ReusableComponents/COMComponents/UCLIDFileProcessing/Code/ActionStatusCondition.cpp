@@ -60,18 +60,7 @@ string ActionStatusCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFilePro
 	
 	string strQuery = "SELECT " + strSelect + " FROM FAMFile ";
 
-	long nActionID = 0;
-	if (nWorkflowID > 0)
-	{
-		auto mapActions = ipFAMDB->GetWorkflowActions(nWorkflowID);
-		nActionID = (mapActions->Contains(m_strAction.c_str()))
-			? asLong(mapActions->GetValue(m_strAction.c_str()))
-			: -1;
-	}
-	else
-	{
-		nActionID = ipFAMDB->GetActionID(m_strAction.c_str());
-	}
+	long nActionID = ipFAMDB->GetActionIDForWorkflow(m_strAction.c_str(), nWorkflowID);
 
 	// Check if comparing skipped status
 	if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionSkipped)

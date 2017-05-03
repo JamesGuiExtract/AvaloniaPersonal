@@ -17,9 +17,9 @@
 #include <msclr\marshal_cppstd.h>
 #include <msclr\marshal_windows.h>
 
+using namespace Extract::Utilities;
 using namespace msclr::interop;
 using namespace System::Collections::Specialized;
-
 
 namespace Extract
 {
@@ -61,10 +61,17 @@ namespace Extract
 						uex.addDebugInfo("New Action Name", strNewAction);
 						uex.addDebugInfo("New Action ID", dwNewActionID);
 
-						ListItemPair ^newItem = gcnew ListItemPair(newAction, dwNewActionID);
-						actionsCheckedListBox->Items->Add(newItem, CheckState::Unchecked);
+						int index = actionsGridView->Rows->Add();
+						auto newRow = actionsGridView->Rows[index];
+						newRow->Cells[ActionIncludedColumnIndex]->Value = true;
+						newRow->Cells[ActionIDColumnIndex]->Value = dwNewActionID;
+						newRow->Cells[ActionNameColumnIndex]->Value = newAction;
+						newRow->Cells[ActionMainSequenceColumnIndex]->Value = true;
+						newRow->Selected = true;
 
-						  // Restore the wait cursor because we have finished adding an action to DB
+						workflowActionsDirty = true;
+
+						// Restore the wait cursor because we have finished adding an action to DB
 						wait.Restore();
 
 						// Log application trace [LRCAU #5052 - JDS - 12/18/2008]
@@ -80,7 +87,7 @@ namespace Extract
 			try
 			{
 				// Check if there is no action selected
-				if (actionsCheckedListBox->SelectedIndex <= 0)
+				if (actionsGridView->SelectedRows->Count != 1)
 				{
 					return;
 				}
@@ -89,20 +96,19 @@ namespace Extract
 				// Display the wait cursor while action is deleted
 				CWaitCursor cursor;
 
-				// Get index of first selection
-				int iIndex = actionsCheckedListBox->SelectedIndex;
+				DataGridViewRow ^selectedRow = actionsGridView->SelectedRows[0];
 				
 				// Get the action name to remove
-				ListItemPair ^ ActionItemToDelete = safe_cast<ListItemPair ^>(actionsCheckedListBox->SelectedItem);
+				String^ strActionName = (String^)selectedRow->Cells[ActionNameColumnIndex]->Value;
 
 				// Prompt to verify
-				if (MessageBox::Show(ActiveForm, "Remove the action: " + ActionItemToDelete->Name + "?", "Confirmation",
+				if (MessageBox::Show(ActiveForm, "Remove the action: " + strActionName + "?", "Confirmation",
 					MessageBoxButtons::YesNoCancel, MessageBoxIcon::Question) != System::Windows::Forms::DialogResult::Yes)
 				{
 					return;
 				}
 
-				if (MessageBox::Show(ActiveForm, "Do you really want to remove the action: " + ActionItemToDelete->Name + "?",
+				if (MessageBox::Show(ActiveForm, "Do you really want to remove the action: " + strActionName + "?",
 					"Final Confirmation", MessageBoxButtons::YesNoCancel, MessageBoxIcon::Question) != System::Windows::Forms::DialogResult::Yes)
 				{
 					return;
@@ -117,14 +123,14 @@ namespace Extract
 					marshal_context marshalContext;
 
 					BSTR bstrActionName;
-					bstrActionName = marshalContext.marshal_as<BSTR>(ActionItemToDelete->Name);
+					bstrActionName = marshalContext.marshal_as<BSTR>(strActionName);
 
 					// Delete the action
 					_ipfamDatabase->DeleteAction(bstrActionName);
 
-					actionsCheckedListBox->Items->Remove(ActionItemToDelete);
+					actionsGridView->Rows->Remove(selectedRow);
 
-					strActionDeleted = marshal_as<std::string>(ActionItemToDelete->Name);
+					strActionDeleted = marshal_as<std::string>(strActionName);
 				}
 				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41925");
 
@@ -146,19 +152,20 @@ namespace Extract
 			try
 			{
 				// Check if there is no action selected
-				if (actionsCheckedListBox->SelectedIndex <= 0)
+				if (actionsGridView->SelectedRows->Count != 1)
 				{
 					return;
 				}
 
-				// Get index of first selection
-				ListItemPair ^ actionItemToRename = safe_cast<ListItemPair ^>(actionsCheckedListBox->SelectedItem);
-
 				// Display the wait cursor while action is deleted
 				CWaitCursor cursor;
 
-				string strOldName = marshal_as<std::string>(actionItemToRename->Name);
-				DWORD dwID = actionItemToRename->ID;
+				DataGridViewRow ^selectedRow = actionsGridView->SelectedRows[0];
+
+				// Get ID and action name 
+				DWORD dwID = (DWORD)selectedRow->Cells[ActionIDColumnIndex]->Value;
+				String^ oldName = (String^)selectedRow->Cells[ActionNameColumnIndex]->Value;
+				string strOldName = marshal_as<string>(oldName);
 
 				// Create an add action dialog
 				RenameActionDlg dlgRenameAction(_ipfamDatabase);
@@ -196,13 +203,11 @@ namespace Extract
 						uex.log();
 
 						// Display the message that the action is renamed
-						String^ strPrompt = "The action '" + actionItemToRename->Name + "' has been renamed to '"
+						String^ strPrompt = "The action '" + oldName + "' has been renamed to '"
 							+ marshal_as<String^>(strNewName) + "'.";
 						MessageBox::Show(ActiveForm, strPrompt, "Success", MessageBoxButtons::OK, MessageBoxIcon::Information);
 
-						actionItemToRename->Name = marshal_as<String^>(strNewName);
-						
-						actionsCheckedListBox->Refresh();
+						selectedRow->Cells[ActionNameColumnIndex]->Value = marshal_as<String^>(strNewName);
 					}
 				}
 			}
@@ -224,7 +229,7 @@ namespace Extract
 		{
 			try
 			{
-				if (workflowComboBox->SelectedIndex < 0)
+				if (workflowComboBox->SelectedIndex <= 0)
 				{
 					return;
 				}
@@ -252,6 +257,10 @@ namespace Extract
 							workflowComboBox->Items[workflowComboBox->SelectedIndex] = selected;
 							workflowComboBox->Refresh();
 						}
+
+						// After editing the workflow, label actions that serve critical steps in the workflow
+						// (Start, End, Finalize)
+						setActionStepsForCurrentWorkflow();
 						updateButtons();
 					}
 				}
@@ -270,7 +279,7 @@ namespace Extract
 				Int32 currentWorkflowID = -1;
 
 				ListItemPair ^selected;
-				if (workflowComboBox->SelectedIndex >= 0)
+				if (workflowComboBox->SelectedIndex > 0)
 				{
 					selected = safe_cast<ListItemPair^>(workflowComboBox->SelectedItem);
 					
@@ -288,7 +297,6 @@ namespace Extract
 
 						loadWorkflowCombo();
 
-
 						updateButtons();
 					}
 				}
@@ -303,7 +311,7 @@ namespace Extract
 		{
 			try
 			{
-				if (workflowComboBox->SelectedIndex >= 0)
+				if (workflowComboBox->SelectedIndex > 0)
 				{
 					ListItemPair ^selectedItem = safe_cast<ListItemPair^>(workflowComboBox->SelectedItem);
 					if (MessageBox::Show("Delete the " + selectedItem->Name + " workflow?", "Delete workflow",
@@ -313,7 +321,6 @@ namespace Extract
 						workflowActionsDirty = false;
 						_currentWorkflow = "";
 						loadWorkflowCombo();
-						setActionChecksForCurrentWorkflow();
 					}
 				}
 			}
@@ -333,7 +340,9 @@ namespace Extract
 					promptAndSaveActionsForWorkFlow(previousWorkflow);
 				}
 
-				if (workflowComboBox->SelectedIndex != -1)
+				bool workflowSelected = workflowComboBox->SelectedIndex > 0;
+
+				if (workflowSelected)
 				{
 					ListItemPair ^ currentItem = safe_cast<ListItemPair ^>(workflowComboBox->SelectedItem);
 					_currentWorkflow = currentItem->Name;
@@ -343,7 +352,17 @@ namespace Extract
 					_currentWorkflow = "";
 				}
 
+				ActionIncludedColumn->Visible = workflowSelected;
+				ActionMainSequenceColumn->Visible = workflowSelected;
+
+				// When changing workflows, clear _initializedActions so that any action included
+				// from this point will be defaulted as a main sequence action.
+				_initializedActions.Clear();
+
 				setActionChecksForCurrentWorkflow();
+				setActionStepsForCurrentWorkflow();
+
+				workflowActionsDirty = false;
 				updateButtons();
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42007");
@@ -361,41 +380,28 @@ namespace Extract
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42043");
 		}
-		
-		Void WorkflowManagement::HandleActionsCheckedListBox_MouseClick(System::Object^  sender, MouseEventArgs^ e)
+
+		void WorkflowManagement::HandleCellContentClick(System::Object ^sender, System::Windows::Forms::DataGridViewCellEventArgs ^e)
 		{
 			try
 			{
-				if (workflowComboBox->SelectedIndex < 0)
+				if (e->ColumnIndex == ActionIncludedColumnIndex)
 				{
-					return;
+					toggleActionIncluded(actionsGridView->Rows[e->RowIndex]);
 				}
-				int mouseClickItem = actionsCheckedListBox->IndexFromPoint(e->X, e->Y);
-				actionsCheckedListBox->SelectedIndex = mouseClickItem;
-				if ((e->Button == System::Windows::Forms::MouseButtons::Left) && mouseClickItem >= 0)
+				else if (e->ColumnIndex == ActionMainSequenceColumnIndex)
 				{
-					if (e->X > 13)
-					{
-						actionsCheckedListBox->SetItemChecked(actionsCheckedListBox->SelectedIndex,
-							!actionsCheckedListBox->GetItemChecked(actionsCheckedListBox->SelectedIndex));
-
-					}
-					else
-					{
-							workflowActionsDirty = true;
-							saveChangesButton->Enabled = true;
-
-					}
+					toggleMainSequenceAction(actionsGridView->Rows[e->RowIndex]);
 				}
 			}
-			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42064");
+			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43346");
 		}
 
 		Void WorkflowManagement::HandleSaveChangesButton_Click(System::Object ^ sender, System::EventArgs ^ e)
 		{
 			try
 			{
-				if (workflowComboBox->SelectedIndex >= 0 && workflowActionsDirty)
+				if (workflowComboBox->SelectedIndex > 0 && workflowActionsDirty)
 				{
 					ListItemPair ^selectedWorkflow = safe_cast<ListItemPair^>(workflowComboBox->SelectedItem);
 
@@ -411,7 +417,7 @@ namespace Extract
 		{
 			try
 			{
-				if (workflowComboBox->SelectedIndex >= 0 && workflowActionsDirty)
+				if (workflowComboBox->SelectedIndex > 0 && workflowActionsDirty)
 				{
 					ListItemPair ^selectedWorkflow = safe_cast<ListItemPair^>(workflowComboBox->SelectedItem);
 
@@ -428,16 +434,26 @@ namespace Extract
 		Void WorkflowManagement::loadActionsList()
 		{
 			// Clear the list so it can be reloaded
-			actionsCheckedListBox->Items->Clear();
-			actionsCheckedListBox->DisplayMember = "Name";
-			actionsCheckedListBox->ValueMember = "ID";
+			actionsGridView->Rows->Clear();
 
 			// Get the actions from the database
 			IStrToStrMapPtr actions = _ipfamDatabase->GetAllActions();
-			ListCtrlHelper::LoadListCtrl(actionsCheckedListBox, actions);
+			IIUnknownVectorPtr itemPairs = actions->GetAllKeyValuePairs();
+			int numItems = itemPairs->Size();
+			for (int i = 0; i < numItems; i++)
+			{
+				IStringPairPtr currentActionPair = (IStringPairPtr)itemPairs->At(i);
+
+				int index = actionsGridView->Rows->Add();
+				auto newRow = actionsGridView->Rows[index];
+				newRow->Cells[ActionIDColumnIndex]->Value =
+					Int32::Parse(marshal_as<String^>(currentActionPair->StringValue));
+				newRow->Cells[ActionNameColumnIndex]->Value =
+					marshal_as<String^>(currentActionPair->StringKey);
+			}
 
 			// if there is no selected workflow there is nothing else to do
-			if (workflowComboBox->SelectedIndex < 0)
+			if (workflowComboBox->SelectedIndex <= 0)
 			{
 				// reset the workflow actions dirty flag
 				workflowActionsDirty = false;
@@ -448,50 +464,211 @@ namespace Extract
 			}
 		}
 
-		Void WorkflowManagement::setActionChecksForCurrentWorkflow()
+		Void WorkflowManagement::toggleActionIncluded(DataGridViewRow ^row)
 		{
+			bool currentlyIncluded = (bool)row->Cells[ActionIncludedColumnIndex]->Value;
+			String^ workflowStep = (String^)row->Cells[ActionStepColumnIndex]->Value;
 
-			// Clear all the checks
-			for (int i = 0;  i < actionsCheckedListBox->Items->Count; i++)
+			if (currentlyIncluded && !String::IsNullOrWhiteSpace(workflowStep))
 			{
-				actionsCheckedListBox->SetItemCheckState(i, CheckState::Unchecked);
+				UtilityMethods::ShowMessageBox("This action has been designated as the " + workflowStep +
+					" action for this workflow. The workflow definition needs to be modified before this action " +
+					"can be removed from the workflow.", "Cannot remove action", true);
+				return;
 			}
 
-			// if no workflow is selected nothing else to do
-			if (workflowComboBox->SelectedIndex < 0)
+			auto checkBoxCell = (DataGridViewCheckBoxCell^)row->Cells[ActionMainSequenceColumnIndex];
+
+			currentlyIncluded = !currentlyIncluded;
+			row->Cells[ActionIncludedColumnIndex]->Value = currentlyIncluded;
+
+			if (currentlyIncluded)
+			{
+				// Ensure the main sequence checkbox is visible for actions are included.
+				checkBoxCell->FlatStyle = FlatStyle::Standard;
+				checkBoxCell->Style->BackColor = actionsGridView->DefaultCellStyle->BackColor;
+				checkBoxCell->Style->ForeColor = actionsGridView->DefaultCellStyle->ForeColor;
+				checkBoxCell->Style->SelectionBackColor = actionsGridView->DefaultCellStyle->SelectionBackColor;
+				checkBoxCell->Style->SelectionForeColor = actionsGridView->DefaultCellStyle->SelectionForeColor;
+				checkBoxCell->ReadOnly = false;
+
+				String^ actionName = (String^)row->Cells[ActionNameColumnIndex]->Value;
+				if (!_initializedActions.Contains(actionName))
+				{
+					_initializedActions.Add(actionName);
+					toggleMainSequenceAction(row);
+				}
+			}
+			else
+			{
+				// Make the main sequence checkbox appear for actions not included.
+				checkBoxCell->FlatStyle = FlatStyle::Flat;
+				checkBoxCell->Style->BackColor = actionsGridView->BackgroundColor;
+				checkBoxCell->Style->ForeColor = actionsGridView->BackgroundColor;
+				checkBoxCell->Style->SelectionBackColor = actionsGridView->BackgroundColor;
+				checkBoxCell->Style->SelectionForeColor = actionsGridView->BackgroundColor;
+				checkBoxCell->ReadOnly = true;
+			}
+
+			workflowActionsDirty = true;
+			updateButtons();
+		}
+
+		Void WorkflowManagement::toggleMainSequenceAction(DataGridViewRow ^row)
+		{
+			bool currentlyIncluded = (bool)row->Cells[ActionIncludedColumnIndex]->Value;
+			if (currentlyIncluded)
+			{
+				bool currentlyMainSequence = (bool)row->Cells[ActionMainSequenceColumnIndex]->Value;
+				String^ workflowStep = (String^)row->Cells[ActionStepColumnIndex]->Value;
+
+				if (workflowStep == "Start" || workflowStep == "End")
+				{
+					UtilityMethods::ShowMessageBox("This action has been designated as the " + workflowStep +
+						" action for this workflow. The workflow definition needs to be modified or this action " +
+						"must remain designated as a main sequence action.", "Invalid designation", true);
+					return;
+				}
+				else if (workflowStep == "Finalize")
+				{
+					UtilityMethods::ShowMessageBox("This action has been designated as the " + workflowStep +
+						" action for this workflow. The workflow definition needs to be modified or this action " +
+						"must not be designated as a main sequence action.", "Invalid designation", true);
+					return;
+				}
+
+				auto cell = row->Cells[ActionMainSequenceColumnIndex];
+				cell->Value = !currentlyMainSequence;
+
+				workflowActionsDirty = true;
+				updateButtons();
+			}
+		}
+
+		Void WorkflowManagement::setActionChecksForCurrentWorkflow()
+		{
+			// Clear all the checks
+			for each (DataGridViewRow ^row in actionsGridView->Rows)
+			{
+				row->Cells[ActionIncludedColumnIndex]->Value = false;
+				row->Cells[ActionMainSequenceColumnIndex]->Value = false;
+			}
+
+			int workflowID = getSelectedWorkflowId();
+			if (workflowID == -1)
 			{
 				return;
 			}
 
-			// Set the checks
-			// Get the currently selected workflow
-			ListItemPair ^selectedWorkflow = safe_cast<ListItemPair^>(workflowComboBox->SelectedItem);
-
 			// Get the actions for the workflow
-			IStrToStrMapPtr workflowActions = _ipfamDatabase->GetWorkflowActions(selectedWorkflow->ID);
+			IIUnknownVectorPtr workflowActions = _ipfamDatabase->GetWorkflowActions(workflowID);
 
-			// Get the KeyValue pairs
-			IIUnknownVectorPtr itemPairs = workflowActions->GetAllKeyValuePairs();
-
-			int numItems = itemPairs->Size();
+			Dictionary<String^, bool> includedActions;
+			int numItems = workflowActions->Size();
 			for (int i = 0; i < numItems; i++)
 			{
-				IStringPairPtr currentActionPair = safe_cast<IStringPairPtr>(itemPairs->At(i));
-				ListItemPair ^newItem = gcnew ListItemPair(currentActionPair);
+				IVariantVectorPtr actionProperties = safe_cast<IVariantVectorPtr>(workflowActions->At(i));
+				String^ name = marshal_as<String^>(actionProperties->Item[1].bstrVal);
+				bool mainSequence = asCppBool(actionProperties->Item[2].boolVal);
+				includedActions[name] = mainSequence;
+			}
 
-				Int32 index = actionsCheckedListBox->FindStringExact(newItem->Name);
-				if (index != ListBox::NoMatches)
+			for each (DataGridViewRow ^row in actionsGridView->Rows)
+			{
+				String^ actionName = (String^)row->Cells[ActionNameColumnIndex]->Value;
+				auto checkBoxCell = (DataGridViewCheckBoxCell^)row->Cells[ActionMainSequenceColumnIndex];
+				bool mainSequence = false;
+
+				if (includedActions.TryGetValue(actionName, mainSequence))
 				{
-					actionsCheckedListBox->SetItemChecked(index, true);
+					// Ensure the main sequence checkbox is visible for actions are included.
+					checkBoxCell->FlatStyle = FlatStyle::Standard;
+					checkBoxCell->Style->BackColor = actionsGridView->DefaultCellStyle->BackColor;
+					checkBoxCell->Style->ForeColor = actionsGridView->DefaultCellStyle->ForeColor;
+					checkBoxCell->Style->SelectionBackColor = actionsGridView->DefaultCellStyle->SelectionBackColor;
+					checkBoxCell->Style->SelectionForeColor = actionsGridView->DefaultCellStyle->SelectionForeColor;
+					checkBoxCell->ReadOnly = false;
+
+					row->Cells[ActionIncludedColumnIndex]->Value = true;
+					row->Cells[ActionMainSequenceColumnIndex]->Value = mainSequence;
+					_initializedActions.Add(actionName);
+				}
+				else
+				{
+					// Make the main sequence checkbox appear for actions not included.
+					checkBoxCell->FlatStyle = FlatStyle::Flat;
+					checkBoxCell->Style->BackColor = actionsGridView->BackgroundColor;
+					checkBoxCell->Style->ForeColor = actionsGridView->BackgroundColor;
+					checkBoxCell->Style->SelectionBackColor = actionsGridView->BackgroundColor;
+					checkBoxCell->Style->SelectionForeColor = actionsGridView->BackgroundColor;
+					checkBoxCell->ReadOnly = true;
 				}
 			}
-			workflowActionsDirty = false;
+		}
+
+		Void WorkflowManagement::setActionStepsForCurrentWorkflow()
+		{
+			// Clear all the existing steps
+			for each (DataGridViewRow ^row in actionsGridView->Rows)
+			{
+				row->Cells[ActionStepColumnIndex]->Value = __nullptr;
+			}
+
+			int workflowID = getSelectedWorkflowId();
+			if (workflowID == -1)
+			{
+				return;
+			}
+
+			IWorkflowDefinitionPtr workflowDefinition =
+				_ipfamDatabase->GetWorkflowDefinition(workflowID);
+			Dictionary<String^, String^> specialActions;
+			String^ startAction = marshal_as<String^>(workflowDefinition->StartAction);
+			if (!String::IsNullOrWhiteSpace(startAction))
+			{
+				specialActions[startAction] = "Start";
+			}
+			String^ endAction = marshal_as<String^>(workflowDefinition->EndAction);
+			if (!String::IsNullOrWhiteSpace(endAction))
+			{
+				specialActions[endAction] = "End";
+			}
+			String^ postWorkflowAction = marshal_as<String^>(workflowDefinition->PostWorkflowAction);
+			if (!String::IsNullOrWhiteSpace(postWorkflowAction))
+			{
+				specialActions[postWorkflowAction] = "Finalize";
+			}
+
+			for each (DataGridViewRow ^row in actionsGridView->Rows)
+			{
+				String^ actionName = (String^)row->Cells[ActionNameColumnIndex]->Value;
+				String^ specialAction;
+				if (specialActions.TryGetValue(actionName, specialAction))
+				{
+					row->Cells[ActionStepColumnIndex]->Value = specialAction;
+				}
+			}
+		}
+
+		int WorkflowManagement::getSelectedWorkflowId()
+		{
+			bool workflowSelected = workflowComboBox->SelectedIndex > 0;
+
+			// if no workflow is selected nothing else to do
+			if (!workflowSelected)
+			{
+				return -1;
+			}
+
+			ListItemPair ^selectedWorkflow = safe_cast<ListItemPair^>(workflowComboBox->SelectedItem);
+
+			return selectedWorkflow->ID;
 		}
 
 		Void WorkflowManagement::updateButtons()
 		{
-			modifyWorkflowButton->Enabled = workflowComboBox->SelectedIndex >= 0;
-			deleteWorkflowButton->Enabled = workflowComboBox->SelectedIndex >= 0;
+			modifyWorkflowButton->Enabled = workflowComboBox->SelectedIndex > 0;
+			deleteWorkflowButton->Enabled = workflowComboBox->SelectedIndex > 0;
 			saveChangesButton->Enabled = workflowActionsDirty;
 		}
 
@@ -507,10 +684,21 @@ namespace Extract
 
 			ListCtrlHelper::LoadListCtrl(workflowComboBox, workflows);
 
-			int currIndex = workflowComboBox->FindStringExact(_currentWorkflow);
+			workflowComboBox->Items->Insert(0, "<All workflows>");
+
+			int currIndex = max(0, workflowComboBox->FindStringExact(_currentWorkflow));
 			workflowComboBox->SelectedIndex = currIndex;
 			
+			bool workflowSelected = (currIndex > 0);
+			ActionIncludedColumn->Visible = workflowSelected;
+			ActionMainSequenceColumn->Visible = workflowSelected;
+
+			_initializedActions.Clear();
+
 			setActionChecksForCurrentWorkflow();
+			setActionStepsForCurrentWorkflow();
+			
+			workflowActionsDirty = false;
 			
 			updateButtons();
 		}
@@ -530,32 +718,30 @@ namespace Extract
 			}
 		}
 
-		Void WorkflowManagement::checkAction(System::String ^ action)
-		{
-			CheckedListBox::CheckedIndexCollection ^ checked = actionsCheckedListBox->CheckedIndices;
-			if (!String::IsNullOrEmpty(action))
-			{
-				int index = actionsCheckedListBox->FindStringExact(action);
-				if (!checked->Contains(index))
-				{
-					actionsCheckedListBox->SetItemChecked(index, true);
-					workflowActionsDirty = true;
-				}
-			}
-		}
-		
 		Void WorkflowManagement::saveActionsForWorkflow(ListItemPair ^workFlowToUpdate)
 		{
 			marshal_context marshalContext;
-			IVariantVectorPtr newWorkflowActions(CLSID_VariantVector);
+			IIUnknownVectorPtr newWorkflowActions(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI42022", newWorkflowActions != __nullptr);
 
-			IEnumerator^ checkedEnum = actionsCheckedListBox->CheckedItems->GetEnumerator();
-			while (checkedEnum->MoveNext())
+			HashSet<String^> actionNames;
+			for each (DataGridViewRow ^row in actionsGridView->Rows)
 			{
-				ListItemPair ^current = safe_cast<ListItemPair^>(checkedEnum->Current);
-				newWorkflowActions->PushBack(marshalContext.marshal_as<BSTR>(current->Name));
+				if ((bool)row->Cells[ActionIncludedColumnIndex]->Value)
+				{
+					IVariantVectorPtr ipActionInfo(CLSID_VariantVector);
+
+					String^ actionName = (String^)row->Cells[ActionNameColumnIndex]->Value;
+					actionNames.Add(actionName);
+					BSTR bstrActionName = marshalContext.marshal_as<BSTR>(actionName);
+					ipActionInfo->PushBack(bstrActionName);
+					bool mainSequence = (bool)row->Cells[ActionMainSequenceColumnIndex]->Value;
+					ipActionInfo->PushBack(asVariantBool(mainSequence));
+
+					newWorkflowActions->PushBack(ipActionInfo);
+				}
 			}
+
 			_ipfamDatabase->SetWorkflowActions(workFlowToUpdate->ID, newWorkflowActions);
 		}
 #pragma endregion

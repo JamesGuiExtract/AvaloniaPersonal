@@ -22,6 +22,12 @@ namespace Extract.FileActionManager.Database.Test
 
         static readonly string _LABDE_EMPTY_DB = "Resources.Demo_LabDE_Empty";
 
+        static readonly string _LABDE_ACTION1 = "A01_ExtractData";
+        static readonly string _LABDE_ACTION2 = "A02_Verify";
+        static readonly string _LABDE_ACTION3 = "A03_QA";
+        static readonly string _LABDE_ACTION4 = "B01_ViewNonLab";
+        static readonly string _LABDE_ACTION5 = "Z_AdminAction";
+
         #endregion Constants
 
         #region Fields
@@ -162,7 +168,8 @@ namespace Extract.FileActionManager.Database.Test
             try
             {
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
-                int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kExtraction);
+                int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kExtraction,
+                    _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION5);
 
                 // Test initial Workflow property values
                 WorkflowDefinition outputDefinition = fileProcessingDb.GetWorkflowDefinition(id);
@@ -176,19 +183,15 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(string.IsNullOrEmpty(outputDefinition.OutputAttributeSet));
                 Assert.That(string.IsNullOrEmpty(outputDefinition.OutputFileMetadataField));
 
-                var actionNames = new[] { "A01_ExtractData", "A02_Verify", "Z_AdminAction" }
-                    .ToVariantVector();
-                fileProcessingDb.SetWorkflowActions(id, actionNames);
-
                 // Update workflow properties.
                 WorkflowDefinition workflowDefinition = new WorkflowDefinition();
                 workflowDefinition.ID = id;
                 workflowDefinition.Name = "Workflow1";
                 workflowDefinition.Type = EWorkflowType.kClassification;
                 workflowDefinition.Description = "A test of FileProcessingDB.SetWorkflowDefinition.";
-                workflowDefinition.StartAction = "A01_ExtractData";
-                workflowDefinition.EndAction = "A02_Verify";
-                workflowDefinition.PostWorkflowAction = "Z_AdminAction";
+                workflowDefinition.StartAction = _LABDE_ACTION1;
+                workflowDefinition.EndAction = _LABDE_ACTION2;
+                workflowDefinition.PostWorkflowAction = _LABDE_ACTION5;
                 workflowDefinition.DocumentFolder = @"C:\Demo_LabDE\Input";
                 workflowDefinition.OutputAttributeSet = "DataFoundByRules";
                 workflowDefinition.OutputFileMetadataField = "PatientFirstName";
@@ -251,11 +254,8 @@ namespace Extract.FileActionManager.Database.Test
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
                 // Create and configure workflow
-                int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kExtraction);
-
-                var actionNames = new[] { "A01_ExtractData", "A02_Verify", "Z_AdminAction" }
-                    .ToVariantVector();
-                fileProcessingDb.SetWorkflowActions(id, actionNames);
+                int id = fileProcessingDb.AddWorkflow(
+                    "Workflow1", EWorkflowType.kExtraction, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION5);
 
                 WorkflowDefinition workflowDefinition = new WorkflowDefinition();
                 workflowDefinition.ID = id;
@@ -263,9 +263,9 @@ namespace Extract.FileActionManager.Database.Test
                 workflowDefinition.Type = EWorkflowType.kExtraction;
                 workflowDefinition.Description =
                     "A test of whether workflows are retained after a database clear operation.";
-                workflowDefinition.StartAction = "A01_ExtractData";
-                workflowDefinition.EndAction = "A02_Verify";
-                workflowDefinition.PostWorkflowAction = "Z_AdminAction";
+                workflowDefinition.StartAction = _LABDE_ACTION1;
+                workflowDefinition.EndAction = _LABDE_ACTION2;
+                workflowDefinition.PostWorkflowAction = _LABDE_ACTION5;
                 workflowDefinition.DocumentFolder = @"C:\Demo_LabDE\Input";
                 workflowDefinition.OutputAttributeSet = "DataFoundByRules";
                 workflowDefinition.OutputFileMetadataField = "PatientFirstName";
@@ -306,25 +306,39 @@ namespace Extract.FileActionManager.Database.Test
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
                 var allActionNames = new[] // In order of name
-                    { "A01_ExtractData", "A02_Verify", "A03_QA", "B01_ViewNonLab", "Z_AdminAction"};
+                    { _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3, _LABDE_ACTION4, _LABDE_ACTION5};
 
                 int id = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
 
-                IStrToStrMap workflowActionMap = fileProcessingDb.GetWorkflowActions(id);
-                Assert.That(workflowActionMap.Size == 0);
+                IUnknownVector workflowActions = fileProcessingDb.GetWorkflowActions(id);
+                Assert.That(workflowActions.Size() == 0);
 
                 // Test adding three existing actions to workflow
-                var actionNames = new[] { "A01_ExtractData", "A02_Verify", "A03_QA" }; // In order of name
-                fileProcessingDb.SetWorkflowActions(id, actionNames.ToVariantVector());
+                var actionNames =
+                    new[] { _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3 }; // In order of name
+                workflowActions = actionNames
+                    .Select(name =>
+                     {
+                         var actionInfo = new VariantVector();
+                         actionInfo.PushBack(name);
+                         actionInfo.PushBack(true);
+                         return actionInfo;
+                     })
+                    .ToIUnknownVector();
 
-                workflowActionMap = fileProcessingDb.GetWorkflowActions(id);
-                var workflowActionDictionary = workflowActionMap.ComToDictionary();
-                var retrievedActions = workflowActionDictionary.Keys.OrderBy(name => name);
+                fileProcessingDb.SetWorkflowActions(id, workflowActions);
+
+                workflowActions = fileProcessingDb.GetWorkflowActions(id);
+                var retrievedActions = workflowActions
+                    .ToIEnumerable<IVariantVector>()
+                    .Select(actionInfo => (string)actionInfo[1])
+                    .OrderBy(name => name);
                 Assert.That(actionNames.SequenceEqual(retrievedActions));
 
                 // Test that the GetWorkflowNameFromActionID works 
-                var returnedWorkflowSet = workflowActionDictionary.Values
-                    .Select(v => fileProcessingDb.GetWorkflowNameFromActionID(Int32.Parse(v, CultureInfo.CurrentCulture)))
+                var returnedWorkflowSet = workflowActions
+                    .ToIEnumerable<IVariantVector>()
+                    .Select(actionInfo => fileProcessingDb.GetWorkflowNameFromActionID((int)actionInfo[0]))
                     .Distinct();
 
                 Assert.That(returnedWorkflowSet.Single() == "Workflow1");
@@ -340,18 +354,35 @@ namespace Extract.FileActionManager.Database.Test
                 // Test deleting 2 actions + adding one existing action and one new action to workflow
                 fileProcessingDb.DefineNewAction(testDbName);
 
-                actionNames = new[] { "A02_Verify", testDbName, "Z_AdminAction" }; // In order of name
-                fileProcessingDb.SetWorkflowActions(id, actionNames.ToVariantVector());
+                actionNames =
+                    new[] { _LABDE_ACTION2, testDbName, _LABDE_ACTION5 }; // In order of name
+                workflowActions = actionNames
+                    .Select(name =>
+                    {
+                        var actionInfo = new VariantVector();
+                        actionInfo.PushBack(name);
+                        actionInfo.PushBack(true);
+                        return actionInfo;
+                    })
+                    .ToIUnknownVector();
 
-                workflowActionMap = fileProcessingDb.GetWorkflowActions(id);
-                retrievedActions = workflowActionMap.ComToDictionary().Keys.OrderBy(name => name);
+                fileProcessingDb.SetWorkflowActions(id, workflowActions);
+
+                workflowActions = fileProcessingDb.GetWorkflowActions(id);
+                retrievedActions = workflowActions
+                    .ToIEnumerable<IVariantVector>()
+                    .Select(actionInfo => (string)actionInfo[1])
+                    .OrderBy(name => name);
                 Assert.That(actionNames.SequenceEqual(retrievedActions));
 
                 // Confirm that action configuration is preserved if DB is cleared (retaining settings)
                 fileProcessingDb.Clear(true);
 
-                workflowActionMap = fileProcessingDb.GetWorkflowActions(id);
-                retrievedActions = workflowActionMap.ComToDictionary().Keys.OrderBy(name => name);
+                workflowActions = fileProcessingDb.GetWorkflowActions(id);
+                retrievedActions = workflowActions
+                    .ToIEnumerable<IVariantVector>()
+                    .Select(actionInfo => (string)actionInfo[1])
+                    .OrderBy(name => name);
                 Assert.That(actionNames.SequenceEqual(retrievedActions));
 
                 // Confirm workflow can be deleted even if it has actions.
@@ -388,7 +419,15 @@ namespace Extract.FileActionManager.Database.Test
                 int actionEnd1 = fileProcessingDb.DefineNewAction("End");
                 Assert.Throws<COMException>(() => fileProcessingDb.GetActionID("End"));
 
-                var workflowActions = new[] { "Start", "End" }.ToVariantVector();
+                var workflowActions = new[] { "Start", "End" }
+                    .Select(name =>
+                    {
+                        var actionInfo = new VariantVector();
+                        actionInfo.PushBack(name);
+                        actionInfo.PushBack(true);
+                        return actionInfo;
+                    })
+                    .ToIUnknownVector();
                 fileProcessingDb.SetWorkflowActions(workflowID, workflowActions);
 
                 // Test that a separate action ID was assigned for the workflow
@@ -400,9 +439,9 @@ namespace Extract.FileActionManager.Database.Test
                 // Test renaming an action while an active workflow is set.
                 fileProcessingDb.RenameAction("Start", "Begin");
                 var newWorkflowActions = fileProcessingDb.GetWorkflowActions(workflowID)
-                    .ComToDictionary()
-                    .Keys
-                    .AsEnumerable<string>()
+                    .ToIEnumerable<IVariantVector>()
+                    .Select(actionInfo => (string)actionInfo[1])
+                    .OrderBy(name => name)
                     .ToArray();
                 Assert.That(newWorkflowActions[0] == "Begin");
                 Assert.That(newWorkflowActions[1] == "End");
@@ -429,7 +468,7 @@ namespace Extract.FileActionManager.Database.Test
                 // After having deleted actions both with and without the active workflow set, make
                 // sure there are no actions left.
                 fileProcessingDb.DeleteAction("Begin");
-                Assert.That(fileProcessingDb.GetWorkflowActions(workflowID).Size == 0);
+                Assert.That(fileProcessingDb.GetWorkflowActions(workflowID).Size() == 0);
                 Assert.That(fileProcessingDb.GetActions().Size == 0);
             }
             finally

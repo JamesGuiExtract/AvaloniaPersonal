@@ -6552,15 +6552,15 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 	return ipWorkflowDefinition;
 }
 //-------------------------------------------------------------------------------------------------
-map<string, long> CFileProcessingDB::getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID)
+vector<tuple<long, string, bool>> CFileProcessingDB::getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID)
 {
-	map<string, long> mapWorkflowActions;
+	vector<tuple<long, string, bool>> vecWorkflowActions;
 
 	_RecordsetPtr ipActionSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI41992", ipActionSet != __nullptr);
 
 	string strQuery =
-		Util::Format("SELECT [ID], [ASCName] "
+		Util::Format("SELECT [ID], [ASCName], [MainSequence] "
 			"FROM dbo.[Action] "
 			"WHERE [WorkflowID] = %i", nWorkflowID);
 
@@ -6572,12 +6572,18 @@ map<string, long> CFileProcessingDB::getWorkflowActions(_ConnectionPtr ipConnect
 		FieldsPtr ipFields = ipActionSet->Fields;
 		ASSERT_RESOURCE_ALLOCATION("ELI41993", ipFields != __nullptr);
 
-		mapWorkflowActions[getStringField(ipFields, "ASCName")] = getLongField(ipFields, "ID");
+		long nId = getLongField(ipFields, "ID");
+		string strName = getStringField(ipFields, "ASCName");
+		bool bMainSequence = isNULL(ipFields, "MainSequence")
+			? true
+			: getBoolField(ipFields, "MainSequence");
+
+		vecWorkflowActions.push_back(make_tuple(nId, strName, bMainSequence));
 
 		ipActionSet->MoveNext();
 	}
 
-	return mapWorkflowActions;
+	return vecWorkflowActions;
 }
 //-------------------------------------------------------------------------------------------------
 vector<pair<string, string>> CFileProcessingDB::getWorkflowNamesAndIDs(_ConnectionPtr ipConnection)
@@ -6635,22 +6641,13 @@ map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 			getWorkflowDefinition(ipConnection, nWorkflowID);
 		ASSERT_RESOURCE_ALLOCATION("ELI42137", ipWorkflowDefinition != __nullptr);
 
-		long nPostWorkflowActionID = -1;
-		if (ipWorkflowDefinition->PostWorkflowAction.length() > 0)
-		{
-			nPostWorkflowActionID = getActionID(ipConnection,
-				asString(ipWorkflowDefinition->PostWorkflowAction));
-		}
-
-		// TODO: A more deterministic way of specifying the "primary" actions in a workflow.
-		// For now, all actions in the workflow except for the post-workflow action.
 		vector<string> vecIncludedActionIDs;
-		map<string, long> mapWorkflowActions = getWorkflowActions(ipConnection, nWorkflowID);
-		for each (pair<string, long> item in mapWorkflowActions)
+		vector<tuple<long, string, bool>> vecWorkflowActions = getWorkflowActions(ipConnection, nWorkflowID);
+		for each (tuple<long, string, bool> item in vecWorkflowActions)
 		{
-			if (item.second != nPostWorkflowActionID)
+			if (get<2>(item))
 			{
-				vecIncludedActionIDs.push_back(asString(item.second));
+				vecIncludedActionIDs.push_back(asString(get<0>(item)));
 			}
 		}
 

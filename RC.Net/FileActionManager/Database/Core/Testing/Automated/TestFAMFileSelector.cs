@@ -235,13 +235,13 @@ namespace Extract.FileActionManager.Database.Test
             {
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
-                int workflowId1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowId1, new[] { _LABDE_ACTION1, _LABDE_ACTION2 }.ToVariantVector());
+                fileProcessingDb.AddWorkflow(
+                    "Workflow1", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 var fileIDs1 = fileProcessingDb.AddTestFiles1();
 
-                int workflowId2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowId2, new[] { _LABDE_ACTION1, _LABDE_ACTION3 }.ToVariantVector());
+                fileProcessingDb.AddWorkflow(
+                    "Workflow2", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION3);
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
                 var fileIDs2 = fileProcessingDb.AddTestFiles2();
 
@@ -347,13 +347,13 @@ namespace Extract.FileActionManager.Database.Test
             {
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
-                int workflowId1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowId1, new[] { _LABDE_ACTION1, _LABDE_ACTION2 }.ToVariantVector());
+                fileProcessingDb.AddWorkflow(
+                    "Workflow1", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 var fileIDs1 = fileProcessingDb.AddTestFiles1();
 
-                int workflowId2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
-                fileProcessingDb.SetWorkflowActions(workflowId2, new[] { _LABDE_ACTION1, _LABDE_ACTION3 }.ToVariantVector());
+                fileProcessingDb.AddWorkflow(
+                    "Workflow2", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION3);
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
                 var fileIDs2 = fileProcessingDb.AddTestFiles2();
 

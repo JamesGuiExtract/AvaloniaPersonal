@@ -267,16 +267,16 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 using (TemporaryFile tmpFile2 = new TemporaryFile(false))
                 {
                     // Create 2 workflows
-                    int workflowID1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
-                    fileProcessingDb.SetWorkflowActions(workflowID1, new[] { _FIRST_ACTION, _SECOND_ACTION }.ToVariantVector());
+                    int workflowID1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined,
+                        _FIRST_ACTION, _SECOND_ACTION);
                     fileProcessingDb.ActiveWorkflow = "Workflow1";
 
                     // Get the action ID's for the first workflow
                     int firstAction1 = fileProcessingDb.GetActionID(_FIRST_ACTION);
                     int secondAction1 = fileProcessingDb.GetActionID(_SECOND_ACTION);
 
-                    int workflowID2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
-                    fileProcessingDb.SetWorkflowActions(workflowID2, new[] { _FIRST_ACTION, _SECOND_ACTION }.ToVariantVector());
+                    int workflowID2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined,
+                        _FIRST_ACTION, _SECOND_ACTION);
                     fileProcessingDb.ActiveWorkflow = "Workflow2";
 
                     int firstAction2 = fileProcessingDb.GetActionID(_FIRST_ACTION);
@@ -339,15 +339,15 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 {
 
                     // Create 2 workflows
-                    int workflowID1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
-                    fileProcessingDb.SetWorkflowActions(workflowID1, new[] { _FIRST_ACTION, _SECOND_ACTION }.ToVariantVector());
+                    int workflowID1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined,
+                        _FIRST_ACTION, _SECOND_ACTION);
                     fileProcessingDb.ActiveWorkflow = "Workflow1";
 
                     int firstAction1 = fileProcessingDb.GetActionID(_FIRST_ACTION);
                     int secondAction1 = fileProcessingDb.GetActionID(_SECOND_ACTION);
 
-                    int workflowID2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
-                    fileProcessingDb.SetWorkflowActions(workflowID2, new[] { _FIRST_ACTION, _SECOND_ACTION }.ToVariantVector());
+                    int workflowID2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined,
+                        _FIRST_ACTION, _SECOND_ACTION);
                     fileProcessingDb.ActiveWorkflow = "Workflow2";
 
                     int firstAction2 = fileProcessingDb.GetActionID(_FIRST_ACTION);
@@ -418,22 +418,22 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 using (TemporaryFile tmpFile2 = new TemporaryFile(false))
                 {
                     // Create 3 workflows
-                    int workflowID1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
-                    fileProcessingDb.SetWorkflowActions(workflowID1, new[] { _FIRST_ACTION, _SECOND_ACTION }.ToVariantVector());
+                    int workflowID1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined,
+                        _FIRST_ACTION, _SECOND_ACTION);
                     fileProcessingDb.ActiveWorkflow = "Workflow1";
 
                     int firstAction1 = fileProcessingDb.GetActionID(_FIRST_ACTION);
                     int secondAction1 = fileProcessingDb.GetActionID(_SECOND_ACTION);
 
-                    int workflowID2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
-                    fileProcessingDb.SetWorkflowActions(workflowID2, new[] { _FIRST_ACTION, _SECOND_ACTION }.ToVariantVector());
+                    int workflowID2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined,
+                        _FIRST_ACTION, _SECOND_ACTION);
                     fileProcessingDb.ActiveWorkflow = "Workflow2";
 
                     int firstAction2 = fileProcessingDb.GetActionID(_FIRST_ACTION);
                     int secondAction2 = fileProcessingDb.GetActionID(_SECOND_ACTION);
 
-                    int workflowID3 = fileProcessingDb.AddWorkflow("Workflow3", EWorkflowType.kUndefined);
-                    fileProcessingDb.SetWorkflowActions(workflowID3, new[] { _SECOND_ACTION }.ToVariantVector());
+                    int workflowID3 = fileProcessingDb.AddWorkflow("Workflow3", EWorkflowType.kUndefined,
+                        _SECOND_ACTION);
 
                     fileProcessingDb.ActiveWorkflow = "Workflow3";
                     int secondAction3 = fileProcessingDb.GetActionID(_SECOND_ACTION);

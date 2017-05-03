@@ -3959,7 +3959,7 @@ STDMETHODIMP CFileProcessingDB::GetWorkflows(IStrToStrMap ** pmapWorkFlowNameToI
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41932");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetWorkflowActions(long nID, IStrToStrMap** pmapActionNameToID)
+STDMETHODIMP CFileProcessingDB::GetWorkflowActions(long nID, IIUnknownVector** pvecActions)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -3967,20 +3967,20 @@ STDMETHODIMP CFileProcessingDB::GetWorkflowActions(long nID, IStrToStrMap** pmap
 	{
 		validateLicense();
 
-		if (!GetWorkflowActions_Internal(false, nID, pmapActionNameToID))
+		if (!GetWorkflowActions_Internal(false, nID, pvecActions))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 				gstrMAIN_DB_LOCK);
 
-			GetWorkflowActions_Internal(true, nID, pmapActionNameToID);
+			GetWorkflowActions_Internal(true, nID, pvecActions);
 		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41987");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetWorkflowActions(long nID, IVariantVector* pActionList)
+STDMETHODIMP CFileProcessingDB::SetWorkflowActions(long nID, IIUnknownVector* pActionList)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -4281,7 +4281,30 @@ STDMETHODIMP CFileProcessingDB::GetWorkflowNameFromActionID(long nActionID, BSTR
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43300");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetActionIDForWorkflow(BSTR bstrActionName, long nWorkflowID, long* pnActionID)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI43310", pnActionID != __nullptr);
+
+		if (!GetActionIDForWorkflow_Internal(false, bstrActionName, nWorkflowID, pnActionID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetActionIDForWorkflow_Internal(true, bstrActionName, nWorkflowID, pnActionID);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43311");
+}
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods
 //-------------------------------------------------------------------------------------------------

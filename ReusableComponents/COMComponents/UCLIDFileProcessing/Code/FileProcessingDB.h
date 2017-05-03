@@ -24,6 +24,7 @@
 #include <map>
 #include <vector>
 #include <set>
+#include <tuple>
 
 using namespace std;
 using namespace ADODB;
@@ -318,8 +319,8 @@ public:
 	STDMETHOD(GetWorkflowDefinition)(long nID, IWorkflowDefinition** ppWorkflowDefinition);
 	STDMETHOD(SetWorkflowDefinition)(IWorkflowDefinition* pWorkflowDefinition);
 	STDMETHOD(GetWorkflows)(IStrToStrMap ** pmapWorkFlowNameToID);
-	STDMETHOD(GetWorkflowActions)(long nID, IStrToStrMap** pmapActionNameToID);
-	STDMETHOD(SetWorkflowActions)(long nID, IVariantVector* pActionList);
+	STDMETHOD(GetWorkflowActions)(long nID, IIUnknownVector** pvecActions);
+	STDMETHOD(SetWorkflowActions)(long nID, IIUnknownVector* pActionList);
 	STDMETHOD(get_ActiveWorkflow)(BSTR* pbstrWorkflowName);
 	STDMETHOD(put_ActiveWorkflow)(BSTR bstrWorkflowName);
 	STDMETHOD(get_ActiveActionID)(long* pnActionID);
@@ -333,6 +334,7 @@ public:
 	STDMETHOD(IsFileInWorkflow)(long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 	STDMETHOD(get_UsingWorkflows)(VARIANT_BOOL *pbUsingWorkflows);
 	STDMETHOD(GetWorkflowNameFromActionID)(long nActionID, BSTR* pbstrWorkflowName);
+	STDMETHOD(GetActionIDForWorkflow)(BSTR bstrActionName, long nWorkflowID, long* pnActionID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1191,8 +1193,8 @@ private:
 	// Gets the specified workflow definition
 	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr getWorkflowDefinition(_ConnectionPtr ipConnection, long nID);
 
-	// Gets a map of all workflow names and IDs.
-	map<string, long> getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID);
+	// For every action in a workflow, gets the action id, name and whether main sequence.
+	vector<tuple<long, string, bool>> getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID);
 
 	vector<pair<string, string>> getWorkflowNamesAndIDs(_ConnectionPtr ipConnection);
 
@@ -1375,8 +1377,8 @@ private:
 	bool GetWorkflowDefinition_Internal(bool bDBLocked, long nID, IWorkflowDefinition** ppWorkflowDefinition);
 	bool SetWorkflowDefinition_Internal(bool bDBLocked, IWorkflowDefinition* pWorkflowDefinition);
 	bool GetWorkflows_Internal(bool bDBLocked, IStrToStrMap ** pmapWorkFlowNameToID);
-	bool GetWorkflowActions_Internal(bool bDBLocked, long nID, IStrToStrMap ** pmapActionNameToID);
-	bool SetWorkflowActions_Internal(bool bDBLocked, long nID, IVariantVector* pActionList);
+	bool GetWorkflowActions_Internal(bool bDBLocked, long nID, IIUnknownVector ** pvecActions);
+	bool SetWorkflowActions_Internal(bool bDBLocked, long nID, IIUnknownVector* pActionList);
 	bool GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
 	bool GetAllActions_Internal(bool bDBLocked, IStrToStrMap** pmapActionNameToID);
 	bool GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus);
@@ -1386,6 +1388,7 @@ private:
 	bool IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 	bool GetUsingWorkflows_Internal(bool bDBLocked, VARIANT_BOOL *pbUsingWorkflows);
 	bool GetWorkflowNameFromActionID_Internal(bool bDBLocked, long nActionID, BSTR* pbstrWorkflowName);
+	bool GetActionIDForWorkflow_Internal(bool bDBLocked, BSTR bstrActionName, long nWorkflowID, long* pnActionID);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

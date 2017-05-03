@@ -276,8 +276,11 @@ namespace Extract.FileActionManager.FileProcessors
                         paginationDocumentDataPanelAssembly, null, null);
 
                     _paginationDocumentDataPanel = CreateDocumentDataPanel(expandedAssemblyFileName);
-                    _paginationDocumentDataPanel.PanelControl.ParentChanged +=
-                        HandlePaginationDocumentDataPanel_ParentChanged;
+                    if (_paginationDocumentDataPanel.PanelControl != null)
+                    {
+                        _paginationDocumentDataPanel.PanelControl.ParentChanged +=
+                            HandlePaginationDocumentDataPanel_ParentChanged;
+                    }
 
                     if (_paginationDocumentDataPanel.AdvancedDataEntryOperationsSupported)
                     {
@@ -909,7 +912,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Add the file to the DB and check it out for this process before actually writing
                 // it to outputPath to prevent a running file supplier from grabbing it and another
                 // process from getting it.
-                int fileID = _paginationPanel.AddFileWithNameConflictResolve(e, priority);
+                _paginationPanel.AddFileWithNameConflictResolve(e, priority);
 
                 // Add pagination history before the image is created so that it does not
                 // get queued by a watching supplier

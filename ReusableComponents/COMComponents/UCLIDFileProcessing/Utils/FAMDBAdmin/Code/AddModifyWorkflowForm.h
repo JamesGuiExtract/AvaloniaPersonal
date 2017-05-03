@@ -431,7 +431,7 @@ namespace Extract {
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->cancelButton;
-				this->ClientSize = System::Drawing::Size(581, 425);
+				this->ClientSize = System::Drawing::Size(581, 426);
 				this->Controls->Add(this->groupBox1);
 				this->Controls->Add(this->cancelButton);
 				this->Controls->Add(this->label6);
@@ -456,6 +456,7 @@ namespace Extract {
 				this->MinimumSize = System::Drawing::Size(597, 464);
 				this->Name = L"AddModifyWorkflowForm";
 				this->ShowIcon = false;
+				this->ShowInTaskbar = false;
 				this->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
 				this->Text = L"Add/Modify Workflow";
 				this->Load += gcnew System::EventHandler(this, &AddModifyWorkflowForm::HandleAddModifyWorkflowForm_Load);

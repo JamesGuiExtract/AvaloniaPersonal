@@ -69,7 +69,7 @@ namespace Extract
 				// Load data into the form				
 				loadActionComboLists();
 				loadWorkFlowTypeCombo();
-				loadOutputAttributeSetCombo();
+				loadOutputAttributeSetCombo();	
 				loadOutputFileMetadataFieldCombo();
 				loadWorkflow();
 			}
@@ -101,48 +101,59 @@ namespace Extract
 				ipWorkflowDefinition->Description = context.marshal_as<BSTR>(descriptionTextBox->Text);
 
 				// Used to add the actions that are part of the definition to the workflow
-				IVariantVectorPtr ipActions(CLSID_VariantVector);
+				IIUnknownVectorPtr ipActions(CLSID_IUnknownVector);
 
-				ListItemPair ^selected;
 				EWorkflowType workflowType = kUndefined;
 				if (workFlowTypeComboBox->SelectedIndex >= 0)
 				{
-					selected = safe_cast<ListItemPair^>(workFlowTypeComboBox->SelectedItem);
+					ListItemPair ^selected = safe_cast<ListItemPair^>(workFlowTypeComboBox->SelectedItem);
 					workflowType = safe_cast<EWorkflowType>(selected->ID);
 					ipWorkflowDefinition->Type = workflowType;
 				}
 
 				if (startActionComboBox->SelectedIndex >= 0)
 				{
-					selected = safe_cast<ListItemPair^>(startActionComboBox->SelectedItem);
-					ipWorkflowDefinition->StartAction = context.marshal_as<BSTR>(selected->Name);
-					if (!String::IsNullOrWhiteSpace(selected->Name))
+					String^ startAction = (String^)startActionComboBox->SelectedItem;
+					ipWorkflowDefinition->StartAction = context.marshal_as<BSTR>(startAction);
+					if (!String::IsNullOrWhiteSpace(startAction))
 					{
-						ipActions->PushBack(ipWorkflowDefinition->StartAction);
+						IVariantVectorPtr ipActionInfo(CLSID_VariantVector);
+						ipActionInfo->PushBack(ipWorkflowDefinition->StartAction);
+						ipActionInfo->PushBack(VARIANT_TRUE);
+						
+						ipActions->PushBack(ipActionInfo);
 					}
 				}
 				if (endActionComboBox->SelectedIndex >= 0)
 				{
-					selected = safe_cast<ListItemPair^>(endActionComboBox->SelectedItem);
-					ipWorkflowDefinition->EndAction = context.marshal_as<BSTR>(selected->Name);
-					if (!String::IsNullOrWhiteSpace(selected->Name))
+					String^ endAction = (String^)endActionComboBox->SelectedItem;
+					ipWorkflowDefinition->EndAction = context.marshal_as<BSTR>(endAction);
+					if (!String::IsNullOrWhiteSpace(endAction))
 					{
-						ipActions->PushBack(ipWorkflowDefinition->EndAction);
+						IVariantVectorPtr ipActionInfo(CLSID_VariantVector);
+						ipActionInfo->PushBack(ipWorkflowDefinition->EndAction);
+						ipActionInfo->PushBack(VARIANT_TRUE);
+
+						ipActions->PushBack(ipActionInfo);
 					}
 				}
 				if (postWorkflowActionComboBox->SelectedIndex >= 0)
 				{
-					selected = safe_cast<ListItemPair^>(postWorkflowActionComboBox->SelectedItem);
-					ipWorkflowDefinition->PostWorkflowAction = context.marshal_as<BSTR>(selected->Name);
-					if (!String::IsNullOrWhiteSpace(selected->Name))
+					String^ postWorkflowAction = (String^)postWorkflowActionComboBox->SelectedItem;
+					ipWorkflowDefinition->PostWorkflowAction = context.marshal_as<BSTR>(postWorkflowAction);
+					if (!String::IsNullOrWhiteSpace(postWorkflowAction))
 					{
-						ipActions->PushBack(ipWorkflowDefinition->PostWorkflowAction);
+						IVariantVectorPtr ipActionInfo(CLSID_VariantVector);
+						ipActionInfo->PushBack(ipWorkflowDefinition->PostWorkflowAction);
+						ipActionInfo->PushBack(VARIANT_FALSE);
+
+						ipActions->PushBack(ipActionInfo);
 					}
 				}
 
 				if (outputAttributeSetComboBox->SelectedIndex >= 0)
 				{
-					selected = safe_cast<ListItemPair^>(outputAttributeSetComboBox->SelectedItem);
+					ListItemPair^ selected = safe_cast<ListItemPair^>(outputAttributeSetComboBox->SelectedItem);
 					ipWorkflowDefinition->OutputAttributeSet = context.marshal_as<BSTR>(selected->Name);
 				}
 				ipWorkflowDefinition->DocumentFolder = context.marshal_as<BSTR>(documentFolderTextBox->Text);
@@ -159,7 +170,7 @@ namespace Extract
 					_workflowID = _ipfamDatabase->AddWorkflow(ipWorkflowDefinition->Name, workflowType);
 					ipWorkflowDefinition->ID = _workflowID;
 
-					if (ipActions->Size > 0)
+					if (ipActions->Size() > 0)
 					{
 						// Need to add the actions that are in the definition to the workflow
 						_ipfamDatabase->SetWorkflowActions(_workflowID, ipActions);
@@ -214,32 +225,49 @@ namespace Extract
 
 		Void AddModifyWorkflowForm::loadActionComboLists()
 		{
-			IStrToStrMapPtr actions;
-			
+			IVariantVectorPtr mainSequenceActions(CLSID_VariantVector);
+			IVariantVectorPtr otherActions(CLSID_VariantVector);
+
 			// If this is a new workflow load all the actions
 			// if this is an existing workflow just load the actions associated with the workflow
 			if (_workflowID < 0)
 			{
 				// Get All actions from the database
-				actions = _ipfamDatabase->GetAllActions();
+				IStrToStrMapPtr actions = _ipfamDatabase->GetAllActions();
+				mainSequenceActions->Append(actions->GetKeys());
+				otherActions->Append(actions->GetKeys());
 			}
 			else
 			{
-				actions = _ipfamDatabase->GetWorkflowActions(_workflowID);
+				IIUnknownVectorPtr actions = _ipfamDatabase->GetWorkflowActions(_workflowID);
+				long count = actions->Size();
+				for (long i = 0; i < count; i++)
+				{
+					IVariantVectorPtr properties = actions->At(i);
+					if (properties->Item[2].boolVal == VARIANT_TRUE)
+					{
+						mainSequenceActions->PushBack(properties->Item[1]);
+					}
+					else
+					{
+						otherActions->PushBack(properties->Item[1]);
+					}
+				}
 			}
 
+
 			// Load each of the action combo boxes
-			ListCtrlHelper::LoadListCtrl(startActionComboBox, actions);
+			ListCtrlHelper::LoadListCtrl(startActionComboBox, mainSequenceActions);
 			// Empty item at the first index
-			startActionComboBox->Items->Insert(0, gcnew ListItemPair("", 0));
+			startActionComboBox->Items->Insert(0, "");
 
-			ListCtrlHelper::LoadListCtrl(endActionComboBox, actions);
+			ListCtrlHelper::LoadListCtrl(endActionComboBox, mainSequenceActions);
 			// Empty item at the first index
-			endActionComboBox->Items->Insert(0, gcnew ListItemPair("", 0));
+			endActionComboBox->Items->Insert(0, "");
 
-			ListCtrlHelper::LoadListCtrl(postWorkflowActionComboBox, actions);
+			ListCtrlHelper::LoadListCtrl(postWorkflowActionComboBox, otherActions);
 			// Empty item at the first index
-			postWorkflowActionComboBox->Items->Insert(0, gcnew ListItemPair("", 0));
+			postWorkflowActionComboBox->Items->Insert(0, "");
 		}
 
 		Void Extract::FAMDBAdmin::AddModifyWorkflowForm::loadWorkFlowTypeCombo()
