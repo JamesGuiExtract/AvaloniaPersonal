@@ -4257,6 +4257,30 @@ STDMETHODIMP CFileProcessingDB::get_UsingWorkflows(VARIANT_BOOL *pbUsingWorkflow
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43228");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkflowNameFromActionID(long nActionID, BSTR * pbstrWorkflowName)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI43299", pbstrWorkflowName != __nullptr);
+
+		if (!GetWorkflowNameFromActionID_Internal(false, nActionID, pbstrWorkflowName))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetWorkflowNameFromActionID_Internal(true, nActionID, pbstrWorkflowName);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43300");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

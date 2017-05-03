@@ -679,7 +679,7 @@ STDMETHODIMP CAFUtility::SortAttributesSpatially(IIUnknownVector* pAttributes)
 		ASSERT_RESOURCE_ALLOCATION("ELI11292", ipCompare != __nullptr);
 		
 		ipAttributes->Sort(ipCompare);
-	}	
+	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11291");
 
 	return S_OK;
@@ -690,7 +690,7 @@ STDMETHODIMP CAFUtility::raw_GetBuiltInTags(IVariantVector** ppTags)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
-	{	
+	{
 		ASSERT_ARGUMENT("ELI26578", ppTags != __nullptr);
 
 		validateLicense();
@@ -699,7 +699,7 @@ STDMETHODIMP CAFUtility::raw_GetBuiltInTags(IVariantVector** ppTags)
 		ASSERT_RESOURCE_ALLOCATION("ELI11773", ipVec != __nullptr);
 
 		*ppTags = ipVec.Detach();
-	}	
+	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11770");
 
 	return S_OK;
@@ -710,14 +710,14 @@ STDMETHODIMP CAFUtility::raw_GetCustomFileTags(IVariantVector** ppTags)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
-	{	
+	{
 		validateLicense();
 
 		IVariantVectorPtr ipVec = loadCustomFileTagsFromINI();
 		ASSERT_RESOURCE_ALLOCATION("ELI11774", ipVec != __nullptr);
 
 		*ppTags = ipVec.Detach();
-	}	
+	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11771");
 
 	return S_OK;
@@ -763,6 +763,33 @@ STDMETHODIMP CAFUtility::raw_AddTag(BSTR bstrTagName, BSTR bstrTagValue)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38087");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::raw_GetAddedTags(IIUnknownVector **ppStringPairTags)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI43278", ppStringPairTags != __nullptr);
+
+		IIUnknownVectorPtr ipStringPairTags(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI43280", ipStringPairTags != __nullptr);
+
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
+		
+		for (auto iter = m_mapAddedTags.begin(); iter != m_mapAddedTags.end(); iter++)
+		{
+			IStringPairPtr ipStringPair(CLSID_StringPair);
+			ipStringPair->StringKey = iter->first.c_str();
+			ipStringPair->StringValue = iter->second.c_str();
+			ipStringPairTags->PushBack(ipStringPair);
+		}
+		*ppStringPairTags = ipStringPairTags.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43279");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFUtility::raw_GetAllTags(IVariantVector** ppTags)

@@ -51,6 +51,7 @@ public:
 	STDMETHOD(GetFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(EditCustomTags)(long hParentWindow);
+	STDMETHOD(GetAddedTags)(IIUnknownVector **ppStringPairTags);
 
 // IMiscUtils
 	STDMETHOD(AutoEncryptFile)(/*[in]*/ BSTR strFile, /*[in]*/ BSTR strRegistryKey);

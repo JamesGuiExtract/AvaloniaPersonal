@@ -1315,6 +1315,33 @@ STDMETHODIMP CMiscUtils::AddTag(BSTR bstrTagName, BSTR bstrTagValue)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36103");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::GetAddedTags(IIUnknownVector **ppStringPairTags)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI43281", ppStringPairTags != __nullptr);
+
+		UCLID_COMUTILSLib::IIUnknownVectorPtr ipStringPairTags(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI43282", ipStringPairTags != __nullptr);
+
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
+
+		for (auto iter = m_mapAddedTags.begin(); iter != m_mapAddedTags.end(); iter++)
+		{
+			UCLID_COMUTILSLib::IStringPairPtr ipStringPair(CLSID_StringPair);
+			ipStringPair->StringKey = iter->first.c_str();
+			ipStringPair->StringValue = iter->second.c_str();
+			ipStringPairTags->PushBack(ipStringPair);
+		}
+		*ppStringPairTags = (IIUnknownVector*) ipStringPairTags.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43283");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::HasImageFileExtension(BSTR bstrFileName, VARIANT_BOOL* pvbValue)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());

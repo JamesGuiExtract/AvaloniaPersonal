@@ -587,9 +587,19 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 						// Was cancel request either passed in or received via a call to Cancel?
 						bool bCancel = (bCancelRequested || m_eventCancelRequested.isSignaled());
 
+						_bstr_t bstrCurrentWorkflow("");
+						long nWorkflowID = ipFileRecord->WorkflowID;
+						if (m_ipDB != __nullptr && nWorkflowID > 0)
+						{
+							UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDef = m_ipDB->GetWorkflowDefinition(nWorkflowID);
+							bstrCurrentWorkflow = ipWorkflowDef->Name;
+						}
+						// Replace tag manager with new instance that has current workflow
+						UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipTagManager = m_ipFAMTagManager->GetFAMTagManagerWithWorkflow(bstrCurrentWorkflow);
+
 						UCLID_FILEPROCESSINGLib::EFileProcessingResult eResult =
 							m_ipCurrentTask->ProcessFile(ipFileRecord,
-							nActionID, m_ipFAMTagManager, m_ipDB, ipSubProgressStatus,
+							nActionID, ipTagManager, m_ipDB, ipSubProgressStatus,
 							asVariantBool(bCancel));
 
 						// Task is no longer running; indicate such

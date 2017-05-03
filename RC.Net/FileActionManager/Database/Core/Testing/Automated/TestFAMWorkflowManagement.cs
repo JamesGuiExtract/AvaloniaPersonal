@@ -318,8 +318,16 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb.SetWorkflowActions(id, actionNames.ToVariantVector());
 
                 workflowActionMap = fileProcessingDb.GetWorkflowActions(id);
-                var retrievedActions = workflowActionMap.ComToDictionary().Keys.OrderBy(name => name);
+                var workflowActionDictionary = workflowActionMap.ComToDictionary();
+                var retrievedActions = workflowActionDictionary.Keys.OrderBy(name => name);
                 Assert.That(actionNames.SequenceEqual(retrievedActions));
+
+                // Test that the GetWorkflowNameFromActionID works 
+                var returnedWorkflowSet = workflowActionDictionary.Values
+                    .Select(v => fileProcessingDb.GetWorkflowNameFromActionID(Int32.Parse(v, CultureInfo.CurrentCulture)))
+                    .Distinct();
+
+                Assert.That(returnedWorkflowSet.Single() == "Workflow1");
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 retrievedActions = fileProcessingDb.GetActions().ComToDictionary().Keys.OrderBy(name => name);

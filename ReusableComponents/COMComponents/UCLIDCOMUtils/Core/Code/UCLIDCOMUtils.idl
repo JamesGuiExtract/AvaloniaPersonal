@@ -1371,6 +1371,8 @@ library UCLID_COMUTILSLib
 		//			tags added via this method will be become part of GetBuiltInTags rather than
 		//			GetCustomFileTags as "custom" tags refers to user-defined tags.
 		[id(9), helpstring("method AddTag")] HRESULT AddTag([in] BSTR bstrTagName, [in] BSTR bstrTagValue);
+		// PURPOSE: To return an IIUnknownVector containing StringPair objects for all tags added using AddTag
+		[id(10), helpstring("method GetAddedTags")] HRESULT GetAddedTags([out, retval] IIUnknownVector **ppStringPairTags);
 	}	
 
 	[

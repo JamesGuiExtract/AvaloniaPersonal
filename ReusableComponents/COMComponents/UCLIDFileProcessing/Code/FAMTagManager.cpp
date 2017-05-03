@@ -29,7 +29,7 @@ const string strMRU_MUTEX_NAME = "ExtractContextMRURegistryMutex";
 //--------------------------------------------------------------------------------------------------
 string CFAMTagManager::ms_strFPSDir;
 string CFAMTagManager::ms_strFPSFileName;
-CMutex CFAMTagManager::ms_mutex;
+CCriticalSection CFAMTagManager::ms_criticalsection;
 IContextTagProviderPtr CFAMTagManager::ms_ipContextTagProvider;
 map<stringCSIS, map<stringCSIS, stringCSIS>> CFAMTagManager::ms_mapWorkflowContextTags;
 
@@ -46,7 +46,7 @@ CFAMTagManager::CFAMTagManager()
 
 	// ms_ipContextTagProvider is not created until the first instance of FAMTagManager is
 	// created.
-	CSingleLock lock(&ms_mutex, TRUE);
+	CSingleLock lock(&ms_criticalsection, TRUE);
 	if (ms_ipContextTagProvider == __nullptr)
 	{
 		ms_ipContextTagProvider.CreateInstance("Extract.Utilities.ContextTags.ContextTagProvider");
@@ -77,7 +77,8 @@ STDMETHODIMP CFAMTagManager::InterfaceSupportsErrorInfo(REFIID riid)
 	{
 		&IID_ILicensedComponent,
 		&IID_IFAMTagManager,
-		&IID_ITagUtility
+		&IID_ITagUtility,
+		&IID_ICopyableObject
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -100,7 +101,7 @@ STDMETHODIMP CFAMTagManager::get_FPSFileDir(BSTR *strFPSDir)
 
 		ASSERT_ARGUMENT("ELI24981", strFPSDir != __nullptr);
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		*strFPSDir = _bstr_t(ms_strFPSDir.c_str()).Detach();
 
 		return S_OK;		
@@ -115,7 +116,7 @@ STDMETHODIMP CFAMTagManager::put_FPSFileDir(BSTR strFPSDir)
 		// Check license
 		validateLicense();
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		ms_strFPSDir = asString(strFPSDir);
 
 		ms_ipContextTagProvider->ContextPath = ms_strFPSDir.c_str();
@@ -140,7 +141,7 @@ STDMETHODIMP CFAMTagManager::get_FPSFileName(BSTR *strFPSFileName)
 
 		ASSERT_ARGUMENT("ELI36124", strFPSFileName != __nullptr);
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		*strFPSFileName = _bstr_t(ms_strFPSFileName.c_str()).Detach();
 
 		return S_OK;		
@@ -155,7 +156,7 @@ STDMETHODIMP CFAMTagManager::put_FPSFileName(BSTR strFPSFileName)
 		// Check license
 		validateLicense();
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		ms_strFPSFileName = asString(strFPSFileName);
 
 		string strPath = getDirectoryFromFullPath(ms_strFPSFileName);
@@ -275,6 +276,7 @@ STDMETHODIMP CFAMTagManager::raw_GetBuiltInTags(IVariantVector* *ppTags)
 		ipVec->PushBack(get_bstr_t(strFPS_FILE_DIR_TAG));
 		ipVec->PushBack(get_bstr_t(strFPS_FILENAME_TAG));
 		ipVec->PushBack(get_bstr_t(strCOMMON_COMPONENTS_DIR_TAG));
+		ipVec->PushBack(get_bstr_t(strWORKFLOW_TAG));
 
 		if (m_bAlwaysShowDatabaseTags)
 		{
@@ -298,7 +300,7 @@ STDMETHODIMP CFAMTagManager::raw_GetBuiltInTags(IVariantVector* *ppTags)
 		}
 
 		// Report any programmatically added tags.
-		CSingleLock lock(&m_mutexAddedTags, TRUE);
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
 		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
 			 iter != m_mapAddedTags.end();
 			 iter++)
@@ -325,7 +327,7 @@ STDMETHODIMP CFAMTagManager::raw_GetCustomFileTags(IVariantVector* *ppTags)
 		IVariantVectorPtr ipVec(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI19432", ipVec != __nullptr);
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		IVariantVectorPtr ipTagNames = ms_ipContextTagProvider->GetTagNames();
 		ASSERT_RESOURCE_ALLOCATION("ELI37904", ipTagNames != __nullptr);
 
@@ -443,12 +445,39 @@ STDMETHODIMP CFAMTagManager::raw_AddTag(BSTR bstrTagName, BSTR bstrTagValue)
 			strTag += ">";
 		}
 
-		CSingleLock lock(&m_mutexAddedTags, TRUE);
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
 		m_mapAddedTags[strTag] = asString(bstrTagValue);
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38089");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::raw_GetAddedTags(IIUnknownVector **ppStringPairTags)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI43284", ppStringPairTags != __nullptr);
+
+		IIUnknownVectorPtr ipStringPairTags(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI43285", ipStringPairTags != __nullptr);
+
+		CSingleLock lock(&m_criticalSectionAddedTags, TRUE);
+
+		for (auto iter = m_mapAddedTags.begin(); iter != m_mapAddedTags.end(); iter++)
+		{
+			IStringPairPtr ipStringPair(CLSID_StringPair);
+			ipStringPair->StringKey = iter->first.c_str();
+			ipStringPair->StringValue = iter->second.c_str();
+			ipStringPairTags->PushBack(ipStringPair);
+		}
+		*ppStringPairTags = ipStringPairTags.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43286");
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMTagManager::StringContainsInvalidTags(BSTR strInput, VARIANT_BOOL *pbValue)
@@ -642,7 +671,7 @@ STDMETHODIMP CFAMTagManager::get_DatabaseServer(BSTR *strDatabaseServer)
 
 		ASSERT_ARGUMENT("ELI38303", strDatabaseServer != __nullptr);
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		*strDatabaseServer = _bstr_t(m_strDatabaseServer.c_str()).Detach();
 		
 		return S_OK;		
@@ -657,7 +686,7 @@ STDMETHODIMP CFAMTagManager::put_DatabaseServer(BSTR strDatabaseServer)
 		// Check license
 		validateLicense();
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		m_strDatabaseServer = asString(strDatabaseServer);
 
 		return S_OK;
@@ -674,7 +703,7 @@ STDMETHODIMP CFAMTagManager::get_DatabaseName(BSTR *strDatabaseName)
 
 		ASSERT_ARGUMENT("ELI38304", strDatabaseName != __nullptr);
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		*strDatabaseName = _bstr_t(m_strDatabaseName.c_str()).Detach();
 		
 		return S_OK;		
@@ -689,7 +718,7 @@ STDMETHODIMP CFAMTagManager::put_DatabaseName(BSTR strDatabaseName)
 		// Check license
 		validateLicense();
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		m_strDatabaseName = asString(strDatabaseName);
 
 		return S_OK;
@@ -706,7 +735,7 @@ STDMETHODIMP CFAMTagManager::get_ActionName(BSTR *strActionName)
 
 		ASSERT_ARGUMENT("ELI38312", strActionName != __nullptr);
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		*strActionName = _bstr_t(m_strDatabaseAction.c_str()).Detach();
 		
 		return S_OK;		
@@ -721,7 +750,7 @@ STDMETHODIMP CFAMTagManager::put_ActionName(BSTR strActionName)
 		// Check license
 		validateLicense();
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		m_strDatabaseAction = asString(strActionName);
 
 		return S_OK;
@@ -752,7 +781,7 @@ STDMETHODIMP CFAMTagManager::get_Workflow(BSTR *strWorkflow)
 
 		ASSERT_ARGUMENT("ELI43223", strWorkflow != __nullptr);
 
-		CSingleLock lock(&ms_mutex, TRUE);
+		CSingleLock lock(&ms_criticalsection, TRUE);
 		*strWorkflow = _bstr_t(m_strWorkflow.c_str()).Detach();
 
 		return S_OK;
@@ -766,14 +795,38 @@ STDMETHODIMP CFAMTagManager::put_Workflow(BSTR strWorkflow)
 	{
 		// Check license
 		validateLicense();
-
-		CSingleLock lock(&ms_mutex, TRUE);
-		m_strWorkflow = asString(strWorkflow);
+		string strNewWorkflow = asString(strWorkflow);
+		{
+			CSingleLock lock(&ms_criticalsection, TRUE);
+			m_strWorkflow = strNewWorkflow;
+		}
+		
+		CSingleLock lock2(&m_criticalSectionAddedTags, TRUE);
+		// add the workflow to the map
+		m_mapAddedTags[strWORKFLOW_TAG] = strNewWorkflow;
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43225");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::GetFAMTagManagerWithWorkflow(BSTR bstrWorkflow, IFAMTagManager **ppFAMTagManager)
+{
+	try
+	{
+		ICopyableObjectPtr ipThis(this);
+		ASSERT_RESOURCE_ALLOCATION("ELI43295", ipThis != __nullptr);
+
+		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipNew = ipThis->Clone();
+		ipNew->Workflow = _bstr_t(bstrWorkflow);
+
+		*ppFAMTagManager = (IFAMTagManager *) ipNew.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43294");
+}
+
 
 //--------------------------------------------------------------------------------------------------
 // ILicensedComponent
@@ -795,6 +848,79 @@ STDMETHODIMP CFAMTagManager::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	{
 		*pbValue = VARIANT_FALSE;
 	}
+
+	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// ICopyableObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::raw_CopyFrom(IUnknown *pObject)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// validate license first
+		validateLicense();
+
+		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipSource(pObject);
+		ASSERT_RESOURCE_ALLOCATION("ELI43288", ipSource != __nullptr);
+		
+		string strNewWorkflow = asString(ipSource->Workflow);
+
+		{
+			CSingleLock lock(&ms_criticalsection, TRUE);
+			m_bAlwaysShowDatabaseTags = asCppBool(ipSource->AlwaysShowDatabaseTags);
+			m_strDatabaseServer = asString(ipSource->DatabaseServer);
+			m_strDatabaseName = asString(ipSource->DatabaseName);
+			m_strDatabaseAction = asString(ipSource->ActionName);
+			m_strWorkflow = strNewWorkflow;
+		}
+
+		ITagUtilityPtr ipTagUtility = ipSource;
+		ASSERT_RESOURCE_ALLOCATION("ELI43289", ipTagUtility != __nullptr);
+
+		IIUnknownVectorPtr ipAddedTags = ipTagUtility->GetAddedTags();
+
+		CSingleLock lock2(&m_criticalSectionAddedTags, TRUE);
+		long nSize = ipAddedTags->Size();
+		m_mapAddedTags.clear();
+		for (long i = nSize; i < nSize; i++)
+		{
+			IStringPairPtr ipStringPair = ipAddedTags->At(i);
+			m_mapAddedTags[asString(ipStringPair->StringKey)] = asString(ipStringPair->StringValue);
+		}
+		// This will probably already be in the tags because of the previous loop but just in case
+		m_mapAddedTags[strWORKFLOW_TAG] = strNewWorkflow;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43290");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::raw_Clone(IUnknown* *pObject)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI43291", pObject != __nullptr);
+
+		// Validate license first
+		validateLicense();
+
+		// Create another instance of this object
+		ICopyableObjectPtr ipObjCopy(CLSID_FAMTagManager);
+		ASSERT_RESOURCE_ALLOCATION("ELI43292", ipObjCopy != __nullptr);
+
+		IUnknownPtr ipUnk(this);
+		ipObjCopy->CopyFrom(ipUnk);
+
+		// Return the new object to the caller
+		*pObject = ipObjCopy.Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43293");
 
 	return S_OK;
 }
@@ -869,7 +995,7 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 	// As long as ms_strFPSDir is specified, apply any defined environment-specific path tags.
 	// Expand these before the built-in tags so that built-in tags can be used within custom
 	// environment tags.
-	CSingleLock lock(&ms_mutex, TRUE);
+	CSingleLock lock(&ms_criticalsection, TRUE);
 	if (!ms_mapWorkflowContextTags.empty())
 	{
 		// Workflow being asked for may not have entries in the context tag provider so change to default values(workflow="")
@@ -980,7 +1106,7 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 	}
 
 	// Expand any programmatically added tags.
-	CSingleLock lock2(&m_mutexAddedTags, TRUE);
+	CSingleLock lock2(&m_criticalSectionAddedTags, TRUE);
 	for (map<string, string>::iterator iter = m_mapAddedTags.begin();
 			iter != m_mapAddedTags.end();
 			iter++)
@@ -1018,6 +1144,8 @@ void CFAMTagManager::refreshContextTags()
 
 		m_upContextMRUList->writeToPersistentStore();
 	}
+
+	CSingleLock lock(&ms_criticalsection, TRUE);
 
 	// https://extract.atlassian.net/browse/ISSUE-13001
 	// Cache the context the tag values to avoid frequent COM calls which also tend to leak

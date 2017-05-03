@@ -1904,6 +1904,10 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Gets whether the FAM database has workflows that are being used.
 		[propget, id(179), helpstring("method UsingWorkflows")] HRESULT UsingWorkflows([out, retval] VARIANT_BOOL *pbUsingWorkflows);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Gets the workflow name associated with the ActionID
+		[id(180), helpstring("method GetWorkflowNameFromActionID")] HRESULT GetWorkflowNameFromActionID(
+			[in] long nActionID, [out, retval] BSTR* pbstrWorkflowName);
 	};
 
 	[
@@ -2372,6 +2376,9 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Sets and gets the Current workflow
 		[propget, id(18), helpstring("property Workflow")] HRESULT Workflow([out, retval] BSTR *strWorkflow);
 		[propput, id(18), helpstring("property Workflow")] HRESULT Workflow([in] BSTR strWorkflow);
+		// PURPOSE: Returns a cloned FAMTagManager that has the workflow set to the workflow provided
+		[id(19), helpstring("method GetFAMTagManagerWithWorkflow")] HRESULT GetFAMTagManagerWithWorkflow(
+			[in] BSTR bstrWorkflow, [out, retval] IFAMTagManager** ppFAMTagManager);
 	};
 
 	[
@@ -2737,6 +2744,7 @@ library UCLID_FILEPROCESSINGLib
 		[default] interface IFAMTagManager;
 		interface ILicensedComponent;
 		interface ITagUtility;
+		interface ICopyableObject;
 	};
 	[
 		uuid(A7BD9DDF-04BC-46f3-9965-26E9AEF06091),

@@ -332,6 +332,7 @@ public:
 	STDMETHOD(GetWorkflowID)(BSTR bstrWorkflowName, long *pnID);
 	STDMETHOD(IsFileInWorkflow)(long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 	STDMETHOD(get_UsingWorkflows)(VARIANT_BOOL *pbUsingWorkflows);
+	STDMETHOD(GetWorkflowNameFromActionID)(long nActionID, BSTR* pbstrWorkflowName);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1384,6 +1385,7 @@ private:
 	bool GetWorkflowID_Internal(bool bDBLocked, BSTR bstrWorkflowName, long *pnID);
 	bool IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 	bool GetUsingWorkflows_Internal(bool bDBLocked, VARIANT_BOOL *pbUsingWorkflows);
+	bool GetWorkflowNameFromActionID_Internal(bool bDBLocked, long nActionID, BSTR* pbstrWorkflowName);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

@@ -10278,3 +10278,55 @@ bool CFileProcessingDB::GetUsingWorkflows_Internal(bool bDBLocked, VARIANT_BOOL 
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkflowNameFromActionID_Internal(bool bDBLocked, long nActionID, BSTR * pbstrWorkflowName)
+{
+		try
+	{
+		try
+		{
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+
+			string strQuery = "SELECT COALESCE( Workflow.Name, '') AS [Name] ";
+			strQuery += "FROM  Action LEFT JOIN ";
+			strQuery += "Workflow ON Action.WorkflowID = Workflow.ID ";
+			strQuery += "WHERE Action.ID = " + asString(nActionID);
+
+			_RecordsetPtr ipWorkflowNameSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI43301", ipWorkflowNameSet != __nullptr);
+
+			ipWorkflowNameSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
+				adLockReadOnly, adCmdText);
+
+			// There should be at least one record
+			if (!asCppBool(ipWorkflowNameSet->adoEOF))
+			{
+				string workflowName = getStringField(ipWorkflowNameSet->Fields, "Name");
+				*pbstrWorkflowName = _bstr_t(workflowName.c_str()).Detach();
+				return true;
+			}
+			UCLIDException ue("ELI43304", "Unable to obtain workflow name.");
+			ue.addDebugInfo("ActionID", asString(nActionID));
+			// set bDBLocked to true so that the exception will be thrown instead of a retry with lock
+			bDBLocked = true;
+			throw ue;
+
+			END_CONNECTION_RETRY(ipConnection, "ELI43297");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43298");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------

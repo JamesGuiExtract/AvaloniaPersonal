@@ -1938,6 +1938,15 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 						Win32SemaphoreLockGuard lg(pThreadData->m_rSemaphore);
 						workItem.markAsStarted();
 						fprm->updateWorkItem(workItem);
+
+						_bstr_t bstrCurrentWorkflow("");
+						if (ipDB != __nullptr)
+						{
+							bstrCurrentWorkflow = ipDB->GetWorkflowNameFromActionID(nActionID);
+						}
+						// Replace tag manager with new instance that has current workflow
+						ipFAMTag = ipFAMTag->GetFAMTagManagerWithWorkflow(bstrCurrentWorkflow);
+
 						ipTask->ProcessWorkItem(ipWorkItem, nActionID, ipFAMTag, ipDB, workItem.m_ipProgressStatus);
 						ipDB->NotifyWorkItemCompleted(nWorkItemID);
 						workItem.markAsCompleted();

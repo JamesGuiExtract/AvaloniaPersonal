@@ -22,6 +22,7 @@ class ATL_NO_VTABLE CFAMTagManager :
 	public ISupportErrorInfo,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ITagUtility, &IID_ITagUtility, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,	
 	public IDispatchImpl<IFAMTagManager, &IID_IFAMTagManager, &LIBID_UCLID_FILEPROCESSINGLib>
 {
 public:
@@ -35,6 +36,7 @@ BEGIN_COM_MAP(CFAMTagManager)
 	COM_INTERFACE_ENTRY2(IDispatch,IFAMTagManager)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ITagUtility)
+	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 END_COM_MAP()
 
@@ -64,6 +66,7 @@ public:
 	STDMETHOD(raw_GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(raw_EditCustomTags)(long hParentWindow);
 	STDMETHOD(raw_AddTag)(BSTR bstrTagName, BSTR bstrTagValue);
+	STDMETHOD(raw_GetAddedTags)(IIUnknownVector **ppStringPairTags);
 
 // IFAMTagManager
 	STDMETHOD(get_FPSFileDir)(BSTR *strFPSDir);
@@ -88,6 +91,11 @@ public:
 	STDMETHOD(RefreshContextTags)();
 	STDMETHOD(get_Workflow)(BSTR *strWorkflow);
 	STDMETHOD(put_Workflow)(BSTR strWorkflow);
+	STDMETHOD(GetFAMTagManagerWithWorkflow)(BSTR bstrWorkflow, IFAMTagManager** ppFAMTagManager);
+	
+	// ICopyableObject
+	STDMETHOD(raw_Clone)(IUnknown * * pObject);
+	STDMETHOD(raw_CopyFrom)(IUnknown * pObject);
 
 private:
 
@@ -109,7 +117,7 @@ private:
 	static map<stringCSIS, map<stringCSIS, stringCSIS>> ms_mapWorkflowContextTags;
 
 	// Controls access to the above static variables.
-	static CMutex ms_mutex;
+	static CCriticalSection ms_criticalsection;
 
 	// Mutex for accessing the MRU context list in the registry
 	CMutex m_mutexMRU;
@@ -124,9 +132,10 @@ private:
 	string m_strWorkflow;
 
 	// Programmatically added path tags.
-	map<string, string> m_mapAddedTags;	
-	// Mutex for accessing m_mapAddedTags
-	CMutex m_mutexAddedTags;
+	map<string, string> m_mapAddedTags;
+	
+	// Critical section for accessing m_mapAddedTags
+	CCriticalSection m_criticalSectionAddedTags;
 
 	// pointer to the utility object to use for path function expansion.
 	IMiscUtilsPtr m_ipMiscUtils;
