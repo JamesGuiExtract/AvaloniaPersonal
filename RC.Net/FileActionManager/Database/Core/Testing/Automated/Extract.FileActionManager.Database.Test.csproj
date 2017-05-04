@@ -72,6 +72,7 @@
     <Compile Include="TestFAMWorkflowManagement.cs" />
     <Compile Include="TestFAMServiceDatabaseManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\Core\Code\Extract.csproj">

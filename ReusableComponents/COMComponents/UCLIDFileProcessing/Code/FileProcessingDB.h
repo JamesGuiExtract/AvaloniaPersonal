@@ -1100,7 +1100,7 @@ private:
 	//			will be thrown.
 	// RETURNS: A vector of IFileRecords for the files that were set to processing.
 	IIUnknownVectorPtr setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
-		const string& strSelectSQL, const string& strActionName,
+		const string& strSelectSQL, const string& strActionName, long nMaxFiles,
 		const string& strAllowedCurrentStatus);
 
 	// Gets a set containing the File ID's for all files that are skipped for the specified action

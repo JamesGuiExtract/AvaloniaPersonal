@@ -4958,6 +4958,7 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
 														   const string& strSelectSQL,
 														   const string& strActionName,
+														   long nMaxFiles,
 														   const string& strAllowedCurrentStatus)
 {
 	// Declare query string so that if there is an exception the query can be added to debug info
@@ -5014,6 +5015,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						replaceVariable(strQuery, "<MachineID>", asString(getMachineID(ipConnection)));
 						replaceVariable(strQuery, "<ActiveFAMID>", asString(m_nActiveFAMID));
 						replaceVariable(strQuery, "<RecordFASTEntry>", m_bUpdateFASTTable ? "1" : "0");
+						replaceVariable(strQuery, "<MaxFiles>", asString(nMaxFiles));
 
 						// Loop to retry getting files until there are either no records returned 
 						// Get recordset of files to be set to processing.

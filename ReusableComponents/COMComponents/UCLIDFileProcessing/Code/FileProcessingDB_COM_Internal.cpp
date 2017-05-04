@@ -2745,7 +2745,7 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction,  long nMaxFiles, 
+bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction, long nMaxFiles, 
 												  VARIANT_BOOL bGetSkippedFiles,
 												  BSTR bstrSkippedForUserName,
 												  IIUnknownVector * * pvecFileRecords)
@@ -2763,7 +2763,6 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
 
 			string strWhere = "";
-			string strTop = "TOP (" + asString(nMaxFiles) + ") ";
 			if (bGetSkippedFiles == VARIANT_TRUE)
 			{
 				strWhere = "INNER JOIN SkippedFile ON FileActionStatus.FileID = SkippedFile.FileID "
@@ -2836,17 +2835,14 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				END_CONNECTION_RETRY(ipConnection, "ELI34143");
 			}
 
-			// Order by priority [LRCAU #5438]
-			strWhere += ") ORDER BY [FileActionStatus].[Priority] DESC, [FileActionStatus].[FileID] ASC ";
-
 			// Build the from clause
 			string strFrom = "FROM FAMFile INNER JOIN FileActionStatus "
 				"ON FileActionStatus.FileID = FAMFile.ID AND FileActionStatus.ActionID IN (<ActionIDPlaceHolder>) "
-				+ strWhere;
+				+ strWhere + ")";
 
 			// create query to select top records;
-			string strSelectSQL = "SELECT " + strTop
-				+ " FAMFile.ID, FileName, Pages, FileSize, FileActionStatus.Priority, ActionStatus, FileActionStatus.ActionID " + strFrom;
+			string strSelectSQL =
+				"SELECT FAMFile.ID, FileName, Pages, FileSize, FileActionStatus.Priority, ActionStatus, FileActionStatus.ActionID " + strFrom;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2863,7 +2859,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				// The previous status of the files to process is expected to be either pending or
 				// skipped.
 				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-					bDBLocked, ipConnection, strSelectSQL, strActionName, "PS");
+					bDBLocked, ipConnection, strSelectSQL, strActionName, nMaxFiles, "PS");
 				*pvecFileRecords = ipFiles.Detach();
 			END_CONNECTION_RETRY(ipConnection, "ELI30377");
 		}
@@ -2939,7 +2935,7 @@ bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, 
 
 			// Perform all processing related to setting a file as processing.
 			IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-				bDBLocked, ipConnection, strSelectSQL, strActionName, /*strActionIDs,*/ "");
+				bDBLocked, ipConnection, strSelectSQL, strActionName, 1, "");
 
 			if (ipFiles->Size() == 0)
 			{
@@ -6489,7 +6485,7 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 				// The previous status of the files to process is expected to be either pending or
 				// skipped.
 				string strActionName = getActionName(ipConnection, nActionID);
-				setFilesToProcessing(bDBLocked, ipConnection, strSelectSQL, strActionName, /*asString(nActionID),*/ "PS");
+				setFilesToProcessing(bDBLocked, ipConnection, strSelectSQL, strActionName, 1, "PS");
 
 			END_CONNECTION_RETRY(ipConnection, "ELI30389");
 		}

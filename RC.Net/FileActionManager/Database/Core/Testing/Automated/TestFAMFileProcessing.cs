@@ -2,6 +2,7 @@
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -28,6 +29,10 @@ namespace Extract.FileActionManager.Database.Test
         static readonly string _LABDE_TEST_FILE1 = "Resources.TestImage001.tif";
         static readonly string _LABDE_TEST_FILE2 = "Resources.TestImage002.tif";
         static readonly string _LABDE_TEST_FILE3 = "Resources.TestImage003.tif";
+        static readonly string _LABDE_TEST_FILE4 = "Resources.TestImage004.tif";
+        static readonly string _LABDE_TEST_FILE5 = "Resources.TestImage005.tif";
+        static readonly string _LABDE_TEST_FILE6 = "Resources.TestImage006.tif";
+        static readonly string _LABDE_TEST_FILE7 = "Resources.TestImage007.tif";
 
         static readonly string _ACTION1 = "Action1";
         static readonly string _ACTION2 = "Action2";
@@ -964,6 +969,312 @@ namespace Extract.FileActionManager.Database.Test
             {
                 _testFiles.RemoveFile(_LABDE_TEST_FILE1);
                 _testFiles.RemoveFile(_LABDE_TEST_FILE2);
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        [Test, Category("Automated")]
+        public static void FilePriority()
+        {
+            GeneralMethods.TestSetup();
+
+            _testFiles = new TestFileManager<TestFAMFileProcessing>();
+            _testDbManager = new FAMTestDBManager<TestFAMFileProcessing>();
+
+            string testDbName = "Test_FilePriority";
+
+            try
+            {
+                string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
+                string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
+                string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
+                string testFileName4 = _testFiles.GetFile(_LABDE_TEST_FILE4);
+                string testFileName5 = _testFiles.GetFile(_LABDE_TEST_FILE5);
+                string testFileName6 = _testFiles.GetFile(_LABDE_TEST_FILE6);
+                string testFileName7 = _testFiles.GetFile(_LABDE_TEST_FILE7);
+                FileProcessingDB fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+
+                int actionId = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+
+                // Queue files with varying priorities:
+                // 1 = Normal
+                // 2 = Low
+                // 3 = High
+                // 4 = High
+                // 5 = BelowNormal
+                // 6 = AboveNormal
+                // 7 = Normal
+                // Order should be: 3, 4, 6, 1, 7, 5, 2
+                bool alreadyExists = false;
+                EActionStatus previousStatus;
+                var fileIDs = new List<string>(new[] { "" }); // add blank as first item so that fileIDs indices will be 1-based.
+                var fileRecord = fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, _CURRENT_WORKFLOW,
+                    EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, _CURRENT_WORKFLOW,
+                    EFilePriority.kPriorityLow, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION1, _CURRENT_WORKFLOW,
+                    EFilePriority.kPriorityHigh, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName4, _LABDE_ACTION1, _CURRENT_WORKFLOW,
+                    EFilePriority.kPriorityHigh, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName5, _LABDE_ACTION1, _CURRENT_WORKFLOW,
+                    EFilePriority.kPriorityBelowNormal, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName6, _LABDE_ACTION1, _CURRENT_WORKFLOW,
+                    EFilePriority.kPriorityAboveNormal, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName7, _LABDE_ACTION1, _CURRENT_WORKFLOW,
+                    EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+
+                var fileSelector = new FAMFileSelector();
+                fileSelector.AddActionStatusCondition(fileProcessingDb, _LABDE_ACTION1, EActionStatus.kActionCompleted);
+
+                var setStatusTaskConfig = new SetActionStatusFileProcessor();
+                setStatusTaskConfig.ActionName = _LABDE_ACTION2;
+                setStatusTaskConfig.ActionStatus = (int)EActionStatus.kActionPending;
+                var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    threadCount: 1, filesToGrab: 1, keepProcessing: false, docsToProcess: 1))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                Assert.AreEqual(fileIDs[3], fileSelector.GetResults(fileProcessingDb).Single());
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    threadCount: 1, filesToGrab: 2, keepProcessing: false, docsToProcess: 2))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                Assert.AreEqual(
+                    Invariant($"{fileIDs[3]},{fileIDs[4]},{fileIDs[6]}"),
+                    string.Join(",", fileSelector.GetResults(fileProcessingDb)));
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    threadCount: 2, filesToGrab: 25, keepProcessing: false, docsToProcess: 2))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                Assert.AreEqual(
+                    Invariant($"{fileIDs[1]},{fileIDs[3]},{fileIDs[4]},{fileIDs[6]},{fileIDs[7]}"),
+                    string.Join(",", fileSelector.GetResults(fileProcessingDb)));
+                // Ensure extra files grabbed were properly returned to pending.
+                Assert.AreEqual(2, fileProcessingDb.GetStats(actionId, false).NumDocumentsPending);
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    threadCount: 1, filesToGrab: 25, keepProcessing: false, docsToProcess: 1))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                Assert.AreEqual(
+                    Invariant($"{fileIDs[1]},{fileIDs[3]},{fileIDs[4]},{fileIDs[5]},{fileIDs[6]},{fileIDs[7]}"),
+                    string.Join(",", fileSelector.GetResults(fileProcessingDb)));
+            }
+            finally
+            {
+                _testFiles.RemoveFile(_LABDE_TEST_FILE1);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE2);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE3);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE4);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE5);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE6);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE7);
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        [Test, Category("Automated")]
+        public static void FilePriorityWithWorkflows()
+        {
+            GeneralMethods.TestSetup();
+
+            _testFiles = new TestFileManager<TestFAMFileProcessing>();
+            _testDbManager = new FAMTestDBManager<TestFAMFileProcessing>();
+
+            string testDbName = "Test_FilePriorityWithWorkflows";
+
+            try
+            {
+                string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
+                string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
+                string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
+                string testFileName4 = _testFiles.GetFile(_LABDE_TEST_FILE4);
+                string testFileName5 = _testFiles.GetFile(_LABDE_TEST_FILE5);
+                string testFileName6 = _testFiles.GetFile(_LABDE_TEST_FILE6);
+                string testFileName7 = _testFiles.GetFile(_LABDE_TEST_FILE7);
+                FileProcessingDB fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+
+                // Create 2 workflows
+                int workflowID1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined);
+                fileProcessingDb.SetWorkflowActions(workflowID1, new[] { _LABDE_ACTION1, _LABDE_ACTION2 }.ToVariantVector());
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                int extractAction1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+
+                int workflowID2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined);
+                fileProcessingDb.SetWorkflowActions(workflowID2, new[] { _LABDE_ACTION1, _LABDE_ACTION2 }.ToVariantVector());
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                int extractAction2 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+
+                // Queue files with varying priorities:
+                // 1 = Normal       Workflow 1
+                // 2 = Low          Workflow 2
+                // 3 = High         Workflow 1,2
+                // 4 = High         Workflow 1
+                // 5 = BelowNormal  Workflow 2
+                // 6 = AboveNormal  Workflow 1,2
+                // 7 = Normal       Workflow 2
+                // Workflow 1 order: 3, 4, 6, 1
+                // Workflow 2 order: 3, 6, 7, 5, 2
+                bool alreadyExists = false;
+                EActionStatus previousStatus;
+                var fileIDs = new List<string>(new[] { "" }); // add blank as first item so that fileIDs indices will be 1-based.
+                var fileRecord = fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID1,
+                    EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, workflowID2,
+                    EFilePriority.kPriorityLow, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION1, workflowID1,
+                    EFilePriority.kPriorityHigh, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION1, workflowID2,
+                    EFilePriority.kPriorityHigh, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName4, _LABDE_ACTION1, workflowID1,
+                    EFilePriority.kPriorityHigh, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName5, _LABDE_ACTION1, workflowID2,
+                    EFilePriority.kPriorityBelowNormal, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName6, _LABDE_ACTION1, workflowID1,
+                    EFilePriority.kPriorityAboveNormal, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileRecord = fileProcessingDb.AddFile(testFileName6, _LABDE_ACTION1, workflowID2,
+                    EFilePriority.kPriorityAboveNormal, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+                fileRecord = fileProcessingDb.AddFile(testFileName7, _LABDE_ACTION1, workflowID2,
+                    EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
+                    out alreadyExists, out previousStatus);
+                fileIDs.Add(fileRecord.FileID.AsString());
+
+                var fileSelector = new FAMFileSelector();
+                fileSelector.AddActionStatusCondition(fileProcessingDb, _LABDE_ACTION1, EActionStatus.kActionCompleted);
+
+                var setStatusTaskConfig = new SetActionStatusFileProcessor();
+                setStatusTaskConfig.ActionName = _LABDE_ACTION2;
+                setStatusTaskConfig.ActionStatus = (int)EActionStatus.kActionPending;
+                var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "Workflow1", setStatusTask,
+                    threadCount: 1, filesToGrab: 1, keepProcessing: false, docsToProcess: 1))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                Assert.AreEqual(fileIDs[3], fileSelector.GetResults(fileProcessingDb).Single());
+                Assert.AreEqual(1, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete);
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "Workflow2", setStatusTask,
+                    threadCount: 1, filesToGrab: 1, keepProcessing: false, docsToProcess: 1))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                Assert.AreEqual(fileIDs[3], fileSelector.GetResults(fileProcessingDb).Single());
+                // File 3 should now be processed in both workflows.
+                Assert.AreEqual(2, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete);
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "Workflow1", setStatusTask,
+                    threadCount: 2, filesToGrab: 25, keepProcessing: false, docsToProcess: 2))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                Assert.AreEqual(
+                    Invariant($"{fileIDs[3]},{fileIDs[4]},{fileIDs[6]}"),
+                    string.Join(",", fileSelector.GetResults(fileProcessingDb)));
+                // Ensure extra file grabbed was properly returned to pending.
+                Assert.AreEqual(1, fileProcessingDb.GetStats(extractAction1, false).NumDocumentsPending);
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "Workflow1", setStatusTask,
+                    threadCount: 2, filesToGrab: 25, keepProcessing: false, docsToProcess: 2))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                Assert.AreEqual(0, fileProcessingDb.GetStats(extractAction1, false).NumDocumentsPending);
+                Assert.AreEqual(4, fileProcessingDb.GetStats(extractAction1, false).NumDocumentsComplete);
+                Assert.AreEqual(4, fileProcessingDb.GetStats(extractAction2, false).NumDocumentsPending);
+                Assert.AreEqual(1, fileProcessingDb.GetStats(extractAction2, false).NumDocumentsComplete);
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "Workflow2", setStatusTask,
+                    threadCount: 1, filesToGrab: 1, keepProcessing: false, docsToProcess: 2))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                Assert.AreEqual(
+                   Invariant($"{fileIDs[3]},{fileIDs[6]},{fileIDs[7]}"),
+                   string.Join(",", fileSelector.GetResults(fileProcessingDb)));
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _LABDE_ACTION1, "Workflow2", setStatusTask,
+                    threadCount: 2, filesToGrab: 1, keepProcessing: false, docsToProcess: 1))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                Assert.AreEqual(
+                   Invariant($"{fileIDs[3]},{fileIDs[5]},{fileIDs[6]},{fileIDs[7]}"),
+                   string.Join(",", fileSelector.GetResults(fileProcessingDb)));
+
+                // 2 files processed in both workflows, 1 file unprocessed in workflow2
+                Assert.AreEqual(1, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending);
+                Assert.AreEqual(8, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete);
+            }
+            finally
+            {
+                _testFiles.RemoveFile(_LABDE_TEST_FILE1);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE2);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE3);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE4);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE5);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE6);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE7);
                 _testDbManager.RemoveDatabase(testDbName);
             }
         }
