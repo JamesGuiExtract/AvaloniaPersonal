@@ -105,9 +105,25 @@ namespace Extract.DocumentSummary
             }
         }
 
-        public Control ActiveDataControl => throw new NotImplementedException();
+        public Control ActiveDataControl
+        {
+            get
+            {
+                return null;
+            }
+        }
 
-        public bool PrimaryPageIsForActiveDocument { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool PrimaryPageIsForActiveDocument
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+            }
+        }
 
         public void LoadData(PaginationDocumentData data, bool forDisplay)
         {
@@ -115,7 +131,7 @@ namespace Extract.DocumentSummary
 
         public bool SaveData(PaginationDocumentData data, bool validateData)
         {
-            return false;
+            return true;
         }
 
         public void ClearData()

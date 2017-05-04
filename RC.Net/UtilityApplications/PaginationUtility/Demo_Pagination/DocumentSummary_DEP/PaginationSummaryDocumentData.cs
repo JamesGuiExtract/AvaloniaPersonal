@@ -1,7 +1,11 @@
-﻿using Extract.UtilityApplications.PaginationUtility;
+﻿using Extract.Utilities;
+using Extract.UtilityApplications.PaginationUtility;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
 namespace Extract.DocumentSummary
@@ -31,6 +35,22 @@ namespace Extract.DocumentSummary
         {
             try
             {
+                // Prevent adding attributes for a top-level document with suggested paginations.
+                var rootAttributeNames = attributes.ToIEnumerable<IAttribute>()
+                    .Select(attribute => attribute.Name)
+                    .Distinct()
+                    .ToArray();
+                if (rootAttributeNames.Length == 1 && rootAttributeNames.Single() == "Document")
+                {
+                    return;
+                }
+
+                // Inherit data from source document if none exists for this one.
+                if (attributes.Size() == 0 && File.Exists(sourceDocName + ".voa"))
+                {
+                    attributes.LoadFrom(sourceDocName + ".voa", false);
+                }
+
                 _fields = new Dictionary<string, PaginationDataField>()
                     {
                         {
