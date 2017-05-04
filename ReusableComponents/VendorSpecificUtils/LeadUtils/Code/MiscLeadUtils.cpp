@@ -1285,7 +1285,7 @@ void getFileInformation(const string& strImageFileName, bool bIncludePageCount, 
 			L_UCHAR cBuf[1024];
 			L_INT nRead = sizeof(cBuf);
 			DWORD dwNumOfBytesRead=0;
-			CHandle hFile(CreateFile(pszFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL));
+			CHandle hFile(CreateFile(pszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL));
 
 			if (dwStartIndex > 0)
 			{
@@ -2045,7 +2045,7 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
 				{
 					dwStartIndex = getPDFStartIndex(strImageFileName);
 				}
-				CHandle hFile(CreateFile(pszImageFile, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL));
+				CHandle hFile(CreateFile(pszImageFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL));
 				DWORD dwFileSize = GetFileSize(hFile, NULL) - dwStartIndex;
 				nRet = L_LoadFileOffset((L_HFILE)hFile.operator HANDLE(), dwStartIndex, dwFileSize, &rBitmap, sizeof(BITMAPHANDLE), 0,
 					ORDER_RGB, LOADFILE_ALLOCATE | LOADFILE_STORE, NULL, NULL, &lfo, &rFileInfo);
@@ -2106,7 +2106,7 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
 //-------------------------------------------------------------------------------------------------
 DWORD getPDFStartIndex(const string& strFileName)
 {
-	CHandle hFile(CreateFile(strFileName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL));
+	CHandle hFile(CreateFile(strFileName.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL));
 	// Allow up to 1KB prefix
 	const int nMaxPrefix = 1024;
 	char cBuf[nMaxPrefix + 4];
