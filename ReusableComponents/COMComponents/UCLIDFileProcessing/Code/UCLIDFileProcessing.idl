@@ -965,8 +965,8 @@ library UCLID_FILEPROCESSINGLib
 		// REQUIRE:	strAction is a valid action defined in the Action table
 		//			nID is a valid file ID defined in the FPMFile table
 		// PROMISE: If pOldStatus != __nullptr, then the old status associated with the file will be returned.
-		// NOTE:	If pOldStatus != __nullptr, then two database operations will need to performed (as opposed to
-		//			just one) in order to return the previous status
+		// NOTE:	If nWorkflowID param == -1 then the current, active workflow will be used to resolve the
+		//			action name to an ID.
 		//			If vbQueueChangeIfProcessing is VARIANT_TRUE and the file is currently processing, a
 		//			change to eStatus will be queued in the QueuedActionStatusChange table. If
 		//			VARIANT_FALSE the file action status will be overwritten regardless of its current

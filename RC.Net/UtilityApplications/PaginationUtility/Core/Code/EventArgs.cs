@@ -176,7 +176,8 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
-    /// Event args for a <see cref="PaginationPanel.CreatingOutputDocument"/> event.
+    /// Event args for <see cref="PaginationPanel.CreatingOutputDocument"/>
+    /// and <see cref="PaginationPanel.OutputDocumentCreated"/> events.
     /// </summary>
     public class CreatingOutputDocumentEventArgs : EventArgs
     {
@@ -303,6 +304,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Set after the output document is added to the database. Used by handlers of the
+        /// <see cref="PaginationPanel.OutputDocumentCreated"/> event
+        /// </summary>
+        public int FileID
+        {
+            get;
+            internal set;
         }
     }
 

@@ -617,6 +617,10 @@ namespace Extract.FileActionManager.FileProcessors
                     ExtractException.Assert("ELI40386",
                         "Cannot set pagination output back to pending in same action",
                         outputActionID != _actionID);
+
+                    // Register for OutputDocumentCreated event in order to set status for the
+                    // OutputAction _after_ the document has been created
+                    _paginationPanel.OutputDocumentCreated += HandlePaginationPanel_OutputDocumentCreated;
                 }
 
                 _paginationPanel.LoadNextDocument += HandlePaginationPanel_LoadNextDocument;
@@ -925,16 +929,6 @@ namespace Extract.FileActionManager.FileProcessors
                 FileProcessingDB.AddPaginationHistory(
                     e.OutputFileName, sourcePageInfo, _fileTaskSessionID.Value);
 
-                // PaginationSourceAction allows a paginated source to be moved into a
-                // cleanup action even when it is completed for this action without actually
-                // having completed all FAM tasks.
-                if (!string.IsNullOrWhiteSpace(_settings.OutputAction))
-                {
-                    EActionStatus oldStatus;
-                    FileProcessingDB.SetStatusForFile(fileID,
-                        _settings.OutputAction, -1, EActionStatus.kActionPending, false, true, out oldStatus);
-                }
-
                 // Produce a uss file for the paginated document using the uss data from the
                 // source documents
                 int pageCounter = 1;
@@ -1167,6 +1161,30 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41476");
+            }
+        }
+
+        /// <summary>
+        /// Sets a newly created file to pending for the OutputAction
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance containing the
+        /// FileID of the newly created file.</param>
+        void HandlePaginationPanel_OutputDocumentCreated(object sender, CreatingOutputDocumentEventArgs e)
+        {
+            try
+            {
+                FileProcessingDB.SetStatusForFile(e.FileID,
+                    _settings.OutputAction,
+                    -1, // Current workflow
+                    EActionStatus.kActionPending,
+                    vbAllowQueuedStatusOverride: false,
+                    vbQueueChangeIfProcessing: false,
+                    poldStatus: out var _);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI43308");
             }
         }
 

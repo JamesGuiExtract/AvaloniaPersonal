@@ -204,6 +204,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<CreatingOutputDocumentEventArgs> CreatingOutputDocument;
 
         /// <summary>
+        /// Raised when the newly created document is fully created (moved from temp dir to final destination)
+        /// </summary>
+        public event EventHandler<CreatingOutputDocumentEventArgs> OutputDocumentCreated;
+
+        /// <summary>
         /// Raised when a pagination operation is complete. May follow multiple
         /// <see cref="CreatingOutputDocument"/> events if a single pagination event produced
         /// multiple documents.
@@ -1757,6 +1762,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
             }
 
+            e.FileID = fileID;
+
             return fileID;
         }
         #endregion Methods
@@ -2209,6 +2216,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     !string.IsNullOrWhiteSpace(outputFileName));
 
                 File.Copy(tempFile.FileName, outputFileName);
+
+                OnOutputDocumentCreated(eventArgs);
             }
             catch (Exception ex)
             {
@@ -3169,6 +3178,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 eventHandler(this, eventArgs);
             }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="OutputDocumentCreated"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="CreatingOutputDocumentEventArgs"/> instance to
+        /// use when raising the event.</param>
+        private void OnOutputDocumentCreated(CreatingOutputDocumentEventArgs eventArgs)
+        {
+            OutputDocumentCreated?.Invoke(this, eventArgs);
         }
 
         /// <summary>

@@ -1318,9 +1318,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         "Pagination cannot be performed for more than one workflow at a time.",
                         !FileProcessingDB.RunningAllWorkflows);
 
-                    ValidationPaginationActions();
+                    ValidatePaginationActions();
 
                     LoadPaginationDocumentDataPanel();
+
+                    // Register for OutputDocumentCreated event in order to set status for the
+                    // PaginationOutputAction _after_ the document has been created
+                    _paginationPanel.OutputDocumentCreated += HandlePaginationPanel_OutputDocumentCreated;
 
                     if (_configManager.RegisteredDocumentTypes.Any())
                     {
@@ -3155,14 +3159,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             _ATTRIBUTE_STORAGE_MANAGER_GUID);
                         attributesCopy.ReportMemoryUsage();
                     }
-
-                    if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
-                    {
-                        EActionStatus oldStatus;
-                        FileProcessingDB.SetStatusForFile(fileID,
-                            _settings.PaginationSettings.PaginationOutputAction, -1,
-                            EActionStatus.kActionPending, false, false, out oldStatus);
-                    }
                 }
                 else
                 {
@@ -3307,6 +3303,33 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39752");
+            }
+        }
+
+        /// <summary>
+        /// Sets a newly created file to pending for the PaginationOutputAction, if one is specified
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance containing the
+        /// FileID of the newly created file.</param>
+        void HandlePaginationPanel_OutputDocumentCreated(object sender, CreatingOutputDocumentEventArgs e)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
+                {
+                    FileProcessingDB.SetStatusForFile(e.FileID,
+                        _settings.PaginationSettings.PaginationOutputAction,
+                        -1, // Current workflow
+                        EActionStatus.kActionPending,
+                        vbAllowQueuedStatusOverride: false,
+                        vbQueueChangeIfProcessing: false,
+                        poldStatus: out var _);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI43307");
             }
         }
 
@@ -4608,7 +4631,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Validates that the action settings for pagination are valid.
         /// </summary>
-        void ValidationPaginationActions()
+        void ValidatePaginationActions()
         {
             if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationSourceAction))
             {
