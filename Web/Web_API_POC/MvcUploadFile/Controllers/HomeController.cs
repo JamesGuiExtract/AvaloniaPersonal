@@ -39,6 +39,8 @@ namespace MvcUploadFile.Controllers
                     //client.BaseAddress = new Uri("http://david2016svrvm");
                     //client.BaseAddress = new Uri("http://localhost:58926");
                     client.BaseAddress = new Uri(_options.SiteSpecificUrl);
+                    //var token = "Bearer " + _options.JWT;
+                    var token = _options.JWT;
 
                     foreach (var file in files)
                     {
@@ -49,6 +51,8 @@ namespace MvcUploadFile.Controllers
                         var fileContent = new StreamContent(file.OpenReadStream());
                         fileContent.Headers.Add("X-FileName", fileName);
                         fileContent.Headers.Add("X-ContentType", file.ContentType);
+                        //Request.Headers.Add("Authorization", token);
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                         //var response = await client.PostAsync("api/FileItem", fileContent);
                         //var response = await client.PostAsync("FileApi_VS2017/api/FileItem", fileContent);

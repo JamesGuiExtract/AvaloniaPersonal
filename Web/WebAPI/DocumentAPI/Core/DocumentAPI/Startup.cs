@@ -1,4 +1,5 @@
 ﻿using DocumentAPI.Models;
+using Extract;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Formatters;              // for HttpNoContentOutputFormatter
@@ -9,6 +10,7 @@ using Swashbuckle.Swagger.Model;
 using System;
 using System.IO;
 using static DocumentAPI.Utils;
+using DocumentAPI.Controllers;
 
 namespace DocumentAPI
 {
@@ -38,6 +40,11 @@ namespace DocumentAPI
                 InitializeDefaultValues();
 
                 Utils.environment = env;
+            }
+            catch (ExtractException ee)
+            {
+                Log.WriteLine(ee);
+                throw;
             }
             catch (Exception ex)
             {
@@ -176,6 +183,21 @@ namespace DocumentAPI
             if (String.IsNullOrWhiteSpace(applyContextOnStartup) || applyContextOnStartup.IsEquivalent("true"))
             {
                 Utils.ApplyCurrentApiContext();
+            }
+
+            var timeoutValue = Configuration["TokenTimeoutSeconds"];
+            if (!String.IsNullOrWhiteSpace(timeoutValue))
+            {
+                bool parsed = Int32.TryParse(timeoutValue, out int timeoutInSecondsValue);
+                if (parsed)
+                {
+                    UsersController.TokenTimeoutInSeconds = timeoutInSecondsValue;                    
+                }
+                else
+                {
+                    Log.WriteLine(Inv($"Warning: the text: {timeoutValue}, could not be parsed ") +
+                                      "as a TokenTimeoutSeconds value, so the default value has been applied", "ELI43341");
+                }
             }
         }
     }

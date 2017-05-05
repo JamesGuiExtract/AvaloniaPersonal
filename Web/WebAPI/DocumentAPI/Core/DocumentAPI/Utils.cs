@@ -97,17 +97,13 @@ namespace DocumentAPI
         /// <summary>
         /// make a document attribute set for a successful return case
         /// </summary>
-        /// <param name="documentAttribute">document attribute to embed into DocumentAttributeSet</param>
-        /// <returns>DocumentAttributeSet with specified content embedded</returns>
-        public static DocumentAttributeSet MakeDocumentAttributeSet(DocumentAttribute documentAttribute)
+        /// <returns>new DocumentAttributeSet</returns>
+        public static DocumentAttributeSet MakeNewDocumentAttributeSet()
         {
-            var lda = new List<DocumentAttribute>();
-            lda.Add(documentAttribute);
-
             return new DocumentAttributeSet
             {
                 Error = MakeError(isError: false),
-                Attributes = lda
+                Attributes = new List<DocumentAttribute>()
             };
         }
 
@@ -192,7 +188,7 @@ namespace DocumentAPI
         {
             DocumentSubmitResult result = new DocumentSubmitResult()
             {
-                Id = Enum.GetName(typeof(DocumentSubmitType), submitType) + fileId.ToString(),
+                Id = isError ? "-1" : Enum.GetName(typeof(DocumentSubmitType), submitType) + fileId.ToString(),
                 Error = MakeError(isError: isError, message: message, code: code)
             };
 
@@ -366,12 +362,12 @@ namespace DocumentAPI
         public static ApiContext ClaimsToContext(ClaimsPrincipal user)
         {
             var workflowName  = user.Claims.Where(claim => claim.Type == "WorkflowName").Select(claim => claim.Value).First();
-            var databaseServerName = user.Claims.Where(claim => claim.Type == "DatabaseServerName").Select(claim => claim.Value).First();
-            var databaseName = user.Claims.Where(claim => claim.Type == "DatabaseName").Select(claim => claim.Value).First();
+            var databaseServerName = CurrentApiContext.DatabaseServerName;
+            var databaseName = CurrentApiContext.DatabaseName;
 
             Contract.Assert(!String.IsNullOrWhiteSpace(databaseServerName), "Database server name is empty, from Claims");
-            Contract.Assert(!String.IsNullOrWhiteSpace(databaseName), "Database name is empty, from Claims");
-            Contract.Assert(!String.IsNullOrWhiteSpace(workflowName), "Workflow name is empty, from Claims");
+            Contract.Assert(!String.IsNullOrWhiteSpace(databaseName), "Database name is empty");
+            Contract.Assert(!String.IsNullOrWhiteSpace(workflowName), "Workflow name is empty");
 
             return new ApiContext(databaseServerName, databaseName, workflowName);
         }

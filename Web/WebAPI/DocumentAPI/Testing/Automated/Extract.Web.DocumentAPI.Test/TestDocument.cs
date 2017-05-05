@@ -358,17 +358,17 @@ namespace Extract.Web.DocumentAPI.Test
                     for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                     {
                          var docType = data.GetDocumentType(id: i.ToString());
-                         Assert.IsTrue(!String.IsNullOrEmpty(docType));
+                         Assert.IsTrue(!String.IsNullOrEmpty(docType.Text));
 
                          switch (i)
                          {
                              case 6:
                              case 8:
-                                 Assert.IsTrue(docType.IsEquivalent("NonLab"), "Document type expected to be NonLab, is: {0}", docType);
+                                 Assert.IsTrue(docType.Text.IsEquivalent("NonLab"), "Document type expected to be NonLab, is: {0}", docType);
                                  break;
 
                              default:
-                                 Assert.IsTrue(docType.IsEquivalent("Unknown"), "Document type expected to be Unknown, is: {0}", docType);
+                                 Assert.IsTrue(docType.Text.IsEquivalent("Unknown"), "Document type expected to be Unknown, is: {0}", docType);
                                  break;
                         }
                     }

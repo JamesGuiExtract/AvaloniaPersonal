@@ -201,6 +201,10 @@
       <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
       <Name>Extract.AttributeFinder</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
+      <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
+      <Name>Extract</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
       <Project>{f3314bbe-b008-488d-a2e0-351c49d914d7}</Project>
       <Name>Extract.Testing.Utilities</Name>

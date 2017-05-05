@@ -25,5 +25,7 @@ namespace MvcUploadFile
         /// E.g. "FileApi_VS2017/api/FileItem" or "api/FileItem" (for local IISExpress-hosted debug system)
         /// </summary>
         public string WebApiPortionOfUrl { get; set; }
+
+        public string JWT { get; set; }
     }
 }

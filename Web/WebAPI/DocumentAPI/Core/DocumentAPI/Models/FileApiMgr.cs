@@ -40,11 +40,9 @@ namespace DocumentAPI.Models
                     return fa;
                 }
             }
-            catch (ExtractException)
+            catch (ExtractException ee)
             {
-                // Don't log here - if the exception is already an ExtractException, then it has already been logged,
-                // so this avoids double-logging from FileApi.MakeAssociatedWorkflow.
-                throw;
+                throw new ExtractException("ELI43343", ee.Message, ee);
             }
             catch (Exception ex)
             {
@@ -52,7 +50,6 @@ namespace DocumentAPI.Models
                 ee.AddDebugData("FileAPI factory failed for workflow:", apiContext.WorkflowName, encrypt: false);
                 ee.AddDebugData("database server name", apiContext.DatabaseServerName, encrypt: false);
                 ee.AddDebugData("database name", apiContext.DatabaseName, encrypt: false);
-                Log.WriteLine(ee);
 
                 throw ee;
             }

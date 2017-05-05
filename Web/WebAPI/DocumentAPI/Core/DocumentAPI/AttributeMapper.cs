@@ -312,8 +312,7 @@ namespace DocumentAPI
 
             try
             {
-                var rootDocAttrSet = new DocumentAttributeSet();
-                rootDocAttrSet.Attributes = new List<DocumentAttribute>();
+                var rootDocAttrSet = MakeNewDocumentAttributeSet();
 
                 for (int i = 0; i < _attributes.Size(); ++i)
                 {

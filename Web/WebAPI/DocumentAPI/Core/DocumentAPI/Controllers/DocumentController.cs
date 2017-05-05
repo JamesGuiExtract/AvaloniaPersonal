@@ -31,36 +31,49 @@ namespace DocumentAPI.Controllers
         /// <summary>
         /// Gets result set for a submitted file that has finished processing
         /// </summary>
+        /// <param name="Id">file ID</param>
         /// <returns>a DocumentAttributeSet, which contains error info iff there was an error</returns>
-        [HttpGet("GetResultSet/{id}")]
+        [HttpGet("GetResultSet/{Id}")]
         [ProducesResponseType(typeof(DocumentAttributeSet), 200)] 
-        public DocumentAttributeSet GetResultSet(string id)
+        public IActionResult GetResultSet(string Id)
         {
-            if (!ModelState.IsValid || String.IsNullOrWhiteSpace(id))
+            try
             {
-                Log.WriteLine("string id is empty", "ELI43235");
-                return MakeDocumentAttributeSetError("id argument cannot be empty");
-            }
+                if (!ModelState.IsValid || String.IsNullOrWhiteSpace(Id))
+                {
+                    Log.WriteLine("string id is empty", "ELI43235");
+                    var result = MakeDocumentAttributeSetError("id argument cannot be empty");
+                    return BadRequest(result);
+                }
 
-            // using ensures that the underlying FileApi.InUse flag is cleared on exit
-            using (var data = new DocumentData(ClaimsToContext(User), useAttributeDbMgr: true))
+                // using ensures that the underlying FileApi.InUse flag is cleared on exit
+                using (var data = new DocumentData(ClaimsToContext(User), useAttributeDbMgr: true))
+                {
+                    var result = data.GetDocumentResultSet(Id);
+                    return result.Error.ErrorOccurred ? (IActionResult)BadRequest(result) : Ok(result);
+                }
+            }
+            catch (ExtractException ee)
             {
-                return data.GetDocumentResultSet(id);
+                Log.WriteLine(ee);
+                var result = MakeDocumentAttributeSetError(ee.Message);
+                return BadRequest(result);
             }
         }
 
 
         /// <summary>
-        /// Upload 1 to N files for document processing
+        /// Upload a file for document processing
         /// </summary>
         /// <returns>a DocumentSubmitResult, which contains error info iff there was an error</returns>
         [HttpPost("SubmitFile")]
-        public async Task<DocumentSubmitResult> SubmitFile()
+        [Produces(typeof(DocumentSubmitResult))]
+        public async Task<IActionResult> SubmitFile()
         {
             try
             {
                 string fileName = Request?.Headers["X-FileName"];
-                Contract.Assert(String.IsNullOrWhiteSpace(fileName), "Filename cannot be empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(fileName), "Filename cannot be empty");
 
                 // Request.Body is type FrameRequestStream, inherits from Stream, which is also the parent of FileStream
                 Stream fileStream = (Stream)Request.Body;
@@ -68,13 +81,14 @@ namespace DocumentAPI.Controllers
 
                 using (var data = new DocumentData(ClaimsToContext(User)))
                 {
-                    return await data.SubmitFile(fileName, fileStream);
+                    var result = await data.SubmitFile(fileName, fileStream);
+                    return Ok(result);
                 }
             }
-            catch (Exception ex)
+            catch (ExtractException ee)
             {
-                Log.WriteLine(ex.AsExtract("ELI42149"));
-                return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
+                Log.WriteLine(ee);
+                return BadRequest(MakeDocumentSubmitResult(fileId: -1, isError: true, message: ee.Message, code: -1));
             }
         }
 
@@ -85,38 +99,65 @@ namespace DocumentAPI.Controllers
         /// <param name="args">a SubmitTextArgs instance</param>
         /// <returns>a DocumentSubmitResult, which contains error info iff there was an error</returns>
         [HttpPost("SubmitText")]
-        public async Task<DocumentSubmitResult> SubmitText([FromBody]SubmitTextArgs args)
+        [Produces(typeof(DocumentSubmitResult))]
+        public async Task<IActionResult> SubmitText([FromBody]SubmitTextArgs args)
         {
             if (!ModelState.IsValid || String.IsNullOrWhiteSpace(args.Text))
             {
-                return MakeDocumentSubmitResult(fileId: -1, isError: true, message: "File name is empty", code: -1);
+                return BadRequest(MakeDocumentSubmitResult(fileId: -1, isError: true, message: "Submitted text is empty", code: -1));
             }
 
-            using (var data = new DocumentData(ClaimsToContext(User)))
+            try
             {
-                return await data.SubmitText(args.Text);
+                using (var data = new DocumentData(ClaimsToContext(User)))
+                {
+                    var result = await data.SubmitText(args.Text);
+                    return Ok(result);
+                }
+            }
+            catch (ExtractException ee)
+            {
+                Log.WriteLine(ee);
+                return BadRequest(MakeDocumentSubmitResult(fileId: -1, isError: true, message: ee.Message, code: -1));
             }
         }
 
         /// <summary>
         /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document
         /// </summary>
-        /// <param name="stringId">file Id</param>
+        /// <param name="Id">file Id</param>
         /// <returns>List of ProcessingStatus</returns>
-        [HttpGet("GetStatus")]
-        public List<ProcessingStatus> GetStatus([FromQuery] string stringId)
+        [HttpGet("GetStatus/{Id}")]
+        [Produces(typeof(List<ProcessingStatus>))]
+        public IActionResult GetStatus(string Id)
         {
-            if (String.IsNullOrWhiteSpace(stringId))
+            if (String.IsNullOrWhiteSpace(Id))
             {
-                return MakeListProcessingStatus(isError: true, 
-                                                message: "stringId argument is empty", 
-                                                status: DocumentProcessingStatus.Failed, 
-                                                code: -1);
+                var result = MakeListProcessingStatus(isError: true, 
+                                                      message: "stringId argument is empty", 
+                                                      status: DocumentProcessingStatus.Failed, 
+                                                      code: -1);
+                return BadRequest(result);
             }
 
-            var data = new DocumentData(ClaimsToContext(User));
+            try
             {
-                return data.GetStatus(stringId);
+                var data = new DocumentData(ClaimsToContext(User));
+                {
+                    var result = data.GetStatus(Id);
+                    return Ok(result);
+                }
+            }
+            catch (ExtractException ee)
+            {
+                Log.WriteLine(ee);
+
+                var err = MakeListOf(
+                            MakeProcessingStatus(DocumentProcessingStatus.NotApplicable,
+                                                 isError: true,
+                                                 message: ee.Message,
+                                                 code: -1));
+                return BadRequest(err);
             }
         }
 
@@ -196,6 +237,11 @@ namespace DocumentAPI.Controllers
                     return PhysicalFile(fileName, fileContentType, fileDownloadName);
                 }
             }
+            catch (ExtractException ee)
+            {
+                Log.WriteLine(ee);
+                return BadRequest(ee.Message);
+            }
             catch (Exception ex)
             {
                 var message = Inv($"Exception: {ex.Message}, while returning file: {filename}, for fileId: {Id}");
@@ -208,17 +254,17 @@ namespace DocumentAPI.Controllers
         /// <summary>
         /// Gets a result file for the specified input document
         /// </summary>
-        /// <param name="id">file id</param>
+        /// <param name="Id">file id</param>
         /// <returns>result file</returns>
-        [HttpGet("GetFileResult/{id}")]
+        [HttpGet("GetFileResult/{Id}")]
         [Produces(typeof(PhysicalFileResult))]
-        public IActionResult GetFileResult(string id)
+        public IActionResult GetFileResult(string Id)
         {
             try
             {
                 using (var data = new DocumentData(ClaimsToContext(User)))
                 {
-                    var (filename, isError, errMessage) = data.GetResult(id);
+                    var (filename, isError, errMessage) = data.GetResult(Id);
                     if (isError)
                     {
                         return BadRequest(errMessage);
@@ -238,9 +284,14 @@ namespace DocumentAPI.Controllers
                     return PhysicalFile(filename, fileContentType, fileDownloadName);
                 }
             }
+            catch (ExtractException ee)
+            {
+                Log.WriteLine(ee);
+                return BadRequest(ee.Message);
+            }
             catch (Exception ex)
             {
-                var message = Inv($"Exception: {ex.Message}, while returning file for fileId: {id}");
+                var message = Inv($"Exception: {ex.Message}, while returning file for fileId: {Id}");
                 Log.WriteLine(message, "ELI43237");
                 return BadRequest(message);
             }
@@ -249,30 +300,47 @@ namespace DocumentAPI.Controllers
         /// <summary>
         /// Gets a text result for a specified input document
         /// </summary>
-        /// <param name="textId">file id - may be prepended by "Text"</param>
+        /// <param name="Id">file id - may be prepended by "Text"</param>
         /// <returns>TextResult instance</returns>
-        [HttpGet("GetTextResult")]
+        [HttpGet("GetTextResult/{Id}")]
         [Produces(typeof(TextResult))]
-        public async Task<TextResult> GetTextResult([FromQuery] string textId)
+        public async Task<IActionResult> GetTextResult(string Id)
         {
-            using (var data = new DocumentData(ClaimsToContext(User)))
+            try
             {
-                return await data.GetTextResult(textId);
+                using (var data = new DocumentData(ClaimsToContext(User)))
+                {
+                    return Ok(await data.GetTextResult(Id));
+                }
+            }
+            catch (ExtractException ee)
+            {
+                Log.WriteLine(ee);
+                return BadRequest(MakeTextResult("", isError: true, errorMessage: ee.Message));
             }
         }
 
         /// <summary>
         /// Gets the type of the submitted document (document classification)
         /// </summary>
-        /// <param name="id">file Id of the document</param>
+        /// <param name="Id">file Id of the document</param>
         /// <returns>string containing the type of the document</returns>
-        [HttpGet("GetDocumentType/{id}")]
-        [Produces(typeof(String))]
-        public string GetDocumentType(string id)
+        [HttpGet("GetDocumentType/{Id}")]
+        [Produces(typeof(TextResult))]
+        public IActionResult GetDocumentType(string Id)
         {
-            using (var data = new DocumentData(ClaimsToContext(User), useAttributeDbMgr: true))
+            try
             {
-                return data.GetDocumentType(id);
+                using (var data = new DocumentData(ClaimsToContext(User), useAttributeDbMgr: true))
+                {
+                    var result = data.GetDocumentType(Id);
+                    return result.Error.ErrorOccurred ? (IActionResult)BadRequest(result) : Ok(result);
+                }
+            }
+            catch (ExtractException ee)
+            {
+                Log.WriteLine(ee);
+                return BadRequest(MakeTextResult("", isError: true, errorMessage: ee.Message));
             }
         }
     }

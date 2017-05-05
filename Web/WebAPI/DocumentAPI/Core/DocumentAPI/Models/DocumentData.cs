@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
@@ -45,12 +44,13 @@ namespace DocumentAPI.Models
                     _attributeDbMgr.FAMDB = _fileApi.Interface;
                 }
             }
+            catch (ExtractException ee)
+            {
+                throw new ExtractException("ELI43334", ee.Message, ee);
+            }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI42162");
-                Log.WriteLine(ee);
-
-                throw ee;
+                throw ex.AsExtract("ELI42162");
             }
         }
 
@@ -82,12 +82,13 @@ namespace DocumentAPI.Models
                 var mapper = new AttributeMapper(results, _fileApi.GetWorkflow.Type);
                 return mapper.MapAttributesToDocumentAttributeSet();
             }
+            catch (ExtractException ee)
+            {
+                throw new ExtractException("ELI43337", ee.Message, ee);
+            }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI42124");
-                Log.WriteLine(ee);
-
-                return MakeDocumentAttributeSetError(ee.Message);
+                throw ex.AsExtract("ELI42124");
             }
         }
 
@@ -119,13 +120,16 @@ namespace DocumentAPI.Models
                                                                      closeConnection: true);
                 return results;
             }
+            catch (ExtractException ee)
+            {
+                throw new ExtractException("ELI43338", ee.Message, ee);
+            }
             catch (Exception ex)
             {
                 var ee = ex.AsExtract("ELI42106");
                 ee.AddDebugData("FileID", id, encrypt: false);
                 ee.AddDebugData("AttributeSetName", _fileApi.GetWorkflow.OutputAttributeSet, encrypt: false);
                 ee.AddDebugData("Workflow", _fileApi.GetWorkflow.Name, encrypt: false);
-                Log.WriteLine(ee);
 
                 throw ee;
             }
@@ -177,9 +181,7 @@ namespace DocumentAPI.Models
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI42169");
-                Log.WriteLine(ee);
-                throw ee;
+                throw ex.AsExtract("ELI42169");
             }
         }
 
@@ -215,12 +217,15 @@ namespace DocumentAPI.Models
                     fs.Close();
                 }
 
-                return AddFile(fullPath, "ELI42148");
+                return AddFile(fullPath, DocumentSubmitType.File);
+            }
+            catch (ExtractException ee)
+            {
+                throw new ExtractException("ELI43322", ee.Message, ee);
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Error: {ex.Message}"), "ELI43242");
-                return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
+                throw ex.AsExtract("ELI43242");
             }
         }
 
@@ -251,14 +256,9 @@ namespace DocumentAPI.Models
         /// Add file - this encapsulates fileProcessingDB.AddFile
         /// </summary>
         /// <param name="fullPath">path + filename - path is expected to exist at this point</param>
-        /// <param name="eliCode">eliCode from caller</param>
         /// <param name="submitType">File or Text - affects the return value: [File|Text]+Id</param>
-        /// <param name="caller">Set by runtime - do NOT pass this argument!</param>
         /// <returns>DocumentSubmitresult instance that contains error info iff an error has occurred</returns>
-        public DocumentSubmitResult AddFile(string fullPath,
-                                            string eliCode,
-                                            DocumentSubmitType submitType = DocumentSubmitType.File,
-                                            [CallerMemberName] string caller = null)
+        public DocumentSubmitResult AddFile(string fullPath, DocumentSubmitType submitType)
         {
             try
             {
@@ -287,13 +287,13 @@ namespace DocumentAPI.Models
                                                 code: 0,
                                                 submitType: submitType);
             }
+            catch (ExtractException ee)
+            {
+                throw new ExtractException("ELI43323", ee.Message, ee);
+            }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract(eliCode);
-                ee.AddDebugData("Method caller", caller, encrypt: false);
-                Log.WriteLine(ee);
-
-                return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ee.Message, code: -1);
+                throw ex.AsExtract("ELI43331");
             }
         }
 
@@ -324,12 +324,15 @@ namespace DocumentAPI.Models
                     fs.Close();
                 }
 
-                return AddFile(fullPath, "ELI42108", DocumentSubmitType.Text);
+                return AddFile(fullPath, DocumentSubmitType.Text);
+            }
+            catch (ExtractException ee)
+            {
+                throw new ExtractException("ELI43339", ee.Message, ee);
             }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Error: {ex.Message}"), "ELI43243");
-                return MakeDocumentSubmitResult(fileId: -1, isError: true, message: ex.Message, code: -1);
+                throw ex.AsExtract("ELI43243");
             }
         }
 
@@ -351,30 +354,26 @@ namespace DocumentAPI.Models
                 {
                     status = _fileApi.Interface.GetWorkflowStatus(fileId);
                 }
+                catch (ExtractException ee)
+                {
+                    throw new ExtractException("ELI43324", ee.Message, ee);
+                }
                 catch (Exception ex)
                 {
                     var ee = ex.AsExtract("ELI42109");
-                    Log.WriteLine(ee);
-
-                    return MakeListOf(
-                                MakeProcessingStatus(DocumentProcessingStatus.NotApplicable,
-                                                     isError: true,
-                                                     message: ee.Message,
-                                                     code: -1));
+                    throw ee;
                 }
 
                 var ps = MakeProcessingStatus(ConvertToStatus(status, fileId));
                 return MakeListOf(ps);
             }
+            catch (ExtractException ee)
+            {
+                throw new ExtractException("ELI43340", ee.Message, ee);
+            }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Error: {ex.Message}"), "ELI43244");
-
-                return MakeListOf(
-                            MakeProcessingStatus(DocumentProcessingStatus.NotApplicable,
-                                                 isError: true,
-                                                 message: ex.Message,
-                                                 code: -1));
+                throw ex.AsExtract("ELI43244");
             }
         }
 
@@ -412,34 +411,19 @@ namespace DocumentAPI.Models
                 AssertFileInWorkflow(fileId);
 
                 filename = _fileApi.Interface.GetFileNameFromFileID(fileId);
+                Contract.Assert(!String.IsNullOrWhiteSpace(filename), "Error getting the filename for fileId: {0}", Id);
+                Contract.Assert(System.IO.File.Exists(filename), "File: {0}, does not exist", filename);
+
+                return (filename: filename, errorMessage: "", error: false);
+            }
+            catch (ExtractException ee)
+            {
+                throw new ExtractException("ELI43325", ee.Message, ee);
             }
             catch (Exception ex)
             {
                 var ee = ex.AsExtract("ELI42110");
-                Log.WriteLine(ee);
-
-                var message = ee.Message + ", " + Inv($"while getting filename from fileId: {Id}");
-                return (filename: "", errorMessage: message, error: true);
-            }
-
-            try
-            {
-                Contract.Assert(!String.IsNullOrWhiteSpace(filename), "Error getting the filename for fileId: {0}", Id);
-
-                if (!System.IO.File.Exists(filename))
-                {
-                    var message = Inv($"The file: {filename}, does not exist");
-                    Log.WriteLine(message, "ELI43245");
-                    return (filename: "", errorMessage: message, error: true);
-                }
-
-                return (filename: filename, errorMessage: "", error: false);
-            }
-            catch (Exception ex)
-            {
-                var message = Inv($"Exception: {ex.Message}, while returning file: {filename}, for fileId: {Id}");
-                Log.WriteLine(message, "ELI43246");
-                return (filename: "", errorMessage: message, error: true);
+                throw ee;
             }
         }
 
@@ -485,14 +469,19 @@ namespace DocumentAPI.Models
                     _fileApi.Interface.SetFileStatusToPending(fileId, postAction, vbAllowQueuedStatusOverride: false);
                 }
             }
+            catch (ExtractException ee)
+            {
+                var xx = new ExtractException("ELI43327", ee.Message, ee);
+                xx.AddDebugData("FileID", fileId, encrypt: false);
+                xx.AddDebugData("OutputFileMetadataField", getFileTag, encrypt: false);
+                throw xx;
+            }
             catch (Exception ex)
             {
                 var ee = ex.AsExtract("ELI42119");
                 ee.AddDebugData("FileID", fileId, encrypt: false);
                 ee.AddDebugData("OutputFileMetadataField", getFileTag, encrypt: false);
-                Log.WriteLine(ee);
-
-                return (filename, error: true, errorMessage: ee.Message);
+                throw ee;
             }
 
             return (filename, error: false, errorMessage: "");
@@ -508,10 +497,7 @@ namespace DocumentAPI.Models
             try
             {
                 var (filename, isError, errMessage) = GetResult(textId);
-                if (isError)
-                {
-                    return MakeTextResult(text: "", isError: true, errorMessage: errMessage);
-                }
+                Contract.Assert(!isError, "Error returned from GetResult");
 
                 using (var fs = new FileStream(filename, FileMode.Open))
                 {
@@ -522,11 +508,17 @@ namespace DocumentAPI.Models
                     return MakeTextResult(text);
                 }
             }
+            catch (ExtractException ee)
+            {
+                var xx = new ExtractException("ELI43328", ee.Message, ee);
+                xx.AddDebugData("TextID", textId, encrypt: false);
+                throw xx;
+            }
             catch (Exception ex)
             {
-                var message = Inv($"Exception: {ex.Message}, while returning text for textId: {textId}");
-                Log.WriteLine(message, "ELI43247");
-                return MakeTextResult(text: "", isError: true, errorMessage: message);
+                var ee = ex.AsExtract("ELI43247");
+                ee.AddDebugData("TextID", textId, encrypt: false);
+                throw ee;
             }
         }
 
@@ -534,17 +526,18 @@ namespace DocumentAPI.Models
         /// GetDocumentType (API) implementation
         /// </summary>
         /// <param name="id">file Id</param>
-        /// <returns>document type (string)</returns>
-        public string GetDocumentType(string id)
+        /// <returns>document type (string), wrapped in a TextResult</returns>
+        public TextResult GetDocumentType(string id)
         {
             try
             {
                 var results = GetAttributeSetForFile(id);
-                return GetDocumentType(results);
+                var docType = GetDocumentType(results);
+                return MakeTextResult(docType);
             }
             catch (ExtractException ee)
             {
-                return ee.Message;
+                throw new ExtractException("ELI43329", ee.Message, ee);
             }
         }
 
@@ -570,12 +563,13 @@ namespace DocumentAPI.Models
 
                 return "Unknown";
             }
+            catch (ExtractException ee)
+            {
+                throw new ExtractException("ELI43330", ee.Message, ee);
+            }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI42121");
-                Log.WriteLine(ee);
-
-                throw ee;
+                throw ex.AsExtract("ELI42121");
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract;
+using System;
 
 namespace DocumentAPI
 {
@@ -24,9 +25,8 @@ namespace DocumentAPI
             if (!condition)
             {
                 var issue = String.Format(statement, args);
-                Log.WriteLine(issue, "ELI43256");
-
-                throw new InvalidOperationException(issue);
+                var ee = new ExtractException("ELI43256", issue);
+                throw ee;
             }
         }
 
@@ -36,8 +36,8 @@ namespace DocumentAPI
         /// <param name="statement">description of the contract violation</param>
         public static void Violated(string statement)
         {
-            Log.WriteLine(statement, "ELI43257");
-            throw new InvalidOperationException(statement);
+            var ee = new ExtractException("ELI43257", statement);
+            throw ee;
         }
     }
 }

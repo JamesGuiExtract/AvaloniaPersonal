@@ -1,6 +1,6 @@
 ﻿
 using DocumentAPI.Models;
-
+using Extract;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
@@ -117,13 +117,11 @@ namespace Extract.Web.DocumentAPI.Test
 
                 try
                 {
-                    var workflowStatus = WorkflowData.GetWorkflowStatus("", ApiUtils.CurrentApiContext);
-                    Assert.IsTrue(workflowStatus.Error.ErrorOccurred == true, "status should have the error flag set and does not");
+                    Assert.Throws<ExtractException>(() => WorkflowData.GetWorkflowStatus("", ApiUtils.CurrentApiContext));
 
-                    workflowStatus = WorkflowData.GetWorkflowStatus("InvalidWorkflow", ApiUtils.CurrentApiContext);
-                    Assert.IsTrue(workflowStatus.Error.ErrorOccurred == true, "status should have the error flag set and does not");
+                    Assert.Throws<ExtractException>(() => WorkflowData.GetWorkflowStatus("InvalidWorkflow", ApiUtils.CurrentApiContext));
 
-                    workflowStatus = WorkflowData.GetWorkflowStatus("CourtOffice", ApiUtils.CurrentApiContext);
+                    var workflowStatus = WorkflowData.GetWorkflowStatus("CourtOffice", ApiUtils.CurrentApiContext);
                     Assert.IsTrue(workflowStatus.Error.ErrorOccurred == false, "status should NOT have the error flag set and it is");
                 }
                 catch (Exception)

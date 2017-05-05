@@ -69,7 +69,6 @@ namespace DocumentAPI.Models
                 ee.AddDebugData("Database server name", DatabaseServer, encrypt: false);
                 ee.AddDebugData("Database name", DatabaseName, encrypt: false);
 
-                Log.WriteLine(ee);
                 throw ee;
             }
         }
@@ -158,7 +157,6 @@ namespace DocumentAPI.Models
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteLine(Inv($"Invalid workflow name: {workflowName}"), "ELI43233");
                     throw ex.AsExtract("ELI43263");
                 }
 

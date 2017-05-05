@@ -21,10 +21,7 @@ namespace DocumentAPI.Models
 
             try
             {
-                if (String.IsNullOrWhiteSpace(workflowName))
-                {
-                    return MakeWorkflowStatusError("workFlowName argument is empty");
-                }
+                Contract.Assert(!String.IsNullOrWhiteSpace(workflowName), "Empty workflow name");
 
                 // The workflow name specified might be the name used in the (user-specified) api context, 
                 // or it could be a different workflow name. Treat it as if it were different; if not,
@@ -53,11 +50,13 @@ namespace DocumentAPI.Models
                     NumberUnattempted = unattempted
                 };
             }
+            catch (ExtractException ee)
+            {
+                throw new ExtractException("ELI43342", ee.Message, ee);
+            }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI42181");
-                Log.WriteLine(ee);
-                return MakeWorkflowStatusError(ee.Message);
+                throw ex.AsExtract("ELI42181");
             }
             finally
             {

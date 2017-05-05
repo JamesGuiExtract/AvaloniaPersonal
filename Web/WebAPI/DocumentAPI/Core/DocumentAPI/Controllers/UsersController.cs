@@ -20,7 +20,7 @@ namespace DocumentAPI.Controllers
     [BindRequired]
     public class UsersController : Controller
     {
-        static readonly TimeSpan _expiration = TimeSpan.FromHours(12);
+        static TimeSpan _expiration = TimeSpan.FromHours(12);
 
         static SymmetricSecurityKey _signingKey;
         static string _secretKey;
@@ -78,10 +78,7 @@ namespace DocumentAPI.Controllers
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
 
-                    // Add custom claims. The database info is from the current context, while the workflow name may be 
-                    // from the user login request.
-                    new Claim("DatabaseServerName", context.DatabaseServerName),
-                    new Claim("DatabaseName", context.DatabaseName),
+                    // Add custom claims. The workflow name may be from the user login request.
                     new Claim("WorkflowName", context.WorkflowName)
                 };
 
@@ -91,7 +88,7 @@ namespace DocumentAPI.Controllers
                     audience: Audience,
                     claims: claims,
                     notBefore: now,
-                    expires: now.Add(_expiration),
+                    expires: now.Add(TokenTimeout),
                     signingCredentials: new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256));
 
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
@@ -104,7 +101,7 @@ namespace DocumentAPI.Controllers
                 var responseToken = new
                 {
                     access_token = encodedJwt,
-                    expires_in = (int)_expiration.TotalSeconds
+                    expires_in = TokenTimeoutInSeconds
                 };
 
                 var response = JsonConvert.SerializeObject(responseToken, serializerSettings);
@@ -149,6 +146,34 @@ namespace DocumentAPI.Controllers
             {
                 _secretKey = value;
                 _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_secretKey));
+            }
+        }
+
+        /// <summary>
+        /// gets/sets the Token timeout interval used in JWTs
+        /// </summary>
+        public static int TokenTimeoutInSeconds
+        {
+            get
+            {
+                return Convert.ToInt32(_expiration.TotalSeconds);
+            }
+            set
+            {
+                var ts = TimeSpan.FromSeconds(Convert.ToDouble(value));
+                Contract.Assert(value > 0 && ts < TimeSpan.FromHours(24), "Invalid value for token timeout seconds: {0}", value);
+                _expiration = ts;
+            }
+        }
+
+        /// <summary>
+        /// For internal use, just makes this more readable
+        /// </summary>
+        static TimeSpan TokenTimeout
+        {
+            get
+            {
+                return _expiration;
             }
         }
     }
