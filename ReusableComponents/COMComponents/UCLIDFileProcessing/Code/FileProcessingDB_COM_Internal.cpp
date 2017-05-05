@@ -6474,7 +6474,7 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				string strSelectSQL = "SELECT FAMFile.ID, FileName, Pages, FileSize, "
+				string strSelectSQL = "SELECT FAMFile.ID, FileName, Pages, FileSize, ActionID,"
 					"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
 					"COALESCE(ActionStatus, 'U') AS ActionStatus "
 					"FROM FAMFile LEFT JOIN FileActionStatus ON "
