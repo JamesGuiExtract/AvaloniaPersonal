@@ -1423,6 +1423,20 @@ library UCLID_COMUTILSLib
 		//			using the default value if there is not a value assigned for the given workflow
 		[id(9), helpstring("method GetTagValuePairsForWorkflow")] HRESULT GetTagValuePairsForWorkflow(
 			[in] BSTR bstrWorkflow, [out, retval] IStrToStrMap **ppTagValuePairs);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Checks if ContextTag database for the given context needs to be updated
+		//			bstrContextPath - Context path for to be checked
+		//			pbNeedsUpdate = VARIANT_TRUE if database is not the current version
+		//			pbNeedsUpdate = VARIANT_FALSE if database is the current version
+		//				if there is not ContextTag database at the given path VARIANT_FALSE will
+		//				be returned since there is no defined context and if there will be a context
+		//				defined a new database will be created
+		[id(10), helpstring("method IsUpdateRequired")] HRESULT IsUpdateRequired(
+			[in] BSTR bstrContextPath, [out, retval] VARIANT_BOOL *pbNeedsUpdate);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Updates the ContextTag database for the given ContextPath to the latest version
+		//			an exception will be thrown if the context tag database does not exist
+		[id(11), helpstring("method UpdateContextTagsDB")] HRESULT UpdateContextTagsDB([in] BSTR bstrContextPath);
 	}
 
 	//---------------------------------------------------------------------------------------------

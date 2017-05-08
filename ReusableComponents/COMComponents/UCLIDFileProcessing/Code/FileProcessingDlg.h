@@ -346,7 +346,7 @@ private:
 	// If strFileName == "" this method will open a dialog from which the user can select a .fps file
 	// to open
 	void openFile(string strFileName);
-	//---------------------------------------------------------------------------------------------
+		//---------------------------------------------------------------------------------------------
 	// This method will flush the current dialog settings to the m_ipFileProcMgr and then saves them
 	// to an fps file. bShowConfigurationWarnings indicates whether a prompt should be displayed
 	// about any potential configuration issues before allowing the save.
@@ -452,4 +452,7 @@ private:
 
 	// Positions the Workflow combo, labels and context button
 	void positionWorkflowContextControls();
+
+	// Check the version of the context tags database and prompt for update if it isn't current
+	void checkAndUpdateContextTagsDatabaseIfNeeded(std::string &strFileName);
 };

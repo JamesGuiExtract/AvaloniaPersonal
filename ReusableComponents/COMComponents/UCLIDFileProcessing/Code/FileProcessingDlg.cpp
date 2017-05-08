@@ -79,6 +79,9 @@ static const long gnDEFAULT_STATUS_PANE_WIDTH = 20;
 const string gstrFLEX_INDEX_BIN_RELATIVE_CC = ".\\..\\FlexIndexComponents\\Bin\\";
 const string gstrFAMDBADMIN_FILENAME = "FAMDBAdmin.exe";
 
+// Name of the Cutom tags database file
+const string gstrCUSTOMTAGS_DB_FILE = "CustomTags.sdf";
+
 // To indicate counts that are uninitialized.
 static const long gnUNINITIALIZED = -1;
 
@@ -2458,6 +2461,8 @@ void FileProcessingDlg::openFile(string strFileName)
 			throw UCLIDException("ELI10964", "File is not an FPS file.");
 		}
 		
+		checkAndUpdateContextTagsDatabaseIfNeeded(strFileName);
+
 		getFPM()->LoadFrom(get_bstr_t(strFileName), VARIANT_FALSE);
 		loadSettingsFromManager();
 
@@ -2478,6 +2483,30 @@ void FileProcessingDlg::openFile(string strFileName)
 	{
 		removeFileFromMRUList(strFileName);
 		throw;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::checkAndUpdateContextTagsDatabaseIfNeeded(std::string &strFileName)
+{
+	// Before loading if there is a ContextTags database defined make sure it is the correct version
+	IContextTagProviderPtr ipContextTags;
+	ipContextTags.CreateInstance("Extract.Utilities.ContextTags.ContextTagProvider");
+	ASSERT_RESOURCE_ALLOCATION("ELI43335", ipContextTags != __nullptr);
+	string strContextPath = getDirectoryFromFullPath(strFileName);
+	string strCustomTagsDBFile = strContextPath + "\\" + gstrCUSTOMTAGS_DB_FILE;
+	if (isFileOrFolderValid(strCustomTagsDBFile) && ipContextTags->IsUpdateRequired(strContextPath.c_str()))
+	{
+		if (MessageBox("The context tags database needs to be updated to a newer version. Update?",
+			"Context tags database update", MB_YESNO | MB_ICONQUESTION) == IDYES)
+		{
+			ipContextTags->UpdateContextTagsDB(strContextPath.c_str());
+		}
+		else
+		{
+			UCLIDException ue("ELI43336", "Context tags database needs to be updated.");
+			ue.addDebugInfo("ContextPath", strContextPath, false);
+			throw ue;
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -2563,6 +2592,8 @@ bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfiguratio
 	{
 		return false;
 	}
+
+	checkAndUpdateContextTagsDatabaseIfNeeded(strFileName);
 
 	getFPM()->SaveTo(get_bstr_t(strFileName), VARIANT_TRUE);
 

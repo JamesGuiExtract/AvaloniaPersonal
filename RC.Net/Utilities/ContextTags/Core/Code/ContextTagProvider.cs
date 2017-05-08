@@ -362,6 +362,50 @@ namespace Extract.Utilities.ContextTags
             }
         }
 
+        /// <summary>
+        /// Checks if the ContextTags database for the given contextPath needs to be updated
+        /// </summary>
+        /// <param name="contextPath">Context path of the ContextTags database to check</param>
+        /// <returns><see langword="true"/> if the database needs to be updated
+        /// and <see langword="false"/>if the database does not need to be updated</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
+        public bool IsUpdateRequired(string contextPath)
+        {
+            try
+            {
+                string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
+                ContextTagDatabaseManager manager = new ContextTagDatabaseManager(settingFileName);
+                return manager.IsUpdateRequired;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ex.CreateComVisible("ELI43318", "Unable to determine if ContextTags database needs update.");
+                ee.AddDebugData("ContextPath", contextPath, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Updates the ContextTag database for the given ContextPath to the latest version
+        /// an exception will be thrown if the context tag database does not exist
+        /// </summary>
+        /// <param name="contextPath">Context path of the ContextTags database to update</param>
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
+        public void UpdateContextTagsDB(string contextPath)
+        {
+            try
+            {
+                string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
+                ContextTagDatabaseManager manager = new ContextTagDatabaseManager(settingFileName);
+                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+                task.Wait();
+            }
+            catch(Exception ex)
+            {
+                throw ex.CreateComVisible("ELI43319", "Unable to update ContextTags database.");
+            }
+        }
+
         #endregion IContextTagProvider
 
         #region Private Members
@@ -400,6 +444,26 @@ namespace Extract.Utilities.ContextTags
                     // Even if there are no custom tags available, provide the option to edit.
                     _workflowTagValues[""].Add(_EDIT_CUSTOM_TAGS_LABEL, "");
                     return false;
+                }
+
+
+                // Check if the database is the current version
+                var manager = new ContextTagDatabaseManager(settingFileName);
+                if (manager.IsUpdateRequired)
+                {
+                    ExtractException updateRequiredException = new ExtractException("ELI43316", "ContextTag database requires update.");
+                    try
+                    {
+                        updateRequiredException.AddDebugData("ContextTagDatabase", settingFileName, false);
+                        updateRequiredException.AddDebugData("DatabaseVersion", manager.GetSchemaVersion(), false);
+                        updateRequiredException.AddDebugData("ExpectedVersion", ContextTagDatabaseManager.CurrentSchemaVersion, false);
+                        throw updateRequiredException;
+                    }
+                    catch(Exception ex)
+                    {
+                        updateRequiredException = new ExtractException("ELI43317", "ContextTag database requires update.", ex);
+                        throw updateRequiredException;
+                    }
                 }
 
                 bool databasePopulated = false;

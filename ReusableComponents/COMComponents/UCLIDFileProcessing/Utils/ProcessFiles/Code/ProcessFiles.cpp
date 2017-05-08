@@ -61,6 +61,9 @@ const string gstrRECOVERY_PROMPT =
 	"This can happen because of an application crash or other error.  Would you like to attempt "
 	"recovering the File Action Manager settings from your previous session?";
 
+// Name of the Cutom tags database file
+const string gstrCUSTOMTAGS_DB_FILE = "CustomTags.sdf";
+
 //-------------------------------------------------------------------------------------------------
 // CProcessFilesApp initialization
 //-------------------------------------------------------------------------------------------------
@@ -508,6 +511,27 @@ BOOL CProcessFilesApp::InitInstance()
 				}
 				else if ( strFileName != "" )
 				{
+					// Before loading if there is a ContextTags database defined make sure it is the correct version
+					IContextTagProviderPtr ipContextTags;
+					ipContextTags.CreateInstance("Extract.Utilities.ContextTags.ContextTagProvider");
+					ASSERT_RESOURCE_ALLOCATION("ELI43332", ipContextTags != __nullptr);
+					string strContextPath = getDirectoryFromFullPath(strFileName);
+					string strCustomTagsDBFile = strContextPath + "\\" + gstrCUSTOMTAGS_DB_FILE;
+					if (isFileOrFolderValid(strCustomTagsDBFile) && ipContextTags->IsUpdateRequired(strContextPath.c_str()))
+					{
+						if (MessageBox(NULL, "The context tags database needs to be updated to a newer version. Update?",
+							"Context tags database update", MB_YESNO | MB_ICONQUESTION) == IDYES)
+						{
+							ipContextTags->UpdateContextTagsDB(strContextPath.c_str());
+						}
+						else
+						{
+							UCLIDException ue("ELI43333", "Context tags database needs to be updated.");
+							ue.addDebugInfo("ContextPath", strContextPath, false);
+							throw ue;
+						}
+					}
+
 					// load the FAM settings from the specified file
 					ipFileProcMgr->LoadFrom(_bstr_t(strFileName.c_str()), VARIANT_FALSE);
 				}
