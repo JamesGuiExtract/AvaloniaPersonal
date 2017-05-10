@@ -35,6 +35,11 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         static readonly string _DATABASE_NAME_TAG = "<DatabaseName>";
 
+        /// <summary>
+        /// Constant string for the default values tag
+        /// </summary>
+        static readonly string DefaultValuesTag = "<DefaultValues>";
+
         #endregion Constants
 
         #region Fields
@@ -216,6 +221,7 @@ namespace Extract.Utilities.ContextTags
                 pluginManager.AddControlToPluginToolStrip(_workflowComboBox);
 
                 pluginManager.DataChanged += HandlePluginManager_DataChanged;
+                pluginManager.DataGridViewCellFormatting += HandlePluginManager_DataGridViewCellFormatting;
 
                 UpdateWorkflowCombo();
             }
@@ -444,6 +450,43 @@ namespace Extract.Utilities.ContextTags
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="DataGridView.CellFormatting"/> event that is available
+        /// through the <see cref="ISQLCDBEditorPluginManager.DataGridViewCellFormatting"/> event
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="DataGridViewCellFormattingEventArgs"/> instance 
+        /// containing the event data</param>
+        void HandlePluginManager_DataGridViewCellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            try
+            {
+                // Check the row index is withing the bounds of the _contextTagsView
+                if (e.RowIndex >= _contextTagsView.Count || e.RowIndex < 0)
+                {
+                    return;
+                }
+
+                // Get the ContextTagsEditorViewRow for the current row
+                var row = _contextTagsView[e.RowIndex] as ContextTagsEditorViewRow;
+                if (row != null)
+                {
+                    // get the ContextTagsEditorViewPropertyDescriptor for the current column
+                    var col = row.GetProperties()[e.ColumnIndex] as ContextTagsEditorViewPropertyDescriptor;
+
+                    // If the value in the column is a value for a workflow change the color
+                    if (col != null && col.IsWorkflowValue(row))
+                    {
+                        e.CellStyle.ForeColor = System.Drawing.Color.Red;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI43350");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -568,7 +611,7 @@ namespace Extract.Utilities.ContextTags
                 _workflowComboBox.Items.Clear();
                 _workflowLabel.Visible = true;
                 _workflowComboBox.Visible = true;
-                _workflowComboBox.Items.Insert(0, "");
+                _workflowComboBox.Items.Insert(0, DefaultValuesTag);
                 _workflowComboBox.Items.AddRange(_workflows.ToArray());
                 int indexToSelect = 0;
                 if (!String.IsNullOrEmpty(selected))

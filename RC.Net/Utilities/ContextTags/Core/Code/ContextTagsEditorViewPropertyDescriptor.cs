@@ -32,6 +32,11 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         Action<ContextTagsEditorViewRow, object> _setAction;
 
+        /// <summary>
+        /// The Func used to retrieve whether the value is for a workflow
+        /// </summary>
+        Func<ContextTagsEditorViewRow, bool> _isWorkflowValueFunc;
+
         #endregion Fields
 
         #region Constructors
@@ -45,7 +50,8 @@ namespace Extract.Utilities.ContextTags
         /// <param name="setAction">The Action used to update the property's value.</param>
         public ContextTagsEditorViewPropertyDescriptor(string name,
             Func<ContextTagsEditorViewRow, object> getFunc,
-            Action<ContextTagsEditorViewRow, object> setAction)
+            Action<ContextTagsEditorViewRow, object> setAction,
+            Func<ContextTagsEditorViewRow, bool> isWorkflowValueFunc)
             : base(name, null)
         {
             try
@@ -59,6 +65,7 @@ namespace Extract.Utilities.ContextTags
 
                 _getFunc = getFunc;
                 _setAction = setAction;
+                _isWorkflowValueFunc = isWorkflowValueFunc;
             }
             catch (Exception ex)
             {
@@ -67,6 +74,29 @@ namespace Extract.Utilities.ContextTags
         }
 
         #endregion Constructors
+
+        #region Public Methods
+
+        /// <summary>
+        /// Gets the flag indicating if the current values is for a workflow
+        /// </summary>
+        /// <param name="component">The component with the property for which to retrieve the value.
+        /// </param>
+        /// <returns><see langword="true"/> if current value is workflow specific <see langword="false"/>
+        /// if it is not</returns>
+        public bool IsWorkflowValue(object component)
+        {
+            try
+            {
+                return (_isWorkflowValueFunc == null) ? false : _isWorkflowValueFunc((ContextTagsEditorViewRow)component);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI43348");
+            }
+        }
+
+        #endregion Public Methods
 
         #region Overrides
 

@@ -39,9 +39,9 @@ namespace Extract.Utilities.ContextTags
         static readonly string DatabaseNameTag = "<DatabaseName>";
 
         /// <summary>
-        /// Constant string for the all workflows tag
+        /// Constant string for the default values tag
         /// </summary>
-        static readonly string AllWorkflowsTag = "<All workflows>";
+        static readonly string DefaultValuesTag = "<DefaultValues>";
 
         #endregion Constants
 
@@ -81,54 +81,6 @@ namespace Extract.Utilities.ContextTags
         static readonly object _workflowLock = new object();
 
         #endregion Fields
-
-		#region Properties
-
-        /// <summary>
-        /// Property to access the current _workflow field with locking
-        /// </summary>
-        static public string ActiveWorkflow
-        {
-            get
-            {
-                try
-                {
-                    lock (_workflowLock)
-                    {
-                        return _workflow;
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI43269");
-                }
-            }
-            set
-            {
-                try
-                {
-                    lock (_workflowLock)
-                    {
-                        if (value == AllWorkflowsTag)
-                        {
-                            _workflow = "";
-                        }
-                        else
-                        {
-                            _workflow = value;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-
-                    throw ex.AsExtract("ELI43270");
-                }
-            }
-        }
-
-		#endregion Properties
 
         #region Constructors
 
@@ -209,6 +161,50 @@ namespace Extract.Utilities.ContextTags
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Property to access the current _workflow field with locking
+        /// </summary>
+        static public string ActiveWorkflow
+        {
+            get
+            {
+                try
+                {
+                    lock (_workflowLock)
+                    {
+                        return _workflow;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI43269");
+                }
+            }
+            set
+            {
+                try
+                {
+                    lock (_workflowLock)
+                    {
+                        if (value == DefaultValuesTag)
+                        {
+                            _workflow = "";
+                        }
+                        else
+                        {
+                            _workflow = value;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    throw ex.AsExtract("ELI43270");
+                }
+            }
         }
 
         #endregion Properties
@@ -411,7 +407,8 @@ namespace Extract.Utilities.ContextTags
             yield return new ContextTagsEditorViewPropertyDescriptor(
                 "Tag name",
                 row => row.CustomTag.Name,
-                (row, value) => SetTagName(row, value));
+                (row, value) => SetTagName(row, value),
+                row => false);
         }
 
         /// <summary>
@@ -429,7 +426,8 @@ namespace Extract.Utilities.ContextTags
                 var propertyDescriptor = new ContextTagsEditorViewPropertyDescriptor(
                     context.Name,
                     (row) => GetTagValue(row, context),
-                    (row, value) => SetTagValue(row, context, value));
+                    (row, value) => SetTagValue(row, context, value),
+                    (row) => IsWorkflowValue(row, context));
 
                 return propertyDescriptor;
             });
@@ -518,10 +516,10 @@ namespace Extract.Utilities.ContextTags
         /// Sets the value of the tag for the specified <see paramref="row"/> and
         /// <see paramref="context"/>.
         /// </summary>
-        /// <param name="context">The <see cref="ContextTableV1"/> for which the tag value should be
-        /// set.</param>
         /// <param name="row">The <see cref="ContextTagsEditorViewRow"/> for which the tag value
         /// should be set.</param>
+        /// <param name="context">The <see cref="ContextTableV1"/> for which the tag value should be
+        /// set.</param>
         /// <param name="value">The value to set.</param>
         void SetTagValue(ContextTagsEditorViewRow row, ContextTableV1 context, object value)
         {
@@ -580,6 +578,40 @@ namespace Extract.Utilities.ContextTags
             catch (Exception ex)
             {
                 throw AsDataErrorException("ELI38000", ex);
+            }
+        }
+
+        /// <summary>
+        /// Returns whether the current row is a workflow specific value for the given context
+        /// </summary>
+        /// <param name="row">The <see cref="ContextTagsEditorViewRow"/> for which the tag value
+        /// should be set.</param>
+        /// <param name="context">The <see cref="ContextTableV1"/> for which the tag value should be
+        /// set.</param>
+        /// <returns><see langword="true"/> if current value is workflow specific <see langword="false"/>
+        /// if it is not</returns>
+        bool IsWorkflowValue(ContextTagsEditorViewRow row, ContextTableV1 context)
+        {
+            try
+            {
+                if (_database.IsDisposed)
+                {
+                    return false;
+                }
+
+                var contextValues = _database.TagValue
+                    .Where(tagValue => tagValue.ContextID == context.ID);
+
+                var workflowContextValue = contextValues
+                    .Where(tagValue => tagValue.TagID == row.CustomTag.ID && tagValue.Workflow == ActiveWorkflow)
+                    .Select(tagValue => tagValue.Value)
+                    .SingleOrDefault();
+
+                return ActiveWorkflow != "" && workflowContextValue != null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI43349");
             }
         }
 

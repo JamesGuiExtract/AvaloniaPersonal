@@ -21,6 +21,11 @@ namespace Extract.SQLCDBEditor
         event EventHandler<DataChangedEventArgs> DataChanged;
 
         /// <summary>
+        /// Raised to indicate a DataGridView Cell is formatting
+        /// </summary>
+        event EventHandler<DataGridViewCellFormattingEventArgs> DataGridViewCellFormatting;
+
+        /// <summary>
         /// Creates a new <see cref="Button"/> in the plugin toolstrip for use by the plugin.
         /// </summary>
         /// <returns>The <see cref="Button"/>.</returns>

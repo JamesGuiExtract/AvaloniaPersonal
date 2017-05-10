@@ -333,6 +333,11 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         public event EventHandler<GridSelectionEventArgs> SelectionChanged;
 
+        /// <summary>
+        /// Raised to indicate a DataGridView Cell is formatting
+        /// </summary>
+        public event EventHandler<DataGridViewCellFormattingEventArgs> DataGridViewCellFormatting;
+
         #endregion Events
 
         #region Properties
@@ -666,6 +671,7 @@ namespace Extract.SQLCDBEditor
             // the user from moving on from any row until any error has been resolved.
             _resultsGrid.RowValidating += HandleResultsGrid_RowValidating;
             _resultsGrid.RowsRemoved += HandleResultsGrid_DataBoundRowsRemoved;
+            _resultsGrid.CellFormatting += HandleResultsGrid_CellFormatting;
 
             IsLoaded = true;
         }
@@ -2061,6 +2067,25 @@ namespace Extract.SQLCDBEditor
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="DataGridView.CellFormatting"/> event of the
+        /// <see cref="_resultsGrid"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataGridViewRowsRemovedEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleResultsGrid_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            try
+            {
+                OnDataGridViewCellFormatting(sender, e);
+            }
+            catch(Exception ex)
+            {
+                ex.ExtractDisplay("ELI43347");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -3026,6 +3051,21 @@ namespace Extract.SQLCDBEditor
                         .Cast<DataRowView>()
                         .Select(dataRow => dataRow.Row)
                         .Cast<DataRow>()));
+            }
+        }
+
+        /// <summary>
+        ///  Raises the <see cref="DataGridViewCellFormatting"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void OnDataGridViewCellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            var eventHandler = DataGridViewCellFormatting;
+            if (eventHandler != null)
+            {
+                eventHandler(sender, e);
             }
         }
 
