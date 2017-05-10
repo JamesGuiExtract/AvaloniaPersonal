@@ -1,13 +1,7 @@
-﻿using Extract.Drawing;
-using Extract.Imaging.Forms;
-using Extract.Utilities.Forms;
-using Leadtools;
-using Leadtools.Drawing;
+﻿using Extract.Imaging.Forms;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -19,15 +13,6 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// </summary>
     internal partial class PageThumbnailControl : NavigablePaginationControl
     {
-        #region Constants
-
-        /// <summary>
-        /// Licensing key to unlock document (anti-aliasing) support
-        /// </summary>
-        static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
-
-        #endregion Constants
-
         #region Fields
 
         /// <summary>
@@ -46,15 +31,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         static Padding? _normalPadding;
 
         /// <summary>
+        /// The panel that contains all elements to be displayed to users. To improve on user object
+        /// usage when displaying a lot of documents or pages, only those page controls which are
+        /// currently visible will have _contentsPanel instantiated.
+        /// </summary>
+        PageThumbnailControlContents _contentsPanel;
+
+        /// <summary>
         /// The <see cref="Page"/> represented by this instance.
         /// </summary>
         Page _page;
-
-        /// <summary>
-        /// The <see cref="ImageViewer"/> being used to display the active page or
-        /// <see langword="null"/> if the page is not currently being displayed.
-        /// </summary>
-        ImageViewer _activeImageViewer;
 
         /// <summary>
         /// The <see cref="PageStylist"/>s being used to apply styles to this instance.
@@ -62,14 +48,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         HashSet<PageStylist> _pageStylists = new HashSet<PageStylist>();
 
         /// <summary>
-        /// Keeps track of the last tooltip message displayed for this control.
-        /// </summary>
-        string _toolTipText;
-
-        /// <summary>
         /// Indicates whether the page should be considered deleted.
         /// </summary>
         bool _deleted;
+
+        /// <summary>
+        /// Indicates whether the page associated with this control is currently displayed in the
+        /// <see cref="ImageViewer"/>.
+        /// </summary>
+        bool _pageIsDisplayed;
 
         #endregion Fields
 
@@ -111,12 +98,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 Document = document;
                 _page = page;
 
-                // Set the labels based on the source document name and page number, not the output
-                // Filename.
-                _fileNameLabel.Text = Path.GetFileNameWithoutExtension(_page.OriginalDocumentName);
-                _pageNumberLabel.Text = string.Format(CultureInfo.CurrentCulture, "Page {0:D}",
-                    page.OriginalPageNumber);
-
                 if (Document != null)
                 {
                     Document.AddPage(this);
@@ -125,14 +106,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Add a reference to the Page so that the source document is not deleted before this
                 // instance is.
                 _page.AddReference(this);
-                _page.ThumbnailChanged += HandlePage_ThumbnailChanged;
-                _page.OrientationChanged += HandlePage_OrientationChanged;
-
-                // Turn on anti-aliasing
-                RasterSupport.Unlock(RasterSupportType.Document, _DOCUMENT_SUPPORT_KEY);
-                RasterPaintProperties properties = _rasterPictureBox.PaintProperties;
-                properties.PaintDisplayMode |= RasterPaintDisplayModeFlags.ScaleToGray;
-                _rasterPictureBox.PaintProperties = properties;
             }
             catch (Exception ex)
             {
@@ -161,7 +134,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         using (var pageControl = new PageThumbnailControl())
                         {
-                            _uniformSize = pageControl.GetPreferredSize(Size.Empty);
+                            _uniformSize = pageControl.Size;
                         }
                     }
 
@@ -279,7 +252,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _activeImageViewer != null;
+                return _pageIsDisplayed;
             }
         }
 
@@ -299,9 +272,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.Highlighted = value;
 
-                // Refresh _outerPanel to update the indication of whether it is currently the
-                // primary selection.
-                _outerPanel.Invalidate(false);
+                _contentsPanel?.OnHighlightedStateChanged();
             }
         }
 
@@ -356,7 +327,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         OnPageStateChanged();
 
-                        Invalidate();
+                        _contentsPanel?.OnDeletedStateChanged();
                     }
                 }
                 catch (Exception ex)
@@ -378,22 +349,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                // Get the location of the mouse relative to the _rasterPictureBox (the surface to
-                // which stylists draw).
-                var mouseLocation = _rasterPictureBox.PointToClient(Control.MousePosition);
-
-                // Check if any of the stylists drawing at this position have their own tooltip text
-                // to use.
-                string newToolTipText = _pageStylists
-                    .Select(stylist => stylist.GetToolTipText(_rasterPictureBox, mouseLocation))
-                    .FirstOrDefault(text => !string.IsNullOrWhiteSpace(text));
-                    newToolTipText = newToolTipText ?? Page.OriginalDocumentName;
-
-                if (newToolTipText != _toolTipText)
-                {
-                    _toolTipText = newToolTipText;
-                    SetToolTip(this, toolTip, newToolTipText);
-                }
+                _contentsPanel?.SetToolTip(toolTip);
             }
             catch (Exception ex)
             {
@@ -412,93 +368,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                // Expensive refreshes of the entire form should only be performed if the page was
-                // changed.
-                bool imagePageChanged = false;
-
                 if (!PageLayoutControl.EnablePageDisplay)
                 {
                     return;
                 }
 
-                // Show the image only if this instance is currently in a PageLayoutControl.
-                if (display && ParentForm != null)
+                _pageIsDisplayed = display;
+
+                if (_contentsPanel != null)
                 {
-                    // To prevent flicker of the image viewer tool strips while loading a new image,
-                    // if we can find a parent ToolStripContainer, lock it until the new image is
-                    // loaded.
-                    // [DotNetRCAndUtils:931]
-                    // This, and the addition of a parameter on OpenImage to prevent an initial
-                    // refresh is in place of locking the entire form which can cause the form to
-                    // fall behind other open applications when clicked.
-                    LockControlUpdates toolStripLocker = null;
-                    for (Control control = imageViewer; control != null; control = control.Parent)
-                    {
-                        var toolStripContainer = control as ToolStripContainer;
-                        if (toolStripContainer != null)
-                        {
-                            toolStripLocker = new LockControlUpdates(toolStripContainer);
-                            break;
-                        }
-                    }
+                    // Show the image only if this instance is currently in a PageLayoutControl.
+                    bool imagePageChanged = _contentsPanel.DisplayPage(imageViewer, display && ParentForm != null);
 
-                    try
-                    {
-                        if (Page.OriginalDocumentName != imageViewer.ImageFile)
-                        {
-                            imagePageChanged = true;
-
-                            imageViewer.OpenImage(Page.OriginalDocumentName, false, false);
-                        }
-                        if (imageViewer.PageNumber != Page.OriginalPageNumber)
-                        {
-                            imagePageChanged = true;
-
-                            imageViewer.PageNumber = Page.OriginalPageNumber;
-                        }
-                        if (imageViewer.Orientation != Page.ImageOrientation)
-                        {
-                            imagePageChanged = true;
-
-                            // Set the image viewer orientation to be the same value as the control.
-                            // I can't figure out why it used to be the -Page.Orientation; when it was
-                            // that way a control with a 90 or 270 degree orientation would cause the
-                            // image to get flipped the second time it was selected (so that the image
-                            // displayed in the full-sized image viewer would not match the thumbnail)
-                            // https://extract.atlassian.net/browse/ISSUE-14208
-                            imageViewer.Orientation = Page.ImageOrientation;
-                        }
-
-                        if (_activeImageViewer == null)
-                        {
-                            imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
-                            imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
-                            imageViewer.PageChanged += HandleImageViewer_PageChanged;
-
-                            _activeImageViewer = imageViewer;
-                        }
-                    }
-                    finally
-                    {
-                        if (toolStripLocker != null)
-                        {
-                            toolStripLocker.Dispose();
-                        }
-                    }
-
+                    // Expensive refreshes of the entire form should only be performed if the page was
+                    // changed.
                     if (imagePageChanged)
                     {
                         ParentForm.Refresh();
                     }
-                }
-                // Close the image if specified.
-                else if (!display && _activeImageViewer != null)
-                {
-                    // [DotNetRCAndUtils:956]
-                    // Do not unload the image, otherwise it may be deleted or modified by an
-                    // outside application while still available in this UI.
-                    _activeImageViewer.CloseImage(false);
-                    DeactivateImageViewer();
                 }
             }
             catch (Exception ex)
@@ -513,13 +400,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public void DeactivateImageViewer()
         {
-            if (_activeImageViewer != null)
-            {
-                _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
-                _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
-                _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
-                _activeImageViewer = null;
-            }
+            _contentsPanel?.DeactivateImageViewer();
         }
 
         /// <summary>
@@ -550,6 +431,46 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Overrides
 
         /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.Layout" /> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.LayoutEventArgs" /> that contains the
+        /// event data.</param>
+        protected override void OnLayout(LayoutEventArgs e)
+        {
+            try
+            {
+                // Create or dispose of _contentsPanel depending on current visibility.
+                SetContents();
+
+                base.OnLayout(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI43372");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.Paint" /> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.PaintEventArgs" /> that contains the
+        /// event data.</param>
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            try
+            {
+                // Create or dispose of _contentsPanel depending on current visibility.
+                SetContents();
+
+                base.OnPaint(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI43373");
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether this control is selected.
         /// </summary>
         /// <value><see langword="true"/> if selected; otherwise, <see langword="false"/>.
@@ -567,45 +488,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     base.Selected = value;
 
-                    _borderPanel.Invalidate();
+                    _contentsPanel?.OnSelectedStateChanged();
                 }
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.UserControl.Load"/> event.
-        /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
-        /// </param>
-        protected override void OnLoad(EventArgs e)
-        {
-            try
-            {
-                base.OnLoad(e);
-
-                try
-                {
-                    // [DotNetRCAndUtils:959]
-                    // For reasons I don't understand, the dispose of one PageThumbnailControl can
-                    // sometimes trigger the OnLoad call of a subsequent PageThumbnailControl.
-                    // Ensure the page thumbnail exists before trying to use it.
-                    if (!IsDisposed && _page != null && !_page.IsDisposed)
-                    {
-                        // RasterPictureBox does dispose of the old image.
-                        _rasterPictureBox.Image = _page.ThumbnailImage;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // To prevent any exceptions from being needlessly displayed at times user
-                    // wouldn't otherwise know of a problem, just log exceptions setting the
-                    // thumbnail image for now. Needs to be re-visited later.
-                    ex.ExtractLog("ELI35668");
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35477");
             }
         }
 
@@ -620,24 +504,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    if (_rasterPictureBox != null)
-                    {
-                        _rasterPictureBox.Dispose();
-                        _rasterPictureBox = null;
-                    }
-
                     if (_page != null)
                     {
-                        _page.ThumbnailChanged -= HandlePage_ThumbnailChanged;
-                        _page.OrientationChanged -= HandlePage_OrientationChanged;
                         _page.RemoveReference(this);
                         _page = null;
                     }
 
-                    if (_activeImageViewer != null)
+                    if (_contentsPanel != null)
                     {
-                        _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
-                        _activeImageViewer = null;
+                        var contentsPanel = _contentsPanel;
+                        UnRegisterForEvents(contentsPanel);
+                        Controls.Remove(contentsPanel);
+                        contentsPanel.Dispose();
+                        _contentsPanel = null;
                     }
 
                     if (components != null)
@@ -656,236 +535,56 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Overrides
 
-        #region Event Handlers
-
         /// <summary>
-        /// Handles the <see cref="T:Page.ThumbnailChanged"/> event of the <see cref="_page"/> control.
+        /// Gets the page stylists.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandlePage_ThumbnailChanged(object sender, EventArgs e)
+        /// <value>
+        /// The page stylists.
+        /// </value>
+        internal HashSet<PageStylist> PageStylists
         {
-            try
+            get
             {
-                UpdateThumbnail();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35481");
+                return _pageStylists;
             }
         }
-
-        /// <summary>
-        /// Handles the <see cref="T:Page.OrientationChanged"/> event of the <see cref="Page"/> control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandlePage_OrientationChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                UpdateThumbnail();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35566");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.Paint"/> event of the <see cref="_borderPanel"/> control
-        /// in order to indicate the selection state.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandleBorderPanel_Paint(object sender, PaintEventArgs e)
-        {
-            try
-            {
-                var brush = ExtractBrushes.GetSolidBrush(Selected
-                    ? SystemColors.ControlDark
-                    : SystemColors.Control);
-
-                e.Graphics.FillRectangle(brush, e.ClipRectangle);
-
-                foreach (var stylist in _pageStylists)
-                {
-                    stylist.PaintBackground(e);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39634");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.Paint"/> event of the <see cref="_rasterPictureBox"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandleRasterPictureBox_Paint(object sender, PaintEventArgs e)
-        {
-            try
-            {
-                foreach (var stylist in _pageStylists)
-                {
-                    stylist.PaintForeground(_rasterPictureBox, e);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35562");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.Paint"/> event of the <see cref="_outerPanel"/> control
-        /// in order to indicate the selection state.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandleOuterPanel_Paint(object sender, PaintEventArgs e)
-        {
-            try
-            {
-                if (Highlighted)
-                {
-                    var highlightBrush = ExtractBrushes.GetSolidBrush(SystemColors.Highlight);
-                    e.Graphics.FillRectangle(highlightBrush, e.ClipRectangle);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI35484");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ImageViewer.OrientationChanged"/> event of the
-        /// <see cref="_activeImageViewer"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Extract.Imaging.Forms.OrientationChangedEventArgs"/>
-        /// instance containing the event data.</param>
-        void HandleActiveImageViewer_OrientationChanged(object sender, OrientationChangedEventArgs e)
-        {
-            try
-            {
-                ExtractException.Assert("ELI35587", "Unexpected image viewer event registration",
-                    _activeImageViewer != null);
-
-                Page.ImageOrientation = _activeImageViewer.Orientation;
-                OnPageStateChanged();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35564");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="T:ImageViewer.ImageChanged"/> event of the
-        /// <see cref="_activeImageViewer"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleImageViewer_ImageChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                // [DotNetRCAndUtils:1039]
-                // If the page has changed, the displayed page is no longer the one associated with
-                // this instance; don't allow rotation of the displayed page to affect the rotation
-                // of this page.
-                DeactivateImageViewer();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35881");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="T:ImageViewer.PageChanged"/> event of the
-        /// <see cref="_activeImageViewer"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Extract.Imaging.Forms.PageChangedEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandleImageViewer_PageChanged(object sender, PageChangedEventArgs e)
-        {
-            try
-            {
-                // [DotNetRCAndUtils:1039]
-                // If the page has changed, the displayed page is no longer the one associated with
-                // this instance; don't allow rotation of the displayed page to affect the rotation
-                // of this page.
-                DeactivateImageViewer();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35882");
-            }
-        }
-
-        #endregion Event Handlers
 
         #region Private Members
 
         /// <summary>
-        /// Recursively associates the specified <see paramref="toolTip"/> and
-        /// <see paramref="toolTipText"/> with the specified <see paramref="control"/>.
+        /// Creates or disposes of <see cref="_contentsPanel"/> depending on current visibility of
+        /// this control.
         /// </summary>
-        /// <param name="control">The <see cref="Control"/> to which the tooltip should be applied.
-        /// </param>
-        /// <param name="toolTip">The <see cref="ToolTip"/> to apply.</param>
-        /// <param name="toolTipText">The tooltip text to apply.</param>
-        void SetToolTip(Control control, ToolTip toolTip, string toolTipText)
+        void SetContents()
         {
-            toolTip.SetToolTip(control, toolTipText);
+            bool visible =
+                Parent != null &&
+                Visible &&
+                Parent.ClientRectangle.IntersectsWith(Bounds);
 
-            foreach (Control childControl in control.Controls)
+            if (visible && _contentsPanel == null)
             {
-                SetToolTip(childControl, toolTip, toolTipText);
+                _contentsPanel = new PageThumbnailControlContents(this, _page);
+
+                Controls.Add(_contentsPanel);
+                _contentsPanel.Invalidate(true);
+
+                RegisterForEvents(_contentsPanel);
             }
-        }
-
-        /// <summary>
-        /// Updates the thumbnail image.
-        /// </summary>
-        void UpdateThumbnail()
-        {
-            if (IsDisposed || !IsHandleCreated)
+            else if (!visible && _contentsPanel != null)
             {
-                return;
+                var contentsPanel = _contentsPanel;
+                UnRegisterForEvents(contentsPanel);
+                Controls.Remove(contentsPanel);
+                contentsPanel.Dispose();
+                _contentsPanel = null;
             }
-
-            // Since the thumbnail may be changed by a background thread and we don't want the work
-            // of the background worker to be held up waiting on messages currently being
-            // handled in the UI thread, invoke the image change to occur on the UI thread.
-            this.SafeBeginInvoke("ELI35559", () =>
-            {
-                // Ensure this control has not been disposed of since invoking the thumbnail change.
-                if (!IsDisposed && _page != null && !_page.IsDisposed)
-                {
-                    // RasterPictureBox does dispose of the old image.
-                    _rasterPictureBox.Image = _page.ThumbnailImage;
-                    _rasterPictureBox.Invalidate();
-                }
-            });
         }
 
         /// <summary>
         /// Raises the <see cref="PageStateChanged"/> event.
         /// </summary>
-        void OnPageStateChanged()
+        internal void OnPageStateChanged()
         {
             var eventHandler = PageStateChanged;
             if (eventHandler != null)

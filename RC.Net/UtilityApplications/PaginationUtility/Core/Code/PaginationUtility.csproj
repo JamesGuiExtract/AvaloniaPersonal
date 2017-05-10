@@ -114,6 +114,12 @@
     </Compile>
     <Compile Include="IPaginationUtility.cs" />
     <Compile Include="IPaginationDocumentDataPanel.cs" />
+    <Compile Include="PageThumbnailControlContents.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PageThumbnailControlContents.Designer.cs">
+      <DependentUpon>PageThumbnailControlContents.cs</DependentUpon>
+    </Compile>
     <Compile Include="PaginationDataField.cs" />
     <Compile Include="PaginationDocumentData.cs" />
     <Compile Include="PaginationLayoutEngine.cs" />
@@ -199,7 +205,7 @@
     </Compile>
     <Compile Include="ThreadManager.cs">
       <SubType>UserControl</SubType>
-	  <DependentUpon>DataEntryPanelContainer.cs</DependentUpon>
+      <DependentUpon>DataEntryPanelContainer.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
@@ -222,6 +228,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PageLayoutControl.resx">
       <DependentUpon>PageLayoutControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PageThumbnailControlContents.resx">
+      <DependentUpon>PageThumbnailControlContents.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PageThumbnailControl.resx">
       <DependentUpon>PageThumbnailControl.cs</DependentUpon>

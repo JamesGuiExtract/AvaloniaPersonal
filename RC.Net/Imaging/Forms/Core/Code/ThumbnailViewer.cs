@@ -268,7 +268,7 @@ namespace Extract.Imaging.Forms
         {
             if (_worker == null)
             {
-                _worker = new ThumbnailWorker(_imageViewer.ImageFile, _imageList.ItemImageSize);
+                _worker = new ThumbnailWorker(_imageViewer.ImageFile, _imageList.ItemImageSize, false);
 
                 _worker.BeginLoading();
             }

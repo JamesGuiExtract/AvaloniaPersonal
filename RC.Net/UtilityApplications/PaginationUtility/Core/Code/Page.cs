@@ -89,6 +89,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<EventArgs> OrientationChanged;
 
+        /// <summary>
+        /// Occurs when the <see cref="ThumbnailImage"/> property accessor is called.
+        /// </summary>
+        public event EventHandler<EventArgs> ThumbnailRequested;
+
         #endregion Events
 
         #region Properties
@@ -142,6 +147,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 lock (_lock)
                 {
+                    OnThumbnailRequested();
+
                     return (_thumbnailImage != null && !_thumbnailImage.IsDisposed)
                         ? _thumbnailImage.Clone()
                         : null;
@@ -429,6 +436,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 eventHandler(this, new EventArgs());
             }
+        }
+
+        void OnThumbnailRequested()
+        {
+            ThumbnailRequested?.Invoke(this, new EventArgs());
         }
 
         #endregion Private Methods

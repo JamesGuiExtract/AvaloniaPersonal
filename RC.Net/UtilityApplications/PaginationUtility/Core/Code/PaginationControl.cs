@@ -375,7 +375,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Event Handlers
 
-        #region Private Members
+        #region Protected Members
 
         /// <summary>
         /// Registers to receive key events from child controls that should be raised as if
@@ -383,7 +383,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="control">The <see cref="Control"/> whose children's events should be
         /// forwarded.</param>
-        void RegisterForEvents(Control control)
+        protected void RegisterForEvents(Control control)
         {
             foreach (Control childControl in control.Controls)
             {
@@ -398,6 +398,24 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        #endregion Private Members
+        /// <summary>
+        /// Unregisters to receive key events from child controls
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> whose children's events should be
+        /// unregistered.</param>
+        protected void UnRegisterForEvents(Control control)
+        {
+            foreach (Control childControl in control.Controls)
+            {
+                childControl.Click -= HandleControl_Click;
+                childControl.DoubleClick -= HandleControl_DoubleClick;
+                childControl.MouseMove -= HandleControl_MouseMove;
+                childControl.KeyUp -= HandleControl_KeyUp;
+
+                UnRegisterForEvents(childControl);
+            }
+        }
+
+        #endregion Protected Members
     }
 }

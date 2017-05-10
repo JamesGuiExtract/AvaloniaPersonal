@@ -8,7 +8,7 @@
 // Constants
 //-------------------------------------------------------------------------------------------------
 // The upper bound for the threads dialog box
-const int giTHREADS_UPPER_RANGE = 100;
+const int giTHREADS_UPPER_RANGE = 1000;
 
 // ProgID for the set schedule COM object
 const string gstrSET_SCHEDULE_PROG_ID = "Extract.FileActionManager.Forms.SetProcessingSchedule";

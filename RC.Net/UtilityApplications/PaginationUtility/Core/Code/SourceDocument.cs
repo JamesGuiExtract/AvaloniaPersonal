@@ -47,19 +47,19 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 FileName = fileName;
 
-                _thumbnailWorker = new ThumbnailWorker(FileName, PageThumbnailControl.ThumbnailSize);
+                _thumbnailWorker = new ThumbnailWorker(FileName, PageThumbnailControl.ThumbnailSize, true);
 
                 // Initialize a Page instance for each page of the document with a placeholder
                 // thumbnail that will be replaced as the _thumbnailWorker loads the thumbnails.
                 for (int pageNumber = 1; pageNumber <= _thumbnailWorker.PageCount; pageNumber++)
                 {
                     var page = new Page(this, pageNumber);
+                    page.ThumbnailRequested += HandlePage_ThumbnailRequested;
                     _pages.Add(page);
                     _loadingPages[pageNumber] = page;
                 }
 
                 _thumbnailWorker.ThumbnailLoaded += HandleThumbnailWorker_ThumbnailLoaded;
-                _thumbnailWorker.BeginLoading();
             }
             catch (Exception ex)
             {
@@ -142,6 +142,25 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Event Handlers
 
         /// <summary>
+        /// Handles the <see cref="ThumbnailRequested"/> event of a <see cref="Page"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandlePage_ThumbnailRequested(object sender, EventArgs e)
+        {
+            try
+            {
+                var page = (Page)sender;
+
+                _thumbnailWorker.GetThumbnail(page.OriginalPageNumber);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI43390");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="ThumbnailWorker.ThumbnailLoaded"/> event of the
         /// <see cref="_thumbnailWorker"/> control.
         /// </summary>
@@ -159,22 +178,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 _loadingPages.Remove(e.PageNumber);
-
-                if (_loadingPages.Count == 0)
-                {
-                    Task.Factory.StartNew(() =>
-                    {
-                        // Thumbnail worker could also be disposed from UI thread, so invoke the
-                        // call to dispose so that is it not disposed of while the UI thread is
-                        // using it.
-                        var thumbnailWorker = _thumbnailWorker;
-                        if (thumbnailWorker != null)
-                        {
-                            thumbnailWorker.Dispose();
-                            _thumbnailWorker = null;
-                        }
-                    });
-                }
             }
             catch (Exception ex)
             {

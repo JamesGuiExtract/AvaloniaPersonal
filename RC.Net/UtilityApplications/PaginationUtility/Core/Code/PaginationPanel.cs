@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using static System.FormattableString;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -2737,10 +2738,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         return null;
                     }
 
-                    if (sourceDocument.Pages.Count > 1000)
+                    if (sourceDocument.Pages.Count > PaginationUtilityForm._MAX_LOADED_PAGES)
                     {
                         var ee = new ExtractException("ELI40384",
-                            "Unable to load more that 1000 pages for pagination.");
+                            Invariant($"Unable to load more than {PaginationUtilityForm._MAX_LOADED_PAGES} pages for pagination."));
                         ee.AddDebugData("Filename", inputFileName, false);
                         ee.AddDebugData("Pages", sourceDocument.Pages.Count, false);
 

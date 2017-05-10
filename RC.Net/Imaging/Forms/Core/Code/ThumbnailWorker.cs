@@ -1,6 +1,7 @@
 using Extract.Licensing;
 using Leadtools;
 using System;
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.Threading;
 
@@ -32,7 +33,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The thread in which the loading is performed.
         /// </summary>
-        readonly Thread _thread;
+        Thread _thread;
 
         /// <summary>
         /// The number of the pages in the file from which to load thumbnails.
@@ -45,6 +46,12 @@ namespace Extract.Imaging.Forms
         readonly Size _thumbnailSize;
 
         /// <summary>
+        /// <c>true</c> if the thumbnails should be loaded only when requested; <c>false</c> if the
+        /// thumbnails should start loading right away.
+        /// </summary>
+        readonly bool _lazyLoading;
+
+        /// <summary>
         /// The first page of high priority thumbnails to load.
         /// </summary>
         volatile int _priorityStartPage = 1;
@@ -53,6 +60,12 @@ namespace Extract.Imaging.Forms
         /// The last page of high priority thumbnails to load.
         /// </summary>
         volatile int _priorityEndPage;
+
+        /// <summary>
+        /// An explicitly defined set of pages to load; when specified, only the pages in this queue
+        /// will be loaded.
+        /// </summary>
+        ConcurrentQueue<int> _pagesToLoad = new ConcurrentQueue<int>();
 
         /// <summary>
         /// Codecs for loading thumbnails.
@@ -98,7 +111,12 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Initializes a new instance of the <see cref="ThumbnailWorker"/> class.
         /// </summary>
-        public ThumbnailWorker(string fileName, Size thumbnailSize)
+        /// <param name="fileName">The filename of the document for which thumbnail images should be
+        /// loaded.</param>
+        /// <param name="thumbnailSize">The size of the thumbnails to load.</param>
+        /// <param name="lazyLoading"><c>true</c> if the thumbnails should be loaded only when
+        /// requested; <c>false</c> if the thumbnails should start loading right away.</param>
+        public ThumbnailWorker(string fileName, Size thumbnailSize, bool lazyLoading)
         {
             try
             {
@@ -115,10 +133,14 @@ namespace Extract.Imaging.Forms
 
                 _pageCount = _reader.PageCount;
                 _thumbnailSize = thumbnailSize;
+                _lazyLoading = lazyLoading;
                 _thumbnails = new RasterImage[_pageCount];
                 _priorityEndPage = _pageCount;
 
-                _thread = new Thread(LoadThumbnails);
+                if (!_lazyLoading)
+                {
+                    _thread = new Thread(LoadThumbnails);
+                }
             }
             catch (Exception ex)
             {
@@ -298,7 +320,20 @@ namespace Extract.Imaging.Forms
 
                 lock (_lock)
                 {
-                    return _thumbnails[page - 1];
+                    var thumbnail = _thumbnails[page - 1];
+                    if (_lazyLoading && thumbnail == null)
+                    {
+                        // If the thumbnail requested is not yet available, schedule it to be loaded.
+                        _pagesToLoad.Enqueue(page);
+
+                        if (!_running)
+                        {
+                            _thread = new Thread(LoadThumbnails);
+                            BeginLoading();
+                        }
+                    }
+
+                    return thumbnail;
                 }
             }
             catch (Exception ex)
@@ -318,33 +353,50 @@ namespace Extract.Imaging.Forms
         /// </returns>
         int GetNextPageToLoad()
         {
+            int page = -1;
+
             // Wait here if processing is paused but not cancelled.
             WaitHandle.WaitAny(new WaitHandle[] { _unPausedEvent, _cancelledEvent });
 
-            if (_cancelledEvent.WaitOne(0))
+            if (!_cancelledEvent.WaitOne(0))
             {
-                return -1;
+                lock (_lock)
+                {
+                    if (_lazyLoading)
+                    {
+                        if (_pagesToLoad != null)
+                        {
+                            if (!_pagesToLoad.TryDequeue(out page))
+                            {
+                                page = -1;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Return the first priority unloaded page.
+                        page = GetUnloadedPageInRange(_priorityStartPage, _priorityEndPage);
+
+                        // Return the first page prior to the first priority page
+                        if (page <= 0)
+                        {
+                            page = GetUnloadedPageInRange(1, _priorityStartPage - 1);
+                        }
+
+                        // Return the first page after the last priority page
+                        if (page <= 0)
+                        {
+                            page = GetUnloadedPageInRange(_priorityEndPage + 1, _pageCount);
+                        }
+                    }
+                }
             }
 
-            lock (_lock)
+            if (page <= 0)
             {
-                // Return the first priority unloaded page.
-                int page = GetUnloadedPageInRange(_priorityStartPage, _priorityEndPage);
-                if (page > 0)
-                {
-                    return page;
-                }
-
-                // Return the first page prior to the first priority page
-                page = GetUnloadedPageInRange(1, _priorityStartPage - 1);
-                if (page > 0)
-                {
-                    return page;
-                }
-
-                // Return the first page after the last priority page
-                return GetUnloadedPageInRange(_priorityEndPage + 1, _pageCount);
+                _running = false;
             }
+            return page;
         }
 
         /// <summary>
@@ -393,32 +445,41 @@ namespace Extract.Imaging.Forms
                     // Load the thumbnail for this page
                     RasterImage privateThumbnail = null;
                     RasterImage publicThumbnail = null;
-                    try
-                    {
-                        privateThumbnail = _reader.ReadPageAsThumbnail(page, _thumbnailSize);
-                        publicThumbnail = privateThumbnail;
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.ExtractLog("ELI37825");
-                        privateThumbnail = ThumbnailViewer._ERROR_IMAGE;
-                        // The image shared via the public ThumbnailLoaded event is to be managed
-                        // and disposed by the event's handler. Therefore, provide a copy of
-                        // _ERROR_IMAGE so that it does not get disposed.
-                        publicThumbnail = privateThumbnail.Clone();
-                    }
 
                     lock (_lock)
                     {
-                        _thumbnails[page - 1] = privateThumbnail;
+                        privateThumbnail = _thumbnails[page - 1];
                     }
 
-                    // If there were no registered comsumers of this event, any clone of _ERROR_IMAGE
-                    // should be disposed of here since there will be no other code to do so.
-                    if (!OnThumbnailLoaded(page, publicThumbnail) &&
-                        privateThumbnail == ThumbnailViewer._ERROR_IMAGE)
+                    if (privateThumbnail == null)
                     {
-                        publicThumbnail.Dispose();
+                        try
+                        {
+                            privateThumbnail = _reader.ReadPageAsThumbnail(page, _thumbnailSize);
+                            publicThumbnail = privateThumbnail;
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractLog("ELI37825");
+                            privateThumbnail = ThumbnailViewer._ERROR_IMAGE;
+                            // The image shared via the public ThumbnailLoaded event is to be managed
+                            // and disposed by the event's handler. Therefore, provide a copy of
+                            // _ERROR_IMAGE so that it does not get disposed.
+                            publicThumbnail = privateThumbnail.Clone();
+                        }
+
+                        lock (_lock)
+                        {
+                            _thumbnails[page - 1] = privateThumbnail;
+                        }
+
+                        // If there were no registered consumers of this event, any clone of _ERROR_IMAGE
+                        // should be disposed of here since there will be no other code to do so.
+                        if (!OnThumbnailLoaded(page, publicThumbnail) &&
+                            privateThumbnail == ThumbnailViewer._ERROR_IMAGE)
+                        {
+                            publicThumbnail.Dispose();
+                        }
                     }
 
                     page = GetNextPageToLoad();

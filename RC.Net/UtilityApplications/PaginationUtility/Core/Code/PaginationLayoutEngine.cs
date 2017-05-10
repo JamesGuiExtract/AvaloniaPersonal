@@ -20,13 +20,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<LayoutCompletedEventArgs> LayoutCompleted;
 
+        #endregion Events
+
+        #region Fields
+
         /// <summary>
         /// Indicates when a layout operation has been invoked. (Layout operations are delayed to be
         /// able to perform one layout rather than many as individual control properties change).
         /// </summary>
         bool _layoutInvoked;
 
-        #endregion Properties
+        #endregion Fields
 
         #region Properties
 
@@ -75,13 +79,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 parent.SafeBeginInvoke("ELI40230", () =>
                 {
-                    DoLayout(parent);
-
-                    foreach (var control in parent.Controls.OfType<PaginationSeparator>())
-                    {
-                        control.Invalidate();
-                    }
-                    parent.Invalidate();
+                    DoLayout(parent, layoutEventArgs);
 
                     parent.ResumeLayout();
                     _layoutInvoked = false;
@@ -112,7 +110,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Does the layout.
         /// </summary>
         /// <param name="parent">The parent.</param>
-        void DoLayout(Control parent)
+        void DoLayout(Control parent, LayoutEventArgs layoutEventArgs)
         {
             // Use DisplayRectangle so that parent.Padding is honored.
             Rectangle parentDisplayRectangle = parent.DisplayRectangle;
@@ -123,6 +121,15 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             List<PaginationControl> redundantControls = new List<PaginationControl>();
             PaginationSeparator lastSeparator = null;
+
+            // If the affected control is not currently visible, abort the layout to avoid
+            // unnecessary repeated layouts as a large number of documents/pages are loading.
+            if (layoutEventArgs?.AffectedControl != null &&
+                layoutEventArgs?.AffectedControl != parent &&
+                !parent.ClientRectangle.IntersectsWith(layoutEventArgs.AffectedControl.Bounds))
+            {
+                return;
+            }
 
             // Layout all PaginationControls (ignore any other kind of control).
             foreach (PaginationControl control in parent.Controls.OfType<PaginationControl>())

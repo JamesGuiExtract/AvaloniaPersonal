@@ -165,6 +165,13 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         bool _disposeThreadPending;
 
+        /// <summary>
+        /// Indicates whether a document selection is pending; rather than perform selections as
+        /// each document is loaded (which can cause a lot of flickering), wait until all pending
+        /// events are executed and only then perform the selection.
+        /// </summary>
+        bool _documentSelectionPending = true;
+
         #endregion Fields
 
         #region Events
@@ -287,6 +294,8 @@ namespace Extract.FileActionManager.FileProcessors
                         _advancedCommandsToolStrip.Visible = true;
                     }
                 }
+
+                Application.Idle += HandleApplicationIdle;
             }
             catch (Exception ex)
             {
@@ -715,6 +724,8 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 try
                 {
+                    Application.Idle -= HandleApplicationIdle;
+
                     // Close any open panels before disposing of anything
                     // https://extract.atlassian.net/browse/ISSUE-14377
                     _paginationPanel?.CloseDataPanel(validateData: false);
@@ -753,6 +764,40 @@ namespace Extract.FileActionManager.FileProcessors
         #endregion Overrides
 
         #region Event Handlers
+
+        /// <summary>
+        /// Handles the <see cref="Application.Idle"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        void HandleApplicationIdle(object sender, EventArgs e)
+        {
+            try
+            {
+                // Once application is idle, go ahead and perform any pending document selection.
+                if (_documentSelectionPending)
+                {
+                    _documentSelectionPending = false;
+
+                    if (_lastDocumentPosition != -1)
+                    {
+                        this.SafeBeginInvoke("ELI43370", () =>
+                        {
+                            _paginationPanel.SelectDocumentAtPosition(
+                                (_lastDocumentPosition == -1)
+                                    ? 0
+                                    : _lastDocumentPosition);
+                            _lastDocumentPosition = -1;
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI43371");
+            }
+        }
 
         /// <summary>
         /// Handles the <see cref="ToolStripItem.Click"/> event.
@@ -869,16 +914,7 @@ namespace Extract.FileActionManager.FileProcessors
                     if (_changingDocuments)
                     {
                         _changingDocuments = false;
-
-                        // If a new document was loaded in place of the released document(s), document
-                        // selection will already have been defaulted. Otherwise, go ahead and default now.
-                        this.SafeBeginInvoke("ELI40141", () =>
-                        {
-                            if (_lastDocumentPosition != -1)
-                            {
-                                DefaultDocumentSelection();
-                            }
-                        });
+                        _documentSelectionPending = true;
                     }
                 }
                 catch (Exception ex)
@@ -1229,7 +1265,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 LoadDocumentForPagination(fileID, fileName, false);
-                DefaultDocumentSelection();
+                _documentSelectionPending = true;
             }
             catch (Exception ex)
             {
@@ -1263,7 +1299,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 LoadDocumentForPagination(fileID, fileName, false);
-                DefaultDocumentSelection();
+                _documentSelectionPending = true;
             }
             catch (Exception ex)
             {
@@ -1741,22 +1777,6 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 throw ex.AsExtract("ELI40106");
             }
-        }
-
-        /// <summary>
-        /// Selects the document that now exists at <see cref="_lastDocumentPosition"/> (or the
-        /// first document if <see cref="_lastDocumentPosition"/> is not set.
-        /// </summary>
-        void DefaultDocumentSelection()
-        {
-            this.SafeBeginInvoke("ELI40228", () =>
-                {
-                    _paginationPanel.SelectDocumentAtPosition(
-                        (_lastDocumentPosition == -1)
-                            ? 0
-                            : _lastDocumentPosition);
-                    _lastDocumentPosition = -1;
-                });
         }
 
         /// <summary>
