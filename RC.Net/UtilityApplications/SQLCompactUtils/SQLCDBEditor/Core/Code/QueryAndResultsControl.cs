@@ -338,6 +338,11 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         public event EventHandler<DataGridViewCellFormattingEventArgs> DataGridViewCellFormatting;
 
+        /// <summary>
+        /// Raised when a context menu is needed for a cell
+        /// </summary>
+        public event DataGridViewCellContextMenuStripNeededEventHandler DataGridViewCellContextMenuStripNeeded;
+
         #endregion Events
 
         #region Properties
@@ -672,6 +677,7 @@ namespace Extract.SQLCDBEditor
             _resultsGrid.RowValidating += HandleResultsGrid_RowValidating;
             _resultsGrid.RowsRemoved += HandleResultsGrid_DataBoundRowsRemoved;
             _resultsGrid.CellFormatting += HandleResultsGrid_CellFormatting;
+            _resultsGrid.CellContextMenuStripNeeded += HandleResultsGrid_CellContextMenuStripNeeded;
 
             IsLoaded = true;
         }
@@ -2086,6 +2092,26 @@ namespace Extract.SQLCDBEditor
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="DataGridView.CellContextMenuStripNeeded "/> event of the
+        /// <see cref="_resultsGrid"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataGridViewCellContextMenuStripNeededEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleResultsGrid_CellContextMenuStripNeeded(object sender, 
+            DataGridViewCellContextMenuStripNeededEventArgs e)
+        {
+            try
+            {
+                OnDataGridViewCellContextMenuStripNeeded(sender, e);
+            }
+            catch(Exception ex)
+            {
+                ex.ExtractDisplay("ELI43351");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -3063,6 +3089,21 @@ namespace Extract.SQLCDBEditor
         void OnDataGridViewCellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             var eventHandler = DataGridViewCellFormatting;
+            if (eventHandler != null)
+            {
+                eventHandler(sender, e);
+            }
+        }
+
+        /// <summary>
+        ///  Raises the <see cref="DataGridViewCellContextMenuStripNeeded"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void OnDataGridViewCellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
+        {
+            var eventHandler = DataGridViewCellContextMenuStripNeeded;
             if (eventHandler != null)
             {
                 eventHandler(sender, e);

@@ -26,6 +26,11 @@ namespace Extract.SQLCDBEditor
         event EventHandler<DataGridViewCellFormattingEventArgs> DataGridViewCellFormatting;
 
         /// <summary>
+        /// Raised when the context menu for a cell is needed
+        /// </summary>
+        event DataGridViewCellContextMenuStripNeededEventHandler DataGridViewCellContextMenuStripNeeded;
+
+        /// <summary>
         /// Creates a new <see cref="Button"/> in the plugin toolstrip for use by the plugin.
         /// </summary>
         /// <returns>The <see cref="Button"/>.</returns>

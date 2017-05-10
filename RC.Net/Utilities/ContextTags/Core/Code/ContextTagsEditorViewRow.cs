@@ -264,6 +264,40 @@ namespace Extract.Utilities.ContextTags
             }
         }
 
+        /// <summary>
+        /// Deletes the tag workflow value data associated with this instance from the database.
+        /// </summary>
+        /// <param name="context">Context that has the value to be deleted</param>
+        public void DeleteWorkflowValue(string context)
+        {
+            try
+            {
+                // If _customTag is not set, this row has not been initialized and there is nothing
+                // to delete.
+                if (_customTag != null)
+                {
+                    var Context = _database.Context.Single(c => c.Name == context);
+
+                    var TagValue = _database.TagValue
+                        .Single(t => t.ContextID == Context.ID && t.TagID == _customTag.ID && t.Workflow == _workflow);
+
+                    // Deletes will cascade.
+                    _database.TagValue.DeleteOnSubmit(TagValue);
+                    _database.SubmitChanges();
+
+                    if (HasBeenCommitted)
+                    {
+                        OnDataChanged();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI43353");
+            }
+        }
+
+
         #endregion Methods
 
         #region Overrides
@@ -607,7 +641,7 @@ namespace Extract.Utilities.ContextTags
                     .Select(tagValue => tagValue.Value)
                     .SingleOrDefault();
 
-                return ActiveWorkflow != "" && workflowContextValue != null;
+                return !String.IsNullOrEmpty(ActiveWorkflow) && workflowContextValue != null;
             }
             catch (Exception ex)
             {

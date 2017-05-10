@@ -222,6 +222,7 @@ namespace Extract.Utilities.ContextTags
 
                 pluginManager.DataChanged += HandlePluginManager_DataChanged;
                 pluginManager.DataGridViewCellFormatting += HandlePluginManager_DataGridViewCellFormatting;
+                pluginManager.DataGridViewCellContextMenuStripNeeded += HandlePluginManager_DataGridViewCellContextMenuStripNeeded;
 
                 UpdateWorkflowCombo();
             }
@@ -484,6 +485,67 @@ namespace Extract.Utilities.ContextTags
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI43350");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.CellFormatting"/> event that is available
+        /// through the <see cref="ISQLCDBEditorPluginManager.DataGridViewCellFormatting"/> event
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="DataGridViewCellFormattingEventArgs"/> instance 
+        /// containing the event data</param>
+        void HandlePluginManager_DataGridViewCellContextMenuStripNeeded(object sender, 
+            DataGridViewCellContextMenuStripNeededEventArgs e)
+        {
+            try
+            {
+                var dg = sender as DataGridView;
+
+                // Change the current cell to the cell in event args
+                if (dg != null)
+                {
+                    dg.CurrentCell = dg.Rows[e.RowIndex].Cells[e.ColumnIndex];
+                }
+
+                // Check the row index is withing the bounds of the _contextTagsView
+                if (e.RowIndex >= _contextTagsView.Count || e.RowIndex < 0) 
+                {
+                    return;
+                }
+
+                // Get the ContextTagsEditorViewRow for the current row
+                var row = _contextTagsView[e.RowIndex] as ContextTagsEditorViewRow;
+                if (row != null && row.HasBeenCommitted)
+                {
+                    // Make sure the column is within the bounds of the properties collection for the row
+                    var properties = row.GetProperties();
+                    if (e.ColumnIndex < 0 || e.ColumnIndex >= properties.Count)
+                    {
+                        return;
+                    }
+
+                    // get the ContextTagsEditorViewPropertyDescriptor for the current column
+                    var col = row.GetProperties()[e.ColumnIndex] as ContextTagsEditorViewPropertyDescriptor;
+
+                    // If the value in the column is a value for a workflow change the color
+                    if (col != null && col.IsWorkflowValue(row))
+                    {
+                        e.ContextMenuStrip = new ContextMenuStrip();
+                        e.ContextMenuStrip.Items.Add("Restore default", null,
+                            (s, a) =>
+                            {
+                                row.DeleteWorkflowValue(col.DisplayName);
+                                
+                                dg?.NotifyCurrentCellDirty(true);
+                                dg?.Refresh();
+                            });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI43352");
             }
         }
 
