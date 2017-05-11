@@ -1393,6 +1393,97 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
+        /// <summary>
+        /// Tests adding, renaming and deleting actions both in an out of a workflow.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void ConnectionRetryProperties()
+        {
+            string testDbName = "Test_ConnectionRetryProperties";
+            FileProcessingDB fileProcessingDb = null;
+
+            try
+            {
+                 fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+
+                // Set connections retry properties to known settings
+                fileProcessingDb.SetDBInfoSetting("NumberOfConnectionRetries", "10", true, false);
+                fileProcessingDb.SetDBInfoSetting("ConnectionRetryTimeout", "120", true, false);
+
+                int numberOfRetries;
+                double retryTimeOut;
+                
+                // Get the current number of retries
+                fileProcessingDb.GetConnectionRetrySettings(out numberOfRetries, out retryTimeOut);
+
+                Assert.That(numberOfRetries == 10);
+                Assert.That(retryTimeOut == 120.0);
+
+                Assert.That(fileProcessingDb.NumberOfConnectionRetries == 10);
+                Assert.That(fileProcessingDb.ConnectionRetryTimeout == 120);
+
+                // Change the settings
+                // Set connections retry properties to known settings
+                fileProcessingDb.SetDBInfoSetting("NumberOfConnectionRetries", "20", true, false);
+                fileProcessingDb.SetDBInfoSetting("ConnectionRetryTimeout", "150", true, false);
+
+                // This causes the settings to be reloaded from the DBInfo table
+                fileProcessingDb.ResetDBConnection(true);
+
+                // Get the current number of retries
+                fileProcessingDb.GetConnectionRetrySettings(out numberOfRetries, out retryTimeOut);
+
+                Assert.That(numberOfRetries == 20);
+                Assert.That(retryTimeOut == 150.0);
+
+                Assert.That(fileProcessingDb.NumberOfConnectionRetries == 20);
+                Assert.That(fileProcessingDb.ConnectionRetryTimeout == 150.0);
+
+
+                // Set using the properties
+                fileProcessingDb.NumberOfConnectionRetries = 0;
+                fileProcessingDb.ConnectionRetryTimeout = 0;
+
+                fileProcessingDb.GetConnectionRetrySettings(out numberOfRetries, out retryTimeOut);
+
+                Assert.That(numberOfRetries == 0);
+                Assert.That(retryTimeOut == 0);
+
+                Assert.That(fileProcessingDb.NumberOfConnectionRetries == 0);
+                Assert.That(fileProcessingDb.ConnectionRetryTimeout == 0);
+
+                // This causes the settings to be reloaded from the DBInfo table
+                fileProcessingDb.ResetDBConnection(true);
+
+                fileProcessingDb.GetConnectionRetrySettings(out numberOfRetries, out retryTimeOut);
+
+                Assert.That(numberOfRetries == 0);
+                Assert.That(retryTimeOut == 0);
+
+                Assert.That(fileProcessingDb.NumberOfConnectionRetries == 0);
+                Assert.That(fileProcessingDb.ConnectionRetryTimeout == 0);
+
+                // Open a different instance to see that the setting in the DBInfo table are
+                // what they were last set to
+                fileProcessingDb = new FileProcessingDB();
+                fileProcessingDb.DatabaseName = testDbName;
+                fileProcessingDb.DatabaseServer = "(local)";
+                fileProcessingDb.ResetDBConnection(true);
+
+                fileProcessingDb.GetConnectionRetrySettings(out numberOfRetries, out retryTimeOut);
+                Assert.That(numberOfRetries == 20);
+                Assert.That(retryTimeOut == 150.0);
+
+                Assert.That(fileProcessingDb.NumberOfConnectionRetries == 20);
+                Assert.That(fileProcessingDb.ConnectionRetryTimeout == 150.0);
+            }
+            finally
+            {
+                fileProcessingDb?.CloseAllDBConnections();
+                fileProcessingDb = null;
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
         #endregion Test Methods
     }
 }

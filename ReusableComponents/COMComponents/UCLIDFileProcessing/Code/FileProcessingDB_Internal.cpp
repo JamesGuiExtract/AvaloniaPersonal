@@ -3216,8 +3216,8 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 		m_iCommandTimeout = glDEFAULT_COMMAND_TIMEOUT;
 		m_bUpdateQueueEventTable = true;
 		m_bUpdateFASTTable = true;
-		m_iNumberOfRetries = giDEFAULT_RETRY_COUNT;
-		m_dRetryTimeout = gdDEFAULT_RETRY_TIMEOUT;
+		m_iNumberOfRetries = m_bNumberOfRetriesOverridden ? m_iNumberOfRetries : giDEFAULT_RETRY_COUNT;
+		m_dRetryTimeout = m_bRetryTimeoutOverridden ? m_dRetryTimeout : gdDEFAULT_RETRY_TIMEOUT;
 		m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
 		m_bAllowRestartableProcessing = false;
 
@@ -3296,15 +3296,21 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 						{
 							_lastCodePos = "150";
 
-							// Get the Connection retry count
-							m_iNumberOfRetries = asLong(getStringField(ipFields, "Value"));
+							if (!m_bNumberOfRetriesOverridden)
+							{
+								// Get the Connection retry count
+								m_iNumberOfRetries = asLong(getStringField(ipFields, "Value"));
+							}
 						}
 						else if (strValue == gstrCONNECTION_RETRY_TIMEOUT)
 						{
 							_lastCodePos = "160";
 
-							// Get the connection retry timeout
-							m_dRetryTimeout =  asDouble(getStringField(ipFields, "Value"));
+							if (!m_bRetryTimeoutOverridden)
+							{
+								// Get the connection retry timeout
+								m_dRetryTimeout = asDouble(getStringField(ipFields, "Value"));
+							}
 						}
 						else if (strValue == gstrAUTO_DELETE_FILE_ACTION_COMMENT)
 						{

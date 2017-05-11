@@ -59,7 +59,9 @@ m_bUpdateQueueEventTable(true),
 m_bUpdateFASTTable(true),
 m_bAutoDeleteFileActionComment(false),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
+m_bNumberOfRetriesOverridden(false),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
+m_bRetryTimeoutOverridden(false),
 m_nActiveFAMID(0),
 m_nFAMSessionID(0),
 m_strUPI(""),
@@ -2826,6 +2828,8 @@ STDMETHODIMP CFileProcessingDB::DuplicateConnection(IFileProcessingDB *pConnecti
 		ipThis->AdvancedConnectionStringProperties =
 			ipConnectionSource->AdvancedConnectionStringProperties;
 		ipThis->ActiveWorkflow = ipConnectionSource->ActiveWorkflow;
+		ipThis->ConnectionRetryTimeout = ipConnectionSource->ConnectionRetryTimeout;
+		ipThis->NumberOfConnectionRetries = ipConnectionSource->NumberOfConnectionRetries;
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		_ConnectionPtr ipConnection = __nullptr;
@@ -4305,6 +4309,65 @@ STDMETHODIMP CFileProcessingDB::GetActionIDForWorkflow(BSTR bstrActionName, long
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43311");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::put_NumberOfConnectionRetries(long nNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		m_iNumberOfRetries = nNewVal;
+		m_bNumberOfRetriesOverridden = true;
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43358");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_NumberOfConnectionRetries(long * pnVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI43354", pnVal != __nullptr);
+
+		*pnVal = m_iNumberOfRetries;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43355");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::put_ConnectionRetryTimeout(long nNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		m_dRetryTimeout = nNewVal;
+		m_bRetryTimeoutOverridden = true;
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43359");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_ConnectionRetryTimeout(long * pnVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI43360", pnVal != __nullptr);
+
+		*pnVal = (long)m_dRetryTimeout;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43361");
+}
+
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods
 //-------------------------------------------------------------------------------------------------

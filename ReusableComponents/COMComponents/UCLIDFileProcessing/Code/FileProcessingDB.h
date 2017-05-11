@@ -335,6 +335,10 @@ public:
 	STDMETHOD(get_UsingWorkflows)(VARIANT_BOOL *pbUsingWorkflows);
 	STDMETHOD(GetWorkflowNameFromActionID)(long nActionID, BSTR* pbstrWorkflowName);
 	STDMETHOD(GetActionIDForWorkflow)(BSTR bstrActionName, long nWorkflowID, long* pnActionID);
+	STDMETHOD(put_NumberOfConnectionRetries)(long nNewVal);
+	STDMETHOD(get_NumberOfConnectionRetries)(long *pnVal);
+	STDMETHOD(put_ConnectionRetryTimeout)(long nNewVal);
+	STDMETHOD(get_ConnectionRetryTimeout)(long *pnVal);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -508,8 +512,17 @@ private:
 	// time the reconnect attempt times out an exception will be logged.
 	int m_iNumberOfRetries;
 
+	// This flag indicates that m_iNumberOfRetires was set as a property instead
+	// of from DBInfo - if this is true m_iNumberOfRetries will not be loaded
+	// from DBInfo
+	bool m_bNumberOfRetriesOverridden;
+
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
+
+	// This flag indicates that m_dRetryTimeout was set as a property instead
+	// of from DBInfo - if this is true m_dRetryTimeout will not be loaded from DBInfo
+	bool m_bRetryTimeoutOverridden;
 
 	// Contains the timeout in seconds to keep retrying the GetFilesToProcess Transaction
 	double m_dGetFilesToProcessTransactionTimeout;
