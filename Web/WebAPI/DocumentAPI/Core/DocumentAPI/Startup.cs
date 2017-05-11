@@ -9,8 +9,10 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.Swagger.Model;
 using System;
 using System.IO;
+
 using static DocumentAPI.Utils;
 using DocumentAPI.Controllers;
+using DocumentAPI.Filters;
 
 namespace DocumentAPI
 {
@@ -114,6 +116,9 @@ namespace DocumentAPI
 
                     // Enables swagger gen to recognize [Authorize] attributes on controllers and actions
                     options.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
+
+                    // Register File Upload Operation Filter - this supports upload button in Swagger UI for Document.SubmitFile
+                    options.OperationFilter<FileUploadOperation>();
                 });
 
                 services.Configure<ServerOptions>(Configuration);

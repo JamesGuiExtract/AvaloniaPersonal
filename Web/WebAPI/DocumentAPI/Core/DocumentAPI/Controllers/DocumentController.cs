@@ -2,6 +2,7 @@
 using DocumentAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -65,18 +66,22 @@ namespace DocumentAPI.Controllers
         /// <summary>
         /// Upload a file for document processing
         /// </summary>
+        /// <param name="file">input file - NOTE: if the argument name is changed here, it MUST 
+        /// also be changed in FileUploadOperation.Apply, NonBodyParameter.Name - if not, then Swagger UI
+        /// for this action will be broken!</param>
         /// <returns>a DocumentSubmitResult, which contains error info iff there was an error</returns>
         [HttpPost("SubmitFile")]
         [Produces(typeof(DocumentSubmitResult))]
-        public async Task<IActionResult> SubmitFile()
+        public async Task<IActionResult> SubmitFile(IFormFile file)
         {
             try
             {
-                string fileName = Request?.Headers["X-FileName"];
-                Contract.Assert(!String.IsNullOrWhiteSpace(fileName), "Filename cannot be empty");
+                Contract.Assert(file.Length > 0, "Zero length file: {0}, has been submitted", file.FileName);
 
-                // Request.Body is type FrameRequestStream, inherits from Stream, which is also the parent of FileStream
-                Stream fileStream = (Stream)Request.Body;
+                var fileName = file.FileName;
+                Contract.Assert(!String.IsNullOrWhiteSpace(fileName), "Empty filename");
+
+                var fileStream = file.OpenReadStream();
                 Contract.Assert(fileStream != null, "Null filestream");
 
                 using (var data = new DocumentData(ClaimsToContext(User)))
@@ -91,7 +96,6 @@ namespace DocumentAPI.Controllers
                 return BadRequest(MakeDocumentSubmitResult(fileId: -1, isError: true, message: ee.Message, code: -1));
             }
         }
-
 
         /// <summary>
         /// submit text for processing

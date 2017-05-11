@@ -18,8 +18,8 @@ namespace DocumentAPI.Models
         /// <summary>
         /// Apply 
         /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="context"></param>
+        /// <param name="operation">Swagger operation</param>
+        /// <param name="context">unused</param>
         public void Apply(Operation operation, OperationFilterContext context)
         {
             try
