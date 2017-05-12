@@ -34,8 +34,6 @@ CRuleExecutionEnv::CRuleExecutionEnv()
 	// Setup Registry persistence item
 	ma_pSettingsCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 		new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrREG_ROOT_KEY ) );
-
-	updateSettingsFromRegistry();
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleExecutionEnv::InterfaceSupportsErrorInfo(REFIID riid)
@@ -81,6 +79,14 @@ STDMETHODIMP CRuleExecutionEnv::PushRSDFileName(BSTR strFileName, long *pnStackS
 		rThisThreadRSDFileStack.push(strFile);
 
 		long nStackSize = rThisThreadRSDFileStack.size();
+
+		// If this ruleset is the top-level ruleset, refresh settings (such as whether to add attribute
+		// history and whether to use parallelization) so that a change in settings during processing
+		// is reflected without requiring a restart (e.g., don't have to close and reopen the ruleset editor)
+		if (nStackSize == 1)
+		{
+			updateSettingsFromRegistry();
+		}
 
 		// return the stack size
 		*pnStackSize = nStackSize;
