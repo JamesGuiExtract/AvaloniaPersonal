@@ -22,6 +22,12 @@ namespace Extract.FileActionManager.Database.Test
 
         static readonly string _LABDE_EMPTY_DB = "Resources.Demo_LabDE_Empty";
 
+        static readonly string _LABDE_TEST_FILE1 = "Resources.TestImage001.tif";
+        static readonly string _LABDE_TEST_FILE2 = "Resources.TestImage002.tif";
+
+        static readonly string _ACTION_A = "ActionA";
+        static readonly string _ACTION_B = "ActionB";
+        static readonly string _ACTION_C = "ActionC";
         static readonly string _LABDE_ACTION1 = "A01_ExtractData";
         static readonly string _LABDE_ACTION2 = "A02_Verify";
         static readonly string _LABDE_ACTION3 = "A03_QA";
@@ -37,6 +43,11 @@ namespace Extract.FileActionManager.Database.Test
         /// </summary>
         static FAMTestDBManager<TestFAMWorkflowManagement> _testDbManager;
 
+        /// <summary>
+        /// Manages test files.
+        /// </summary>
+        static TestFileManager<TestFAMFileProcessing> _testFiles;
+
         #endregion Fields
 
         #region Overhead
@@ -50,6 +61,7 @@ namespace Extract.FileActionManager.Database.Test
             GeneralMethods.TestSetup();
 
             _testDbManager = new FAMTestDBManager<TestFAMWorkflowManagement>();
+            _testFiles = new TestFileManager<TestFAMFileProcessing>();
         }
 
         /// <summary>
@@ -477,6 +489,246 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
+        /// Tests Move files to different workflow
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void MoveWorkflow()
+        {
+            string testDbName = "Test_MoveWorkflow";
+            IFileProcessingDB fileProcessingDb = CreateTestDatabase(testDbName);
+            try
+            {
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION_A, true, false);
+                
+                string testfileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
+                bool alreadyExists = false;
+                EActionStatus previousStatus;
+                var fileRecord1 = fileProcessingDb.AddFile(testfileName1, _ACTION_A, -1, EFilePriority.kPriorityNormal,
+                    false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+
+                int actionA_NoWorkflow_ID = fileProcessingDb.GetActionID(_ACTION_A);
+                int actionB_NoWorkflow_ID = fileProcessingDb.GetActionID(_ACTION_B);
+
+                fileProcessingDb.StartFileTaskSession("59496DF7-3951-49B7-B063-8C28F4CD843F", fileRecord1.FileID, actionA_NoWorkflow_ID);
+
+                fileProcessingDb.RecordFAMSessionStop();
+
+                var setStatusTaskConfig = new SetActionStatusFileProcessor();
+                setStatusTaskConfig.ActionName = _ACTION_B;
+                setStatusTaskConfig.ActionStatus = (int)EActionStatus.kActionPending;
+                var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _ACTION_A, "", setStatusTask))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                var originalAS_ActionA = fileProcessingDb.GetStats(actionA_NoWorkflow_ID, false);
+                var originalAS_ActionB = fileProcessingDb.GetStats(actionB_NoWorkflow_ID, false);
+
+                int workflow1ID = fileProcessingDb.AddWorkflow(
+                    "Workflow1", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B);
+
+                fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow1ID);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                int actionA_Workflow1_ID = fileProcessingDb.GetActionID(_ACTION_A);
+                int actionB_Workflow1_ID = fileProcessingDb.GetActionID(_ACTION_B);
+
+                Func<ActionStatistics, ActionStatistics, bool> StatsAreEqual = (s1, s2) =>
+                {
+                    bool retValue = true;
+                    retValue = retValue && s1.NumBytes == s2.NumBytes;
+                    retValue = retValue && s1.NumBytesComplete == s2.NumBytesComplete;
+                    retValue = retValue && s1.NumBytesFailed == s2.NumBytesFailed;
+                    retValue = retValue && s1.NumBytesPending == s2.NumBytesPending;
+                    retValue = retValue && s1.NumBytesSkipped == s2.NumBytesSkipped;
+                    retValue = retValue && s1.NumDocuments == s2.NumDocuments;
+                    retValue = retValue && s1.NumDocumentsComplete == s2.NumDocumentsComplete;
+                    retValue = retValue && s1.NumDocumentsFailed == s2.NumDocumentsFailed;
+                    retValue = retValue && s1.NumDocumentsPending == s2.NumDocumentsPending;
+                    retValue = retValue && s1.NumDocumentsSkipped == s2.NumDocumentsSkipped;
+                    retValue = retValue && s1.NumPages == s2.NumPages;
+                    retValue = retValue && s1.NumPagesComplete == s2.NumPagesComplete;
+                    retValue = retValue && s1.NumPagesFailed == s2.NumPagesFailed;
+                    retValue = retValue && s1.NumPagesPending == s2.NumPagesPending;
+                    retValue = retValue && s1.NumPagesSkipped == s2.NumPagesSkipped;
+
+                    return retValue;
+                };
+
+                ActionStatistics blankAS = new ActionStatistics();
+
+                var afterMoveOriginalActionA = fileProcessingDb.GetStats(actionA_NoWorkflow_ID, false);
+                var afterMoveOriginalActionB = fileProcessingDb.GetStats(actionB_NoWorkflow_ID, false);
+
+                // Original actions should now be blank
+                Assert.That(StatsAreEqual(afterMoveOriginalActionA, blankAS));
+                Assert.That(StatsAreEqual(afterMoveOriginalActionB, blankAS));
+
+                var afterMoveWorkflow1ActionA = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
+                var afterMoveWorkflow1ActionB = fileProcessingDb.GetStats(actionB_Workflow1_ID, false);
+
+                Assert.That(StatsAreEqual(originalAS_ActionA, afterMoveWorkflow1ActionA));
+                Assert.That(StatsAreEqual(originalAS_ActionB, afterMoveWorkflow1ActionB));
+
+                // This should return 1 record with file ID of 
+                var testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM WorkflowFile");
+                Assert.That(testRecordset.RecordCount == 1, "There should be 1 record in WorkflowFile table");
+
+                testRecordset.Filter = "FileID = " + fileRecord1.FileID.AsString() + " AND WorkflowID = " + workflow1ID.AsString();
+                Assert.That(testRecordset.RecordCount == 1);
+
+                // Actions are different should throw and exception
+                int workflow2ID = fileProcessingDb.AddWorkflow(
+                    "Workflow2", EWorkflowType.kUndefined, _ACTION_B, _ACTION_C);
+
+                Assert.That(
+                    Assert.Throws<COMException>(() =>
+                        { fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", workflow1ID, workflow2ID); })
+                        .AsExtract("TEST").Message == "Destination workflow is missing actions in the source workflow."
+                );
+
+                // Add another FAMSession
+                fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION_B, false, true);
+
+                string testfileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
+                var fileRecord2 = fileProcessingDb.AddFile(testfileName2, _ACTION_B, -1, EFilePriority.kPriorityNormal,
+                    false, false, EActionStatus.kActionSkipped, false, out alreadyExists, out previousStatus);
+
+                fileProcessingDb.StartFileTaskSession("59496DF7-3951-49B7-B063-8C28F4CD843F", fileRecord2.FileID, actionB_Workflow1_ID);
+
+                fileProcessingDb.RecordFAMSessionStop();
+
+                var afterAddSkippedAS_ActionB = fileProcessingDb.GetStats(actionB_Workflow1_ID, false);
+
+                int workflow3ID = fileProcessingDb.AddWorkflow(
+                    "Workflow3", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B);
+
+                fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", workflow1ID, workflow3ID);
+
+                var statsForA1_W1_AfterMoveToW3 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
+                var statsForA2_W1_AfterMoveToW3 = fileProcessingDb.GetStats(actionB_Workflow1_ID, false);
+
+                Assert.That(StatsAreEqual(statsForA1_W1_AfterMoveToW3, blankAS));
+                Assert.That(StatsAreEqual(statsForA2_W1_AfterMoveToW3, blankAS));
+
+                fileProcessingDb.ActiveWorkflow = "Workflow3";
+                int actionA_Workflow3_ID = fileProcessingDb.GetActionID(_ACTION_A);
+                int actionB_Workflow3_ID = fileProcessingDb.GetActionID(_ACTION_B);
+
+
+                var statsForActionA_W3 = fileProcessingDb.GetStats(actionA_Workflow3_ID, false);
+                var statsForActionB_W3 = fileProcessingDb.GetStats(actionB_Workflow3_ID, false);
+
+                Assert.That(StatsAreEqual(originalAS_ActionA, statsForActionA_W3));
+                Assert.That(StatsAreEqual(afterAddSkippedAS_ActionB, statsForActionB_W3));
+
+
+                // Check records in workflow table
+                testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM WorkflowFile");
+                Assert.That(testRecordset.RecordCount == 2, "There should be 2 records in WorkflowFile table");
+
+                testRecordset.Filter = "FileID = " + fileRecord1.FileID.AsString() + " AND WorkflowID = " + workflow3ID.AsString();
+                Assert.That(testRecordset.RecordCount == 1);
+
+                testRecordset.Filter = "FileID = " + fileRecord2.FileID.AsString() + " AND WorkflowID = " + workflow3ID.AsString();
+                Assert.That(testRecordset.RecordCount == 1);
+
+                // Check records in FileActionStatus table
+                testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM FileActionStatus");
+                Assert.That(testRecordset.RecordCount == 3, "There should be 3 records in FileActionStatus table");
+
+                testRecordset.Filter = "ActionID = " + actionA_Workflow3_ID.AsString() + 
+                    " AND FileID = " + fileRecord1.FileID.AsString() +" AND ActionStatus = 'C'";
+                Assert.That(testRecordset.RecordCount == 1);
+
+                testRecordset.Filter = "ActionID = " + actionB_Workflow3_ID.AsString() +
+                    " AND FileID = " + fileRecord1.FileID.AsString() + " AND ActionStatus = 'P'";
+                Assert.That(testRecordset.RecordCount == 1);
+
+                testRecordset.Filter = "ActionID = " + actionB_Workflow3_ID.AsString() +
+                    " AND FileID = " + fileRecord2.FileID.AsString() + " AND ActionStatus = 'S'";
+                Assert.That(testRecordset.RecordCount == 1);
+
+                // Check records in FileActionStateTransition table
+                testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM FileActionStateTransition");
+                Assert.That(testRecordset.RecordCount == 3, "There should be 3 records in FileActionStateTransition table");
+
+                testRecordset.Filter = "ActionID = " + actionA_Workflow3_ID.AsString() + " AND ASC_From = 'P' AND ASC_To = 'R'";
+                Assert.That(testRecordset.RecordCount == 1);
+
+                testRecordset.Filter = "ActionID = " + actionA_Workflow3_ID.AsString() + " AND ASC_From = 'R' AND ASC_To = 'C'";
+                Assert.That(testRecordset.RecordCount == 1);
+
+                testRecordset.Filter = "ActionID = " + actionB_Workflow3_ID.AsString() + " AND ASC_From = 'U' AND ASC_To = 'P'";
+                Assert.That(testRecordset.RecordCount == 1);
+
+                // Check records in QueueEvent table
+                testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM QueueEvent");
+                Assert.That(testRecordset.RecordCount == 2, "There should be 2 records in QueueEvent table");
+
+                testRecordset.Filter = "ActionID = " + actionA_Workflow3_ID.AsString() + " AND FileID = " + fileRecord1.FileID.AsString();
+                Assert.That(testRecordset.RecordCount == 1);
+
+                testRecordset.Filter = "ActionID = " + actionB_Workflow3_ID.AsString() + " AND FileID = " + fileRecord2.FileID.AsString();
+                Assert.That(testRecordset.RecordCount == 1);
+
+                // Check the FAMSession table records
+                testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM FAMSession");
+                Assert.That(testRecordset.RecordCount == 3, "There should be 3 records in FAMSession table");
+
+                testRecordset.Filter = "ActionID = " + actionA_NoWorkflow_ID.AsString();
+                Assert.That(testRecordset.RecordCount == 2);
+
+                testRecordset.Filter = "ActionID = " + actionB_NoWorkflow_ID.AsString();
+                Assert.That(testRecordset.RecordCount == 1);
+
+                // Check the FileTaskSession records
+                testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM FileTaskSession");
+                Assert.That(testRecordset.RecordCount == 2, "There should be 2 records in FileTaskSession table");
+
+                testRecordset.Filter = "ActionID = " + actionA_Workflow3_ID.AsString() + " AND FileID = " + fileRecord1.FileID.AsString();
+                Assert.That(testRecordset.RecordCount == 1);
+
+                testRecordset.Filter = "ActionID = " + actionB_Workflow3_ID.AsString() + " AND FileID = " + fileRecord2.FileID.AsString();
+                Assert.That(testRecordset.RecordCount == 1);
+
+                // Check Skipped file records
+                testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM SkippedFile");
+                Assert.That(testRecordset.RecordCount == 1, "There should be 2 records in SkippedFile table");
+
+                testRecordset.Filter = "ActionID = " + actionB_Workflow3_ID.AsString() + " AND FileID = " + fileRecord2.FileID.AsString();
+                Assert.That(testRecordset.RecordCount == 1);
+            }
+            finally
+            {
+                fileProcessingDb.CloseAllDBConnections();
+                fileProcessingDb = null;
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
         #endregion Test Methods
+
+        #region Helper Methods
+
+        static IFileProcessingDB CreateTestDatabase(string DBName)
+        {
+            var fileProcessingDB = _testDbManager.GetNewDatabase(DBName);
+
+            // Create 2 actions
+            fileProcessingDB.DefineNewAction(_ACTION_A);
+            fileProcessingDB.DefineNewAction(_ACTION_B);
+            fileProcessingDB.DefineNewAction(_ACTION_C);
+
+            return fileProcessingDB;
+        }
+
+        #endregion Helper Methods
     }
+
+
+ 
+
 }

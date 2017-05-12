@@ -2569,21 +2569,24 @@ STDMETHODIMP CFileProcessingDB::RecalculateStatistics()
 		// Get the connection for the thread and save it locally.
 		ipConnection = getDBConnection();
 		
-		IStrToStrMapPtr ipMapActions = getActions(ipConnection);
-		ASSERT_RESOURCE_ALLOCATION("ELI34335", ipMapActions != __nullptr);		
+		// Create a pointer to a recordset
+		_RecordsetPtr ipActionSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI43422", ipActionSet != __nullptr);
 
-		// Loop through each action to recalculate the statistics.
-		long lSize = ipMapActions->Size;
-		vector<int> vecActionIDs(lSize);
-		for (int i = 0; i < lSize; i++)
+		string strQuery = "SELECT * FROM [Action]";
+
+		// Open the Action table
+		ipActionSet->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
+			adLockReadOnly, adCmdTable);
+
+		// Step through all records
+		while (ipActionSet->adoEOF == VARIANT_FALSE)
 		{
-			_bstr_t bstrKey;
-			_bstr_t bstrValue;
-			ipMapActions->GetKeyValue(i, bstrKey.GetAddress(), bstrValue.GetAddress());
-		
-			int nActionID = asLong(asString(bstrValue));
+			long nActionID = getLongField(ipActionSet->Fields, "ID");
 	
 			reCalculateStats(ipConnection, nActionID);
+
+			ipActionSet->MoveNext();
 		}
 
 		END_CONNECTION_RETRY(ipConnection, "ELI34329")
@@ -4405,6 +4408,31 @@ STDMETHODIMP CFileProcessingDB::SetNewPassword(BSTR bstrUserName, VARIANT_BOOL* 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43407");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::MoveFilesToWorkflowFromQuery(BSTR bstrQuery, long nSourceWorkflowID, 
+	long nDestWorkflowID)
+{
+		AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+
+
+	try
+	{
+		validateLicense();
+
+		if (!MoveFilesToWorkflowFromQuery_Internal(false, bstrQuery, nSourceWorkflowID, nDestWorkflowID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			MoveFilesToWorkflowFromQuery_Internal(true, bstrQuery, nSourceWorkflowID, nDestWorkflowID);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43404");
 }
 
 //-------------------------------------------------------------------------------------------------

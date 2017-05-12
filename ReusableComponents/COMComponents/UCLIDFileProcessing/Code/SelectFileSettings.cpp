@@ -183,7 +183,7 @@ string SelectFileSettings::buildQueryForWorkflow(UCLID_FILEPROCESSINGLib::IFileP
 }
 //--------------------------------------------------------------------------------------------------
 string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
-									  const string& strSelect, string strOrderByClause)
+									  const string& strSelect, string strOrderByClause, bool bIgnoreWorkflows)
 {
 	ASSERT_ARGUMENT("ELI27722", ipFAMDB != __nullptr);
 	
@@ -192,7 +192,7 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 	string strQuery;
 
 	long nWorkflowID = ipFAMDB->GetWorkflowID("");
-	if (nWorkflowID > 0)
+	if (!bIgnoreWorkflows && nWorkflowID > 0)
 	{
 		string strInnerQuery = buildQueryForWorkflow(ipFAMDB, strSelect, nWorkflowID);
 		strQuery = Util::Format(
@@ -205,7 +205,7 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 	{
 		IStrToStrMapPtr mapWorkflows = ipFAMDB->GetWorkflows();
 		long nWorkflowCount = mapWorkflows->Size;
-		if (nWorkflowCount > 0)
+		if (!bIgnoreWorkflows && nWorkflowCount > 0)
 		{
 			for (long i = 0; i < nWorkflowCount; i++)
 			{

@@ -198,7 +198,7 @@ void CExportFileListDlg::OnClickedOK()
 
 		// Build the query from the settings
 		string strQuery = m_ipFileSelector->BuildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUES.c_str(),
-			" ORDER BY [FAMFile].[ID]");
+			" ORDER BY [FAMFile].[ID]", false);
 
 		// Call ExportFileList() to export the file list and get a count of exported files
 		long lNumFilesExported = m_ipFAMDB->ExportFileList(strQuery.c_str(), _bstrFileName,

@@ -46,7 +46,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(GetSummaryString)(BSTR* pbstrSummaryString);
 	STDMETHOD(get_SelectingAllFiles)(VARIANT_BOOL* pbSelectingAllFiles);
 	STDMETHOD(BuildQuery)(IFileProcessingDB *pFAMDB, BSTR bstrSelect,
-			BSTR bstrOrderByClause, BSTR* pbstrQuery);
+			BSTR bstrOrderByClause, VARIANT_BOOL bIgnoreWorkflows, BSTR* pbstrQuery);
 	STDMETHOD(Reset)();
 
 // ISupportsErrorInfo

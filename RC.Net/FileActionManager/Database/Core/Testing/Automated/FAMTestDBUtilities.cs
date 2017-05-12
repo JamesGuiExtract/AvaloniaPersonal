@@ -61,7 +61,7 @@ namespace Extract.FileActionManager.Database.Test
                 resultsTable.Locale = CultureInfo.CurrentCulture;
 
                 string query = fileSelector.BuildQuery(
-                    fileProcessingDB, "[FAMFile].[ID]", "ORDER BY [FAMFile].[ID]");
+                    fileProcessingDB, "[FAMFile].[ID]", "ORDER BY [FAMFile].[ID]", false);
 
                 Recordset adoRecordset = fileProcessingDB.GetResultsForQuery(query);
 

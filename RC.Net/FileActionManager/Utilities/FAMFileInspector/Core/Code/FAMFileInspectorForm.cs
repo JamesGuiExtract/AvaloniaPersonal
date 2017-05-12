@@ -1142,7 +1142,7 @@ namespace Extract.FileActionManager.Utilities
                     {
                         query = FileSelector.BuildQuery(FileProcessingDB,
                             "[FAMFile].[ID], [FAMFile].[FileName], [FAMFile].[Pages]",
-                            " ORDER BY [FAMFile].[ID]");
+                            " ORDER BY [FAMFile].[ID]", false);
                     }
 
                     // Run the query on a background thread so the UI remains responsive as rows are

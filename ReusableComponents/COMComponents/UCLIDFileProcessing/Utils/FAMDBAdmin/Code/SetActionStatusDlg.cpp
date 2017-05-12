@@ -319,7 +319,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			// Get the query for updating files
 			string strSelect = "FAMFile.ID";
 			string strQuery =
-				asString(m_ipFileSelector->BuildQuery(m_ipFAMDB, get_bstr_t(strSelect), ""));
+				asString(m_ipFileSelector->BuildQuery(m_ipFAMDB, get_bstr_t(strSelect), "", VARIANT_FALSE));
 			uex.addDebugInfo("Query", strQuery);
 
 			// Modify the file status

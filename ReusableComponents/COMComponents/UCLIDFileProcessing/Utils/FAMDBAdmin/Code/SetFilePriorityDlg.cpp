@@ -127,7 +127,7 @@ void CSetFilePriorityDlg::OnClickedOK()
 
 		// Build the query for setting priority
 		string strQuery =
-				asString(m_ipFileSelector->BuildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUE.c_str(), ""));
+				asString(m_ipFileSelector->BuildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUE.c_str(), "", VARIANT_FALSE));
 
 		// Get the priority string
 		CString zPriority;

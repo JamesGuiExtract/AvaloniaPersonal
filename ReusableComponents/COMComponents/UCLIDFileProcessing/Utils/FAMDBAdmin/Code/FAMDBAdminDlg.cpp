@@ -16,6 +16,7 @@
 #include "ManageUsersDlg.h"
 #include "ManageMetadataFieldsDlg.h"
 #include "ManageAttributeSets.h"
+#include "MoveToWorkflowForm.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -135,6 +136,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_MANAGE_RULE_COUNTERS, &CFAMDBAdminDlg::OnManageRuleCounters)
 	//}}AFX_MSG_MAP
 	ON_CBN_SELCHANGE(IDC_WORKFLOW_COMBO, &CFAMDBAdminDlg::OnCbnSelchangeWorkflowCombo)
+	ON_COMMAND(ID_TOOLS_MOVE_FILES_TO_WORKFLOW, &CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -984,6 +986,29 @@ void CFAMDBAdminDlg::OnCbnSelchangeWorkflowCombo()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42073");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow()
+{
+	try
+	{
+		// Display the WorkflowManagement dialog
+		MoveToWorkflowForm ^moveToWorkflow = gcnew MoveToWorkflowForm(m_ipFAMDB);
+		NativeWindow ^currentWindow = __nullptr;
+		try
+		{
+			IntPtr managedHWND(this->GetSafeHwnd());
+			currentWindow = NativeWindow::FromHandle(managedHWND);
+			moveToWorkflow->ShowDialog(currentWindow);
+			UpdateSummaryTab();
+		}
+		finally
+		{
+			if (currentWindow)
+				currentWindow->ReleaseHandle();
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43362");
 }
 
 //-------------------------------------------------------------------------------------------------

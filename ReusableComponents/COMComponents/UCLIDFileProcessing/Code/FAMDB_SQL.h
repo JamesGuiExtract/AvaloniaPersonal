@@ -1871,3 +1871,25 @@ static const string gstrGET_WORKFLOW_STATUS =
 "SET NOCOUNT OFF \r\n"
 "END CATCH";
 
+// Helper queries for Moving workflows
+static const string gstrDROP_TEMP_FILESELECTION_PROC =
+"IF OBJECT_ID('tempdb..#FileSelectionProc') IS NOT NULL DROP PROCEDURE #FileSelectionProc";
+
+static const string gstrCREATE_TEMP_FILESELECTION_PROC =
+"CREATE PROCEDURE #fileSelectionProc AS													 \r\n"
+"BEGIN																					 \r\n"
+"																						 \r\n"
+"<SelectionQuery>																		 \r\n"
+"																						 \r\n"
+"END																					     ";
+
+static const string gstrCREATE_TEMP_SELECTEDFILESTOMOVE = 
+"if OBJECT_ID('tempdb..#SelectedFilesToMove') is not null DROP TABLE #SelectedFilesToMove\r\n"
+"																						 \r\n"
+"CREATE TABLE #SelectedFilesToMove(														 \r\n"
+"	ID INT																				 \r\n"
+")																						 \r\n"
+"																						 \r\n"
+"INSERT INTO #SelectedFilesToMove EXEC #fileSelectionProc								 \r\n"
+"DROP PROCEDURE #fileSelectionProc															 ";
+

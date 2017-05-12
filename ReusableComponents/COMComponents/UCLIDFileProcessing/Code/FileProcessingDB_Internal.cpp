@@ -7053,3 +7053,47 @@ void CFileProcessingDB::initOutputFileMetadataFieldValue(_ConnectionPtr ipConnec
 		setMetadataFieldValue(ipConnection, nFileID, strOutputFileMetadataField, strExpandedPath);
 	}
 }
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::verifyDestinationActions(ADODB::_ConnectionPtr &ipConnection, std::string &strSelectionFrom)
+{
+	string strMissingActions = Util::Format(
+		"SELECT DISTINCT SA.ASCName as MissingAction \r\n"
+		"%s "
+		"WHERE DA.ID IS NULL",
+		strSelectionFrom.c_str());
+
+	// Check if there are Actions missing in the dest
+	_RecordsetPtr ipMissingActions(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI43438", ipMissingActions != __nullptr);
+
+	ipMissingActions->Open(strMissingActions.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
+		adLockReadOnly, adCmdText);
+
+	if (!asCppBool(ipMissingActions->adoEOF))
+	{
+		UCLIDException ue("ELI43439", "Destination workflow is missing actions in the source workflow.");
+		vector<string> vecMissingActions;
+		while (!asCppBool(ipMissingActions->adoEOF))
+		{
+			vecMissingActions.push_back(getStringField(ipMissingActions->Fields, "MissingAction"));
+			ipMissingActions->MoveNext();
+		}
+		ue.addDebugInfo("MissingActions", asString(vecMissingActions, true, ","));
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::createTempTableOfSelectedFiles(ADODB::_ConnectionPtr &ipConnection, std::string &strQueryFrom)
+{
+	vector<string> vecCreateTemp;
+	vecCreateTemp.push_back(gstrDROP_TEMP_FILESELECTION_PROC);
+
+	string strCreateTempProc = gstrCREATE_TEMP_FILESELECTION_PROC;
+	replaceVariable(strCreateTempProc, "<SelectionQuery>", strQueryFrom);
+
+	vecCreateTemp.push_back(strCreateTempProc);
+
+	vecCreateTemp.push_back(gstrCREATE_TEMP_SELECTEDFILESTOMOVE);
+
+	executeVectorOfSQL(ipConnection, vecCreateTemp);
+}

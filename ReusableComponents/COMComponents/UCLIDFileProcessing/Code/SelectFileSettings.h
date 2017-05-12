@@ -80,7 +80,7 @@ public:
 	// strSelect = "FAMFile.ID, FAMFile.Priority", etc
 	// NOTE2: It can be assumed that the FAMFile table will be included in the query.
 	string buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
-					  const string& strSelect, string strOrderByClause);
+					  const string& strSelect, string strOrderByClause, bool bIgnoreWorkflows);
 
 	// Builds a select query with the specified values selected for the current settings
 	// in the specified workflow.

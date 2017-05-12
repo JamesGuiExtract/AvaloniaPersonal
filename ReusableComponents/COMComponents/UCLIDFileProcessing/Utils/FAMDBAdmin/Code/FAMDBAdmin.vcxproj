@@ -180,6 +180,7 @@
     <ClCompile Include="ManageTagsDlg.cpp" />
     <ClCompile Include="ManageUserCountersDlg.cpp" />
     <ClCompile Include="ManageUsersDlg.cpp" />
+    <ClCompile Include="MoveToWorkflowForm.cpp" />
     <ClCompile Include="RenameActionDlg.cpp" />
     <ClCompile Include="SetActionStatusDlg.cpp" />
     <ClCompile Include="SetFilePriorityDlg.cpp" />
@@ -209,6 +210,9 @@
     <ClInclude Include="ManageTagsDlg.h" />
     <ClInclude Include="ManageUserCountersDlg.h" />
     <ClInclude Include="ManageUsersDlg.h" />
+    <ClInclude Include="MoveToWorkflowForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="RenameActionDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SetActionStatusDlg.h" />
@@ -277,6 +281,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AddModifyWorkflowForm.resx">
       <DependentUpon>AddModifyWorkflowForm.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MoveToWorkflowForm.resx">
+      <DependentUpon>MoveToWorkflowForm.h</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WorkflowManagement.resx">
       <DependentUpon>WorkflowManagement.h</DependentUpon>

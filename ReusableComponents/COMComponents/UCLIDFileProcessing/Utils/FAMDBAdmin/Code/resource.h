@@ -186,13 +186,14 @@
 #define ID_MANAGE_ATTRIBUTESETS         32809
 #define ID_TOOLS_COUNTERS               32810
 #define ID_MANAGE_RULE_COUNTERS         32811
+#define ID_TOOLS_MOVE_FILES_TO_WORKFLOW 32812
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        148
-#define _APS_NEXT_COMMAND_VALUE         32812
+#define _APS_NEXT_COMMAND_VALUE         32813
 #define _APS_NEXT_CONTROL_VALUE         2125
 #define _APS_NEXT_SYMED_VALUE           2122
 #endif

@@ -10486,3 +10486,227 @@ bool CFileProcessingDB::GetActionIDForWorkflow_Internal(bool bDBLocked, BSTR bst
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BSTR bstrQuery, 
+	long nSourceWorkflowID, long nDestWorkflowID)
+{
+	try
+	{
+		try
+		{
+			string strQueryFrom = asString(bstrQuery);
+			ASSERT_ARGUMENT("ELI43405", !strQueryFrom.empty());
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
+
+			// Create the #SelectedFilesToMove temp table;
+			createTempTableOfSelectedFiles(ipConnection, strQueryFrom);
+
+			// Query to add the new WorkflowChange record
+			string strWorkflowChangeQuery = Util::Format(
+				"INSERT INTO[dbo].[WorkflowChange] ([DestWorkflowID]) "
+				"OUTPUT INSERTED.ID "
+				"VALUES (%li);", nDestWorkflowID);
+
+			long nWorkflowChangeID = 0;
+			executeCmdQuery(ipConnection, strWorkflowChangeQuery, false, &nWorkflowChangeID);
+
+			string strSourceWorkflowSelection;
+			switch (nSourceWorkflowID)
+			{
+			case -1: // No workflow
+				strSourceWorkflowSelection = "SA.WorkflowID IS NULL ";
+				break;
+			case 0: // All workflows
+				strSourceWorkflowSelection = 
+					Util::Format("SA.WorkflowID IS NOT NULL AND SA.WorkflowID <> %li", nDestWorkflowID);
+				break;
+			default:
+				strSourceWorkflowSelection = Util::Format("SA.WorkflowID = %li", nSourceWorkflowID);
+			}
+
+			string strDestWorkflowSelection = Util::Format("DA.WorkflowID = %li", nDestWorkflowID);
+
+			string strSelectionFrom = Util::Format(
+				"FROM #SelectedFilesToMove AS SQ \r\n"
+				"INNER JOIN FileActionStatus AS FAS ON SQ.ID = FAS.FileID \r\n"
+				"INNER JOIN [Action] AS SA ON FAS.ActionID = SA.ID AND %s \r\n"
+				"LEFT JOIN [Action] AS DA ON SA.ASCName = DA.ASCName AND %s \r\n",
+				strSourceWorkflowSelection.c_str(), strDestWorkflowSelection.c_str());
+
+			verifyDestinationActions(ipConnection, strSelectionFrom);
+
+			string strSelectedFilesWithSourceAndDest = Util::Format(
+				"SELECT DISTINCT \r\n"
+				"	SQ.ID as FileID, %li as WorkflowChangeID, SA.ID AS SourceActionID, DA.ID AS DestActionID, \r\n"
+				"	SA.WorkflowID AS SourceWorkflowID, DA.WorkflowID AS DestWorkflowID \r\n"
+				"%s",
+				nWorkflowChangeID, strSelectionFrom.c_str());
+
+			// Add files to the workflowChangeFile table
+			string strWorkflowChangeFile = Util::Format(
+				"INSERT INTO [dbo].[WorkflowChangeFile] "
+				"([FileID] "
+				"	, [WorkflowChangeID] "
+				"	, [SourceActionID] "
+				"	, [DestActionID] "
+				"	, [SourceWorkflowID] "
+				"	, [DestWorkflowID]) %s ", strSelectedFilesWithSourceAndDest.c_str());
+
+			vector<string> vecUpdateQueries;
+			vecUpdateQueries.push_back(strWorkflowChangeFile);
+		    
+			if (nSourceWorkflowID == -1)
+			{
+				vecUpdateQueries.push_back(Util::Format(
+					"INSERT INTO [dbo].[WorkflowFile] "
+					"([WorkflowID] "
+					"	, [FileID]) "
+					"SELECT DISTINCT DestWorkflowID, FileID "
+					"FROM WorkflowChangeFile "
+					"WHERE WorkflowChangeID = %li;", nWorkflowChangeID));
+			}
+			else
+			{
+				vecUpdateQueries.push_back(Util::Format(
+					"UPDATE       [dbo].WorkflowFile "
+					"SET                WorkflowID = WorkflowChangeFile.DestWorkflowID "
+					"FROM            WorkflowChangeFile INNER JOIN "
+					"WorkflowFile "
+					"ON WorkflowChangeFile.FileID = WorkflowFile.FileID "
+					"AND WorkflowChangeFile.SourceWorkflowID = WorkflowFile.WorkflowID "
+					"WHERE (WorkflowChangeFile.WorkflowChangeID = %li); ", nWorkflowChangeID));
+			}
+			
+			// FileActionStatus table
+			vecUpdateQueries.push_back(Util::Format(
+				"UPDATE [dbo].[FileActionStatus] "
+				"	SET [ActionID] = WorkflowChangeFile.DestActionID "
+				"FROM WorkflowChangeFile INNER JOIN FileActionStatus "
+				"	ON WorkflowChangeFile.SourceActionID = FileActionStatus.ActionID "
+				"		AND WorkflowChangeFile.FileID = FileActionStatus.FileID "
+				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
+
+			// FAMSession - May need special handling 
+			// To simplify, just change the FAMSession ActionID to the no assigned workflow action id
+			vecUpdateQueries.push_back(Util::Format(
+				"UPDATE [dbo].[FAMSession] "
+				"SET [ActionID] = A2.[ID] "
+				"FROM [FAMSession] "
+				"INNER JOIN [FileTaskSession] ON [FAMSession].ID = [FileTaskSession].FAMSessionID "
+				"INNER JOIN [WorkflowChangeFile] ON [WorkflowChangeFile].FileID = [FileTaskSession].FileID "
+				"AND [WorkflowChangeFile].WorkflowChangeID = %li "
+				"AND [FileTaskSession].ActionID = [WorkflowChangeFile].SourceActionID "
+				"INNER JOIN [Action] AS A1 "
+				"ON A1.[ID] = [FAMSession].ActionID INNER JOIN "
+				"[Action] AS A2 ON A1.[ASCName] = A2.[ASCName] AND A2.[WorkflowID] IS NULL ", 
+				nWorkflowChangeID));
+
+			// FileTaskSession
+			vecUpdateQueries.push_back(Util::Format(
+				"UPDATE       FileTaskSession "
+				"SET                ActionID = WorkflowChangeFile.DestActionID "
+				"FROM            FileTaskSession INNER JOIN "
+				"WorkflowChangeFile "
+				"ON FileTaskSession.FileID = WorkflowChangeFile.FileID "
+				"AND FileTaskSession.ActionID = WorkflowChangeFile.SourceActionID "
+				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
+
+			// FileActionComment
+			vecUpdateQueries.push_back(Util::Format(
+				"UPDATE [dbo].[FileActionComment] "
+				"	SET [ActionID] = WorkflowChangeFile.DestActionID "
+				"FROM WorkflowChangeFile INNER JOIN "
+				"	FileActionComment ON WorkflowChangeFile.FileID = FileActionComment.FileID "
+				"	AND WorkflowChangeFile.SourceActionID = FileActionComment.ActionID "
+				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
+
+			// FileActionStateTransistion
+			vecUpdateQueries.push_back(Util::Format(
+				"UPDATE     [dbo].FileActionStateTransition "
+				"	SET                ActionID = WorkflowChangeFile.DestActionID "
+				"FROM            WorkflowChangeFile INNER JOIN "
+				"	FileActionStateTransition ON WorkflowChangeFile.FileID = FileActionStateTransition.FileID "
+				"		AND FileActionStateTransition.ActionID = WorkflowChangeFile.SourceActionID "
+				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
+
+			// FTPEventHistory
+			vecUpdateQueries.push_back(Util::Format(
+				"UPDATE       FTPEventHistory "
+				"SET                ActionID = WorkflowChangeFile.DestActionID "
+				"FROM            FTPEventHistory INNER JOIN "
+				"WorkflowChangeFile ON FTPEventHistory.FileID = WorkflowChangeFile.FileID "
+				"AND WorkflowChangeFile.SourceActionID = FTPEventHistory.ActionID "
+				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
+
+
+			// QueuedActionStatusChange
+			vecUpdateQueries.push_back(Util::Format(
+				"UPDATE       QueuedActionStatusChange "
+				"SET                ActionID = WorkflowChangeFile.DestActionID "
+				"FROM            QueuedActionStatusChange INNER JOIN "
+				"WorkflowChangeFile "
+				"ON QueuedActionStatusChange.FileID = WorkflowChangeFile.FileID "
+				"AND QueuedActionStatusChange.ActionID = WorkflowChangeFile.SourceActionID "
+				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
+
+			// QueueEvent
+			vecUpdateQueries.push_back(Util::Format(
+				"UPDATE       QueueEvent "
+				"SET                ActionID = WorkflowChangeFile.DestActionID "
+				"FROM            QueueEvent INNER JOIN "
+				"WorkflowChangeFile "
+				"ON QueueEvent.FileID = WorkflowChangeFile.FileID "
+				"AND QueueEvent.ActionID = WorkflowChangeFile.SourceActionID "
+				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
+
+			// SkippedFile
+			vecUpdateQueries.push_back(Util::Format(
+				"UPDATE       SkippedFile "
+				"SET                ActionID = WorkflowChangeFile.DestActionID "
+				"FROM            SkippedFile INNER JOIN "
+				"WorkflowChangeFile "
+				"ON SkippedFile.FileID = WorkflowChangeFile.FileID "
+				"AND SkippedFile.ActionID = WorkflowChangeFile.SourceActionID "
+				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
+
+			// WorkItemGroup 
+			vecUpdateQueries.push_back(Util::Format(
+				"UPDATE       WorkItemGroup "
+				"SET                ActionID = WorkflowChangeFile.DestActionID "
+				"FROM            WorkItemGroup INNER JOIN "
+				"WorkflowChangeFile "
+				"ON WorkItemGroup.FileID = WorkflowChangeFile.FileID "
+				"AND WorkItemGroup.ActionID = WorkflowChangeFile.SourceActionID "
+				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
+
+			executeVectorOfSQL(ipConnection, vecUpdateQueries);
+
+			// Recalculate the action statistics - May be able to get a list of all the source and dest actions and 
+			// recalculate only those actions.
+			getThisAsCOMPtr()->RecalculateStatistics();
+
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI43401");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43402");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------

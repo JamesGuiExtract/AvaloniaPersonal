@@ -1935,6 +1935,11 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Set a new password for the specified user
 		// NOTE:	Call will fail if not currently logged in as admin.
 		[id(184), helpstring("method SetNewPassword")] HRESULT SetNewPassword([in] BSTR bstrUserName, [out, retval] VARIANT_BOOL* pbSuccess);
+		// PROMISE: Moves the files selected by the query that are in the SourceWorkflow to the DestWorkflow
+		//			nSourceWorkflowID = 0 it will be to only move files that have a workflow assigned
+		//			nSourceWorkflowID = -1 will be to only move files that have not been assigned to any workflow
+		[id(185), helpstring("method MoveFilesToWorkflowFromQuery")] HRESULT MoveFilesToWorkflowFromQuery(
+			[in] BSTR bstrQuery, [in] long nSourceWorkflowID, [in] long nDestWorkflowID);
 	};
 
 	[
@@ -2639,10 +2644,13 @@ library UCLID_FILEPROCESSINGLib
 		//			bstrSelect- The columns the query should select. For example:
 		//				"FAMFile.ID, FAMFile.FileName" or "FAMFile.ID, FAMFile.Priority".
 		//				NOTE: It can be assumed that the FAMFile table will be included in the query.
+		//			bIgnoreWorkflows - if VARIANT_TRUE the returned query doesn't include any workflow
+		//				references. if VARIANT_FALSE if workflows are defined the state of the ActiveWorkflow
+		//				property on pFAMDB will be used to build the query
 		// RETURNS: pbstrQuery- The query to select files based on the current settings.
 		[id(5), helpstring("method BuildQuery")] HRESULT BuildQuery(
 			[in] IFileProcessingDB *pFAMDB, [in] BSTR bstrSelect, [in] BSTR bstrOrderByClause,
-			[out, retval] BSTR* pbstrQuery);
+			[in] VARIANT_BOOL bIgnoreWorkflows, [out, retval] BSTR* pbstrQuery);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Resets all configured condition and subset settings.
 		[id(6), helpstring("method Reset")] HRESULT Reset();

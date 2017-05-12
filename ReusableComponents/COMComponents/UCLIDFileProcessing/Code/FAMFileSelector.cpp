@@ -203,7 +203,8 @@ STDMETHODIMP CFAMFileSelector::get_SelectingAllFiles(VARIANT_BOOL* pbSelectingAl
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMFileSelector::BuildQuery(IFileProcessingDB *pFAMDB,
-	BSTR bstrSelect, BSTR bstrOrderByClause, BSTR* pbstrQuery)
+	BSTR bstrSelect, BSTR bstrOrderByClause, VARIANT_BOOL bIgnoreWorkflows,
+	BSTR* pbstrQuery)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -216,7 +217,7 @@ STDMETHODIMP CFAMFileSelector::BuildQuery(IFileProcessingDB *pFAMDB,
 		ASSERT_ARGUMENT("ELI35703", pbstrQuery != __nullptr);
 
 		string strQuery = m_settings.buildQuery(ipFAMDB, asString(bstrSelect),
-			asString(bstrOrderByClause));
+			asString(bstrOrderByClause), asCppBool(bIgnoreWorkflows));
 		*pbstrQuery = get_bstr_t(strQuery).Detach();
 
 		return S_OK;
