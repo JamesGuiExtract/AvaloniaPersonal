@@ -287,7 +287,7 @@ namespace Extract.AttributeFinder.Rules
 
                 RuleSet ruleSet = LoadRuleSet(pAFDoc);
 
-                IEnumerable<ComAttribute> foundAttributes = GetFoundAttributes(ruleSet, pAttribute);
+                IEnumerable<ComAttribute> foundAttributes = GetFoundAttributes(ruleSet, pAttribute, pAFDoc);
 
                 // Create the dictionary used to store the expression variables.
                 InitializeVariables();
@@ -338,7 +338,7 @@ namespace Extract.AttributeFinder.Rules
 
                     foreach (ComAttribute attribute in sourceAttributes)
                     {
-                        foundAttributes.AddRange(GetFoundAttributes(ruleSet, attribute));
+                        foundAttributes.AddRange(GetFoundAttributes(ruleSet, attribute, pAFDoc));
                     }
 
                     // Use the found attributes to populate the dictionary of expression variables.
@@ -710,8 +710,9 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="ruleSet">The <see cref="RuleSet"/> to run.</param>
         /// <param name="attribute">The <see cref="ComAttribute"/> whose value should be processed.
         /// </param>
+        /// <param name="sourceDoc">The <see cref="AFDocument"/> from which the attribute-to-be-scored was found.</param>
         /// <returns>The <see cref="ComAttribute"/>s found by the <see paramref="ruleSet"/>.</returns>
-        static IEnumerable<ComAttribute> GetFoundAttributes(RuleSet ruleSet, ComAttribute attribute)
+        static IEnumerable<ComAttribute> GetFoundAttributes(RuleSet ruleSet, ComAttribute attribute, AFDocument sourceDoc)
         {
             // Use ComObjectReleaser on the RuleExecutionSession so that the current RSD file name is
             // handled correctly.
@@ -722,7 +723,9 @@ namespace Extract.AttributeFinder.Rules
                 session.SetRSDFileName(ruleSet.FileName);
 
                 // Turn the supplied attribute into an AFDocument to run the rules against.
-                AFDocument afDoc = new AFDocument();
+                // Use a clone of the source document so that the rule execution stack and any document tags are passed on to the rules
+                // https://extract.atlassian.net/browse/ISSUE-14666
+                AFDocument afDoc = sourceDoc.PartialClone(false, false);
                 afDoc.Attribute = attribute;
 
                 IUnknownVector foundAttributes = ruleSet.ExecuteRulesOnText(afDoc, null, "", null);
