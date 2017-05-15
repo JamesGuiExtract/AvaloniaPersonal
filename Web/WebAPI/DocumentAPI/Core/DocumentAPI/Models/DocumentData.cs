@@ -277,7 +277,7 @@ namespace DocumentAPI.Models
                                              false,                                                    // force status change
                                              false,                                                    // file modified
                                              UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
-                                             true,                                                     // skip page count
+                                             false,                                                    // skip page count
                                              out bool bAlreadyExists,                                  // returns whether file already existed
                                              out EActionStatus previousActionStatus);                  // returns the previous action status (if file already existed)
 

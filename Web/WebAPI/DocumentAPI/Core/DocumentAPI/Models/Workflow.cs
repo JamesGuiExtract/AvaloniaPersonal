@@ -158,7 +158,6 @@ namespace DocumentAPI.Models
             }
             private set
             {
-                Contract.Assert(!String.IsNullOrWhiteSpace(value), "OutputAttributeSet is a required value and cannot be empty");
                 _outputAttributeSet = value;
             }
         }

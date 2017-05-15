@@ -220,8 +220,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpatialStringChecksum", "..
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResolutionNormalizer2", "..\..\ResolutionNormalizer2\Code\ResolutionNormalizer2.vcxproj", "{6FF90A76-C143-4FB9-BD15-D9EB8E1E2C44}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TokenGen", "..\..\..\..\Web\WebAPI\Utilities\TokenGen\TokenGen\TokenGen.csproj", "{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1386,22 +1384,6 @@ Global
 		{6FF90A76-C143-4FB9-BD15-D9EB8E1E2C44}.Release|Win32.ActiveCfg = Release|Win32
 		{6FF90A76-C143-4FB9-BD15-D9EB8E1E2C44}.Release|Win32.Build.0 = Release|Win32
 		{6FF90A76-C143-4FB9-BD15-D9EB8E1E2C44}.Release|x86.ActiveCfg = Release|Win32
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Debug|Win32.Build.0 = Debug|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Debug|x86.Build.0 = Debug|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Release|Win32.ActiveCfg = Release|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Release|Win32.Build.0 = Release|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Release|x86.ActiveCfg = Release|Any CPU
-		{AF0C4193-9EDA-4FCE-B16A-1E957FA5A0C7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

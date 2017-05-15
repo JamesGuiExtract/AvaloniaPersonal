@@ -40,7 +40,7 @@ namespace DocumentAPI
             if (name.IsEquivalent("HCData") ||
                 name.IsEquivalent("MCData") ||
                 name.IsEquivalent("LCData") ||
-                name.IsEquivalent("Clues")   ||
+                name.IsEquivalent("Clues")  ||
                 name.IsEquivalent("Manual") )
             {
                 return true;

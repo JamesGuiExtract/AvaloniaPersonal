@@ -88,6 +88,7 @@ namespace DocumentAPI
 
                 // TODO - when project is renamed, this xml file name must be changed.
                 var xmlPath = Path.Combine(basepath, "DocumentAPI.xml");
+                Log.WriteLine(Inv($"Swagger file: {xmlPath}"), "ELI43368");
 
                 services.AddSwaggerGen();
                 services.ConfigureSwaggerGen(options =>

@@ -4,27 +4,6 @@ using System.Drawing;                   // for Point
 namespace DocumentAPI.Models
 {
     /// <summary>
-    /// enum for Attribute Type
-    /// </summary>
-    public enum AttributeType
-    {
-        /// <summary>
-        /// The attribute is a redaction
-        /// </summary>
-        Redaction = 1,
-
-        /// <summary>
-        /// The attribute is a clue
-        /// </summary>
-        Clue,
-
-        /// <summary>
-        /// the attribute is a Data element
-        /// </summary>
-        Data
-    };
-
-    /// <summary>
     /// enumeration that represents the relative confidence in a particular redacted element
     /// </summary>
     public enum ConfidenceLevel

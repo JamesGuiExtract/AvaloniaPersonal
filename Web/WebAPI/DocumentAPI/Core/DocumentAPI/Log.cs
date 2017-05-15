@@ -26,9 +26,11 @@ namespace DocumentAPI
                                      [CallerFilePath] string filePath = "",
                                      [CallerLineNumber] int sourceLineNumber = 0)
         {
-            var filename = Path.GetFileName(filePath);
-            var message = Utils.Inv($"{text}, Source file: {filename}, Function: {memberName}, line number: {sourceLineNumber}");
-            ExtractException.Log(eliCode, message);
+            var ee = new ExtractException(eliCode, text);
+            ee.AddDebugData("Caller Name", memberName, encrypt: false);
+            ee.AddDebugData("Caller File", filePath, encrypt: false);
+            ee.AddDebugData("Called from line", sourceLineNumber, encrypt: false);
+            ee.Log();
         }
 
         /// <summary>

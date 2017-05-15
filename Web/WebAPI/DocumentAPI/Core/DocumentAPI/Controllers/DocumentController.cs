@@ -137,10 +137,11 @@ namespace DocumentAPI.Controllers
         {
             if (String.IsNullOrWhiteSpace(Id))
             {
-                var result = MakeListProcessingStatus(isError: true, 
-                                                      message: "stringId argument is empty", 
-                                                      status: DocumentProcessingStatus.Failed, 
-                                                      code: -1);
+                var result = MakeListOf(
+                                MakeProcessingStatus(status: DocumentProcessingStatus.Failed, 
+                                                     isError: true, 
+                                                     message: "stringId argument is empty", 
+                                                     code: -1));
                 return BadRequest(result);
             }
 

@@ -49,32 +49,6 @@ namespace DocumentAPI
         }
 
         /// <summary>
-        /// Make a list of Processing status, with one ProcessingStatus element.
-        /// </summary>
-        /// <param name="isError">true if error</param>
-        /// <param name="message">error mesasge</param>
-        /// <param name="status">document processing status instance</param>
-        /// <param name="code">error code (-1 for error, 0 for no errror)</param>
-        /// <returns>list of ProcessingStatus objects</returns>
-        public static List<ProcessingStatus> MakeListProcessingStatus(bool isError, 
-                                                                      string message, 
-                                                                      DocumentProcessingStatus status,
-                                                                      int code = 0)
-        {
-            var ps = new ProcessingStatus
-            {
-                Error = MakeError(isError, message, code: 0),
-                DocumentStatus = status,
-                StatusText = Enum.GetName(typeof(DocumentProcessingStatus), status)
-            };
-
-            List<ProcessingStatus> lps = new List<ProcessingStatus>();
-            lps.Add(ps);
-
-            return lps;
-        }
-
-        /// <summary>
         /// makes a document attribute set for returning an error
         /// </summary>
         /// <param name="message">error mesasge</param>
@@ -160,18 +134,6 @@ namespace DocumentAPI
         }
 
         /// <summary>
-        /// make a default initialized SpatialLineZone
-        /// </summary>
-        /// <returns>a default SpatialLineZone</returns>
-        public static SpatialLineZone MakeDefaultSpatialLineZone()
-        {
-            return new SpatialLineZone()
-            {
-                PageNumber = -1
-            };
-        }
-
-        /// <summary>
         /// makes a DocumentSubmitResult
         /// </summary>
         /// <param name="fileId">file id</param>
@@ -211,6 +173,7 @@ namespace DocumentAPI
             return new ProcessingStatus()
             {
                 DocumentStatus = status,
+                StatusText = Enum.GetName(typeof(DocumentProcessingStatus), status),
                 Error = MakeError(isError, message, code)
             };
         }
