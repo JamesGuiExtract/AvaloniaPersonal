@@ -132,16 +132,15 @@ namespace DocumentAPI.Controllers
         /// <param name="Id">file Id</param>
         /// <returns>List of ProcessingStatus</returns>
         [HttpGet("GetStatus/{Id}")]
-        [Produces(typeof(List<ProcessingStatus>))]
+        [Produces(typeof(ProcessingStatus))]
         public IActionResult GetStatus(string Id)
         {
             if (String.IsNullOrWhiteSpace(Id))
             {
-                var result = MakeListOf(
-                                MakeProcessingStatus(status: DocumentProcessingStatus.Failed, 
-                                                     isError: true, 
-                                                     message: "stringId argument is empty", 
-                                                     code: -1));
+                var result = MakeProcessingStatus(status: DocumentProcessingStatus.Failed, 
+                                                  isError: true, 
+                                                  message: "stringId argument is empty", 
+                                                  code: -1);
                 return BadRequest(result);
             }
 
@@ -157,11 +156,10 @@ namespace DocumentAPI.Controllers
             {
                 Log.WriteLine(ee);
 
-                var err = MakeListOf(
-                            MakeProcessingStatus(DocumentProcessingStatus.NotApplicable,
-                                                 isError: true,
-                                                 message: ee.Message,
-                                                 code: -1));
+                var err = MakeProcessingStatus(DocumentProcessingStatus.NotApplicable,
+                                               isError: true,
+                                               message: ee.Message,
+                                               code: -1);
                 return BadRequest(err);
             }
         }

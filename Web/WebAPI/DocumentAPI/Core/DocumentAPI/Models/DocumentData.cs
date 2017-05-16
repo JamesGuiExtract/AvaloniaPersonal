@@ -341,7 +341,7 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="stringId">file id</param>
         /// <returns>List of ProcessingStatus, can contain error info</returns>
-        public List<ProcessingStatus> GetStatus(string stringId)
+        public ProcessingStatus GetStatus(string stringId)
         {
             try
             {
@@ -365,7 +365,7 @@ namespace DocumentAPI.Models
                 }
 
                 var ps = MakeProcessingStatus(ConvertToStatus(status, fileId));
-                return MakeListOf(ps);
+                return ps;
             }
             catch (ExtractException ee)
             {

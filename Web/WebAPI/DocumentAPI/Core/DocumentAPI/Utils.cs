@@ -179,16 +179,6 @@ namespace DocumentAPI
         }
 
         /// <summary>
-        /// routine to simplify making a List of some type with a single item.
-        /// </summary>
-        /// <param name="item">the item to add to the list</param>
-        /// <returns>List of T, with the input item added</returns>
-        public static List<T> MakeListOf<T>(T item)
-        {
-            return new List<T> { item };
-        }
-
-        /// <summary>
         /// returns the method name of the caller - do NOT set the default argument!
         /// </summary>
         /// <param name="caller">do not set this!</param>

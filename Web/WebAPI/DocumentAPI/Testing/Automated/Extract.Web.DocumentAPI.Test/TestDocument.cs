@@ -239,8 +239,8 @@ namespace Extract.Web.DocumentAPI.Test
                     for (int i = 1; i <= 10; ++i)
                     {
                         var result = data.GetStatus(stringId: i.ToString());
-                        Assert.IsTrue(result.Count > 0, "Empty result was returned");
-                        var status = result[0];
+                        Assert.IsTrue(result != null, "Empty result was returned");
+                        var status = result;
                         Assert.IsTrue(status.DocumentStatus == DocumentProcessingStatus.Processing, 
                                       "Unexpected processing state");
                     }
