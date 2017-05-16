@@ -62,6 +62,11 @@ namespace Extract.ReportViewer
         readonly string _databaseName;
 
         /// <summary>
+        /// The workflow name that the report should be run on.
+        /// </summary>
+        readonly string _workflowName;
+
+        /// <summary>
         /// The <see cref="ExtractReport"/> object that contains the report to
         /// be displayed.
         /// </summary>
@@ -90,8 +95,9 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="serverName">The database server to attach the report to.</param>
         /// <param name="databaseName">The database name to attach the report to.</param>
-        public ReportViewerForm(string serverName, string databaseName)
-            : this(null, serverName, databaseName)
+        /// <param name="workflowName">The workflow to run the report on.</param>
+        public ReportViewerForm(string serverName, string databaseName, string workflowName)
+            : this(null, serverName, databaseName, workflowName)
         {
         }
 
@@ -101,7 +107,7 @@ namespace Extract.ReportViewer
         /// <param name="report">The <see cref="ExtractReport"/> report to
         /// attach to.</param>
         public ReportViewerForm(ExtractReport report)
-            : this (report, report.DatabaseServer, report.DatabaseName)
+            : this (report, report.DatabaseServer, report.DatabaseName, report.WorkflowName)
         {
         }
 
@@ -112,7 +118,8 @@ namespace Extract.ReportViewer
         /// attach to.</param>
         /// <param name="serverName">The database server to attach the report to.</param>
         /// <param name="databaseName">The database name to attach the report to.</param>
-        public ReportViewerForm(ExtractReport report, string serverName, string databaseName)
+        /// <param name="workflowName">The workflow to run the report on.</param>
+        public ReportViewerForm(ExtractReport report, string serverName, string databaseName, string workflowName)
         {
             try
             {
@@ -134,6 +141,7 @@ namespace Extract.ReportViewer
                 _reportFileName = report != null ? report.FileName : "";
                 _serverName = serverName;
                 _databaseName = databaseName;
+                _workflowName = workflowName;
 
                 // Enable/disable the save template menu item depending on whether the
                 // report is a standard report or not
@@ -339,7 +347,7 @@ namespace Extract.ReportViewer
                         this.Refresh();
 
                         // Load the new report
-                        _report = new ExtractReport(_serverName, _databaseName, _reportFileName,
+                        _report = new ExtractReport(_serverName, _databaseName, _workflowName, _reportFileName,
                             openReport.StandardReport);
 
                         // Enable/disable the save template menu item depending on whether the

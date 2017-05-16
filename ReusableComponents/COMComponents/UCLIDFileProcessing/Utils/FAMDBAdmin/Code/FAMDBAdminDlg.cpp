@@ -761,7 +761,8 @@ void CFAMDBAdminDlg::OnToolsReports()
 
 		// Put quotes around server and database [LegacyRC #5091]
 		string strParameters = "\"" + asString(m_ipFAMDB->DatabaseServer) + "\"" + " "
-			+ "\"" + asString(m_ipFAMDB->DatabaseName) + "\"";
+			+ "\"" + asString(m_ipFAMDB->DatabaseName) + "\""
+			+ " \"" + asString(m_ipFAMDB->ActiveWorkflow) + "\"";
 
 		// Start the ReportViewer application
 		runEXE(strEXEPath, strParameters, 0, NULL, getDirectoryFromFullPath(strEXEPath));

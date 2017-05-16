@@ -76,7 +76,7 @@ namespace Extract.ReportViewer
                         return;
                     }
                 }
-                else if (args.Length < 2 || args.Length > 13)
+                else if (args.Length < 3 || args.Length > 14)
                 {
                     ShowUsage("Incorrect number of arguments!");
                     return;
@@ -85,6 +85,7 @@ namespace Extract.ReportViewer
                 // Get the command line arguments
                 string serverName = args[0];
                 string databaseName = args[1];
+                string workflowName = args[2];
                 string reportFile = "";
                 string outputFile = "";
                 List<string> mailRecipients = new List<string>();
@@ -93,11 +94,11 @@ namespace Extract.ReportViewer
                 string senderName = null;
                 bool overwrite = false;
                 bool prompt = false;
-                if (args.Length > 2)
+                if (args.Length > 3)
                 {
-                    // Third argument must be report file, attempt to get the report file
+                    // Fourth argument must be report file, attempt to get the report file
                     // from the command line parameter
-                    reportFile = GetReportFileName(args[2]);
+                    reportFile = GetReportFileName(args[3]);
 
                     for (int i = 3; i < args.Length; i++)
                     {
@@ -242,7 +243,7 @@ namespace Extract.ReportViewer
                         "Report File Name", reportFile);
 
                     // Prepare the report object
-                    report = new ExtractReport(serverName, databaseName, reportFile, prompt);
+                    report = new ExtractReport(serverName, databaseName, workflowName, reportFile, prompt);
                 }
 
                 // If an output file was specified and the report object exists
@@ -287,7 +288,7 @@ namespace Extract.ReportViewer
                     }
 
                     ReportViewerForm reportViewer = new ReportViewerForm(report,
-                        serverName, databaseName);
+                        serverName, databaseName, workflowName);
 
                     Application.Run(reportViewer);
                 }
@@ -348,10 +349,11 @@ namespace Extract.ReportViewer
 
             // Add the command line syntax
             usage.Append(Environment.GetCommandLineArgs()[0]);
-            usage.AppendLine(" /? | /reset | <ServerName> <DatabaseName> [<CrystalReportFile> "
+            usage.AppendLine(" /? | /reset | <ServerName> <DatabaseName> <WorkflowName> "
+                + "[<CrystalReportFile> "
                 + "/f <OutputPDFName> /ow /prompt /mailto <recipient_list> /subject <mail_subject> "
                 + "/senderAddress <sender_address> /senderName <sender_name> "
-                + "/ef (ExceptionLogFile)");
+                + "/ef (ExceptionLogFile)]");
             usage.AppendLine();
             usage.AppendLine("Usage:");
             usage.AppendLine("-----------------");

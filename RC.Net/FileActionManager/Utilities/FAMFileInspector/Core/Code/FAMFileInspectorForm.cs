@@ -838,6 +838,41 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+
+        /// <summary>
+        /// Gets or sets the name of the workflow being inspected.
+        /// </summary>
+        /// <value>
+        /// The name of the workflow being inspected.
+        /// </value>
+        public string WorkflowName
+        {
+            get
+            {
+                return FileProcessingDB?.ActiveWorkflow ?? "";
+            }
+
+            set
+            {
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(value) && FileProcessingDB == null)
+                    {
+                        FileProcessingDB = new FileProcessingDB();
+                    }
+
+                    if (FileProcessingDB != null)
+                    {
+                        FileProcessingDB.ActiveWorkflow = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI43369");
+                }
+            }
+        }
+
         /// <summary>
         /// Gets or sets the directory being inspected by this instance. Used when
         /// <see cref="FileProcessingDB"/> is <see langword="null"/>.
@@ -2708,7 +2743,7 @@ namespace Extract.FileActionManager.Utilities
                     // If the report takes any parameters in addition to DocumentName, display a
                     // prompt so the user can specify them.
                     bool promptForParameters = report.ParametersCollection.Count > 1;
-                    report.Initialize(DatabaseServer, DatabaseName, promptForParameters);
+                    report.Initialize(DatabaseServer, DatabaseName, WorkflowName, promptForParameters);
 
                     // Show report on another thread so that the report is not modal to the FFI. The
                     // thread needs to be STA

@@ -76,6 +76,11 @@ namespace Extract.ReportViewer
         string _databaseName;
 
         /// <summary>
+        /// The name of the workflow to report on
+        /// </summary>
+        string _workflowName;
+
+        /// <summary>
         /// The name of the report file.
         /// </summary>
         string _reportFileName;
@@ -108,8 +113,8 @@ namespace Extract.ReportViewer
         /// <param name="serverName">The server to connect to.</param>
         /// <param name="databaseName">The database to connect to.</param>
         /// <param name="fileName">The name of the report file to load.</param>
-        public ExtractReport(string serverName, string databaseName, string fileName)
-            : this(serverName, databaseName, fileName, true)
+        public ExtractReport(string serverName, string databaseName, string fileName, string workflowName)
+            : this(serverName, databaseName, fileName, workflowName, true)
         {
         }
 
@@ -118,12 +123,13 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="serverName">The server to connect to.</param>
         /// <param name="databaseName">The database to connect to.</param>
+        /// <param name="workflowName">The workflow to report on.</param>
         /// <param name="fileName">The name of the report file to load.</param>
         /// <param name="promptForParameters">Whether to prompt the user to
         /// enter in new values for the parameters or to use the values
         /// stored in the XML file.</param>
-        public ExtractReport(string serverName, string databaseName, string fileName,
-            bool promptForParameters)
+        public ExtractReport(string serverName, string databaseName, string workflowName,
+            string fileName, bool promptForParameters)
         {
             try
             {
@@ -136,6 +142,7 @@ namespace Extract.ReportViewer
                 _report = new ReportDocument();
                 _serverName = serverName;
                 _databaseName = databaseName;
+                _workflowName = workflowName;
                 _reportFileName = fileName;
                 _report.FileName = fileName;
 
@@ -206,6 +213,20 @@ namespace Extract.ReportViewer
             get
             {
                 return _databaseName;
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the workflow.
+        /// </summary>
+        /// <value>
+        /// The name of the workflow.
+        /// </value>
+        public string WorkflowName
+        {
+            get
+            {
+                return _workflowName;
             }
         }
 
@@ -391,10 +412,12 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="serverName">The server to connect to.</param>
         /// <param name="databaseName">The database to connect to.</param>
+        /// <param name="workflowName">The workflow to report on.</param>
         /// <param name="promptForParameters">Whether to prompt the user to
         /// enter in new values for the parameters or to use the values
         /// stored in the XML file.</param>
-        public void Initialize(string serverName, string databaseName, bool promptForParameters)
+        public void Initialize(string serverName, string databaseName, string workflowName,
+            bool promptForParameters)
         {
             try
             {
@@ -410,6 +433,7 @@ namespace Extract.ReportViewer
 
                 _serverName = serverName;
                 _databaseName = databaseName;
+                _workflowName = workflowName;
 
                 SetDatabaseConnection();
                 _canceledInitialization = !SetParameters(promptForParameters, true);
@@ -500,8 +524,7 @@ namespace Extract.ReportViewer
                 int numberOfParametersSet = 0;
                 foreach (IExtractReportParameter parameter in _parameters.Values)
                 {
-                    TextParameter text = parameter as TextParameter;
-                    if (text != null)
+                    if (parameter is TextParameter text)
                     {
                         numberOfParametersSet +=
                             SetParameterValues(reportParameters, text.ParameterName,
@@ -509,24 +532,21 @@ namespace Extract.ReportViewer
                         continue;
                     }
 
-                    NumberParameter number = parameter as NumberParameter;
-                    if (number != null)
+                    if (parameter is NumberParameter number)
                     {
                         numberOfParametersSet += SetParameterValues(reportParameters,
                             number.ParameterName, number.ParameterValue);
                         continue;
                     }
 
-                    DateParameter date = parameter as DateParameter;
-                    if (date != null)
+                    if (parameter is DateParameter date)
                     {
                         numberOfParametersSet += SetParameterValues(reportParameters,
                             date.ParameterName, date.ParameterValue);
                         continue;
                     }
 
-                    DateRangeParameter dateRange = parameter as DateRangeParameter;
-                    if (dateRange != null)
+                    if (parameter is DateRangeParameter dateRange)
                     {
                         string minParam = dateRange.ParameterName + "_Min";
                         string maxParam = dateRange.ParameterName + "_Max";
@@ -538,8 +558,7 @@ namespace Extract.ReportViewer
                         continue;
                     }
 
-                    ValueListParameter valueList = parameter as ValueListParameter;
-                    if (valueList != null)
+                    if (parameter is ValueListParameter valueList)
                     {
                         numberOfParametersSet += SetParameterValues(reportParameters,
                             valueList.ParameterName, valueList.ParameterValue);
@@ -563,6 +582,8 @@ namespace Extract.ReportViewer
                     "ES_DatabaseName", _databaseName, false);
                 numberOfParametersSet += SetParameterValues(reportParameters,
                     "ES_ServerName", _serverName, false);
+                numberOfParametersSet += SetParameterValues(reportParameters,
+                    "ES_WorkflowName", _databaseName, false);
 
                 // Get the count of "non-linked" parameters
                 int numberOfParameters = GetNonLinkedParameterCount(reportParameters);
