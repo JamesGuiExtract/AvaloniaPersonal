@@ -47,10 +47,7 @@ namespace DocumentAPI.Models
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI42178");
-                Log.WriteLine(ee);
-
-                return false;
+                throw ex.AsExtract("ELI43409");
             }
             finally
             {

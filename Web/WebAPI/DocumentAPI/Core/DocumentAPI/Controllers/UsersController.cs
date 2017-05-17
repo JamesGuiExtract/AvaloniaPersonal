@@ -33,30 +33,41 @@ namespace DocumentAPI.Controllers
         [HttpPost("Login")]
         public IActionResult Login([FromBody] User user)
         {
-            if (user == null)
+            try
             {
-                return BadRequest("null Model.User");
-            }
-            if (String.IsNullOrWhiteSpace(user.Username))
-            {
-                return BadRequest("Username is empty");
-            }
-            if (String.IsNullOrWhiteSpace(user.Password))
-            {
-                return BadRequest("Password is empty");
-            }
+                if (user == null)
+                {
+                    return BadRequest("null Model.User");
+                }
+                if (String.IsNullOrWhiteSpace(user.Username))
+                {
+                    return BadRequest("Username is empty");
+                }
+                if (String.IsNullOrWhiteSpace(user.Password))
+                {
+                    return BadRequest("Password is empty");
+                }
 
-            // The user may have specified a workflow - if so then ensure that the API context uses
-            // the specified workflow.
-            var context = LoginContext(user.WorkflowName);
-            var userData = new UserData(FileApiMgr.GetInterface(context));
-            if (userData.MatchUser(user))
-            {
-                var token = GenerateToken(user, context);
-                return Ok(token);
-            }
+                // The user may have specified a workflow - if so then ensure that the API context uses
+                // the specified workflow.
+                var context = LoginContext(user.WorkflowName);
+                var userData = new UserData(FileApiMgr.GetInterface(context));
 
-            return BadRequest("Unknown user or password");
+                if (userData.MatchUser(user))
+                {
+                    var token = GenerateToken(user, context);
+                    return Ok(token);
+                }
+
+                return BadRequest("Unknown user or password");
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI42178");
+                Log.WriteLine(ee);
+
+                return BadRequest(ee.Message);
+            }
         }
 
         /// <summary>
