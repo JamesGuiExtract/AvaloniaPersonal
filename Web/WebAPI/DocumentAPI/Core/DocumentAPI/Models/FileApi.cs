@@ -41,9 +41,11 @@ namespace DocumentAPI.Models
             {
                 _apiContext = apiContext;
 
-                _fileProcessingDB.DatabaseServer = DatabaseServer;
-                _fileProcessingDB.DatabaseName = DatabaseName;
-                _fileProcessingDB.ActiveWorkflow = WorkflowName;
+                _fileProcessingDB.DatabaseServer = apiContext.DatabaseServerName;
+                _fileProcessingDB.DatabaseName = apiContext.DatabaseName;
+                _fileProcessingDB.ActiveWorkflow = apiContext.WorkflowName;
+                _fileProcessingDB.NumberOfConnectionRetries = apiContext.NumberOfConnectionRetries;
+                _fileProcessingDB.ConnectionRetryTimeout = apiContext.ConnectionRetryTimeout;
 
                 _workflow = MakeAssociatedWorkflow(WorkflowName);
 
@@ -93,10 +95,6 @@ namespace DocumentAPI.Models
             {
                 return _apiContext.DatabaseServerName;
             }
-            private set
-            {
-                _apiContext.DatabaseServerName = value;
-            }
         }
 
         /// <summary>
@@ -108,10 +106,6 @@ namespace DocumentAPI.Models
             {
                 return _apiContext.DatabaseName;
             }
-            private set
-            {
-                _apiContext.DatabaseName = value;
-            }
         }
 
         /// <summary>
@@ -122,10 +116,6 @@ namespace DocumentAPI.Models
             get
             {
                 return _apiContext.WorkflowName;
-            }
-            private set
-            {
-                _apiContext.WorkflowName = value;
             }
         }
 

@@ -179,7 +179,10 @@ namespace DocumentAPI
             var databaseName = Configuration["DatabaseName"];
             var workflowName = Configuration["DefaultWorkflow"];
 
-            Utils.SetCurrentApiContext(databaseServer, databaseName, workflowName);
+            var dbConnectionRetries = Configuration["DbNumberOfConnectionRetries"];
+            var dbConnectionTimeout = Configuration["DbConnectionRetryTimeout"];
+
+            Utils.SetCurrentApiContext(databaseServer, databaseName, workflowName, dbConnectionRetries, dbConnectionTimeout);
 
             // "Applying" the context values at startup is a convenient way of ensuring that the configured context is
             // correct, as any problems will be asserted and logged, and the service will exit from starting up, so it

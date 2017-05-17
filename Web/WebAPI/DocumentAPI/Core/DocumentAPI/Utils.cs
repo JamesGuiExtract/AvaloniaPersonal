@@ -225,13 +225,23 @@ namespace DocumentAPI
         /// <param name="databaseServerName">database server name</param>
         /// <param name="databaseName">database name</param>
         /// <param name="workflowName">workflow name</param>
-        public static void SetCurrentApiContext(string databaseServerName, string databaseName, string workflowName)
+        /// <param name="dbNumberOfConnectionRetries">number of times to retry DB connection on failure</param>
+        /// <param name="dbConnectionRetryTimeout">timeout value in seconds</param>
+        public static void SetCurrentApiContext(string databaseServerName, 
+                                                string databaseName, 
+                                                string workflowName,
+                                                string dbNumberOfConnectionRetries = "",
+                                                string dbConnectionRetryTimeout = "")
         {
             try
             {
                 lock (_apiContextLock)
                 {
-                    _currentApiContext = new ApiContext(databaseServerName, databaseName, workflowName);
+                    _currentApiContext = new ApiContext(databaseServerName, 
+                                                        databaseName, 
+                                                        workflowName,
+                                                        dbNumberOfConnectionRetries,
+                                                        dbConnectionRetryTimeout);
                 }
             }
             catch (Exception ex)
@@ -342,5 +352,7 @@ namespace DocumentAPI
 
             return new ApiContext(databaseServerName, databaseName, namedWorkflow);
         }
+
+
     }
 }

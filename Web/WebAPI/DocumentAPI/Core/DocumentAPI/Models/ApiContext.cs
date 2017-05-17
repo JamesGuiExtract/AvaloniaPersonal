@@ -13,9 +13,11 @@ namespace DocumentAPI.Models
     /// </summary>
     public class ApiContext
     {
-        string _databaseServerName;
-        string _databaseName;
-        string _workflowName;
+        // These default values are from FileProcessingDB. The intent here 
+        // is that if these values are not overridden, then apply the defaults 
+        // for normal execution. 
+        const string _defaultRetryCount = "10";
+        const string _defaultRetryTimeout = "120";
 
         /// <summary>
         /// this class maintains the essential API context data - Database server name, database name, and workflow name
@@ -23,63 +25,70 @@ namespace DocumentAPI.Models
         /// <param name="databaseServerName">server name</param>
         /// <param name="databaseName">database name</param>
         /// <param name="workflowName">workflow name</param>
-        public ApiContext(string databaseServerName, string databaseName, string workflowName)
+        /// <param name="numberOfConnectionRetries">number of retries on DB connection, on failure</param>
+        /// <param name="connectionRetryTimeout">timout interval for DB connection</param>
+        public ApiContext(string databaseServerName, 
+                          string databaseName, 
+                          string workflowName,
+                          string numberOfConnectionRetries = "",
+                          string connectionRetryTimeout = "")
         {
+            Contract.Assert(!String.IsNullOrWhiteSpace(databaseServerName), "Database server name is empty");
             DatabaseServerName = databaseServerName;
+
+            Contract.Assert(!String.IsNullOrWhiteSpace(databaseName), "Database name is empty");
             DatabaseName = databaseName;
+
+            Contract.Assert(!String.IsNullOrWhiteSpace(workflowName), "Workflow name is empty");
             WorkflowName = workflowName;
+
+            var numberOfRetries =
+                !String.IsNullOrWhiteSpace(numberOfConnectionRetries) ?
+                numberOfConnectionRetries :
+                _defaultRetryCount;
+
+            bool parsed = Int32.TryParse(numberOfRetries, out int retries);
+            if (parsed)
+            {
+                Contract.Assert(retries > 0, "Number of DB connection retries must be > 0");
+                NumberOfConnectionRetries = retries;
+            }
+
+            var timeoutInterval =
+                !String.IsNullOrWhiteSpace(connectionRetryTimeout) ?
+                connectionRetryTimeout :
+                _defaultRetryTimeout;
+
+            parsed = Int32.TryParse(timeoutInterval, out int timeout);
+            if (parsed)
+            {
+                ConnectionRetryTimeout = timeout;
+            }
         }
+
+        /// <summary>
+        /// Number of times to retry DB connection on failure
+        /// </summary>
+        public int NumberOfConnectionRetries { get; private set; }
+
+        /// <summary>
+        /// retry interval in seconds
+        /// </summary>
+        public int ConnectionRetryTimeout { get; private set; }
 
         /// <summary>
         /// database server name
         /// </summary>
-        public string DatabaseServerName
-        {
-            get
-            {
-                Contract.Assert(!String.IsNullOrWhiteSpace(_databaseServerName), "Database server name is empty");
-                return _databaseServerName;
-            }
-            set
-            {
-                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set an empty database server name");
-                _databaseServerName = value;
-            }
-        }
+        public string DatabaseServerName { get; private set; }
 
         /// <summary>
         /// database name
         /// </summary>
-        public string DatabaseName
-        {
-            get
-            {
-                Contract.Assert(!String.IsNullOrWhiteSpace(_databaseName), "Database name is empty");
-                return _databaseName;
-            }
-            set
-            {
-                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set an empty database name");
-                _databaseName = value;
-            }
-        }
+        public string DatabaseName { get; private set; }
 
         /// <summary>
         /// workflow name
         /// </summary>
-        public string WorkflowName
-        {
-            get
-            {
-                Contract.Assert(!String.IsNullOrWhiteSpace(_workflowName), "Workflow name is empty");
-                return _workflowName;
-            }
-            set
-            {
-                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set an empty workflow name");
-                _workflowName = value;
-            }
-        }
-
+        public string WorkflowName { get; set; }
     }
 }
