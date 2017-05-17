@@ -9,6 +9,7 @@ using System.Linq;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using System.Threading;
 
 namespace Extract.Utilities.ContextTags
 {
@@ -90,6 +91,30 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         List<String> _workflows;
 
+        /// <summary>
+        /// Used for HashSet to contain workflow load failures
+        /// </summary>
+        struct DatabaseData
+        {
+            public string Server;
+            public string Database;
+        }
+
+        /// <summary>
+        /// Used to contain the databases that could not load workflows
+        /// </summary>
+        HashSet<DatabaseData> _workflowLoadFailedDBs;
+
+        /// <summary>
+        /// Set of databases currently in progress of loading
+        /// </summary>
+        HashSet<DatabaseData> _workflowLoadInProgressDBs;
+
+        /// <summary>
+        /// Used for synchronization on _workflowLoadFailedDBs and _workflowLoadInProgressDBs
+        /// </summary>
+        Object _lockFor_workflowLoadDBs = new Object();
+
         #endregion Fields
 
         #region Constructors
@@ -112,6 +137,11 @@ namespace Extract.Utilities.ContextTags
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI38032",
                     _OBJECT_NAME);
+
+                _workflowLoadFailedDBs = new HashSet<DatabaseData>();
+                _workflowLoadInProgressDBs = new HashSet<DatabaseData>();
+
+                _workflows = new List<string>();
             }
             catch (Exception ex)
             {
@@ -198,8 +228,6 @@ namespace Extract.Utilities.ContextTags
 
                 _connection = connection;
 
-                RefreshData();
-
                 _editContextsButton = pluginManager.GetNewButton();
                 _editContextsButton.Text = "Edit Contexts";
                 _editContextsButton.Click += HandleEditContextsButton_Click;
@@ -211,6 +239,7 @@ namespace Extract.Utilities.ContextTags
 
                 _workflowComboBox = new ComboBox();
                 _workflowComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+                _workflowComboBox.Sorted = true;
                 _workflowLabel = new Label();
                 _workflowLabel.Text = "Workflow:";
                 _workflowLabel.Visible = false;
@@ -223,6 +252,8 @@ namespace Extract.Utilities.ContextTags
                 pluginManager.DataChanged += HandlePluginManager_DataChanged;
                 pluginManager.DataGridViewCellFormatting += HandlePluginManager_DataGridViewCellFormatting;
                 pluginManager.DataGridViewCellContextMenuStripNeeded += HandlePluginManager_DataGridViewCellContextMenuStripNeeded;
+
+                RefreshData();
 
                 UpdateWorkflowCombo();
             }
@@ -282,8 +313,6 @@ namespace Extract.Utilities.ContextTags
                 // is initialized via the refresh call, errors will result as a the DataGridView is
                 // initialized. 
                 _contextTagsView.AllowNew = true;
-
-                UpdateWorkflowCombo();
             }
             catch (Exception ex)
             {
@@ -583,19 +612,33 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
+        /// Adds the workflows to the _workflows list and to the combo box
+        /// </summary>
+        /// <param name="addedWorkflows">Workflow to add</param>
+        void AddWorkflows(List<string> addedWorkflows)
+        {
+            var workflowsToAdd = addedWorkflows
+                 .Except(_workflows, StringComparer.CurrentCultureIgnoreCase);
+            if (workflowsToAdd.Count() > 0)
+            {
+                _workflows.AddRange(workflowsToAdd);
+                LoadWorkflowsIntoComboBox();
+            }
+        }
+
+        /// <summary>
         /// Sets the _workflows member variable to contain a list of workflows obtained from
-		/// all the databases that have been defined with the DatabaseServer and DatabaseName tags
-		/// and also include any workflows that are currently used in the Context tags database file
+        /// all the databases that have been defined with the DatabaseServer and DatabaseName tags
+        /// and also include any workflows that are currently used in the Context tags database file
         /// </summary>
         void GetWorkflows()
         {
-            _workflows = new List<string>();
-
             // Add the workflows that are already in the database
             var workflowsInContextDB = _database.TagValue
                 .Where(w => w.Workflow != "")
                 .Select(s => s.Workflow)
-                .Distinct();
+                .Distinct().AsEnumerable()
+                .Except(_workflows, StringComparer.CurrentCultureIgnoreCase); 
 
             _workflows.AddRange(workflowsInContextDB);
 
@@ -620,53 +663,114 @@ namespace Extract.Utilities.ContextTags
             // For each context ID get the database name and database Server (if it exists)
             foreach (var contextID in ContextIDs)
             {
-                string databaseServer = _database.TagValue
+                DatabaseData db = new DatabaseData();
+                db.Server = _database.TagValue
                     .Where(t => t.TagID == DatabaseServerTagID && t.ContextID == contextID)
                     .Select(t => t.Value)
                     .SingleOrDefault();
-                string databaseName = _database.TagValue
+                db.Database = _database.TagValue
                   .Where(t => t.TagID == DatabaseNameTagID && t.ContextID == contextID)
                   .Select(t => t.Value)
                   .SingleOrDefault();
 
-                if (String.IsNullOrWhiteSpace(databaseServer) || String.IsNullOrWhiteSpace(databaseName))
+                lock (_lockFor_workflowLoadDBs)
                 {
-                    continue;
+                    if (String.IsNullOrWhiteSpace(db.Server) || String.IsNullOrWhiteSpace(db.Database) ||
+                        _workflowLoadFailedDBs.Contains(db) || _workflowLoadInProgressDBs.Contains(db))
+                    {
+                        continue;
+                    }
+                    _workflowLoadInProgressDBs.Add(db);
                 }
 
-                // This adds the values from the database assigned to the context 
-                try
+
+				// Gets the Workflows from a database
+                Thread getWorkflowThread = new Thread(() =>
                 {
-                    FileProcessingDB famDB = new FileProcessingDB();
-                    famDB.DatabaseServer = databaseServer;
-                    famDB.DatabaseName = databaseName;
-                    famDB.ResetDBConnection(false);
-                    StrToStrMap workflowMap =  famDB.GetWorkflows();
-                    var workflowsToAdd = workflowMap.ComToDictionary()
-                        .Select(w => w.Key)
-                        .Except(_workflows, StringComparer.CurrentCultureIgnoreCase);
-                    _workflows.AddRange(workflowsToAdd);
-                }
-                catch(Exception ex)
-                {
-                    ex.ExtractLog("ELI42184");
-                }
+                    bool connected = false;
+                    // This adds the values from the database assigned to the context 
+                    try
+                    {
+                        FileProcessingDB famDB = new FileProcessingDB();
+                        famDB.DatabaseServer = db.Server;
+                        famDB.DatabaseName = db.Database;
+                        famDB.ConnectionRetryTimeout = 0;
+                        famDB.NumberOfConnectionRetries = 0;
+                        famDB.ResetDBConnection(false);
+                        connected = true;
+                        StrToStrMap workflowMap = famDB.GetWorkflows();
+
+                        var workflowsToAdd = workflowMap.ComToDictionary()
+                            .Select(w => w.Key)
+                            .ToList();
+
+                        if (workflowsToAdd.Count() > 0)
+                        {
+                            _workflowComboBox.SafeBeginInvoke("ELI43446", () =>
+                                 {
+                                     AddWorkflows(workflowsToAdd);
+
+                                 }, false);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException ee = new ExtractException("ELI42184", "Unable to get workflows from database.", ex);
+                        ee.AddDebugData("Server", db.Server, false);
+                        ee.AddDebugData("Database", db.Database, false);
+                        ee.Log();
+                        if (!connected)
+                        {
+                            try
+                            {
+                                lock (_lockFor_workflowLoadDBs)
+                                {
+                                    _workflowLoadFailedDBs.Add(db);
+                                }
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            lock (_lockFor_workflowLoadDBs)
+                            {
+                                _workflowLoadInProgressDBs.Remove(db);
+                            }
+                        }
+                        catch (Exception) { }
+                    }
+                });
+                getWorkflowThread.SetApartmentState(ApartmentState.MTA);
+                getWorkflowThread.Start();
             }
         }
 
         /// <summary>
         /// Updates the workflow combo for the current values in _workflows if the list is empty 
-		/// the label and combobox will be hidden otherwise will be made visible and contain
+		/// the label and ComboBox will be hidden otherwise will be made visible and contain
 		/// the values that are in _workflows
         /// </summary>
-        private void UpdateWorkflowCombo()
+        void UpdateWorkflowCombo()
         {
             if (_workflowComboBox == null)
             {
                 return;
             }
-            _workflowComboBox.SelectionChangeCommitted -= HandleWorkflowComboBox_SelectionChangeCommitted;
+            
             GetWorkflows();
+
+            LoadWorkflowsIntoComboBox();
+        }
+
+        /// <summary>
+        /// Loads the workflows in _workflows list into the WorkflowCombo
+        /// </summary>
+        void LoadWorkflowsIntoComboBox()
+        {
+            _workflowComboBox.SelectionChangeCommitted -= HandleWorkflowComboBox_SelectionChangeCommitted;
             if (_workflows.Count > 0)
             {
                 string selected = _workflowComboBox.SelectedItem as string;
@@ -687,6 +791,7 @@ namespace Extract.Utilities.ContextTags
             else
             {
                 _workflowComboBox.Items.Clear();
+                _workflowComboBox.Items.Insert(0, DefaultValuesTag);
                 _workflowComboBox.Visible = false;
                 _workflowLabel.Visible = false;
             }
