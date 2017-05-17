@@ -413,6 +413,9 @@ private:
 	// If 0 there is not a registered FAM session.
 	int m_nFAMSessionID;
 
+	// The name of the FPS file for any currently active FAM session.
+	string m_strFPSFileName;
+
 	// Machine username
 	string m_strFAMUserName;
 

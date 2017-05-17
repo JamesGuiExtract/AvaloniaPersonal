@@ -270,14 +270,14 @@ private:
 	// the number of bytes in the list
 	LONGLONG m_nNumBytes;
 
-	// Mutex to lock for updating the m_queTaskIds, m_queDelayedTasks, m_queFinishedTask
-	CMutex m_objLock;
+	// CriticalSection to lock for updating the m_queTaskIds, m_queDelayedTasks, m_queFinishedTask
+	CCriticalSection m_objLock;
 
-	// Mutex to lock when reading or updating the m_mapTasks object
-	CMutex m_readTaskMapMutex;
+	// CriticalSection to lock when reading or updating the m_mapTasks object
+	CCriticalSection m_readTaskMapMutex;
 	
-	// Mutex used to block the check to load the queue from the database
-	CMutex m_LoadDBLock;
+	// CriticalSection used to block the check to load the queue from the database
+	CCriticalSection m_LoadDBLock;
 
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFPMDB;
 
@@ -329,9 +329,9 @@ private:
 	// List of work items available for processing - the work item records are in the m_mapWorkItems
 	WorkItemIdList m_queWorkItemIds;
 
-	// Mutexes to use when reading or updating the m_mapWorkItems map
-	CMutex m_queWorkItemsMutex; // protects m_queWorkItemIds
-	CMutex m_mapReadWorkItems; // protects m_mapWorkItems
+	// CriticalSections to use when reading or updating the m_mapWorkItems map
+	CCriticalSection m_queWorkItemsMutex; // protects m_queWorkItemIds
+	CCriticalSection m_mapReadWorkItems; // protects m_mapWorkItems
 
 	// This should be set to the priority of the last file that was marked as current or if there
 	// was no file to mark as current this should be set to kPriorityDefault.  This value is used to 

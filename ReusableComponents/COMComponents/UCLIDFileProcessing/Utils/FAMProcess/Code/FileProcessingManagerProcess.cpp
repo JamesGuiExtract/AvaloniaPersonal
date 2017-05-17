@@ -145,6 +145,10 @@ STDMETHODIMP CFileProcessingManagerProcess::Start(LONG lNumberOfFilesToProcess)
 			throw uex;
 		}
 
+		// https://extract.atlassian.net/browse/ISSUE-14685
+		// Ensure the FAMProcessingManager's database settings are used (needed for customTags, workflows).
+		m_ipFPM->RefreshDBSettings();
+
 		// Restrict the number of stored records to twice the number of logical processors
 		m_ipFPM->RestrictNumStoredRecords = VARIANT_TRUE;
 		m_ipFPM->MaxStoredRecords = 2 * getNumLogicalProcessors();

@@ -447,7 +447,7 @@ namespace Extract
 				int index = actionsGridView->Rows->Add();
 				auto newRow = actionsGridView->Rows[index];
 				newRow->Cells[ActionIDColumnIndex]->Value =
-					Int32::Parse(marshal_as<String^>(currentActionPair->StringValue));
+					UInt32::Parse(marshal_as<String^>(currentActionPair->StringValue));
 				newRow->Cells[ActionNameColumnIndex]->Value =
 					marshal_as<String^>(currentActionPair->StringKey);
 			}
@@ -529,7 +529,7 @@ namespace Extract
 						"must remain designated as a main sequence action.", "Invalid designation", true);
 					return;
 				}
-				else if (workflowStep == "Finalize")
+				else if (workflowStep == "Post Workflow")
 				{
 					UtilityMethods::ShowMessageBox("This action has been designated as the " + workflowStep +
 						" action for this workflow. The workflow definition needs to be modified or this action " +
@@ -636,7 +636,7 @@ namespace Extract
 			String^ postWorkflowAction = marshal_as<String^>(workflowDefinition->PostWorkflowAction);
 			if (!String::IsNullOrWhiteSpace(postWorkflowAction))
 			{
-				specialActions[postWorkflowAction] = "Finalize";
+				specialActions[postWorkflowAction] = "Post Workflow";
 			}
 
 			for each (DataGridViewRow ^row in actionsGridView->Rows)

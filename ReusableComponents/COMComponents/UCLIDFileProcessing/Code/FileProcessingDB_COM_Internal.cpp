@@ -1938,8 +1938,12 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				validateDBSchemaVersion();
 
 				// Do not allow adding of files to all workflows via AddFile.
-				ASSERT_RUNTIME_CONDITION("ELI42029", nWorkflowID > 0 || !m_bRunningAllWorkflows,
-					"Workflow has not been set.");
+				if (nWorkflowID <= 0 && m_bRunningAllWorkflows)
+				{
+					UCLIDException ue("ELI42029", "Workflow has not been set.");
+					ue.addDebugInfo("FPS File", m_strFPSFileName, false);
+					throw ue;
+				}
 
 				if (nWorkflowID <= 0 && m_bUsingWorkflowsForCurrentAction)
 				{
@@ -5783,7 +5787,7 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 		try
 		{
 			// Get the FPS File name
-			string strFPSFileName = asString(bstrFPSFileName);
+			m_strFPSFileName = asString(bstrFPSFileName);
 
 			string strFAMSessionQuery = "INSERT INTO [" + gstrFAM_SESSION + "] ";
 			strFAMSessionQuery += "([MachineID], [FAMUserID], [UPI], [FPSFileID], [ActionID], "
@@ -5807,7 +5811,7 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 
 				// Get FPSFileID, MachineID, and UserID (this will add records if they don't exist)
 				long nFPSFileID = getKeyID(ipConnection, gstrFPS_FILE, "FPSFileName",
-					strFPSFileName.empty() ? "<Unsaved FPS File>" : strFPSFileName);
+					m_strFPSFileName.empty() ? "<Unsaved FPS File>" : m_strFPSFileName);
 				long nMachineID = getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName);
 				long nUserID = getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName);
 				string strQueuing = (asCppBool(vbQueuing) ? "1" : "0");
@@ -5836,6 +5840,8 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 	}
 	catch(UCLIDException &ue)
 	{
+		m_strFPSFileName = "";
+
 		if (!bDBLocked)
 		{
 			return false;
@@ -5884,6 +5890,7 @@ bool CFileProcessingDB::RecordFAMSessionStop_Internal(bool bDBLocked)
 
 			m_nFAMSessionID = 0;
 			m_nActiveActionID = -1;
+			m_strFPSFileName = "";
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30697");
 	}
@@ -5891,6 +5898,7 @@ bool CFileProcessingDB::RecordFAMSessionStop_Internal(bool bDBLocked)
 	{
 		m_nFAMSessionID = 0;
 		m_nActiveActionID = -1;
+		m_strFPSFileName = "";
 
 		if (!bDBLocked)
 		{
