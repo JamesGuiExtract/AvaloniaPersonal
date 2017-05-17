@@ -2932,7 +2932,9 @@ bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, 
 			validateDBSchemaVersion();
 
 			string strFileID = asString(nFileID);
-			string strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strActionName);
+
+			// All workflows is not allowed so this will be a singular ID
+			string strActionID = getActionIDsForActiveWorkflow(ipConnection, strActionName);
 			
 			// Unlike SelectFilesToProcess which will always be selecting files that already exist
 			// in the FileActionStatus table, specific file IDs passed into this method should not
@@ -2940,27 +2942,27 @@ bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, 
 			// the row that can be updated by setFilesToProcessing. 
 			string strInsertSQL =
 				"INSERT INTO [FileActionStatus] ([FileID], [ActionID], [ActionStatus], [Priority]) "
-				"SELECT <FileID>, [FileActionStatus].[ActionID], 'U', [FAMFile].[Priority] "
-				"FROM FAMFile LEFT JOIN [ActionID] ON FileActionStatus.FileID = FAMFile.ID "
-				"	AND FileActionStatus.ActionID IN (<ActionIDs>) "
+				"SELECT <FileID>, <ActionID>, 'U', [FAMFile].[Priority] "
+				"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
+				"	AND FileActionStatus.ActionID = <ActionID> "
 				"WHERE [FAMFile].[ID] = <FileID> AND ActionStatus IS NULL";
 
 			replaceVariable(strInsertSQL, "<FileID>", strFileID);
-			replaceVariable(strInsertSQL, "<ActionIDs>", strActionIDs);
+			replaceVariable(strInsertSQL, "<ActionID>", strActionID);
 
 			executeCmdQuery(ipConnection, strInsertSQL);
 
 			// Select the required file info from the database based on the file ID and current action.
 			string strSelectSQL =
-				"SELECT FAMFile.ID, FileName, Pages, FileSize, "
+				"SELECT FAMFile.ID, FileName, Pages, FileSize, ActionID, "
 				"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
 				"COALESCE(ActionStatus, 'U') AS ActionStatus "
 				"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
-				"	AND FileActionStatus.ActionID IN (<ActionIDs>) "
+				"	AND FileActionStatus.ActionID = <ActionID> "
 				"WHERE [FAMFile].[ID] = <FileID>";
 
 			replaceVariable(strSelectSQL, "<FileID>", strFileID);
-			replaceVariable(strSelectSQL, "<ActionIDs>", strActionIDs);
+			replaceVariable(strSelectSQL, "<ActionID>", strActionID);
 
 			// Perform all processing related to setting a file as processing.
 			IIUnknownVectorPtr ipFiles = setFilesToProcessing(

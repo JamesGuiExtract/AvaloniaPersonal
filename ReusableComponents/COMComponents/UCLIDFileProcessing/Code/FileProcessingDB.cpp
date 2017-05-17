@@ -3207,6 +3207,9 @@ STDMETHODIMP CFileProcessingDB::GetFileToProcess(long nFileID, BSTR strAction,
 	{
 		validateLicense();
 
+		ASSERT_RUNTIME_CONDITION("ELI43393", !m_bRunningAllWorkflows,
+			"GetFileToProcess is not valid when processing <All workflows>");
+
 		if (!GetFileToProcess_Internal(false, nFileID, strAction, ppFileRecord))
 		{
 			// Lock the database for this instance

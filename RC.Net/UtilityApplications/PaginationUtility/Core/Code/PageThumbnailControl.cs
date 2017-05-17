@@ -368,7 +368,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!PageLayoutControl.EnablePageDisplay)
+                if (PageLayoutControl == null || !PageLayoutControl.EnablePageDisplay)
                 {
                     return;
                 }
