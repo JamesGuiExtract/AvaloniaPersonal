@@ -5,7 +5,12 @@
 #include "cpputil.h"
 #include "StringTokenizer.h"
 #include "UCLIDException.h"
-#include <afxmt.h>
+
+//--------------------------------------------------------------------------------------------------
+// Statics
+//--------------------------------------------------------------------------------------------------
+CCriticalSection UPI::ms_criticalSection;
+volatile bool UPI::ms_bInitialized = false;
 
 //-------------------------------------------------------------------------------------------------
 UPI::UPI(const string& strUPI)
@@ -98,16 +103,13 @@ const std::string& UPI::getProcessSemaphoreName() const
 //-------------------------------------------------------------------------------------------------
 const UPI& UPI::getCurrentProcessUPI()
 {
-	static bool sbInitialized = false;
-
 	// create the UPI for the current process if it hasn't already been created.
 	static string strUPI;
-	if (!sbInitialized)
+	if (!ms_bInitialized)
 	{
-		static CMutex sMutex;
-		CSingleLock lg(&sMutex, TRUE);
+		CSingleLock lg(&ms_criticalSection, TRUE);
 
-		if (!sbInitialized)
+		if (!ms_bInitialized)
 		{
 			// append the computer name
 			const string strSLASH = "\\";
@@ -144,7 +146,7 @@ const UPI& UPI::getCurrentProcessUPI()
 			// append the current time
 			strUPI += getTimeAsString();
 
-			sbInitialized = true;
+			ms_bInitialized = true;
 		}
 	}
 

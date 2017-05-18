@@ -4,6 +4,7 @@
 #include "BaseUtils.h"
 
 #include <string>
+#include <afxmt.h>
 
 //	class to represent the Unique Process Identifier (UPI)
 //	The Unique Process Identifier (UPI) is a string of the form
@@ -37,4 +38,6 @@ private:
 	std::string m_strStartDate;
 	std::string m_strStartTime;
 	std::string m_strProcessSemaphoreName;
+	static volatile bool ms_bInitialized;
+	static CCriticalSection ms_criticalSection;
 };
