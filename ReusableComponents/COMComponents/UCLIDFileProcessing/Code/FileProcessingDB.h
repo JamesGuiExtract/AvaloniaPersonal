@@ -339,6 +339,7 @@ public:
 	STDMETHOD(get_NumberOfConnectionRetries)(long *pnVal);
 	STDMETHOD(put_ConnectionRetryTimeout)(long nNewVal);
 	STDMETHOD(get_ConnectionRetryTimeout)(long *pnVal);
+	STDMETHOD(SetNewPassword)(BSTR bstrUserName, VARIANT_BOOL* pbSuccess);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -888,16 +889,15 @@ private:
 	// if there is a record returns the stored password and the return value is true;
 	bool getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseAdmin);
 
-	// Encrypts the provided user name + password string
-	// and stores the result in the Login table
-	void encryptAndStoreUserNamePassword(const string strUserNameAndPassword, bool bUseAdmin,
-										bool bFailIfUserDoesNotExist = false);
+	// Encrypts the provided user name + password string and stores the result in the Login table
+	void encryptAndStoreUserNamePassword(const string& strUser, const string& strPassword,
+										 bool bFailIfUserDoesNotExist = false);
 
 	// Stores the value contained in the encrypted string into the database.
 	// NOTE: This method assumes that the provided string has already been encrypted,
 	// DO NOT call this method with an unencrypted string unless you intend to have
 	// the combined user and password value stored in plain text.
-	void storeEncryptedPasswordAndUserName(const string& strEncryptedPW, bool bUseAdmin,
+	void storeEncryptedPasswordAndUserName(const string& strUser, const string& strEncryptedPW,
 		bool bFailIfUserDoesNotExist = false, bool bCreateTransactionGuard = true);
 
 	// Returns the result of encrypting the input string

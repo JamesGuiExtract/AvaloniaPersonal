@@ -28,6 +28,7 @@
 #define IDR_MENU_SUMMARY_TOTAL_COLUMN   145
 #define IDD_DIALOG_MANAGE_ATTRIBUTE_SETS 146
 
+
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
 // These ID's are defined in FAMUtils
@@ -132,6 +133,7 @@
 #define IDC_BTN_REFRESH_ACTIONS         2095
 #define IDC_BTN_ACTION_CLOSE            2096
 #define IDC_BTN_CLEAR_USER_PASSWORD     2097
+#define IDC_BTN_NEW_USER_PASSWORD       2098
 #define IDC_LIST_METADATA_FIELDS_TO_MANAGE 2109
 #define IDC_BTN_ADD_METADATA_FIELD      2110
 #define IDC_BTN_REMOVE_METADATA_FIELD   2111

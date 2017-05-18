@@ -55,6 +55,7 @@ void CManageUsersDlg::DoDataExchange(CDataExchange *pDX)
 		DDX_Control(pDX, IDC_BTN_DELETE_USER, m_btnRemove);
 		DDX_Control(pDX, IDC_BTN_RENAME_USER, m_btnRename);
 		DDX_Control(pDX, IDC_BTN_REFRESH_USERS, m_btnRefresh);
+		DDX_Control(pDX, IDC_BTN_NEW_USER_PASSWORD, m_btnNewPassword);
 		DDX_Control(pDX, IDC_BTN_CLEAR_USER_PASSWORD, m_btnClearPassword);
 		DDX_Control(pDX, IDC_LIST_USERS, m_listUsers);
 	}
@@ -66,6 +67,7 @@ BEGIN_MESSAGE_MAP(CManageUsersDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_DELETE_USER, &CManageUsersDlg::OnBtnRemove)
 	ON_BN_CLICKED(IDC_BTN_RENAME_USER, &CManageUsersDlg::OnBtnRename)
 	ON_BN_CLICKED(IDC_BTN_REFRESH_USERS, &CManageUsersDlg::OnBtnRefresh)
+	ON_BN_CLICKED(IDC_BTN_NEW_USER_PASSWORD, &CManageUsersDlg::OnBtnNewPassword)
 	ON_BN_CLICKED(IDC_BTN_CLEAR_USER_PASSWORD, &CManageUsersDlg::OnBtnClearPassword)
 	ON_BN_CLICKED(IDC_BTN_USER_CLOSE, &CManageUsersDlg::OnBtnClose)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_USERS, &CManageUsersDlg::OnNMDblclkList)
@@ -267,6 +269,39 @@ void CManageUsersDlg::OnBtnRefresh()
 		refreshUserList();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29027");
+}
+//-------------------------------------------------------------------------------------------------
+void CManageUsersDlg::OnBtnNewPassword()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		// If there are no selected items or the user said no to delete then just return
+		if (m_listUsers.GetSelectedCount() != 1)
+		{
+			// Nothing to do
+			return;
+		}
+
+		// refresh the user list so that the setting in the password list is up to date
+		refreshUserList();
+
+		POSITION pos = m_listUsers.GetFirstSelectedItemPosition();
+		if (pos != __nullptr)
+		{
+			// Get the selected user
+			int iIndex = m_listUsers.GetNextSelectedItem(pos);
+			string strUser = m_listUsers.GetItemText(iIndex, giUSER_COLUMN);
+
+			if (m_ipFAMDB->SetNewPassword(strUser.c_str()) == VARIANT_TRUE)
+			{
+				refreshUserList();
+				MessageBox("New password has been set!", "Success!", MB_OK);
+			}
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43408");
 }
 //-------------------------------------------------------------------------------------------------
 void CManageUsersDlg::OnBtnClearPassword()

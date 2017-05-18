@@ -2823,29 +2823,27 @@ bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseA
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29897");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserNameAndPassword,
-														bool bUseAdmin, bool bFailIfUserDoesNotExist)
+void CFileProcessingDB::encryptAndStoreUserNamePassword(const string& strUser,
+														const string& strPassword,
+														bool bFailIfUserDoesNotExist)
 {
 	// Get the encrypted version of the combined string
-	string strEncryptedCombined = getEncryptedString(strUserNameAndPassword);
+	string strEncryptedCombined = getEncryptedString(strUser + strPassword);
 
-	storeEncryptedPasswordAndUserName(strEncryptedCombined, bUseAdmin, bFailIfUserDoesNotExist);
+	storeEncryptedPasswordAndUserName(strUser, strEncryptedCombined, bFailIfUserDoesNotExist);
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strEncryptedPW,
-														  bool bUseAdmin,
+void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strUser,
+														  const string& strEncryptedPW,
 														  bool bFailIfUserDoesNotExist,
 														  bool bCreateTransactionGuard)
 {
-	string strUser = bUseAdmin ? gstrADMIN_USER : m_strFAMUserName;
-
 	// Lock the mutex for this instance
 	CSingleLock lock(&m_criticalSection, TRUE);
 
 	// Create a pointer to a recordset
 	_RecordsetPtr ipLoginSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI15722", ipLoginSet != __nullptr);
-
 
 	// Begin Transaction if needed
 	unique_ptr<TransactionGuard> apTg;
@@ -3085,8 +3083,7 @@ bool CFileProcessingDB::initializeIfBlankDB(bool initWithoutPrompt, string strAd
 			{
 				clear(false, true, false);
 
-				strAdminPassword = gstrADMIN_USER + strAdminPassword;
-				encryptAndStoreUserNamePassword(strAdminPassword, true, false);
+				encryptAndStoreUserNamePassword(gstrADMIN_USER, strAdminPassword, false);
 
 				return true;
 			}
@@ -3957,7 +3954,7 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 			// Add the admin user back with admin PW
 			if (!strAdminPW.empty())
 			{
-				storeEncryptedPasswordAndUserName(strAdminPW, true, false, false);
+				storeEncryptedPasswordAndUserName(gstrADMIN_USER, strAdminPW, false, false);
 			}
 
 			tg.CommitTrans();

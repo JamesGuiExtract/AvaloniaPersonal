@@ -38,6 +38,7 @@ protected:
 	afx_msg void OnBtnRemove();
 	afx_msg void OnBtnRename();
 	afx_msg void OnBtnRefresh();
+	afx_msg void OnBtnNewPassword();
 	afx_msg void OnBtnClearPassword();
 	afx_msg void OnBtnClose();
 	afx_msg void OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult);
@@ -55,6 +56,7 @@ private:
 	CButton m_btnRemove;
 	CButton m_btnRename;
 	CButton m_btnRefresh;
+	CButton m_btnNewPassword;
 	CButton m_btnClearPassword;
 
 	// The file action manager DB pointer

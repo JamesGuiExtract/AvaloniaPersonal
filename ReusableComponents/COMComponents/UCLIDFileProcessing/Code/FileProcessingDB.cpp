@@ -812,8 +812,7 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 			// Update password in database Login table (fail if not the admin user
 			// and the user doesn't exist)
 			string strPassword = dlgPW.m_zNewPassword;
-			string strCombined = strUser + strPassword;
-			encryptAndStoreUserNamePassword(strCombined, bUseAdmin, !bUseAdmin);
+			encryptAndStoreUserNamePassword(strUser, strPassword, !bUseAdmin);
 
 			// Just added password to the db so it is valid
 			*pbLoginValid = VARIANT_TRUE;
@@ -916,8 +915,7 @@ STDMETHODIMP CFileProcessingDB::ChangeLogin(VARIANT_BOOL bChangeAdmin, VARIANT_B
 
 		// Encrypt and store the user name and password in the Login table
 		string strPassword = dlgPW.m_zNewPassword;
-		string strCombined = strUser + strPassword;
-		encryptAndStoreUserNamePassword(strCombined, bUseAdmin);
+		encryptAndStoreUserNamePassword(strUser, strPassword);
 
 		// Just added the new password to the db so it is valid
 		*pbChangeValid = VARIANT_TRUE;
@@ -4370,6 +4368,37 @@ STDMETHODIMP CFileProcessingDB::get_ConnectionRetryTimeout(long * pnVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43361");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetNewPassword(BSTR bstrUserName, VARIANT_BOOL* pbSuccess)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		*pbSuccess = VARIANT_FALSE;
+		
+		ASSERT_RUNTIME_CONDITION("ELI43406", m_bLoggedInAsAdmin,
+			"SetNewPassword cannot be used if not logged in as admin.");
+
+		string strUser = asString(bstrUserName);
+		string strCaption = "Set new password for " + strUser;
+
+		// Display Change Password dialog
+		PasswordDlg dlgPW(strCaption);
+		if (dlgPW.DoModal() != IDOK)
+		{
+			return S_OK;
+		}
+
+		// Update password in database Login table (fail if the doesn't exist)
+		string strPassword = dlgPW.m_zNewPassword;
+		encryptAndStoreUserNamePassword(strUser, strPassword, true);
+
+		*pbSuccess = VARIANT_TRUE;
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43407");
 }
 
 //-------------------------------------------------------------------------------------------------

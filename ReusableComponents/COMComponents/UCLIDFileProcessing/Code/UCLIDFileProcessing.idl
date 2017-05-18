@@ -1931,6 +1931,10 @@ library UCLID_FILEPROCESSINGLib
 		//			the value is the number of seconds t
 		[propput, id(183), helpstring("property ConnectionRetryTimeout")] HRESULT ConnectionRetryTimeout([in] long nNewVal);
 		[propget, id(183), helpstring("property ConnectionRetryTimeout")] HRESULT ConnectionRetryTimeout([out, retval] long *pnVal);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Set a new password for the specified user
+		// NOTE:	Call will fail if not currently logged in as admin.
+		[id(184), helpstring("method SetNewPassword")] HRESULT SetNewPassword([in] BSTR bstrUserName, [out, retval] VARIANT_BOOL* pbSuccess);
 	};
 
 	[
