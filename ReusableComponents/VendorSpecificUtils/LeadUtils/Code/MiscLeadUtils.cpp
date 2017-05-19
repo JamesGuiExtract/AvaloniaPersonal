@@ -1281,38 +1281,41 @@ void getFileInformation(const string& strImageFileName, bool bIncludePageCount, 
 				dwStartIndex = getPDFStartIndex(strImageFileName);
 			}
 
-			L_VOID *hInfo;
-			L_UCHAR cBuf[1024];
-			L_INT nRead = sizeof(cBuf);
-			DWORD dwNumOfBytesRead=0;
-			CHandle hFile(CreateFile(pszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL));
-
-			if (dwStartIndex > 0)
+			if (dwStartIndex == 0)
 			{
-				SetFilePointer( hFile, dwStartIndex, __nullptr, FILE_BEGIN ); 
+				nRet = L_FileInfo(pszFileName, &rFileInfo, sizeof(FILEINFO), flags, pLFO);
 			}
-
-			nRet = L_StartFeedInfo (&hInfo, &rFileInfo, sizeof(FILEINFO), flags, pLFO);
-			if (nRet == SUCCESS)
+			else
 			{
-				while (true)
+				L_VOID *hInfo;
+				L_UCHAR cBuf[1024];
+				L_INT nRead = sizeof(cBuf);
+				DWORD dwNumOfBytesRead = 0;
+
+				CHandle hFile(CreateFile(pszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL));
+				SetFilePointer(hFile, dwStartIndex, __nullptr, FILE_BEGIN);
+				nRet = L_StartFeedInfo(&hInfo, &rFileInfo, sizeof(FILEINFO), flags, pLFO);
+				if (nRet == SUCCESS)
 				{
-					if (!ReadFile(hFile, cBuf, nRead, &dwNumOfBytesRead, __nullptr))
+					while (true)
 					{
-						nRet = ERROR_FILE_READ;
-						break;
+						if (!ReadFile(hFile, cBuf, nRead, &dwNumOfBytesRead, __nullptr))
+						{
+							nRet = ERROR_FILE_READ;
+							break;
+						}
+						if (dwNumOfBytesRead == 0)
+						{
+							break;
+						}
+						nRet = L_FeedInfo(hInfo, cBuf, dwNumOfBytesRead);
+						if (nRet != SUCCESS) // SUCCESS_ABORT, enough info provided, or an error
+						{
+							break;
+						}
 					}
-					if (dwNumOfBytesRead == 0)
-					{
-						break;
-					}
-					nRet = L_FeedInfo(hInfo, cBuf, dwNumOfBytesRead);
-					if (nRet != SUCCESS) // SUCCESS_ABORT, enough info provided, or an error
-					{
-						break;
-					}
+					nRet = L_StopFeedInfo(hInfo);
 				}
-				nRet = L_StopFeedInfo(hInfo);
 			}
 								
 			// Check result
@@ -2045,10 +2048,17 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
 				{
 					dwStartIndex = getPDFStartIndex(strImageFileName);
 				}
-				CHandle hFile(CreateFile(pszImageFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL));
-				DWORD dwFileSize = GetFileSize(hFile, NULL) - dwStartIndex;
-				nRet = L_LoadFileOffset((L_HFILE)hFile.operator HANDLE(), dwStartIndex, dwFileSize, &rBitmap, sizeof(BITMAPHANDLE), 0,
-					ORDER_RGB, LOADFILE_ALLOCATE | LOADFILE_STORE, NULL, NULL, &lfo, &rFileInfo);
+				if (dwStartIndex == 0)
+				{
+					nRet = L_LoadBitmap(pszImageFile, &rBitmap, sizeof(BITMAPHANDLE), 0, ORDER_RGB, &lfo, &rFileInfo);
+				}
+				else
+				{
+					CHandle hFile(CreateFile(pszImageFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL));
+					DWORD dwFileSize = GetFileSize(hFile, NULL) - dwStartIndex;
+					nRet = L_LoadFileOffset((L_HFILE)hFile.operator HANDLE(), dwStartIndex, dwFileSize, &rBitmap, sizeof(BITMAPHANDLE), 0,
+						ORDER_RGB, LOADFILE_ALLOCATE | LOADFILE_STORE, NULL, NULL, &lfo, &rFileInfo);
+				}
 
 				// Check result
 				if (nRet == SUCCESS)
