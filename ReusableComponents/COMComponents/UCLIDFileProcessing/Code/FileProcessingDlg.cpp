@@ -338,8 +338,6 @@ BOOL FileProcessingDlg::OnInitDialog()
 
 			loadWorkflowComboBox();
 
-			// update the UI
-			updateMenuAndToolbar();
 			updateUI();
 
 			// start the processing if requested
@@ -543,8 +541,7 @@ void FileProcessingDlg::OnBtnRun()
 			throw;
 		}
 
-		// update the UI
-		updateMenuAndToolbar();
+		updateUI();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08926");
 }
@@ -641,8 +638,6 @@ void FileProcessingDlg::OnBtnStop()
 					m_propProcessingPage.stopProgressUpdates();
 				}
 
-				// Update the UI
-				updateMenuAndToolbar();
 				updateUI();
 
 				// Re-enable the process menu since no complete message will be sent
@@ -1023,9 +1018,7 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 				nTotalPages, unTotalProcTime );
 		}
 
-		updateStatusBarStats(ipActionStatsNew);
-
-		updateUI();
+		updateStats(ipActionStatsNew);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS( "ELI14508" )
 
@@ -1049,7 +1042,7 @@ LRESULT FileProcessingDlg::OnStatusChange(WPARAM wParam, LPARAM lParam)
 			m_propProcessingPage.onStatusChange(pTask, eOldStatus);
 		}		
 
-		updateUI();
+		updateStatusBar(false);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI11610");
 
@@ -1229,8 +1222,6 @@ void FileProcessingDlg::OnFileNew()
 		setPages.insert(kDatabasePage);
 		updateTabs(setPages);
 
-		// update the UI
-		updateMenuAndToolbar();
 		updateUI();
 
 		// Clear the Report and Status tabs, update UI
@@ -2237,7 +2228,7 @@ void FileProcessingDlg::doResize()
 	UpdateWindow();
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlg::updateStatusBarStats(UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats)
+void FileProcessingDlg::updateStats(UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats)
 {
 	if(ipActionStats == __nullptr)
 	{
@@ -2272,8 +2263,7 @@ void FileProcessingDlg::updateStatusBarStats(UCLID_FILEPROCESSINGLib::IActionSta
 		}
 	}
 
-	// Update the status bar
-	updateUI();
+	updateStatusBar(false);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::updateUI()
@@ -2281,81 +2271,12 @@ void FileProcessingDlg::updateUI()
 	// update the connect to last database button [p13 #4855]
 	m_propDatabasePage.updateLastUsedDBButton();
 
-	CString zStatusText, zCompletedProcessing, zCurrentlyProcessing,
-			zFailed, zPending, zSkipped, zTotal;
-	
 	updateDBConnectionStatus();
 	
-	if (m_bRunning)
-	{
-		if (m_strProcessingStateString.empty())
-		{
-			if (isPageDisplayed(kProcessingLogPage))
-			{
-				long nNumCurrentlyProcessing = m_propProcessingPage.getCurrentlyProcessingCount();
-				if (nNumCurrentlyProcessing <= 0)
-				{
-					zStatusText = "Waiting";
-				}
-				else
-				{
-					zStatusText = "Processing";
-				}
-			}
-			else if (isPageDisplayed(kQueueLogPage))
-			{
-				zStatusText = "Queueing";
-			}
-		}
-		else
-		{
-			zStatusText = m_strProcessingStateString.c_str();
-		}
-	}
-	else
-	{
-		zStatusText = getFAMStatus();
+	updateMenuAndToolbar();
 
-		updateMenuAndToolbar();
-	}
+	updateStatusBar(true);
 
-	// Display comma-separated numbers in status bar only if an Action has been selected (P13 #4355)
-	if (m_bDBConnectionReady && m_nCurrActionID != -1)
-	{
-		zCompletedProcessing.Format( "%s %s", gstrCOMPLETED_STATUS_PANE_LABEL.c_str(), 
-			commaFormatNumber( (LONGLONG)m_nNumCompletedProcessing ).c_str() );
-		zCurrentlyProcessing.Format( "%s %s", gstrPROCESSING_STATUS_PANE_LABEL.c_str(), 
-			commaFormatNumber( (LONGLONG)m_nNumCurrentlyProcessing ).c_str() );
-		zFailed.Format( "%s %s", gstrFAILED_STATUS_PANE_LABEL.c_str(),
-			commaFormatNumber( (LONGLONG)m_nNumFailed ).c_str() );
-		zSkipped.Format( "%s %s", gstrSKIPPED_STATUS_PANE_LABEL.c_str(),
-			commaFormatNumber( (LONGLONG)m_nNumSkipped ).c_str() );
-		zPending.Format( "%s %s", gstrPENDING_STATUS_PANE_LABEL.c_str(),
-			commaFormatNumber( (LONGLONG)m_nNumPending ).c_str() );
-		zTotal.Format( "%s %s", gstrTOTAL_STATUS_PANE_LABEL.c_str(), 
-			commaFormatNumber( (LONGLONG)m_nNumTotalDocs ).c_str() );
-	}
-	else
-	{
-		// Just display the labels in the cells
-		zCompletedProcessing.Format( "%s", gstrCOMPLETED_STATUS_PANE_LABEL.c_str() );
-		zCurrentlyProcessing.Format( "%s", gstrPROCESSING_STATUS_PANE_LABEL.c_str() );
-		zFailed.Format( "%s", gstrFAILED_STATUS_PANE_LABEL.c_str() );
-		zPending.Format( "%s", gstrPENDING_STATUS_PANE_LABEL.c_str() );
-		zSkipped.Format( "%s", gstrSKIPPED_STATUS_PANE_LABEL.c_str() );
-		zTotal.Format( "%s", gstrTOTAL_STATUS_PANE_LABEL.c_str() );
-	}
-
-	// Update status text
-	m_statusBar.SetText(zStatusText, gnSTATUS_TEXT_STATUS_PANE_ID, 0);
-	m_statusBar.SetText(zCompletedProcessing, gnCOMPLETED_COUNTS_STATUS_PANE_ID, 0);
-	m_statusBar.SetText(zCurrentlyProcessing, gnPROCESSING_COUNTS_STATUS_PANE_ID, 0);
-	m_statusBar.SetText(zPending, gnPENDING_COUNTS_STATUS_PANE_ID, 0);
-	m_statusBar.SetText(zSkipped, gnSKIPPED_COUNTS_STATUS_PANE_ID, 0);
-	m_statusBar.SetText(zFailed, gnFAILED_COUNTS_STATUS_PANE_ID, 0);
-	m_statusBar.SetText(zTotal, gnTOTAL_COUNTS_STATUS_PANE_ID, 0);
-
-	// Set the title bar text
 	CString szTitle = "File Action Manager";
 	string strActiveContext = asString(m_ipFAMTagManager->ActiveContext);
 	string strFile = getFileNameFromFullPath(m_strCurrFPSFilename);
@@ -2384,7 +2305,7 @@ void FileProcessingDlg::updateUI()
 	strTitleComponents.push_back("File Action Manager");
 
 	szTitle = asString(strTitleComponents, false, " - ").c_str();
-		
+
 	if (!m_strProcessingStateString.empty())
 	{
 		string strTitle = szTitle;
@@ -2394,8 +2315,112 @@ void FileProcessingDlg::updateUI()
 
 	// Update context related controls on the database tab.
 	m_propDatabasePage.setCurrentContextState(bFileSaved, isValidContext(), strActiveContext);
-	
+
 	m_buttonContext.SetWindowText(strActiveContext.c_str());
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::updateStatusBar(bool bForceUpdate)
+{
+	CString zOldStatusText, zOldCompletedProcessing, zOldCurrentlyProcessing, zOldFailed, zOldPending, zOldSkipped, zOldTotal;
+	CString zNewStatusText, zNewCompletedProcessing, zNewCurrentlyProcessing, zNewFailed, zNewPending, zNewSkipped, zNewTotal;
+
+	if (m_bRunning)
+	{
+		if (m_strProcessingStateString.empty())
+		{
+			if (isPageDisplayed(kProcessingLogPage))
+			{
+				long nNumCurrentlyProcessing = m_propProcessingPage.getCurrentlyProcessingCount();
+				if (nNumCurrentlyProcessing <= 0)
+				{
+					zNewStatusText = "Waiting";
+				}
+				else
+				{
+					zNewStatusText = "Processing";
+				}
+			}
+			else if (isPageDisplayed(kQueueLogPage))
+			{
+				zNewStatusText = "Queueing";
+			}
+		}
+		else
+		{
+			zNewStatusText = m_strProcessingStateString.c_str();
+		}
+	}
+	else
+	{
+		zNewStatusText = getFAMStatus();
+	}
+
+	// Display comma-separated numbers in status bar only if an Action has been selected (P13 #4355)
+	if (m_bDBConnectionReady && m_nCurrActionID != -1)
+	{
+		zNewCompletedProcessing.Format("%s %s", gstrCOMPLETED_STATUS_PANE_LABEL.c_str(),
+			commaFormatNumber((LONGLONG)m_nNumCompletedProcessing).c_str());
+		zNewCurrentlyProcessing.Format("%s %s", gstrPROCESSING_STATUS_PANE_LABEL.c_str(),
+			commaFormatNumber((LONGLONG)m_nNumCurrentlyProcessing).c_str());
+		zNewFailed.Format("%s %s", gstrFAILED_STATUS_PANE_LABEL.c_str(),
+			commaFormatNumber((LONGLONG)m_nNumFailed).c_str());
+		zNewSkipped.Format("%s %s", gstrSKIPPED_STATUS_PANE_LABEL.c_str(),
+			commaFormatNumber((LONGLONG)m_nNumSkipped).c_str());
+		zNewPending.Format("%s %s", gstrPENDING_STATUS_PANE_LABEL.c_str(),
+			commaFormatNumber((LONGLONG)m_nNumPending).c_str());
+		zNewTotal.Format("%s %s", gstrTOTAL_STATUS_PANE_LABEL.c_str(),
+			commaFormatNumber((LONGLONG)m_nNumTotalDocs).c_str());
+	}
+	else
+	{
+		// Just display the labels in the cells
+		zNewCompletedProcessing.Format("%s", gstrCOMPLETED_STATUS_PANE_LABEL.c_str());
+		zNewCurrentlyProcessing.Format("%s", gstrPROCESSING_STATUS_PANE_LABEL.c_str());
+		zNewFailed.Format("%s", gstrFAILED_STATUS_PANE_LABEL.c_str());
+		zNewPending.Format("%s", gstrPENDING_STATUS_PANE_LABEL.c_str());
+		zNewSkipped.Format("%s", gstrSKIPPED_STATUS_PANE_LABEL.c_str());
+		zNewTotal.Format("%s", gstrTOTAL_STATUS_PANE_LABEL.c_str());
+	}
+
+	if (!bForceUpdate)
+	{
+		zOldStatusText = m_statusBar.GetText(gnSTATUS_TEXT_STATUS_PANE_ID);
+		zOldCompletedProcessing = m_statusBar.GetText(gnCOMPLETED_COUNTS_STATUS_PANE_ID);
+		zOldCurrentlyProcessing = m_statusBar.GetText(gnPROCESSING_COUNTS_STATUS_PANE_ID);
+		zOldPending = m_statusBar.GetText(gnPENDING_COUNTS_STATUS_PANE_ID);
+		zOldSkipped = m_statusBar.GetText(gnSKIPPED_COUNTS_STATUS_PANE_ID);
+		zOldFailed = m_statusBar.GetText(gnFAILED_COUNTS_STATUS_PANE_ID);
+		zOldTotal = m_statusBar.GetText(gnTOTAL_COUNTS_STATUS_PANE_ID);
+	}
+	
+	if (zOldStatusText != zNewStatusText)
+	{
+		m_statusBar.SetText(zNewStatusText, gnSTATUS_TEXT_STATUS_PANE_ID, 0);
+	}
+	if (zOldCompletedProcessing != zNewCompletedProcessing)
+	{
+		m_statusBar.SetText(zNewCompletedProcessing, gnCOMPLETED_COUNTS_STATUS_PANE_ID, 0);
+	}
+	if (zOldCurrentlyProcessing != zNewCurrentlyProcessing)
+	{
+		m_statusBar.SetText(zNewCurrentlyProcessing, gnPROCESSING_COUNTS_STATUS_PANE_ID, 0);
+	}
+	if (zOldPending != zNewPending)
+	{
+		m_statusBar.SetText(zNewPending, gnPENDING_COUNTS_STATUS_PANE_ID, 0);
+	}
+	if (zOldSkipped != zNewSkipped)
+	{
+		m_statusBar.SetText(zNewSkipped, gnSKIPPED_COUNTS_STATUS_PANE_ID, 0);
+	}
+	if (zOldFailed != zNewFailed)
+	{
+		m_statusBar.SetText(zNewFailed, gnFAILED_COUNTS_STATUS_PANE_ID, 0);
+	}
+	if (zOldTotal != zNewTotal)
+	{
+		m_statusBar.SetText(zNewTotal, gnTOTAL_COUNTS_STATUS_PANE_ID, 0);
+	}
 }
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingDlg::isFAMReady()
@@ -2466,8 +2491,6 @@ void FileProcessingDlg::openFile(string strFileName)
 		getFPM()->LoadFrom(get_bstr_t(strFileName), VARIANT_FALSE);
 		loadSettingsFromManager();
 
-		// update the UI
-		updateMenuAndToolbar();
 		updateUI();
 
 		// Delete recovery file - user has opened a new file
@@ -2752,7 +2775,6 @@ void FileProcessingDlg::loadSettingsFromManager()
 		// https://extract.atlassian.net/browse/ISSUE-13100
 		try
 		{
-			updateMenuAndToolbar();
 			updateUI();
 		}
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38315")
@@ -3052,17 +3074,17 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 					getDBPointer()->GetStats(m_nCurrActionID, VARIANT_FALSE);
 				ASSERT_RESOURCE_ALLOCATION("ELI38476", ipActionStats != __nullptr);
 	
-				updateStatusBarStats(ipActionStats);
+				updateStats(ipActionStats);
 			}
 		}
 		// If the action name doesn't exist don't show an error; simply don't update the counts
 		catch (_com_error&)
 		{
-			updateStatusBarStats(nullptr);
+			updateStats(__nullptr);
 		}
 		catch (UCLIDException&)
 		{
-			updateStatusBarStats(nullptr);
+			updateStats(__nullptr);
 		}
 	}
 	else
@@ -3070,7 +3092,7 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 		// Hide the Action page
 		updateTabs(setPages);
 
-		updateStatusBarStats(__nullptr);
+		updateStats(__nullptr);
 	}
 
 	updateUI();
@@ -3229,7 +3251,6 @@ void FileProcessingDlg::updateUIForProcessingComplete()
 		pMenu->EnableMenuItem(1, MF_BYPOSITION | MF_ENABLED);
 
 		updateUI();
-		updateMenuAndToolbar();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29347");
 }

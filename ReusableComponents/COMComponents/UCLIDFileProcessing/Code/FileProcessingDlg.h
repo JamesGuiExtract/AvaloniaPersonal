@@ -80,11 +80,17 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: This method will update UI
 	void updateUI();
+	//---------------------------------------------------------------------------------------------
+	// Updates the status bar (current status + stats). This will not query for the latest stats;
+	// it will use the previously retrieved stats.
+	void updateStatusBar(bool bForceUpdate);
 	//---------------------------------------------------------------------------------------------	
 	// Updates the database tab based on the current database status and updates the UI
 	void updateUIForCurrentDBStatus();
 	//---------------------------------------------------------------------------------------------
-	void updateStatusBarStats(UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats);
+	// Updates the stats using the supplied ipActionStatistics. This will call updateStatusBar to 
+	// display the new stats.
+	void updateStats(UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To return true if the FAM is "Ready" (i.e. FAM is able to Run) and false otherwise
 	bool isFAMReady();

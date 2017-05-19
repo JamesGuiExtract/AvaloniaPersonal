@@ -877,18 +877,39 @@ long CFileProcessingDB::getFileID(_ConnectionPtr ipConnection, string& rstrFileN
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26720");
 }
 //--------------------------------------------------------------------------------------------------
+long CFileProcessingDB::getActiveWorkflowID(_ConnectionPtr ipConnection)
+{
+	if (m_nActiveWorkflowID != 0)
+	{
+		return m_nActiveWorkflowID;
+	}
+	else
+	{
+		string strWorkflow = getActiveWorkflow();
+
+		if (strWorkflow.empty())
+		{
+			// Using <All workflows>
+			m_nActiveWorkflowID = -1;
+		}
+		else
+		{
+			// CAUTION: Call getWorkflowID() only when strWorkflow is not empty to avoid circular reference.
+			m_nActiveWorkflowID = getWorkflowID(ipConnection, strWorkflow);
+		}
+
+		return m_nActiveWorkflowID;
+	}
+}
+//--------------------------------------------------------------------------------------------------
 long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, string strWorkflowName)
 {
 	try
 	{
 		if (strWorkflowName.empty())
 		{
-			strWorkflowName = getActiveWorkflow();
-		}
-
-		if (strWorkflowName.empty())
-		{
-			return -1;
+			// CAUTION: Call getWorkflowID() only when strWorkflowName is empty to avoid circular reference.
+			return getActiveWorkflowID(ipConnection);
 		}
 
 		string strQuery = "SELECT [ID] FROM [Workflow] WHERE [Workflow].[Name] = '" +
@@ -935,7 +956,7 @@ bool CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, long nFile
 {
 	try
 	{
-		if (nWorkflowID <= 0 && databaseUsingWorkflows(ipConnection))
+		if (nWorkflowID <= 0)
 		{
 			nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
 		}
@@ -1042,6 +1063,17 @@ string CFileProcessingDB::getActionIDsForActiveWorkflow(_ConnectionPtr ipConnect
 {
 	try
 	{
+		// This method is used frequently in processing. For efficiency, retrieve the currently workflow's
+		// action ID(s) from cache.
+		{
+			CSingleLock lock(&m_criticalSection, TRUE);
+			auto actionIDsIter = m_mapActionIdsForActiveWorkflow.find(strActionName);
+			if (actionIDsIter != m_mapActionIdsForActiveWorkflow.end())
+			{
+				return actionIDsIter->second;
+			}
+		}
+
 		string strActionIDs;
 
 		string strActiveWorkflow = getActiveWorkflow();
@@ -1082,6 +1114,12 @@ string CFileProcessingDB::getActionIDsForActiveWorkflow(_ConnectionPtr ipConnect
 		else
 		{
 			strActionIDs = asString(getActionID(ipConnection, strActionName, strActiveWorkflow));
+		}
+
+		// Cache strActionIDs for subsequent calls.
+		{
+			CSingleLock lock(&m_criticalSection, TRUE);
+			m_mapActionIdsForActiveWorkflow[strActionName] = strActionIDs;
 		}
 
 		return strActionIDs;
@@ -1244,7 +1282,12 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 				m_lFAMUserID = 0;
 				m_lMachineID = 0;
 				m_bDeniedFastCountPermission = false;
-				m_nWorkflowActionIDCheck = -1;
+				m_mapWorkflowDefinitions.clear();
+				m_mapActionIdsForActiveWorkflow.clear();
+
+				// Zero indicates the ID needs to be looked up next time the ID is requested.
+				// -1 indicates there is no active workflow.
+				m_nActiveWorkflowID = 0;
 
 				// Set the status of the connection to not connected
 				m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
@@ -2517,7 +2560,6 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 			executeCmdQuery(ipConnection, strWorkflowActionQuery, false, &nWorkflowActionCount);
 			m_bUsingWorkflowsForCurrentAction = (nWorkflowActionCount > 0);
 			m_bRunningAllWorkflows = (m_bUsingWorkflowsForCurrentAction && strActiveWorkflow == "");
-			m_nWorkflowActionIDCheck = -1;
 
 			if (m_bUsingWorkflowsForCurrentAction)
 			{
@@ -3870,7 +3912,10 @@ void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 			m_bLoggedInAsAdmin = false;
 		}
 
-		m_nWorkflowActionIDCheck = -1;
+		// Zero indicates the ID needs to be looked up next time the ID is requested.
+		// -1 indicates there is no active workflow.
+		m_nActiveWorkflowID = -1;
+		m_mapWorkflowDefinitions.clear();
 
 		// Reset the Current connection status to not connected
 		m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
@@ -6555,6 +6600,25 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 	return ipWorkflowDefinition;
 }
 //-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getCachedWorkflowDefinition(
+	_ConnectionPtr ipConnection, long nWorkflowID)
+{
+	CSingleLock lock(&m_criticalSection, TRUE);
+
+	auto iterWorkflow = m_mapWorkflowDefinitions.find(nWorkflowID);
+	if (iterWorkflow != m_mapWorkflowDefinitions.end())
+	{
+		return iterWorkflow->second;
+	}
+	else
+	{
+		UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDef =
+			getWorkflowDefinition(ipConnection, nWorkflowID);
+		m_mapWorkflowDefinitions[nWorkflowID] = ipWorkflowDef;
+		return ipWorkflowDef;
+	}
+}
+//-------------------------------------------------------------------------------------------------
 vector<tuple<long, string, bool>> CFileProcessingDB::getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID)
 {
 	vector<tuple<long, string, bool>> vecWorkflowActions;
@@ -6638,10 +6702,10 @@ map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 		ipConnection = getDBConnection();
 		validateDBSchemaVersion();
 
-		long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
+		long nWorkflowID = getActiveWorkflowID(ipConnection);
 
 		UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
-			getWorkflowDefinition(ipConnection, nWorkflowID);
+			getCachedWorkflowDefinition(ipConnection, nWorkflowID);
 		ASSERT_RESOURCE_ALLOCATION("ELI42137", ipWorkflowDefinition != __nullptr);
 
 		vector<string> vecIncludedActionIDs;
@@ -6689,27 +6753,12 @@ map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::databaseUsingWorkflows(_ConnectionPtr ipConnection)
 {
-	if (m_nWorkflowActionIDCheck < 0)
-	{
-		CSingleLock lg(&m_criticalSection, TRUE);
+	string strQuery = "SELECT COUNT([ID]) AS [ID] FROM [Workflow]\r\n";
 
-		if (m_nWorkflowActionIDCheck < 0)
-		{
-			string strQuery =
-				"SELECT COALESCE(MAX([ActionID]), 0) AS [ID] FROM \r\n"
-				"(\r\n"
-				"	SELECT TOP 1 [ActionID] FROM [FileActionStatus] \r\n"
-				"	INNER JOIN [Action] ON [ActionID] = [Action].[ID] \r\n"
-				"	WHERE [WorkflowID] IS NOT NULL \r\n"
-				") T";
+	long nWorkflowCount = -1;
+	executeCmdQuery(ipConnection, strQuery, false, &nWorkflowCount);
 
-			long nWorkflowActionIDCheck = -1;
-			executeCmdQuery(ipConnection, strQuery, false, &nWorkflowActionIDCheck);
-			m_nWorkflowActionIDCheck = nWorkflowActionIDCheck;
-		}
-	}
-
-	return m_nWorkflowActionIDCheck > 0;
+	return nWorkflowCount > 0;
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const string& strAction,
@@ -6977,7 +7026,7 @@ void CFileProcessingDB::initOutputFileMetadataFieldValue(_ConnectionPtr ipConnec
 	long nFileID, string strFileName, long nWorkflowID)
 {
 	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
-		getWorkflowDefinition(ipConnection, nWorkflowID);
+		getCachedWorkflowDefinition(ipConnection, nWorkflowID);
 	ASSERT_RESOURCE_ALLOCATION("ELI43187", ipWorkflowDefinition != __nullptr);
 
 	string strOutputFileMetadataField = ipWorkflowDefinition->OutputFileMetadataField;

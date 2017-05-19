@@ -1794,7 +1794,9 @@ bool CFileProcessingDB::DeleteAction_Internal(bool bDBLocked, BSTR strAction)
 				assertProcessingNotActiveForAction(bDBLocked, ipConnection, strActionName);
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+				m_mapActionIdsForActiveWorkflow.clear();
 
 				// Delete the action
 				string strDeleteActionQuery = "DELETE FROM [Action] WHERE [ASCName] = '" + strActionName + "'";
@@ -1947,7 +1949,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 				if (nWorkflowID <= 0 && m_bUsingWorkflowsForCurrentAction)
 				{
-					nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
+					nWorkflowID = getActiveWorkflowID(ipConnection);
 				}
 
 				string strActionName = asString(strAction);
@@ -7157,12 +7159,11 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 			}
 			else
 			{
-				string strActiveWorkflow = getActiveWorkflow();
+				long nWorkflowID = getActiveWorkflowID(ipConnection);
 
 				// Can't use a fast count if workflows are involved; need to use the WorkflowFile table.
-				if (!strActiveWorkflow.empty())
+				if (nWorkflowID > 0)
 				{
-					long nWorkflowID = getWorkflowID(ipConnection, strActiveWorkflow);
 					string strCountQuery = gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY;
 					replaceVariable(strCountQuery, "<WorkflowID>", asString(nWorkflowID));
 
@@ -9648,6 +9649,8 @@ bool CFileProcessingDB::AddWorkflow_Internal(bool bDBLocked, BSTR bstrName, EWor
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
+			m_mapWorkflowDefinitions.clear();
+
 			const char* szWorkflowType = "U";
 			switch (eType)
 			{
@@ -9699,6 +9702,8 @@ bool CFileProcessingDB::DeleteWorkflow_Internal(bool bDBLocked, long nID)
 			validateDBSchemaVersion();
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+			m_mapWorkflowDefinitions.clear();
 
 			long nDeletedCount = executeCmdQuery(ipConnection,
 				"DELETE FROM [Workflow] WHERE [ID] = " + asString(nID));
@@ -9787,6 +9792,8 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 			validateDBSchemaVersion();
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+			m_mapWorkflowDefinitions.clear();
 
 			_RecordsetPtr ipWorkflowSet(__uuidof(Recordset));
 			ASSERT_RESOURCE_ALLOCATION("ELI41916", ipWorkflowSet != __nullptr);
@@ -10040,6 +10047,8 @@ bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
 			validateDBSchemaVersion();
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+			m_mapActionIdsForActiveWorkflow.clear();
 
 			long nActionCount = ipActionList->Size();
 			vector<string> vecActionNames;

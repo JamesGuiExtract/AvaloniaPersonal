@@ -378,6 +378,13 @@ private:
 	// Map that contains the open connection for each thread.
 	map<DWORD, _ConnectionPtr> m_mapThreadIDtoDBConnections;
 
+	// Cache the actionID associated with each action name for the current workflow, or all action IDs
+	// for all workflows (represented with a key of "").
+	map<string, string> m_mapActionIdsForActiveWorkflow;
+
+	// Cache the workflow definiation for each workflow ID.
+	map<long, UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr> m_mapWorkflowDefinitions;
+
 	// For synchronization of connections, active workflow, and other resources that are otherwise
 	// not thread-safe
 	CCriticalSection m_criticalSection;
@@ -443,18 +450,16 @@ private:
 	// except in cases where m_criticalSection is locked.
 	string m_strActiveWorkflow;
 
+	// Zero indicates the ID needs to be looked up next time the ID is requested.
+	// -1 indicates there is no active workflow.
+	long m_nActiveWorkflowID;
+
 	// Indicates whether workflows are being used for processing within the context of the current action.
 	volatile bool m_bUsingWorkflowsForCurrentAction;
 
 	// Indicates whether an action is being processed across all workflows. This will be true
 	// when m_bUsingWorkflowsForCurrentAction is true and m_strActiveWorkflow empty.
 	volatile bool m_bRunningAllWorkflows;
-	
-	// An ID indicating whether any workflows are currently in use anywhere in the database.
-	// -1 indicates a check has not been made for workflows, 0 means a check has been made, but
-	// there are no active workflows and > 0 means there are active workflows.
-	// NOTE: This property should not be checked directly; instead databaseUsingWorkflows() should be used.
-	volatile long m_nWorkflowActionIDCheck;
 
 	// Keeps track of the last time this instance checked stats.
 	CTime m_timeLastStatsCheck;
@@ -702,6 +707,9 @@ private:
 	void addASTransFromSelect (_ConnectionPtr ipConnection, const string &strAction,
 		long nActionID, const string &strToState, const string &strException, const string &strComment, 
 		const string &strWhereClause, const string &strTopClause);
+
+	// Gets the ID of the currently active workflow or -1 if no workflow is active.
+	long getActiveWorkflowID(_ConnectionPtr ipConnection);
 
 	// PROMISE: To return the ID for the given provided workflow name.
 	long getWorkflowID(_ConnectionPtr ipConnection, string strWorkflowName);
@@ -1208,6 +1216,10 @@ private:
 
 	// Gets the specified workflow definition
 	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr getWorkflowDefinition(_ConnectionPtr ipConnection, long nID);
+	
+	// Gets the specified workflow in cases where performance is important and it's not expected
+	// that the workflow will have changed.
+	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr getCachedWorkflowDefinition(_ConnectionPtr ipConnection, long nID);
 
 	// For every action in a workflow, gets the action id, name and whether main sequence.
 	vector<tuple<long, string, bool>> getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID);
@@ -1218,7 +1230,7 @@ private:
 	// Return value is a map of ActionStatus codes (R, F, C, U) to their respective counts.
 	map<string, long> getWorkflowStatus(long nFileID);
 
-	// Indicates whether any workflows are currently in use anywhere in the database.
+	// Indicates whether any workflows are currently defined in the database.
 	bool databaseUsingWorkflows(_ConnectionPtr ipConnection);
 
 	// Helper function for SetStatusForAllFiles COM method that may be called once per workflow when

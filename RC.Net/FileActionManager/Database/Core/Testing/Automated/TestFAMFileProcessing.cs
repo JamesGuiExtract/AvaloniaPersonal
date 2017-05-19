@@ -154,8 +154,7 @@ namespace Extract.FileActionManager.Database.Test
                     "Workflow1", EWorkflowType.kUndefined, _LABDE_ACTION1);
                 int actionId = fileProcessingDb.GetActionID(_LABDE_ACTION1);
 
-                // While a workflow has been defined, it is not yet being used.
-                Assert.IsFalse(fileProcessingDb.UsingWorkflows);
+                Assert.IsTrue(fileProcessingDb.UsingWorkflows);
 
                 fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
 

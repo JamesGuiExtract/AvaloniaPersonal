@@ -1910,7 +1910,7 @@ library UCLID_FILEPROCESSINGLib
 		[id(178), helpstring("method IsFileInWorkflow")] HRESULT IsFileInWorkflow([in] long nFileID,
 			[in] long nWorkflowID, [out, retval] VARIANT_BOOL *pbIsInWorkflow);
 		// -----------------------------------------------------------------------------------------------
-		// PROMISE: Gets whether the FAM database has workflows that are being used.
+		// PROMISE: Gets whether the FAM database has any workflows defined.
 		[propget, id(179), helpstring("method UsingWorkflows")] HRESULT UsingWorkflows([out, retval] VARIANT_BOOL *pbUsingWorkflows);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Gets the workflow name associated with the ActionID

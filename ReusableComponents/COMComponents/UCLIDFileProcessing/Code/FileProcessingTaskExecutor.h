@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -144,8 +145,8 @@ private:
 	//////////
 	
 	Win32Event m_eventCancelRequested;
-	CMutex m_mutex;
-	CMutex m_mutexCurrentTask;
+	CCriticalSection m_criticalSection;
+	CCriticalSection m_criticalSectionCurrentTask;
 
 	// Signaled if standby mode has ended and the executor should not longer wait on any standby
 	// calls that are blocking.
@@ -167,6 +168,9 @@ private:
 	
 	// Text that should prepend any status message to be posted to a ProgressStatus object
 	string m_strStatusMessagePrefix;
+
+	// Maps workflow IDs to the corresponding workflow name.
+	map<long, _bstr_t> m_mapWorkflowNames;
 	
 	// Indicates that a valid task list was provided and Init was called on every enabled task
 	bool m_bInitialized;
@@ -200,4 +204,8 @@ private:
 
 	// Returns the count of enabled file processing tasks
 	long countEnabledTasks();
+
+	// Gets the name of the workflow with the specified ID. The name will be cached and would not
+	// reflect any changes to the workflow name in the midst of processing were they to occur.
+	_bstr_t getWorkflowName(long nWorkflowID);
 };

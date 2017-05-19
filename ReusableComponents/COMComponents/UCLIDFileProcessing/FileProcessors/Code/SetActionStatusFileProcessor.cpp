@@ -282,6 +282,11 @@ STDMETHODIMP CSetActionStatusFileProcessor::put_Workflow(BSTR bstrNewVal)
         // update action name
 		m_strWorkflow = asString(bstrNewVal);
 
+		if (m_strWorkflow.empty())
+		{
+			m_strWorkflow = gstrCURRENT_WORKFLOW;
+		}
+
         // set dirty flag to true
         m_bDirty = true;
     }
@@ -333,7 +338,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 		long nWorkflowId = ipFileRecord->WorkflowID;
 		
 		// Set the target workflow
-		if (m_strWorkflow != gstrCURRENT_WORKFLOW)
+		if (!m_strWorkflow.empty() && m_strWorkflow != gstrCURRENT_WORKFLOW)
 		{
 			nWorkflowId = ipDB->GetWorkflowID(m_strWorkflow.c_str());
 		}
@@ -666,6 +671,10 @@ STDMETHODIMP CSetActionStatusFileProcessor::Load(IStream *pStream)
 		if (nDataVersion >= 3)
 		{
 			dataReader >> m_strWorkflow;
+			if (gstrCURRENT_WORKFLOW.empty())
+			{
+				m_strWorkflow = gstrCURRENT_WORKFLOW;
+			}
 		}
 
         // Clear the dirty flag as we've loaded a fresh object

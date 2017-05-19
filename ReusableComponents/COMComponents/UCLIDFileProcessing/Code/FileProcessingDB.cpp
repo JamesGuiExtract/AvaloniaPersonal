@@ -82,9 +82,9 @@ m_strEncryptedDatabaseID(""),
 m_bDatabaseIDValuesValidated(false),
 m_ipSecureCounters(__nullptr),
 m_strActiveWorkflow(""),
+m_nActiveWorkflowID(0),
 m_bUsingWorkflowsForCurrentAction(false),
 m_bRunningAllWorkflows(false),
-m_nWorkflowActionIDCheck(-1),
 m_nLastFAMFileID(0),
 m_bDeniedFastCountPermission(false),
 m_ipFAMTagManager(__nullptr)
@@ -4037,6 +4037,12 @@ STDMETHODIMP CFileProcessingDB::put_ActiveWorkflow(BSTR bstrWorkflowName)
 		CSingleLock lock(&m_criticalSection, TRUE);
 		m_strActiveWorkflow = asString(bstrWorkflowName);
 		ms_strLastWorkflow = m_strActiveWorkflow;
+		
+		// Clear cached action IDs
+		m_mapActionIdsForActiveWorkflow.clear();
+		// Zero indicates the ID needs to be looked up next time the ID is requested.
+		// -1 indicates there is no active workflow.
+		m_nActiveWorkflowID = 0;
 
 		return S_OK;
 	}

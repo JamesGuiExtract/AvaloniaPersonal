@@ -135,7 +135,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::Init(IIUnknownVector *pFileProcessingT
 
 	try
 	{
-		CSingleLock lg(&m_mutex,TRUE);
+		CSingleLock lg(&m_criticalSection,TRUE);
 
 		// Check license
 		validateLicense();
@@ -172,7 +172,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(IFileRecord* pFileRecord,
 
 	try
 	{
-		CSingleLock lg(&m_mutex,TRUE);
+		CSingleLock lg(&m_criticalSection,TRUE);
 
 		// Check license
 		validateLicense();
@@ -207,7 +207,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(IFileRecord* pFileRec
 
 	try
 	{
-		CSingleLock lg(&m_mutex,TRUE);
+		CSingleLock lg(&m_criticalSection,TRUE);
 
 		// Check license
 		validateLicense();
@@ -283,7 +283,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::Close()
 
 	try
 	{
-		CSingleLock lg(&m_mutex,TRUE);
+		CSingleLock lg(&m_criticalSection,TRUE);
 
 		// Check license
 		validateLicense();
@@ -353,7 +353,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::Standby(VARIANT_BOOL *pVal)
 			// Since Standby occurs on a different thread than Init & Close, we need to be sure that the
 			// initialization state remains constant until we are done accessing m_vecProcessingTasks.
 			{
-				CSingleLock lg(&m_mutex, TRUE);
+				CSingleLock lg(&m_criticalSection, TRUE);
 
 				// If we are no longer initialized, no need to initialize standby.
 				if (!m_bInitialized)
@@ -576,10 +576,11 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 						// Ensure that in the case of an error that m_ipCurrentTask will be restored to NULL
 						ValueRestorer<UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr> restorer(m_ipCurrentTask, NULL);
 
-						// Retrieve this file processor; use separate scope to limit m_mutexCurrentTask lock to this call
+						// Retrieve this file processor; use separate scope to limit
+						// m_criticalSectionCurrentTask lock to this call
 						{
 							// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
-							CSingleLock lock(&m_mutexCurrentTask, TRUE);
+							CSingleLock lock(&m_criticalSectionCurrentTask, TRUE);
 							m_ipCurrentTask = upTask->Task;
 							ASSERT_RESOURCE_ALLOCATION("ELI17692", m_ipCurrentTask != __nullptr);
 						}
@@ -587,13 +588,7 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 						// Was cancel request either passed in or received via a call to Cancel?
 						bool bCancel = (bCancelRequested || m_eventCancelRequested.isSignaled());
 
-						_bstr_t bstrCurrentWorkflow("");
-						long nWorkflowID = ipFileRecord->WorkflowID;
-						if (m_ipDB != __nullptr && nWorkflowID > 0)
-						{
-							UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDef = m_ipDB->GetWorkflowDefinition(nWorkflowID);
-							bstrCurrentWorkflow = ipWorkflowDef->Name;
-						}
+						_bstr_t bstrCurrentWorkflow = getWorkflowName(ipFileRecord->WorkflowID);
 						// Replace tag manager with new instance that has current workflow
 						UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipTagManager = m_ipFAMTagManager->GetFAMTagManagerWithWorkflow(bstrCurrentWorkflow);
 
@@ -605,7 +600,7 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 						// Task is no longer running; indicate such
 						{
 							// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
-							CSingleLock lock(&m_mutexCurrentTask, TRUE);
+							CSingleLock lock(&m_criticalSectionCurrentTask, TRUE);
 							m_ipCurrentTask = __nullptr;
 						}
 
@@ -773,7 +768,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr CFileProcessingTaskExecutor::get
 	try
 	{
 		// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
-		CSingleLock lock(&m_mutexCurrentTask, TRUE);
+		CSingleLock lock(&m_criticalSectionCurrentTask, TRUE);
 
 		return m_ipCurrentTask;
 	}
@@ -795,10 +790,31 @@ long CFileProcessingTaskExecutor::countEnabledTasks()
 	return nCount;
 }
 //-------------------------------------------------------------------------------------------------
+_bstr_t CFileProcessingTaskExecutor::getWorkflowName(long nWorkflowID)
+{
+	if (m_ipDB == __nullptr || nWorkflowID <= 0)
+	{
+		return "";
+	}
+
+	CSingleLock lg(&m_criticalSection, TRUE);
+
+	auto workflowName = m_mapWorkflowNames.find(nWorkflowID);
+	if (workflowName != m_mapWorkflowNames.end())
+	{
+		return workflowName->second;
+	}
+	else
+	{
+		UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDef = m_ipDB->GetWorkflowDefinition(nWorkflowID);
+		m_mapWorkflowNames[nWorkflowID] = ipWorkflowDef->Name;
+		return ipWorkflowDef->Name;
+	}
+}
+//-------------------------------------------------------------------------------------------------
 void CFileProcessingTaskExecutor::validateLicense()
 {
 	static const unsigned long THIS_COMPONENT_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
 
 	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI17690", "File Processing Task Executor");
 }
-//-------------------------------------------------------------------------------------------------
