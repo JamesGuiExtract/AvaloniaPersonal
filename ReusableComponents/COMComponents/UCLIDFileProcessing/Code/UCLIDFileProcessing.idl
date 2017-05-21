@@ -1691,7 +1691,7 @@ library UCLID_FILEPROCESSINGLib
 		//			bstrTaskClassGuid already exists in the TaskClass table.
 		// RETURNS: The ID of the added FileTaskSession row.
 		[id(145), helpstring("methods StartFileTaskSession")] HRESULT StartFileTaskSession(
-			[in] BSTR bstrTaskClassGuid, [in] long nFileID, [out, retval] long *pnFileTaskSessionID);
+			[in] BSTR bstrTaskClassGuid, [in] long nFileID, [in] long nActionID, [out, retval] long *pnFileTaskSessionID);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To execute the specified command query and return the number of affected rows
 		// AND a long long value of a named column.

@@ -189,7 +189,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         if (ipFAMDB != nullptr)
         {
             nFileTaskSessionID = 
-                ipFAMDB->StartFileTaskSession(gstrREDACTION_TASK_GUID.c_str(), nFileID);
+                ipFAMDB->StartFileTaskSession(gstrREDACTION_TASK_GUID.c_str(), nFileID, ipFileRecord->ActionID);
         }
 
         // Default to successful completion

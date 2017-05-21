@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 147;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 148;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1144,7 +1144,7 @@ int UpdateToSchemaVersion129(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vector<string> vecQueries;
 
 		vecQueries.push_back(gstrCREATE_TASK_CLASS);
-		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_V129);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_DATETIMESTAMP_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX);
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_FAM_SESSION_FK);
@@ -1712,7 +1712,7 @@ int UpdateToSchemaVersion147(_ConnectionPtr ipConnection,
 
 		vector<string> vecQueries;
 
-		vecQueries.push_back("ALTER TABLE dbo.[Action] ADD[MainSequence] BIT NULL");
+		vecQueries.push_back("ALTER TABLE dbo.[Action] ADD [MainSequence] BIT NULL");
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -1720,6 +1720,50 @@ int UpdateToSchemaVersion147(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43302");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion148(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 148;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 10;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGE);
+		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE);
+
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGE_WORKFLOW_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_ACTIONSOURCE_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_ACTIONDESTINATION_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWDEST_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWSOURCE_FK);
+
+		// Need to update the FileTaskSession to include the ActionID
+		vecQueries.push_back("ALTER TABLE dbo.[FileTaskSession] ADD [ActionID] int;");
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_ACTION_FK);
+		vecQueries.push_back(
+			"UPDATE       [FileTaskSession] "
+			"SET                [ActionID] = [FAMSession].[ActionID] "
+			"FROM            [FAMSession] INNER JOIN "
+			"[FileTaskSession] ON [FAMSession].[ID] = [FileTaskSession].[FAMSessionID] ");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43412");
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -6647,7 +6691,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 144:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion145);
 				case 145:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion146);
 				case 146:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion147);
-				case 147:	break;
+				case 147:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion148);
+				case 148:	break;
 
 				default:
 					{
@@ -8765,7 +8810,7 @@ bool CFileProcessingDB::RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOl
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid,
-	long nFileID, long *pnFileTaskSessionID)
+	long nFileID, long nActionID, long *pnFileTaskSessionID)
 {
 	try
 	{
@@ -8787,6 +8832,7 @@ bool CFileProcessingDB::StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrT
 			replaceVariable(strInsertSQL, "<FAMSessionID>", asString(m_nFAMSessionID));
 			replaceVariable(strInsertSQL, "<TaskClassGuid>", asString(bstrTaskClassGuid));
 			replaceVariable(strInsertSQL, "<FileID>", asString(nFileID));
+			replaceVariable(strInsertSQL, "<ActionID>", asString(nActionID));
 
 			long nFileTaskSessionID = 0;
 			executeCmdQuery(ipConnection, strInsertSQL, false, pnFileTaskSessionID);

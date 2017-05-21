@@ -1383,7 +1383,7 @@ namespace Extract.Redaction.Verification
             if (_fileDatabase != null)
             {
                 thisMemento.FileTaskSessionID =
-                    _fileDatabase.StartFileTaskSession(_VERIFY_TASK_GUID, thisMemento.FileId);
+                    _fileDatabase.StartFileTaskSession(_VERIFY_TASK_GUID, thisMemento.FileId, thisMemento.ActionId);
             }
 
             // If the timer is currently running, its current time will be the overhead time (time

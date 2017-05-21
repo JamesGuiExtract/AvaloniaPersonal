@@ -551,7 +551,7 @@ namespace Extract.FileActionManager.FileProcessors
                     IntervalTimer timer = new IntervalTimer();
                     timer.Start();
                     int fileTaskSessionID = pDB.StartFileTaskSession(_CLASS_GUID,
-                                                                     pFileRecord.FileID);
+                                                                     pFileRecord.FileID, pFileRecord.ActionID);
                     var afutility = new UCLID_AFUTILSLib.AFUtility();
                     IUnknownVector voaData = afutility.GetAttributesFromFile(voaFileName);
                     voaData.ReportMemoryUsage();

@@ -85,6 +85,8 @@ static const string gstrPAGINATION="Pagination";
 static const string gstrWORKFLOW_TYPE = "WorkflowType";
 static const string gstrWORKFLOW = "Workflow";
 static const string gstrWORKFLOW_FILE = "WorkflowFile";
+static const string gstrWORKFLOWCHANGE = "WorkflowChange";
+static const string gstrWORKFLOWCHANGE_FILE = "WorkflowChangeFile";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -296,7 +298,7 @@ public:
 	STDMETHOD(GetLastConnectionStringConfiguredThisProcess)(BSTR *pbstrConnectionString);
 	STDMETHOD(get_ActiveFAMID)(long *pnActiveFAMID);
 	STDMETHOD(get_FAMSessionID)(long *pnFAMSessionID);
-	STDMETHOD(StartFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, long *pnFileTaskSessionID);
+	STDMETHOD(StartFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, long nActionID, long *pnFileTaskSessionID);
 	STDMETHOD(UpdateFileTaskSession)(long nFileTaskSessionID, double dDuration, double dOverheadTime);
 	STDMETHOD(GetFileNameFromFileID)( /*[in]*/ long fileID, /*[out, retval]*/ BSTR* pbstrFileName );
 	STDMETHOD(GetSecureCounters)(VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
@@ -1386,7 +1388,7 @@ private:
 	bool AddMetadataField_Internal(bool bDBLocked, const string& strMetadataFieldName);
 	bool DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMetadataFieldName);
 	bool RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
-	bool StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, long *pnFileTaskSessionID);
+	bool StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, long nActionID, long *pnFileTaskSessionID);
 	bool UpdateFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID, double dDuration, double dOverheadTime);
 	bool GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	bool GetSecureCounterName_Internal(bool bDBLocked, long nCounterID, BSTR *pstrCounterName);

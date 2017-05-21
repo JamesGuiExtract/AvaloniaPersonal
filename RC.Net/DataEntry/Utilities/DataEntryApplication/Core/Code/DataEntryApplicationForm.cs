@@ -4444,7 +4444,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 _recordedDatabaseData = false;
 
-                _fileTaskSessionID = FileProcessingDB.StartFileTaskSession(_VERIFICATION_TASK_GUID, _fileId);
+                _fileTaskSessionID = FileProcessingDB.StartFileTaskSession(_VERIFICATION_TASK_GUID, _fileId, _actionId);
 
                 if (_paginationPanel != null)
                 {

@@ -180,3 +180,14 @@ static const string gstrCREATE_WORKFLOW_LEGACY =
 	"	[OutputAttributeSetID] BIGINT, "
 	"	[OutputFileMetadataFieldID] INT, "
 	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
+
+// Used for schema version 129-147
+static const string gstrCREATE_FILE_TASK_SESSION_V129 =
+	"CREATE TABLE [dbo].[FileTaskSession]( "
+	" [ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FileTaskSession] PRIMARY KEY CLUSTERED, "
+	" [FAMSessionID] [int] NOT NULL, "
+	" [TaskClassID] [int] NOT NULL, "
+	" [FileID] [int] NOT NULL, "
+	" [DateTimeStamp] [datetime] NULL, "
+	" [Duration] [float] NULL, "
+	" [OverheadTime] [float] NULL)";

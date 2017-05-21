@@ -1593,6 +1593,14 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_PAGINATION_ORIGINALFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_PAGINATION_FILETASKSESSION_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWFILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGE_WORKFLOW_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_ACTIONSOURCE_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_ACTIONDESTINATION_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWDEST_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWSOURCE_FK);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_ACTION_FK);
 
 		if (bAddUserTables)
 		{
@@ -1754,6 +1762,8 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION);
 	vecQueries.push_back(gstrCREATE_PAGINATION);
 	vecQueries.push_back(gstrCREATE_WORKFLOWFILE);
+	vecQueries.push_back(gstrCREATE_WORKFLOWCHANGE);
+	vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE);
 
 	return vecQueries;
 }
@@ -3201,6 +3211,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrWORKFLOW_TYPE);
 	vecTables.push_back(gstrWORKFLOW);
 	vecTables.push_back(gstrWORKFLOW_FILE);
+	vecTables.push_back(gstrWORKFLOWCHANGE);
+	vecTables.push_back(gstrWORKFLOWCHANGE_FILE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -5098,6 +5110,8 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 							long nActionID = getLongField(ipFields, "ActionID");
 
 							ipFileRecord->WorkflowID = getWorkflowID(ipConnection, nActionID);
+
+							ipFileRecord->ActionID = nActionID;
 
 							// Get the previous state
 							string strFileFromState = getStringField(ipFields, "ASC_From");

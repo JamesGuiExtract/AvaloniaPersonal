@@ -1447,7 +1447,7 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 _fileTaskSessionID = 
                     _paginationPanel.FileTaskSessionID = FileProcessingDB.StartFileTaskSession(
-                        _PAGINATION_TASK_GUID, _fileID);
+                        _PAGINATION_TASK_GUID, _fileID, _actionID);
             }
             catch (Exception ex)
             {

@@ -2275,7 +2275,7 @@ EFileProcessingResult CFileProcessingMgmtRole::startFileProcessingChain(FileProc
 
 		// Attempt to process the file
 		EFileProcessingResult eResult = (EFileProcessingResult) ipExecutor->ProcessFile(
-			task.getFileRecord(), m_pRecordMgr->getActionID(),
+			task.getFileRecord(), task.getFileRecord()->ActionID,
 			task.m_ipProgressStatus, VARIANT_FALSE);
 
 		return eResult;
@@ -2383,7 +2383,7 @@ void CFileProcessingMgmtRole::executeErrorTask(FileProcessingRecord &task,
 	// Run the task
 	UCLID_FILEPROCESSINGLib::EFileProcessingResult eResult = ipExecutor->InitProcessClose(
 		task.getFileRecord(), ipErrorTaskList, 
-		m_pRecordMgr->getActionID(), getFPMDB(), getFAMTagManager(), getFileRequestHandler(),
+		task.getFileRecord()->ActionID, getFPMDB(), getFAMTagManager(), getFileRequestHandler(),
 		task.m_ipProgressStatus, VARIANT_FALSE);
 
 	// Log a cancellation during error task execution

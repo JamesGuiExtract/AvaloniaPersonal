@@ -3497,7 +3497,7 @@ STDMETHODIMP CFileProcessingDB::get_FAMSessionID(long *pnFAMSessionID)
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::StartFileTaskSession(BSTR bstrTaskClassGuid, long nFileID,
-	long *pnFileTaskSessionID)
+	long nActionID, long *pnFileTaskSessionID)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -3507,12 +3507,12 @@ STDMETHODIMP CFileProcessingDB::StartFileTaskSession(BSTR bstrTaskClassGuid, lon
 
 		ASSERT_ARGUMENT("ELI38638", pnFileTaskSessionID != nullptr);
 
-		if (!StartFileTaskSession_Internal(false, bstrTaskClassGuid, nFileID, pnFileTaskSessionID))
+		if (!StartFileTaskSession_Internal(false, bstrTaskClassGuid, nFileID, nActionID, pnFileTaskSessionID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			StartFileTaskSession_Internal(true, bstrTaskClassGuid, nFileID, pnFileTaskSessionID);
+			StartFileTaskSession_Internal(true, bstrTaskClassGuid, nFileID, nActionID, pnFileTaskSessionID);
 		}
 		
 		return S_OK;

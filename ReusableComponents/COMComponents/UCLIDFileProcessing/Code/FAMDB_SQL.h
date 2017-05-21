@@ -352,6 +352,7 @@ static const string gstrCREATE_FILE_TASK_SESSION =
 	"CREATE TABLE [dbo].[FileTaskSession]( "
 	" [ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FileTaskSession] PRIMARY KEY CLUSTERED, "
 	" [FAMSessionID] [int] NOT NULL, "
+	" [ActionID] [int] NULL,"
 	" [TaskClassID] [int] NOT NULL, "
 	" [FileID] [int] NOT NULL, "
 	" [DateTimeStamp] [datetime] NULL, "
@@ -414,6 +415,24 @@ static const string gstrCREATE_WORKFLOWFILE =
 	"	[WorkflowID] INT NOT NULL, "
 	"	[FileID] INT NOT NULL, "
 	"	CONSTRAINT [PK_WorkflowFile] PRIMARY KEY CLUSTERED ([WorkflowID], [FileID]));";
+
+static const string gstrCREATE_WORKFLOWCHANGE =
+	"CREATE TABLE [dbo].[WorkflowChange]( "
+	"	[ID]               INT IDENTITY(1, 1) NOT NULL, "
+	"	[WorkflowChangeDate]   DATETIMEOFFSET "
+	"		CONSTRAINT [DF_WorkflowChange_WorkflowChangeDate] DEFAULT (sysdatetimeoffset()) NOT NULL, "
+	"	[DestWorkflowID]   INT NOT NULL, "
+	"	CONSTRAINT [PK_WorkflowChange] PRIMARY KEY CLUSTERED([ID] ASC)); ";
+
+static const string gstrCREATE_WORKFLOWCHANGEFILE =
+	"CREATE TABLE [dbo].[WorkflowChangeFile]( "
+	"	[FileID]           INT NOT NULL, "
+	"	[WorkflowChangeID] INT NOT NULL, "
+	"	[SourceActionID]   INT NOT NULL, "
+	"	[DestActionID]     INT NOT NULL, "
+	"	[SourceWorkflowID] INT NULL, "
+	"	[DestWorkflowID]   INT NOT NULL, "
+	"	CONSTRAINT [PK_WorkflowChangeFile] PRIMARY KEY CLUSTERED([FileID] ASC, [WorkflowChangeID] ASC));";
 
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
@@ -968,6 +987,11 @@ static const string gstrADD_FILE_TASK_SESSION_FAMFILE_FK =
 	"WITH CHECK ADD  CONSTRAINT [FK_FileTaskSession_FAMFile] FOREIGN KEY([FileID])"
 	"REFERENCES [dbo].[FAMFile] ([ID])";
 
+static const string gstrADD_FILE_TASK_SESSION_ACTION_FK =
+	"ALTER TABLE [dbo].[FileTaskSession]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_FileTaskSession_Action] FOREIGN KEY([ActionID])"
+	"REFERENCES [dbo].[Action] ([ID])";
+
 static const string gstrADD_SECURE_COUNTER_VALUE_CHANGE_SECURE_COUNTER_FK =
 	"ALTER TABLE [dbo].SecureCounterValueChange "
 	"WITH CHECK ADD CONSTRAINT FK_SecureCounterValueChange_SecureCounter FOREIGN KEY([CounterID]) "
@@ -1052,6 +1076,56 @@ static const string gstrADD_WORKFLOWFILE_FAMFILE_FK =
 	"REFERENCES [FAMFile]([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
+
+static const string gstrADD_WORKFLOWCHANGE_WORKFLOW_FK = 
+	"ALTER TABLE dbo.[WorkflowChange] "
+	"ADD CONSTRAINT [FK_WorkflowChange_WorkflowDest] FOREIGN KEY([DestWorkflowID]) "
+	"REFERENCES dbo.[Workflow]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_WORKFLOWCHANGEFILE_FAMFILE_FK = 
+	"ALTER TABLE dbo.[WorkFlowChangeFile] "
+	"ADD CONSTRAINT [FK_WorkflowChangeFile_FAMFile] FOREIGN KEY([FileID]) "
+	"REFERENCES[dbo].[FAMFile]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK =
+	"ALTER TABLE dbo.[WorkFlowChangeFile] "
+	"ADD CONSTRAINT [FK_WorkflowChangeFile_WorkflowChange] FOREIGN KEY([WorkflowChangeID]) "
+	"REFERENCES[dbo].[WorkflowChange]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_WORKFLOWCHANGEFILE_ACTIONSOURCE_FK =
+	"ALTER TABLE dbo.[WorkFlowChangeFile] "
+	"ADD CONSTRAINT [FK_WorkflowChangeFile_ActionSource] FOREIGN KEY([SourceActionID]) "
+	"REFERENCES[dbo].[Action]([ID]) "
+	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
+
+static const string gstrADD_WORKFLOWCHANGEFILE_ACTIONDESTINATION_FK =
+	"ALTER TABLE dbo.[WorkFlowChangeFile] "
+	"ADD CONSTRAINT [FK_WorkflowChangeFile_ActionDestination] FOREIGN KEY([DestActionID]) "
+	"REFERENCES[dbo].[Action]([ID]) "
+	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Workflow table.
+
+static const string gstrADD_WORKFLOWCHANGEFILE_WORKFLOWDEST_FK =
+	"ALTER TABLE dbo.[WorkFlowChangeFile] "
+	"ADD CONSTRAINT [FK_WorkflowChangeFile_WorkflowDest] FOREIGN KEY([DestWorkflowID]) "
+	"REFERENCES[dbo].[Workflow]([ID]) "
+	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Workflow table.
+
+static const string gstrADD_WORKFLOWCHANGEFILE_WORKFLOWSOURCE_FK =
+	"ALTER TABLE dbo.[WorkFlowChangeFile] "
+	"ADD CONSTRAINT [FK_WorkflowChangeFile_WorkflowSource] FOREIGN KEY([SourceWorkflowID]) "
+	"REFERENCES[dbo].[Workflow]([ID]) "
+	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Workflow table.
+
 
 static const string gstrADD_DB_PROCEXECUTOR_ROLE =
 	"IF DATABASE_PRINCIPAL_ID('db_procexecutor') IS NULL \r\n"
@@ -1628,9 +1702,10 @@ static const string gstrSTART_FILETASKSESSION_DATA =
 	"INSERT INTO [dbo].[FileTaskSession] "
 	" ([FAMSessionID]"
 	"  ,[TaskClassID]"
-	"  ,[FileID])"
+	"  ,[FileID] "
+	"  ,[ActionID])"
 	"  OUTPUT INSERTED.ID"
-	"  VALUES (<FAMSessionID>, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = '<TaskClassGuid>'), <FileID>)";
+	"  VALUES (<FAMSessionID>, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = '<TaskClassGuid>'), <FileID>, <ActionID>)";
 
 static const string gstrUPDATE_FILETASKSESSION_DATA = 
 	"UPDATE [dbo].[FileTaskSession] SET "
