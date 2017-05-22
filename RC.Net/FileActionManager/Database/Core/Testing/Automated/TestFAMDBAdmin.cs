@@ -111,17 +111,17 @@ namespace Extract.FileActionManager.Database.Test
         }
 
         /// <summary>
-        /// Tests the ModifyActionStatusForQuery method in a database without workflows
+        /// Tests the ModifyActionStatusForSelection method in a database without workflows
         /// </summary>
         [Test, Category("Automated")]
-        public static void ModifyActionStatusForQuery()
+        public static void ModifyActionStatusForSelection()
         {
             GeneralMethods.TestSetup();
 
             _testFiles = new TestFileManager<TestFAMFileProcessing>();
             _testDbManager = new FAMTestDBManager<TestFAMFileProcessing>();
 
-            string testDbName = "Test_ModifyActionStatusForQuery";
+            string testDbName = "Test_ModifyActionStatusForSelection";
 
             try
             {
@@ -162,10 +162,11 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 1);
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsFailed == 1);
 
-                fileProcessingDb.ModifyActionStatusForQuery(
-                    "SELECT [ID] FROM [FAMFile] " +
-                    "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'",
-                    _LABDE_ACTION3, EActionStatus.kActionPending, "", null);
+                var fileSelector = new FAMFileSelector();
+                fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
+                    "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
+                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION3, EActionStatus.kActionPending, "");
 
                 // Updated statuses
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -177,9 +178,11 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 2);
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsFailed == 0);
 
-                fileProcessingDb.ModifyActionStatusForQuery(
-                    "SELECT [ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3",
-                    _LABDE_ACTION2, EActionStatus.kActionSkipped, "", null);
+                fileSelector.Reset();
+                fileSelector.AddQueryCondition(
+                    "SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
+                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION2, EActionStatus.kActionSkipped, "");
 
                 // Updated statuses
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -205,17 +208,17 @@ namespace Extract.FileActionManager.Database.Test
         }
 
         /// <summary>
-        /// Tests the ModifyActionStatusForQuery method in a database with workflows
+        /// Tests the ModifyActionStatusForSelection method in a database with workflows
         /// </summary>
         [Test, Category("Automated")]
-        public static void ModifyActionStatusForQueryWithWorkflows()
+        public static void ModifyActionStatusForSelectionWithWorkflows()
         {
             GeneralMethods.TestSetup();
 
             _testFiles = new TestFileManager<TestFAMFileProcessing>();
             _testDbManager = new FAMTestDBManager<TestFAMFileProcessing>();
 
-            string testDbName = "Test_ModifyActionStatusForQueryWithWorkflows";
+            string testDbName = "Test_ModifyActionStatusForSelectionWithWorkflows";
 
             try
             {
@@ -272,10 +275,12 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetFileCount(false) == 2);
                 Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 2);
 
-                fileProcessingDb.ModifyActionStatusForQuery("SELECT [ID] FROM [FAMFile]", _LABDE_ACTION1,
-                    EActionStatus.kActionUnattempted, "", null);
+                var fileSelector = new FAMFileSelector();
+                fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
+                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION1, EActionStatus.kActionUnattempted, "");
 
-                // Statuses after ModifyActionStatusForQuery in Workflow 1
+                // Statuses after ModifyActionStatusForSelection in Workflow 1
                 //            |  P  |  R  |  S  |  C  |  F 
                 // Workflow 1 ----------------------------   
                 //   Action 1 
@@ -309,12 +314,13 @@ namespace Extract.FileActionManager.Database.Test
 
                 Assert.That(fileProcessingDb.GetFileCount(false) == 3);
 
-                fileProcessingDb.ModifyActionStatusForQuery(
-                    "SELECT [ID] FROM [FAMFile] " +
-                    "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'",
-                    _LABDE_ACTION3, EActionStatus.kActionPending, "", null);
+                fileSelector.Reset();
+                fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
+                    "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
+                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION3, EActionStatus.kActionPending, "");
 
-                // Statuses after ModifyActionStatusForQuery in Workflow 2
+                // Statuses after ModifyActionStatusForSelection in Workflow 2
                 //            |  P  |  R  |  S  |  C  |  F 
                 // Workflow 1 ----------------------------  
                 //   Action 1 
@@ -330,11 +336,12 @@ namespace Extract.FileActionManager.Database.Test
 
                 fileProcessingDb.ActiveWorkflow = "";
 
-                fileProcessingDb.ModifyActionStatusForQuery(
-                    "SELECT [ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3",
-                    _LABDE_ACTION2, EActionStatus.kActionSkipped, "", null);
+                fileSelector.Reset();
+                fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
+                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION2, EActionStatus.kActionSkipped, "");
 
-                // Statuses after ModifyActionStatusForQuery for all workflows
+                // Statuses after ModifyActionStatusForSelection for all workflows
                 //            |  P  |  R  |  S  |  C  |  F 
                 // Workflow 1 ----------------------------  
                 //   Action 1 

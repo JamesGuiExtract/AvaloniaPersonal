@@ -408,6 +408,7 @@ static const string gstrCREATE_WORKFLOW =
 	"	[OutputAttributeSetID] BIGINT, "
 	"	[OutputFileMetadataFieldID] INT, "
 	"	[OutputFilePathInitializationFunction] NVARCHAR(255) NULL, "
+	"	[LoadBalanceWeight] INT NOT NULL CONSTRAINT [DF_Workflow_LoadBalanceWeight] DEFAULT(1), "
 	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
 static const string gstrCREATE_WORKFLOWFILE =
@@ -1370,39 +1371,106 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 "	[Pages] [int] NOT NULL, \r\n"
 "	[Priority] [int] NOT NULL, \r\n"
 "	[ActionID] [int] NOT NULL, \r\n"
+"	[WorkflowID][int] NULL, \r\n"
 "	[ASC_From] [nvarchar](1) NOT NULL \r\n"
 "); \r\n"
+"DECLARE @LoadBalanceRoundSize INT \r\n"
 "SET NOCOUNT ON \r\n"
 "BEGIN TRY \r\n"
-// Use table expression to group files by ID to avoid selecting the same file twice if queued in
-// multiple workflows simultaneously. FileRepetition will be > 1 for any cases where a file ID is
-// being returned beyond to first instance in this result set.
-"   ;WITH SelectedFiles AS \r\n"
+// Calculate the load the total size of a each round of processing to be used when load balancing
+// is active. The initial number of files grabbed should be a multiple of this to ensure when the
+// round is sequenced, that there is a statistically appropriate chance which files get left out of
+// the files returned.
+"	SELECT @LoadBalanceRoundSize = CASE WHEN 1 = <LoadBalance> \r\n"
+"			THEN ((<MaxFiles> + SUM(LoadBalanceWeight) - 1) / SUM(LoadBalanceWeight)) * SUM(LoadBalanceWeight) \r\n"
+"			ELSE <MaxFiles> END \r\n"
+"		FROM Workflow \r\n"
+"	INNER JOIN Action ON WorkflowID = Workflow.ID AND ASCName = '<ActionName>' \r\n"
+//	Iteration will generated a sequence of numbers 1 to 10 (The max weight of any given workflow)
+"	;WITH Iteration(Num) AS \r\n"
 "	( \r\n"
-"		SELECT ID, FileName, FileSize, Pages, Priority, ActionStatus, ActionId, \r\n"
+"		SELECT 1 FROM Workflow \r\n"
+"		UNION ALL \r\n"
+"		SELECT Num + 1 FROM Iteration WHERE Num <= 10 \r\n"
+"	), \r\n"
+// Load balancing between workflows works by creating "rounds" of processing where for each round
+// the number of files processed for a workflow will equal its weight. WeightedWorkflowList produces
+// a result representing such a round where each row represents a file to be processed by the
+// respective workflow. For each row returned, a random number will be assigned that will be
+// consistent for across multiple references (based on the fact that RAND will generate the same
+// value for all calls in a query).
+"	WeightedWorkflowList(WorkflowID, LoadBalanceWeight, Random) AS \r\n"
+"	( \r\n"
+"		SELECT ID, \r\n"
+"			LoadBalanceWeight, \r\n"
+//	RAND has a very poor distribution for similar seeds. Gymnastics here is to a produce well
+//  distributed seed for RAND
+"			RAND(CHECKSUM(HASHBYTES('MD5', CAST(ROW_NUMBER() OVER(ORDER BY(SELECT 1)) ^ CHECKSUM(RAND()) AS VARCHAR)))) \r\n"
+"		FROM Iteration CROSS JOIN Workflow \r\n"
+"		WHERE Num <= Workflow.LoadBalanceWeight \r\n"
+"	), \r\n"
+// In order to account for cases where the FPS is not grabbing the same number of files at a time
+// as the total number of files in a round (especially the case where only 1 file is being grabbed
+// at a time), the order of files processed in a round should be randomized between separate calls
+// to GFTP.
+"   LoadBalancing(WorkflowID, OverallSequence, WorkflowSequence) AS \r\n"
+"   ( \r\n"
+"   	SELECT WorkflowID, \r\n"
+"   			ROW_NUMBER() OVER (ORDER BY Random), \r\n"
+"   			ROW_NUMBER() OVER (PARTITION BY WorkflowID ORDER BY Random) \r\n"
+"   		FROM WeightedWorkflowList \r\n"
+"   			WHERE 1 = <LoadBalance> \r\n"
+"   ), \r\n"
+// Selected files is the overall domain of files available with an added FileRepitition column used
+// to weed out duplicate files when processing <All workflows>.
+"	SelectedFiles AS \r\n"
+"	( \r\n"
+"		SELECT ID, FileName, FileSize, Pages, Priority, ActionStatus, ActionId,\r\n"
 "			ROW_NUMBER() OVER (PARTITION BY ID ORDER BY Priority DESC, ID ASC) AS FileRepetition \r\n"
 "		FROM ( <SelectFilesToProcessQuery> ) T \r\n"
 "	), \r\n"
+// Limited files will restrict the selected files to only those files to be returned. This includes
+// excluding locked or processing files, limiting to <MaxFiles>, and removing duplicate file IDs when
+// processing on <all workflows> by excluding cases where FileRepetition is > 1.
 "	LimitedFiles AS \r\n"
 "	( \r\n"
-"		SELECT TOP(<MaxFiles>) SelectedFiles.* \r\n"
+"		SELECT TOP(@LoadBalanceRoundSize) SelectedFiles.*, WorkflowID, \r\n"
+//				WorkflowRound is in which round of processing this file should be processed.
+"				(ROW_NUMBER() OVER(PARTITION BY WorkflowID ORDER BY Priority DESC, SelectedFiles.ID ASC) - 1) / LoadBalanceWeight AS WorkflowRound, \r\n"
+//				WorkflowSequence is the position in a round specific to files of the same workflow
+"				(ROW_NUMBER() OVER(PARTITION BY WorkflowID ORDER BY Priority DESC, SelectedFiles.ID ASC) - 1) % LoadBalanceWeight + 1 AS WorkflowSequence \r\n"
 "			FROM SelectedFiles \r\n"
-"			LEFT JOIN LockedFile ON ID = LockedFile.FileID AND LockedFile.ActionName = '<ActionName>' \r\n"
+"			INNER JOIN Action ON SelectedFiles.ActionID = Action.ID \r\n"
+"			LEFT JOIN Workflow ON 1 = <LoadBalance> AND Action.WorkflowID = Workflow.ID \r\n"
+"			LEFT JOIN LockedFile ON SelectedFiles.ID = LockedFile.FileID AND LockedFile.ActionName = '<ActionName>' \r\n"
 "			WHERE SelectedFiles.ActionStatus <> 'R' AND LockedFile.FileID IS NULL AND FileRepetition = 1 \r\n"
-"			ORDER BY Priority DESC, ID ASC \r\n"
+//			WorkflowRound and WorkflowSequence will determine the order when load balancing is active,
+//			otherwise they will be NULL and Priority and FileID will determine the order.
+"			ORDER BY WorkflowRound ASC, WorkflowSequence ASC, Priority DESC, SelectedFiles.ID ASC \r\n"
+"	), \r\n"
+// Sequenced files will apply randomized sequencing using the LoadBalancing expression above if load
+// balancing is active.
+"	SequencedFiles AS \r\n"
+"	( \r\n"
+"		SELECT TOP(<MaxFiles>) LimitedFiles.* \r\n"
+"			FROM LimitedFiles \r\n"
+"			LEFT JOIN LoadBalancing ON LimitedFiles.WorkflowID = LoadBalancing.WorkflowID \r\n"
+"				AND LimitedFiles.WorkflowSequence = LoadBalancing.WorkflowSequence \r\n"
+"		ORDER BY WorkflowRound ASC, OverallSequence ASC, Priority DESC, LimitedFiles.ID ASC \r\n"
 "	) \r\n"
 "	UPDATE FileActionStatus Set ActionStatus = 'R' \r\n"
-"	OUTPUT LimitedFiles.ID, "
-"		   LimitedFiles.FileName, "
-"		   LimitedFiles.FileSize, "
-"		   LimitedFiles.Pages, "
-"		   LimitedFiles.Priority, "
-"		   LimitedFiles.ActionId, "		   
+"	OUTPUT SequencedFiles.ID, "
+"		   SequencedFiles.FileName, "
+"		   SequencedFiles.FileSize, "
+"		   SequencedFiles.Pages, "
+"		   SequencedFiles.Priority, "
+"		   SequencedFiles.ActionId, "
+"		   COALESCE(SequencedFiles.WorkflowID, -1) AS WorkflowID, "
 "		   deleted.ActionStatus "
 "		INTO @OutputTableVar \r\n"
 "	FROM  \r\n"
-"		LimitedFiles \r\n"
-"	INNER JOIN FileActionStatus on FileActionStatus.FileID = LimitedFiles.ID AND FileActionStatus.ActionID = LimitedFiles.ActionID \r\n"
+"		SequencedFiles \r\n"
+"	INNER JOIN FileActionStatus on FileActionStatus.FileID = SequencedFiles.ID AND FileActionStatus.ActionID = SequencedFiles.ActionID \r\n"
 "	IF (1 = <RecordFASTEntry>) BEGIN"
 //	If a file that is currently unattempted is being moved to processing, first add a FAST table
 //	entry from U->P before adding a record from P -> R

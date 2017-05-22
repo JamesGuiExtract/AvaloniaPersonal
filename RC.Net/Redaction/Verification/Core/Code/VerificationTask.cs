@@ -351,6 +351,9 @@ namespace Extract.Redaction.Verification
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject, "ELI26891",
 					_COMPONENT_DESCRIPTION);
 
+                ExtractException.Assert("ELI43414",
+                    "Verification is not supported for <All workflows>", !pDB.RunningAllWorkflows);
+
                 _form.ShowForm(CreateVerificationTaskForm);
             }
             catch (Exception ex)

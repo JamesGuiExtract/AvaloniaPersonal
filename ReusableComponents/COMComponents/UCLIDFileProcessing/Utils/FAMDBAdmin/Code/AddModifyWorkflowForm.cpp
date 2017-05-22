@@ -72,6 +72,8 @@ namespace Extract
 				loadOutputAttributeSetCombo();	
 				loadOutputFileMetadataFieldCombo();
 				loadWorkflow();
+				_loadBalanceWeightComboBox->SelectedItem =
+					ipWorkflowDefinition->LoadBalanceWeight.ToString();
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41952");
 		}
@@ -157,6 +159,8 @@ namespace Extract
 					ipWorkflowDefinition->OutputAttributeSet = context.marshal_as<BSTR>(selected->Name);
 				}
 				ipWorkflowDefinition->DocumentFolder = context.marshal_as<BSTR>(documentFolderTextBox->Text);
+
+				ipWorkflowDefinition->LoadBalanceWeight = Int32::Parse((String^)_loadBalanceWeightComboBox->SelectedItem);
 
 				if (outputFileMetadataFieldComboBox->SelectedIndex >= 0)
 				{

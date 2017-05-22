@@ -58,6 +58,7 @@ m_iCommandTimeout(glDEFAULT_COMMAND_TIMEOUT),
 m_bUpdateQueueEventTable(true),
 m_bUpdateFASTTable(true),
 m_bAutoDeleteFileActionComment(false),
+m_bLoadBalance(true),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
 m_bNumberOfRetriesOverridden(false),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
@@ -1487,9 +1488,8 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26777");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, BSTR bstrToAction,
+STDMETHODIMP CFileProcessingDB::ModifyActionStatusForSelection(IFAMFileSelector* pFileSelector, BSTR bstrToAction,
 														   EActionStatus eaStatus, BSTR bstrFromAction,
-														   IRandomMathCondition* pRandomCondition,
 														   long* pnNumRecordsModified)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -1498,13 +1498,13 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 	{
 		validateLicense();
 
-		if (!ModifyActionStatusForQuery_Internal(false, bstrQueryFrom, bstrToAction, eaStatus, 
-			bstrFromAction, pRandomCondition, pnNumRecordsModified))
+		if (!ModifyActionStatusForSelection_Internal(false, pFileSelector, bstrToAction, eaStatus, 
+			bstrFromAction, pnNumRecordsModified))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-			ModifyActionStatusForQuery_Internal(true, bstrQueryFrom, bstrToAction, eaStatus, 
-				bstrFromAction, pRandomCondition, pnNumRecordsModified);
+			ModifyActionStatusForSelection_Internal(true, pFileSelector, bstrToAction, eaStatus,
+				bstrFromAction, pnNumRecordsModified);
 		}
 		return S_OK;
 	}
@@ -4032,20 +4032,7 @@ STDMETHODIMP CFileProcessingDB::put_ActiveWorkflow(BSTR bstrWorkflowName)
 
 	try
 	{
-		if (m_nFAMSessionID != 0)
-		{
-			throw UCLIDException("ELI42030", "Cannot set workflow while a session is open.");
-		}
-
-		CSingleLock lock(&m_criticalSection, TRUE);
-		m_strActiveWorkflow = asString(bstrWorkflowName);
-		ms_strLastWorkflow = m_strActiveWorkflow;
-		
-		// Clear cached action IDs
-		m_mapActionIdsForActiveWorkflow.clear();
-		// Zero indicates the ID needs to be looked up next time the ID is requested.
-		// -1 indicates there is no active workflow.
-		m_nActiveWorkflowID = 0;
+		setActiveWorkflow(asString(bstrWorkflowName));
 
 		return S_OK;
 	}

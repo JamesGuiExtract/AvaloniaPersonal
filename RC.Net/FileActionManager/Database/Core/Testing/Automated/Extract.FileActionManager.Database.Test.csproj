@@ -229,6 +229,9 @@
     <EmbeddedResource Include="Resources\TestImage006.tif" />
     <EmbeddedResource Include="Resources\TestImage007.tif" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\TestImage008.tif" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>UnitTestingDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>

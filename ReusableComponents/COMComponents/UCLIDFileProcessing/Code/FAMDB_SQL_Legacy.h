@@ -166,8 +166,8 @@ static const string gstrCREATE_PAGINATION_DESTFILE_INDEX_LEGACY =
 	"CREATE UNIQUE NONCLUSTERED INDEX [IX_Pagination_DestFile] ON "
 	"	[dbo].[Pagination] ([DestFileID], [DestPage])";
 
-// Used for schema versions 143 - 146
-static const string gstrCREATE_WORKFLOW_LEGACY =
+// Used for schema versions 143 - 145
+static const string gstrCREATE_WORKFLOW_V143 =
 	"CREATE TABLE [dbo].[Workflow]( "
 	"	[ID] INT IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_Workflow] PRIMARY KEY CLUSTERED, "
 	"	[Name] NVARCHAR(100), "
@@ -180,6 +180,23 @@ static const string gstrCREATE_WORKFLOW_LEGACY =
 	"	[OutputAttributeSetID] BIGINT, "
 	"	[OutputFileMetadataFieldID] INT, "
 	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
+
+// Used for schema versions 146 - 147
+static const string gstrCREATE_WORKFLOW_V146 =
+"CREATE TABLE [dbo].[Workflow]( "
+"	[ID] INT IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_Workflow] PRIMARY KEY CLUSTERED, "
+"	[Name] NVARCHAR(100), "
+"	[WorkflowTypeCode] NVARCHAR(1), "
+"	[Description] NVARCHAR(MAX), "
+"	[StartActionID] INT, "
+"	[EndActionID] INT, "
+"	[PostWorkflowActionID] INT, "
+"	[DocumentFolder] NVARCHAR(255), "
+"	[OutputAttributeSetID] BIGINT, "
+"	[OutputFileMetadataFieldID] INT, "
+"	[OutputFilePathInitializationFunction] NVARCHAR(255) NULL, "
+"	[LoadBalanceWeight] INT NOT NULL CONSTRAINT [DF_Workflow_LoadBalanceWeight] DEFAULT(1), "
+"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
 // Used for schema version 129-147
 static const string gstrCREATE_FILE_TASK_SESSION_V129 =

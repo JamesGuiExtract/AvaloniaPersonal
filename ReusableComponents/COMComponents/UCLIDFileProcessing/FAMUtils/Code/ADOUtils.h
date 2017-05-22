@@ -136,7 +136,10 @@ static const string gstrSET_IDENTITY_INSERT_OFF = "SET IDENTITY_INSERT <TableNam
 // PROMISE: To return the long value of the field named strFieldName in the ipFields collection
 //			if the field does not exist an exception will be thrown
 //			if the field is of the wrong type an exception will be thrown
-FAMUTILS_API long getLongField( const FieldsPtr& ipFields, const string& strFieldName );
+FAMUTILS_API long getLongField( const FieldsPtr& ipFields, const string& strFieldName);
+
+// PROMISE: Same as above except nDefaultIfNull will be returned if NULL.
+FAMUTILS_API long getLongField(const FieldsPtr& ipFields, const string& strFieldName, long nDefaultIfNull);
 
 // PROMISE: To return the long long value of the field named strFieldName in the ipFields collection
 //			if the field does not exist an exception will be thrown

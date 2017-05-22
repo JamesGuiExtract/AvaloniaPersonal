@@ -1,7 +1,9 @@
 ﻿using ADODB;
 using Extract.Database;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Globalization;
@@ -76,6 +78,49 @@ namespace Extract.FileActionManager.Database.Test
             }
 
             return resultsArray;
+        }
+
+        /// <summary>
+        /// Adds the specified test files to the database.
+        /// </summary>
+        /// <param name="fileProcessingDb">The file processing database.</param>
+        /// <param name="testFiles">The <see cref="TestFileManager"/> managing the test files.</param>
+        /// <param name="filesToAdd">The files to add including the file's resource name, the action
+        /// to which it should be added, the workflow it is being added for, the new action status and
+        /// the priority for the file.</param>
+        /// <returns>An array of the indices as strings with index 0 as "" so that the indices of the
+        /// returned files IDs are 1-based to coincide with like FAM file IDs.</returns>
+        public static string[] AddTestFiles(this IFileProcessingDB fileProcessingDB,
+            TestFileManager<TestFAMFileProcessing> testFiles,
+            params (string fileName,
+                    string actionName,
+                    int workflowID,
+                    EActionStatus actionStatus,
+                    EFilePriority priority)[]
+                filesToAdd)
+        {
+            var fileIDs = new List<string>();
+            fileIDs.Add("");
+
+            fileProcessingDB.RecordFAMSessionStart("Test.fps", filesToAdd.First().actionName, true, false);
+
+            foreach (var fileToAdd in filesToAdd)
+            {
+                string testFileName = testFiles.GetFile(fileToAdd.fileName);
+
+                var fileRecord = fileProcessingDB.AddFile(
+                    testFileName, fileToAdd.actionName, fileToAdd.workflowID, fileToAdd.priority, false, false,
+                    fileToAdd.actionStatus, true, out bool alreadyExists, out EActionStatus previousStatus);
+                string id = fileRecord.FileID.AsString();
+                if (!fileIDs.Contains(id))
+                {
+                    fileIDs.Add(id);
+                }
+            }
+
+            fileProcessingDB.RecordFAMSessionStop();
+
+            return fileIDs.ToArray();
         }
     }
 }

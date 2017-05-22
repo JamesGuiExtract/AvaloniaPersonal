@@ -37,6 +37,7 @@ static const string gstrMAX_SLEEP_BETWEEN_DB_CHECKS = "MaxMillisecondsBetweenChe
 static const string gstrLAST_DB_INFO_CHANGE = "LastDBInfoChange";
 static const string gstrSTORE_FTP_EVENT_HISTORY = "StoreFTPEventHistory";
 static const string gstrALTERNATE_COMPONENT_DATA_DIR = "AlternateComponentDataDir";
+static const string gstrENABLE_LOAD_BALANCING = "EnableLoadBalancing";
 
 static const string gstrEMAIL_ENABLE_SETTINGS = "EmailEnableSettings";
 static const string gstrEMAIL_SERVER = "EmailServer";

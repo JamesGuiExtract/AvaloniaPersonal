@@ -14,6 +14,7 @@ using namespace std;
 CWorkflowDefinition::CWorkflowDefinition()
 : m_nID(0)
 , m_eType(kUndefined)
+, m_nLoadBalanceWeight(1)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -349,6 +350,33 @@ STDMETHODIMP CWorkflowDefinition::put_OutputFilePathInitializationFunction(BSTR 
 		m_strOutputFilePathInitializationFunction = asString(newVal);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43191");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkflowDefinition::get_LoadBalanceWeight(LONG* pnWeight)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI43423", pnWeight != __nullptr);
+		*pnWeight = m_nLoadBalanceWeight;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43424");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkflowDefinition::put_LoadBalanceWeight(LONG nWeight)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_nLoadBalanceWeight = nWeight;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43425");
 
 	return S_OK;
 }

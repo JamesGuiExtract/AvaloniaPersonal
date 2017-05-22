@@ -636,6 +636,9 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI40129", _COMPONENT_DESCRIPTION);
 
+                ExtractException.Assert("ELI43427",
+                    "Pagination is not supported for <All workflows>", !pDB.RunningAllWorkflows);
+
                 _fileProcessingDB = pDB;
                 _actionID = nActionID;
                 _tagManager = pFAMTM;

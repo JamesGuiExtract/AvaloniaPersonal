@@ -75,6 +75,9 @@ namespace Extract {
 			// Handle the case that either the included or main sequence check boxes has been clicked.
 			void HandleCellContentClick(System::Object ^sender, System::Windows::Forms::DataGridViewCellEventArgs ^e);
 
+			// Handle case that the checkbox to toggle the enabled status of load balancing is changed.
+			void HandleLoadBalanceCheckBox_CheckedChanged(System::Object^  sender, System::EventArgs^  e);
+
 #pragma endregion
 
 #pragma region Helper methods
@@ -136,6 +139,7 @@ namespace Extract {
 			private: System::Windows::Forms::DataGridViewTextBoxColumn^  ActionNameColumn;
 			private: System::Windows::Forms::DataGridViewTextBoxColumn^  ActionStepColumn;
 			private: System::Windows::Forms::DataGridViewCheckBoxColumn^  ActionMainSequenceColumn;
+			private: System::Windows::Forms::CheckBox^  _loadBalanceCheckBox;
 
 			static int ActionIDColumnIndex = 0;
 			static int ActionIncludedColumnIndex = 1;
@@ -227,6 +231,7 @@ namespace Extract {
 				this->saveChangesButton = (gcnew System::Windows::Forms::Button());
 				this->addWorkflowButton = (gcnew System::Windows::Forms::Button());
 				this->workflowGroupBox = (gcnew System::Windows::Forms::GroupBox());
+				this->_loadBalanceCheckBox = (gcnew System::Windows::Forms::CheckBox());
 				this->actionsGroupBox = (gcnew System::Windows::Forms::GroupBox());
 				this->actionsGridView = (gcnew System::Windows::Forms::DataGridView());
 				this->ActionIDColumn = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
@@ -265,7 +270,7 @@ namespace Extract {
 				// addActionButton
 				// 
 				this->addActionButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-				this->addActionButton->Location = System::Drawing::Point(6, 268);
+				this->addActionButton->Location = System::Drawing::Point(6, 274);
 				this->addActionButton->Name = L"addActionButton";
 				this->addActionButton->Size = System::Drawing::Size(118, 23);
 				this->addActionButton->TabIndex = 5;
@@ -276,7 +281,7 @@ namespace Extract {
 				// deleteActionButton
 				// 
 				this->deleteActionButton->Anchor = System::Windows::Forms::AnchorStyles::Bottom;
-				this->deleteActionButton->Location = System::Drawing::Point(131, 268);
+				this->deleteActionButton->Location = System::Drawing::Point(131, 274);
 				this->deleteActionButton->Name = L"deleteActionButton";
 				this->deleteActionButton->Size = System::Drawing::Size(118, 23);
 				this->deleteActionButton->TabIndex = 6;
@@ -287,7 +292,7 @@ namespace Extract {
 				// renameActionButton
 				// 
 				this->renameActionButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->renameActionButton->Location = System::Drawing::Point(255, 268);
+				this->renameActionButton->Location = System::Drawing::Point(255, 274);
 				this->renameActionButton->Name = L"renameActionButton";
 				this->renameActionButton->Size = System::Drawing::Size(118, 23);
 				this->renameActionButton->TabIndex = 7;
@@ -299,7 +304,7 @@ namespace Extract {
 				// 
 				this->closeButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->closeButton->DialogResult = System::Windows::Forms::DialogResult::OK;
-				this->closeButton->Location = System::Drawing::Point(281, 399);
+				this->closeButton->Location = System::Drawing::Point(281, 427);
 				this->closeButton->Name = L"closeButton";
 				this->closeButton->Size = System::Drawing::Size(118, 23);
 				this->closeButton->TabIndex = 9;
@@ -321,7 +326,7 @@ namespace Extract {
 				// 
 				this->saveChangesButton->Anchor = System::Windows::Forms::AnchorStyles::Bottom;
 				this->saveChangesButton->Enabled = false;
-				this->saveChangesButton->Location = System::Drawing::Point(157, 399);
+				this->saveChangesButton->Location = System::Drawing::Point(157, 427);
 				this->saveChangesButton->Name = L"saveChangesButton";
 				this->saveChangesButton->Size = System::Drawing::Size(118, 23);
 				this->saveChangesButton->TabIndex = 8;
@@ -331,7 +336,7 @@ namespace Extract {
 				// 
 				// addWorkflowButton
 				// 
-				this->addWorkflowButton->Location = System::Drawing::Point(7, 47);
+				this->addWorkflowButton->Location = System::Drawing::Point(6, 47);
 				this->addWorkflowButton->Name = L"addWorkflowButton";
 				this->addWorkflowButton->Size = System::Drawing::Size(118, 23);
 				this->addWorkflowButton->TabIndex = 1;
@@ -341,19 +346,30 @@ namespace Extract {
 				// 
 				// workflowGroupBox
 				// 
-				this->workflowGroupBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
-					| System::Windows::Forms::AnchorStyles::Left)
+				this->workflowGroupBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
 					| System::Windows::Forms::AnchorStyles::Right));
+				this->workflowGroupBox->Controls->Add(this->_loadBalanceCheckBox);
 				this->workflowGroupBox->Controls->Add(this->addWorkflowButton);
 				this->workflowGroupBox->Controls->Add(this->workflowComboBox);
 				this->workflowGroupBox->Controls->Add(this->deleteWorkflowButton);
 				this->workflowGroupBox->Controls->Add(this->modifyWorkflowButton);
 				this->workflowGroupBox->Location = System::Drawing::Point(14, 12);
 				this->workflowGroupBox->Name = L"workflowGroupBox";
-				this->workflowGroupBox->Size = System::Drawing::Size(381, 80);
+				this->workflowGroupBox->Size = System::Drawing::Size(381, 100);
 				this->workflowGroupBox->TabIndex = 10;
 				this->workflowGroupBox->TabStop = false;
 				this->workflowGroupBox->Text = L"Workflow";
+				// 
+				// _loadBalanceCheckBox
+				// 
+				this->_loadBalanceCheckBox->AutoSize = true;
+				this->_loadBalanceCheckBox->Location = System::Drawing::Point(7, 76);
+				this->_loadBalanceCheckBox->Name = L"_loadBalanceCheckBox";
+				this->_loadBalanceCheckBox->Size = System::Drawing::Size(293, 17);
+				this->_loadBalanceCheckBox->TabIndex = 3;
+				this->_loadBalanceCheckBox->Text = L"Enable load balancing when processing <All workflows> ";
+				this->_loadBalanceCheckBox->UseVisualStyleBackColor = true;
+				this->_loadBalanceCheckBox->CheckedChanged += gcnew System::EventHandler(this, &WorkflowManagement::HandleLoadBalanceCheckBox_CheckedChanged);
 				// 
 				// actionsGroupBox
 				// 
@@ -364,9 +380,9 @@ namespace Extract {
 				this->actionsGroupBox->Controls->Add(this->renameActionButton);
 				this->actionsGroupBox->Controls->Add(this->addActionButton);
 				this->actionsGroupBox->Controls->Add(this->deleteActionButton);
-				this->actionsGroupBox->Location = System::Drawing::Point(14, 96);
+				this->actionsGroupBox->Location = System::Drawing::Point(14, 118);
 				this->actionsGroupBox->Name = L"actionsGroupBox";
-				this->actionsGroupBox->Size = System::Drawing::Size(381, 300);
+				this->actionsGroupBox->Size = System::Drawing::Size(381, 306);
 				this->actionsGroupBox->TabIndex = 11;
 				this->actionsGroupBox->TabStop = false;
 				this->actionsGroupBox->Text = L"Actions";
@@ -430,7 +446,7 @@ namespace Extract {
 				this->actionsGridView->ShowCellToolTips = false;
 				this->actionsGridView->ShowEditingIcon = false;
 				this->actionsGridView->ShowRowErrors = false;
-				this->actionsGridView->Size = System::Drawing::Size(365, 243);
+				this->actionsGridView->Size = System::Drawing::Size(365, 249);
 				this->actionsGridView->TabIndex = 4;
 				this->actionsGridView->CellContentClick += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &WorkflowManagement::HandleCellContentClick);
 				// 
@@ -481,7 +497,7 @@ namespace Extract {
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->closeButton;
-				this->ClientSize = System::Drawing::Size(405, 431);
+				this->ClientSize = System::Drawing::Size(405, 459);
 				this->Controls->Add(this->saveChangesButton);
 				this->Controls->Add(this->closeButton);
 				this->Controls->Add(this->workflowGroupBox);
@@ -498,6 +514,7 @@ namespace Extract {
 				this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &WorkflowManagement::HandleWorkflowManagement_FormClosing);
 				this->Load += gcnew System::EventHandler(this, &WorkflowManagement::HandleWorkflowManagement_Load);
 				this->workflowGroupBox->ResumeLayout(false);
+				this->workflowGroupBox->PerformLayout();
 				this->actionsGroupBox->ResumeLayout(false);
 				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->actionsGridView))->EndInit();
 				this->ResumeLayout(false);

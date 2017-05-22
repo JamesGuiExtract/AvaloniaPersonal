@@ -220,6 +220,8 @@ namespace Extract
 			{
 				loadActionsList();
 				loadWorkflowCombo();
+				_loadBalanceCheckBox->Checked =
+					marshal_as<String^>(_ipfamDatabase->GetDBInfoSetting("EnableLoadBalancing", true)) == "1";
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41934")
 
@@ -395,6 +397,16 @@ namespace Extract
 				}
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43346");
+		}
+
+		void WorkflowManagement::HandleLoadBalanceCheckBox_CheckedChanged(System::Object^  sender, System::EventArgs^  e)
+		{
+			try
+			{
+				_ipfamDatabase->SetDBInfoSetting("EnableLoadBalancing",
+					_loadBalanceCheckBox->Checked ? "1" : "0", VARIANT_TRUE, VARIANT_TRUE);
+			}
+			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43426");
 		}
 
 		Void WorkflowManagement::HandleSaveChangesButton_Click(System::Object ^ sender, System::EventArgs ^ e)

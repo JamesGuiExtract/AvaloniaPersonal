@@ -162,6 +162,8 @@ namespace Extract {
 		private: System::Windows::Forms::TextBox^  outputFilePathInitializationFunctionTextBox;
 		private: System::Windows::Forms::Label^  label8;
 		private: System::Windows::Forms::GroupBox^  groupBox1;
+		private: System::Windows::Forms::ComboBox^  _loadBalanceWeightComboBox;
+		private: System::Windows::Forms::Label^  label9;
 
 
 		private:
@@ -200,6 +202,8 @@ namespace Extract {
 				this->outputFilePathInitializationFunctionTextBox = (gcnew System::Windows::Forms::TextBox());
 				this->label8 = (gcnew System::Windows::Forms::Label());
 				this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+				this->_loadBalanceWeightComboBox = (gcnew System::Windows::Forms::ComboBox());
+				this->label9 = (gcnew System::Windows::Forms::Label());
 				this->groupBox1->SuspendLayout();
 				this->SuspendLayout();
 				// 
@@ -331,19 +335,19 @@ namespace Extract {
 				// label6
 				// 
 				this->label6->AutoSize = true;
-				this->label6->Location = System::Drawing::Point(10, 270);
+				this->label6->Location = System::Drawing::Point(10, 296);
 				this->label6->Name = L"label6";
 				this->label6->Size = System::Drawing::Size(97, 13);
-				this->label6->TabIndex = 14;
+				this->label6->TabIndex = 16;
 				this->label6->Text = L"Output attribute set";
 				// 
 				// okButton
 				// 
 				this->okButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->okButton->Location = System::Drawing::Point(414, 393);
+				this->okButton->Location = System::Drawing::Point(414, 410);
 				this->okButton->Name = L"okButton";
 				this->okButton->Size = System::Drawing::Size(75, 23);
-				this->okButton->TabIndex = 17;
+				this->okButton->TabIndex = 19;
 				this->okButton->Text = L"O&K";
 				this->okButton->UseVisualStyleBackColor = true;
 				this->okButton->Click += gcnew System::EventHandler(this, &AddModifyWorkflowForm::HandleOkButton_Click);
@@ -353,10 +357,10 @@ namespace Extract {
 				this->cancelButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->cancelButton->CausesValidation = false;
 				this->cancelButton->DialogResult = System::Windows::Forms::DialogResult::Cancel;
-				this->cancelButton->Location = System::Drawing::Point(495, 393);
+				this->cancelButton->Location = System::Drawing::Point(495, 410);
 				this->cancelButton->Name = L"cancelButton";
 				this->cancelButton->Size = System::Drawing::Size(75, 23);
-				this->cancelButton->TabIndex = 18;
+				this->cancelButton->TabIndex = 20;
 				this->cancelButton->Text = L"&Cancel";
 				this->cancelButton->UseVisualStyleBackColor = true;
 				// 
@@ -366,10 +370,10 @@ namespace Extract {
 					| System::Windows::Forms::AnchorStyles::Right));
 				this->outputAttributeSetComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->outputAttributeSetComboBox->FormattingEnabled = true;
-				this->outputAttributeSetComboBox->Location = System::Drawing::Point(142, 266);
+				this->outputAttributeSetComboBox->Location = System::Drawing::Point(142, 292);
 				this->outputAttributeSetComboBox->Name = L"outputAttributeSetComboBox";
 				this->outputAttributeSetComboBox->Size = System::Drawing::Size(408, 21);
-				this->outputAttributeSetComboBox->TabIndex = 15;
+				this->outputAttributeSetComboBox->TabIndex = 17;
 				// 
 				// label7
 				// 
@@ -399,7 +403,6 @@ namespace Extract {
 				this->outputFilePathInitializationFunctionTextBox->Name = L"outputFilePathInitializationFunctionTextBox";
 				this->outputFilePathInitializationFunctionTextBox->Size = System::Drawing::Size(415, 20);
 				this->outputFilePathInitializationFunctionTextBox->TabIndex = 13;
-				this->outputFilePathInitializationFunctionTextBox->Text = L"<SourceDocName>.voa";
 				// 
 				// label8
 				// 
@@ -418,12 +421,34 @@ namespace Extract {
 				this->groupBox1->Controls->Add(this->outputFilePathInitializationFunctionTextBox);
 				this->groupBox1->Controls->Add(this->outputFileMetadataFieldComboBox);
 				this->groupBox1->Controls->Add(this->label7);
-				this->groupBox1->Location = System::Drawing::Point(12, 297);
+				this->groupBox1->Location = System::Drawing::Point(13, 319);
 				this->groupBox1->Name = L"groupBox1";
 				this->groupBox1->Size = System::Drawing::Size(557, 84);
-				this->groupBox1->TabIndex = 16;
+				this->groupBox1->TabIndex = 18;
 				this->groupBox1->TabStop = false;
 				this->groupBox1->Text = L"Output file path configuration";
+				// 
+				// _loadBalanceWeightComboBox
+				// 
+				this->_loadBalanceWeightComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
+				this->_loadBalanceWeightComboBox->FormattingEnabled = true;
+				this->_loadBalanceWeightComboBox->Items->AddRange(gcnew cli::array< System::Object^  >(10) {
+					L"1", L"2", L"3", L"4", L"5",
+						L"6", L"7", L"8", L"9", L"10"
+				});
+				this->_loadBalanceWeightComboBox->Location = System::Drawing::Point(142, 265);
+				this->_loadBalanceWeightComboBox->Name = L"_loadBalanceWeightComboBox";
+				this->_loadBalanceWeightComboBox->Size = System::Drawing::Size(52, 21);
+				this->_loadBalanceWeightComboBox->TabIndex = 15;
+				// 
+				// label9
+				// 
+				this->label9->AutoSize = true;
+				this->label9->Location = System::Drawing::Point(10, 269);
+				this->label9->Name = L"label9";
+				this->label9->Size = System::Drawing::Size(106, 13);
+				this->label9->TabIndex = 14;
+				this->label9->Text = L"Load balance weight";
 				// 
 				// AddModifyWorkflowForm
 				// 
@@ -431,7 +456,9 @@ namespace Extract {
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->cancelButton;
-				this->ClientSize = System::Drawing::Size(581, 426);
+				this->ClientSize = System::Drawing::Size(581, 443);
+				this->Controls->Add(this->_loadBalanceWeightComboBox);
+				this->Controls->Add(this->label9);
 				this->Controls->Add(this->groupBox1);
 				this->Controls->Add(this->cancelButton);
 				this->Controls->Add(this->label6);

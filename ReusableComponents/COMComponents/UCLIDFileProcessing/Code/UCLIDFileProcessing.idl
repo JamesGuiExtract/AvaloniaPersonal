@@ -37,6 +37,7 @@ library UCLID_FILEPROCESSINGLib
 	interface IParallelizableTask;
 	interface IWorkItemRecord;
 	interface IFileRequestHandler;
+	interface IFAMFileSelector;
 
 	//----------------------------------------------------------------------------------------------
 	//-E N U M S -----------------------------------------------------------------------------------
@@ -738,6 +739,8 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(10), helpstring ("property OutputFileMetadataField")] HRESULT OutputFileMetadataField([in] BSTR OutputAttributeSet);
 		[propget, id(11), helpstring ("property OutputFilePathInitializationFunction")] HRESULT OutputFilePathInitializationFunction([out, retval] BSTR* pVal);
 		[propput, id(11), helpstring ("property OutputFilePathInitializationFunction")] HRESULT OutputFilePathInitializationFunction([in] BSTR newVal);
+		[propget, id(12), helpstring ("property LoadBalanceWeight")] HRESULT LoadBalanceWeight([out, retval] long* pnWeight);
+		[propput, id(12), helpstring ("property LoadBalanceWeight")] HRESULT LoadBalanceWeight([in] long nWeight);
 	}
 
 	[
@@ -1172,10 +1175,9 @@ library UCLID_FILEPROCESSINGLib
 		//							   returns TRUE
 		// REQUIRE: If bstrFromAction is specified, the bstrQueryFrom query must include the column name
 		//			the status is to be copied from.
-		[id(51), helpstring("method ModifyActionStatusForQuery")] HRESULT ModifyActionStatusForQuery(
-			[in] BSTR bstrQuery, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
-			[in] BSTR bstrFromAction, [in] IRandomMathCondition* pRandomCondition,
-			[out,retval] long* pnNumRecordsModified);
+		[id(51), helpstring("method ModifyActionStatusForSelection")] HRESULT ModifyActionStatusForSelection(
+			[in] IFAMFileSelector* pFileSelector, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
+			[in] BSTR bstrFromAction, [out,retval] long* pnNumRecordsModified);
 
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to file tagging

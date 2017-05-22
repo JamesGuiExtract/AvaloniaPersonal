@@ -2603,8 +2603,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _documentDataPanel != null &&
-                    _tableLayoutPanel.Controls.Contains(_documentDataPanel.PanelControl);
+                return DocumentDataPanel?.PanelControl
+                    .GetAncestors()
+                    .OfType<PaginationSeparator>()
+                    .FirstOrDefault()
+                        != null;
             }
         }
 
@@ -2812,30 +2815,27 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return true;
             }
 
+            var openData = IsDataPanelOpen ? _documentWithDataInEdit : null;
+            if (openData != null)
+            {
+                if (!CloseDataPanel(validateData))
+                {
+                    // It is the responsibility of the DocumentDataPanel to inform the user of
+                    // any data issues that need correction if the panel is open.
+                    return false;
+                }
+            }
+
             foreach (var document in _pendingDocuments.Where(document =>
+                document != openData &&
                 document.PageControls.Any(c => !c.Deleted) &&
                 (!selectedDocumentsOnly || document.Selected)))
             {
-                bool dataIsValid;
-
-                if (document == _documentWithDataInEdit && IsDataPanelOpen)
-                {
-                    dataIsValid = CloseDataPanel(validateData);
-                    if (!dataIsValid)
-                    {
-                        // It is the responsibility of the DocumentDataPanel to inform the user of
-                        // any data issues that need correction if the panel is open.
-                        return false;
-                    }
-                }
-                else
-                {
-                    // To account for the case that the panel may manipulate raw data; make
-                    // sure the data has been loaded into a panel before saving.
-                    _documentDataPanel.LoadData(document.DocumentData, forDisplay: false);
-                    Application.DoEvents();
-                    dataIsValid = _documentDataPanel.SaveData(document.DocumentData, validateData);
-                }
+                // To account for the case that the panel may manipulate raw data; make
+                // sure the data has been loaded into a panel before saving.
+                _documentDataPanel.LoadData(document.DocumentData, forDisplay: false);
+                Application.DoEvents();
+                bool dataIsValid = _documentDataPanel.SaveData(document.DocumentData, validateData);
 
                 if (validateData && !dataIsValid)
                 {

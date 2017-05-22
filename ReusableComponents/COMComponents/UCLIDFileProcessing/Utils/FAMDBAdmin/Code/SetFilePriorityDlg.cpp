@@ -69,6 +69,23 @@ BOOL CSetFilePriorityDlg::OnInitDialog()
 	{
 		CDialog::OnInitDialog();
 
+		if (asCppBool(m_ipFAMDB->GetUsingWorkflows()) && m_ipFAMDB->ActiveWorkflow.length() == 0)
+		{
+			if (IDYES != MessageBox(
+				"Setting priority for files under <All workflows> may cause \r\n"
+				"unexpected results. This will result in the priority of \r\n"
+				"selected files in each individual workflow being set.\r\n"
+				"The new priority will apply to all workflows if any files \r\n"
+				"exist in multiple workflows.\r\n\r\n"
+				"Be sure you are clear on the effect this will have on each \r\n"
+				"workflow before proceeding.\r\n\r\n"
+				"Proceed?", "Warning", MB_YESNO | MB_ICONWARNING))
+			{
+				EndDialog(0);
+				return FALSE;
+			}
+		}
+
 		// Fill the priority combo box
 		fillPriorityCombo();
 

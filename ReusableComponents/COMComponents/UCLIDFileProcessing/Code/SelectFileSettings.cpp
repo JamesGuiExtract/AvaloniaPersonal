@@ -218,7 +218,20 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 				BSTR bstrValue;
 				mapWorkflows->raw_GetKeyValue(i, &bstrKey, &bstrValue);
 				nWorkflowID = asLong(bstrValue);
-				string strInnerQuery = buildQueryForWorkflow(ipFAMDB, strSelect, nWorkflowID);
+				string strInnerQuery;
+				try
+				{
+					try
+					{
+						strInnerQuery = buildQueryForWorkflow(ipFAMDB, strSelect, nWorkflowID);
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43445")
+				}
+				catch (UCLIDException &ue)
+				{
+					ue.addDebugInfo("Workflow", asString(bstrKey), false);
+					throw ue;
+				}
 
 				strQuery += Util::Format(
 					"SELECT %s FROM (\r\n%s\r\n) AS [FAMFile] \r\n"

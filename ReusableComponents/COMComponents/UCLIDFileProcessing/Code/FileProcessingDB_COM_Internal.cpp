@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 148;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 149;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1579,7 +1579,7 @@ int UpdateToSchemaVersion143(_ConnectionPtr ipConnection,
 		vector<string> vecQueries;
 
 		vecQueries.push_back(gstrCREATE_WORKFLOW_TYPE);
-		vecQueries.push_back(gstrCREATE_WORKFLOW_LEGACY);
+		vecQueries.push_back(gstrCREATE_WORKFLOW_V143);
 		vecQueries.push_back(gstrADD_WORKFLOW_WORKFLOWTYPE_FK);
 		vecQueries.push_back(gstrADD_WORKFLOW_STARTACTION_FK);
 		vecQueries.push_back(gstrADD_WORKFLOW_ENDACTION_FK);
@@ -1764,6 +1764,35 @@ int UpdateToSchemaVersion148(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43412");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion149(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 149;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE dbo.[Workflow] ADD [LoadBalanceWeight] INT NOT NULL DEFAULT(1)");
+
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrENABLE_LOAD_BALANCING + "', '1')");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43416");
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -4016,24 +4045,23 @@ bool CFileProcessingDB::ClearFileActionComment_Internal(bool bDBLocked, long nFi
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR bstrQueryFrom, 
+bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked, 
+															IFAMFileSelector* pFileSelector,
 															BSTR bstrToAction, EActionStatus eaStatus, 
 															BSTR bstrFromAction, 
-															IRandomMathCondition* pRandomCondition,
 															long* pnNumRecordsModified)
 {
+	string strTempWorkflow;
+
 	try
 	{
 		try
 		{
 			// Check that an action name and a FROM clause have been passed in
-			string strQueryFrom = asString(bstrQueryFrom);
-			ASSERT_ARGUMENT("ELI30380", !strQueryFrom.empty());
+			UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector(pFileSelector);
+			ASSERT_ARGUMENT("ELI30380", ipFileSelector != __nullptr);
 			string strToAction = asString(bstrToAction);
 			ASSERT_ARGUMENT("ELI30381", !strToAction.empty());
-
-			// Wrap the random condition (if there is one, in a smart pointer)
-			UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition(pRandomCondition);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -4058,32 +4086,49 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 					strStatus = asStatusString(eaStatus);
 				}
 
-				if (m_strActiveWorkflow.empty() && databaseUsingWorkflows(ipConnection))
+				string strOriginalWorkflow = getActiveWorkflow();
+
+				if (strOriginalWorkflow.empty() && databaseUsingWorkflows(ipConnection))
 				{
-					ValueRestorer<string> restorer(m_strActiveWorkflow, "");
-
-					vector<pair<string, string>> vecWorkflowNamesAndIDs = getWorkflowNamesAndIDs(ipConnection);
-
-					for each (pair<string, string> strWorkflow in vecWorkflowNamesAndIDs)
+					try
 					{
-						if (getActionIDNoThrow(ipConnection, strToAction, strWorkflow.first) <= 0)
+						vector<pair<string, string>> vecWorkflowNamesAndIDs = getWorkflowNamesAndIDs(ipConnection);
+
+						for each (pair<string, string> strWorkflow in vecWorkflowNamesAndIDs)
 						{
-							// If the target action does no exist in the workflow, there is nothing to do.
-							continue;
+							// modifyActionStatusForSelection will run in the context of m_strActiveWorkflow.
+							// Repeat the call for each workflow.
+							setActiveWorkflow(strWorkflow.first);
+							strTempWorkflow = strWorkflow.first;
+
+							if (getActionIDNoThrow(ipConnection, strToAction, strWorkflow.first) <= 0)
+							{
+								UCLIDException ue("ELI43440", Util::Format(
+									"Action \"%s\" does not exist in workflow.",
+									strToAction.c_str()));
+								// Add workflow as debug for consistency with errors emanating from getActionID()
+								ue.addDebugInfo("Workflow", strWorkflow.first, false);
+								throw ue;
+							}
+
+							modifyActionStatusForSelection(ipFileSelector, strToAction, strStatus,
+								strFromAction, &nNumRecordsModified);
+							strTempWorkflow = "";
 						}
 
-						// modifyActionStatusForQuery will run in the context of m_strActiveWorkflow.
-						// Repeat the call for each workflow.
-						m_strActiveWorkflow = strWorkflow.first;
+						setActiveWorkflow(strOriginalWorkflow);
+					}
+					catch (...)
+					{
+						setActiveWorkflow(strOriginalWorkflow);
 
-						modifyActionStatusForQuery(ipConnection, strQueryFrom, strToAction, strStatus,
-							strFromAction, ipRandomCondition, &nNumRecordsModified);
+						throw;
 					}
 				}
 				else
 				{
-					modifyActionStatusForQuery(ipConnection, strQueryFrom, strToAction, strStatus,
-						strFromAction, ipRandomCondition, &nNumRecordsModified);
+					modifyActionStatusForSelection(ipFileSelector, strToAction, strStatus,
+						strFromAction, &nNumRecordsModified);
 				}
 
 				// Commit the transaction
@@ -4101,6 +4146,11 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 	}
 	catch(UCLIDException &ue)
 	{
+		if (!strTempWorkflow.empty())
+		{
+			ue.addDebugInfo("Workflow", strTempWorkflow, false);
+		}
+
 		if (!bDBLocked)
 		{
 			return false;
@@ -6692,7 +6742,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 145:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion146);
 				case 146:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion147);
 				case 147:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion148);
-				case 148:	break;
+				case 148:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion149);
+				case 149:	break;
 
 				default:
 					{
@@ -9857,6 +9908,7 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 					", [OutputAttributeSetID] "
 					", [OutputFileMetadataFieldID] "
 					", [OutputFilePathInitializationFunction] "
+					", [LoadBalanceWeight] "
 					"	FROM [Workflow]"
 					"	WHERE [ID] = %i", ipWorkflowDefinition->ID);
 
@@ -9949,6 +10001,8 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 
 			setStringField(ipFields, "OutputFilePathInitializationFunction",
 				asString(ipWorkflowDefinition->OutputFilePathInitializationFunction));
+
+			setLongField(ipFields, "LoadBalanceWeight", ipWorkflowDefinition->LoadBalanceWeight);
 
 			setStringField(ipFields, "Name", asString(ipWorkflowDefinition->Name));
 

@@ -83,6 +83,21 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 	{
 		CDialog::OnInitDialog();
 
+		if (asCppBool(m_ipFAMDB->GetUsingWorkflows()) && m_ipFAMDB->ActiveWorkflow.length() == 0)
+		{
+			if (IDYES != MessageBox(
+				"Setting action status under <All workflows> may cause \r\n"
+				"unexpected results. This will result in the same operation \r\n"
+				"being executed separately for all workflows in the database.\r\n\r\n"
+				"Be sure you are clear on the effect this will have on each \r\n"
+				"workflow before proceeding.\r\n\r\n"
+				"Proceed?", "Warning", MB_YESNO | MB_ICONWARNING))
+			{
+				EndDialog(0);
+				return FALSE;
+			}
+		}
+
 		// Display a wait-cursor because we are getting information from the DB, 
 		// which may take a few seconds
 		CWaitCursor wait;
@@ -323,8 +338,8 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			uex.addDebugInfo("Query", strQuery);
 
 			// Modify the file status
-			m_ipFAMDB->ModifyActionStatusForQuery(strQuery.c_str(), (LPCTSTR)zToActionName,
-				eNewStatus, (LPCTSTR)zFromAction, __nullptr);
+			m_ipFAMDB->ModifyActionStatusForSelection(m_ipFileSelector, (LPCTSTR)zToActionName,
+				eNewStatus, (LPCTSTR)zFromAction);
 		}
 		else
 		{

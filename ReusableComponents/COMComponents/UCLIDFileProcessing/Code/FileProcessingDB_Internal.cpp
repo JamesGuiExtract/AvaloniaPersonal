@@ -983,6 +983,24 @@ string CFileProcessingDB::getActiveWorkflow()
 	return m_strActiveWorkflow;
 }
 //--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::setActiveWorkflow(string strWorkflowName)
+{
+	if (m_nFAMSessionID != 0)
+	{
+		throw UCLIDException("ELI42030", "Cannot set workflow while a session is open.");
+	}
+
+	CSingleLock lock(&m_criticalSection, TRUE);
+	m_strActiveWorkflow = strWorkflowName;
+	ms_strLastWorkflow = strWorkflowName;
+
+	// Clear cached action IDs
+	m_mapActionIdsForActiveWorkflow.clear();
+	// Zero indicates the ID needs to be looked up next time the ID is requested.
+	// -1 indicates there is no active workflow.
+	m_nActiveWorkflowID = 0;
+}
+//--------------------------------------------------------------------------------------------------
 long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& strActionName)
 {
 	try
@@ -1004,11 +1022,20 @@ long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& s
 		else
 		{
 			string strQuery = Util::Format(
-				"SELECT [ID] FROM [Action] WHERE [ASCName] = '%s' AND [WorkflowID] = %d",
+				"SELECT COALESCE(MAX([ID]), -1) AS [ID] FROM [Action] WHERE [ASCName] = '%s' AND [WorkflowID] = %d",
 				strActionName.c_str(), nWorkflowID);
 
-			long nActionID = 0;
+			long nActionID = -1;
 			executeCmdQuery(ipConnection, strQuery, false, &nActionID);
+			if (nActionID < 0)
+			{
+				UCLIDException ue("ELI43444", Util::Format(
+					"Action \"%s\" does not exist in workflow.",
+					strActionName.c_str()));
+				ue.addDebugInfo("WorkflowID", nWorkflowID, false);
+				throw ue;
+			}
+
 			return nActionID;
 		}
 	}
@@ -1020,7 +1047,7 @@ long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& s
 	try
 	{
 		string strQuery =  Util::Format(
-			"SELECT [Action].[ID] FROM [Action] "
+			"SELECT COALESCE(MAX([Action].[ID]), -1) AS [ID] FROM [Action] "
 			"	LEFT JOIN [WorkFlow] ON [WorkflowID] = [Workflow].[ID]"
 			"	WHERE [ASCName] = '%s' AND [Workflow].[Name] %s",
 				strActionName.c_str(),
@@ -1028,8 +1055,25 @@ long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& s
 					? "IS NULL"
 					: " = '" + strWorkflow + "'").c_str());
 		
-		long nActionID = 0;
+		long nActionID = -1;
 		executeCmdQuery(ipConnection, strQuery, false, &nActionID);
+		if (nActionID < 0)
+		{
+			if (strWorkflow.empty())
+			{
+				throw UCLIDException("ELI43442", Util::Format("Action \"%s\" does not exist."));
+			}
+			else
+			{
+				UCLIDException ue("ELI43443", Util::Format(
+					"Action \"%s\" does not exist in workflow.",
+					strActionName.c_str()));
+				// Add workflow as debug for consistency with errors emanating from getActionID with
+				// workflow ID specified.
+				ue.addDebugInfo("Workflow", strWorkflow, false);
+				throw ue;
+			}
+		}
 
 		return nActionID;
 	}
@@ -2023,6 +2067,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrMAX_SLEEP_BETWEEN_DB_CHECKS] = asString(gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK);
 	mapDefaultValues[gstrSTORE_FTP_EVENT_HISTORY] = "1";
 	mapDefaultValues[gstrALTERNATE_COMPONENT_DATA_DIR] = "";
+	mapDefaultValues[gstrENABLE_LOAD_BALANCING] = "1";
 	// Email setting defaults should be kept in sync with Extract.Utilities.Email.ExtractSmtp
 	mapDefaultValues[gstrEMAIL_ENABLE_SETTINGS] = "0";
 	mapDefaultValues[gstrEMAIL_SERVER] = "";
@@ -2980,11 +3025,12 @@ UCLID_FILEPROCESSINGLib::IFileRecordPtr CFileProcessingDB::getFileRecordFromFiel
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 	ASSERT_RESOURCE_ALLOCATION("ELI17027", ipFileRecord != __nullptr);
 	
-	// Set the file data from the fields collection (set ActionID and WorkflowID to 0)
-	ipFileRecord->SetFileData(getLongField(ipFields, "ID"), 0,
+	// Depending on context, the query may not have returned ActionID or WorkflowID;
+	// default to 0 if missing.
+	ipFileRecord->SetFileData(getLongField(ipFields, "ID"), getLongField(ipFields, "ActionID", 0),
 		getStringField(ipFields, "FileName").c_str(), getLongLongField(ipFields, "FileSize"),
 		getLongField(ipFields, "Pages"), (UCLID_FILEPROCESSINGLib::EFilePriority)
-		(bGetPriority ? getLongField(ipFields, "Priority") : 0), 0);
+		(bGetPriority ? getLongField(ipFields, "Priority") : 0), getLongField(ipFields, "WorkflowID", 0));
 
 	return ipFileRecord;
 }
@@ -3487,6 +3533,12 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 						{
 							_lastCodePos = "320";
 							m_bStoreDBInfoChangeHistory = getStringField(ipFields, "Value") == "1";
+						}
+						else if (strValue == gstrENABLE_LOAD_BALANCING)
+						{
+							_lastCodePos = "330";
+
+							m_bLoadBalance = getStringField(ipFields, "Value") == "1";
 						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
@@ -5076,6 +5128,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						replaceVariable(strQuery, "<ActiveFAMID>", asString(m_nActiveFAMID));
 						replaceVariable(strQuery, "<RecordFASTEntry>", m_bUpdateFASTTable ? "1" : "0");
 						replaceVariable(strQuery, "<MaxFiles>", asString(nMaxFiles));
+						replaceVariable(strQuery, "<LoadBalance>", m_bLoadBalance && m_bRunningAllWorkflows ? "1" : "0");
 
 						// Loop to retry getting files until there are either no records returned 
 						// Get recordset of files to be set to processing.
@@ -5107,11 +5160,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 
 							string strFileID = asString(ipFileRecord->FileID);
 
-							long nActionID = getLongField(ipFields, "ActionID");
 
-							ipFileRecord->WorkflowID = getWorkflowID(ipConnection, nActionID);
-
-							ipFileRecord->ActionID = nActionID;
 
 							// Get the previous state
 							string strFileFromState = getStringField(ipFields, "ASC_From");
@@ -5137,11 +5186,11 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 							// pending entries in [QueuedActionStatusChange] for the selected files.
 							executeCmdQuery(ipConnection,
 								"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
-								"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + asString(nActionID) +
+								"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + asString(ipFileRecord->ActionID) +
 								" AND [FileID] = " + strFileID);
 
 							// Update the Statistics
-							updateStats(ipConnection, nActionID, asEActionStatus(strFileFromState), 
+							updateStats(ipConnection, ipFileRecord->ActionID, asEActionStatus(strFileFromState),
 								kActionProcessing, ipFileRecord, ipFileRecord);
 
 							// move to the next record in the recordset
@@ -6512,6 +6561,7 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 			", [OutputAttributeSetID] "
 			", [OutputFileMetadataFieldID] "
 			", [OutputFilePathInitializationFunction] "
+			", [LoadBalanceWeight] "
 			"	FROM [Workflow]"
 			"	WHERE [ID] = %i", nID);
 
@@ -6610,6 +6660,8 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 	ipWorkflowDefinition->OutputFilePathInitializationFunction = isNULL(ipFields, "OutputFilePathInitializationFunction")
 		? ""
 		: (_bstr_t)ipFields->Item["OutputFilePathInitializationFunction"]->GetValue();
+
+	ipWorkflowDefinition->LoadBalanceWeight = getLongField(ipFields, "LoadBalanceWeight");
 
 	return ipWorkflowDefinition;
 }
@@ -6887,26 +6939,20 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 	reCalculateStats(ipConnection, nActionID);
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::modifyActionStatusForQuery(_ConnectionPtr ipConnection, string strQueryFrom,
-	string strToAction, string strNewStatus, string strFromAction,
-	UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition, long* pnNumRecordsModified)
+void CFileProcessingDB::modifyActionStatusForSelection(
+	UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector,
+	string strToAction, string strNewStatus, string strFromAction, long* pnNumRecordsModified)
 {
 	_RecordsetPtr ipFileSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != __nullptr);
 
-	string strActiveWorkflow = getActiveWorkflow();
-	if (!strActiveWorkflow.empty())
-	{
-		long nWorkflowId = getWorkflowID(ipConnection, strActiveWorkflow);
+	_bstr_t bstrQueryFrom = ipFileSelector->BuildQuery(
+		getThisAsCOMPtr(), "[FAMFile].[ID]", "", VARIANT_FALSE);
 
-		strQueryFrom += Util::Format(" \r\n"
-			"INTERSECT "
-			"SELECT [FileID] AS [ID] FROM [WorkflowFile] \r\n"
-			"	WHERE [WorkflowID] = %d", nWorkflowId);
-	}
+	_ConnectionPtr ipConnection = getDBConnection();
 
 	// Open the file set
-	ipFileSet->Open(strQueryFrom.c_str(), _variant_t((IDispatch*)ipConnection, true),
+	ipFileSet->Open(bstrQueryFrom, _variant_t(ipConnection, true),
 		adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 	// Create an empty file record object for the random condition.
@@ -6925,15 +6971,10 @@ void CFileProcessingDB::modifyActionStatusForQuery(_ConnectionPtr ipConnection, 
 	vector<long> vecFileIds;
 	while (ipFileSet->adoEOF == VARIANT_FALSE)
 	{
-		if (ipRandomCondition == __nullptr || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
-		{
-			// Get the file ID
-			vecFileIds.push_back(getLongField(ipFileSet->Fields, "ID"));
+		vecFileIds.push_back(getLongField(ipFileSet->Fields, "ID"));
 
-			nNumRecordsModified++;
-		}
+		nNumRecordsModified++;
 
-		// Move to next record
 		ipFileSet->MoveNext();
 	}
 	ipFileSet->Close();

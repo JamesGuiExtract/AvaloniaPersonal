@@ -20,8 +20,6 @@ namespace Extract.FileActionManager.Database.Test
     {
         #region Constants
 
-        static readonly int _CURRENT_WORKFLOW = -1;
-
         static readonly string _LABDE_EMPTY_DB = "Resources.Demo_LabDE_Empty";
         static readonly string _LABDE_TEST_FILE1 = "Resources.TestImage001.tif";
         static readonly string _LABDE_TEST_FILE2 = "Resources.TestImage002.tif";
@@ -30,7 +28,6 @@ namespace Extract.FileActionManager.Database.Test
         static readonly string _LABDE_TEST_FILE5 = "Resources.TestImage005.tif";
         static readonly string _LABDE_TEST_FILE6 = "Resources.TestImage006.tif";
         static readonly string _LABDE_TEST_FILE7 = "Resources.TestImage007.tif";
-
 
         static readonly string _LABDE_ACTION1 = "A01_ExtractData";
         static readonly string _LABDE_ACTION2 = "A02_Verify";
@@ -87,98 +84,6 @@ namespace Extract.FileActionManager.Database.Test
 
         #endregion Overhead
 
-        #region Helper Methods
-
-        /// <summary>
-        /// Statuses by file index position
-        ///            |  P  |  R  |  S  |  C  |  F 
-        ///  Action 1   0,1,4              2,3               
-        ///  Action 2                 2           3
-        /// High priority: 1
-        /// </summary>
-        /// <param name="fileProcessingDb">The file processing database.</param>
-        /// <returns></returns>
-        static string[] AddTestFiles1(this FileProcessingDB fileProcessingDb)
-        {
-            string testFileName0 = _testFiles.GetFile(_LABDE_TEST_FILE1);
-            string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE2);
-            string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE3);
-            string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE4);
-            string testFileName4 = _testFiles.GetFile(_LABDE_TEST_FILE5);
-
-            fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
-
-            var fileIDs = new List<string>();
-
-            var fileRecord = fileProcessingDb.AddFile(
-                testFileName0, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
-                EActionStatus.kActionPending, true, out bool alreadyExists, out EActionStatus previousStatus);
-            fileIDs.Add(fileRecord.FileID.AsString());
-            fileRecord = fileProcessingDb.AddFile(
-                testFileName1, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityHigh, false, false,
-                EActionStatus.kActionPending, true, out alreadyExists, out previousStatus);
-            fileIDs.Add(fileRecord.FileID.AsString());
-            fileRecord = fileProcessingDb.AddFile(
-                testFileName2, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
-                EActionStatus.kActionCompleted, true, out alreadyExists, out previousStatus);
-            fileProcessingDb.NotifyFileSkipped(fileRecord.FileID, _LABDE_ACTION2, -1, false);
-            fileIDs.Add(fileRecord.FileID.AsString());
-            fileRecord = fileProcessingDb.AddFile(
-                testFileName3, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
-                EActionStatus.kActionCompleted, true, out alreadyExists, out previousStatus);
-            fileProcessingDb.NotifyFileFailed(fileRecord.FileID, _LABDE_ACTION2, -1,
-                new ExtractException("ELI43262", "Simulated failure").ToSerializedHexString(), false);
-            fileIDs.Add(fileRecord.FileID.AsString());
-            fileRecord = fileProcessingDb.AddFile(
-                testFileName4, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
-                EActionStatus.kActionPending, true, out alreadyExists, out previousStatus);
-            fileIDs.Add(fileRecord.FileID.AsString());
-
-            fileProcessingDb.RecordFAMSessionStop();
-
-            return fileIDs.ToArray();
-        }
-
-        /// <summary>
-        /// Statuses by file index position
-        ///            |  P  |  R  |  S  |  C  |  F 
-        ///  Action 1     0                 1
-        ///  Action 2
-        ///  Action 3     2
-        /// High priority: 1,2
-        /// </summary>
-        /// <param name="fileProcessingDb">The file processing database.</param>
-        /// <returns></returns>
-        static string[] AddTestFiles2(this FileProcessingDB fileProcessingDb)
-        {
-            string testFileName0 = _testFiles.GetFile(_LABDE_TEST_FILE5);
-            string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE6);
-            string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE7);
-
-            fileProcessingDb.RecordFAMSessionStart("Test.fps", _LABDE_ACTION1, true, false);
-
-            var fileIDs = new List<string>();
-
-            var fileRecord = fileProcessingDb.AddFile(
-                testFileName0, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
-                EActionStatus.kActionPending, true, out bool alreadyExists, out EActionStatus previousStatus);
-            fileIDs.Add(fileRecord.FileID.AsString());
-            fileRecord = fileProcessingDb.AddFile(
-                testFileName1, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityHigh, false, false,
-                EActionStatus.kActionCompleted, true, out alreadyExists, out previousStatus);
-            fileIDs.Add(fileRecord.FileID.AsString());
-            fileRecord = fileProcessingDb.AddFile(
-                testFileName2, _LABDE_ACTION3, _CURRENT_WORKFLOW, EFilePriority.kPriorityHigh, false, false,
-                EActionStatus.kActionPending, true, out alreadyExists, out previousStatus);
-            fileIDs.Add(fileRecord.FileID.AsString());
-
-            fileProcessingDb.RecordFAMSessionStop();
-
-            return fileIDs.ToArray();
-        }
-
-        #endregion Helper Methods
-
         #region TestMethods
 
         [Test, Category("TestFAMFileSelector")]
@@ -189,7 +94,23 @@ namespace Extract.FileActionManager.Database.Test
             try
             {
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
-                var fileIDs = fileProcessingDb.AddTestFiles1();
+
+                /// Statuses by file index position
+                ///            |  P  |  R  |  S  |  C  |  F 
+                ///  Action 1   1,2,5              3,4               
+                ///  Action 2                 3           4
+                /// High priority: 2
+                (string fileName, string actionName, int workflowID, EActionStatus actionStatus, EFilePriority priority)[] testFiles =
+                {
+                    (_LABDE_TEST_FILE1, _LABDE_ACTION1, -1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE2, _LABDE_ACTION1, -1, EActionStatus.kActionPending, EFilePriority.kPriorityHigh),
+                    (_LABDE_TEST_FILE3, _LABDE_ACTION1, -1, EActionStatus.kActionCompleted, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE3, _LABDE_ACTION2, -1, EActionStatus.kActionSkipped, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE4, _LABDE_ACTION1, -1, EActionStatus.kActionCompleted, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE4, _LABDE_ACTION2, -1, EActionStatus.kActionFailed, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE5, _LABDE_ACTION1, -1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal),
+                };
+                var fileIDs = fileProcessingDb.AddTestFiles(_testFiles, testFiles);
                 var fileSelector = new FAMFileSelector();
 
                 Assert.IsTrue(fileSelector.SelectingAllFiles);
@@ -198,30 +119,35 @@ namespace Extract.FileActionManager.Database.Test
 
                 Assert.IsFalse(fileSelector.SelectingAllFiles);
                 Assert.AreEqual(
-                    Invariant($"{fileIDs[0]},{fileIDs[1]},{fileIDs[4]}"),
+                    Invariant($"{fileIDs[1]},{fileIDs[2]},{fileIDs[5]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
 
                 fileSelector.Reset();
                 fileSelector.AddQueryCondition("SELECT FAMFile.ID FROM FAMFile WHERE [Priority] = 5");
 
-                Assert.AreEqual(fileSelector.GetResults(fileProcessingDb).Single(), fileIDs[1]);
+                Assert.AreEqual(fileSelector.GetResults(fileProcessingDb).Single(), fileIDs[2]);
 
                 fileSelector.Reset();
                 fileProcessingDb.AddFileSet("TestFileSet",
                     new[]
                     {
-                        int.Parse(fileIDs[0], CultureInfo.InvariantCulture),
-                        int.Parse(fileIDs[2], CultureInfo.InvariantCulture)
+                        int.Parse(fileIDs[1], CultureInfo.InvariantCulture),
+                        int.Parse(fileIDs[3], CultureInfo.InvariantCulture)
                     }
                     .ToVariantVector());
                 fileSelector.AddFileSetCondition("TestFileSet");
 
                 Assert.AreEqual(
-                    Invariant($"{fileIDs[0]},{fileIDs[2]}"),
+                    Invariant($"{fileIDs[1]},{fileIDs[3]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
             }
             finally
             {
+                _testFiles.RemoveFile(_LABDE_TEST_FILE1);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE2);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE3);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE4);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE5);
                 _testDbManager.RemoveDatabase(testDbName);
             }
         }
@@ -235,71 +161,98 @@ namespace Extract.FileActionManager.Database.Test
             {
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
-                fileProcessingDb.AddWorkflow(
+                int workflowID1 = fileProcessingDb.AddWorkflow(
                     "Workflow1", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
-                fileProcessingDb.ActiveWorkflow = "Workflow1";
-                var fileIDs1 = fileProcessingDb.AddTestFiles1();
-
-                fileProcessingDb.AddWorkflow(
+                int workflowID2 = fileProcessingDb.AddWorkflow(
                     "Workflow2", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION3);
-                fileProcessingDb.ActiveWorkflow = "Workflow2";
-                var fileIDs2 = fileProcessingDb.AddTestFiles2();
+
+                /// Statuses by file index position
+                ///  Workflow1 |  P  |  R  |  S  |  C  |  F 
+                ///  Action 1   1,2,5              3,4               
+                ///  Action 2                 3           4
+                /// High priority: 2
+                ///  Workflow2 |  P  |  R  |  S  |  C  |  F 
+                ///  Action 1     5                 6
+                ///  Action 2
+                ///  Action 3     7
+                /// High priority: 6,7
+                (string fileName, string actionName, int workflowID, EActionStatus actionStatus, EFilePriority priority)[] testFiles =
+                {
+                    (_LABDE_TEST_FILE1, _LABDE_ACTION1, workflowID1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE2, _LABDE_ACTION1, workflowID1, EActionStatus.kActionPending, EFilePriority.kPriorityHigh),
+                    (_LABDE_TEST_FILE3, _LABDE_ACTION1, workflowID1, EActionStatus.kActionCompleted, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE3, _LABDE_ACTION2, workflowID1, EActionStatus.kActionSkipped, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE4, _LABDE_ACTION1, workflowID1, EActionStatus.kActionCompleted, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE4, _LABDE_ACTION2, workflowID1, EActionStatus.kActionFailed, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE5, _LABDE_ACTION1, workflowID1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE5, _LABDE_ACTION1, workflowID2, EActionStatus.kActionPending, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE6, _LABDE_ACTION1, workflowID2, EActionStatus.kActionCompleted, EFilePriority.kPriorityHigh),
+                    (_LABDE_TEST_FILE7, _LABDE_ACTION3, workflowID2, EActionStatus.kActionPending, EFilePriority.kPriorityHigh),
+                };
+                var fileIDs = fileProcessingDb.AddTestFiles(_testFiles, testFiles);
 
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddActionStatusCondition(fileProcessingDb, _LABDE_ACTION1, EActionStatus.kActionPending);
 
                 fileProcessingDb.ActiveWorkflow = "";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs1[0]},{fileIDs1[1]},{fileIDs2[0]}"),
+                    Invariant($"{fileIDs[1]},{fileIDs[2]},{fileIDs[5]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs1[0]},{fileIDs1[1]},{fileIDs1[4]}"),
+                    Invariant($"{fileIDs[1]},{fileIDs[2]},{fileIDs[5]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
-                Assert.AreEqual(fileIDs2[0], fileSelector.GetResults(fileProcessingDb).Single());
+                Assert.AreEqual(fileIDs[5], fileSelector.GetResults(fileProcessingDb).Single());
 
                 fileSelector.Reset();
                 fileSelector.AddQueryCondition("SELECT FAMFile.ID FROM FAMFile WHERE [Priority] = 5");
 
                 fileProcessingDb.ActiveWorkflow = "";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs1[1]},{fileIDs2[1]},{fileIDs2[2]}"),
+                    Invariant($"{fileIDs[2]},{fileIDs[6]},{fileIDs[7]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs1[1]}"),
+                    Invariant($"{fileIDs[2]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs2[1]},{fileIDs2[2]}"),
+                    Invariant($"{fileIDs[6]},{fileIDs[7]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
 
                 fileSelector.Reset();
                 fileProcessingDb.AddFileSet("TestFileSet",
                     new[]
                     {
-                        int.Parse(fileIDs1[0], CultureInfo.InvariantCulture),
-                        int.Parse(fileIDs2[2], CultureInfo.InvariantCulture)
+                        int.Parse(fileIDs[1], CultureInfo.InvariantCulture),
+                        int.Parse(fileIDs[7], CultureInfo.InvariantCulture)
                     }
                     .ToVariantVector());
                 fileSelector.AddFileSetCondition("TestFileSet");
 
                 fileProcessingDb.ActiveWorkflow = "";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs1[0]},{fileIDs2[2]}"),
+                    Invariant($"{fileIDs[1]},{fileIDs[7]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs1[0]}"),
+                    Invariant($"{fileIDs[1]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs2[2]}"),
+                    Invariant($"{fileIDs[7]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
             }
             finally
             {
+                _testFiles.RemoveFile(_LABDE_TEST_FILE1);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE2);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE3);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE4);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE5);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE6);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE7);
                 _testDbManager.RemoveDatabase(testDbName);
             }
         }
@@ -312,7 +265,23 @@ namespace Extract.FileActionManager.Database.Test
             try
             {
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
-                var fileIDs = fileProcessingDb.AddTestFiles1();
+
+                /// Statuses by file index position
+                ///            |  P  |  R  |  S  |  C  |  F 
+                ///  Action 1   1,2,5              3,4               
+                ///  Action 2                 3           4
+                /// High priority: 2
+                (string fileName, string actionName, int workflowID, EActionStatus actionStatus, EFilePriority priority)[] testFiles =
+                {
+                    (_LABDE_TEST_FILE1, _LABDE_ACTION1, -1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE2, _LABDE_ACTION1, -1, EActionStatus.kActionPending, EFilePriority.kPriorityHigh),
+                    (_LABDE_TEST_FILE3, _LABDE_ACTION1, -1, EActionStatus.kActionCompleted, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE3, _LABDE_ACTION2, -1, EActionStatus.kActionSkipped, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE4, _LABDE_ACTION1, -1, EActionStatus.kActionCompleted, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE4, _LABDE_ACTION2, -1, EActionStatus.kActionFailed, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE5, _LABDE_ACTION1, -1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal),
+                };
+                var fileIDs = fileProcessingDb.AddTestFiles(_testFiles, testFiles);
 
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddActionStatusCondition(fileProcessingDb, _LABDE_ACTION1, EActionStatus.kActionPending);
@@ -323,17 +292,22 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: true, bUsePercentage: false, nSubsetSize: 2);
 
                 Assert.AreEqual(
-                    Invariant($"{fileIDs[0]},{fileIDs[1]}"),
+                    Invariant($"{fileIDs[1]},{fileIDs[2]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
 
                 fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: false, bUsePercentage: false, nSubsetSize: 1);
 
                 Assert.AreEqual(
-                    Invariant($"{fileIDs[4]}"),
+                    Invariant($"{fileIDs[5]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
             }
             finally
             {
+                _testFiles.RemoveFile(_LABDE_TEST_FILE1);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE2);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE3);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE4);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE5);
                 _testDbManager.RemoveDatabase(testDbName);
             }
         }
@@ -347,15 +321,35 @@ namespace Extract.FileActionManager.Database.Test
             {
                 var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
-                fileProcessingDb.AddWorkflow(
+                int workflowID1 = fileProcessingDb.AddWorkflow(
                     "Workflow1", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
-                fileProcessingDb.ActiveWorkflow = "Workflow1";
-                var fileIDs1 = fileProcessingDb.AddTestFiles1();
-
-                fileProcessingDb.AddWorkflow(
+                int workflowID2 = fileProcessingDb.AddWorkflow(
                     "Workflow2", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION3);
-                fileProcessingDb.ActiveWorkflow = "Workflow2";
-                var fileIDs2 = fileProcessingDb.AddTestFiles2();
+
+                /// Statuses by file index position
+                ///  Workflow1 |  P  |  R  |  S  |  C  |  F 
+                ///  Action 1   1,2,5              3,4               
+                ///  Action 2                 3           4
+                /// High priority: 2
+                ///  Workflow2 |  P  |  R  |  S  |  C  |  F 
+                ///  Action 1     5                 6
+                ///  Action 2
+                ///  Action 3     7
+                /// High priority: 6,7
+                (string fileName, string actionName, int workflowID, EActionStatus actionStatus, EFilePriority priority)[] testFiles =
+                {
+                    (_LABDE_TEST_FILE1, _LABDE_ACTION1, workflowID1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE2, _LABDE_ACTION1, workflowID1, EActionStatus.kActionPending, EFilePriority.kPriorityHigh),
+                    (_LABDE_TEST_FILE3, _LABDE_ACTION1, workflowID1, EActionStatus.kActionCompleted, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE3, _LABDE_ACTION2, workflowID1, EActionStatus.kActionSkipped, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE4, _LABDE_ACTION1, workflowID1, EActionStatus.kActionCompleted, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE4, _LABDE_ACTION2, workflowID1, EActionStatus.kActionFailed, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE5, _LABDE_ACTION1, workflowID1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE5, _LABDE_ACTION1, workflowID2, EActionStatus.kActionPending, EFilePriority.kPriorityNormal),
+                    (_LABDE_TEST_FILE6, _LABDE_ACTION1, workflowID2, EActionStatus.kActionCompleted, EFilePriority.kPriorityHigh),
+                    (_LABDE_TEST_FILE7, _LABDE_ACTION3, workflowID2, EActionStatus.kActionPending, EFilePriority.kPriorityHigh),
+                };
+                var fileIDs = fileProcessingDb.AddTestFiles(_testFiles, testFiles);
 
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddActionStatusCondition(fileProcessingDb, _LABDE_ACTION1, EActionStatus.kActionPending);
@@ -372,34 +366,41 @@ namespace Extract.FileActionManager.Database.Test
 
                 fileProcessingDb.ActiveWorkflow = "";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs1[0]},{fileIDs1[1]}"),
+                    Invariant($"{fileIDs[1]},{fileIDs[2]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs1[0]},{fileIDs1[1]}"),
+                    Invariant($"{fileIDs[1]},{fileIDs[2]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs2[0]}"),
+                    Invariant($"{fileIDs[5]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
 
                 fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: false, bUsePercentage: false, nSubsetSize: 1);
 
                 fileProcessingDb.ActiveWorkflow = "";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs2[0]}"),
+                    Invariant($"{fileIDs[5]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs1[4]}"),
+                    Invariant($"{fileIDs[5]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
                 Assert.AreEqual(
-                    Invariant($"{fileIDs2[0]}"),
+                    Invariant($"{fileIDs[5]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
             }
             finally
             {
+                _testFiles.RemoveFile(_LABDE_TEST_FILE1);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE2);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE3);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE4);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE5);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE6);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE7);
                 _testDbManager.RemoveDatabase(testDbName);
             }
         }

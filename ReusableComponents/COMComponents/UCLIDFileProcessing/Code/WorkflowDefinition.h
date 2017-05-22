@@ -71,6 +71,8 @@ public:
 	STDMETHOD(put_OutputFileMetadataField)(BSTR OutputFileMetadataField);
 	STDMETHOD(get_OutputFilePathInitializationFunction)(BSTR* pVal);
 	STDMETHOD(put_OutputFilePathInitializationFunction)(BSTR newVal);
+	STDMETHOD(get_LoadBalanceWeight)(LONG* pnWeight);
+	STDMETHOD(put_LoadBalanceWeight)(LONG nWeight);
 
 private:
 
@@ -86,6 +88,7 @@ private:
 	string m_strOutputAttributeSet;
 	string m_strOutputFileMetadataField;
 	string m_strOutputFilePathInitializationFunction;
+	long m_nLoadBalanceWeight;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(WorkflowDefinition), CWorkflowDefinition)

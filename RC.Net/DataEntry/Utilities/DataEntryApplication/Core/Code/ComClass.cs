@@ -312,6 +312,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
                     "ELI26896", _DEFAULT_FILE_ACTION_TASK_NAME);
 
+                ExtractException.Assert("ELI43413", 
+                    "Verification is not supported for <All workflows>", !pDB.RunningAllWorkflows);
+
                 if (_settings.InputEventTrackingEnabled || _settings.CountersEnabled)
                 {
                     ExtractException.Assert("ELI29827", "Cannot enable " +

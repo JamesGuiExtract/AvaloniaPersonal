@@ -194,6 +194,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(string.IsNullOrEmpty(outputDefinition.DocumentFolder));
                 Assert.That(string.IsNullOrEmpty(outputDefinition.OutputAttributeSet));
                 Assert.That(string.IsNullOrEmpty(outputDefinition.OutputFileMetadataField));
+                Assert.AreEqual(1, outputDefinition.LoadBalanceWeight);
 
                 // Update workflow properties.
                 WorkflowDefinition workflowDefinition = new WorkflowDefinition();
@@ -207,6 +208,7 @@ namespace Extract.FileActionManager.Database.Test
                 workflowDefinition.DocumentFolder = @"C:\Demo_LabDE\Input";
                 workflowDefinition.OutputAttributeSet = "DataFoundByRules";
                 workflowDefinition.OutputFileMetadataField = "PatientFirstName";
+                workflowDefinition.LoadBalanceWeight = 2;
                 fileProcessingDb.SetWorkflowDefinition(workflowDefinition);
 
                 // Test updated workflow properties.
@@ -220,6 +222,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(outputDefinition.DocumentFolder == workflowDefinition.DocumentFolder);
                 Assert.That(outputDefinition.OutputAttributeSet == workflowDefinition.OutputAttributeSet);
                 Assert.That(outputDefinition.OutputFileMetadataField == workflowDefinition.OutputFileMetadataField);
+                Assert.That(outputDefinition.LoadBalanceWeight == workflowDefinition.LoadBalanceWeight);
 
                 // Clear workflow properties
                 workflowDefinition.ID = id;
@@ -232,6 +235,7 @@ namespace Extract.FileActionManager.Database.Test
                 workflowDefinition.DocumentFolder = @"";
                 workflowDefinition.OutputAttributeSet = "";
                 workflowDefinition.OutputFileMetadataField = "";
+                workflowDefinition.LoadBalanceWeight = 1;
                 fileProcessingDb.SetWorkflowDefinition(workflowDefinition);
 
                 // Test cleared workflow properties
@@ -245,6 +249,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(string.IsNullOrEmpty(outputDefinition.DocumentFolder));
                 Assert.That(string.IsNullOrEmpty(outputDefinition.OutputAttributeSet));
                 Assert.That(string.IsNullOrEmpty(outputDefinition.OutputFileMetadataField));
+                Assert.AreEqual(1, outputDefinition.LoadBalanceWeight);
             }
 
             finally
@@ -281,6 +286,7 @@ namespace Extract.FileActionManager.Database.Test
                 workflowDefinition.DocumentFolder = @"C:\Demo_LabDE\Input";
                 workflowDefinition.OutputAttributeSet = "DataFoundByRules";
                 workflowDefinition.OutputFileMetadataField = "PatientFirstName";
+                workflowDefinition.LoadBalanceWeight = 2;
                 fileProcessingDb.SetWorkflowDefinition(workflowDefinition);
 
                 // Clear DB (retain user settings).
@@ -297,6 +303,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(outputDefinition.DocumentFolder == workflowDefinition.DocumentFolder);
                 Assert.That(outputDefinition.OutputAttributeSet == workflowDefinition.OutputAttributeSet);
                 Assert.That(outputDefinition.OutputFileMetadataField == workflowDefinition.OutputFileMetadataField);
+                Assert.That(outputDefinition.LoadBalanceWeight == workflowDefinition.LoadBalanceWeight);
             }
 
             finally

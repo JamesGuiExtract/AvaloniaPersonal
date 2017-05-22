@@ -405,6 +405,11 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 
 		// Update the summary tab
 		UpdateSummaryTab();
+
+		if (!bRetainValues)
+		{
+			loadWorkflowComboBox();
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14861");
 }

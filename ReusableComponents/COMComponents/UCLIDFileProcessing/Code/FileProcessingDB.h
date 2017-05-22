@@ -192,9 +192,8 @@ public:
 	STDMETHOD(SetFileActionComment)(long nFileID, long nActionID, BSTR bstrComment);
 	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
 	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
-	STDMETHOD(ModifyActionStatusForQuery)(BSTR bstrQueryFrom, BSTR bstrToAction,
-		EActionStatus eaStatus, BSTR bstrFromAction, IRandomMathCondition* pRandomCondition,
-		long* pnNumRecordsModified);
+	STDMETHOD(ModifyActionStatusForSelection)(IFAMFileSelector* pFileSelector, BSTR bstrToAction,
+		EActionStatus eaStatus, BSTR bstrFromAction, long* pnNumRecordsModified);
 	STDMETHOD(GetTags)(IStrToStrMap** ppTags);
 	STDMETHOD(GetTagNames)(IVariantVector** ppTagNames);
 	STDMETHOD(HasTags)(VARIANT_BOOL* pvbVal);
@@ -514,6 +513,9 @@ private:
 	// Flag indicating whether file action comments should be deleted when files are completed
 	bool m_bAutoDeleteFileActionComment;
 
+	// Whether to load balance between workflows when processing on <All workflows>
+	bool m_bLoadBalance;
+
 	// Timeout value for automatically reverting files
 	int m_nAutoRevertTimeOutInMinutes;
 
@@ -728,6 +730,10 @@ private:
 	// Gets the currently active workflow. Should be checked instead of m_strActiveWorkflow in order
 	// to synchronize access.
 	string getActiveWorkflow();
+
+	// Sets the currently active workflow. Should be used instead of m_strActiveWorkflow in order
+	// to synchronize access and managed cached workflow info.
+	void setActiveWorkflow(string strWorkflowName);
 
 	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match
 	//			the action name stored in the database using the connection object provided.
@@ -1240,12 +1246,10 @@ private:
 	// called for <All workflows>
 	void setStatusForAllFiles(_ConnectionPtr ipConnection, const string& strAction, EActionStatus eStatus);
 
-	// Helper function for ModifyActionStatusForQuery COM method that may be called once per workflow when
+	// Helper function for ModifyActionStatusForSelection COM method that may be called once per workflow when
 	// called for <All workflows>
-	void modifyActionStatusForQuery(_ConnectionPtr ipConnection, string strQueryFrom, string strToAction,
-		string strNewStatus, string strFromAction,
-		UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition,
-		long* pnNumRecordsModified);
+	void modifyActionStatusForSelection(UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector, string strToAction,
+		string strNewStatus, string strFromAction, long* pnNumRecordsModified);
 
 	// Sets the value of the output file name metadata field based on the workflow configuration
 	void initOutputFileMetadataFieldValue(_ConnectionPtr ipConnection, long nFileID, string strFileName, long nWorkflowID);
@@ -1314,9 +1318,9 @@ private:
 	bool GetFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID, 
 		BSTR* pbstrComment);
 	bool ClearFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID);
-	bool ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR bstrQueryFrom, 
+	bool ModifyActionStatusForSelection_Internal(bool bDBLocked, IFAMFileSelector* pFileSelector,
 		BSTR bstrToAction, EActionStatus eaStatus, BSTR bstrFromAction, 
-		IRandomMathCondition* pRandomCondition, long* pnNumRecordsModified);
+		long* pnNumRecordsModified);
 	bool GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags);
 	bool GetTagNames_Internal(bool bDBLocked, IVariantVector **ppTagNames);
 	bool HasTags_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal);
