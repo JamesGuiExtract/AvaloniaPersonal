@@ -446,28 +446,17 @@ namespace DocumentAPI.Models
                 getFileTag = _fileApi.GetWorkflow.OutputFileMetadataField;
                 Contract.Assert(!String.IsNullOrWhiteSpace(getFileTag), "Workflow does not have a defined OutputFileMetaDataField");
 
-                var fieldResult = _fileApi.Interface.GetMetadataFieldValue(fileId, getFileTag);
-                Contract.Assert(!String.IsNullOrWhiteSpace(fieldResult), "Retrieved an empty metaDataField result for fileID: {0}", fileId);
+                filename = _fileApi.Interface.GetMetadataFieldValue(fileId, getFileTag);
+                Contract.Assert(!String.IsNullOrWhiteSpace(filename), "No result file found for file ID: {0}", fileId);
 
-                // The value most probably contains one or more tags, so expand the tag(s) here.
-                var tagMgr = new FAMTagManager();
-                Contract.Assert(tagMgr != null, "FAM Tag Manager creation failed");
-
-                // Need the original SourceDocName, so look it up.
-                var sourceDocName = _fileApi.Interface.GetFileNameFromFileID(fileId);
-                Contract.Assert(!String.IsNullOrWhiteSpace(sourceDocName), "Retrieved an empty filename for FileID: {0}", fileId);
-
-                filename = tagMgr.ExpandTagsAndFunctions(fieldResult, sourceDocName);
-                Contract.Assert(!String.IsNullOrWhiteSpace(filename),
-                                "Failed to expand tag(s) for input: {0}, SourceDocName: {1}",
-                                fieldResult,
-                                sourceDocName);
-
+                // Start the post action, if any, on this file.
                 var postAction = _fileApi.GetWorkflow.PostWorkflowAction;
                 if (!String.IsNullOrWhiteSpace(postAction))
                 {
                     _fileApi.Interface.SetFileStatusToPending(fileId, postAction, vbAllowQueuedStatusOverride: false);
                 }
+
+                return (filename, error: false, errorMessage: "");
             }
             catch (ExtractException ee)
             {
@@ -483,8 +472,6 @@ namespace DocumentAPI.Models
                 ee.AddDebugData("OutputFileMetadataField", getFileTag, encrypt: false);
                 throw ee;
             }
-
-            return (filename, error: false, errorMessage: "");
         }
 
         /// <summary>

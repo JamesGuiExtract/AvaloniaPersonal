@@ -30,7 +30,7 @@ namespace DocumentAPI.Controllers
     public class DocumentController : Controller
     {
         /// <summary>
-        /// Gets result set for a submitted file that has finished processing
+        /// Get the result set for a document that has finished processing
         /// </summary>
         /// <param name="Id">file ID</param>
         /// <returns>a DocumentAttributeSet, which contains error info iff there was an error</returns>
@@ -64,7 +64,7 @@ namespace DocumentAPI.Controllers
 
 
         /// <summary>
-        /// Upload a file for document processing
+        /// Submit a file for document processing
         /// </summary>
         /// <param name="file">input file - NOTE: if the argument name is changed here, it MUST 
         /// also be changed in FileUploadOperation.Apply, NonBodyParameter.Name - if not, then Swagger UI
@@ -98,7 +98,7 @@ namespace DocumentAPI.Controllers
         }
 
         /// <summary>
-        /// submit text for processing
+        /// Submit text for document processing
         /// </summary>
         /// <param name="args">a SubmitTextArgs instance</param>
         /// <returns>a DocumentSubmitResult, which contains error info iff there was an error</returns>
@@ -127,7 +127,7 @@ namespace DocumentAPI.Controllers
         }
 
         /// <summary>
-        /// get a list of 1..N processing status instances that correspond to the stringId of the submitted document
+        /// Get the status that corresponds to the Id of the submitted document
         /// </summary>
         /// <param name="Id">file Id</param>
         /// <returns>List of ProcessingStatus</returns>
@@ -211,7 +211,7 @@ namespace DocumentAPI.Controllers
         }
 
         /// <summary>
-        /// get the original source file associated with the file id
+        /// Get the original source file of a submitted document
         /// </summary>
         /// <param name="Id">the file id, as a string. Often prepended with "Text" or "File"</param>
         /// <returns>the original image file associated with the file id</returns>
@@ -255,7 +255,7 @@ namespace DocumentAPI.Controllers
 
 
         /// <summary>
-        /// Gets a result file for the specified input document
+        /// Get the result file for the specified input document
         /// </summary>
         /// <param name="Id">file id</param>
         /// <returns>result file</returns>
@@ -301,7 +301,7 @@ namespace DocumentAPI.Controllers
         }
 
         /// <summary>
-        /// Gets a text result for a specified input document
+        /// Gets the text result for a specified input document
         /// </summary>
         /// <param name="Id">file id - may be prepended by "Text"</param>
         /// <returns>TextResult instance</returns>
@@ -324,7 +324,7 @@ namespace DocumentAPI.Controllers
         }
 
         /// <summary>
-        /// Gets the type of the submitted document (document classification)
+        /// Get the type of the submitted document (document classification)
         /// </summary>
         /// <param name="Id">file Id of the document</param>
         /// <returns>string containing the type of the document</returns>
