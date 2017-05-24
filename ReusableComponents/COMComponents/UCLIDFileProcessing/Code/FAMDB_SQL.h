@@ -432,7 +432,7 @@ static const string gstrCREATE_WORKFLOWCHANGEFILE =
 	"	[DestActionID]     INT NOT NULL, "
 	"	[SourceWorkflowID] INT NULL, "
 	"	[DestWorkflowID]   INT NOT NULL, "
-	"	CONSTRAINT [PK_WorkflowChangeFile] PRIMARY KEY CLUSTERED([FileID] ASC, [WorkflowChangeID] ASC));";
+	"	CONSTRAINT [PK_WorkflowChangeFile] PRIMARY KEY CLUSTERED([FileID] ASC, [WorkflowChangeID] ASC, [SourceActionID] ASC));";
 
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
