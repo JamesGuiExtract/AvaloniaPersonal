@@ -1377,7 +1377,7 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 // Use table expression to group files by ID to avoid selecting the same file twice if queued in
 // multiple workflows simultaneously. FileRepetition will be > 1 for any cases where a file ID is
 // being returned beyond to first instance in this result set.
-"   WITH SelectedFiles AS \r\n"
+"   ;WITH SelectedFiles AS \r\n"
 "	( \r\n"
 "		SELECT ID, FileName, FileSize, Pages, Priority, ActionStatus, ActionId, \r\n"
 "			ROW_NUMBER() OVER (PARTITION BY ID ORDER BY Priority DESC, ID ASC) AS FileRepetition \r\n"
