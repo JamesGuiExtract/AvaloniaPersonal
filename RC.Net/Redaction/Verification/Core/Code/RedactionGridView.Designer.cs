@@ -43,6 +43,11 @@ namespace Extract.Redaction.Verification
                         _visitedFont.Dispose();
                         _visitedFont = null;
                     }
+                    if (_getPageInfoTask != null)
+                    {
+                        _getPageInfoTask.Dispose();
+                        _getPageInfoTask = null;
+                    }
                 }
                 catch {}
             }

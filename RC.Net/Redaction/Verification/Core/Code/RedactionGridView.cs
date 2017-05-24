@@ -1,6 +1,7 @@
 using Extract.AttributeFinder;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
@@ -217,6 +219,17 @@ namespace Extract.Redaction.Verification
         LongToObjectMap _pageInfoMap;
 
         /// <summary>
+        /// Task to represent the background collection of page info. Used to prefetch this data
+        /// so that creating the first manual redaction on very large images will not cause the UI to freeze
+        /// </summary>
+        Task<List<(int page, int width, int height)>> _getPageInfoTask;
+
+        /// <summary>
+        /// Func that will collect the page info for each page of the image
+        /// </summary>
+        Func<List<(int page, int width, int height)>> _getPageInfo;
+
+        /// <summary>
         /// The source document for the redactions
         /// </summary>
         string _sourceDocument;
@@ -247,6 +260,16 @@ namespace Extract.Redaction.Verification
 
             _dataGridView.AutoGenerateColumns = false;
             _dataGridView.DataSource = _redactions;
+
+            _getPageInfo = () =>
+                // Iterate over each page of the image.
+                Enumerable.Range(1, _imageViewer.PageCount)
+                .Select(i =>
+                {
+                    ImagePageProperties pageProperties = _imageViewer.GetPageProperties(i);
+                    return (page: i, width: pageProperties.Width, height: pageProperties.Height);
+                })
+                .ToList();
         }
 
         #endregion Constructors
@@ -1564,20 +1587,35 @@ namespace Extract.Redaction.Verification
             // operation. Cache the map for future use.
             if (_pageInfoMap == null)
             {
-                // Iterate over each page of the image.
-                _pageInfoMap = new LongToObjectMap();
-                for (int i = 1; i <= _imageViewer.PageCount; i++)
+                using (new TemporaryWaitCursor())
                 {
-                    ImagePageProperties pageProperties = _imageViewer.GetPageProperties(i);
+                    // If the task was not started for some reason then just run the action directly
+                    if (_getPageInfoTask == null || _getPageInfoTask.Status == TaskStatus.WaitingToRun)
+                    {
+                        _getPageInfo();
+                    }
+                    else
+                    {
+                        _getPageInfoTask.Wait();
+                    }
 
-                    // Create the spatial page info for this page
-                    SpatialPageInfo pageInfo = new SpatialPageInfo();
-                    int width = pageProperties.Width;
-                    int height = pageProperties.Height;
-                    pageInfo.Initialize(width, height, EOrientation.kRotNone, 0);
+                    if (_getPageInfoTask.IsFaulted)
+                    {
+                        var ag = _getPageInfoTask.Exception as AggregateException;
+                        var ue = (ag?.InnerException ?? _getPageInfoTask.Exception).AsExtract("ELI43421");
+                        throw ue;
+                    }
+                    var pageInfoMap = new LongToObjectMap();
+                    foreach ((int page, int width, int height) in _getPageInfoTask.Result)
+                    {
+                        // Create the spatial page info for this page
+                        SpatialPageInfo pageInfo = new SpatialPageInfo();
+                        pageInfo.Initialize(width, height, EOrientation.kRotNone, 0);
 
-                    // Add it to the map
-                    _pageInfoMap.Set(i, pageInfo);
+                        // Add it to the map
+                        pageInfoMap.Set(page, pageInfo);
+                    }
+                    _pageInfoMap = pageInfoMap;
                 }
             }
 
@@ -2213,7 +2251,23 @@ namespace Extract.Redaction.Verification
             try
             {
                 _pageInfoMap = null;
-                _dataGridView.Enabled = _imageViewer.IsImageAvailable;
+
+                if (_imageViewer.IsImageAvailable)
+                {
+                    if (_imageViewer.SpatialPageInfos != null)
+                    {
+                        _pageInfoMap = _imageViewer.SpatialPageInfos;
+                    }
+                    else
+                    {
+                        _getPageInfoTask = Task.Run(_getPageInfo);
+                    }
+                    _dataGridView.Enabled = true;
+                }
+                else
+                {
+                    _dataGridView.Enabled = false;
+                }
             }
             catch (Exception ex)
             {

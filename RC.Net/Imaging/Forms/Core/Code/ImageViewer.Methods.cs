@@ -255,7 +255,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 var ussFileName = fileName + ".uss";
-                _spatialPageInfos = null;
+                SpatialPageInfos = null;
                 if (File.Exists(ussFileName))
                 {
                     // Ignore problems loading the uss file, treat same as missing
@@ -266,7 +266,7 @@ namespace Extract.Imaging.Forms
 
                         if (spatialString.HasSpatialInfo())
                         {
-                            _spatialPageInfos = spatialString.SpatialPageInfos;
+                            SpatialPageInfos = spatialString.SpatialPageInfos;
                         }
                     }
                     catch (Exception ex)
@@ -441,9 +441,9 @@ namespace Extract.Imaging.Forms
 
             try
             {
-                if (_spatialPageInfos != null && _spatialPageInfos.Contains(pageNumber))
+                if (SpatialPageInfos != null && SpatialPageInfos.Contains(pageNumber))
                 {
-                    var pageInfo = (SpatialPageInfo)_spatialPageInfos.GetValue(pageNumber);
+                    var pageInfo = (SpatialPageInfo)SpatialPageInfos.GetValue(pageNumber);
                     switch (pageInfo.Orientation)
                     {
                         case EOrientation.kRotNone:
@@ -627,6 +627,8 @@ namespace Extract.Imaging.Forms
 
                     // Set image file name to empty string
                     _imageFile = "";
+
+                    _spatialPageInfos = null;
 
                     // Update the annotations
                     UpdateAnnotations();

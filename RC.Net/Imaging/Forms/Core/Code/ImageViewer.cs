@@ -533,7 +533,8 @@ namespace Extract.Imaging.Forms
         bool _updatingFitMode;
 
         /// <summary>
-        /// The spatial page infos from the associated USS file. Used to auto-rotate pages on load.
+        /// The spatial page infos from the associated USS file. Used to auto-rotate pages on load and as a short-cut
+        /// for adding redactions (so that the collection doesn't have to be recreated https://extract.atlassian.net/browse/ISSUE-14702)
         /// </summary>
         LongToObjectMap _spatialPageInfos;
 
@@ -2761,6 +2762,24 @@ namespace Extract.Imaging.Forms
             get;
             set;
         } = true;
+
+        /// <summary>
+        /// The spatial page infos from the associated USS file. Used to auto-rotate pages on load and as a short-cut
+        /// for adding redactions (so that the collection doesn't have to be recreated https://extract.atlassian.net/browse/ISSUE-14702)
+        /// </summary>
+        [Browsable(false)]
+        [CLSCompliant(false)]
+        public LongToObjectMap SpatialPageInfos
+        {
+            get
+            {
+                return _spatialPageInfos;
+            }
+            private set
+            {
+                _spatialPageInfos = value;
+            }
+        }
 
         #endregion Properties
 
