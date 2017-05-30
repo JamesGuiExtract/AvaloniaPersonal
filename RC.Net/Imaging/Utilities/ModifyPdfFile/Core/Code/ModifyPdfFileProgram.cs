@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
@@ -99,6 +100,7 @@ namespace Extract.Utilities
                 string[] hyperlinkAttributes = null;
                 string hyperlinkAddress = "";
                 string[] highlightAttributes = null;
+                string[] textAttributes = null;
                 string dataFileName = "";
                 bool overWrite = false;
 
@@ -127,7 +129,7 @@ namespace Extract.Utilities
                         }
 
                         hyperlinkAttributes =
-                            args[i].Split(new[] { ',', ';', ' '}, StringSplitOptions.RemoveEmptyEntries);
+                            args[i].Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
                     }
                     else if (temp.Equals("/la", StringComparison.OrdinalIgnoreCase))
                     {
@@ -148,6 +150,17 @@ namespace Extract.Utilities
                         }
 
                         highlightAttributes =
+                            args[i].Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    }
+                    else if (temp.Equals("/txt", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if ((++i) >= argumentCount)
+                        {
+                            DisplayUsage("No attribute names specified.");
+                            return;
+                        }
+
+                        textAttributes =
                             args[i].Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     }
                     else if (temp.Equals("/voa", StringComparison.OrdinalIgnoreCase))
@@ -190,11 +203,16 @@ namespace Extract.Utilities
                 ExtractException.Assert("ELI31878", "Source file is not a pdf.",
                     ImageMethods.IsPdf(pdfSource), "PDF Source", pdfSource);
 
-                ExtractException.Assert("ELI36286", "No PDF modifications have been configured.",
-                    removeAnnotations || hyperlinkAttributes != null || highlightAttributes != null);
+                bool addingAnnotations =
+                    (hyperlinkAttributes != null ||
+                    highlightAttributes != null ||
+                    textAttributes != null);
 
-                ExtractException.Assert("ELI36268", "Data file for hyperlinks not specified.",
-                    (hyperlinkAttributes == null && highlightAttributes == null) || 
+                ExtractException.Assert("ELI36286", "No PDF modifications have been configured.",
+                    removeAnnotations || addingAnnotations);
+
+                ExtractException.Assert("ELI36268", "Data file for annotations not specified.",
+                    !addingAnnotations || 
                     !string.IsNullOrWhiteSpace(dataFileName), "Data file", dataFileName);
 
                 if (!overWrite && File.Exists(pdfDest))
@@ -236,6 +254,12 @@ namespace Extract.Utilities
                         {
                             modified |= AddAnnotations(pdfDocument, dataFileName,
                                 highlightAttributes, "highlight", HighlightCreator, exceptions);
+                        }
+
+                        if (textAttributes != null)
+                        {
+                            modified |= AddAnnotations(pdfDocument, dataFileName,
+                                textAttributes, "text annotation", FreeTextAnnotationCreator, exceptions);
                         }
 
                         // Save output as long as either something has been modified or no
@@ -288,9 +312,10 @@ namespace Extract.Utilities
                 sb.AppendLine();
             }
             sb.Append(Environment.GetCommandLineArgs()[0]);
-            sb.AppendLine(" <PDFSource> <PDFDestination> [/ra] [/l <AttributeNames> " +
-                "[/la <LinkAddress>] [/h <AttributeNames>] [/voa <DataFilename>] " +
-                "[/o] [/ef <ExceptionFile>]");
+            sb.AppendLine(" <PDFSource> <PDFDestination> [/ra] \r\n" +
+                "[/l <AttributeNames>] [/la <LinkAddress>] [/h <AttributeNames>] \r\n" +
+                "[/txt <AttributeNames>] [/voa <DataFilename>] [/o] \r\n" +
+                "[/ef <ExceptionFile>]");
             sb.AppendLine();
             sb.AppendLine("Usage:");
             sb.AppendLine("-------------------");
@@ -303,8 +328,10 @@ namespace Extract.Utilities
                 "hyperlinks. If not specified, the value of the attributes will be used.");
             sb.AppendLine("/h <AttributeNames>: Indicates that hyperlinks should be added for " +
                 "attributes whose names are indicated in a comma separated list.");
+            sb.AppendLine("/txt <AttributeNames>: Indicates that text annotations should be added " +
+                "for attributes whose names are indicated in a comma separated list.");
             sb.AppendLine("/voa <DataFileName>: The name of the datafile containing the " +
-                "attributes to use for hyperlinks.");
+                "attributes to use for annotations, highlights or hyperlinks.");
             sb.AppendLine("/o: Will overwrite the destination file if it exists.");
             sb.AppendLine("/ef <ExceptionFile>: Log any exceptions to the specified");
             sb.AppendLine("    file rather than display them.");
@@ -556,6 +583,39 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38369");
+            }
+        }
+
+        /// <summary>
+        /// Creates a free text annotation.
+        /// </summary>
+        /// <param name="page">The <see cref="Aspose.Pdf.Page"/> the highlight should be added to.
+        /// </param>
+        /// <param name="rectangle">A <see cref="Aspose.Pdf.Rectangle"/> describing the bounds of the
+        /// highlight.</param>
+        /// <param name="attribute">The <see cref="IAttribute"/> from the voa file the highlight is
+        /// associated with.</param>
+        /// <returns>The <see cref="Annotation"/>.</returns>
+        static Annotation FreeTextAnnotationCreator(Aspose.Pdf.Page page, Aspose.Pdf.Rectangle rectangle,
+            IAttribute attribute)
+        {
+            try
+            {
+                TextAnnotation textAnnotation = new TextAnnotation(page, rectangle);
+                textAnnotation.Title = attribute
+                    .SubAttributes
+                    .ToIEnumerable<IAttribute>()
+                    .Where(a => a.Name == "Title")
+                    .Select(a => a.Value.String)
+                    .FirstOrDefault()
+                    ?? attribute.Name.Replace('_', ' ');
+                textAnnotation.Contents = attribute.Value.String;
+
+                return textAnnotation;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI43554");
             }
         }
 
