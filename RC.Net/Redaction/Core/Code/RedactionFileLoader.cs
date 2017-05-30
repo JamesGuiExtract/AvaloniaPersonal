@@ -506,6 +506,7 @@ namespace Extract.Redaction
             _verificationSessionId = 0;
             _onDemandSessionId = 0;
             _nextId = 1;
+            _allSessions = _verificationSessions = _onDemandSessions = null;
 
             _fileName = fileName;
             _sourceDocument = sourceDocument;
