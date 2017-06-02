@@ -2,9 +2,13 @@
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
 using System.Data.OleDb;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry.LabDE
@@ -12,7 +16,7 @@ namespace Extract.DataEntry.LabDE
     /// <summary>
     /// Provides access to the LabDE related data in a FAM database.
     /// </summary>
-    internal class FAMData : IDisposable
+    public class FAMData : IDisposable
     {
         #region Fields
 
@@ -69,7 +73,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Raised to indicate data associated with one of the table rows being managed has changed.
         /// </summary>
-        public event EventHandler<RowDataUpdatedArgs> RowDataUpdated;
+        public event EventHandler<RowDataUpdatedEventArgs> RowDataUpdated;
 
         #endregion Events
 
@@ -90,7 +94,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// The data configuration
         /// </summary>
-        public IFAMDataConfiguration DataConfiguration
+        public virtual IFAMDataConfiguration DataConfiguration
         {
             get;
             set;
@@ -103,7 +107,7 @@ namespace Extract.DataEntry.LabDE
         /// <value><see langword="true"/> if this instance has any
         /// <see cref="DocumentDataRecord"/> instance; otherwise, <see langword="false"/>.
         /// </value>
-        public bool HasRowData
+        public virtual bool HasRowData
         {
             get
             {
@@ -114,7 +118,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Gets the currently loaded <see cref="DocumentDataRecord"/> for the table's current rows.
         /// </summary>
-        public IEnumerable<DocumentDataRecord> LoadedRecords
+        public virtual IEnumerable<DocumentDataRecord> LoadedRecords
         {
             get
             {
@@ -125,7 +129,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Gets a single-quoted list of record IDs that are currently assigned in the UI.
         /// </summary>
-        public List<string> AlreadyMappedRecordIDs
+        public virtual ReadOnlyCollection<string> AlreadyMappedRecordIds
         {
             get
             {
@@ -140,13 +144,25 @@ namespace Extract.DataEntry.LabDE
                             .ToList();
                     }
 
-                    return _alreadyMappedRecordIDs;
+                    return _alreadyMappedRecordIDs.AsReadOnly();
                 }
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI41516");
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the default sort.
+        /// </summary>
+        /// <value>
+        /// The default sort.
+        /// </value>
+        public virtual Tuple<string, ListSortDirection> DefaultSort
+        {
+            get;
+            private set;
         }
 
         #endregion Properties
@@ -156,21 +172,21 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Gets a <see cref="DataTable"/> with the records specified by <see paramref="recordIDs"/>.
         /// Info for the records is cached for subsequent calls to <see cref="GetRecordDescription"/> or
-        /// <see cref="GetCorrespondingFileIDs"/>.
+        /// <see cref="GetCorrespondingFileIds"/>.
         /// </summary>
-        /// <param name="recordIDs">A comma delimited list of record IDs to be returned or an SQL
+        /// <param name="recordIds">A comma delimited list of record IDs to be returned or an SQL
         /// query that selects the record numbers to be returned.</param>
-        /// <param name="queryForRecordIDs"><see langword="true"/> if
+        /// <param name="queryForRecordIds"><see langword="true"/> if
         /// <see paramref="recordIDs"/> represents an SQL query to select the appropriate record IDs,
         /// <see langword="false"/> if the record IDs are specified via a comma separated list (in
         /// which case the record IDs should be single-quoted for proper string comparisons).
         /// </param>
         /// <returns>A <see cref="DataTable"/> listing specified records.</returns>
-        public DataTable LoadRecordInfo(string recordIDs, bool queryForRecordIDs)
+        public virtual DataTable LoadRecordInfo(string recordIds, bool queryForRecordIds)
         {
             try
             {
-                var recordInfoQuery = DataConfiguration.GetRecordInfoQuery(recordIDs, queryForRecordIDs);
+                var recordInfoQuery = DataConfiguration.GetRecordInfoQuery(recordIds, queryForRecordIds);
 
                 string lastRecordID = null;
                 using (DataTable results = DBMethods.ExecuteDBQuery(OleDbConnection, recordInfoQuery))
@@ -186,6 +202,27 @@ namespace Extract.DataEntry.LabDE
                     // Remove the FileID column that was not specified by recordInfoQuery, but rather
                     // used behind the scenes to compile correspondingFileIds.
                     matchingRecords.Columns.Remove("FileID");
+
+                    var sortedColumn = matchingRecords.Columns
+                        .OfType<DataColumn>()
+                        .Select(column =>
+                            new Tuple<DataColumn, Match>(
+                                column, Regex.Match(column.ColumnName, @"\s(ASC|DESC)")))
+                        .SingleOrDefault(item => item.Item2.Success);
+
+                    if (sortedColumn.Item2 != null)
+                    {
+                        sortedColumn.Item1.Caption =
+                            sortedColumn.Item1.ColumnName.Substring(0, sortedColumn.Item2.Index);
+                        DefaultSort = new Tuple<string, ListSortDirection>(sortedColumn.Item1.ColumnName,
+                            (sortedColumn.Item2.Value == " ASC")
+                                ? ListSortDirection.Ascending
+                                : ListSortDirection.Descending);
+                    }
+                    else
+                    {
+                        DefaultSort = null;
+                    }
 
                     DocumentDataRecordInfo recordInfo = null;
 
@@ -204,9 +241,9 @@ namespace Extract.DataEntry.LabDE
                             recordInfo = new DocumentDataRecordInfo();
                             recordInfo.Description = string.Join("\r\n", matchingRecords.Columns
                                 .OfType<DataColumn>()
-                                .Select(column => column.ColumnName + ": " +
+                                .Select(column => column.Caption + ": " +
                                     row.ItemArray[column.Ordinal].ToString()));
-                            recordInfo.CorrespondingFileIDs = new List<int>();
+                            recordInfo.CorrespondingFileIds = new List<int>();
 
                             _recordInfoCache.CacheData(recordID, recordInfo);
                         }
@@ -215,7 +252,7 @@ namespace Extract.DataEntry.LabDE
                         object fileIdValue = row.ItemArray.Last();
                         if (!(fileIdValue is System.DBNull))
                         {
-                            recordInfo.CorrespondingFileIDs.Add((int)fileIdValue);
+                            recordInfo.CorrespondingFileIds.Add((int)fileIdValue);
                         }
                     }
 
@@ -236,7 +273,7 @@ namespace Extract.DataEntry.LabDE
         /// </param>
         /// <returns>a <see cref="DocumentDataRecord"/> instance that provides access to FAM database data.
         /// </returns>
-        public DocumentDataRecord GetRowData(DataEntryTableRow dataEntryRow)
+        public virtual DocumentDataRecord GetRowData(DataEntryTableRow dataEntryRow)
         {
             try
             {
@@ -257,7 +294,7 @@ namespace Extract.DataEntry.LabDE
                     // After initially creating a new DocumentDataRecord, raise OnRowDataUpdated so
                     // the record picker column will know of the record ID's initial value (if
                     // the record ID exists).
-                    OnRowDataUpdated(new RowDataUpdatedArgs(rowData,
+                    OnRowDataUpdated(new RowDataUpdatedEventArgs(rowData,
                         !string.IsNullOrWhiteSpace(rowData.IdField.Value)));
                 }
                 else
@@ -278,7 +315,7 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <param name="recordID">The record ID for which a description is needed.</param>
         /// <returns>A text description of the record.</returns>
-        public string GetRecordDescription(string recordID)
+        public virtual string GetRecordDescription(string recordID)
         {
             try
             {
@@ -307,20 +344,20 @@ namespace Extract.DataEntry.LabDE
         /// <param name="record">The <see cref="DocumentDataRecord"/> for which matching records are to be
         /// retrieved.</param>
         /// <returns>A <see cref="DataTable"/> listing the possibly matching records.</returns>
-        public DataTable GetMatchingRecords(DocumentDataRecord record)
+        public virtual DataTable GetMatchingRecords(DocumentDataRecord record)
         {
             try
             {
-                string selectedRecordIDsQuery = record.GetSelectedRecordIDsQuery();
+                string selectedRecordIDsQuery = record.GetSelectedRecordIdsQuery();
 
                 // LoadRecordInfo has the side-effect of caching data from selectedRecordIDsQuery into
                 // _recordInfoCache
                 DataTable matchingRecordTable = LoadRecordInfo(selectedRecordIDsQuery, true);
 
                 // Cache the list of records if they have not yet been.
-                if (record.MatchingRecordIDs == null)
+                if (record.MatchingRecordIds == null)
                 {
-                    record.MatchingRecordIDs = new HashSet<string>(
+                    record.MatchingRecordIds = new HashSet<string>(
                         matchingRecordTable.Rows
                             .OfType<DataRow>()
                             .Select(row => "'" + row.ItemArray[0].ToString() + "'"));
@@ -338,19 +375,19 @@ namespace Extract.DataEntry.LabDE
         /// Gets the file IDs for files that have already been filed against
         /// <see paramref="recordID"/> in LabDE.
         /// </summary>
-        /// <param name="recordID">The record ID.</param>
+        /// <param name="recordId">The record ID.</param>
         /// <returns>The file IDs for files that have already been filed against the record ID.
         /// </returns>
-        public IEnumerable<int> GetCorrespondingFileIDs(string recordID)
+        public virtual IEnumerable<int> GetCorrespondingFileIds(string recordId)
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(recordID))
+                if (!string.IsNullOrWhiteSpace(recordId))
                 {
-                    DocumentDataRecordInfo recordInfo = GetRecordInfo(recordID);
+                    DocumentDataRecordInfo recordInfo = GetRecordInfo(recordId);
                     if (recordInfo != null)
                     {
-                        return recordInfo.CorrespondingFileIDs;
+                        return recordInfo.CorrespondingFileIds;
                     }
                 }
 
@@ -368,7 +405,7 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <param name="dataEntryRow">The <see cref="DataEntryTableRow"/> for which data should be
         /// deleted.</param>
-        public void DeleteRow(DataEntryTableRow dataEntryRow)
+        public virtual void DeleteRow(DataEntryTableRow dataEntryRow)
         {
             try
             {
@@ -396,7 +433,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Resets the row data.
         /// </summary>
-        public void ResetRowData()
+        public virtual void ResetRowData()
         {
             var deletedRows = _rowData.ToArray();
             _rowData.Clear();
@@ -417,14 +454,15 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <returns>The descriptions of all records on the active document that have previously
         /// been submitted.</returns>
-        public IEnumerable<string> GetPreviouslySubmittedRecords()
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public virtual IEnumerable<string> GetPreviouslySubmittedRecords()
         {
             foreach (var documentDataRecord in _rowData.Values)
             {
                 string id = documentDataRecord.IdField.Value;
 
                 DocumentDataRecordInfo recordInfo = GetRecordInfo(id);
-                if (recordInfo != null && recordInfo.CorrespondingFileIDs.Any()) 
+                if (recordInfo != null && recordInfo.CorrespondingFileIds.Any()) 
                 {
                     yield return recordInfo.Description;
                 }
@@ -437,7 +475,7 @@ namespace Extract.DataEntry.LabDE
         /// the new record.
         /// </summary>
         /// <param name="fileId">The fileId the records should be linked to.</param>
-        public void LinkFileWithCurrentRecords(int fileId)
+        public virtual void LinkFileWithCurrentRecords(int fileId)
         {
             try
             {
@@ -462,7 +500,7 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <param name="clearDatabaseData"><see langword="true"/> to clear data cached from the
         /// database; <see langword="false"/> to clear only data obtained from the UI.</param>
-        public void ClearCachedData(bool clearDatabaseData)
+        public virtual void ClearCachedData(bool clearDatabaseData)
         {
             try
             {
@@ -513,7 +551,7 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>   
-        void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -546,7 +584,7 @@ namespace Extract.DataEntry.LabDE
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleRowData_DataUpdated(object sender, RowDataUpdatedArgs e)
+        void HandleRowData_DataUpdated(object sender, RowDataUpdatedEventArgs e)
         {
             try
             {
@@ -594,7 +632,9 @@ namespace Extract.DataEntry.LabDE
         /// A <see cref="OleDbConnection"/> against the currently specified
         /// <see cref="FileProcessingDB"/>.
         /// </value>
-        OleDbConnection OleDbConnection
+        /// Using the same casing as MS's own type name for crissakes
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Db")]
+        protected OleDbConnection OleDbConnection
         {
             get
             {
@@ -618,7 +658,7 @@ namespace Extract.DataEntry.LabDE
         /// <returns>
         /// The <see cref="DocumentDataRecordInfo"/> for the specified <see paramref="recordID"/>.
         /// </returns>
-        DocumentDataRecordInfo GetRecordInfo(string recordID)
+        protected virtual DocumentDataRecordInfo GetRecordInfo(string recordID)
         {
             DocumentDataRecordInfo recordInfo = null;
 
@@ -642,10 +682,17 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Raises the <see cref="RowDataUpdated"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="RowDataUpdatedArgs"/> representing this event.</param>
-        void OnRowDataUpdated(RowDataUpdatedArgs e)
+        /// <param name="e">The <see cref="RowDataUpdatedEventArgs"/> representing this event.</param>
+        protected virtual void OnRowDataUpdated(RowDataUpdatedEventArgs e)
         {
-            RowDataUpdated?.Invoke(this, e);
+            try
+            {
+                RowDataUpdated?.Invoke(this, e);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI43447");
+            }
         }
 
         #endregion Private Members
@@ -654,7 +701,7 @@ namespace Extract.DataEntry.LabDE
     /// <summary>
     /// Information regarding a record in the FAM DB.
     /// </summary>
-    internal class DocumentDataRecordInfo
+    public class DocumentDataRecordInfo
     {
         /// <summary>
         /// A description of the record.
@@ -668,7 +715,9 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// The FAM file IDs for files that have already been filed against this record.
         /// </summary>
-        public List<int> CorrespondingFileIDs
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public List<int> CorrespondingFileIds
         {
             get;
             set;
@@ -679,15 +728,15 @@ namespace Extract.DataEntry.LabDE
     /// An <see cref="EventArgs"/> that represents data for the <see cref="FAMData.RowDataUpdated"/>
     /// event.
     /// </summary>
-    internal class RowDataUpdatedArgs : EventArgs
+    public class RowDataUpdatedEventArgs : EventArgs
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RowDataUpdatedArgs"/> class.
+        /// Initializes a new instance of the <see cref="RowDataUpdatedEventArgs"/> class.
         /// </summary>
         /// <param name="rowData">The <see cref="DocumentDataRecord"/> for which data was updated.</param>
         /// <param name="recordIdUpdated"><see langword="true"/> if the record ID has been
         /// changed; otherwise, <see langword="false"/>.</param>
-        public RowDataUpdatedArgs(DocumentDataRecord rowData, bool recordIdUpdated)
+        public RowDataUpdatedEventArgs(DocumentDataRecord rowData, bool recordIdUpdated)
             : base()
         {
             DocumentDataRecord = rowData;

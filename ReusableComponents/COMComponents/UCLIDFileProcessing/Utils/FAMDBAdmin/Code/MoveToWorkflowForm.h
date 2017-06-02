@@ -23,8 +23,10 @@ namespace Extract {
 
 			// Constructor
 			//		famDatabase : FAM database to use to manage workflows and actions
-			MoveToWorkflowForm(IFileProcessingDBPtr famDatabase)
+			MoveToWorkflowForm(IFileProcessingDBPtr famDatabase, bool noWorkflowSource)
 			{
+				_noWorkflowSource = noWorkflowSource;
+
 				InitializeComponent();
 
 				// Create the pointer to the smart pointer for the database
@@ -120,6 +122,7 @@ namespace Extract {
 
 			// The FAM database that is being managed
 			IFileProcessingDBPtr *_pipfamDatabase;
+			bool _noWorkflowSource;
 			
 			System::Windows::Forms::Button^  _okButton;
 			System::Windows::Forms::Button^  _cancelButton;

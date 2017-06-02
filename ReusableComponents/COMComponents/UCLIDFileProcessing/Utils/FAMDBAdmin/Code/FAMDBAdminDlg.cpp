@@ -64,6 +64,7 @@ m_ipSchemaUpdateProgressStatus(NULL),
 m_ipSchemaUpdateProgressStatusDialog(NULL),
 m_bSchemaUpdateSucceeded(false),
 m_bDBSchemaIsNotCurrent(false),
+m_bUnaffiliatedFiles(false),
 m_bInitialized(false)
 {
 	try
@@ -207,6 +208,18 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 				if (iResult == IDYES)
 				{
 					OnDatabaseUpdateSchema();
+				}
+			}
+			else if (strCurDBStatus == gstrUNAFFILIATED_FILES)
+			{
+				int iResult = MessageBox("This database has defined workflow(s) but files that exist "
+					"outside those workflows.\r\n\r\nThese files need to be migrated to workflows before "
+					"processing.\r\n\r\nDo you wish to migrate the files now?",
+					"Migrate files to workflows?",
+					MB_YESNO);
+				if (iResult == IDYES)
+				{
+					showMoveToWorkflowDialog(true);
 				}
 			}
 		}
@@ -356,6 +369,7 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 		// Set the database is good flag to false
 		m_bIsDBGood = false;
 		m_bDBSchemaIsNotCurrent = false;
+		m_bUnaffiliatedFiles = false;
 		try
 		{
 			// Clear the database
@@ -368,6 +382,10 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 			if (strCurDBStatus == gstrWRONG_SCHEMA)
 			{
 				m_bDBSchemaIsNotCurrent = true;
+			}
+			else if (strCurDBStatus == gstrUNAFFILIATED_FILES)
+			{
+				m_bUnaffiliatedFiles = true;
 			}
 			else if (strCurDBStatus == gstrCONNECTION_ESTABLISHED)
 			{
@@ -470,12 +488,7 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 
 			if (m_bSchemaUpdateSucceeded)
 			{
-				string strServer = asString(m_ipFAMDB->DatabaseServer);
-				string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
-				string strAdvConnStringProperties =
-					asString(m_ipFAMDB->AdvancedConnectionStringProperties);
-
-				OnDBConfigChanged(strServer, strDatabaseName, strAdvConnStringProperties);
+				refreshDBStatus();
 
 				// Set the database status
 				setUIDatabaseStatus();
@@ -860,15 +873,55 @@ void CFAMDBAdminDlg::OnManageWorkflowActions()
 		NativeWindow ^currentWindow = __nullptr;
 		try
 		{
-			IntPtr managedHWND(this->GetSafeHwnd());
-			NativeWindow ^currentWindow = NativeWindow::FromHandle(managedHWND);
-			workFlow->ShowDialog(currentWindow);
+			try
+			{
+				IntPtr managedHWND(this->GetSafeHwnd());
+				NativeWindow ^currentWindow = NativeWindow::FromHandle(managedHWND);
+				workFlow->ShowDialog(currentWindow);
+
+				// Force re-check for unaffiliated files.
+				m_ipFAMDB->ResetDBConnection(VARIANT_FALSE);
+				refreshDBStatus();
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43451")
+		}
+		catch (UCLIDException &ue)
+		{
+			string strCurDBStatus;
+
+			try
+			{
+				strCurDBStatus = asString(m_ipFAMDB->GetCurrentConnectionStatus());
+				if (strCurDBStatus == gstrUNAFFILIATED_FILES)
+				{
+					int iResult = MessageBox("This database has defined workflow(s) but files that exist "
+						"outside those workflows.\r\n\r\nThese files need to be migrated to workflows before "
+						"processing.\r\n\r\nDo you wish to migrate the files now?",
+						"Migrate files to workflows?",
+						MB_YESNO);
+					if (iResult == IDYES)
+					{
+						showMoveToWorkflowDialog(true);
+					}
+					else
+					{
+						refreshDBStatus();
+					}
+				}
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI43452");
+
+			if (strCurDBStatus != gstrUNAFFILIATED_FILES)
+			{
+				throw ue;
+			}
 		}
 		finally
 		{
 			if (currentWindow)
 				currentWindow->ReleaseHandle();
 		}
+
 		loadWorkflowComboBox();
 
 		//Update the summary tab
@@ -997,21 +1050,7 @@ void CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow()
 {
 	try
 	{
-		// Display the WorkflowManagement dialog
-		MoveToWorkflowForm ^moveToWorkflow = gcnew MoveToWorkflowForm(m_ipFAMDB);
-		NativeWindow ^currentWindow = __nullptr;
-		try
-		{
-			IntPtr managedHWND(this->GetSafeHwnd());
-			currentWindow = NativeWindow::FromHandle(managedHWND);
-			moveToWorkflow->ShowDialog(currentWindow);
-			UpdateSummaryTab();
-		}
-		finally
-		{
-			if (currentWindow)
-				currentWindow->ReleaseHandle();
-		}
+		showMoveToWorkflowDialog(m_bUnaffiliatedFiles);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43362");
 }
@@ -1033,6 +1072,7 @@ void CFAMDBAdminDlg::OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
 		// Preset the DB good flag to false
 		m_bIsDBGood = false;
 		m_bDBSchemaIsNotCurrent = false;
+		m_bUnaffiliatedFiles = false;
 
 		// Set the server and database
 		m_ipFAMDB->DatabaseServer = rstrServer.c_str();
@@ -1061,6 +1101,10 @@ void CFAMDBAdminDlg::OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
 		if (strCurDBStatus == gstrWRONG_SCHEMA)
 		{
 			m_bDBSchemaIsNotCurrent = true;
+		}
+		else if (strCurDBStatus == gstrUNAFFILIATED_FILES)
+		{
+			m_bUnaffiliatedFiles = true;
 		}
 		m_comboBoxWorkflow.ResetContent();
 	}
@@ -1115,7 +1159,7 @@ void CFAMDBAdminDlg::enableMenus()
 	pMenu->EnableMenuItem(ID_DATABASE_SET_OPTIONS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_TAGS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_BATES_COUNTERS, m_bIsDBGood ? nEnable : nDisable);
-	pMenu->EnableMenuItem(ID_MANAGE_ACTIONS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_ACTIONS, (m_bIsDBGood || m_bUnaffiliatedFiles) ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_USERS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_METADATA, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_ATTRIBUTESETS, m_bIsDBGood ? nEnable : nDisable);
@@ -1328,4 +1372,33 @@ void CFAMDBAdminDlg::positionWorkflowControls()
 	controlRect.right = rectDlg.right - 6;
 	m_comboBoxWorkflow.MoveWindow(controlRect);
 
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::showMoveToWorkflowDialog(bool bAreUnaffiliatedFiles)
+{
+	MoveToWorkflowForm ^moveToWorkflow = gcnew MoveToWorkflowForm(m_ipFAMDB, bAreUnaffiliatedFiles);
+	NativeWindow ^currentWindow = __nullptr;
+	try
+	{
+		IntPtr managedHWND(this->GetSafeHwnd());
+		currentWindow = NativeWindow::FromHandle(managedHWND);
+		moveToWorkflow->ShowDialog(currentWindow);
+
+		refreshDBStatus();
+		UpdateSummaryTab();
+	}
+	finally
+	{
+		if (currentWindow)
+			currentWindow->ReleaseHandle();
+	}
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::refreshDBStatus()
+{
+	string strServer = asString(m_ipFAMDB->DatabaseServer);
+	string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
+	string strAdvConnStringProperties =
+		asString(m_ipFAMDB->AdvancedConnectionStringProperties);
+	OnDBConfigChanged(strServer, strDatabaseName, strAdvConnStringProperties);
 }

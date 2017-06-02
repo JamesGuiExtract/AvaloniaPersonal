@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -73,6 +74,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Gets the record ID that was selected in the UI.
         /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods")]
         public string SelectedRecordId
         {
             get;
@@ -117,13 +119,26 @@ namespace Extract.DataEntry.LabDE
         /// Updates the data in <see cref="_recordsDataGridView"/> to display the current possible
         /// matching records in the FAM database.
         /// </summary>
-        public void UpdateRecordSelectionGrid()
+        public virtual void UpdateRecordSelectionGrid()
         {
             try
             {
                 var disposableSource = _recordsDataGridView.DataSource as IDisposable;
 
                 _recordsDataGridView.DataSource = RowData.UnmappedMatchingRecords;
+                for (int i = 0; i < _recordsDataGridView.ColumnCount; i++)
+                {
+                    _recordsDataGridView.Columns[i].HeaderText =
+                        RowData.UnmappedMatchingRecords.Table.Columns[i].Caption;
+                }
+
+                if (RowData.DefaultSort != null)
+                {
+                    var sortedColumn = _recordsDataGridView.Columns
+                        .OfType<DataGridViewColumn>()
+                        .Single(column => column.Name == RowData.DefaultSort.Item1);
+                    _recordsDataGridView.Sort(sortedColumn, RowData.DefaultSort.Item2);
+                }
 
                 if (disposableSource != null)
                 {
@@ -155,7 +170,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Gets the title of the pane.
         /// </summary>
-        public string Title
+        public virtual string Title
         {
             get
             {
@@ -166,7 +181,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// The IDs of the files to be populated in the FFI file list.
         /// </summary>
-        public IEnumerable<int> SelectedFileIds
+        public virtual IEnumerable<int> SelectedFileIds
         {
             get
             {
@@ -193,7 +208,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// The position of the pane in the FFI.
         /// </summary>
-        public SelectionPanePosition PanePosition
+        public virtual SelectionPanePosition PanePosition
         {
             get
             {
@@ -235,7 +250,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Gets if there is any changes that need to be applied. 
         /// </summary>
-        public bool Dirty
+        public virtual bool Dirty
         {
             get
             {
@@ -256,7 +271,7 @@ namespace Extract.DataEntry.LabDE
         /// applying changes. If <see langword="null"/>, no prompt will be displayed when applying
         /// changed.
         /// </summary>
-        public string ApplyPrompt
+        public virtual string ApplyPrompt
         {
             get
             {
@@ -269,7 +284,7 @@ namespace Extract.DataEntry.LabDE
         /// the user is canceling changes. If <see langword="null"/>, no prompt will be displayed
         /// when canceling except if the FFI is closed via the form's cancel button (red X).
         /// </summary>
-        public string CancelPrompt
+        public virtual string CancelPrompt
         {
             get
             {
@@ -282,7 +297,7 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <returns><see langword="true"/> if the changes were successfully applied; otherwise,
         /// <see langword="false"/>.</returns>
-        public bool Apply()
+        public virtual bool Apply()
         {
             try
             {
@@ -309,7 +324,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Cancels all uncommitted data changes specified via SetValue.
         /// </summary>
-        public void Cancel()
+        public virtual void Cancel()
         {
             try
             {
@@ -329,7 +344,7 @@ namespace Extract.DataEntry.LabDE
         /// The <see cref="DocumentDataRecord"/> that is used to retrieve and cache record information for
         /// the currently selected <see cref="DataEntryTableRow"/>.
         /// </summary>
-        internal DocumentDataRecord RowData
+        internal virtual DocumentDataRecord RowData
         {
             get;
             set;
@@ -394,7 +409,11 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                AcceptFunction?.Invoke(sender, e);
+                // Don't treat double-clicks in the row header as a row selection.
+                if (e.RowIndex >= 0)
+                {
+                    AcceptFunction?.Invoke(sender, e);
+                }
             }
             catch (Exception ex)
             {
@@ -411,7 +430,8 @@ namespace Extract.DataEntry.LabDE
         /// <see cref="_recordsDataGridView"/>.
         /// </summary>
         /// <returns>The record ID of the currently selected row.</returns>
-        string GetSelectedRecordId()
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        protected virtual string GetSelectedRecordId()
         {
             if (_recordsDataGridView.SelectedRows.Count != 1)
             {
@@ -427,7 +447,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Resets the record selection to <see cref="SelectedRecordId"/>.
         /// </summary>
-        void ResetSelection()
+        protected virtual void ResetSelection()
         {
             _recordsDataGridView.ClearSelection();
 
@@ -472,7 +492,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Raises the <see cref="RefreshRequired"/> event.
         /// </summary>
-        void OnRefreshRequired()
+        protected virtual void OnRefreshRequired()
         {
             if (RefreshRequired != null)
             {

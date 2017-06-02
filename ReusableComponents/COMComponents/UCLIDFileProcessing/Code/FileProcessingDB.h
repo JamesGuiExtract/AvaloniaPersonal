@@ -921,7 +921,10 @@ private:
 	string getEncryptedString(const string strInput);
 
 	// Throws and exception if the DBSchemaVersion in the DB is different from the current DBSchemaVersion
-	void validateDBSchemaVersion();
+	void validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles = false);
+
+	// Returns whether, if workflows exist, files exist that haven't been assigned to a workflow.
+	bool unaffiliatedWorkflowFilesExist();
 
 	// Assigns m_nActiveActionID, m_bUsingWorkflowsForCurrentAction, and m_bRunningAllWorkflows based on the
 	// current workflow and strActionName.

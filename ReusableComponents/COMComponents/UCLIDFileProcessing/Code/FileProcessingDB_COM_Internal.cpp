@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 149;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 150;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1795,6 +1795,32 @@ int UpdateToSchemaVersion149(_ConnectionPtr ipConnection,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43416");
 }
 //-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion150(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 150;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE dbo.[FileHandler] ADD [WorkflowName] NVARCHAR(100) NULL");
+		vecQueries.push_back(gstrADD_FILE_HANDLER_WORKFLOW_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43448");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -6743,7 +6769,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 146:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion147);
 				case 147:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion148);
 				case 148:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion149);
-				case 149:	break;
+				case 149:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion150);
+				case 150:	break;
 
 				default:
 					{

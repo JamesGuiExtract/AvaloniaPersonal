@@ -282,7 +282,6 @@ static const string gstrCREATE_FIELD_SEARCH_TABLE =
 	"[FieldName] [nvarchar](64) NOT NULL CONSTRAINT [IX_FieldSearch_FieldName] UNIQUE,"
 	"[AttributeQuery] [nvarchar](256) NOT NULL)";
 
-// Was LaunchApp in versions 114 and 115
 static const string gstrCREATE_FILE_HANDLER_TABLE =
 	"CREATE TABLE [dbo].[FileHandler]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_LaunchApp] PRIMARY KEY CLUSTERED,"
@@ -294,7 +293,8 @@ static const string gstrCREATE_FILE_HANDLER_TABLE =
 	"[AdminOnly] [bit] NOT NULL DEFAULT 0,"
 	"[AllowMultipleFiles] [bit] NOT NULL DEFAULT 0,"
 	"[SupportsErrorHandling] [bit] NOT NULL DEFAULT 0,"
-	"[Blocking] [bit] NOT NULL DEFAULT 1)";
+	"[Blocking] [bit] NOT NULL DEFAULT 1,"
+	"[WorkflowName] NVARCHAR(100) NULL)";
 
 static const string gstrCREATE_FEATURE_TABLE =
 	"CREATE TABLE [dbo].[Feature]("
@@ -1127,6 +1127,12 @@ static const string gstrADD_WORKFLOWCHANGEFILE_WORKFLOWSOURCE_FK =
 	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
 	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Workflow table.
 
+static const string gstrADD_FILE_HANDLER_WORKFLOW_FK =
+	"ALTER TABLE dbo.[FileHandler] "
+	"WITH CHECK ADD CONSTRAINT [FK_FileHandler_Workflow] FOREIGN KEY([WorkflowName]) "
+	"REFERENCES [dbo].[Workflow]([Name]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE SET NULL";
 
 static const string gstrADD_DB_PROCEXECUTOR_ROLE =
 	"IF DATABASE_PRINCIPAL_ID('db_procexecutor') IS NULL \r\n"

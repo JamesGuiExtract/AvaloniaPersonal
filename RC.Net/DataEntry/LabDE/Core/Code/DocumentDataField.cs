@@ -9,7 +9,7 @@ namespace Extract.DataEntry.LabDE
     /// Represents a field in the voa data found by rules and/or displayed for verification.
     /// </summary>
     /// <seealso cref="System.IDisposable" />
-    internal class DocumentDataField : IDisposable
+    public class DocumentDataField : IDisposable
     {
         #region Fields
 
@@ -81,6 +81,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The <see cref="IAttribute"/> representing this field's value.
         /// </value>
+        [SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods")]
         public IAttribute Attribute
         {
             get
@@ -152,7 +153,7 @@ namespace Extract.DataEntry.LabDE
         /// he current string value of <see cref="Attribute"/> or <see cref="string.Empty"/> if
         /// <see cref="Attribute"/> does not currently exist.
         /// </value>
-        public string Value
+        public virtual string Value
         {
             get
             {
@@ -180,7 +181,7 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -237,7 +238,8 @@ namespace Extract.DataEntry.LabDE
         /// Gets the <see cref="IAttribute"/> that should represent this field's value.
         /// </summary>
         /// <returns>The <see cref="IAttribute"/> that should represent this field's value.</returns>
-        IAttribute GetAttribute()
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        protected IAttribute GetAttribute()
         {
             // If attributeQuery is root-relative, set queryRootAttribute so that the query is not
             // evaluated relative to it.
@@ -255,7 +257,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Raises the <see cref="AttributeUpdated"/> event.
         /// </summary>
-        void OnAttributeUpdated()
+        protected virtual void OnAttributeUpdated()
         {
             AttributeUpdated?.Invoke(this, new EventArgs());
         }

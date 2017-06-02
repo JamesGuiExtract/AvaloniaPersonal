@@ -51,6 +51,21 @@ static const std::string gstrCREATE_LAUNCH_APP_TABLE_V114 =
 	"[SupportsErrorHandling] [bit] NOT NULL DEFAULT 0,"
 	"[Blocking] [bit] NOT NULL DEFAULT 1)";
 
+// Used from schema 116 - 149
+// Was LaunchApp in versions 114 and 115
+static const string gstrCREATE_FILE_HANDLER_TABLE_V116 =
+	"CREATE TABLE [dbo].[FileHandler]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_LaunchApp] PRIMARY KEY CLUSTERED,"
+	"[Enabled] [bit] NOT NULL DEFAULT 1,"
+	"[AppName] [nvarchar](64) NOT NULL CONSTRAINT [IX_FileHandler_AppName] UNIQUE,"
+	"[IconPath] [nvarchar](260),"
+	"[ApplicationPath] [nvarchar](260) NOT NULL,"
+	"[Arguments] [ntext],"
+	"[AdminOnly] [bit] NOT NULL DEFAULT 0,"
+	"[AllowMultipleFiles] [bit] NOT NULL DEFAULT 0,"
+	"[SupportsErrorHandling] [bit] NOT NULL DEFAULT 0,"
+	"[Blocking] [bit] NOT NULL DEFAULT 1)";
+
 // For use in updating from version 125 and before
 static const std::string gstrCREATE_WORK_ITEM_GROUP_TABLE_V118 =
 	"CREATE TABLE [dbo].[WorkItemGroup]("

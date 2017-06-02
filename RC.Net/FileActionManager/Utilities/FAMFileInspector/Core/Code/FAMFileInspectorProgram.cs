@@ -26,6 +26,11 @@ namespace Extract.FileActionManager.Utilities
         static string _databaseName;
 
         /// <summary>
+        /// The workflow
+        /// </summary>
+        static string _workflow;
+
+        /// <summary>
         /// The directory being inspected by this instance (rather than a database).
         /// </summary>
         static string _directory;
@@ -116,6 +121,7 @@ namespace Extract.FileActionManager.Utilities
                 {
                     famFileInspectorForm.DatabaseServer = _databaseServer;
                     famFileInspectorForm.DatabaseName = _databaseName;
+                    famFileInspectorForm.WorkflowName = _workflow;
                 }
                 else if (!string.IsNullOrWhiteSpace(_directory))
                 {
@@ -384,14 +390,6 @@ namespace Extract.FileActionManager.Utilities
 
                     _voaPathExpression = args[i];
                 }
-                else if (i == 0)
-                {
-                    _databaseServer = argument;
-                }
-                else if (!string.IsNullOrWhiteSpace(_databaseServer) && i == 1)
-                {
-                    _databaseName = argument;
-                }
                 else if (argument.Equals("/query", StringComparison.OrdinalIgnoreCase))
                 {
                     if (string.IsNullOrWhiteSpace(_databaseName))
@@ -485,9 +483,28 @@ namespace Extract.FileActionManager.Utilities
                     }
                     _fileFilter = args[i];
                 }
+                else if (argument.Equals("/workflow", StringComparison.OrdinalIgnoreCase))
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        ShowUsage("Workflow name expected.");
+                        return false;
+                    }
+
+                    _workflow = args[i];
+                }
                 else if (argument.Equals("/r", StringComparison.OrdinalIgnoreCase))
                 {
                     _recursive = true;
+                }
+                else if (i == 0)
+                {
+                    _databaseServer = argument;
+                }
+                else if (!string.IsNullOrWhiteSpace(_databaseServer) && i == 1)
+                {
+                    _databaseName = argument;
                 }
                 else
                 {
@@ -559,10 +576,9 @@ namespace Extract.FileActionManager.Utilities
             }
 
             usage.Append(Environment.GetCommandLineArgs()[0]);
-            usage.AppendLine(" /? | [[<ServerName> <DatabaseName> [/action <actionName> " +
-                "/status <statusName>] [/query <queryFileName>] | /directory <directory> " +
-                "[/filefilter <filefilter>] [/r]] " +
-                " | " +
+            usage.AppendLine(" /? | [[<ServerName> <DatabaseName> [/workflow <workflowName>] " +
+                "[/action <actionName> /status <statusName>] [/query <queryFileName>] | " +
+                "/directory <directory> [/filefilter <filefilter>] [/r]] | " +
                 "/filelist <filename> ]" +
                 " [/filecount [top|bottom|random] <count>]" +
                 " | " +
@@ -571,6 +587,9 @@ namespace Extract.FileActionManager.Utilities
             usage.AppendLine("ServerName: The name of the database server to connect to.");
             usage.AppendLine();
             usage.AppendLine("DatabaseName: The name of the database to connect to.");
+            usage.AppendLine();
+            usage.AppendLine("/workflow <workflowName>: The name of the workflow to which this " +
+                "instance should be confined.");
             usage.AppendLine();
             usage.AppendLine("/action <actionName>: The name of the action when limiting the " +
                 "initial file selection based on a file action status condition. Must be used " +

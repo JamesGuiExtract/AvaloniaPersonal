@@ -79,12 +79,20 @@ namespace Extract {
 			_sourceWorkflowComboBox->DisplayMember = "Name";
 			_sourceWorkflowComboBox->ValueMember = "ID";
 
-			ListCtrlHelper::LoadListCtrl(_sourceWorkflowComboBox, workflows);
-
-			ListItemPair ^tempListItem = gcnew ListItemPair("<All workflows>", 0);
-			_sourceWorkflowComboBox->Items->Insert(0, tempListItem);
-			tempListItem = gcnew ListItemPair("<No workflow>", -1);
-			_sourceWorkflowComboBox->Items->Insert(0, tempListItem);
+			if (_noWorkflowSource)
+			{
+				ListItemPair ^listItem = gcnew ListItemPair("<No workflow>", -1);
+				_sourceWorkflowComboBox->Items->Insert(0, listItem);
+				_sourceWorkflowComboBox->SelectedIndex = 0;
+				_sourceWorkflowComboBox->Enabled = false;
+			}
+			else
+			{
+				ListCtrlHelper::LoadListCtrl(_sourceWorkflowComboBox, workflows);
+				ListItemPair ^listItem = gcnew ListItemPair("<All workflows>", 0);
+				_sourceWorkflowComboBox->Items->Insert(0, listItem);
+				_sourceWorkflowComboBox->Enabled = true;
+			}
 
 			_destinationWorkflowComboBox->Items->Clear();
 
@@ -134,6 +142,7 @@ namespace Extract {
 
 			if (closeDialog)
 			{
+				DialogResult = System::Windows::Forms::DialogResult::OK;
 				Close();
 			}
 		}

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UCLID_AFCORELib;
 
@@ -11,7 +12,7 @@ namespace Extract.DataEntry.LabDE
     /// A configuration to be used to represent order record types.
     /// </summary>
     /// <seealso cref="Extract.DataEntry.LabDE.IFAMDataConfiguration" />
-    internal class OrderDataConfiguration : IFAMDataConfiguration
+    public class OrderDataConfiguration : IFAMDataConfiguration
     {
         #region Constants
 
@@ -97,7 +98,7 @@ namespace Extract.DataEntry.LabDE
                 RecordQueryColumns.Add("Patient", "[LabDEPatient].[LastName] + ', ' + [LabDEPatient].[FirstName]");
                 RecordQueryColumns.Add("Ordered By",
                     "(" + _ORDER_PROVIDER_LAST_NAME_XPATH + " + ', ' + " + _ORDER_PROVIDER_FIRST_NAME_XPATH + ")");
-                RecordQueryColumns.Add("Request Date/Time", "[LabDEOrder].[ReferenceDateTime]");
+                RecordQueryColumns.Add("Request Date/Time DESC", "[LabDEOrder].[ReferenceDateTime]");
                 RecordQueryColumns.Add("Collection Date/Time", "[LabDEOrderFile].[CollectionDate]");
 
                 ColorQueryConditions = new OrderedDictionary();
@@ -208,6 +209,8 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// An SQL query that selects record IDs based on additional custom criteria
         /// </value>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
         public List<string> RecordMatchCriteria
         {
             get;
@@ -224,6 +227,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The definitions of the columns for the order selection grid.
         /// </value>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public OrderedDictionary RecordQueryColumns
         {
             get;
@@ -248,6 +252,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The different possible status colors for the buttons and their SQL query conditions.
         /// </value>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public OrderedDictionary ColorQueryConditions
         {
             get;
@@ -289,13 +294,14 @@ namespace Extract.DataEntry.LabDE
         /// documents that have been filed against the order. Multiple rows may be return per record
         /// for records for which multiple files have been submitted.
         /// </summary>
-        /// <param name="recordIDs">The record IDs for which info is needed.</param>
+        /// <param name="recordIds">The record IDs for which info is needed.</param>
         /// <param name="selectViaQuery"><c>true</c> if <see paramref="recordIDs"/> represents an SQL
         /// query that will return the record IDs, <c>false</c> if <see paramref="recordIDs"/>
         /// is a literal comma delimited list of record IDs.</param>
         /// <returns>An SQL query to retrieve data from a FAM DB related to the
         /// <see paramref="selectedRecordNumbers"/>.</returns>
-        public string GetRecordInfoQuery(string recordIDs, bool selectViaQuery)
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "1#")]
+        public virtual string GetRecordInfoQuery(string recordIds, bool selectViaQuery)
         {
             try
             {
@@ -311,7 +317,7 @@ namespace Extract.DataEntry.LabDE
                 if (selectViaQuery)
                 {
                     declarationsClause = "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
-                        "INSERT INTO @OrderNumbers\r\n" + recordIDs;
+                        "INSERT INTO @OrderNumbers\r\n" + recordIds;
                 }
 
                 string columnsClause = string.Join(", \r\n",
@@ -329,7 +335,7 @@ namespace Extract.DataEntry.LabDE
                     "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] \r\n" +
                     (selectViaQuery
                         ? "INNER JOIN @OrderNumbers ON [LabDEOrder].[OrderNumber] = [@OrderNumbers].[OrderNumber]"
-                        : "WHERE [LabDEOrder].[OrderNumber] IN (" + recordIDs + ")");
+                        : "WHERE [LabDEOrder].[OrderNumber] IN (" + recordIds + ")");
 
                 return query;
             }

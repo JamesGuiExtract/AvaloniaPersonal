@@ -1656,6 +1656,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			// Foreign key for OutputAttributeSetID is added in AttributeDBMgr
 			vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
 			vecQueries.push_back(gstrADD_WORKFLOWFILE_WORKFLOW_FK);
+			vecQueries.push_back(gstrADD_FILE_HANDLER_WORKFLOW_FK);
 		}
 
 		// Don't create the FK between the Secure counter tables unless at least one
@@ -2542,7 +2543,7 @@ int CFileProcessingDB::getDBSchemaVersion()
 	return m_iDBSchemaVersion;
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::validateDBSchemaVersion()
+void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/* = false */)
 {
 	// If in the process of checking the database schema or during an update operation, do not
 	// validate the database schema; this would cause the schema update to fail or infinite recursion.
@@ -2596,7 +2597,36 @@ void CFileProcessingDB::validateDBSchemaVersion()
 			// licensed product specific DB components have up-to-data schema versions.
 			m_bProductSpecificDBSchemasAreValid = true;
 		}
+
+		if (bCheckForUnaffiliatedFiles && unaffiliatedWorkflowFilesExist())
+		{
+			m_strCurrentConnectionStatus = gstrUNAFFILIATED_FILES;
+			throw UCLIDException("ELI43450", "Workflows exists, but there are unaffiliated files.");
+		}
 	}
+}
+//--------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::unaffiliatedWorkflowFilesExist()
+{
+	_ConnectionPtr ipConnection = getDBConnection();
+	ASSERT_RESOURCE_ALLOCATION("ELI43449", ipConnection != __nullptr);
+
+	if (databaseUsingWorkflows(ipConnection))
+	{
+		string strQuery =
+			"SELECT COALESCE(MAX([ID]), -1) AS [ID] FROM \r\n"
+			"( \r\n"
+			"	SELECT TOP 1 [ID] FROM [FAMFile] \r\n"
+			"	LEFT JOIN [WorkflowFile] ON [FAMFile].[ID] = [FileID] \r\n"
+			"	WHERE [WorkflowID] IS NULL \r\n"
+			") T";
+		long nUnaffiliatedFileId = -1;
+		executeCmdQuery(ipConnection, strQuery, false, &nUnaffiliatedFileId);
+
+		return nUnaffiliatedFileId != -1;
+	}
+
+	return false;
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const string& strActionName)
@@ -3918,7 +3948,7 @@ void CFileProcessingDB::resetDBConnection()
 			_lastCodePos = "60";
 
 			// Validate the schema
-			validateDBSchemaVersion();
+			validateDBSchemaVersion(true);
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");

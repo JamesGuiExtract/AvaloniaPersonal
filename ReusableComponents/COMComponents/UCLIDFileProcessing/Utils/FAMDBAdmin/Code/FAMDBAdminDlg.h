@@ -130,6 +130,10 @@ private:
 	// Indicates the current database schema is known to be out-of-date.
 	bool m_bDBSchemaIsNotCurrent;
 
+	// Indicates workflows are in use but there are files in the database unaffiliated with
+	// workflows.
+	bool m_bUnaffiliatedFiles;
+
 	// Saves/restores window position/size info to/from the registry.
 	WindowPersistenceMgr m_windowMgr;
 
@@ -181,4 +185,11 @@ private:
 
 	// Positions the workflow combo and label
 	void positionWorkflowControls();
+
+	// Shows the dialog that allows files to be migrated to new workflows
+	// If bNoWorkflowSource is true, the source workflow selection will be force to <No workflow>
+	void showMoveToWorkflowDialog(bool bAreUnaffiliatedFiles);
+
+	// Refreshed the current DB connection status.
+	void refreshDBStatus();
 };

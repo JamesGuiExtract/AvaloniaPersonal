@@ -1,6 +1,7 @@
 ﻿using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -16,7 +17,7 @@ namespace Extract.DataEntry.LabDE
     /// Provides access to data pertaining to a record to be mapped in a LabDE table.
     /// </summary>
     /// <seealso cref="System.IDisposable" />
-    internal abstract class DocumentDataRecord : IDisposable
+    public abstract class DocumentDataRecord : IDisposable
     {
         #region Fields
 
@@ -56,9 +57,9 @@ namespace Extract.DataEntry.LabDE
         DocumentDataField _idField;
 
         /// <summary>
-        /// 
+        /// Gets the active fields.
         /// </summary>
-        protected Dictionary<IAttribute, DocumentDataField> _activeFields =
+        Dictionary<IAttribute, DocumentDataField> _activeFields =
             new Dictionary<IAttribute, DocumentDataField>();
 
         #endregion Fields
@@ -73,6 +74,7 @@ namespace Extract.DataEntry.LabDE
         /// <param name="dataEntryTableRow">The <see cref="DataEntryTableRow"/> representing the
         /// record in the LabDE DEP to which this instance pertains.</param>
         /// <param name="attribute">The <see cref="IAttribute"/> representing the current record</param>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "fam")]
         protected DocumentDataRecord(FAMData famData, DataEntryTableRow dataEntryTableRow, IAttribute attribute)
         {
             try
@@ -94,7 +96,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Raised to indicate data associated with this instance has changed.
         /// </summary>
-        public event EventHandler<RowDataUpdatedArgs> RowDataUpdated;
+        public event EventHandler<RowDataUpdatedEventArgs> RowDataUpdated;
 
         #endregion Events
 
@@ -115,7 +117,6 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The <see cref="IAttribute"/> representing this record.
         /// </value>
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public IAttribute Attribute
         {
             get
@@ -157,7 +158,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The <see cref="DocumentDataField"/> representing the ID.
         /// </value>
-        public DocumentDataField IdField
+        public virtual DocumentDataField IdField
         {
             get
             {
@@ -174,7 +175,7 @@ namespace Extract.DataEntry.LabDE
         /// current LabDE record; <see langword="null"/> if there is no color to indicate the current
         /// status.
         /// </value>
-        public Color? StatusColor
+        public virtual Color? StatusColor
         {
             get
             {
@@ -193,10 +194,10 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// A HashSet of potentially matching IDs for the current LabDE record. 
         /// </value>
-        public HashSet<string> MatchingRecordIDs
+        public virtual HashSet<string> MatchingRecordIds
         {
             get;
-            set;
+            internal set;
         }
 
         /// <summary>
@@ -233,7 +234,7 @@ namespace Extract.DataEntry.LabDE
                     // Put the unmapped records in to a string list excluding this row's currently
                     // mapped record ID. (record IDs will be quoted for SQL).
                     string otherAlreadyMappedRecords = string.Join(",",
-                        FAMData.AlreadyMappedRecordIDs
+                        FAMData.AlreadyMappedRecordIds
                             .Except(new[] { "'" + IdField.Value + "'" },
                                 StringComparer.OrdinalIgnoreCase));
 
@@ -255,6 +256,20 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
+        /// <summary>
+        /// Gets or sets the default sort.
+        /// </summary>
+        /// <value>
+        /// The default sort.
+        /// </value>
+        public virtual Tuple<string, ListSortDirection> DefaultSort
+        {
+            get
+            {
+                return FAMData.DefaultSort;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -264,20 +279,21 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <returns>An SQL query that retrieves possibly matching record IDs for this instance.
         /// </returns>
-        public virtual string GetSelectedRecordIDsQuery()
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public virtual string GetSelectedRecordIdsQuery()
         {
             try
             {
                 string recordIDsQuery = null;
 
-                if (MatchingRecordIDs != null)
+                if (MatchingRecordIds != null)
                 {
                     // If the matching order IDs have been cached, select them directly rather than
                     //querying for them.
-                    if (MatchingRecordIDs.Count > 0)
+                    if (MatchingRecordIds.Count > 0)
                     {
                         recordIDsQuery = string.Join("\r\nUNION\r\n",
-                            MatchingRecordIDs.Select(orderNum => "SELECT " + orderNum));
+                            MatchingRecordIds.Select(orderNum => "SELECT " + orderNum));
                     }
                     else
                     {
@@ -315,6 +331,7 @@ namespace Extract.DataEntry.LabDE
         /// <returns>A <see cref="Color"/> that indicating availability of matching records for the
         /// provided <see cref="DocumentDataRecord"/> or <see langword="null"/> if there is no color that
         /// reflects the current status.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public abstract Color? GetRecordsStatusColor();
 
         /// <summary>
@@ -334,7 +351,7 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                return FAMData.GetCorrespondingFileIDs(recordId);
+                return FAMData.GetCorrespondingFileIds(recordId);
             }
             catch (Exception ex)
             {
@@ -359,7 +376,7 @@ namespace Extract.DataEntry.LabDE
                         _matchingRecords = null;
                     }
 
-                    MatchingRecordIDs = null;
+                    MatchingRecordIds = null;
                 }
 
                 // Status color depends both on DB and UI data... it must be cleared for all calls into
@@ -415,7 +432,7 @@ namespace Extract.DataEntry.LabDE
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/>
         /// instance containing the event data.</param>
-        public void Handle_AttributeUpdated(object sender, EventArgs e)
+        void Handle_AttributeUpdated(object sender, EventArgs e)
         {
             try
             {
@@ -472,6 +489,21 @@ namespace Extract.DataEntry.LabDE
 
         #endregion IDisposable Members
 
+        #region Protected Members
+
+        /// <summary>
+        /// Gets the active fields.
+        /// </summary>
+        protected Dictionary<IAttribute, DocumentDataField> ActiveFields
+        {
+            get
+            {
+                return _activeFields;
+            }
+        }
+
+        #endregion Protected Members
+
         #region Private Members
 
         /// <summary>
@@ -510,11 +542,11 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <param name="recordIdUpdated"><see langword="true"/> if the record ID has been
         /// changed; otherwise, <see langword="false"/>.</param>
-        void OnRowDataUpdated(bool recordIdUpdated)
+        protected virtual void OnRowDataUpdated(bool recordIdUpdated)
         {
             if (RowDataUpdated != null)
             {
-                RowDataUpdated(this, new RowDataUpdatedArgs(this, recordIdUpdated));
+                RowDataUpdated(this, new RowDataUpdatedEventArgs(this, recordIdUpdated));
             }
         }
 

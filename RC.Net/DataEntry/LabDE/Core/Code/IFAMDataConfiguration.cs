@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using UCLID_AFCORELib;
 
 namespace Extract.DataEntry.LabDE
@@ -8,7 +9,7 @@ namespace Extract.DataEntry.LabDE
     /// Represents a configuration to be able to retrieve data from a FAM database for a particular
     /// record type.
     /// </summary>
-    internal interface IFAMDataConfiguration
+    public interface IFAMDataConfiguration
     {
         /// <summary>
         /// Gets the root clause of an SQL query that selects and joins any relevant tables to be
@@ -66,6 +67,8 @@ namespace Extract.DataEntry.LabDE
         /// A list of SQL clauses (to be used in a WHERE clause against <see cref="BaseSelectQuery"/>)
         /// that must all be true for a potential record to be matching.
         /// </value>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
         List<string> RecordMatchCriteria
         {
             get;
@@ -82,6 +85,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The definitions of the columns for the record selection grid.
         /// </value>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         OrderedDictionary RecordQueryColumns
         {
             get;
@@ -98,6 +102,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The different possible status colors for the buttons and their SQL query conditions.
         /// </value>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         OrderedDictionary ColorQueryConditions
         {
             get;
@@ -115,6 +120,7 @@ namespace Extract.DataEntry.LabDE
         /// <returns>
         /// A new <see cref="DocumentDataRecord"/>.
         /// </returns>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "fam")]
         DocumentDataRecord CreateDocumentDataRecord(
             FAMData famData, DataEntryTableRow dataEntryTableRow, IAttribute attribute);
 
@@ -127,12 +133,12 @@ namespace Extract.DataEntry.LabDE
         /// documents that have been filed against the record. Multiple rows may be return per record
         /// for records for which multiple files have been submitted.
         /// </summary>
-        /// <param name="recordIDs">The record IDs for which info is needed.</param>
-        /// <param name="queryForRecordIDs"><c>true</c> if <see paramref="recordIDs"/> represents an SQL
+        /// <param name="recordIds">The record IDs for which info is needed.</param>
+        /// <param name="queryForRecordIds"><c>true</c> if <see paramref="recordIDs"/> represents an SQL
         /// query that will return the record IDs, <c>false</c> if <see paramref="recordIDs"/>
         /// is a literal comma delimited list of record IDs.</param>
         /// <returns>An SQL query to retrieve data from a FAM DB related to the
         /// <see paramref="selectedRecordNumbers"/>.</returns>
-        string GetRecordInfoQuery(string recordIDs, bool queryForRecordIDs);
+        string GetRecordInfoQuery(string recordIds, bool queryForRecordIds);
     }
 }

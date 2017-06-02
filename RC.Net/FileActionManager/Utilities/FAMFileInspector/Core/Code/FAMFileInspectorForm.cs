@@ -269,6 +269,18 @@ namespace Extract.FileActionManager.Utilities
                 get;
                 set;
             }
+
+            /// <summary>
+            /// Gets or sets the workflow.
+            /// </summary>
+            /// <value>
+            /// The workflow.
+            /// </value>
+            public string Workflow
+            {
+                get;
+                set;
+            }
         }
 
         #endregion Structs
@@ -406,6 +418,11 @@ namespace Extract.FileActionManager.Utilities
         /// context menu options.
         /// </summary>
         ToolStripSeparator _customMenuSeparator;
+
+        /// <summary>
+        /// A separator between file handler menu options and the rest of the context menu.
+        /// </summary>
+        ToolStripSeparator _fileHandlerSeparator;
 
         /// <summary>
         /// Indicates whether a refresh of custom column values is pending.
@@ -1244,7 +1261,8 @@ namespace Extract.FileActionManager.Utilities
                 {
                     if (newContextMenuStrip.Items.Count > 0)
                     {
-                        newContextMenuStrip.Items.Add(new ToolStripSeparator());
+                        _fileHandlerSeparator = new ToolStripSeparator();
+                        newContextMenuStrip.Items.Add(_fileHandlerSeparator);
                     }
 
                     newContextMenuStrip.Items.AddRange(featureMenuItems.ToArray());
@@ -2540,11 +2558,18 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 int selectionCount = SelectedRows.Count();
+                bool areAnyVisible = false;
 
                 // Enable/disable each file handler item in the context menu based on the current
                 // selection.
                 foreach (KeyValuePair<ToolStripMenuItem, FileHandlerItem> app in _fileHandlerItems)
                 {
+                    bool isVisible =
+                        string.IsNullOrWhiteSpace(app.Value.Workflow) ||
+                        app.Value.Workflow.Equals(FileProcessingDB.ActiveWorkflow, StringComparison.OrdinalIgnoreCase);
+                    app.Key.Visible = isVisible;
+                    areAnyVisible |= isVisible;
+
                     if (selectionCount == 0)
                     {
                         // If there is no selection, no options should be enabled.
@@ -2561,6 +2586,8 @@ namespace Extract.FileActionManager.Utilities
                         app.Key.Enabled = true;
                     }
                 }
+
+                _fileHandlerSeparator.Visible = areAnyVisible;
 
                 // Open file location should be available for single selection only.
                 if (_openFileLocationMenuItem != null)
@@ -5360,7 +5387,7 @@ namespace Extract.FileActionManager.Utilities
             // log-on mode from the database's FileHandler table.
             using (var queryResults = GetResultsForQuery(
                 "SELECT [AppName], [ApplicationPath], [Arguments], [AllowMultipleFiles], " +
-                    "[SupportsErrorHandling], [Blocking] " +
+                    "[SupportsErrorHandling], [Blocking], [WorkflowName] " +
                 "FROM [FileHandler] WHERE [Enabled] = 1 " +
                 (InAdminMode ? "" : "AND [AdminOnly] = 0 ") +
                 "ORDER BY [AppName]"))
@@ -5375,6 +5402,7 @@ namespace Extract.FileActionManager.Utilities
                     fileHandlerItem.AllowMultipleFiles = (bool)row["AllowMultipleFiles"];
                     fileHandlerItem.SupportsErrorHandling = (bool)row["SupportsErrorHandling"];
                     fileHandlerItem.Blocking = (bool)row["Blocking"];
+                    fileHandlerItem.Workflow = (string)row["WorkflowName"];
 
                     // Create a context menu option and add a handler for it.
                     var menuItem = new ToolStripMenuItem(fileHandlerItem.Name);

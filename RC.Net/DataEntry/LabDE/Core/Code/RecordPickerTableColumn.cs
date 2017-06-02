@@ -7,7 +7,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Data;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Design;
@@ -503,30 +502,30 @@ namespace Extract.DataEntry.LabDE
         {
             if (disposing)
             {
-                if (_famData != null)
+                try
                 {
                     _famData.RowDataUpdated -= HandleFamData_RowDataUpdated;
                     _famData.Dispose();
                     _famData = null;
-                }
 
-                _recordIDColumn = null;
-                _dataEntryControlHost = null;
+                    _recordIDColumn = null;
+                    _dataEntryControlHost = null;
 
-                // This fixes a multiple registration problem, where event handlers were getting assigned
-                // many times (3 that I saw) - and fixes a memory leak as well.
-                // Done for Issue-14322, didn't fix the issue but is an improvement.
-                if (_eventsRegistered)
-                {
-                    DataGridView.HandleCreated -= HandleDataGridView_HandleCreated;
-                    DataGridView.HandleDestroyed -= HandleDataGridView_HandleDestroyed;
-                    DataGridView.CellContentClick -= HandleDataGridView_CellContentClick;
-                    DataGridView.CellPainting -= HandleDataGridView_CellPainting;
-                    DataGridView.Rows.CollectionChanged -= HandleDataGridViewRows_CollectionChanged;
+                    // This fixes a multiple registration problem, where event handlers were getting assigned
+                    // many times (3 that I saw) - and fixes a memory leak as well.
+                    // Done for Issue-14322, didn't fix the issue but is an improvement.
+                    if (_eventsRegistered)
+                    {
+                        DataGridView.HandleCreated -= HandleDataGridView_HandleCreated;
+                        DataGridView.HandleDestroyed -= HandleDataGridView_HandleDestroyed;
+                        DataGridView.CellContentClick -= HandleDataGridView_CellContentClick;
+                        DataGridView.CellPainting -= HandleDataGridView_CellPainting;
+                        DataGridView.Rows.CollectionChanged -= HandleDataGridViewRows_CollectionChanged;
 
-                    _eventsRegistered = false;
-                    _isDisposed = true;
-                }
+                        _eventsRegistered = false;
+                        _isDisposed = true;
+                    }
+                } catch { }
             }
 
             base.Dispose(disposing);
@@ -761,9 +760,9 @@ namespace Extract.DataEntry.LabDE
         /// Handles the <see cref="E:FAMData.RowDataUpdated"/> event.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RowDataUpdatedArgs"/> instance containing the
+        /// <param name="e">The <see cref="RowDataUpdatedEventArgs"/> instance containing the
         /// event data.</param>
-        void HandleFamData_RowDataUpdated(object sender, RowDataUpdatedArgs e)
+        void HandleFamData_RowDataUpdated(object sender, RowDataUpdatedEventArgs e)
         {
             try
             {

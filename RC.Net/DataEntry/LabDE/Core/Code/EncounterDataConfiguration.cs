@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UCLID_AFCORELib;
 
@@ -11,7 +12,7 @@ namespace Extract.DataEntry.LabDE
     /// A configuration to be used to represent encounter record types.
     /// </summary>
     /// <seealso cref="Extract.DataEntry.LabDE.IFAMDataConfiguration" />
-    internal class EncounterDataConfiguration : IFAMDataConfiguration
+    public class EncounterDataConfiguration : IFAMDataConfiguration
     {
         #region Constants
 
@@ -71,7 +72,7 @@ namespace Extract.DataEntry.LabDE
                 RecordQueryColumns = new OrderedDictionary();
                 RecordQueryColumns.Add(IdFieldDatabaseName, "[LabDEEncounter].[CSN]");
                 RecordQueryColumns.Add("Patient", "[LabDEPatient].[LastName] + ', ' + [LabDEPatient].[FirstName]");
-                RecordQueryColumns.Add("Date / Time", "[LabDEEncounter].[EncounterDateTime]");
+                RecordQueryColumns.Add("Date / Time DESC", "[LabDEEncounter].[EncounterDateTime]");
                 RecordQueryColumns.Add("Department", "[LabDEEncounter].[Department]");
                 RecordQueryColumns.Add("Type", "[LabDEEncounter].[EncounterType]");
                 RecordQueryColumns.Add("Provider", "[LabDEEncounter].[EncounterProvider]");
@@ -180,6 +181,8 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// A list of SQL clauses (to be used in a WHERE clause against <see cref="BaseSelectQuery"/>)
         /// that must all be true for a potential record to be matching.
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
         public List<string> RecordMatchCriteria
         {
             get;
@@ -196,6 +199,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The definitions of the columns for the selection grid.
         /// </value>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public OrderedDictionary RecordQueryColumns
         {
             get;
@@ -217,6 +221,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The different possible status colors for the buttons and their SQL query conditions.
         /// </value>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public OrderedDictionary ColorQueryConditions
         {
             get;
@@ -238,7 +243,7 @@ namespace Extract.DataEntry.LabDE
         /// <returns>
         /// A new <see cref="DocumentDataRecord"/>.
         /// </returns>
-        public DocumentDataRecord CreateDocumentDataRecord(
+        public virtual DocumentDataRecord CreateDocumentDataRecord(
             FAMData famData, DataEntryTableRow dataEntryTableRow, IAttribute attribute)
         {
             try
@@ -260,13 +265,14 @@ namespace Extract.DataEntry.LabDE
         /// documents that have been filed against the encounter. Multiple rows may be return per
         /// record for records for which multiple files have been submitted.
         /// </summary>
-        /// <param name="recordIDs">The record IDs for which info is needed.</param>
+        /// <param name="recordIds">The record IDs for which info is needed.</param>
         /// <param name="selectViaQuery"><c>true</c> if <see paramref="recordIDs"/> represents an SQL
         /// query that will return the record IDs, <c>false</c> if <see paramref="recordIDs"/>
         /// is a literal comma delimited list of record IDs.</param>
         /// <returns>An SQL query to retrieve data from a FAM DB related to the
         /// <see paramref="selectedRecordNumbers"/>.</returns>
-        public string GetRecordInfoQuery(string recordIDs, bool selectViaQuery)
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "1#")]
+        public virtual string GetRecordInfoQuery(string recordIds, bool selectViaQuery)
         {
             try
             {
@@ -282,7 +288,7 @@ namespace Extract.DataEntry.LabDE
                 if (selectViaQuery)
                 {
                     declarationsClause = "DECLARE @CSNs TABLE ([CSN] NVARCHAR(20)) \r\n" +
-                        "INSERT INTO @CSNs\r\n" + recordIDs;
+                        "INSERT INTO @CSNs\r\n" + recordIds;
                 }
 
                 string columnsClause = string.Join(", \r\n",
@@ -300,7 +306,7 @@ namespace Extract.DataEntry.LabDE
                     "FULL JOIN [LabDEEncounterFile] ON [LabDEEncounterFile].[EncounterID] = [LabDEEncounter].[CSN] \r\n" +
                     (selectViaQuery
                         ? "INNER JOIN @CSNs ON [LabDEEncounter].[CSN] = [@CSNs].[CSN]"
-                        : "WHERE [LabDEEncounter].[CSN] IN (" + recordIDs + ")");
+                        : "WHERE [LabDEEncounter].[CSN] IN (" + recordIds + ")");
 
                 return query;
             }

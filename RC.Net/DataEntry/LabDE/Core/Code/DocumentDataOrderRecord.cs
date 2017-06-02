@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -13,7 +15,7 @@ namespace Extract.DataEntry.LabDE
     /// <summary>
     /// Represents a field in the voa data found by rules and/or displayed for verification.
     /// </summary>
-    internal class DocumentDataOrderRecord : DocumentDataRecord, IDisposable
+    public class DocumentDataOrderRecord : DocumentDataRecord
     {
         #region Fields
 
@@ -34,6 +36,7 @@ namespace Extract.DataEntry.LabDE
         /// <param name="dataEntryTableRow">The <see cref="DataEntryTableRow"/> representing the
         /// order in the LabDE DEP to which this instance pertains.</param>
         /// <param name="attribute">The <see cref="IAttribute"/> that represents this record.</param>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "fam")]
         public DocumentDataOrderRecord(FAMData famData, DataEntryTableRow dataEntryTableRow, IAttribute attribute)
             : base(famData, dataEntryTableRow, attribute)
         {
@@ -73,12 +76,12 @@ namespace Extract.DataEntry.LabDE
                 // Select the matching order numbers into a table variable.                
                 string declarationsClause =
                     "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
-                        "INSERT INTO @OrderNumbers\r\n" + GetSelectedRecordIDsQuery();
+                        "INSERT INTO @OrderNumbers\r\n" + GetSelectedRecordIdsQuery();
 
                 // If we haven't yet cached the order numbers, set up query components to retrieve the
                 // possibly matching orders from the database.
                 string columnsClause = "";
-                if (MatchingRecordIDs == null)
+                if (MatchingRecordIds == null)
                 {
                     // Create a column to select the order numbers in a comma delimited format that can
                     // be re-used in subsequent queries.
@@ -97,7 +100,7 @@ namespace Extract.DataEntry.LabDE
 
                 // Queries to select data all other order rows that would match to the same LabDEOrder
                 // table rows.
-                List<string> unmappedOrders = GetQueriesForUnmappedRecordRows(FAMData.LoadedRecords);
+                var unmappedOrders = new List<string>(GetQueriesForUnmappedRecordRows(FAMData.LoadedRecords));
 
                 // Aggregate the data returned by a query for potentially matching orders (including
                 // unmapped orders currently in the UI into fields accessible to the ColorQueryConditions.
@@ -119,8 +122,8 @@ namespace Extract.DataEntry.LabDE
                     "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [CombinedOrders].[OrderNumber] \r\n" +
                     "INNER JOIN @OrderNumbers ON [CombinedOrders].[OrderNumber] = [@OrderNumbers].[OrderNumber] " +
                         "OR [CombinedOrders].[OrderNumber] = '*'\r\n" +
-                    (FAMData.AlreadyMappedRecordIDs.Any()
-                        ? "WHERE ([CombinedOrders].[OrderNumber] NOT IN (" + string.Join(",", FAMData.AlreadyMappedRecordIDs) + "))\r\n"
+                    (FAMData.AlreadyMappedRecordIds.Any()
+                        ? "WHERE ([CombinedOrders].[OrderNumber] NOT IN (" + string.Join(",", FAMData.AlreadyMappedRecordIds) + "))\r\n"
                         : "") +
                     // Group by TempID as well so that all matching orders from the UI end up as separate rows.
                     "GROUP BY [CombinedOrders].[OrderNumber], [CombinedOrders].[TempID]";
@@ -135,9 +138,9 @@ namespace Extract.DataEntry.LabDE
                     DataRow resultsRow = results.Rows[0];
 
                     // Cache the order numbers if they have not already been.
-                    if (MatchingRecordIDs == null)
+                    if (MatchingRecordIds == null)
                     {
-                        MatchingRecordIDs = (resultsRow["OrderNumbers"] == DBNull.Value)
+                        MatchingRecordIds = (resultsRow["OrderNumbers"] == DBNull.Value)
                             ? new HashSet<string>()
                             : new HashSet<string>(
                                 // Remove trailing ',' then surround with apostrophes
@@ -229,7 +232,7 @@ namespace Extract.DataEntry.LabDE
         /// <returns>SQL queries that will select the data for the order rows into a result set that
         /// can be joined with data for potentially matching orders in the LabDEOrder database table.
         /// </returns>
-        List<string> GetQueriesForUnmappedRecordRows(IEnumerable<DocumentDataRecord> records)
+        protected virtual ReadOnlyCollection<string> GetQueriesForUnmappedRecordRows(IEnumerable<DocumentDataRecord> records)
         {
             List<string> unmappedRecords = new List<string>();
 
@@ -237,9 +240,9 @@ namespace Extract.DataEntry.LabDE
 
             // If this order is missing data for any active fields, it is not possible to match to
             // other records.
-            if (_activeFields.Values.Any(field => string.IsNullOrWhiteSpace(field.Value)))
+            if (ActiveFields.Values.Any(field => string.IsNullOrWhiteSpace(field.Value)))
             {
-                return unmappedRecords;
+                return unmappedRecords.AsReadOnly();
             }
 
             // Loop through all other order attributes
@@ -249,9 +252,9 @@ namespace Extract.DataEntry.LabDE
             {
                 // For each matching but unmapped row.
                 if (string.IsNullOrWhiteSpace(otherOrder.IdField.Value) &&
-                    otherOrder._activeFields.Values.Select(field => field.Value)
+                    otherOrder.ActiveFields.Values.Select(field => field.Value)
                     .SequenceEqual(
-                        _activeFields.Values.Select(field => field.Value)))
+                        ActiveFields.Values.Select(field => field.Value)))
                 {
                     // Generate an SQL statement that can select data from the UI into query results
                     // that can be combined with actual UI data.
@@ -271,7 +274,7 @@ namespace Extract.DataEntry.LabDE
                 }
             }
 
-            return unmappedRecords;
+            return unmappedRecords.AsReadOnly();
         }
 
         #endregion Private Members
