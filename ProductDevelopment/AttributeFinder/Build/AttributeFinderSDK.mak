@@ -57,6 +57,7 @@ LabDEBuildDir=$(PDRootDir)\DataEntry\LabDE\Build
 DeveloperLicensing=I:\Common\Engineering\Tools\SecureClients\COMLicense_Developer\Current
 RuleWriterLicensing=I:\Common\Engineering\Tools\SecureClients\COMLicense_RuleWriter\Current
 SupportLicensing=I:\Common\Engineering\Tools\SecureClients\COMLicense\Current
+WebAPI=$(EngineeringRootDirectory)\Web\WebAPI\DocumentAPI\Core\DocumentAPI\bin\Debug\net46\win7-x86
 
 # determine the name of the release output directory based upon the build
 # configuration that is being built
@@ -212,6 +213,11 @@ CopySilentInstallsDir:
 	@IF NOT EXIST "$(OtherSetupFiles)\SilentInstalls" MKDIR "$(OtherSetupFiles)\SilentInstalls"
 	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(OtherSetupFiles)\SilentInstalls"
 	
+CopyDocumentAPIFiles:
+	@ECHO Copying DocumentAPIFiles
+	@IF NOT EXIST "$(OtherSetupFiles)\DocumentAPI" MKDIR "$(OtherSetupFiles)\DocumentAPI"
+	@XCOPY "$(WebAPI)\*.*" "$(OtherSetupFiles)\DocumentAPI"
+	
 CreateSharepointInstall:
 #@Echo Creating Sharepoint Installs...
 #@CD $(PDRootDir)\AFIntegrations\Sharepoint\Build
@@ -245,7 +251,7 @@ CopyFilesToInternalUse:
 	@COPY  "$(BinariesFolder)\*.dll" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\*.xml" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CopyIDShieldSilentInstall CreateFLEXIndexDSInstall CopyFLEXIndexSilentInstall CreateLabDEInstall CopySilentInstallsDir CopyFilesToInternalUse
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CopyIDShieldSilentInstall CreateFLEXIndexDSInstall CopyFLEXIndexSilentInstall CreateLabDEInstall CopySilentInstallsDir CopyFilesToInternalUse CopyDocumentAPIFiles
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
