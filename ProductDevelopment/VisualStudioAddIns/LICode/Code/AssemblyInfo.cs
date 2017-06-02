@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("LICode")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2016")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

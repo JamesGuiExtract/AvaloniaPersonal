@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Resolution Normalizer")]
-[assembly: AssemblyCopyright("(c) 2016 Extract Systems, LLC.")]
+[assembly: AssemblyCopyright("(c) 2017 Extract Systems, LLC.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
