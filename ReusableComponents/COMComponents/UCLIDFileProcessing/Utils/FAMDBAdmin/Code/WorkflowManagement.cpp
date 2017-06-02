@@ -335,7 +335,7 @@ namespace Extract
 			{
 				int indexOfLastWorkflow = workflowComboBox->FindStringExact(_currentWorkflow);
 
-				if (indexOfLastWorkflow >= 0 && workflowActionsDirty)
+				if (indexOfLastWorkflow > 0 && workflowActionsDirty) 
 				{
 					ListItemPair ^previousWorkflow = safe_cast<ListItemPair^>(workflowComboBox->Items[indexOfLastWorkflow]);
 
