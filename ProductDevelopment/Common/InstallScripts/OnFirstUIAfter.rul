@@ -48,6 +48,9 @@ begin
 	
 	// Delete all lst files
 	DeleteFile(CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.LST");
+	
+	// Create the LicenseFiles folder
+	CreateDir(CommonAppDataFolder ^ "LicenseFiles");
 
     Disable(STATUSEX);
 

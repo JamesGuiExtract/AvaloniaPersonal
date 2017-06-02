@@ -85,6 +85,9 @@ begin
 		// Install the readme file
 		InstallReadme();
 		
+		// Create the LicenseFiles folder
+		CreateDir(CommonAppDataFolder ^ "LicenseFiles");
+		
     endif;
     
     Disable(STATUSEX);
