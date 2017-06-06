@@ -31,7 +31,6 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RegisterForComInterop>true</RegisterForComInterop>
-   
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -45,7 +44,6 @@
     <RegisterForComInterop>true</RegisterForComInterop>
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-   
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
@@ -77,6 +75,13 @@
     </Compile>
     <Compile Include="PageCountConditionSettingsDialog.Designer.cs">
       <DependentUpon>PageCountConditionSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WorkflowCondition.cs" />
+    <Compile Include="WorkflowConditionSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WorkflowConditionSettingsDialog.Designer.cs">
+      <DependentUpon>WorkflowConditionSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="FileTimestampCondition.cs" />
     <Compile Include="DocumentTypeCondition.cs" />
@@ -195,6 +200,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VOAFileContentsConditionSettingsDialog.resx">
       <DependentUpon>VOAFileContentsConditionSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WorkflowConditionSettingsDialog.resx">
+      <DependentUpon>WorkflowConditionSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

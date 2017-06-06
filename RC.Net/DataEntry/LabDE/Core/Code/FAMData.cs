@@ -210,7 +210,7 @@ namespace Extract.DataEntry.LabDE
                                 column, Regex.Match(column.ColumnName, @"\s(ASC|DESC)")))
                         .SingleOrDefault(item => item.Item2.Success);
 
-                    if (sortedColumn.Item2 != null)
+                    if (sortedColumn != null)
                     {
                         sortedColumn.Item1.Caption =
                             sortedColumn.Item1.ColumnName.Substring(0, sortedColumn.Item2.Index);
