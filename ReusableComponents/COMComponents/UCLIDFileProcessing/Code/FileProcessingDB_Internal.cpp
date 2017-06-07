@@ -1640,10 +1640,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGE_WORKFLOW_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK);
-		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_ACTIONSOURCE_FK);
-		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_ACTIONDESTINATION_FK);
-		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWDEST_FK);
-		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWSOURCE_FK);
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_ACTION_FK);
 
 		if (bAddUserTables)
@@ -1657,6 +1653,10 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
 			vecQueries.push_back(gstrADD_WORKFLOWFILE_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_FILE_HANDLER_WORKFLOW_FK);
+
+			// Add triggers
+			vecQueries.push_back(gstrCREATE_ACTION_ON_DELETE_TRIGGER);
+			vecQueries.push_back(gstrCREATE_WORKFLOW_ON_DELETE_TRIGGER);
 		}
 
 		// Don't create the FK between the Secure counter tables unless at least one

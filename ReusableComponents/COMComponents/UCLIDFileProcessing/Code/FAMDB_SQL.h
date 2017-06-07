@@ -1099,34 +1099,6 @@ static const string gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
-static const string gstrADD_WORKFLOWCHANGEFILE_ACTIONSOURCE_FK =
-	"ALTER TABLE dbo.[WorkFlowChangeFile] "
-	"ADD CONSTRAINT [FK_WorkflowChangeFile_ActionSource] FOREIGN KEY([SourceActionID]) "
-	"REFERENCES[dbo].[Action]([ID]) "
-	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
-	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
-
-static const string gstrADD_WORKFLOWCHANGEFILE_ACTIONDESTINATION_FK =
-	"ALTER TABLE dbo.[WorkFlowChangeFile] "
-	"ADD CONSTRAINT [FK_WorkflowChangeFile_ActionDestination] FOREIGN KEY([DestActionID]) "
-	"REFERENCES[dbo].[Action]([ID]) "
-	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
-	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Workflow table.
-
-static const string gstrADD_WORKFLOWCHANGEFILE_WORKFLOWDEST_FK =
-	"ALTER TABLE dbo.[WorkFlowChangeFile] "
-	"ADD CONSTRAINT [FK_WorkflowChangeFile_WorkflowDest] FOREIGN KEY([DestWorkflowID]) "
-	"REFERENCES[dbo].[Workflow]([ID]) "
-	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
-	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Workflow table.
-
-static const string gstrADD_WORKFLOWCHANGEFILE_WORKFLOWSOURCE_FK =
-	"ALTER TABLE dbo.[WorkFlowChangeFile] "
-	"ADD CONSTRAINT [FK_WorkflowChangeFile_WorkflowSource] FOREIGN KEY([SourceWorkflowID]) "
-	"REFERENCES[dbo].[Workflow]([ID]) "
-	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
-	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Workflow table.
-
 static const string gstrADD_FILE_HANDLER_WORKFLOW_FK =
 	"ALTER TABLE dbo.[FileHandler] "
 	"WITH CHECK ADD CONSTRAINT [FK_FileHandler_Workflow] FOREIGN KEY([WorkflowName]) "
@@ -1140,6 +1112,41 @@ static const string gstrADD_DB_PROCEXECUTOR_ROLE =
 	"	CREATE ROLE db_procexecutor \r\n"
 	"	GRANT EXECUTE TO db_procexecutor \r\n"
 	"END\r\n";
+
+// Queries to add triggers
+static const string gstrCREATE_ACTION_ON_DELETE_TRIGGER =
+	"CREATE TRIGGER dbo.ActionOnDeleteTrigger \r\n"
+	"ON  dbo.Action \r\n"
+	"AFTER DELETE \r\n"
+	"AS \r\n"
+	"BEGIN \r\n"
+	"-- SET NOCOUNT ON added to prevent extra result sets from \r\n"
+	"-- interfering with SELECT statements. \r\n"
+	"SET NOCOUNT ON; \r\n"
+	" \r\n"
+	"--Insert statements for trigger here \r\n"
+	"DELETE FROM WorkflowChangeFile \r\n"
+	"FROM WorkflowChangeFile w INNER JOIN deleted d ON W.SourceActionID = D.ID OR W.DestActionID = D.ID \r\n"
+	"END";
+
+static const string gstrCREATE_WORKFLOW_ON_DELETE_TRIGGER =
+	"CREATE TRIGGER dbo.WorkflowOnDeleteTrigger \r\n"
+	"ON  dbo.Workflow \r\n"
+	"AFTER DELETE \r\n"
+	"AS \r\n"
+	"BEGIN \r\n"
+	"-- SET NOCOUNT ON added to prevent extra result sets from \r\n"
+	"-- interfering with SELECT statements. \r\n"
+	"SET NOCOUNT ON; \r\n"
+	" \r\n"
+	"--Insert statements for trigger here \r\n"
+	"DELETE FROM WorkflowChange \r\n"
+	"FROM WorkflowChange W INNER JOIN deleted D ON W.DestWorkflowID = D.ID \r\n"
+	" \r\n"
+	"DELETE FROM WorkflowChangeFile \r\n"
+	"FROM WorkflowChangeFile W INNER JOIN deleted D ON W.DestWorkflowID = D.ID OR w.SourceWorkflowID = D.ID \r\n"
+	"END";
+
 
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_NAME_VAL = "<LockName>";

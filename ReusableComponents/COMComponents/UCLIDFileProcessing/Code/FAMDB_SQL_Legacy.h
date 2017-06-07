@@ -223,3 +223,36 @@ static const string gstrCREATE_FILE_TASK_SESSION_V129 =
 	" [DateTimeStamp] [datetime] NULL, "
 	" [Duration] [float] NULL, "
 	" [OverheadTime] [float] NULL)";
+
+// used for schema version 148-150
+static const string gstrADD_WORKFLOWCHANGEFILE_ACTIONSOURCE_FK_148 =
+"ALTER TABLE dbo.[WorkFlowChangeFile] "
+"ADD CONSTRAINT [FK_WorkflowChangeFile_ActionSource] FOREIGN KEY([SourceActionID]) "
+"REFERENCES[dbo].[Action]([ID]) "
+" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
+
+// used for schema version 148-150
+static const string gstrADD_WORKFLOWCHANGEFILE_ACTIONDESTINATION_FK_148 =
+"ALTER TABLE dbo.[WorkFlowChangeFile] "
+"ADD CONSTRAINT [FK_WorkflowChangeFile_ActionDestination] FOREIGN KEY([DestActionID]) "
+"REFERENCES[dbo].[Action]([ID]) "
+" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Workflow table.
+
+// used for schema version 148-150
+static const string gstrADD_WORKFLOWCHANGEFILE_WORKFLOWDEST_FK_148 =
+"ALTER TABLE dbo.[WorkFlowChangeFile] "
+"ADD CONSTRAINT [FK_WorkflowChangeFile_WorkflowDest] FOREIGN KEY([DestWorkflowID]) "
+"REFERENCES[dbo].[Workflow]([ID]) "
+" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Workflow table.
+
+// used for schema version 148-150
+static const string gstrADD_WORKFLOWCHANGEFILE_WORKFLOWSOURCE_FK_148 =
+"ALTER TABLE dbo.[WorkFlowChangeFile] "
+"ADD CONSTRAINT [FK_WorkflowChangeFile_WorkflowSource] FOREIGN KEY([SourceWorkflowID]) "
+"REFERENCES[dbo].[Workflow]([ID]) "
+" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Workflow table.
+
