@@ -86,7 +86,7 @@ begin
 		InstallReadme();
 		
 		// Create the LicenseFiles folder
-		CreateDir(CommonAppDataFolder ^ "LicenseFiles");
+		CreateDir(CommonAppDataFolder ^ EXTRACT_LICENSEFILES);
 		
     endif;
     
