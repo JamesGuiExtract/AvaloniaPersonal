@@ -1,10 +1,12 @@
 ﻿using Accord.MachineLearning.VectorMachines;
 using Accord.MachineLearning.VectorMachines.Learning;
 using Accord.Math;
+using Accord.Statistics.Kernels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 
 namespace Extract.AttributeFinder
@@ -26,24 +28,49 @@ namespace Extract.AttributeFinder
         /// <param name="inputs">Array of feature vectors</param>
         /// <param name="outputs">Array of classes (category codes) for each input</param>
         /// <param name="complexity">Complexity value to use for training</param>
+        /// <param name="choosingComplexity">Whether this method is being called as part of figuring out what Complexity parameter is the best
+        /// (and thus no need to calibrate the machine for probabilities, e.g.)</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        protected override void TrainClassifier(double[][] inputs, int[] outputs, double complexity,
+        protected override void TrainClassifier(double[][] inputs, int[] outputs, double complexity, bool choosingComplexity,
             Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             // Build classifier
-            var kernel = new Accord.Statistics.Kernels.Linear();
+            IKernel kernel = new Linear();
             var classifier = new MulticlassSupportVectorMachine(FeatureVectorLength, kernel, NumberOfClasses);
 
             // Train classifier
-            var teacher = new MulticlassSupportVectorLearning(classifier, inputs, outputs);
-            teacher.Algorithm = (svm, classInputs, classOutputs, i, j) =>
+            var teacher = new MulticlassSupportVectorLearning(classifier, inputs, outputs)
+            {
+                Algorithm = (svm, classInputs, classOutputs, positiveClassIndex, negativeClassIndex) =>
                 {
-                    var f = new SequentialMinimalOptimization(svm, classInputs, classOutputs);
-                    f.Complexity = complexity;
-                    return f;
-                };
+                    var f = new SequentialMinimalOptimization(svm, classInputs, classOutputs)
+                    {
+                        Complexity = complexity,
+                        Compact = (kernel is Linear) && CreateCompactMachine
+                    };
 
+                    // Only set WeightRatio if there is a specifed weight ratio that should always be applied,
+                    // or one that should be conditionally applied and it is true that the positive class of this
+                    // machine is the designated overall negative class. (e.g., LearningMachineDataEncoder._NOT_FIRST_PAGE_CATEGORY_CODE)
+                    // NOTE: The positive class is compared because the function is only passed a valid
+                    // positive class index (the other parameter is just -posidx)
+                    // NOTE: The positive class is compared for consistency, because the other type of SVM (multilabel)
+                    // is only passed a valid positive class index (the negative class index param is just the positive index with the sign changed)
+                    if (PositiveToNegativeWeightRatio.HasValue
+                        && (!ConditionallyApplyWeightRatio || positiveClassIndex == 0))
+                    {
+                        f.WeightRatio = PositiveToNegativeWeightRatio.Value;
+                    }
+
+                    if (TrainingAlgorithmCacheSize.HasValue)
+                    {
+                        f.CacheSize = TrainingAlgorithmCacheSize.Value;
+                    }
+
+                    return f;
+                }
+            };
             teacher.SubproblemFinished +=
                 delegate
                 {
@@ -64,7 +91,7 @@ namespace Extract.AttributeFinder
         /// <remarks>Answer score will always be null</remarks>
         /// <param name="inputs">The feature vector</param>
         /// <returns>The answer code and score</returns>
-        public override Tuple<int, double?> ComputeAnswer(double[] inputs)
+        public override (int answerCode, double? score) ComputeAnswer(double[] inputs)
         {
             try
             {
@@ -75,7 +102,7 @@ namespace Extract.AttributeFinder
 
                 int answer = ((MulticlassSupportVectorMachine)Classifier).Compute(inputs);
 
-                return Tuple.Create<int, double?>(answer, null);
+                return (answer, null);
             }
             catch (Exception e)
             {

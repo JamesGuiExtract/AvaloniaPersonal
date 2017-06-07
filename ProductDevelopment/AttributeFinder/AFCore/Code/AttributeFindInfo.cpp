@@ -296,11 +296,13 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 				if (ipAttributeRule->IgnoreErrors)
 				{
-#ifdef _DEBUG
-					ue.display();
-#else
+// This is really annoying when running automated tests
+// and when testing LabDE rules that use Orders Matching using the rule tester
+//#ifdef _DEBUG
+//					ue.display();
+//#else
 					ue.log();
-#endif
+//#endif
 					continue;
 				}
 				else

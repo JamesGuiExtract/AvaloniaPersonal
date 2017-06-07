@@ -34,7 +34,7 @@ namespace Extract.AttributeFinder
         /// <param name="inputs">The feature vector</param>
         /// <returns>The answer code and score</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        Tuple<int, double?> ComputeAnswer(double[] inputs);
+        (int answerCode, double? score) ComputeAnswer(double[] inputs);
 
         /// <summary>
         /// The number of classes that this classifier can recognize

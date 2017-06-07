@@ -42,7 +42,7 @@ namespace Extract.AttributeFinder
         ///            Add LabelAttributesSettings property and backing field
         /// Version 3: Add versioning to LearningMachineDataEncoder
         /// </summary>
-        const int _CURRENT_VERSION = 3;
+        const int _CURRENT_VERSION = 4;
 
         // Encryption password for serialization, renamed to obfuscate purpose
         private static readonly byte[] _CONVERGENCE_MATRIX = new byte[64]
@@ -105,6 +105,12 @@ namespace Extract.AttributeFinder
 
         [OptionalField(VersionAdded = 2)]
         private LabelAttributes _labelAttributesPersistedSettings;
+
+        [OptionalField(VersionAdded = 4)]
+        private bool _translateUnknownCategory;
+
+        [OptionalField(VersionAdded = 4)]
+        private string _translateUnknownCategoryTo;
 
         #endregion Fields
 
@@ -313,6 +319,40 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Whether to translate the special Unknown class to another value.
+        /// </summary>
+        /// <remarks>
+        /// This Unknown value is assigned when the prediction probability score does not exceed the
+        /// Unknown category cutoff value.
+        /// </remarks>
+        public bool TranslateUnknownCategory
+        {
+            get
+            {
+                return _translateUnknownCategory;
+            }
+            set
+            {
+                _translateUnknownCategory = value;
+            }
+        }
+
+        /// <summary>
+        /// The value to which to translate the special Unknown class
+        /// </summary>
+        public string TranslateUnknownCategoryTo
+        {
+            get
+            {
+                return _translateUnknownCategoryTo ?? "";
+            }
+            set
+            {
+                _translateUnknownCategoryTo = value;
+            }
+        }
+
         #endregion Properties
 
         #region Public Methods
@@ -362,7 +402,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public Tuple<AccuracyData, AccuracyData> TrainMachine()
+        public (AccuracyData trainingSet, AccuracyData testingSet) TrainMachine()
         {
             try
             {
@@ -381,7 +421,7 @@ namespace Extract.AttributeFinder
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public Tuple<AccuracyData, AccuracyData> TrainMachine(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        public (AccuracyData trainingSet, AccuracyData testingSet) TrainMachine(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             try
             {
@@ -398,7 +438,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public Tuple<AccuracyData, AccuracyData> TestMachine()
+        public (AccuracyData trainingSet, AccuracyData testingSet) TestMachine()
         {
             try
             {
@@ -417,7 +457,7 @@ namespace Extract.AttributeFinder
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public Tuple<AccuracyData, AccuracyData> TestMachine(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        public (AccuracyData trainingSet, AccuracyData testingSet) TestMachine(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             try
             {
@@ -447,19 +487,21 @@ namespace Extract.AttributeFinder
                 ExtractException.Assert("ELI41629", "Attribute vector cannot be null", attributeVector != null);
 
                 IEnumerable<double[]> inputs = Encoder.GetFeatureVectors(document, attributeVector);
-                IEnumerable<Tuple<int, double?>> outputs = inputs.Select(Classifier.ComputeAnswer);
+                var outputs = inputs.Select(Classifier.ComputeAnswer);
                 if (Usage == LearningMachineUsage.DocumentCategorization)
                 {
-                    IEnumerable<ComAttribute> categories = outputs.Select(answerAndScore =>
+                    IEnumerable<ComAttribute> categories = outputs.Select(res =>
                         {
                             string category;
-                            if (UseUnknownCategory && answerAndScore.Item2 != null && answerAndScore.Item2 < UnknownCategoryCutoff)
+                            if (UseUnknownCategory && res.score != null && res.score < UnknownCategoryCutoff)
                             {
-                                category = _UNKNOWN_CATEGORY;
+                                category = TranslateUnknownCategory
+                                    ? TranslateUnknownCategoryTo
+                                    : _UNKNOWN_CATEGORY;
                             }
                             else
                             {
-                                category = Encoder.AnswerCodeToName[answerAndScore.Item1];
+                                category = Encoder.AnswerCodeToName[res.answerCode];
                             }
                             var ss = new SpatialStringClass();
                             ss.CreateNonSpatialString(category, document.SourceDocName);
@@ -515,7 +557,7 @@ namespace Extract.AttributeFinder
                 else if (Usage == LearningMachineUsage.AttributeCategorization)
                 {
                     var attributeCreator = new AttributeCreator(document.SourceDocName);
-                    foreach(Tuple<ComAttribute, Tuple<int, double?>> attrAndAnswer in
+                    foreach(var attrAndAnswer in
                         attributeVector.ToIEnumerable<ComAttribute>()
                         .Zip(outputs, Tuple.Create))
                     {
@@ -525,7 +567,7 @@ namespace Extract.AttributeFinder
                             attribute.SubAttributes.Clear();
                         }
 
-                        string category = Encoder.AnswerCodeToName[attrAndAnswer.Item2.Item1];
+                        string category = Encoder.AnswerCodeToName[attrAndAnswer.Item2.answerCode];
                         attribute.SubAttributes.PushBack(
                             attributeCreator.Create(LearningMachineDataEncoder.CategoryAttributeName, category));
                     }
@@ -557,20 +599,25 @@ namespace Extract.AttributeFinder
                 int[] predictions = inputs.Apply(Classifier.ComputeAnswer)
                     .Select(t =>
                         {
-                            if (UseUnknownCategory && t.Item2 != null
-                                && t.Item2 < UnknownCategoryCutoff)
+                            if (UseUnknownCategory && t.score.HasValue
+                                && t.score < UnknownCategoryCutoff)
                             {
-                                unknownCategoryUsed = true;
+                                if (TranslateUnknownCategory
+                                    && Encoder.AnswerNameToCode.TryGetValue(TranslateUnknownCategoryTo, out int answerCode))
+                                {
+                                    return answerCode;
+                                }
 
                                 // Use value beyond any that the classifier would use for unknown
                                 // rather than LearningMachineDataEncoder.UnknownCategoryCode to avoid
                                 // misleading 100% accuracy results
                                 // https://extract.atlassian.net/browse/ISSUE-13894
+                                unknownCategoryUsed = true;
                                 return Classifier.NumberOfClasses;
                             }
                             else
                             {
-                                return t.Item1;
+                                return t.answerCode;
                             }
                         })
 
@@ -629,6 +676,8 @@ namespace Extract.AttributeFinder
                     || other.InputConfig != null && !other.InputConfig.Equals(InputConfig)
                     || other.LabelAttributesSettings == null && LabelAttributesSettings != null
                     || other.LabelAttributesSettings != null && !other.LabelAttributesSettings.Equals(LabelAttributesSettings)
+                    || other.TranslateUnknownCategory != TranslateUnknownCategory
+                    || TranslateUnknownCategory && !string.Equals(other.TranslateUnknownCategoryTo, TranslateUnknownCategoryTo)
                     )
                 {
                     return false;
@@ -823,6 +872,10 @@ namespace Extract.AttributeFinder
             {
                 writer.WriteLine("UnknownCategoryCutoff: {0}", UnknownCategoryCutoff);
             }
+            if (TranslateUnknownCategory)
+            {
+                writer.WriteLine("TranslateUnknownTo: {0}", TranslateUnknownCategoryTo);
+            }
             return baseWriter.ToString().Trim();
         }
 
@@ -837,7 +890,7 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        private Tuple<AccuracyData, AccuracyData> TrainAndTestMachine(bool testOnly, Action<StatusArgs> updateStatus,
+        private  (AccuracyData trainingSet, AccuracyData testingSet) TrainAndTestMachine(bool testOnly, Action<StatusArgs> updateStatus,
             CancellationToken cancellationToken)
         {
             ExtractException.Assert("ELI39840", "Machine is not fully configured", IsConfigured);
@@ -881,13 +934,12 @@ namespace Extract.AttributeFinder
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return Tuple.Create(GetAccuracyScore(trainInputs, trainOutputs), GetAccuracyScore(testInputs, testOutputs));
+                return (GetAccuracyScore(trainInputs, trainOutputs), GetAccuracyScore(testInputs, testOutputs));
             }
             // If no training data, just test testing set
             else
             {
-                return Tuple.Create<AccuracyData, AccuracyData>
-                    (null, GetAccuracyScore(featureVectorsAndAnswers.Item1, featureVectorsAndAnswers.Item2));
+                return (null, GetAccuracyScore(featureVectorsAndAnswers.Item1, featureVectorsAndAnswers.Item2));
             }
         }
 
@@ -939,12 +991,20 @@ namespace Extract.AttributeFinder
                 _labelAttributesPersistedSettings = null;
             }
 
+            if (_version == 4)
+            {
+                if (IsCompatibleWithVersion(3))
+                {
+                    _version = 3;
+                }
+            }
+
             // Since v1 of LearningMachineDataEncoder had no versioning, this object's version
             // was incremented at the same time versioning was added to that object so as to prevent
             // incompatible usage.
             // But, in order to allow for use in older software when possible, decrease the version if this object
             // is compatible with the previous version
-            if (_CURRENT_VERSION == 3)
+            if (_version == 3)
             {
                 if (IsCompatibleWithVersion(2))
                 {
@@ -970,6 +1030,16 @@ namespace Extract.AttributeFinder
         /// </returns>
         internal bool IsCompatibleWithVersion(int version)
         {
+            if (_version == 4 && version == 3)
+            {
+                if (TranslateUnknownCategory
+                    && !string.Equals(TranslateUnknownCategoryTo, "Unknown", StringComparison.Ordinal))
+                {
+                    return false;
+                }
+                return true;
+            }
+
             if (_version == 3 && version == 2)
             {
                 // LearningMachineDataEncoder v1 corresponds to LearningMachine v2
@@ -985,8 +1055,9 @@ namespace Extract.AttributeFinder
         [OnDeserializing]
         private void OnDeserializing(StreamingContext context)
         {
-            // Here to make FXCop happy
             _labelAttributesPersistedSettings = null;
+            _translateUnknownCategory = false;
+            _translateUnknownCategoryTo = null;
         }
 
         /// <summary>

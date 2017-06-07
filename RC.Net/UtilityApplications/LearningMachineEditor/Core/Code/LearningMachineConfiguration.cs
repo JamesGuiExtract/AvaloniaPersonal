@@ -166,8 +166,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     = attributeCategorizationInputPanel.Size
                     = documentCategorizationFolderInputPanel.Size
                     = documentCategorizationCsvInputPanel.Size;
-                multiclassSvmPanel.Location = neuralNetPanel.Location;
-                multilabelSvmPanel.Location = neuralNetPanel.Location;
+                svmPanel.Location = neuralNetPanel.Location;
+                multilabelSvmPanel.Left = svmPanel.Left;
 
                 // Assign appropriate path tags
                 documentCategorizationCsvFeatureVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
@@ -546,8 +546,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 ClearErrors();
 
-                // Set input config controls
                 var inputConfig = CurrentLearningMachine.InputConfig;
+                var encoder = CurrentLearningMachine.Encoder;
+
+                // Set input config controls
                 if (CurrentLearningMachine.Usage == LearningMachineUsage.DocumentCategorization)
                 {
                     documentCategorizationRadioButton.Checked = true;
@@ -558,6 +560,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         documentCategorizationCsvFeatureVoaTextBox.Text = inputConfig.AttributesPath ?? "";
                         documentCategorizationCsvTrainingPercentageTextBox.Text = inputConfig.TrainingSetPercentage.ToString(CultureInfo.CurrentCulture);
                         documentCategorizationCsvRandomNumberSeedTextBox.Text = CurrentLearningMachine.RandomNumberSeed.ToString(CultureInfo.CurrentCulture);
+                        documentCategorizationCsvNegativeClassNameTextBox.Text = encoder.NegativeClassName;
                     }
                     else
                     {
@@ -567,6 +570,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         documentCategorizationFolderAnswerTextBox.Text = inputConfig.AnswerPath ?? "";
                         documentCategorizationFolderTrainingPercentageTextBox.Text = inputConfig.TrainingSetPercentage.ToString(CultureInfo.CurrentCulture);
                         documentCategorizationFolderRandomNumberSeedTextBox.Text = CurrentLearningMachine.RandomNumberSeed.ToString(CultureInfo.CurrentCulture);
+                        documentCategorizationFolderNegativeClassNameTextBox.Text = encoder.NegativeClassName;
                     }
                 }
                 else if (CurrentLearningMachine.Usage == LearningMachineUsage.Pagination)
@@ -578,6 +582,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     paginationAnswerVoaTextBox.Text = inputConfig.AnswerPath ?? "";
                     paginationTrainingPercentageTextBox.Text = inputConfig.TrainingSetPercentage.ToString(CultureInfo.CurrentCulture);
                     paginationRandomNumberSeedTextBox.Text = CurrentLearningMachine.RandomNumberSeed.ToString(CultureInfo.CurrentCulture);
+                    paginationNegativeClassNameTextBox.Text = encoder.NegativeClassName;
                 }
                 else if (CurrentLearningMachine.Usage == LearningMachineUsage.AttributeCategorization)
                 {
@@ -587,6 +592,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     attributeCategorizationCandidateVoaTextBox.Text = inputConfig.AttributesPath ?? "";
                     attributeCategorizationTrainingPercentageTextBox.Text = inputConfig.TrainingSetPercentage.ToString(CultureInfo.CurrentCulture);
                     attributeCategorizationRandomNumberSeedTextBox.Text = CurrentLearningMachine.RandomNumberSeed.ToString(CultureInfo.CurrentCulture);
+                    attributeCategorizationNegativeClassNameTextBox.Text = encoder.NegativeClassName;
                 }
                 else
                 {
@@ -594,7 +600,6 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 }
 
                 // Set encoder controls
-                var encoder = CurrentLearningMachine.Encoder;
                 if (encoder.AutoBagOfWords == null)
                 {
                     useAutoBagOfWordsCheckBox.Checked = false;
@@ -621,6 +626,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 // Set machine controls
                 machineTypeComboBox.SelectEnumValue(CurrentLearningMachine.MachineType);
+
+                // Neural net
                 if (CurrentLearningMachine.MachineType == LearningMachineType.ActivationNetwork)
                 {
                     NeuralNetworkClassifier classifier = (NeuralNetworkClassifier)CurrentLearningMachine.Classifier;
@@ -633,23 +640,45 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     }
                     sigmoidAlphaTextBox.Text = classifier.SigmoidAlpha.ToString("r", CultureInfo.CurrentCulture);
                 }
-                else if (CurrentLearningMachine.MachineType == LearningMachineType.MulticlassSVM)
+
+                // SVM
+                else if (CurrentLearningMachine.MachineType == LearningMachineType.MulticlassSVM
+                    || CurrentLearningMachine.MachineType == LearningMachineType.MultilabelSVM)
                 {
-                    MulticlassSupportVectorMachineClassifier classifier =
-                        (MulticlassSupportVectorMachineClassifier)CurrentLearningMachine.Classifier;
-                    multiclassSvmComplexityTextBox.Text = classifier.Complexity.ToString(CultureInfo.CurrentCulture);
-                    multiclassSvmAutoComplexityCheckBox.Checked = classifier.AutomaticallyChooseComplexityValue;
-                }
-                else if (CurrentLearningMachine.MachineType == LearningMachineType.MultilabelSVM)
-                {
-                    MultilabelSupportVectorMachineClassifier classifier =
-                        (MultilabelSupportVectorMachineClassifier)CurrentLearningMachine.Classifier;
-                    multilabelSvmComplexityTextBox.Text = classifier.Complexity.ToString("r", CultureInfo.CurrentCulture);
-                    multilabelSvmAutoComplexityCheckBox.Checked = classifier.AutomaticallyChooseComplexityValue;
-                    multilabelSvmCalibrateForProbabilitiesCheckBox.Checked = classifier.CalibrateMachineToProduceProbabilities;
-                    multilabelSvmUseClassProportionsCheckBox.Checked = classifier.UseClassProportionsForComplexityWeights;
-                    multilabelSvmUseUnknownCheckBox.Checked = CurrentLearningMachine.UseUnknownCategory;
-                    multilabelSvmUnknownCutoffTextBox.Text = CurrentLearningMachine.UnknownCategoryCutoff.ToString("r", CultureInfo.CurrentCulture);
+                    var classifier = (SupportVectorMachineClassifier)CurrentLearningMachine.Classifier;
+                    svmComplexityTextBox.Text = classifier.Complexity.ToString(CultureInfo.CurrentCulture);
+                    svmAutoComplexityCheckBox.Checked = classifier.AutomaticallyChooseComplexityValue;
+                    switch (classifier.ScoreTypeToUseForComplexityChoosingAlgorithm)
+                    {
+                        case MachineScoreType.Precision:
+                            svmUsePrecisionRadioButton.Checked = true;
+                            break;
+                        case MachineScoreType.Recall:
+                            svmUseRecallRadioButton.Checked = true;
+                            break;
+                        default:
+                            svmUseF1ScoreRadioButton.Checked = true;
+                            break;
+                    }
+                    svmConditionallyApplyWeightRatioCheckBox.Checked = classifier.ConditionallyApplyWeightRatio;
+                    svmWeightRatioTextBox.Text = classifier.PositiveToNegativeWeightRatio.HasValue
+                        ? classifier.PositiveToNegativeWeightRatio.Value.ToString("r", CultureInfo.CurrentCulture)
+                        : "";
+                    svmCacheSizeTextBox.Text = classifier.TrainingAlgorithmCacheSize.HasValue
+                        ? classifier.TrainingAlgorithmCacheSize.Value.ToString(CultureInfo.CurrentCulture)
+                        : "";
+
+                    // Additional options for multi-label SVM
+                    if (CurrentLearningMachine.MachineType == LearningMachineType.MultilabelSVM)
+                    {
+                        var multilabel = (MultilabelSupportVectorMachineClassifier)classifier;
+                        multilabelSvmCalibrateForProbabilitiesCheckBox.Checked = multilabel.CalibrateMachineToProduceProbabilities;
+
+                        multilabelSvmUseUnknownCheckBox.Checked = CurrentLearningMachine.UseUnknownCategory;
+                        multilabelSvmUnknownCutoffTextBox.Text = CurrentLearningMachine.UnknownCategoryCutoff.ToString("r", CultureInfo.CurrentCulture);
+                        multilabelSvmTranslateUnknownCheckbox.Checked = CurrentLearningMachine.TranslateUnknownCategory;
+                        multilabelSvmTranslateUnknownTextBox.Text = CurrentLearningMachine.TranslateUnknownCategoryTo ?? "";
+                    }
                 }
                 else
                 {
@@ -678,8 +707,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             learningMachine.LabelAttributesSettings = CurrentLearningMachine.LabelAttributesSettings
                 ?.DeepClone();
 
-            SetInputConfigValues(learningMachine);
-            SetEncoderValues(learningMachine);
+            SetInputConfigValues(learningMachine, out string negativeClassName);
+            SetEncoderValues(learningMachine, negativeClassName);
             SetClassifierValues(learningMachine);
 
             return learningMachine;
@@ -749,7 +778,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// Initializes a <see cref="CurrentLearningMachine"/> with input configuration values
         /// </summary>
         /// <param name="learningMachine">The <see cref="CurrentLearningMachine"/> to be initialized</param>
-        private void SetInputConfigValues(LearningMachine learningMachine)
+        /// <param name="negativeClassName">The name to be used for the negative class. The control to use depends on usage
+        /// and input config settings so it is determined here rather than in <see cref="SetEncoderValues"/></param>
+        private void SetInputConfigValues(LearningMachine learningMachine, out string negativeClassName)
         {
             var inputConfig = learningMachine.InputConfig = new InputConfiguration();
             int randomSeed;
@@ -769,6 +800,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     inputConfig.AnswerPath = null;
                     trainingPercentageTextBox = documentCategorizationCsvTrainingPercentageTextBox;
                     randomSeedTextBox = documentCategorizationCsvRandomNumberSeedTextBox;
+                    negativeClassName = documentCategorizationCsvNegativeClassNameTextBox.Text;
                 }
                 else // folderSearchRadioButton.Checked
                 {
@@ -778,6 +810,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     answerPathTextBox = documentCategorizationFolderAnswerTextBox;
                     trainingPercentageTextBox = documentCategorizationFolderTrainingPercentageTextBox;
                     randomSeedTextBox = documentCategorizationFolderRandomNumberSeedTextBox;
+                    negativeClassName = documentCategorizationFolderNegativeClassNameTextBox.Text;
                 }
             }
             else if (paginationRadioButton.Checked)
@@ -790,6 +823,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 answerPathTextBox = paginationAnswerVoaTextBox;
                 trainingPercentageTextBox = paginationTrainingPercentageTextBox;
                 randomSeedTextBox = paginationRandomNumberSeedTextBox;
+                negativeClassName = paginationNegativeClassNameTextBox.Text;
             }
             else // LearningMachineUsage.AttributeCategorization
             {
@@ -800,6 +834,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 attributesPathTextBox = attributeCategorizationCandidateVoaTextBox;
                 trainingPercentageTextBox = attributeCategorizationTrainingPercentageTextBox;
                 randomSeedTextBox = attributeCategorizationRandomNumberSeedTextBox;
+                negativeClassName = attributeCategorizationNegativeClassNameTextBox.Text;
             }
 
             // Set input path
@@ -868,7 +903,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// Initializes a <see cref="CurrentLearningMachine"/> with encoder values
         /// </summary>
         /// <param name="learningMachine">The <see cref="CurrentLearningMachine"/> to be initialized</param>
-        private void SetEncoderValues(LearningMachine learningMachine)
+        private void SetEncoderValues(LearningMachine learningMachine, string negativeClassName)
         {
             var usage = documentCategorizationRadioButton.Checked
                 ? LearningMachineUsage.DocumentCategorization
@@ -943,7 +978,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
 
             learningMachine.Encoder = new LearningMachineDataEncoder(usage, autoBoW, attributeFilter,
-                negateFilter, maxAttributeVectorizerFeatures, attributesToTokenize, shingleSizeForTokens);
+                negateFilter, maxAttributeVectorizerFeatures, attributesToTokenize, shingleSizeForTokens, negativeClassName);
         }
 
         /// <summary>
@@ -1038,27 +1073,77 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         }
 
         /// <summary>
+        /// Initializes a <see cref="CurrentLearningMachine"/> with classifier values
+        /// </summary>
+        /// <param name="classifier">The <see cref="SupportVectorMachineClassifier"/> to be initialized</param>
+        private void SetSVMClassifierValues(SupportVectorMachineClassifier classifier)
+        {
+            double complexity;
+            if (!double.TryParse(svmComplexityTextBox.Text, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                CultureInfo.InvariantCulture, out complexity)
+                || complexity == 0)
+            {
+                svmComplexityTextBox.SetError(configurationErrorProvider,
+                    "Complexity must be a number greater than zero");
+                _valid = false;
+            }
+
+            string ratioText = svmWeightRatioTextBox.Text;
+            bool isWeightRatioSpecified = !String.IsNullOrWhiteSpace(ratioText);
+            double weightRatio = 1;
+            if (isWeightRatioSpecified
+                && !double.TryParse(ratioText, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                    CultureInfo.InvariantCulture, out weightRatio)
+                || weightRatio == 0)
+            {
+                svmWeightRatioTextBox.SetError(configurationErrorProvider,
+                    "Weight ratio must be a number greater than zero");
+                _valid = false;
+            }
+
+            string cacheSizeText = svmCacheSizeTextBox.Text;
+            bool isCacheSizeSpecified = !String.IsNullOrWhiteSpace(cacheSizeText);
+            int cacheSize = 0;
+            if (isCacheSizeSpecified
+                && !int.TryParse(cacheSizeText, NumberStyles.Integer, CultureInfo.InvariantCulture,
+                out cacheSize) || cacheSize < 0)
+            {
+                svmCacheSizeTextBox.SetError(configurationErrorProvider,
+                    "Cache size must be empty or a non-negative integer");
+                _valid = false;
+            }
+
+            classifier.Complexity = complexity;
+            classifier.AutomaticallyChooseComplexityValue = svmAutoComplexityCheckBox.Checked;
+            classifier.PositiveToNegativeWeightRatio = isWeightRatioSpecified ? weightRatio : (double?) null;
+            classifier.TrainingAlgorithmCacheSize = isCacheSizeSpecified ? cacheSize : (int?) null;
+            classifier.ConditionallyApplyWeightRatio = svmConditionallyApplyWeightRatioCheckBox.Checked;
+
+            if (svmUsePrecisionRadioButton.Checked)
+            {
+                classifier.ScoreTypeToUseForComplexityChoosingAlgorithm = MachineScoreType.Precision;
+            }
+            else if (svmUseRecallRadioButton.Checked)
+            {
+                classifier.ScoreTypeToUseForComplexityChoosingAlgorithm = MachineScoreType.Recall;
+            }
+            else
+            {
+                classifier.ScoreTypeToUseForComplexityChoosingAlgorithm = MachineScoreType.OverallAgreementOrF1;
+            }
+        }
+
+        /// <summary>
         /// Initializes a <see cref="CurrentLearningMachine"/> with multi-class SVM classifier values
         /// </summary>
         /// <param name="learningMachine">The <see cref="CurrentLearningMachine"/> to be initialized</param>
         private void SetMulticlassSVMClassifierValues(LearningMachine learningMachine)
         {
-            double complexity;
-            if (!double.TryParse(multiclassSvmComplexityTextBox.Text, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
-                CultureInfo.InvariantCulture, out complexity)
-                || complexity == 0)
-            {
-                multiclassSvmComplexityTextBox.SetError(configurationErrorProvider,
-                    "Complexity must be a number greater than zero");
-                _valid = false;
-            }
-
-            learningMachine.Classifier = new MulticlassSupportVectorMachineClassifier
-                {
-                    Complexity = complexity,
-                    AutomaticallyChooseComplexityValue = multiclassSvmAutoComplexityCheckBox.Checked
-                };
+            MulticlassSupportVectorMachineClassifier classifier;
+            learningMachine.Classifier = classifier = new MulticlassSupportVectorMachineClassifier();
+            SetSVMClassifierValues(classifier);
         }
+
 
         /// <summary>
         /// Initializes a <see cref="CurrentLearningMachine"/> with classifier values
@@ -1066,23 +1151,13 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="learningMachine">The <see cref="CurrentLearningMachine"/> to be initialized</param>
         private void SetMultilabelSVMClassifierValues(LearningMachine learningMachine)
         {
-            double complexity;
-            if (!double.TryParse(multilabelSvmComplexityTextBox.Text, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
-                CultureInfo.InvariantCulture, out complexity)
-                || complexity == 0)
+            MultilabelSupportVectorMachineClassifier classifier;
+            learningMachine.Classifier = classifier = new MultilabelSupportVectorMachineClassifier
             {
-                multilabelSvmComplexityTextBox.SetError(configurationErrorProvider,
-                    "Complexity must be a number greater than zero");
-                _valid = false;
-            }
+                CalibrateMachineToProduceProbabilities = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked,
+            };
 
-            learningMachine.Classifier = new MultilabelSupportVectorMachineClassifier
-                {
-                    Complexity = complexity,
-                    AutomaticallyChooseComplexityValue = multilabelSvmAutoComplexityCheckBox.Checked,
-                    CalibrateMachineToProduceProbabilities = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked,
-                    UseClassProportionsForComplexityWeights = multilabelSvmUseClassProportionsCheckBox.Checked
-                };
+            SetSVMClassifierValues(classifier);
 
             // Set values only associated with multilabel SVM at this time
             learningMachine.UseUnknownCategory = multilabelSvmUseUnknownCheckBox.Checked;
@@ -1096,6 +1171,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 _valid = false;
             }
             learningMachine.UnknownCategoryCutoff = unknownCategoryCutoff;
+            learningMachine.TranslateUnknownCategory = multilabelSvmTranslateUnknownCheckbox.Checked;
+            learningMachine.TranslateUnknownCategoryTo = multilabelSvmTranslateUnknownTextBox.Text;
         }
 
         /// <summary>
@@ -1191,23 +1268,29 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             if (machineType == LearningMachineType.ActivationNetwork)
             {
                 neuralNetPanel.Visible = true;
-                multiclassSvmPanel.Visible = false;
                 multilabelSvmPanel.Visible = false;
+                svmPanel.Visible = false;
                 numberOfCandidateNetwordsTextBox.Enabled = useCrossValidationSetsCheckBox.Checked;
             }
-            else if (machineType == LearningMachineType.MulticlassSVM)
+            else if (machineType == LearningMachineType.MulticlassSVM
+                || machineType == LearningMachineType.MultilabelSVM)
             {
                 neuralNetPanel.Visible = false;
-                multiclassSvmPanel.Visible = true;
-                multilabelSvmPanel.Visible = false;
-            }
-            else if (machineType == LearningMachineType.MultilabelSVM)
-            {
-                neuralNetPanel.Visible = false;
-                multiclassSvmPanel.Visible = false;
-                multilabelSvmPanel.Visible = true;
-                multilabelSvmUseUnknownCheckBox.Enabled = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked;
-                multilabelSvmUnknownCutoffTextBox.Enabled = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked;
+                svmPanel.Visible = true;
+                svmScoreTypeGroupBox.Enabled = svmAutoComplexityCheckBox.Checked;
+
+                if (machineType == LearningMachineType.MultilabelSVM)
+                {
+                    multilabelSvmPanel.Visible = true;
+                    multilabelSvmUseUnknownCheckBox.Enabled = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked;
+                    multilabelSvmUnknownCutoffTextBox.Enabled = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked;
+                    multilabelSvmTranslateUnknownCheckbox.Enabled = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked;
+                    multilabelSvmTranslateUnknownTextBox.Enabled = multilabelSvmTranslateUnknownCheckbox.Checked;
+                }
+                else
+                {
+                    multilabelSvmPanel.Visible = false;
+                }
             }
         }
 
@@ -1328,16 +1411,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     attributeCategorizationRandomNumberSeedTextBox
                 );
 
-                // Automatically pick SVM Complexity
+                // Negative class name
                 SyncControls(
-                    multiclassSvmAutoComplexityCheckBox,
-                    multilabelSvmAutoComplexityCheckBox
-                );
-
-                // SVM Complexity
-                SyncControls(
-                    multiclassSvmComplexityTextBox,
-                    multilabelSvmComplexityTextBox
+                    documentCategorizationCsvNegativeClassNameTextBox,
+                    documentCategorizationFolderNegativeClassNameTextBox,
+                    paginationNegativeClassNameTextBox,
+                    attributeCategorizationNegativeClassNameTextBox
                 );
 
                 // Training percentage
@@ -1377,21 +1456,25 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 documentCategorizationCsvRandomNumberSeedTextBox.Text = "0";
                 documentCategorizationCsvTextBox.Text = _DEFAULT_INPUT_LOCATION;
                 documentCategorizationCsvTrainingPercentageTextBox.Text = "80";
+                documentCategorizationCsvNegativeClassNameTextBox.Text = LearningMachineDataEncoder.UnknownCategoryName;
                 documentCategorizationFolderAnswerTextBox.Text = "$FileOf($DirOf(<SourceDocName>))";
                 documentCategorizationFolderFeatureVoaTextBox.Text = "<SourceDocName>.protofeatures.voa";
                 documentCategorizationFolderRandomNumberSeedTextBox.Text = "0";
                 documentCategorizationFolderTrainingPercentageTextBox.Text = "80";
+                documentCategorizationFolderNegativeClassNameTextBox.Text = LearningMachineDataEncoder.UnknownCategoryName;
                 documentCategorizationInputFolderTextBox.Text = _DEFAULT_INPUT_LOCATION;
                 documentCategorizationRadioButton.Checked = true;
                 folderSearchRadioButton.Checked = true;
                 maxFeaturesTextBox.Text = "2000";
                 maxShingleSizeTextBox.Text = "5";
                 maximumTrainingIterationsTextBox.Text = "500";
-                multiclassSvmAutoComplexityCheckBox.Checked = true;
-                multiclassSvmComplexityTextBox.Text = "1.0";
-                multilabelSvmAutoComplexityCheckBox.Checked = true;
+                svmAutoComplexityCheckBox.Checked = true;
+                svmComplexityTextBox.Text = "1.0";
+                svmUseF1ScoreRadioButton.Checked = true;
+                svmWeightRatioTextBox.Text = "";
+                svmConditionallyApplyWeightRatioCheckBox.Checked = true;
+                svmCacheSizeTextBox.Text = "4000";
                 multilabelSvmCalibrateForProbabilitiesCheckBox.Checked = true;
-                multilabelSvmComplexityTextBox.Text = "1.0";
                 multilabelSvmUnknownCutoffTextBox.Text = "0.5";
                 multilabelSvmUseUnknownCheckBox.Checked = true;
                 numberOfCandidateNetwordsTextBox.Text = "5";
@@ -1400,10 +1483,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 paginationFileListOrFolderTextBox.Text = _DEFAULT_INPUT_LOCATION;
                 paginationRandomNumberSeedTextBox.Text = "0";
                 paginationTrainingPercentageTextBox.Text = "80";
+                paginationNegativeClassNameTextBox.Text = LearningMachineDataEncoder.NotFirstPageCategory;
                 attributeCategorizationCandidateVoaTextBox.Text = "<SourceDocName>.labeled.voa";
                 attributeCategorizationFileListOrFolderTextBox.Text = _DEFAULT_INPUT_LOCATION;
                 attributeCategorizationRandomNumberSeedTextBox.Text = "0";
                 attributeCategorizationTrainingPercentageTextBox.Text = "80";
+                attributeCategorizationNegativeClassNameTextBox.Text = "";
                 sigmoidAlphaTextBox.Text = "2.0";
                 sizeOfHiddenLayersTextBox.Text = "25";
                 specifiedPagesTextBox.Text = "";

@@ -40,6 +40,8 @@
             this.documentCategorizationRadioButton = new System.Windows.Forms.RadioButton();
             this.inputConfigurationGroupBox = new System.Windows.Forms.GroupBox();
             this.attributeCategorizationInputPanel = new System.Windows.Forms.Panel();
+            this.label10 = new System.Windows.Forms.Label();
+            this.attributeCategorizationNegativeClassNameTextBox = new System.Windows.Forms.TextBox();
             this.attributeCategorizationCreateCandidateVoaButton = new System.Windows.Forms.Button();
             this.attributeCategorizationRandomNumberSeedLabel = new System.Windows.Forms.Label();
             this.attributeCategorizationRandomNumberSeedTextBox = new System.Windows.Forms.TextBox();
@@ -52,6 +54,8 @@
             this.attributeCategorizationFileListOrFolderBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this.attributeCategorizationFileListOrFolderTextBox = new System.Windows.Forms.TextBox();
             this.documentCategorizationFolderInputPanel = new System.Windows.Forms.Panel();
+            this.label9 = new System.Windows.Forms.Label();
+            this.documentCategorizationFolderNegativeClassNameTextBox = new System.Windows.Forms.TextBox();
             this.documentCategorizationFolderFeatureVoaLabel = new System.Windows.Forms.Label();
             this.documentCategorizationFolderFeatureVoaPathTagButton = new Extract.Utilities.Forms.PathTagsButton();
             this.documentCategorizationFolderFeatureVoaTextBox = new System.Windows.Forms.TextBox();
@@ -67,6 +71,8 @@
             this.documentCategorizationInputFolderTextBox = new System.Windows.Forms.TextBox();
             this.folderSearchRadioButton = new System.Windows.Forms.RadioButton();
             this.paginationInputPanel = new System.Windows.Forms.Panel();
+            this.label8 = new System.Windows.Forms.Label();
+            this.paginationNegativeClassNameTextBox = new System.Windows.Forms.TextBox();
             this.paginationAnswerVoaLabel = new System.Windows.Forms.Label();
             this.paginationAnswerVoaPathTagButton = new Extract.Utilities.Forms.PathTagsButton();
             this.paginationAnswerVoaTextBox = new System.Windows.Forms.TextBox();
@@ -82,7 +88,9 @@
             this.paginationFileListOrFolderTextBox = new System.Windows.Forms.TextBox();
             this.textFileOrCsvRadioButton = new System.Windows.Forms.RadioButton();
             this.documentCategorizationCsvInputPanel = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
             this.documentCategorizationCsvFeatureVoaLabel = new System.Windows.Forms.Label();
+            this.documentCategorizationCsvNegativeClassNameTextBox = new System.Windows.Forms.TextBox();
             this.documentCategorizationCsvFeatureVoaPathTagButton = new Extract.Utilities.Forms.PathTagsButton();
             this.documentCategorizationCsvFeatureVoaTextBox = new System.Windows.Forms.TextBox();
             this.documentCategorizationCsvRandomNumberSeedLabel = new System.Windows.Forms.Label();
@@ -117,17 +125,24 @@
             this.useAutoBagOfWordsCheckBox = new System.Windows.Forms.CheckBox();
             this.machineConfigurationTabPage = new System.Windows.Forms.TabPage();
             this.multilabelSvmPanel = new System.Windows.Forms.Panel();
-            this.multilabelSvmUnknownCutoffTextBox = new System.Windows.Forms.TextBox();
-            this.multilabelSvmUseUnknownCheckBox = new System.Windows.Forms.CheckBox();
-            this.multilabelSvmUseClassProportionsCheckBox = new System.Windows.Forms.CheckBox();
             this.multilabelSvmCalibrateForProbabilitiesCheckBox = new System.Windows.Forms.CheckBox();
-            this.multilabelSvmAutoComplexityCheckBox = new System.Windows.Forms.CheckBox();
-            this.multilabelSvmComplexityTextBox = new System.Windows.Forms.TextBox();
-            this.multilabelSvmComplexityLabel = new System.Windows.Forms.Label();
-            this.multiclassSvmPanel = new System.Windows.Forms.Panel();
-            this.multiclassSvmAutoComplexityCheckBox = new System.Windows.Forms.CheckBox();
-            this.multiclassSvmComplexityTextBox = new System.Windows.Forms.TextBox();
-            this.multiclassSvmComplexityLabel = new System.Windows.Forms.Label();
+            this.multilabelSvmUseUnknownCheckBox = new System.Windows.Forms.CheckBox();
+            this.multilabelSvmUnknownCutoffTextBox = new System.Windows.Forms.TextBox();
+            this.multilabelSvmTranslateUnknownTextBox = new System.Windows.Forms.TextBox();
+            this.multilabelSvmTranslateUnknownCheckbox = new System.Windows.Forms.CheckBox();
+            this.svmPanel = new System.Windows.Forms.Panel();
+            this.svmScoreTypeGroupBox = new System.Windows.Forms.GroupBox();
+            this.svmUsePrecisionRadioButton = new System.Windows.Forms.RadioButton();
+            this.svmUseRecallRadioButton = new System.Windows.Forms.RadioButton();
+            this.svmUseF1ScoreRadioButton = new System.Windows.Forms.RadioButton();
+            this.svmConditionallyApplyWeightRatioCheckBox = new System.Windows.Forms.CheckBox();
+            this.svmCacheSizeTextBox = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.svmWeightRatioTextBox = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.svmAutoComplexityCheckBox = new System.Windows.Forms.CheckBox();
+            this.svmComplexityTextBox = new System.Windows.Forms.TextBox();
+            this.svmComplexityLabel = new System.Windows.Forms.Label();
             this.machineTypeLabel = new System.Windows.Forms.Label();
             this.neuralNetPanel = new System.Windows.Forms.Panel();
             this.numberOfCandidateNetwordsTextBox = new System.Windows.Forms.TextBox();
@@ -160,7 +175,8 @@
             this.autoBagOfWordsGroupBox.SuspendLayout();
             this.machineConfigurationTabPage.SuspendLayout();
             this.multilabelSvmPanel.SuspendLayout();
-            this.multiclassSvmPanel.SuspendLayout();
+            this.svmPanel.SuspendLayout();
+            this.svmScoreTypeGroupBox.SuspendLayout();
             this.neuralNetPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.configurationErrorProvider)).BeginInit();
             this.SuspendLayout();
@@ -171,7 +187,7 @@
             this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 711);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1362, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1651, 22);
             this.statusStrip1.TabIndex = 3;
             // 
             // toolStripStatusLabel1
@@ -191,7 +207,7 @@
             this.configurationTabControl.Location = new System.Drawing.Point(0, 5);
             this.configurationTabControl.Name = "configurationTabControl";
             this.configurationTabControl.SelectedIndex = 0;
-            this.configurationTabControl.Size = new System.Drawing.Size(1362, 674);
+            this.configurationTabControl.Size = new System.Drawing.Size(1651, 674);
             this.configurationTabControl.TabIndex = 0;
             this.configurationTabControl.SelectedIndexChanged += new System.EventHandler(this.HandleConfigurationTabControl_SelectedIndexChanged);
             // 
@@ -202,7 +218,7 @@
             this.inputConfigurationTabPage.Location = new System.Drawing.Point(4, 22);
             this.inputConfigurationTabPage.Name = "inputConfigurationTabPage";
             this.inputConfigurationTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.inputConfigurationTabPage.Size = new System.Drawing.Size(1354, 648);
+            this.inputConfigurationTabPage.Size = new System.Drawing.Size(1643, 648);
             this.inputConfigurationTabPage.TabIndex = 0;
             this.inputConfigurationTabPage.Text = "Input configuration";
             this.inputConfigurationTabPage.UseVisualStyleBackColor = true;
@@ -216,7 +232,7 @@
             this.machineUsageGroupBox.Controls.Add(this.documentCategorizationRadioButton);
             this.machineUsageGroupBox.Location = new System.Drawing.Point(3, 6);
             this.machineUsageGroupBox.Name = "machineUsageGroupBox";
-            this.machineUsageGroupBox.Size = new System.Drawing.Size(1346, 90);
+            this.machineUsageGroupBox.Size = new System.Drawing.Size(1632, 90);
             this.machineUsageGroupBox.TabIndex = 0;
             this.machineUsageGroupBox.TabStop = false;
             this.machineUsageGroupBox.Text = "Machine learning engine usage";
@@ -270,7 +286,7 @@
             this.inputConfigurationGroupBox.Controls.Add(this.documentCategorizationCsvInputPanel);
             this.inputConfigurationGroupBox.Location = new System.Drawing.Point(3, 98);
             this.inputConfigurationGroupBox.Name = "inputConfigurationGroupBox";
-            this.inputConfigurationGroupBox.Size = new System.Drawing.Size(1346, 544);
+            this.inputConfigurationGroupBox.Size = new System.Drawing.Size(1632, 544);
             this.inputConfigurationGroupBox.TabIndex = 1;
             this.inputConfigurationGroupBox.TabStop = false;
             this.inputConfigurationGroupBox.Text = "Training/testing files";
@@ -279,6 +295,8 @@
             // 
             this.attributeCategorizationInputPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.attributeCategorizationInputPanel.Controls.Add(this.label10);
+            this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationNegativeClassNameTextBox);
             this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationCreateCandidateVoaButton);
             this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationRandomNumberSeedLabel);
             this.attributeCategorizationInputPanel.Controls.Add(this.attributeCategorizationRandomNumberSeedTextBox);
@@ -296,12 +314,30 @@
             this.attributeCategorizationInputPanel.TabIndex = 5;
             this.attributeCategorizationInputPanel.Visible = false;
             // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(156, 140);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(289, 13);
+            this.label10.TabIndex = 16;
+            this.label10.Text = "Negative-class name (e.g., for determining Precision/Recall)";
+            // 
+            // attributeCategorizationNegativeClassNameTextBox
+            // 
+            this.attributeCategorizationNegativeClassNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.attributeCategorizationNegativeClassNameTextBox.Location = new System.Drawing.Point(159, 158);
+            this.attributeCategorizationNegativeClassNameTextBox.Name = "attributeCategorizationNegativeClassNameTextBox";
+            this.attributeCategorizationNegativeClassNameTextBox.Size = new System.Drawing.Size(336, 20);
+            this.attributeCategorizationNegativeClassNameTextBox.TabIndex = 11;
+            // 
             // attributeCategorizationCreateCandidateVoaButton
             // 
             this.attributeCategorizationCreateCandidateVoaButton.Location = new System.Drawing.Point(10, 107);
             this.attributeCategorizationCreateCandidateVoaButton.Name = "attributeCategorizationCreateCandidateVoaButton";
             this.attributeCategorizationCreateCandidateVoaButton.Size = new System.Drawing.Size(213, 23);
-            this.attributeCategorizationCreateCandidateVoaButton.TabIndex = 13;
+            this.attributeCategorizationCreateCandidateVoaButton.TabIndex = 14;
             this.attributeCategorizationCreateCandidateVoaButton.Text = "Create labeled candidate attribute files...";
             this.attributeCategorizationCreateCandidateVoaButton.UseVisualStyleBackColor = true;
             this.attributeCategorizationCreateCandidateVoaButton.Click += new System.EventHandler(this.HandleAttributeCategorizationCreateCandidateVoaButton_Click);
@@ -312,7 +348,7 @@
             this.attributeCategorizationRandomNumberSeedLabel.Location = new System.Drawing.Point(8, 185);
             this.attributeCategorizationRandomNumberSeedLabel.Name = "attributeCategorizationRandomNumberSeedLabel";
             this.attributeCategorizationRandomNumberSeedLabel.Size = new System.Drawing.Size(111, 13);
-            this.attributeCategorizationRandomNumberSeedLabel.TabIndex = 11;
+            this.attributeCategorizationRandomNumberSeedLabel.TabIndex = 12;
             this.attributeCategorizationRandomNumberSeedLabel.Text = "Random number seed";
             // 
             // attributeCategorizationRandomNumberSeedTextBox
@@ -320,7 +356,7 @@
             this.attributeCategorizationRandomNumberSeedTextBox.Location = new System.Drawing.Point(10, 203);
             this.attributeCategorizationRandomNumberSeedTextBox.Name = "attributeCategorizationRandomNumberSeedTextBox";
             this.attributeCategorizationRandomNumberSeedTextBox.Size = new System.Drawing.Size(71, 20);
-            this.attributeCategorizationRandomNumberSeedTextBox.TabIndex = 12;
+            this.attributeCategorizationRandomNumberSeedTextBox.TabIndex = 13;
             this.attributeCategorizationRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.attributeCategorizationRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             this.attributeCategorizationRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
@@ -412,6 +448,8 @@
             // 
             this.documentCategorizationFolderInputPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.documentCategorizationFolderInputPanel.Controls.Add(this.label9);
+            this.documentCategorizationFolderInputPanel.Controls.Add(this.documentCategorizationFolderNegativeClassNameTextBox);
             this.documentCategorizationFolderInputPanel.Controls.Add(this.documentCategorizationFolderFeatureVoaLabel);
             this.documentCategorizationFolderInputPanel.Controls.Add(this.documentCategorizationFolderFeatureVoaPathTagButton);
             this.documentCategorizationFolderInputPanel.Controls.Add(this.documentCategorizationFolderFeatureVoaTextBox);
@@ -430,6 +468,26 @@
             this.documentCategorizationFolderInputPanel.Size = new System.Drawing.Size(535, 246);
             this.documentCategorizationFolderInputPanel.TabIndex = 4;
             this.documentCategorizationFolderInputPanel.Visible = false;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(154, 151);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(289, 13);
+            this.label9.TabIndex = 16;
+            this.label9.Text = "Negative-class name (e.g., for determining Precision/Recall)";
+            // 
+            // documentCategorizationFolderNegativeClassNameTextBox
+            // 
+            this.documentCategorizationFolderNegativeClassNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.documentCategorizationFolderNegativeClassNameTextBox.Location = new System.Drawing.Point(157, 169);
+            this.documentCategorizationFolderNegativeClassNameTextBox.Name = "documentCategorizationFolderNegativeClassNameTextBox";
+            this.documentCategorizationFolderNegativeClassNameTextBox.Size = new System.Drawing.Size(336, 20);
+            this.documentCategorizationFolderNegativeClassNameTextBox.TabIndex = 11;
+            this.documentCategorizationFolderNegativeClassNameTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationFolderNegativeClassNameTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // documentCategorizationFolderFeatureVoaLabel
             // 
@@ -470,7 +528,7 @@
             this.documentCategorizationFolderRandomNumberSeedLabel.Location = new System.Drawing.Point(8, 196);
             this.documentCategorizationFolderRandomNumberSeedLabel.Name = "documentCategorizationFolderRandomNumberSeedLabel";
             this.documentCategorizationFolderRandomNumberSeedLabel.Size = new System.Drawing.Size(111, 13);
-            this.documentCategorizationFolderRandomNumberSeedLabel.TabIndex = 11;
+            this.documentCategorizationFolderRandomNumberSeedLabel.TabIndex = 12;
             this.documentCategorizationFolderRandomNumberSeedLabel.Text = "Random number seed";
             // 
             // documentCategorizationFolderRandomNumberSeedTextBox
@@ -478,7 +536,7 @@
             this.documentCategorizationFolderRandomNumberSeedTextBox.Location = new System.Drawing.Point(10, 214);
             this.documentCategorizationFolderRandomNumberSeedTextBox.Name = "documentCategorizationFolderRandomNumberSeedTextBox";
             this.documentCategorizationFolderRandomNumberSeedTextBox.Size = new System.Drawing.Size(71, 20);
-            this.documentCategorizationFolderRandomNumberSeedTextBox.TabIndex = 12;
+            this.documentCategorizationFolderRandomNumberSeedTextBox.TabIndex = 13;
             this.documentCategorizationFolderRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.documentCategorizationFolderRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             this.documentCategorizationFolderRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
@@ -583,6 +641,8 @@
             // 
             this.paginationInputPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.paginationInputPanel.Controls.Add(this.label8);
+            this.paginationInputPanel.Controls.Add(this.paginationNegativeClassNameTextBox);
             this.paginationInputPanel.Controls.Add(this.paginationAnswerVoaLabel);
             this.paginationInputPanel.Controls.Add(this.paginationAnswerVoaPathTagButton);
             this.paginationInputPanel.Controls.Add(this.paginationAnswerVoaTextBox);
@@ -601,6 +661,24 @@
             this.paginationInputPanel.Size = new System.Drawing.Size(536, 244);
             this.paginationInputPanel.TabIndex = 3;
             this.paginationInputPanel.Visible = false;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(156, 151);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(106, 13);
+            this.label8.TabIndex = 14;
+            this.label8.Text = "Negative-class name";
+            // 
+            // paginationNegativeClassNameTextBox
+            // 
+            this.paginationNegativeClassNameTextBox.Location = new System.Drawing.Point(159, 169);
+            this.paginationNegativeClassNameTextBox.Name = "paginationNegativeClassNameTextBox";
+            this.paginationNegativeClassNameTextBox.Size = new System.Drawing.Size(336, 20);
+            this.paginationNegativeClassNameTextBox.TabIndex = 11;
+            this.paginationNegativeClassNameTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.paginationNegativeClassNameTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // paginationAnswerVoaLabel
             // 
@@ -640,7 +718,7 @@
             this.paginationRandomNumberSeedLabel.Location = new System.Drawing.Point(8, 196);
             this.paginationRandomNumberSeedLabel.Name = "paginationRandomNumberSeedLabel";
             this.paginationRandomNumberSeedLabel.Size = new System.Drawing.Size(111, 13);
-            this.paginationRandomNumberSeedLabel.TabIndex = 11;
+            this.paginationRandomNumberSeedLabel.TabIndex = 12;
             this.paginationRandomNumberSeedLabel.Text = "Random number seed";
             // 
             // paginationRandomNumberSeedTextBox
@@ -648,7 +726,7 @@
             this.paginationRandomNumberSeedTextBox.Location = new System.Drawing.Point(10, 214);
             this.paginationRandomNumberSeedTextBox.Name = "paginationRandomNumberSeedTextBox";
             this.paginationRandomNumberSeedTextBox.Size = new System.Drawing.Size(71, 20);
-            this.paginationRandomNumberSeedTextBox.TabIndex = 12;
+            this.paginationRandomNumberSeedTextBox.TabIndex = 13;
             this.paginationRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.paginationRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             this.paginationRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
@@ -752,7 +830,9 @@
             // 
             this.documentCategorizationCsvInputPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.documentCategorizationCsvInputPanel.Controls.Add(this.label3);
             this.documentCategorizationCsvInputPanel.Controls.Add(this.documentCategorizationCsvFeatureVoaLabel);
+            this.documentCategorizationCsvInputPanel.Controls.Add(this.documentCategorizationCsvNegativeClassNameTextBox);
             this.documentCategorizationCsvInputPanel.Controls.Add(this.documentCategorizationCsvFeatureVoaPathTagButton);
             this.documentCategorizationCsvInputPanel.Controls.Add(this.documentCategorizationCsvFeatureVoaTextBox);
             this.documentCategorizationCsvInputPanel.Controls.Add(this.documentCategorizationCsvRandomNumberSeedLabel);
@@ -767,6 +847,15 @@
             this.documentCategorizationCsvInputPanel.Size = new System.Drawing.Size(532, 477);
             this.documentCategorizationCsvInputPanel.TabIndex = 2;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(152, 105);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(289, 13);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Negative-class name (e.g., for determining Precision/Recall)";
+            // 
             // documentCategorizationCsvFeatureVoaLabel
             // 
             this.documentCategorizationCsvFeatureVoaLabel.AutoSize = true;
@@ -776,6 +865,17 @@
             this.documentCategorizationCsvFeatureVoaLabel.TabIndex = 3;
             this.documentCategorizationCsvFeatureVoaLabel.Text = "Feature-attribute files (relative path to VOA or EAV file for each <SourceDocName" +
     ">)";
+            // 
+            // documentCategorizationCsvNegativeClassNameTextBox
+            // 
+            this.documentCategorizationCsvNegativeClassNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.documentCategorizationCsvNegativeClassNameTextBox.Location = new System.Drawing.Point(155, 123);
+            this.documentCategorizationCsvNegativeClassNameTextBox.Name = "documentCategorizationCsvNegativeClassNameTextBox";
+            this.documentCategorizationCsvNegativeClassNameTextBox.Size = new System.Drawing.Size(336, 20);
+            this.documentCategorizationCsvNegativeClassNameTextBox.TabIndex = 8;
+            this.documentCategorizationCsvNegativeClassNameTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.documentCategorizationCsvNegativeClassNameTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
             // documentCategorizationCsvFeatureVoaPathTagButton
             // 
@@ -806,7 +906,7 @@
             this.documentCategorizationCsvRandomNumberSeedLabel.Location = new System.Drawing.Point(8, 150);
             this.documentCategorizationCsvRandomNumberSeedLabel.Name = "documentCategorizationCsvRandomNumberSeedLabel";
             this.documentCategorizationCsvRandomNumberSeedLabel.Size = new System.Drawing.Size(111, 13);
-            this.documentCategorizationCsvRandomNumberSeedLabel.TabIndex = 8;
+            this.documentCategorizationCsvRandomNumberSeedLabel.TabIndex = 9;
             this.documentCategorizationCsvRandomNumberSeedLabel.Text = "Random number seed";
             // 
             // documentCategorizationCsvRandomNumberSeedTextBox
@@ -814,7 +914,7 @@
             this.documentCategorizationCsvRandomNumberSeedTextBox.Location = new System.Drawing.Point(10, 168);
             this.documentCategorizationCsvRandomNumberSeedTextBox.Name = "documentCategorizationCsvRandomNumberSeedTextBox";
             this.documentCategorizationCsvRandomNumberSeedTextBox.Size = new System.Drawing.Size(71, 20);
-            this.documentCategorizationCsvRandomNumberSeedTextBox.TabIndex = 9;
+            this.documentCategorizationCsvRandomNumberSeedTextBox.TabIndex = 10;
             this.documentCategorizationCsvRandomNumberSeedTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.documentCategorizationCsvRandomNumberSeedTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             this.documentCategorizationCsvRandomNumberSeedTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
@@ -880,7 +980,7 @@
             this.featureConfigurationTabPage.Location = new System.Drawing.Point(4, 22);
             this.featureConfigurationTabPage.Name = "featureConfigurationTabPage";
             this.featureConfigurationTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.featureConfigurationTabPage.Size = new System.Drawing.Size(1354, 648);
+            this.featureConfigurationTabPage.Size = new System.Drawing.Size(1643, 648);
             this.featureConfigurationTabPage.TabIndex = 1;
             this.featureConfigurationTabPage.Text = "Feature configuration";
             this.featureConfigurationTabPage.UseVisualStyleBackColor = true;
@@ -901,7 +1001,7 @@
             this.groupBox1.Controls.Add(this.useAttributeFeatureFilterCheckBox);
             this.groupBox1.Location = new System.Drawing.Point(3, 102);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(1345, 267);
+            this.groupBox1.Size = new System.Drawing.Size(1634, 267);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Attribute feature vectorizers";
@@ -952,7 +1052,7 @@
             this.attributesToTokenizeFilterTextBox.Location = new System.Drawing.Point(10, 165);
             this.attributesToTokenizeFilterTextBox.Multiline = true;
             this.attributesToTokenizeFilterTextBox.Name = "attributesToTokenizeFilterTextBox";
-            this.attributesToTokenizeFilterTextBox.Size = new System.Drawing.Size(1323, 44);
+            this.attributesToTokenizeFilterTextBox.Size = new System.Drawing.Size(1612, 44);
             this.attributesToTokenizeFilterTextBox.TabIndex = 7;
             this.attributesToTokenizeFilterTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             this.attributesToTokenizeFilterTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
@@ -997,7 +1097,7 @@
             this.attributeFeatureFilterTextBox.Location = new System.Drawing.Point(10, 43);
             this.attributeFeatureFilterTextBox.Multiline = true;
             this.attributeFeatureFilterTextBox.Name = "attributeFeatureFilterTextBox";
-            this.attributeFeatureFilterTextBox.Size = new System.Drawing.Size(1323, 44);
+            this.attributeFeatureFilterTextBox.Size = new System.Drawing.Size(1612, 44);
             this.attributeFeatureFilterTextBox.TabIndex = 3;
             this.attributeFeatureFilterTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             this.attributeFeatureFilterTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
@@ -1019,7 +1119,7 @@
             // 
             this.viewAnswerListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.viewAnswerListButton.Enabled = false;
-            this.viewAnswerListButton.Location = new System.Drawing.Point(1245, 385);
+            this.viewAnswerListButton.Location = new System.Drawing.Point(1534, 385);
             this.viewAnswerListButton.Name = "viewAnswerListButton";
             this.viewAnswerListButton.Size = new System.Drawing.Size(101, 23);
             this.viewAnswerListButton.TabIndex = 0;
@@ -1041,7 +1141,7 @@
             // 
             this.editFeaturesButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.editFeaturesButton.Enabled = false;
-            this.editFeaturesButton.Location = new System.Drawing.Point(1138, 385);
+            this.editFeaturesButton.Location = new System.Drawing.Point(1427, 385);
             this.editFeaturesButton.Name = "editFeaturesButton";
             this.editFeaturesButton.Size = new System.Drawing.Size(101, 23);
             this.editFeaturesButton.TabIndex = 4;
@@ -1062,7 +1162,7 @@
             this.autoBagOfWordsGroupBox.Controls.Add(this.useAutoBagOfWordsCheckBox);
             this.autoBagOfWordsGroupBox.Location = new System.Drawing.Point(3, 6);
             this.autoBagOfWordsGroupBox.Name = "autoBagOfWordsGroupBox";
-            this.autoBagOfWordsGroupBox.Size = new System.Drawing.Size(1346, 90);
+            this.autoBagOfWordsGroupBox.Size = new System.Drawing.Size(1635, 90);
             this.autoBagOfWordsGroupBox.TabIndex = 1;
             this.autoBagOfWordsGroupBox.TabStop = false;
             this.autoBagOfWordsGroupBox.Text = "Auto-BoW";
@@ -1144,155 +1244,237 @@
             // machineConfigurationTabPage
             // 
             this.machineConfigurationTabPage.Controls.Add(this.multilabelSvmPanel);
-            this.machineConfigurationTabPage.Controls.Add(this.multiclassSvmPanel);
+            this.machineConfigurationTabPage.Controls.Add(this.svmPanel);
             this.machineConfigurationTabPage.Controls.Add(this.machineTypeLabel);
             this.machineConfigurationTabPage.Controls.Add(this.neuralNetPanel);
             this.machineConfigurationTabPage.Controls.Add(this.machineTypeComboBox);
             this.machineConfigurationTabPage.Location = new System.Drawing.Point(4, 22);
             this.machineConfigurationTabPage.Name = "machineConfigurationTabPage";
             this.machineConfigurationTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.machineConfigurationTabPage.Size = new System.Drawing.Size(1354, 648);
+            this.machineConfigurationTabPage.Size = new System.Drawing.Size(1643, 648);
             this.machineConfigurationTabPage.TabIndex = 2;
             this.machineConfigurationTabPage.Text = "Machine configuration";
             this.machineConfigurationTabPage.UseVisualStyleBackColor = true;
             // 
             // multilabelSvmPanel
             // 
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmUnknownCutoffTextBox);
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmUseUnknownCheckBox);
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmUseClassProportionsCheckBox);
             this.multilabelSvmPanel.Controls.Add(this.multilabelSvmCalibrateForProbabilitiesCheckBox);
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmAutoComplexityCheckBox);
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmComplexityTextBox);
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmComplexityLabel);
-            this.multilabelSvmPanel.Location = new System.Drawing.Point(554, 138);
+            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmUseUnknownCheckBox);
+            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmUnknownCutoffTextBox);
+            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmTranslateUnknownTextBox);
+            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmTranslateUnknownCheckbox);
+            this.multilabelSvmPanel.Location = new System.Drawing.Point(548, 340);
             this.multilabelSvmPanel.Name = "multilabelSvmPanel";
-            this.multilabelSvmPanel.Size = new System.Drawing.Size(541, 145);
+            this.multilabelSvmPanel.Size = new System.Drawing.Size(558, 89);
             this.multilabelSvmPanel.TabIndex = 4;
-            // 
-            // multilabelSvmUnknownCutoffTextBox
-            // 
-            this.multilabelSvmUnknownCutoffTextBox.Location = new System.Drawing.Point(290, 117);
-            this.multilabelSvmUnknownCutoffTextBox.Name = "multilabelSvmUnknownCutoffTextBox";
-            this.multilabelSvmUnknownCutoffTextBox.Size = new System.Drawing.Size(44, 20);
-            this.multilabelSvmUnknownCutoffTextBox.TabIndex = 6;
-            this.multilabelSvmUnknownCutoffTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.multilabelSvmUnknownCutoffTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multilabelSvmUnknownCutoffTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
-            // 
-            // multilabelSvmUseUnknownCheckBox
-            // 
-            this.multilabelSvmUseUnknownCheckBox.AutoSize = true;
-            this.multilabelSvmUseUnknownCheckBox.Checked = true;
-            this.multilabelSvmUseUnknownCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.multilabelSvmUseUnknownCheckBox.Location = new System.Drawing.Point(4, 120);
-            this.multilabelSvmUseUnknownCheckBox.Name = "multilabelSvmUseUnknownCheckBox";
-            this.multilabelSvmUseUnknownCheckBox.Size = new System.Drawing.Size(280, 17);
-            this.multilabelSvmUseUnknownCheckBox.TabIndex = 5;
-            this.multilabelSvmUseUnknownCheckBox.Text = "Use Unknown category when max probability is below";
-            this.multilabelSvmUseUnknownCheckBox.UseVisualStyleBackColor = true;
-            this.multilabelSvmUseUnknownCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
-            // 
-            // multilabelSvmUseClassProportionsCheckBox
-            // 
-            this.multilabelSvmUseClassProportionsCheckBox.AutoSize = true;
-            this.multilabelSvmUseClassProportionsCheckBox.Location = new System.Drawing.Point(4, 74);
-            this.multilabelSvmUseClassProportionsCheckBox.Name = "multilabelSvmUseClassProportionsCheckBox";
-            this.multilabelSvmUseClassProportionsCheckBox.Size = new System.Drawing.Size(464, 17);
-            this.multilabelSvmUseClassProportionsCheckBox.TabIndex = 3;
-            this.multilabelSvmUseClassProportionsCheckBox.Text = "Use different Complexity weights for positive and negative classes based on class" +
-    " proportions";
-            this.multilabelSvmUseClassProportionsCheckBox.UseVisualStyleBackColor = true;
-            this.multilabelSvmUseClassProportionsCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
             // multilabelSvmCalibrateForProbabilitiesCheckBox
             // 
             this.multilabelSvmCalibrateForProbabilitiesCheckBox.AutoSize = true;
             this.multilabelSvmCalibrateForProbabilitiesCheckBox.Checked = true;
             this.multilabelSvmCalibrateForProbabilitiesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.Location = new System.Drawing.Point(4, 97);
+            this.multilabelSvmCalibrateForProbabilitiesCheckBox.Location = new System.Drawing.Point(7, 13);
             this.multilabelSvmCalibrateForProbabilitiesCheckBox.Name = "multilabelSvmCalibrateForProbabilitiesCheckBox";
             this.multilabelSvmCalibrateForProbabilitiesCheckBox.Size = new System.Drawing.Size(222, 17);
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.TabIndex = 4;
+            this.multilabelSvmCalibrateForProbabilitiesCheckBox.TabIndex = 0;
             this.multilabelSvmCalibrateForProbabilitiesCheckBox.Text = "Calibrate machine to produce probabilities";
             this.multilabelSvmCalibrateForProbabilitiesCheckBox.UseVisualStyleBackColor = true;
             this.multilabelSvmCalibrateForProbabilitiesCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
-            // multilabelSvmAutoComplexityCheckBox
+            // multilabelSvmUseUnknownCheckBox
             // 
-            this.multilabelSvmAutoComplexityCheckBox.AutoSize = true;
-            this.multilabelSvmAutoComplexityCheckBox.Checked = true;
-            this.multilabelSvmAutoComplexityCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.multilabelSvmAutoComplexityCheckBox.Location = new System.Drawing.Point(4, 52);
-            this.multilabelSvmAutoComplexityCheckBox.Name = "multilabelSvmAutoComplexityCheckBox";
-            this.multilabelSvmAutoComplexityCheckBox.Size = new System.Drawing.Size(471, 17);
-            this.multilabelSvmAutoComplexityCheckBox.TabIndex = 2;
-            this.multilabelSvmAutoComplexityCheckBox.Text = "Choose complexity parameter automatically using a cross validation set (increases" +
+            this.multilabelSvmUseUnknownCheckBox.AutoSize = true;
+            this.multilabelSvmUseUnknownCheckBox.Checked = true;
+            this.multilabelSvmUseUnknownCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.multilabelSvmUseUnknownCheckBox.Location = new System.Drawing.Point(7, 36);
+            this.multilabelSvmUseUnknownCheckBox.Name = "multilabelSvmUseUnknownCheckBox";
+            this.multilabelSvmUseUnknownCheckBox.Size = new System.Drawing.Size(280, 17);
+            this.multilabelSvmUseUnknownCheckBox.TabIndex = 1;
+            this.multilabelSvmUseUnknownCheckBox.Text = "Use Unknown category when max probability is below";
+            this.multilabelSvmUseUnknownCheckBox.UseVisualStyleBackColor = true;
+            this.multilabelSvmUseUnknownCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            // 
+            // multilabelSvmUnknownCutoffTextBox
+            // 
+            this.multilabelSvmUnknownCutoffTextBox.Location = new System.Drawing.Point(293, 33);
+            this.multilabelSvmUnknownCutoffTextBox.Name = "multilabelSvmUnknownCutoffTextBox";
+            this.multilabelSvmUnknownCutoffTextBox.Size = new System.Drawing.Size(44, 20);
+            this.multilabelSvmUnknownCutoffTextBox.TabIndex = 2;
+            this.multilabelSvmUnknownCutoffTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.multilabelSvmUnknownCutoffTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.multilabelSvmUnknownCutoffTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            // 
+            // multilabelSvmTranslateUnknownTextBox
+            // 
+            this.multilabelSvmTranslateUnknownTextBox.Location = new System.Drawing.Point(237, 56);
+            this.multilabelSvmTranslateUnknownTextBox.Name = "multilabelSvmTranslateUnknownTextBox";
+            this.multilabelSvmTranslateUnknownTextBox.Size = new System.Drawing.Size(296, 20);
+            this.multilabelSvmTranslateUnknownTextBox.TabIndex = 4;
+            this.multilabelSvmTranslateUnknownTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.multilabelSvmTranslateUnknownTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            // 
+            // multilabelSvmTranslateUnknownCheckbox
+            // 
+            this.multilabelSvmTranslateUnknownCheckbox.AutoSize = true;
+            this.multilabelSvmTranslateUnknownCheckbox.Checked = true;
+            this.multilabelSvmTranslateUnknownCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.multilabelSvmTranslateUnknownCheckbox.Location = new System.Drawing.Point(8, 59);
+            this.multilabelSvmTranslateUnknownCheckbox.Name = "multilabelSvmTranslateUnknownCheckbox";
+            this.multilabelSvmTranslateUnknownCheckbox.Size = new System.Drawing.Size(223, 17);
+            this.multilabelSvmTranslateUnknownCheckbox.TabIndex = 3;
+            this.multilabelSvmTranslateUnknownCheckbox.Text = "Translate Unknown category to this name";
+            this.multilabelSvmTranslateUnknownCheckbox.UseVisualStyleBackColor = true;
+            this.multilabelSvmTranslateUnknownCheckbox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            // 
+            // svmPanel
+            // 
+            this.svmPanel.Controls.Add(this.svmScoreTypeGroupBox);
+            this.svmPanel.Controls.Add(this.svmConditionallyApplyWeightRatioCheckBox);
+            this.svmPanel.Controls.Add(this.svmCacheSizeTextBox);
+            this.svmPanel.Controls.Add(this.label6);
+            this.svmPanel.Controls.Add(this.svmWeightRatioTextBox);
+            this.svmPanel.Controls.Add(this.label5);
+            this.svmPanel.Controls.Add(this.svmAutoComplexityCheckBox);
+            this.svmPanel.Controls.Add(this.svmComplexityTextBox);
+            this.svmPanel.Controls.Add(this.svmComplexityLabel);
+            this.svmPanel.Location = new System.Drawing.Point(548, 54);
+            this.svmPanel.Name = "svmPanel";
+            this.svmPanel.Size = new System.Drawing.Size(558, 280);
+            this.svmPanel.TabIndex = 3;
+            // 
+            // svmScoreTypeGroupBox
+            // 
+            this.svmScoreTypeGroupBox.Controls.Add(this.svmUsePrecisionRadioButton);
+            this.svmScoreTypeGroupBox.Controls.Add(this.svmUseRecallRadioButton);
+            this.svmScoreTypeGroupBox.Controls.Add(this.svmUseF1ScoreRadioButton);
+            this.svmScoreTypeGroupBox.Location = new System.Drawing.Point(7, 72);
+            this.svmScoreTypeGroupBox.Name = "svmScoreTypeGroupBox";
+            this.svmScoreTypeGroupBox.Size = new System.Drawing.Size(538, 89);
+            this.svmScoreTypeGroupBox.TabIndex = 3;
+            this.svmScoreTypeGroupBox.TabStop = false;
+            // 
+            // svmUsePrecisionRadioButton
+            // 
+            this.svmUsePrecisionRadioButton.AutoSize = true;
+            this.svmUsePrecisionRadioButton.Location = new System.Drawing.Point(6, 36);
+            this.svmUsePrecisionRadioButton.Name = "svmUsePrecisionRadioButton";
+            this.svmUsePrecisionRadioButton.Size = new System.Drawing.Size(244, 17);
+            this.svmUsePrecisionRadioButton.TabIndex = 1;
+            this.svmUsePrecisionRadioButton.TabStop = true;
+            this.svmUsePrecisionRadioButton.Text = "Use precision (only works for 2-class problems)";
+            this.svmUsePrecisionRadioButton.UseVisualStyleBackColor = true;
+            this.svmUsePrecisionRadioButton.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            // 
+            // svmUseRecallRadioButton
+            // 
+            this.svmUseRecallRadioButton.AutoSize = true;
+            this.svmUseRecallRadioButton.Location = new System.Drawing.Point(6, 59);
+            this.svmUseRecallRadioButton.Name = "svmUseRecallRadioButton";
+            this.svmUseRecallRadioButton.Size = new System.Drawing.Size(227, 17);
+            this.svmUseRecallRadioButton.TabIndex = 2;
+            this.svmUseRecallRadioButton.TabStop = true;
+            this.svmUseRecallRadioButton.Text = "Use recall (only works for 2-class problems)";
+            this.svmUseRecallRadioButton.UseVisualStyleBackColor = true;
+            this.svmUseRecallRadioButton.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            // 
+            // svmUseF1ScoreRadioButton
+            // 
+            this.svmUseF1ScoreRadioButton.AutoSize = true;
+            this.svmUseF1ScoreRadioButton.Location = new System.Drawing.Point(6, 13);
+            this.svmUseF1ScoreRadioButton.Name = "svmUseF1ScoreRadioButton";
+            this.svmUseF1ScoreRadioButton.Size = new System.Drawing.Size(233, 17);
+            this.svmUseF1ScoreRadioButton.TabIndex = 0;
+            this.svmUseF1ScoreRadioButton.TabStop = true;
+            this.svmUseF1ScoreRadioButton.Text = "Use overall agreement/F1-score to compare";
+            this.svmUseF1ScoreRadioButton.UseVisualStyleBackColor = true;
+            this.svmUseF1ScoreRadioButton.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            // 
+            // svmConditionallyApplyWeightRatioCheckBox
+            // 
+            this.svmConditionallyApplyWeightRatioCheckBox.AutoSize = true;
+            this.svmConditionallyApplyWeightRatioCheckBox.Checked = true;
+            this.svmConditionallyApplyWeightRatioCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.svmConditionallyApplyWeightRatioCheckBox.Location = new System.Drawing.Point(7, 211);
+            this.svmConditionallyApplyWeightRatioCheckBox.Name = "svmConditionallyApplyWeightRatioCheckBox";
+            this.svmConditionallyApplyWeightRatioCheckBox.Size = new System.Drawing.Size(538, 17);
+            this.svmConditionallyApplyWeightRatioCheckBox.TabIndex = 6;
+            this.svmConditionallyApplyWeightRatioCheckBox.Text = "Only apply weight ratio when the positive class of the classifier being trained i" +
+    "s the designated Negative class";
+            this.svmConditionallyApplyWeightRatioCheckBox.UseVisualStyleBackColor = true;
+            this.svmConditionallyApplyWeightRatioCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            // 
+            // svmCacheSizeTextBox
+            // 
+            this.svmCacheSizeTextBox.Location = new System.Drawing.Point(8, 251);
+            this.svmCacheSizeTextBox.Name = "svmCacheSizeTextBox";
+            this.svmCacheSizeTextBox.Size = new System.Drawing.Size(64, 20);
+            this.svmCacheSizeTextBox.TabIndex = 8;
+            this.svmCacheSizeTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.svmCacheSizeTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.svmCacheSizeTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(4, 235);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(412, 13);
+            this.label6.TabIndex = 7;
+            this.label6.Text = "SMO cache size (blank for default = training set size, smaller = slower but less " +
+    "memory)";
+            // 
+            // svmWeightRatioTextBox
+            // 
+            this.svmWeightRatioTextBox.Location = new System.Drawing.Point(7, 187);
+            this.svmWeightRatioTextBox.Name = "svmWeightRatioTextBox";
+            this.svmWeightRatioTextBox.Size = new System.Drawing.Size(64, 20);
+            this.svmWeightRatioTextBox.TabIndex = 5;
+            this.svmWeightRatioTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.svmWeightRatioTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.svmWeightRatioTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 171);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(481, 13);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "Positive to negative class weight ratio (what portion of Complexity will be appli" +
+    "ed to the positive class)";
+            // 
+            // svmAutoComplexityCheckBox
+            // 
+            this.svmAutoComplexityCheckBox.AutoSize = true;
+            this.svmAutoComplexityCheckBox.Checked = true;
+            this.svmAutoComplexityCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.svmAutoComplexityCheckBox.Location = new System.Drawing.Point(7, 52);
+            this.svmAutoComplexityCheckBox.Name = "svmAutoComplexityCheckBox";
+            this.svmAutoComplexityCheckBox.Size = new System.Drawing.Size(471, 17);
+            this.svmAutoComplexityCheckBox.TabIndex = 2;
+            this.svmAutoComplexityCheckBox.Text = "Choose complexity parameter automatically using a cross validation set (increases" +
     " training time)";
-            this.multilabelSvmAutoComplexityCheckBox.UseVisualStyleBackColor = true;
-            this.multilabelSvmAutoComplexityCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            this.svmAutoComplexityCheckBox.UseVisualStyleBackColor = true;
+            this.svmAutoComplexityCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
-            // multilabelSvmComplexityTextBox
+            // svmComplexityTextBox
             // 
-            this.multilabelSvmComplexityTextBox.Location = new System.Drawing.Point(4, 22);
-            this.multilabelSvmComplexityTextBox.Name = "multilabelSvmComplexityTextBox";
-            this.multilabelSvmComplexityTextBox.Size = new System.Drawing.Size(64, 20);
-            this.multilabelSvmComplexityTextBox.TabIndex = 1;
-            this.multilabelSvmComplexityTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.multilabelSvmComplexityTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multilabelSvmComplexityTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            this.svmComplexityTextBox.Location = new System.Drawing.Point(7, 22);
+            this.svmComplexityTextBox.Name = "svmComplexityTextBox";
+            this.svmComplexityTextBox.Size = new System.Drawing.Size(64, 20);
+            this.svmComplexityTextBox.TabIndex = 1;
+            this.svmComplexityTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.svmComplexityTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.svmComplexityTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
-            // multilabelSvmComplexityLabel
+            // svmComplexityLabel
             // 
-            this.multilabelSvmComplexityLabel.AutoSize = true;
-            this.multilabelSvmComplexityLabel.Location = new System.Drawing.Point(1, 6);
-            this.multilabelSvmComplexityLabel.Name = "multilabelSvmComplexityLabel";
-            this.multilabelSvmComplexityLabel.Size = new System.Drawing.Size(277, 13);
-            this.multilabelSvmComplexityLabel.TabIndex = 0;
-            this.multilabelSvmComplexityLabel.Text = "Complexity (Higher = higher variance/lower bias classifier)";
-            // 
-            // multiclassSvmPanel
-            // 
-            this.multiclassSvmPanel.Controls.Add(this.multiclassSvmAutoComplexityCheckBox);
-            this.multiclassSvmPanel.Controls.Add(this.multiclassSvmComplexityTextBox);
-            this.multiclassSvmPanel.Controls.Add(this.multiclassSvmComplexityLabel);
-            this.multiclassSvmPanel.Location = new System.Drawing.Point(554, 56);
-            this.multiclassSvmPanel.Name = "multiclassSvmPanel";
-            this.multiclassSvmPanel.Size = new System.Drawing.Size(541, 76);
-            this.multiclassSvmPanel.TabIndex = 3;
-            // 
-            // multiclassSvmAutoComplexityCheckBox
-            // 
-            this.multiclassSvmAutoComplexityCheckBox.AutoSize = true;
-            this.multiclassSvmAutoComplexityCheckBox.Checked = true;
-            this.multiclassSvmAutoComplexityCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.multiclassSvmAutoComplexityCheckBox.Location = new System.Drawing.Point(4, 52);
-            this.multiclassSvmAutoComplexityCheckBox.Name = "multiclassSvmAutoComplexityCheckBox";
-            this.multiclassSvmAutoComplexityCheckBox.Size = new System.Drawing.Size(471, 17);
-            this.multiclassSvmAutoComplexityCheckBox.TabIndex = 2;
-            this.multiclassSvmAutoComplexityCheckBox.Text = "Choose complexity parameter automatically using a cross validation set (increases" +
-    " training time)";
-            this.multiclassSvmAutoComplexityCheckBox.UseVisualStyleBackColor = true;
-            this.multiclassSvmAutoComplexityCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
-            // 
-            // multiclassSvmComplexityTextBox
-            // 
-            this.multiclassSvmComplexityTextBox.Location = new System.Drawing.Point(4, 22);
-            this.multiclassSvmComplexityTextBox.Name = "multiclassSvmComplexityTextBox";
-            this.multiclassSvmComplexityTextBox.Size = new System.Drawing.Size(64, 20);
-            this.multiclassSvmComplexityTextBox.TabIndex = 1;
-            this.multiclassSvmComplexityTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.multiclassSvmComplexityTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multiclassSvmComplexityTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
-            // 
-            // multiclassSvmComplexityLabel
-            // 
-            this.multiclassSvmComplexityLabel.AutoSize = true;
-            this.multiclassSvmComplexityLabel.Location = new System.Drawing.Point(1, 6);
-            this.multiclassSvmComplexityLabel.Name = "multiclassSvmComplexityLabel";
-            this.multiclassSvmComplexityLabel.Size = new System.Drawing.Size(277, 13);
-            this.multiclassSvmComplexityLabel.TabIndex = 0;
-            this.multiclassSvmComplexityLabel.Text = "Complexity (Higher = higher variance/lower bias classifier)";
+            this.svmComplexityLabel.AutoSize = true;
+            this.svmComplexityLabel.Location = new System.Drawing.Point(4, 6);
+            this.svmComplexityLabel.Name = "svmComplexityLabel";
+            this.svmComplexityLabel.Size = new System.Drawing.Size(277, 13);
+            this.svmComplexityLabel.TabIndex = 0;
+            this.svmComplexityLabel.Text = "Complexity (Higher = higher variance/lower bias classifier)";
             // 
             // machineTypeLabel
             // 
@@ -1321,7 +1503,7 @@
             // 
             // numberOfCandidateNetwordsTextBox
             // 
-            this.numberOfCandidateNetwordsTextBox.Location = new System.Drawing.Point(4, 175);
+            this.numberOfCandidateNetwordsTextBox.Location = new System.Drawing.Point(8, 175);
             this.numberOfCandidateNetwordsTextBox.Name = "numberOfCandidateNetwordsTextBox";
             this.numberOfCandidateNetwordsTextBox.Size = new System.Drawing.Size(32, 20);
             this.numberOfCandidateNetwordsTextBox.TabIndex = 8;
@@ -1332,7 +1514,7 @@
             // numberOfCandidateNetworksLabel
             // 
             this.numberOfCandidateNetworksLabel.AutoSize = true;
-            this.numberOfCandidateNetworksLabel.Location = new System.Drawing.Point(1, 159);
+            this.numberOfCandidateNetworksLabel.Location = new System.Drawing.Point(5, 159);
             this.numberOfCandidateNetworksLabel.Name = "numberOfCandidateNetworksLabel";
             this.numberOfCandidateNetworksLabel.Size = new System.Drawing.Size(189, 13);
             this.numberOfCandidateNetworksLabel.TabIndex = 7;
@@ -1343,7 +1525,7 @@
             this.useCrossValidationSetsCheckBox.AutoSize = true;
             this.useCrossValidationSetsCheckBox.Checked = true;
             this.useCrossValidationSetsCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.useCrossValidationSetsCheckBox.Location = new System.Drawing.Point(4, 136);
+            this.useCrossValidationSetsCheckBox.Location = new System.Drawing.Point(8, 136);
             this.useCrossValidationSetsCheckBox.Name = "useCrossValidationSetsCheckBox";
             this.useCrossValidationSetsCheckBox.Size = new System.Drawing.Size(476, 17);
             this.useCrossValidationSetsCheckBox.TabIndex = 6;
@@ -1354,7 +1536,7 @@
             // 
             // maximumTrainingIterationsTextBox
             // 
-            this.maximumTrainingIterationsTextBox.Location = new System.Drawing.Point(4, 106);
+            this.maximumTrainingIterationsTextBox.Location = new System.Drawing.Point(8, 106);
             this.maximumTrainingIterationsTextBox.Name = "maximumTrainingIterationsTextBox";
             this.maximumTrainingIterationsTextBox.Size = new System.Drawing.Size(32, 20);
             this.maximumTrainingIterationsTextBox.TabIndex = 5;
@@ -1365,7 +1547,7 @@
             // maximumTrainingIterationsLabel
             // 
             this.maximumTrainingIterationsLabel.AutoSize = true;
-            this.maximumTrainingIterationsLabel.Location = new System.Drawing.Point(1, 90);
+            this.maximumTrainingIterationsLabel.Location = new System.Drawing.Point(5, 90);
             this.maximumTrainingIterationsLabel.Name = "maximumTrainingIterationsLabel";
             this.maximumTrainingIterationsLabel.Size = new System.Drawing.Size(133, 13);
             this.maximumTrainingIterationsLabel.TabIndex = 4;
@@ -1373,7 +1555,7 @@
             // 
             // sigmoidAlphaTextBox
             // 
-            this.sigmoidAlphaTextBox.Location = new System.Drawing.Point(4, 64);
+            this.sigmoidAlphaTextBox.Location = new System.Drawing.Point(8, 64);
             this.sigmoidAlphaTextBox.Name = "sigmoidAlphaTextBox";
             this.sigmoidAlphaTextBox.Size = new System.Drawing.Size(32, 20);
             this.sigmoidAlphaTextBox.TabIndex = 3;
@@ -1384,7 +1566,7 @@
             // sigmoidAlphaLabel
             // 
             this.sigmoidAlphaLabel.AutoSize = true;
-            this.sigmoidAlphaLabel.Location = new System.Drawing.Point(1, 48);
+            this.sigmoidAlphaLabel.Location = new System.Drawing.Point(5, 48);
             this.sigmoidAlphaLabel.Name = "sigmoidAlphaLabel";
             this.sigmoidAlphaLabel.Size = new System.Drawing.Size(249, 13);
             this.sigmoidAlphaLabel.TabIndex = 2;
@@ -1392,7 +1574,7 @@
             // 
             // sizeOfHiddenLayersTextBox
             // 
-            this.sizeOfHiddenLayersTextBox.Location = new System.Drawing.Point(4, 22);
+            this.sizeOfHiddenLayersTextBox.Location = new System.Drawing.Point(8, 22);
             this.sizeOfHiddenLayersTextBox.Name = "sizeOfHiddenLayersTextBox";
             this.sizeOfHiddenLayersTextBox.Size = new System.Drawing.Size(67, 20);
             this.sizeOfHiddenLayersTextBox.TabIndex = 1;
@@ -1403,7 +1585,7 @@
             // sizeOfHiddenLayersLabel
             // 
             this.sizeOfHiddenLayersLabel.AutoSize = true;
-            this.sizeOfHiddenLayersLabel.Location = new System.Drawing.Point(1, 6);
+            this.sizeOfHiddenLayersLabel.Location = new System.Drawing.Point(5, 6);
             this.sizeOfHiddenLayersLabel.Name = "sizeOfHiddenLayersLabel";
             this.sizeOfHiddenLayersLabel.Size = new System.Drawing.Size(327, 13);
             this.sizeOfHiddenLayersLabel.TabIndex = 0;
@@ -1422,7 +1604,7 @@
             // saveMachineAsButton
             // 
             this.saveMachineAsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveMachineAsButton.Location = new System.Drawing.Point(1297, 683);
+            this.saveMachineAsButton.Location = new System.Drawing.Point(1586, 683);
             this.saveMachineAsButton.Name = "saveMachineAsButton";
             this.saveMachineAsButton.Size = new System.Drawing.Size(60, 23);
             this.saveMachineAsButton.TabIndex = 5;
@@ -1449,7 +1631,7 @@
             // openMachineButton
             // 
             this.openMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.openMachineButton.Location = new System.Drawing.Point(1165, 683);
+            this.openMachineButton.Location = new System.Drawing.Point(1454, 683);
             this.openMachineButton.Name = "openMachineButton";
             this.openMachineButton.Size = new System.Drawing.Size(60, 23);
             this.openMachineButton.TabIndex = 3;
@@ -1460,7 +1642,7 @@
             // saveMachineButton
             // 
             this.saveMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveMachineButton.Location = new System.Drawing.Point(1231, 683);
+            this.saveMachineButton.Location = new System.Drawing.Point(1520, 683);
             this.saveMachineButton.Name = "saveMachineButton";
             this.saveMachineButton.Size = new System.Drawing.Size(60, 23);
             this.saveMachineButton.TabIndex = 4;
@@ -1471,7 +1653,7 @@
             // newMachineButton
             // 
             this.newMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.newMachineButton.Location = new System.Drawing.Point(1099, 683);
+            this.newMachineButton.Location = new System.Drawing.Point(1388, 683);
             this.newMachineButton.Name = "newMachineButton";
             this.newMachineButton.Size = new System.Drawing.Size(60, 23);
             this.newMachineButton.TabIndex = 2;
@@ -1485,7 +1667,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1362, 733);
+            this.ClientSize = new System.Drawing.Size(1651, 733);
             this.Controls.Add(this.newMachineButton);
             this.Controls.Add(this.saveMachineButton);
             this.Controls.Add(this.configurationTabControl);
@@ -1523,8 +1705,10 @@
             this.machineConfigurationTabPage.PerformLayout();
             this.multilabelSvmPanel.ResumeLayout(false);
             this.multilabelSvmPanel.PerformLayout();
-            this.multiclassSvmPanel.ResumeLayout(false);
-            this.multiclassSvmPanel.PerformLayout();
+            this.svmPanel.ResumeLayout(false);
+            this.svmPanel.PerformLayout();
+            this.svmScoreTypeGroupBox.ResumeLayout(false);
+            this.svmScoreTypeGroupBox.PerformLayout();
             this.neuralNetPanel.ResumeLayout(false);
             this.neuralNetPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.configurationErrorProvider)).EndInit();
@@ -1586,18 +1770,13 @@
         private System.Windows.Forms.CheckBox specifiedPagesCheckBox;
         private System.Windows.Forms.Button computeFeaturesButton;
         private System.Windows.Forms.TabPage machineConfigurationTabPage;
-        private System.Windows.Forms.Panel multilabelSvmPanel;
+        private System.Windows.Forms.Panel svmPanel;
         private System.Windows.Forms.TextBox multilabelSvmUnknownCutoffTextBox;
         private System.Windows.Forms.CheckBox multilabelSvmUseUnknownCheckBox;
-        private System.Windows.Forms.CheckBox multilabelSvmUseClassProportionsCheckBox;
         private System.Windows.Forms.CheckBox multilabelSvmCalibrateForProbabilitiesCheckBox;
-        private System.Windows.Forms.CheckBox multilabelSvmAutoComplexityCheckBox;
-        private System.Windows.Forms.TextBox multilabelSvmComplexityTextBox;
-        private System.Windows.Forms.Label multilabelSvmComplexityLabel;
-        private System.Windows.Forms.Panel multiclassSvmPanel;
-        private System.Windows.Forms.CheckBox multiclassSvmAutoComplexityCheckBox;
-        private System.Windows.Forms.TextBox multiclassSvmComplexityTextBox;
-        private System.Windows.Forms.Label multiclassSvmComplexityLabel;
+        private System.Windows.Forms.CheckBox svmAutoComplexityCheckBox;
+        private System.Windows.Forms.TextBox svmComplexityTextBox;
+        private System.Windows.Forms.Label svmComplexityLabel;
         private System.Windows.Forms.Label machineTypeLabel;
         private System.Windows.Forms.Panel neuralNetPanel;
         private System.Windows.Forms.TextBox numberOfCandidateNetwordsTextBox;
@@ -1650,6 +1829,26 @@
         private System.Windows.Forms.ComboBox attributeFeatureFilterComboBox;
         private System.Windows.Forms.TextBox attributeFeatureFilterTextBox;
         private System.Windows.Forms.CheckBox useAttributeFeatureFilterCheckBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox documentCategorizationCsvNegativeClassNameTextBox;
+        private System.Windows.Forms.TextBox svmWeightRatioTextBox;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox svmCacheSizeTextBox;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TextBox attributeCategorizationNegativeClassNameTextBox;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox documentCategorizationFolderNegativeClassNameTextBox;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox paginationNegativeClassNameTextBox;
+        private System.Windows.Forms.RadioButton svmUseF1ScoreRadioButton;
+        private System.Windows.Forms.TextBox multilabelSvmTranslateUnknownTextBox;
+        private System.Windows.Forms.CheckBox multilabelSvmTranslateUnknownCheckbox;
+        private System.Windows.Forms.Panel multilabelSvmPanel;
+        private System.Windows.Forms.RadioButton svmUseRecallRadioButton;
+        private System.Windows.Forms.RadioButton svmUsePrecisionRadioButton;
+        private System.Windows.Forms.CheckBox svmConditionallyApplyWeightRatioCheckBox;
+        private System.Windows.Forms.GroupBox svmScoreTypeGroupBox;
     }
 }
 

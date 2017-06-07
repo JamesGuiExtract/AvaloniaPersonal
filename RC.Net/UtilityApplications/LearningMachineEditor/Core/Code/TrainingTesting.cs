@@ -328,7 +328,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                       .ToString()
                 });
 
-            Func<Action<StatusArgs>, CancellationToken, Tuple<AccuracyData, AccuracyData>> operation = null;
+            Func<Action<StatusArgs>, CancellationToken, ValueTuple<AccuracyData, AccuracyData>> operation = null;
             if (testOnly)
             {
                 operation = learningMachine.TestMachine;

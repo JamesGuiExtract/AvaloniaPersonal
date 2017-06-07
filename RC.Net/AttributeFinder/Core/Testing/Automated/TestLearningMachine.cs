@@ -380,11 +380,14 @@ namespace Extract.AttributeFinder.Test
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 0.87);
+            // Note: this number has fallen with the change to use a larger CV set size when picking the value of the Complexity parameter.
+            // (Was 20% and now is 50%.) This change was mostly motivated by a desire to increaset the speed of the algorithm but it also may
+            // lead to better results. In this case, it doesn't affect the testing set results, only the training set results, which don't really matter.
+            Assert.Greater(results.trainingSet.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 0.7);
 
             // Test results are between 70% and 80% when there are 'other' dates (neither DOB nor CollectionDate)
-            Assert.Greater(results.Item2.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 0.7);
-            Assert.Less(results.Item2.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 0.8);
+            Assert.Greater(results.testingSet.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 0.7);
+            Assert.Less(results.testingSet.Match(gcm => gcm.OverallAgreement, _ => Double.NaN), 0.8);
         }
 
         [Test, Category("LearningMachine")]

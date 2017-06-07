@@ -271,7 +271,7 @@ namespace Extract.AttributeFinder
 
         // Used for document categorization.
         // Used to represent categories that are in testing data but not in training data.
-        static readonly string _UNKNOWN_CATEGORY = "Unknown_CB588EBE-4861-40FF-A640-BEF6BB42A54A";
+        public static readonly string UnknownCategoryName = "Unknown_CB588EBE-4861-40FF-A640-BEF6BB42A54A";
 
         /// <summary>
         /// Code reserved to represent an 'other' category that will not be assigned to a real
@@ -286,7 +286,7 @@ namespace Extract.AttributeFinder
 
         // Private values used for pagination categories
         static readonly string _FIRST_PAGE_CATEGORY = "FirstPage";
-        static readonly string _NOT_FIRST_PAGE_CATEGORY = "NotFirstPage";
+        public static readonly string NotFirstPageCategory = "NotFirstPage";
         static readonly int _NOT_FIRST_PAGE_CATEGORY_CODE = 0;
 
         /// <summary>
@@ -338,6 +338,9 @@ namespace Extract.AttributeFinder
 
         [OptionalField(VersionAdded = 2)]
         private int _attributeVectorizerMaxFeatures;
+
+        [OptionalField(VersionAdded = 2)]
+        private string _negativeClassName;
 
         #endregion Fields
 
@@ -554,6 +557,22 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// The name to use for the negative/unknown class (e.g., the document type assigned when a testing a classifier
+        /// against a new set of data and the expected document type is not one that is recognized by the classifier)
+        /// </summary>
+        public string NegativeClassName
+        {
+            get
+            {
+                return _negativeClassName;
+            }
+            set
+            {
+                _negativeClassName = value ?? "";
+            }
+        }
+
         #endregion Properties
 
         #region Constructors
@@ -575,9 +594,10 @@ namespace Extract.AttributeFinder
         /// <param name="attributeVectorizerMaxFeatures">The max number of terms retained for each attribute vectorizer.</param>
         /// <param name="attributesToTokenize">A query used to select a subset of attributes to be tokenized and converted into shingles.</param>
         /// <param name="attributeVectorizerShingleSize">The maximum size of word-n-grams to be derived from attribute vectorizer tokens.</param>
+        /// <param name="negativeClassName">The name to designate as the negative class (use <c>null</c> for default according to <see paramref="usage"/>)</param>
         public LearningMachineDataEncoder(LearningMachineUsage usage, SpatialStringFeatureVectorizer autoBagOfWords = null,
             string attributeFilter = null, bool negateFilter = false, int attributeVectorizerMaxFeatures = 500,
-            string attributesToTokenize = null, int attributeVectorizerShingleSize = 1)
+            string attributesToTokenize = null, int attributeVectorizerShingleSize = 1, string negativeClassName = null)
         {
             MachineUsage = usage;
             AutoBagOfWords = autoBagOfWords;
@@ -589,6 +609,12 @@ namespace Extract.AttributeFinder
             AttributeVectorizerMaxFeatures = attributeVectorizerMaxFeatures;
             AttributesToTokenizeFilter = attributesToTokenize;
             AttributeVectorizerShingleSize = attributeVectorizerShingleSize;
+            NegativeClassName = negativeClassName ??
+                (MachineUsage == LearningMachineUsage.AttributeCategorization
+                    ? ""
+                    : MachineUsage == LearningMachineUsage.Pagination
+                        ? NotFirstPageCategory
+                        : UnknownCategoryName);
         }
 
         #endregion Constructors
@@ -628,7 +654,7 @@ namespace Extract.AttributeFinder
                         return new {startPage, endPage, hasEndPage};
                     });
 
-                var documentBreaks = Enumerable.Repeat(_NOT_FIRST_PAGE_CATEGORY, numberOfPages - 1).ToArray();
+                var documentBreaks = Enumerable.Repeat(NotFirstPageCategory, numberOfPages - 1).ToArray();
                 foreach(var pageRange in pageRanges)
                 {
                     if (pageRange.startPage > 1)
@@ -940,6 +966,7 @@ namespace Extract.AttributeFinder
                     || other.AttributeVectorizerMaxFeatures != AttributeVectorizerMaxFeatures
                     || other.AttributesToTokenizeFilter != AttributesToTokenizeFilter
                     || other.AttributeVectorizerShingleSize != AttributeVectorizerShingleSize
+                    || other.NegativeClassName != NegativeClassName
                     || other.AreEncodingsComputed && AreEncodingsComputed &&
                         (  !other.AttributeFeatureVectorizers.SequenceEqual(AttributeFeatureVectorizers)
                         || other.AutoBagOfWords != null && !other.AutoBagOfWords.Equals(AutoBagOfWords)
@@ -1041,6 +1068,7 @@ namespace Extract.AttributeFinder
                 {
                     writer.WriteLine("FeatureVectorLength: {0:N0}", FeatureVectorLength);
                 }
+                writer.WriteLine("NegativeClassName: {0}", NegativeClassName);
                 writer.Indent = oldIndent;
             }
             catch (Exception e)
@@ -1326,7 +1354,7 @@ namespace Extract.AttributeFinder
                 // Initialize answer code mappings if updating answers (true if training the classifier)
                 if (updateAnswerCodes)
                 {
-                    InitializeAnswerCodeMappings(answers);
+                    InitializeAnswerCodeMappings(answers, NegativeClassName);
                 }
 
                 double[][] featureVectors = new double[ussFilePaths.Length][];
@@ -1403,7 +1431,7 @@ namespace Extract.AttributeFinder
             AnswerNameToCode.Clear();
 
             // Add the negative category or an 'other' category
-            string otherCategory = negativeCategory ?? _UNKNOWN_CATEGORY;
+            string otherCategory = negativeCategory ?? UnknownCategoryName;
 
             AnswerCodeToName.Add(UnknownOrNegativeCategoryCode, otherCategory);
             AnswerNameToCode.Add(otherCategory, UnknownOrNegativeCategoryCode);
@@ -1680,7 +1708,7 @@ namespace Extract.AttributeFinder
             AttributeFeatureVectorizers = vectorizerMap.Values;
 
             // Add category names and codes
-            InitializeAnswerCodeMappings(answers);
+            InitializeAnswerCodeMappings(answers, NegativeClassName);
         }
 
         /// <summary>
@@ -1753,8 +1781,8 @@ namespace Extract.AttributeFinder
             AttributeFeatureVectorizers = vectorizerMap.Values;
 
             // Add category names and codes
-            AnswerCodeToName.Add(_NOT_FIRST_PAGE_CATEGORY_CODE, _NOT_FIRST_PAGE_CATEGORY);
-            AnswerNameToCode.Add(_NOT_FIRST_PAGE_CATEGORY, _NOT_FIRST_PAGE_CATEGORY_CODE);
+            AnswerCodeToName.Add(_NOT_FIRST_PAGE_CATEGORY_CODE, NotFirstPageCategory);
+            AnswerNameToCode.Add(NotFirstPageCategory, _NOT_FIRST_PAGE_CATEGORY_CODE);
             AnswerCodeToName.Add(FirstPageCategoryCode, _FIRST_PAGE_CATEGORY);
             AnswerNameToCode.Add(_FIRST_PAGE_CATEGORY, FirstPageCategoryCode);
         }
@@ -1801,7 +1829,7 @@ namespace Extract.AttributeFinder
                         updateStatus(new StatusArgs { StatusMessage = "Files processed: {0:N0}", Int32Value = 1, Indent = 1 });
                         return labels;
                     })
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .Distinct(StringComparer.OrdinalIgnoreCase) // https://extract.atlassian.net/browse/ISSUE-14761
                     .ToList();
             }
 
@@ -1841,7 +1869,7 @@ namespace Extract.AttributeFinder
             AttributeFeatureVectorizers = vectorizerMap.Values;
 
             // Add category names and codes
-            InitializeAnswerCodeMappings(answers, negativeCategory:String.Empty);
+            InitializeAnswerCodeMappings(answers, NegativeClassName);
         }
 
         /// <summary>
@@ -1904,7 +1932,8 @@ namespace Extract.AttributeFinder
             }
 
             var matching = _afUtility.Value.QueryAttributes(protoFeatures, AttributeFilter, false)
-                    .ToIEnumerable<ComAttribute>();
+                    .ToIEnumerable<ComAttribute>()
+                    .Distinct();
 
             // If negating filter, clone the vector and remove matching
             if (NegateFilter)
@@ -1962,6 +1991,12 @@ namespace Extract.AttributeFinder
             _attributeVectorizerMaxFeatures = Int32.MaxValue;
             _attributesToTokenizeFilter = null;
             _attributeVectorizerShingleSize = 1;
+            _negativeClassName =
+                MachineUsage == LearningMachineUsage.AttributeCategorization
+                    ? ""
+                    : MachineUsage == LearningMachineUsage.Pagination
+                        ? NotFirstPageCategory
+                        : UnknownCategoryName;
         }
 
         /// <summary>

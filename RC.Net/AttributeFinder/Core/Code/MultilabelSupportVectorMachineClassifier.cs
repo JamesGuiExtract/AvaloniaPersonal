@@ -1,10 +1,13 @@
 ﻿using Accord.MachineLearning.VectorMachines;
 using Accord.MachineLearning.VectorMachines.Learning;
 using Accord.Math;
+using Accord.Statistics.Kernels;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Extract.AttributeFinder
 {
@@ -18,7 +21,16 @@ namespace Extract.AttributeFinder
     [Obfuscation(Feature = "renaming", Exclude = true)]
     public class MultilabelSupportVectorMachineClassifier : SupportVectorMachineClassifier, IDisposable
     {
+        #region Constants
+
+        const int _CURRENT_VERSION = 2;
+
+        #endregion Constants
+
         #region Fields
+
+        [OptionalField(VersionAdded = 2)]
+        private int _version = _CURRENT_VERSION;
 
         // Backing fields for properties
         private bool _calibrateMachineToProduceProbabilities;
@@ -47,9 +59,10 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Whether to give different weight to errors for some classes based on number of
-        /// examples of each class (so that minority classes are not ignored)
+        /// This was used as a parameter to the SMO training algorithm but it is no longer used.
+        /// The value of this parameter would not affect run-time behavior of a classifier
         /// </summary>
+        [Obsolete("This feature has been deprecated. Use explicit WeightRatio property instead.")]
         public bool UseClassProportionsForComplexityWeights
         {
             get
@@ -75,7 +88,6 @@ namespace Extract.AttributeFinder
         public MultilabelSupportVectorMachineClassifier() : base()
         {
             CalibrateMachineToProduceProbabilities = false;
-            UseClassProportionsForComplexityWeights = true;
         }
 
         #endregion Constructors
@@ -88,25 +100,47 @@ namespace Extract.AttributeFinder
         /// <param name="inputs">Array of feature vectors</param>
         /// <param name="outputs">Array of classes (category codes) for each input</param>
         /// <param name="complexity">Complexity value to use for training</param>
+        /// <param name="choosingComplexity">Whether this method is being called as part of figuring out what Complexity parameter is the best
+        /// (and thus no need to calibrate the machine for probabilities, e.g.)</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        protected override void TrainClassifier(double[][] inputs, int[] outputs, double complexity,
+        protected override void TrainClassifier(double[][] inputs, int[] outputs, double complexity, bool choosingComplexity,
             Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             // Build classifier
-            var kernel = new Accord.Statistics.Kernels.Linear();
+            IKernel kernel = new Linear();
             var classifier = new MultilabelSupportVectorMachine(FeatureVectorLength, kernel, NumberOfClasses);
 
             // Train classifier
-            var teacher = new MultilabelSupportVectorLearning(classifier, inputs, outputs);
-            teacher.Algorithm = (svm, classInputs, classOutputs, i, j) =>
+            var teacher = new MultilabelSupportVectorLearning(classifier, inputs, outputs)
+            {
+                Algorithm = (svm, classInputs, classOutputs, positiveClassIndex, _) =>
                 {
-                    var f = new SequentialMinimalOptimization(svm, classInputs, classOutputs);
-                    f.Complexity = complexity;
-                    f.UseClassProportions = UseClassProportionsForComplexityWeights;
-                    return f;
-                };
+                    var f = new SequentialMinimalOptimization(svm, classInputs, classOutputs)
+                    {
+                        Complexity = complexity,
+                        Compact = (kernel is Linear) && CreateCompactMachine
+                    };
 
+                    // Only set WeightRatio if there is a specifed weight ratio that should always be applied,
+                    // or one that should be conditionally applied and it is true that the positive class of this
+                    // machine is the designated overall negative class. (e.g., LearningMachineDataEncoder._NOT_FIRST_PAGE_CATEGORY_CODE)
+                    // NOTE: The positive class is compared because the function is only passed a valid
+                    // positive class index (the negative class index param is just the positive index with the sign changed)
+                    if (PositiveToNegativeWeightRatio.HasValue
+                        && (!ConditionallyApplyWeightRatio || positiveClassIndex == 0))
+                    {
+                        f.WeightRatio = PositiveToNegativeWeightRatio.Value;
+                    }
+
+                    if (TrainingAlgorithmCacheSize.HasValue)
+                    {
+                        f.CacheSize = TrainingAlgorithmCacheSize.Value;
+                    }
+
+                    return f;
+                }
+            };
             teacher.SubproblemFinished +=
                 delegate
                 {
@@ -118,17 +152,17 @@ namespace Extract.AttributeFinder
             updateStatus(new StatusArgs { StatusMessage = "Training error: {0:N4}", DoubleValues = new[] { error } });
 
             double likelihood = 0;
-            if (CalibrateMachineToProduceProbabilities)
+            if (!choosingComplexity && CalibrateMachineToProduceProbabilities)
             {
                 updateStatus(new StatusArgs { StatusMessage = "Calibrating..." });
-                for (int i = 0; i < classifier.Machines.Length; i++)
+                Parallel.For(0, classifier.Machines.Length, i =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     var machine = classifier.Machines[i];
                     var outputsForMachine = outputs.Apply(y => y == i ? 1 : -1);
                     var calibration = new ProbabilisticOutputCalibration(machine, inputs, outputsForMachine);
                     likelihood += calibration.Run() / inputs.Length;
-                }
+                });
                 updateStatus(new StatusArgs { StatusMessage = "Calibrated. Average log-likelihood: {0:N4}",
                     DoubleValues = new[] { likelihood / classifier.Machines.Length },
                     ReplaceLastStatus = true });
@@ -143,7 +177,7 @@ namespace Extract.AttributeFinder
         /// was <see langword="true"/> when this instance was trained</remarks>
         /// <param name="inputs">The feature vector</param>
         /// <returns>The answer code and score</returns>
-        public override Tuple<int, double?> ComputeAnswer(double[] inputs)
+        public override (int answerCode, double? score) ComputeAnswer(double[] inputs)
         {
             try
             {
@@ -154,18 +188,16 @@ namespace Extract.AttributeFinder
                 // Scale inputs
                 inputs = inputs.Subtract(FeatureMean).ElementwiseDivide(FeatureScaleFactor);
 
-                double[] responses;
-                classifier.Compute(inputs, out responses);
+                classifier.Compute(inputs, out double[] responses);
 
-                int imax;
-                double? max = responses.Max(out imax);
+                double? max = responses.Max(out int imax);
 
                 // Only return score if classifier is probabilistic
                 if (!classifier.IsProbabilistic)
                 {
                     max = null;
                 }
-                return Tuple.Create(imax, max);
+                return (imax, max);
             }
             catch (Exception e)
             {
@@ -191,7 +223,7 @@ namespace Extract.AttributeFinder
                 if (other == null
                     || !base.IsConfigurationEqualTo(other)
                     || other.CalibrateMachineToProduceProbabilities != CalibrateMachineToProduceProbabilities
-                    || other.UseClassProportionsForComplexityWeights != UseClassProportionsForComplexityWeights)
+                   )
                 {
                     return false;
                 }
@@ -216,7 +248,6 @@ namespace Extract.AttributeFinder
                 var oldIndent = writer.Indent;
                 writer.Indent++;
                 writer.WriteLine("CalibrateMachineToProduceProbabilities: {0}", CalibrateMachineToProduceProbabilities);
-                writer.WriteLine("UseClassProportionsForComplexityWeights: {0}", UseClassProportionsForComplexityWeights);
                 writer.Indent = oldIndent;
             }
             catch (Exception e)
@@ -255,5 +286,41 @@ namespace Extract.AttributeFinder
         }
 
         #endregion IDisposable Members
+
+        #region Private Methods
+
+        /// <summary>
+        /// Called when deserializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+            // Set non-serialized fields
+
+            // Set optional fields
+            _version = 1; // _version added with version 2
+        }
+
+        /// <summary>
+        /// Called when deserialized
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            ExtractException.Assert("ELI43530", "Cannot load newer MultilabelSupportVectorMachineClassifier",
+                _version <= _CURRENT_VERSION,
+                "Current version", _CURRENT_VERSION,
+                "Version to load", _version);
+
+            // Set obsolete fields
+            _useClassProportionsForComplexityWeights = false;
+
+            _version = _CURRENT_VERSION;
+        }
+
+        #endregion Private Methods
+
     }
 }

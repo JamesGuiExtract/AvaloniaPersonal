@@ -382,15 +382,13 @@ namespace Extract.AttributeFinder.Test
             {
                 AutomaticallyChooseComplexityValue = false,
                 Complexity = 1.0,
-                CalibrateMachineToProduceProbabilities = true,
-                UseClassProportionsForComplexityWeights = true
+                CalibrateMachineToProduceProbabilities = true
             };
             var classifier2 = new MultilabelSupportVectorMachineClassifier
             {
                 AutomaticallyChooseComplexityValue = false,
                 Complexity = 1.0,
-                CalibrateMachineToProduceProbabilities = true,
-                UseClassProportionsForComplexityWeights = true
+                CalibrateMachineToProduceProbabilities = true
             };
 
             Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
@@ -415,13 +413,6 @@ namespace Extract.AttributeFinder.Test
 
             // Set back to the same
             classifier2.CalibrateMachineToProduceProbabilities = true;
-            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
-
-            classifier2.UseClassProportionsForComplexityWeights = false;
-            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
-
-            // Set back to the same
-            classifier2.UseClassProportionsForComplexityWeights = true;
             Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
 
             // Training one classifier should not affect configuration equality

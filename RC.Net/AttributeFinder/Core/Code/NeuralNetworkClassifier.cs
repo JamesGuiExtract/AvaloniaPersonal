@@ -362,7 +362,7 @@ namespace Extract.AttributeFinder
         /// <remarks>Answer score will always be null</remarks>
         /// <param name="inputs">The feature vector</param>
         /// <returns>The answer code and score</returns>
-        public Tuple<int, double?> ComputeAnswer(double[] inputs)
+        public (int answerCode, double? score) ComputeAnswer(double[] inputs)
         {
             try
             {
@@ -374,10 +374,9 @@ namespace Extract.AttributeFinder
                 double[] responses = _classifier.Compute(inputs);
 
                 // Return index of highest value neuron in the output layer
-                int imax;
-                responses.Max(out imax);
+                responses.Max(out int imax);
 
-                return Tuple.Create<int, double?>(imax, null);
+                return (imax, null);
             }
             catch (Exception e)
             {

@@ -38,7 +38,7 @@ namespace Extract.DataEntry.Test
 
         static void CheckResult(string expected, string converted)
         {
-            Assert.That(expected == converted);
+            Assert.AreEqual(expected, converted);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Extract.DataEntry.Test
             CheckResult(expected: "02/14/2004", converted: Util.FormatDate("2/14/2004"));
 
             // single digit month and day, 2 digit year
-            CheckResult(expected: "02/04/1917", converted: Util.FormatDate("2/4/17"));
+            CheckResult(expected: "02/04/1918", converted: Util.FormatDate("2/4/18"));
 
             CheckResult(expected: "12/15/1958", converted: Util.FormatDate("12/15/58"));
             CheckResult(expected: "02/01/2012", converted: Util.FormatDate("2/1/2012"));
