@@ -426,14 +426,15 @@ static const string gstrCREATE_WORKFLOWCHANGE =
 	"	CONSTRAINT [PK_WorkflowChange] PRIMARY KEY CLUSTERED([ID] ASC)); ";
 
 static const string gstrCREATE_WORKFLOWCHANGEFILE =
-	"CREATE TABLE [dbo].[WorkflowChangeFile]( "
+"CREATE TABLE [dbo].[WorkflowChangeFile]( "
+	"   [ID]			   INT IDENTITY(1, 1) NOT NULL,"
 	"	[FileID]           INT NOT NULL, "
 	"	[WorkflowChangeID] INT NOT NULL, "
-	"	[SourceActionID]   INT NOT NULL, "
-	"	[DestActionID]     INT NOT NULL, "
+	"	[SourceActionID]   INT NULL, "
+	"	[DestActionID]     INT NULL, "
 	"	[SourceWorkflowID] INT NULL, "
 	"	[DestWorkflowID]   INT NOT NULL, "
-	"	CONSTRAINT [PK_WorkflowChangeFile] PRIMARY KEY CLUSTERED([FileID] ASC, [WorkflowChangeID] ASC, [SourceActionID] ASC));";
+	"	CONSTRAINT [PK_WorkflowChangeFile] PRIMARY KEY CLUSTERED([ID] ASC));";
 
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
@@ -532,6 +533,10 @@ static const string gstrCREATE_PAGINATION_ORIGINALFILE_INDEX =
 static const string gstrCREATE_PAGINATION_FILETASKSESSION_INDEX = 
 	"CREATE NONCLUSTERED INDEX [IX_Pagination_FileTaskSession] ON "
 	"	[dbo].[Pagination] ([FileTaskSessionID])";
+
+static const string gstrCREATE_WORKFLOWCHANGEFILE_INDEX =
+"CREATE UNIQUE NONCLUSTERED INDEX [IX_WorkflowChangeFileUnique] "
+	"ON [dbo].[WorkflowChangeFile] ([FileID] ASC, [WorkflowChangeID] ASC, [SourceActionID] ASC)";
 
 // Add foreign keys SQL
 static const string gstrADD_ACTION_WORKFLOW_FK =

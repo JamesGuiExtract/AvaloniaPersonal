@@ -1150,9 +1150,10 @@ void CFAMDBAdminDlg::enableMenus()
 
 	// Enable all of the menus
 	pMenu->EnableMenuItem(ID_DATABASE_CLEAR, nEnable);
-	pMenu->EnableMenuItem(ID_DATABASE_LOGOUT, nEnable);
+	pMenu->EnableMenuItem(ID_DATABASE_LOGOUT, nEnable); 
 
 	// Only enable other menu items if the db connection is good
+	pMenu->EnableMenuItem(ID_DATABASE_CLEAR, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_DATABASE_RESETLOCK, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_DATABASE_UPDATE_SCHEMA, m_bDBSchemaIsNotCurrent ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_DATABASE_CHANGEPASSWORD, m_bIsDBGood ? nEnable : nDisable);
@@ -1169,6 +1170,8 @@ void CFAMDBAdminDlg::enableMenus()
 	pMenu->EnableMenuItem(ID_TOOLS_EXPORTFILELISTS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_INSPECT_FILES, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_REPORTS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_TOOLS_RECALCULATE_STATS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_TOOLS_MOVE_FILES_TO_WORKFLOW, m_bIsDBGood ? nEnable : nDisable);
 }
 //-------------------------------------------------------------------------------------------------
 bool CFAMDBAdminDlg::notifyNoActions()

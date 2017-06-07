@@ -143,6 +143,11 @@ BOOL CFAMDBAdminApp::InitInstance()
 						// Exit the App
 						return FALSE;
 					}
+					
+					// Create a new FAMDB pointer so that there are not settings carried over from previous open
+					ipFAMDB = __nullptr;
+					ipFAMDB.CreateInstance(strProgID.c_str());
+					ASSERT_RESOURCE_ALLOCATION("ELI43479", ipFAMDB != __nullptr);
 				}
 				else if (!asCppBool(bLoginCanceled))
 				{
@@ -164,6 +169,11 @@ BOOL CFAMDBAdminApp::InitInstance()
 				// Exit the App
 				return FALSE;
 			}
+
+			// Create a new FAMDB pointer so that there are not settings carried over from previous open
+			ipFAMDB = __nullptr;
+			ipFAMDB.CreateInstance(strProgID.c_str());
+			ASSERT_RESOURCE_ALLOCATION("ELI43478", ipFAMDB != __nullptr);
 
 			// If CFAMDBAdminDlg's result was IDOK, the user has chosen to logout without closing;
 			// the login prompt should be re-displayed.

@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 151;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 152;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1739,15 +1739,15 @@ int UpdateToSchemaVersion148(_ConnectionPtr ipConnection,
 		vector<string> vecQueries;
 
 		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGE);
-		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE);
+		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE_V148);
 
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGE_WORKFLOW_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK);
-		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_ACTIONSOURCE_FK_148);
-		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_ACTIONDESTINATION_FK_148);
-		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWDEST_FK_148);
-		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWSOURCE_FK_148);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_ACTIONSOURCE_FK_V148);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_ACTIONDESTINATION_FK_V148);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWDEST_FK_V148);
+		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWSOURCE_FK_V148);
 
 		// Need to update the FileTaskSession to include the ActionID
 		vecQueries.push_back("ALTER TABLE dbo.[FileTaskSession] ADD [ActionID] int;");
@@ -1851,6 +1851,37 @@ int UpdateToSchemaVersion151(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43448");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion152(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 152;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE dbo.[WorkflowChangeFile] DROP CONSTRAINT [PK_WorkflowChangeFile]");
+		vecQueries.push_back("ALTER TABLE dbo.[WorkflowChangeFile] ADD [ID] INT IDENTITY(1,1) NOT NULL"); 
+		vecQueries.push_back("ALTER TABLE dbo.[WorkflowChangeFile] ADD CONSTRAINT [PK_WorkflowChangeFile] PRIMARY KEY(ID)");
+		vecQueries.push_back("ALTER TABLE dbo.[WorkflowChangeFile] ALTER COLUMN [SourceActionID] INT NULL");
+		vecQueries.push_back("ALTER TABLE dbo.[WorkflowChangeFile] ALTER COLUMN [DestActionID] INT NULL");
+		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE_INDEX);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43476");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6802,7 +6833,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 148:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion149);
 				case 149:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion150);
 				case 150:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion151);
-				case 151:	break;
+				case 151:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion152);
+				case 152:	break;
 
 				default:
 					{
@@ -10632,36 +10664,41 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 			executeCmdQuery(ipConnection, strWorkflowChangeQuery, false, &nWorkflowChangeID);
 
 			string strSourceWorkflowSelection;
+			string strWorkflowFileSelection = "";
 			switch (nSourceWorkflowID)
 			{
 			case -1: // No workflow
 				strSourceWorkflowSelection = "SA.WorkflowID IS NULL ";
+				strWorkflowFileSelection = "WHERE WF.WorkflowID IS NULL";
 				break;
 			case 0: // All workflows
 				strSourceWorkflowSelection = 
 					Util::Format("SA.WorkflowID IS NOT NULL AND SA.WorkflowID <> %li", nDestWorkflowID);
+				strWorkflowFileSelection = "WHERE WF.WorkflowID IS NOT NULL";
 				break;
 			default:
 				strSourceWorkflowSelection = Util::Format("SA.WorkflowID = %li", nSourceWorkflowID);
+				strWorkflowFileSelection = Util::Format("WHERE WF.WorkflowID = %li", nSourceWorkflowID);
 			}
 
 			string strDestWorkflowSelection = Util::Format("DA.WorkflowID = %li", nDestWorkflowID);
 
 			string strSelectionFrom = Util::Format(
 				"FROM #SelectedFilesToMove AS SQ \r\n"
-				"INNER JOIN FileActionStatus AS FAS ON SQ.ID = FAS.FileID \r\n"
-				"INNER JOIN [Action] AS SA ON FAS.ActionID = SA.ID AND %s \r\n"
-				"LEFT JOIN [Action] AS DA ON SA.ASCName = DA.ASCName AND %s \r\n",
-				strSourceWorkflowSelection.c_str(), strDestWorkflowSelection.c_str());
+				"LEFT JOIN FileActionStatus AS FAS ON SQ.ID = FAS.FileID \r\n"
+				"LEFT JOIN [Action] AS SA ON FAS.ActionID = SA.ID AND %s \r\n"
+				"LEFT JOIN [Action] AS DA ON SA.ASCName = DA.ASCName AND %s \r\n"
+				"LEFT JOIN [WorkflowFile] AS WF ON WF.FileID = SQ.ID %s \r\n",
+				strSourceWorkflowSelection.c_str(), strDestWorkflowSelection.c_str(), strWorkflowFileSelection.c_str());
 
 			verifyDestinationActions(ipConnection, strSelectionFrom);
 
 			string strSelectedFilesWithSourceAndDest = Util::Format(
 				"SELECT DISTINCT \r\n"
 				"	SQ.ID as FileID, %li as WorkflowChangeID, SA.ID AS SourceActionID, DA.ID AS DestActionID, \r\n"
-				"	SA.WorkflowID AS SourceWorkflowID, DA.WorkflowID AS DestWorkflowID \r\n"
+				"	SA.WorkflowID AS SourceWorkflowID, %li AS DestWorkflowID \r\n"
 				"%s",
-				nWorkflowChangeID, strSelectionFrom.c_str());
+				nWorkflowChangeID, nDestWorkflowID, strSelectionFrom.c_str());
 
 			// Add files to the workflowChangeFile table
 			string strWorkflowChangeFile = Util::Format(

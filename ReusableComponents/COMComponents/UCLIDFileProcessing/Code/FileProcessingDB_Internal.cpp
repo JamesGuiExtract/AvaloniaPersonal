@@ -1641,6 +1641,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK);
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_ACTION_FK);
+		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE_INDEX);
 
 		if (bAddUserTables)
 		{
@@ -7130,7 +7131,7 @@ void CFileProcessingDB::verifyDestinationActions(ADODB::_ConnectionPtr &ipConnec
 	string strMissingActions = Util::Format(
 		"SELECT DISTINCT SA.ASCName as MissingAction \r\n"
 		"%s "
-		"WHERE DA.ID IS NULL",
+		" AND DA.ID IS NULL AND SA.ID IS NOT NULL",
 		strSelectionFrom.c_str());
 
 	// Check if there are Actions missing in the dest

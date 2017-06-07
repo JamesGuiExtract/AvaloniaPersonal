@@ -496,6 +496,7 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
+        /// <summary>
         /// Tests Move files to different workflow
         /// </summary>
         [Test, Category("Automated")]
@@ -543,28 +544,7 @@ namespace Extract.FileActionManager.Database.Test
                 int actionA_Workflow1_ID = fileProcessingDb.GetActionID(_ACTION_A);
                 int actionB_Workflow1_ID = fileProcessingDb.GetActionID(_ACTION_B);
 
-                Func<ActionStatistics, ActionStatistics, bool> StatsAreEqual = (s1, s2) =>
-                {
-                    bool retValue = true;
-                    retValue = retValue && s1.NumBytes == s2.NumBytes;
-                    retValue = retValue && s1.NumBytesComplete == s2.NumBytesComplete;
-                    retValue = retValue && s1.NumBytesFailed == s2.NumBytesFailed;
-                    retValue = retValue && s1.NumBytesPending == s2.NumBytesPending;
-                    retValue = retValue && s1.NumBytesSkipped == s2.NumBytesSkipped;
-                    retValue = retValue && s1.NumDocuments == s2.NumDocuments;
-                    retValue = retValue && s1.NumDocumentsComplete == s2.NumDocumentsComplete;
-                    retValue = retValue && s1.NumDocumentsFailed == s2.NumDocumentsFailed;
-                    retValue = retValue && s1.NumDocumentsPending == s2.NumDocumentsPending;
-                    retValue = retValue && s1.NumDocumentsSkipped == s2.NumDocumentsSkipped;
-                    retValue = retValue && s1.NumPages == s2.NumPages;
-                    retValue = retValue && s1.NumPagesComplete == s2.NumPagesComplete;
-                    retValue = retValue && s1.NumPagesFailed == s2.NumPagesFailed;
-                    retValue = retValue && s1.NumPagesPending == s2.NumPagesPending;
-                    retValue = retValue && s1.NumPagesSkipped == s2.NumPagesSkipped;
-
-                    return retValue;
-                };
-
+ 
                 ActionStatistics blankAS = new ActionStatistics();
 
                 var afterMoveOriginalActionA = fileProcessingDb.GetStats(actionA_NoWorkflow_ID, false);
@@ -716,6 +696,151 @@ namespace Extract.FileActionManager.Database.Test
                 _testDbManager.RemoveDatabase(testDbName);
             }
         }
+
+        /// <summary>
+        /// Tests Move files to different workflow
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void MoveWorkflow_UnattemptedAndWithaction()
+        {
+            string testDbName = "Test_MoveWorkflow_UnattemptedAndWithaction";
+            IFileProcessingDB fileProcessingDb = CreateTestDatabase(testDbName);
+            try
+            {
+                string testfileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
+                string testfileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
+
+                bool alreadyExists = false;
+                EActionStatus previousStatus;
+
+                // 1 file on action and one file unattempted
+                var fileRecord1 = fileProcessingDb.AddFile(testfileName1, _ACTION_A, -1, EFilePriority.kPriorityNormal,
+                    false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+                var fileRecord2 = fileProcessingDb.AddFile(testfileName2, _ACTION_A, -1, EFilePriority.kPriorityNormal,
+                    false, false, EActionStatus.kActionUnattempted, false, out alreadyExists, out previousStatus);
+                var workflow1ID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined, _ACTION_A);
+                var workflow2ID = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined, _ACTION_A);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                var actionA_Workflow1_ID = fileProcessingDb.GetActionID(_ACTION_A);
+
+                //var statsW1_1 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                var actionA_Workflow2_ID = fileProcessingDb.GetActionID(_ACTION_A);
+
+                var statsW2_1 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
+
+                fileProcessingDb.MoveFilesToWorkflowFromQuery(
+                    "SELECT ID FROM FAMFILE WHERE ID = " + fileRecord1.FileID.AsString(), -1, workflow1ID);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                var statsW1_2 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
+                Assert.That(statsW1_2.NumDocuments == 1 && statsW1_2.NumDocumentsPending == 1,
+                    "One pending document for Workflow1");
+
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                var statsW2_2 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
+                Assert.That(StatsAreEqual(statsW2_1, statsW2_2), "Workflow2 is unchanged after moving file to Workflow1");
+
+                fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow2ID);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                var statsW1_3 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
+                Assert.That(StatsAreEqual(statsW1_2, statsW1_3), "Workflow1 is unchanged after moving file to Workflow2");
+
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                var statsW2_3 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
+                Assert.That(statsW2_3.NumDocuments == 1 && statsW2_3.NumDocumentsPending == 0,
+                    "One document in Workflow2 that is not pending");
+
+                // Check records in workflow table
+                var testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM WorkflowFile");
+                Assert.That(testRecordset.RecordCount == 2, "There should be 2 records in WorkflowFile table");
+
+                testRecordset.Filter = "FileID = " + fileRecord1.FileID.AsString() + " AND WorkflowID = " + workflow1ID.AsString();
+                Assert.That(testRecordset.RecordCount == 1, "One document for Workflow1");
+
+                testRecordset.Filter = "FileID = " + fileRecord2.FileID.AsString() + " AND WorkflowID = " + workflow2ID.AsString();
+                Assert.That(testRecordset.RecordCount == 1, "One document for Workflow2");
+            }
+            finally
+            {
+                fileProcessingDb.CloseAllDBConnections();
+                fileProcessingDb = null;
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// Tests Move files to different workflow
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void MoveWorkflow_Unattempted()
+        {
+            string testDbName = "Test_MoveWorkflow_Unattempted";
+            IFileProcessingDB fileProcessingDb = CreateTestDatabase(testDbName);
+            try
+            {
+                string testfileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
+                string testfileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
+
+                bool alreadyExists = false;
+                EActionStatus previousStatus;
+
+                // add 2 unattempted files
+                var fileRecord1 = fileProcessingDb.AddFile(testfileName1, _ACTION_A, -1, EFilePriority.kPriorityNormal,
+                    false, false, EActionStatus.kActionUnattempted, false, out alreadyExists, out previousStatus);
+                var fileRecord2 = fileProcessingDb.AddFile(testfileName2, _ACTION_A, -1, EFilePriority.kPriorityNormal,
+                    false, false, EActionStatus.kActionUnattempted, false, out alreadyExists, out previousStatus);
+                var workflow1ID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined, _ACTION_A);
+                var workflow2ID = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined, _ACTION_A);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                var actionA_Workflow1_ID = fileProcessingDb.GetActionID(_ACTION_A);
+
+                //var statsW1_1 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                var actionA_Workflow2_ID = fileProcessingDb.GetActionID(_ACTION_A);
+
+                var statsW2_1 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
+
+                fileProcessingDb.MoveFilesToWorkflowFromQuery(
+                    "SELECT ID FROM FAMFILE WHERE ID = " + fileRecord1.FileID.AsString(), -1, workflow1ID);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                var statsW1_2 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
+                Assert.That(statsW1_2.NumDocuments == 1, "One document in Workflow1");
+
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                var statsW2_2 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
+                Assert.That(StatsAreEqual(statsW2_1, statsW2_2), "Workflow2 is unchanged after moving file to Workflow1");
+
+                fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow2ID);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                var statsW1_3 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
+                Assert.That(StatsAreEqual(statsW1_2, statsW1_3), "Workflow1 is unchanged after moving file to Workflow2");
+
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                var statsW2_3 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
+                Assert.That(statsW2_3.NumDocuments == 1, "There should be 1 record for Workflow2");
+
+                // Check records in workflow table
+                var testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM WorkflowFile");
+                Assert.That(testRecordset.RecordCount == 2, "There should be 2 records in WorkflowFile table");
+
+                testRecordset.Filter = "FileID = " + fileRecord1.FileID.AsString() + " AND WorkflowID = " + workflow1ID.AsString();
+                Assert.That(testRecordset.RecordCount == 1, "WorkflowFile table contains 1 record for Workflow1");
+            }
+            finally
+            {
+                fileProcessingDb.CloseAllDBConnections();
+                fileProcessingDb = null;
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
         #endregion Test Methods
 
         #region Helper Methods
@@ -732,10 +857,34 @@ namespace Extract.FileActionManager.Database.Test
             return fileProcessingDB;
         }
 
+        /// <summary>
+        /// Compares 2 ActionStatistics records for equality
+        /// </summary>
+        /// <param name="s1">First ActionStatistic to compare</param>
+        /// <param name="s2">Second ActionStatistic to compare</param>
+        /// <returns>True if s1 and s2 are equal, false otherwise</returns>
+        static bool StatsAreEqual(ActionStatistics s1, ActionStatistics s2)
+        {
+            bool retValue = true;
+            retValue = retValue && s1.NumBytes == s2.NumBytes;
+            retValue = retValue && s1.NumBytesComplete == s2.NumBytesComplete;
+            retValue = retValue && s1.NumBytesFailed == s2.NumBytesFailed;
+            retValue = retValue && s1.NumBytesPending == s2.NumBytesPending;
+            retValue = retValue && s1.NumBytesSkipped == s2.NumBytesSkipped;
+            retValue = retValue && s1.NumDocuments == s2.NumDocuments;
+            retValue = retValue && s1.NumDocumentsComplete == s2.NumDocumentsComplete;
+            retValue = retValue && s1.NumDocumentsFailed == s2.NumDocumentsFailed;
+            retValue = retValue && s1.NumDocumentsPending == s2.NumDocumentsPending;
+            retValue = retValue && s1.NumDocumentsSkipped == s2.NumDocumentsSkipped;
+            retValue = retValue && s1.NumPages == s2.NumPages;
+            retValue = retValue && s1.NumPagesComplete == s2.NumPagesComplete;
+            retValue = retValue && s1.NumPagesFailed == s2.NumPagesFailed;
+            retValue = retValue && s1.NumPagesPending == s2.NumPagesPending;
+            retValue = retValue && s1.NumPagesSkipped == s2.NumPagesSkipped;
+
+            return retValue;
+        }
+
         #endregion Helper Methods
     }
-
-
- 
-
 }
