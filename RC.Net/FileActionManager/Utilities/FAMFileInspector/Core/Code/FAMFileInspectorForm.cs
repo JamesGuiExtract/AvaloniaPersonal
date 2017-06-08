@@ -5402,7 +5402,10 @@ namespace Extract.FileActionManager.Utilities
                     fileHandlerItem.AllowMultipleFiles = (bool)row["AllowMultipleFiles"];
                     fileHandlerItem.SupportsErrorHandling = (bool)row["SupportsErrorHandling"];
                     fileHandlerItem.Blocking = (bool)row["Blocking"];
-                    fileHandlerItem.Workflow = (string)row["WorkflowName"];
+                    var workflowValue = row["WorkflowName"];
+                    fileHandlerItem.Workflow = (workflowValue == DBNull.Value)
+                        ? "" : 
+                        (string)workflowValue;
 
                     // Create a context menu option and add a handler for it.
                     var menuItem = new ToolStripMenuItem(fileHandlerItem.Name);
