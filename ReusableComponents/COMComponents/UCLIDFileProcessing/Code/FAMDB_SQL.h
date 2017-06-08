@@ -1402,7 +1402,7 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 //	Iteration will generated a sequence of numbers 1 to 10 (The max weight of any given workflow)
 "	;WITH Iteration(Num) AS \r\n"
 "	( \r\n"
-"		SELECT 1 FROM Workflow \r\n"
+"		SELECT 1 \r\n"
 "		UNION ALL \r\n"
 "		SELECT Num + 1 FROM Iteration WHERE Num <= 10 \r\n"
 "	), \r\n"
