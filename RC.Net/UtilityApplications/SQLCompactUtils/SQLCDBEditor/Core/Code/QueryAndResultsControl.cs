@@ -546,6 +546,36 @@ namespace Extract.SQLCDBEditor
             }
         }
 
+        /// <summary>
+        /// Sets or gets the AllowUserToAddRows property of the _resultsGrid
+        /// </summary>
+        public bool AllowUserToAddRows
+        {
+            get
+            {
+                return _resultsGrid.AllowUserToAddRows;
+            }
+            set
+            {
+                _resultsGrid.AllowUserToAddRows = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets or gets the AllowUserToDeleteRows property of the _resultsGrid
+        /// </summary>
+        public bool AllowUserToDeleteRows
+        {
+            get
+            {
+                return _resultsGrid.AllowUserToDeleteRows;
+            }
+            set
+            {
+                _resultsGrid.AllowUserToDeleteRows = value;
+            }
+        }
+
         #endregion Properties
 
         #region Methods

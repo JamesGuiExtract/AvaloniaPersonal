@@ -115,6 +115,11 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         Object _lockFor_workflowLoadDBs = new Object();
 
+        /// <summary>
+        /// Owning plugin manager
+        /// </summary>
+        ISQLCDBEditorPluginManager _pluginManager;
+
         #endregion Fields
 
         #region Constructors
@@ -224,6 +229,10 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
+                _pluginManager = pluginManager;
+                _pluginManager.AllowUserToAddRows = true;
+                _pluginManager.AllowUserToDeleteRows = true;
+
                 ExtractException.Assert("ELI38034", "Null argument exception", connection != null);
 
                 _connection = connection;
@@ -471,6 +480,8 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
+                _pluginManager.AllowUserToAddRows = _workflowComboBox.SelectedIndex <= 0;
+                _pluginManager.AllowUserToDeleteRows = _workflowComboBox.SelectedIndex <= 0;
                 RefreshData();
             }
             catch (Exception ex)
@@ -529,7 +540,14 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                var dg = sender as DataGridView;
+
+                // Check the row index is withing the bounds of the _contextTagsView
+                if (e.RowIndex >= _contextTagsView.Count || e.RowIndex < 0 || e.ColumnIndex < 0) 
+                {
+                    return;
+                }
+
+                 var dg = sender as DataGridView;
 
                 // Change the current cell to the cell in event args
                 if (dg != null)
@@ -537,13 +555,7 @@ namespace Extract.Utilities.ContextTags
                     dg.CurrentCell = dg.Rows[e.RowIndex].Cells[e.ColumnIndex];
                 }
 
-                // Check the row index is withing the bounds of the _contextTagsView
-                if (e.RowIndex >= _contextTagsView.Count || e.RowIndex < 0) 
-                {
-                    return;
-                }
-
-                // Get the ContextTagsEditorViewRow for the current row
+               // Get the ContextTagsEditorViewRow for the current row
                 var row = _contextTagsView[e.RowIndex] as ContextTagsEditorViewRow;
                 if (row != null && row.HasBeenCommitted)
                 {

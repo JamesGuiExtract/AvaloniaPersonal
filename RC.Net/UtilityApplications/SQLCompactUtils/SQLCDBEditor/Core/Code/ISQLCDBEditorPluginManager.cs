@@ -47,5 +47,15 @@ namespace Extract.SQLCDBEditor
         /// Causes the results of the <see cref="SQLCDBEditorPlugin.Query"/> to be refreshed.
         /// </summary>
         void RefreshQueryResults();
+
+        /// <summary>
+        /// Allows plug-in to be able to control if a user and add rows
+        /// </summary>
+        bool AllowUserToAddRows { get; set; }
+
+        /// <summary>
+        /// Allows plug-in to be able to control if a user can delete rows
+        /// </summary>
+        bool AllowUserToDeleteRows { get; set; }
     }
 }
