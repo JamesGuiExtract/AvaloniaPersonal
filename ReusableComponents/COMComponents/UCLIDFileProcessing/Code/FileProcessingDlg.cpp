@@ -2960,16 +2960,24 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 
 		_lastCodePos = "50";
 
+		// Get the current workflow and action name
+		string currentWorkflow = ipFPMDB->ActiveWorkflow;
+		string currentActionName = ipFPMgr->GetExpandedActionName();
+
+		_lastCodePos = "55";
+
 		// Get the action ID
 		long nActionID = -1;
 		try
 		{
-			nActionID = ipFPMDB->GetActionID( ipFPMgr->GetExpandedActionName() );
+			nActionID = ipFPMDB->GetActionID(currentActionName.c_str());
 		}
 		catch (...)
 		{
 			// If the action name doesn't exist the main thread will handle it
 		}
+
+		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats;
 
 		if (nActionID != -1)
 		{
@@ -2982,10 +2990,19 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 				// keep attempting to update the statistics
 				try
 				{
-					// Get the stats from the db in a temp object so that the UI will not be blocked
-					UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = 
-						ipFPMDB->GetStats(nActionID, VARIANT_FALSE);
-					ASSERT_RESOURCE_ALLOCATION("ELI20383", ipNewActionStats != __nullptr);
+					if (currentWorkflow.empty())
+					{
+						_lastCodePos = "62";
+						ipNewActionStats = ipFPMDB->GetStatsAllWorkflows(currentActionName.c_str(), VARIANT_FALSE);
+						ASSERT_RESOURCE_ALLOCATION("ELI43480", ipNewActionStats != __nullptr);
+					}
+					else
+					{
+						_lastCodePos = "66";
+						// Get the stats from the db in a temp object so that the UI will not be blocked
+						ipNewActionStats = ipFPMDB->GetStats(nActionID, VARIANT_FALSE);
+						ASSERT_RESOURCE_ALLOCATION("ELI20383", ipNewActionStats != __nullptr);
+					}
 				
 					_lastCodePos = "70";
 
@@ -3005,9 +3022,21 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 			// finishes the stats that are displayed will be current at the time of the thread stop event being signaled.
 			// If this is the only instance and it is processing files the final stats will show that the processing is 
 			// finished instead of showing the stats as of the last timeout
-			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = ipFPMDB->GetStats(nActionID, VARIANT_TRUE);
+			if (currentWorkflow.empty())
+			{
+				_lastCodePos = "90";
+				ipNewActionStats = ipFPMDB->GetStatsAllWorkflows(currentActionName.c_str(), VARIANT_TRUE);
+				ASSERT_RESOURCE_ALLOCATION("ELI43481", ipNewActionStats != __nullptr);
+			}
+			else
+			{
+				_lastCodePos = "100";
+				// Get the stats from the db in a temp object so that the UI will not be blocked
+				ipNewActionStats = ipFPMDB->GetStats(nActionID, VARIANT_TRUE);
+				ASSERT_RESOURCE_ALLOCATION("ELI43482", ipNewActionStats != __nullptr);
+			}
 			
-			_lastCodePos = "90";
+			_lastCodePos = "110";
 			
 			pFPDlg->PostMessageA(FP_STATISTICS_UPDATE, (WPARAM) ipNewActionStats.Detach(), (LPARAM)0 );
 		}
