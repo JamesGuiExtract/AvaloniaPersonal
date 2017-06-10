@@ -4975,7 +4975,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="i2">InstallMode</col>
 		<row><td>ConfigureEmailSettingsShortcut</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut1</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
-		<row><td>NewShortcut10</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut11</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut12</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut13</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
@@ -5078,7 +5077,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="I4">ISAttributes</col>
 		<row><td>ConfigureEmailSettingsShortcut</td><td>newfolder1</td><td>##ID_STRING35##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]EmailFile</td><td>/c</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut1</td><td>newfolder1</td><td>##ID_STRING17##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]VOAFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut10</td><td>newfolder1</td><td>##ID_STRING42##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]PaginationUtility.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut11</td><td>newfolder1</td><td>##ID_STRING26##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]UEXViewer.exe</td><td>"[CommonAppDataFolder]Extract Systems\LogFiles\ExtractException.UEX"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut12</td><td>newfolder1</td><td>##ID_STRING27##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ConvertFPSFile.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut13</td><td>newfolder1</td><td>##ID_STRING29##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ExtractImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
