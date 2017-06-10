@@ -5,6 +5,7 @@
 namespace Extract {
 	namespace FAMDBAdmin {
 
+		using namespace Extract::Utilities::Forms;
 		using namespace System;
 		using namespace System::ComponentModel;
 		using namespace System::Collections;

@@ -51,6 +51,11 @@ namespace Extract.FileActionManager.RunFPSFile
         static bool _ignoreDb;
 
         /// <summary>
+        /// The workflow to use (null to default to workflow in FPS file or not use workflows).
+        /// </summary>
+        static string _workflow;
+
+        /// <summary>
         /// Queues the document into the FPS file's database if it if it has not already been queued.
         /// </summary>
         static bool _queue;
@@ -193,6 +198,11 @@ namespace Extract.FileActionManager.RunFPSFile
                 }
                 else
                 {
+                    if (!string.IsNullOrEmpty(_workflow))
+                    {
+                        fileProcessingManager.ActiveWorkflow = _workflow;
+                    }
+
                     // If database interaction is required, allow fileProcessigManager to manage the
                     // processing.
                     fileProcessingManager.ProcessSingleFile(_sourceDocName, _queue, _process,
@@ -250,7 +260,7 @@ namespace Extract.FileActionManager.RunFPSFile
                 return false;
             }
 
-            if (args.Length < 3 || args.Length > 10)
+            if (args.Length < 3)
             {
                 ShowUsage("Invalid number of command-line arguments.");
                 return false;
@@ -282,6 +292,16 @@ namespace Extract.FileActionManager.RunFPSFile
                 if (argument.Equals("/ignoredb", StringComparison.Ordinal))
                 {
                     _ignoreDb = true;
+                }
+                else if (argument.Equals("/workflow", StringComparison.Ordinal))
+                {
+                    if (i + 1 >= args.Length)
+                    {
+                        ShowUsage("Workflow name expected.");
+                        return false;
+                    }
+
+                    _workflow = args[++i];
                 }
                 else if (argument.Equals("/queue", StringComparison.Ordinal))
                 {
@@ -387,7 +407,7 @@ namespace Extract.FileActionManager.RunFPSFile
             }
 
             usage.Append(Environment.GetCommandLineArgs()[0]);
-            usage.Append(" <FPSFileName> <SourceDocName> [/ignoreDb] [/queue] [/process]");
+            usage.Append(" <FPSFileName> <SourceDocName> [/ignoreDb] [/workflow <workflow>] [/queue] [/process]");
             usage.AppendLine(" [/forceProcessing] [/priority <integer value>] [/ef <filename>]");
             usage.AppendLine();
 
@@ -407,6 +427,11 @@ namespace Extract.FileActionManager.RunFPSFile
             usage.Append("/process /forceProcessing or /priority switches. The FPS file cannot ");
             usage.Append("contain any tasks that depend on access to the FPS file's specified ");
             usage.Append("database or action.");
+            usage.AppendLine();
+            usage.AppendLine();
+
+            usage.Append("/workflow: Specifies the workflow to use. If the FPS file also has a ");
+            usage.Append("workflow specified, this will override the FPS file setting.");
             usage.AppendLine();
             usage.AppendLine();
 

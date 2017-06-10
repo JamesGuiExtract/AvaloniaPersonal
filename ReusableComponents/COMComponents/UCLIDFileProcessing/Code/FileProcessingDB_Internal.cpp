@@ -1103,6 +1103,30 @@ long CFileProcessingDB::getActionIDNoThrow(_ConnectionPtr ipConnection, const st
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42067");
 }
 //--------------------------------------------------------------------------------------------------
+long CFileProcessingDB::getActionIDNoThrow(_ConnectionPtr ipConnection, const string& strActionName,
+										   long nWorkflowID)
+{
+	try
+	{
+		if (nWorkflowID <= 0)
+		{
+			return getActionIDNoThrow(ipConnection, strActionName, nWorkflowID);
+		}
+		else
+		{
+			string strQuery = Util::Format(
+				"SELECT COALESCE(MAX([ID]), -1) AS [ID] FROM [Action] WHERE [ASCName] = '%s' AND [WorkflowID] = %d",
+				strActionName.c_str(), nWorkflowID);
+
+			long nActionID = -1;
+			executeCmdQuery(ipConnection, strQuery, false, &nActionID);
+
+			return nActionID;
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43483");
+}
+//--------------------------------------------------------------------------------------------------
 string CFileProcessingDB::getActionIDsForActiveWorkflow(_ConnectionPtr ipConnection, const string& strActionName)
 {
 	try

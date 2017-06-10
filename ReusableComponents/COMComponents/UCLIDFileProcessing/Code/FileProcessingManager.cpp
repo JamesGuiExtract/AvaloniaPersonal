@@ -1057,6 +1057,8 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				// Validate that the action name exists in the database (auto-create if that setting is set)
 				getFPMDB()->AutoCreateAction(bstrActionName);
 
+				getFPMDB()->ActiveWorkflow = m_strActiveWorkflow.c_str();
+
 				getFPMDB()->RecordFAMSessionStart(
 					m_strFPSFileName.c_str(), bstrActionName, vbQueue, vbProcess);
 

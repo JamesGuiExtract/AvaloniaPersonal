@@ -10614,7 +10614,7 @@ bool CFileProcessingDB::GetActionIDForWorkflow_Internal(bool bDBLocked, BSTR bst
 			ipConnection = getDBConnection();
 
 			// Get the action ID
-			*pnActionID = getActionID(ipConnection, asString(bstrActionName), nWorkflowID);
+			*pnActionID = getActionIDNoThrow(ipConnection, asString(bstrActionName), nWorkflowID);
 
 			END_CONNECTION_RETRY(ipConnection, "ELI43313");
 		}

@@ -2587,7 +2587,10 @@ namespace Extract.FileActionManager.Utilities
                     }
                 }
 
-                _fileHandlerSeparator.Visible = areAnyVisible;
+                if (_fileHandlerSeparator != null)
+                {
+                    _fileHandlerSeparator.Visible = areAnyVisible;
+                }
 
                 // Open file location should be available for single selection only.
                 if (_openFileLocationMenuItem != null)

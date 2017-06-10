@@ -134,8 +134,20 @@ namespace Extract {
 				ipTempDB->ActiveWorkflow = "";
 			}
 
-			_bstr_t bstrQuery = _ipFileSelector->BuildQuery(ipTempDB, "FAMFILE.ID", "", true);
-			 _ipfamDatabase->MoveFilesToWorkflowFromQuery(bstrQuery, selectedSourceWorkflow->ID, selectedDestWorkflow->ID);
+			{
+				auto waitCursor = gcnew TemporaryWaitCursor();
+
+				try
+				{
+					_bstr_t bstrQuery = _ipFileSelector->BuildQuery(ipTempDB, "FAMFILE.ID", "", true);
+					_ipfamDatabase->MoveFilesToWorkflowFromQuery(bstrQuery, selectedSourceWorkflow->ID, selectedDestWorkflow->ID);
+				}
+				finally
+				{
+					// Dispose
+					delete waitCursor;
+				}
+			}
 
 			 MessageBox::Show("The selected files have been moved to " + selectedDestWorkflow->Name, 
 				 "Workflow moved", MessageBoxButtons::OK);

@@ -753,6 +753,7 @@ private:
 	// The same as getActionID, except if the specified action does not exist in the current workflow,
 	// rather than throwing an error, 0 will be returned.
 	long getActionIDNoThrow(_ConnectionPtr ipConnection, const string& strActionName, const string& strWorkflow);
+	long getActionIDNoThrow(_ConnectionPtr ipConnection, const string& strActionName, long nWorkflowID);
 
 	// Returns a comma-delimited list of IDs to process in the currently active workflow (if any).
 	// In most cases this will be a single action ID, the exception being cases where
