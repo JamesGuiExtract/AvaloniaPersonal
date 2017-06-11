@@ -576,10 +576,16 @@ namespace Extract.Utilities.ContextTags
                         e.ContextMenuStrip.Items.Add("Restore default", null,
                             (s, a) =>
                             {
-                                row.DeleteWorkflowValue(col.DisplayName);
-                                
-                                dg?.NotifyCurrentCellDirty(true);
-                                dg?.Refresh();
+                                try
+                                {
+                                    row.DeleteWorkflowValue(col.DisplayName);
+                                    OnDataChanged(true, false);
+                                    dg?.Refresh();
+                                }
+                                catch(Exception ex)
+                                {
+                                    ex.ExtractDisplay("ELI43484");
+                                }
                             });
                     }
                 }
