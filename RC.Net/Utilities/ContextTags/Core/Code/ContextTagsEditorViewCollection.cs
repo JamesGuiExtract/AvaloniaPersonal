@@ -518,7 +518,7 @@ namespace Extract.Utilities.ContextTags
                 // of specific rows in the collection.
                 _defaultViewRow = new ContextTagsEditorViewRow(_database, null, ActiveWorkflow);
 
-                foreach (var customTag in _database.CustomTag)
+                foreach (var customTag in _database.CustomTag.OrderBy(ct=> ct.Name))
                 {
                     // The row that is mapped to the new row in a DataGridView can end up being
                     // persisted. Ignore and delete any unnamed custom tags on load.
