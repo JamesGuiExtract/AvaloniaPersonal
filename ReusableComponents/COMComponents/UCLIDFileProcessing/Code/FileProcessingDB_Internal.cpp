@@ -1110,7 +1110,7 @@ long CFileProcessingDB::getActionIDNoThrow(_ConnectionPtr ipConnection, const st
 	{
 		if (nWorkflowID <= 0)
 		{
-			return getActionIDNoThrow(ipConnection, strActionName, nWorkflowID);
+			return getActionIDNoThrow(ipConnection, strActionName, "");
 		}
 		else
 		{
