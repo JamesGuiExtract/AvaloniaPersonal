@@ -503,7 +503,7 @@ namespace Extract.Utilities.ContextTags
             try
             {
                 // Check the row index is withing the bounds of the _contextTagsView
-                if (e.RowIndex >= _contextTagsView.Count || e.RowIndex < 0)
+                if (e.RowIndex >= _contextTagsView.Count || e.RowIndex < 0 || e.ColumnIndex < 0)
                 {
                     return;
                 }
@@ -512,6 +512,13 @@ namespace Extract.Utilities.ContextTags
                 var row = _contextTagsView[e.RowIndex] as ContextTagsEditorViewRow;
                 if (row != null)
                 {
+                    // Make sure the column is within the bounds of the properties collection for the row
+                    var properties = row.GetProperties();
+                    if (e.ColumnIndex < 0 || e.ColumnIndex >= properties.Count)
+                    {
+                        return;
+                    }
+
                     // get the ContextTagsEditorViewPropertyDescriptor for the current column
                     var col = row.GetProperties()[e.ColumnIndex] as ContextTagsEditorViewPropertyDescriptor;
 

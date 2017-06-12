@@ -46,6 +46,11 @@ namespace Extract.Utilities.ContextTags
         ObservableCollection<ContextTagsEditorViewRow> _contextRows =
             new ObservableCollection<ContextTagsEditorViewRow>();
 
+        /// <summary>
+        /// Flag to indicate that data is being loaded from the database
+        /// </summary>
+        bool _dataLoading = false;
+
         #endregion Fields
 
         #region Properties
@@ -111,12 +116,7 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                // Remove the event handler for collection changed while updating the displayed data
-                // this keeps the save button in SQLDBEditor from being enabled when changing
-                // the workflow combo box selection
-                _contextRows.CollectionChanged -= HandleContextRows_CollectionChanged;
-
-                Clear();
+	            Clear();
 
                 LoadData();
 
@@ -126,11 +126,6 @@ namespace Extract.Utilities.ContextTags
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38004");
-            }
-            finally
-            {
-                _contextRows.CollectionChanged += HandleContextRows_CollectionChanged;
-
             }
         }
 
@@ -468,7 +463,7 @@ namespace Extract.Utilities.ContextTags
                     }
                 }
 
-                if (dataChanged)
+                if (!_dataLoading && dataChanged)
                 {
                     OnDataChanged();
                 }
@@ -507,31 +502,39 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         void LoadData()
         {
-            if (_database != null)
+            try
             {
-                // Ensure all relevant tables are up-to-date.
-                _database.Refresh(RefreshMode.OverwriteCurrentValues, _database.Context);
-                _database.Refresh(RefreshMode.OverwriteCurrentValues, _database.CustomTag);
-                _database.Refresh(RefreshMode.OverwriteCurrentValues, _database.TagValue);
-
-                // _defaultViewRow will be used to describe the collection's properties independent
-                // of specific rows in the collection.
-                _defaultViewRow = new ContextTagsEditorViewRow(_database, null, ActiveWorkflow);
-
-                foreach (var customTag in _database.CustomTag.OrderBy(ct=> ct.Name))
+                _dataLoading = true;
+                if (_database != null)
                 {
-                    // The row that is mapped to the new row in a DataGridView can end up being
-                    // persisted. Ignore and delete any unnamed custom tags on load.
-                    var row = new ContextTagsEditorViewRow(_database, customTag, ActiveWorkflow);
-                    if (string.IsNullOrWhiteSpace(customTag.Name))
+                    // Ensure all relevant tables are up-to-date.
+                    _database.Refresh(RefreshMode.OverwriteCurrentValues, _database.Context);
+                    _database.Refresh(RefreshMode.OverwriteCurrentValues, _database.CustomTag);
+                    _database.Refresh(RefreshMode.OverwriteCurrentValues, _database.TagValue);
+
+                    // _defaultViewRow will be used to describe the collection's properties independent
+                    // of specific rows in the collection.
+                    _defaultViewRow = new ContextTagsEditorViewRow(_database, null, ActiveWorkflow);
+
+                    foreach (var customTag in _database.CustomTag.OrderBy(ct => ct.Name))
                     {
-                        row.Delete();
-                    }
-                    else
-                    {
-                        _contextRows.Add(row);
+                        // The row that is mapped to the new row in a DataGridView can end up being
+                        // persisted. Ignore and delete any unnamed custom tags on load.
+                        var row = new ContextTagsEditorViewRow(_database, customTag, ActiveWorkflow);
+                        if (string.IsNullOrWhiteSpace(customTag.Name))
+                        {
+                            row.Delete();
+                        }
+                        else
+                        {
+                            _contextRows.Add(row);
+                        }
                     }
                 }
+            }
+            finally
+            {
+                _dataLoading = false;
             }
         }
 
