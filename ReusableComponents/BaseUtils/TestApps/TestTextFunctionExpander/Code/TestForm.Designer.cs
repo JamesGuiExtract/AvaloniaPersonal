@@ -42,11 +42,13 @@ namespace Extract.BaseUtils.Testing
             this._browseSourceDoc = new Extract.Utilities.Forms.BrowseButton();
             this._browseFpsDir = new Extract.Utilities.Forms.BrowseButton();
             this.pathTagsButton1 = new Extract.Utilities.Forms.PathTagsButton();
+            this.label5 = new System.Windows.Forms.Label();
+            this._textWorkflow = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // _buttonTest
             // 
-            this._buttonTest.Location = new System.Drawing.Point(387, 360);
+            this._buttonTest.Location = new System.Drawing.Point(387, 397);
             this._buttonTest.Name = "_buttonTest";
             this._buttonTest.Size = new System.Drawing.Size(75, 23);
             this._buttonTest.TabIndex = 0;
@@ -57,7 +59,7 @@ namespace Extract.BaseUtils.Testing
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 87);
+            this.label1.Location = new System.Drawing.Point(12, 124);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(34, 13);
             this.label1.TabIndex = 2;
@@ -66,7 +68,7 @@ namespace Extract.BaseUtils.Testing
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 222);
+            this.label2.Location = new System.Drawing.Point(12, 259);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(56, 13);
             this.label2.TabIndex = 4;
@@ -90,7 +92,7 @@ namespace Extract.BaseUtils.Testing
             // 
             // _buttonClear
             // 
-            this._buttonClear.Location = new System.Drawing.Point(12, 360);
+            this._buttonClear.Location = new System.Drawing.Point(12, 397);
             this._buttonClear.Name = "_buttonClear";
             this._buttonClear.Size = new System.Drawing.Size(75, 23);
             this._buttonClear.TabIndex = 9;
@@ -103,20 +105,20 @@ namespace Extract.BaseUtils.Testing
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(9, 48);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(68, 13);
+            this.label4.Size = new System.Drawing.Size(83, 13);
             this.label4.TabIndex = 10;
             this.label4.Text = "<FPSFileName>";
             // 
-            // _textFpsFile
+            // _textFpsFileName
             // 
             this._textFpsFileName.Location = new System.Drawing.Point(12, 64);
-            this._textFpsFileName.Name = "_textFpsFile";
+            this._textFpsFileName.Name = "_textFpsFileName";
             this._textFpsFileName.Size = new System.Drawing.Size(417, 20);
             this._textFpsFileName.TabIndex = 11;
             // 
             // _textValue
             // 
-            this._textValue.Location = new System.Drawing.Point(12, 103);
+            this._textValue.Location = new System.Drawing.Point(12, 140);
             this._textValue.Multiline = true;
             this._textValue.Name = "_textValue";
             this._textValue.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -125,7 +127,7 @@ namespace Extract.BaseUtils.Testing
             // 
             // _textExpansion
             // 
-            this._textExpansion.Location = new System.Drawing.Point(12, 238);
+            this._textExpansion.Location = new System.Drawing.Point(12, 275);
             this._textExpansion.Multiline = true;
             this._textExpansion.Name = "_textExpansion";
             this._textExpansion.ReadOnly = true;
@@ -158,7 +160,7 @@ namespace Extract.BaseUtils.Testing
             // pathTagsButton1
             // 
             this.pathTagsButton1.Image = ((System.Drawing.Image)(resources.GetObject("pathTagsButton1.Image")));
-            this.pathTagsButton1.Location = new System.Drawing.Point(435, 102);
+            this.pathTagsButton1.Location = new System.Drawing.Point(435, 139);
             this.pathTagsButton1.Name = "pathTagsButton1";
             this.pathTagsButton1.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this.pathTagsButton1.Size = new System.Drawing.Size(18, 20);
@@ -166,11 +168,30 @@ namespace Extract.BaseUtils.Testing
             this.pathTagsButton1.TextControl = this._textValue;
             this.pathTagsButton1.UseVisualStyleBackColor = true;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(13, 87);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(64, 13);
+            this.label5.TabIndex = 17;
+            this.label5.Text = "<Workflow>";
+            // 
+            // _textWorkflow
+            // 
+            this._textWorkflow.Location = new System.Drawing.Point(12, 102);
+            this._textWorkflow.Name = "_textWorkflow";
+            this._textWorkflow.Size = new System.Drawing.Size(417, 20);
+            this._textWorkflow.TabIndex = 18;
+            this._textWorkflow.Text = "TestWorkflow";
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(474, 394);
+            this.ClientSize = new System.Drawing.Size(474, 425);
+            this.Controls.Add(this._textWorkflow);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.pathTagsButton1);
             this.Controls.Add(this._browseFpsDir);
             this.Controls.Add(this._browseSourceDoc);
@@ -206,6 +227,8 @@ namespace Extract.BaseUtils.Testing
         private Extract.Utilities.Forms.BrowseButton _browseSourceDoc;
         private Extract.Utilities.Forms.BrowseButton _browseFpsDir;
         private Extract.Utilities.Forms.PathTagsButton pathTagsButton1;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox _textWorkflow;
     }
 }
 

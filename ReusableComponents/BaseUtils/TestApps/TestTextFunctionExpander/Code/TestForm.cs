@@ -29,6 +29,11 @@ namespace Extract.BaseUtils.Testing
         static readonly string _DEFAULT_FPS_FILE_NAME = @"C:\FPSFiles\TestFpsFile.fps";
 
         /// <summary>
+        /// The default workflow value
+        /// </summary>
+        static readonly string _DEFAULT_WORKFLOW = "TestWorkflow";
+
+        /// <summary>
         /// The name of this object.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(TestForm).ToString();
@@ -50,6 +55,7 @@ namespace Extract.BaseUtils.Testing
                 // Set the default SourceDocName and FPSFileDir
                 _textSourceDoc.Text = _DEFAULT_SOURCE_DOC;
                 _textFpsFileName.Text = _DEFAULT_FPS_FILE_NAME;
+                _textWorkflow.Text = _DEFUALT_WORKFLOW;
             }
             catch (Exception ex)
             {
@@ -81,7 +87,7 @@ namespace Extract.BaseUtils.Testing
                 var tagManager = new FAMTagManager();
                 tagManager.FPSFileDir = Path.GetDirectoryName(_textFpsFileName.Text);
                 tagManager.FPSFileName = _textFpsFileName.Text;
-                
+                tagManager.Workflow = _textWorkflow.Text;
 
                 // Get a tag manager to use for expanding the tags
                 var tags = new FileActionManagerPathTags(tagManager, _textSourceDoc.Text);
