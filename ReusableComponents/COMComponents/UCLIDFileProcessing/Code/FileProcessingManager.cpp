@@ -38,7 +38,8 @@ m_nNumberOfFilesToExecute(0),
 m_bCancelling(false),
 m_bIsAuthenticated(false),
 m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB),
-m_strActiveWorkflow("")
+m_strActiveWorkflow(""),
+m_bRequireAdminEdit(false)
 {
 	try
 	{
@@ -1333,6 +1334,43 @@ STDMETHODIMP CFileProcessingManager::put_ActiveWorkflow(BSTR newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42077");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_RequireAdminEdit(VARIANT_BOOL *pvbRequireAdminEdit)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI43522", pvbRequireAdminEdit != __nullptr);
+
+		// Needs to return the set ActiveWorkflow 
+		*pvbRequireAdminEdit = asVariantBool(m_bRequireAdminEdit);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43523");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::put_RequireAdminEdit(VARIANT_BOOL bRequireAdminEdit)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		bool newVal = asCppBool(bRequireAdminEdit);
+		if (newVal != m_bRequireAdminEdit)
+		{
+			m_bRequireAdminEdit = newVal;
+			m_bDirty = true;
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43524");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods
@@ -1641,6 +1679,8 @@ void CFileProcessingManager::clear()
 		getFPMDB()->ResetDBConnection(VARIANT_TRUE);
 
 		m_nMaxFilesFromDB = gnMAX_NUMBER_OF_FILES_FROM_DB;
+
+		m_bRequireAdminEdit = false;
 
 		m_bDirty = false;
 	}

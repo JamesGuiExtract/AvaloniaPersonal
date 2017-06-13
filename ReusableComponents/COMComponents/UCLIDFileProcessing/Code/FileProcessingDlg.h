@@ -145,6 +145,8 @@ protected:
 	afx_msg void OnFileOpen();
 	afx_msg void OnFileSave();
 	afx_msg void OnFileSaveas();
+	afx_msg void OnFileRequireAdminEdit();
+	afx_msg void OnFileLoginAsAdmin();
 	afx_msg void OnToolsCheckfornewcomponents();
 	afx_msg void OnToolsOptions();
 	afx_msg void OnDropFiles( HDROP hDropInfo );
@@ -324,6 +326,9 @@ private:
 	// available for use in m_propDatabasePage.
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr m_ipFAMTagManager;
 
+	// Flag indicating if the FPS requires an admin login to allow editing
+	bool m_bRequireAdminEdit;
+
 	////////////
 	// Methods
 	///////////
@@ -461,4 +466,7 @@ private:
 
 	// Check the version of the context tags database and prompt for update if it isn't current
 	void checkAndUpdateContextTagsDatabaseIfNeeded(std::string &strFileName);
+
+	// Enable or Disable all tabs based on bEnable
+	void setPagesEnable(bool bEnable);
 };

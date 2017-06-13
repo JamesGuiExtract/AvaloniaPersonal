@@ -542,6 +542,9 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Sets and Gets the currently active workflow
 		[propget, id(59), helpstring("property ActiveWorkflow ")] HRESULT ActiveWorkflow([out, retval] BSTR* pbstrWorkflowName);
 		[propput, id(59), helpstring("property ActiveWorkflow ")] HRESULT ActiveWorkflow([in] BSTR bstrWorkflowName);
+		// PROMISE: Sets and Gets whether an admin login is required to edit the settings
+		[propget, id(60), helpstring("property RequireAdminEdit ")] HRESULT RequireAdminEdit([out, retval] VARIANT_BOOL* pvbRequireAdminEdit);
+		[propput, id(60), helpstring("property RequireAdminEdit ")] HRESULT RequireAdminEdit([in] VARIANT_BOOL bRequireAdminEdit);
 	};
 
 	[

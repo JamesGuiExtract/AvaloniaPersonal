@@ -14,7 +14,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 16;
+const unsigned long gnCurrentVersion = 17;
 // Version 15: Added AdvancedConnectionStringProperties
 const int gnOLD_CONVERT_VERSION = 10;
 
@@ -87,6 +87,8 @@ STDMETHODIMP CFileProcessingManager::IsDirty(void)
 //	 Added the Server and Database
 // Version 14:
 //	 Added Max files from DB into FPS file settings as opposed to registry setting
+// Version 17:
+//	 Added require admin edit setting
 STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -194,6 +196,11 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 			dataReader >> m_strActiveWorkflow;
 		}
 
+		if (nDataVersion > 16)
+		{
+			dataReader >> m_bRequireAdminEdit;
+		}
+
 		// Read in the collected File Supplying Management Role
 		IPersistStreamPtr ipFSObj;
 		readObjectFromStream( ipFSObj, pStream, "ELI14399" );
@@ -257,6 +264,9 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Save the current workflow
 		dataWriter << m_strActiveWorkflow;
+
+		// Save the require admin edit flag
+		dataWriter << m_bRequireAdminEdit;
 		
 		// Flush the stream
 		dataWriter.flushToByteStream();

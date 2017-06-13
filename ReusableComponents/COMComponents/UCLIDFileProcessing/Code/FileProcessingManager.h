@@ -102,6 +102,8 @@ public:
 	STDMETHOD(RefreshDBSettings)();
 	STDMETHOD(get_ActiveWorkflow)(BSTR *pVal);
 	STDMETHOD(put_ActiveWorkflow)(BSTR newVal);
+	STDMETHOD(get_RequireAdminEdit)(VARIANT_BOOL *pvbRequireAdminEdit);
+	STDMETHOD(put_RequireAdminEdit)(VARIANT_BOOL bRequireAdminEdit);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -210,6 +212,9 @@ private:
 
 	// Store the currently active workflow
 	string m_strActiveWorkflow;
+
+	// Flag indicating that the FPS requires admin to edit
+	bool m_bRequireAdminEdit;
 
 	///////////
 	// Methods

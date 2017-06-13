@@ -217,6 +217,8 @@ BEGIN_MESSAGE_MAP(FileProcessingDlg, CDialog)
 	ON_COMMAND(ID_FILE_OPEN, OnFileOpen)
 	ON_COMMAND(ID_FILE_SAVE, OnFileSave)
 	ON_COMMAND(ID_FILE_SAVEAS, OnFileSaveas)
+	ON_COMMAND(ID_FILE_REQUIREADMINEDIT, OnFileRequireAdminEdit)
+	ON_COMMAND(ID_FILE_LOGINASADMIN, OnFileLoginAsAdmin)
 	ON_COMMAND(ID_TOOLS_CHECKFORNEWCOMPONENTS, OnToolsCheckfornewcomponents)
 	ON_COMMAND(ID_TOOLS_OPTIONS, OnToolsOptions)
 	ON_WM_DROPFILES()
@@ -477,23 +479,7 @@ void FileProcessingDlg::OnBtnRun()
 			m_propProcessingPage.startProgressUpdates();
 		}
 
-		// Disable the Process setup page while running
-		if (isPageDisplayed(kProcessingSetupPage))
-		{
-			m_propProcessSetupPage.setEnabled(false);
-		}
-
-		// Disable the Queue setup page
-		if (isPageDisplayed(kQueueSetupPage))
-		{
-			m_propQueueSetupPage.setEnabled(false);
-		}
-
-		// Disable the action page
-		if (isPageDisplayed(kActionPage))
-		{
-			m_propActionPage.setEnabled(false);
-		}
+		setPagesEnable(false);
 
 		// set the running flag
 		m_bRunning = true;
@@ -1353,6 +1339,45 @@ void FileProcessingDlg::OnFileExit()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10962");
 }
 //-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::OnFileLoginAsAdmin()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		VARIANT_BOOL vbCanceled;
+		// Must be logged in as admin
+		if (asCppBool(getDBPointer()->IsConnected) && !asCppBool(getDBPointer()->LoggedInAsAdmin))
+		{
+			getDBPointer()->ShowLogin(VARIANT_TRUE, &vbCanceled);
+			updateMenuAndToolbar();
+		}
+			
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43517");
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::OnFileRequireAdminEdit()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		VARIANT_BOOL vbCanceled;
+		// Must be logged in as admin -- if the connection isn't good this the value can't be changed
+		if (asCppBool(getDBPointer()->IsConnected) && 
+			(asCppBool(getDBPointer()->LoggedInAsAdmin) || asCppBool(getDBPointer()->ShowLogin(VARIANT_TRUE, &vbCanceled))))
+		{
+			m_bRequireAdminEdit = !m_bRequireAdminEdit;
+			updateMenuAndToolbar();
+		}
+
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43531");
+}
+//-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::OnProcessStartprocessing() 
 {
 	OnBtnRun();
@@ -1960,10 +1985,14 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	bool bProcessingStarted = (getFPM()->ProcessingStarted == VARIANT_TRUE);
 	bool bProcessingPaused = false;
 	bool bContextSelected = (m_ipFAMTagManager->ActiveContext.length() > 0);
+	bool bFPSLocked = m_bRequireAdminEdit && asCppBool(getDBPointer()->IsConnected) && !asCppBool(getDBPointer()->LoggedInAsAdmin);
 
 	// update the menu items
 	CMenu* pMenu = GetMenu();
 
+	pMenu->CheckMenuItem(ID_FILE_REQUIREADMINEDIT, MF_BYCOMMAND | (m_bRequireAdminEdit) ? MF_CHECKED : MF_UNCHECKED);
+	pMenu->EnableMenuItem(ID_FILE_LOGINASADMIN, MF_BYCOMMAND | (bFPSLocked) ? MF_ENABLED : MF_GRAYED);
+		 
 	// A local flag indicate FAM is processing or running only with statistics tab
 	bool bRunningStatus = bProcessingStarted || (m_bStatsOnlyRunning && m_bRunning);
 
@@ -1999,15 +2028,15 @@ void FileProcessingDlg::updateMenuAndToolbar()
 
 	// update the toolbar buttons
 	m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_OPEN, asMFCBool(!bRunningStatus));
-	m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_SAVE, asMFCBool(!bRunningStatus));
+	m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_SAVE, asMFCBool(!bRunningStatus && !bFPSLocked));
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_RUN, asMFCBool(bEnableRun) );
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_PAUSE, asMFCBool(bEnablePause) );
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_STOP, asMFCBool(bEnableStop) );
 	m_toolBar.GetToolBarCtrl().PressButton(IDC_BTN_PAUSE, asMFCBool(bProcessingPaused) );
 
 	// update workflow combo
-	m_comboBoxWorkflow.EnableWindow(asMFCBool(!bRunningStatus && m_bWorkflowsDefined));
-	m_buttonContext.EnableWindow(asMFCBool(!bRunningStatus && bContextSelected));
+	m_comboBoxWorkflow.EnableWindow(asMFCBool(!bRunningStatus && !bFPSLocked && m_bWorkflowsDefined));
+	m_buttonContext.EnableWindow(asMFCBool(!bRunningStatus && !bFPSLocked && bContextSelected));
 
 	// Get the auto scrolling setting from registry
 	bool bAutoScroll = ma_pCfgMgr->getAutoScrolling();
@@ -2023,18 +2052,22 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	
 	// enable/disable menu items as appropriate.
 	pMenu->EnableMenuItem(0, MF_BYPOSITION | (bRunningStatus ? MF_GRAYED : MF_ENABLED) );
+	pMenu->EnableMenuItem(ID_FILE_SAVE, MF_BYCOMMAND | (!bFPSLocked) ? MF_ENABLED : MF_GRAYED);
+	pMenu->EnableMenuItem(ID_FILE_SAVEAS, MF_BYCOMMAND | (!bFPSLocked) ? MF_ENABLED : MF_GRAYED);
 	pMenu->EnableMenuItem(ID_PROCESS_STARTPROCESSING, MF_BYCOMMAND | (bEnableRun ? MF_ENABLED: MF_GRAYED) );
 	pMenu->EnableMenuItem(ID_PROCESS_PAUSEPROCESSING, MF_BYCOMMAND | (bEnablePause ? MF_ENABLED: MF_GRAYED) );
 	pMenu->EnableMenuItem(ID_PROCESS_STOPPROCESSING, MF_BYCOMMAND | (bEnableStop ? MF_ENABLED: MF_GRAYED) );
 	pMenu->EnableMenuItem(2, MF_BYPOSITION | (bRunningStatus ? MF_GRAYED : MF_ENABLED) );
-	pMenu->EnableMenuItem(ID_TOOLS_EDITCUSTOMTAGS, MF_BYCOMMAND | (bContextSelected ? MF_ENABLED : MF_GRAYED) );
+	pMenu->EnableMenuItem(ID_TOOLS_EDITCUSTOMTAGS, MF_BYCOMMAND | (bContextSelected && !bFPSLocked ? MF_ENABLED : MF_GRAYED) );
 
 	// Enable/disable the controls on the database page based on whether
 	// we are currently processing or not
 	if (m_propDatabasePage.m_hWnd != __nullptr)
 	{
-		m_propDatabasePage.enableAllControls(!m_bRunning);
+		m_propDatabasePage.enableAllControls(!m_bRunning && !bFPSLocked);
 	}
+
+	setPagesEnable(!m_bRunning && !bFPSLocked);
 
 	// redraw the menu bar
 	DrawMenuBar();
@@ -2728,6 +2761,8 @@ void FileProcessingDlg::loadSettingsFromManager()
 
 	try
 	{
+		m_bRequireAdminEdit = asCppBool(getFPM()->RequireAdminEdit);
+
 		// get the .FPS file first so that it will still be set even
 		// if an exception is thrown below here [p13 #4580]
 		// Get the .FPS filename and set it to the current FPS file
@@ -2787,6 +2822,7 @@ bool FileProcessingDlg::flushSettingsToManager()
 {
 	getFPM()->RestrictNumStoredRecords = VARIANT_TRUE;
 	getFPM()->MaxStoredRecords = m_dlgOptions.getMaxDisplayRecords();
+	getFPM()->RequireAdminEdit = asVariantBool(m_bRequireAdminEdit);
 
 	return true;
 }
@@ -3571,7 +3607,6 @@ void FileProcessingDlg::loadWorkflowComboBox()
 	m_comboBoxWorkflow.SetCurSel(index);
 }
 //--------------------------------------------------------------------------------------------------
-
 void FileProcessingDlg::positionWorkflowContextControls()
 {
 	CRect rectDlg, labelWorkflowRect, workflowRect, labelContextRect, contextButtonRect;
@@ -3607,4 +3642,25 @@ void FileProcessingDlg::positionWorkflowContextControls()
 	workflowRect.right = labelContextRect.left - 6;
 	workflowRect.MoveToY(rectDlg.bottom - workflowRect.Height() - gnSTATUS_BAR_HEIGHT - 10);
 	m_comboBoxWorkflow.MoveWindow(workflowRect);
+}
+//--------------------------------------------------------------------------------------------------
+void FileProcessingDlg::setPagesEnable(bool bEnable)
+{
+	// Disable the Process setup page while running
+	if (isPageDisplayed(kProcessingSetupPage))
+	{
+		m_propProcessSetupPage.setEnabled(bEnable);
+	}
+
+	// Disable the Queue setup page
+	if (isPageDisplayed(kQueueSetupPage))
+	{
+		m_propQueueSetupPage.setEnabled(bEnable);
+	}
+
+	// Disable the action page
+	if (isPageDisplayed(kActionPage))
+	{
+		m_propActionPage.setEnabled(bEnable);
+	}
 }
