@@ -294,6 +294,7 @@ namespace Extract {
 				this->startActionComboBox->Location = System::Drawing::Point(142, 158);
 				this->startActionComboBox->Name = L"startActionComboBox";
 				this->startActionComboBox->Size = System::Drawing::Size(239, 21);
+				this->startActionComboBox->Sorted = true;
 				this->startActionComboBox->TabIndex = 7;
 				// 
 				// endActionComboBox
@@ -303,6 +304,7 @@ namespace Extract {
 				this->endActionComboBox->Location = System::Drawing::Point(142, 185);
 				this->endActionComboBox->Name = L"endActionComboBox";
 				this->endActionComboBox->Size = System::Drawing::Size(239, 21);
+				this->endActionComboBox->Sorted = true;
 				this->endActionComboBox->TabIndex = 9;
 				// 
 				// postWorkflowActionComboBox
@@ -312,6 +314,7 @@ namespace Extract {
 				this->postWorkflowActionComboBox->Location = System::Drawing::Point(142, 212);
 				this->postWorkflowActionComboBox->Name = L"postWorkflowActionComboBox";
 				this->postWorkflowActionComboBox->Size = System::Drawing::Size(239, 21);
+				this->postWorkflowActionComboBox->Sorted = true;
 				this->postWorkflowActionComboBox->TabIndex = 11;
 				// 
 				// label5
