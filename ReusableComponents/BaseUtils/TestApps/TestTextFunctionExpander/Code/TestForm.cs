@@ -55,7 +55,7 @@ namespace Extract.BaseUtils.Testing
                 // Set the default SourceDocName and FPSFileDir
                 _textSourceDoc.Text = _DEFAULT_SOURCE_DOC;
                 _textFpsFileName.Text = _DEFAULT_FPS_FILE_NAME;
-                _textWorkflow.Text = _DEFUALT_WORKFLOW;
+                _textWorkflow.Text = _DEFAULT_WORKFLOW;
             }
             catch (Exception ex)
             {
