@@ -3097,13 +3097,24 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 		// If there is an action set, show the stats for the current action.
 		try
 		{
+			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats;
+			string currentWorkflow = asString( getDBPointer()->ActiveWorkflow);
 			if (m_nCurrActionID != -1)
 			{
-				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats = 
-					getDBPointer()->GetStats(m_nCurrActionID, VARIANT_FALSE);
-				ASSERT_RESOURCE_ALLOCATION("ELI38476", ipActionStats != __nullptr);
-	
-				updateStats(ipActionStats);
+				if (currentWorkflow.empty())
+				{
+					string currentActionName = getDBPointer()->GetActionName(m_nCurrActionID);
+					ipActionStats = getDBPointer()->GetStatsAllWorkflows(currentActionName.c_str(), VARIANT_FALSE);
+					ASSERT_RESOURCE_ALLOCATION("ELI43480", ipActionStats != __nullptr);
+				}
+				else
+				{
+					ipActionStats =
+						getDBPointer()->GetStats(m_nCurrActionID, VARIANT_FALSE);
+					ASSERT_RESOURCE_ALLOCATION("ELI38476", ipActionStats != __nullptr);
+
+					updateStats(ipActionStats);
+				}
 			}
 		}
 		// If the action name doesn't exist don't show an error; simply don't update the counts
