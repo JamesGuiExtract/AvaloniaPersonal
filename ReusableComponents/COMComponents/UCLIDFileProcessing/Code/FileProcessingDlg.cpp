@@ -3112,9 +3112,8 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 					ipActionStats =
 						getDBPointer()->GetStats(m_nCurrActionID, VARIANT_FALSE);
 					ASSERT_RESOURCE_ALLOCATION("ELI38476", ipActionStats != __nullptr);
-
-					updateStats(ipActionStats);
 				}
+				updateStats(ipActionStats);
 			}
 		}
 		// If the action name doesn't exist don't show an error; simply don't update the counts
