@@ -116,7 +116,9 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
  m_bPaused(false),
  m_nNumberOfDocsToExecute(0),
  m_bUpdatingConnection(false),
- m_bWorkflowsDefined(false)
+ m_bWorkflowsDefined(false),
+ m_bRequireAdminEdit(false),
+ m_bFPSLocked(false)
 {
 	try
 	{
@@ -425,7 +427,7 @@ void FileProcessingDlg::OnBtnRun()
 			// here because we don't want the internal dirty flag to be
 			// effected by this SaveTo() call.
 			IPersistStreamPtr ipPersist = ipFPM;
-			if (ipPersist->IsDirty() == S_OK)
+			if (!m_bFPSLocked && ipPersist->IsDirty() == S_OK)
 			{
 				// Only perform the from save if the file is dirty
 				ipFPM->SaveTo(m_pFRM->getRecoveryFileName().c_str(), 
@@ -905,7 +907,7 @@ void FileProcessingDlg::OnTimer(UINT nIDEvent)
 					// Only save if the current file is dirty [LRCAU #6012]
 					UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFPM = getFPM();
 					IPersistStreamPtr ipPersist = ipFPM;
-					if (ipPersist->IsDirty() == S_OK)
+					if (!m_bFPSLocked && ipPersist->IsDirty() == S_OK)
 					{
 						ipFPM->SaveTo(m_pFRM->getRecoveryFileName().c_str(), 
 							VARIANT_FALSE);
@@ -1232,7 +1234,7 @@ void FileProcessingDlg::OnFileOpen()
 		// Test if the FAM is running
 		if (!m_bRunning)
 		{
-			openFile(string(""));
+			openFile(string(""), false);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10959");
@@ -1273,7 +1275,7 @@ void FileProcessingDlg::OnDropFiles(HDROP hDropInfo)
 			if (strExtension == gstrFILE_PROCESSING_SPECIFICATION_EXT)
 			{
 				// Attempt to open the file
-				openFile(strFile);
+				openFile(strFile, false);
 			}
 		}
 	}
@@ -1676,7 +1678,7 @@ void FileProcessingDlg::OnSelectFAMMRUPopupMenu(UINT nID)
 			// get the current selected file index of MRU list
 			int nCurrentSelectedFileIndex = nID - ID_FAM_MRU_FILE1;
 
-			openFile(m_upMRUList->at(nCurrentSelectedFileIndex));
+			openFile(m_upMRUList->at(nCurrentSelectedFileIndex), false);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32006");
@@ -1985,13 +1987,13 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	bool bProcessingStarted = (getFPM()->ProcessingStarted == VARIANT_TRUE);
 	bool bProcessingPaused = false;
 	bool bContextSelected = (m_ipFAMTagManager->ActiveContext.length() > 0);
-	bool bFPSLocked = m_bRequireAdminEdit && asCppBool(getDBPointer()->IsConnected) && !asCppBool(getDBPointer()->LoggedInAsAdmin);
+	m_bFPSLocked = m_bRequireAdminEdit && asCppBool(getDBPointer()->IsConnected) && !asCppBool(getDBPointer()->LoggedInAsAdmin);
 
 	// update the menu items
 	CMenu* pMenu = GetMenu();
 
 	pMenu->CheckMenuItem(ID_FILE_REQUIREADMINEDIT, MF_BYCOMMAND | (m_bRequireAdminEdit) ? MF_CHECKED : MF_UNCHECKED);
-	pMenu->EnableMenuItem(ID_FILE_LOGINASADMIN, MF_BYCOMMAND | (bFPSLocked) ? MF_ENABLED : MF_GRAYED);
+	pMenu->EnableMenuItem(ID_FILE_LOGINASADMIN, MF_BYCOMMAND | (m_bFPSLocked) ? MF_ENABLED : MF_GRAYED);
 		 
 	// A local flag indicate FAM is processing or running only with statistics tab
 	bool bRunningStatus = bProcessingStarted || (m_bStatsOnlyRunning && m_bRunning);
@@ -2028,15 +2030,15 @@ void FileProcessingDlg::updateMenuAndToolbar()
 
 	// update the toolbar buttons
 	m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_OPEN, asMFCBool(!bRunningStatus));
-	m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_SAVE, asMFCBool(!bRunningStatus && !bFPSLocked));
+	m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_SAVE, asMFCBool(!bRunningStatus && !m_bFPSLocked));
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_RUN, asMFCBool(bEnableRun) );
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_PAUSE, asMFCBool(bEnablePause) );
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_STOP, asMFCBool(bEnableStop) );
 	m_toolBar.GetToolBarCtrl().PressButton(IDC_BTN_PAUSE, asMFCBool(bProcessingPaused) );
 
 	// update workflow combo
-	m_comboBoxWorkflow.EnableWindow(asMFCBool(!bRunningStatus && !bFPSLocked && m_bWorkflowsDefined));
-	m_buttonContext.EnableWindow(asMFCBool(!bRunningStatus && !bFPSLocked && bContextSelected));
+	m_comboBoxWorkflow.EnableWindow(asMFCBool(!bRunningStatus && !m_bFPSLocked && m_bWorkflowsDefined));
+	m_buttonContext.EnableWindow(asMFCBool(!bRunningStatus && !m_bFPSLocked && bContextSelected));
 
 	// Get the auto scrolling setting from registry
 	bool bAutoScroll = ma_pCfgMgr->getAutoScrolling();
@@ -2052,22 +2054,22 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	
 	// enable/disable menu items as appropriate.
 	pMenu->EnableMenuItem(0, MF_BYPOSITION | (bRunningStatus ? MF_GRAYED : MF_ENABLED) );
-	pMenu->EnableMenuItem(ID_FILE_SAVE, MF_BYCOMMAND | (!bFPSLocked) ? MF_ENABLED : MF_GRAYED);
-	pMenu->EnableMenuItem(ID_FILE_SAVEAS, MF_BYCOMMAND | (!bFPSLocked) ? MF_ENABLED : MF_GRAYED);
+	pMenu->EnableMenuItem(ID_FILE_SAVE, MF_BYCOMMAND | (!m_bFPSLocked) ? MF_ENABLED : MF_GRAYED);
+	pMenu->EnableMenuItem(ID_FILE_SAVEAS, MF_BYCOMMAND | (!m_bFPSLocked) ? MF_ENABLED : MF_GRAYED);
 	pMenu->EnableMenuItem(ID_PROCESS_STARTPROCESSING, MF_BYCOMMAND | (bEnableRun ? MF_ENABLED: MF_GRAYED) );
 	pMenu->EnableMenuItem(ID_PROCESS_PAUSEPROCESSING, MF_BYCOMMAND | (bEnablePause ? MF_ENABLED: MF_GRAYED) );
 	pMenu->EnableMenuItem(ID_PROCESS_STOPPROCESSING, MF_BYCOMMAND | (bEnableStop ? MF_ENABLED: MF_GRAYED) );
 	pMenu->EnableMenuItem(2, MF_BYPOSITION | (bRunningStatus ? MF_GRAYED : MF_ENABLED) );
-	pMenu->EnableMenuItem(ID_TOOLS_EDITCUSTOMTAGS, MF_BYCOMMAND | (bContextSelected && !bFPSLocked ? MF_ENABLED : MF_GRAYED) );
+	pMenu->EnableMenuItem(ID_TOOLS_EDITCUSTOMTAGS, MF_BYCOMMAND | (bContextSelected && !m_bFPSLocked ? MF_ENABLED : MF_GRAYED) );
 
 	// Enable/disable the controls on the database page based on whether
 	// we are currently processing or not
 	if (m_propDatabasePage.m_hWnd != __nullptr)
 	{
-		m_propDatabasePage.enableAllControls(!m_bRunning && !bFPSLocked);
+		m_propDatabasePage.enableAllControls(!m_bRunning && !m_bFPSLocked);
 	}
 
-	setPagesEnable(!m_bRunning && !bFPSLocked);
+	setPagesEnable(!m_bRunning && !m_bFPSLocked);
 
 	// redraw the menu bar
 	DrawMenuBar();
@@ -2472,7 +2474,7 @@ bool FileProcessingDlg::isFAMReady()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlg::openFile(string strFileName) 
+void FileProcessingDlg::openFile(string strFileName, bool bPreserveConnection) 
 {
 	try
 	{
@@ -2521,7 +2523,28 @@ void FileProcessingDlg::openFile(string strFileName)
 		
 		checkAndUpdateContextTagsDatabaseIfNeeded(strFileName);
 
+		// If bPreserveConnection, create a duplicate copy to use to restore key connection state
+		// variables back to the newly loaded connection.
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipSavedConnection(__nullptr);
+		if (bPreserveConnection)
+		{
+			ipSavedConnection.CreateInstance(CLSID_FileProcessingDB);
+			ipSavedConnection->DuplicateConnection(getDBPointer());
+		}
+		
 		getFPM()->LoadFrom(get_bstr_t(strFileName), VARIANT_FALSE);
+
+		if (bPreserveConnection)
+		{
+			ASSERT_RUNTIME_CONDITION("ELI43532",
+				ipSavedConnection->DatabaseServer == getDBPointer()->DatabaseServer,
+				"Unexpected database change");
+			ASSERT_RUNTIME_CONDITION("ELI43532",
+				ipSavedConnection->DatabaseName == getDBPointer()->DatabaseName,
+				"Unexpected database change");
+			getDBPointer()->DuplicateConnection(ipSavedConnection);
+		}
+
 		loadSettingsFromManager();
 
 		updateUI();
@@ -2667,7 +2690,7 @@ bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfiguratio
 	setCurrFPSFile(strFileName);
 
 	// Reopen the file - this will reset the context so that tags will be interpreted correctly
-	openFile(m_strCurrFPSFilename);
+	openFile(m_strCurrFPSFilename, true);
 	
 	// The open file call above sometimes triggers the side-effect of a task description
 	// "disappearing" when on the processing setup tag. Invalidate to ensure the current tab is
@@ -2684,7 +2707,7 @@ bool FileProcessingDlg::checkForSave()
 	ASSERT_RESOURCE_ALLOCATION("ELI14154", ipStream != __nullptr);
 
 	// Check if there is any change in the FPM
-	if (ipStream->IsDirty() == S_OK)
+	if (!m_bFPSLocked && ipStream->IsDirty() == S_OK)
 	{
 		// Provide MessageBox to user
 		int nRet = MessageBox("Current settings have been modified.\nDo you wish to save the changes?", 

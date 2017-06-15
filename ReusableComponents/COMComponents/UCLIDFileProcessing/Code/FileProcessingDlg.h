@@ -329,6 +329,9 @@ private:
 	// Flag indicating if the FPS requires an admin login to allow editing
 	bool m_bRequireAdminEdit;
 
+	// Indicates whether the FAM is currently locked from editing.
+	bool m_bFPSLocked;
+
 	////////////
 	// Methods
 	///////////
@@ -356,7 +359,10 @@ private:
 	// If the current configuration of the dialog has not been saved it will prompt the user to save.
 	// If strFileName == "" this method will open a dialog from which the user can select a .fps file
 	// to open
-	void openFile(string strFileName);
+	// If bPreserveConnection is true, key connection parameters will be restored after loading
+	// (most notably admin login status). Do not use bPreserveConnection unless it is certain the loaded
+	// database will match the current database.
+	void openFile(string strFileName, bool bPreserveConnection);
 		//---------------------------------------------------------------------------------------------
 	// This method will flush the current dialog settings to the m_ipFileProcMgr and then saves them
 	// to an fps file. bShowConfigurationWarnings indicates whether a prompt should be displayed
