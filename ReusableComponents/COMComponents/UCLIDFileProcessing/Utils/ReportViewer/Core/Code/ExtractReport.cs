@@ -583,7 +583,7 @@ namespace Extract.ReportViewer
                 numberOfParametersSet += SetParameterValues(reportParameters,
                     "ES_ServerName", _serverName, false);
                 numberOfParametersSet += SetParameterValues(reportParameters,
-                    "ES_WorkflowName", _databaseName, false);
+                    "ES_WorkflowName", _workflowName, false);
 
                 // Get the count of "non-linked" parameters
                 int numberOfParameters = GetNonLinkedParameterCount(reportParameters);
