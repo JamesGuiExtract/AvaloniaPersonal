@@ -27,5 +27,7 @@ namespace MvcUploadFile
         public string WebApiPortionOfUrl { get; set; }
 
         public string JWT { get; set; }
+
+        public string LogPath { get; set; }
     }
 }

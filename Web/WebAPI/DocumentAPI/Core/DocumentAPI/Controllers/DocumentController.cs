@@ -76,6 +76,7 @@ namespace DocumentAPI.Controllers
         {
             try
             {
+                Contract.Assert(file != null, "Null file has been submitted");
                 Contract.Assert(file.Length > 0, "Zero length file: {0}, has been submitted", file.FileName);
 
                 var fileName = file.FileName;
