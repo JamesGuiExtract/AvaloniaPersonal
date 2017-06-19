@@ -1293,7 +1293,17 @@ namespace Extract.Redaction.Verification
                            Path.GetExtension(sourceDocument);
             }
 
-            return Path.Combine(directory, fileName);
+            try
+            {
+                return Path.Combine(directory, fileName);
+            }
+            catch (Exception ex)
+            {
+                var ue = ex.AsExtract("ELI43534");
+                ue.AddDebugData("Bad directory name", directory, false);
+                ue.AddDebugData("Bad file name", fileName, false);
+                throw ue;
+            }
         }
 
         /// <summary>

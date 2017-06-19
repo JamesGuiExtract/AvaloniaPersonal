@@ -1278,7 +1278,19 @@ namespace Extract.Utilities
                 }
 
                 // Updated to use the .Net 4.0 path combine
-                return Path.Combine(list);
+                try
+                {
+                    return Path.Combine(list);
+                }
+                catch (Exception ae)
+                {
+                    var ue = ae.AsExtract("ELI43536");
+                    foreach (string li in list)
+                    {
+                        ue.AddDebugData("Bad item", li, false);
+                    }
+                    throw ue;
+                }
             }
             catch (Exception ex)
             {
