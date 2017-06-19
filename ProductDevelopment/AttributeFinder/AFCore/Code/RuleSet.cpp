@@ -2270,7 +2270,7 @@ void CRuleSet::decrementCounters(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 						asString(ipAFDoc->Text->SourceDocName));
 				}
 
-				decrementCounter(counterInfo, nNumToDecrement, true);
+				decrementCounter(counterInfo, nNumToDecrement, true, ipAFDoc);
 			}
 		}
 	}
@@ -2280,7 +2280,8 @@ void CRuleSet::decrementCounters(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39180");
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool bAllowAccumulation)
+void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool bAllowAccumulation,
+	UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 {
 	ASSERT_RUNTIME_CONDITION("ELI38998", nNumToDecrement >= 0,
 		"Invalid counter decrement attempted.");
@@ -2369,6 +2370,14 @@ void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool 
 			UCLIDException ue("ELI39008", "Rule execution counter not available.");
 			ue.addDebugInfo("ID", counter.m_nID);
 			ue.addDebugInfo("Name", counter.m_strName);
+
+			// Only top-level rules files can decrement counters so perhaps that is why
+			// this has failed.
+			// https://extract.atlassian.net/browse/ISSUE-14386
+			if (ipAFDoc != __nullptr && ipAFDoc->RSDFileStack != __nullptr)
+			{
+				ue.addDebugInfo("Is top-level rules file", ipAFDoc->RSDFileStack->Size == 1);
+			}
 			throw ue;
 		}
 
@@ -2399,7 +2408,7 @@ void CRuleSet::flushCounters()
 
 		if (counterData.m_nCountDecrementAccumulation > 0)
 		{
-			decrementCounter(counterInfo, 0, false);
+			decrementCounter(counterInfo, 0, false, __nullptr);
 		}
 	}
 }

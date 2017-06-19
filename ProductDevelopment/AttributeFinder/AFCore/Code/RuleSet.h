@@ -296,7 +296,8 @@ private:
 	// can allow a small number of counts to accumulate before deducting them from the key to limit
 	// the extent to which counter decrements can be a bottleneck. If bAllowAccumulation = false
 	// no such accumulation is allowed (and any counts already accumulated will be decremented).
-	void decrementCounter(CounterInfo& counter, int nNumToDecrement, bool bAllowAccumulation);
+	void decrementCounter(CounterInfo& counter, int nNumToDecrement, bool bAllowAccumulation,
+		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc);
 
 	// Decrements from the specified counter any accumulated counts right away.
 	void flushCounters();
