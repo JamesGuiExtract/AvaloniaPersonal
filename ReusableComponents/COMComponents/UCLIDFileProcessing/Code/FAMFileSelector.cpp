@@ -167,7 +167,8 @@ STDMETHODIMP CFAMFileSelector::LimitToSubset(VARIANT_BOOL bRandomSubset, VARIANT
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35769");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMFileSelector::GetSummaryString(BSTR *pbstrSummaryString)
+STDMETHODIMP CFAMFileSelector::GetSummaryString(IFileProcessingDB *pFAMDB, VARIANT_BOOL bIgnoreWorkflows,
+												BSTR *pbstrSummaryString)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -176,8 +177,10 @@ STDMETHODIMP CFAMFileSelector::GetSummaryString(BSTR *pbstrSummaryString)
 		validateLicense();
 
 		ASSERT_ARGUMENT("ELI35698", pbstrSummaryString != __nullptr);
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB(pFAMDB);
+		ASSERT_ARGUMENT("ELI43538", ipFAMDB != __nullptr);
 
-		string strSummaryString = m_settings.getSummaryString();
+		string strSummaryString = m_settings.getSummaryString(ipFAMDB, asCppBool(bIgnoreWorkflows));
 		*pbstrSummaryString = get_bstr_t(strSummaryString).Detach();
 	
 		return S_OK;

@@ -4882,7 +4882,7 @@ namespace Extract.FileActionManager.Utilities
                 string summaryText =
                     (LockFileSelector && !string.IsNullOrWhiteSpace(LockedFileSelectionSummary))
                         ? LockedFileSelectionSummary
-                        : FileSelector.GetSummaryString();
+                        : FileSelector.GetSummaryString(FileProcessingDB, false);
                 _selectFilesSummaryLabel.Text = "Listing ";
                 _selectFilesSummaryLabel.Text +=
                     summaryText.Substring(0, 1).ToLower(CultureInfo.CurrentCulture);

@@ -312,7 +312,7 @@ public:
 	STDMETHOD(get_ConnectedDatabaseName)(BSTR* pbstrDatabaseName);
 	STDMETHOD(SetSecureCounterAlertLevel)(long nCounterID, long nAlertLevel, long nAlertMultiple);
 	STDMETHOD(AddFileNoQueue)(BSTR bstrFile, long long llFileSize, long lPageCount,
-		EFilePriority ePriority, long* pnID);
+		EFilePriority ePriority, long nWorkflowID, long* pnID);
 	STDMETHOD(AddPaginationHistory)(BSTR bstrOutputFile, IIUnknownVector* pSourcePageInfo,
 		long nFileTaskSessionID);
 	STDMETHOD(AddWorkflow)(BSTR bstrName, EWorkflowType eType, long* pnID);
@@ -1420,7 +1420,7 @@ private:
 	bool GetCounterUpdateRequestCode_Internal(bool bDBLocked, BSTR* pstrUpdateRequestCode);
 	bool SetSecureCounterAlertLevel_Internal(bool bDBLocked, long nCounterID, long nAlertLevel, long nAlertMultiple);
 	bool AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, long long llFileSize, long lPageCount,
-		EFilePriority ePriority, long* pnID);
+		EFilePriority ePriority, long nWorkflowID, long* pnID);
 	bool AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrOutputFile, IIUnknownVector* pSourcePageInfo,
 		long nFileTaskSessionID);
 	bool AddWorkflow_Internal(bool bDBLocked, BSTR bstrName, EWorkflowType eType, long* pnID);

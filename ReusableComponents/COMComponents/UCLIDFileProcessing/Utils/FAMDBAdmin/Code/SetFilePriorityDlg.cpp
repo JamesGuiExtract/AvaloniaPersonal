@@ -105,7 +105,8 @@ BOOL CSetFilePriorityDlg::OnInitDialog()
 		m_comboPriority.SetCurSel(nIndex);
 
 		// Update the summary with the settings string
-		m_editSummary.SetWindowText(asString(m_ipFileSelector->GetSummaryString()).c_str());
+		m_editSummary.SetWindowText(asString(
+			m_ipFileSelector->GetSummaryString(m_ipFAMDB, false)).c_str());
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27688");
 
@@ -125,7 +126,8 @@ void CSetFilePriorityDlg::OnClickedSelectFiles()
 		// Update the summary text if new settings were applied.
 		if (bAppliedSettings)
 		{
-			string strSummaryString = asString(m_ipFileSelector->GetSummaryString());
+			string strSummaryString = asString(
+				m_ipFileSelector->GetSummaryString(m_ipFAMDB, false));
 			m_editSummary.SetWindowText(strSummaryString.c_str());
 		}
 	}

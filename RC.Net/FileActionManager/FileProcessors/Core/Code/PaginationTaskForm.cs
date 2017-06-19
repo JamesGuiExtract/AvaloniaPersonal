@@ -791,6 +791,9 @@ namespace Extract.FileActionManager.FileProcessors
                             _lastDocumentPosition = -1;
                         });
                     }
+
+                    // Without this call, after committing the top document separator bar is not updating correctly after commit.
+                    _paginationPanel.Invalidate();
                 }
             }
             catch (Exception ex)

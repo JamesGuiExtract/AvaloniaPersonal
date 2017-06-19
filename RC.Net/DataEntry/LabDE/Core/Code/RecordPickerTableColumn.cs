@@ -328,8 +328,7 @@ namespace Extract.DataEntry.LabDE
             {
                 LoadDataForAllRows();
 
-                string currentFileName = DataEntryControlHost.ImageViewer.ImageFile;
-                int fileId = FileProcessingDB.GetFileID(currentFileName);
+                int fileId = FileProcessingDB.GetFileID(AttributeStatusInfo.SourceDocName);
 
                 FAMData.LinkFileWithCurrentRecords(fileId);
             }

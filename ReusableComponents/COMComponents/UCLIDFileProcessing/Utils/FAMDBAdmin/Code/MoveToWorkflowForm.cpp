@@ -27,7 +27,8 @@ namespace Extract {
 					Close();
 				}
 
-				_selectFilesSummaryTextBox->Text = marshal_as<String^>(_ipFileSelector->GetSummaryString());
+				_selectFilesSummaryTextBox->Text = marshal_as<String^>(
+					_ipFileSelector->GetSummaryString(_ipfamDatabase, true));
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43395");
 		}
@@ -43,7 +44,8 @@ namespace Extract {
 				// Update the summary text if new settings were applied.
 				if (bAppliedSettings)
 				{
-					String^ strSummaryString = marshal_as<String^>(_ipFileSelector->GetSummaryString());
+					String^ strSummaryString = marshal_as<String^>(
+						_ipFileSelector->GetSummaryString(_ipfamDatabase, true));
 					_selectFilesSummaryTextBox->Text = strSummaryString;
 				}
 

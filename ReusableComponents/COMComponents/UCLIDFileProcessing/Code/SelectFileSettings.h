@@ -72,7 +72,9 @@ public:
 	bool selectingAllFiles() { return m_vecConditions.empty() && !m_bLimitToSubset; }
 
 	// Builds the summary string
-	string getSummaryString();
+	// The same ipFAMDB and bIgnoreWorkflows value should be used here as for build query so as to
+	// be able to display to the user if results will be limited to a specific workflow.
+	string getSummaryString(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB, bool bIgnoreWorkflows);
 
 	// Builds a select query with the specified values selected for the current settings.
 	// NOTE: strSelect should contain only the values to be selected by the query, for

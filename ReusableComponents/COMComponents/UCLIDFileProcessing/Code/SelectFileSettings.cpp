@@ -71,13 +71,25 @@ void SelectFileSettings::clearConditions()
 	m_vecConditions.clear();
 }
 //--------------------------------------------------------------------------------------------------
-string SelectFileSettings::getSummaryString()
+string SelectFileSettings::getSummaryString(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
+											bool bIgnoreWorkflows)
 {
-	string strSummary = "All files ";
+	string strWorkflow;
+	if (!bIgnoreWorkflows)
+	{
+		strWorkflow = asString(ipFAMDB->ActiveWorkflow);
+	}
+
+	string strSummary = strWorkflow.empty()
+		? "All files "
+		: "All files in the workflow \"" + strWorkflow + "\" ";
 
 	if (m_vecConditions.empty())
 	{
-		strSummary += "in the database";
+		if (strWorkflow.empty())
+		{
+			strSummary += "in the database";
+		}
 	}
 	else
 	{
@@ -92,6 +104,8 @@ string SelectFileSettings::getSummaryString()
 			strSummary += m_vecConditions[i]->getSummaryString(bFirst);
 		}
 	}
+
+	strSummary = trim(strSummary, "", " ");
 
 	if (m_bLimitToSubset)
 	{

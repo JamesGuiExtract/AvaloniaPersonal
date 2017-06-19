@@ -1738,10 +1738,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             int fileID = -1;
+            const int nCurrentWorkflow = -1;
             try
             {
                 fileID = FileProcessingDB.AddFileNoQueue(
-                    e.OutputFileName, e.FileSize, e.PageCount, priority);
+                    e.OutputFileName, e.FileSize, e.PageCount, priority, nCurrentWorkflow);
             }
             catch (Exception ex)
             {
@@ -1760,7 +1761,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
 
                     fileID = FileProcessingDB.AddFileNoQueue(
-                        e.OutputFileName, e.FileSize, e.PageCount, priority);
+                        e.OutputFileName, e.FileSize, e.PageCount, priority, nCurrentWorkflow);
                 }
                 else
                 {

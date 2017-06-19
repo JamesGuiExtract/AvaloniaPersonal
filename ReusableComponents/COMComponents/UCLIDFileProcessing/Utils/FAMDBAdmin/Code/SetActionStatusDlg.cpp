@@ -144,7 +144,8 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 		updateControls();
 
 		// Update the summary edit box with the settings
-		m_editSummary.SetWindowText(asString(m_ipFileSelector->GetSummaryString()).c_str());
+		m_editSummary.SetWindowText(asString(
+			m_ipFileSelector->GetSummaryString(m_ipFAMDB, false)).c_str());
 
 		// Set the focus to the select files button
 		GetDlgItem(IDC_BTN_SLCT_FLS_STATUS)->SetFocus();
@@ -221,7 +222,8 @@ void CSetActionStatusDlg::OnClickedSelectFiles()
 		// Update the summary text if new settings were applied.
 		if (bAppliedSettings)
 		{
-			string strSummaryString = asString(m_ipFileSelector->GetSummaryString());
+			string strSummaryString = asString(
+				m_ipFileSelector->GetSummaryString(m_ipFAMDB, false));
 			m_editSummary.SetWindowText(strSummaryString.c_str());
 		}
 
@@ -326,7 +328,8 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			uex.addDebugInfo("Copy From Action", lFromActionID); 
 		}
 
-		string strSummaryString = asString(m_ipFileSelector->GetSummaryString());
+		string strSummaryString = asString(
+			m_ipFileSelector->GetSummaryString(m_ipFAMDB, false));
 		uex.addDebugInfo("Files Selected", strSummaryString);
 
 		if (!asCppBool(m_ipFileSelector->SelectingAllFiles))

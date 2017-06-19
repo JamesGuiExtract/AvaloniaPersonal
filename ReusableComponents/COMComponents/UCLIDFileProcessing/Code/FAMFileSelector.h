@@ -43,7 +43,8 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(AddFileSetCondition)(BSTR bstrFileSet);
 	STDMETHOD(LimitToSubset)(VARIANT_BOOL bRandomSubset, VARIANT_BOOL bTopSubset,
 		VARIANT_BOOL bUsePercentage, LONG nSubsetSize);
-	STDMETHOD(GetSummaryString)(BSTR* pbstrSummaryString);
+	STDMETHOD(GetSummaryString)(IFileProcessingDB *pFAMDB, VARIANT_BOOL bIgnoreWorkflows,
+		BSTR* pbstrSummaryString);
 	STDMETHOD(get_SelectingAllFiles)(VARIANT_BOOL* pbSelectingAllFiles);
 	STDMETHOD(BuildQuery)(IFileProcessingDB *pFAMDB, BSTR bstrSelect,
 			BSTR bstrOrderByClause, VARIANT_BOOL bIgnoreWorkflows, BSTR* pbstrQuery);

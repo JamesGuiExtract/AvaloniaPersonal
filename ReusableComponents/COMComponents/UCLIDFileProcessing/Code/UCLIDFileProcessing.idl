@@ -1802,7 +1802,7 @@ library UCLID_FILEPROCESSINGLib
 		// RETURNS: The ID that has been associated with the file.
 		[id(159), helpstring("method AddFileNoQueue")] HRESULT AddFileNoQueue([in] BSTR strFile,
 			[in] long long llFileSize, [in] LONG lPageCount,  [in] EFilePriority ePriority,
-			[out, retval] long* pnID);
+			[in] long nWorkflowID, [out, retval] long* pnID);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To add data to the Pagination table indicating the source of all pages for the
 		//			newly generated bstrOutputFile.
@@ -2651,7 +2651,11 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Gets colloquial text describing the current settings.
 		// RETURNS:	pbstrSummaryString- The colloquial text describing the current settings.
+		// ARGS:	The same pFAMDB and bIgnoreWorkflows parameters should be used here as will be
+		//			used for BuildQuery so as to be able to display to the user if results will be
+		//			limited to a specific workflow.
 		[id(3), helpstring("method GetSummaryString")] HRESULT GetSummaryString(
+			[in] IFileProcessingDB *pFAMDB, [in] VARIANT_BOOL bIgnoreWorkflows,
 			[out, retval] BSTR* pbstrSummaryString);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Gets whether the instance is currently configured to return all files.

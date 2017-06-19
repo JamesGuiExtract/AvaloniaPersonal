@@ -9674,7 +9674,8 @@ bool CFileProcessingDB::SetSecureCounterAlertLevel_Internal(bool bDBLocked, long
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, long long llFileSize,
-												long lPageCount, EFilePriority ePriority, long* pnID)
+												long lPageCount, EFilePriority ePriority, long nWorkflowID, 
+												long* pnID)
 {
 	try
 	{
@@ -9703,6 +9704,19 @@ bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, l
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
+				// Do not allow adding of files to all workflows via AddFile.
+				if (nWorkflowID <= 0 && m_bRunningAllWorkflows)
+				{
+					UCLIDException ue("ELI43539", "Workflow has not been set.");
+					ue.addDebugInfo("FPS File", m_strFPSFileName, false);
+					throw ue;
+				}
+
+				if (nWorkflowID <= 0 && m_bUsingWorkflowsForCurrentAction)
+				{
+					nWorkflowID = getActiveWorkflowID(ipConnection);
+				}
+
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
@@ -9714,6 +9728,15 @@ bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, l
 				{
 					// add a new QueueEvent record 
 					addQueueEventRecord(ipConnection, nID, -1, asString(bstrFile), "P", llFileSize);
+				}
+
+				if (nWorkflowID > 0 && !isFileInWorkflow(ipConnection, nID, nWorkflowID))
+				{
+					// In the case that the file did exist in the DB, but not the workflow, the
+					// [WorkflowFile] row will be added as part of the setStatusForFile call.
+					executeCmdQuery(ipConnection, Util::Format(
+						"INSERT INTO [WorkflowFile] ([WorkflowID], [FileID]) VALUES (%d,%d)",
+						nWorkflowID, nID));
 				}
 
 				// Commit the changes to the database

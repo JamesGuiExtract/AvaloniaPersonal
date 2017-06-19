@@ -3817,8 +3817,8 @@ STDMETHODIMP CFileProcessingDB::SetSecureCounterAlertLevel(long nCounterID, long
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39131");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::AddFileNoQueue(BSTR bstrFile, long long llFileSize,
-											   long lPageCount, EFilePriority ePriority, long* pnID)
+STDMETHODIMP CFileProcessingDB::AddFileNoQueue(BSTR bstrFile, long long llFileSize, long lPageCount,
+											   EFilePriority ePriority, long nWorkflowID, long* pnID)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -3826,13 +3826,13 @@ STDMETHODIMP CFileProcessingDB::AddFileNoQueue(BSTR bstrFile, long long llFileSi
 	{
 		validateLicense();
 		
-		if (!AddFileNoQueue_Internal(false, bstrFile, llFileSize, lPageCount, ePriority, pnID))
+		if (!AddFileNoQueue_Internal(false, bstrFile, llFileSize, lPageCount, ePriority, nWorkflowID, pnID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
 				gstrMAIN_DB_LOCK);
 
-			AddFileNoQueue_Internal(true, bstrFile, llFileSize, lPageCount, ePriority, pnID);
+			AddFileNoQueue_Internal(true, bstrFile, llFileSize, lPageCount, ePriority, nWorkflowID, pnID);
 		}
 		return S_OK;
 	}
