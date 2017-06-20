@@ -15,8 +15,53 @@ namespace SubmitFilesConsole
         static string _userName = "Admin";
         static string _password = "a";
         static string _workflowName = "CourtOffice";
-        static string _logPath = "c:/temp/MvcUplaodFile/Logs";
-        static string _webApiPortionOfUrl = "api/Document/SubmitFile";
+        static string _logPath = "c:/temp/MvcUploadFile/Logs";
+        static string _virtualDirectory = "";
+
+        // "class paths" used by this application
+        static readonly string _documentPath = "api/Document";
+        static readonly string _usersPath = "api/Users";
+
+        /// <summary>
+        /// assemble a correct web class.method path
+        /// </summary>
+        /// <param name="virtualDirectory">the virutal directory name used by the host (often IIS). May be empty (when hosted by IISExpress, or self-hosted)</param>
+        /// <param name="classPath">something like "api/Document" or "api/Users". This should NEVER be empty</param>
+        /// <param name="methodName">The name of the method being invoked. Should NOT have '/' chars</param>
+        /// <returns></returns>
+        static string MakeMethodPath(string virtualDirectory, string classPath, string methodName)
+        {
+            if (String.IsNullOrWhiteSpace(classPath))
+            {
+                throw new Exception("Empty classPath string, while building a method path");
+            }
+
+            if (String.IsNullOrWhiteSpace(methodName))
+            {
+                throw new Exception("Empty method name string, while building a method path");
+            }
+
+            string vpath = "";
+            if (!String.IsNullOrWhiteSpace(virtualDirectory))
+            {
+                vpath += virtualDirectory;
+            }
+
+            if (!String.IsNullOrWhiteSpace(vpath) && !vpath.EndsWith("/"))
+            {
+                vpath += "/";
+            }
+
+            vpath += classPath;
+
+            if (!vpath.EndsWith("/"))
+            {
+                vpath += "/";
+            }
+
+            vpath += methodName;
+            return vpath;
+        }
 
         /* JWT is returned JSON encoded, looks like this:
         {
@@ -45,36 +90,30 @@ namespace SubmitFilesConsole
         /// <returns>token text extracted from the JWT returned by the DocumentAPI</returns>
         static string Login()
         {
-            try
+            using (var client = new HttpClient())
             {
-                using (var client = new HttpClient())
+                client.BaseAddress = new Uri(_baseAddr);
+
+                UserData loginInfo = new UserData
                 {
-                    client.BaseAddress = new Uri(_baseAddr);
+                    Username = _userName,
+                    Password = _password,
+                    WorkflowName = _workflowName
+                };
 
-                    UserData loginInfo = new UserData
-                    {
-                        Username = _userName,
-                        Password = _password,
-                        WorkflowName = _workflowName
-                    };
+                string loginAsText = loginInfo.ToJsonString();
 
-                    string loginAsText = loginInfo.ToJsonString();
-
-                    var content = new StringContent(loginAsText, Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = client.PostAsync("api/Users/Login", content).Result;
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string jwtToken = response.Content.ReadAsStringAsync().Result;
-                        return ExtractAccessToken(jwtToken);
-                    }
+                var content = new StringContent(loginAsText, Encoding.UTF8, "application/json");
+                var invokeLogin = MakeMethodPath(_virtualDirectory, _usersPath, "Login");
+                HttpResponseMessage response = client.PostAsync(invokeLogin, content).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string jwtToken = response.Content.ReadAsStringAsync().Result;
+                    return ExtractAccessToken(jwtToken);
                 }
-            }
-            catch (Exception ex)
-            {
-                string msg = ex.Message;
-            }
 
-            return "";
+                throw new Exception($"Login failed, response code: {response.StatusCode}");
+            }
         }
 
         /// <summary>
@@ -114,16 +153,16 @@ namespace SubmitFilesConsole
                 _workflowName = workflowName;
             }
 
-            var webApiPortionOfUrl = Configuration["WebApiPortionOfUrl"];
-            if (!String.IsNullOrWhiteSpace(webApiPortionOfUrl))
-            {
-                _webApiPortionOfUrl = webApiPortionOfUrl;
-            }
-
             var logPath = Configuration["LogPath"];
             if (!String.IsNullOrWhiteSpace(logPath))
             {
                 _logPath = logPath;
+            }
+
+            var vdir = Configuration["VirtualDirectory"];
+            if (!String.IsNullOrWhiteSpace(vdir))
+            {
+                _virtualDirectory = vdir;
             }
         }
 
@@ -163,7 +202,8 @@ namespace SubmitFilesConsole
                         }, "File", fileName);
 
                         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                        var response = client.PostAsync(_webApiPortionOfUrl, content).Result;
+                        var invokeSubmitFile = MakeMethodPath(_virtualDirectory, _documentPath, "SubmitFile");
+                        var response = client.PostAsync(invokeSubmitFile, content).Result;
 
                         timer.Stop();
                         var code = response.StatusCode;

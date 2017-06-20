@@ -39,6 +39,7 @@ namespace SubmitFilesConsole
         public void WriteLine(string text)
         {
             _log.WriteLine(text);
+            Console.WriteLine(text);
         }
 
         public void Close()
