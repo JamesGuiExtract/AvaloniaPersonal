@@ -435,17 +435,24 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         public virtual void ResetRowData()
         {
-            var deletedRows = _rowData.ToArray();
-            _rowData.Clear();
-
-            foreach (var row in deletedRows)
+            try
             {
-                _rowData.Remove(row.Key);
-                row.Value.RowDataUpdated -= HandleRowData_DataUpdated;
-                row.Value.Dispose();
-            }
+                var deletedRows = _rowData.ToArray();
+                _rowData.Clear();
 
-            ClearCachedData(true);
+                foreach (var row in deletedRows)
+                {
+                    _rowData.Remove(row.Key);
+                    row.Value.RowDataUpdated -= HandleRowData_DataUpdated;
+                    row.Value.Dispose();
+                }
+
+                ClearCachedData(true);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI43540");
+            }
         }
 
         /// <summary>

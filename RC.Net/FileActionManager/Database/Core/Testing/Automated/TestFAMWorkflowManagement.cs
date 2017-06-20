@@ -701,9 +701,9 @@ namespace Extract.FileActionManager.Database.Test
         /// Tests Move files to different workflow
         /// </summary>
         [Test, Category("Automated")]
-        public static void MoveWorkflow_UnattemptedAndWithaction()
+        public static void MoveWorkflow_UnattemptedAndWithAction()
         {
-            string testDbName = "Test_MoveWorkflow_UnattemptedAndWithaction";
+            string testDbName = "Test_MoveWorkflow_UnattemptedAndWithAction";
             IFileProcessingDB fileProcessingDb = CreateTestDatabase(testDbName);
             try
             {

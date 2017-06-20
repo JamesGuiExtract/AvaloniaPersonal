@@ -212,14 +212,22 @@ STDMETHODIMP CRuleSet::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlag
 		ASSERT_RESOURCE_ALLOCATION("ELI16904", ipPersistStream != __nullptr);
 
 		// Load the ruleset
-		readObjectFromFile(ipPersistStream, strFullFileName, m_bstrStreamName, bIsEncrypted);
+		try
+		{
+			readObjectFromFile(ipPersistStream, strFullFileName, m_bstrStreamName, bIsEncrypted);
+		}
+		catch (UCLIDException& ue)
+		{
+			ue.addDebugInfo("File to load", strFileName);
+			throw ue;
+		}
 		m_bIsEncrypted = bIsEncrypted;
 
 		// mark this object as dirty depending upon bSetDirtyFlagToTrue
 		m_bDirty = (bSetDirtyFlagToTrue == VARIANT_TRUE);
 
 		// update the filename associated with this ruleset
-		m_strFileName = asString(strFullFileName);
+		m_strFileName = strFileName;
 
 		// Wait for the file to be accessible
 		waitForFileAccess(m_strFileName, giMODE_READ_ONLY);

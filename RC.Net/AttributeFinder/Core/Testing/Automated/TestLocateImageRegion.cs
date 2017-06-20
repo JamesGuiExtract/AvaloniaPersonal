@@ -24,7 +24,7 @@ namespace Extract.AttributeFinder.Test
         /// <summary>
         /// Manages the test files used by this test
         /// </summary>
-        static TestFileManager<TestCreateAttribute> _testFiles;
+        static TestFileManager<TestLocateImageRegion> _testFiles;
 
         const string _A418_TIF_FILE = "Resources.A418.tif";
         const string _A418_USS_FILE = "Resources.A418.tif.uss";
@@ -45,7 +45,7 @@ namespace Extract.AttributeFinder.Test
         public static void Setup()
         {
             GeneralMethods.TestSetup();
-            _testFiles = new TestFileManager<TestCreateAttribute>();
+            _testFiles = new TestFileManager<TestLocateImageRegion>();
         }
 
         /// <summary>

@@ -322,6 +322,8 @@ STDMETHODIMP CAFDocument::PartialClone(VARIANT_BOOL vbCloneAttributes, VARIANT_B
 		}
 
 		ipDocCopy->ParallelRunMode = (UCLID_AFCORELib::EParallelRunMode)m_eParallelRunMode;
+		ipDocCopy->FKBVersion = get_bstr_t(m_strFKBVersion);
+		ipDocCopy->AlternateComponentDataDir = get_bstr_t(m_strAlternateComponentDataDir);
 
 		// Return the new object to the caller
 		*pAFDoc = (IAFDocument *)ipDocCopy.Detach();
@@ -414,22 +416,19 @@ STDMETHODIMP CAFDocument::put_FKBVersion(BSTR newVal)
 	{
 		string newFKBVersion = asString(newVal);
 
-		// If this it the top-level rule (or if there are no rulesets executing),
-		// apply the FKB version (no questions asked)
-		if (m_ipRSDFileStack->Size < 2)
-		{
-			m_strFKBVersion = newFKBVersion;
-		}
 		// If this is a nested ruleset, ensure it is not a different FKB version than that which
 		// has already been specified.
-		else if (!m_strFKBVersion.empty() &&
-				 _strcmpi(newFKBVersion.c_str(), m_strFKBVersion.c_str()) != 0)
+		if (m_ipRSDFileStack->Size > 1 &&
+			!m_strFKBVersion.empty() &&
+			 _strcmpi(newFKBVersion.c_str(), m_strFKBVersion.c_str()) != 0)
 		{
 			UCLIDException ue("ELI41947", "Conflicting FKB version numbers!");
 			ue.addDebugInfo("Original version", m_strFKBVersion);
 			ue.addDebugInfo("Conflicting version", newFKBVersion);
 			throw ue;
 		}
+
+		m_strFKBVersion = newFKBVersion;
 
 		return S_OK;
 	}
