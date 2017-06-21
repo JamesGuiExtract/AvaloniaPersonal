@@ -17,7 +17,7 @@ del "Outbound XML Messages\*.*" /s /q
 del "Outbound XML Messages\Sent\*.*" /s /q
 del "OnBase export\*.*" /s /q
 
-Solution\Database Files\Original\OrderMappingDB.sdf
+copy "Solution\Database Files\Original\OrderMappingDB.sdf" "Solution\Database Files\OrderMappingDB.sdf"
 
 rem Setup batch file to detach the DB
 echo sp_detach_db Demo_LabDE >"%~dp0SQL.sql"
