@@ -1,7 +1,7 @@
 ﻿using Extract;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
@@ -257,8 +257,11 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="fullPath">path + filename - path is expected to exist at this point</param>
         /// <param name="submitType">File or Text - affects the return value: [File|Text]+Id</param>
+        /// <param name="caller">caller of this method - DO NOT SET, specified by compiler</param>
         /// <returns>DocumentSubmitresult instance that contains error info iff an error has occurred</returns>
-        public DocumentSubmitResult AddFile(string fullPath, DocumentSubmitType submitType)
+        public DocumentSubmitResult AddFile(string fullPath, 
+                                            DocumentSubmitType submitType, 
+                                            [CallerMemberName] string caller = "")
         {
             try
             {
@@ -268,6 +271,11 @@ namespace DocumentAPI.Models
                 Contract.Assert(!String.IsNullOrWhiteSpace(workflow.StartAction), 
                                 "The workflow: {0}, must have a Start action", 
                                 _fileApi.WorkflowName);
+
+                // Start a FAM session so that the active action is set. This in turn enables the output result file to be
+                // added to the FileMetadataFieldValue, for later retrieval by Get[File|Text]Result.
+                // ISSUE-14777 Submitting a file via the API, FileMetaDataFieldValue table does not get populated
+                fileProcessingDB.RecordFAMSessionStart(caller, workflow.StartAction, vbQueuing: true, vbProcessing: false);
 
                 var fileRecord =
                     fileProcessingDB.AddFile(fullPath,                                                 // full path to file
@@ -280,6 +288,8 @@ namespace DocumentAPI.Models
                                              false,                                                    // skip page count
                                              out bool bAlreadyExists,                                  // returns whether file already existed
                                              out EActionStatus previousActionStatus);                  // returns the previous action status (if file already existed)
+
+                fileProcessingDB.RecordFAMSessionStop();
 
                 return MakeDocumentSubmitResult(fileId: fileRecord.FileID,
                                                 isError: false,
