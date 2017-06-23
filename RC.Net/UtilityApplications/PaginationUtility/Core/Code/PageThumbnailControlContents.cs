@@ -453,7 +453,20 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI43383");
+                var ee = ex.AsExtract("ELI43383");
+
+                // https://extract.atlassian.net/browse/ISSUE-14778
+                // I have been unable to reproduce a GDI related exception here and unable to find
+                // via research a fix I believe would prevent the error. Since painting the border
+                // is not a critical operation, just log any GDI exceptions.
+                if (ee.Message.Contains("GDI"))
+                {
+                    ee.Log();
+                }
+                else
+                {
+                    ee.Display();
+                }
             }
         }
 
