@@ -524,6 +524,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     replaceExistingTypeInstances: true);
 
                 pageControl.Document = this;
+
+                Invalidate();
             }
             catch (Exception ex)
             {
@@ -564,8 +566,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     pageControl.PageStateChanged -= HandlePageControl_PageStateChanged;
                 }
-
+    
                 pageControl.Document = null;
+
+                Invalidate();
             }
             catch (Exception ex)
             {

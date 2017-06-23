@@ -781,6 +781,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
                         _updateLock.Dispose();
                         _updateLock = null;
+                        ((PaginationLayoutEngine)_flowLayoutPanel.LayoutEngine).ForceNextLayout = true;
                         UpdateCommandStates();
                     }
                 }

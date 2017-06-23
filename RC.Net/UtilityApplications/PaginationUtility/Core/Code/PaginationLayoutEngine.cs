@@ -45,6 +45,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the next layout should be required.
+        /// (optimization related).
+        /// </summary>
+        /// <value><c>true</c> if the next layout should be forced to execute; <c>false</c> if
+        /// there is no known reason the layout event can't be skipped for optimization purposes.
+        /// </value>
+        public bool ForceNextLayout
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Overrides
@@ -80,6 +93,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                 parent.SafeBeginInvoke("ELI40230", () =>
                 {
                     DoLayout(parent, layoutEventArgs);
+
+                    // Manually update separators that have pending status changes.
+                    foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
+                        .Where(separator => separator.UpdateRequired))
+                    {
+                        separator.Invalidate();
+                        separator.UpdateRequired = false;
+                    }
 
                     parent.ResumeLayout();
                     _layoutInvoked = false;
@@ -124,19 +145,23 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             // If the affected control is not currently visible, abort the layout to avoid
             // unnecessary repeated layouts as a large number of documents/pages are loading.
-            if (layoutEventArgs?.AffectedControl != null &&
+            if (!ForceNextLayout &&
+                layoutEventArgs?.AffectedControl != null &&
                 layoutEventArgs?.AffectedControl != parent &&
+                !layoutEventArgs.AffectedProperty.Equals("Visible") &&
                 !parent.ClientRectangle.IntersectsWith(layoutEventArgs.AffectedControl.Bounds))
             {
                 return;
             }
 
+            ForceNextLayout = false;
+
             // Layout all PaginationControls (ignore any other kind of control).
             foreach (PaginationControl control in parent.Controls.OfType<PaginationControl>())
             {
                 var separator = control as PaginationSeparator;
-                PaginationControl previousControl = control.PreviousControl as PaginationControl;
-                PaginationControl previousSeparator = previousControl as PaginationSeparator;
+                var previousControl = control.PreviousControl as PaginationControl;
+                var previousSeparator = previousControl as PaginationSeparator;
 
                 // Only apply layout to visible controls.
                 if (!control.Visible)
@@ -154,6 +179,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // should be ignored.
                     redundantControls.Add(separator);
                     separator.Visible = false;
+
+                    // Separator is being removed, previousSeparator is will be associated with a
+                    // new document. Ensure this new association is reflected.
+                    previousSeparator.UpdateRequired = true;
+
                     continue;
                 }
 

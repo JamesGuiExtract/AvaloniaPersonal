@@ -236,6 +236,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether a update of the separator controls is required
+        /// to reflect a change in document status.
+        /// </summary>
+        /// <value><c>true</c> if an update of the control is required; otherwise, <c>false</c>.
+        /// </value>
+        public bool UpdateRequired
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Public Members
@@ -282,6 +294,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             _collapsed = false;
                         }
+
+                        UpdateRequired = true;
                     }
 
                     return document;
@@ -726,6 +740,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                UpdateRequired = true;
+
                 // Whenever the associated document is updated, invalidate to ensure displayed icons
                 // reflect the current document state.
                 Invalidate();
@@ -769,6 +785,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     // Force a follow-up layout to occur after assigning this separator to a new document.
                     doLayout = true;
+                    UpdateRequired = true;
                 }
 
                 _collapseDocumentButton.Visible = true;
