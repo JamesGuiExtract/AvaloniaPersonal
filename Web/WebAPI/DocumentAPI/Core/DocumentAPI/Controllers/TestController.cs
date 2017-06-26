@@ -5,6 +5,7 @@ using System;
 
 namespace DocumentAPI.Controllers
 {
+#if Add_Test_Controller
     /// <summary>
     /// necessary evil because model binding won't bind to primitive types in FromBody...
     /// </summary>
@@ -41,26 +42,10 @@ namespace DocumentAPI.Controllers
         {
             try
             {
-                if (String.IsNullOrWhiteSpace(args.DatabaseServerName))
-                {
-                    var message = "database server name cannot be empty";
-                    Log.WriteLine(message, "ELI43238");
-                    return BadRequest(message);
-                }
-
-                if (String.IsNullOrWhiteSpace(args.DatabaseName))
-                {
-                    var message = "database name cannot be empty";
-                    Log.WriteLine(message, "ELI43239");
-                    return BadRequest(message);
-                }
-
-                if (String.IsNullOrWhiteSpace(args.WorkflowName) )
-                {
-                    var message = "workflow name cannot be empty";
-                    Log.WriteLine(message, "ELI43240");
-                    return BadRequest(message);
-                }
+                Contract.Assert(args != null, "null args");
+                Contract.Assert(!String.IsNullOrWhiteSpace(args.DatabaseServerName), "database server name cannot be empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(args.DatabaseName), "database name cannot be empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(args.WorkflowName), "workflow name cannot be empty");
 
                 Utils.SetCurrentApiContext(args.DatabaseServerName, args.DatabaseName, args.WorkflowName);
                 Utils.ApplyCurrentApiContext();
@@ -75,4 +60,5 @@ namespace DocumentAPI.Controllers
             }
         }
     }
+#endif
 }

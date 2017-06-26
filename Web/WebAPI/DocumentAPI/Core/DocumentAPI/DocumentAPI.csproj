@@ -12,6 +12,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <DefineConstants>TRACE;DEBUG;Add_Test_Controller;NET46</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <COMReference Include="UCLID_FILEPROCESSINGLib.dll">
