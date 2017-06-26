@@ -4398,7 +4398,7 @@ STDMETHODIMP CFileProcessingDB::SetNewPassword(BSTR bstrUserName, VARIANT_BOOL* 
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::MoveFilesToWorkflowFromQuery(BSTR bstrQuery, long nSourceWorkflowID, 
-	long nDestWorkflowID)
+	long nDestWorkflowID, long *pnCount)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -4406,13 +4406,13 @@ STDMETHODIMP CFileProcessingDB::MoveFilesToWorkflowFromQuery(BSTR bstrQuery, lon
 	{
 		validateLicense();
 
-		if (!MoveFilesToWorkflowFromQuery_Internal(false, bstrQuery, nSourceWorkflowID, nDestWorkflowID))
+		if (!MoveFilesToWorkflowFromQuery_Internal(false, bstrQuery, nSourceWorkflowID, nDestWorkflowID, pnCount))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 				gstrMAIN_DB_LOCK);
 
-			MoveFilesToWorkflowFromQuery_Internal(true, bstrQuery, nSourceWorkflowID, nDestWorkflowID);
+			MoveFilesToWorkflowFromQuery_Internal(true, bstrQuery, nSourceWorkflowID, nDestWorkflowID, pnCount);
 		}
 
 		return S_OK;

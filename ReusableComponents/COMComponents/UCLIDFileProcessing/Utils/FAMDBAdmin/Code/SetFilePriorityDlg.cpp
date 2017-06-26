@@ -121,7 +121,7 @@ void CSetFilePriorityDlg::OnClickedSelectFiles()
 	{
 		bool bAppliedSettings = asCppBool(m_ipFileSelector->Configure(m_ipFAMDB,
 			"Select files to modify priority",
-			get_bstr_t("SELECT " + gstrSQL_DISPLAY_SELECT_VALUES + " FROM FAMFile")));
+			get_bstr_t("SELECT " + gstrSQL_DISPLAY_SELECT_VALUES + " FROM FAMFile"), false));
 
 		// Update the summary text if new settings were applied.
 		if (bAppliedSettings)

@@ -8,7 +8,7 @@ const string gstrWRONG_SCHEMA = "Database found, but schema version is not compa
 const string gstrDB_NOT_INITIALIZED = "Database found, but is not initialized!";
 const string gstrUNABLE_TO_CONNECT_TO_SERVER = "Unable to connect to server!";
 const string gstrDB_NOT_FOUND = "Connected to server, but database not found!";
-const string gstrUNAFFILIATED_FILES = "Workflows exists, but there are unaffiliated files!";
+const string gstrUNAFFILIATED_FILES = "Workflows exist, but there are unaffiliated files!";
 
 // DBInfo Names
 static const string gstrFAMDB_SCHEMA_VERSION = "FAMDBSchemaVersion";

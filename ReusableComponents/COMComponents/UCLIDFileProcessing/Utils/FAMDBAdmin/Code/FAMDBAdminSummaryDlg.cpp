@@ -3,6 +3,7 @@
 #include "FAMDBAdminSummaryDlg.h"
 #include "ExportFileListDlg.h"
 #include "SetActionStatusDlg.h"
+#include "FAMUtilsConstants.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -546,7 +547,7 @@ void CFAMDBAdminSummaryDlg::setFAMDatabase(IFileProcessingDBPtr ipFAMDB)
 	ASSERT_ARGUMENT("ELI19805", ipFAMDB != __nullptr);
 	m_ipFAMDB = ipFAMDB;
 
-	// Need to determine the datatabase type being worked with
+	// Need to determine the database type being worked with
 	IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
 	ASSERT_RESOURCE_ALLOCATION("ELI34545", ipFAMDBUtils != __nullptr);
 
@@ -632,6 +633,11 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 		if (nActionIDToRefresh < 0)
 		{
 			m_listActions.DeleteAllItems();
+
+			if (asString(m_ipFAMDB->GetCurrentConnectionStatus()) != gstrCONNECTION_ESTABLISHED)
+			{
+				return;
+			}
 		}
 		// Need to refresh all actions if the table has not yet been populated.
 		else if (m_listActions.GetItemCount() == 0)

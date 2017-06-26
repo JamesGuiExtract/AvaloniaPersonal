@@ -183,6 +183,11 @@ private:
 	// Loads the workflow combo
 	void loadWorkflowComboBox();
 
+	// Updates UI elements when workflows or their included files may have changed.
+	// Unlike refreshDBStatus, this won't clear a currently selected workflow and can account for
+	// a workflow name that has changed (even it if is the active workflow).
+	bool refreshWorkflowStatus();
+
 	// Positions the workflow combo and label
 	void positionWorkflowControls();
 

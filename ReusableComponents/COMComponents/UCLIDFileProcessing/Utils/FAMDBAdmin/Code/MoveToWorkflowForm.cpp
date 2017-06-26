@@ -38,8 +38,10 @@ namespace Extract {
 			try
 			{
 				// Display the select files configuration dialog
+				// Ignore workflows for configuration of the condition; however, at execution of the
+				// condition, it will be constrained to the source workflow.
 				bool bAppliedSettings = asCppBool(_ipFileSelector->Configure(_ipfamDatabase,
-					"Select files to change action status for", "SELECT FAMFile.ID FROM FAMFile"));
+					"Select files to change action status for", "SELECT FAMFile.ID FROM FAMFile", true));
 
 				// Update the summary text if new settings were applied.
 				if (bAppliedSettings)
@@ -106,6 +108,8 @@ namespace Extract {
 
 		Void MoveToWorkflowForm::applyWorkflowChanges(bool closeDialog)
 		{
+			long nCount = 0;
+
 			if (!areSettingsValid())
 			{
 				return;
@@ -127,22 +131,26 @@ namespace Extract {
 			IFileProcessingDBPtr ipTempDB(CLSID_FileProcessingDB);
 			ipTempDB->DuplicateConnection(_ipfamDatabase);
 
-			if (selectedSourceWorkflow->ID > 0)
-			{
-				ipTempDB->ActiveWorkflow = marshal_as<_bstr_t>(selectedSourceWorkflow->Name);
-			}
-			else
+			if (selectedSourceWorkflow->ID <= 0)
 			{
 				ipTempDB->ActiveWorkflow = "";
 			}
+			else
+			{
+				ipTempDB->ActiveWorkflow = marshal_as<_bstr_t>(selectedSourceWorkflow->Name);
+			}
+			
 
 			{
 				auto waitCursor = gcnew TemporaryWaitCursor();
 
 				try
 				{
-					_bstr_t bstrQuery = _ipFileSelector->BuildQuery(ipTempDB, "FAMFILE.ID", "", true);
-					_ipfamDatabase->MoveFilesToWorkflowFromQuery(bstrQuery, selectedSourceWorkflow->ID, selectedDestWorkflow->ID);
+					// Ignore workflows only if moving files unaffiliated with any workflows. Otherwise, constrain the
+					// file selection to the source workflow.
+					_bstr_t bstrQuery = _ipFileSelector->BuildQuery(ipTempDB, "FAMFILE.ID", "", _noWorkflowSource);
+					nCount = _ipfamDatabase->MoveFilesToWorkflowFromQuery(
+						bstrQuery, selectedSourceWorkflow->ID, selectedDestWorkflow->ID);
 				}
 				finally
 				{
@@ -151,9 +159,19 @@ namespace Extract {
 				}
 			}
 
-			 MessageBox::Show("The selected files have been moved to " + selectedDestWorkflow->Name, 
-				 "Workflow moved", MessageBoxButtons::OK);
-
+			if (nCount > 0)
+			{
+				MessageBox::Show(
+					nCount.ToString(CultureInfo::CurrentCulture) + " files have been moved to " + selectedDestWorkflow->Name,
+					"Files moved to workflow", MessageBoxButtons::OK);
+			}
+			else
+			{
+				MessageBox::Show("Current selection does not include any files from " + selectedSourceWorkflow->Name,
+					"Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
+				closeDialog = false;
+			}
+			
 			if (closeDialog)
 			{
 				DialogResult = System::Windows::Forms::DialogResult::OK;

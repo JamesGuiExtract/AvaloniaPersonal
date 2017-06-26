@@ -217,7 +217,7 @@ void CSetActionStatusDlg::OnClickedSelectFiles()
 	{
 		// Display the select files configuration dialog
 		bool bAppliedSettings = asCppBool(m_ipFileSelector->Configure(m_ipFAMDB,
-			"Select files to change action status for", "SELECT FAMFile.ID FROM FAMFile"));
+			"Select files to change action status for", "SELECT FAMFile.ID FROM FAMFile", false));
 
 		// Update the summary text if new settings were applied.
 		if (bAppliedSettings)

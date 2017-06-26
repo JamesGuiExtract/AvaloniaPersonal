@@ -1944,7 +1944,8 @@ library UCLID_FILEPROCESSINGLib
 		//			nSourceWorkflowID = 0 it will be to only move files that have a workflow assigned
 		//			nSourceWorkflowID = -1 will be to only move files that have not been assigned to any workflow
 		[id(185), helpstring("method MoveFilesToWorkflowFromQuery")] HRESULT MoveFilesToWorkflowFromQuery(
-			[in] BSTR bstrQuery, [in] long nSourceWorkflowID, [in] long nDestWorkflowID);
+			[in] BSTR bstrQuery, [in] long nSourceWorkflowID, [in] long nDestWorkflowID,
+			[out, retval] long *pnCount);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Gets the value of first attribute matching the specified attribute path in the
 		//			specified attribute set for the specified file or blank if the specified attribute
@@ -2640,7 +2641,7 @@ library UCLID_FILEPROCESSINGLib
 		//				settings, otherwise VARIANT_FALSE.
 		[id(1), helpstring("method Configure")] HRESULT Configure(
 			[in] IFileProcessingDB *pFAMDB, [in] BSTR bstrPrompt, [in] BSTR bstrQueryLabel,
-			[out, retval] VARIANT_BOOL* pbNewSettingsApplied);
+			[in] VARIANT_BOOL bIgnoreWorkflows, [out, retval] VARIANT_BOOL* pbNewSettingsApplied);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Adds an action status condition to the current settings.
 		// ARGS:	pFAMDB- The IFileProcessingDB the condition relates to.

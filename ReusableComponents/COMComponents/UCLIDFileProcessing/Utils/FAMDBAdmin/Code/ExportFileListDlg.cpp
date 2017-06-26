@@ -149,7 +149,7 @@ void CExportFileListDlg::OnClickedSelectFiles()
 		// Display the select files configuration dialog
 		bool bAppliedSettings = asCppBool(m_ipFileSelector->Configure(m_ipFAMDB,
 			"Select filenames to export",
-			get_bstr_t("SELECT " + gstrSQL_DISPLAY_SELECT_VALUES + " FROM FAMFile")));
+			get_bstr_t("SELECT " + gstrSQL_DISPLAY_SELECT_VALUES + " FROM FAMFile"), false));
 
 		// Update the summary text if new settings were applied.
 		if (bAppliedSettings)

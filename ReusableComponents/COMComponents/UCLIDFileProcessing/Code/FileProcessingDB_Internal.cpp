@@ -2626,7 +2626,7 @@ void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/
 		if (bCheckForUnaffiliatedFiles && unaffiliatedWorkflowFilesExist())
 		{
 			m_strCurrentConnectionStatus = gstrUNAFFILIATED_FILES;
-			throw UCLIDException("ELI43450", "Workflows exists, but there are unaffiliated files.");
+			throw UCLIDException("ELI43450", "Workflows exist, but there are unaffiliated files.");
 		}
 	}
 }
@@ -3963,7 +3963,7 @@ void CFileProcessingDB::resetDBConnection()
 			if (isBlankDB())
 			{
 				m_strCurrentConnectionStatus = gstrDB_NOT_INITIALIZED;
-				
+
 				UCLIDException ue("ELI36146", "The database has not been initialized.");
 				ue.addDebugInfo("Database Name", m_strDatabaseName);
 				ue.addDebugInfo("Database Server", m_strDatabaseServer);

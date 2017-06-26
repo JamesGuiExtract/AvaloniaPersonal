@@ -39,7 +39,8 @@ void CFAMFileSelector::FinalRelease()
 // IFAMTagManager
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMFileSelector::Configure(IFileProcessingDB *pFAMDB,
-	BSTR bstrSectionHeader, BSTR bstrQueryLabel, VARIANT_BOOL* pbNewSettingsApplied)
+	BSTR bstrSectionHeader, BSTR bstrQueryLabel, VARIANT_BOOL bIgnoreWorkflows, 
+	VARIANT_BOOL* pbNewSettingsApplied)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -47,9 +48,23 @@ STDMETHODIMP CFAMFileSelector::Configure(IFileProcessingDB *pFAMDB,
 	{
 		validateLicense();
 
-		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB(pFAMDB);
-		ASSERT_ARGUMENT("ELI35693", ipFAMDB != __nullptr);
+		ASSERT_ARGUMENT("ELI35693", pFAMDB != __nullptr);
 		ASSERT_ARGUMENT("ELI35694", pbNewSettingsApplied != __nullptr);
+		
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB;
+		if (asCppBool(bIgnoreWorkflows))
+		{
+			ipFAMDB.CreateInstance(CLSID_FileProcessingDB);
+			ASSERT_RESOURCE_ALLOCATION("ELI43541", ipFAMDB != __nullptr);
+			
+			ipFAMDB->DuplicateConnection((UCLID_FILEPROCESSINGLib::IFileProcessingDB*)pFAMDB);
+			ipFAMDB->ActiveWorkflow = "";
+		}
+		else
+		{
+			ipFAMDB = pFAMDB;
+			ASSERT_RESOURCE_ALLOCATION("ELI43542", ipFAMDB != __nullptr);
+		}
 
 		// Create the file select dialog
 		CSelectFilesDlg dlg(

@@ -10655,7 +10655,7 @@ bool CFileProcessingDB::GetActionIDForWorkflow_Internal(bool bDBLocked, BSTR bst
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BSTR bstrQuery, 
-	long nSourceWorkflowID, long nDestWorkflowID)
+	long nSourceWorkflowID, long nDestWorkflowID, long *pnCount)
 {
 	try
 	{
@@ -10663,6 +10663,7 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 		{
 			string strQueryFrom = asString(bstrQuery);
 			ASSERT_ARGUMENT("ELI43405", !strQueryFrom.empty());
+			ASSERT_ARGUMENT("ELI43543", pnCount != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -10676,6 +10677,10 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 
 			// Create the #SelectedFilesToMove temp table;
 			createTempTableOfSelectedFiles(ipConnection, strQueryFrom);
+
+			// Get the count of files being moved.
+			// TODO: This doesn't account for files already in the dest workflow.
+			executeCmdQuery(ipConnection, "SELECT COUNT(ID) AS ID FROM #SelectedFilesToMove", false, pnCount);
 
 			// Query to add the new WorkflowChange record
 			string strWorkflowChangeQuery = Util::Format(

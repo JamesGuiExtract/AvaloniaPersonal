@@ -341,7 +341,7 @@ public:
 	STDMETHOD(put_ConnectionRetryTimeout)(long nNewVal);
 	STDMETHOD(get_ConnectionRetryTimeout)(long *pnVal);
 	STDMETHOD(SetNewPassword)(BSTR bstrUserName, VARIANT_BOOL* pbSuccess);
-	STDMETHOD(MoveFilesToWorkflowFromQuery)(BSTR bstrQuery, long nSourceWorkflowID, long nDestWorkflowID);
+	STDMETHOD(MoveFilesToWorkflowFromQuery)(BSTR bstrQuery, long nSourceWorkflowID, long nDestWorkflowID, long *pnCount);
 	STDMETHOD(GetAttributeValue)(BSTR bstrSourceDocName, BSTR bstrAttributeSetName, BSTR bstrAttributePath,
 		BSTR* pbstrValue);
 
@@ -1440,7 +1440,7 @@ private:
 	bool GetUsingWorkflows_Internal(bool bDBLocked, VARIANT_BOOL *pbUsingWorkflows);
 	bool GetWorkflowNameFromActionID_Internal(bool bDBLocked, long nActionID, BSTR* pbstrWorkflowName);
 	bool GetActionIDForWorkflow_Internal(bool bDBLocked, BSTR bstrActionName, long nWorkflowID, long* pnActionID);
-	bool MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BSTR bstrQuery, long nSourceWorkflowID,  long nDestWorkflowID);
+	bool MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BSTR bstrQuery, long nSourceWorkflowID,  long nDestWorkflowID, long *pnCount);
 	bool GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSourceDocName, BSTR bstrAttributeSetName, BSTR bstrAttributePath,
 		BSTR* pbstrValue);
 	void InvalidatePreviousCachedInfoIfNecessary();
