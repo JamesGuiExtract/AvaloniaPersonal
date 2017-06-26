@@ -30,6 +30,7 @@
 
 #include <string>
 #include <set>
+#include <unordered_map>
 using namespace std;
 
 #ifdef _DEBUG
@@ -341,7 +342,8 @@ void initNuanceEngineAndLicense()
 //-------------------------------------------------------------------------------------------------
 // Will perform the image conversion
 void nuanceConvertImage(const string strInputFileName, const string strOutputFileName, 
-				  EConverterFileType eOutputType, bool bPreserveColor, string strPagesToRemove)
+				  EConverterFileType eOutputType, bool bPreserveColor, string strPagesToRemove,
+				  IMF_FORMAT nExplicitFormat)
 {
 	// [LegacyRCAndUtils:6275]
 	// Since we will be using the Nuance engine, ensure we are licensed for it.
@@ -351,6 +353,7 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 	bool bOutputImageOpened(false);
 	int nPage(0);
 	unique_ptr<HIMGFILE> uphOutputImage(__nullptr);
+	unique_ptr<TemporaryFileName> pTempOutputFile;
 
 	try
 	{
@@ -370,68 +373,29 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			THROW_UE_ON_ERROR("ELI37426", "Unable to get page count.",
 				kRecGetImgFilePageCount(hInputImage, &nPageCount));
 
-			IMG_INFO imgInfo = {0};
-			IMF_FORMAT imgFormat;
-			int nBitsPerPixel = 1;
-			for (int i = 0; i < nPageCount; i++)
-			{
-				THROW_UE_ON_ERROR("ELI36840", "Failed to indentify image format.",
-					kRecGetImgFilePageInfo(0, hInputImage, i, &imgInfo, &imgFormat));
-
-				nBitsPerPixel = max(nBitsPerPixel, imgInfo.BitsPerPixel);
-			}
-
 			// Set format and temp file extension based on the ouput type. If the extension doesn't
 			// match the format, the nuance engine will throw and error when saving.
 			string strExt;
 			switch (eOutputType)
 			{
 				case kFileType_Tif:
-					{
-						if (!bPreserveColor)
-						{
-							nFormat = FF_TIFG4;
-							THROW_UE_ON_ERROR("ELI37423", "Unable to set image conversion method.",
-								kRecSetImgConvMode(0, CNV_AUTO));
-							
-						}
-						else
-						{
-							nFormat = (nBitsPerPixel == 1) ? FF_TIFG4 : FF_TIFLZW;
-						}
-						strExt = ".tif";
-					}
+					strExt = ".tif";
 					break;
-
 				case kFileType_Pdf:
-					{
-						// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
-						// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
-						// FF_PDF_SUPERB.
-						nFormat = (nBitsPerPixel == 1) ? FF_PDF_SUPERB : FF_PDF_GOOD;
-						strExt = ".pdf";
-					}
+					strExt = ".pdf";
 					break;
 
 				case kFileType_Jpg:
-					{
-						nFormat = FF_JPG_SUPERB;
-						strExt = ".jpg";
-					}
+					strExt = ".jpg";
 					break;
 			}
 
 			// Create a temporary file into which the results should be written until the entire
 			// document has been output.
-			unique_ptr<TemporaryFileName> pTempOutputFile(new TemporaryFileName(true, NULL, strExt.c_str()));
+			pTempOutputFile.reset(new TemporaryFileName(true, NULL, strExt.c_str()));
 			string strTempOutputFileName = pTempOutputFile->getName();
 			// If the destination file name exists before Nuance tries to open it, it will throw an error.
 			deleteFile(strTempOutputFileName);
-
-			// https://extract.atlassian.net/browse/ISSUE-12162
-			// kRecSetImgConvMode(0, CNV_AUTO) should be called (above) only in the case that we are
-			// outputting tif files without preserving color depth, otherwise color information will
-			// be stripped out.
 
 			// Don't use RecMemoryReleaser on the output image because we will need to manually
 			// close it at the end of this method to be able to copy it to its permanent location.
@@ -455,7 +419,9 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 				setPagesToRemove = set<int>(vecPagesToRemove.begin(), vecPagesToRemove.end());
 			}
 
+			IMG_INFO imgInfo = {0};
 			bool bOuputAtLeastOnePage = false;
+			bool bConversionSet = false;
 			for (nPage = 0; nPage < nPageCount; nPage++)
 			{
 				if (setPagesToRemove.find(nPage + 1) != setPagesToRemove.end())
@@ -464,6 +430,66 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 				}
 
 				bOuputAtLeastOnePage = true;
+
+				nFormat = FF_TIFNO;
+				if (nExplicitFormat >= 0)
+				{
+					nFormat = nExplicitFormat;
+				}
+				else if (eOutputType == kFileType_Tif && !bPreserveColor)
+				{
+					nFormat = FF_TIFG4;
+				}
+				else if (eOutputType == kFileType_Jpg)
+				{
+					nFormat = FF_JPG_SUPERB;
+				}
+				else
+				{
+					IMF_FORMAT imgFormat;
+					THROW_UE_ON_ERROR("ELI36840", "Failed to identify image format.",
+						kRecGetImgFilePageInfo(0, hInputImage, nPage, &imgInfo, &imgFormat));
+					int nBitsPerPixel = imgInfo.BitsPerPixel;
+
+					switch (eOutputType)
+					{
+					case kFileType_Tif:
+					{
+						nFormat = (nBitsPerPixel == 1) ? FF_TIFG4 : FF_TIFLZW;
+					}
+					break;
+
+					case kFileType_Pdf:
+					{
+						// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
+						// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
+						// FF_PDF_SUPERB.
+						nFormat = (nBitsPerPixel == 1) ? FF_PDF_SUPERB : FF_PDF_GOOD;
+					}
+					break;
+					}
+				}
+
+				// https://extract.atlassian.net/browse/ISSUE-12162
+				// kRecSetImgConvMode(0, CNV_AUTO) should be called only in the case that we are
+				// outputting tif files without preserving color depth, otherwise color information will
+				// be stripped out.
+				if (eOutputType == kFileType_Tif
+					&& (!bPreserveColor || nFormat != FF_TIFNO && nFormat != FF_TIFPB && nFormat != FF_TIFLZW))
+				{
+					if (!bConversionSet)
+					{
+						THROW_UE_ON_ERROR("ELI37423", "Unable to set image conversion method.",
+							kRecSetImgConvMode(0, CNV_AUTO));
+						bConversionSet = true;
+					}
+				}
+				else if (bConversionSet)
+				{
+					THROW_UE_ON_ERROR("ELI43553", "Unable to set image conversion method.",
+						kRecSetImgConvMode(0, CNV_NO));
+					bConversionSet = false;
+				}
 
 				// NOTE: RecAPI uses zero-based page number indexes
 				HPAGE hImagePage;
@@ -867,16 +893,36 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 	}
 }
 //-------------------------------------------------------------------------------------------------
+unordered_map<string, pair<IMF_FORMAT, string>> getFormats()
+{
+	unordered_map<string, pair<IMF_FORMAT, string>> mapFormats;
+	mapFormats["tifno"]           = make_pair(FF_TIFNO, "           \tUncompressed TIFF image format.");
+	mapFormats["tifpb"]           = make_pair(FF_TIFPB, "           \tPackbits TIFF image format.");
+	mapFormats["tifhu"]           = make_pair(FF_TIFHU, "           \tGroup 3 Modified TIFF image format.");
+	mapFormats["tifg31"]          = make_pair(FF_TIFG31, "          \tStandard G3 1D TIFF image format.");
+	mapFormats["tifg32"]          = make_pair(FF_TIFG32, "          \tStandard G3 2D TIFF image format.");
+	mapFormats["tifg4"]           = make_pair(FF_TIFG4, "           \tStandard G4 TIFF image format.");
+	mapFormats["tiflzw"]          = make_pair(FF_TIFLZW, "          \tTIFF-LZW image format incorporating Unisys compression.");
+	mapFormats["jpg_superb"]      = make_pair(FF_JPG_SUPERB, "      \tJPEG format with negligible information loss.");
+	mapFormats["jpg_good"]        = make_pair(FF_JPG_GOOD, "        \tJPEG format with average information loss.  (Results in medium-size image files when saving.)");
+	mapFormats["jpg_min"]         = make_pair(FF_JPG_MIN, "         \tJPEG format optimized for minimum image file size. Worst image quality.");
+	mapFormats["pdf_min"]         = make_pair(FF_PDF_MIN, "         \tAdobe PDF format. Minimum image file size.");
+	mapFormats["pdf_good"]        = make_pair(FF_PDF_GOOD, "        \tAdobe PDF format. Results in medium-size image files when saving.");
+	mapFormats["pdf_superb"]      = make_pair(FF_PDF_SUPERB, "      \tAdobe PDF format with negligible information loss.");
+	mapFormats["pdf_mrc_min"]     = make_pair(FF_PDF_MRC_MIN, "     \tAdobe PDF format with MRC technology. Optimized for minimum image file size.");
+	mapFormats["pdf_mrc_good"]    = make_pair(FF_PDF_MRC_GOOD, "    \tAdobe PDF format with MRC technology. (Results in medium-size image files when saving.)");
+	mapFormats["pdf_mrc_superb"]  = make_pair(FF_PDF_MRC_SUPERB, "  \tAdobe PDF format with MRC technology. PDF with small information loss.");
+	return mapFormats;
+}
+//-------------------------------------------------------------------------------------------------
 void usage()
 {
-	string strUsage = "This application has 3 required arguments and 4 optional arguments:\n";
-		strUsage += "An input image file (.tif or .pdf) and \n"
-					"an output image file (.pdf or .tif) and \n"
-					"an output file type (/pdf, /tif or /jpg).\n\n"
-					"The optional argument (/retain) will cause any redaction annotations to \n"
-					"be burned into the resulting image (if the source is tif and destination \n"
-					"is a pdf or jpg, if source and dest are both tif then all annotations are \n"
-					"retained, if the source is pdf then there are no annotations to retain).\n"
+	string strUsage = "This application has 3 required arguments and 9 optional arguments:\n";
+		strUsage += "An input image file (.tif or .pdf) \n"
+					"An output image file (.pdf or .tif) \n"
+					"An output file type (/pdf, /tif or /jpg).\n\n"
+					"The optional argument (/retain) will cause any redaction annotations to be burned into the resulting image (if the source is tif and destination \n"
+					"\tis a pdf or jpg, if source and dest are both tif then all annotations are retained, if the source is pdf then there are no annotations to retain).\n"
 					"The optional arguments for applying passwords only apply if out_type is /pdf.\n"
 					" /user\t\tSpecifies the user password to apply to the PDF.\n"
 					" /owner\t\tSpecified the owner password and permissions to apply to the PDF.\n"
@@ -890,26 +936,27 @@ void usage()
 					" \t\tAllow filling in form fields = 64.\n"
 					" \t\tAllow document assembly = 128.\n"
 					" \t\tAllow all options = 255.\n"
-					"The optional argument /vp [perspective_id] will set the view perspective of "
-					"the output to the specified value (1-8) or to 1 (top-left) if the "
-					"perspective_id is not specified.\n"
-					"The optional argument /am will use an alternate method to perform \n"
-					"the conversion. This option is not compatible with any other optional \n"
-					" argument except '/RemovePages' or '/ef'. \n"
-					"The optional argument /RemovePages will exclude the specified pages \n"
-					"from the output. The pages can be specified as an individual page number, \n"
-					"a comma-separated list, a range of pages denoted with a hypen, or a \n"
-					"dash followed by a number to indicate the last x pages should be removed. \n"
-					"The optional argument /color will preserve the color depth of the source \n"
-					"image even if the output is a tif image. If this option is not used, all \n"
-					"tif output images will be bitonal regardless of source bit depth. \n"
-					"The optional argument (/ef <filename>) fully specifies the location \n"
-					"of an exception log that will store any thrown exception.  Without \n"
-					"an exception log, any thrown exception will be displayed.\n\n";
-		strUsage += "Usage:\n";
+					"The optional argument /vp [perspective_id] will set the view perspective of the output to the specified value (1-8) or to 1 (top-left) if the perspective_id is not specified.\n"
+					"The optional argument /am will use an alternate method to perform the conversion. This option is not compatible with any other optional argument except '/RemovePages', '/ef', '/color' and '/format'. \n"
+					"The optional argument /RemovePages will exclude the specified pages from the output. The pages can be specified as an individual page number, a comma-separated list, \n"
+					"\ta range of pages denoted with a hypen, or a dash followed by a number to indicate the last x pages should be removed. \n"
+					"The optional argument /color will preserve the color depth of the source image even if the output is a tif image. If this option is not used, all tif output images will be bitonal regardless of source bit depth. \n"
+					"The optional argument (/ef <filename>) fully specifies the location of an exception log that will store any thrown exception. Without an exception log, any thrown exception will be displayed.\n"
+					"The optional argument (/format <format>) allows specification of the Nuance file format (only works when '/am' is specified). Available formats:\n";
+		auto mapFormats = getFormats();
+		map<IMF_FORMAT, pair<string, string>> mapOrderedFormats;
+		for (auto it = mapFormats.begin(); it != mapFormats.end(); ++it)
+		{
+			mapOrderedFormats[it->second.first] = make_pair(it->first, it->second.second);
+		}
+		for (auto it = mapOrderedFormats.begin(); it != mapOrderedFormats.end(); ++it)
+		{
+			strUsage += " \t\t" + it->second.first + it->second.second + "\n";
+		}
+		strUsage += "\nUsage:\n";
 		strUsage += "ImageFormatConverter.exe <strInput> <strOutput> <out_type> [/retain] "
 					"[/user \"<Password>\"] [/owner \"<Password>\" <Permissions>] [/vp [perspective_id]] "
-					"[/am] [/RemovePages \"<Pages>\"] [/color] [/ef <filename>]\n"
+					"[/am] [/RemovePages \"<Pages>\"] [/color] [/ef <filename>] [/format <format>]\n"
 					"where:\n"
 					"out_type is /pdf, /tif or /jpg,\n"
 					"<Password> is the password to apply (user and/or owner) to the PDF (requires out_type = /pdf).\n"
@@ -1012,6 +1059,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 				bool bUseNuance = false;
 				bool bPreserveColor = false;
 				string strPagesToRemove;
+				IMF_FORMAT eExplicitFormat = (IMF_FORMAT)-1;
 				for (size_t i=3; i < uiParamCount; i++)
 				{
 					string strTemp = vecParams[i];
@@ -1126,11 +1174,36 @@ BOOL CImageFormatConverterApp::InitInstance()
 					{
 						bEncryptedPasswords = true;
 					}
+					else if (strTemp == "/format")
+					{
+						if (++i == uiParamCount)
+						{
+							usage();
+							return FALSE;
+						}
+
+						unordered_map<string, pair<IMF_FORMAT, string>> mapFormats = getFormats();
+						strTemp = vecParams[i];
+						makeLowerCase(strTemp);
+						auto search = mapFormats.find(strTemp);
+						if (search == mapFormats.end())
+						{
+							usage();
+							return FALSE;
+						}
+						eExplicitFormat = search->second.first;
+					}
 					else
 					{
 						usage();
 						return FALSE;
 					}
+				}
+
+				if (!bUseNuance && eExplicitFormat >= 0)
+				{
+					throw UCLIDException("ELI43551",
+						"Cannot specify /format without specifying /am");
 				}
 
 				if (eOutputType != kFileType_Pdf
@@ -1178,7 +1251,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 					}
 
 					nuanceConvertImage(strInputName, strOutputName, eOutputType, bPreserveColor,
-						strPagesToRemove);
+						strPagesToRemove, eExplicitFormat);
 				}
 				else
 				{
