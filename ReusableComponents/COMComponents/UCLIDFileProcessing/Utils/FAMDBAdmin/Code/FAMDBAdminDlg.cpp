@@ -1412,7 +1412,6 @@ void CFAMDBAdminDlg::showMoveToWorkflowDialog(bool bAreUnaffiliatedFiles)
 //--------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::refreshDBStatus()
 {
-	string strCurrentWorkflow = m_strCurrentWorkflow;
 	string strServer = asString(m_ipFAMDB->DatabaseServer);
 	string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
 	string strAdvConnStringProperties =
