@@ -2526,7 +2526,7 @@ void FileProcessingDlg::openFile(string strFileName, bool bPreserveConnection)
 		// If bPreserveConnection, create a duplicate copy to use to restore key connection state
 		// variables back to the newly loaded connection.
 		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipSavedConnection(__nullptr);
-		if (bPreserveConnection)
+		if (bPreserveConnection && m_bDBConnectionReady)
 		{
 			ipSavedConnection.CreateInstance(CLSID_FileProcessingDB);
 			ipSavedConnection->DuplicateConnection(getDBPointer());
@@ -2534,15 +2534,17 @@ void FileProcessingDlg::openFile(string strFileName, bool bPreserveConnection)
 		
 		getFPM()->LoadFrom(get_bstr_t(strFileName), VARIANT_FALSE);
 
-		if (bPreserveConnection)
+		// https://extract.atlassian.net/browse/ISSUE-14793
+		// If the target DB has changed due to being saved into a different context or we didn't
+		// have a good connection in the first place, don't preserve current login.
+		// NOTE: Compare connections strings not DB server/name as they may resolve to
+		// different DBs based on context.
+		if (bPreserveConnection && ipSavedConnection != __nullptr &&
+			ipSavedConnection->ConnectionString == getDBPointer()->ConnectionString)
 		{
-			ASSERT_RUNTIME_CONDITION("ELI43532",
-				ipSavedConnection->DatabaseServer == getDBPointer()->DatabaseServer,
-				"Unexpected database change");
-			ASSERT_RUNTIME_CONDITION("ELI43532",
-				ipSavedConnection->DatabaseName == getDBPointer()->DatabaseName,
-				"Unexpected database change");
-			getDBPointer()->DuplicateConnection(ipSavedConnection);
+			{
+				getDBPointer()->DuplicateConnection(ipSavedConnection);
+			}
 		}
 
 		loadSettingsFromManager();

@@ -538,7 +538,9 @@ namespace Extract.FileActionManager.Database.Test
                 int workflow1ID = fileProcessingDb.AddWorkflow(
                     "Workflow1", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B);
 
-                fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow1ID);
+                int count = 
+                    fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow1ID);
+                Assert.AreEqual(1, count);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 int actionA_Workflow1_ID = fileProcessingDb.GetActionID(_ACTION_A);
@@ -593,7 +595,9 @@ namespace Extract.FileActionManager.Database.Test
                 int workflow3ID = fileProcessingDb.AddWorkflow(
                     "Workflow3", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B);
 
-                fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", workflow1ID, workflow3ID);
+                count =
+                    fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", workflow1ID, workflow3ID);
+                Assert.AreEqual(2, count);
 
                 var statsForA1_W1_AfterMoveToW3 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
                 var statsForA2_W1_AfterMoveToW3 = fileProcessingDb.GetStats(actionB_Workflow1_ID, false);
@@ -731,8 +735,10 @@ namespace Extract.FileActionManager.Database.Test
 
                 var statsW2_1 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
 
-                fileProcessingDb.MoveFilesToWorkflowFromQuery(
+                int count =
+                    fileProcessingDb.MoveFilesToWorkflowFromQuery(
                     "SELECT ID FROM FAMFILE WHERE ID = " + fileRecord1.FileID.AsString(), -1, workflow1ID);
+                Assert.AreEqual(1, count);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 var statsW1_2 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
@@ -743,7 +749,11 @@ namespace Extract.FileActionManager.Database.Test
                 var statsW2_2 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
                 Assert.That(StatsAreEqual(statsW2_1, statsW2_2), "Workflow2 is unchanged after moving file to Workflow1");
 
-                fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow2ID);
+                count =
+                    fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow2ID);
+                // Currently the count reflects the number of documents selected, not moved. In the FAMDBAdmin,
+                // FAMFileSelector would be limited to the current workflow and thus would not select fileID
+                Assert.AreEqual(2, count);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 var statsW1_3 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
@@ -805,8 +815,10 @@ namespace Extract.FileActionManager.Database.Test
 
                 var statsW2_1 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
 
-                fileProcessingDb.MoveFilesToWorkflowFromQuery(
-                    "SELECT ID FROM FAMFILE WHERE ID = " + fileRecord1.FileID.AsString(), -1, workflow1ID);
+                int count =
+                    fileProcessingDb.MoveFilesToWorkflowFromQuery(
+                        "SELECT ID FROM FAMFILE WHERE ID = " + fileRecord1.FileID.AsString(), -1, workflow1ID);
+                Assert.AreEqual(1, count);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 var statsW1_2 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
@@ -816,7 +828,11 @@ namespace Extract.FileActionManager.Database.Test
                 var statsW2_2 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
                 Assert.That(StatsAreEqual(statsW2_1, statsW2_2), "Workflow2 is unchanged after moving file to Workflow1");
 
-                fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow2ID);
+                count = 
+                    fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow2ID);
+                // Currently the count reflects the number of documents selected, not moved. In the FAMDBAdmin,
+                // FAMFileSelector would be limited to the current workflow and thus would not select fileID1.
+                Assert.AreEqual(2, count);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 var statsW1_3 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
