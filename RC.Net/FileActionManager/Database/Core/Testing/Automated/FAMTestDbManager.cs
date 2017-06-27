@@ -178,12 +178,11 @@ namespace Extract.FileActionManager.Database.Test
             {
                 if (ee == null)
                 {
-                    throw ex.AsExtract("ELI41910");
+                    ex.AsExtract("ELI41910").ExtractLog("ELI43552");
                 }
                 else
                 {
                     ex.ExtractLog("ELI41912");
-                    throw ee;
                 }
             }
         }

@@ -993,11 +993,6 @@ static const string gstrADD_FILE_TASK_SESSION_FAMFILE_FK =
 	"WITH CHECK ADD  CONSTRAINT [FK_FileTaskSession_FAMFile] FOREIGN KEY([FileID])"
 	"REFERENCES [dbo].[FAMFile] ([ID])";
 
-static const string gstrADD_FILE_TASK_SESSION_ACTION_FK =
-	"ALTER TABLE [dbo].[FileTaskSession]  "
-	"WITH CHECK ADD  CONSTRAINT [FK_FileTaskSession_Action] FOREIGN KEY([ActionID])"
-	"REFERENCES [dbo].[Action] ([ID])";
-
 static const string gstrADD_SECURE_COUNTER_VALUE_CHANGE_SECURE_COUNTER_FK =
 	"ALTER TABLE [dbo].SecureCounterValueChange "
 	"WITH CHECK ADD CONSTRAINT FK_SecureCounterValueChange_SecureCounter FOREIGN KEY([CounterID]) "
@@ -1132,6 +1127,11 @@ static const string gstrCREATE_ACTION_ON_DELETE_TRIGGER =
 	"--Insert statements for trigger here \r\n"
 	"DELETE FROM WorkflowChangeFile \r\n"
 	"FROM WorkflowChangeFile w INNER JOIN deleted d ON W.SourceActionID = D.ID OR W.DestActionID = D.ID \r\n"
+	"\r\n"
+	"--Update the FileTaskSession table \r\n"
+	"UPDATE [dbo].[FileTaskSession] \r\n"
+	"SET [ActionID] = NULL  \r\n"
+	"FROM[dbo].[FileTaskSession] INNER JOIN deleted d ON[FileTaskSession].ActionID = D.ID \r\n"
 	"END";
 
 static const string gstrCREATE_WORKFLOW_ON_DELETE_TRIGGER =

@@ -34,6 +34,8 @@ namespace Extract.FileActionManager.Database.Test
         static readonly string _LABDE_ACTION4 = "B01_ViewNonLab";
         static readonly string _LABDE_ACTION5 = "Z_AdminAction";
 
+        static readonly string _ALL_WORKFLOWS = "<All workflows>";
+
         #endregion Constants
 
         #region Fields
@@ -527,7 +529,7 @@ namespace Extract.FileActionManager.Database.Test
                 var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _ACTION_A, "", setStatusTask))
+                    fileProcessingDb, _ACTION_A, _ALL_WORKFLOWS, setStatusTask))
                 {
                     famSession.WaitForProcessingToComplete();
                 }

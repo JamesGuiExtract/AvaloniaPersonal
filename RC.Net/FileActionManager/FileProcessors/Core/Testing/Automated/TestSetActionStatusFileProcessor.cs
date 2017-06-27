@@ -30,7 +30,9 @@ namespace Extract.FileActionManager.FileProcessors.Test
         static readonly string _FIRST_ACTION = "first";
 
         static readonly string _SECOND_ACTION = "second";
-        
+
+        static readonly string _ALL_WORKFLOWS = "<All workflows>";
+
         #endregion Constants
 
         #region Overhead
@@ -377,7 +379,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                     // Process all workflows
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask))
+                        fileProcessingDb, _FIRST_ACTION, _ALL_WORKFLOWS, setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }
@@ -459,7 +461,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                     // Process files for all workflows
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask))
+                        fileProcessingDb, _FIRST_ACTION, _ALL_WORKFLOWS, setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }

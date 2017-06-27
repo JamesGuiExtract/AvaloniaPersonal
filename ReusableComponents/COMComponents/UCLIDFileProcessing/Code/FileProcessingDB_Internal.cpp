@@ -1664,7 +1664,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGE_WORKFLOW_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK);
-		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_ACTION_FK);
 		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE_INDEX);
 
 		if (bAddUserTables)

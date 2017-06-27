@@ -210,6 +210,33 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		// Reset the DB Connection
 		getFPMDB()->ResetDBConnection(VARIANT_FALSE);
 
+		// Before starting processing or supplying verify that the workflow configuration is correct
+		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipSupplyingActionMgmtRole =
+			getActionMgmtRole(m_ipFSMgmtRole);
+
+		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipProcessingActionMgmtRole =
+			getActionMgmtRole(m_ipFPMgmtRole);
+
+		// Do workflows exist
+		if (asCppBool(getFPMDB()->UsingWorkflows))
+		{
+			// ActiveWorkflow has to be set
+			if (m_strActiveWorkflow.empty())
+			{
+				UCLIDException ue("ELI43548", "Workflows are defined in Database but no workflow is set.");
+				ue.addDebugInfo("FPSFile", m_strFPSFileName);
+				throw ue;
+			}
+
+			// Supplying cannot use <All workflows>
+			if (ipSupplyingActionMgmtRole->Enabled && m_strActiveWorkflow == gstrALL_WORKFLOWS)
+			{
+				UCLIDException ue("ELI43549", "Supplying cannot be configured for <All workflows>.");
+				ue.addDebugInfo("FPSFile", m_strFPSFileName);
+				throw ue;
+			}
+		}
+
 		// Set the number of files to process
 		m_recordMgr.setNumberOfFilesToProcess(m_nNumberOfFilesToExecute);
 
@@ -232,12 +259,6 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		// Log start processing information
 		EStartStopStatus eStatus = kStart;
 		logStatusInfo(eStatus);
-
-		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipSupplyingActionMgmtRole =
-			getActionMgmtRole(m_ipFSMgmtRole);
-
-		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipProcessingActionMgmtRole =
-			getActionMgmtRole(m_ipFPMgmtRole);
 		
 		getFPMDB()->RecordFAMSessionStart(m_strFPSFileName.c_str(), strExpandedAction.c_str(),
 			ipSupplyingActionMgmtRole->Enabled, ipProcessingActionMgmtRole->Enabled);

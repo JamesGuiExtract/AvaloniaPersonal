@@ -267,4 +267,10 @@ static const string gstrCREATE_WORKFLOWCHANGEFILE_V148 =
 "	[DestWorkflowID]   INT NOT NULL, "
 "	CONSTRAINT [PK_WorkflowChangeFile] PRIMARY KEY CLUSTERED([FileID] ASC, [WorkflowChangeID] ASC, [SourceActionID] ASC));";
 
+// used for schema version 148-152
+static const string gstrADD_FILE_TASK_SESSION_ACTION_FK_V148 =
+"ALTER TABLE [dbo].[FileTaskSession]  "
+"WITH CHECK ADD  CONSTRAINT [FK_FileTaskSession_Action] FOREIGN KEY([ActionID])"
+"REFERENCES [dbo].[Action] ([ID])";
+
 

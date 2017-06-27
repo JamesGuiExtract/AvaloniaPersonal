@@ -49,6 +49,8 @@ namespace Extract.FileActionManager.Database.Test
 
         static readonly string _CLEANUP_ACTION = "Cleanup";
 
+        static readonly string _ALL_WORKFLOWS = "<All workflows>";
+
         #endregion Constants
 
         #region Fields
@@ -836,7 +838,7 @@ namespace Extract.FileActionManager.Database.Test
                 var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask))
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask))
                 {
                     famSession.WaitForProcessingToComplete();
                 }
@@ -857,7 +859,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStats(extractAction, false).NumDocumentsPending == 2);
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask,
                     threadCount: 2, filesToGrab: 2))
                 {
                     famSession.WaitForProcessingToComplete();
@@ -946,7 +948,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.AreEqual(1, fileProcessingDb.GetStats(extractAction2, false).NumDocumentsPending);
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask))
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask))
                 {
                     famSession.WaitForProcessingToComplete();
                 }
@@ -969,7 +971,7 @@ namespace Extract.FileActionManager.Database.Test
                 // the check for more files will not return anything while one instance of file 1 is processing
                 // and the other is pending.
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", sleepTask,
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, sleepTask,
                     threadCount: 3, filesToGrab: 3, keepProcessing: true, docsToProcess: 3))
                 {
                     System.Threading.Thread.Sleep(500);
@@ -1277,7 +1279,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 // Ensure the 3 files from each workflow are processed with load-balancing in order of priority, then ID
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask,
                     threadCount: 1, filesToGrab: 6, keepProcessing: false, docsToProcess: 6))
                 {
                     famSession.WaitForProcessingToComplete();
@@ -1308,7 +1310,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb.SetWorkflowDefinition(workflow2);
 
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask,
                     threadCount: 1, filesToGrab: 5, keepProcessing: false, docsToProcess: 5))
                 {
                     famSession.WaitForProcessingToComplete();
@@ -1328,7 +1330,7 @@ namespace Extract.FileActionManager.Database.Test
                 // the workflows without error. (In most cases it will grab one file from each, but
                 // there is a small chance it will end up taking 2 files from workflow 1).
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask,
                     threadCount: 1, filesToGrab: 2, keepProcessing: false, docsToProcess: 2))
                 {
                     famSession.WaitForProcessingToComplete();
@@ -1338,7 +1340,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 // Ensure that when trying to process 2 more, it processes the last file without error.
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask,
                     threadCount: 1, filesToGrab: 2, keepProcessing: false, docsToProcess: 2))
                 {
                     famSession.WaitForProcessingToComplete();
@@ -1353,7 +1355,7 @@ namespace Extract.FileActionManager.Database.Test
                 // ID regardless of workflow.
                 fileProcessingDb.SetDBInfoSetting("EnableLoadBalancing", "0", true, false);
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask,
                     threadCount: 1, filesToGrab: 5, keepProcessing: false, docsToProcess: 5))
                 {
                     famSession.WaitForProcessingToComplete();
@@ -1435,7 +1437,7 @@ namespace Extract.FileActionManager.Database.Test
                 // case that means exactly 100 files from each workflow.
                 fileProcessingDb.SetDBInfoSetting("EnableLoadBalancing", "0", true, false);
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask,
                     threadCount: 4, filesToGrab: 1, keepProcessing: false, docsToProcess:300))
                 {
                     famSession.WaitForProcessingToComplete();
@@ -1456,7 +1458,7 @@ namespace Extract.FileActionManager.Database.Test
                 // processed for each will based on random chance.
                 fileProcessingDb.SetDBInfoSetting("EnableLoadBalancing", "1", true, false);
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask,
                     threadCount: 4, filesToGrab: 1, keepProcessing: false, docsToProcess: 300))
                 {
                     famSession.WaitForProcessingToComplete();
@@ -1486,7 +1488,7 @@ namespace Extract.FileActionManager.Database.Test
                 // sum of all dept weightings (1 + 2 + 3), this should guarantee that the number of
                 // files processed for each dept exactly corresponds to the weightings.
                 using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _LABDE_ACTION1, "", setStatusTask,
+                    fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask,
                     threadCount: 4, filesToGrab: 6, keepProcessing: false, docsToProcess: 300))
                 {
                     famSession.WaitForProcessingToComplete();
@@ -1558,7 +1560,7 @@ namespace Extract.FileActionManager.Database.Test
                     startProcessingEvent.WaitOne();
 
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _LABDE_ACTION1, "", sleepTask,
+                        fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, sleepTask,
                         threadCount: 1, filesToGrab: 1, keepProcessing: true, docsToProcess: 1))
                     {
                         int processed = famSession.WaitForProcessingToComplete();

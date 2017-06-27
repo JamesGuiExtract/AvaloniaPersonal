@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 152;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 153;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1751,7 +1751,7 @@ int UpdateToSchemaVersion148(_ConnectionPtr ipConnection,
 
 		// Need to update the FileTaskSession to include the ActionID
 		vecQueries.push_back("ALTER TABLE dbo.[FileTaskSession] ADD [ActionID] int;");
-		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_ACTION_FK);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_ACTION_FK_V148);
 		vecQueries.push_back(
 			"UPDATE       [FileTaskSession] "
 			"SET                [ActionID] = [FAMSession].[ActionID] "
@@ -1882,6 +1882,32 @@ int UpdateToSchemaVersion152(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43476");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion153(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 153;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back("DROP TRIGGER [dbo].[ActionOnDeleteTrigger]");
+		vecQueries.push_back("ALTER TABLE [dbo].[FileTaskSession] DROP CONSTRAINT [FK_FileTaskSession_Action] ");
+		vecQueries.push_back(gstrCREATE_ACTION_ON_DELETE_TRIGGER);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43550");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6834,7 +6860,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 149:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion150);
 				case 150:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion151);
 				case 151:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion152);
-				case 152:	break;
+				case 152:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion153);
+				case 153:	break;
 
 				default:
 					{
