@@ -1756,7 +1756,7 @@ namespace Extract.FileActionManager.Utilities
                 if (UseDatabaseMode)
                 {
                     if (FileSelector.Configure(FileProcessingDB, "Select the files to be listed",
-                        "SELECT [Filename] FROM [FAMFile]"))
+                        "SELECT [Filename] FROM [FAMFile]", false))
                     {
                         selectionConfirmed = true;
                     }
