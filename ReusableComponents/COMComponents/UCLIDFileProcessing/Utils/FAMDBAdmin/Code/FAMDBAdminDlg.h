@@ -193,7 +193,7 @@ private:
 
 	// Shows the dialog that allows files to be migrated to new workflows
 	// If bNoWorkflowSource is true, the source workflow selection will be force to <No workflow>
-	void showMoveToWorkflowDialog(bool bAreUnaffiliatedFiles);
+	int showMoveToWorkflowDialog(bool bAreUnaffiliatedFiles);
 
 	// Refreshed the current DB connection status.
 	void refreshDBStatus();

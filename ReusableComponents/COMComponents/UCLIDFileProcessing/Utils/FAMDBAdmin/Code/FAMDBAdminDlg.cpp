@@ -790,12 +790,12 @@ void CFAMDBAdminDlg::OnToolsReports()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18033");
 }
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnToolsCheckForNewComponents() 
+void CFAMDBAdminDlg::OnToolsCheckForNewComponents()
 {
-	AFX_MANAGE_STATE( AfxGetModuleState() );
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
 	try
-	{	
+	{
 		// create a vector of all categories we care about.
 		IVariantVectorPtr ipCategoryNames(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI18165", ipCategoryNames != __nullptr);
@@ -819,10 +819,10 @@ void CFAMDBAdminDlg::OnToolsCheckForNewComponents()
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnManageTags()
 {
-	AFX_MANAGE_STATE( AfxGetModuleState() );
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
 	try
-	{	
+	{
 		// Create a new tag manager dialog
 		CManageTagsDlg dlg(m_ipFAMDB);
 
@@ -834,10 +834,10 @@ void CFAMDBAdminDlg::OnManageTags()
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnManageBatesCounters()
 {
-	AFX_MANAGE_STATE( AfxGetModuleState() );
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
 	try
-	{	
+	{
 		// Create a new counter manager dialog
 		CManageUserCountersDlg dlg(m_ipFAMDB);
 
@@ -849,10 +849,10 @@ void CFAMDBAdminDlg::OnManageBatesCounters()
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnManageLoginUsers()
 {
-	AFX_MANAGE_STATE( AfxGetModuleState() );
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
 	try
-	{	
+	{
 		// Create a new user manager dialog
 		CManageUsersDlg dlg(m_ipFAMDB);
 
@@ -864,14 +864,14 @@ void CFAMDBAdminDlg::OnManageLoginUsers()
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnManageWorkflowActions()
 {
-	AFX_MANAGE_STATE( AfxGetModuleState() );
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
 	try
-	{	
+	{
 		// Display the WorkflowManagement dialog
-		WorkflowManagement ^workFlow = gcnew WorkflowManagement(m_ipFAMDB, marshal_as<String^>( m_strCurrentWorkflow));
+		WorkflowManagement ^workFlow = gcnew WorkflowManagement(m_ipFAMDB, marshal_as<String^>(m_strCurrentWorkflow));
 		NativeWindow ^currentWindow = __nullptr;
-				
+
 		IntPtr managedHWND(this->GetSafeHwnd());
 		currentWindow = NativeWindow::FromHandle(managedHWND);
 		workFlow->ShowDialog(currentWindow);
@@ -880,7 +880,7 @@ void CFAMDBAdminDlg::OnManageWorkflowActions()
 		{
 			refreshWorkflowStatus();
 
-			if (m_bUnaffiliatedFiles)
+			while (m_bUnaffiliatedFiles)
 			{
 				int iResult = MessageBox("This database has defined workflow(s) but files that exist "
 					"outside those workflows.\r\n\r\nThese files need to be migrated to workflows before "
@@ -889,7 +889,14 @@ void CFAMDBAdminDlg::OnManageWorkflowActions()
 					MB_YESNO);
 				if (iResult == IDYES)
 				{
-					showMoveToWorkflowDialog(true);
+					if (showMoveToWorkflowDialog(true) != IDOK)
+					{
+						break;
+					}
+				}
+				else
+				{
+					break;
 				}
 			}
 		}
@@ -1391,7 +1398,7 @@ void CFAMDBAdminDlg::positionWorkflowControls()
 
 }
 //--------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::showMoveToWorkflowDialog(bool bAreUnaffiliatedFiles)
+int CFAMDBAdminDlg::showMoveToWorkflowDialog(bool bAreUnaffiliatedFiles)
 {
 	MoveToWorkflowForm ^moveToWorkflow = gcnew MoveToWorkflowForm(m_ipFAMDB, bAreUnaffiliatedFiles);
 	NativeWindow ^currentWindow = __nullptr;
@@ -1399,9 +1406,11 @@ void CFAMDBAdminDlg::showMoveToWorkflowDialog(bool bAreUnaffiliatedFiles)
 	{
 		IntPtr managedHWND(this->GetSafeHwnd());
 		currentWindow = NativeWindow::FromHandle(managedHWND);
-		moveToWorkflow->ShowDialog(currentWindow);
+		DialogResult result = moveToWorkflow->ShowDialog(currentWindow);
 
 		refreshWorkflowStatus();
+
+		return (int)result;
 	}
 	finally
 	{

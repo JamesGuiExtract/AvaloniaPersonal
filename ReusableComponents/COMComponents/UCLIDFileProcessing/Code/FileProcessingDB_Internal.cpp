@@ -985,12 +985,22 @@ string CFileProcessingDB::getActiveWorkflow()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setActiveWorkflow(string strWorkflowName)
 {
+	CSingleLock lock(&m_criticalSection, TRUE);
+
+	if (m_strActiveWorkflow == strWorkflowName)
+	{
+		// https://extract.atlassian.net/browse/ISSUE-14766
+		// If the specified workflow is the same as the current workflow, do nothing.
+		// This should prevent any possible code paths that do a "refresh" of current DB settings
+		// from triggering assertion ELI42030.
+		return;
+	}
+
 	if (m_nFAMSessionID != 0)
 	{
 		throw UCLIDException("ELI42030", "Cannot set workflow while a session is open.");
 	}
 
-	CSingleLock lock(&m_criticalSection, TRUE);
 	m_strActiveWorkflow = strWorkflowName;
 	ms_strLastWorkflow = strWorkflowName;
 

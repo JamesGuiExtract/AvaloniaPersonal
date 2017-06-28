@@ -129,7 +129,7 @@ namespace Extract.Utilities
                         }
 
                         hyperlinkAttributes =
-                            args[i].Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+                            args[i].Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     }
                     else if (temp.Equals("/la", StringComparison.OrdinalIgnoreCase))
                     {

@@ -753,9 +753,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 count =
                     fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow2ID);
-                // Currently the count reflects the number of documents selected, not moved. In the FAMDBAdmin,
-                // FAMFileSelector would be limited to the current workflow and thus would not select fileID
-                Assert.AreEqual(2, count);
+                Assert.AreEqual(1, count);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 var statsW1_3 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
@@ -832,9 +830,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 count = 
                     fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow2ID);
-                // Currently the count reflects the number of documents selected, not moved. In the FAMDBAdmin,
-                // FAMFileSelector would be limited to the current workflow and thus would not select fileID1.
-                Assert.AreEqual(2, count);
+                Assert.AreEqual(1, count);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 var statsW1_3 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
@@ -844,12 +840,26 @@ namespace Extract.FileActionManager.Database.Test
                 var statsW2_3 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
                 Assert.That(statsW2_3.NumDocuments == 1, "There should be 1 record for Workflow2");
 
+                count =
+                    fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", workflow1ID, workflow2ID);
+                Assert.AreEqual(1, count);
+
+                ActionStatistics blankAS = new ActionStatistics();
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                var statsW1_4 = fileProcessingDb.GetStats(actionA_Workflow1_ID, false);
+                Assert.That(StatsAreEqual(blankAS, statsW1_4), "Workflow1 is not empty after moving file to Workflow2");
+
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                var statsW2_4 = fileProcessingDb.GetStats(actionA_Workflow2_ID, false);
+                Assert.That(statsW2_4.NumDocuments == 2, "There should be 2 records for Workflow2");
+
                 // Check records in workflow table
                 var testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM WorkflowFile");
                 Assert.That(testRecordset.RecordCount == 2, "There should be 2 records in WorkflowFile table");
 
                 testRecordset.Filter = "FileID = " + fileRecord1.FileID.AsString() + " AND WorkflowID = " + workflow1ID.AsString();
-                Assert.That(testRecordset.RecordCount == 1, "WorkflowFile table contains 1 record for Workflow1");
+                Assert.That(testRecordset.RecordCount == 0, "WorkflowFile table contains 0 records for Workflow1");
             }
             finally
             {

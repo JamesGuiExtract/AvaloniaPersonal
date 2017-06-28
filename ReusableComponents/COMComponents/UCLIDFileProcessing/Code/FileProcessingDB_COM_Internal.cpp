@@ -10711,10 +10711,6 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 			// Create the #SelectedFilesToMove temp table;
 			createTempTableOfSelectedFiles(ipConnection, strQueryFrom);
 
-			// Get the count of files being moved.
-			// TODO: This doesn't account for files already in the dest workflow.
-			executeCmdQuery(ipConnection, "SELECT COUNT(ID) AS ID FROM #SelectedFilesToMove", false, pnCount);
-
 			// Query to add the new WorkflowChange record
 			string strWorkflowChangeQuery = Util::Format(
 				"INSERT INTO[dbo].[WorkflowChange] ([DestWorkflowID]) "
@@ -10757,7 +10753,7 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 			string strSelectedFilesWithSourceAndDest = Util::Format(
 				"SELECT DISTINCT \r\n"
 				"	SQ.ID as FileID, %li as WorkflowChangeID, SA.ID AS SourceActionID, DA.ID AS DestActionID, \r\n"
-				"	SA.WorkflowID AS SourceWorkflowID, %li AS DestWorkflowID \r\n"
+				"	WF.WorkflowID AS SourceWorkflowID, %li AS DestWorkflowID \r\n"
 				"%s",
 				nWorkflowChangeID, nDestWorkflowID, strSelectionFrom.c_str());
 
@@ -10771,8 +10767,14 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 				"	, [SourceWorkflowID] "
 				"	, [DestWorkflowID]) %s ", strSelectedFilesWithSourceAndDest.c_str());
 
+			executeCmdQuery(ipConnection, strWorkflowChangeFile);
+
+			// Get the count of files being moved.
+			executeCmdQuery(ipConnection, Util::Format(
+				"SELECT COUNT(DISTINCT(FileID)) AS ID FROM [WorkflowChangeFile] WHERE WorkflowChangeID = %li",
+				nWorkflowChangeID), false, pnCount);
+
 			vector<string> vecUpdateQueries;
-			vecUpdateQueries.push_back(strWorkflowChangeFile);
 		    
 			if (nSourceWorkflowID == -1)
 			{
