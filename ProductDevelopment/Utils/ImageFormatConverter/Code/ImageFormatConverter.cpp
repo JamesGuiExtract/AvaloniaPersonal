@@ -939,7 +939,7 @@ void usage()
 					"The optional argument /vp [perspective_id] will set the view perspective of the output to the specified value (1-8) or to 1 (top-left) if the perspective_id is not specified.\n"
 					"The optional argument /am will use an alternate method to perform the conversion. This option is not compatible with any other optional argument except '/RemovePages', '/ef', '/color' and '/format'. \n"
 					"The optional argument /RemovePages will exclude the specified pages from the output. The pages can be specified as an individual page number, a comma-separated list, \n"
-					"\ta range of pages denoted with a hypen, or a dash followed by a number to indicate the last x pages should be removed. \n"
+					"\ta range of pages denoted with a hyphen, or a dash followed by a number to indicate the last x pages should be removed. \n"
 					"The optional argument /color will preserve the color depth of the source image even if the output is a tif image. If this option is not used, all tif output images will be bitonal regardless of source bit depth. \n"
 					"The optional argument (/ef <filename>) fully specifies the location of an exception log that will store any thrown exception. Without an exception log, any thrown exception will be displayed.\n"
 					"The optional argument (/format <format>) allows specification of the Nuance file format (only works when '/am' is specified). Available formats:\n";

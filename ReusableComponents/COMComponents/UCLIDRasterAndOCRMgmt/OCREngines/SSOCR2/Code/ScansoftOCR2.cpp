@@ -2612,6 +2612,8 @@ bool zoneIsLessThan(ZONE zoneLeft, ZONE zoneRight)
 bool isBasicLatinCharacter(unsigned short usLetterCode)
 {
 	// NOTE: 176 is the degree symbol.
-	return usLetterCode <= 126 || usLetterCode == 176;
+	// Don't allow 0 as a letter code
+	// https://extract.atlassian.net/browse/ISSUE-14802
+	return usLetterCode > 0 && usLetterCode <= 126 || usLetterCode == 176;
 }
 //-------------------------------------------------------------------------------------------------
