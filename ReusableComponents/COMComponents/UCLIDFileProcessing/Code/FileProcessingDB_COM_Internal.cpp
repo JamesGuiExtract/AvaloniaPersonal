@@ -1938,6 +1938,12 @@ bool CFileProcessingDB::DefineNewAction_Internal(bool bDBLocked, BSTR strAction,
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
+				if (getActionIDNoThrow(ipConnection, strActionName, "") > 0)
+				{
+					UCLIDException ue("ELI43555", "Action " + strActionName + " already exists");
+					throw ue;
+				}
+
 				*pnID = getKeyID(ipConnection, "Action", "ASCName", strActionName);
 
 				// Commit this transaction

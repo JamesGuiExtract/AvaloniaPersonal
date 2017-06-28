@@ -113,9 +113,10 @@ namespace Extract
 					ipWorkflowDefinition->Type = workflowType;
 				}
 
+				String^ startAction;
 				if (startActionComboBox->SelectedIndex >= 0)
 				{
-					String^ startAction = (String^)startActionComboBox->SelectedItem;
+					startAction = (String^)startActionComboBox->SelectedItem;
 					ipWorkflowDefinition->StartAction = context.marshal_as<BSTR>(startAction);
 					if (!String::IsNullOrWhiteSpace(startAction))
 					{
@@ -126,9 +127,10 @@ namespace Extract
 						ipActions->PushBack(ipActionInfo);
 					}
 				}
+				String^ endAction;
 				if (endActionComboBox->SelectedIndex >= 0)
 				{
-					String^ endAction = (String^)endActionComboBox->SelectedItem;
+					endAction = (String^)endActionComboBox->SelectedItem;
 					ipWorkflowDefinition->EndAction = context.marshal_as<BSTR>(endAction);
 					if (!String::IsNullOrWhiteSpace(endAction))
 					{
@@ -142,6 +144,14 @@ namespace Extract
 				if (postWorkflowActionComboBox->SelectedIndex >= 0)
 				{
 					String^ postWorkflowAction = (String^)postWorkflowActionComboBox->SelectedItem;
+					if (postWorkflowAction == startAction || postWorkflowAction == endAction)
+					{
+						System::Windows::Forms::MessageBox::Show(
+							"Post workflow action cannot be same as start or end action.");
+						postWorkflowActionComboBox->Focus();
+						return;
+					}
+
 					ipWorkflowDefinition->PostWorkflowAction = context.marshal_as<BSTR>(postWorkflowAction);
 					if (!String::IsNullOrWhiteSpace(postWorkflowAction))
 					{

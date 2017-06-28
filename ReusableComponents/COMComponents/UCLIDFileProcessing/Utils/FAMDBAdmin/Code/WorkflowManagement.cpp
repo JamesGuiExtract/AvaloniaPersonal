@@ -69,7 +69,14 @@ namespace Extract
 						newRow->Cells[ActionMainSequenceColumnIndex]->Value = true;
 						newRow->Selected = true;
 
-						workflowActionsDirty = true;
+						// If there is a currently selected workflow, the action will default to be
+						// included and thus should flag the workflow actions as dirty.
+						int workflowID = getSelectedWorkflowId();
+						if (workflowID != -1)
+						{
+							workflowActionsDirty = true;
+							updateButtons();
+						}
 
 						// Restore the wait cursor because we have finished adding an action to DB
 						wait.Restore();
