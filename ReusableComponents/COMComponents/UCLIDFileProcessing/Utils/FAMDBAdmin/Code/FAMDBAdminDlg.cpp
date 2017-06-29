@@ -620,9 +620,8 @@ void CFAMDBAdminDlg::OnHelpFileActionManagerHelp()
 		return;
 #endif
 		
-		// go up Two level, from "..\Extract Systems\FlexIndexComponents\Bin\" 
-		// to "..\Extract Systems\", and then go to
-		// "..\Extract Systems\FLEX Index\Help\"
+		// All help files should be in Extract Systems\Help
+		// Binaries are in Extract Systems\CommonComponents
 		string strExtractFolder = getCurrentProcessEXEDirectory();
 		string strExtractSystemFolderName("\\Extract Systems");
 		int nBinPos = strExtractFolder.rfind(strExtractSystemFolderName);
@@ -637,9 +636,9 @@ void CFAMDBAdminDlg::OnHelpFileActionManagerHelp()
 		string strHelpPath = strExtractFolder.substr(0, nBinPos + strExtractSystemFolderName.length() );
 
 		// Initialize the paths to possible help files
-		string strFlexHelpPath = strHelpPath + "\\FlexIndex\\Help\\FLEXIndex.chm";
-		string strIDShieldHelpPath = strHelpPath + "\\IDShield\\Help\\IDShield.chm";
-		string strLabDEHelpPath = strHelpPath + "\\LabDE\\Help\\LabDE.chm";
+		string strFlexHelpPath = strHelpPath + "\\Help\\FLEXIndex.chm";
+		string strIDShieldHelpPath = strHelpPath + "\\Help\\IDShield.chm";
+		string strLabDEHelpPath = strHelpPath + "\\Help\\LabDE.chm";
 
 		// Check for FLEXIndex Help file
 		if (isFileOrFolderValid( strFlexHelpPath ))
