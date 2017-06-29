@@ -147,7 +147,7 @@ namespace DocumentAPI.Controllers
 
             try
             {
-                var data = new DocumentData(ClaimsToContext(User));
+                using (var data = new DocumentData(ClaimsToContext(User)))
                 {
                     var result = data.GetStatus(Id);
                     return Ok(result);

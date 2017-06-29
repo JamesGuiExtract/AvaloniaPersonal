@@ -7,17 +7,32 @@ namespace DocumentAPI.Models
     /// <summary>
     /// data model for User(Controller)
     /// </summary>
-    public class UserData
+    public sealed class UserData: IDisposable
     {
         FileApi _fileApi;
 
         /// <summary>
         /// UserData CTOR
         /// </summary>
-        /// <param name="fileApi">the fileApi object to use</param>
-        public UserData(FileApi fileApi)
+        /// <param name="apiContext">the api context to use for the fileApi</param>
+        //public UserData(FileApi fileApi)
+        public UserData(ApiContext apiContext)
         {
-            _fileApi = fileApi;
+            _fileApi = FileApiMgr.GetInterface(apiContext);
+        }
+
+        /// <summary>
+        /// Dispose - release the fileApi (reset in use flag)
+        /// </summary>
+        public void Dispose()
+        {
+            if (_fileApi == null)
+            {
+                return;
+            }
+
+            _fileApi.InUse = false;
+            _fileApi = null;
         }
 
         /// <summary>

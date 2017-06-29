@@ -51,12 +51,13 @@ namespace DocumentAPI.Controllers
                 // The user may have specified a workflow - if so then ensure that the API context uses
                 // the specified workflow.
                 var context = LoginContext(user.WorkflowName);
-                var userData = new UserData(FileApiMgr.GetInterface(context));
-
-                if (userData.MatchUser(user))
+                using (var userData = new UserData(context))
                 {
-                    var token = GenerateToken(user, context);
-                    return Ok(token);
+                    if (userData.MatchUser(user))
+                    {
+                        var token = GenerateToken(user, context);
+                        return Ok(token);
+                    }
                 }
 
                 return BadRequest("Unknown user or password");

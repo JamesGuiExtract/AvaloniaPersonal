@@ -67,8 +67,7 @@ namespace Extract.Web.DocumentAPI.Test
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                var c = Utils.SetDefaultApiContext(dbName);
-                var fileApi = FileApiMgr.GetInterface(c);
+                Utils.SetDefaultApiContext(dbName);
 
                 try
                 {
@@ -78,8 +77,10 @@ namespace Extract.Web.DocumentAPI.Test
                         Password = "a"
                     };
 
-                    var userData = new UserData(fileApi);
-                    Assert.IsTrue(userData.MatchUser(user), "User did not match");
+                    using (var userData = new UserData(Utils.GetCurrentApiContext))
+                    {
+                        Assert.IsTrue(userData.MatchUser(user), "User did not match");
+                    }
                 }
                 catch (Exception)
                 {

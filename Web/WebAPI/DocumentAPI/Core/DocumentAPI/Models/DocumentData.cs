@@ -59,11 +59,17 @@ namespace DocumentAPI.Models
         /// </summary>
         public void Dispose()
         {
-            _attributeDbMgr = null;
-            
+            if (_attributeDbMgr != null)
+            {
+                _attributeDbMgr = null;
+            }
+
             // Allow the fileApi object to be reused by clearing the InUse flag.
-            _fileApi.InUse = false;
-            _fileApi = null;
+            if (_fileApi != null)
+            {
+                _fileApi.InUse = false;
+                _fileApi = null;
+            }
         }
 
         /// <summary>

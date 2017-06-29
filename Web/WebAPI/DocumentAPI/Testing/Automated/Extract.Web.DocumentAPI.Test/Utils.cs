@@ -57,5 +57,17 @@ namespace Extract.Web.DocumentAPI.Test
 
             return apiContext;
         }
+
+        /// <summary>
+        /// Get the current API context.
+        /// </summary>
+        /// <returns>the current API context</returns>
+        public static ApiContext GetCurrentApiContext
+        {
+            get
+            {
+                return ApiUtils.CurrentApiContext;
+            }
+        }
     }
 }
