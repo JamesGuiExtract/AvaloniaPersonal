@@ -375,17 +375,30 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _pageIsDisplayed = display;
 
-                if (_contentsPanel != null)
+                if (_contentsPanel == null)
                 {
-                    // Show the image only if this instance is currently in a PageLayoutControl.
-                    bool imagePageChanged = _contentsPanel.DisplayPage(imageViewer, display && ParentForm != null);
-
-                    // Expensive refreshes of the entire form should only be performed if the page was
-                    // changed.
-                    if (imagePageChanged)
+                    // https://extract.atlassian.net/browse/ISSUE-14808
+                    // Contents panel needs to be created to display a page if requested. It is not
+                    // okay to simply not show the page as had been the case after the initial 10.6
+                    // re-factor.
+                    if (display)
                     {
-                        ParentForm.Refresh();
+                        SetContents();
                     }
+                    else
+                    {
+                        return;
+                    }
+                }
+
+                // Show the image only if this instance is currently in a PageLayoutControl.
+                bool imagePageChanged = _contentsPanel.DisplayPage(imageViewer, display && ParentForm != null);
+
+                // Expensive refreshes of the entire form should only be performed if the page was
+                // changed.
+                if (imagePageChanged)
+                {
+                    ParentForm.Refresh();
                 }
             }
             catch (Exception ex)
