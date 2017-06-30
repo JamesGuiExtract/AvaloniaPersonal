@@ -215,8 +215,8 @@ CopySilentInstallsDir:
 	
 CopyDocumentAPIFiles:
 	@ECHO Copying DocumentAPIFiles
-	@IF NOT EXIST "$(OtherSetupFiles)\DocumentAPI" MKDIR "$(OtherSetupFiles)\DocumentAPI"
-	@XCOPY "$(WebAPI)\*.*" "$(OtherSetupFiles)\DocumentAPI"
+	@IF NOT EXIST "$(OtherSetupFiles)\WebAPI" MKDIR "$(OtherSetupFiles)\WebAPI"
+	@XCOPY "$(WebAPI)\*.*" "$(OtherSetupFiles)\WebAPI"
 	
 CreateSharepointInstall:
 #@Echo Creating Sharepoint Installs...

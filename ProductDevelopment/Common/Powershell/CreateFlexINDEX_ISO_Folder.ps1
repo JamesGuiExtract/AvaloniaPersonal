@@ -76,6 +76,11 @@ Invoke-Expression "$CommonSetup -InstallFolder 'FlexIndex'"
 Invoke-Expression "$CommonSetup -InstallFolder 'SilentInstalls'"
 Invoke-Expression "$CommonSetup -InstallFolder 'Demo_FlexIndex'"
 
+# Setup link to WebAPI path
+$OtherPath = 'D:\Internal\ProductReleases\FlexIndex\Internal\BleedingEdge\' + $FlexIndexVersion + '\Other\'
+$WebAPISetup = "$MakeSymLinkCommon -BaseDestPath '$BaseDestPath' -BaseTargetPath '$OtherPath'"
+Invoke-Expression "$WebAPISetup -InstallFolder 'WebAPI'"
+
 $FileDest = $BaseDestPath + 'FlexIndex.ico'
 $FileTarget = $SetupFilesPath + 'FlexIndexInstall\FlexIndex.ico'
 
