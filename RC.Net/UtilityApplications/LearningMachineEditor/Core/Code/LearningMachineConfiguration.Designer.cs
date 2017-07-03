@@ -844,7 +844,7 @@
             this.documentCategorizationCsvInputPanel.Controls.Add(this.documentCategorizationCsvTextBox);
             this.documentCategorizationCsvInputPanel.Location = new System.Drawing.Point(6, 67);
             this.documentCategorizationCsvInputPanel.Name = "documentCategorizationCsvInputPanel";
-            this.documentCategorizationCsvInputPanel.Size = new System.Drawing.Size(532, 477);
+            this.documentCategorizationCsvInputPanel.Size = new System.Drawing.Size(532, 450);
             this.documentCategorizationCsvInputPanel.TabIndex = 2;
             // 
             // label3

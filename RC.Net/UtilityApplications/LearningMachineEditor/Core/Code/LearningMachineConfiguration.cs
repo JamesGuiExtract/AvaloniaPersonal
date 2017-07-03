@@ -646,7 +646,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     || CurrentLearningMachine.MachineType == LearningMachineType.MultilabelSVM)
                 {
                     var classifier = (SupportVectorMachineClassifier)CurrentLearningMachine.Classifier;
-                    svmComplexityTextBox.Text = classifier.Complexity.ToString(CultureInfo.CurrentCulture);
+                    svmComplexityTextBox.Text = classifier.Complexity.ToString("r", CultureInfo.CurrentCulture);
                     svmAutoComplexityCheckBox.Checked = classifier.AutomaticallyChooseComplexityValue;
                     switch (classifier.ScoreTypeToUseForComplexityChoosingAlgorithm)
                     {
