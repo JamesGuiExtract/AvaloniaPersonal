@@ -874,7 +874,16 @@ namespace Extract.DataEntry.LabDE
                 // we already know there will not be any results.
                 if (KeyFieldsArePopulated)
                 {
-                    adoRecordset = FileProcessingDB.GetResultsForQuery(DuplicateDocumentsQuery);
+                    // https://extract.atlassian.net/browse/ISSUE-14820
+                    // The FFI will limit the selected files to the current workflow via usage of a
+                    // FAMFileSelector like this. Do so here to keep the count returned here
+                    // consistent with the files that will be displayed when the FFI is launched.
+                    FAMFileSelector selector = new FAMFileSelector();
+                    selector.AddQueryCondition(DuplicateDocumentsQuery);
+                    string strQuery = selector.BuildQuery(FileProcessingDB, "[FAMFile].[ID]",
+                        " ORDER BY [FAMFile].[ID]", false);
+
+                    adoRecordset = FileProcessingDB.GetResultsForQuery(strQuery);
                     return adoRecordset.RecordCount;
                 }
                 else

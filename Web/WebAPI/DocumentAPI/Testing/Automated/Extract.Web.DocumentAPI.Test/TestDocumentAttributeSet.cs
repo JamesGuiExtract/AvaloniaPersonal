@@ -335,7 +335,7 @@ namespace Extract.Web.DocumentAPI.Test
                 AssertSame(left.Name, left.Value, $"LineInfo[{i}].SpatialLineBounds.Left", bounds.Left.ToString());
 
                 var bottom = attributes[Bottom];
-                AssertSame(bottom.Name, bottom.Value, $"LineInfo[{i}].SpatialLineBounds.Bottom", bounds.Botton.ToString());
+                AssertSame(bottom.Name, bottom.Value, $"LineInfo[{i}].SpatialLineBounds.Bottom", bounds.Bottom.ToString());
 
                 var right = attributes[Right];
                 AssertSame(right.Name, right.Value, $"LineInfo[{i}].SpatialLineBounds.Right", bounds.Right.ToString());

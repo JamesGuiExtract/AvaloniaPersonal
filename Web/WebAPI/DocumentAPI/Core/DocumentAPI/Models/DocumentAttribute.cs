@@ -105,9 +105,9 @@ namespace DocumentAPI.Models
         public int Left { get; set; }
 
         /// <summary>
-        /// The botton of the bounding rectangle.
+        /// The bottom of the bounding rectangle.
         /// </summary>
-        public int Botton { get; set; }
+        public int Bottom { get; set; }
 
         /// <summary>
         /// The right edge of the bounding rectangle.

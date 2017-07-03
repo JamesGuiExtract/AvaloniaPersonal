@@ -127,7 +127,7 @@ namespace DocumentAPI
 
             bounds.Top = rect.Top;
             bounds.Left = rect.Left;
-            bounds.Botton = rect.Bottom;
+            bounds.Bottom = rect.Bottom;
             bounds.Right = rect.Right;
 
             return bounds;

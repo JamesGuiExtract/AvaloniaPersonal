@@ -650,7 +650,14 @@ namespace Extract
 			String^ endAction = marshal_as<String^>(workflowDefinition->EndAction);
 			if (!String::IsNullOrWhiteSpace(endAction))
 			{
-				specialActions[endAction] = "End";
+				if (startAction == endAction)
+				{
+					specialActions[endAction] = "Start/End";
+				}
+				else
+				{
+					specialActions[endAction] = "End";
+				}
 			}
 			String^ postWorkflowAction = marshal_as<String^>(workflowDefinition->PostWorkflowAction);
 			if (!String::IsNullOrWhiteSpace(postWorkflowAction))
