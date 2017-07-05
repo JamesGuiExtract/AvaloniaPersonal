@@ -58,6 +58,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _pageIsDisplayed;
 
+        /// <summary>
+        /// Prevents recursion in SetContents()
+        /// </summary>
+        bool _updatingContents;
+
         #endregion Fields
 
         #region Constructors
@@ -383,7 +388,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // re-factor.
                     if (display)
                     {
-                        SetContents();
+                        SetContents(forceCreation: true);
                     }
                     else
                     {
@@ -568,29 +573,45 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Creates or disposes of <see cref="_contentsPanel"/> depending on current visibility of
         /// this control.
         /// </summary>
-        void SetContents()
+        /// <param name="forceCreation"><c>true</c> if the contents should be created even if the
+        /// page is not currently visible.</param>
+        void SetContents(bool forceCreation = false)
         {
-            bool visible =
-                Parent != null &&
-                Visible &&
-                Parent.ClientRectangle.IntersectsWith(Bounds);
-
-            if (visible && _contentsPanel == null)
+            if (_updatingContents)
             {
-                _contentsPanel = new PageThumbnailControlContents(this, _page);
-
-                Controls.Add(_contentsPanel);
-                _contentsPanel.Invalidate(true);
-
-                RegisterForEvents(_contentsPanel);
+                return;
             }
-            else if (!visible && _contentsPanel != null)
+
+            try
             {
-                var contentsPanel = _contentsPanel;
-                UnRegisterForEvents(contentsPanel);
-                Controls.Remove(contentsPanel);
-                contentsPanel.Dispose();
-                _contentsPanel = null;
+                _updatingContents = true;
+
+                bool visible = forceCreation ||
+                    (Parent != null &&
+                     Visible &&
+                     Parent.ClientRectangle.IntersectsWith(Bounds));
+
+                if (visible && _contentsPanel == null)
+                {
+                    _contentsPanel = new PageThumbnailControlContents(this, _page);
+
+                    Controls.Add(_contentsPanel);
+                    _contentsPanel.Invalidate(true);
+
+                    RegisterForEvents(_contentsPanel);
+                }
+                else if (!visible && _contentsPanel != null)
+                {
+                    var contentsPanel = _contentsPanel;
+                    UnRegisterForEvents(contentsPanel);
+                    Controls.Remove(contentsPanel);
+                    contentsPanel.Dispose();
+                    _contentsPanel = null;
+                }
+            }
+            finally
+            {
+                _updatingContents = false;
             }
         }
 

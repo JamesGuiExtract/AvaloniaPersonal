@@ -332,8 +332,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _documentTypeComboBox.Enabled = false;
-
                 return ActiveDataEntryPanel.SaveData(data, validateData);
             }
             catch (Exception ex)

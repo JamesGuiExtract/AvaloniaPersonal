@@ -143,13 +143,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             List<PaginationControl> redundantControls = new List<PaginationControl>();
             PaginationSeparator lastSeparator = null;
 
-            // If the affected control is not currently visible, abort the layout to avoid
-            // unnecessary repeated layouts as a large number of documents/pages are loading.
+            // If the affected control is not currently visible or is offscreen below the current
+            // visible ClientRectangle, abort the layout to avoid unnecessary repeated layouts as
+            // a large number of documents/pages are loading.
             if (!ForceNextLayout &&
                 layoutEventArgs?.AffectedControl != null &&
                 layoutEventArgs?.AffectedControl != parent &&
                 !layoutEventArgs.AffectedProperty.Equals("Visible") &&
-                !parent.ClientRectangle.IntersectsWith(layoutEventArgs.AffectedControl.Bounds))
+                (parent.ClientRectangle.Bottom < layoutEventArgs.AffectedControl.Bounds.Top))
             {
                 return;
             }
