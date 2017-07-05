@@ -150,7 +150,7 @@ namespace DocumentAPI
         {
             DocumentSubmitResult result = new DocumentSubmitResult()
             {
-                Id = isError ? "-1" : Enum.GetName(typeof(DocumentSubmitType), submitType) + fileId.ToString(),
+                Id = isError ? -1 : fileId,
                 Error = MakeError(isError: isError, message: message, code: code)
             };
 
@@ -324,15 +324,25 @@ namespace DocumentAPI
         /// <returns> an API context object</returns>
         public static ApiContext ClaimsToContext(ClaimsPrincipal user)
         {
-            var workflowName  = user.Claims.Where(claim => claim.Type == "WorkflowName").Select(claim => claim.Value).First();
-            var databaseServerName = CurrentApiContext.DatabaseServerName;
-            var databaseName = CurrentApiContext.DatabaseName;
+            try
+            {
+                var workflowName = user.Claims.Where(claim => claim.Type == "WorkflowName").Select(claim => claim.Value).First();
+                var databaseServerName = CurrentApiContext.DatabaseServerName;
+                var databaseName = CurrentApiContext.DatabaseName;
 
-            Contract.Assert(!String.IsNullOrWhiteSpace(databaseServerName), "Database server name is empty, from Claims");
-            Contract.Assert(!String.IsNullOrWhiteSpace(databaseName), "Database name is empty");
-            Contract.Assert(!String.IsNullOrWhiteSpace(workflowName), "Workflow name is empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(databaseServerName), "Database server name is empty, from Claims");
+                Contract.Assert(!String.IsNullOrWhiteSpace(databaseName), "Database name is empty");
+                Contract.Assert(!String.IsNullOrWhiteSpace(workflowName), "Workflow name is empty");
 
-            return new ApiContext(databaseServerName, databaseName, workflowName);
+                return new ApiContext(databaseServerName, databaseName, workflowName);
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI43662");
+                Log.WriteLine(ee);
+                throw ee;
+                //throw new AuthenticationException("Unauthorized", ex);
+            }
         }
 
         /// <summary>

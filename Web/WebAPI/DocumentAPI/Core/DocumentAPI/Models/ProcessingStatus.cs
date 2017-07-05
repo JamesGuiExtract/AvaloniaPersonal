@@ -42,6 +42,11 @@
         Failed,
 
         /// <summary>
+        /// The document was submitted for processing, but is no longer progressing in the workflow.
+        /// </summary>
+        Incomplete,
+
+        /// <summary>
         /// The enum value is not applicable - i.e. getting the processing status failed.
         /// In this case review the Error information.
         /// </summary>

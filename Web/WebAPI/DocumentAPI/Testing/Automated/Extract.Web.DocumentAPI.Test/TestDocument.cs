@@ -83,10 +83,6 @@ namespace Extract.Web.DocumentAPI.Test
                     var result = data.SubmitFile(filename, stream).Result;
                     Assert.IsTrue(result != null, "Null result returned from submitfile");
 
-                    var fileId = DocumentData.ConvertIdToFileId(result.Id);
-                    Assert.IsTrue(fileId > 0, "Bad value for fileId: {0}", fileId);
-                    Assert.IsTrue(result.Error.ErrorOccurred == false, "An error has been signaled");
-
                     // It is OK to re-submit - the web service writes a unique filename, based on the 
                     // submitted filename, so test this as well.
                     var result2 = data.SubmitFile(filename, stream).Result;
@@ -134,9 +130,6 @@ namespace Extract.Web.DocumentAPI.Test
                 using (var data = new DocumentData(ApiUtils.CurrentApiContext))
                 {
                     var result = data.SubmitText("Document 1, SSN: 111-22-3333, DOB: 10-04-1999").Result;
-                    var fileId = DocumentData.ConvertIdToFileId(result.Id);
-                    Assert.IsTrue(fileId > 0, "Bad value for fileId: {0}", fileId);
-                    Assert.IsTrue(result.Error.ErrorOccurred == false, "An error has been signaled");
 
                     var (sourceFilename, errMsg, err) = data.GetSourceFileName(result.Id);
                     Assert.IsTrue(err != true, "Error signaled by GetSourceFileName, fileId: {0}", result.Id);
@@ -238,7 +231,7 @@ namespace Extract.Web.DocumentAPI.Test
                 {
                     for (int i = 1; i <= 10; ++i)
                     {
-                        var result = data.GetStatus(stringId: i.ToString());
+                        var result = data.GetStatus(fileId: i);
                         Assert.IsTrue(result != null, "Empty result was returned");
                         var status = result;
                         Assert.IsTrue(status.DocumentStatus == DocumentProcessingStatus.Processing, 
@@ -279,7 +272,7 @@ namespace Extract.Web.DocumentAPI.Test
                 {
                     for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                     {
-                        var (filename, isError, errMessage) = data.GetResult(id: i.ToString());
+                        var (filename, isError, errMessage) = data.GetResult(fileId: i);
                         Assert.IsTrue(!String.IsNullOrEmpty(filename), "Empty filename returned");
                         Assert.IsTrue(!isError, "An error was signaled");
                         Assert.IsTrue(String.IsNullOrEmpty(errMessage), "An error message was returned");
@@ -324,7 +317,7 @@ namespace Extract.Web.DocumentAPI.Test
 
                 using (var data = new DocumentData(ApiUtils.CurrentApiContext))
                 {
-                    var result = data.GetTextResult(textId: "1").Result;
+                    var result = data.GetTextResult(Id: 1).Result;
                     Assert.IsTrue(result.Error.ErrorOccurred == false, "error is indicated");
                     Assert.IsTrue(String.IsNullOrEmpty(result.Error.Message), "error, message: {0}", result.Error.Message);
                 }
@@ -357,7 +350,7 @@ namespace Extract.Web.DocumentAPI.Test
                 {
                     for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                     {
-                         var docType = data.GetDocumentType(id: i.ToString());
+                         var docType = data.GetDocumentType(id: i);
                          Assert.IsTrue(!String.IsNullOrEmpty(docType.Text));
 
                          switch (i)

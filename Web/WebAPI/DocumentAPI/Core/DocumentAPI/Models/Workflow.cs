@@ -262,8 +262,8 @@ namespace DocumentAPI.Models
         public int NumberFailed { get; set; }
 
         /// <summary>
-        /// number of documents unattempted
+        /// number of document submitted but that are no longer progressing through the workflow.
         /// </summary>
-        public int NumberUnattempted { get; set; }
+        public int NumberIncomplete { get; set; }
     }
 }

@@ -117,11 +117,7 @@ namespace Extract.Web.DocumentAPI.Test
 
                 try
                 {
-                    Assert.Throws<ExtractException>(() => WorkflowData.GetWorkflowStatus("", ApiUtils.CurrentApiContext));
-
-                    Assert.Throws<ExtractException>(() => WorkflowData.GetWorkflowStatus("InvalidWorkflow", ApiUtils.CurrentApiContext));
-
-                    var workflowStatus = WorkflowData.GetWorkflowStatus("CourtOffice", ApiUtils.CurrentApiContext);
+                    var workflowStatus = WorkflowData.GetWorkflowStatus(ApiUtils.CurrentApiContext);
                     Assert.IsTrue(workflowStatus.Error.ErrorOccurred == false, "status should NOT have the error flag set and it is");
                 }
                 catch (Exception)

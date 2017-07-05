@@ -36,17 +36,12 @@ namespace DocumentAPI.Controllers
         /// <returns>a DocumentAttributeSet, which contains error info iff there was an error</returns>
         [HttpGet("GetResultSet/{Id}")]
         [ProducesResponseType(typeof(DocumentAttributeSet), 200)] 
-        public IActionResult GetResultSet(string Id)
+        public IActionResult GetResultSet(int Id)
         {
             try
             {
-                if (!ModelState.IsValid || String.IsNullOrWhiteSpace(Id))
-                {
-                    Log.WriteLine("string id is empty", "ELI43235");
-                    var result = MakeDocumentAttributeSetError("id argument cannot be empty");
-                    return BadRequest(result);
-                }
-
+                Contract.Assert(ModelState.IsValid && Id > 0, "Invalid input Id");
+                
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(ClaimsToContext(User), useAttributeDbMgr: true))
                 {
@@ -54,8 +49,9 @@ namespace DocumentAPI.Controllers
                     return result.Error.ErrorOccurred ? (IActionResult)BadRequest(result) : Ok(result);
                 }
             }
-            catch (ExtractException ee)
+            catch (Exception ex)
             {
+                var ee = ex.AsExtract("ELI43653");
                 Log.WriteLine(ee);
                 var result = MakeDocumentAttributeSetError(ee.Message);
                 return BadRequest(result);
@@ -91,8 +87,9 @@ namespace DocumentAPI.Controllers
                     return Ok(result);
                 }
             }
-            catch (ExtractException ee)
+            catch (Exception ex)
             {
+                var ee = ex.AsExtract("ELI43654");
                 Log.WriteLine(ee);
                 return BadRequest(MakeDocumentSubmitResult(fileId: -1, isError: true, message: ee.Message, code: -1));
             }
@@ -107,21 +104,19 @@ namespace DocumentAPI.Controllers
         [Produces(typeof(DocumentSubmitResult))]
         public async Task<IActionResult> SubmitText([FromBody]SubmitTextArgs args)
         {
-            if (!ModelState.IsValid || String.IsNullOrWhiteSpace(args.Text))
-            {
-                return BadRequest(MakeDocumentSubmitResult(fileId: -1, isError: true, message: "Submitted text is empty", code: -1));
-            }
-
             try
             {
+                Contract.Assert(ModelState.IsValid && !String.IsNullOrWhiteSpace(args.Text), "Submitted text is empty");
+
                 using (var data = new DocumentData(ClaimsToContext(User)))
                 {
                     var result = await data.SubmitText(args.Text);
                     return Ok(result);
                 }
             }
-            catch (ExtractException ee)
+            catch (Exception ex)
             {
+                var ee = ex.AsExtract("ELI43655");
                 Log.WriteLine(ee);
                 return BadRequest(MakeDocumentSubmitResult(fileId: -1, isError: true, message: ee.Message, code: -1));
             }
@@ -134,27 +129,21 @@ namespace DocumentAPI.Controllers
         /// <returns>List of ProcessingStatus</returns>
         [HttpGet("GetStatus/{Id}")]
         [Produces(typeof(ProcessingStatus))]
-        public IActionResult GetStatus(string Id)
+        public IActionResult GetStatus(int Id)
         {
-            if (String.IsNullOrWhiteSpace(Id))
-            {
-                var result = MakeProcessingStatus(status: DocumentProcessingStatus.Failed, 
-                                                  isError: true, 
-                                                  message: "stringId argument is empty", 
-                                                  code: -1);
-                return BadRequest(result);
-            }
-
             try
             {
+                Contract.Assert(Id > 0, "Id is not valid");
+
                 using (var data = new DocumentData(ClaimsToContext(User)))
                 {
                     var result = data.GetStatus(Id);
                     return Ok(result);
                 }
-            }
-            catch (ExtractException ee)
+            }   
+            catch (Exception ex)
             {
+                ExtractException ee = ex.AsExtract("ELI43652");
                 Log.WriteLine(ee);
 
                 var err = MakeProcessingStatus(DocumentProcessingStatus.NotApplicable,
@@ -214,14 +203,12 @@ namespace DocumentAPI.Controllers
         /// <summary>
         /// Get the original source file of a submitted document
         /// </summary>
-        /// <param name="Id">the file id, as a string. Often prepended with "Text" or "File"</param>
+        /// <param name="Id">the file id</param>
         /// <returns>the original image file associated with the file id</returns>
         [HttpGet("GetSourceFile/{Id}")]
         [Produces(typeof(PhysicalFileResult))]
-        public IActionResult GetSourceFile(string Id)
+        public IActionResult GetSourceFile(int Id)
         {
-            string filename = "";
-
             try
             {
                 using (var data = new DocumentData(ClaimsToContext(User)))
@@ -241,16 +228,11 @@ namespace DocumentAPI.Controllers
                     return PhysicalFile(fileName, fileContentType, fileDownloadName);
                 }
             }
-            catch (ExtractException ee)
-            {
-                Log.WriteLine(ee);
-                return BadRequest(ee.Message);
-            }
             catch (Exception ex)
             {
-                var message = Inv($"Exception: {ex.Message}, while returning file: {filename}, for fileId: {Id}");
-                Log.WriteLine(message, "ELI43236");
-                return BadRequest(message);
+                var ee = ex.AsExtract("ELI43656");
+                Log.WriteLine(ee);
+                return BadRequest(ee.Message);
             }
         }
 
@@ -262,7 +244,7 @@ namespace DocumentAPI.Controllers
         /// <returns>result file</returns>
         [HttpGet("GetFileResult/{Id}")]
         [Produces(typeof(PhysicalFileResult))]
-        public IActionResult GetFileResult(string Id)
+        public IActionResult GetFileResult(int Id)
         {
             try
             {
@@ -288,16 +270,12 @@ namespace DocumentAPI.Controllers
                     return PhysicalFile(filename, fileContentType, fileDownloadName);
                 }
             }
-            catch (ExtractException ee)
-            {
-                Log.WriteLine(ee);
-                return BadRequest(ee.Message);
-            }
             catch (Exception ex)
             {
+                var ee = ex.AsExtract("ELI43657");
                 var message = Inv($"Exception: {ex.Message}, while returning file for fileId: {Id}");
-                Log.WriteLine(message, "ELI43237");
-                return BadRequest(message);
+                Log.WriteLine(ee);
+                return BadRequest(ee.Message);
             }
         }
 
@@ -308,7 +286,7 @@ namespace DocumentAPI.Controllers
         /// <returns>TextResult instance</returns>
         [HttpGet("GetTextResult/{Id}")]
         [Produces(typeof(TextResult))]
-        public async Task<IActionResult> GetTextResult(string Id)
+        public async Task<IActionResult> GetTextResult(int Id)
         {
             try
             {
@@ -317,8 +295,9 @@ namespace DocumentAPI.Controllers
                     return Ok(await data.GetTextResult(Id));
                 }
             }
-            catch (ExtractException ee)
+            catch (Exception ex)
             {
+                var ee = ex.AsExtract("ELI43658");
                 Log.WriteLine(ee);
                 return BadRequest(MakeTextResult("", isError: true, errorMessage: ee.Message));
             }
@@ -331,7 +310,7 @@ namespace DocumentAPI.Controllers
         /// <returns>string containing the type of the document</returns>
         [HttpGet("GetDocumentType/{Id}")]
         [Produces(typeof(TextResult))]
-        public IActionResult GetDocumentType(string Id)
+        public IActionResult GetDocumentType(int Id)
         {
             try
             {
@@ -341,8 +320,9 @@ namespace DocumentAPI.Controllers
                     return result.Error.ErrorOccurred ? (IActionResult)BadRequest(result) : Ok(result);
                 }
             }
-            catch (ExtractException ee)
+            catch (Exception ex)
             {
+                var ee = ex.AsExtract("ELI43659");
                 Log.WriteLine(ee);
                 return BadRequest(MakeTextResult("", isError: true, errorMessage: ee.Message));
             }

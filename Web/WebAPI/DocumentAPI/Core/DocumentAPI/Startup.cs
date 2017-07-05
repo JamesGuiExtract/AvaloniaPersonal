@@ -43,14 +43,9 @@ namespace DocumentAPI
 
                 Utils.environment = env;
             }
-            catch (ExtractException ee)
-            {
-                Log.WriteLine(ee);
-                throw;
-            }
             catch (Exception ex)
             {
-                Log.WriteLine(Inv($"Exception reported: {ex.Message}"), "ELI43259");
+                Log.WriteLine(ex.AsExtract("ELI43650"));
 
                 // Any exception here should cause the service to not start.
                 throw;

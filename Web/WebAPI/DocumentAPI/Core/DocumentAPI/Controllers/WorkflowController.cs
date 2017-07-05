@@ -3,6 +3,7 @@ using Extract;
 using static DocumentAPI.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace DocumentAPI.Controllers
 {
@@ -16,19 +17,19 @@ namespace DocumentAPI.Controllers
         /// <summary>
         /// get status of specified workflow
         /// </summary>
-        /// <param name="workflowName"></param>
         /// <returns>a workflow status object</returns>
-        [HttpGet("GetWorkflowStatus/{workflowName}")]
+        [HttpGet("GetWorkflowStatus")]
         [Produces(typeof(WorkflowStatus))]
-        public IActionResult GetWorkflowStatus(string workflowName)
+        public IActionResult GetWorkflowStatus()
         {
             try
             {
-                var result = WorkflowData.GetWorkflowStatus(workflowName, ClaimsToContext(User));
+                var result = WorkflowData.GetWorkflowStatus(ClaimsToContext(User));
                 return result.Error.ErrorOccurred ? (IActionResult)BadRequest(result) : Ok(result);
             }
-            catch (ExtractException ee)
+            catch (Exception ex)
             {
+                var ee = ex.AsExtract("ELI43660");
                 Log.WriteLine(ee);
                 return BadRequest(MakeWorkflowStatusError(ee.Message));
             }

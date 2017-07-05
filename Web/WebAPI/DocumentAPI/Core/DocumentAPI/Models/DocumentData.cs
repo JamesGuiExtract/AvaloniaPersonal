@@ -44,10 +44,6 @@ namespace DocumentAPI.Models
                     _attributeDbMgr.FAMDB = _fileApi.Interface;
                 }
             }
-            catch (ExtractException ee)
-            {
-                throw new ExtractException("ELI43334", ee.Message, ee);
-            }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI42162");
@@ -77,20 +73,15 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <returns>DocumentAttributeSet instance, including error info iff there is an error</returns>
         /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
-        public DocumentAttributeSet GetDocumentResultSet(string id)
+        public DocumentAttributeSet GetDocumentResultSet(int fileId)
         {
             try
             {
-                int fileId = ConvertIdToFileId(id);
                 AssertFileInWorkflow(fileId);
 
-                var results = GetAttributeSetForFile(id);
+                var results = GetAttributeSetForFile(fileId);
                 var mapper = new AttributeMapper(results, _fileApi.GetWorkflow.Type);
                 return mapper.MapAttributesToDocumentAttributeSet();
-            }
-            catch (ExtractException ee)
-            {
-                throw new ExtractException("ELI43337", ee.Message, ee);
             }
             catch (Exception ex)
             {
@@ -101,93 +92,46 @@ namespace DocumentAPI.Models
         /// <summary>
         /// get the specified file attribute set
         /// </summary>
-        /// <param name="id">file id</param>
+        /// <param name="fileId">file id</param>
         /// <returns>IUnknownVector (attribute)</returns>
         /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
-        IUnknownVector GetAttributeSetForFile(string id)
+        IUnknownVector GetAttributeSetForFile(int fileId)
         {
             try
             {
-                var fileId = ConvertIdToFileId(id);
                 AssertFileInWorkflow(fileId);
-
-                const int mostRecentSet = -1;
 
                 var attrSetName = _fileApi.GetWorkflow.OutputAttributeSet;
 
-                Contract.Assert(!String.IsNullOrWhiteSpace(attrSetName), 
-                                "the workflow: {0}, has OutputAttributeSet that is empty", 
-                                _fileApi.GetWorkflow.Name);
-                Contract.Assert(_attributeDbMgr != null, "_attributeDbMgr is null");
+                try
+                {
+                    Contract.Assert(!String.IsNullOrWhiteSpace(attrSetName),
+                                    "the workflow: {0}, has OutputAttributeSet that is empty",
+                                    _fileApi.GetWorkflow.Name);
+                    Contract.Assert(_attributeDbMgr != null, "_attributeDbMgr is null");
+                }
+                catch (Exception ex)
+                {
+                    var ee = ex.AsExtract("ELI43651");
+                    ee.AddDebugData("MissingResource", ee.Message, false);
+                    throw ee;
+                }
 
-                var results = _attributeDbMgr.GetAttributeSetForFile(fileID: fileId,
+                const int mostRecentSet = -1;
+                var results = _attributeDbMgr.GetAttributeSetForFile(fileId,
                                                                      attributeSetName: attrSetName,
                                                                      relativeIndex: mostRecentSet,
                                                                      closeConnection: true);
                 return results;
             }
-            catch (ExtractException ee)
-            {
-                throw new ExtractException("ELI43338", ee.Message, ee);
-            }
             catch (Exception ex)
             {
                 var ee = ex.AsExtract("ELI42106");
-                ee.AddDebugData("FileID", id, encrypt: false);
+                ee.AddDebugData("FileID", fileId, encrypt: false);
                 ee.AddDebugData("AttributeSetName", _fileApi.GetWorkflow.OutputAttributeSet, encrypt: false);
                 ee.AddDebugData("Workflow", _fileApi.GetWorkflow.Name, encrypt: false);
 
                 throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Convert from a string Id to a file Id, removing optional File or Text preamble as necessary.
-        /// </summary>
-        /// <param name="id">file id</param>
-        /// <returns>file Id (integer)</returns>
-        /// <remarks>This is public so that a unit test can use it; 
-        /// otherwise this function is only referenced from this class.</remarks>
-        static public int ConvertIdToFileId(string id)
-        {
-            try
-            {
-                Contract.Assert(!String.IsNullOrWhiteSpace(id), "id is empty");
-
-                int startPosition;
-                string value;
-                string preamble = "";
-                if (id.Contains("File"))
-                {
-                    preamble = "File";
-                }
-                else if (id.Contains("Text"))
-                {
-                    preamble = "Text";
-                }
-
-                if (!String.IsNullOrWhiteSpace(preamble))
-                {
-                    startPosition = id.IndexOf(preamble, startIndex: 0, comparisonType: StringComparison.OrdinalIgnoreCase);
-                    value = id.Remove(startPosition, preamble.Length);
-                    Contract.Assert(value.Length != 0,
-                                    "Removing {0}, from fileId resulted in zero length string, Id: {1}",
-                                    preamble,
-                                    id);
-                }
-                else
-                {
-                    value = id;
-                }
-
-                bool converted = Int32.TryParse(value, out int fileId);
-                Contract.Assert(true == converted, "Bad fileId value, original id: {0}, value: {1}", id, value);
-
-                return fileId;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI42169");
             }
         }
 
@@ -201,10 +145,7 @@ namespace DocumentAPI.Models
         {
             try
             {
-                if (String.IsNullOrWhiteSpace(fileName))
-                {
-                    return MakeDocumentSubmitResult(fileId: -1, isError: true, message: "File name is empty", code: -1);
-                }
+                Contract.Assert(!String.IsNullOrWhiteSpace(fileName), "File name is empty");
 
                 var workflow = _fileApi.GetWorkflow;
                 var uploads = workflow.DocumentFolder;
@@ -224,10 +165,6 @@ namespace DocumentAPI.Models
                 }
 
                 return AddFile(fullPath, DocumentSubmitType.File);
-            }
-            catch (ExtractException ee)
-            {
-                throw new ExtractException("ELI43322", ee.Message, ee);
             }
             catch (Exception ex)
             {
@@ -303,10 +240,6 @@ namespace DocumentAPI.Models
                                                 code: 0,
                                                 submitType: submitType);
             }
-            catch (ExtractException ee)
-            {
-                throw new ExtractException("ELI43323", ee.Message, ee);
-            }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI43331");
@@ -342,10 +275,6 @@ namespace DocumentAPI.Models
 
                 return AddFile(fullPath, DocumentSubmitType.Text);
             }
-            catch (ExtractException ee)
-            {
-                throw new ExtractException("ELI43339", ee.Message, ee);
-            }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI43243");
@@ -355,13 +284,12 @@ namespace DocumentAPI.Models
         /// <summary>
         /// implementation of GetStatus
         /// </summary>
-        /// <param name="stringId">file id</param>
+        /// <param name="fileId">file id</param>
         /// <returns>List of ProcessingStatus, can contain error info</returns>
-        public ProcessingStatus GetStatus(string stringId)
+        public ProcessingStatus GetStatus(int fileId)
         {
             try
             {
-                int fileId = ConvertIdToFileId(stringId);
                 AssertFileInWorkflow(fileId);
 
                 EActionStatus status = EActionStatus.kActionFailed;
@@ -370,22 +298,13 @@ namespace DocumentAPI.Models
                 {
                     status = _fileApi.Interface.GetWorkflowStatus(fileId);
                 }
-                catch (ExtractException ee)
-                {
-                    throw new ExtractException("ELI43324", ee.Message, ee);
-                }
                 catch (Exception ex)
                 {
-                    var ee = ex.AsExtract("ELI42109");
-                    throw ee;
+                    throw ex.AsExtract("ELI42109");
                 }
 
                 var ps = MakeProcessingStatus(ConvertToStatus(status, fileId));
                 return ps;
-            }
-            catch (ExtractException ee)
-            {
-                throw new ExtractException("ELI43340", ee.Message, ee);
             }
             catch (Exception ex)
             {
@@ -407,6 +326,9 @@ namespace DocumentAPI.Models
                 case EActionStatus.kActionProcessing:
                     return DocumentProcessingStatus.Processing;
 
+                case EActionStatus.kActionUnattempted:
+                    return DocumentProcessingStatus.Incomplete;
+
                 default:
                     return DocumentProcessingStatus.NotApplicable;
             }
@@ -415,55 +337,68 @@ namespace DocumentAPI.Models
         /// <summary>
         /// GetSourceFileName 
         /// </summary>
-        /// <param name="Id">file id</param>
+        /// <param name="fileId">file id</param>
         /// <returns>the full path + filename of the original source file</returns>
-        public (string filename, string errorMessage, bool error) GetSourceFileName(string Id)
+        public (string filename, string errorMessage, bool error) GetSourceFileName(int fileId)
         {
             string filename = "";
 
             try
             {
-                var fileId = ConvertIdToFileId(Id);
                 AssertFileInWorkflow(fileId);
 
                 filename = _fileApi.Interface.GetFileNameFromFileID(fileId);
-                Contract.Assert(!String.IsNullOrWhiteSpace(filename), "Error getting the filename for fileId: {0}", Id);
-                Contract.Assert(System.IO.File.Exists(filename), "File: {0}, does not exist", filename);
+
+                try
+                {
+                    Contract.Assert(!String.IsNullOrWhiteSpace(filename), "Error getting the filename for fileId: {0}", fileId);
+                    Contract.Assert(System.IO.File.Exists(filename), "File: {0}, does not exist", filename);
+                }
+                catch (Exception ex)
+                {
+                    var ee = ex.AsExtract("ELI43580");
+                    ee.AddDebugData("MissingResource", ee.Message, false);
+                    ee.AddDebugData("Filename", filename, false);
+                    throw ee;
+                }
 
                 return (filename: filename, errorMessage: "", error: false);
             }
-            catch (ExtractException ee)
-            {
-                throw new ExtractException("ELI43325", ee.Message, ee);
-            }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI42110");
-                throw ee;
+                throw ex.AsExtract("ELI42110");
             }
         }
 
         /// <summary>
         /// GetResult - used by several API calls
         /// </summary>
-        /// <param name="id">the database file id to use</param>
+        /// <param name="fileId">the database file id to use</param>
         /// <returns>returns a tuple of filename, error flag, error message</returns>
-        public (string filename, bool error, string errorMessage) GetResult(string id)
+        public (string filename, bool error, string errorMessage) GetResult(int fileId)
         {
             string filename = "";
-            int fileId = -1;
             string getFileTag = "";
 
             try
             {
-                fileId = ConvertIdToFileId(id);
                 AssertFileInWorkflow(fileId);
 
-                getFileTag = _fileApi.GetWorkflow.OutputFileMetadataField;
-                Contract.Assert(!String.IsNullOrWhiteSpace(getFileTag), "Workflow does not have a defined OutputFileMetaDataField");
+                try
+                {
+                    getFileTag = _fileApi.GetWorkflow.OutputFileMetadataField;
+                    Contract.Assert(!String.IsNullOrWhiteSpace(getFileTag), "Workflow does not have a defined OutputFileMetaDataField");
 
-                filename = _fileApi.Interface.GetMetadataFieldValue(fileId, getFileTag);
-                Contract.Assert(!String.IsNullOrWhiteSpace(filename), "No result file found for file ID: {0}", fileId);
+                    filename = _fileApi.Interface.GetMetadataFieldValue(fileId, getFileTag);
+                    Contract.Assert(!String.IsNullOrWhiteSpace(filename), "No result file found for file ID: {0}", fileId);
+                }
+                catch (Exception ex)
+                {
+                    var ee = ex.AsExtract("ELI43580");
+                    ee.AddDebugData("MissingResource", ee.Message, false);
+                    ee.AddDebugData("Filename", filename, false);
+                    throw ee;
+                }
 
                 // Start the post action, if any, on this file.
                 var postAction = _fileApi.GetWorkflow.PostWorkflowAction;
@@ -473,13 +408,6 @@ namespace DocumentAPI.Models
                 }
 
                 return (filename, error: false, errorMessage: "");
-            }
-            catch (ExtractException ee)
-            {
-                var xx = new ExtractException("ELI43327", ee.Message, ee);
-                xx.AddDebugData("FileID", fileId, encrypt: false);
-                xx.AddDebugData("OutputFileMetadataField", getFileTag, encrypt: false);
-                throw xx;
             }
             catch (Exception ex)
             {
@@ -493,13 +421,13 @@ namespace DocumentAPI.Models
         /// <summary>
         /// GetTextResult implementation
         /// </summary>
-        /// <param name="textId">file id</param>
+        /// <param name="Id">file id</param>
         /// <returns>TextResult instance, may contain error info</returns>
-        public async Task<TextResult> GetTextResult(string textId)
+        public async Task<TextResult> GetTextResult(int Id)
         {
             try
             {
-                var (filename, isError, errMessage) = GetResult(textId);
+                var (filename, isError, errMessage) = GetResult(Id);
                 Contract.Assert(!isError, "Error returned from GetResult");
 
                 using (var fs = new FileStream(filename, FileMode.Open))
@@ -511,16 +439,10 @@ namespace DocumentAPI.Models
                     return MakeTextResult(text);
                 }
             }
-            catch (ExtractException ee)
-            {
-                var xx = new ExtractException("ELI43328", ee.Message, ee);
-                xx.AddDebugData("TextID", textId, encrypt: false);
-                throw xx;
-            }
             catch (Exception ex)
             {
                 var ee = ex.AsExtract("ELI43247");
-                ee.AddDebugData("TextID", textId, encrypt: false);
+                ee.AddDebugData("ID", Id, encrypt: false);
                 throw ee;
             }
         }
@@ -530,7 +452,7 @@ namespace DocumentAPI.Models
         /// </summary>
         /// <param name="id">file Id</param>
         /// <returns>document type (string), wrapped in a TextResult</returns>
-        public TextResult GetDocumentType(string id)
+        public TextResult GetDocumentType(int id)
         {
             try
             {
@@ -538,9 +460,9 @@ namespace DocumentAPI.Models
                 var docType = GetDocumentType(results);
                 return MakeTextResult(docType);
             }
-            catch (ExtractException ee)
+            catch (Exception ex)
             {
-                throw new ExtractException("ELI43329", ee.Message, ee);
+                throw ex.AsExtract("ELI43329");
             }
         }
 
@@ -566,10 +488,6 @@ namespace DocumentAPI.Models
 
                 return "Unknown";
             }
-            catch (ExtractException ee)
-            {
-                throw new ExtractException("ELI43330", ee.Message, ee);
-            }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI42121");
@@ -585,10 +503,19 @@ namespace DocumentAPI.Models
         {
             bool isInWorkflow =  _fileApi.Interface.IsFileInWorkflow(fileId, _fileApi.GetWorkflow.Id);
 
-            Contract.Assert(isInWorkflow,
-                            "The specified file Id: {0}, is not in the workflow: {1}",
-                            fileId,
-                            _fileApi.WorkflowName);
+            try
+            {
+                Contract.Assert(isInWorkflow,
+                                "The specified file Id: {0}, is not in the workflow: {1}",
+                                fileId,
+                                _fileApi.WorkflowName);
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI43579");
+                ee.AddDebugData("MissingResource", ee.Message, false);
+                throw ee;
+            }
         }
     }
 }

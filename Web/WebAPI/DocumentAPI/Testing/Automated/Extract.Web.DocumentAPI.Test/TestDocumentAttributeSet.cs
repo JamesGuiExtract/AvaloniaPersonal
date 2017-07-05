@@ -286,7 +286,7 @@ namespace Extract.Web.DocumentAPI.Test
                 using (var data = new DocumentData(ApiUtils.CurrentApiContext, useAttributeDbMgr: true))
                 {
                     Assert.IsTrue(data != null, "null DocumentData reference");
-                    return data.GetDocumentResultSet(fileId.ToString());
+                    return data.GetDocumentResultSet(fileId);
                 }
             }
             catch (Exception ex)

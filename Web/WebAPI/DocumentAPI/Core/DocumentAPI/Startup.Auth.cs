@@ -56,6 +56,9 @@ namespace DocumentAPI
                 TokenValidationParameters = tokenValidationParameters
             });
 
+            // Removed for now, as it causes http return values of 400 instead of 401 when enabled, probably because
+            // there is no handler for cookie-based auth.
+            /*
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AutomaticAuthenticate = true,
@@ -66,6 +69,7 @@ namespace DocumentAPI
                     SecurityAlgorithms.HmacSha256,
                     tokenValidationParameters)
             });
+            */
         }
     }
 }
