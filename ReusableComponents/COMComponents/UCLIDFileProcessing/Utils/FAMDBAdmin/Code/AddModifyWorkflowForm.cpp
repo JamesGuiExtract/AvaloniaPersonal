@@ -141,7 +141,8 @@ namespace Extract
 						ipActions->PushBack(ipActionInfo);
 					}
 				}
-				if (postWorkflowActionComboBox->SelectedIndex >= 0)
+				// 0 is a blank value so the post action should always be able to be empty
+				if (postWorkflowActionComboBox->SelectedIndex > 0)
 				{
 					String^ postWorkflowAction = (String^)postWorkflowActionComboBox->SelectedItem;
 					if (postWorkflowAction == startAction || postWorkflowAction == endAction)
