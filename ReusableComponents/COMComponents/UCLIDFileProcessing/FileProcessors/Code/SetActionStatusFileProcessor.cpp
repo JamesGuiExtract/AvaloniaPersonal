@@ -336,11 +336,14 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
         ASSERT_ARGUMENT("ELI31342", ipFileRecord != __nullptr);
 
 		long nWorkflowId = ipFileRecord->WorkflowID;
+		bool bChangingWorkflows = false;
 		
 		// Set the target workflow
 		if (!m_strWorkflow.empty() && m_strWorkflow != gstrCURRENT_WORKFLOW)
 		{
-			nWorkflowId = ipDB->GetWorkflowID(m_strWorkflow.c_str());
+			long nNewWorkflowID = ipDB->GetWorkflowID(m_strWorkflow.c_str());
+			bChangingWorkflows = (nNewWorkflowID != nWorkflowId);
+			nWorkflowId = nNewWorkflowID;
 		}
 
         // Default to successful completion
@@ -361,7 +364,12 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
             m_strActionName, fileName);
 
         // Auto create if necessary
-        ipDB->AutoCreateAction(strActionName.c_str());
+		// https://extract.atlassian.net/browse/ISSUE-14833
+		// For now, auto-creation of actions is disallowed if the destination workflow is different.
+		if (!bChangingWorkflows)
+		{
+			ipDB->AutoCreateAction(strActionName.c_str());
+		}
 
         EActionStatus ePrevStatus = kActionUnattempted;
 

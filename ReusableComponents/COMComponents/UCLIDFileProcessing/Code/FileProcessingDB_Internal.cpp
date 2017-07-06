@@ -566,15 +566,20 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			}
 			_lastCodePos = "330";
 
+
 			// Remove WorkItemGroups when file status changes -- if processing will be allowed to
 			// stop before all work items complete then this will need to be changed to 
 			// only delete if new status is 'U', 'C' or 'F'
 			if ((!m_bAllowRestartableProcessing && strNewState == "P") || strNewState == "U" || strNewState == "C" || strNewState == "F")
 			{
-				string strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strAction);
-				string strDeleteWorkItemGroupQuery = "DELETE FROM WorkItemGroup WHERE FileID = " + asString(nFileID)
-					+ " AND ActionID IN (" + strActionIDs + ")";
-				executeCmdQuery(ipConnection, strDeleteWorkItemGroupQuery);
+				long nActionID = getActionIDNoThrow(ipConnection, strAction, nWorkflowID);
+				// ActionID may be -1 if setting an action that exists in nWorkflowID but not this workflow.
+				if (nActionID > 0)
+				{
+					string strDeleteWorkItemGroupQuery = "DELETE FROM WorkItemGroup WHERE FileID = " + asString(nFileID)
+						+ " AND ActionID = " + asString(nActionID);
+					executeCmdQuery(ipConnection, strDeleteWorkItemGroupQuery);
+				}
 			}
 
 			_lastCodePos = "340";
