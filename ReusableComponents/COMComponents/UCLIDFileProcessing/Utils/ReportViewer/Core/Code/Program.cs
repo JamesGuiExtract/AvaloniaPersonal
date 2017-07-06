@@ -100,7 +100,7 @@ namespace Extract.ReportViewer
                     // from the command line parameter
                     reportFile = GetReportFileName(args[3]);
 
-                    for (int i = 3; i < args.Length; i++)
+                    for (int i = 4; i < args.Length; i++)
                     {
                         if (args[i].Equals("/f", StringComparison.OrdinalIgnoreCase))
                         {
@@ -360,6 +360,8 @@ namespace Extract.ReportViewer
             usage.AppendLine("<ServerName> - The name of the database server to connect to");
             usage.AppendLine();
             usage.AppendLine("<DatabaseName> - The name of the database to connect to");
+            usage.AppendLine();
+            usage.AppendLine("<WorkflowName> - The name of the workflow to use for the report");
             usage.AppendLine();
             usage.AppendLine("<CrystalReportFile> - The path to the crystal report file to run");
             usage.AppendLine();
