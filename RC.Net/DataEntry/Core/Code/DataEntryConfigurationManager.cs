@@ -870,8 +870,16 @@ namespace Extract.DataEntry
         /// <param name="ee">The <see cref="ExtractException"/> representing the error.</param>
         void OnConfigurationChangeError(ExtractException ee)
         {
-            ConfigurationChangeError?.Invoke(this,
-                new VerificationExceptionGeneratedEventArgs(ee, true));
+            var eventHandler = ConfigurationChangeError;
+            if (eventHandler == null)
+            {
+                ee.Display();
+            }
+            else
+            {
+                eventHandler(this,
+                    new VerificationExceptionGeneratedEventArgs(ee, true));
+            }
         }
 
         #endregion Private Members
