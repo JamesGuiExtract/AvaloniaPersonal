@@ -338,9 +338,7 @@ namespace DocumentAPI
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI43662");
-                Log.WriteLine(ee);
-                throw ee;
+                throw ex.AsExtract("ELI43662");
                 //throw new AuthenticationException("Unauthorized", ex);
             }
         }
