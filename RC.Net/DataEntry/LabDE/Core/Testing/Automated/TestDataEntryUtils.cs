@@ -68,7 +68,7 @@ namespace Extract.DataEntry.Test
             CheckResult(expected: "12/15/1958", converted: Util.FormatDate("12151958"));
 
             // hyphen separators
-            CheckResult(expected: "02/04/1917", converted: Util.FormatDate("2-4-17"));
+            CheckResult(expected: "02/04/1918", converted: Util.FormatDate("2-4-18"));
             CheckResult(expected: "02/14/2004", converted: Util.FormatDate("2-14-2004"));
 
             // dot separators
