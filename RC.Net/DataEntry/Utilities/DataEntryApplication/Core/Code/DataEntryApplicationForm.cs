@@ -3317,7 +3317,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
+                bool sendForReprocessing = false;
+                if (e.DocumentData != null && !e.DocumentData.SendForReprocessing != null)
+                {
+                    sendForReprocessing = e.DocumentData.SendForReprocessing.Value;
+                }
+                else if (e.PagesEqualButRotated)
+                {
+                    sendForReprocessing = false;
+                }
+                else
+                {
+                    sendForReprocessing = !e.SuggestedPaginationAccepted.HasValue ||
+                                          !e.SuggestedPaginationAccepted.Value;
+                }
+
+                if (sendForReprocessing
+                    && !string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
                 {
                     FileProcessingDB.SetStatusForFile(e.FileID,
                         _settings.PaginationSettings.PaginationOutputAction,
