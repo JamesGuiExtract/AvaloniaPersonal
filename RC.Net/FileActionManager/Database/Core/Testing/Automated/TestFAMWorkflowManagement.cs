@@ -538,7 +538,7 @@ namespace Extract.FileActionManager.Database.Test
                 var originalAS_ActionB = fileProcessingDb.GetStats(actionB_NoWorkflow_ID, false);
 
                 int workflow1ID = fileProcessingDb.AddWorkflow(
-                    "Workflow1", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B);
+                    "Workflow1", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B, _ACTION_C);
 
                 int count = 
                     fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", -1, workflow1ID);
@@ -595,7 +595,7 @@ namespace Extract.FileActionManager.Database.Test
                 var afterAddSkippedAS_ActionB = fileProcessingDb.GetStats(actionB_Workflow1_ID, false);
 
                 int workflow3ID = fileProcessingDb.AddWorkflow(
-                    "Workflow3", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B);
+                    "Workflow3", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B, _ACTION_C);
 
                 count =
                     fileProcessingDb.MoveFilesToWorkflowFromQuery("SELECT ID FROM FAMFILE", workflow1ID, workflow3ID);
@@ -724,8 +724,8 @@ namespace Extract.FileActionManager.Database.Test
                     false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
                 var fileRecord2 = fileProcessingDb.AddFile(testfileName2, _ACTION_A, -1, EFilePriority.kPriorityNormal,
                     false, false, EActionStatus.kActionUnattempted, false, out alreadyExists, out previousStatus);
-                var workflow1ID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined, _ACTION_A);
-                var workflow2ID = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined, _ACTION_A);
+                var workflow1ID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B, _ACTION_C);
+                var workflow2ID = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B, _ACTION_C);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 var actionA_Workflow1_ID = fileProcessingDb.GetActionID(_ACTION_A);
@@ -802,8 +802,8 @@ namespace Extract.FileActionManager.Database.Test
                     false, false, EActionStatus.kActionUnattempted, false, out alreadyExists, out previousStatus);
                 var fileRecord2 = fileProcessingDb.AddFile(testfileName2, _ACTION_A, -1, EFilePriority.kPriorityNormal,
                     false, false, EActionStatus.kActionUnattempted, false, out alreadyExists, out previousStatus);
-                var workflow1ID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined, _ACTION_A);
-                var workflow2ID = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined, _ACTION_A);
+                var workflow1ID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B, _ACTION_C);
+                var workflow2ID = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B, _ACTION_C);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 var actionA_Workflow1_ID = fileProcessingDb.GetActionID(_ACTION_A);

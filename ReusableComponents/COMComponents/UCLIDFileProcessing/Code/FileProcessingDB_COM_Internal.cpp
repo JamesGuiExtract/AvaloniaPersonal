@@ -10725,16 +10725,16 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 			switch (nSourceWorkflowID)
 			{
 			case -1: // No workflow
-				strSourceWorkflowSelection = "SA.WorkflowID IS NULL ";
+				strSourceWorkflowSelection = "[Action].WorkflowID IS NULL ";
 				strWorkflowFileSelection = "WHERE WF.WorkflowID IS NULL";
 				break;
 			case 0: // All workflows
 				strSourceWorkflowSelection = 
-					Util::Format("SA.WorkflowID IS NOT NULL AND SA.WorkflowID <> %li", nDestWorkflowID);
+					Util::Format("[Action].WorkflowID IS NOT NULL AND [Action].WorkflowID <> %li", nDestWorkflowID);
 				strWorkflowFileSelection = "WHERE WF.WorkflowID IS NOT NULL";
 				break;
 			default:
-				strSourceWorkflowSelection = Util::Format("SA.WorkflowID = %li", nSourceWorkflowID);
+				strSourceWorkflowSelection = Util::Format("[Action].WorkflowID = %li", nSourceWorkflowID);
 				strWorkflowFileSelection = Util::Format("WHERE WF.WorkflowID = %li", nSourceWorkflowID);
 			}
 
@@ -10742,8 +10742,7 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 
 			string strSelectionFrom = Util::Format(
 				"FROM #SelectedFilesToMove AS SQ \r\n"
-				"LEFT JOIN FileActionStatus AS FAS ON SQ.ID = FAS.FileID \r\n"
-				"LEFT JOIN [Action] AS SA ON FAS.ActionID = SA.ID AND %s \r\n"
+				"CROSS JOIN  (SELECT * FROM [Action] WHERE %s) AS SA \r\n"
 				"LEFT JOIN [Action] AS DA ON SA.ASCName = DA.ASCName AND %s \r\n"
 				"LEFT JOIN [WorkflowFile] AS WF ON WF.FileID = SQ.ID %s \r\n",
 				strSourceWorkflowSelection.c_str(), strDestWorkflowSelection.c_str(), strWorkflowFileSelection.c_str());
