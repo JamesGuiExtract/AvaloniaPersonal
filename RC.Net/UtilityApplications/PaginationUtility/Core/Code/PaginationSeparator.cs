@@ -341,6 +341,9 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                             Document.Collapsed = value;
 
+                            // Invalidate so that paint occurs and new collapsed state is indicated.
+                            Invalidate();
+
                             OnDocumentCollapsedChanged();
                         }
                     }
