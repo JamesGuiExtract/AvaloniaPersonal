@@ -1595,6 +1595,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_PAGINATION_ORIGINALFILE_INDEX);
 		vecQueries.push_back(gstrCREATE_PAGINATION_FILETASKSESSION_INDEX);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_ACTION_INDEX);
 		
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)

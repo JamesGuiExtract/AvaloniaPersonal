@@ -534,6 +534,11 @@ static const string gstrCREATE_PAGINATION_FILETASKSESSION_INDEX =
 	"CREATE NONCLUSTERED INDEX [IX_Pagination_FileTaskSession] ON "
 	"	[dbo].[Pagination] ([FileTaskSessionID])";
 
+static const string gstrCREATE_FILE_TASK_SESSION_ACTION_INDEX =
+	"CREATE NONCLUSTERED INDEX IX_FileTaskSession_Action \r\n"
+	"ON [dbo].[FileTaskSession]([ActionID]) \r\n"
+	"INCLUDE ([ID], [FileID], [DateTimeStamp]) ";
+
 static const string gstrCREATE_WORKFLOWCHANGEFILE_INDEX =
 "CREATE UNIQUE NONCLUSTERED INDEX [IX_WorkflowChangeFileUnique] "
 	"ON [dbo].[WorkflowChangeFile] ([FileID] ASC, [WorkflowChangeID] ASC, [SourceActionID] ASC)";
