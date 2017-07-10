@@ -1,0 +1,18 @@
+(??FindIfXOf=2, timeout=00:00:30)
+(
+  ((?x)(?'testpattern1'
+      (?~<method=better_fit>Instruments)
+  ))
+  ((??FindIfXOf=2)
+    (((?'nestedtestpattern_not_output'(?~<>value)))(received)(deed)(trust)(beneficial))
+    ((?'findpattern_of_testpattern_is_output'.))
+  )
+)
+((??FindIfXOf=1)
+  (
+    ((?x:(?'testpattern_of_findpattern_is_output'
+        borrower
+    )))
+  )
+  ((?'findpattern_is_output'[\S\s]+))
+)

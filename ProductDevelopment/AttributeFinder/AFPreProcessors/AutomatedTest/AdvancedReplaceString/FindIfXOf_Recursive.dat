@@ -1,0 +1,18 @@
+(??FindIfXOf=2, timeout=00:00:30)
+(
+  ((?x)(?'testpattern1'
+      (?~<method=better_fit>DO\sNOT\sREMOVE\sTHIS\sPAGE)
+  ))
+  ((??FindIfXOf=2)
+    (((?'nestedtestpattern'(?~<>value)))(received)(deed)(trust)(beneficial))
+    ((?'findpattern_of_testpattern'.))
+  )
+)
+((??FindIfXOf=1)
+  (
+    ((?x:(?'testpattern_of_findpattern'
+        mortgage
+    )))
+  )
+  ((?'findpattern'Hereby))
+)

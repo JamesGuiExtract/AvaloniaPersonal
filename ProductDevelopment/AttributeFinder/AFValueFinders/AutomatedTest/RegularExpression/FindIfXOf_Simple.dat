@@ -1,0 +1,8 @@
+(??FindIfXOf=2, timeout=00:00:30)
+(
+  ((?x)(?'testpattern1'
+      (?~<method=better_fit>Instruments)
+  ))
+  ((?'testpattern2'beneficial))
+)
+((?'findpattern'Original\sBorrower))
