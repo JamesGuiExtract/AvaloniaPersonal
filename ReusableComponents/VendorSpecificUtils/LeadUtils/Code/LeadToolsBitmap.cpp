@@ -19,13 +19,14 @@ const COLORREF gnCOLOR_BLACK = RGB(0, 0, 0);
 //-------------------------------------------------------------------------------------------------
 LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ulPage, 
 								 double dRotation/* = 0*/, int nBitsPerPixel/* = 1*/,
-								 bool bUseDithering/* = true*/)
+								 bool bUseDithering/* = true*/, bool bUseAdaptiveThresholdToConvertToBitonal/* = false*/)
 : m_bitmapFreeer(m_hBitmap, true)
 , m_strImageFileName(strImageFileName)
 {
 	try
 	{
 		// Initialize FILEINFO and LOADFILEOPTION for L_LoadBitmap call
+		L_INT nRet;
 		m_FileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
 		lfo.PageNumber = ulPage;
@@ -35,13 +36,27 @@ LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ul
 		// https://extract.atlassian.net/browse/ISSUE-14596
 		loadImagePage(m_strImageFileName, m_hBitmap, m_FileInfo, lfo);
 
-		// Convert to specified bpp
-		const long nDEFAULT_NUMBER_OF_COLORS = 0;
-		L_UINT flags = CRF_FIXEDPALETTE | (bUseDithering ? CRF_ORDEREDDITHERING : CRF_NODITHERING);
-		L_INT nRet = L_ColorResBitmap(&m_hBitmap, &m_hBitmap, sizeof(BITMAPHANDLE), nBitsPerPixel, flags,
-			 NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
-		throwExceptionIfNotSuccess(nRet, "ELI42166", 
-			"Internal error: Unable to convert image to specified bits-per-pixel!", strImageFileName);
+		// Convert to specified bpp if necessary
+		if (nBitsPerPixel != m_FileInfo.BitsPerPixel)
+		{
+			// If specified, when converting from color/grayscale to bitonal use an adaptive threshold algorithm
+			// https://extract.atlassian.net/browse/ISSUE-14842
+			if (bUseAdaptiveThresholdToConvertToBitonal && nBitsPerPixel == 1)
+			{
+				unlockDocumentSupport();
+				nRet = L_AutoBinarizeBitmap(&m_hBitmap, 0, AUTO_BINARIZE_PRE_AUTO | AUTO_BINARIZE_THRESHOLD_AUTO);
+				throwExceptionIfNotSuccess(nRet, "ELI44666",
+					"Internal error: Unable to binarize image!", strImageFileName);
+			}
+
+			const long nDEFAULT_NUMBER_OF_COLORS = 0;
+			L_UINT flags = CRF_FIXEDPALETTE | (bUseDithering ? CRF_ORDEREDDITHERING : CRF_NODITHERING);
+			nRet = L_ColorResBitmap(&m_hBitmap, &m_hBitmap, sizeof(BITMAPHANDLE), nBitsPerPixel, flags,
+				NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
+
+			throwExceptionIfNotSuccess(nRet, "ELI42166",
+				"Internal error: Unable to convert image to specified bits-per-pixel!", strImageFileName);
+		}
 
 		// L_RotateBitmap takes the rotation degrees in hundredths of a degree.  Convert
 		// to hundredths of a degree
@@ -98,7 +113,7 @@ bool LeadToolsBitmap::isPixelBlack(CPoint point)
 //-------------------------------------------------------------------------------------------------
 bool LeadToolsBitmap::isPixelBlack(int x, int y)
 {
-	return (L_GetPixelColor(&m_hBitmap, y, x) == gnCOLOR_BLACK);
+	return L_GetPixelColor(&m_hBitmap, y, x) == gnCOLOR_BLACK;
 }
 //-------------------------------------------------------------------------------------------------
 bool LeadToolsBitmap::contains(CPoint point)

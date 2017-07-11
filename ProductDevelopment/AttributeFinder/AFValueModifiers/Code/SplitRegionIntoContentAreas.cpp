@@ -569,7 +569,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::ShrinkToFit(BSTR bstrSourceDocName, l
 		CRect rect;
 		ipRect->GetBounds(&rect.left, &rect.top, &rect.right, &rect.bottom);
 
-		m_apPageBitmap.reset(new LeadToolsBitmap(asString(bstrSourceDocName), nPage, 0));
+		m_apPageBitmap.reset(new LeadToolsBitmap(asString(bstrSourceDocName), nPage, 0, 1, false, true));
 		ASSERT_RESOURCE_ALLOCATION("ELI36432", m_apPageBitmap.get() != __nullptr);
 
 		m_rectCurrentPage.SetRect(0, 0,
@@ -3004,7 +3004,7 @@ bool CSplitRegionIntoContentAreas::loadPageBitmap(IAFDocumentPtr ipDoc, long nPa
 			}
 
 			m_apPageBitmap.reset(new LeadToolsBitmap(asString(ipPageText->SourceDocName), nPage,
-				-dRotation, 1, false));
+				-dRotation, 1, false, true));
 			ASSERT_RESOURCE_ALLOCATION("ELI22124", m_apPageBitmap.get() != __nullptr);
 
 			m_rectCurrentPage.SetRect(0, 0,

@@ -13,7 +13,7 @@ class LEADUTILS_API LeadToolsBitmap
 {
 public:
 	LeadToolsBitmap(const string strImageFileName, unsigned long ulPage, double dRotation = 0,
-		int nBitsPerPixel = 1, bool bUseDithering = true);
+		int nBitsPerPixel = 1, bool bUseDithering = true, bool bUseAdaptiveThresholdToConvertToBitonal = false);
 
 	// Returns the value of the pixel at the given point (true = black, false = white)
 	bool isPixelBlack(CPoint point);
