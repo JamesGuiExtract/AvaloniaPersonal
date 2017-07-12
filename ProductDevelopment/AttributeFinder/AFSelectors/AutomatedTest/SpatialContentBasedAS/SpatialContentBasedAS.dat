@@ -11,3 +11,6 @@
 // Remove all attributes that don't contain 15 rows of 5 to 50% pixel coverage.  Remove non Spatial Data
 <TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test4.eav
 
+// Test low res image with gray text
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\GrayAreas.tif.uss;;Test5.eav
+

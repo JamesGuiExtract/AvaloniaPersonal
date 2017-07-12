@@ -10,6 +10,7 @@
 #include <ComUtils.h>
 #include <MiscLeadUtils.h>
 #include <ExtractZoneAsImage.h>
+#include <LeadToolsBitmap.h>
 #include <LeadToolsBitmapFreeer.h>
 #include <ComponentLicenseIDs.h>
 
@@ -218,9 +219,6 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 
 		ASSERT_ARGUMENT("ELI27291", ppImageStats != __nullptr);
 
-		BITMAPHANDLE bmPageBitmap;
-		LeadToolsBitmapFreeer freeerPage( bmPageBitmap, true );
-
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(pRaster);
 		ASSERT_RESOURCE_ALLOCATION("ELI13285", ipZone != __nullptr );
 
@@ -230,14 +228,16 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 		LicenseManagement::verifyFileTypeLicensed( strImageName );
 
 		// Load the page into bitmap
-		loadImagePage( strImageName, pRaster->PageNumber, bmPageBitmap );
+		unique_ptr<LeadToolsBitmap> apPageBitmap(new LeadToolsBitmap(strImageName, pRaster->PageNumber,
+			0, 1, false, true));
+		ASSERT_RESOURCE_ALLOCATION("ELI44665", apPageBitmap.get() != __nullptr);
 
 		// Rotate this bitmap if needed
-		handleRotatedImage( strImageName, pRaster->PageNumber, &bmPageBitmap );
+		handleRotatedImage( strImageName, pRaster->PageNumber, &apPageBitmap->m_hBitmap );
 
 		BITMAPHANDLE bmZoneBitmap;
 		LeadToolsBitmapFreeer freeerZone( bmZoneBitmap, true );
-		extractZoneAsBitmap( &bmPageBitmap, pRaster->StartX, pRaster->StartY, 
+		extractZoneAsBitmap( &apPageBitmap->m_hBitmap, pRaster->StartX, pRaster->StartY, 
 			pRaster->EndX, pRaster->EndY, pRaster->Height, &bmZoneBitmap );
 
 		UCLID_IMAGEUTILSLib::IImageStatsPtr ipImageStats(CLSID_ImageStats);
