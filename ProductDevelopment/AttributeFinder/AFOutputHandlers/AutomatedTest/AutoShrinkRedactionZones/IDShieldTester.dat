@@ -18,3 +18,6 @@
 // https://extract.atlassian.net/browse/ISSUE-13531
 <TESTFOLDER>;.\Test04.rsd;.\ISSUE-13531;;$DirOf(<SourceDocName>)\..\Test04.voa
 
+// Test on PDF
+// https://extract.atlassian.net/browse/ISSUE-14842
+<TESTFOLDER>;.\Test05.rsd;.\ISSUE-14842;;$DirOf(<SourceDocName>)\..\Test05.voa

@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
+using Extract.Imaging.Utilities;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -201,6 +202,13 @@ namespace Extract.AttributeFinder.Rules
 
                 ExtractException.Assert("ELI38497", "Rule is not properly configured.",
                     IsConfigured());
+
+                // Attempt to unlock PDF support
+                ExtractException ee = UnlockLeadtools.UnlockPdfSupport(returnExceptionIfUnlicensed: false);
+                if (ee != null)
+                {
+                    throw ee;
+                }
 
                 // So that the garbage collector knows of and properly manages the associated
                 // memory.
