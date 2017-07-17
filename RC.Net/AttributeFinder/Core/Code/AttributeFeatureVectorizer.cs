@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder
@@ -20,6 +21,17 @@ namespace Extract.AttributeFinder
     [Obfuscation(Feature = "renaming", Exclude = true)]
     public class AttributeFeatureVectorizer : IFeatureVectorizer
     {
+        #region Constants
+
+        /// <summary>
+        /// Version 2: Added field _bitmapSize to ensure compatible Bitmaps (used for FeatureVectorType.Bitmap)
+        /// </summary>
+        const int _CURRENT_VERSION = 2;
+
+        const string _BITMAP_PATTERN = @"(?in)\ABitmap: (?'width'\d+) x (?'height'\d+) = (?'data'\d+(,\d+)*)\z";
+
+        #endregion Constants
+
         #region Fields
 
         // Backing fields for properties
@@ -39,6 +51,12 @@ namespace Extract.AttributeFinder
         /// Set of values seen during configuration
         /// </summary>
         private HashSet<string> _distinctValuesSeen = new HashSet<string>(StringComparer.Ordinal);
+
+        [OptionalField(VersionAdded = 2)]
+        private int _version = _CURRENT_VERSION;
+
+        [OptionalField(VersionAdded = 2)]
+        private int _bitmapSize;
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // Non-serialized collections to track term frequency information in order to compute tf*idf score (used as a relevance heuristic)
@@ -223,6 +241,9 @@ namespace Extract.AttributeFinder
                         return _bagOfWords.Value.CodeToString
                             .OrderBy(p => p.Key)
                             .Select(p => p.Value);
+                    case FeatureVectorizerType.Bitmap:
+                        return Enumerable.Repeat(string.Format(CultureInfo.CurrentCulture, "Bitmap of length {0:N0}", BitmapSize), 1);
+
                     default:
                         return Enumerable.Empty<string>();
                 }
@@ -244,9 +265,26 @@ namespace Extract.AttributeFinder
                         return 2;
                     case FeatureVectorizerType.DiscreteTerms:
                         return RecognizedValues.Count() + 1;
+                    case FeatureVectorizerType.Bitmap:
+                        return BitmapSize + 1;
                     default:
                         return 0;
                 }
+            }
+        }
+
+        /// <summary>
+        /// The size of the bitmap (used for FeatureVectorizerType.Bitmap)
+        /// </summary>
+        public int BitmapSize
+        {
+            get
+            {
+                return _bitmapSize;
+            }
+            private set
+            {
+                _bitmapSize = value;
             }
         }
 
@@ -341,14 +379,34 @@ namespace Extract.AttributeFinder
                     _documentsSeen.Add(docName);
                     _categoriesSeen.Add(category);
 
-                    double _;
-                    if (Double.TryParse(protoFeature, out _))
+                    if (Double.TryParse(protoFeature, out double _))
                     {
                         CountOfNumericValuesOccurred++;
                     }
                     else
                     {
                         CountOfNonnumericValuesOccurred++;
+
+                        Match match;
+                        if ((FeatureType == FeatureVectorizerType.Exists || FeatureType == FeatureVectorizerType.Bitmap)
+                            && protoFeature.StartsWith("Bitmap", StringComparison.OrdinalIgnoreCase)
+                            && (match = Regex.Match(protoFeature, _BITMAP_PATTERN)).Success
+                            && int.TryParse(match.Groups["width"].Value, out int width)
+                            && int.TryParse(match.Groups["height"].Value, out int height))
+                        {
+                            // Validate dimensions
+                            int dataSize = match.Groups["data"].Value.Split(new[] { ',' }).Length;
+                            ExtractException.Assert("ELI44670",
+                                UtilityMethods.FormatInvariant($"Invalid/mismatched bitmap data for feature {Name}"),
+                                dataSize == width * height && (BitmapSize == 0 || dataSize == BitmapSize));
+
+                            BitmapSize = dataSize;
+                            FeatureType = FeatureVectorizerType.Bitmap;
+                        }
+                        else if (FeatureType == FeatureVectorizerType.Bitmap)
+                        {
+                            FeatureType = FeatureVectorizerType.DiscreteTerms;
+                        }
                     }
                 }
 
@@ -373,6 +431,16 @@ namespace Extract.AttributeFinder
                             FeatureType = FeatureVectorizerType.Numeric;
                         }
                     }
+                }
+                else if (FeatureType == FeatureVectorizerType.Numeric
+                    && CountOfNonnumericValuesOccurred > 0)
+                {
+                    FeatureType = FeatureVectorizerType.DiscreteTerms;
+                }
+                else if (FeatureType == FeatureVectorizerType.Bitmap
+                    && CountOfNumericValuesOccurred > 0)
+                {
+                    FeatureType = FeatureVectorizerType.DiscreteTerms;
                 }
 
                 if (_bagOfWords.IsValueCreated)
@@ -417,8 +485,7 @@ namespace Extract.AttributeFinder
                     case FeatureVectorizerType.Numeric:
                         var firstNumeric = values.Select(value =>
                         {
-                            double number;
-                            bool success = double.TryParse(value, out number);
+                            bool success = double.TryParse(value, out double number);
                             return new { number, success };
                         })
                         .FirstOrDefault(pair => pair.success);
@@ -430,6 +497,25 @@ namespace Extract.AttributeFinder
                         var features = _bagOfWords.Value.GetFeatureVector(values.ToArray()).Select(i => (double)i);
                         return features.Concat(new[] { exists }).ToArray();
 
+                    case FeatureVectorizerType.Bitmap:
+                        var firstMatch = values.Select(value =>
+                            Regex.Match(value, _BITMAP_PATTERN))
+                            .FirstOrDefault(match => match.Success);
+
+                        if (firstMatch == null)
+                        {
+                            return new double[BitmapSize].Concat(new[] { exists }).ToArray();
+                        }
+                        var data = firstMatch.Groups["data"].Value.Split(new[] { ',' });
+                        if (data.Length != BitmapSize)
+                        {
+                            return new double[BitmapSize].Concat(new[] { exists }).ToArray();
+                        }
+                        else
+                        {
+                            return data.Select(s => double.TryParse(s, out double d) ? d : 0.0)
+                                .Concat(new[] { exists }).ToArray();
+                        }
                     default:
                         throw new ExtractException("ELI39525", "Unsupported FeatureType: " + FeatureType.ToString());
                 }
@@ -490,6 +576,8 @@ namespace Extract.AttributeFinder
                 || other.Name != Name
                 || FeatureType == FeatureVectorizerType.DiscreteTerms &&
                    !other.RecognizedValues.SequenceEqual(RecognizedValues)
+                || FeatureType == FeatureVectorizerType.Bitmap &&
+                   other.BitmapSize != BitmapSize
                 )
             {
                 return false;
@@ -507,7 +595,8 @@ namespace Extract.AttributeFinder
             var hash = HashCode.Start
                 .Hash(Enabled)
                 .Hash(FeatureType)
-                .Hash(Name);
+                .Hash(Name)
+                .Hash(BitmapSize);
             if (FeatureType == FeatureVectorizerType.DiscreteTerms)
             {
                 foreach (var value in RecognizedValues)
@@ -543,12 +632,28 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Called when deserializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+            _bitmapSize = 0;
+        }
+
+        /// <summary>
         /// Called when deserialized
         /// </summary>
         /// <param name="context">The context.</param>
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
+            ExtractException.Assert("ELI44672", "Cannot load newer AttributeFeatureVectorizer",
+                _version <= _CURRENT_VERSION,
+                "Current version", _CURRENT_VERSION,
+                "Version to load", _version);
+
+            _version = _CURRENT_VERSION;
             _termFrequency = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
             _termToDocument = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
             _categoriesSeen = new HashSet<string>(StringComparer.Ordinal);

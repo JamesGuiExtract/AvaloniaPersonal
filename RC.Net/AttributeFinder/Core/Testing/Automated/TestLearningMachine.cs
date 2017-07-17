@@ -15,6 +15,7 @@ using ComAttribute = UCLID_AFCORELib.Attribute;
 using System.Threading;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Extract.AttributeFinder.Test
 {
@@ -1158,6 +1159,69 @@ namespace Extract.AttributeFinder.Test
             }
         }
 
+        // Test building a classifier for yes/no bubbles using bitmap features
+        [Test, Category("LearningMachine")]
+        public static void TestBitmapFeature()
+        {
+            SetBitmapFiles();
+            var rulesetPath = _testFiles.GetFile("Resources.LearningMachine.Bitmap.bubble.rsd");
+            _testFiles.GetFile("Resources.LearningMachine.Bitmap.bubble.dat");
+
+            // Run the protofeature creation rules
+            Parallel.ForEach(Directory.GetFiles(_inputFolder.Last(), "*.tif"), imagePath =>
+            {
+                var uss = new SpatialStringClass();
+                uss.LoadFrom(imagePath + ".uss", false);
+                var doc = new AFDocumentClass { Text = uss };
+                var ruleset = new RuleSetClass();
+                ruleset.LoadFrom(rulesetPath, false);
+                ruleset.ExecuteRulesOnText(doc, null, null, null);
+            });
+
+            // Create labeled attributes
+            var inputConfig = new InputConfiguration
+            {
+                InputPath = _inputFolder.Last(),
+                InputPathType = InputType.Folder,
+                AttributesPath = "<SourceDocName>.labeled.voa",
+                AnswerPath = "",
+                TrainingSetPercentage = 80
+            };
+            var labelAttributes = new LabelAttributes
+            {
+                AttributesToLabelPath = @"<SourceDocName>.protofeatures.voa",
+                SourceOfLabelsPath = @"<SourceDocName>.evoa",
+                DestinationPath = @"<SourceDocName>.labeled.voa"
+            };
+
+            labelAttributes.CategoryQueryPairs.Add(new CategoryQueryPair
+                {
+                    Category = "@Type",
+                    CategoryIsXPath = true,
+                    Query = "/*/*"
+                });
+
+            labelAttributes.Process(inputConfig);
+
+            // Train/test the machine
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.labeled.voa",
+                    TrainingSetPercentage = 80
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature"),
+                Classifier = new NeuralNetworkClassifier { HiddenLayers = new[] { 50 } }
+            };
+            var results = lm.TrainMachine();
+            Assert.Greater(results.trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.96);
+            Assert.Greater(results.testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.93);
+        }
+
+
         #endregion Tests
 
         #region Helper Methods
@@ -1206,6 +1270,31 @@ namespace Extract.AttributeFinder.Test
                 _testFiles.GetFile(resourceName, path);
 
                 resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".eav");
+                path = Path.Combine(_inputFolder.Last(), resourceName);
+                _testFiles.GetFile(resourceName, path);
+            }
+        }
+
+        // Helper method to build folder structure for bitmap feature testing
+        // These images and voas are mocked-up forms from Exact Sciences
+        private static void SetBitmapFiles()
+        {
+            _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+            Directory.CreateDirectory(_inputFolder.Last());
+
+            for (int i = 1; i <= 30; i++)
+            {
+                var baseName = "Resources.LearningMachine.Bitmap.{0:D3}.tif{1}";
+
+                string resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i, "");
+                string path = Path.Combine(_inputFolder.Last(), resourceName);
+                _testFiles.GetFile(resourceName, path);
+
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".uss");
+                path = Path.Combine(_inputFolder.Last(), resourceName);
+                _testFiles.GetFile(resourceName, path);
+
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".evoa");
                 path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
             }

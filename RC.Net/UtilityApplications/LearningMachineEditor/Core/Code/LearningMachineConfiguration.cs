@@ -617,7 +617,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 attributeFeatureFilterTextBox.Text = encoder.AttributeFilter ?? "";
 
                 maxFeaturesPerVectorizerTextBox.Text =
-                    encoder.AttributeVectorizerMaxFeatures.ToString(CultureInfo.CurrentCulture);
+                    encoder.AttributeVectorizerMaxDiscreteTermsFeatures.ToString(CultureInfo.CurrentCulture);
 
                 tokenizeAttributesFilterCheckBox.Checked = !string.IsNullOrWhiteSpace(encoder.AttributesToTokenizeFilter);
                 attributesToTokenizeFilterTextBox.Text = encoder.AttributesToTokenizeFilter ?? "";

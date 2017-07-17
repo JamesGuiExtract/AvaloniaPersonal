@@ -1,0 +1,5 @@
+  (?~<error=3,method=better_fit>^3\.\x20Patient\x20has\x20a\x20history\x20of\x20CRC\x20or\x20adenomas\?)
+| (?~<error=3,method=better_fit>^4\.\x20Patient\x20has\x20a\x20condition\x20associated\x20with\x20a\x20higher\x20risk)
+| (?~<error=3>^2\.\x20Patient\x20had\x20a\x20positive\x20CRC\x20test\x20w\/in\x20the\x20past\x206\x20months\?)
+| (?~<error=3,method=better_fit>^1\.\x20Patient\x20Is\x20due\x20for\x20colorectal\x20cancer\x20\(CRC\)\x20screening\?)
+| (?~<error=3>^5\.\x20Patient\x20is\x20presenting\x20with\x20signs\x20or\x20symptoms\x20of)

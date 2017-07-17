@@ -1021,9 +1021,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(7, 94);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(135, 13);
+            this.label2.Size = new System.Drawing.Size(282, 13);
             this.label2.TabIndex = 4;
-            this.label2.Text = "Max features per vectorizer";
+            this.label2.Text = "Max features per vectorizer (applies to DiscreteTerms only)";
             // 
             // maxShingleSizeForAttributeFeaturesTextBox
             // 
