@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,8 +15,6 @@ using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
-using UCLID_AFCORELib;
-using System.Runtime.Serialization;
 
 namespace Extract.AttributeFinder
 {
@@ -94,7 +93,12 @@ namespace Extract.AttributeFinder
         /// Creates a feature vector of at least a length of two where one feature is whether the Attribute exists
         /// and the other features are for presence/absence of vocabulary terms. AKA Bag-of-Words.
         /// </summary>
-        DiscreteTerms = 2
+        DiscreteTerms = 2,
+
+        /// <summary>
+        /// Creates a feature vector of pixelcount + 1 from an array of pixel values encoded in the attribute's value
+        /// </summary>
+        Bitmap = 3
     }
 
     /// <summary>
@@ -515,7 +519,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Gets/sets the maximum number of features (distinct values seen) to retain per attribute feature vectorizer.
         /// </summary>
-        public int AttributeVectorizerMaxFeatures
+        public int AttributeVectorizerMaxDiscreteTermsFeatures
         {
             get
             {
@@ -606,7 +610,7 @@ namespace Extract.AttributeFinder
             NegateFilter = negateFilter;
             AnswerCodeToName = new Dictionary<int, string>();
             AnswerNameToCode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            AttributeVectorizerMaxFeatures = attributeVectorizerMaxFeatures;
+            AttributeVectorizerMaxDiscreteTermsFeatures = attributeVectorizerMaxFeatures;
             AttributesToTokenizeFilter = attributesToTokenize;
             AttributeVectorizerShingleSize = attributeVectorizerShingleSize;
             NegativeClassName = negativeClassName ??
@@ -805,7 +809,7 @@ namespace Extract.AttributeFinder
 
                 foreach(var vectorizer in AttributeFeatureVectorizers)
                 {
-                    vectorizer.LimitToTopTerms(AttributeVectorizerMaxFeatures);
+                    vectorizer.LimitToTopTerms(AttributeVectorizerMaxDiscreteTermsFeatures);
                 }
 
                 updateStatus(new StatusArgs
@@ -963,7 +967,7 @@ namespace Extract.AttributeFinder
                     || other.AutoBagOfWords != null && !other.AutoBagOfWords.IsConfigurationEqualTo(AutoBagOfWords)
                     || other.MachineUsage != MachineUsage
                     || other.NegateFilter != NegateFilter
-                    || other.AttributeVectorizerMaxFeatures != AttributeVectorizerMaxFeatures
+                    || other.AttributeVectorizerMaxDiscreteTermsFeatures != AttributeVectorizerMaxDiscreteTermsFeatures
                     || other.AttributesToTokenizeFilter != AttributesToTokenizeFilter
                     || other.AttributeVectorizerShingleSize != AttributeVectorizerShingleSize
                     || other.NegativeClassName != NegativeClassName
