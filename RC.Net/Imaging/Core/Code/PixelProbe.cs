@@ -115,6 +115,26 @@ namespace Extract.Imaging
                 throw ee;
             }
         }
+        
+        /// <summary>
+        /// Gets the color of the pixel at the specified coordinates
+        /// </summary>
+        /// <param name="x">The x coordinate of the pixel</param>
+        /// <param name="y">The y coordinate of the pixel</param>
+        /// <returns>The color of the pixel at the specified coordinates</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "x")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "y")]
+        public RasterColor GetPixelColor(int x, int y)
+        {
+            try
+            {
+                return _image.GetPixelColor(y, x);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44667");
+            }
+        }
 
         /// <summary>
         /// Determines if the specified pixel exists on the page.

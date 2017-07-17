@@ -1,7 +1,16 @@
-﻿using Extract.Utilities;
+﻿using Extract.Imaging;
+using Extract.Utilities;
+using Leadtools;
+using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Globalization;
+using System.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
-using System.Linq;
+using UCLID_AFCORELib;
+using UCLID_COMUTILSLib;
 
 namespace Extract.AttributeFinder
 {
@@ -20,8 +29,9 @@ namespace Extract.AttributeFinder
         /// argument list. This information can be used to discover the signature of the function
         /// which allows you to differentiate between overloaded functions.</param>
         /// <param name="functionName">The name of the function referenced by this instance.</param>
+        /// <param name="context">The <see cref="XPathContext"/> to be used to resolve nodes to <see cref="UCLID_AFCORELib.IAttribute">attributes</see></param>
         public XPathContextFunctions(int minArgs, int maxArgs,
-            XPathResultType returnType, XPathResultType[] argTypes, string functionName)
+            XPathResultType returnType, XPathResultType[] argTypes, string functionName, XPathContext context)
         {
             try
             {
@@ -30,6 +40,7 @@ namespace Extract.AttributeFinder
                 ReturnType = returnType;
                 ArgTypes = argTypes;
                 FunctionName = functionName;
+                Context = context;
             }
             catch (System.Exception ex)
             {
@@ -96,6 +107,15 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// The <see cref="XPathContext"/> used to resolve nodes to <see cref="UCLID_AFCORELib.IAttribute">attributes</see>
+        /// </summary>
+        public XPathContext Context
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Provides the method to invoke the function with the given arguments in the given context.
         /// </summary>
         /// <param name="xsltContext">The XSLT context for the function call.</param>
@@ -143,12 +163,114 @@ namespace Extract.AttributeFinder
                     }
                     return UtilityMethods.LevenshteinDistance(stringArgs[0], stringArgs[1]);
                 }
+                else if (FunctionName == "Bitmap")
+                {
+                    if (args[0] is double width
+                        && args[1] is double height
+                        && args[2] is XPathNodeIterator nodeIterator)
+                    {
+                        if (nodeIterator.MoveNext())
+                        {
+                            var attr = (new XPathContext.XPathIterator(nodeIterator, Context)).CurrentAttribute;
+                            return InvokeBitmapFunction(Convert.ToInt32(width, CultureInfo.CurrentCulture),
+                                                        Convert.ToInt32(height, CultureInfo.CurrentCulture),
+                                                        attr);
+                        }
+                    }
+                    else
+                    {
+                        throw new ExtractException("ELI44669",
+                        UtilityMethods.FormatInvariant($"Bad arguments. ",
+                            $"Expected Double * Double * XPathSelectionIterator, ",
+                            $"received {args[0].GetType().Name} * {args[1].GetType().Name} * {args[2].GetType().Name}"));
+                    }
+                }
 
                 return null;
             }
             catch (System.Exception ex)
             {
                 throw ex.AsExtract("ELI39415");
+            }
+        }
+
+        /// <summary>
+        /// Invokes the es:Bitmap function to scale and encode an attribute's area as a bitmap
+        /// </summary>
+        /// <param name="width">The width of the resulting bitmap</param>
+        /// <param name="height">The height of the resulting bitmap</param>
+        /// <param name="attr">The attribute to be used to generate the bitmap</param>
+        /// <returns></returns>
+        static string InvokeBitmapFunction(int width, int height, IAttribute attr)
+        {
+            try
+            {
+                RasterZone zone = null;
+                var value = attr.Value;
+                if (!value.HasSpatialInfo())
+                {
+                    return "";
+                }
+
+                var zones = value.GetOriginalImageRasterZones();
+                if (zones.Size() == 1)
+                {
+                    zone = new RasterZone((UCLID_RASTERANDOCRMGMTLib.RasterZone)zones.At(0));
+                }
+                else
+                {
+                    int pageNumber = value.GetFirstPageNumber();
+                    var valueOnPage = value.GetSpecifiedPages(pageNumber, pageNumber);
+
+                    LongRectangle rectangle = valueOnPage.GetOriginalImageBounds();
+                    rectangle.GetBounds(out int left, out int top, out int right, out int bottom);
+                    zone = new RasterZone(Rectangle.FromLTRB(left, top, right, bottom), pageNumber);
+                }
+
+                Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+                var rect = new Rectangle(0, 0, width, height);
+
+                using (var codecs = new ImageCodecs())
+                using (var reader = codecs.CreateReader(value.SourceDocName))
+                using (var probe = reader.CreatePixelProbe(zone.PageNumber))
+                using (var g = Graphics.FromImage(bitmap))
+                {
+                    ZoneGeometry data = new ZoneGeometry(zone);
+                    Bitmap sourceBitmap = data.GetZoneAsBitmap(probe);
+
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    g.Clear(Color.White);
+                    g.DrawImage(sourceBitmap, rect);
+                }
+
+                // Select the brightness of each pixel
+                var bitmapData = bitmap.LockBits(rect, ImageLockMode.ReadOnly, bitmap.PixelFormat);
+                var numberOfBytes = bitmapData.Stride * height;
+                var numberOfPixels = width * height;
+
+                var ptr = bitmapData.Scan0;
+                var bitmapBytes = new byte[numberOfBytes];
+                System.Runtime.InteropServices.Marshal.Copy(ptr, bitmapBytes, 0, numberOfBytes);
+
+                // Pixels are stored as sequential R, G, B
+                var pixelValues = new byte[numberOfPixels];
+                for (int i = 0, j = 0; i < numberOfPixels; i++, j += 3)
+                {
+                    pixelValues[i] = RasterHsvColor.FromRasterColor(
+                        new RasterColor(bitmapBytes[j], bitmapBytes[j + 1], bitmapBytes[j + 2])).V;
+                }
+                bitmap.UnlockBits(bitmapData);
+
+                var formattedString = UtilityMethods.FormatInvariant($"Bitmap: {width} x {height} = ") +
+                    string.Join(",", pixelValues);
+
+                return formattedString;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44671");
             }
         }
     }

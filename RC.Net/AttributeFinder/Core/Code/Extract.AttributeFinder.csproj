@@ -96,6 +96,7 @@
       <HintPath>..\..\..\APIs\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907" />
     <Reference Include="Lucene.Net, Version=3.0.3.0, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <HintPath>..\..\..\APIs\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll</HintPath>
       <Private>True</Private>
@@ -144,6 +145,7 @@
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
@@ -274,6 +276,10 @@
     <ProjectReference Include="..\..\..\Encryption\Core\Code\Extract.Encryption.vcxproj">
       <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
       <Name>Extract.Encryption</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
+      <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
+      <Name>Extract.Imaging</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
