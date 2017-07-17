@@ -487,7 +487,7 @@ namespace Extract.AttributeFinder
         #region Overrides
 
         /// <summary>
-        /// When overridden in a derived class, resolves a function reference and returns an
+        /// Resolves a function reference and returns an
         /// <see cref="T:IXsltContextFunction"/> representing the function. The
         /// <see cref="T:IXsltContextFunction"/> is used at execution time to get the return value
         /// of the function.
@@ -511,7 +511,10 @@ namespace Extract.AttributeFinder
                     {
                         case "Levenshtein":
                             return new XPathContextFunctions(2, 2, XPathResultType.Number,
-                                ArgTypes, "Levenshtein");
+                                ArgTypes, "Levenshtein", this);
+                        case "Bitmap":
+                            return new XPathContextFunctions(3, 3, XPathResultType.String,
+                                ArgTypes, "Bitmap", this);
                     }
                 }
 

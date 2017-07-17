@@ -3,7 +3,9 @@ using Extract.Utilities;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Extract.Imaging
@@ -616,35 +618,6 @@ namespace Extract.Imaging
             }
         }
 
-        #endregion Methods
-
-        #region ICloneable Members
-
-        /// <summary>
-        /// Creates a new object that is a copy of the current instance.
-        /// </summary>
-        /// <returns>
-        /// A new object that is a copy of this instance.
-        /// </returns>
-        public object Clone()
-        {
-            try
-            {
-                // Most members can simply be copied by value.
-                ZoneGeometry clone = (ZoneGeometry)MemberwiseClone();
-
-                // Vertices array needs to be deep copied.
-                clone._vertices = new PointF[4];
-                _vertices.CopyTo(clone._vertices, 0);
-
-                return clone;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI31350", ex);
-            }
-        }
-
         /// <summary>
         /// Determines if the specified points define a line along a similar angle to the zone
         /// defined by this <see cref="ZoneGeometry"/> instance that passes across the left side of
@@ -710,6 +683,88 @@ namespace Extract.Imaging
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI31462", ex);
+            }
+        }
+
+        /// <summary>
+        /// Creates a <see cref="Bitmap"/> containing the pixel data of this zone
+        /// </summary>
+        /// <param name="probe">The <see cref="PixelProbe"/> to be used to get the pixel data</param>
+        /// <returns>An RGB 24bpp <see cref="Bitmap"/> (formatted with <see cref="PixelFormat.Format24bppRgb"/>)</returns>
+        public Bitmap GetZoneAsBitmap(PixelProbe probe)
+        {
+            try
+            {
+                // Retrieve a working rectangle relative to the zone's coordinate system
+                RectangleF rectangle = GetWorkingRectangle(Side.Left, out PointF theta);
+
+                // Create a bitmap object to be filled
+                int width = Convert.ToInt32(rectangle.Width);
+                int height = Convert.ToInt32(rectangle.Height);
+                Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+
+                // Fill an array with the pixel data
+                var rect = new Rectangle(0, 0, width, height);
+                var bitmapData = bitmap.LockBits(rect, ImageLockMode.WriteOnly, bitmap.PixelFormat);
+                var numberOfBytes = bitmapData.Stride * height;
+                var bitmapBytes = new byte[numberOfBytes];
+
+                PointF pixel = new PointF(rectangle.Left, rectangle.Top);
+                for (int y = 0; pixel.Y <= rectangle.Bottom && y < height; pixel.Y++, y++)
+                {
+                    pixel.X = rectangle.Left;
+                    for (int x = 0; pixel.X <= rectangle.Right && x < width; pixel.X++, x++)
+                    {
+                        var rotatedPixel = GeometryMethods.Rotate(pixel, theta);
+                        Point point = theta.X > 0 ? Point.Ceiling(rotatedPixel) : Point.Truncate(rotatedPixel);
+
+                        var color = probe.GetPixelColor(point.X, point.Y);
+                        var i = (y * width + x) * 3;
+                        bitmapBytes[i] = color.R;
+                        bitmapBytes[i + 1] = color.G;
+                        bitmapBytes[i + 2] = color.B;
+                    }
+                }
+
+                // Set the bitmap's data
+                var ptr = bitmapData.Scan0;
+                Marshal.Copy(bitmapBytes, 0, ptr, bitmapBytes.Length);
+                bitmap.UnlockBits(bitmapData);
+
+                return bitmap;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44668");
+            }
+        }
+
+        #endregion Methods
+
+        #region ICloneable Members
+
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        /// <returns>
+        /// A new object that is a copy of this instance.
+        /// </returns>
+        public object Clone()
+        {
+            try
+            {
+                // Most members can simply be copied by value.
+                ZoneGeometry clone = (ZoneGeometry)MemberwiseClone();
+
+                // Vertices array needs to be deep copied.
+                clone._vertices = new PointF[4];
+                _vertices.CopyTo(clone._vertices, 0);
+
+                return clone;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31350", ex);
             }
         }
 
