@@ -117,6 +117,7 @@ namespace Extract.FileActionManager.FileProcessors
                     = _expectedPaginationAttributesBrowseButton.Enabled
                     = _expectedPaginationAttributesPathTagButton.Enabled
                     = _expectedPaginationAttributesCheckBox.Checked;
+                _singleDocModeCheckBox.Checked = Settings.SingleSourceDocumentMode;
             }
             catch (Exception ex)
             {
@@ -173,6 +174,7 @@ namespace Extract.FileActionManager.FileProcessors
                 Settings.DocumentDataPanelAssembly = _documentDataAssemblyTextBox.Text;
                 Settings.OutputExpectedPaginationAttributesFiles = _expectedPaginationAttributesCheckBox.Checked;
                 Settings.ExpectedPaginationAttributesOutputPath = _expectedPaginationAttributesTextBox.Text;
+                Settings.SingleSourceDocumentMode = _singleDocModeCheckBox.Checked;
 
                 DialogResult = DialogResult.OK;
             }

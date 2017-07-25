@@ -6,6 +6,7 @@ using Extract.Utilities.Forms;
 using System;
 using System.Linq;
 using System.Windows.Forms;
+using UCLID_COMUTILSLib;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -121,12 +122,35 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets a <see cref="DataEntryPaginationDocumentData" /> instance based on the provided
+        /// <see paramref="attributes" />.
+        /// </summary>
+        /// <param name="attributes">The VOA data for while a <see cref="PaginationDocumentData" />
+        /// instance is needed.</param>
+        /// <param name="sourceDocName">The name of the source document for which data is being
+        /// loaded.</param>
+        /// <returns>
+        /// The <see cref="DataEntryPaginationDocumentData"/> instance.
+        /// </returns>
+        public virtual DataEntryPaginationDocumentData GetDocumentData(IUnknownVector attributes, string sourceDocName)
+        {
+            try
+            {
+                return new DataEntryPaginationDocumentData(attributes, sourceDocName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44681");
+            }
+        }
+
+        /// <summary>
         /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>
         /// <param name="forDisplay"><c>true</c> if the loaded data is to be displayed; <c>false</c>
         /// if the data is being loaded only for data manipulation or validation.</param>
-        public void LoadData(PaginationDocumentData data, bool forDisplay)
+        public virtual void LoadData(PaginationDocumentData data, bool forDisplay)
         {
             try
             {
@@ -149,6 +173,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         _documentData.SetDataError(DataValidity == DataValidity.Invalid);
                     }
+
+                    _documentData.SetInitialized();
                 }
 
                 UpdateSwipingState();
@@ -183,7 +209,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
         /// <returns><see langword="true"/> if the data was saved correctly or
         /// <see langword="false"/> if corrections are needed before it can be saved.</returns>
-        public bool SaveData(PaginationDocumentData data, bool validateData)
+        public virtual bool SaveData(PaginationDocumentData data, bool validateData)
         {
             try
             {

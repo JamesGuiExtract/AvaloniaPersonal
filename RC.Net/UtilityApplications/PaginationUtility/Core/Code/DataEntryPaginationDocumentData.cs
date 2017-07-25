@@ -45,6 +45,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         IDisposable _undoState;
 
+        /// <summary>
+        /// Indicates whether the data has been initialized for display.
+        /// </summary>
+        bool _initialized;
+
+        /// <summary>
+        /// Indicates whether this instance wants to override whether the document is returned to
+        /// the server for reprocessing.
+        /// </summary>
+        bool? _sendForReprocessing = null;
+
         #endregion Fields
 
         #region Constructors
@@ -112,7 +123,31 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Properties
 
+        #region Methods
+
+        /// <summary>
+        /// Sets the value of <see cref="SendForReprocessing"/>.
+        /// </summary>
+        /// <param name="sendForReprocessing">The value to apply.</param>
+        public void SetSendForReprocessing(bool? sendForReprocessing)
+        {
+            _sendForReprocessing = sendForReprocessing;
+        }
+
+        #endregion Methods
+
         #region Overrides
+
+        /// <summary>
+        /// Gets a value indicating whether the data has been initialized for display.
+        /// </summary>
+        public override bool Initialized
+        {
+            get
+            {
+                return _initialized;
+            }
+        }
 
         /// <summary>
         /// A description of the document.
@@ -199,11 +234,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <value><see langword="null"/> to if the decision should not be overridden, otherwise
         /// a boolean value indicating what the override should be.</value>
         public override bool? SendForReprocessing
-
         {
             get
             {
-                return base.SendForReprocessing;
+                return _sendForReprocessing;
             }
         }
 
@@ -311,6 +345,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (summary != _summary)
             {
                 _summary = summary;
+
+                OnDocumentDataStateChanged();
+            }
+        }
+        
+        /// <summary>
+        /// Marks this data as initialized for display.
+        /// </summary>
+        internal void SetInitialized()
+        {
+            if (!_initialized)
+            {
+                _initialized = true;
 
                 OnDocumentDataStateChanged();
             }

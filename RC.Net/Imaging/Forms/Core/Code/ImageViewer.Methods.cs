@@ -254,25 +254,15 @@ namespace Extract.Imaging.Forms
                     }
                 }
 
-                var ussFileName = fileName + ".uss";
                 SpatialPageInfos = null;
-                if (File.Exists(ussFileName))
+                // Ignore problems loading the uss file, treat same as missing
+                try
                 {
-                    // Ignore problems loading the uss file, treat same as missing
-                    try
-                    {
-                        var spatialString = new SpatialString();
-                        spatialString.LoadFrom(ussFileName, false);
-
-                        if (spatialString.HasSpatialInfo())
-                        {
-                            SpatialPageInfos = spatialString.SpatialPageInfos;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        (new ExtractException("ELI43200", "Could not load uss file for auto-rotation", ex)).Log();
-                    }
+                    SpatialPageInfos = ImageMethods.GetSpatialPageInfos(fileName);
+                }
+                catch (Exception ex)
+                {
+                    (new ExtractException("ELI43200", "Could not load uss file for auto-rotation", ex)).Log();
                 }
 
                 // Raise the opening image event
@@ -441,28 +431,11 @@ namespace Extract.Imaging.Forms
 
             try
             {
-                if (SpatialPageInfos != null && SpatialPageInfos.Contains(pageNumber))
-                {
-                    var pageInfo = (SpatialPageInfo)SpatialPageInfos.GetValue(pageNumber);
-                    switch (pageInfo.Orientation)
-                    {
-                        case EOrientation.kRotNone:
-                            pageData.Orientation = 0;
-                            break;
 
-                        case EOrientation.kRotLeft:
-                            pageData.Orientation = 270;
-                            break;
+                var orientation = ImageMethods.GetPageRotation(_spatialPageInfos, pageNumber);
+                pageData.Orientation = orientation.HasValue ? orientation.Value : 0;
 
-                        case EOrientation.kRotDown:
-                            pageData.Orientation = 180;
-                            break;
-
-                        case EOrientation.kRotRight:
-                            pageData.Orientation = 90;
-                            break;
-                    }
-                }
+                return pageData;
             }
             catch (Exception ex)
             {

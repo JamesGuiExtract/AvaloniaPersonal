@@ -387,19 +387,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// following windows message.
         /// </summary>
         bool _updateCommandStatesInvoked;
-
-        /// <summary>
-        /// The <see cref="IPaginationDocumentDataPanel"/> that is currently open for editing
-        /// or <see langword="null"/> if there is no data panel currently open for editing.
-        /// </summary>
-        IPaginationDocumentDataPanel _documentDataPanel;
-
-        /// <summary>
-        /// The <see cref="OutputDocument"/> whose data is currently being edited by
-        /// _documentDataPanel.
-        /// </summary>
-        OutputDocument _documentInDataEdit;
-
+      
         #endregion Fields
 
         #region Constructors
@@ -621,19 +609,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the indicator to show whether documents will be
-        /// queued for reprocessing should be hidden.
-        /// </summary>
-        /// <value><see langword="true"/> if the reprocessing indicator should be hidden; otherwise,
-        /// <see langword="false"/>.
-        /// </value>
-        public bool HideReprocessIndicator
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether the <see cref="LoadNextDocumentButtonControl"/>
         /// is enabled.
         /// </summary>
@@ -831,13 +806,13 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (_primarySelection != null)
                     {
-                        if (_documentDataPanel != null)
+                        if (DocumentDataPanel != null)
                         {
                             // Let the data entry panel know if the current page corresponds to the document
                             // it has loaded.
-                            _documentDataPanel.PrimaryPageIsForActiveDocument =
-                                (_documentInDataEdit != null) &&
-                                _documentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document;
+                            DocumentDataPanel.PrimaryPageIsForActiveDocument =
+                                (DocumentInDataEdit != null) &&
+                                DocumentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document;
                         }
 
                         SetHighlightedAndDisplayed(_primarySelection, true);
@@ -854,6 +829,26 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// The <see cref="IPaginationDocumentDataPanel"/> that is currently open for editing
+        /// or <see langword="null"/> if there is no data panel currently open for editing.
+        /// </summary>
+        public IPaginationDocumentDataPanel DocumentDataPanel
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// The <see cref="OutputDocument"/> for which <see cref="DocumentDataPanel"/> is currently
+        /// displayed.
+        /// </summary>
+        public OutputDocument DocumentInDataEdit
+        {
+            get;
+            private set;
         }
 
         #endregion Properties
@@ -926,7 +921,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (lastPageControl == null)
                     {
                         InsertPaginationControl(
-                            new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator), index: 0);
+                            new PaginationSeparator(CommitOnlySelection), index: 0);
                         pageIndex = 1;
                     }
                     // Otherwise, place the separator immediately after the previous document.
@@ -934,7 +929,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         pageIndex = _flowLayoutPanel.Controls.GetChildIndex(lastPageControl) + 1;
                         InsertPaginationControl(
-                            new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator), index: pageIndex);
+                            new PaginationSeparator(CommitOnlySelection), index: pageIndex);
                         pageIndex++;
                     }
                 }
@@ -968,9 +963,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                     allPagesCanBeLoaded = CanAllPagesBeLoaded(ref pagesToLoad);
                 }
 
+                var spatialPageInfos = ImageMethods.GetSpatialPageInfos(sourceDocument.FileName);
+
                 // Create a page control for every page in sourceDocument.
                 foreach (Page page in pagesToLoad)
                 {
+                    var orientation = ImageMethods.GetPageRotation(spatialPageInfos, page.OriginalPageNumber);
+                    if (orientation != null)
+                    {
+                        page.ImageOrientation = orientation.Value;
+                    }
+
                     var pageControl = new PageThumbnailControl(outputDocument, page);
                     if (deletedPages != null && deletedPages.Contains(page.OriginalPageNumber))
                     {
@@ -1055,7 +1058,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (lastPageControl != null)
                     {
                         InsertPaginationControl(
-                            new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator), index: -1);
+                            new PaginationSeparator(CommitOnlySelection), index: -1);
                     }
 
                     // Create a page control for every page in sourceDocument.
@@ -1806,8 +1809,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 // If the _documentDataPanelControl has focus, keystrokes shouldn't be treated as
                 // pagination shortcut keys.
-                if (_documentDataPanel?.PanelControl != null &&
-                    _documentDataPanel.PanelControl.ContainsFocus)
+                if (DocumentDataPanel?.PanelControl != null &&
+                    DocumentDataPanel.PanelControl.ContainsFocus)
                 {
                     IgnoreShortcutKey = true;
                 }
@@ -2550,8 +2553,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // If a data panel was provided to be opened...
                 if (e.DocumentDataPanel != null)
                 {
-                    _documentDataPanel = e.DocumentDataPanel;
-                    _documentInDataEdit = e.OutputDocument;
+                    DocumentDataPanel = e.DocumentDataPanel;
+                    DocumentInDataEdit = e.OutputDocument;
 
                     var activePage = PrimarySelection as PageThumbnailControl;
                     if (activePage == null || activePage.Document != e.OutputDocument)
@@ -2566,9 +2569,9 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     // Let the data entry panel know if the current page corresponds to the document
                     // it has loaded.
-                    _documentDataPanel.PrimaryPageIsForActiveDocument =
-                        (_documentInDataEdit != null) &&
-                        (_documentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document);
+                    DocumentDataPanel.PrimaryPageIsForActiveDocument =
+                        (DocumentInDataEdit != null) &&
+                        (DocumentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document);
                 }
             }
             catch (Exception ex)
@@ -2588,8 +2591,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _documentDataPanel = null;
-                _documentInDataEdit = null;
+                DocumentDataPanel = null;
+                DocumentInDataEdit = null;
             }
             catch (Exception ex)
             {
@@ -2715,7 +2718,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var lastControl = _flowLayoutPanel.Controls.OfType<PaginationControl>().LastOrDefault();
                 if (lastControl != null && !(lastControl is PaginationSeparator))
                 {
-                    AddPaginationControl(new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator));
+                    AddPaginationControl(new PaginationSeparator(CommitOnlySelection));
                 }
             }
 
@@ -2724,7 +2727,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // Precede the first page with a separator to serve as a header for the document.
             if (isPageControl && _flowLayoutPanel.Controls.Count == 0)
             {
-                AddPaginationControl(new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator));
+                AddPaginationControl(new PaginationSeparator(CommitOnlySelection));
             }
 
             // A pagination separator is meaningless as the first control.
@@ -3703,7 +3706,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // A null page represents a document boundary; insert a separator.
                 if (page.Key == null)
                 {
-                    var separator = new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator);
+                    var separator = new PaginationSeparator(CommitOnlySelection);
                     insertedPaginationControls.Add(separator);
 
                     if (InitializePaginationControl(separator, ref index))
@@ -4514,7 +4517,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             int index = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
                             InitializePaginationControl(
-                                new PaginationSeparator(CommitOnlySelection, HideReprocessIndicator), ref index);
+                                new PaginationSeparator(CommitOnlySelection), ref index);
                         }
                     }
                 }

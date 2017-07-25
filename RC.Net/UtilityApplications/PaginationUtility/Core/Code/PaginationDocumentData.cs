@@ -61,6 +61,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Public Members
 
         /// <summary>
+        /// Gets a value indicating whether the data has been initialized for display.
+        /// </summary>
+        public virtual bool Initialized
+        {
+            get
+            {
+                // Unless overridden, data is assumed to be initialized right away.
+                return true;
+            }
+        }
+
+        /// <summary>
         /// The source document related to this instance if there is a singular source document;
         /// otherwise, <see langword="null"/>.
         /// </summary>

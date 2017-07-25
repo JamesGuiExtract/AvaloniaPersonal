@@ -50,6 +50,7 @@
             this._expectedPaginationAttributesPathTagButton = new Extract.Utilities.Forms.PathTagsButton();
             this._expectedPaginationAttributesTextBox = new Extract.Utilities.Forms.BetterTextBox();
             this._expectedPaginationAttributesBrowseButton = new Extract.Utilities.Forms.BrowseButton();
+            this._singleDocModeCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -268,12 +269,23 @@
             this._expectedPaginationAttributesBrowseButton.TextControl = this._expectedPaginationAttributesTextBox;
             this._expectedPaginationAttributesBrowseButton.UseVisualStyleBackColor = true;
             // 
+            // _singleDocModeCheckBox
+            // 
+            this._singleDocModeCheckBox.AutoSize = true;
+            this._singleDocModeCheckBox.Location = new System.Drawing.Point(16, 248);
+            this._singleDocModeCheckBox.Name = "_singleDocModeCheckBox";
+            this._singleDocModeCheckBox.Size = new System.Drawing.Size(374, 17);
+            this._singleDocModeCheckBox.TabIndex = 18;
+            this._singleDocModeCheckBox.Text = "Single source document mode (verify only one source document at a time)";
+            this._singleDocModeCheckBox.UseVisualStyleBackColor = true;
+            // 
             // PaginationTaskSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(555, 331);
+            this.Controls.Add(this._singleDocModeCheckBox);
             this.Controls.Add(this._expectedPaginationAttributesCheckBox);
             this.Controls.Add(infoTip5);
             this.Controls.Add(this._expectedPaginationAttributesPathTagButton);
@@ -323,5 +335,6 @@
         private Utilities.Forms.PathTagsButton _expectedPaginationAttributesPathTagButton;
         private Utilities.Forms.BetterTextBox _expectedPaginationAttributesTextBox;
         private Utilities.Forms.BrowseButton _expectedPaginationAttributesBrowseButton;
+        private System.Windows.Forms.CheckBox _singleDocModeCheckBox;
     }
 }

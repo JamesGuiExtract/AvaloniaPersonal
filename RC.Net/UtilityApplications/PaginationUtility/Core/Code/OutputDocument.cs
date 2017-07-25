@@ -53,11 +53,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Initializes a new instance of the <see cref="OutputDocument"/> class.
         /// </summary>
         /// <param name="fileName">The filename that the document is to be saved as.</param>
-        public OutputDocument(string fileName)
+        /// <param name="AutoSelectForReprocess"><c>true</c> if it should be automatically
+        /// determined whether to return the document for reprocessing based upon pagination
+        /// changes made in the UI; otherwise, <c>false</c>.</param>
+        public OutputDocument(string fileName, bool autoSelectForReprocess = false)
         {
             try
             {
                 FileName = fileName;
+                AutoSelectForReprocess = autoSelectForReprocess;
             }
             catch (Exception ex)
             {
@@ -442,6 +446,51 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else
                 {
                     return DocumentData.Summary;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether it should be automatically determined whether to
+        /// return the document for reprocessing based upon pagination changes made in the UI.
+        /// </summary>
+        /// <value><c>true</c> reprocessing requirement should be automatically determined;
+        /// otherwise, <c>false</c>.
+        /// </value>
+        public bool AutoSelectForReprocess
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this document is to be returned for reprocessing.
+        /// </summary>
+        /// <value> <c>true</c> if the document is to be reprocessed; otherwise, <c>false</c>.
+        /// </value>
+        public bool SendForReprocessing
+        {
+            get
+            {
+                try
+                {
+                    if (DocumentData?.SendForReprocessing == true)
+                    {
+                        return true;
+                    }
+                    else if (AutoSelectForReprocess)
+                    {
+                        return
+                            !InOriginalForm &&
+                            PageControls.Any(c => !c.Deleted) &&
+                            (DocumentData?.DataSharedInVerification != true);
+                    }
+
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI44682");
                 }
             }
         }

@@ -104,12 +104,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             new Dictionary<string, Tuple<bool, PaginationDocumentData>>();
 
         /// <summary>
-        /// Indicates the <see cref="OutputDocument"/> whose <see cref="PaginationDocumentData"/>
-        /// is reflected in <see cref="DocumentDataPanel"/>.
-        /// </summary>
-        OutputDocument _documentWithDataInEdit;
-
-        /// <summary>
         /// Indicated a manually overridden value for <see cref="PendingChanges"/> or
         /// <see langword="null"/> if there is no manually overridden value
         /// (<see cref="PendingChanges"/> will return a calculated value).
@@ -231,6 +225,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<CommittingChangesEventArgs> CommittingChanges;
 
+        /// <summary>
+        /// Raised to indicate this panel is being re-initialized.
+        /// </summary>
+        public event EventHandler<EventArgs> PanelResetting;
+
+        /// <summary>
+        /// Raised to indicate the panel content is being reverted (either to original or suggested
+        /// pagination).
+        /// </summary>
+        public event EventHandler<EventArgs> RevertedChanges;
+
         #endregion Events
 
         #region Configuration Properties
@@ -279,11 +284,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <value><see langword="true"/> if the reprocessing indicator should be hidden; otherwise,
         /// <see langword="false"/>.
         /// </value>
-        public bool HideReprocessIndicator
+        [DefaultValue(true)]
+        public bool AutoSelectForReprocess
         {
             get;
             set;
-        }
+        } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance should cache images with the
@@ -386,6 +392,25 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI39596");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of proposed output documents displayed.
+        /// </summary>
+        public int OutputDocumentCount
+        {
+            get
+            {
+                try
+                {
+                    return _primaryPageLayoutControl.Documents
+                        .Count(doc => doc.PageControls.Any(page => !page.Deleted));
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI44683");
                 }
             }
         }
@@ -567,10 +592,35 @@ namespace Extract.UtilityApplications.PaginationUtility
             set;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this instance's data panel is open.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance's data panel is open; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool IsDataPanelOpen
+        {
+            get
+            {
+                try
+                {
+                    return DocumentDataPanel?.PanelControl
+                        .GetAncestors()
+                        .OfType<PaginationSeparator>()
+                        .FirstOrDefault()
+                            != null;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI44684");
+                }
+            }
+        }
+
         #endregion Runtime Properties
 
         #region Internal Properties
-        
+
         #endregion Internal Properties
 
         #region Methods
@@ -1294,6 +1344,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _primaryPageLayoutControl.Focus();
 
                 UpdateCommandStates();
+
+                OnRevertedChanges();
             }
             catch (Exception ex)
             {
@@ -1373,7 +1425,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 }
 
                                 // If the document's data is open for editing, close the panel.
-                                if (_documentWithDataInEdit == outputDocument)
+                                if (_primaryPageLayoutControl.DocumentInDataEdit == outputDocument)
                                 {
                                     CloseDataPanel(validateData: false);
                                 }
@@ -1447,6 +1499,32 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40150");
+            }
+        }
+
+        /// <summary>
+        /// Opens the data panel for the singly selected document or the first document.
+        /// </summary>
+        public void OpenDataPanel()
+        {
+            try
+            {
+                var selectedDocs = _primaryPageLayoutControl.PartiallySelectedDocuments;
+
+                var targetDocument = selectedDocs.Count() == 1
+                    ? selectedDocs.Single()
+                    : _primaryPageLayoutControl
+                        .Documents
+                        .FirstOrDefault();
+
+                if (targetDocument != _primaryPageLayoutControl.DocumentInDataEdit)
+                {
+                    targetDocument?.PaginationSeparator?.OpenDataPanel();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44685");
             }
         }
 
@@ -1792,7 +1870,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 string outputDocumentName = GenerateOutputDocumentName(originalDocName);
-                var outputDocument = new OutputDocument(outputDocumentName);
+                var outputDocument = new OutputDocument(outputDocumentName, AutoSelectForReprocess);
                 outputDocument.DocumentOutputting += HandleOutputDocument_DocumentOutputting;
                 outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
 
@@ -2357,13 +2435,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (!CloseDataPanel(validateData: false))
                     {
-                        _primaryPageLayoutControl.SelectDocument(_documentWithDataInEdit);
+                        _primaryPageLayoutControl.SelectDocument(_primaryPageLayoutControl.DocumentInDataEdit);
                         return;
                     }
 
                     // Data is not loaded into the panel until PaginationSeparator.OpenDataPanel
                     // so that the control handles are instantiated first.
-                    _documentWithDataInEdit = e.OutputDocument;
                     e.DocumentDataPanel = DocumentDataPanel;
                 }
             }
@@ -2510,7 +2587,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         void HandleDocumentDataPanel_PageLoadRequest(object sender, PageLoadRequestEventArgs e)
         {
             var pageToSelect =
-                (_documentWithDataInEdit?.PageControls ?? _primaryPageLayoutControl.PageControls)
+                (_primaryPageLayoutControl.DocumentInDataEdit?.PageControls ?? _primaryPageLayoutControl.PageControls)
                     .FirstOrDefault(c => e.PageNumber == c.Page.OriginalPageNumber &&
                         c.Page.OriginalDocumentName
                             .Equals(e.SourceDocName, StringComparison.OrdinalIgnoreCase));
@@ -2541,7 +2618,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_documentDataPanel != null &&
                     !_committingChanges && !_raisingCommittingChanges &&
                     _primaryPageLayoutControl.PrimarySelection != null &&
-                    _documentWithDataInEdit.PageControls.Contains(_primaryPageLayoutControl.PrimarySelection) &&
+                    _primaryPageLayoutControl.DocumentInDataEdit.PageControls.Contains(_primaryPageLayoutControl.PrimarySelection) &&
                         Control.MouseButtons == MouseButtons.None &&
                         Control.ModifierKeys == Keys.None)
                 {
@@ -2593,24 +2670,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Event Handlers
 
         #region Private Members
-
-        /// <summary>
-        /// Gets a value indicating whether this instance's data panel is open.
-        /// </summary>
-        /// <value><see langword="true"/> if this instance's data panel is open; otherwise,
-        /// <see langword="false"/>.
-        /// </value>
-        bool IsDataPanelOpen
-        {
-            get
-            {
-                return DocumentDataPanel?.PanelControl
-                    .GetAncestors()
-                    .OfType<PaginationSeparator>()
-                    .FirstOrDefault()
-                        != null;
-            }
-        }
 
         /// <summary>
         /// Gets a value indicating whether all documents are currently collapsed (pages hidden).
@@ -2683,6 +2742,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void ResetPrimaryPageLayoutControl()
         {
+            OnPanelResetting();
+
+            if (_selectAllToCommitCheckBox != null)
+            {
+                _selectAllToCommitCheckBox.Visible = CommitOnlySelection;
+            }
+
             if (_primaryPageLayoutControl != null)
             {
                 _primaryPageLayoutControl.StateChanged -= HandlePageLayoutControl_StateChanged;
@@ -2705,7 +2771,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.ExternalOutputOnly = true;
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
             _primaryPageLayoutControl.CommitOnlySelection = CommitOnlySelection;
-            _primaryPageLayoutControl.HideReprocessIndicator = HideReprocessIndicator;
             _primaryPageLayoutControl.LoadNextDocumentVisible = LoadNextDocumentVisible;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandlePrimaryPageLayoutControl_LoadNextDocumentRequest;
@@ -2816,7 +2881,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return true;
             }
 
-            var openData = IsDataPanelOpen ? _documentWithDataInEdit : null;
+            var openData = IsDataPanelOpen ? _primaryPageLayoutControl.DocumentInDataEdit : null;
             if (openData != null)
             {
                 if (!CloseDataPanel(validateData))
@@ -2873,15 +2938,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .FirstOrDefault();
                     if (separator != null)
                     {
-                        if (separator.CloseDataPanel(saveData: true, validateData: validateData))
-                        {
-                            _documentWithDataInEdit = null;
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                        return separator.CloseDataPanel(saveData: true, validateData: validateData);
                     }
                 }
             }
@@ -3155,11 +3212,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// the event data.</param>
         void OnDocumentDataRequest(DocumentDataRequestEventArgs eventArgs)
         {
-            var eventHandler = DocumentDataRequest;
-            if (eventHandler != null)
-            {
-                eventHandler(this, eventArgs);
-            }
+            DocumentDataRequest?.Invoke(this, eventArgs);
         }
 
         /// <summary>
@@ -3167,11 +3220,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void OnLoadNextDocument()
         {
-            var eventHandler = LoadNextDocument;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
+            LoadNextDocument?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
@@ -3181,11 +3230,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// use when raising the event.</param>
         void OnCreatingOutputDocument(CreatingOutputDocumentEventArgs eventArgs)
         {
-            var eventHandler = CreatingOutputDocument;
-            if (eventHandler != null)
-            {
-                eventHandler(this, eventArgs);
-            }
+            CreatingOutputDocument?.Invoke(this, eventArgs);
         }
 
         /// <summary>
@@ -3216,14 +3261,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             IEnumerable<string> disregardedPaginationSources,
             IEnumerable<KeyValuePair<string, PaginationDocumentData>> unmodifiedPaginationSources)
         {
-            var eventHandler = Paginated;
-            if (eventHandler != null)
-            {
-                eventHandler(this, 
-                    new PaginatedEventArgs(
-                        paginatedDocumentSources, disregardedPaginationSources,
-                        unmodifiedPaginationSources));
-            }
+            Paginated?.Invoke(this,
+                new PaginatedEventArgs(
+                    paginatedDocumentSources, disregardedPaginationSources,
+                    unmodifiedPaginationSources));
         }
 
         /// <summary>
@@ -3233,11 +3274,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void OnPaginationError(ExtractException ee)
         {
-            var eventHandler = PaginationError;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new ExtractExceptionEventArgs(ee));
-            }
+            PaginationError?.Invoke(this, new ExtractExceptionEventArgs(ee));
         }
 
         /// <summary>
@@ -3245,11 +3282,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void OnStateChanged()
         {
-            var eventHandler = StateChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
+            StateChanged?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
@@ -3276,6 +3309,22 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 _raisingCommittingChanges = false;
             }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="PanelResetting"/> event.
+        /// </summary>
+        void OnPanelResetting()
+        {
+            PanelResetting?.Invoke(this, new EventArgs());
+        }
+
+        /// <summary>
+        /// Raises the <see cref="RevertedChanges"/> event.
+        /// </summary>
+        void OnRevertedChanges()
+        {
+            RevertedChanges?.Invoke(this, new EventArgs());
         }
 
         #endregion Private Members

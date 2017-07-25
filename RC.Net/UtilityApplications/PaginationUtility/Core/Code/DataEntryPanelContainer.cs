@@ -383,7 +383,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                var documentData = new DataEntryPaginationDocumentData(attributes, sourceDocName);
+                var documentData = ActiveDataEntryPanel.GetDocumentData(attributes, sourceDocName);
                 UpdateDocumentStatus(documentData);
 
                 return documentData;
@@ -855,6 +855,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             ExtractException ee = null;
             bool dataModified = false;
             bool dataError = false;
+            bool? reprocess = false;
             string summary = null;
 
             try
@@ -901,6 +902,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         tempPanel.LoadData(tempData, forDisplay: false);
                         dataModified = tempPanel.UndoOperationAvailable;
+                        reprocess = tempData.SendForReprocessing;
                         if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)
                         {
                             dataError = (tempPanel.ActiveDataEntryPanel.DataValidity == DataValidity.Invalid);
@@ -941,6 +943,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         documentData.SetModified(dataModified);
                         documentData.SetDataError(dataError);
                         documentData.SetSummary(summary);
+                        documentData.SetSendForReprocessing(reprocess);
+                        documentData.SetInitialized();
                     }
                 }
                 finally
