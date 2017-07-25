@@ -88,6 +88,18 @@ namespace Extract.FileActionManager.FileProcessors
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the task should run in single source document mode.
+        /// </summary>
+        /// <value><c>true</c> if only every one source file should be loaded at once and applied at
+        /// once; otherwise, <c>false</c>.
+        /// </value>
+        bool SingleSourceDocumentMode
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
@@ -111,8 +123,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// Versions:
         /// 1. Initial version
         /// 2. Added OutputExpectedPaginationAttributesFiles and ExpectedPaginationAttributesOutputPath
+        /// 3. Added SingleSourceDocumentMode
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -194,7 +207,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Gets/sets the file path to output expected pagination attributes to
         /// </summary>
-        private string _expectedPaginationAttributesOutputPath;
+        private string _expectedPaginationAttributesOutputPath = _DEFAULT_EXPECTED_OUTPUT_PATH;
+
+        /// <summary>
+        /// The single source document mode
+        /// </summary>
+        bool _singleSourceDocumentMode;
 
         #endregion Fields
 
@@ -215,7 +233,6 @@ namespace Extract.FileActionManager.FileProcessors
                         _form = new VerificationForm<PaginationTaskForm>();
                     }
                 }
-                _expectedPaginationAttributesOutputPath = _DEFAULT_EXPECTED_OUTPUT_PATH;
             }
             catch (Exception ex)
             {
@@ -394,6 +411,24 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Gets/sets 
+        /// </summary>
+        public bool SingleSourceDocumentMode
+        {
+            get
+            {
+                return _singleSourceDocumentMode;
+            }
+            set
+            {
+                if (value != _singleSourceDocumentMode)
+                {
+                    _singleSourceDocumentMode = value;
+                    _dirty = true;
+                }
+            }
+        }
 
         #endregion Properties
 
@@ -435,6 +470,7 @@ namespace Extract.FileActionManager.FileProcessors
             DocumentDataPanelAssembly = task.DocumentDataPanelAssembly;
             OutputExpectedPaginationAttributesFiles = task.OutputExpectedPaginationAttributesFiles;
             ExpectedPaginationAttributesOutputPath = task.ExpectedPaginationAttributesOutputPath;
+            SingleSourceDocumentMode = task.SingleSourceDocumentMode;
 
             _dirty = true;
         }
@@ -765,6 +801,11 @@ namespace Extract.FileActionManager.FileProcessors
                         OutputExpectedPaginationAttributesFiles = reader.ReadBoolean();
                         ExpectedPaginationAttributesOutputPath = reader.ReadString();
                     }
+
+                    if (reader.Version >= 3)
+                    {
+                        SingleSourceDocumentMode = reader.ReadBoolean();
+                    }
                 }
 
                 // Freshly loaded object is not dirty
@@ -799,6 +840,7 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write(DocumentDataPanelAssembly);
                     writer.Write(OutputExpectedPaginationAttributesFiles);
                     writer.Write(ExpectedPaginationAttributesOutputPath);
+                    writer.Write(SingleSourceDocumentMode);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);

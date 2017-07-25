@@ -30,6 +30,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         HashSet<object> _references = new HashSet<object>();
 
         /// <summary>
+        /// Indicates whether the thumbnail has been loaded.
+        /// </summary>
+        bool _thumbnailLoaded;
+
+        /// <summary>
         /// The thumbnail <see cref="RasterImage"/> for this page.
         /// </summary>
         RasterImage _thumbnailImage;
@@ -169,6 +174,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                             // thread, assign the new thumbnail image before disposing of the old one.
                             RasterImage oldThumbnailImage = _thumbnailImage;
                             _thumbnailImage = value.Clone();
+                            if (ImageOrientation != 0)
+                            {
+                                ImageMethods.RotateImageByDegrees(_thumbnailImage, ImageOrientation);
+                            }
+
                             if (oldThumbnailImage != null)
                             {
                                 oldThumbnailImage.Dispose();
@@ -180,6 +190,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (thumbnailChanged)
                     {
+                        _thumbnailLoaded = true;
                         OnThumbnailChanged();
                     }
                 }
@@ -212,7 +223,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         lock (_lock)
                         {
-                            if (_thumbnailImage != null)
+                            if (_thumbnailLoaded && _thumbnailImage != null)
                             {
                                 ImageMethods.RotateImageByDegrees(_thumbnailImage,
                                     value - _imageOrientation);

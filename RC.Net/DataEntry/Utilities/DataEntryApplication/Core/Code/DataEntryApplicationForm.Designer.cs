@@ -333,7 +333,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationPanel.CommitOnlySelection = false;
             this._paginationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._paginationPanel.ExpectedPaginationAttributesPath = null;
-            this._paginationPanel.HideReprocessIndicator = false;
+            this._paginationPanel.AutoSelectForReprocess = true;
             this._paginationPanel.ImageViewer = null;
             this._paginationPanel.LoadNextDocumentVisible = false;
             this._paginationPanel.Location = new System.Drawing.Point(0, 0);

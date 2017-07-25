@@ -1,3 +1,4 @@
+using Extract;
 using Extract.Drawing;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -11,6 +12,8 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.Imaging
 {
@@ -310,7 +313,7 @@ namespace Extract.Imaging
                 throw ee;
             }
         }
-        
+
         /// <summary>
         /// Generates a high quality thumbnail image that is the specified scaling percentage
         /// of the original image.
@@ -464,11 +467,11 @@ namespace Extract.Imaging
                     _OBJECT_NAME);
 
                 // Clip the bounds within the bounds of the image
-                bounds.Intersect(new Rectangle(new Point(0,0), new Size(source.Width, source.Height)));
+                bounds.Intersect(new Rectangle(new Point(0, 0), new Size(source.Width, source.Height)));
 
                 // Source point is the top left of the rotated rectangle
                 Point sourcePoint = bounds.Location;
-                bounds.Location = new Point(0,0);
+                bounds.Location = new Point(0, 0);
 
                 // Create the destination image and set matching resolution
                 subImage = new RasterImage(RasterMemoryFlags.Conventional, bounds.Width,
@@ -566,7 +569,7 @@ namespace Extract.Imaging
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "3#")]
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "4#")]
-        public static RasterImage ExtractZoneFromPage(RasterZone zone, RasterImage page, 
+        public static RasterImage ExtractZoneFromPage(RasterZone zone, RasterImage page,
             out int orientation, out double skew, out Size offset)
         {
             RasterImage rasterZoneImage = null;
@@ -607,8 +610,8 @@ namespace Extract.Imaging
                 // important that it is the same size as the bounding rectangle since the raster zone
                 // is centered in the bounding rectangle and we will be rotating the destination 
                 // raster zone about it's center.
-                rasterZoneImage = new RasterImage(RasterMemoryFlags.Conventional, 
-                    boundingRectangle.Width, boundingRectangle.Height, page.BitsPerPixel, 
+                rasterZoneImage = new RasterImage(RasterMemoryFlags.Conventional,
+                    boundingRectangle.Width, boundingRectangle.Height, page.BitsPerPixel,
                     page.Order, page.ViewPerspective, page.GetPalette(), IntPtr.Zero, 0);
                 rasterZoneImage.OriginalFormat = page.OriginalFormat;
 
@@ -623,7 +626,7 @@ namespace Extract.Imaging
                 adjustedBoundingRectangle.Intersect(pageArea);
 
                 // Make note of the image location of the adjusted rectangle in the source image.
-                Point sourcePoint = 
+                Point sourcePoint =
                     new Point(adjustedBoundingRectangle.Left, adjustedBoundingRectangle.Top);
 
                 // Move the adjusted rectangle so that it indicates where the contents of the 
@@ -634,7 +637,7 @@ namespace Extract.Imaging
                 adjustedBoundingRectangle.Offset(-boundingRectangle.Left, -boundingRectangle.Top);
 
                 // Copy the content from the source image into the raster zone image.
-                CombineFastCommand combineCommand = new CombineFastCommand(rasterZoneImage, 
+                CombineFastCommand combineCommand = new CombineFastCommand(rasterZoneImage,
                     adjustedBoundingRectangle.AsLeadRect(), sourcePoint.AsLeadPoint(),
                     CombineFastCommandFlags.SourceCopy);
                 combineCommand.Run(page);
@@ -653,7 +656,7 @@ namespace Extract.Imaging
                 // lost from the source image during transfer and rotation, we now need to calculate
                 // how much content to clip from the edges of the raster zone image to leave us
                 // with only the content in the raster zone itself.
-                int finalImageAreaWidth = (int) GeometryMethods.Distance(endPoint, startPoint);
+                int finalImageAreaWidth = (int)GeometryMethods.Distance(endPoint, startPoint);
                 int xOffset = (rasterZoneImage.Width - finalImageAreaWidth) / 2;
                 int yOffset = (rasterZoneImage.Height - height) / 2;
 
@@ -664,7 +667,7 @@ namespace Extract.Imaging
                 CropCommand cropCommand = new CropCommand();
                 cropCommand.Rectangle = finalImageArea.AsLeadRect();
                 cropCommand.Run(rasterZoneImage);
-                
+
                 // To allow coordinates from the resulting image to be translated into the source
                 // image, calculate the transform needed to move the center of the resulting raster 
                 // image to the top left of the raster zone in the source image.
@@ -950,7 +953,7 @@ namespace Extract.Imaging
                 }
 
                 int exitCode = SystemMethods.RunExtractExecutable(_IMAGE_FORMAT_CONVERTER, arguments);
-                
+
                 // [DotNetRCAndUtils:849]
                 // If _IMAGE_FORMAT_CONVERTER does not return 0, the conversion did not succeed
                 // (likely crashed).
@@ -1283,6 +1286,79 @@ namespace Extract.Imaging
             }
 
             conversionCommand.Run(rasterImage);
+        }
+
+        /// <summary>
+        /// Gets the SpatialPageInfo map from the specified file's OCR data.
+        /// </summary>
+        /// <param name="filename">The filename for which SpatialPageInfos are needed.</param>
+        /// <returns>The SpatialPageInfo map from the specified file's OCR data.</returns>
+        [CLSCompliant(false)]
+        public static LongToObjectMap GetSpatialPageInfos(string fileName)
+        {
+            try
+            {
+                var ussFileName = fileName + ".uss";
+                if (File.Exists(ussFileName))
+                {
+                    var spatialString = new SpatialString();
+                    spatialString.LoadFrom(ussFileName, false);
+
+                    if (spatialString.HasSpatialInfo())
+                    {
+                        return spatialString.SpatialPageInfos;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44679");
+            }
+        }
+
+        /// <summary>
+        /// Gets the page rotation for the specified <see paramref="pageNumber"/> from the specified
+        /// <paramref name="spatialPageInfos"/>.
+        /// </summary>
+        /// <param name="spatialPageInfos">The spatial page infos.</param>
+        /// <param name="pageNumber">The page number.</param>
+        /// <returns>The page rotation for the specified page or <c>null</c> if there is no data for
+        /// the specified page.</returns>
+        [CLSCompliant(false)]
+        public static int? GetPageRotation(ILongToObjectMap spatialPageInfos, int pageNumber)
+        {
+            try
+            {
+                if (spatialPageInfos != null && spatialPageInfos.Contains(pageNumber))
+                {
+                    var pageInfo = (SpatialPageInfo)spatialPageInfos.GetValue(pageNumber);
+                    switch (pageInfo.Orientation)
+                    {
+                        case EOrientation.kRotNone:
+                            return 0;
+
+                        case EOrientation.kRotLeft:
+                            return 270;
+
+                        case EOrientation.kRotDown:
+                            return 180;
+
+                        case EOrientation.kRotRight:
+                            return 90;
+
+                        default:
+                            return null;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44680");
+            }
         }
     }
 

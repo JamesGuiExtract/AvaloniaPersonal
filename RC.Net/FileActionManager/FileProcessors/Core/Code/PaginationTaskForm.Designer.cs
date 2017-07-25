@@ -180,7 +180,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.CommitOnlySelection = true;
             this._paginationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._paginationPanel.ExpectedPaginationAttributesPath = null;
-            this._paginationPanel.HideReprocessIndicator = true;
+            this._paginationPanel.AutoSelectForReprocess = false;
             this._paginationPanel.ImageViewer = null;
             this._paginationPanel.LoadNextDocumentVisible = true;
             this._paginationPanel.Location = new System.Drawing.Point(0, 0);
@@ -198,6 +198,8 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.PaginationError += new System.EventHandler<Extract.ExtractExceptionEventArgs>(this.HandlePaginationPanel_PaginationError);
             this._paginationPanel.StateChanged += new System.EventHandler<System.EventArgs>(this.HandlePaginationPanel_StateChanged);
             this._paginationPanel.CommittingChanges += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CommittingChangesEventArgs>(this.HandlePaginationPanel_CommittingChanges);
+            this._paginationPanel.PanelResetting += new System.EventHandler<System.EventArgs>(HandlePaginationPanel_PanelResetting);
+            this._paginationPanel.RevertedChanges += new System.EventHandler<System.EventArgs>(HandlePaginationPanel_RevertedChanges);
             // 
             // _imageViewer
             // 

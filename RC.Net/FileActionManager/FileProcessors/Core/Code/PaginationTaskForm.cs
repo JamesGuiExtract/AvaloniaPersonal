@@ -448,7 +448,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             get
             {
-                return AutoZoomMode.NoZoom;             
+                return AutoZoomMode.NoZoom;
             }
         }
 
@@ -766,6 +766,56 @@ namespace Extract.FileActionManager.FileProcessors
         #region Event Handlers
 
         /// <summary>
+        /// Handles the <see cref="PaginationPanel.PanelResetting"/> event of the
+        /// <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandlePaginationPanel_PanelResetting(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_settings.SingleSourceDocumentMode)
+                {
+                    _paginationPanel.CommitOnlySelection = false;
+                    _paginationPanel.LoadNextDocumentVisible = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI44675");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationPanel.RevertedChanges"/> event of the
+        /// <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandlePaginationPanel_RevertedChanges(object sender, EventArgs e)
+        {
+            try
+            {
+                // SingleSourceDocumentMode should auto-open the DEP if there is no suggested pagination
+                if (_settings.SingleSourceDocumentMode)
+                { 
+                    _paginationPanel.SafeBeginInvoke("ELI44676", () =>
+                    {
+                        if (!_paginationPanel.IsDataPanelOpen && _paginationPanel.OutputDocumentCount == 1)
+                        {
+                            _paginationPanel.OpenDataPanel();
+                        }
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI44677");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Application.Idle"/> event.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -790,6 +840,13 @@ namespace Extract.FileActionManager.FileProcessors
                                     : _lastDocumentPosition);
                             _lastDocumentPosition = -1;
                         });
+                    }
+
+                    // SingleSourceDocumentMode should auto-open the DEP if there is no suggested pagination
+                    if (_settings.SingleSourceDocumentMode && !_paginationPanel.IsDataPanelOpen &&
+                        _paginationPanel.OutputDocumentCount == 1)
+                    {
+                        _paginationPanel.OpenDataPanel();
                     }
 
                     // Without this call, after committing the top document separator bar is not updating correctly after commit.
@@ -870,8 +927,8 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                string dataSourceDocName = 
-                    (e.SourceDocNames.Count() == 1) 
+                string dataSourceDocName =
+                    (e.SourceDocNames.Count() == 1)
                         ? e.SourceDocNames.Single()
                         : null;
                 e.DocumentData = GetAsPaginationDocumentData(new IUnknownVector(), dataSourceDocName);
@@ -988,7 +1045,7 @@ namespace Extract.FileActionManager.FileProcessors
                     destPages.Add(pageCounter++);
                 }
 
-                var newSpatialPageInfos = PaginationPanel.CreateUSSForPaginatedDocument(e.OutputFileName, 
+                var newSpatialPageInfos = PaginationPanel.CreateUSSForPaginatedDocument(e.OutputFileName,
                                                                                         pageMap,
                                                                                         e.RotatedPages);
 
@@ -1258,7 +1315,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _fileID = fileID;
                 _actionID = actionID;
                 _fileProcessingDB = fileProcessingDB;
-                
+
                 _fileTaskSessionID = _paginationPanel.FileTaskSessionID = null;
                 StartFileTaskSession();
 
@@ -1292,17 +1349,20 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                // This method must be run in the UI thread since it is loading attributes for
-                // use in the UI thread.
-                if (InvokeRequired)
+                if (!_settings.SingleSourceDocumentMode)
                 {
-                    this.Invoke((MethodInvoker)(() =>
-                        Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB)));
-                    return;
-                }
+                    // This method must be run in the UI thread since it is loading attributes for
+                    // use in the UI thread.
+                    if (InvokeRequired)
+                    {
+                        this.Invoke((MethodInvoker)(() =>
+                            Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB)));
+                        return;
+                    }
 
-                LoadDocumentForPagination(fileID, fileName, false);
-                _documentSelectionPending = true;
+                    LoadDocumentForPagination(fileID, fileName, false);
+                    _documentSelectionPending = true;
+                }
             }
             catch (Exception ex)
             {
@@ -1448,7 +1508,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                _fileTaskSessionID = 
+                _fileTaskSessionID =
                     _paginationPanel.FileTaskSessionID = FileProcessingDB.StartFileTaskSession(
                         _PAGINATION_TASK_GUID, _fileID, _actionID);
             }
@@ -1669,6 +1729,20 @@ namespace Extract.FileActionManager.FileProcessors
             }
             finally
             {
+                try
+                {
+                    // If in SingleSourceDocumentMode, the apply button should always be enabled whenever
+                    // a document is loaded (rather than only being enabled when a document is selected)
+                    if (_settings.SingleSourceDocumentMode && _paginationPanel.SourceDocuments.Any())
+                    {
+                        _paginationPanel.PendingChanges = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractLog("ELI44678");
+                }
+
                 _paginationPanel.SuspendUIUpdates = false;
             }
         }

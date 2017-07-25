@@ -68,12 +68,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _showSelectionCheckBox;
 
-        /// <summary>
-        /// Indicates whether the indicator to show whether documents will be
-        /// queued for reprocessing should be hidden.
-        /// </summary>
-        bool _hideReprocessIndicator;
-
         #endregion Fields
 
         #region Constructors
@@ -83,9 +77,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="showSelectionCheckBox"><see langword="true"/> if the selection check box
         /// should be visible; otherwise, <see langword="false"/>.</param>
-        /// <param name="hideReprocessIndicator">indicating whether the indicator to show whether documents will be
-        /// queued for reprocessing should be hidden.</param>
-        public PaginationSeparator(bool showSelectionCheckBox, bool hideReprocessIndicator)
+        public PaginationSeparator(bool showSelectionCheckBox)
             : base()
         {
             try
@@ -98,12 +90,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // If the selection check box is not to be displayed, allow the checkbox column
                     // to collapse.
                     _tableLayoutPanel.ColumnStyles[2].Width = 0;
-                }
-                _hideReprocessIndicator = hideReprocessIndicator;
-                if (_hideReprocessIndicator)
-                {
-                    int column = _tableLayoutPanel.GetCellPosition(_reprocessDocumentPictureBox).Column;
-                    _tableLayoutPanel.ColumnStyles[column].Width = 0;
                 }
                 
                 _toolTip.SetToolTip(_newDocumentGlyph, "This is a new document that will be created");
@@ -137,7 +123,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_uniformSize == null)
                     {
-                        using (var separator = new PaginationSeparator(false, false))
+                        using (var separator = new PaginationSeparator(false))
                         {
                             _uniformSize = new Size(-1, separator.Height);
                         }
@@ -580,9 +566,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                UpdateControls();
-
-                base.OnInvalidated(e);
+                // If the controls cannot be updated at this time, no need to invalidate (optimization).
+                if (UpdateControls())
+                {
+                    base.OnInvalidated(e);
+                }
             }
             catch (Exception ex)
             {
@@ -777,11 +765,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Updates UI indications to reflect the current state of the associated document.
         /// </summary>
-        void UpdateControls()
+        bool UpdateControls()
         {
+            bool doLayout = false;
             if (Document != null)
             {
-                bool doLayout = false;
                 if (Document.PaginationSeparator != this)
                 {
                     Document.PaginationSeparator = this;
@@ -790,7 +778,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     doLayout = true;
                     UpdateRequired = true;
                 }
+            }
 
+            if (doLayout || Document?.DocumentData?.Initialized == true)
+            {
                 _collapseDocumentButton.Visible = true;
                 _selectedCheckBox.Visible = _showSelectionCheckBox;
                 _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
@@ -811,18 +802,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 _newDocumentGlyph.Visible = !Document.InSourceDocForm;
                 _editedPaginationGlyph.Visible = !Document.InOriginalForm;
-                bool dataSharedInVerification = Document.InOriginalForm &&
-                    (Document.DocumentData != null && Document.DocumentData.DataSharedInVerification);
-                bool? sendForReprocessingOverride = (Document.DocumentData == null)
-                    ? null
-                    : Document.DocumentData.SendForReprocessing;
-                _reprocessDocumentPictureBox.Visible =
-                    !_hideReprocessIndicator &&
-                    !dataSharedInVerification &&
-                    Document.PageControls.Any(c => !c.Deleted) &&
-                    (sendForReprocessingOverride.HasValue
-                        ? Document.DocumentData.SendForReprocessing.Value
-                        : !Document.InOriginalForm);
+                _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing;
                 _editedDataPictureBox.Visible = Document.DataModified;
                 _dataErrorPictureBox.Visible = Document.DataError;
 
@@ -831,7 +811,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     PerformLayout();
                 }
 
-                return;
+                return true;
             }
             else
             {
@@ -845,6 +825,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _reprocessDocumentPictureBox.Visible = false;
                 _editedDataPictureBox.Visible = false;
                 _dataErrorPictureBox.Visible = false;
+
+                return false;
             }
         }
 
