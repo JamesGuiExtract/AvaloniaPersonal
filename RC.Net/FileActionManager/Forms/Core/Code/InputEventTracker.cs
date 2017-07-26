@@ -237,6 +237,22 @@ namespace Extract.FileActionManager.Forms
 
         #endregion Constructors
 
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets whether this instance is actively tracking events.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if active; otherwise, <c>false</c>.
+        /// </value>
+        public bool Active
+        {
+            get;
+            set;
+        } = true;
+
+        #endregion Properties
+
         #region Methods
 
         /// <summary>
@@ -296,7 +312,10 @@ namespace Extract.FileActionManager.Forms
         /// </summary>
         public void NotifyOfInputEvent()
         {
-            _inputCount++;
+            if (_trackEvents && Active)
+            {
+                _inputCount++;
+            }
         }
 
         /// <summary>
@@ -473,7 +492,7 @@ namespace Extract.FileActionManager.Forms
             try
             {
                 // Only check the message if event tracking is on
-                if (_trackEvents)
+                if (_trackEvents && Active)
                 {
                     switch (message.Msg)
                     {

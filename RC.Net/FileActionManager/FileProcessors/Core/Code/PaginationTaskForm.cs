@@ -172,6 +172,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         bool _documentSelectionPending = true;
 
+        /// <summary>
+        /// Tracks user input in the file processing database.
+        /// </summary>
+        InputEventTracker _inputEventTracker;
+
         #endregion Fields
 
         #region Events
@@ -731,6 +736,11 @@ namespace Extract.FileActionManager.FileProcessors
                     _paginationPanel?.CloseDataPanel(validateData: false);
 
                     // Release managed resources
+                    if (_inputEventTracker != null)
+                    {
+                        _inputEventTracker.Dispose();
+                        _inputEventTracker = null;
+                    }
                     if (components != null)
                     {
                         components.Dispose();
@@ -1319,6 +1329,13 @@ namespace Extract.FileActionManager.FileProcessors
                 _fileTaskSessionID = _paginationPanel.FileTaskSessionID = null;
                 StartFileTaskSession();
 
+                if (_inputEventTracker == null)
+                {
+                    _inputEventTracker = new InputEventTracker(fileProcessingDB, actionID);
+                    _inputEventTracker.RegisterControl(this);
+                }
+                _inputEventTracker.Active = true;
+
                 if (!Focused)
                 {
                     FormsMethods.FlashWindow(this, true, true);
@@ -1595,6 +1612,12 @@ namespace Extract.FileActionManager.FileProcessors
                     EActionStatus oldStatus;
                     FileProcessingDB.SetStatusForFile(sourceFileID,
                         targetAction, -1, EActionStatus.kActionPending, false, true, out oldStatus);
+                }
+
+                if (_paginationPanel.OutputDocumentCount == 0)
+                {
+                    // Don't count input when a document is not open.
+                    _inputEventTracker.Active = false;
                 }
             }
 
