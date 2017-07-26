@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
+using UCLID_COMUTILSLib;
 
 namespace Extract.AttributeFinder
 {
@@ -853,6 +854,11 @@ namespace Extract.AttributeFinder
                 }
                 return false;
             }
+        }
+
+        internal IEnumerable<string> ComputeEncodingsFromAttributesTrainingData(SpatialString[] spatialStrings, IUnknownVector[] labeledCandidateAttributes)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion Private Classes

@@ -834,6 +834,60 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Uses the training data to automatically configure the <see cref="AutoBagOfWords"/> and
+        /// <see cref="AttributeFeatureVectorizers"/> collection so that feature vectors can be
+        /// generated with this instance.
+        /// </summary>
+        /// <param name="ussFilePaths">The paths to the USS files to be used to configure this object</param>
+        /// <param name="inputVOAFilePaths">The paths to the proto-feature VOA files to be used to
+        /// configure this object</param>
+        /// <param name="answersOrAnswerFiles">The predictions for each example (if <see cref="MachineUsage"/> is
+        /// <see cref="LearningMachineUsage.DocumentCategorization"/>) or the paths to VOA files of predictions
+        /// (if <see cref="MachineUsage"/> is <see cref="LearningMachineUsage.Pagination"/></param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        public void ComputeEncodings(SpatialString[] spatialStrings, IUnknownVector[] inputVoas, string[] answers)
+        {
+            try
+            {
+                // Clear results of any previously computed encodings
+                Clear();
+
+                if (MachineUsage == LearningMachineUsage.DocumentCategorization)
+                {
+                    ComputeDocumentEncodings(spatialStrings, inputVoas, answers);
+                }
+                else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
+                {
+                    ComputeAttributesEncodings(spatialStrings, inputVoas);
+                }
+                else
+                {
+                    throw new ExtractException("ELI44711", "Unsupported LearningMachineUsage: " + MachineUsage.ToString());
+                }
+                ExtractException.Assert("ELI44712", "Unable to successfully compute encodings", AreEncodingsComputed);
+
+                foreach(var vectorizer in AttributeFeatureVectorizers)
+                {
+                    vectorizer.LimitToTopTerms(AttributeVectorizerMaxDiscreteTermsFeatures);
+                }
+            }
+            catch (Exception e)
+            {
+                // Clear any partially computed encodings
+                try
+                {
+                    Clear();
+                }
+                catch (ExtractException e2)
+                {
+                    e2.Log();
+                }
+                throw e.AsExtract("ELI44713");
+            }
+        }
+
+        /// <summary>
         /// Gets enumerations of feature vectors and answer codes for enumerations of input files
         /// </summary>
         /// <param name="ussFilePaths">The paths to the USS files to be used to generate the feature vectors</param>
@@ -950,6 +1004,138 @@ namespace Extract.AttributeFinder
             {
                 throw e.AsExtract("ELI39544");
             }
+        }
+
+        public (double[][] featureVector, int[] answers) GetFeatureVectorAndAnswerCollections
+            (SpatialString[] spatialStrings, IUnknownVector[] inputVoas, string[] answers, bool updateAnswerCodes)
+        {
+            try
+            {
+                ExtractException.Assert("ELI44714", "Encodings have not been computed", AreEncodingsComputed);
+
+                // Null or empty VOA collection is OK. Set to null to simplify code
+                if (inputVoas != null && inputVoas.Length == 0)
+                {
+                    inputVoas = null;
+                }
+
+                if ( inputVoas != null && inputVoas.Length != spatialStrings.Length
+                    || answers != null && answers.Length != spatialStrings.Length)
+                {
+                    throw new ExtractException("ELI44715", "Arguments are of different lengths");
+                }
+
+                if (MachineUsage == LearningMachineUsage.DocumentCategorization)
+                {
+                    return GetDocumentFeatureVectorAndAnswerCollection(spatialStrings, inputVoas, answers, updateAnswerCodes);
+                }
+                else if (MachineUsage == LearningMachineUsage.Pagination)
+                {
+                    throw new ExtractException("ELI44716", "Pagination is not supported for this method");
+                }
+                else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
+                {
+                    var results = GetAttributesFeatureVectorAndAnswerCollection(spatialStrings, inputVoas);
+
+                    double[][] featureVectors = new double[results.Length][];
+                    int[] answerCodes = new int[results.Length];
+                    for (int i = 0; i < results.Length; i++)
+                    {
+                        featureVectors[i] = results[i].Item1;
+                        answerCodes[i] = results[i].Item2;
+                    }
+                    return (featureVectors, answerCodes);
+                }
+                else
+                {
+                    throw new ExtractException("ELI40372", "Unsupported LearningMachineUsage: " + MachineUsage.ToString());
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39544");
+            }
+        }
+
+        private Tuple<double[], int>[]  GetAttributesFeatureVectorAndAnswerCollection(SpatialString[] spatialStrings, IUnknownVector[] inputVOAs)
+        {
+            var results = new Tuple<double[], int>[spatialStrings.Length][];
+            for(int i = 0; i < spatialStrings.Length; i++)
+            {
+                var attributes = inputVOAs[i];
+
+                var answerCodes = new List<int>(attributes.Size());
+                var filteredAttributes = new List<ComAttribute>(attributes.Size());
+                foreach(var attribute in attributes.ToIEnumerable<ComAttribute>())
+                {
+                    var categoryAttributes =
+                        AttributeMethods.GetAttributesByName(attribute.SubAttributes, CategoryAttributeName);
+
+                    int countOfCategoryAttributes = categoryAttributes.Count();
+                    ExtractException.Assert("ELI44717", "There should be zero or one category attribute",
+                        countOfCategoryAttributes <= 1,
+                        "Candidate attribute name", attribute.Name,
+                        "Category attribute name", CategoryAttributeName,
+                        "Count of category attributes", countOfCategoryAttributes);
+
+                    // Not a candidate attribute
+                    if (countOfCategoryAttributes == 0)
+                    {
+                        continue;
+                    }
+
+                    string categoryName = categoryAttributes.First().Value.String;
+                    int code;
+                    if (!AnswerNameToCode.TryGetValue(categoryName, out code))
+                    {
+                        var ex = new ExtractException("ELI44718",
+                            "Unknown attribute category/label encountered, treating as if unlabeled (as if empty type)");
+                        ex.AddDebugData("Unknown category name", categoryName, false);
+                        ex.Log();
+                        code = UnknownOrNegativeCategoryCode;
+                    }
+                    filteredAttributes.Add(attribute);
+                    answerCodes.Add(code);
+                }
+
+                List<double[]> featureVectors = GetAttributesFeatureVectors(spatialStrings[i], filteredAttributes).ToList();
+
+                results[i] = new Tuple<double[], int>[featureVectors.Count];
+                for (int j = 0; j < featureVectors.Count; j++)
+                {
+                    results[i][j] = (Tuple.Create(featureVectors[j], answerCodes[j]));
+                }
+            }
+
+            return results.SelectMany(a => a).ToArray();
+        }
+
+        private (double[][] featureVector, int[] answers) GetDocumentFeatureVectorAndAnswerCollection(SpatialString[] spatialStrings, IUnknownVector[] inputVOAs, string[] answers, bool updateAnswerCodes)
+        {
+            // Initialize answer code mappings if updating answers (true if training the classifier)
+            if (updateAnswerCodes)
+            {
+                InitializeAnswerCodeMappings(answers, NegativeClassName);
+            }
+
+            double[][] featureVectors = new double[spatialStrings.Length][];
+            int[] answerCodes = new int[spatialStrings.Length];
+            for(int i = 0; i < spatialStrings.Length; i++)
+            {
+                string answer = answers[i];
+                double[] featureVector = GetDocumentFeatureVector(spatialStrings[i], inputVOAs[i]);
+
+                int answerCode;
+                if (!AnswerNameToCode.TryGetValue(answer, out answerCode))
+                {
+                    answerCode = UnknownOrNegativeCategoryCode;
+                }
+
+                featureVectors[i] = featureVector;
+                answerCodes[i] = answerCode;
+            }
+
+            return (featureVectors, answerCodes);
         }
 
         /// <summary>
@@ -1182,21 +1368,7 @@ namespace Extract.AttributeFinder
             {
                 var attributes = _afUtility.Value.GetAttributesFromFile(attributesFilePath);
                 attributes.ReportMemoryUsage();
-                var filteredAttributes = attributes
-                    .ToIEnumerable<ComAttribute>()
-                    .Select(attribute =>
-                    {
-                        string category = AttributeMethods
-                            .GetAttributesByName(attribute.SubAttributes, CategoryAttributeName)
-                            .FirstOrDefault()?.Value.String;
-                        return Tuple.Create(category, attribute);
-                    })
-                    .Where(t => t.Item1 != null);
-
-                return filteredAttributes
-                    .Select(categoryAttributePair =>
-                        Tuple.Create(categoryAttributePair.Item1,
-                        GetFilteredMapOfNamesToValues(categoryAttributePair.Item2.SubAttributes)));
+                return GetAttributesProtoFeatures(attributes);
             }
             catch (Exception e)
             {
@@ -1204,6 +1376,26 @@ namespace Extract.AttributeFinder
                 ue.AddDebugData("Attributes file path", attributesFilePath, false);
                 throw ue;
             }
+        }
+
+        private IEnumerable<Tuple<string, NameToProtoFeaturesMap>>  GetAttributesProtoFeatures(IUnknownVector attributes)
+        {
+            attributes.ReportMemoryUsage();
+            var filteredAttributes = attributes
+                .ToIEnumerable<ComAttribute>()
+                .Select(attribute =>
+                {
+                    string category = AttributeMethods
+                        .GetAttributesByName(attribute.SubAttributes, CategoryAttributeName)
+                        .FirstOrDefault()?.Value.String;
+                    return Tuple.Create(category, attribute);
+                })
+                .Where(t => t.Item1 != null);
+
+            return filteredAttributes
+                .Select(categoryAttributePair =>
+                    Tuple.Create(categoryAttributePair.Item1,
+                    GetFilteredMapOfNamesToValues(categoryAttributePair.Item2.SubAttributes)));
         }
 
         /// <summary>
@@ -1479,7 +1671,7 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Builds a collection of feature vector and answer code tuples. Assumes that this
-        /// object has been configured with <see cref="ComputeDocumentEncodings"/>
+        /// object has been configured with <see cref="ComputePaginationEncodings"/>
         /// </summary>
         /// <param name="ussFilePaths">The uss paths of each input file</param>
         /// <param name="inputVOAFilePaths">The input VOA paths corresponding to each uss file</param>
@@ -1896,6 +2088,91 @@ namespace Extract.AttributeFinder
             InitializeAnswerCodeMappings(answers, NegativeClassName);
         }
 
+        private void ComputeDocumentEncodings(SpatialString[] spatialStrings, IUnknownVector[] inputVOAs, string[] answers)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ComputeAttributesEncodings(SpatialString[] spatialStrings, IUnknownVector[] labeledCandidateAttributes)
+        {
+            // Configure SpatialStringFeatureVectorizer
+            List<string> answers = null;
+            if (AutoBagOfWords != null)
+            {
+                answers = AutoBagOfWords.ComputeEncodingsFromAttributesTrainingData
+                    (spatialStrings, labeledCandidateAttributes)
+                    .ToList();
+            }
+            else
+            {
+                answers = labeledCandidateAttributes
+                    .SelectMany(voa =>
+                    {
+                        var labels = CollectLabelsFromLabeledCandidateAttributes(voa);
+                        return labels;
+                    })
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+            }
+
+            // Configure AttributeFeatureVectorizer collection
+            IEnumerable<Tuple<string, NameToProtoFeaturesMap>> categoryAndProtoFeaturesCollection =
+                labeledCandidateAttributes.SelectMany(GetAttributesProtoFeatures);
+
+            Dictionary<string, AttributeFeatureVectorizer> vectorizerMap
+                = new Dictionary<string, AttributeFeatureVectorizer>(StringComparer.OrdinalIgnoreCase);
+
+            // Count each attribute as a separate document for purposes of TF*IDF score
+            int exampleNumber = 0;
+            foreach (var labeledExample in categoryAndProtoFeaturesCollection)
+            {
+                ++exampleNumber;
+                var category = labeledExample.Item1;
+                var example = labeledExample.Item2;
+
+                foreach (var group in example)
+                {
+                    string name = group.Key;
+                    var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
+                    vectorizer.ComputeEncodingsFromTrainingData(
+                        protoFeatures: group.Value,
+                        category: category,
+                        docName: exampleNumber.ToString(CultureInfo.InvariantCulture));
+                }
+            }
+            AttributeFeatureVectorizers = vectorizerMap.Values;
+
+            // Add category names and codes
+            InitializeAnswerCodeMappings(answers, NegativeClassName);
+        }
+
+        static internal IEnumerable<string> CollectLabelsFromLabeledCandidateAttributes(IUnknownVector attributes)
+        {
+            return attributes
+                .ToIEnumerable<ComAttribute>()
+                .Select(attr =>
+                {
+                    var categoryAttributes =
+                        AttributeMethods.GetAttributesByName(attr.SubAttributes, CategoryAttributeName);
+
+                    int countOfCategoryAttributes = categoryAttributes.Count();
+                    ExtractException.Assert("ELI41416", "There should be zero or one category attribute",
+                        countOfCategoryAttributes <= 1,
+                        "Candidate attribute name", attr.Name,
+                        "Category attribute name", CategoryAttributeName,
+                        "Count of category attributes", countOfCategoryAttributes);
+
+                    // Not a candidate attribute
+                    if (countOfCategoryAttributes == 0)
+                    {
+                        return null;
+                    }
+
+                    return categoryAttributes.First().Value.String;
+                })
+                .Where(a => a != null);
+        }
+
         /// <summary>
         /// Collects the labels (types) from a candidate attributes file
         /// </summary>
@@ -1907,30 +2184,7 @@ namespace Extract.AttributeFinder
             {
                 var attributes = _afUtility.Value.GetAttributesFromFile(attributesFilePath);
                 attributes.ReportMemoryUsage();
-                return attributes
-                    .ToIEnumerable<ComAttribute>()
-                    .Select(attr =>
-                    {
-                        var categoryAttributes =
-                            AttributeMethods.GetAttributesByName(attr.SubAttributes, CategoryAttributeName);
-
-                        int countOfCategoryAttributes = categoryAttributes.Count();
-                        ExtractException.Assert("ELI41416", "There should be zero or one category attribute",
-                            countOfCategoryAttributes <= 1,
-                            "VOA file", attributesFilePath,
-                            "Candidate attribute name", attr.Name,
-                            "Category attribute name", CategoryAttributeName,
-                            "Count of category attributes", countOfCategoryAttributes);
-
-                        // Not a candidate attribute
-                        if (countOfCategoryAttributes == 0)
-                        {
-                            return null;
-                        }
-
-                        return categoryAttributes.First().Value.String;
-                    })
-                    .Where(a => a != null);
+                return CollectLabelsFromLabeledCandidateAttributes(attributes);
             }
             catch (Exception e)
             {

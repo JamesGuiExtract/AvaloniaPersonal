@@ -70,4 +70,9 @@ namespace Extract.AttributeFinder
         /// <param name="writer">The <see cref="System.CodeDom.Compiler.IndentedTextWriter"/> to use</param>
         void PrettyPrint(System.CodeDom.Compiler.IndentedTextWriter writer);
     }
+
+    public interface IIncrementallyTrainableClassifier
+    {
+        void TrainClassifier(double[] input, int output, int? numberOfClasses = null, Random randomGenerator = null);
+    }
 }

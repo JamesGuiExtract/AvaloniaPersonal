@@ -17,7 +17,7 @@ namespace Extract.AttributeFinder
     [Serializable]
     // Don't rename because it could break serialization
     [Obfuscation(Feature = "renaming", Exclude = true)]
-    public class NeuralNetworkClassifier : ITrainableClassifier
+    public class NeuralNetworkClassifier : ITrainableClassifier, IIncrementallyTrainableClassifier
     {
 
         #region Constants
@@ -369,7 +369,10 @@ namespace Extract.AttributeFinder
                 ExtractException.Assert("ELI39736", "This classifier has not been trained", IsTrained);
 
                 // Scale inputs
-                inputs = inputs.Subtract(_featureMean).ElementwiseDivide(_featureScaleFactor);
+                if (_featureMean != null && _featureScaleFactor != null)
+                {
+                    inputs = inputs.Subtract(_featureMean).ElementwiseDivide(_featureScaleFactor);
+                }
 
                 double[] responses = _classifier.Compute(inputs);
 
@@ -458,6 +461,72 @@ namespace Extract.AttributeFinder
         }
 
         #endregion ITrainableClassifier
+
+        #region IIncrementallyTrainableClassifier
+
+        /// <summary>
+        /// Trains the classifier to recognize classifications
+        /// </summary>
+        /// <param name="input">The input feature vectors</param>
+        /// <param name="output">The classes for each input</param>
+        /// <param name="randomGenerator">Random number generator to use for randomness</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        public void TrainClassifier(double[] input, int output, int? numberOfClasses = null, Random randomGenerator = null)
+        {
+            try
+            {
+                ExtractException.Assert("ELI44707", "No input given", input != null && input.Length > 0);
+
+                // If a random number generator was specified, then specify the random number generator
+                // for neuron initialization so that results are reproducible
+                if (randomGenerator != null)
+                {
+                    AForge.Neuro.Neuron.RandGenerator = new AForge.ThreadSafeRandom(randomGenerator.Next());
+                }
+
+                _featureVectorLength = input.Length;
+
+                ExtractException.Assert("ELI44708", "Number of classes has not been set!", NumberOfClasses != 0 || numberOfClasses.HasValue);
+                int[] layers = null;
+
+                if (_classifier == null)
+                {
+                    if (NumberOfClasses == 0)
+                    {
+                        NumberOfClasses = numberOfClasses.Value;
+                    }
+                    layers = HiddenLayers.Concat(new int[] { NumberOfClasses }).ToArray();
+                }
+
+
+                // Standardize input
+                if (_featureMean != null && _featureScaleFactor != null && _featureScaleFactor.All(n => n != 0))
+                {
+                    input = input.Subtract(_featureMean).ElementwiseDivide(_featureScaleFactor);
+                }
+
+                // Expand output into one-hot vector
+                double[] expandedOutput = new double[NumberOfClasses];
+                for (int i = 0; i < expandedOutput.Length; i++)
+                {
+                    expandedOutput[i] = -1;
+                }
+                expandedOutput[output] = 1;
+
+                _classifier = TrainClassifier(input, expandedOutput, _classifier, layers);
+
+                IsTrained = true;
+                LastTrainedOn = DateTime.Now;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39722");
+            }
+        }
+
+        #endregion IIncrementallyTrainableClassifier
+
 
         #region Private Methods
 
@@ -574,6 +643,31 @@ namespace Extract.AttributeFinder
 
             trainedNetwork = (ActivationNetwork)ActivationNetwork.Load(bestStream);
             return lowestError;
+        }
+
+        /// <summary>
+        /// Trains a classifier by running the training algorithm <see cref="MaxTrainingIterations"/> times.
+        /// </summary>
+        /// <param name="trainInput">Feature vector to train with</param>
+        /// <param name="trainOutput">Class (category code) for the training input</param>
+        /// <param name="ann">Neural net to be trained (if null then a new network will be created)</param>
+        /// <param name="layers">Sizes of hidden and output layers (ignored if <see paramref="ann"/> is non-null)</param>
+        /// <returns>The resulting network</returns>
+        private ActivationNetwork TrainClassifier(double[] trainInput, double[] trainOutput, ActivationNetwork ann, int[] layers)
+        {
+            if (ann == null)
+            {
+                ann = new ActivationNetwork(new BipolarSigmoidFunction(SigmoidAlpha), _featureVectorLength, layers);
+                var initializer = new NguyenWidrow(ann);
+                initializer.Randomize();
+            }
+            var teacher = new Accord.Neuro.Learning.ParallelResilientBackpropagationLearning(ann);
+            for (int i = 1; i <= MaxTrainingIterations; i++)
+            {
+                teacher.Run(trainInput, trainOutput);
+            }
+
+            return ann;
         }
 
         #endregion Private Methods
