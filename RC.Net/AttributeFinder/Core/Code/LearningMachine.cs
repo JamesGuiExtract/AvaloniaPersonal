@@ -1075,7 +1075,7 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        private  (AccuracyData trainingSet, AccuracyData testingSet) TrainAndTestMachine(bool testOnly, Action<StatusArgs> updateStatus,
+        private (AccuracyData trainingSet, AccuracyData testingSet) TrainAndTestMachine(bool testOnly, Action<StatusArgs> updateStatus,
             CancellationToken cancellationToken)
         {
             ExtractException.Assert("ELI39840", "Machine is not fully configured", IsConfigured);
@@ -1132,6 +1132,53 @@ namespace Extract.AttributeFinder
                 var testResult = GetAccuracyScore(featureVectorsAndAnswers.Item1, featureVectorsAndAnswers.Item2);
                 AccuracyData = (train: null, test: new SerializableConfusionMatrix(Encoder, testResult));
                 return (null, testResult);
+            }
+        }
+
+        /// <summary>
+        /// Trains the machine using data specified
+        /// </summary>
+        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
+        public void IncrementallyTrainMachine(SpatialString spatialString, IUnknownVector inputVoa, string answer)
+        {
+            try
+            {
+                var spatialStrings = new[] { spatialString };
+                var inputVOAs = new[] { inputVoa };
+                var answers = answer is null ? null : new[] { answer };
+
+                IncrementallyTrainMachine(spatialStrings, inputVOAs, answers);
+            }
+            catch (ExtractException uex)
+            {
+                throw uex;
+            }
+        }
+
+        /// <summary>
+        /// Trains the machine using data specified
+        /// </summary>
+        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
+        public void IncrementallyTrainMachine(SpatialString[] spatialStrings, IUnknownVector[] inputVoa, string[] answers)
+        {
+            ExtractException.Assert("ELI44719", "Machine is not fully configured", Encoder != null && Classifier != null);
+            if (Classifier is IIncrementallyTrainableClassifier classifier)
+            {
+                if (!Encoder.AreEncodingsComputed)
+                {
+                    Encoder.ComputeEncodings(spatialStrings, inputVoa, answers);
+                }
+
+                var (trainInputs, trainOutputs) = Encoder.GetFeatureVectorAndAnswerCollections(spatialStrings, inputVoa, answers, true);
+                var numberOfClasses = trainOutputs.Max() + 1;
+                for (int i = 0; i < trainInputs.Length; i++)
+                {
+                    classifier.TrainClassifier(trainInputs[i], trainOutputs[i], numberOfClasses);
+                }
+            }
+            else
+            {
+                throw new ExtractException("ELI44720", "Machine does not support incremental training");
             }
         }
 

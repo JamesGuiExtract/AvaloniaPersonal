@@ -513,7 +513,7 @@ namespace Extract.AttributeFinder
                         }
                         else
                         {
-                            return data.Select(s => double.TryParse(s, out double d) ? d : 0.0)
+                            return data.Select(s => double.TryParse(s, out double d) ? (d - 128)/128 : 0.0) // Scale and zero center to improve training speed when used in online fashion
                                 .Concat(new[] { exists }).ToArray();
                         }
                     default:

@@ -147,6 +147,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\APIs\Stanford.NLP.NER.3.7.0.1\lib\stanford-ner.dll</HintPath>
     </Reference>
+    <Reference Include="CAPI_PInvoke, Version=19.11.0.0, Culture=neutral, PublicKeyToken=d277acbc760e5eaf, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_19\Bin\CAPI_PInvoke.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
@@ -280,6 +284,13 @@
     </Compile>
     <Compile Include="SetDocumentTagsSettingsDialog.Designer.cs">
       <DependentUpon>SetDocumentTagsSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TemplateFinder.cs" />
+    <Compile Include="TemplateFinderSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TemplateFinderSettingsDialog.Designer.cs">
+      <DependentUpon>TemplateFinderSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="ValueConditionSelector.cs" />
     <Compile Include="ValueConditionSelectorSettingsDialog.cs">
@@ -497,6 +508,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SetDocumentTagsSettingsDialog.resx">
       <DependentUpon>SetDocumentTagsSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TemplateFinderSettingsDialog.resx">
+      <DependentUpon>TemplateFinderSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ValueConditionSelectorSettingsDialog.resx">
       <DependentUpon>ValueConditionSelectorSettingsDialog.cs</DependentUpon>
