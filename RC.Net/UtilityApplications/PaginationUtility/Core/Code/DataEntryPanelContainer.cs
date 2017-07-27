@@ -729,7 +729,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <value>
         /// The active data entry panel.
         /// </value>
-        DataEntryDocumentDataPanel ActiveDataEntryPanel
+        internal DataEntryDocumentDataPanel ActiveDataEntryPanel
         {
             get
             {

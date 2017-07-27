@@ -387,7 +387,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// following windows message.
         /// </summary>
         bool _updateCommandStatesInvoked;
-      
+
+        /// <summary>
+        /// Indicates whether this panel should appear as having input focus.
+        /// </summary>
+        public bool _indicateFocus = true;
+
         #endregion Fields
 
         #region Constructors
@@ -488,6 +493,50 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Events
 
         #region Properties
+
+        /// <summary>
+        /// Gets or sets whether this panel should appear as having input focus.
+        /// </summary>
+        /// <value> <c>true</c> if the panel should appear to have input focus;
+        /// otherwise, <c>false</c>.
+        /// </value>
+        public bool IndicateFocus
+        {
+            get
+            {
+                return _indicateFocus;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _indicateFocus)
+                    {
+                        _indicateFocus = value;
+
+                        if (value)
+                        {
+                            PrimarySelection?.Invalidate();
+                        }
+                        else
+                        {
+                            // If losing focus, reset selection (which would no longer be indicated).
+                            // This prevents any possible surprises as focus in returned to the panel.
+                            ProcessControlSelection(
+                                activeControl: PrimarySelection,
+                                additionalControls: null,
+                                select: true,
+                                modifierKeys: Keys.None);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI44705");
+                }
+            }
+        } 
 
         /// <summary>
         /// Gets or sets the <see cref="ImageViewer"/> that is to display the images from selected

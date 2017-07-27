@@ -504,13 +504,6 @@ namespace Extract.DataEntry
         VariantVector _confidenceBoundaries;
 
         /// <summary>
-        /// The default color to use for highlighting data in the image viewer or to indicate the
-        /// active status of data in a control. This will be the same color as the top tier color
-        /// in _highlightColors.
-        /// </summary>
-        Color _defaultHighlightColor = Color.LightGreen;
-
-        /// <summary>
         /// A list of names of DataEntry controls that should remain disabled at all times.
         /// </summary>
         readonly List<string> _disabledControls = new List<string>();
@@ -940,6 +933,17 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// The default color to use for highlighting data in the image viewer or to indicate the
+        /// active status of data in a control. This will be the same color as the top tier color
+        /// in _highlightColors.
+        /// </summary>
+        public Color ActiveSelectionColor
+        {
+            get;
+            set;
+        } = Color.LightGreen;
+
+        /// <summary>
         /// Gets or sets one or more colors to use to highlight data in the image viewer or indicate
         /// the active status of data in a control.
         /// </summary>
@@ -996,7 +1000,7 @@ namespace Extract.DataEntry
 
                     // Apply the supplied colors and initialize the default color.
                     _highlightColors = value;
-                    _defaultHighlightColor = _highlightColors[_highlightColors.Length - 1].Color;
+                    ActiveSelectionColor = _highlightColors[_highlightColors.Length - 1].Color;
 
                     // Initialize _confidenceBoundaries
                     _confidenceBoundaries = new VariantVectorClass();
@@ -1425,7 +1429,7 @@ namespace Extract.DataEntry
                                 }
                             }
 
-                            _imageViewer.DefaultHighlightColor = _defaultHighlightColor;
+                            _imageViewer.DefaultHighlightColor = ActiveSelectionColor;
                             _imageViewer.AllowBandedSelection = false;
                             _changingData = false;
                         }
@@ -1677,7 +1681,7 @@ namespace Extract.DataEntry
                     // last selected control remaining active when the next document is loaded.
                     if (_activeDataControl != null)
                     {
-                        _activeDataControl.IndicateActive(false, _defaultHighlightColor);
+                        _activeDataControl.IndicateActive(false, ActiveSelectionColor);
                         _activeDataControl = null;
                     }
 
@@ -1756,7 +1760,7 @@ namespace Extract.DataEntry
                         // Remove activate status from the active control.
                         if (!imageIsAvailable && dataControl == _activeDataControl)
                         {
-                            dataControl.IndicateActive(false, _defaultHighlightColor);
+                            dataControl.IndicateActive(false, ActiveSelectionColor);
                         }
 
                         // Set the enabled status of every data control depending on the 
@@ -2392,7 +2396,7 @@ namespace Extract.DataEntry
                         // complete.
                         if (_activeDataControl != null)
                         {
-                            _activeDataControl.IndicateActive(false, _defaultHighlightColor);
+                            _activeDataControl.IndicateActive(false, ActiveSelectionColor);
                         }
 
                         if (undo)
@@ -2416,7 +2420,7 @@ namespace Extract.DataEntry
                         if (_activeDataControl != null)
                         {
                             ExecuteOnIdle("ELI34414", () => _activeDataControl.IndicateActive(
-                                true, _defaultHighlightColor));
+                                true, ActiveSelectionColor));
                         }
 
                         // Invoke EndUndo/EndRedo on idle the to ensure that nothing that happened
@@ -2722,7 +2726,7 @@ namespace Extract.DataEntry
                 // re-initializes the current selection even if the same control is still selected.
                 if (_activeDataControl != null)
                 {
-                    _activeDataControl.IndicateActive(false, _defaultHighlightColor);
+                    _activeDataControl.IndicateActive(false, ActiveSelectionColor);
                     _activeDataControl = null;
                 }
 
@@ -3240,7 +3244,7 @@ namespace Extract.DataEntry
                 // De-activate any existing control that is active
                 if (_activeDataControl != null)
                 {
-                    _activeDataControl.IndicateActive(false, _defaultHighlightColor);
+                    _activeDataControl.IndicateActive(false, ActiveSelectionColor);
                 }
 
                 // If this method was attempting to change focus, there is at least once case where
@@ -3269,7 +3273,7 @@ namespace Extract.DataEntry
                 _refocusingControl = null;
 
                 _activeDataControl = newActiveDataControl;
-                _activeDataControl.IndicateActive(true, _defaultHighlightColor);
+                _activeDataControl.IndicateActive(true, ActiveSelectionColor);
 
                 // Once a new control gains focus, show tooltips again if they were hidden.
                 if (_temporarilyHidingTooltips)
@@ -3354,7 +3358,11 @@ namespace Extract.DataEntry
                 }
 
                 // Displays the appropriate highlights, tooltips and error icons.
-                ApplySelection(e.SelectionState, false);
+                // Don't finalize (change pages, draw highlights) if a control focus change to
+                // another control is pending.
+                bool suppressSelectionFinalization =
+                    _focusingControl != null && _focusingControl != e.SelectionState.DataControl;
+                ApplySelection(e.SelectionState, suppressSelectionFinalization);
 
                 // If an exception was thrown from EndEdit, throw it here.
                 if (endEditException != null)
@@ -3913,6 +3921,11 @@ namespace Extract.DataEntry
         {
             try
             {
+                if (!ProcessImageViewerKeyboardInput)
+                {
+                    return;
+                }
+
                 Control activeControl = _activeDataControl as Control;
 
                 // Give focus back to the active control so it can receive input.
@@ -4626,6 +4639,36 @@ namespace Extract.DataEntry
         #endregion Internal Members
 
         #region Protected Members
+
+        /// <summary>
+        /// Gets a <see cref="IDataEntryControl"/> that is currently in the process of gaining focus.
+        /// </summary>
+        /// <value>
+        /// A <see cref="IDataEntryControl"/> that is currently in the process of gaining focus or
+        /// <see langword="null"/> if no control is presently gaining focus.
+        /// </value>
+        protected IDataEntryControl FocusingControl
+        {
+            get
+            {
+                return _focusingControl;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether keyboard input directed at the <see cref="ImageViewer"/>
+        /// should be processed by this panel.
+        /// </summary>
+        /// <value><c>true</c> if keyboard input directed at the <see cref="ImageViewer"/>
+        /// should be processed by this panel; otherwise, <c>false</c>.
+        /// </value>
+        protected virtual bool ProcessImageViewerKeyboardInput
+        {
+            get
+            {
+                return true;
+            }
+        }
 
         /// <summary>
         /// Navigates to the specified page, settings _performingProgrammaticZoom in the process to
