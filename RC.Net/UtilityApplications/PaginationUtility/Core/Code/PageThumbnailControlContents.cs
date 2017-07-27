@@ -332,7 +332,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (_pageControl != null && _pageControl.Highlighted)
                 {
-                    var highlightBrush = ExtractBrushes.GetSolidBrush(SystemColors.Highlight);
+                    var highlightColor = _pageControl.PageLayoutControl.IndicateFocus
+                        ? SystemColors.Highlight
+                        : SystemColors.ControlDark;
+                    var highlightBrush = ExtractBrushes.GetSolidBrush(highlightColor);
                     e.Graphics.FillRectangle(highlightBrush, e.ClipRectangle);
                 }
             }
@@ -439,7 +442,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (_pageControl != null)
                 {
-                    var brush = ExtractBrushes.GetSolidBrush(_pageControl.Selected
+                    var brush = ExtractBrushes.GetSolidBrush(
+                        _pageControl.Selected && _pageControl.PageLayoutControl.IndicateFocus
                         ? SystemColors.ControlDark
                         : SystemColors.Control);
 

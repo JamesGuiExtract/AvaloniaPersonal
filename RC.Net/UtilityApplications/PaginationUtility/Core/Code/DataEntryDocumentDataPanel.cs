@@ -4,6 +4,7 @@ using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
@@ -38,6 +39,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// document for which this DEP is editing data.
         /// </summary>
         bool _primaryPageIsForActiveDocument;
+
+        /// <summary>
+        /// Indicates whether this panel should be presented as having input focus.
+        /// </summary>
+        bool _indicateFocus = true;
 
         #endregion Fields
 
@@ -423,6 +429,50 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets whether this panel should be presented as having input focus.
+        /// </summary>
+        /// <value><c>true</c> if this panel should be presented as having input focus;
+        /// otherwise, <c>false</c>.
+        /// </value>
+        public bool IndicateFocus
+        {
+            get
+            {
+                return _indicateFocus;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _indicateFocus)
+                    {
+                        var activeControlColor = value
+                            ? ActiveSelectionColor
+                            : Color.LightGray;
+
+                        ActiveDataControl?.IndicateActive(true, activeControlColor);
+
+                        // The image page relating to the currently active field will be displayed
+                        // if this focus change is in conjunction with another control gaining focus.
+                        // However, if no focus change is occurring, we need to call for the related
+                        // page to be displayed here.
+                        if (FocusingControl == null || FocusingControl == ActiveDataControl)
+                        {
+                            LoadPageInImageViewer(allowSourceDocumentSwitch: true);
+                        }
+
+                        _indicateFocus = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI44698");
+                }
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="Form.Load"/> event.
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="Form.Load"/> 
@@ -561,6 +611,20 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41353");
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether keyboard input directed at the <see cref="ImageViewer"/>
+        /// should be processed by this panel.
+        /// </summary>
+        /// <value><c>true</c> if keyboard input directed at the <see cref="ImageViewer"/>
+        /// should be processed by this panel; otherwise, <c>false</c>.
+        protected override bool ProcessImageViewerKeyboardInput
+        {
+            get
+            {
+                return IndicateFocus ? base.ProcessImageViewerKeyboardInput : false;
             }
         }
 

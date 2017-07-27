@@ -157,6 +157,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _raisingCommittingChanges;
 
+        /// <summary>
+        /// Indicates whether _documentDataPanel is currently focused.
+        /// </summary>
+        bool _dataPanelFocused;
+
         #endregion Fields
 
         #region Constructors
@@ -461,6 +466,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _documentDataPanel.PageLoadRequest -= HandleDocumentDataPanel_PageLoadRequest;
                             if (_documentDataPanel.PanelControl != null)
                             {
+                                _documentDataPanel.PanelControl.Enter -= HandlePanelControl_Enter;
                                 _documentDataPanel.PanelControl.Leave -= HandlePanelControl_Leave;
                             }
                         }
@@ -472,6 +478,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _documentDataPanel.PageLoadRequest += HandleDocumentDataPanel_PageLoadRequest;
                             if (_documentDataPanel.PanelControl != null)
                             {
+                                _documentDataPanel.PanelControl.Enter += HandlePanelControl_Enter;
                                 _documentDataPanel.PanelControl.Leave += HandlePanelControl_Leave;
                             }
                         }
@@ -2109,6 +2116,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_imageViewer != null)
                         {
                             _imageViewer.ImageFileClosing -= HandleImageViewer_ImageFileClosing;
+                            _imageViewer.Enter -= HandleImageViewer_Enter;
+                            _imageViewer.Leave -= HandleImageViewer_Leave;
+                            _imageViewer.PreviewKeyDown -= HandleImageViewer_PreviewKeyDown;
                         }
 
                         _imageViewer = value;
@@ -2116,6 +2126,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_imageViewer != null)
                         {
                             _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
+                            _imageViewer.Enter += HandleImageViewer_Enter;
+                            _imageViewer.Leave += HandleImageViewer_Leave;
+                            _imageViewer.PreviewKeyDown += HandleImageViewer_PreviewKeyDown;
                         }
                     }
                 }
@@ -2586,18 +2599,48 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void HandleDocumentDataPanel_PageLoadRequest(object sender, PageLoadRequestEventArgs e)
         {
-            var pageToSelect =
-                (_primaryPageLayoutControl.DocumentInDataEdit?.PageControls ?? _primaryPageLayoutControl.PageControls)
-                    .FirstOrDefault(c => e.PageNumber == c.Page.OriginalPageNumber &&
-                        c.Page.OriginalDocumentName
-                            .Equals(e.SourceDocName, StringComparison.OrdinalIgnoreCase));
-
-            if (pageToSelect != null)
+            try
             {
-                // https://extract.atlassian.net/browse/ISSUE-14343
-                // Don't allow the selection of a page scroll away from the DEP that requested the
-                // page change.
-                _primaryPageLayoutControl.SelectPage(pageToSelect, scrollToPage: false);
+                // Only select the page if the DEP is currently intended to have focus. This prevents
+                // unexpected page changes when focused is changed between different panels.
+                if (_dataPanelFocused)
+                {
+                    var pageToSelect =
+                        (_primaryPageLayoutControl.DocumentInDataEdit?.PageControls ?? _primaryPageLayoutControl.PageControls)
+                            .FirstOrDefault(c => e.PageNumber == c.Page.OriginalPageNumber &&
+                                c.Page.OriginalDocumentName
+                                    .Equals(e.SourceDocName, StringComparison.OrdinalIgnoreCase));
+
+                    if (pageToSelect != null)
+                    {
+                        // https://extract.atlassian.net/browse/ISSUE-14343
+                        // Don't allow the selection of a page scroll away from the DEP that requested the
+                        // page change.
+                        _primaryPageLayoutControl.SelectPage(pageToSelect, scrollToPage: false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44702");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Enter"/> event of the
+        /// <see cref="_documentDataPanel.PanelControl"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandlePanelControl_Enter(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessFocusChange();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI44703");
             }
         }
 
@@ -2611,27 +2654,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                // If focus is lost while a page belonging to the active data entry panel is active
-                // and there are not mouse buttons or modifier keys down as they might be for an
-                // ongoing operation, return focus to the data panel. This allows swiping tools to
-                // remain active if they should be active.
-                if (_documentDataPanel != null &&
-                    !_committingChanges && !_raisingCommittingChanges &&
-                    _primaryPageLayoutControl.PrimarySelection != null &&
-                    _primaryPageLayoutControl.DocumentInDataEdit.PageControls.Contains(_primaryPageLayoutControl.PrimarySelection) &&
-                        Control.MouseButtons == MouseButtons.None &&
-                        Control.ModifierKeys == Keys.None)
-                {
-                    this.SafeBeginInvoke("ELI41664", () =>
-                    {
-                        if (_documentDataPanel != null && !_committingChanges && !_raisingCommittingChanges)
-                        {
-                            this.FocusNestedControl(_documentDataPanel.ActiveDataControl);
-                            // Activates swiping if swiping should currently be enabled.
-                            _documentDataPanel.RefreshControlState();
-                        }
-                    });
-                }
+                ProcessFocusChange();
             }
             catch (Exception ex)
             {
@@ -2664,6 +2687,60 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41341");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Enter"/> event of the <see cref="_imageViewer"/> control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="PreviewKeyDownEventArgs"/> instance containing the event data.</param>
+        void HandleImageViewer_Enter(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessFocusChange();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI44700");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Leave"/> event of the <see cref="_imageViewer"/> control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="PreviewKeyDownEventArgs"/> instance containing the event data.</param>
+        void HandleImageViewer_Leave(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessFocusChange();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI44701");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PreviewKeyDown"/> event of the <see cref="_imageViewer"/> control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="PreviewKeyDownEventArgs"/> instance containing the event data.</param>
+        void HandleImageViewer_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            try
+            {
+                if (!_primaryPageLayoutControl.IgnoreShortcutKey && !_dataPanelFocused)
+                {
+                    _shortcuts.ProcessKey(e.KeyCode);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI44699");
             }
         }
 
@@ -3203,6 +3280,34 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             return queryResults;
+        }
+
+        /// <summary>
+        /// Handles focus changes between the DEP, PageLayoutControl and ImageViewer to ensure
+        /// current focus is properly indicated.
+        /// </summary>
+        void ProcessFocusChange()
+        {
+            bool? dataPanelFocused = (_documentDataPanel?.PanelControl?.ContainsFocus == true)
+                ? true
+                : ContainsFocus ? (bool?)false : null;
+
+            if (dataPanelFocused.HasValue && dataPanelFocused.Value != _dataPanelFocused)
+            {
+                _dataPanelFocused = dataPanelFocused.Value;
+
+                var dataEntryContainer = _documentDataPanel as DataEntryPanelContainer;
+                _primaryPageLayoutControl.IndicateFocus = !_dataPanelFocused;
+                var activePanel = dataEntryContainer.ActiveDataEntryPanel;
+                if (activePanel != null)
+                {
+                    // Invoke rather than call directly so that the control that was clicked has the
+                    // opportunity to register the click before we ask the panel to indicate focus.
+                    // If we set IndicateFocus before the clicked control can register the click, the
+                    // it may not trigger the proper page to be opened in the image viewer.
+                    this.SafeBeginInvoke("ELI44704", () => activePanel.IndicateFocus = _dataPanelFocused);
+                }
+            }
         }
 
         /// <summary>
