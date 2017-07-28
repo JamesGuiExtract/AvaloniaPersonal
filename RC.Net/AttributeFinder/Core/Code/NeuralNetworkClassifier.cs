@@ -543,6 +543,13 @@ namespace Extract.AttributeFinder
 
                 if (i >= _WINDOW_SIZE)
                 {
+                    // Stop training if the results are not changing
+                    // https://extract.atlassian.net/browse/ISSUE-14873
+                    if (history.All(t => t.Item2 == history.Peek().Item2))
+                    {
+                        break;
+                    }
+
                     var avgCVLast = history.Skip(_WINDOW_SIZE/2).Average(t => t.Item2);
                     var avgCVPrevLast = history.Take(_WINDOW_SIZE/2).Average(t => t.Item2);
 
