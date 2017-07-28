@@ -511,6 +511,29 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Registers to receive key events from child controls that should be raised as if
+        /// they are coming from this control.
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> whose children's events should be
+        /// forwarded.</param>
+        protected override void RegisterForEvents(Control control)
+        {
+            try
+            {
+                // https://extract.atlassian.net/browse/ISSUE-14874
+                // If _contentsPanel is defined, it's events will have already been registered.
+                if (control != _contentsPanel)
+                {
+                    base.RegisterForEvents(control);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44706");
+            }
+        }
+
         /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
@@ -593,12 +616,13 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (visible && _contentsPanel == null)
                 {
-                    _contentsPanel = new PageThumbnailControlContents(this, _page);
+                    var contentsPanel = new PageThumbnailControlContents(this, _page);
 
-                    Controls.Add(_contentsPanel);
-                    _contentsPanel.Invalidate(true);
+                    Controls.Add(contentsPanel);
+                    contentsPanel.Invalidate(true);
 
-                    RegisterForEvents(_contentsPanel);
+                    RegisterForEvents(contentsPanel);
+                    _contentsPanel = contentsPanel;
                 }
                 else if (!visible && _contentsPanel != null)
                 {
