@@ -383,7 +383,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="control">The <see cref="Control"/> whose children's events should be
         /// forwarded.</param>
-        protected void RegisterForEvents(Control control)
+        protected virtual void RegisterForEvents(Control control)
         {
             foreach (Control childControl in control.Controls)
             {
@@ -403,7 +403,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="control">The <see cref="Control"/> whose children's events should be
         /// unregistered.</param>
-        protected void UnRegisterForEvents(Control control)
+        protected virtual void UnRegisterForEvents(Control control)
         {
             foreach (Control childControl in control.Controls)
             {
