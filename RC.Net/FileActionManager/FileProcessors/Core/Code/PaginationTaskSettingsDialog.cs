@@ -118,6 +118,7 @@ namespace Extract.FileActionManager.FileProcessors
                     = _expectedPaginationAttributesPathTagButton.Enabled
                     = _expectedPaginationAttributesCheckBox.Checked;
                 _singleDocModeCheckBox.Checked = Settings.SingleSourceDocumentMode;
+                _autoRotateCheckBox.Checked = Settings.AutoRotateImages;
             }
             catch (Exception ex)
             {
@@ -175,6 +176,7 @@ namespace Extract.FileActionManager.FileProcessors
                 Settings.OutputExpectedPaginationAttributesFiles = _expectedPaginationAttributesCheckBox.Checked;
                 Settings.ExpectedPaginationAttributesOutputPath = _expectedPaginationAttributesTextBox.Text;
                 Settings.SingleSourceDocumentMode = _singleDocModeCheckBox.Checked;
+                Settings.AutoRotateImages = _autoRotateCheckBox.Checked;
 
                 DialogResult = DialogResult.OK;
             }

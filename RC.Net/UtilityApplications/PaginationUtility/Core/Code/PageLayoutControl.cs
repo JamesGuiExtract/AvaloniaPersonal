@@ -693,6 +693,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether pages should automatically be oriented to match
+        /// the orientation of the text (per OCR).
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if pages should automatically be oriented to match the orientation of the
+        ///   text; otherwise, <c>false</c>.
+        /// </value>
+        public bool AutoRotateImages
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets whether the primarily selected <see cref="PageThumbnailControl"/> should
         /// update the displayed page in the <see cref="ImageViewer"/>.
         /// </summary>
@@ -1012,7 +1026,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     allPagesCanBeLoaded = CanAllPagesBeLoaded(ref pagesToLoad);
                 }
 
-                var spatialPageInfos = ImageMethods.GetSpatialPageInfos(sourceDocument.FileName);
+                // Retrieve spatialPageInfos, which will trigger auto-page rotation, only if
+                // AutoRotateImages is true.
+                var spatialPageInfos = AutoRotateImages
+                    ? ImageMethods.GetSpatialPageInfos(sourceDocument.FileName)
+                    : null;
 
                 // Create a page control for every page in sourceDocument.
                 foreach (Page page in pagesToLoad)
@@ -1020,6 +1038,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     var orientation = ImageMethods.GetPageRotation(spatialPageInfos, page.OriginalPageNumber);
                     if (orientation != null)
                     {
+                        page.ProposedOrientation = orientation.Value;
                         page.ImageOrientation = orientation.Value;
                     }
 
@@ -1082,8 +1101,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="pages">The <see cref="Page"/> instances to load into the document.</param>
         /// <param name="deletedPages">The <see cref="Page"/> instances in <see paramref="pages"/>
         /// that should be loaded in a deleted state.</param>
+        /// <param name="autoRotatePages">Indicates whether pages should automatically be oriented
+        /// to match the orientation of the text (per OCR).</param>
         public void LoadOutputDocument(OutputDocument outputDocument, IEnumerable<Page> pages,
-             IEnumerable<Page> deletedPages)
+             IEnumerable<Page> deletedPages, bool autoRotatePages)
         {
             bool removedLoadNextDocumentButton = false;
 
@@ -1117,6 +1138,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (deletedPages != null && deletedPages.Contains(page))
                         {
                             pageControl.Deleted = true;
+                        }
+
+                        if (autoRotatePages && page.ProposedOrientation != 0)
+                        {
+                            page.ImageOrientation = page.ProposedOrientation;
                         }
 
                         InsertPaginationControl(pageControl, index: -1);

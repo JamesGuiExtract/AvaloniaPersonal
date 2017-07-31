@@ -80,6 +80,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 AddStylist(new CopiedPageStylist(this), replaceExistingTypeInstances: true);
                 AddStylist(new DeletedPageStylist(this), replaceExistingTypeInstances: true);
+                AddStylist(new RotatedPageStylist(this), replaceExistingTypeInstances: true);
             }
             catch (Exception ex)
             {

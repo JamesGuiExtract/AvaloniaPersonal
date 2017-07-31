@@ -244,7 +244,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .Where(c => !c.Deleted)
                         .Select(c => c.Page);
 
-                    if (currentPages.Any(page => page.ImageOrientation != 0))
+                    if (currentPages.Any(page => page.ImageOrientation != page.ProposedOrientation))
                     {
                         return false;
                     }

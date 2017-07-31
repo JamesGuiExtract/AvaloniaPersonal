@@ -281,6 +281,7 @@ namespace Extract.FileActionManager.FileProcessors
                     = settings.OutputExpectedPaginationAttributesFiles;
                 _paginationPanel.ExpectedPaginationAttributesPath = settings.ExpectedPaginationAttributesOutputPath;
                 _paginationPanel.FileProcessingDB = FileProcessingDB;
+                _paginationPanel.AutoRotateImages = _settings.AutoRotateImages;
 
                 if (!string.IsNullOrWhiteSpace(paginationDocumentDataPanelAssembly))
                 {

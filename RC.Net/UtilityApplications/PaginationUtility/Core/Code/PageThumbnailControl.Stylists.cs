@@ -1,13 +1,12 @@
 ﻿using Extract.Drawing;
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
-	/// <summary>
+    /// <summary>
     /// Enables styles to be applied to <see cref="PageThumbnailControl"/>s.
     /// </summary>
     internal abstract class PageStylist
@@ -313,6 +312,42 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40043");
+            }
+        }
+    }
+
+    /// <summary>
+    /// A <see cref="PageStylist"/> that overlays an arrow indicating rotation on any
+    /// <see cref="PageThumbnailControl"/> instances that have been rotated in comparison to the
+    /// source image.
+    /// </summary>
+    internal class RotatedPageStylist : OverlayTextStylist
+    {
+        /// <summary>
+        /// The font used for this stylist needs to be capable of displaying unicode symbols.
+        /// </summary>
+        static readonly Font _SYMBOL_FONT = new Font("Segoe UI Symbol", 90, FontStyle.Bold);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RotatedPageStylist"/> class.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which this stylist
+        /// is responsible.</param>
+        public RotatedPageStylist(PageThumbnailControl pageControl)
+            : base(pageControl, "↻", Color.FromArgb(99, Color.Gold), _SYMBOL_FONT, null)
+        {
+        }
+
+        /// <summary>
+        /// Gets whether the stylist is visible.
+        /// </summary>
+        /// <returns><see langword="true"/> if visible.
+        /// </returns>
+        protected override bool IsVisible
+        {
+            get
+            {
+                return PageControl.Page.ImageOrientation != 0 && !PageControl.Deleted;
             }
         }
     }

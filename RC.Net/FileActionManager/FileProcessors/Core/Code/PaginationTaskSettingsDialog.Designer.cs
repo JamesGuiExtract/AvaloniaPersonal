@@ -51,6 +51,7 @@
             this._expectedPaginationAttributesTextBox = new Extract.Utilities.Forms.BetterTextBox();
             this._expectedPaginationAttributesBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._singleDocModeCheckBox = new System.Windows.Forms.CheckBox();
+            this._autoRotateCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -142,20 +143,20 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(468, 295);
+            this._cancelButton.Location = new System.Drawing.Point(468, 299);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 20;
+            this._cancelButton.TabIndex = 21;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(387, 295);
+            this._okButton.Location = new System.Drawing.Point(387, 299);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 19;
+            this._okButton.TabIndex = 20;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButton_Click);
@@ -279,12 +280,23 @@
             this._singleDocModeCheckBox.Text = "Single source document mode (verify only one source document at a time)";
             this._singleDocModeCheckBox.UseVisualStyleBackColor = true;
             // 
+            // _autoRotateCheckBox
+            // 
+            this._autoRotateCheckBox.AutoSize = true;
+            this._autoRotateCheckBox.Location = new System.Drawing.Point(16, 271);
+            this._autoRotateCheckBox.Name = "_autoRotateCheckBox";
+            this._autoRotateCheckBox.Size = new System.Drawing.Size(199, 17);
+            this._autoRotateCheckBox.TabIndex = 19;
+            this._autoRotateCheckBox.Text = "Automatically rotate pages to vertical";
+            this._autoRotateCheckBox.UseVisualStyleBackColor = true;
+            // 
             // PaginationTaskSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(555, 331);
+            this.ClientSize = new System.Drawing.Size(555, 335);
+            this.Controls.Add(this._autoRotateCheckBox);
             this.Controls.Add(this._singleDocModeCheckBox);
             this.Controls.Add(this._expectedPaginationAttributesCheckBox);
             this.Controls.Add(infoTip5);
@@ -336,5 +348,6 @@
         private Utilities.Forms.BetterTextBox _expectedPaginationAttributesTextBox;
         private Utilities.Forms.BrowseButton _expectedPaginationAttributesBrowseButton;
         private System.Windows.Forms.CheckBox _singleDocModeCheckBox;
+        private System.Windows.Forms.CheckBox _autoRotateCheckBox;
     }
 }
