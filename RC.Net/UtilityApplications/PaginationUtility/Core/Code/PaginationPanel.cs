@@ -297,6 +297,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether pages should automatically be oriented to match
+        /// the orientation of the text (per OCR).
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if pages should automatically be oriented to match the orientation of the
+        ///   text; otherwise, <c>false</c>.
+        /// </value>
+        public bool AutoRotateImages
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this instance should cache images with the
         /// <see cref="ImageViewer"/> when loading files or <see langword="false"/> if it should not
         /// (such as if the application is managing caching externally).
@@ -1285,7 +1299,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             outputDocument.Collapsed = false;
                             outputDocument.Selected = false;
                             _primaryPageLayoutControl.LoadOutputDocument(
-                                outputDocument, outputDocument.OriginalPages, null);
+                                outputDocument, outputDocument.OriginalPages, null, false);
                             if (outputDocument.DocumentData != null)
                             {
                                 outputDocument.DocumentData.Revert();
@@ -1313,7 +1327,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             outputDocument.DocumentData = args.DocumentData;
 
                             _primaryPageLayoutControl.LoadOutputDocument(
-                                outputDocument, sourceDocument.Pages, null);
+                                outputDocument, sourceDocument.Pages, null, false);
                         }
                     }
                 }
@@ -1328,7 +1342,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         outputDocument.Selected = false;
 
                         _primaryPageLayoutControl.LoadOutputDocument(outputDocument,
-                            outputDocument.OriginalPages, outputDocument.OriginalDeletedPages);
+                            outputDocument.OriginalPages, outputDocument.OriginalDeletedPages, true);
                         if (!_pendingDocuments.Contains(outputDocument))
                         {
                             _pendingDocuments.Add(outputDocument);
@@ -2847,6 +2861,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.Dock = DockStyle.Fill;
             _primaryPageLayoutControl.ExternalOutputOnly = true;
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
+            _primaryPageLayoutControl.AutoRotateImages = AutoRotateImages;
             _primaryPageLayoutControl.CommitOnlySelection = CommitOnlySelection;
             _primaryPageLayoutControl.LoadNextDocumentVisible = LoadNextDocumentVisible;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
@@ -3044,8 +3059,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     doc.DocumentData != null && doc.DocumentData.Modified);
                 bool documentCopyExists = nonEmptyDocs.Count > _originalDocuments.Count();
 
-                RevertToSuggestedEnabled = nonEmptyDocs.Any(doc => doc.PaginationSuggested)
-                    && nonEmptyDocs.Any(doc => isDocDataEdited || documentCopyExists || !doc.InOriginalForm);
+                // Removed check of doc.PaginationSuggested here so that auto-rotated images can also
+                // register as if it is a pagination suggestion in terms of reverting.
+                RevertToSuggestedEnabled =
+                    nonEmptyDocs.Any(doc => isDocDataEdited || documentCopyExists || !doc.InOriginalForm);
                 _revertToOriginalToolStripButton.Enabled = RevertToSuggestedEnabled;
 
                 RevertToSourceEnabled = isDocDataEdited || documentCopyExists

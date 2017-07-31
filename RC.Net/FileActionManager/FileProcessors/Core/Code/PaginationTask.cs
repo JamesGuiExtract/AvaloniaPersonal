@@ -100,6 +100,20 @@ namespace Extract.FileActionManager.FileProcessors
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether pages should automatically be oriented to match
+        /// the orientation of the text (per OCR).
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if pages should automatically be oriented to match the orientation of the
+        ///   text; otherwise, <c>false</c>.
+        /// </value>
+        bool AutoRotateImages
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
@@ -124,8 +138,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// 1. Initial version
         /// 2. Added OutputExpectedPaginationAttributesFiles and ExpectedPaginationAttributesOutputPath
         /// 3. Added SingleSourceDocumentMode
+        /// 4. Added AutoRotateImages
         /// </summary>
-        const int _CURRENT_VERSION = 3;
+        const int _CURRENT_VERSION = 4;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -213,6 +228,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// The single source document mode
         /// </summary>
         bool _singleSourceDocumentMode;
+
+        /// <summary>
+        /// Indicates whether pages should automatically be oriented to match the orientation of the
+        /// text (per OCR).
+        /// </summary>
+        bool _autoRotateImages = true;
 
         #endregion Fields
 
@@ -430,6 +451,31 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether pages should automatically be oriented to match
+        /// the orientation of the text (per OCR).
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if pages should automatically be oriented to match the orientation of the
+        ///   text; otherwise, <c>false</c>.
+        /// </value>
+        public bool AutoRotateImages
+        {
+            get
+            {
+                return _autoRotateImages;
+            }
+
+            set
+            {
+                if (value != _autoRotateImages)
+                {
+                    _autoRotateImages = value;
+                    _dirty = true;
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -471,6 +517,7 @@ namespace Extract.FileActionManager.FileProcessors
             OutputExpectedPaginationAttributesFiles = task.OutputExpectedPaginationAttributesFiles;
             ExpectedPaginationAttributesOutputPath = task.ExpectedPaginationAttributesOutputPath;
             SingleSourceDocumentMode = task.SingleSourceDocumentMode;
+            AutoRotateImages = task.AutoRotateImages;
 
             _dirty = true;
         }
@@ -806,6 +853,11 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         SingleSourceDocumentMode = reader.ReadBoolean();
                     }
+
+                    if (reader.Version >= 4)
+                    {
+                        AutoRotateImages = reader.ReadBoolean();
+                    }
                 }
 
                 // Freshly loaded object is not dirty
@@ -841,6 +893,7 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write(OutputExpectedPaginationAttributesFiles);
                     writer.Write(ExpectedPaginationAttributesOutputPath);
                     writer.Write(SingleSourceDocumentMode);
+                    writer.Write(AutoRotateImages);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);

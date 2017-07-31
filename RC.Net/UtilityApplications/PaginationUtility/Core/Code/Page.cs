@@ -243,6 +243,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets the <see cref="ImageOrientation"/> proposed by OCR if
+        /// <see cref="PageLayoutControl.AutoRotateImages"/> is enabled.
+        /// </summary>
+        /// <value>
+        /// The <see cref="ImageOrientation"/> proposed by OCR.
+        /// </value>
+        public int ProposedOrientation
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets all <see cref="PageThumbnailControl"/>s currently referencing this instance.
         /// </summary>
         public IEnumerable<PageThumbnailControl> PageControlReferences
