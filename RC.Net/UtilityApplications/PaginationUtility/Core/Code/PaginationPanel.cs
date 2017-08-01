@@ -3304,29 +3304,32 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void ProcessFocusChange()
         {
-            // true if the data panel conclusively has focus, false if it conclusively does not,
-            // null if focus appears to currently lie neither directly with the DEP nor directly
-            // with _primaryPageLayoutControl.
-            bool? dataPanelFocused = !IsDataPanelOpen
-                ? (bool?) false
-                :   (_documentDataPanel?.PanelControl?.ContainsFocus == true)
-                    ? true
-                    : (ContainsFocus) ? (bool?)false : null;
+            // If neither the DEP nor _primaryPageLayoutControl conclusively has focus (i.e., image
+            // viewer likely has focus), leave _dataPanelFocused as it currently is.
+            bool focusIsKnown = !IsDataPanelOpen
+                || ContainsFocus
+                || (_documentDataPanel?.PanelControl?.ContainsFocus == true);
 
-            if (dataPanelFocused.HasValue && dataPanelFocused.Value != _dataPanelFocused)
+            if (focusIsKnown)
             {
-                _dataPanelFocused = dataPanelFocused.Value;
+                bool dataPanelFocused = IsDataPanelOpen
+                    && (_documentDataPanel?.PanelControl?.ContainsFocus == true);
 
-                var dataEntryContainer = _documentDataPanel as DataEntryPanelContainer;
-                _primaryPageLayoutControl.IndicateFocus = !_dataPanelFocused;
-                var activePanel = dataEntryContainer.ActiveDataEntryPanel;
-                if (activePanel != null)
+                if (dataPanelFocused != _dataPanelFocused)
                 {
-                    // Invoke rather than call directly so that the control that was clicked has the
-                    // opportunity to register the click before we ask the panel to indicate focus.
-                    // If we set IndicateFocus before the clicked control can register the click, the
-                    // it may not trigger the proper page to be opened in the image viewer.
-                    this.SafeBeginInvoke("ELI44704", () => activePanel.IndicateFocus = _dataPanelFocused);
+                    _dataPanelFocused = dataPanelFocused;
+
+                    var dataEntryContainer = _documentDataPanel as DataEntryPanelContainer;
+                    _primaryPageLayoutControl.IndicateFocus = !_dataPanelFocused;
+                    var activePanel = dataEntryContainer.ActiveDataEntryPanel;
+                    if (activePanel != null)
+                    {
+                        // Invoke rather than call directly so that the control that was clicked has the
+                        // opportunity to register the click before we ask the panel to indicate focus.
+                        // If we set IndicateFocus before the clicked control can register the click, the
+                        // it may not trigger the proper page to be opened in the image viewer.
+                        this.SafeBeginInvoke("ELI44704", () => activePanel.IndicateFocus = _dataPanelFocused);
+                    }
                 }
             }
         }
