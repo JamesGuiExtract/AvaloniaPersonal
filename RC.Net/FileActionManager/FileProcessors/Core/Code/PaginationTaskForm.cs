@@ -1344,10 +1344,10 @@ namespace Extract.FileActionManager.FileProcessors
                     // of this task, esp when in SingleSourceDocumentMode. More consistent changes to
                     // title bar text to be discussed later.
                     string titleText = "Extract - <Workflow> - $FileOf(<SourceDocName>)";
-                    titleText = titleText.Replace("-  -", "");
 
                     var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagUtility, fileName);
-                    Text = pathTags.Expand(titleText);
+                    titleText = pathTags.Expand(titleText);
+                    Text = titleText.Replace("-  -", "-");
                 }
 
                 LoadDocumentForPagination(fileID, fileName, false);
@@ -1429,9 +1429,9 @@ namespace Extract.FileActionManager.FileProcessors
                     // of this task, esp when in SingleSourceDocumentMode. More consistent changes to
                     // title bar text to be discussed later.
                     string titleText = "Extract - <Workflow> - (Waiting for file)";
-                    titleText = titleText.Replace("-  -", "");
 
-                    Text = _tagUtility.ExpandTagsAndFunctions(titleText, "", null);
+                    titleText = _tagUtility.ExpandTagsAndFunctions(titleText, "", null);
+                    Text = titleText.Replace("-  -", "-");
                 }
 
                 return true;
