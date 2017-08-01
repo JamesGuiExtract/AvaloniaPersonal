@@ -35,11 +35,6 @@ namespace Extract.FileActionManager.FileProcessors
             FileSystemMethods.UserApplicationDataPath, "PaginateFiles", "PaginateFilesTaskForm.xml");
 
         /// <summary>
-        /// The title to display for the paginate files task form.
-        /// </summary>
-        const string _FORM_TASK_TITLE = "Paginate Files";
-
-        /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(PaginationTaskForm).ToString();
@@ -1342,6 +1337,19 @@ namespace Extract.FileActionManager.FileProcessors
                     FormsMethods.FlashWindow(this, true, true);
                 }
 
+                if (_settings.SingleSourceDocumentMode)
+                {
+                    // In discussion with Rob for the 10.6 Hurley update (10.6.1.XX), he wanted a title
+                    // bar that did not refer to "Paginate Files" since that isn't the primary purpose
+                    // of this task, esp when in SingleSourceDocumentMode. More consistent changes to
+                    // title bar text to be discussed later.
+                    string titleText = "Extract - <Workflow> - $FileOf(<SourceDocName>)";
+                    titleText = titleText.Replace("-  -", "");
+
+                    var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagUtility, fileName);
+                    Text = pathTags.Expand(titleText);
+                }
+
                 LoadDocumentForPagination(fileID, fileName, false);
                 _documentSelectionPending = true;
             }
@@ -1412,6 +1420,18 @@ namespace Extract.FileActionManager.FileProcessors
                 if (InvokeRequired)
                 {
                     return (bool)_invoker.Invoke(new VerificationFormStandby(Standby));
+                }
+
+                if (_settings.SingleSourceDocumentMode)
+                {
+                    // In discussion with Rob for the 10.6 Hurley update (10.6.1.XX), he wanted a title
+                    // bar that did not refer to "Paginate Files" since that isn't the primary purpose
+                    // of this task, esp when in SingleSourceDocumentMode. More consistent changes to
+                    // title bar text to be discussed later.
+                    string titleText = "Extract - <Workflow> - (Waiting for file)";
+                    titleText = titleText.Replace("-  -", "");
+
+                    Text = _tagUtility.ExpandTagsAndFunctions(titleText, "", null);
                 }
 
                 return true;
@@ -1509,13 +1529,16 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         void UpdateControls()
         {
-            if (_paginationPanel.SourceDocuments.Any())
+            if (!_settings.SingleSourceDocumentMode)
             {
-                Text = _FORM_TASK_TITLE;
-            }
-            else
-            {
-                Text = "(Waiting for file) - " + _FORM_TASK_TITLE;
+                if (_paginationPanel.SourceDocuments.Any())
+                {
+                    Text = "Paginate Files";
+                }
+                else
+                {
+                    Text = "(Waiting for file) - Paginate Files";
+                }
             }
         }
 

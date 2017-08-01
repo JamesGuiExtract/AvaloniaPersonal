@@ -457,9 +457,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // if this focus change is in conjunction with another control gaining focus.
                         // However, if no focus change is occurring, we need to call for the related
                         // page to be displayed here.
-                        if (FocusingControl == null || FocusingControl == ActiveDataControl)
+                        if (ImageViewer != null)
                         {
-                            LoadPageInImageViewer(allowSourceDocumentSwitch: true);
+                            if (FocusingControl == null || FocusingControl == ActiveDataControl)
+                            {
+                                LoadPageInImageViewer(allowSourceDocumentSwitch: true);
+                            }
                         }
 
                         _indicateFocus = value;
@@ -469,6 +472,23 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     throw ex.AsExtract("ELI44698");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether tab should advance to the next field if its
+        /// press has triggered the DEP to regain focus.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if the selected field should be advanced; otherwise, <c>false</c>.
+        /// </value>
+        protected override bool AdvanceOnTabTriggeredFocus
+        {
+            get
+            {
+                // If the panel is not currently advertising focus, the tab key should first restore
+                // focus and only advance after a subsequent press.
+                return IndicateFocus;
             }
         }
 

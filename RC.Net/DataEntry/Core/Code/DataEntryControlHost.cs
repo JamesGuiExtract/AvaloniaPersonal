@@ -4656,6 +4656,21 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether tab should advance to the next field if its
+        /// press has triggered the DEP to regain focus.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if the selected field should be advanced; otherwise, <c>false</c>.
+        /// </value>
+        protected virtual bool AdvanceOnTabTriggeredFocus
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether keyboard input directed at the <see cref="ImageViewer"/>
         /// should be processed by this panel.
         /// </summary>
@@ -5753,7 +5768,7 @@ namespace Extract.DataEntry
                 {
                     // Indicate a manual focus event so that HandleControlGotFocus allows the
                     // new attribute selection rather than overriding it.
-                    _manualFocusEvent = true;
+                    _manualFocusEvent = AdvanceOnTabTriggeredFocus;
 
                     activeGenealogy = new Stack<IAttribute>(nextTabStopGenealogy.Reverse());
                     activeAttribute = PropagateAttributes(nextTabStopGenealogy, true, tabByGroup);
