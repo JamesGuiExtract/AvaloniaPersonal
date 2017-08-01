@@ -625,11 +625,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    return DocumentDataPanel?.PanelControl
-                        .GetAncestors()
-                        .OfType<PaginationSeparator>()
-                        .FirstOrDefault()
-                            != null;
+                    // The DocumentDataPanel member of this class will remain set even when it is
+                    // not open. However, the DocumentDataPanel member of PageLayoutControl will
+                    // only be assigned when the panel is actually open.
+                    return _primaryPageLayoutControl.DocumentDataPanel != null;
                 }
                 catch (Exception ex)
                 {
@@ -3305,9 +3304,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void ProcessFocusChange()
         {
-            bool? dataPanelFocused = (_documentDataPanel?.PanelControl?.ContainsFocus == true)
-                ? true
-                : ContainsFocus ? (bool?)false : null;
+            // true if the data panel conclusively has focus, false if it conclusively does not,
+            // null if focus appears to currently lie neither directly with the DEP nor directly
+            // with _primaryPageLayoutControl.
+            bool? dataPanelFocused = !IsDataPanelOpen
+                ? (bool?) false
+                :   (_documentDataPanel?.PanelControl?.ContainsFocus == true)
+                    ? true
+                    : (ContainsFocus) ? (bool?)false : null;
 
             if (dataPanelFocused.HasValue && dataPanelFocused.Value != _dataPanelFocused)
             {

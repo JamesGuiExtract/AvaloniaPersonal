@@ -105,9 +105,9 @@
             label4.AutoSize = true;
             label4.Location = new System.Drawing.Point(13, 151);
             label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(142, 13);
+            label4.Size = new System.Drawing.Size(216, 13);
             label4.TabIndex = 9;
-            label4.Text = "Document data assembly file";
+            label4.Text = "Specify a data entry configuration file to use:";
             // 
             // infoTip5
             // 

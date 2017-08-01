@@ -443,13 +443,15 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         documentDataPanel.ClearData();
                     }
+                    
+                    // Report the DEP to be closed before it is removed so that events that trigger
+                    // as part of its removal do not assume the DEP to be open and usable.
+                    _documentDataPanelControl = null;
+                    OnDocumentDataPanelClosed();
 
-                    _tableLayoutPanel.Controls.Remove(_documentDataPanelControl);
+                    _tableLayoutPanel.Controls.Remove(documentDataPanel.PanelControl);
                     _tableLayoutPanel.Height = _tableLayoutPanel.Controls.OfType<Control>().Max(c => c.Bottom);
                     Height = _tableLayoutPanel.Height;
-                    _documentDataPanelControl = null;
-
-                    OnDocumentDataPanelClosed();
                 }
 
                 _editDocumentDataButton.Checked = false;
