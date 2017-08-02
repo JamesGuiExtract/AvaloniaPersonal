@@ -1886,7 +1886,7 @@ namespace Extract.DataEntry
                 // Ensure edit mode ends once this control is no longer active.
                 if (!setActive && !_preventProgrammaticEndEdit && EditingControl != null)
                 {
-                    EndEdit();
+                    EndEditNoFocus();
                 }
 
                 // The table should be displayed as active only if it is editable.
@@ -2890,6 +2890,29 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35385");
+            }
+        }
+
+        /// <summary>
+        /// Achieves same result as calling <see cref="EndEdit"/>, but without grabbing focus.
+        /// </summary>
+        protected void EndEditNoFocus()
+        {
+            try
+            {
+                // Using reflector I was able to find a codepath that called the private
+                // DataGridView.EndEdit with the "keepFocus" parameter as false if the current cell
+                // is updated while EditMode is EditOnEnter. 
+                var editMode = EditMode;
+                var currentCell = CurrentCell;
+                EditMode = DataGridViewEditMode.EditOnEnter;
+                CurrentCell = null;
+                CurrentCell = currentCell;
+                EditMode = editMode;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44709");
             }
         }
 

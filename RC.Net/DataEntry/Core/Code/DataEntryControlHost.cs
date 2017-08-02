@@ -863,7 +863,7 @@ namespace Extract.DataEntry
         /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool DisableKeyboardInput
+        public virtual bool DisableKeyboardInput
         {
             get;
             set;
@@ -1375,6 +1375,30 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether swiping is enabled.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if swiping is enabled; otherwise, <c>false</c>.
+        /// </value>
+        public virtual bool SwipingEnabled
+        {
+            get
+            {
+                try
+                {
+                    return ImageViewer != null &&
+                        ImageViewer.IsImageAvailable &&
+                        _activeDataControl != null &&
+                        _activeDataControl.SupportsSwiping;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI44710");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region IImageViewerControl Members
@@ -1725,10 +1749,7 @@ namespace Extract.DataEntry
                             _dbConnections, null);
 
                         // Enable or disable swiping as appropriate.
-                        bool swipingEnabled = _activeDataControl != null &&
-                                              _activeDataControl.SupportsSwiping;
-
-                        OnSwipingStateChanged(new SwipingStateChangedEventArgs(swipingEnabled));
+                        OnSwipingStateChanged(new SwipingStateChangedEventArgs(SwipingEnabled));
 
                         // Populate all root level data with the retrieved data.
                         foreach (IDataEntryControl dataControl in _rootLevelControls)
@@ -3291,12 +3312,7 @@ namespace Extract.DataEntry
                 DrawHighlights(true);
 
                 // Enable or disable swiping as appropriate.
-                bool swipingEnabled = ImageViewer != null &&
-                    ImageViewer.IsImageAvailable &&
-                    _activeDataControl != null &&
-                    _activeDataControl.SupportsSwiping;
-
-                OnSwipingStateChanged(new SwipingStateChangedEventArgs(swipingEnabled));
+                OnSwipingStateChanged(new SwipingStateChangedEventArgs(SwipingEnabled));
 
                 OnItemSelectionChanged();
             }
@@ -3596,8 +3612,7 @@ namespace Extract.DataEntry
                 // Don't attempt to process the event as a swipe if the user cancelled a swipe after
                 // starting it, if a swipe is already being processed, or if the active control does
                 // not support swiping.
-                if (!_processingSwipe && _activeDataControl != null &&
-                    _activeDataControl.SupportsSwiping)
+                if (!_processingSwipe && SwipingEnabled)
                 {
                     List<RasterZone> highlightedZones = new List<RasterZone>();
 
@@ -4652,21 +4667,6 @@ namespace Extract.DataEntry
             get
             {
                 return _focusingControl;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether tab should advance to the next field if its
-        /// press has triggered the DEP to regain focus.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if the selected field should be advanced; otherwise, <c>false</c>.
-        /// </value>
-        protected virtual bool AdvanceOnTabTriggeredFocus
-        {
-            get
-            {
-                return true;
             }
         }
 
@@ -5768,7 +5768,7 @@ namespace Extract.DataEntry
                 {
                     // Indicate a manual focus event so that HandleControlGotFocus allows the
                     // new attribute selection rather than overriding it.
-                    _manualFocusEvent = AdvanceOnTabTriggeredFocus;
+                    _manualFocusEvent = true;
 
                     activeGenealogy = new Stack<IAttribute>(nextTabStopGenealogy.Reverse());
                     activeAttribute = PropagateAttributes(nextTabStopGenealogy, true, tabByGroup);

@@ -451,6 +451,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                             ? ActiveSelectionColor
                             : Color.LightGray;
 
+                        // DataEntryTable cells will not update cell style properly while in edit
+                        // mode. To ensure active highlight color is properly updated, set control
+                        // to inactive before indicating active in the new color.
+                        ActiveDataControl?.IndicateActive(false, activeControlColor);
                         ActiveDataControl?.IndicateActive(true, activeControlColor);
 
                         // The image page relating to the currently active field will be displayed
@@ -466,6 +470,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
 
                         _indicateFocus = value;
+
+                        OnSwipingStateChanged(new SwipingStateChangedEventArgs(SwipingEnabled));
                     }
                 }
                 catch (Exception ex)
@@ -476,20 +482,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether tab should advance to the next field if its
-        /// press has triggered the DEP to regain focus.
+        /// Gets a value indicating whether swiping is enabled.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if the selected field should be advanced; otherwise, <c>false</c>.
+        ///   <c>true</c> if swiping is enabled; otherwise, <c>false</c>.
         /// </value>
-        protected override bool AdvanceOnTabTriggeredFocus
+        public override bool SwipingEnabled => 
+            // Do not allow swiping when the DEP is not indicating focus.
+            IndicateFocus && base.SwipingEnabled;
+
+        /// <summary>
+        /// Gets or sets whether keyboard input should be disabled.
+        /// </summary>
+        public override bool DisableKeyboardInput
         {
-            get
-            {
-                // If the panel is not currently advertising focus, the tab key should first restore
-                // focus and only advance after a subsequent press.
-                return IndicateFocus;
-            }
+            // Don't allow keyboard input when the DEP is not indicating focus.
+            get => !IndicateFocus || base.DisableKeyboardInput;
+
+            set => base.DisableKeyboardInput = value;
         }
 
         /// <summary>
@@ -903,11 +913,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _imageViewer.AllowHighlight =
-                    base.ImageViewer != null &&
-                    ImageViewer.IsImageAvailable &&
-                    ActiveDataControl != null &&
-                    ActiveDataControl.SupportsSwiping;
+                _imageViewer.AllowHighlight = SwipingEnabled;
+                if (!SwipingEnabled &&
+                    (_imageViewer.CursorTool == CursorTool.AngularHighlight ||
+                     _imageViewer.CursorTool == CursorTool.RectangularHighlight ||
+                     _imageViewer.CursorTool == CursorTool.WordHighlight))
+                {
+                    _imageViewer.CursorTool = CursorTool.None;
+                }
             }
             catch (Exception ex)
             {
