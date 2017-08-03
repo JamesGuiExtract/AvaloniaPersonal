@@ -1766,6 +1766,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Updates the content of the document separator for the specified <see paramref="document"/>.
+        /// This includes assigning the separator to the document to the if this has not already been
+        /// done.
+        /// </summary>
+        /// <param name="document">The document.</param>
+        public void UpdateDocumentSeparator(OutputDocument document)
+        {
+            try
+            {
+                var separator = _flowLayoutPanel.Controls
+                    .OfType<PaginationSeparator>()
+                    .SingleOrDefault(s => document == s.Document);
+
+                separator?.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44721");
+            }
+        }
+
         #endregion Methods
 
         #region Overrides

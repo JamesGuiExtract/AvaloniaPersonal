@@ -1537,9 +1537,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .Documents
                         .FirstOrDefault();
 
-                if (targetDocument != _primaryPageLayoutControl.DocumentInDataEdit)
+                if (targetDocument != null &&
+                    targetDocument != _primaryPageLayoutControl.DocumentInDataEdit)
                 {
-                    targetDocument?.PaginationSeparator?.OpenDataPanel();
+                    // https://extract.atlassian.net/browse/ISSUE-14886
+                    // Ensure separator has been assigned to the target document
+                    if (targetDocument.PaginationSeparator == null)
+                    {
+                        _primaryPageLayoutControl.UpdateDocumentSeparator(targetDocument);
+                    }
+                    targetDocument.PaginationSeparator.OpenDataPanel();
                 }
             }
             catch (Exception ex)
