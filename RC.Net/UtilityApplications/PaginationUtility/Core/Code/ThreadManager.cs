@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
 using System.Threading;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -12,9 +13,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         class ThreadManager : IDisposable
         {
             /// <summary>
-            /// Indicates in all <see cref="UpdateDocumentStatus"/> threads should be stopped.
+            /// Signals that all <see cref="UpdateDocumentStatus"/> threads should be stopped.
             /// </summary>
-            volatile bool _stopDocumentStatusThreads = false;
+            ManualResetEvent _stopSignaledEvent = new ManualResetEvent(false);
 
             /// <summary>
             /// An event that indicates when the document status threads have all finished.
@@ -53,7 +54,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 get
                 {
-                    return _stopDocumentStatusThreads;
+                    return _stopSignaledEvent.WaitOne(0);
+                }
+            }
+
+            /// <summary>
+            /// Gets a <see cref="WaitHandle"/> that is signaled when <see cref="StopThreads"/> is
+            /// called.
+            /// </summary>
+            public WaitHandle StopEvent
+            {
+                get
+                {
+                    return _stopSignaledEvent;
                 }
             }
 
@@ -81,15 +94,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// <param name="timeout">The timeout.</param>
             public bool StopThreads(int timeout)
             {
-                if (!_stopDocumentStatusThreads)
+                if (!StoppingThreads)
                 {
-                    _stopDocumentStatusThreads = true;
+                    _stopSignaledEvent.Set();
                     _documentStatusThreadsFinishedEvent.Signal();
                 }
 
                 if (_documentStatusThreadsFinishedEvent.Wait(timeout))
                 {
-                    _stopDocumentStatusThreads = false;
+                    _stopSignaledEvent.Reset();
                     _documentStatusThreadsFinishedEvent.Reset(1);
 
                     return true;
@@ -136,6 +149,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                             _documentStatusThreadsFinishedEvent.Dispose();
                             _documentStatusThreadsFinishedEvent = null;
+                        }
+
+                        if (_stopSignaledEvent != null)
+                        {
+                            _stopSignaledEvent.Dispose();
+                            _stopSignaledEvent = null;
                         }
                     }
                     catch { }

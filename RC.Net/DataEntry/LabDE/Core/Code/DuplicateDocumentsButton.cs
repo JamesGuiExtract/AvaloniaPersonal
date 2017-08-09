@@ -814,7 +814,11 @@ namespace Extract.DataEntry.LabDE
         protected virtual void UpdateButtonState()
         {
             // If this is not visible, do not bother updating the button state.
-            if (Visible)
+            // https://extract.atlassian.net/browse/ISSUE-14894
+            // Ensure no updates occur and no files are attempted to be checked out if this thread
+            // is ending. This helps to prevent issues in DataEntryPanelContainer.UpdateDocumentStatusThread
+            // as the paginate files task is closed.
+            if (Visible && !AttributeStatusInfo.ThreadEnding)
             {
                 BackColor = _originalBackColor;
 
@@ -924,10 +928,16 @@ namespace Extract.DataEntry.LabDE
             }
             duplicateFileIDRecordset.Close();
 
+            // https://extract.atlassian.net/browse/ISSUE-14894
+            // Get the currentFileID to ensure under no circumstances will this attempt to check out
+            // the current file. This had been occurring in DataEntryPanelContainer.UpdateDocumentStatusThread
+            // after processing had been stopped and the files were returned to the queue.
+            int currentFileID = FileProcessingDB.GetFileID(AttributeStatusInfo.SourceDocName);
+
             // Check each file that hasn't already been checked out to see if it should be checked
             // out.
             foreach (int fileID in duplicateFileIDs
-                .Where(fileID => !_checkedOutFiles.Contains(fileID)))
+                .Where(fileID => fileID != currentFileID && !_checkedOutFiles.Contains(fileID)))
             {
                 EActionStatus actionStatus =
                     DataEntryApplication.FileProcessingDB.GetFileStatus(
