@@ -123,7 +123,7 @@ namespace Extract.DataEntry
         /// Added persistence of _hintEnabled.
         /// </summary>
         const int _CURRENT_VERSION = 3;
-        
+
         #endregion Constants
 
         #region Static fields
@@ -260,6 +260,13 @@ namespace Extract.DataEntry
         /// </summary>
         [ThreadStatic]
         static Logger _logger;
+
+        /// <summary>
+        /// Indicates whether the current thread is about to end; This can be used to prevent
+        /// unnecessary operations from running.
+        /// </summary>
+        [ThreadStatic]
+        static bool _threadEnding;
 
         /// <summary>
         /// Registered event handlers for the <see cref="DataReset"/> event.
@@ -407,7 +414,7 @@ namespace Extract.DataEntry
         /// prevent recursion via autoUpdateQueries.
         /// </summary>
         bool _raisingAttributeValueModified;
-        
+
         /// <summary>
         /// Specifies under what circumstances the attribute should serve as a tab stop.
         /// </summary>
@@ -714,7 +721,7 @@ namespace Extract.DataEntry
                 return _sourceDocName;
             }
         }
-       
+
         /// <summary>
         /// Gets an <see cref="IPathTags"/> instance to expands path tags.
         /// </summary>
@@ -828,6 +835,29 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current thread is about to end; This can
+        /// be used to prevent unnecessary operations from running.
+        /// <b><para>Note</para></b>
+        /// This value can only be set to <c>true</c> not <c>false</c>.
+        /// </summary>
+        /// <value><c>true</c> if the thread is ending; otherwise, <c>false</c>.
+        /// </value>
+        [ComVisible(false)]
+        public static bool ThreadEnding
+        {
+            get
+            {
+                return _threadEnding;
+            }
+
+            set
+            {
+                ExtractException.Assert("ELI44740", "Cannot clear ThreadEnding status.", value);
+                _threadEnding = value;
+            }
+        }
+
+        /// <summary>
         /// Indicates if logging is currently enabled for the specified <see paramref="category"/>.
         /// </summary>
         /// <param name="category">The <see cref="LogCategories"/> to check for whether logging is
@@ -867,7 +897,7 @@ namespace Extract.DataEntry
                 if (!_statusInfoMap.TryGetValue(attribute, out statusInfo))
                 {
                     statusInfo = attribute.DataObject as AttributeStatusInfo;
-                    
+
                     if (statusInfo == null)
                     {
                         statusInfo = new AttributeStatusInfo();
@@ -934,7 +964,7 @@ namespace Extract.DataEntry
                 string traceFileName = "";
                 try
                 {
-                    if (Logger != null && Logger.LogToMemory && 
+                    if (Logger != null && Logger.LogToMemory &&
                         !string.IsNullOrWhiteSpace(_sourceDocName))
                     {
                         // Generate the trace output filename.
@@ -1018,7 +1048,7 @@ namespace Extract.DataEntry
                 _attributes = attributes;
                 _sourceDocName = sourceDocName;
                 _dbConnections = dbConnections;
-                
+
                 OnDataReset();
             }
             catch (Exception ex)
@@ -1265,7 +1295,7 @@ namespace Extract.DataEntry
         /// value).</param>
         [ComVisible(false)]
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
-        public static void Initialize(IAttribute attribute, IUnknownVector sourceAttributes, 
+        public static void Initialize(IAttribute attribute, IUnknownVector sourceAttributes,
             IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
             TabStopMode? tabStopMode, IDataEntryValidator validatorTemplate, string autoUpdateQuery,
             string validationQuery, bool newAttribute = false)
@@ -2035,7 +2065,7 @@ namespace Extract.DataEntry
         /// a sub-attribute to the previous until the final attribute is the first unviewed 
         /// attribute.</returns>
         [ComVisible(false)]
-        public static Stack<IAttribute> FindNextUnviewedAttribute(IUnknownVector attributes, 
+        public static Stack<IAttribute> FindNextUnviewedAttribute(IUnknownVector attributes,
             Stack<IAttribute> startingPoint, bool forward, bool loop)
         {
             try
@@ -2404,7 +2434,7 @@ namespace Extract.DataEntry
                 throw ExtractException.AsExtractException("ELI25138", ex);
             }
         }
-        
+
         /// <summary>
         /// Finds the first <see cref="IAttribute"/> that is a tabstop in the DEP after the
         /// specified starting point.
@@ -2600,7 +2630,7 @@ namespace Extract.DataEntry
                 string paddedDisplayOrder =
                         string.Format(CultureInfo.InvariantCulture, "{0:D3}", displayOrder);
 
-                statusInfo._displayOrder = 
+                statusInfo._displayOrder =
                     DataEntryMethods.GetTabIndex((Control)statusInfo._owningControl) + "." +
                     paddedDisplayOrder;
             }
@@ -2801,7 +2831,7 @@ namespace Extract.DataEntry
         /// <param name="rasterZones">A list of <see cref="Extract.Imaging.RasterZone"/>s 
         /// that define the spatial hint.</param>
         [ComVisible(false)]
-        public static void SetHintRasterZones(IAttribute attribute, 
+        public static void SetHintRasterZones(IAttribute attribute,
             IEnumerable<Extract.Imaging.RasterZone> rasterZones)
         {
             try
@@ -2881,7 +2911,7 @@ namespace Extract.DataEntry
                 throw ExtractException.AsExtractException("ELI26588", ex);
             }
         }
-        
+
         /// <summary>
         /// Specifies whether the attribute should be persisted in output.
         /// </summary>
@@ -3097,7 +3127,7 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         public static void ForgetLastAppliedStringValues()
         {
-            try 
+            try
             {
                 // LastAppliedStringValues should be remembered throughout the initial loading of a
                 // document regardless of calls into ForgetLastAppliedStringValues.
@@ -3203,7 +3233,7 @@ namespace Extract.DataEntry
                             filters.Count() <= 2, "Query", query);
                         string nameFilter = filters[0];
                         string valueFilter = (filters.Length == 1) ? "" : filters[1];
-                        
+
                         for (int i = 0; i < count; i++)
                         {
                             IAttribute attribute = (IAttribute)attributesToQuery.At(i);
@@ -3249,7 +3279,7 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26102", ex);
-                ee.AddDebugData("rootAttribute", 
+                ee.AddDebugData("rootAttribute",
                     (rootAttribute == null) ? "null" : rootAttribute.Name, false);
                 ee.AddDebugData("query", query, false);
                 throw ee;
@@ -3340,7 +3370,7 @@ namespace Extract.DataEntry
                     // If there was an exception applying any value, restore the original value for
                     // all modified attributes to prevent exceptions from continuously being
                     // generated.
-                    foreach (KeyValuePair<IAttribute, KeyValuePair<bool, SpatialString>> 
+                    foreach (KeyValuePair<IAttribute, KeyValuePair<bool, SpatialString>>
                         modifiedAttribute in _attributesBeingModified)
                     {
                         IAttribute attribute = modifiedAttribute.Key;
@@ -3384,7 +3414,7 @@ namespace Extract.DataEntry
                 _attributesToValidate.Clear();
 
                 throw ExtractException.AsExtractException("ELI26118", ex);
-            }  
+            }
         }
 
         /// <summary>
@@ -3409,7 +3439,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                foreach (IAttribute attribute in 
+                foreach (IAttribute attribute in
                     DataEntryMethods.ToAttributeEnumerable(attributes, true))
                 {
                     ReleaseAttributes(attribute.SubAttributes);
@@ -3804,7 +3834,7 @@ namespace Extract.DataEntry
                 }
             }
 
-            if (!DisableValidationQueries)
+            if (!DisableValidationQueries && !ThreadEnding)
             {
                 // Find any existing validation trigger.
                 AutoUpdateTrigger existingValidationTrigger = null;

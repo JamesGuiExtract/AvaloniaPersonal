@@ -296,6 +296,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 int temp;
                 _pendingDocumentStatusUpdate.TryRemove(data, out temp);
 
+                // Return quickly if this thread is being stopped
+                if (AttributeStatusInfo.ThreadEnding)
+                {
+                    return;
+                }
+
                 _documentData = (DataEntryPaginationDocumentData)data;
                 _configManager.LoadCorrectConfigForData(_documentData.WorkingAttributes);
 
@@ -523,11 +529,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (disposing)
             {
-                if (StatusUpdateThreadManager != null && StatusUpdateThreadManager.Owner == this)
+                if (StatusUpdateThreadManager != null)
                 {
-                    // Will wait up to 10 seconds for any document status threads to finish
-                    StatusUpdateThreadManager.Dispose();
-                    StatusUpdateThreadManager = null;
+                    if (StatusUpdateThreadManager.Owner == this)
+                    {
+                        _pendingDocumentStatusUpdate.Clear();
+
+                        // Will wait up to 10 seconds for any document status threads to finish
+                        StatusUpdateThreadManager.Dispose();
+                        StatusUpdateThreadManager = null;
+                    }
+                    else
+                    {
+                        // Signal to avoid unneeded/unwanted processing still to occur in this instance.
+                        AttributeStatusInfo.ThreadEnding = true;
+                    }
                 }
 
                 if (components != null)
@@ -852,6 +868,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         void UpdateDocumentStatusThread(DataEntryPaginationDocumentData documentData, string serializedAttributes)
         {
             bool registeredThread = false;
+            bool gotSemaphore = false;
             ExtractException ee = null;
             bool dataModified = false;
             bool dataError = false;
@@ -877,11 +894,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return;
                 }
 
-                _documentStatusUpdateSemaphore.WaitOne();
+                // If StatusUpdateThreadManager signaled stop while waiting for the semaphore, abort.
+                if (WaitHandle.WaitAny(new[] { _documentStatusUpdateSemaphore, StatusUpdateThreadManager.StopEvent }) == 1)
+                {
+                    return;
+                }
+
+                gotSemaphore = true;
 
                 // If by the time this thread has a chance to update, the document was loaded, abort.
-                if (!_pendingDocumentStatusUpdate.ContainsKey(documentData) ||
-                    (StatusUpdateThreadManager != null && StatusUpdateThreadManager.StoppingThreads))
+                if (!_pendingDocumentStatusUpdate.ContainsKey(documentData))
                 {
                     return;
                 }
@@ -917,10 +939,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
-                _documentStatusUpdateSemaphore.Release();
                 if (registeredThread)
                 {
                     StatusUpdateThreadManager.SignalThreadEnded();
+                }
+
+                if (gotSemaphore)
+                {
+                    _documentStatusUpdateSemaphore.Release();
                 }
             }
 

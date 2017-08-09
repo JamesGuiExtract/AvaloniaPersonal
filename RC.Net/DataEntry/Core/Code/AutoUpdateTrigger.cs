@@ -474,7 +474,8 @@ namespace Extract.DataEntry
                 // if auto-update queries are blocked.
                 // [DataEntry:1271]
                 // ... or attributes that are not initialized (in the process of being deleted).
-                if (dataEntryQuery.Disabled || !AttributeStatusInfo.GetStatusInfo(_targetAttribute).IsInitialized ||
+                if (AttributeStatusInfo.ThreadEnding || dataEntryQuery.Disabled ||
+                    !AttributeStatusInfo.GetStatusInfo(_targetAttribute).IsInitialized ||
                     (_validationTrigger && !AttributeStatusInfo.ValidationTriggersEnabled) ||
                     (!_validationTrigger && dataEntryQuery.TargetProperty == null &&
                         AttributeStatusInfo.BlockAutoUpdateQueries))
