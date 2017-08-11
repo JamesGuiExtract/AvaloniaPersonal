@@ -1,6 +1,5 @@
-﻿using Extract.Imaging.Forms;
-using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.ObjectModel;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry
@@ -137,6 +136,17 @@ namespace Extract.DataEntry
             get;
         }
 
+        /// <summary>
+        /// Gets the IDs of the files currently loaded in the application.
+        /// </summary>
+        /// <value>
+        /// The IDs of the files currently loaded in the application.
+        /// </value>
+        ReadOnlyCollection<int> FileIds
+        {
+            get;
+        }
+
         #endregion Properties
 
         #region Methods
@@ -160,7 +170,9 @@ namespace Extract.DataEntry
         /// check for changes and save, use the <see cref="Dirty"/> and <see cref="SaveData"/>
         /// members first.
         /// </summary>
-        void DelayFile();
+        /// <param name="fileId">The ID of the file to delay (or -1 when there is only a single
+        /// file to which this call could apply).</param>
+        void DelayFile(int fileId = -1);
 
         /// <summary>
         /// Skips processing for the current file. This is the same as pressing the skip button in

@@ -7,6 +7,7 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -49,43 +50,6 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         static readonly string _IN_USE = "In use ({0})";
 
-        /// <summary>
-        /// The value indicates the document should be the one displayed in the verification UI.
-        /// </summary>
-        protected static readonly string CurrentOption = "Current document";
-
-        /// <summary>
-        /// The value that indicates no action should be taken on the file.
-        /// </summary>
-        protected static readonly string DoNothingOption = "Do nothing";
-
-        /// <summary>
-        /// The value that indicates the document should be stapled into a new unified document.
-        /// </summary>
-        protected static readonly string StapleOption = "Staple";
-
-        /// <summary>
-        /// The value that indicates the document should be stapled into a new unified document but
-        /// without the first page of this document.
-        /// </summary>
-        protected static readonly string StapleWithoutFirstPageOption = "Staple w/o 1st page";
-
-        /// <summary>
-        /// The value indicates the document should be removed from the queue without filing the
-        /// document's results.
-        /// </summary>
-        protected static readonly string IgnoreOption = "Ignore document";
-
-        /// <summary>
-        /// The value indicates the document should be skipped.
-        /// </summary>
-        protected static readonly string SkipOption = "Skip";
-
-        /// <summary>
-        /// All possible actions for files that are owned (checked-out) by the current process.
-        /// </summary>
-        static string[] _ALL_FILE_OPTIONS = new[] { DoNothingOption, StapleOption, IgnoreOption, SkipOption, CurrentOption };
-
         #endregion Constants
 
         #region Fields
@@ -96,53 +60,14 @@ namespace Extract.DataEntry.LabDE
         IFileProcessingDB _fileProcessingDB;
 
         /// <summary>
-        /// Stores the currently selected action for all files that have been displayed in FFI.
+        /// <see langword="true"/> if any file actions have changes since the FFI form was displayed
         /// </summary>
-        Dictionary<int, string> _currentValues = new Dictionary<int, string>();
-
-        /// <summary>
-        /// The files that are currently checked out for processing in different processes.
-        /// </summary>
-        HashSet<int> _inUseFiles = new HashSet<int>();
-
-        /// <summary>
-        /// Stores the previous file action status for the current action for all files that have
-        /// been displayed in the FFI.
-        /// </summary>
-        Dictionary<int, EActionStatus> _previousStatuses = new Dictionary<int, EActionStatus>();
-
-        /// <summary>
-        /// The values that have been programmatically changed since the last GetValue call, thus
-        /// need to be updated in the FFI.
-        /// </summary>
-        HashSet<int> _valuesToRefresh = new HashSet<int>();
-
-        /// <summary>
-        /// Files that have been checked out by the current process in order to keep these files
-        /// from being processed on another action.
-        /// </summary>
-        HashSet<int> _checkedOutFileIDs = new HashSet<int>();
-
-        /// <summary>
-        /// The file ID of the document that was displayed in verification at the time the FFI was
-        /// launched.
-        /// </summary>
-        int _originalFileID = -1;
-
-        /// <summary>
-        /// The file ID of the document that has been selected as the one to be displayed in verification.
-        /// </summary>
-        int _currentFileID = -1;
+        bool _dirty;
 
         /// <summary>
         /// The name of a stapled document that has been output via the staple action.
         /// </summary>
         string _stapledOutputDocument;
-
-        /// <summary>
-        /// <see langword="true"/> if any file actions have changes since the FFI form was displayed
-        /// </summary>
-        bool _dirty;
 
         #endregion Fields
 
@@ -170,74 +95,146 @@ namespace Extract.DataEntry.LabDE
         #region Properties
 
         /// <summary>
-        /// Gets the original file id.
+        /// Represents the action name and status name associated with a single option available in
+        /// the duplicate documents UI.
         /// </summary>
-        public int OriginalFileId
+        internal struct DuplicateDocumentOption
+        {
+            public string Action;
+            public string Status;
+        }
+
+        /// <summary>
+        /// The value indicates the document should be the one displayed in the verification UI.
+        /// </summary>
+        internal virtual DuplicateDocumentOption CurrentOption
         {
             get
             {
-                return _originalFileID;
+                return new DuplicateDocumentOption { Action = "Current", Status = "Current" };
             }
         }
 
         /// <summary>
-        /// Gets or sets the name of the original file.
+        /// The value that indicates no action should be taken on the file.
         /// </summary>
-        /// <value>
-        /// The name of the original file.
-        /// </value>
-        public string OriginalFileName
+        internal virtual DuplicateDocumentOption DoNothingOption
+        {
+            get
+            {
+                return new DuplicateDocumentOption { Action = "Do nothing", Status = "" };
+            }
+        }
+
+        /// <summary>
+        /// The value that indicates the document should be stapled into a new unified document.
+        /// </summary>
+        internal virtual DuplicateDocumentOption StapleOption
+        {
+            get
+            {
+                return new DuplicateDocumentOption { Action = "Staple", Status = "Stapled" };
+            }
+        }
+
+        /// <summary>
+        /// The value that indicates the document should be stapled into a new unified document but
+        /// without the first page of this document.
+        /// </summary>
+        internal virtual DuplicateDocumentOption StapleWithoutFirstPageOption
+        {
+            get
+            {
+                return new DuplicateDocumentOption { Action = "Staple w/o 1st page", Status = "Stapled" };
+            }
+        }
+
+        /// <summary>
+        /// The value indicates the document should be removed from the queue without filing the
+        /// document's results.
+        /// </summary>
+        internal virtual DuplicateDocumentOption IgnoreOption
+        {
+            get
+            {
+                return new DuplicateDocumentOption { Action = "Discard", Status = "Discarded" };
+            }
+        }
+
+        /// <summary>
+        /// The value indicates the document should be skipped.
+        /// </summary>
+        internal virtual DuplicateDocumentOption SkipOption
+        {
+            get
+            {
+                return new DuplicateDocumentOption { Action = "Skip", Status = "Skipped" };
+            }
+        }
+
+        /// <summary>
+        /// Stores the currently selected action for all files that have been displayed in FFI.
+        /// </summary>
+        protected Dictionary<int, string> CurrentValues
         {
             get;
-            set;
-        }
+        } = new Dictionary<int, string>();
 
         /// <summary>
-        /// Gets or sets the file ID of the document currently selected to be displayed in
-        /// verification.
+        /// The files that are currently checked out for processing in different processes.
         /// </summary>
-        /// <value>
-        /// The file ID of the document currently selected to be displayed in verification.
-        /// </value>
-        public int CurrentFileID
+        protected HashSet<int> InUseFiles
         {
-            get
-            {
-                return _currentFileID;
-            }
-
-            set
-            {
-                try
-                {
-                    if (value != _currentFileID)
-                    {
-                        // If there was previously a different CurrentFileID value and that value
-                        // is not being cleared (set to -1), update the previous CurrentFileID to
-                        // ensure there is never more than one "current" file.
-                        if (_currentFileID != -1 && value != -1)
-                        {
-                            _currentValues[_currentFileID] = DoNothingOption;
-                            _valuesToRefresh.Add(_currentFileID);
-                        }
-
-                        _currentFileID = value;
-
-                        if (_originalFileID == -1 && value != -1)
-                        {
-                            _originalFileID = value;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI37444");
-                }
-            }
-        }
+            get;
+        } = new HashSet<int>();
 
         /// <summary>
-        /// Gets or sets the <see cref="IDataEntryApplication"/> instance currently being used in
+        /// Stores the previous file action status for the current action for all files that have
+        /// been displayed in the FFI.
+        /// </summary>
+        protected Dictionary<int, EActionStatus> PreviousStatuses
+        {
+            get;
+        } = new Dictionary<int, EActionStatus>();
+
+        /// <summary>
+        /// The values that have been programmatically changed since the last GetValue call, thus
+        /// need to be updated in the FFI.
+        /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods")]
+        protected HashSet<int> ValuesToRefresh
+        {
+            get;
+        } = new HashSet<int>();
+
+        /// <summary>
+        /// Files that have been checked out by the current process in order to keep these files
+        /// from being processed on another action.
+        /// </summary>
+        protected HashSet<int> CheckedOutFileIds
+        {
+            get;
+        } = new HashSet<int>();
+
+        /// <summary>
+        /// The file ID of the document that was displayed in verification at the time the FFI was
+        /// launched.
+        /// </summary>
+        public HashSet<int> OriginalFileIds
+        {
+            get;
+        } = new HashSet<int>();
+
+        /// <summary>
+        /// The file ID of the document that has been selected as the one to be displayed in verification.
+        /// </summary>
+        protected HashSet<int> CurrentFileIds
+        {
+            get;
+        } = new HashSet<int>();
+
+        /// <summary>
+        /// Gets the <see cref="IDataEntryApplication"/> instance currently being used in
         /// verification.
         /// </summary>
         /// <value>
@@ -246,7 +243,7 @@ namespace Extract.DataEntry.LabDE
         public IDataEntryApplication DataEntryApplication
         {
             get;
-            set;
+            private set;
         }
 
         /// <summary>
@@ -370,6 +367,33 @@ namespace Extract.DataEntry.LabDE
         #region Methods
 
         /// <summary>
+        /// Initializes column with the specified set of files currently loaded in
+        /// <see paramref="dataEntryApplication"/>
+        /// </summary>
+        /// <param name="dataEntryApplication">The <see cref="IDataEntryApplication"/> instance
+        /// currently being used in verification.</param>
+        /// <param name="fileIds">The IDs of the files being </param>
+        public virtual void Initialize(IDataEntryApplication dataEntryApplication)
+        {
+            try
+            {
+                ClearData();
+
+                DataEntryApplication = dataEntryApplication;
+                FileProcessingDB = dataEntryApplication.FileProcessingDB;
+                foreach (int fileId in dataEntryApplication.FileIds)
+                {
+                    OriginalFileIds.Add(fileId);
+                    CurrentFileIds.Add(fileId);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44743");
+            }
+        }
+
+        /// <summary>
         /// Gets the <see cref="EActionStatus"/> of the document prior to being checked out for
         /// display in the FFI.
         /// </summary>
@@ -380,7 +404,7 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                return _previousStatuses[fileID];
+                return PreviousStatuses[fileID];
             }
             catch (Exception ex)
             {
@@ -399,16 +423,15 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                if (_inUseFiles.Contains(fileID))
+                if (InUseFiles.Contains(fileID))
                 {
                     return false;
                 }
-                else if ((fileID == CurrentFileID || fileID == _originalFileID) &&
-                         CurrentFileID != _originalFileID)
+                else if (OriginalFileIds.Contains(fileID) != CurrentFileIds.Contains(fileID))
                 {
                     return true;
                 }
-                else if (fileID == CurrentFileID || _currentValues[fileID] == DoNothingOption)
+                else if (CurrentFileIds.Contains(fileID) || CurrentValues[fileID] == DoNothingOption.Action)
                 {
                     return false;
                 }
@@ -592,7 +615,7 @@ namespace Extract.DataEntry.LabDE
 
                     if (fileIds.Count() > 1)
                     {
-                        choices = choices.Except(new[] { CurrentOption });
+                        choices = choices.Except(new[] { CurrentOption.Action });
                     }
                 }
 
@@ -620,42 +643,42 @@ namespace Extract.DataEntry.LabDE
                 // Attempt to retrieve the value we already have for this file, except in the case
                 // of a file that has been locked by another user... in that case attempt to check
                 // the file out again in case it has been released by the other user.
-                if (_inUseFiles.Contains(fileID) || !_currentValues.TryGetValue(fileID, out value))
+                if (InUseFiles.Contains(fileID) || !CurrentValues.TryGetValue(fileID, out value))
                 {
                     // This is the first time this file has been loaded into the FFI; initialize
                     // the value.
-                    value = DoNothingOption;
+                    value = DoNothingOption.Action;
                     EActionStatus previousStatus = EActionStatus.kActionUnattempted;
                     if (DataEntryApplication.FileRequestHandler.CheckoutForProcessing(
                         fileID, true, out previousStatus))
                     {
-                        _inUseFiles.Remove(fileID);
+                        InUseFiles.Remove(fileID);
 
-                        if (fileID == _currentFileID)
+                        if (CurrentFileIds.Contains(fileID))
                         {
                             // This is the file currently displayed in verification.
-                            value = CurrentOption;
+                            value = CurrentOption.Action;
                         }
                         else if (previousStatus != EActionStatus.kActionProcessing)
                         {
                             // This is the file has been successfully checked out (locked) by the
                             // current process.
-                            _checkedOutFileIDs.Add(fileID);
+                            CheckedOutFileIds.Add(fileID);
                         }
 
-                        _previousStatuses[fileID] = previousStatus;
+                        PreviousStatuses[fileID] = previousStatus;
                     }
                     else
                     {
                         // If the file could not be checked out, another process has the file locked
                         // for processing. Mark as in-use.
-                        _inUseFiles.Add(fileID);
+                        InUseFiles.Add(fileID);
                         value = GetInUseValue(fileID);
 
-                        _previousStatuses[fileID] = EActionStatus.kActionProcessing;
+                        PreviousStatuses[fileID] = EActionStatus.kActionProcessing;
                     }
 
-                    _currentValues[fileID] = value;
+                    CurrentValues[fileID] = value;
                 }
 
                 // If the value is different from what it originally was, indicate that it has
@@ -688,26 +711,32 @@ namespace Extract.DataEntry.LabDE
 
                 // Check if the value is being set for the first time or changed
                 string currentValue = null;
-                if (!_currentValues.TryGetValue(fileId, out currentValue) || value != currentValue)
+                if (!CurrentValues.TryGetValue(fileId, out currentValue) || value != currentValue)
                 {
-                    _currentValues[fileId] = value;
+                    CurrentValues[fileId] = value;
 
-                    if (value == CurrentOption)
+                    if (value == CurrentOption.Action)
                     {
-                        // If this file has been make the current file, update CurrentFileID
-                        CurrentFileID = fileId;
+                        foreach (int oldFileId in CurrentFileIds.Except(new[] { fileId }))
+                        {
+                            CurrentValues[oldFileId] = DoNothingOption.Action;
+                            ValuesToRefresh.Add(oldFileId);
+                        }
+
+                        CurrentFileIds.Clear();
+                        CurrentFileIds.Add(fileId);
                     }
-                    else if (CurrentFileID == fileId)
+                    else if (CurrentFileIds.Contains(fileId))
                     {
                         // If this file had been the current file, clear CurrentFileID
-                        CurrentFileID = -1;
+                        CurrentFileIds.Remove(fileId);
                     }
 
                     _dirty = true;
 
                     // Refresh the value in the UI in order to display an asterisk to indicate when
                     // a value has changed.
-                    _valuesToRefresh.Add(fileId);
+                    ValuesToRefresh.Add(fileId);
                 }
 
                 return true;
@@ -730,7 +759,7 @@ namespace Extract.DataEntry.LabDE
         /// </returns>
         public virtual IEnumerable<int> GetValuesToRefresh()
         {
-            return _valuesToRefresh;
+            return ValuesToRefresh;
         }
 
         #endregion IFAMFileInspectorColumn
@@ -790,7 +819,7 @@ namespace Extract.DataEntry.LabDE
                 // the queue.
                 DataEntryApplication.FileRequestHandler.PauseProcessingQueue();
 
-                bool delayCurrentFile = false;
+                var filesToDelay = new List<int>();
 
                 if (!PromptForActions())
                 {
@@ -799,14 +828,17 @@ namespace Extract.DataEntry.LabDE
 
                 // If no file is specified to be current, but the previous current file is set to
                 // "do nothing", set it as current so that it remains in the UI.
-                if (CurrentFileID == -1 && _originalFileID != -1 &&
-                    _currentValues[_originalFileID] == DoNothingOption)
+                if (CurrentFileIds.Count == 0)
                 {
-                    SetValue(_originalFileID, CurrentOption);
+                    foreach (int fileId in OriginalFileIds.Where
+                        (id => CurrentValues[id] == DoNothingOption.Action))
+                    {
+                        SetValue(fileId, CurrentOption.Action);
+                    }
                 }
 
                 // If the currently displayed file is to be changed.
-                if (_originalFileID != CurrentFileID)
+                if (OriginalFileIds.Except(CurrentFileIds).Any())
                 {
                     // Make sure changes are saved if use wants them saved.
                     if (!PromptToSaveCurrentFileChanges())
@@ -814,26 +846,29 @@ namespace Extract.DataEntry.LabDE
                         return false;
                     }
 
-                    // If a new current file has been specified, it should be officially moved into
-                    // the queue (via fallback status) if it is not already and it should be
-                    // requested to be the next file displayed.
-                    if (CurrentFileID != -1)
+                    foreach (int fileId in OriginalFileIds.Except(CurrentFileIds))
                     {
-                        _checkedOutFileIDs.Remove(CurrentFileID);
-
-                        DataEntryApplication.FileRequestHandler.SetFallbackStatus(
-                            CurrentFileID, EActionStatus.kActionPending);
-
-                        if (!DataEntryApplication.RequestFile(CurrentFileID))
-                        {
-                            new ExtractException("ELI37565",
-                                "Specified current file is not available for processing.").Display();
-                        }
+                        CheckedOutFileIds.Remove(fileId);
+                        
+                        // Since the user does not want the original file displayed in verification any
+                        // longer, delay it.
+                        filesToDelay.Add(fileId);
                     }
+                }
 
-                    // Since the user does not want the original file displayed in verification any
-                    // longer, delay it.
-                    delayCurrentFile = true;
+                // If a new current file has been specified, it should be officially moved into
+                // the queue (via fallback status) if it is not already and it should be
+                // requested to be the next file displayed.
+                foreach (int newId in CurrentFileIds.Except(OriginalFileIds))
+                {
+                    DataEntryApplication.FileRequestHandler.SetFallbackStatus(
+                        newId, EActionStatus.kActionPending);
+
+                    if (!DataEntryApplication.RequestFile(newId))
+                    {
+                        new ExtractException("ELI37565",
+                            "Specified current file is not available for processing.").Display();
+                    }
                 }
 
                 PerformActions();
@@ -843,9 +878,9 @@ namespace Extract.DataEntry.LabDE
                 ReleaseCheckedOutFiles();
 
                 // The delay of the current file should happen last (if necessary).
-                if (delayCurrentFile)
+                foreach (int fileID in filesToDelay)
                 {
-                    DataEntryApplication.DelayFile();
+                    DataEntryApplication.DelayFile(fileID);
                 }
 
                 ClearData();
@@ -905,7 +940,12 @@ namespace Extract.DataEntry.LabDE
         {
             get
             {
-                return _ALL_FILE_OPTIONS;
+                return new[] {
+                    DoNothingOption.Action,
+                    StapleOption.Action,
+                    IgnoreOption.Action,
+                    SkipOption.Action,
+                    CurrentOption.Action };
             }
         }
 
@@ -916,11 +956,15 @@ namespace Extract.DataEntry.LabDE
         /// <param name="fileId">The file ID.</param>
         /// <returns>The value choices available to the specified <see paramref="fileId"/>.
         /// </returns>
-        protected IEnumerable<string> GetValueChoicesHelper(int fileId)
+        protected virtual IEnumerable<string> GetValueChoicesHelper(int fileId)
         {
-            if (_inUseFiles.Contains(fileId))
+            if (InUseFiles.Contains(fileId))
             {
                 return new[] { GetInUseValue(fileId) };
+            }
+            else if (CurrentValues.TryGetValue(fileId, out string option) && option == CurrentOption.Action)
+            {
+                return new[] { CurrentOption.Action };
             }
             else
             {
@@ -1070,7 +1114,7 @@ namespace Extract.DataEntry.LabDE
             {
                 // Since these files are being processed, remove from _checkedOutFileIDs so they
                 // don't get released back to their previous status.
-                _checkedOutFileIDs.Remove(fileId);
+                CheckedOutFileIds.Remove(fileId);
 
                 // Make as complete in the current action.
                 EActionStatus oldStatus;
@@ -1107,7 +1151,7 @@ namespace Extract.DataEntry.LabDE
         /// </returns>
         protected IEnumerable<int> GetFileIdsForAction(string action)
         {
-            return _currentValues
+            return CurrentValues
                 .Where(valuePair => valuePair.Value == action)
                 .Select(valuePair => valuePair.Key);
         }
@@ -1121,15 +1165,15 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                if (GetFileIdsForAction(StapleOption).Count() +
-                        GetFileIdsForAction(StapleWithoutFirstPageOption).Count() == 1)
+                if (GetFileIdsForAction(StapleOption.Action).Count() +
+                        GetFileIdsForAction(StapleWithoutFirstPageOption.Action).Count() == 1)
                 {
                     UtilityMethods.ShowMessageBox("At least 2 documents must be set to " + 
                         StapleOption + "' in order create a stapled document.", "Staple error", true);
                     return false;
                 }
 
-                var stapledIdsWithoutFirstPage = GetFileIdsForAction(StapleWithoutFirstPageOption);
+                var stapledIdsWithoutFirstPage = GetFileIdsForAction(StapleWithoutFirstPageOption.Action);
                 if (stapledIdsWithoutFirstPage.Any())
                 {
                     if (MessageBox.Show("You have selected to exclude the first page from " +
@@ -1158,17 +1202,17 @@ namespace Extract.DataEntry.LabDE
             try
             {
                 // Handle files that have been ignored.
-                var ignoredIds = GetFileIdsForAction(IgnoreOption);
+                var ignoredIds = GetFileIdsForAction(IgnoreOption.Action);
                 StandardActionProcessor(
                     ignoredIds, EActionStatus.kActionCompleted, TagForIgnore, "", "");
 
                 // Handle files that have been skipped.
-                var skippedIds = GetFileIdsForAction(SkipOption);
+                var skippedIds = GetFileIdsForAction(SkipOption.Action);
                 StandardActionProcessor(skippedIds, EActionStatus.kActionSkipped, "", "", "");
 
                 // Handle files that have been stapled.
-                var stapledIdsWithoutFirstPage = GetFileIdsForAction(StapleWithoutFirstPageOption);
-                var stapledIds = GetFileIdsForAction(StapleOption).Union(stapledIdsWithoutFirstPage);
+                var stapledIdsWithoutFirstPage = GetFileIdsForAction(StapleWithoutFirstPageOption.Action);
+                var stapledIds = GetFileIdsForAction(StapleOption.Action).Union(stapledIdsWithoutFirstPage);
                 CreateStapledOutput(stapledIds, stapledIdsWithoutFirstPage);
                 StandardActionProcessor(stapledIds, EActionStatus.kActionCompleted, TagForStaple,
                     StapledIntoMetadataFieldName, StapledIntoMetadataFieldValue);
@@ -1192,8 +1236,8 @@ namespace Extract.DataEntry.LabDE
                 using (var messageBox = new CustomizableMessageBox())
                 {
                     messageBox.Caption = "Save changes?";
-                    messageBox.Text = "There are unsaved changes in '" +
-                        Path.GetFileName(OriginalFileName) + "'.\r\n\r\nSave changes?";
+                    messageBox.Text = "There are unsaved changes in the previously opened file." +
+                        "\r\n\r\nSave changes?";
                     messageBox.AddStandardButtons(MessageBoxButtons.YesNoCancel);
                     string response = messageBox.Show(FAMFileInspectorForm);
                     if (response == "Yes")
@@ -1222,33 +1266,31 @@ namespace Extract.DataEntry.LabDE
             {
                 StringBuilder message = new StringBuilder();
 
-                if (CurrentFileID != -1 && CurrentFileID != _originalFileID)
+                if (OriginalFileIds.Intersect(CurrentFileIds).Count() != CurrentFileIds.Count)
                 {
-                    string fileName = "";
-                    int pageCount = 0;
-                    FAMFileInspectorForm.GetFileInfo(CurrentFileID, out fileName, out pageCount);
+                    FAMFileInspectorForm.GetFileInfo(CurrentFileIds.Single(), out string fileName, out int pageCount);
 
                     message.Append("Make '");
                     message.Append(Path.GetFileName(fileName));
                     message.AppendLine("' the current document.");
                 }
 
-                int stapledDocuments = _currentValues.Values.Count(value =>
-                    value == StapleOption || value == StapleWithoutFirstPageOption);
+                int stapledDocuments = CurrentValues.Values.Count(value =>
+                    value == StapleOption.Action || value == StapleWithoutFirstPageOption.Action);
                 if (stapledDocuments > 0)
                 {
                     message.AppendLine(string.Format(CultureInfo.CurrentCulture,
                         "Staple {0} file(s).", stapledDocuments));
                 }
 
-                int ignoredDocuments = _currentValues.Values.Count(value => value == IgnoreOption);
+                int ignoredDocuments = CurrentValues.Values.Count(value => value == IgnoreOption.Action);
                 if (ignoredDocuments > 0)
                 {
                     message.AppendLine(string.Format(CultureInfo.CurrentCulture,
                         "Ignore {0} file(s).", ignoredDocuments));
                 }
 
-                int skippedDocuments = _currentValues.Values.Count(value => value == SkipOption);
+                int skippedDocuments = CurrentValues.Values.Count(value => value == SkipOption.Action);
                 if (skippedDocuments > 0)
                 {
                     message.AppendLine(string.Format(CultureInfo.CurrentCulture,
@@ -1265,12 +1307,12 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         protected void ReleaseCheckedOutFiles()
         {
-            foreach (int fileId in _checkedOutFileIDs)
+            foreach (int fileId in CheckedOutFileIds)
             {
                 DataEntryApplication.ReleaseFile(fileId);
             }
 
-            _checkedOutFileIDs.Clear();
+            CheckedOutFileIds.Clear();
         }
 
         /// <summary>
@@ -1278,12 +1320,13 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         protected virtual void ClearData()
         {
-            _currentValues.Clear();
-            _inUseFiles.Clear();
-            _valuesToRefresh.Clear();
-            _checkedOutFileIDs.Clear();
-            _currentFileID = -1;
-            _originalFileID = -1;
+            CurrentValues.Clear();
+            InUseFiles.Clear();
+            PreviousStatuses.Clear();
+            ValuesToRefresh.Clear();
+            CheckedOutFileIds.Clear();
+            OriginalFileIds.Clear();
+            CurrentFileIds.Clear();
             _stapledOutputDocument = "";
             _dirty = false;
         }

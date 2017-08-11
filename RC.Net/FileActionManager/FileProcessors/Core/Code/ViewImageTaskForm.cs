@@ -721,7 +721,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// This event is not implemented by <see cref="ViewImageTaskForm"/>.
         /// </summary>
-        public void DelayFile()
+        public void DelayFile(int fileID)
         {
             throw new ExtractException("ELI37504", "Method not implmented.");
         }
