@@ -151,7 +151,9 @@ namespace Extract.FileActionManager.Forms
         /// up in its place, though if there are no more files in the queue this will cause the same
         /// file to be re-displayed.
         /// </summary>
-        void DelayFile();
+        /// <param name="fileId">The ID of the file to delay (or -1 when there is only a single
+        /// file to which this call could apply).</param>
+        void DelayFile(int fileId = -1);
 
         /// <summary>
         /// Executes disposal of any thread-local or thread-static objects just prior to the UI

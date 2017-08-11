@@ -4315,7 +4315,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// This event is not implemented by <see cref="VerificationTaskForm"/>.
         /// </summary>
-        public void DelayFile()
+        public void DelayFile(int fileID = -1)
         {
             throw new ExtractException("ELI37503", "Method not implemented.");
         }

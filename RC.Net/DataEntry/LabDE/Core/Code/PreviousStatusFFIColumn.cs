@@ -87,6 +87,37 @@ namespace Extract.DataEntry.LabDE
 
         #endregion Constructors
 
+        #region Properties
+
+        /// <summary>
+        /// Gets the <see cref="DuplicateDocumentsFFIColumn"/> with which this column is associated.
+        /// </summary>
+        /// <value>
+        /// The <see cref="DuplicateDocumentsFFIColumn"/> with which this column is associated.
+        /// </value>
+        protected DuplicateDocumentsFFIColumn DuplicateDocumentsColumn
+        {
+            get
+            {
+                return _duplicateDocumentsColumn;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IDataEntryApplication"/> instance currently being used in
+        /// verification.
+        /// </summary>
+        /// <value>
+        /// The <see cref="IDataEntryApplication"/> instance currently being used in verification.
+        /// </value>
+        public IDataEntryApplication DataEntryApplication
+        {
+            get;
+            set;
+        }
+
+        #endregion Properties   
+
         #region IFAMFileInspectorColumn Members
 
         /// <summary>
@@ -208,9 +239,9 @@ namespace Extract.DataEntry.LabDE
             {
                 EActionStatus previousStatus = _duplicateDocumentsColumn.GetPreviousStatus(fileID);
 
-                if (fileID == _duplicateDocumentsColumn.OriginalFileId)
+                if (_duplicateDocumentsColumn.OriginalFileIds.Contains(fileID))
                 {
-                    return "Current";
+                    return _duplicateDocumentsColumn.CurrentOption.Status;
                 }
                 else if (previousStatus == EActionStatus.kActionCompleted)
                 {
@@ -223,8 +254,8 @@ namespace Extract.DataEntry.LabDE
                     IEnumerable<string> tagsOnFile = null;
 
                     // Retrieve the tags if either a TagForIgnore or TagForStaple have been configured.
-                    if (!string.IsNullOrWhiteSpace(_duplicateDocumentsColumn.TagForIgnore) ||
-                        !string.IsNullOrWhiteSpace(_duplicateDocumentsColumn.TagForStaple))
+                    if (!string.IsNullOrWhiteSpace(DuplicateDocumentsColumn.TagForIgnore) ||
+                        !string.IsNullOrWhiteSpace(DuplicateDocumentsColumn.TagForStaple))
                     {
                         tagsOnFile = famDb.GetTagsOnFile(fileID).ToIEnumerable<string>();
                     }
@@ -234,20 +265,20 @@ namespace Extract.DataEntry.LabDE
                         tagsOnFile.Contains(_duplicateDocumentsColumn.TagForStaple,
                             StringComparer.OrdinalIgnoreCase))
                     {
-                        return "Stapled";
+                        return DuplicateDocumentsColumn.StapleOption.Status;
                     }
                     // Has the StapledIntoMetadataFieldName been assigned?
                     else if (!string.IsNullOrWhiteSpace(_duplicateDocumentsColumn.StapledIntoMetadataFieldName) &&
                         !string.IsNullOrWhiteSpace(famDb.GetMetadataFieldValue(fileID, _duplicateDocumentsColumn.StapledIntoMetadataFieldName)))
                     {
-                        return "Stapled";
+                        return DuplicateDocumentsColumn.StapleOption.Status;
                     }
                     // Has the TagForIgnore been applied?
                     else if (!string.IsNullOrWhiteSpace(_duplicateDocumentsColumn.TagForIgnore) &&
                         tagsOnFile.Contains(_duplicateDocumentsColumn.TagForIgnore,
                             StringComparer.OrdinalIgnoreCase))
                     {
-                        return "Ignored";
+                        return DuplicateDocumentsColumn.IgnoreOption.Status;
                     }
                 }
 
@@ -286,7 +317,7 @@ namespace Extract.DataEntry.LabDE
 
         /// <summary>
         /// Retrieves the set of file IDs for which the value needs to be refreshed. This method
-        /// will be called after every time the the FFI file list is loaded or refreshed and after
+        /// will be called after every time the FFI file list is loaded or refreshed and after
         /// every time <see cref="SetValue"/> is called in order to check for updated values to be
         /// displayed. <see cref="GetValue"/> will subsequently be called for every returned file
         /// id.

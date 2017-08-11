@@ -8,6 +8,7 @@ using Extract.Utilities.Forms;
 using Extract.UtilityApplications.PaginationUtility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -428,7 +429,19 @@ namespace Extract.FileActionManager.FileProcessors
         /// </returns>
         public bool RequestFile(int fileID)
         {
-            throw new NotImplementedException();
+            try
+            {
+                ExtractException.Assert("ELI44760", "Invalid operation.", FileProcessingDB != null);
+
+                string fileName = FileProcessingDB.GetFileNameFromFileID(fileID);
+                LoadDocumentForPagination(fileID, fileName, true);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44759");
+            }
         }
 
         /// <summary>
@@ -525,6 +538,20 @@ namespace Extract.FileActionManager.FileProcessors
             get
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the IDs of the files currently loaded in the application.
+        /// </summary>
+        /// <value>
+        /// The IDs of the files currently loaded in the application.
+        /// </value>
+        public ReadOnlyCollection<int> FileIds
+        {
+            get
+            {
+                return _fileIDsLoaded.AsReadOnly();
             }
         }
 
@@ -1447,7 +1474,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// up in its place, though if there are no more files in the queue this will cause the same
         /// file to be re-displayed.
         /// </summary>
-        public void DelayFile()
+        /// <param name="fileId">The ID of the file to delay (or -1 when there is only a single
+        /// file to which this call could apply).</param>
+        public void DelayFile(int fileID = -1)
         {
             if (InvokeRequired)
             {
@@ -1455,7 +1484,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     try
                     {
-                        DelayFile();
+                        DelayFile(fileID);
                     }
                     catch (Exception ex)
                     {
@@ -1471,7 +1500,7 @@ namespace Extract.FileActionManager.FileProcessors
                 ExtractException.Assert("ELI40139", "Invalid operation.",
                     FileProcessingDB != null);
 
-                if (!string.IsNullOrEmpty(_fileName))
+                if (_fileID == fileID || (fileID == -1 || _fileID != -1))
                 {
                     OnFileComplete(EFileProcessingResult.kProcessingDelayed);
                 }

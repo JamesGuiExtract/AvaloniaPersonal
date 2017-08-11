@@ -9,6 +9,7 @@ using Extract.Utilities.Forms;
 using Extract.UtilityApplications.PaginationUtility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -3363,7 +3364,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 return (_brandingResources == null) ? "" : _brandingResources.ApplicationTitle;
             }
-        }   
+        }
 
         /// <summary>
         /// Gets how the image viewer zoom/view is adjusted when new fields are selected.
@@ -3481,6 +3482,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Gets the IDs of the files currently loaded in the application.
+        /// </summary>
+        /// <value>
+        /// The IDs of the files currently loaded in the application.
+        /// </value>
+        public ReadOnlyCollection<int> FileIds
+        {
+            get
+            {
+                return ((_fileId > 0) ? new[] { _fileId } : new int[0])
+                    .ToList().AsReadOnly();
+            }
+        }
+
+        /// <summary>
         /// Saves the data currently displayed to disk.
         /// </summary>
         /// <param name="validateData"><see langword="true"/> to ensure the data is conforms to the
@@ -3545,7 +3561,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// check for changes and save, use the <see cref="Dirty"/> and <see cref="SaveData"/>
         /// members first.
         /// </summary>
-        public void DelayFile()
+        /// <param name="fileId">The ID of the file to delay (or -1 when there is only a single
+        /// file to which this call could apply).</param>
+        public void DelayFile(int fileID = -1)
         {
             if (InvokeRequired)
             {
@@ -3553,7 +3571,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     try
                     {
-                        DelayFile();
+                        DelayFile(fileID);
                     }
                     catch (Exception ex)
                     {
@@ -3568,6 +3586,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 ExtractException.Assert("ELI37451", "Invalid operation.",
                     !_standAloneMode && _fileProcessingDb != null);
+
+                ExtractException.Assert("ELI44741", "Cannot delay file that is not open.",
+                    fileID == -1 || fileID == _fileId);
 
                 // If is no image loaded, there is no file to delay. (While paginating the normal
                 // document load may have been short-circuited; assume there is a document to

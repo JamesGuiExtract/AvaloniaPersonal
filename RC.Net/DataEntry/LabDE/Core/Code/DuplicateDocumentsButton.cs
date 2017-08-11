@@ -596,13 +596,8 @@ namespace Extract.DataEntry.LabDE
                     BackColor = FlashColor;
                 }
 
-                string currentFileName = DataEntryControlHost.ImageViewer.ImageFile;
-
                 // Provide the ActionColumn with the necessary information
-                ActionColumn.OriginalFileName = currentFileName;
-                ActionColumn.CurrentFileID = FileProcessingDB.GetFileID(currentFileName);
-                ActionColumn.DataEntryApplication = DataEntryControlHost.DataEntryApplication;
-                ActionColumn.FileProcessingDB = FileProcessingDB;
+                ActionColumn.Initialize(DataEntryControlHost.DataEntryApplication);
                 ActionColumn.FirstName = FirstName;
                 ActionColumn.LastName = LastName;
                 ActionColumn.DOB = DOB;
