@@ -1,0 +1,3 @@
+// Test es:Bitmap function on a PDF (since I couldn't make this work from nunit -Nat)
+// https://extract.atlassian.net/browse/ISSUE-14895
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.pdf;;Test1.eav

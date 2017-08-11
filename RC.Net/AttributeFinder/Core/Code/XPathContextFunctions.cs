@@ -1,4 +1,5 @@
 ﻿using Extract.Imaging;
+using Extract.Imaging.Utilities;
 using Extract.Utilities;
 using Leadtools;
 using System;
@@ -205,6 +206,13 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                // Attempt to unlock PDF support
+                ExtractException ee = UnlockLeadtools.UnlockPdfSupport(returnExceptionIfUnlicensed: false);
+                if (ee != null)
+                {
+                    throw ee;
+                }
+
                 RasterZone zone = null;
                 var value = attr.Value;
                 if (!value.HasSpatialInfo())
