@@ -225,19 +225,9 @@ namespace Extract.Redaction.Verification
         Task<List<(int page, int width, int height)>> _getPageInfoTask;
 
         /// <summary>
-        /// Task to represent the background collection of missing page info.
-        /// </summary>
-        Task<List<(int page, int width, int height)>> _getMissingPageInfoTask;
-
-        /// <summary>
         /// Func that will collect the page info for each page of the image
         /// </summary>
         Func<List<(int page, int width, int height)>> _getPageInfo;
-
-        /// <summary>
-        /// Func that will collect the page info for any missing pages in the _pageInfoMap
-        /// </summary>
-        Func<List<(int page, int width, int height)>> _getMissingPageInfo;
 
         /// <summary>
         /// The source document for the redactions
@@ -276,19 +266,16 @@ namespace Extract.Redaction.Verification
                 Enumerable.Range(1, _imageViewer.PageCount)
                 .Select(i =>
                 {
-                    ImagePageProperties pageProperties = _imageViewer.GetPageProperties(i);
-                    return (page: i, width: pageProperties.Width, height: pageProperties.Height);
-                })
-                .ToList();
-
-            _getMissingPageInfo = () =>
-                // Iterate over each page of the image.
-                Enumerable.Range(1, _imageViewer.PageCount)
-                .Where(i => !_pageInfoMap.Contains(i))
-                .Select(i =>
-                {
-                    ImagePageProperties pageProperties = _imageViewer.GetPageProperties(i);
-                    return (page: i, width: pageProperties.Width, height: pageProperties.Height);
+                    if (_imageViewer.SpatialPageInfos?.Contains(i) ?? false)
+                    {
+                        var pageinfo = (SpatialPageInfo)_imageViewer.SpatialPageInfos.GetValue(i);
+                        return (page: i, width: pageinfo.Width, height: pageinfo.Height);
+                    }
+                    else
+                    {
+                        ImagePageProperties pageProperties = _imageViewer.GetPageProperties(i);
+                        return (page: i, width: pageProperties.Width, height: pageProperties.Height);
+                    }
                 })
                 .ToList();
         }
@@ -1644,53 +1631,6 @@ namespace Extract.Redaction.Verification
                     _pageInfoMap = pageInfoMap;
                 }
             }
-            // It is possible for the spatial page info map in the USS file to be missing pages
-            // https://extract.atlassian.net/browse/ISSUE-14707
-            else
-            {
-                using (new TemporaryWaitCursor())
-                {
-                    List<(int page, int width, int height)> result = null;
-
-                    // If the task was not started for some reason then just run the action directly
-                    if (_getMissingPageInfoTask == null || _getMissingPageInfoTask.Status == TaskStatus.WaitingToRun)
-                    {
-                        result = _getMissingPageInfo();
-                    }
-                    else
-                    {
-                        _getMissingPageInfoTask.Wait();
-
-                        if (_getMissingPageInfoTask.IsFaulted)
-                        {
-                            var ag = _getMissingPageInfoTask.Exception as AggregateException;
-                            var ue = (ag?.InnerException ?? _getMissingPageInfoTask.Exception).AsExtract("ELI43428");
-                            throw ue;
-                        }
-
-                        result = _getMissingPageInfoTask.Result;
-                    }
-
-                    LongToObjectMap pageInfoMap = null;
-                    if (result.Any())
-                    {
-                        pageInfoMap = (LongToObjectMap)((ICopyableObject)_pageInfoMap).Clone();
-
-                        foreach ((int page, int width, int height) in result)
-                        {
-                            // Create the spatial page info for this page
-                            SpatialPageInfo pageInfo = new SpatialPageInfo();
-                            pageInfo.Initialize(width, height, EOrientation.kRotNone, 0);
-
-                            // Add it to the map
-                            pageInfoMap.Set(page, pageInfo);
-                        }
-
-                        pageInfoMap.SetReadonly();
-                        _pageInfoMap = pageInfoMap;
-                    }
-                }
-            }
 
             return _pageInfoMap;
         }
@@ -2327,15 +2267,7 @@ namespace Extract.Redaction.Verification
 
                 if (_imageViewer.IsImageAvailable)
                 {
-                    if (_imageViewer.SpatialPageInfos != null)
-                    {
-                        _pageInfoMap = _imageViewer.SpatialPageInfos;
-                        _getMissingPageInfoTask = Task.Run(_getMissingPageInfo);
-                    }
-                    else
-                    {
-                        _getPageInfoTask = Task.Run(_getPageInfo);
-                    }
+                    _getPageInfoTask = Task.Run(_getPageInfo);
                     _dataGridView.Enabled = true;
                 }
                 else
