@@ -45,7 +45,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// The value indicates the document should be the one displayed in the verification UI.
         /// </summary>
-        internal override DuplicateDocumentOption CurrentOption
+        public override DuplicateDocumentOption CurrentOption
         {
             get
             {

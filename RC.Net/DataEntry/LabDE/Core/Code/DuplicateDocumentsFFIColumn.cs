@@ -98,16 +98,21 @@ namespace Extract.DataEntry.LabDE
         /// Represents the action name and status name associated with a single option available in
         /// the duplicate documents UI.
         /// </summary>
-        internal struct DuplicateDocumentOption
+        [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes")]
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
+        public struct DuplicateDocumentOption
         {
+            [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
             public string Action;
+
+            [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
             public string Status;
         }
 
         /// <summary>
         /// The value indicates the document should be the one displayed in the verification UI.
         /// </summary>
-        internal virtual DuplicateDocumentOption CurrentOption
+        public virtual DuplicateDocumentOption CurrentOption
         {
             get
             {
@@ -118,7 +123,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// The value that indicates no action should be taken on the file.
         /// </summary>
-        internal virtual DuplicateDocumentOption DoNothingOption
+        public virtual DuplicateDocumentOption DoNothingOption
         {
             get
             {
@@ -129,7 +134,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// The value that indicates the document should be stapled into a new unified document.
         /// </summary>
-        internal virtual DuplicateDocumentOption StapleOption
+        public virtual DuplicateDocumentOption StapleOption
         {
             get
             {
@@ -141,7 +146,7 @@ namespace Extract.DataEntry.LabDE
         /// The value that indicates the document should be stapled into a new unified document but
         /// without the first page of this document.
         /// </summary>
-        internal virtual DuplicateDocumentOption StapleWithoutFirstPageOption
+        public virtual DuplicateDocumentOption StapleWithoutFirstPageOption
         {
             get
             {
@@ -153,7 +158,7 @@ namespace Extract.DataEntry.LabDE
         /// The value indicates the document should be removed from the queue without filing the
         /// document's results.
         /// </summary>
-        internal virtual DuplicateDocumentOption IgnoreOption
+        public virtual DuplicateDocumentOption IgnoreOption
         {
             get
             {
@@ -164,7 +169,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// The value indicates the document should be skipped.
         /// </summary>
-        internal virtual DuplicateDocumentOption SkipOption
+        public virtual DuplicateDocumentOption SkipOption
         {
             get
             {
