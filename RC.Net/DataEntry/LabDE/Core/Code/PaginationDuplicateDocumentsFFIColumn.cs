@@ -178,6 +178,36 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
+        /// Gets the value choices available to the specified <see paramref="fileId"/> or all
+        /// potential value choices for any file if <see paramref="fileId"/> is -1.
+        /// </summary>
+        /// <param name="fileId">The file ID.</param>
+        /// <returns>The value choices available to the specified <see paramref="fileId"/>.
+        /// </returns>
+        protected override IEnumerable<string> GetValueChoicesHelper(int fileId)
+        {
+            try
+            {
+                if (InUseFiles.Contains(fileId))
+                {
+                    return new[] { GetInUseValue(fileId) };
+                }
+                else if (CurrentValues.TryGetValue(fileId, out string option) && option == CurrentOption.Action)
+                {
+                    return new[] { CurrentOption.Action };
+                }
+                else
+                {
+                    return AllFileOptions;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44806");
+            }
+        }
+
+        /// <summary>
         /// Prompts regarding any situation that prevents performing the specified action. 
         /// </summary>
         /// <returns><see langword="true"/> if the actions can be successfully applied; otherwise,
