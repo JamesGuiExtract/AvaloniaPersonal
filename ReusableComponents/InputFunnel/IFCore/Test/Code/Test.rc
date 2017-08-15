@@ -121,8 +121,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 10,6,1,82
+ PRODUCTVERSION 10,6,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -139,13 +139,13 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "\0"
             VALUE "FileDescription", "Test MFC Application\0"
-            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "FileVersion", "10, 6, 1, 82\0"
             VALUE "InternalName", "Test\0"
             VALUE "LegalCopyright", "Copyright (C) 2017\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "Test.EXE\0"
             VALUE "ProductName", "Test Application\0"
-            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "ProductVersion", "10, 6, 0, 0\0"
         END
     END
     BLOCK "VarFileInfo"

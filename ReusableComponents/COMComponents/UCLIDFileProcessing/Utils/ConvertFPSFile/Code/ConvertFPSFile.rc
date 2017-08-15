@@ -93,8 +93,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 10,6,1,82
+ PRODUCTVERSION 10,6,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -111,12 +111,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "ConvertFPSFile"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "FileVersion", "10, 6, 1, 82\0"
             VALUE "InternalName", "ConvertFPSFile.exe"
             VALUE "LegalCopyright", "(c) 2017 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "ConvertFPSFile.exe"
             VALUE "ProductName", "ConvertFPSFile"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductVersion", "10, 6, 0, 0\0"
         END
     END
     BLOCK "VarFileInfo"
