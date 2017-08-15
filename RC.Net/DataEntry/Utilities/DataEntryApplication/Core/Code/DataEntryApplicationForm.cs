@@ -3962,6 +3962,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         return DialogResult.Cancel;
                     }
+
+                    // User as selected to discard changes; prevent additional save attempts that
+                    // will re-prompt.
+                    // https://extract.atlassian.net/browse/ISSUE-14904
+                    PreventSaveOfDirtyData = true;
                 }
             }
 
@@ -4040,6 +4045,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Return cancel if the data in the DEP failed validation.
                     response = DialogResult.Cancel;
                 }
+            }
+
+            if (response == DialogResult.Cancel)
+            {
+                // Ensure that if the operation that triggered the same attempt has been cancelled
+                // that PreventSaveOfDirtyData is reset.
+                PreventSaveOfDirtyData = false;
             }
 
             return response;
@@ -4670,8 +4682,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationSourceAction))
             {
-                int sourceActionID = FileProcessingDB.GetActionID(
-                    _settings.PaginationSettings.PaginationSourceAction);
+                int sourceActionID = -1;
+
+                try
+                {
+                    sourceActionID = FileProcessingDB.GetActionID(
+                        _settings.PaginationSettings.PaginationSourceAction);
+                }
+                catch (Exception)
+                {
+                    var ee = new ExtractException("ELI44807", "Action for pagination sources is not valid.");
+                    ee.AddDebugData("Action", _settings.PaginationSettings.PaginationSourceAction, false);
+                    throw ee;
+                }
 
                 ExtractException.Assert("ELI40385",
                     "Cannot set pagination sources back to pending in same action",
@@ -4680,8 +4703,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
             {
-                int outputActionID = FileProcessingDB.GetActionID(
-                    _settings.PaginationSettings.PaginationOutputAction);
+                int outputActionID = -1;
+
+                try
+                {
+                    outputActionID = FileProcessingDB.GetActionID(
+                        _settings.PaginationSettings.PaginationOutputAction);
+                }
+                catch (Exception)
+                {
+                    var ee = new ExtractException("ELI44808", "Action for paginated output is not valid.");
+                    ee.AddDebugData("Action", _settings.PaginationSettings.PaginationOutputAction, false);
+                    throw ee;
+                }
 
                 ExtractException.Assert("ELI40386",
                     "Cannot set pagination output back to pending in same action",
@@ -4709,9 +4743,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Allows config file to be able to update _paginationDocumentDataPanel.
                 _configManager.DefaultDataEntryConfiguration.Config.ApplyObjectSettings(
                     _paginationDocumentDataPanel.PanelControl);
-
-                _paginationPanel.DocumentDataRequest += HandlePaginationPanel_DocumentDataRequest;
             }
+
+            _paginationPanel.DocumentDataRequest += HandlePaginationPanel_DocumentDataRequest;
         }
 
         /// <summary>
