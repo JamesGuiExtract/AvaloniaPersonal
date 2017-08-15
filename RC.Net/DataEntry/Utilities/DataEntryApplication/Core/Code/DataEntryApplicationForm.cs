@@ -615,16 +615,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // For pre-fetching purposes, allow the ImageViewer to cache images.
                 _imageViewer.CacheImages = true;
 
-                if (_paginationPanel != null)
-                {
-                    _paginationPanel.ImageViewer = _imageViewer;
-                    _paginationPanel.ExpectedPaginationAttributesPath =
-                        _settings.PaginationSettings.ExpectedPaginationAttributesOutputPath;
-                    _paginationPanel.OutputExpectedPaginationAttributesFile =
-                        _settings.PaginationSettings.OutputExpectedPaginationAttributesFiles;
-                    _paginationPanel.FileProcessingDB = FileProcessingDB;
-                }
-
                 _invoker = new ControlInvoker(this);
             }
             catch (Exception ex)
@@ -1318,6 +1308,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     ExtractException.Assert("ELI43208",
                         "Pagination cannot be performed for more than one workflow at a time.",
                         !FileProcessingDB.RunningAllWorkflows);
+
+                    _paginationPanel.ImageViewer = _imageViewer;
+                    _paginationPanel.ExpectedPaginationAttributesPath =
+                        _settings.PaginationSettings.ExpectedPaginationAttributesOutputPath;
+                    _paginationPanel.OutputExpectedPaginationAttributesFile =
+                        _settings.PaginationSettings.OutputExpectedPaginationAttributesFiles;
+                    _paginationPanel.FileProcessingDB = FileProcessingDB;
 
                     ValidatePaginationActions();
 

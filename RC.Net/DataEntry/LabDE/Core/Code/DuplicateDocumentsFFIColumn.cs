@@ -963,17 +963,20 @@ namespace Extract.DataEntry.LabDE
         /// </returns>
         protected virtual IEnumerable<string> GetValueChoicesHelper(int fileId)
         {
-            if (InUseFiles.Contains(fileId))
+            try
             {
-                return new[] { GetInUseValue(fileId) };
+                if (InUseFiles.Contains(fileId))
+                {
+                    return new[] { GetInUseValue(fileId) };
+                }
+                else
+                {
+                    return AllFileOptions;
+                }
             }
-            else if (CurrentValues.TryGetValue(fileId, out string option) && option == CurrentOption.Action)
+            catch (Exception ex)
             {
-                return new[] { CurrentOption.Action };
-            }
-            else
-            {
-                return AllFileOptions;
+                throw ex.AsExtract("ELI44805");
             }
         }
 

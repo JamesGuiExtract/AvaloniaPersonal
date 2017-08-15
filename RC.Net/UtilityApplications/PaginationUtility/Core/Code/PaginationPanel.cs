@@ -628,7 +628,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // The DocumentDataPanel member of this class will remain set even when it is
                     // not open. However, the DocumentDataPanel member of PageLayoutControl will
                     // only be assigned when the panel is actually open.
-                    return _primaryPageLayoutControl.DocumentDataPanel != null;
+                    return _primaryPageLayoutControl?.DocumentDataPanel != null;
                 }
                 catch (Exception ex)
                 {
