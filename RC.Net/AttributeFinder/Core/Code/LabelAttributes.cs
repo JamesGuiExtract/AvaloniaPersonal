@@ -325,8 +325,7 @@ namespace Extract.AttributeFinder
                 attributeToLabel.SubAttributes.PushBack(label);
             }
         }
-
-        private static bool HasSpatialOverlap(ComAttribute a, ComAttribute b)
+        private static bool HasSpatialOverlap(ComAttribute a, ComAttribute b, double overlapThreshold = 0.5)
         {
             if (!(a.Value.HasSpatialInfo() && b.Value.HasSpatialInfo()))
             {
@@ -337,8 +336,17 @@ namespace Extract.AttributeFinder
                 var aZones = a.Value.GetOriginalImageRasterZones().ToIEnumerable<RasterZone>();
                 var bZones = b.Value.GetOriginalImageRasterZones().ToIEnumerable<RasterZone>();
 
-                return aZones.Any(aZone => bZones.Any(
-                    bZone => aZone.GetAreaOverlappingWith(bZone) > 0));
+                return aZones.Any(aZone =>
+                    bZones.Any(bZone =>
+                    {
+                        var overlapArea = aZone.GetAreaOverlappingWith(bZone);
+                        var aArea = aZone.Area;
+                        var bArea = bZone.Area;
+                        var overlapRatio1 = overlapArea / aArea;
+                        var overlapRatio2 = overlapArea / bArea;
+                        return overlapRatio1 >= overlapThreshold
+                            || overlapRatio2 >= overlapThreshold;
+                    }));
             }
         }
 
