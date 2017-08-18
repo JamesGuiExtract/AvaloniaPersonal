@@ -66,8 +66,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 10,6,1,82
- PRODUCTVERSION 10,6,0,0
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -85,14 +85,14 @@ BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Extract Systems\0"
             VALUE "FileDescription", "UltimateGrid DLL\0"
-            VALUE "FileVersion", "10, 6, 1, 82\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "UltimateGrid\0"
             VALUE "LegalCopyright", "Copyright (C) 2002\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "UGDLL.DLL\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "UltimateGrid Dynamic Link Library\0"
-            VALUE "ProductVersion", "10, 6, 0, 0\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
             VALUE "SpecialBuild", "\0"
         END
     END

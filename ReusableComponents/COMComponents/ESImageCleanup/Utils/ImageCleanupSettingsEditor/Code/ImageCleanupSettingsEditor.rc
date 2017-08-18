@@ -133,8 +133,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 10,6,1,82
- PRODUCTVERSION 10,6,0,0
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -151,12 +151,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "Image Cleanup Settings Editor"
-            VALUE "FileVersion", "10, 6, 1, 82\0"
+            VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "ImageCleanupSettingsEditor.exe"
             VALUE "LegalCopyright", "(c) 2017 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "ImageCleanupSettingsEditor.exe"
             VALUE "ProductName", "Image Cleanup Settings Editor"
-            VALUE "ProductVersion", "10, 6, 0, 0\0"
+            VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
     BLOCK "VarFileInfo"

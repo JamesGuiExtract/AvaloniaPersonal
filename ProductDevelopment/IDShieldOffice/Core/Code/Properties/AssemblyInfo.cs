@@ -33,8 +33,8 @@ using System.Resources;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("10.6.1.82")]
-[assembly: AssemblyFileVersion("10.6.1.82")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
 // Mark as CLS compliant
