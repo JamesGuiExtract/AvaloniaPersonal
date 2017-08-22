@@ -41,7 +41,7 @@ $ISOTitle = 'IDShieldExtras' + $FlexVersionString
 Get-ChildItem ($BaseDestRootPath + '\IDShield\IDShieldExtras') | New-ISOFile -Path $ISOName -Media DVDPLUSR -Title $ISOTitle
 
 $ISOName = $BaseDestRootPath + '\LabDE\ISO\LabDE' + $FlexVersionString + '.iso'
-$ISOTitle = 'IDShield' + $FlexVersionString
+$ISOTitle = 'LabDE' + $FlexVersionString
 New-Item ($BaseDestRootPath + '\LabDE\ISO') -Type Directory
 Get-ChildItem ($BaseDestRootPath + '\LabDE\LabDE') | New-ISOFile -Path $ISOName -Media DVDPLUSR -Title $ISOTitle
 
