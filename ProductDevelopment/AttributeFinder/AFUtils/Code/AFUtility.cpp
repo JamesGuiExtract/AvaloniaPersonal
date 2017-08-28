@@ -1129,7 +1129,7 @@ void CAFUtility::expandRSDFileDirTag(string& rstrInput,
 			ASSERT_RESOURCE_ALLOCATION("ELI07461", ipREE != __nullptr);
 
 			// get the currently executing rule file's directory
-			string strDir = asString(ipREE->GetCurrentRSDFileDir());
+			strDir = asString(ipREE->GetCurrentRSDFileDir());
 		}
 
 		// if there is no current RSD file, this tag cannot
