@@ -1,0 +1,5 @@
+Train\Example06.tif
+Train\Example07.tif
+Train\Example08.tif
+Train\Example09.tif
+Train\Example10.tif

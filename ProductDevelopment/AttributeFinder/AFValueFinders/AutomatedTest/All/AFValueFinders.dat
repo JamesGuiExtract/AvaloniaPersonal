@@ -5,6 +5,7 @@
 <FILE>;..\FindFromRSDFile\FindFromRSDFile.dat
 <FILE>;..\LocateImageRegion\LocateImageRegion.dat
 <FILE>;..\LoopFinder\LoopFinder.dat
+<FILE>;..\NamedEntityRecognitionFinder\test.dat
 <FILE>;..\PropertyAddressFinder\PropertyAddressFinder.dat
 <FILE>;..\RegularExpression\RegularExpression.dat
 <FILE>;..\RegularExpressionPatternMatcher\RegularExpressionPatternMatcher.dat

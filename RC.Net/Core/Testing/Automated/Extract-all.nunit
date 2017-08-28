@@ -15,7 +15,8 @@
     <assembly path="Extract.Test.dll" />
     <assembly path="Extract.Utilities.Test.dll" />
     <assembly path="Extract.Utilities.Parsers.Test.dll" />
-	<assembly path="Extract.Web.DocumentAPI.Test.dll" />
+    <assembly path="Extract.Web.DocumentAPI.Test.dll" />
+    <assembly path="Extract.UtilityApplications.NERAnnotator.Test.dll" />
   </Config>
   <Config name="Release" binpathtype="Auto" runtimeFramework="any">
     <assembly path="Extract.AttributeFinder.OutputHandlers.Test.dll" />
@@ -32,6 +33,7 @@
     <assembly path="Extract.Test.dll" />
     <assembly path="Extract.Utilities.Test.dll" />
     <assembly path="Extract.Utilities.Parsers.Test.dll" />
-	<assembly path="Extract.Web.DocumentAPI.Test.dll" />	
+    <assembly path="Extract.Web.DocumentAPI.Test.dll" />	
+    <assembly path="Extract.UtilityApplications.NERAnnotator.Test.dll" />
   </Config>
 </NUnitProject>

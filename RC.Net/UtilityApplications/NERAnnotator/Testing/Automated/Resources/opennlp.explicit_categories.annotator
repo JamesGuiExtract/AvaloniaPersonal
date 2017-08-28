@@ -1,0 +1,35 @@
+TrainingInput: .
+TestingInput: ''
+TestingSet: RandomlyPickedFromTrainingSet
+PercentToUseForTestingSet: 50
+RandomSeedForSetDivision: 0
+TypesVoaFunction: <SourceDocName>.evoa
+OutputFileBaseName: oner.annotated.explicit
+PercentUninterestingPagesToInclude: 0
+RandomSeedForPageInclusion: 0
+OutputSeparateFileForEachCategory: false
+FailIfOutputFileExists: true
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: LearnableTokenizer
+TokenizerModelPath: en-token.nlp.etf
+EntityDefinitions:
+- Category: Address
+  CategoryIsXPath: false
+  RootQuery: (/*/HCData|/*/MCData|/*/LCData|/*/Manual)[@Type='Address']
+- Category: Phone
+  CategoryIsXPath: false
+  RootQuery: (/*/HCData|/*/MCData|/*/LCData|/*/Manual)[@Type='Phone']
+- Category: MRN
+  CategoryIsXPath: false
+  RootQuery: (/*/HCData|/*/MCData|/*/LCData|/*/Manual)[@Type='MRN']
+- Category: Name
+  CategoryIsXPath: false
+  RootQuery: (/*/HCData|/*/MCData|/*/LCData|/*/Manual)[@Type='Name']
+- Category: DOB
+  CategoryIsXPath: false
+  RootQuery: (/*/HCData|/*/MCData|/*/LCData|/*/Manual)[@Type='DOB']
+- Category: SSN
+  CategoryIsXPath: false
+  RootQuery: (/*/HCData|/*/MCData|/*/LCData|/*/Manual)[@Type='SSN']

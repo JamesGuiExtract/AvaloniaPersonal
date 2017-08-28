@@ -1,0 +1,21 @@
+TrainingInput: .
+TestingInput: ''
+TestingSet: RandomlyPickedFromTrainingSet
+PercentToUseForTestingSet: 20
+RandomSeedForSetDivision: 0
+TypesVoaFunction: <SourceDocName>.voa
+OutputFileBaseName: opennlp.flex
+PercentUninterestingPagesToInclude: 0
+RandomSeedForPageInclusion: 
+OutputSeparateFileForEachCategory: false
+FailIfOutputFileExists: true
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: LearnableTokenizer
+TokenizerModelPath: en-token.nlp.etf
+EntityDefinitions:
+- Category: Party
+  CategoryIsXPath: false
+  RootQuery: '*/Party'
+  ValueQuery: First|Middle|LastOrCompany

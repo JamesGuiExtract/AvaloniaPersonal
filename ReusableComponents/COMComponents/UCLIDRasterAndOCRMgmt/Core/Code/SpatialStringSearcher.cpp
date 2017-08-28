@@ -624,6 +624,50 @@ STDMETHODIMP CSpatialStringSearcher::ExcludeDataInRegion(ILongRectangle *pRect)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36741");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialStringSearcher::GetCharacterIndexesInRegion(ILongRectangle *pRect, IVariantVector **ppReturnVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44815", ppReturnVal != __nullptr);
+		ILongRectanglePtr ipRect(pRect);
+		ASSERT_ARGUMENT("ELI44816", ipRect != __nullptr);
+
+		validateLicense();
+
+		// Default to NULL return
+		*ppReturnVal = __nullptr;
+
+		//// If less than 5 spatial letters in the searcher, there is no
+		//// enough context to look for words, just return
+		//if (m_vecLetters.size() < 5)
+		//{
+		//	return S_OK;
+		//}
+
+		// Get a vector of all the letters that fall in the region
+		vector<int> vecLetters;		
+		getUnsortedLettersInRegion(ipRect, vecLetters);
+
+		if (vecLetters.size() > 0)
+		{
+			UCLID_COMUTILSLib::IVariantVectorPtr ipVV(CLSID_VariantVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI44817", ipVV != __nullptr);
+
+			for (auto it = vecLetters.begin(); it != vecLetters.end(); ++it)
+			{
+				ipVV->PushBack(*it);
+			}
+
+			*ppReturnVal = ipVV.Detach();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44818");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IManageableMemory

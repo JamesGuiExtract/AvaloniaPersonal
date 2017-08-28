@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 #include <map>
+
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -119,6 +120,7 @@ public:
 	STDMETHOD(CreateExtractFileLock)(BSTR bstrFileName, BSTR bstrContext, void **pLock);
 	STDMETHOD(DeleteExtractFileLock)(void *pLock);
 	STDMETHOD(IsExtractFileLockForFile)(void *pLock, BSTR bstrFileName, VARIANT_BOOL *pbIsForFile);
+	STDMETHOD(GetBase64StringFromFile)(/*[in]*/ BSTR bstrFileName, /*[out, retval]*/ BSTR *pbstrFromFile);
 
 	// PROMISE:	Determines whether the specified object supports configuration either via
 	//			ISpecifyPropertyPages or IConfigurableObject
@@ -143,4 +145,5 @@ private:
 
 	// Implements core tag/function expansion implementation.
 	TextFunctionExpander _textFunctionExpander;
+
 };

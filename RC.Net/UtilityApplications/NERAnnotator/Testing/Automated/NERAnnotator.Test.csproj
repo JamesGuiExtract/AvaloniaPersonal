@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7284BD5B-8E51-4AB8-ADFC-8A8B2F9D9E80}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Extract.UtilityApplications.NERAnnotator.Test</RootNamespace>
+    <AssemblyName>Extract.UtilityApplications.NERAnnotator.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\Binaries\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\..\..\Binaries\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
+    </Reference>
+    <COMReference Include="UCLID_AFCORELib">
+      <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFUTILSLib">
+      <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="TestNERAnnotator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
+      <Project>{6dd0855c-6031-49f4-874c-667f3a576345}</Project>
+      <Name>Extract.AttributeFinder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
+      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
+      <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
+      <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
+      <Name>Extract.Testing.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\Code\NERAnnotator.csproj">
+      <Project>{36fbd81e-acc8-4bed-9d8a-308bdd904092}</Project>
+      <Name>NERAnnotator</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Example01.tif" />
+    <EmbeddedResource Include="Resources\Example01.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example01.tif.overlapping.evoa" />
+    <EmbeddedResource Include="Resources\Example01.tif.voa" />
+    <EmbeddedResource Include="Resources\Example01.tif.uss" />
+    <EmbeddedResource Include="Resources\Example02.tif" />
+    <EmbeddedResource Include="Resources\Example02.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example02.tif.uss" />
+    <EmbeddedResource Include="Resources\Example03.tif" />
+    <EmbeddedResource Include="Resources\Example03.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example03.tif.uss" />
+    <EmbeddedResource Include="Resources\Example04.tif" />
+    <EmbeddedResource Include="Resources\Example04.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example04.tif.uss" />
+    <EmbeddedResource Include="Resources\Example05.tif" />
+    <EmbeddedResource Include="Resources\Example05.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example05.tif.uss" />
+    <EmbeddedResource Include="Resources\Example06.tif" />
+    <EmbeddedResource Include="Resources\Example06.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example06.tif.uss" />
+    <EmbeddedResource Include="Resources\Example07.tif" />
+    <EmbeddedResource Include="Resources\Example07.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example07.tif.uss" />
+    <EmbeddedResource Include="Resources\Example08.tif" />
+    <EmbeddedResource Include="Resources\Example08.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example08.tif.uss" />
+    <EmbeddedResource Include="Resources\Example09.tif" />
+    <EmbeddedResource Include="Resources\Example09.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example09.tif.uss" />
+    <EmbeddedResource Include="Resources\Example10.tif" />
+    <EmbeddedResource Include="Resources\Example10.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example10.tif.uss" />
+    <EmbeddedResource Include="Resources\en-token.nlp.etf" />
+    <EmbeddedResource Include="Resources\en-sent.nlp.etf" />
+    <EmbeddedResource Include="Resources\opennlp.no_sent.learnable_tok.annotator" />
+    <EmbeddedResource Include="Resources\opennlp.no_sent.learnable_tok.train.txt" />
+    <EmbeddedResource Include="Resources\opennlp.no_sent.learnable_tok.test.txt" />
+    <EmbeddedResource Include="Resources\opennlp.sent.learnable_tok.annotator" />
+    <EmbeddedResource Include="Resources\opennlp.sent.learnable_tok.train.txt" />
+    <EmbeddedResource Include="Resources\opennlp.sent.learnable_tok.test.txt" />
+    <EmbeddedResource Include="Resources\opennlp.sent.simple_tok.annotator" />
+    <EmbeddedResource Include="Resources\opennlp.sent.simple_tok.train.txt" />
+    <EmbeddedResource Include="Resources\opennlp.sent.simple_tok.test.txt" />
+    <EmbeddedResource Include="Resources\opennlp.sent.whitespace_tok.annotator" />
+    <EmbeddedResource Include="Resources\opennlp.sent.whitespace_tok.train.txt" />
+    <EmbeddedResource Include="Resources\opennlp.sent.whitespace_tok.test.txt" />
+    <EmbeddedResource Include="Resources\opennlp.train_list.annotator" />
+    <EmbeddedResource Include="Resources\opennlp.flex.annotator" />
+    <EmbeddedResource Include="Resources\train.txt" />
+    <EmbeddedResource Include="Resources\test.txt" />
+    <EmbeddedResource Include="Resources\opennlp.train_list.train.txt" />
+    <EmbeddedResource Include="Resources\opennlp.train_list.test.txt" />
+    <EmbeddedResource Include="Resources\opennlp.both_lists.annotator" />
+    <EmbeddedResource Include="Resources\opennlp.both_lists.train.txt" />
+    <EmbeddedResource Include="Resources\opennlp.both_lists.test.txt" />
+    <EmbeddedResource Include="Resources\opennlp.both_dirs.annotator" />
+    <EmbeddedResource Include="Resources\opennlp.explicit_categories.annotator" />
+    <EmbeddedResource Include="Resources\opennlp.single_output_file.train.txt" />
+    <EmbeddedResource Include="Resources\sner.annotator" />
+    <EmbeddedResource Include="Resources\sner.annotated.train.txt" />
+    <EmbeddedResource Include="Resources\sner.annotated.test.txt" />
+    <EmbeddedResource Include="Resources\opennlp.overlapping_expected.annotator" />
+    <EmbeddedResource Include="Resources\opennlp.overlapping_expected.train.txt" />
+    <EmbeddedResource Include="Resources\overlapping_expected.txt" />
+    <EmbeddedResource Include="Resources\opennlp.flex.train.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>UnitTestingDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

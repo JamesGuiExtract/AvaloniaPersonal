@@ -17,6 +17,8 @@
 #include <PromptDlg.h>
 #include <Misc.h>
 #include <ExtractFileLock.h>
+#include <iostream>
+#include <sstream>
 
 // add license management function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -593,6 +595,51 @@ STDMETHODIMP CMiscUtils::GetStringOptionallyFromFile(BSTR bstrFileName, BSTR *pb
 		return S_OK; 
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14530")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::GetBase64StringFromFile(BSTR bstrFileName, BSTR *pbstrFromFile)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		string strFileName = asString(bstrFileName);
+
+		// Get the extension of the file
+		string strExt = ::getExtensionFromFullPath( strFileName, true );
+		
+		// A string to hold text read from the file
+		string strFromFile;
+	
+		// If the file is an encrypted file
+		if ( strExt == ".etf" )
+		{
+			// Define a encrypted file manager object to read encrypted file
+			MapLabelManager encryptedFileManager;
+
+			// Retrieve binary data from the text file
+			unsigned long ulLength = 0;
+			unsigned char* pszData = encryptedFileManager.getMapLabel(strFileName, &ulLength );
+			std::vector<uchar> data(pszData, pszData + ulLength);
+			delete [] pszData;
+			strFromFile = Util::base64Encode(data);
+		}
+		else
+		{
+			CString zFileName(strFileName.c_str());
+			ifstream ifs(zFileName, ifstream::binary);
+			stringstream data;
+			data << ifs.rdbuf();
+			strFromFile = Util::base64Encode(data);
+		}
+
+		*pbstrFromFile = get_bstr_t(strFromFile).Detach();
+
+		return S_OK; 
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44902")
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::GetFileHeader(BSTR *pbstrFileHeader)

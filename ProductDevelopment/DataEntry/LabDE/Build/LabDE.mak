@@ -147,10 +147,12 @@ CreateDemo_LabDE: BuildDemoLabDE_DEP
 	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.dcc" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.spm" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.nlp" 1 1 "$(BinariesFolder)\EncryptFile.exe"
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\*.dat"
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\*.rsd"
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\*.dcc"
-	@DeleteFiles "$(LabDEDemo)\Solution\Rules\*.spm"
+		@DeleteFiles "$(LabDEDemo)\Solution\Rules\*.spm"
+    @DeleteFiles "$(LabDEDemo)\Solution\Rules\*.nlp"
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\vssver.scc"
 	
 CopySilentInstall:

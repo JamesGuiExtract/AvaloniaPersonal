@@ -1504,6 +1504,8 @@ library UCLID_RASTERANDOCRMGMTLib
 		// supported after having excluded data.
 		[id(10), helpstring("method ExcludeDataInRegion")] HRESULT ExcludeDataInRegion(
 			[in] ILongRectangle *pRect);
+		[id(11), helpstring("method GetCharacterIndexesInRegion")] HRESULT GetCharacterIndexesInRegion(
+			[in] ILongRectangle *pRect, [out, retval] IVariantVector** ipRetVal);
 	};
 
 	[

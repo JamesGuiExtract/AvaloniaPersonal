@@ -108,7 +108,7 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Code\Extract.DataCaptureStats.csproj">
       <Project>{32679A70-BC10-4DD9-9155-9B3E08586EE9}</Project>
-      <Name>Extract.AccuracyStats.DataCaptureStats</Name>
+      <Name>Extract.DataCaptureStats</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

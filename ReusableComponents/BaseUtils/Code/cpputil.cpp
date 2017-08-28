@@ -29,6 +29,10 @@
 #include <nb30.h>
 #include <math.h>
 #include <iostream>
+#include <sstream>
+#include <vector>
+#include <algorithm>
+#include <iterator>
 #include <afxmt.h>
 
 // FIXTHIS: confirm that it is OK to comment these lines
@@ -1415,6 +1419,11 @@ namespace Util
 	namespace Internal
 	{
 		const size_t Size = 1024 * 8;
+
+		//Lookup table for encoding
+		//If you want to use an alternate alphabet, change the characters here
+		const static TCHAR encodeLookup[] = TEXT("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
+		const static TCHAR padChar = TEXT('=');
 	}
 
 	// Utility function that provides string formatting. This function takes a format specifier
@@ -1438,5 +1447,55 @@ namespace Util
 			return std::string( &buffer[0] );
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39183")
+	}
+	//-------------------------------------------------------------------------------------------------
+	std::basic_string<TCHAR> base64Encode(std::stringstream& inputBuffer)
+	{
+		vector<uchar> dest;
+		streampos beg = inputBuffer.tellg();
+		inputBuffer.seekg(0, ios_base::end);
+		streampos end = inputBuffer.tellg();
+		inputBuffer.seekg(0, ios_base::beg);
+		dest.reserve((size_t)(end - beg));
+		dest.assign(istreambuf_iterator<char>(inputBuffer), istreambuf_iterator<char>());
+		std::copy(dest.begin(), dest.end(), std::ostream_iterator<char>(std::cout));
+		return base64Encode(dest);
+	}
+	//-------------------------------------------------------------------------------------------------
+	std::basic_string<TCHAR> base64Encode(std::vector<BYTE>& inputBuffer)
+	{
+		using namespace Internal;
+		std::basic_string<TCHAR> encodedString;
+		encodedString.reserve(((inputBuffer.size()/3) + (inputBuffer.size() % 3 > 0)) * 4);
+		DWORD temp;
+		std::vector<BYTE>::iterator cursor = inputBuffer.begin();
+		for(size_t idx = 0; idx < inputBuffer.size()/3; idx++)
+		{
+			temp  = (*cursor++) << 16; //Convert to big endian
+			temp += (*cursor++) << 8;
+			temp += (*cursor++);
+			encodedString.append(1,encodeLookup[(temp & 0x00FC0000) >> 18]);
+			encodedString.append(1,encodeLookup[(temp & 0x0003F000) >> 12]);
+			encodedString.append(1,encodeLookup[(temp & 0x00000FC0) >> 6 ]);
+			encodedString.append(1,encodeLookup[(temp & 0x0000003F)      ]);
+		}
+		switch(inputBuffer.size() % 3)
+		{
+		case 1:
+			temp  = (*cursor++) << 16; //Convert to big endian
+			encodedString.append(1,encodeLookup[(temp & 0x00FC0000) >> 18]);
+			encodedString.append(1,encodeLookup[(temp & 0x0003F000) >> 12]);
+			encodedString.append(2,padChar);
+			break;
+		case 2:
+			temp  = (*cursor++) << 16; //Convert to big endian
+			temp += (*cursor++) << 8;
+			encodedString.append(1,encodeLookup[(temp & 0x00FC0000) >> 18]);
+			encodedString.append(1,encodeLookup[(temp & 0x0003F000) >> 12]);
+			encodedString.append(1,encodeLookup[(temp & 0x00000FC0) >> 6 ]);
+			encodedString.append(1,padChar);
+			break;
+		}
+		return encodedString;
 	}
 }

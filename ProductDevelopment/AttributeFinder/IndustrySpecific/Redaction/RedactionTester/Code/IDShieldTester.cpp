@@ -1051,7 +1051,22 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 
 				// Don't include metadata, clues or DocumentType attributes from the expected
 				// voa file as expected redactions.
-				m_ipAFUtility->RemoveMetadataAttributes(ipExpectedAttributes);
+//				m_ipAFUtility->RemoveMetadataAttributes(ipExpectedAttributes);
+				long lSize = ipExpectedAttributes->Size();
+				for (long i = 0; i < lSize; i++)
+				{
+					IAttributePtr ipAttribute = ipExpectedAttributes->At(i);
+					ASSERT_ARGUMENT("ELI28451", ipAttribute != __nullptr);
+
+					string strAttributeName = asString(ipAttribute->Name);
+					if (!strAttributeName.empty() && strAttributeName[0] == '_'
+						|| ipAttribute->Value->HasSpatialInfo() == VARIANT_FALSE)
+					{
+						ipExpectedAttributes->Remove(i);
+						lSize--;
+						i--;
+					}
+				}
 
 				// [DataEntry:3610]
 				// Removing filtering of clues that was added 11/9/2009. At that time, the new

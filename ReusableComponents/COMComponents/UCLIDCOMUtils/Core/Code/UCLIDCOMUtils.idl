@@ -1161,6 +1161,10 @@ library UCLID_COMUTILSLib
 		//			bstrFileName.
 		[id(32), helpstring("method IsExtractFileLockForFile")] HRESULT IsExtractFileLockForFile(
 			[in] void *pLock, [in] BSTR bstrFileName, [out, retval] VARIANT_BOOL *pbIsForFile);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the Base64 encoding of a binary file
+		[id(33), helpstring("method GetBase64StringFromFile")] HRESULT GetBase64StringFromFile(
+			[in] BSTR bstrFileName, [out, retval] BSTR *pbstrFromFile);
 	};
 	[
 		object,
