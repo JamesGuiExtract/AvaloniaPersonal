@@ -28,6 +28,7 @@
 #include <list>
 #include <algorithm>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -1101,4 +1102,10 @@ namespace Util
 	// string constant (exactly like printf or sprintf does), and a set of 1..N arguments for
 	// the specifier string. Standard printf-style format specifiers are used in the format string.
 	EXPORT_BaseUtils std::string Format( const char* formatString, ... );
+
+	// Convert string to base-64 encoding
+	// https://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64#C.2B.2B
+	EXPORT_BaseUtils std::basic_string<TCHAR> base64Encode(std::vector<BYTE>& inputBuffer);
+	EXPORT_BaseUtils std::basic_string<TCHAR> base64Encode(std::stringstream& input);
+
 }		// end of namespace Util

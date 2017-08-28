@@ -131,6 +131,30 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Creates a memoized version of a ternary function
+        /// </summary>
+        /// <typeparam name="T1">The type of the first function parameter</typeparam>
+        /// <typeparam name="T2">The type of the second function parameter</typeparam>
+        /// <typeparam name="T3">The type of the third function parameter</typeparam>
+        /// <typeparam name="TResult">The return type of the function</typeparam>
+        /// <param name="fun">The non-memoized function</param>
+        /// <returns>A memoized version of the function</returns>
+        public static Func<T1, T2, T3, TResult> Memoize<T1, T2, T3, TResult>
+            (this Func<T1, T2, T3, TResult> fun)
+        {
+            try
+            {
+                var map = new Dictionary<Tuple<T1, T2, T3>, TResult>();
+                return (a, b, c) => map.GetOrAdd(Tuple.Create(a, b, c), () => fun(a, b, c));
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI44869");
+                throw ee;
+            }
+        }
+
+        /// <summary>
         /// Method to deconstruct a <see cref="KeyValuePair{TKey, TValue}"/>.
         /// This enables more concise iteration over a <see cref="Dictionary{TKey, TValue}"/>,
         /// e.g., foreach(var (key, value) in dictionary)

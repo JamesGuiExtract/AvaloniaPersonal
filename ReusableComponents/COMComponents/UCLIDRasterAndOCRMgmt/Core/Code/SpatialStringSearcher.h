@@ -57,6 +57,7 @@ public:
 	STDMETHOD(GetRightWord)(ILongRectangle* ipRect, ISpatialString** ipReturnString);
 	STDMETHOD(SetUseMidpointsOnly)(VARIANT_BOOL newVal);
 	STDMETHOD(ExcludeDataInRegion)(ILongRectangle *pRect);
+	STDMETHOD(GetCharacterIndexesInRegion)(ILongRectangle *pRect, IVariantVector** ipReturnVal);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

@@ -1,0 +1,20 @@
+TrainingInput: .
+TestingInput: ''
+TestingSet: RandomlyPickedFromTrainingSet
+PercentToUseForTestingSet: 50
+RandomSeedForSetDivision: 0
+TypesVoaFunction: <SourceDocName>.evoa
+OutputFileBaseName: oner.annotated.sent.whitespace
+PercentUninterestingPagesToInclude: 0
+RandomSeedForPageInclusion: 0
+OutputSeparateFileForEachCategory: false
+FailIfOutputFileExists: true
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: WhitespaceTokenizer
+TokenizerModelPath: en-token.nlp.etf
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual

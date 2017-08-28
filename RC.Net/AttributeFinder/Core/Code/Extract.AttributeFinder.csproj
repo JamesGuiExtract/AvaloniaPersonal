@@ -168,6 +168,7 @@
     <Compile Include="AttributeCreator.cs" />
     <Compile Include="AttributeFinderPathTags.cs" />
     <Compile Include="AttributeMethods.cs" />
+    <Compile Include="CategoryQueryPair.cs" />
     <Compile Include="LabelAttributes.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>

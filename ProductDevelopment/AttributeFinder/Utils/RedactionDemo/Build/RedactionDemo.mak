@@ -55,8 +55,10 @@ CopyDemoFiles:
     @ECHO Encrypting Rules files...
     @SendFilesAsArgumentToApplication "$(IDShieldDemo)\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
     @SendFilesAsArgumentToApplication "$(IDShieldDemo)\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+    @SendFilesAsArgumentToApplication "$(IDShieldDemo)\Rules\*.nlp" 1 1 "$(BinariesFolder)\EncryptFile.exe"
     @DeleteFiles "$(IDShieldDemo)\Rules\*.dat"
     @DeleteFiles "$(IDShieldDemo)\Rules\*.rsd"
+    @DeleteFiles "$(IDShieldDemo)\Rules\*.nlp"
     @DeleteFiles "$(IDShieldDemo)\vssver.scc"
 
 CopyImageFilesToInstallFolder: 

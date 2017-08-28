@@ -1,0 +1,20 @@
+TrainingInput: overlapping_expected.txt
+TestingInput: ''
+TestingSet: Specified
+PercentToUseForTestingSet: 50
+RandomSeedForSetDivision: 0
+TypesVoaFunction: <SourceDocName>.overlapping.evoa
+OutputFileBaseName: oner.overlapping_expected
+PercentUninterestingPagesToInclude: 100
+RandomSeedForPageInclusion: 
+OutputSeparateFileForEachCategory: false
+FailIfOutputFileExists: true
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: LearnableTokenizer
+TokenizerModelPath: en-token.nlp.etf
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual

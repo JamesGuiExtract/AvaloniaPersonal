@@ -1,0 +1,5 @@
+Test\Example01.tif
+Test\Example02.tif
+Test\Example03.tif
+Test\Example04.tif
+Test\Example05.tif

@@ -1,0 +1,114 @@
+
+35 Return To : NICHOLS MORTGAGE SERVICES , INC. <START:Address> 1811 NORTH MERIDIAN STREET INDIANAPOLIS , INDIANA 46202 <END> [Space Above This Line For Recording Data ] FHA Case No. State of Indiana MORTGAGE 000-1234567/000 THIS MORTGAGE ( " Security Instrument " ) is given on June 21 , 2007 The Mortgagor is <START:Name> Jane D Doe <END> , WIFE AND HUSBAND AND <START:Name> John D Doe , <END> ( " Borrower " ) .
+This Security Instrument is given to NICHOLS MORTGAGE SERVICES , INC. which is organized and existing under the laws of THE STATE OF INDIANA , and whose address is <START:Address> 1811 NORTH MERIDIAN STREET INDIANAPOLIS , INDIANA 46202 <END> ( " Lender " ) .
+Borrower owes Lender the principal sum of One Hundred Twenty-Seven Thousand Nine Hundred Seventy-Four and 00/100 Dollars ( U.S. $ 127,974.00
+) .
+This debt is evidenced by Borrower 's note dated the same date as this Security Instrument ( " Note " ) , which provides for monthly payments , with the full debt , if not paid earlier , due and payable on July 1 , 2037 This Security Instrument secures to Lender : ( a ) the repayment of the debt evidenced by the Note , with interest , and 6800093583 FHA Indiana Mortgage - 4/96 4 :)4R(IN ) I0604 ) VMP Mortgage Solutions , Inc. Page 1 of 8 Initial 20634-01 07/02/07 0:45AM RUE L VOORHIES HARM : CTY RECORDER KM 34.00 PACES : ii Inst * 1000-1234567
+all renewals , extensions and modifications of the Note ; ( b ) the payment of all other sums , with interest , advanced under paragraph 7 to protect the security of this Security Instrument ; and ( c ) the performance of Borrower 's covenants and agreements under this Security Instrument and the Note .
+For this purpose , Borrower does hereby mortgage , grant and convey to the Lender the following described property located in Marion County , Indiana : See Legal description attached hereto and made a part hereof : as exhibit " A Parcel ID Number : 1234567 which has the address of <START:Address> 123 Fake St <END> {Street ] <START:Address> Indianapolis [City] , Indiana 46239 <END> [Zip Code ] ( " Property Address " ) ; TOGETHER WITH all the improvements now or hereafter erected on the property , and all easements , appurtenances and fixtures now or hereafter a part of the property .
+All replacements and additions shall also be covered by this Security Instrument .
+All of the foregoing is referred to in this Security Instrument as the " Property . "
+BORROWER COVENANTS that Borrower is lawfully seized of the estate hereby conveyed and has the right to mortgage , grant and convey the Property and that the Property is unencumbered , except for encumbrances of record .
+Borrower warrants and will defend generally the title to the Property against all claims and demands , subject to any encumbrances of record .
+THIS SECURITY INSTRUMENT combines uniform covenants for national use and non-uniform covenants with limited variations by jurisdiction to constitute a uniform security instrument covering real property .
+Borrower and Lender covenant and agree as follows : UNIFORM COVENANTS.
+I. Payment of Principal , Interest and Late Charge .
+Borrower shall pay when due the principal of , and interest on , the debt evidenced by the Note and late charges due under the Note .
+2. Monthly Payment of Taxes , Insurance and Other Charges .
+Borrower shall include in each monthly payment , together with the principal and interest as set forth in the Note and any late charges , a sum for ( a ) taxes and special assessments levied or to be levied against the Property , ( b ) leasehold payments or ground rents on the Property , and ( c ) premiums for insurance required under paragraph 4 . In any year in which the Lender must pay a mortgage insurance premium to the Secretary of Housing and Urban Development ( " Secretary " ) , or in any year in which such premium would have been required if Lender still held the Security Instrument , each monthly payment shall also include either : ( i ) a sum for the annual mortgage insurance premium to be paid by Lender to the Secretary , or ( ii ) a monthly charge instead of a mortgage insurance premium if this Security Instrument is held by the Secretary , in a reasonable amount to be determined by the Secretary .
+Except for the monthly charge by the Secretary , these items are called " Escrow Items " and the sums paid to Lender are called " Escrow Funds . "
+Lender may , at any time , collect and hold amounts for Escrow Items in an aggregate amount not to exceed the maximum amount that may be required for Borrower 's escrow account under the Real Estate Settlement Procedures Act of 1974 , 12 U.S.C.
+Section 2601 et seq .
+and implementing regulations , 24 CFR Part 3500 , as they may be 6800093583 C-4R(IN ) 0604 ) Page 2 of 8 20634-02
+If the Lender 's interest in this Security Instrument is held by the Secretary and the Secretary requires immediate payment in full under Paragraph 9 , the Secretary may invoke the nonjudicial power of sale provided in the Single Family Mortgage Foreclosure Act of 1994 ( "Act ' ) ( 12 U.S.C. 3751 et seq . ) by requesting a foreclosure commissioner designated under the Act to commence foreclosure and to sell the Property as provided in the Act .
+Nothing in the preceding sentence shall deprive the Secretary of any rights otherwise available to a Lender under this Paragraph 18 or applicable law .
+19 .
+Release .
+Upon payment of all sums secured by this Security Instrument , Lender shall release this Security Instrument without charge to Borrower .
+20 .
+Waiver of Valuation and Appraisement .
+Borrower waives all right of valuation and appraisement .
+21 .
+Riders to this Security Instrument .
+If one or more riders are executed by Borrower and recorded together with this Security Instrument , the covenants of each such rider shall be incorporated into and shall amend and supplement the covenants and agreements of this Security Instrument as if the rider( s ) were a part of this Security Instrument .
+[ Check applicable box(es ) ] .
+I I Condominium Rider I x I Planned Unit Development Rider Growing Equity Rider Graduated Payment Rider Other [specify ] BY SIGNING BELOW , Borrower accepts and agrees to the terms contained in this Security Instrument and in any rider( s ) executed by Borrower and recorded with it .
+Witnesses : ( Seal ) -Borrower <START:Name> John D <END> _( Seal ) ( Seal ) -Borrower -Borrower ( Seal ) ( Seal ) -Borrower -Borrower _( Seal ) ( Seal ) -Borrower -Borrower 6800093583 CO-41RON ) ( 0604 ) 20634-07 Page 7 of 8
+STATE OF INDIANA , Hamilton County ss : , before me , the undersigned , a Notary On this 21st day of June , 2 007 Public in and for said County , personally appeared <START:Name> Jane D Doe <END> and <START:Name> John D Doe <END> wife and husband , and acknowledged the execution of the foregoing instrument .
+WITNESS my hand and official seal .
+My Commission Expires : Notary Public ' <START:Name> CYNTHIA H. BABB <END> Marion County My Commission Expires IMay 16 , 2015 This instrument was prepared by : <START:Name> Rita Gra mlin <END> NICHOLS MORTGAGE SERVICES , INC <START:Address> 1811 N. Meridian Street INDIANAPOLIS , INDIANA 46202 <END> I affirm , under the penalties for perjury , that I have taken reasonable care to redact each Social Security number in this document , unless required by law .
+<START:Name> Rita Gra mlin <END> NICHOLS MORTGAGE SERVICES , INC 6 8 0 0 0 93 5 8 3 C)-4R(IN ) ( 0604 ) ( 1 ) Page 8 of 8
+PLANNED UNIT DEVELOPMENT RIDER FHA Case No. 000-1234567/000 THIS PLANNED UNIT DEVELOPMENT RIDER is made this 21st day of June , 2007 , and is incorporated into and shall be deemed to amend and supplement the Mortgage , Deed of Trust or Security Deed ( " Security Instrument " ) of the same date given by the undersigned ( " Borrower " ) to secure Borrower 's Note ( " Note " ) to NICHOLS MORTGAGE SERVICES , INC. ( " Lender " ) of the same date and covering the Property described in the Security Instrument and located at : <START:Address> 123 Fake St , Indianapolis , INDIANA 46239 <END> [Property Address ] The Property Address is a part of a planned unit development ( "PUD" ) known as Moeller Estates at Wildwood Farms [Name of Planned Unit Development ] PUD COVENANTS.
+In addition to the covenants and agreements made in the Security Instrument , Borrower and Lender further covenant and agree as follows : A. So long as the Owners Association ( or equivalent entity holding title to common areas and facilities ) , acting as trustee for the homeowners , maintains , with a generally accepted insurance carrier , a "master " or "blanket " policy insuring the Property located in the PUD , including all improvements now existing or hereafter erected on the mortgaged premises , and such policy is satisfactory to Lender and provides insurance coverage in the amounts , for the periods , and against the hazards Lender requires , including fire and other hazards included within the term "extended coverage , " and loss by flood , to the extent required by the Secretary , then : ( i ) Lender waives the provision in Paragraph 2 of this Security Instrument for the monthly payment to Lender of one-twelfth of the yearly premium installments for hazard insurance on the Property , and ( ii ) Borrower 's obligation under Paragraph 4 of this Security Instrument to maintain hazard insurance coverage on the Property is deemec satisfied to the extent that the required coverage is provided by the Owners Association policy .
+Borrower shall give Lender prompt notice of any lapse in required hazard insurance coverage and of any loss occurring from a hazard .
+In the event of a distribution of hazard insurance proceeds in lieu of restoration or repair following a loss to the Property or to common areas and facilities of the PUD , any proceeds payable to Borrower are hereby assigned and shall be paid to Lender for application to the sums secured by this Security Instrument , with any excess paid to the entity legally entitled thereto .
+B. Borrower promises to pay all dues and assessments imposed pursuant to the legal instruments creating and governing the PUD.
+6800093583 FHA Multistate PUD Rider 10/95 Wolters Kluwer Financial SO ces VMPA-589U ( 0402 ).01
+Page 1 of 2 aw .
+r 1110 2 0 6 0 3 -01
+C. If Borrower does not pay PUD dues and assessments when due , then Lender may pay them .
+Any amounts disbursed by Lender under this paragraph C shall become additional debt of Borrower secured by the Security Instrument .
+Unless Borrower and Lender agree to other terms of payment , these amounts shall bear interest from the date of disbursement at the Note rate and shall be payable , with interest , upon notice from Lender to Borrower requesting payment .
+BY SIGNING BELOW , Borrower accepts and agrees to the terms and provisions contained in this F_'UD Rider (atr( Seal ) ( Seal ) <START:Name> Jane D Doe <END> -Borrower <START:Name> Jokii'D D <END> :1 ) -Borrower ( Seal ) ( Seal ) -Borrower -Borrower ( Seal ) ( Seal ) -Borrow er -Borrower ( Seal ) ( Seal ) -Borrow er -Borrower 6800093583 Page 2 of 2 IV 20603-02 VMP-589U ( 0402 ).01
+
+Doc. No.
+A 123456 OFFICE OF THE COUNTY RECORDER SCOTT COUNTY , MINNESOTA Certified Filed and/or Recorded on MEM 03-20-2006 at 11:00 Receipt : 539945 <START:Name> Pat Boeckman <END> , County Recorder 01 Fee : $ 46.00 SATISFACTION OF MORTGAGE Loan # SC#22549961-mb Today 's Date : 02/06/2006 THIS CERTIFIES THAT a certain mortgage owned by the undersigned , an association under the laws of the United States of America , dated 05/18/1996 , executed by <START:Name> John D. Doe <END> and <START:Name> Jane D. Doe <END> , husband and wife , as Mortgagor , to Marquette Bank , N.A. , as Mortgagee , calling for $ 1,214,857.82 ,
+and filed for record on 06/07/1996 , as Document No. 123456 , Cert No. N/A in Book/Volume N/A of Mortgages , Page N/A , in the Office of the County Recorder or the Register of Deeds of Scott County , Minnesota , is , with the indebtedness thereby secured , fully paid and satisfied and the same is hereby released .
+Wells Fargo tank , N.A. By : <START:Name> Teena M. Smyth <END> , Collateral Offer Successor in Interest to Marquett ank , N.A. by reason of name change , amendment of charter and mergers .
+STATE OF MONTANA/COUNTY OF YELLOWSTONE } ss .
+The foregoing instrument was acknowledged before me on 02/06/2006 , by <START:Name> Teena M. Smyth <END> , Collateral Officer of Wells Fargo Bank , N.A. , an association under the laws of the United States of America , on behalf of the association .
+Witness my hand and official seal .
+<START:Name> Marilyn Beck <END> Notary Public for the State of Montana Residing at Billings , Montana My Commission Expires : 11/01/2008 THIS INSTRUMENT WAS DRAFTED BY : Wells Fargo Bank , N.A. , <START:Address> PO Box 31557 , 2324 Overland Ave Billings , MT 59102 <END> , Phone : <START:Phone> 866-255-9102 <END> 102-AT Stewart Title of Minnesota <START:Name> Ne300 Shingle Creek Parkway # 195 Brooklyn Center . <END>
+<START:Name> MN 55430 <END>
+
+111111101 IIIIIII11IIIIIIIIIIIIIIIIIIIHilll 10000123-0123456 Fee : $ 14.00 06/29/2004 08:13 :12 120040046811 Req : US RECORDINGS <START:Name> Frances Deane <END> Clark County Recorder PIN : 123-12-123-123 Recording Requested by and Return to : US Recordings <START:Address> 2925 Country Drive St Paul , Minnesota USA 55117 <END> Prepared By : <START:Name> Steve Jundt <END> U.S. Bank-Collateral Processing <START:Address> P.O. <END>
+<START:Address> Box 2687 Fargo , North Dakota USA 58108-2687 <END> Mail Tax Statements To : <START:Name> JOHN DOE <END> and <START:Name> JANE DOE <END> <START:Address> 123 NOTA ST. <END>
+<START:Address> HENDERSON , Nevada 89015 <END> P8S : Full Reconveyance The undersigned as Trustee or Successor Trustee under that certain Deed of Trust described as follows : Record # : N/A Record Date : December 26 , 2003 Amount : $ 48000.00
+Document Date : November 18 , 2003 County : Clark Time : State : Nevada Book# : 10001234 Page # 01234 Grantor( s ) : <START:Name> JOHN D. DOE <END> and <START:Name> JANE D. DOE <END> , HUSBAND AND WIFE AS JOINT TENANTS Trustee : U.S. Bank Trust Company , National Association Beneficiary : US Bank National Association ND Having received from the Beneficiary under said Deed of Trust , a written request to reconvey , reciting that the obligations secured by the Deed of Trust have been fully satisfied , does hereby grant , bargain , sell and reconvey unto the parties entitled there to all right , title and interest which was heretofore acquired by said Trustee( s ) under said Deed of Trust .
+Dated this 10th day of June , 2004 U.S. Bank Trust Company , National Association STATE OF Minnesota COUNTY OF Ramsey ) SS I( Atittebfrt ) a .iti,z
+1875 P177 BY : <START:Name> Kathleen A Thiel <END> , Mortgage Officer On this 10th day of June , 2004 before me , the undersigned , a Notary Public in and for the State of Minnesota duly commissioned and sworn , personally appeared Kathleen A Thiel to me known to be the Mortgage Officer of the National Banking Association that executed the foregoing instrument , and acknowledged the said instrument to be free and voluntary act and deed of said National Banking Association for the uses and purposes there-in mentioned , and on Oath states , authorized to execute the said instrument .
+WITNESS my hand and official seal fixed the day and year above written .
+/2.1 ," Therese E Rothmund , Notary Public Loan# : 510577920 Invoice# : E0050408 $ !°aRE$ et 110TIIMUND 3 ; 1 ) Notary PubliceMinnesota A:Lia ? ! :1V My Commission Expires Jan31,2008
+
+3 1111111111111111111111111111111111111111111111111 FRESNO County Recorder <START:Name> Robert C , Werner <END> DOC 1000-0123456 RECORDING REQUESTED BY First American Title Company AND WHEN RECORDED MAIL TO : <START:Name> John Doe <END> <START:Address> 123 Non Road San Marino , CA 91108 <END> Acct 5-First American Title Insurance Company Friday , JAN 02 , 2004 08:00:00 Ttl Pd $ 15.00 Nbr-0001350971 jzs/R2/1-3 Space Above This Line for Recorder 's Use Only A.P.N. : 123-123-12 File No. : 1004-1075450 ( RK) INTERSPOUSAL TRANSFER GRANT DEED ( Excluded from Reappraisal under California Constitution Article 13A 1 et seq . )
+The Undersigned Grantor( s ) declare( s ) : DOCUMENTARY TRANSFER TAX $ ).00 ; CITY TRANSFER TAX $ ; This conveyance is solely between spouses and establishes the sole and separate property of a spouse and is EXEMPT from the imposition of the Documentary Transfer Tax pursuant to 11911 of the Revenue and Taxation Code .
+This is an Interspousal Transfer and not a change in ownership under Section 63 of the Revenue and Taxation Code , and transfer by Grantor( s ) is excluded from reappraisal as a creation , transfer , solely between the spouses of any co-owner 's interest .
+FOR A VALUABLE CONSIDERATION , receipt of which is hereby acknowledged , <START:Name> Jane Doe <END> , wife of grantee herein hereby GRANTS to <START:Name> John Doe <END> , a married man as his sole and separate property the following described property in the City of FRESNO , County of FRESNO , State of California : Attached hereto as Exhibit A. It is the express intent of the Grantor , being the spouse of the Grantee , to convey all right , title and interest of the Grantor , community or otherwise , in and to the herein described property to the Grantee as his/her sole and separate property .
+Dated : 12/2W_2003 Mail Tax Statments To : SAME AS ABOVE / 0
+
+1111111111111111111111111111111111111111111111111 FRESNO County Recorder <START:Name> Robert C , Werner <END> DX-- 1000-0123456 RECORDING REQUESTED BY FIRST PACIFIC FINANCIAL , INC. 4 <START:Address> HUTTON CENTRE DRIVE , SUITE 500 SANTA ANA , CA 92707 <END> AND WHEN RECORDED MAIL TO Check Number 54045 Monday , JAN 05 , 2004 14:57:57 Ttl Pd $ 9.00 Nbr-0001353383 gsf/R4/1-1 FIRST PACIFIC FINANCIAL , INC. 4 <START:Address> HUTTON CENTRE DRIVE , SUITE 500 SANTA ANA , CA 92707 <END> L SPACE ABOVE THIS LINE FOR RECORDER 'S USE Assignment of Deed of Trust FOR VALUE RECEIVED , Mortgage Electronic Registration Systems , Inc. ( "MERS " ) as nominee for FIRST PACIFIC FINANCIAL , INC. , A CALIFORNIA CORPORATION , its successors and assigns , hereby grants , assigns and transfers to COUNTRYWIDE HOME LOANS , INC. all beneficial interest under that certain Deed of Trust dated JULY 29 , 2003 , executed by <START:Name> JOHN DOE <END> AND <START:Name> JANE DOE <END> , HUSBAND AND WIFE AS JOINT TENANTS , Trustor to CARRIAGE ESCROW INC. , A CALIFORNIA CORPORATION , Trustee , and recorded as Instrument No. /000M2.31-4-5
+0( : " n ?--- ( 57 page , of Official Records in the County Recorder 's office of FRESNO California , describing land therein as : LOT 66 OF TRACT NO. 3956 , IN THE CITY OF FRESNO , COUNTY OF FRESNO , STATE OF CALIFORNIA , ACCORDING TO THE MAP THEREOF RECORDED IN VOLUME 51 , PAGES 75 AND 76 OF PLATS , FRESNO COUNTY RECORDS. in book County , PARCEL NO. : 123-123-12 TOGETHER with the note or notes therein described or referred to , the money due and to become due ,thereon with interest , and all rights accrued or to accrue under said Deed of Trust .
+I"MERS " ) MORTGAGE ELECTRONrITeSTRATION Sk 'STEMS , INC.
+A / Aft , WALL , " TOIF W <START:Name> ARD <END> au Dated AUGUST 15 , 2003 ) ss .
+State of CALIFORNIA County of ORANGE <START:Name> N.A. <END> ASSISTANT SECRET On AUGUST 15 , 2003 before me , personally appeared <START:Name> N.A. MAYNARD <END> ASSISTANT SECRETARY , personally known to me ( oi ptuvc . .
+. . . . . .
+v e, . ) to be the personc ,q) whose names istar4-subscribed to the within instrument and acknowledged to me that-lie/she/they-executed the same in his/her/their-authorized capacity( ies . ) ,
+and that by-kis/heti-Elicit signature( s ) on the instrument the person( ) or the ! FOR NOTARY SEAL OR STAMP entity upon behalf of which the person( ) acted , executed the instrument .
+INWI ESS my hand and oRcial seal .
+<START:Name> 1.-74-.,4.Li 7-jf-,0-71-1 <END> THE UNDERSIGNED dctory 111l .
+1=711-31J FOR NOTARY SEAL OR STAMP r***************.....67rirrtrsTA******1 Z <START:Name> SUZANNE PION <END> S mihroir .
+EVIrl COMM.
+# 1276498 P NOTARY PV2LfC CALF( ?M P 4,11- 1 ,4 ORANGE COUNTY Ct.T. Exp .
+et .
+11 , 201/ a ...1 ( Seal ) ORDER NO. : 122274 ESCROW NO. : 122274 LOAN NO. : 13005370 MIN 111222333444555666 MERS Phone : 1-888-679-6377 LENDER SUPPORT SYSTEMS INC.
+CA-MER.COR 105/02 )
+
+LIBEIt 1234 PC 12 Fc.rm
+668 ( Rev.September ma ) : - Department of the Treasury - Internal Revenue Service . "
+Notice of Federal Tax Lien Under internal Revenue Laws .
+District Detroit Serial Number For Optional Use by Recording Office ; RECORDED -- , . , .
+Auc 21' 9 so - AM an REGISTER Of-DEEDS r ? ......a.....94-inan . :7 :
+INCHAM COUNTY.MICII .
+As provided by sections 6321 , 6322 , and 8323 of the Internal Revenue Code .
+notice is given that taxes ( including interest and penalties ) have been assessed against the following-named taxpayer .
+Demand for payment of this liability has been made , but it remains unpaid .
+Therefore , there is a lien in favor of the United States on all property and rights fo property belonging to this taxpayer for the amount of these taxes , and additional penalties , interest , and costs that may accrue .
+Name of Taxpayer <START:Name> John <END> & <START:Name> Jane D. Doe <END> Residence <START:Address> 123 Bake Rd , Apt . 1 Lansing , NI 48910 <END> Kind of Tax ( a ) Tax Period Ended ( b ) Data of Assessment ( e ) identifying Number ( r0 Unpaid Balance of Assessment ( a ) 1040 1040 , ... ) ) 7 12-31-78 12-31-79 8-27-79 6-2-80 123-12-1234 123-12-1234 FILED Am 21 9 so MI '80 REGISTER OF DEEDS C;4-2.....e . ,..9.. INGHAM COUNTY,MICH.
+671.10 359.02
+Place of Filing -- - -, , Register of Deeds <START:Address> Ingham County <END> Total <START:Address> Mason , MI 48854 <END> $ 1030.12
+This notice was prepared and signed at <START:Address> 229 Federal Building . <END>
+<START:Address> Lansing . <END>
+<START:Address> MI 48933 <END> , on this , the 14.5th day of August ,19 _AG Title Signature ( <START:Name> Z-?t <END> , <START:Name> William R. Fleck <END> Revenue Officer ( Nets Certificate of officer authorized by law to take acknowledgments Is not essential to the validity of Notice of Federal Tax Lion O.C.M. 28419.1950-1 ,
+C.O. 126. ) Pan 1,-To be kept bi recording office Form 688 ( Rev.
+9-78 )
+
