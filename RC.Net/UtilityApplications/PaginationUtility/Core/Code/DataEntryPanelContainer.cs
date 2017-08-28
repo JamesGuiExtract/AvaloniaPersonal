@@ -188,6 +188,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<EventArgs> RedoAvailabilityChanged;
 
         /// <summary>
+        /// Indicates that the displayed panel has been changed such as for document type specific
+        /// panels when the document type field changes.
+        /// </summary>
+        public event EventHandler<EventArgs> DataPanelChanged;
+
+        /// <summary>
         /// The <see cref="UserControl"/> to be displayed for viewing/editing of document data.
         /// </summary>
         public UserControl PanelControl
@@ -638,6 +644,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Set Active = true for the new DEP so that it tracks image viewer events.
                     newDataEntryControlHost.Active = true;
                 }
+
+                OnDataPanelChanged();
             }
         }
 
@@ -1004,6 +1012,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         void OnRedoAvailabilityChanged()
         {
             RedoAvailabilityChanged?.Invoke(this, new EventArgs());
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DataPanelChanged"/> event.
+        /// </summary>
+        void OnDataPanelChanged()
+        {
+            DataPanelChanged?.Invoke(this, new EventArgs());
         }
 
         #endregion Private Members

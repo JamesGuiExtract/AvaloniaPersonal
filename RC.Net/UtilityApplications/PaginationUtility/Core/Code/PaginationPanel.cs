@@ -482,6 +482,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             {
                                 _documentDataPanel.PanelControl.Enter -= HandlePanelControl_Enter;
                                 _documentDataPanel.PanelControl.Leave -= HandlePanelControl_Leave;
+                                _documentDataPanel.DataPanelChanged -= HandleDataPanel_DataPanelChanged;
                             }
                         }
 
@@ -494,6 +495,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             {
                                 _documentDataPanel.PanelControl.Enter += HandlePanelControl_Enter;
                                 _documentDataPanel.PanelControl.Leave += HandlePanelControl_Leave;
+                                _documentDataPanel.DataPanelChanged += HandleDataPanel_DataPanelChanged;
                             }
                         }
                     }
@@ -1547,6 +1549,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _primaryPageLayoutControl.UpdateDocumentSeparator(targetDocument);
                     }
                     targetDocument.PaginationSeparator.OpenDataPanel();
+
+                    ProcessFocusChange(forceUpdate: true);
                 }
             }
             catch (Exception ex)
@@ -2656,7 +2660,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ProcessFocusChange();
+                ProcessFocusChange(forceUpdate: false);
             }
             catch (Exception ex)
             {
@@ -2674,11 +2678,29 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ProcessFocusChange();
+                ProcessFocusChange(forceUpdate: false);
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41667");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IPaginationDocumentDataPanel.DataPanelChanged"/> event of the
+        /// <see cref="_documentDataPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleDataPanel_DataPanelChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessFocusChange(forceUpdate: true);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44809");
             }
         }
 
@@ -2719,7 +2741,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ProcessFocusChange();
+                ProcessFocusChange(forceUpdate: false);
             }
             catch (Exception ex)
             {
@@ -2736,7 +2758,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ProcessFocusChange();
+                ProcessFocusChange(forceUpdate: false);
             }
             catch (Exception ex)
             {
@@ -3309,7 +3331,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Handles focus changes between the DEP, PageLayoutControl and ImageViewer to ensure
         /// current focus is properly indicated.
         /// </summary>
-        void ProcessFocusChange()
+        /// <param name="forceUpdate"><c>true</c> to force the focus status to be updated in cases
+        /// where the panel itself may have changed without interaction from this class; <c>false</c>
+        /// if the focus status should be updated only if known to have changed.</param>
+        void ProcessFocusChange(bool forceUpdate)
         {
             // If neither the DEP nor _primaryPageLayoutControl conclusively has focus (i.e., image
             // viewer likely has focus), leave _dataPanelFocused as it currently is.
@@ -3322,7 +3347,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 bool dataPanelFocused = IsDataPanelOpen
                     && (_documentDataPanel?.PanelControl?.ContainsFocus == true);
 
-                if (dataPanelFocused != _dataPanelFocused)
+                if (forceUpdate || dataPanelFocused != _dataPanelFocused)
                 {
                     _dataPanelFocused = dataPanelFocused;
 
