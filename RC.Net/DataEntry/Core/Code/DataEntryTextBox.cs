@@ -159,6 +159,13 @@ namespace Extract.DataEntry
         bool _autoCompleteUpdatePending;
 
         /// <summary>
+        /// Indicates if a new auto-complete selection is in progress. Several text changes that are
+        /// not truly representative of what the user has selected may occur as part of this process;
+        /// Following a selection, a non-incremental update of the attribute should be applied.
+        /// </summary>
+        bool _autoCompleteSelectionPending;
+
+        /// <summary>
         /// The active <see cref="FontStyle"/> for the control.
         /// </summary>
         FontStyle _fontStyle;
@@ -590,6 +597,15 @@ namespace Extract.DataEntry
                 // Only apply data if the text box is currently mapped.
                 if (_attribute != null)
                 {
+                    // https://extract.atlassian.net/browse/CUST-1968
+                    // Several text changes that are not truly representative of what the user has
+                    // selected may occur as part of this process. Following a selection, a
+                    // non -incremental update of the attribute should be applied.
+                    if (!_autoCompleteSelectionPending && FormsMethods.IsAutoCompleteDisplayed())
+                    {
+                        _autoCompleteSelectionPending = true;
+                    }
+
                     AttributeStatusInfo.SetValue(_attribute, Text, true, false);
                 }
 
@@ -615,6 +631,10 @@ namespace Extract.DataEntry
             try
             {
                 base.OnLostFocus(e);
+
+                // Ensure this is reset if focus is ever lost with or without applying a new
+                // selection.
+                _autoCompleteSelectionPending = false;
 
                 // If a validation list is supplied, this will correct capitalization differences
                 // with a list item.
@@ -657,12 +677,24 @@ namespace Extract.DataEntry
                 // is active, an enter key press was registered, all text is selected an the text
                 // leads off with a space, trim off the space that is very likely the special space
                 // that was added for all entries in the auto-complete list.
-                if (e.KeyCode == Keys.Return && AutoCompleteCustomSource != null &&
-                    AutoCompleteCustomSource.Count > 0 && TextLength > 1 && 
-                    SelectionLength == TextLength && Text[0] == ' ')
+                if (e.KeyCode == Keys.Return && _autoCompleteSelectionPending)
                 {
-                    Text = Text.Substring(1);
-                    SelectAll();
+                    _autoCompleteSelectionPending = false;
+
+                    if (Text[0] == ' ')
+                    {
+                        Text = Text.Substring(1);
+                        SelectAll();
+                    }
+
+                    // https://extract.atlassian.net/browse/CUST-1968
+                    // Several text changes that are not truly representative of what the user has
+                    // selected may occur as part of this process. Following a selection, a
+                    // non -incremental update of the attribute should be applied.
+                    if (_attribute != null)
+                    {
+                        AttributeStatusInfo.SetValue(_attribute, Text, acceptSpatialInfo: true, endOfEdit: true);
+                    }
                 }
 
                 // Check for selection change.
