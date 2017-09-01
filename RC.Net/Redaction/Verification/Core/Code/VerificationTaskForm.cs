@@ -229,12 +229,6 @@ namespace Extract.Redaction.Verification
         TimeInterval _overheadTimeInterval;
 
         /// <summary>
-        /// <see langword="true"/> if the comment text box has been modified;
-        /// <see langword="false"/> if the comment text box has not been modified.
-        /// </summary>
-        bool _commentChanged;
-
-        /// <summary>
         /// The previously verified documents.
         /// </summary>
         readonly List<VerificationMemento> _history = 
@@ -419,6 +413,11 @@ namespace Extract.Redaction.Verification
         /// Indicates whether the form is closing.
         /// </summary>
         bool _formClosing;
+
+        /// <summary>
+        /// The current file's comment as currently stored in the DB.
+        /// </summary>
+        string _commentFromDB;
 
         #endregion Fields
 
@@ -1578,7 +1577,9 @@ namespace Extract.Redaction.Verification
                 }
 
                 // Check if the viewed document is dirty
-                if (_redactionGridView.Dirty)
+                // https://extract.atlassian.net/browse/ISSUE-14437
+                // Prompt to save changes if the comment has changed as well.
+                if (Dirty)
                 {
                     // Stop the slideshow until we get the user's response.
                     bool slideshowRunning = _slideshowRunning;
@@ -1892,8 +1893,7 @@ namespace Extract.Redaction.Verification
                 return true;
             }
             // If the user has changed something and a prompt is required, prompt.
-            else if (_redactionGridView.Dirty &&
-                     _settings.General.PromptForSaveUntilCommit)
+            else if (Dirty && _settings.General.PromptForSaveUntilCommit)
             {
                 // Stop the slideshow until we get the user's response.
                 StopSlideshow(false);
@@ -2538,7 +2538,8 @@ namespace Extract.Redaction.Verification
                 Text = Path.GetFileName(memento.SourceDocument) + " - " + _formTitle;
 
                 _documentTypeTextBox.Text = memento.DocumentType;
-                _commentsTextBox.Text = GetFileActionComment(memento);
+                _commentFromDB = GetFileActionComment(memento);
+                _commentsTextBox.Text = _commentFromDB;
 
                 _previousDocumentToolStripButton.Enabled = _historyIndex > 0;
                 _nextDocumentCommand.Enabled = IsInHistory;
@@ -2568,6 +2569,7 @@ namespace Extract.Redaction.Verification
                 Text = _formTitle + " (Waiting for file)";
 
                 _documentTypeTextBox.Text = "";
+                _commentFromDB = "";
                 _commentsTextBox.Text = "";
 
                 _previousDocumentToolStripButton.Enabled = false;
@@ -2789,14 +2791,13 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void CommitComment()
         {
-            if (_commentChanged && _fileDatabase != null)
+            if ((_commentFromDB != _commentsTextBox.Text) && _fileDatabase != null)
             {
                 VerificationMemento memento = GetCurrentDocument();
                 if (memento != null)
                 {
-                    string comment = _commentsTextBox.Text;
-                    _fileDatabase.SetFileActionComment(memento.FileId, memento.ActionId, comment);
-                    _commentChanged = false;
+                    _commentFromDB = _commentsTextBox.Text;
+                    _fileDatabase.SetFileActionComment(memento.FileId, memento.ActionId, _commentFromDB);
                 }
             }
         }
@@ -3808,25 +3809,6 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.TextChanged"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="Control.TextChanged"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="Control.TextChanged"/> event.</param>
-        void HandleCommentsTextBoxTextChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                _commentChanged = true;
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI27936", ex);
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="ToolStripItem.Click"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
@@ -4484,6 +4466,23 @@ namespace Extract.Redaction.Verification
         #endregion IMessageFilter Members
 
         #region Private Members
+
+        /// <summary>
+        /// Gets a value indicating whether the data for this document is dirty.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if dirty; otherwise, <c>false</c>.
+        /// </value>
+        bool Dirty
+        {
+            get
+            {
+                // https://extract.atlassian.net/browse/ISSUE-14437
+                // Edited comments mark the document as dirty.
+                return _redactionGridView.Dirty || 
+                    (_commentsTextBox.Text != _commentFromDB);
+            }
+        }
 
         /// <summary>
         /// Starts or stops the slideshow.

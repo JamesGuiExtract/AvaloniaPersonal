@@ -352,7 +352,6 @@ namespace Extract.Redaction.Verification
             this._commentsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._commentsTextBox.Size = new System.Drawing.Size(513, 58);
             this._commentsTextBox.TabIndex = 6;
-            this._commentsTextBox.TextChanged += new System.EventHandler(this.HandleCommentsTextBoxTextChanged);
             // 
             // _commentsLabel
             // 
