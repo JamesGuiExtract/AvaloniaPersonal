@@ -234,6 +234,12 @@ namespace Extract.Redaction.Verification
         /// </summary>
         string _sourceDocument;
 
+        /// <summary>
+        /// Indicates when redaction type column has been clicked by indicating the row in which it
+        /// has been clicked; -1 if there is no active click of the redaction type column.
+        /// </summary>
+        int _typeComboClickedRow = -1;
+
         #endregion Fields
 
         #region Events
@@ -1192,6 +1198,16 @@ namespace Extract.Redaction.Verification
                 UpdateLayerObjectSelection();
 
                 BringSelectionIntoView();
+
+                // https://extract.atlassian.net/browse/ISSUE-14931
+                // If this new selection is a single row that was selected by clicking on the type
+                // column, open the type dropdown.
+                if (_dataGridView.SelectedRows.Count == 1 &&
+                    _dataGridView.SelectedRows[0].Index == _typeComboClickedRow)
+                {
+                    _typeComboClickedRow = -1;
+                    SelectDropDownTypeList();
+                }
 
                 _imageViewer.Invalidate();
             }
@@ -2689,6 +2705,65 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="DataGridView.CellMouseDown"/> event of <see cref="_dataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataGridViewCellMouseEventArgs"/> instance containing the
+        /// event data.</param>
+        void HandleDataGridViewCellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            try
+            {
+                // https://extract.atlassian.net/browse/ISSUE-14931
+                // The redaction type combo should open with a single click; check if the redaction
+                // type column is the one that was clicked.
+                if (e.ColumnIndex == _typeColumn.Index)
+                {
+                    // If the clicked row is already the singly selected row, open the combo
+                    if (_dataGridView.SelectedRows.Count == 1 &&
+                        _dataGridView.SelectedRows[0].Index == e.RowIndex)
+                    {
+                        SelectDropDownTypeList();
+                    }
+                    // Otherwise indicate that the type combo was clicked so that if this is the
+                    // singly selected row upon UpdateSelection the type combo can be opened then.
+                    else
+                    {
+                        _typeComboClickedRow = e.RowIndex;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI44813");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.CellMouseDown"/> event of <see cref="_dataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataGridViewCellMouseEventArgs"/> instance containing the
+        /// event data.</param>
+        void HandleDataGridViewCellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            // Ensure _typeComboClickedRow if the click didn't result in the redaction type combo opening.
+            _typeComboClickedRow = -1;
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Leave"/> event of <see cref="_dataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleDataGridViewLeave(object sender, EventArgs e)
+        {
+            // Ensure _typeComboClickedRow if the click didn't result in the redaction type combo opening.
+            _typeComboClickedRow = -1;
+        }
+
         #endregion Event Handlers
 
         #region IImageViewerControl Members
@@ -2778,6 +2853,9 @@ namespace Extract.Redaction.Verification
                         _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
                         _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
                         _dataGridView.SelectionChanged += HandleDataGridViewSelectionChanged;
+                        _dataGridView.CellMouseDown += HandleDataGridViewCellMouseDown;
+                        _dataGridView.CellMouseUp += HandleDataGridViewCellMouseUp;
+                        _dataGridView.Leave += HandleDataGridViewLeave;
                     }
                     else if (_imageViewer != null)
                     {
@@ -2788,6 +2866,9 @@ namespace Extract.Redaction.Verification
                         _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
                         _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
                         _dataGridView.SelectionChanged -= HandleDataGridViewSelectionChanged;
+                        _dataGridView.CellMouseDown -= HandleDataGridViewCellMouseDown;
+                        _dataGridView.CellMouseUp -= HandleDataGridViewCellMouseUp;
+                        _dataGridView.Leave -= HandleDataGridViewLeave;
                     }
                 }
             }
