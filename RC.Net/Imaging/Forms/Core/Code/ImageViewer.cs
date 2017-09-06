@@ -2750,7 +2750,7 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Gets or sets whether to mainain current, custom zoom level for pages that have
+        /// Gets or sets whether to maintain current, custom zoom level for pages that have
         /// not been shown yet (has no effect if there is a <see cref="FitMode"/> in use.
         /// </summary>
         /// <value>

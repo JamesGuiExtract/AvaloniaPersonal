@@ -981,6 +981,34 @@ bool CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, long nFile
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43218");
 }
 //--------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, string strFileName,
+										 long nWorkflowID)
+{
+	try
+	{
+		if (nWorkflowID <= 0)
+		{
+			nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
+		}
+
+		replaceVariable(strFileName, "'", "''");
+
+		string strQuery = (nWorkflowID > 0)
+			? Util::Format("SELECT COUNT(*) AS [ID] FROM [WorkflowFile] "
+				"INNER JOIN [FAMFile] ON [FileID] = [FAMFile].[ID] "
+				"WHERE [FileName] = '%s' AND [WorkflowID] = %d", strFileName.c_str(), nWorkflowID)
+			: Util::Format(
+				"SELECT COUNT([ID]) AS [ID] FROM [FAMFile] WHERE [FileName] = '%s'",
+				strFileName.c_str());
+
+		long nCount = 0;
+		executeCmdQuery(ipConnection, strQuery, false, &nCount);
+
+		return nCount > 0;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI44849");
+}
+//--------------------------------------------------------------------------------------------------
 string CFileProcessingDB::getActiveWorkflow()
 {
 	CSingleLock lock(&m_criticalSection, TRUE);
@@ -1899,6 +1927,7 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 
 		vecQueries.push_back(gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES);
 		vecQueries.push_back(gstrINSERT_PAGINATION_TASK_CLASS);
+		vecQueries.push_back(gstrSPLIT_MULTI_PAGE_DOCUMENT_TASK_CLASS);
 
 		// Initialize the DB Info settings if necessary
 		if (bInitializeUserTables)

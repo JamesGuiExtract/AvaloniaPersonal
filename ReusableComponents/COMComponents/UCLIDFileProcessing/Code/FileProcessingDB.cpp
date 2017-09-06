@@ -4442,6 +4442,30 @@ STDMETHODIMP CFileProcessingDB::GetAttributeValue(BSTR bstrSourceDocName, BSTR b
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43529");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::IsFileNameInWorkflow(BSTR bstrFileName, long nWorkflowID,
+													 VARIANT_BOOL *pbIsInWorkflow)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		ASSERT_ARGUMENT("ELI44845", pbIsInWorkflow != __nullptr);
+
+		if (!IsFileNameInWorkflow_Internal(false, bstrFileName, nWorkflowID, pbIsInWorkflow))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			IsFileNameInWorkflow_Internal(true, bstrFileName, nWorkflowID, pbIsInWorkflow);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44846");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

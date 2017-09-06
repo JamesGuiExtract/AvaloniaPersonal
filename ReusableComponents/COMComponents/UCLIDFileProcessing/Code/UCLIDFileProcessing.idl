@@ -1953,6 +1953,12 @@ library UCLID_FILEPROCESSINGLib
 		[id(186), helpstring("method GetAttributeValue")] HRESULT GetAttributeValue(
 			[in] BSTR bstrSourceDocName, [in] BSTR bstrAttributeSetName, [in] BSTR bstrAttributePath,
 			[out, retval] BSTR* pbstrValue);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Indicates whether the specified filename exists in the active workflow/database.
+		//			If the specified workflow ID is -1, the current workflow will be tested.
+		//			If there are no workflows defined, the result will indicate whether the file ID is present in the DB.
+		[id(187), helpstring("method IsFileNameInWorkflow")] HRESULT IsFileNameInWorkflow([in] BSTR bstrFileName,
+			[in] long nWorkflowID, [out, retval] VARIANT_BOOL *pbIsInWorkflow);
 	};
 
 	[

@@ -344,6 +344,7 @@ public:
 	STDMETHOD(MoveFilesToWorkflowFromQuery)(BSTR bstrQuery, long nSourceWorkflowID, long nDestWorkflowID, long *pnCount);
 	STDMETHOD(GetAttributeValue)(BSTR bstrSourceDocName, BSTR bstrAttributeSetName, BSTR bstrAttributePath,
 		BSTR* pbstrValue);
+	STDMETHOD(IsFileNameInWorkflow)(BSTR bstrFileName, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -728,6 +729,7 @@ private:
 	// If the specified workflow ID is -1, the current workflow will be tested.
 	// If there are no workflows defined, the result will indicate whether the file ID is present in the DB.
 	bool isFileInWorkflow(_ConnectionPtr ipConnection, long nFileID, long nWorkflowID);
+	bool isFileInWorkflow(_ConnectionPtr ipConnection, string strFileName, long nWorkflowID);
 
 	// Gets the currently active workflow. Should be checked instead of m_strActiveWorkflow in order
 	// to synchronize access.
@@ -1443,6 +1445,7 @@ private:
 	bool MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BSTR bstrQuery, long nSourceWorkflowID,  long nDestWorkflowID, long *pnCount);
 	bool GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSourceDocName, BSTR bstrAttributeSetName, BSTR bstrAttributePath,
 		BSTR* pbstrValue);
+	bool IsFileNameInWorkflow_Internal(bool bDBLocked, BSTR bstrFileName, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

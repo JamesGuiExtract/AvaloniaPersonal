@@ -170,7 +170,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// The path tag expression defining the filename that should be given to a pagination
         /// output document.
         /// </summary>
-        string _outputPath = "$InsertBeforeExtension(<SourceDocName>,_<SubDocIndex>)";
+        string _outputPath = "$InsertBeforeExtension(<SourceDocName>,_Paginated_<SubDocIndex>)";
 
         /// <summary>
         /// The action into which paginated output documents should be moved to pending.

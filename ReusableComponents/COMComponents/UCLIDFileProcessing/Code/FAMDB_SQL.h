@@ -1813,6 +1813,10 @@ static const string gstrINSERT_PAGINATION_TASK_CLASS =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
 	"	('DF414AD2-742A-4ED7-AD20-C1A1C4993175', 'Core: Paginate files') \r\n";
 
+static const string gstrSPLIT_MULTI_PAGE_DOCUMENT_TASK_CLASS =
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('EF1279E8-4EC2-4CBF-9DE5-E107D97916C0', 'Core: Split multi-page document') \r\n";
+
 static const string gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE = 
 	"	SELECT [sc].[ID] "
 	"		,[sc].[CounterName] "

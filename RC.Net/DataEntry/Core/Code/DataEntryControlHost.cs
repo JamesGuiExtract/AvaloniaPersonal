@@ -6863,7 +6863,15 @@ namespace Extract.DataEntry
             // https://extract.atlassian.net/browse/ISSUE-14328
             // In the PaginationPanel, the document open in the image viewer may not be the document
             // to which this highlight pertains.
-            if (!FileSystemMethods.ArePathsEqual(attribute.Value.SourceDocName, ImageViewer.ImageFile))
+            // https://extract.atlassian.net/browse/ISSUE-14901
+            // The above fix broke smart hints since the hints do not have a SourceDocName set.
+            // It appears other changes now prevent ISSUE-14328 from occurring even without this
+            // check, though it seems hard to track down exactly what changes along the way would
+            // have done so. I'm torn between the risk of re-introducing ISSUE-14328 and other
+            // as-yet undiscovered consequences of this early return. As a compromise, I'm adding a
+            // check to confirm the attribute has an SDN before allowing the early return.
+            if (!string.IsNullOrEmpty(attribute.Value.SourceDocName) && 
+                !FileSystemMethods.ArePathsEqual(attribute.Value.SourceDocName, ImageViewer.ImageFile))
             {
                 return attributeHighlights;
             }

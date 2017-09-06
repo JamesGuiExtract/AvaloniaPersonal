@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 154;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 155;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1933,6 +1933,32 @@ int UpdateToSchemaVersion154(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43664");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion155(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 155;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrSPLIT_MULTI_PAGE_DOCUMENT_TASK_CLASS);
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI44842");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6893,7 +6919,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 151:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion152);
 				case 152:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion153);
 				case 153:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion154);
-				case 154:	break;
+				case 154:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion155);
+				case 155:	break;
 
 				default:
 					{
@@ -10998,5 +11025,38 @@ bool CFileProcessingDB::GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSour
 		}
 		throw ue;
 	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::IsFileNameInWorkflow_Internal(bool bDBLocked, BSTR bstrFileName,
+													  long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow)
+{
+	try
+	{
+		try
+		{
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+			
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			*pbIsInWorkflow = asVariantBool(
+				isFileInWorkflow(ipConnection, asString(bstrFileName), nWorkflowID));
+
+			END_CONNECTION_RETRY(ipConnection, "ELI44847");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI44848");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
 	return true;
 }

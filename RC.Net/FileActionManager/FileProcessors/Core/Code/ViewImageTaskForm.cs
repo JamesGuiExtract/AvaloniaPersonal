@@ -723,7 +723,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         public void DelayFile(int fileID)
         {
-            throw new ExtractException("ELI37504", "Method not implmented.");
+            throw new ExtractException("ELI37504", "Method not implemented.");
         }
 
         /// <summary>

@@ -1659,16 +1659,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                                     newPageDataArray[destPage - 1] = pageData;
                                     pageData.UpdatePageNumber(destPage);
 
-                                    var pageInfoCollection = rotatedPages
-                                        .Where(info => info.Page == sourcePage &&
-                                        info.DocumentName == pageData.SourceDocName);
-                                    if (pageInfoCollection.Count() > 0)
+                                    if (rotatedPages != null)
                                     {
-                                        var pageRotationInfo = pageInfoCollection.First();
-                                        RotatePage(sourcePage,
-                                                   pageRotationInfo,
-                                                   oldPageInfos,
-                                                   oldSpatialPageInfo);
+                                        var pageInfoCollection = rotatedPages
+                                            .Where(info => info.Page == sourcePage &&
+                                            info.DocumentName == pageData.SourceDocName);
+                                        if (pageInfoCollection.Count() > 0)
+                                        {
+                                            var pageRotationInfo = pageInfoCollection.First();
+                                            RotatePage(sourcePage,
+                                                       pageRotationInfo,
+                                                       oldPageInfos,
+                                                       oldSpatialPageInfo);
+                                        }
                                     }
                                 }
                                 if (oldPageInfos.Contains(sourcePage))
