@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -35,6 +36,18 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         bool _inDesignMode;
 
+        /// <summary>
+        /// The cell style to apply for any row in <see cref="_recordsDataGridView"/> for which
+        /// results have already been filed.
+        /// </summary>
+        DataGridViewCellStyle _matchedRecordCellStyle;
+
+        /// <summary>
+        /// Row indices pending application of a style that indicates records for which results have
+        /// previously been filed.
+        /// </summary>
+        List<int> _rowsPendingMatchedRecordStyle = new List<int>();
+
         #endregion Fields
 
         #region Constructors
@@ -60,6 +73,12 @@ namespace Extract.DataEntry.LabDE
                     LicenseIdName.LabDECoreObjects, "ELI38143", _OBJECT_NAME);
 
                 InitializeComponent();
+
+                // The cell style to apply for any row in _recordsDataGridView for which results have
+                // already been filed.
+                _matchedRecordCellStyle = new DataGridViewCellStyle(_recordsDataGridView.DefaultCellStyle);
+                _matchedRecordCellStyle.BackColor = Color.LightYellow;
+                _matchedRecordCellStyle.SelectionForeColor = Color.Yellow;
             }
             catch (Exception ex)
             {
@@ -138,6 +157,29 @@ namespace Extract.DataEntry.LabDE
                         .OfType<DataGridViewColumn>()
                         .Single(column => column.Name == RowData.DefaultSort.Item1);
                     _recordsDataGridView.Sort(sortedColumn, RowData.DefaultSort.Item2);
+                }
+
+                // https://extract.atlassian.net/browse/ISSUE-14421
+                // Indicate already matched records with a different cell style.
+                // NOTE: This needs to occur *after* the rows have had default sort applied.
+                foreach (var row in _recordsDataGridView.Rows.OfType<DataGridViewRow>())
+                {
+                    if (RowData.GetCorrespondingFileIds((string)row.Cells[0].Value).Any())
+                    {
+                        // Style updates are ignored if done before the form is shown, defer the
+                        // style update until the form has been displayed if necessary.
+                        if (IsHandleCreated)
+                        {
+                            foreach (var cell in row.Cells.OfType<DataGridViewCell>())
+                            {
+                                cell.Style = _matchedRecordCellStyle;
+                            }
+                        }
+                        else
+                        {
+                            _rowsPendingMatchedRecordStyle.Add(row.Index);
+                        }
+                    }
                 }
 
                 if (disposableSource != null)
@@ -337,6 +379,41 @@ namespace Extract.DataEntry.LabDE
         }
 
         #endregion IFFIDataManager
+
+        #region Overrides
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.UserControl.Load" /> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+        protected override void OnLoad(EventArgs e)
+        {
+            try
+            {
+                base.OnLoad(e);
+
+                // https://extract.atlassian.net/browse/ISSUE-14421
+                // Style updates are ignored if done before the form is show, so this must be done
+                // here rather than UpdateRecordSelectionGrid();
+                if (_rowsPendingMatchedRecordStyle.Any())
+                {
+                    foreach (var cell in _rowsPendingMatchedRecordStyle
+                        .Select(rowIndex => _recordsDataGridView.Rows[rowIndex])
+                        .SelectMany(row => row.Cells.OfType<DataGridViewCell>()))
+                    {
+                        cell.Style = _matchedRecordCellStyle;
+                    }
+
+                    _rowsPendingMatchedRecordStyle.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI44819");
+            }
+        }
+
+        #endregion Overrides
 
         #region Internal Members
 
