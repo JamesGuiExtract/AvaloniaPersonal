@@ -1,4 +1,5 @@
 using Extract.Licensing;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -577,6 +578,82 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Allows the user to select a folder using the folder browser.
         /// </summary>
+        /// <param name="description">The text to display over the selection control.</param>
+        /// <param name="initialFolder">The initial folder for the folder browser.</param>
+        /// <param name="fileFilter">The file type filter.</param>
+        /// <param name="pickFolder">Whether to allow folders to be selected rather than files.</param>
+        /// <param name="ensurePathExists">Whether to validate that the picked path exists.</param>
+        /// <param name="ensureFileExists">Whether to validate that the picked file exists.</param>
+        /// <returns>The result of the user's selection or <see langword="null"/> if the user
+        /// canceled the dialog.</returns>
+        public static string BrowseForFileOrFolder(string description, string initialFolder,
+            bool pickFolder, string fileFilter, bool multipleSelect, bool ensurePathExists, bool ensureFileExists)
+        {
+            try
+            {
+                using (CommonOpenFileDialog browser = new CommonOpenFileDialog
+                {
+                    IsFolderPicker = pickFolder,
+                    Multiselect = multipleSelect,
+                    EnsurePathExists = ensurePathExists,
+                    EnsureFileExists = ensureFileExists
+                })
+                {
+                    // Set the initial folder if necessary
+                    if (!string.IsNullOrEmpty(initialFolder))
+                    {
+                        browser.InitialDirectory = initialFolder;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(description))
+                    {
+                        // Set the description
+                        browser.Title = description;
+                    }
+                    else if (pickFolder)
+                    {
+                        browser.Title = "Please select a folder";
+                    }
+                    else
+                    {
+                        browser.Title = "Please select a file";
+                    }
+
+                    // Set the filter text and the initial filter
+                    if (!string.IsNullOrEmpty(fileFilter))
+                    {
+                        var filters = fileFilter.Split(new[] { '|' });
+                        for (int i = 1; i < filters.Length; i += 2)
+                        {
+                            var filter = new CommonFileDialogFilter(filters[i - 1], filters[i]) { ShowExtensions = false };
+                            browser.Filters.Add(filter);
+                        }
+                    }
+                    if (browser.Filters.Any())
+                    {
+                        browser.DefaultExtension = browser.Filters[0].Extensions.FirstOrDefault();
+                    }
+
+                    // Show the dialog
+                    var result = browser.ShowDialog();
+                    if (result == CommonFileDialogResult.Ok)
+                    {
+                        // Return the selected path.
+                        return browser.FileName;
+                    }
+
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44899");
+            }
+        }
+
+        /// <summary>
+        /// Allows the user to select a folder using the folder browser.
+        /// </summary>
         /// <param name="description">The text to display over the folder selection contro.</param>
         /// <param name="initialFolder">The initial folder for the folder browser.</param>
         /// <returns>The result of the user's selection or <see langword="null"/> if the user
@@ -585,30 +662,7 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                using (FolderBrowserDialog folderBrowser = new FolderBrowserDialog())
-                {
-                    // Set the initial folder if necessary
-                    if (!string.IsNullOrEmpty(initialFolder))
-                    {
-                        folderBrowser.SelectedPath = initialFolder;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(description))
-                    {
-                        // Set the folder browser description
-                        folderBrowser.Description = description;
-                    }
-
-                    // Show the dialog
-                    DialogResult result = folderBrowser.ShowDialog();
-                    if (result == DialogResult.OK)
-                    {
-                        // Return the selected folder path.
-                        return folderBrowser.SelectedPath;
-                    }
-
-                    return null;
-                }
+                return BrowseForFileOrFolder(description, initialFolder, true, null, false, true, false);
             }
             catch (Exception ex)
             {
@@ -627,43 +681,7 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                using (OpenFileDialog openFile = new OpenFileDialog())
-                {
-                    // Set the initial folder if necessary
-                    if (!string.IsNullOrEmpty(initialFolder))
-                    {
-                        openFile.InitialDirectory = initialFolder;
-                    }
-
-                    // Set the filter text and the initial filter
-                    if (!string.IsNullOrEmpty(fileFilter))
-                    {
-                        openFile.Filter = fileFilter;
-                        openFile.FilterIndex = 0;
-                        openFile.AddExtension = true;
-                    }
-                    else
-                    {
-                        openFile.AddExtension = false;
-                    }
-
-                    // Set multi-select to false
-                    openFile.Multiselect = false;
-
-                    // Require that both the path and file exist
-                    openFile.CheckFileExists = true;
-                    openFile.CheckPathExists = true;
-
-                    // Show the dialog
-                    DialogResult result = openFile.ShowDialog();
-                    if (result == DialogResult.OK)
-                    {
-                        // Return the selected file path.
-                        return openFile.FileName;
-                    }
-
-                    return null;
-                }
+                return BrowseForFileOrFolder(null, initialFolder, false, fileFilter, false, true, true);
             }
             catch (Exception ex)
             {

@@ -95,6 +95,8 @@ namespace Extract.Utilities.Forms
         /// selected OK.
         /// </summary>
         TextBoxBase _textControl;
+        private bool _ensurePathExists;
+        private bool _ensureFileExists;
 
         #endregion Fields
 
@@ -189,6 +191,40 @@ namespace Extract.Utilities.Forms
             set
             {
                 _folderDescription = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the path must exist
+        /// </summary>
+        [Category("Behavior")]
+        [Description("Whether the selected path must exist.")]
+        public bool EnsurePathExists
+        {
+            get
+            {
+                return _ensurePathExists;
+            }
+            set
+            {
+                _ensurePathExists = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the file must exist
+        /// </summary>
+        [Category("Behavior")]
+        [Description("Whether the selected file must exist.")]
+        public bool EnsureFileExists
+        {
+            get
+            {
+                return _ensureFileExists;
+            }
+            set
+            {
+                _ensureFileExists = value;
             }
         }
 
@@ -313,9 +349,9 @@ namespace Extract.Utilities.Forms
                     null : Path.GetFullPath(_fileOrFolderPath);
 
                 // Build and display the desired dialog
-                string fileOrFolderPath = _folderBrowser
-                    ? FormsMethods.BrowseForFolder(_folderDescription, initialFolder)
-                    : FormsMethods.BrowseForFile(_fileFilter, initialFolder);
+                string description = _folderBrowser ? _folderDescription : null;
+                string fileOrFolderPath = FormsMethods.BrowseForFileOrFolder(
+                    description, initialFolder, _folderBrowser, _fileFilter, false, _ensurePathExists, _ensureFileExists);
 
                 // If the return value from the dialog is null, the user canceled.
                 if (fileOrFolderPath != null)
