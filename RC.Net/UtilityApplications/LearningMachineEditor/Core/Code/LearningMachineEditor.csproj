@@ -87,6 +87,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WritingDataToCsvStatus.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WritingDataToCsvStatus.Designer.cs">
+      <DependentUpon>WritingDataToCsvStatus.cs</DependentUpon>
+    </Compile>
     <Compile Include="LabelAttributesStatus.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -137,6 +143,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="WritingDataToCsvStatus.resx">
+      <DependentUpon>WritingDataToCsvStatus.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LabelAttributesStatus.resx">
       <DependentUpon>LabelAttributesStatus.cs</DependentUpon>
     </EmbeddedResource>
