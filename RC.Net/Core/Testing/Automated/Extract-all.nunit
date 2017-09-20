@@ -34,7 +34,8 @@
     <assembly path="Extract.Test.dll" />
     <assembly path="Extract.Utilities.Test.dll" />
     <assembly path="Extract.Utilities.Parsers.Test.dll" />
-    <assembly path="Extract.Web.DocumentAPI.Test.dll" />	
+    <assembly path="Extract.Web.DocumentAPI.Test.dll" />
+	<assembly path="Extract.Web.AppBackendAPI.Test.dll" />	
     <assembly path="Extract.UtilityApplications.NERAnnotator.Test.dll" />
     <assembly path="Extract.UtilityApplications.NERDataCollector.Test.dll" />
   </Config>
