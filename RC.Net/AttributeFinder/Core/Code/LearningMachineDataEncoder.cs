@@ -1094,6 +1094,13 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                if (!File.Exists(attributesFilePath))
+                {
+                    var ue = new ExtractException("ELI44904", "Attributes file is missing");
+                    ue.AddDebugData("Attributes file path", attributesFilePath, false);
+                    ue.Log();
+                    return new NameToProtoFeaturesMap();
+                }
                 var attributes = _afUtility.Value.GetAttributesFromFile(attributesFilePath);
                 attributes.ReportMemoryUsage();
                 return GetFilteredMapOfNamesToValues(attributes);
@@ -1394,9 +1401,17 @@ namespace Extract.AttributeFinder
                     if (AttributeFeatureVectorizers.Any() && inputVOAFilePaths != null)
                     {
                         string voa = inputVOAFilePaths[i];
-                        ExtractException.Assert("ELI39655", "Input VOA file doesn't exist", File.Exists(voa));
-                        attributes = _afUtility.Value.GetAttributesFromFile(voa);
-                        attributes.ReportMemoryUsage();
+                        if (!File.Exists(voa))
+                        {
+                            var ue = new ExtractException("ELI39655", "Attributes file is missing");
+                            ue.AddDebugData("Attributes file path", voa, false);
+                            ue.Log();
+                        }
+                        else
+                        {
+                            attributes = _afUtility.Value.GetAttributesFromFile(voa);
+                            attributes.ReportMemoryUsage();
+                        }
                     }
 
                     double[] featureVector = GetDocumentFeatureVector(spatialString, attributes);
@@ -1982,6 +1997,23 @@ namespace Extract.AttributeFinder
                 return string.IsNullOrEmpty(AttributesToTokenizeFilter);
             }
             return _version <= version;
+        }
+
+        /// <summary>
+        /// Called when serializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnSerializing]
+        private void OnSerializing(StreamingContext context)
+        {
+            if (_version == 3 && IsCompatibleWithVersion(2))
+            {
+                _version = 2;
+            }
+            if (_version == 2 && IsCompatibleWithVersion(1))
+            {
+                _version = 1;
+            }
         }
 
         /// <summary>

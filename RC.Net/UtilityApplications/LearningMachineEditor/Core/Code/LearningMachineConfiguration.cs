@@ -522,7 +522,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
 
             // Enable/disable feature editing and answer viewing
-            editFeaturesButton.Enabled = viewAnswerListButton.Enabled
+            editFeaturesButton.Enabled
+                = viewAnswerListButton.Enabled
+                = writeDataToCsvButton.Enabled
                 = CurrentLearningMachine.Encoder.AreEncodingsComputed;
 
             // Check against saved machine configuration
@@ -626,6 +628,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 // Set machine controls
                 machineTypeComboBox.SelectEnumValue(CurrentLearningMachine.MachineType);
+                csvOutputTextBox.Text = CurrentLearningMachine.CsvOutputFile ?? "";
 
                 // Neural net
                 if (CurrentLearningMachine.MachineType == LearningMachineType.ActivationNetwork)
@@ -988,6 +991,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         private void SetClassifierValues(LearningMachine learningMachine)
         {
             var machineType = machineTypeComboBox.ToEnumValue<LearningMachineType>();
+            learningMachine.CsvOutputFile = csvOutputTextBox.Text;
 
             // Neural Network Classifier
             if (machineType == LearningMachineType.ActivationNetwork)
@@ -1964,6 +1968,31 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             catch (Exception ex)
             {
                 ex.AsExtract("ELI41470").Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the Click event of the writeDataToCsvButton by opening a <see cref="WritingDataToCsvStatus"/>
+        /// dialog.
+        /// </summary>
+        private void HandleWriteDataToCsvButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!_valid)
+                {
+                    FocusFirstInvalid();
+                    return;
+                }
+
+                using (var win = new WritingDataToCsvStatus(CurrentLearningMachine))
+                {
+                    win.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI44892");
             }
         }
 

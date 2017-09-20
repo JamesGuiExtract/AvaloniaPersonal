@@ -16,6 +16,7 @@ using System.Runtime.Caching;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -41,8 +42,11 @@ namespace Extract.AttributeFinder
         /// Version 2: Add LearningMachineUsage.AttributeCategorization
         ///            Add LabelAttributesSettings property and backing field
         /// Version 3: Add versioning to LearningMachineDataEncoder
+        /// Version 4: Add TranslateUnknownCategory property and backing field
+        ///            TranslateUnknownCategoryTo property and backing field
+        /// Version 5: Add CsvOutputFile property and backing field
         /// </summary>
-        const int _CURRENT_VERSION = 4;
+        const int _CURRENT_VERSION = 5;
 
         // Encryption password for serialization, renamed to obfuscate purpose
         private static readonly byte[] _CONVERGENCE_MATRIX = new byte[64]
@@ -111,6 +115,9 @@ namespace Extract.AttributeFinder
 
         [OptionalField(VersionAdded = 4)]
         private string _translateUnknownCategoryTo;
+
+        [OptionalField(VersionAdded = 5)]
+        private string _csvOutputFile;
 
         #endregion Fields
 
@@ -350,6 +357,23 @@ namespace Extract.AttributeFinder
             set
             {
                 _translateUnknownCategoryTo = value;
+            }
+        }
+
+        /// <summary>
+        /// The basename to which write feature data CSV files
+        /// </summary>
+        /// <remarks>".train.txt" or ".test.txt" will be added to this file name
+        /// when writing out the data.</remarks>
+        public string CsvOutputFile
+        {
+            get
+            {
+                return _csvOutputFile;
+            }
+            set
+            {
+                _csvOutputFile = value ?? "";
             }
         }
 
@@ -678,6 +702,7 @@ namespace Extract.AttributeFinder
                     || other.LabelAttributesSettings != null && !other.LabelAttributesSettings.Equals(LabelAttributesSettings)
                     || other.TranslateUnknownCategory != TranslateUnknownCategory
                     || TranslateUnknownCategory && !string.Equals(other.TranslateUnknownCategoryTo, TranslateUnknownCategoryTo)
+                    || !string.Equals(other.CsvOutputFile, CsvOutputFile)
                     )
                 {
                     return false;
@@ -844,6 +869,102 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Writes out feature vectors and answers as a csv file, one file for training and one for testing sets
+        /// </summary>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <remarks>The CSV fields are: "ussFileName", "answer", features...</remarks>
+        public void WriteDataToCsv(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        {
+            try
+            {
+                ExtractException.Assert("ELI44890", "Machine is not fully configured", IsConfigured);
+                ExtractException.Assert("ELI44949", "Encodings are not computed", Encoder.AreEncodingsComputed);
+
+                // Compute input files and answers
+                InputConfig.GetInputData(out string[] ussFiles, out string[] voaFiles, out string[] answersOrAnswerFiles, updateStatus, cancellationToken);
+
+                ExtractException.Assert("ELI44891", "No inputs available to train/test machine",
+                    ussFiles.Length > 0);
+
+                var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
+                    updateStatus, cancellationToken, updateAnswerCodes: false);
+
+                // Training set
+                double[][] trainInputs = null;
+                int[] trainOutputs = null;
+                string[] trainFiles = null;
+
+                // Testing set
+                double[][] testInputs = null;
+                int[] testOutputs = null;
+                string[] testFiles = null;
+
+                // Divide data into training and testing subsets
+                if (InputConfig.TrainingSetPercentage > 0)
+                {
+                    var rng = new Random(RandomNumberSeed);
+                    GetIndexesOfSubsetsByCategory(Enumerable.Repeat(0, featureVectorsAndAnswers.Item2.Length).ToArray(),
+                        InputConfig.TrainingSetPercentage / 100.0, out List<int> trainIdx, out List<int> testIdx, rng);
+
+                    // Training set
+                    trainInputs = featureVectorsAndAnswers.Item1.Submatrix(trainIdx);
+                    trainOutputs = featureVectorsAndAnswers.Item2.Submatrix(trainIdx);
+                    trainFiles = ussFiles.Submatrix(trainIdx);
+
+                    // Testing set
+                    testInputs = featureVectorsAndAnswers.Item1.Submatrix(testIdx);
+                    testOutputs = featureVectorsAndAnswers.Item2.Submatrix(testIdx);
+                    testFiles = ussFiles.Submatrix(testIdx);
+                }
+                else
+                {
+                    // Testing set
+                    testInputs = featureVectorsAndAnswers.Item1;
+                    testOutputs = featureVectorsAndAnswers.Item2;
+                    testFiles = ussFiles;
+                }
+
+                int numColumns = featureVectorsAndAnswers.Item1[0].Length + 1;
+
+                if (trainInputs != null && trainInputs.Any())
+                {
+                    var trainingData = trainFiles.Zip(trainInputs.Zip(trainOutputs, (f, a) => (features: f, answer: a)), (uss, d) =>
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        updateStatus(new StatusArgs { StatusMessage = "Processing training set records: {0:N0}", Int32Value = 1 });
+
+                        var data = new List<string>(numColumns);
+                        data.Add(uss.Quote());
+                        data.Add(Encoder.AnswerCodeToName[d.answer].Quote());
+                        data.AddRange(d.features.Select(n => n.ToString(CultureInfo.InvariantCulture)));
+                        return string.Join(",", data);
+                    });
+                    var trainingCsv = CsvOutputFile + ".train.csv";
+                    File.WriteAllLines(trainingCsv, trainingData);
+                }
+
+                var testingData = testFiles.Zip(testInputs.Zip(testOutputs, (f, a) => (features: f, answer: a)), (uss, d) =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    updateStatus(new StatusArgs { StatusMessage = "Processing testing set records: {0:N0}", Int32Value = 1 });
+
+                    var data = new List<string>(numColumns);
+                    data.Add(uss.Quote());
+                    data.Add(Encoder.AnswerCodeToName[d.answer].Quote());
+                    data.AddRange(d.features.Select(n => n.ToString(CultureInfo.InvariantCulture)));
+                    return string.Join(",", data);
+                });
+                var testingCsv = CsvOutputFile + ".test.csv";
+                File.WriteAllLines(testingCsv, testingData);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44893");
+            }
+        }
+
         #endregion Public Methods
 
         #region Overrides
@@ -991,6 +1112,14 @@ namespace Extract.AttributeFinder
                 _labelAttributesPersistedSettings = null;
             }
 
+            if (_version == 5)
+            {
+                if (IsCompatibleWithVersion(4))
+                {
+                    _version = 4;
+                }
+            }
+
             if (_version == 4)
             {
                 if (IsCompatibleWithVersion(3))
@@ -1030,6 +1159,11 @@ namespace Extract.AttributeFinder
         /// </returns>
         internal bool IsCompatibleWithVersion(int version)
         {
+            if (_version == 5 && version == 4)
+            {
+                return string.IsNullOrEmpty(CsvOutputFile);
+            }
+
             if (_version == 4 && version == 3)
             {
                 if (TranslateUnknownCategory

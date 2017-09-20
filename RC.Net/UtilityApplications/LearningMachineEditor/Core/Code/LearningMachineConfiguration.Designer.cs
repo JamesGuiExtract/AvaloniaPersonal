@@ -101,6 +101,10 @@
             this.documentCategorizationCsvTrainingPercentageTextBox = new System.Windows.Forms.TextBox();
             this.documentCategorizationCsvLabel = new System.Windows.Forms.Label();
             this.featureConfigurationTabPage = new System.Windows.Forms.TabPage();
+            this.label4 = new System.Windows.Forms.Label();
+            this.csvOutputBrowseButton = new Extract.Utilities.Forms.BrowseButton();
+            this.csvOutputTextBox = new System.Windows.Forms.TextBox();
+            this.writeDataToCsvButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.maxFeaturesPerVectorizerTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -425,6 +429,8 @@
             // attributeCategorizationFileListOrFolderBrowseButton
             // 
             this.attributeCategorizationFileListOrFolderBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.attributeCategorizationFileListOrFolderBrowseButton.EnsureFileExists = false;
+            this.attributeCategorizationFileListOrFolderBrowseButton.EnsurePathExists = false;
             this.attributeCategorizationFileListOrFolderBrowseButton.Location = new System.Drawing.Point(501, 30);
             this.attributeCategorizationFileListOrFolderBrowseButton.Name = "attributeCategorizationFileListOrFolderBrowseButton";
             this.attributeCategorizationFileListOrFolderBrowseButton.Size = new System.Drawing.Size(24, 24);
@@ -604,6 +610,8 @@
             // documentCategorizationInputFolderBrowseButton
             // 
             this.documentCategorizationInputFolderBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.documentCategorizationInputFolderBrowseButton.EnsureFileExists = false;
+            this.documentCategorizationInputFolderBrowseButton.EnsurePathExists = false;
             this.documentCategorizationInputFolderBrowseButton.FolderBrowser = true;
             this.documentCategorizationInputFolderBrowseButton.Location = new System.Drawing.Point(501, 30);
             this.documentCategorizationInputFolderBrowseButton.Name = "documentCategorizationInputFolderBrowseButton";
@@ -795,6 +803,8 @@
             // paginationFileListOrFolderBrowseButton
             // 
             this.paginationFileListOrFolderBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.paginationFileListOrFolderBrowseButton.EnsureFileExists = false;
+            this.paginationFileListOrFolderBrowseButton.EnsurePathExists = false;
             this.paginationFileListOrFolderBrowseButton.Location = new System.Drawing.Point(501, 30);
             this.paginationFileListOrFolderBrowseButton.Name = "paginationFileListOrFolderBrowseButton";
             this.paginationFileListOrFolderBrowseButton.Size = new System.Drawing.Size(24, 24);
@@ -922,6 +932,8 @@
             // documentCategorizationCsvBrowseButton
             // 
             this.documentCategorizationCsvBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.documentCategorizationCsvBrowseButton.EnsureFileExists = false;
+            this.documentCategorizationCsvBrowseButton.EnsurePathExists = false;
             this.documentCategorizationCsvBrowseButton.Location = new System.Drawing.Point(497, 30);
             this.documentCategorizationCsvBrowseButton.Name = "documentCategorizationCsvBrowseButton";
             this.documentCategorizationCsvBrowseButton.Size = new System.Drawing.Size(24, 24);
@@ -972,6 +984,10 @@
             // 
             // featureConfigurationTabPage
             // 
+            this.featureConfigurationTabPage.Controls.Add(this.label4);
+            this.featureConfigurationTabPage.Controls.Add(this.csvOutputBrowseButton);
+            this.featureConfigurationTabPage.Controls.Add(this.csvOutputTextBox);
+            this.featureConfigurationTabPage.Controls.Add(this.writeDataToCsvButton);
             this.featureConfigurationTabPage.Controls.Add(this.groupBox1);
             this.featureConfigurationTabPage.Controls.Add(this.viewAnswerListButton);
             this.featureConfigurationTabPage.Controls.Add(this.computeFeaturesButton);
@@ -984,6 +1000,49 @@
             this.featureConfigurationTabPage.TabIndex = 1;
             this.featureConfigurationTabPage.Text = "Feature configuration";
             this.featureConfigurationTabPage.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 425);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(340, 13);
+            this.label4.TabIndex = 12;
+            this.label4.Text = "CSV base name (.train.csv or .test.csv will be appended to base-name)";
+            // 
+            // csvOutputBrowseButton
+            // 
+            this.csvOutputBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.csvOutputBrowseButton.EnsureFileExists = false;
+            this.csvOutputBrowseButton.EnsurePathExists = false;
+            this.csvOutputBrowseButton.Location = new System.Drawing.Point(1613, 441);
+            this.csvOutputBrowseButton.Name = "csvOutputBrowseButton";
+            this.csvOutputBrowseButton.Size = new System.Drawing.Size(24, 24);
+            this.csvOutputBrowseButton.TabIndex = 11;
+            this.csvOutputBrowseButton.Text = "...";
+            this.csvOutputBrowseButton.TextControl = this.csvOutputTextBox;
+            this.csvOutputBrowseButton.UseVisualStyleBackColor = true;
+            // 
+            // csvOutputTextBox
+            // 
+            this.csvOutputTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.csvOutputTextBox.Location = new System.Drawing.Point(7, 443);
+            this.csvOutputTextBox.Name = "csvOutputTextBox";
+            this.csvOutputTextBox.Size = new System.Drawing.Size(1600, 20);
+            this.csvOutputTextBox.TabIndex = 10;
+            this.csvOutputTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.csvOutputTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            // 
+            // writeDataToCsvButton
+            // 
+            this.writeDataToCsvButton.Location = new System.Drawing.Point(7, 469);
+            this.writeDataToCsvButton.Name = "writeDataToCsvButton";
+            this.writeDataToCsvButton.Size = new System.Drawing.Size(101, 23);
+            this.writeDataToCsvButton.TabIndex = 9;
+            this.writeDataToCsvButton.Text = "Write data to csv";
+            this.writeDataToCsvButton.UseVisualStyleBackColor = true;
+            this.writeDataToCsvButton.Click += new System.EventHandler(this.HandleWriteDataToCsvButton_Click);
             // 
             // groupBox1
             // 
@@ -1677,7 +1736,7 @@
             this.Controls.Add(this.statusStrip1);
             this.Cursor = System.Windows.Forms.Cursors.Default;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(572, 572);
+            this.MinimumSize = new System.Drawing.Size(572, 620);
             this.Name = "LearningMachineConfiguration";
             this.Text = "Learning Machine Editor";
             this.statusStrip1.ResumeLayout(false);
@@ -1697,6 +1756,7 @@
             this.documentCategorizationCsvInputPanel.ResumeLayout(false);
             this.documentCategorizationCsvInputPanel.PerformLayout();
             this.featureConfigurationTabPage.ResumeLayout(false);
+            this.featureConfigurationTabPage.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.autoBagOfWordsGroupBox.ResumeLayout(false);
@@ -1849,6 +1909,10 @@
         private System.Windows.Forms.RadioButton svmUsePrecisionRadioButton;
         private System.Windows.Forms.CheckBox svmConditionallyApplyWeightRatioCheckBox;
         private System.Windows.Forms.GroupBox svmScoreTypeGroupBox;
+        private System.Windows.Forms.Label label4;
+        private Utilities.Forms.BrowseButton csvOutputBrowseButton;
+        private System.Windows.Forms.TextBox csvOutputTextBox;
+        private System.Windows.Forms.Button writeDataToCsvButton;
     }
 }
 

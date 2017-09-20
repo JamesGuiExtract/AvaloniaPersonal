@@ -218,7 +218,10 @@ namespace Extract.AttributeFinder
                                     throw ue;
                                 }
 
-                                ExtractException.Assert("ELI39757", "CSV rows should contain exactly two fields", fields.Length == 2);
+                                ExtractException.Assert("ELI39757", "CSV rows should contain exactly two fields",
+                                    fields.Length == 2,
+                                    "Field count", fields.Length,
+                                    "Row number", imageFiles.Count + 1);
 
                                 string imageName = fields[0];
                                 string answer = fields[1];
