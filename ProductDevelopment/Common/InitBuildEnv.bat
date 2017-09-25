@@ -10,7 +10,7 @@ SET LEADTOOLS_API_DIR=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadT
 SET LEADTOOLS_API_DOTNET=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_17\DotNet
 
 SET PATH=%windir%;%windir%\System32;%windir%\System32\WindowsPowerShell\v1.0;I:\Common\Engineering\Tools\Utils;%VAULT_DIR%;%NUANCE_API_DIR%;%LEADTOOLS_API_DIR%;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\SafeNetUltraPro\Bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Inlite_5_7\bin
-SET PATH=%PATH%;%DevEnvDir%;%VCPP_DIR%\Tools\MSVC\14.10.25017\bin\HostX86\x86;%VS_COMMON%\Tools;%VS_COMMON%\Tools\bin;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;%DOTFUSCATOR%;%FX_COP%;
+SET PATH=%PATH%;%DevEnvDir%;%VCPP_DIR%\Tools\MSVC\14.11.25503\bin\HostX86\x86;%VS_COMMON%\Tools;%VS_COMMON%\Tools\bin;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;%DOTFUSCATOR%;%FX_COP%;
 SET PATH=%PATH%;%WINDOWS_SDK%\BIN;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_17\Dotnet
 SET INSTALL_PRODUCT_DEVELOPMENT_PATH=\\fnp2\internal\Common\Engineering\productdevelopment
 SET ENGSVR_INTERNAL_BASE=D:\Internal
