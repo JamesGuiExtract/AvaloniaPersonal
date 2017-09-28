@@ -1049,25 +1049,8 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			{
 				ipExpectedAttributes->LoadFrom( strExpectedVOAFile.c_str(), VARIANT_FALSE );
 
-				// Don't include metadata, clues or DocumentType attributes from the expected
+				// Don't include metadata, clues, DocumentType attributes or non-spatial attributes from the expected
 				// voa file as expected redactions.
-//				m_ipAFUtility->RemoveMetadataAttributes(ipExpectedAttributes);
-				long lSize = ipExpectedAttributes->Size();
-				for (long i = 0; i < lSize; i++)
-				{
-					IAttributePtr ipAttribute = ipExpectedAttributes->At(i);
-					ASSERT_ARGUMENT("ELI28451", ipAttribute != __nullptr);
-
-					string strAttributeName = asString(ipAttribute->Name);
-					if (!strAttributeName.empty() && strAttributeName[0] == '_'
-						|| ipAttribute->Value->HasSpatialInfo() == VARIANT_FALSE)
-					{
-						ipExpectedAttributes->Remove(i);
-						lSize--;
-						i--;
-					}
-				}
-
 				// [DataEntry:3610]
 				// Removing filtering of clues that was added 11/9/2009. At that time, the new
 				// verification task was leaving clues in the output so in order to have the
@@ -1077,8 +1060,27 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 				// clues are actually desired in the expected results, it should be allowed.
 				// Currently, the SpatialProximityAS automated test is configured in a way that
 				// expects clues to be included in the test.
-				m_ipAFUtility->QueryAttributes(ipExpectedAttributes, "DocumentType",
-					VARIANT_TRUE);
+				// https://extract.atlassian.net/browse/ISSUE-14966
+				// Add removal of all non-spatial attributes
+				// Change to single loop over top-level attributes because subattributes don't matter
+				// for IDShield testing.
+				long lSize = ipExpectedAttributes->Size();
+				for (long i = 0; i < lSize; i++)
+				{
+					IAttributePtr ipAttribute = ipExpectedAttributes->At(i);
+					ASSERT_ARGUMENT("ELI44910", ipAttribute != __nullptr);
+
+					string strAttributeName = asString(ipAttribute->Name);
+					makeLowerCase(strAttributeName);
+					if (!strAttributeName.empty() && strAttributeName[0] == '_'
+						|| strAttributeName == "documenttype"
+						|| ipAttribute->Value->HasSpatialInfo() == VARIANT_FALSE)
+					{
+						ipExpectedAttributes->Remove(i);
+						lSize--;
+						i--;
+					}
+				}
 			}
 			// If the file does not exist, there are no expected values, throw an exception
 			else
