@@ -1476,7 +1476,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="fileId">The ID of the file to delay (or -1 when there is only a single
         /// file to which this call could apply).</param>
-        public void DelayFile(int fileID = -1)
+        public void DelayFile(int fileId = -1)
         {
             if (InvokeRequired)
             {
@@ -1484,7 +1484,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     try
                     {
-                        DelayFile(fileID);
+                        DelayFile(fileId);
                     }
                     catch (Exception ex)
                     {
@@ -1500,7 +1500,7 @@ namespace Extract.FileActionManager.FileProcessors
                 ExtractException.Assert("ELI40139", "Invalid operation.",
                     FileProcessingDB != null);
 
-                if (_fileID == fileID || (fileID == -1 || _fileID != -1))
+                if (_fileID == fileId || (fileId == -1 || _fileID != -1))
                 {
                     OnFileComplete(EFileProcessingResult.kProcessingDelayed);
                 }
