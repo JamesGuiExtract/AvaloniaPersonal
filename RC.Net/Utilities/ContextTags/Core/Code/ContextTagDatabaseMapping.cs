@@ -36,8 +36,9 @@ namespace Extract.Utilities.ContextTags
         /// Initializes a new instance of the <see cref="ContextTagDatabase"/> class.
         /// </summary>
         /// <param name="fileName">The Sql compact file name.</param>
-        public ContextTagDatabase(string fileName) :
-            base(SqlCompactMethods.BuildDBConnectionString(fileName))
+        /// <param name="readOnly">Whether to open the database in read-only mode</param>
+        public ContextTagDatabase(string fileName, bool readOnly = false) :
+            base(SqlCompactMethods.BuildDBConnectionString(fileName, exclusive: false, readOnly: readOnly))
         {
         }
 
