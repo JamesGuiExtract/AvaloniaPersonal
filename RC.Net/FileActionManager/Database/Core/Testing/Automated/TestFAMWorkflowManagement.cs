@@ -800,7 +800,7 @@ namespace Extract.FileActionManager.Database.Test
                 // add 2 unattempted files
                 var fileRecord1 = fileProcessingDb.AddFile(testfileName1, _ACTION_A, -1, EFilePriority.kPriorityNormal,
                     false, false, EActionStatus.kActionUnattempted, false, out alreadyExists, out previousStatus);
-                var fileRecord2 = fileProcessingDb.AddFile(testfileName2, _ACTION_A, -1, EFilePriority.kPriorityNormal,
+                fileProcessingDb.AddFile(testfileName2, _ACTION_A, -1, EFilePriority.kPriorityNormal,
                     false, false, EActionStatus.kActionUnattempted, false, out alreadyExists, out previousStatus);
                 var workflow1ID = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B, _ACTION_C);
                 var workflow2ID = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined, _ACTION_A, _ACTION_B, _ACTION_C);
