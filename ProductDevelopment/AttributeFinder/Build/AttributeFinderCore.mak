@@ -286,6 +286,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\PrintDocument.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\SpecialImageFormatConverter.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\ResolutionNormalizer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /v  "$(BinariesFolder)\NERAnnotator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(RCNETDir)\APIs\Aspose\Aspose.Pdf for .Net 9.8\License\Aspose.Pdf.lic" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
 	@COPY "$(CommonDirectory)\FixMachineConfig.vbs" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
 	@COPY /v  "$(BinariesFolder)\Obfuscated\*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
@@ -339,6 +340,10 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Reports\*.*" "$(AFCoreInstallFilesRootDir)\Reports" /Y/E
 	@COPY "$(RCNETDir)\APIs\MSOffice\Office2007\installer\o2007pia.msi" "$(AFCoreInstallFilesRootDir)\OfficeRedist"
 	@COPY /v "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Utils\ProcessFiles\Code\res\ProcessFiles.ico" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /v "$(ReusableComponentsRootDirectory)\APIs\Nuance_19\Bin\CAPI_PInvoke.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@XCOPY "$(RCNETDir)\APIs\IKVM.8.1.5717.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
+	@XCOPY "$(RCNETDir)\APIs\Stanford.NLP.NER.3.7.0.1\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
+	@COPY /V "$(RCNETDir)\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	
     @COPY /V "$(BinariesFolder)\ImageEdit.ocx" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @COPY /V "$(BinariesFolder)\UCLIDGenericDisplay2.ocx" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
