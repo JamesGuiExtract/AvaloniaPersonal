@@ -1706,7 +1706,9 @@ namespace Extract.Imaging.Forms
                 ZoomInfo customZoomInfo = new ZoomInfo();
                 bool applyPreviousZoom = false;
                 if (MaintainZoomLevelForNewPages &&
-                    _fitMode == FitMode.None && _pageNumber > 0)
+                    _fitMode == FitMode.None &&
+                    _pageNumber > 0 &&
+                    _imagePages[_pageNumber - 1].ZoomHistoryCount > 0)
                 {
                     customZoomInfo = _imagePages[_pageNumber - 1].ZoomInfo;
                     applyPreviousZoom = true;
@@ -4188,7 +4190,13 @@ namespace Extract.Imaging.Forms
                         finally
                         {
                             // Restore the original page
-                            SetPageNumber(originalPage, false, false);
+                            // As part of work on:
+                            // https://extract.atlassian.net/browse/ISSUE-14968
+                            // I found if a fit mode is not set and updateZoom is false, zoom is not
+                            // correctly restored for originalPage. While we wouldn't want extra zoom
+                            // histories added because of a print, with updateZoom = true these are
+                            // properly prevented via code that checks for duplicate history items.
+                            SetPageNumber(originalPage, updateZoom: true, raisePageChanged: false);
 
                             // Unsuppress the paint event
                             base.EndUpdate();
