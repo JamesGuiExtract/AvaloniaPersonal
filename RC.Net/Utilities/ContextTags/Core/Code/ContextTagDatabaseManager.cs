@@ -315,72 +315,60 @@ namespace Extract.Utilities.ContextTags
             if (_versionNumber == 0 || forceUpdate)
             {
                 CurrentContextTagDatabase db = null;
-
-                // If there is no open connection then open one that is read-only
-                // and then try again as read/write
-                // https://extract.atlassian.net/browse/ISSUE-14936
-                bool openReadOnly = _connection == null;
-                bool keepTrying = true;
-                while (keepTrying)
+                DatabaseConnectionInfo cachedDB = null;
+                try
                 {
-                    keepTrying = false;
-                    try
+                    if (_connection != null)
                     {
-                        if (_connection != null)
-                        {
-                            db = new CurrentContextTagDatabase(_connection);
-                        }
-                        else
-                        {
-                            db = new CurrentContextTagDatabase(_databaseFile, readOnly: openReadOnly);
-                        }
-
-                        IQueryable<string> schemaVersion = null;
-                        int count = 0;
-                        try
-                        {
-                            var settings = db.Settings;
-                            schemaVersion = from s in settings
-                                            where s.Name == ContextTagsDBSchemaVersionKey
-                                            select s.Value;
-                            count = schemaVersion.Count();
-                        }
-                        // If the attempt to open the DB in read-only mode failed, attempt to open with write access.
-                        // This is to handle the scenario that a database was last saved in XP or Server 2003 and needs to be rewritten
-                        catch (Exception ex) when (openReadOnly)
-                        {
-                            openReadOnly = false;
-                            keepTrying = true;
-                            ex.ExtractLog("ELI44911");
-                            continue;
-                        }
-
-                        if (count != 1)
-                        {
-                            var ee = new ExtractException("ELI37969",
-                                count > 1 ? "Should only be 1 schema version entry in database." :
-                                "No schema version found in database.");
-                            throw ee;
-                        }
-                        if (!int.TryParse(schemaVersion.First(), out int version))
-                        {
-                            var ee = new ExtractException("ELI37970",
-                                "Invalid schema version number format.");
-                            ee.AddDebugData("Schema Version Number", schemaVersion.First(), false);
-                            throw ee;
-                        }
-                        _versionNumber = version;
+                        db = new CurrentContextTagDatabase(_connection);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        throw ExtractException.AsExtractException("ELI37971", ex);
-                    }
-                    finally
-                    {
-                        if (db != null)
+                        // Make a local copy (SQL compact can't handle network shares from multiple processes)
+                        // https://extract.atlassian.net/browse/ISSUE-14936
+                        cachedDB = new DatabaseConnectionInfo(typeof(SqlCeConnection).AssemblyQualifiedName,
+                              SqlCompactMethods.BuildDBConnectionString(_databaseFile))
                         {
-                            db.Dispose();
-                        }
+                            UseLocalSqlCeCopy = true
+                        };
+                        db = new CurrentContextTagDatabase(cachedDB.ManagedDbConnection);
+                    }
+
+                    var settings = db.Settings;
+                    var schemaVersion = from s in settings
+                                    where s.Name == ContextTagsDBSchemaVersionKey
+                                    select s.Value;
+                    var count = schemaVersion.Count();
+
+                    if (count != 1)
+                    {
+                        var ee = new ExtractException("ELI37969",
+                            count > 1 ? "Should only be 1 schema version entry in database." :
+                            "No schema version found in database.");
+                        throw ee;
+                    }
+                    if (!int.TryParse(schemaVersion.First(), out int version))
+                    {
+                        var ee = new ExtractException("ELI37970",
+                            "Invalid schema version number format.");
+                        ee.AddDebugData("Schema Version Number", schemaVersion.First(), false);
+                        throw ee;
+                    }
+                    _versionNumber = version;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI37971", ex);
+                }
+                finally
+                {
+                    if (db != null)
+                    {
+                        db.Dispose();
+                    }
+                    if (cachedDB != null)
+                    {
+                        cachedDB.Dispose();
                     }
                 }
             }
