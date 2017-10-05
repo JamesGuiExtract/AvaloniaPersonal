@@ -532,6 +532,8 @@ BOOL CProcessFilesApp::InitInstance()
 						}
 					}
 
+					ipContextTags->Close();
+
 					// load the FAM settings from the specified file
 					ipFileProcMgr->LoadFrom(_bstr_t(strFileName.c_str()), VARIANT_FALSE);
 				}

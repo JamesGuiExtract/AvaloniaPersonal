@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
 
 namespace Extract.Database
@@ -35,12 +36,13 @@ namespace Extract.Database
         /// <param name="compactDBFile">The compact DB file.</param>
         /// <param name="exclusive">if set to <see langword="true"/> then builds a connection
         /// string that will provide exclusive access to the DB file.</param>
+        /// <param name="readOnly">Whether to set read-only mode in the connection string.</param>
         /// <returns>
         /// The connection string for connecting to the DB.
         /// </returns>
-        public static string BuildDBConnectionString(string compactDBFile, bool exclusive)
+        public static string BuildDBConnectionString(string compactDBFile, bool exclusive, bool readOnly = false)
         {
-            return BuildDBConnectionString(compactDBFile, exclusive, -1, _DEFAULT_MAX_BUFFER);
+            return BuildDBConnectionString(compactDBFile, exclusive, -1, _DEFAULT_MAX_BUFFER, readOnly);
         }
 
         /// <summary>
@@ -68,11 +70,12 @@ namespace Extract.Database
         /// string that will provide exclusive access to the DB file.</param>
         /// <param name="maxDatabaseSize">Max size of the database (in MB).</param>
         /// <param name="maxBufferSize">Max size of the buffer (in KB).</param>
+        /// <param name="readOnly">Whether to set read-only mode in the connection string.</param>
         /// <returns>
         /// The connection string for connecting to the DB.
         /// </returns>
         public static string BuildDBConnectionString(string compactDBFile, bool exclusive,
-            int maxDatabaseSize, int maxBufferSize)
+            int maxDatabaseSize, int maxBufferSize, bool readOnly = false)
         {
             try
             {
@@ -89,6 +92,10 @@ namespace Extract.Database
                 if (exclusive)
                 {
                     sb.Append("File Mode=Exclusive;");
+                }
+                if (readOnly)
+                {
+                    sb.Append("Mode = 'Read Only';");
                 }
                 if (maxDatabaseSize > 0)
                 {
