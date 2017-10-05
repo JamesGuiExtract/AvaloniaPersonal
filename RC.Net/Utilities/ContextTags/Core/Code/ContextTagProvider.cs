@@ -1,10 +1,8 @@
-﻿using Extract.Database;
-using Extract.Licensing;
+﻿using Extract.Licensing;
 using Extract.SQLCDBEditor;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -70,6 +68,11 @@ namespace Extract.Utilities.ContextTags
         /// <see cref="GetTagValue"/>.
         /// </summary>
         string _activeContext;
+
+        /// <summary>
+        /// For the specified contextPath, the currently available manager (if any).
+        /// </summary>
+        (string contextPath, ContextTagDatabaseManager manager) _readOnlyManager;
 
         /// <summary>
         /// Controls access to _tagValues from multiple threads.
@@ -144,7 +147,7 @@ namespace Extract.Utilities.ContextTags
         {
             get
             {
-                return (_activeContext == null) ? "": _activeContext;
+                return (_activeContext == null) ? "" : _activeContext;
             }
         }
 
@@ -195,8 +198,8 @@ namespace Extract.Utilities.ContextTags
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "1#")]
         public string GetTagValue(string tagName, string workflow)
         {
-            try 
-	        {
+            try
+            {
                 lock (_lock)
                 {
                     // If the workflow is a key return tag value for that workflow
@@ -207,14 +210,14 @@ namespace Extract.Utilities.ContextTags
                     return _workflowTagValues[workflow][tagName];
                 }
             }
-	        catch (Exception ex)
-	        {
+            catch (Exception ex)
+            {
                 var ee = ex.AsExtract("ELI37962");
                 ee.AddDebugData("ActiveContext", _activeContext, false);
                 ee.AddDebugData("TagName", tagName, false);
 
                 throw ee.CreateComVisible("ELI37902", "Failed to retrieve environment tag value.");
-	        }
+            }
         }
 
         /// <summary>
@@ -241,9 +244,11 @@ namespace Extract.Utilities.ContextTags
                     string settingFileName = Path.Combine(ContextPath, _SETTING_FILENAME);
                     if (!File.Exists(settingFileName))
                     {
-                        var manager = new ContextTagDatabaseManager(settingFileName);
-                        manager.CreateDatabase(true);
-                        createdDatabase = true;
+                        using (var manager = new ContextTagDatabaseManager(settingFileName, readOnly: false))
+                        {
+                            manager.CreateDatabase(true);
+                            createdDatabase = true;
+                        }
                     }
 
                     EditDatabase(settingFileName, (IntPtr)hParentWindow);
@@ -275,8 +280,8 @@ namespace Extract.Utilities.ContextTags
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
         public VariantVector GetUndefinedTags(string workflow)
         {
-            try 
-	        {
+            try
+            {
                 if (string.IsNullOrWhiteSpace(_activeContext))
                 {
                     return new VariantVector();
@@ -293,9 +298,9 @@ namespace Extract.Utilities.ContextTags
                     .ToVariantVector();
             }
             catch (Exception ex)
-	        {
-		        throw ex.CreateComVisible("ELI38094", "Failed to check tag values.");
-	        }
+            {
+                throw ex.CreateComVisible("ELI38094", "Failed to check tag values.");
+            }
         }
 
         /// <summary>
@@ -305,7 +310,7 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                LoadTagsForPath(_contextPath);
+                LoadTagsForPath(ContextPath);
             }
             catch (Exception ex)
             {
@@ -323,7 +328,7 @@ namespace Extract.Utilities.ContextTags
             {
                 return _workflowTagValues.Keys.ToVariantVector();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI43226", "Failed to get workflows with context tag values.");
             }
@@ -356,7 +361,7 @@ namespace Extract.Utilities.ContextTags
 
                 return mapOfContextTags;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI43231", "Failed to get context tag values for workflow.");
             }
@@ -373,8 +378,7 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
-                ContextTagDatabaseManager manager = new ContextTagDatabaseManager(settingFileName);
+                var manager = GetReadOnlyManager(contextPath);
                 return manager.IsUpdateRequired;
             }
             catch (Exception ex)
@@ -396,19 +400,76 @@ namespace Extract.Utilities.ContextTags
             try
             {
                 string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
-                ContextTagDatabaseManager manager = new ContextTagDatabaseManager(settingFileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                task.Wait();
+                using (var manager = new ContextTagDatabaseManager(settingFileName, readOnly: false))
+                {
+                    var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+                    task.Wait();
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI43319", "Unable to update ContextTags database.");
+            }
+        }
+
+        /// <summary>
+        /// Closes any open databases or resources
+        /// </summary>
+        public void Close()
+        {
+            try
+            {
+                _readOnlyManager.manager?.Dispose();
+                _readOnlyManager = ("", null);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44955");
             }
         }
 
         #endregion IContextTagProvider
 
         #region Private Members
+
+        /// <summary>
+        /// Gets a <see cref="ContextTagDatabaseManager"/> instance for the specified
+        /// <see cref="ContextTagDatabaseManager"/> in read-only mode.
+        /// </summary>
+        /// <param name="contextPath">The context path for the manager.</param>
+        /// <returns></returns>
+        ContextTagDatabaseManager GetReadOnlyManager(string contextPath)
+        {
+            try
+            {
+                lock (_lock)
+                {
+                    if (_readOnlyManager.contextPath != contextPath)
+                    {
+                        Close();
+                    }
+
+                    if (_readOnlyManager.manager == null)
+                    {
+                        string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
+                        if (File.Exists(settingFileName))
+                        {
+                            _readOnlyManager = (contextPath, new ContextTagDatabaseManager(settingFileName, true));
+                        }
+                    }
+                    else
+                    {
+                        _readOnlyManager.manager.RefreshDatabase();
+                    }
+
+                    return _readOnlyManager.manager;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44950");
+            }
+        }
 
         /// <summary>
         /// Initializes <see cref="_workflowTagValues"/> with the tags for the specified
@@ -436,24 +497,23 @@ namespace Extract.Utilities.ContextTags
                 {
                     return false;
                 }
-                
+
                 // If _SETTING_FILENAME doesn't exist, there is nothing more to do.
-                string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
-                if (!File.Exists(settingFileName))
+                var manager = GetReadOnlyManager(contextPath);
+                if (manager == null)
                 {
                     // Even if there are no custom tags available, provide the option to edit.
                     _workflowTagValues[""].Add(_EDIT_CUSTOM_TAGS_LABEL, "");
                     return false;
                 }
 
-
                 // Check if the database is the current version
-                var manager = new ContextTagDatabaseManager(settingFileName);
                 if (manager.IsUpdateRequired)
                 {
                     ExtractException updateRequiredException = new ExtractException("ELI43316", "ContextTag database requires update.");
                     try
                     {
+                        string settingFileName = Path.Combine(ContextPath, _SETTING_FILENAME);
                         updateRequiredException.AddDebugData("ContextTagDatabase", settingFileName, false);
                         updateRequiredException.AddDebugData("DatabaseVersion", manager.GetSchemaVersion(), false);
                         updateRequiredException.AddDebugData("ExpectedVersion", ContextTagDatabaseManager.CurrentSchemaVersion, false);
@@ -466,88 +526,72 @@ namespace Extract.Utilities.ContextTags
                     }
                 }
 
-                bool databasePopulated = false;
-            
-                // Query the database file to get the active context and associated tag values.
-                using (var dbConnectionInfo = new DatabaseConnectionInfo(
-                    typeof(SqlCeConnection).AssemblyQualifiedName,
-                    SqlCompactMethods.BuildDBConnectionString(settingFileName)))
+                // In case some users are using a mapped drive, convert to a UNC path to try
+                // to ensure as much as possible that all users accessing the same folder
+                // will be correctly associated with the proper context.
+                string UNCPath = contextPath;
+                FileSystemMethods.ConvertToNetworkPath(ref UNCPath, false);
+                if (UNCPath.EndsWith("\\", StringComparison.OrdinalIgnoreCase))
                 {
-                    dbConnectionInfo.UseLocalSqlCeCopy = true;
+                    UNCPath = UNCPath.Substring(0, UNCPath.Length - 1);
+                }
 
-                    using (ContextTagDatabase database = new ContextTagDatabase(
-                        dbConnectionInfo.ManagedDbConnection))
+                _activeContext = manager.ContextTagDatabase.GetContextNameForDirectory(UNCPath);
+
+                // We were able to find a proper context; load all tag values for this
+                // context.
+                if (_activeContext != null)
+                {
+                    // The row that is mapped to the new row in a DataGridView can end up being
+                    // persisted. Ignore any unnamed custom tags.
+
+                    // Get the workflows
+                    var workflows = manager.ContextTagDatabase.TagValue
+                        .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
+                            tagValue.CustomTag.Name != "")
+                        .Select(w => w.Workflow)
+                        .Distinct().ToList();
+
+                    // Get dictionary of values for each workflow
+                    foreach (string workflow in workflows)
                     {
-                        // In case some users are using a mapped drive, convert to a UNC path to try
-                        // to ensure as much as possible that all users accessing the same folder
-                        // will be correctly associated with the proper context.
-                        string UNCPath = contextPath;
-                        FileSystemMethods.ConvertToNetworkPath(ref UNCPath, false);
-                        if (UNCPath.EndsWith("\\", StringComparison.OrdinalIgnoreCase))
+                        // Get the values that are for the current workflow
+                        var workflowValues = manager.ContextTagDatabase.TagValue
+                            .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
+                                tagValue.CustomTag.Name != "" && tagValue.Workflow == workflow)
+                            .Select(tagValue => new { tagValue.CustomTag.Name, tagValue.Value })
+                            .Distinct();
+
+                        var definedTags = workflowValues.Select(v => v.Name);
+
+                        if (!string.IsNullOrEmpty(workflow))
                         {
-                            UNCPath = UNCPath.Substring(0, UNCPath.Length - 1);
-                        }
-
-                        _activeContext = database.GetContextNameForDirectory(UNCPath);
-
-                        // We were able to find a proper context; load all tag values for this
-                        // context.
-                        if (_activeContext != null)
-                        {
-                            // The row that is mapped to the new row in a DataGridView can end up being
-                            // persisted. Ignore any unnamed custom tags.
-
-                            // Get the workflows
-                            var workflows = database.TagValue
+                            _workflowTagValues.Remove(workflow);
+                            _workflowTagValues[workflow] = workflowValues
+                                .Union(manager.ContextTagDatabase.TagValue
                                 .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
-                                    tagValue.CustomTag.Name != "")
-                                .Select(w => w.Workflow)
-                                .Distinct().ToList();
-                            
-                            // Get dictionary of values for each workflow
-                            foreach (string workflow in workflows)
-                            {
-                                // Get the values that are for the current workflow
-                                var workflowValues = database.TagValue
-                                    .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
-                                        tagValue.CustomTag.Name != "" && tagValue.Workflow == workflow)
-                                    .Select(tagValue => new { tagValue.CustomTag.Name, tagValue.Value })
-                                    .Distinct();
-
-                                var definedTags = workflowValues.Select(v => v.Name);
-
-                                if (!string.IsNullOrEmpty(workflow))
-                                {
-                                    _workflowTagValues.Remove(workflow);
-                                    _workflowTagValues[workflow] = workflowValues
-                                        .Union(database.TagValue
-                                        .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
-                                            tagValue.CustomTag.Name != "" && !definedTags.Contains(tagValue.CustomTag.Name) && tagValue.Workflow == "")
-                                        .Select(tagValue => new { tagValue.CustomTag.Name, tagValue.Value })
-                                        .Distinct())
-                                        .ToDictionary(tagValue =>
-                                            tagValue.Name, tagValue => tagValue.Value, StringComparer.OrdinalIgnoreCase);
-                                }
-                                else
-                                {
-                                    _workflowTagValues.Remove(workflow);
-                                    _workflowTagValues[workflow] = workflowValues.ToDictionary(tagValue =>
-                                        tagValue.Name, tagValue => tagValue.Value, StringComparer.OrdinalIgnoreCase);
-                                }
-                            }
+                                    tagValue.CustomTag.Name != "" && !definedTags.Contains(tagValue.CustomTag.Name) && tagValue.Workflow == "")
+                                .Select(tagValue => new { tagValue.CustomTag.Name, tagValue.Value })
+                                .Distinct())
+                                .ToDictionary(tagValue =>
+                                    tagValue.Name, tagValue => tagValue.Value, StringComparer.OrdinalIgnoreCase);
                         }
                         else
                         {
-                            _activeContext = "No context defined!";
+                            _workflowTagValues.Remove(workflow);
+                            _workflowTagValues[workflow] = workflowValues.ToDictionary(tagValue =>
+                                tagValue.Name, tagValue => tagValue.Value, StringComparer.OrdinalIgnoreCase);
                         }
- 
- 						databasePopulated = database.Context.Any() || database.CustomTag.Any();
-                   }
+                    }
                 }
-
+                else
+                {
+                    _activeContext = "No context defined!";
+                }
+ 
                 _workflowTagValues[""].Add(_EDIT_CUSTOM_TAGS_LABEL, "");
 
-                return databasePopulated;
+                return manager.ContextTagDatabase.Context.Any() || manager.ContextTagDatabase.CustomTag.Any();
             }
         }
 

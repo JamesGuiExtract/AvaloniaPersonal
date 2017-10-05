@@ -95,9 +95,7 @@ namespace Extract.Database
                 }
                 if (readOnly)
                 {
-                    sb.Append("Mode = Read Only;Temp Path='");
-                    sb.Append(Path.GetTempPath());
-                    sb.Append("';");
+                    sb.Append("Mode = 'Read Only';");
                 }
                 if (maxDatabaseSize > 0)
                 {

@@ -36,6 +36,7 @@ string CFAMTagManager::ms_strFPSFileName;
 CCriticalSection CFAMTagManager::ms_criticalsection;
 IContextTagProviderPtr CFAMTagManager::ms_ipContextTagProvider;
 map<stringCSIS, map<stringCSIS, stringCSIS>> CFAMTagManager::ms_mapWorkflowContextTags;
+long CFAMTagManager::ms_nReferenceCount = 0;
 
 //--------------------------------------------------------------------------------------------------
 // CFAMTagManager
@@ -47,11 +48,13 @@ CFAMTagManager::CFAMTagManager()
 	, m_strWorkflow("")
 , m_ipFAMDB(__nullptr)
 {
+	CSingleLock lock(&ms_criticalsection, TRUE);
+	ms_nReferenceCount++;
+
 	ASSERT_RESOURCE_ALLOCATION("ELI35226", m_ipMiscUtils != __nullptr);
 
 	// ms_ipContextTagProvider is not created until the first instance of FAMTagManager is
 	// created.
-	CSingleLock lock(&ms_criticalsection, TRUE);
 	if (ms_ipContextTagProvider == __nullptr)
 	{
 		ms_ipContextTagProvider.CreateInstance("Extract.Utilities.ContextTags.ContextTagProvider");
@@ -68,6 +71,14 @@ CFAMTagManager::~CFAMTagManager()
 {
 	try
 	{
+		CSingleLock lock(&ms_criticalsection, TRUE);
+		ms_nReferenceCount--;
+
+		if (ms_nReferenceCount == 0 && ms_ipContextTagProvider != __nullptr)
+		{
+			ms_ipContextTagProvider->Close();
+		}
+
 		m_ipMiscUtils = __nullptr;
 		m_ipFAMDB = __nullptr;
 	}

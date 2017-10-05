@@ -13,14 +13,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
 
-using CurrentContextTagDatabase = Extract.Utilities.ContextTags.ContextTagDatabase;
-
 namespace Extract.Utilities.ContextTags
 {
     /// <summary>
     /// Manages the context tags database.
     /// </summary>
-    public class ContextTagDatabaseManager : IDatabaseSchemaManager
+    public class ContextTagDatabaseManager : IDatabaseSchemaManager, IDisposable
     {
         #region Constants
 
@@ -37,8 +35,7 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// The current context-specific tag schema version.
         /// </summary>
-        public static readonly int CurrentSchemaVersion =
-            CurrentContextTagDatabase.CurrentSchemaVersion;
+        public static readonly int CurrentSchemaVersion = ContextTagDatabase.CurrentSchemaVersion;
 
         /// <summary>
         /// The class that manages this schema and can perform upgrades to the latest schema.
@@ -60,6 +57,22 @@ namespace Extract.Utilities.ContextTags
         DbConnection _connection;
 
         /// <summary>
+        /// The connection information for the currently open custom tags database.
+        /// </summary>
+        DatabaseConnectionInfo _connectionInfo;
+
+        /// <summary>
+        /// The currently open <see cref="ContextTagDatabase"/>.
+        /// </summary>
+        ContextTagDatabase _contextTagDatabase;
+
+        /// <summary>
+        /// true to use a temporary local read-only copy of the database or false to open the
+        /// database for writing in it's original location.
+        /// </summary>
+        bool _readonly;
+
+        /// <summary>
         /// The current schema version of the database.
         /// </summary>
         int _versionNumber;
@@ -72,7 +85,7 @@ namespace Extract.Utilities.ContextTags
         /// Initializes a new instance of the <see cref="ContextTagDatabaseManager"/> class.
         /// </summary>
         public ContextTagDatabaseManager()
-            : this(string.Empty)
+            : this(fileName: string.Empty, readOnly: false)
         {
         }
 
@@ -80,31 +93,19 @@ namespace Extract.Utilities.ContextTags
         /// Initializes a new instance of the <see cref="ContextTagDatabaseManager"/> class.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
-        public ContextTagDatabaseManager(string fileName)
+        /// <param name="readOnly"><c>true</c> to use a temporary local read-only copy of the
+        /// database;  <c>false</c> to open the database for writing in it's original location.
+        /// </param>
+        public ContextTagDatabaseManager(string fileName, bool readOnly)
         {
             try
             {
                 _databaseFile = string.IsNullOrWhiteSpace(fileName) ? null : fileName;
+                _readonly = readOnly;
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI37963", ex);
-            }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContextTagDatabaseManager"/> class.
-        /// </summary>
-        /// <param name="connection">The database connection.</param>
-        public ContextTagDatabaseManager(DbConnection connection)
-        {
-            try
-            {
-                SetDatabaseConnection(connection);
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI37964", ex);
             }
         }
 
@@ -132,9 +133,8 @@ namespace Extract.Utilities.ContextTags
                         !string.IsNullOrWhiteSpace(value));
                     if (!value.Equals(_databaseFile, StringComparison.OrdinalIgnoreCase))
                     {
-                        _connection = null;
+                        ResetDatabase();
                         _databaseFile = value;
-                        _versionNumber = 0;
                     }
                 }
                 catch (Exception ex)
@@ -152,30 +152,13 @@ namespace Extract.Utilities.ContextTags
         {
             get
             {
-                CurrentContextTagDatabase db = null;
                 try
                 {
-                    if (_connection != null)
-                    {
-                        db = new CurrentContextTagDatabase(_connection);
-                    }
-                    else
-                    {
-                        db = new CurrentContextTagDatabase(_databaseFile);
-                    }
-
-                    return db.Settings.ToDictionary(s => s.Name, s => s.Value);
+                    return ContextTagDatabase.Settings.ToDictionary(s => s.Name, s => s.Value);
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI37967", ex);
-                }
-                finally
-                {
-                    if (db != null)
-                    {
-                        db.Dispose();
-                    }
+                    throw ex.AsExtract("ELI37967");
                 }
             }
         }
@@ -217,6 +200,8 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
+                ExtractException.Assert("ELI44952", "Unable to create database with read-only connection!", !_readonly);
+
                 backupFile = null;
                 if (!File.Exists(_databaseFile))
                 {
@@ -230,41 +215,38 @@ namespace Extract.Utilities.ContextTags
                 }
 
                 bool created = false;
-                if (_connection == null || _connection.State == ConnectionState.Closed)
+                if (DbConnection == null || DbConnection.State == ConnectionState.Closed)
                 {
-                    using (var contextTagDB = new CurrentContextTagDatabase(_databaseFile))
+                    if (!ContextTagDatabase.DatabaseExists())
                     {
-                        if (!contextTagDB.DatabaseExists())
-                        {
-                            // Create the DB and initialize the settings table
-                            contextTagDB.CreateDatabase();
+                        // Create the DB and initialize the settings table
+                        ContextTagDatabase.CreateDatabase();
 
-                            // I have not been successful in setting cascade deletes via the
-                            // Association attribute in TagValueTableV1. For now, manually re-add
-                            // the foreign key constraints to enable the cascade of deletes.
-                            contextTagDB.ExecuteCommand(
-                                "ALTER TABLE TagValue DROP FK_TagValue_Context");
-                            contextTagDB.ExecuteCommand(
-                                "ALTER TABLE TagValue ADD CONSTRAINT FK_TagValue_Context " +
-                                "FOREIGN KEY (ContextID) REFERENCES Context(ID) ON DELETE CASCADE");
-                            contextTagDB.ExecuteCommand(
-                                "ALTER TABLE TagValue DROP FK_TagValue_CustomTag");
-                            contextTagDB.ExecuteCommand(
-                                "ALTER TABLE TagValue ADD CONSTRAINT FK_TagValue_CustomTag " +
-                                "FOREIGN KEY (TagID) REFERENCES CustomTag(ID) ON DELETE CASCADE");
+                        // I have not been successful in setting cascade deletes via the
+                        // Association attribute in TagValueTableV1. For now, manually re-add
+                        // the foreign key constraints to enable the cascade of deletes.
+                        ContextTagDatabase.ExecuteCommand(
+                            "ALTER TABLE TagValue DROP FK_TagValue_Context");
+                        ContextTagDatabase.ExecuteCommand(
+                            "ALTER TABLE TagValue ADD CONSTRAINT FK_TagValue_Context " +
+                            "FOREIGN KEY (ContextID) REFERENCES Context(ID) ON DELETE CASCADE");
+                        ContextTagDatabase.ExecuteCommand(
+                            "ALTER TABLE TagValue DROP FK_TagValue_CustomTag");
+                        ContextTagDatabase.ExecuteCommand(
+                            "ALTER TABLE TagValue ADD CONSTRAINT FK_TagValue_CustomTag " +
+                            "FOREIGN KEY (TagID) REFERENCES CustomTag(ID) ON DELETE CASCADE");
 
-                            contextTagDB.ExecuteCommand(
-                                "ALTER TABLE Context ADD CONSTRAINT UC_ContextName UNIQUE (Name)");
-                            contextTagDB.ExecuteCommand(
-                                "ALTER TABLE Context ADD CONSTRAINT UC_ContextFPSFileDir UNIQUE (FPSFileDir)");
-                            contextTagDB.ExecuteCommand(
-                                "ALTER TABLE CustomTag ADD CONSTRAINT UC_CustomTagName UNIQUE (Name)");
+                        ContextTagDatabase.ExecuteCommand(
+                            "ALTER TABLE Context ADD CONSTRAINT UC_ContextName UNIQUE (Name)");
+                        ContextTagDatabase.ExecuteCommand(
+                            "ALTER TABLE Context ADD CONSTRAINT UC_ContextFPSFileDir UNIQUE (FPSFileDir)");
+                        ContextTagDatabase.ExecuteCommand(
+                            "ALTER TABLE CustomTag ADD CONSTRAINT UC_CustomTagName UNIQUE (Name)");
 
-                            contextTagDB.Settings.InsertAllOnSubmit<Settings>(
-                                BuildListOfDefaultSettings());
-                            contextTagDB.SubmitChanges(ConflictMode.FailOnFirstConflict);
-                            created = true;
-                        }
+                        ContextTagDatabase.Settings.InsertAllOnSubmit<Settings>(
+                            BuildListOfDefaultSettings());
+                        ContextTagDatabase.SubmitChanges(ConflictMode.FailOnFirstConflict);
+                        created = true;
                     }
                 }
 
@@ -314,74 +296,33 @@ namespace Extract.Utilities.ContextTags
         {
             if (_versionNumber == 0 || forceUpdate)
             {
-                CurrentContextTagDatabase db = null;
-
-                // If there is no open connection then open one that is read-only
-                // and then try again as read/write
-                // https://extract.atlassian.net/browse/ISSUE-14936
-                bool openReadOnly = _connection == null;
-                bool keepTrying = true;
-                while (keepTrying)
+                try
                 {
-                    keepTrying = false;
-                    try
-                    {
-                        if (_connection != null)
-                        {
-                            db = new CurrentContextTagDatabase(_connection);
-                        }
-                        else
-                        {
-                            db = new CurrentContextTagDatabase(_databaseFile, readOnly: openReadOnly);
-                        }
+                    var settings = ContextTagDatabase.Settings;
+                    var schemaVersion = from s in settings
+                                    where s.Name == ContextTagsDBSchemaVersionKey
+                                    select s.Value;
+                    var count = schemaVersion.Count();
 
-                        IQueryable<string> schemaVersion = null;
-                        int count = 0;
-                        try
-                        {
-                            var settings = db.Settings;
-                            schemaVersion = from s in settings
-                                            where s.Name == ContextTagsDBSchemaVersionKey
-                                            select s.Value;
-                            count = schemaVersion.Count();
-                        }
-                        // If the attempt to open the DB in read-only mode failed, attempt to open with write access.
-                        // This is to handle the scenario that a database was last saved in XP or Server 2003 and needs to be rewritten
-                        catch (Exception ex) when (openReadOnly)
-                        {
-                            openReadOnly = false;
-                            keepTrying = true;
-                            ex.ExtractLog("ELI44911");
-                            continue;
-                        }
-
-                        if (count != 1)
-                        {
-                            var ee = new ExtractException("ELI37969",
-                                count > 1 ? "Should only be 1 schema version entry in database." :
-                                "No schema version found in database.");
-                            throw ee;
-                        }
-                        if (!int.TryParse(schemaVersion.First(), out int version))
-                        {
-                            var ee = new ExtractException("ELI37970",
-                                "Invalid schema version number format.");
-                            ee.AddDebugData("Schema Version Number", schemaVersion.First(), false);
-                            throw ee;
-                        }
-                        _versionNumber = version;
-                    }
-                    catch (Exception ex)
+                    if (count != 1)
                     {
-                        throw ExtractException.AsExtractException("ELI37971", ex);
+                        var ee = new ExtractException("ELI37969",
+                            count > 1 ? "Should only be 1 schema version entry in database." :
+                            "No schema version found in database.");
+                        throw ee;
                     }
-                    finally
+                    if (!int.TryParse(schemaVersion.First(), out int version))
                     {
-                        if (db != null)
-                        {
-                            db.Dispose();
-                        }
+                        var ee = new ExtractException("ELI37970",
+                            "Invalid schema version number format.");
+                        ee.AddDebugData("Schema Version Number", schemaVersion.First(), false);
+                        throw ee;
                     }
+                    _versionNumber = version;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI37971", ex);
                 }
             }
 
@@ -402,38 +343,28 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Copies the settings table values from the specified backup file to the current database.
+        /// Refreshes data from the database
         /// </summary>
-        /// <param name="backupFile">The backup file to copy from.</param>
-        void CopySettings(string backupFile)
+        /// <returns></returns>
+        public void RefreshDatabase()
         {
-            using (var currentDb = new CurrentContextTagDatabase(_databaseFile))
+            try
             {
-                using (var oldDb = new CurrentContextTagDatabase(backupFile))
+                // In the case that a local read-only database is being used, forcing
+                // _contextTagDatabase to be re-created next use will force _connectionInfo's
+                // ManagedDBConnection property to be accessed which will for the temp DB copy to be
+                // updated if the source has a newer modified date.
+                if (_contextTagDatabase != null)
                 {
-                    var currentSettings = currentDb.Settings;
-
-                    foreach (Settings table in oldDb.Settings)
-                    {
-                        // Do not copy schema version or schema manager key
-                        if (table.Name.Equals(ContextTagsDBSchemaVersionKey,
-                                StringComparison.OrdinalIgnoreCase)
-                            || table.Name.Equals(DatabaseHelperMethods.DatabaseSchemaManagerKey,
-                                StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
-                        var setting = from s in currentSettings where s.Name == table.Name select s;
-                        if (setting.Count() > 0)
-                        {
-                            var temp = setting.First();
-                            temp.Value = table.Value;
-                        }
-                    }
-
-                    currentDb.SubmitChanges(ConflictMode.FailOnFirstConflict);
+                    _contextTagDatabase.Dispose();
+                    _contextTagDatabase = null;
                 }
+
+                _versionNumber = 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44954");
             }
         }
 
@@ -502,9 +433,13 @@ namespace Extract.Utilities.ContextTags
                         "This schema updater only works on SqlCe connections.");
                 }
 
-                _connection = connection;
-                _databaseFile = _connection.Database;
-                _versionNumber = 0;
+                if (connection != DbConnection)
+                {
+                    ResetDatabase();
+                    _connection = connection;
+                    _databaseFile = _connection.Database;
+                    _readonly = connection.ConnectionString.IndexOf("Read Only", StringComparison.OrdinalIgnoreCase) >= 0;
+                }
             }
             catch (Exception ex)
             {
@@ -532,6 +467,8 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
+                ExtractException.Assert("ELI44951", "Unable to update schema with read-only connection!", !_readonly);
+
                 if (cancelTokenSource == null)
                 {
                     throw new ArgumentNullException("cancelTokenSource");
@@ -550,6 +487,8 @@ namespace Extract.Utilities.ContextTags
                     // Check if the task has already been cancelled
                     ct.ThrowIfCancellationRequested();
 
+                    // In order for the database to be backed up, the connection must be closed.
+                    ResetDatabase();
                     string backUpFileName = BackupDatabase();
 
                     while (version < CurrentSchemaVersion)
@@ -646,8 +585,119 @@ namespace Extract.Utilities.ContextTags
                 }
             }
         }
-        
+
         #endregion
 
+        #region IDisposable
+
+        /// <overloads>Releases resources used by the <see cref="ContextTagDatabaseManager"/>.
+        /// </overloads>
+        /// <summary>
+        /// Releases all resources used by the <see cref="ContextTagDatabaseManager"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="ContextTagDatabaseManager"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                try
+                {
+                    if (_contextTagDatabase != null)
+                    {
+                        _contextTagDatabase.Dispose();
+                        _contextTagDatabase = null;
+                    }
+
+                    if (_connection != null)
+                    {
+                        _connection.Dispose();
+                        _connection = null;
+                    }
+
+                    if (_connectionInfo != null)
+                    {
+                        _connectionInfo.Dispose();
+                        _connectionInfo = null;
+                    }
+                }
+                catch { }
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable
+
+        #region Internal Members
+
+        /// <summary>
+        /// Gets the <see cref="ContextTagDatabase"/> instance to use.
+        /// </summary>
+        internal ContextTagDatabase ContextTagDatabase
+        {
+            get
+            {
+                if (_contextTagDatabase == null)
+                {
+                    _contextTagDatabase = (DbConnection == null)
+                        ? new ContextTagDatabase(_databaseFile, _readonly)
+                        : new ContextTagDatabase(DbConnection);
+                }
+
+                return _contextTagDatabase;
+            }
+        }
+
+        #endregion Internal Members
+
+        #region Private Members
+
+        /// <summary>
+        /// Gets the <see cref="DbConnection"/> to use.
+        /// </summary>
+        DbConnection DbConnection
+        {
+            get
+            {
+                if (_connection == null && _connectionInfo == null && File.Exists(_databaseFile))
+                {
+                    // Make a local copy (SQL compact can't handle network shares from multiple processes)
+                    // https://extract.atlassian.net/browse/ISSUE-14936
+                    _connectionInfo = new DatabaseConnectionInfo(typeof(SqlCeConnection).AssemblyQualifiedName,
+                            SqlCompactMethods.BuildDBConnectionString(_databaseFile))
+                    {
+                        UseLocalSqlCeCopy = _readonly
+                    };
+                }
+
+                return _connection ?? _connectionInfo?.ManagedDbConnection;
+            }
+        }
+
+        /// <summary>
+        /// Reset and dispose of the database connection and related objects.
+        /// </summary>
+        void ResetDatabase()
+        {
+            _contextTagDatabase?.Dispose();
+            _contextTagDatabase = null;
+            _connection?.Dispose();
+            _connection = null;
+            _connectionInfo?.Dispose();
+            _connectionInfo = null;
+            _versionNumber = 0;
+        }
+
+        #endregion Private Members
     }
 }

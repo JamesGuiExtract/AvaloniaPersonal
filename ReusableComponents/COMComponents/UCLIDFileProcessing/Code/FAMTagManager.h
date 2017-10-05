@@ -122,6 +122,12 @@ private:
 
 	// Controls access to the above static variables.
 	static CCriticalSection ms_criticalsection;
+	
+	/// <summary>
+	/// Reference count for the number of FAMTagManagers that currently exist.
+	/// Used to release the active copy of the ContextTags DB when all instances are destroyed.
+	/// </summary>
+	static long ms_nReferenceCount;
 
 	// Mutex for accessing the MRU context list in the registry
 	CMutex m_mutexMRU;

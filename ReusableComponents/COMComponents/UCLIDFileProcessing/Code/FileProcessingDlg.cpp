@@ -2589,6 +2589,8 @@ void FileProcessingDlg::checkAndUpdateContextTagsDatabaseIfNeeded(std::string &s
 			throw ue;
 		}
 	}
+
+	ipContextTags->Close();
 }
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfigurationWarnings)
@@ -3450,8 +3452,8 @@ bool FileProcessingDlg::displayRecentContextSelection()
 	vector<string> vecContexts;
 
 	long nSize = m_upContextMRUList->getCurrentListSize();
-	IContextTagProviderPtr m_ipContextTags("Extract.Utilities.ContextTags.ContextTagProvider");
-	ASSERT_RESOURCE_ALLOCATION("ELI39300", m_ipContextTags != nullptr);
+	IContextTagProviderPtr ipContextTags("Extract.Utilities.ContextTags.ContextTagProvider");
+	ASSERT_RESOURCE_ALLOCATION("ELI39300", ipContextTags != nullptr);
 
 	map<string, string> mapContextOptions;
 
@@ -3463,8 +3465,8 @@ bool FileProcessingDlg::displayRecentContextSelection()
 			try
 			{
 				strPath = m_upContextMRUList->at(i);
-				m_ipContextTags->ContextPath = strPath.c_str();
-				string strContext = asString(m_ipContextTags->ActiveContext);
+				ipContextTags->ContextPath = strPath.c_str();
+				string strContext = asString(ipContextTags->ActiveContext);
 				if (isValidContext(strContext))
 				{
 					string strContextOption = Util::Format("%s (%s)",
@@ -3483,6 +3485,8 @@ bool FileProcessingDlg::displayRecentContextSelection()
 			newUE.log();
 		}
 	}
+
+	ipContextTags->Close();
 
 	CDialogSelect dlgSelect("Select the context to use:", "Select Context", vecContexts,
 		nSize > 0 ? vecContexts.front() : "");
