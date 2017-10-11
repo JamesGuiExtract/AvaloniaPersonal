@@ -2590,7 +2590,7 @@ void FileProcessingDlg::checkAndUpdateContextTagsDatabaseIfNeeded(std::string &s
 		}
 	}
 
-	ipContextTags->Close();
+	ipContextTags->CloseDatabase();
 }
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfigurationWarnings)
@@ -3486,7 +3486,7 @@ bool FileProcessingDlg::displayRecentContextSelection()
 		}
 	}
 
-	ipContextTags->Close();
+	ipContextTags->CloseDatabase();
 
 	CDialogSelect dlgSelect("Select the context to use:", "Select Context", vecContexts,
 		nSize > 0 ? vecContexts.front() : "");

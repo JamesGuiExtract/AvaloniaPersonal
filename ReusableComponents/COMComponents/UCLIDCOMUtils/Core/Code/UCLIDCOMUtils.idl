@@ -1443,8 +1443,8 @@ library UCLID_COMUTILSLib
 		//			an exception will be thrown if the context tag database does not exist
 		[id(11), helpstring("method UpdateContextTagsDB")] HRESULT UpdateContextTagsDB([in] BSTR bstrContextPath);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Closes any open databases or resources
-		[id(12), helpstring("method Close")] HRESULT Close();
+		// PURPOSE: Closes any open local context tag database.
+		[id(12), helpstring("method CloseDatabase")] HRESULT CloseDatabase();
 	}
 
 	//---------------------------------------------------------------------------------------------
