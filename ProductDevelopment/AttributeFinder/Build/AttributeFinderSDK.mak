@@ -243,7 +243,7 @@ UpdateLicenseFiles:
 CopyFilesToInternalUse:
 	@ECHO Copy files to archive
 	@IF NOT EXIST "$(InternalUseBuildFilesArchive)\OriginalFiles" @MKDIR "$(InternalUseBuildFilesArchive)\OriginalFiles"
-	@IF NOT EXIST "$(InternalUseBuildFilesArchive)\OriginalFiles" @MKDIR "$(InternalUseBuildFilesArchive)\Obfuscated"
+	@IF NOT EXIST "$(InternalUseBuildFilesArchive)\Obfuscated" @MKDIR "$(InternalUseBuildFilesArchive)\Obfuscated"
 	@COPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" 
 	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)"
  	@COPY  "$(BinariesFolder)\Obfuscated\*.*" "$(InternalUseBuildFilesArchive)\Obfuscated" 
