@@ -93,7 +93,20 @@ SetVersions:
     @DATE /T
     @TIME /T
     @ECHO.
-
+	
+BuildDashboards: BuildPDUtils
+	@ECHO Building Dashboard apps...
+	@Echo.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+    @CD "$(RCNETDir)\Dashboards"
+    @devenv Dashboards.sln /BUILD $(BuildConfig) 
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+	
 BuildPDUtils: BuildAttributeFinderCore
 	@ECHO Building PD Utils...
     @ECHO.
@@ -219,6 +232,8 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\NERAnnotator.exe" /mapout:"$(BinariesFolder)\Map\mapNERAnnotator.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\NERDataCollector.exe" /mapout:"$(BinariesFolder)\Map\mapNERDataCollector.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\NERTrainer.exe" /mapout:"$(BinariesFolder)\Map\mapNERTrainer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DashboardCreator.exe" /mapout:"$(BinariesFolder)\Map\mapDashboardCreator.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DashboardViewer.exe" /mapout:"$(BinariesFolder)\Map\mapDashboardViewer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
     
     @ECHO.
     @DATE /T
@@ -237,7 +252,7 @@ CopyCommonFiles:
     @TIME /T
     @ECHO.
 	
-CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
+CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
     @ECHO Copying the AttributeFinderCore files to installation directory...
     @ECHO.
     @DATE /T
@@ -288,6 +303,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\PrintDocument.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\SpecialImageFormatConverter.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\ResolutionNormalizer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /v  "$(BinariesFolder)\Obfuscated\DashboardViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\NERAnnotator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\NERDataCollector.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\NERTrainer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
@@ -304,10 +320,12 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY "$(RCNETDir)\APIs\Aspose\Aspose.Pdf for .Net 9.8\Bin\net4.0\Aspose.Pdf.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Common.Logging.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY "$(RCNETDir)\APIs\DevExpress\v17.2\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 # This includes System.ValueTuple in the install
 	@COPY "$(RCNETDir)\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 # This makes System.ValueTuple available when installshield runs regasm
 	@COPY "$(RCNETDir)\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+
 
 	@COPY "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\LogicNP.EZShellExtensions.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(BinariesFolder)\Extract.Utilities.ShellExtensions.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
