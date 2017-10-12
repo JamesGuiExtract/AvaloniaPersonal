@@ -238,6 +238,23 @@ STDMETHODIMP CLaunchAppFileProcessor::get_MinStackSize(unsigned long *pnMinStack
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35014");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CLaunchAppFileProcessor::get_DisplaysUI(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44979", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44980");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

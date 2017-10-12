@@ -98,6 +98,7 @@ public:
 	STDMETHOD(raw_Close)();
 	STDMETHOD(raw_Standby)(VARIANT_BOOL* pVal);
 	STDMETHOD(get_MinStackSize)(unsigned long *pnMinStackSize);
+	STDMETHOD(get_DisplaysUI)(VARIANT_BOOL* pVal);
 
 // IAccessRequired
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);

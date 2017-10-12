@@ -470,6 +470,17 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Returns a value indicating that the task does not display a UI
+        /// </summary>
+        public bool DisplaysUI
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Stops processing the current file.
         /// </summary>
         public void Cancel()

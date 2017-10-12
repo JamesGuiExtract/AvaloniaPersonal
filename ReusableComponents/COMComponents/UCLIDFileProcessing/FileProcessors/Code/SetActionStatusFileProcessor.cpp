@@ -488,6 +488,23 @@ STDMETHODIMP CSetActionStatusFileProcessor::get_MinStackSize(unsigned long *pnMi
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35020");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSetActionStatusFileProcessor::get_DisplaysUI(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44985", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44986");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

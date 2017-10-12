@@ -503,6 +503,23 @@ STDMETHODIMP CAFEngineFileProcessor::get_MinStackSize(unsigned long *pnMinStackS
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35030");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFEngineFileProcessor::get_DisplaysUI(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44963", pVal != __nullptr);
+
+		validateLicense();
+
+		*pVal = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44964");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

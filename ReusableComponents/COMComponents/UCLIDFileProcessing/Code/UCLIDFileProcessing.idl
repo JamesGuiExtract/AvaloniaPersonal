@@ -379,6 +379,9 @@ library UCLID_FILEPROCESSINGLib
 		//				value of the Windows default stack size (1048576 or 1MB) and all the individual
 		//				MinStackSize values of the processing tasks.
 		[propget, id(16), helpstring("property MinStackSize")] HRESULT MinStackSize([out, retval] unsigned long* pnMinStackSize);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		Property that indicates that the task displays a UI
+		[propget, id(17), helpstring("property DisplaysUI")] HRESULT DisplaysUI([out, retval] VARIANT_BOOL* pVal);
 	};
 
 	[
@@ -545,6 +548,10 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Sets and Gets whether an admin login is required to edit the settings
 		[propget, id(60), helpstring("property RequireAdminEdit ")] HRESULT RequireAdminEdit([out, retval] VARIANT_BOOL* pvbRequireAdminEdit);
 		[propput, id(60), helpstring("property RequireAdminEdit ")] HRESULT RequireAdminEdit([in] VARIANT_BOOL bRequireAdminEdit);
+		// PROMISE: Waits for processing to complete
+		[id(61), helpstring("method WaitForProcessingCompleted")] HRESULT WaitForProcessingCompleted();
+		// PROMISE: Gets whether any of the processing Displays a UI
+		[propget, id(62), helpstring("property ProcessingDisplaysUI")] HRESULT ProcessingDisplaysUI([out, retval] VARIANT_BOOL* pProcessingDisplaysUI);
 	};
 
 	[
@@ -2251,6 +2258,8 @@ library UCLID_FILEPROCESSINGLib
 		//			after at least one file has processed. If the process is configured to keep processing as
 		//			files are queued, but no files ever are, this flag will remain false.
 		[propget, id(19), helpstring("property HasProcessingCompleted")] HRESULT HasProcessingCompleted([out, retval] VARIANT_BOOL* pVal);
+		// PROMISE: Gets whether any of the processing Displays a UI
+		[propget, id(20), helpstring("property ProcessingDisplaysUI")] HRESULT ProcessingDisplaysUI([out, retval] VARIANT_BOOL* pProcessingDisplaysUI);
 	};
 
 	[

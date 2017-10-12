@@ -39,7 +39,8 @@ m_bCancelling(false),
 m_bIsAuthenticated(false),
 m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB),
 m_strActiveWorkflow(""),
-m_bRequireAdminEdit(false)
+m_bRequireAdminEdit(false),
+m_ProcessingCompletedEvent()
 {
 	try
 	{
@@ -184,6 +185,9 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 				throw UCLIDException("ELI12733", "StartProcessing() cannot be called when processing is currently taking place!");
 			}
 		}
+
+		// Reset the Processing Completed event
+		m_ProcessingCompletedEvent.reset();
 
 		m_ipFAMTagManager->Workflow = m_ipFPMDB->ActiveWorkflow;
 
@@ -1392,6 +1396,37 @@ STDMETHODIMP CFileProcessingManager::put_RequireAdminEdit(VARIANT_BOOL bRequireA
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43524");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::WaitForProcessingCompleted()
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		// check that currently processing
+		if (m_bProcessing)
+		{
+			m_ProcessingCompletedEvent.messageWait();
+		}
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44960");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_ProcessingDisplaysUI(VARIANT_BOOL * pProcessingDisplaysUI)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		
+		*pProcessingDisplaysUI = m_ipFPMgmtRole->ProcessingDisplaysUI;
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44994");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods
@@ -1432,6 +1467,7 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCompleted(void)
 					{
 						::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
 					}
+					m_ProcessingCompletedEvent.signal();
 				}
 				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38477");
 
@@ -1447,6 +1483,7 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCompleted(void)
 			{
 				::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
 			}
+			m_ProcessingCompletedEvent.signal();
 		}
 
 		return S_OK;

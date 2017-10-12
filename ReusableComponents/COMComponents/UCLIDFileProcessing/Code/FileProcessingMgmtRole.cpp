@@ -1802,6 +1802,37 @@ STDMETHODIMP CFileProcessingMgmtRole::get_HasProcessingCompleted(VARIANT_BOOL* p
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42133")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_ProcessingDisplaysUI(VARIANT_BOOL * pProcessingDisplaysUI)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44995", pProcessingDisplaysUI != __nullptr);
+
+		bool bDisplaysUI = false;
+
+		unsigned long ulMinStackSize = 0;
+		int nTaskCount = m_ipFileProcessingTasks->Size();
+		for (int i = 0; (i < nTaskCount) && !bDisplaysUI; i++)
+		{
+			// Get the current object as ObjectWithDescription
+			IObjectWithDescriptionPtr ipOWD = m_ipFileProcessingTasks->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI44997", ipOWD != __nullptr);
+
+			UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProcessor(ipOWD->Object);
+			ASSERT_RESOURCE_ALLOCATION("ELI44998", ipFileProcessor != __nullptr);
+
+			bDisplaysUI = asCppBool(ipFileProcessor->DisplaysUI);
+		}
+
+		*pProcessingDisplaysUI = asVariantBool(bDisplaysUI);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44996")
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private methods

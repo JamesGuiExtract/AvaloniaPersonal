@@ -104,6 +104,7 @@ public:
 	STDMETHOD(put_TasksForConditionTrue)(IIUnknownVector * newVal);
 	STDMETHOD(get_TasksForConditionFalse)(IIUnknownVector ** pVal);
 	STDMETHOD(put_TasksForConditionFalse)(IIUnknownVector * newVal);
+	STDMETHOD(get_DisplaysUI)(VARIANT_BOOL* pVal);
 
 // IFileProcessingTask
 	STDMETHOD(raw_Init)(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB *pDB,

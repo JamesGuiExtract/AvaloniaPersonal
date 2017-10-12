@@ -65,6 +65,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestDisplaysUI.cs" />
     <Compile Include="FileProcessingTaskTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestSetActionStatusFileProcessor.cs" />

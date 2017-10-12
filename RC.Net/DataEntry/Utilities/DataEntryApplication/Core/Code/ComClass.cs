@@ -294,6 +294,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Returns a value indicating that the task displasy a UI
+        /// </summary>
+        public bool DisplaysUI
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Initializes the <see cref="DataEntryApplicationForm"/> to receive documents for
         /// processing.
         /// </summary>

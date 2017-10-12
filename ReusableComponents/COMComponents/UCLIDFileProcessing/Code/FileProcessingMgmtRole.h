@@ -196,6 +196,7 @@ public:
 	STDMETHOD(get_ErrorEmailTask)(IErrorEmailTask** pVal);
 	STDMETHOD(put_ErrorEmailTask)(IErrorEmailTask* newVal);
 	STDMETHOD(get_HasProcessingCompleted)(VARIANT_BOOL* pVal);
+	STDMETHOD(get_ProcessingDisplaysUI)(VARIANT_BOOL* pProcessingDisplaysUI);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID* pClassID);

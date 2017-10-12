@@ -338,7 +338,6 @@ STDMETHODIMP CEnhanceOCRTask::raw_Standby(VARIANT_BOOL* pVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36662");
 }
-
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CEnhanceOCRTask::get_MinStackSize(unsigned long *pnMinStackSize)
 {
@@ -355,6 +354,23 @@ STDMETHODIMP CEnhanceOCRTask::get_MinStackSize(unsigned long *pnMinStackSize)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36664");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CEnhanceOCRTask::get_DisplaysUI(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44965", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44966");
 }
 
 //-------------------------------------------------------------------------------------------------

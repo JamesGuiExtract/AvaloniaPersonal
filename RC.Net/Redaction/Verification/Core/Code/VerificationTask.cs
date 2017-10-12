@@ -261,6 +261,17 @@ namespace Extract.Redaction.Verification
                 return 0;
             }
         }
+        
+        /// <summary>
+        /// Returns a value indicating that the task displays a ui
+        /// </summary>
+        public bool DisplaysUI
+        {
+            get
+            {
+                return true;
+            }
+        }
 
         /// <summary>
         /// Stops processing the current file.

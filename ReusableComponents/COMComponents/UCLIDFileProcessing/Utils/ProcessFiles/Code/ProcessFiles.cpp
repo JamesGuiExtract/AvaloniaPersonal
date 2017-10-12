@@ -97,7 +97,9 @@ void usage()
 						"\t\tIt is recommended that the /service switch is used with this option\n"
 						"\t/service - disables the autosave of the FPS file, will close when processing completes\n"
 						"\t\tand will stop processing and close if it receives a close message\n"
-						"\t/sleep:<ms> - ProcessFiles.exe will wait <ms> milliseconds before launching";
+						"\t/sleep:<ms> - ProcessFiles.exe will wait <ms> milliseconds before launching\n"
+						"\t/NoFAM - FAM will not be displayed, there must be a UI task that when closed will exit\n"
+						"\t\tbehaves as if /s/c have been specified";
 	AfxMessageBox(strUsage.c_str());
 }
 //-------------------------------------------------------------------------------------------------
@@ -240,6 +242,7 @@ BOOL CProcessFilesApp::InitInstance()
 			int iExecuteCount = 0;
 			int iSleepTime = 0;
 			bool bConnectionSpecified = false;
+			bool bNoFAM = false;
 
 			if (__argc >= 2)
 			{
@@ -428,6 +431,10 @@ BOOL CProcessFilesApp::InitInstance()
 							return FALSE;
 						}
 					}
+					else if (_stricmp(__argv[i], "/NoFAM") == 0)
+					{
+						bNoFAM = true;
+					}
 					else
 					{
 						usage();
@@ -475,7 +482,7 @@ BOOL CProcessFilesApp::InitInstance()
 			// Create an FileRecoveryManager object
 			unique_ptr<FileRecoveryManager> apFRM(__nullptr);
 
-			if ( !bRunningAsService )
+			if ( !bRunningAsService && !bNoFAM)
 			{
 				// setup the FileRecoveryManager
 				apFRM.reset(new FileRecoveryManager(".tmp"));
@@ -571,10 +578,39 @@ BOOL CProcessFilesApp::InitInstance()
 					strAdvConnStrProperties.c_str();
 			}
 
-			// Show the UI
-			ipFileProcMgr->ShowUI( bRunOnInit ? VARIANT_TRUE : VARIANT_FALSE, 
-				bCloseOnComplete ? VARIANT_TRUE : VARIANT_FALSE, bForceCloseOnComplete 
-				? VARIANT_TRUE : VARIANT_FALSE, iExecuteCount, apFRM.get() );
+			if (bNoFAM)
+			{
+				if (asCppBool(ipFileProcMgr->AuthenticateForProcessing()))
+				{
+					if (!asCppBool(ipFileProcMgr->ProcessingDisplaysUI))
+					{
+						UCLIDException ue("ELI44999", "FPS file does not have tasks the display a UI.");
+						ue.addDebugInfo("FPSFile", strFileName);
+						throw ue;
+					}
+
+					ipFileProcMgr->NumberOfDocsToProcess = iExecuteCount;
+
+					// Override the KeepProcessingAsAdded to always wait for new files
+					ipFileProcMgr->FileProcessingMgmtRole->KeepProcessingAsAdded = VARIANT_TRUE;
+
+					// Refresh the database settings
+					ipFileProcMgr->RefreshDBSettings();
+
+					// Start the processing
+					ipFileProcMgr->StartProcessing();
+
+					ipFileProcMgr->WaitForProcessingCompleted();
+				}
+				 
+			}
+			else
+			{
+				// Show the UI
+				ipFileProcMgr->ShowUI(bRunOnInit ? VARIANT_TRUE : VARIANT_FALSE,
+					bCloseOnComplete ? VARIANT_TRUE : VARIANT_FALSE, bForceCloseOnComplete
+					? VARIANT_TRUE : VARIANT_FALSE, iExecuteCount, apFRM.get());
+			}
 
 			// notify the FDRS that the application exited normally
 			FailureDetectionAndReportingMgr::notifyApplicationNormallyExited();

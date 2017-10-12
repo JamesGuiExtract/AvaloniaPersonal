@@ -377,6 +377,23 @@ STDMETHODIMP CSleepTask::get_MinStackSize(unsigned long *pnMinStackSize)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35022");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSleepTask::get_DisplaysUI(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44987", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44988");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

@@ -104,6 +104,8 @@ public:
 	STDMETHOD(put_ActiveWorkflow)(BSTR newVal);
 	STDMETHOD(get_RequireAdminEdit)(VARIANT_BOOL *pvbRequireAdminEdit);
 	STDMETHOD(put_RequireAdminEdit)(VARIANT_BOOL bRequireAdminEdit);
+	STDMETHOD(WaitForProcessingCompleted)();
+	STDMETHOD(get_ProcessingDisplaysUI)(VARIANT_BOOL *pProcessingDisplaysUI);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -215,6 +217,9 @@ private:
 
 	// Flag indicating that the FPS requires admin to edit
 	bool m_bRequireAdminEdit;
+
+	// Event that gets signaled when NotifyProcessingCompleted
+	Win32Event m_ProcessingCompletedEvent;
 
 	///////////
 	// Methods

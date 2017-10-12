@@ -218,6 +218,23 @@ STDMETHODIMP CCleanupImageFileProcessor::get_MinStackSize(unsigned long *pnMinSt
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35006");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CCleanupImageFileProcessor::get_DisplaysUI(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44971", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44972");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

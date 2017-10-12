@@ -384,6 +384,23 @@ STDMETHODIMP COCRFileProcessor::get_MinStackSize(unsigned long *pnMinStackSize)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35018");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP COCRFileProcessor::get_DisplaysUI(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44983", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44984");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

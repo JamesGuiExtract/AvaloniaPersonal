@@ -151,6 +151,17 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Returns a value indicating that the task does not display a UI
+        /// </summary>
+        public bool DisplaysUI
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Called before any file processing starts.
         /// </summary>  
         /// <param name="nActionID">The ID of the action being processed.</param>

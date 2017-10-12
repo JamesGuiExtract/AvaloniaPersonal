@@ -188,6 +188,24 @@ STDMETHODIMP CAFConvertVOAToXMLTask::get_MinStackSize(unsigned long *pnMinStackS
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35028");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFConvertVOAToXMLTask::get_DisplaysUI(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44961", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44962");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

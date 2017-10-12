@@ -224,6 +224,23 @@ STDMETHODIMP CFilterIDShieldDataFileTask::get_MinStackSize(unsigned long *pnMinS
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35024");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFilterIDShieldDataFileTask::get_DisplaysUI(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI44989", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44990");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation
