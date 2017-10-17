@@ -280,6 +280,22 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
+        private void HandleDetailsButton_Click(object sender, EventArgs e)
+        {
+            var accuracyData = _editor.CurrentLearningMachine.AccuracyData;
+            if (!accuracyData.HasValue)
+            {
+                return;
+            }
+
+            var val = accuracyData.Value;
+            var copy = (val.train?.DeepClone(), val.test?.DeepClone());
+            using (var form = new TestDetails(copy))
+            {
+                form.ShowDialog();
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -369,22 +385,22 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                         var completedMessage = testOnly ? "Testing Complete" : "Training Complete";
                         _statusUpdates.Enqueue(
-                            new StatusArgs { StatusMessage = completedMessage + ". Time elapsed: " + elapsedTime + "\r\n"});
+                            new StatusArgs { StatusMessage = completedMessage + ". Time elapsed: " + elapsedTime + "\r\n" });
 
                         Action<AccuracyData> writeAccuracyData =
                             accuracyData => accuracyData.Match(
                             gcm =>
                             {
                                 _statusUpdates.Enqueue(new StatusArgs
-                                    {
-                                        StatusMessage = "  Number of samples: {0:N0}",
-                                        Int32Value = gcm.Samples
-                                    });
+                                {
+                                    StatusMessage = "  Number of samples: {0:N0}",
+                                    Int32Value = gcm.Samples
+                                });
                                 _statusUpdates.Enqueue(new StatusArgs
-                                    {
-                                        StatusMessage = "  Overall agreement: {0:N4}\r\n  Chance agreement: {1:N4}",
-                                        DoubleValues = new[] { gcm.OverallAgreement, gcm.ChanceAgreement }
-                                    });
+                                {
+                                    StatusMessage = "  Overall agreement: {0:N4}\r\n  Chance agreement: {1:N4}",
+                                    DoubleValues = new[] { gcm.OverallAgreement, gcm.ChanceAgreement }
+                                });
                             },
                             cm =>
                             {
@@ -395,17 +411,17 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                                 string positiveCategory = learningMachine.Encoder.AnswerCodeToName[positiveCategoryCodes.First()];
 
                                 _statusUpdates.Enqueue(new StatusArgs
-                                    {
-                                        StatusMessage = "  Number of samples: {0:N0}",
-                                        Int32Value = cm.Samples
-                                    });
+                                {
+                                    StatusMessage = "  Number of samples: {0:N0}",
+                                    Int32Value = cm.Samples
+                                });
                                 _statusUpdates.Enqueue(new StatusArgs
-                                    {
-                                        StatusMessage = "  F1 Score: {0:N4}" +
+                                {
+                                    StatusMessage = "  F1 Score: {0:N4}" +
                                         "\r\n  Precision: {1:N4}, Recall: {2:N4}" +
-                                        "\r\n  (" + positiveCategory +" = positive case)",
-                                        DoubleValues = new[] { cm.FScore, cm.Precision, cm.Recall }
-                                    });
+                                        "\r\n  (" + positiveCategory + " = positive case)",
+                                    DoubleValues = new[] { cm.FScore, cm.Precision, cm.Recall }
+                                });
                             });
 
                         var trainingAccuracyData = task.Result.Item1;
@@ -461,6 +477,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             cancelButton.Enabled = true;
         }
 
+
         /// <summary>
         /// Set boolean flags and control states based on learning machines' states
         /// </summary>
@@ -479,6 +496,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
             trainTestButton.Enabled = _editor.CurrentLearningMachine.InputConfig.TrainingSetPercentage > 0;
             clearLogToolStripMenuItem.Enabled = !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.TrainingLog);
+            detailsButton.Enabled = _editor.CurrentLearningMachine.AccuracyData != null;
+
             _processing = false;
         }
 

@@ -55,6 +55,7 @@
             this.computeFeaturesGroupBox = new System.Windows.Forms.GroupBox();
             this.recomputeFeaturesRadioButton = new System.Windows.Forms.RadioButton();
             this.useCurrentFeaturesRadioButton = new System.Windows.Forms.RadioButton();
+            this.detailsButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.trainingLogContextMenuStrip.SuspendLayout();
             this.computeFeaturesGroupBox.SuspendLayout();
@@ -214,6 +215,17 @@
             this.useCurrentFeaturesRadioButton.Text = "Use currently configured feature vectorizers when training";
             this.useCurrentFeaturesRadioButton.UseVisualStyleBackColor = true;
             // 
+            // detailsButton
+            // 
+            this.detailsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.detailsButton.Location = new System.Drawing.Point(318, 569);
+            this.detailsButton.Name = "detailsButton";
+            this.detailsButton.Size = new System.Drawing.Size(75, 23);
+            this.detailsButton.TabIndex = 10;
+            this.detailsButton.Text = "Details...";
+            this.detailsButton.UseVisualStyleBackColor = true;
+            this.detailsButton.Click += new System.EventHandler(this.HandleDetailsButton_Click);
+            // 
             // TrainingTesting
             // 
             this.AcceptButton = this.closeButton;
@@ -221,6 +233,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.closeButton;
             this.ClientSize = new System.Drawing.Size(556, 604);
+            this.Controls.Add(this.detailsButton);
             this.Controls.Add(this.computeFeaturesGroupBox);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.groupBox1);
@@ -261,5 +274,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.Button detailsButton;
     }
 }

@@ -366,28 +366,6 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(expectedFeatureVectorLength, featureVector.Length);
         }
 
-        // Test exception handling
-        // One input VOA is non-existent, one is empty string
-        [Test, Category("LearningMachineDataEncoder")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "VOA")]
-        public static void DocumentCategorizationWithAutoBowAndBadVOA()
-        {
-            SetDocumentCategorizationFiles();
-            var autoBoW = new SpatialStringFeatureVectorizer("", 5, 2000);
-            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW,
-                attributeFilter:"DocumentType");
-
-            _voaFiles[1] = "";
-            var ex = Assert.Throws<ExtractException>(() => encoder.ComputeEncodings(_ussFiles, _voaFiles, _categories));
-            Assert.That( ex.Message, Is.EqualTo("Cannot get attributes from unsupported file type.") );
-            Assert.That(!encoder.AreEncodingsComputed);
-
-            _voaFiles[1] = "blah.voa";
-            ex = Assert.Throws<ExtractException>(() => encoder.ComputeEncodings(_ussFiles, _voaFiles, _categories));
-            Assert.That( ex.Message, Is.EqualTo("Specified file or folder can't be found.") );
-            Assert.That(!encoder.AreEncodingsComputed);
-        }
-
         // Test using only auto-bag-of-words feature
         [Test, Category("LearningMachineDataEncoder")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "VOA")]
