@@ -1457,7 +1457,7 @@ namespace Extract.AttributeFinder
 
             // Add category code for each name seen
             int nextCategoryCode = 0;
-            foreach (var category in answers.Distinct()
+            foreach (var category in answers.Distinct(StringComparer.OrdinalIgnoreCase)
                 .Where(k => !k.Equals(otherCategory, StringComparison.OrdinalIgnoreCase))
                 .OrderBy(s => s, StringComparer.OrdinalIgnoreCase))
             {

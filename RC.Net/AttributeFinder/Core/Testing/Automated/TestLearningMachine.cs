@@ -1221,6 +1221,34 @@ namespace Extract.AttributeFinder.Test
             Assert.Greater(results.testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.93);
         }
 
+        // https://extract.atlassian.net/browse/ISSUE-14979
+        [SuppressMessage("Microsoft.Globalization", "CA1308")]
+        [Test, Category("LearningMachine")]
+        public static void MultiplyCasedDocType()
+        {
+            SetDocumentCategorizationFiles();
+            var csvContents = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories)
+                .Select(imagePath => string.Join(",", imagePath, Path.GetFileName(Path.GetDirectoryName(imagePath)))).ToList();
+            csvContents.Add(csvContents.Last().ToUpperInvariant());
+            csvContents.Add(csvContents.Last().ToLowerInvariant());
+            File.WriteAllLines(_csvPath, csvContents);
+
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _csvPath,
+                    InputPathType = InputType.TextFileOrCsv,
+                    AttributesPath = "",
+                    AnswerPath = "",
+                    TrainingSetPercentage = 80
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            lm.TrainMachine();
+        }
+
 
         #endregion Tests
 
