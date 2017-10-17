@@ -27,7 +27,6 @@ namespace Extract.UtilityApplications.NERAnnotator
         SpatialStringSearcher _searcher = new SpatialStringSearcher();
 
         // Function to return character indexes that an attribute's value overlaps
-        Func<IEnumerable<RasterZone>, SpatialString, bool, HashSet<int>> _getCharIndexes;
         Func<IEnumerable<RasterZone>, SpatialString, bool, HashSet<int>> _getCharIndexesMemoized;
 
         Settings _settings;
@@ -51,30 +50,6 @@ namespace Extract.UtilityApplications.NERAnnotator
             _cancellationToken = cancellationToken;
             _searcher.SetIncludeDataOnBoundary(true);
             _searcher.SetBoundaryResolution(ESpatialEntity.kCharacter);
-
-            // Define a to-be-memoized function to return character indexes that an attribute's value overlaps
-            _getCharIndexes = (entityZones, sourceString, useMidpoint) =>
-            {
-                _searcher.SetUseMidpointsOnly(useMidpoint);
-                var indexes = new HashSet<int>();
-                foreach (RasterZone rasterZone in entityZones)
-                {
-                    int page = rasterZone.PageNumber;
-                    LongRectangle bounds = rasterZone.GetRectangularBounds(
-                        sourceString.GetOCRImagePageBounds(page));
-
-                    var zoneIndexes = _searcher.GetCharacterIndexesInRegion(bounds);
-                    // Result will be null if there is no OCR result for the region, e.g., handwriting
-                    if (zoneIndexes != null)
-                    {
-                        foreach (var index in zoneIndexes.ToIEnumerable<int>().OrderBy(i => i).Skip(1))
-                        {
-                            indexes.Add(index);
-                        }
-                    }
-                }
-                return indexes;
-            };
         }
 
         #endregion Constructors
@@ -431,7 +406,7 @@ namespace Extract.UtilityApplications.NERAnnotator
             {
                 var page = uss.GetSpecifiedPages(pageNum, pageNum);
                 _searcher.InitSpatialStringSearcher(page, false);
-                _getCharIndexesMemoized = _getCharIndexes.Memoize();
+                _getCharIndexesMemoized = ((Func<IEnumerable<RasterZone>, SpatialString, bool, HashSet<int>>)GetCharIndexes).Memoize();
 
                 // Collect all candidate attributes for this page
                 var attributesOnThisPage = typesVoa
@@ -719,6 +694,30 @@ namespace Extract.UtilityApplications.NERAnnotator
                     }
                 }
             }
+        }
+
+        // A to-be-memoized function to return character indexes that an attribute's value overlaps
+        HashSet<int> GetCharIndexes(IEnumerable<RasterZone> entityZones, SpatialString sourceString, bool useMidpoint)
+        {
+            _searcher.SetUseMidpointsOnly(useMidpoint);
+            var indexes = new HashSet<int>();
+            foreach (RasterZone rasterZone in entityZones)
+            {
+                int page = rasterZone.PageNumber;
+                LongRectangle bounds = rasterZone.GetRectangularBounds(
+                    sourceString.GetOCRImagePageBounds(page));
+
+                var zoneIndexes = _searcher.GetCharacterIndexesInRegion(bounds);
+                // Result will be null if there is no OCR result for the region, e.g., handwriting
+                if (zoneIndexes != null)
+                {
+                    foreach (var index in zoneIndexes.ToIEnumerable<int>().OrderBy(i => i).Skip(1))
+                    {
+                        indexes.Add(index);
+                    }
+                }
+            }
+            return indexes;
         }
 
         #endregion Private Methods

@@ -208,8 +208,14 @@ namespace Extract.AttributeFinder.Test
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
-            Assert.Greater(results.Item2.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+            Assert.Greater(results.trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+            Assert.Greater(results.testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+
+            // Test SerializableConfusionMatrix
+            var trainCM = lm.AccuracyData.Value.train;
+            var testCM = lm.AccuracyData.Value.test;
+            Assert.AreEqual(results.trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), trainCM.OverallAgreement());
+            Assert.AreEqual(results.testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), testCM.OverallAgreement());
 
             // Test output
             string[] ussFiles, voaFiles, answers;
@@ -286,6 +292,17 @@ namespace Extract.AttributeFinder.Test
             var results = lm.TrainMachine();
             Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.9);
             Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
+
+            // Test SerializableConfusionMatrix
+            var trainCM = lm.AccuracyData.Value.train;
+            var testCM = lm.AccuracyData.Value.test;
+            Assert.AreEqual(results.trainingSet.Match(_ => Double.NaN, cm => cm.FScore), trainCM.FScoreMicroAverage());
+            Assert.AreEqual(results.trainingSet.Match(_ => Double.NaN, cm => cm.Recall), trainCM.RecallMicroAverage());
+            Assert.AreEqual(results.trainingSet.Match(_ => Double.NaN, cm => cm.Precision), trainCM.PrecisionMicroAverage());
+
+            Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), testCM.FScoreMicroAverage());
+            Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Recall), testCM.RecallMicroAverage());
+            Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Precision), testCM.PrecisionMicroAverage());
         }
 
         [Test, Category("LearningMachine")]
@@ -315,6 +332,17 @@ namespace Extract.AttributeFinder.Test
             var results = lm.TrainMachine();
             Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.9);
             Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
+
+            // Test SerializableConfusionMatrix
+            var trainCM = lm.AccuracyData.Value.train;
+            var testCM = lm.AccuracyData.Value.test;
+            Assert.AreEqual(results.trainingSet.Match(_ => Double.NaN, cm => cm.FScore), trainCM.FScoreMicroAverage());
+            Assert.AreEqual(results.trainingSet.Match(_ => Double.NaN, cm => cm.Recall), trainCM.RecallMicroAverage());
+            Assert.AreEqual(results.trainingSet.Match(_ => Double.NaN, cm => cm.Precision), trainCM.PrecisionMicroAverage());
+
+            Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), testCM.FScoreMicroAverage());
+            Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Recall), testCM.RecallMicroAverage());
+            Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Precision), testCM.PrecisionMicroAverage());
         }
 
         [Test, Category("LearningMachine")]
@@ -362,6 +390,17 @@ namespace Extract.AttributeFinder.Test
             var results = lm.TrainMachine();
             Assert.AreEqual(1.0, results.Item1.Match(_ => Double.NaN, cm => cm.FScore));
             Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.85);
+
+            // Test SerializableConfusionMatrix
+            var trainCM = lm.AccuracyData.Value.train;
+            var testCM = lm.AccuracyData.Value.test;
+            Assert.AreEqual(results.trainingSet.Match(_ => Double.NaN, cm => cm.FScore), trainCM.FScoreMicroAverage());
+            Assert.AreEqual(results.trainingSet.Match(_ => Double.NaN, cm => cm.Recall), trainCM.RecallMicroAverage());
+            Assert.AreEqual(results.trainingSet.Match(_ => Double.NaN, cm => cm.Precision), trainCM.PrecisionMicroAverage());
+
+            Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), testCM.FScoreMicroAverage());
+            Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Recall), testCM.RecallMicroAverage());
+            Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Precision), testCM.PrecisionMicroAverage());
         }
 
         [Test, Category("LearningMachine")]
@@ -1378,6 +1417,59 @@ namespace Extract.AttributeFinder.Test
             var results = lm.TestMachine();
             Assert.AreEqual(1.0, results.trainingSet.Match(_ => Double.NaN, cm => cm.FScore));
             Assert.Greater(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), 0.85);
+        }
+
+        [Test, Category("LearningMachine")]
+        public static void PrecisionRecallMicroAverage()
+        {
+            SetDocumentCategorizationFiles();
+            string[] csvContents = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories)
+                .Select(imagePath => string.Join(",", imagePath, Path.GetFileName(Path.GetDirectoryName(imagePath)))).ToArray();
+
+            // Create some extra data so that training and testing sets are different
+            csvContents = csvContents.Concat(csvContents).ToArray();
+
+            File.WriteAllLines(_csvPath, csvContents);
+
+            var inputConfig = new InputConfiguration
+            {
+                InputPath = _csvPath,
+                InputPathType = InputType.TextFileOrCsv,
+                AttributesPath = "",
+                AnswerPath = "",
+                TrainingSetPercentage = 80
+            };
+            var lm = new LearningMachine
+            {
+                InputConfig = inputConfig,
+                Encoder = new LearningMachineDataEncoder(
+                    LearningMachineUsage.DocumentCategorization,
+                    new SpatialStringFeatureVectorizer(null, 5, 20),
+                    negativeClassName: "Unknown"),
+                Classifier = new MultilabelSupportVectorMachineClassifier { CalibrateMachineToProduceProbabilities = true },
+                UseUnknownCategory = true,
+                UnknownCategoryCutoff = 0.60,
+                TranslateUnknownCategory = true,
+                TranslateUnknownCategoryTo = "Unknown"
+            };
+            var results = lm.TrainMachine();
+            Assert.AreEqual(0.9, results.trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy));
+            Assert.AreEqual(0.9, results.testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy));
+
+            var trainCM = lm.AccuracyData.Value.train;
+            var testCM = lm.AccuracyData.Value.test;
+            Assert.Greater(trainCM.PrecisionMicroAverage(), 0.99);
+            Assert.AreEqual(trainCM.RecallMicroAverage(), 0.9);
+            Assert.Greater(trainCM.FScoreMicroAverage(), 0.94);
+            Assert.Less(trainCM.FScoreMicroAverage(), 0.95);
+
+            Assert.AreEqual(testCM.RecallMicroAverage(), 0.9);
+            Assert.Greater(testCM.FScoreMicroAverage(), 0.94);
+            Assert.Less(testCM.FScoreMicroAverage(), 0.95);
+
+            CollectionAssert.AreNotEquivalent(
+                trainCM.Data.SelectMany(a => a).ToArray(),
+                testCM.Data.SelectMany(a => a).ToArray());
         }
 
         #endregion Tests

@@ -17,7 +17,6 @@ using System.Runtime.Caching;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -122,6 +121,9 @@ namespace Extract.AttributeFinder
 
         [OptionalField(VersionAdded = 5)]
         private bool _standardizeFeaturesForCsvOutput;
+
+        [OptionalField(VersionAdded = 5)]
+        private (SerializableConfusionMatrix train, SerializableConfusionMatrix test)? _accuracyData;
 
         #endregion Fields
 
@@ -381,6 +383,10 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Whether to standardize feature values before writing out to CSV
+        /// </summary>
+        /// <remarks>Standardizing means subtracting the mean and dividing by the standard deviation of each feature</remarks>
         public bool StandardizeFeaturesForCsvOutput
         {
             get
@@ -390,6 +396,22 @@ namespace Extract.AttributeFinder
             set
             {
                 _standardizeFeaturesForCsvOutput = value;
+            }
+        }
+
+        /// <summary>
+        /// Accuracy data from the last training/testing session
+        /// </summary>;
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public (SerializableConfusionMatrix train, SerializableConfusionMatrix test)? AccuracyData
+        {
+            get
+            {
+                return _accuracyData;
+            }
+            set
+            {
+                _accuracyData = value;
             }
         }
 
@@ -1097,12 +1119,19 @@ namespace Extract.AttributeFinder
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return (GetAccuracyScore(trainInputs, trainOutputs), GetAccuracyScore(testInputs, testOutputs));
+                var trainResult = GetAccuracyScore(trainInputs, trainOutputs);
+                var testResult = GetAccuracyScore(testInputs, testOutputs);
+                AccuracyData =
+                    (train: new SerializableConfusionMatrix(Encoder, trainResult),
+                    test: new SerializableConfusionMatrix(Encoder, testResult));
+                return (trainResult, testResult);
             }
             // If no training data, just test testing set
             else
             {
-                return (null, GetAccuracyScore(featureVectorsAndAnswers.Item1, featureVectorsAndAnswers.Item2));
+                var testResult = GetAccuracyScore(featureVectorsAndAnswers.Item1, featureVectorsAndAnswers.Item2);
+                AccuracyData = (train: null, test: new SerializableConfusionMatrix(Encoder, testResult));
+                return (null, testResult);
             }
         }
 
