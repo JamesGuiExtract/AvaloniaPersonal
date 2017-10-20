@@ -1824,7 +1824,10 @@ STDMETHODIMP CFileProcessingMgmtRole::get_ProcessingDisplaysUI(VARIANT_BOOL * pP
 			UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProcessor(ipOWD->Object);
 			ASSERT_RESOURCE_ALLOCATION("ELI44998", ipFileProcessor != __nullptr);
 
-			bDisplaysUI = asCppBool(ipFileProcessor->DisplaysUI);
+			if (asCppBool(ipOWD->Enabled))
+			{
+				bDisplaysUI = asCppBool(ipFileProcessor->DisplaysUI);
+			}
 		}
 
 		*pProcessingDisplaysUI = asVariantBool(bDisplaysUI);
