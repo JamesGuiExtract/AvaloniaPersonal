@@ -1,4 +1,5 @@
 ﻿using Accord.Math;
+using Accord.Statistics;
 using Accord.Statistics.Analysis;
 using Extract.Encryption;
 using Extract.Licensing;
@@ -118,6 +119,9 @@ namespace Extract.AttributeFinder
 
         [OptionalField(VersionAdded = 5)]
         private string _csvOutputFile;
+
+        [OptionalField(VersionAdded = 5)]
+        private bool _standardizeFeaturesForCsvOutput;
 
         #endregion Fields
 
@@ -374,6 +378,18 @@ namespace Extract.AttributeFinder
             set
             {
                 _csvOutputFile = value ?? "";
+            }
+        }
+
+        public bool StandardizeFeaturesForCsvOutput
+        {
+            get
+            {
+                return _standardizeFeaturesForCsvOutput;
+            }
+            set
+            {
+                _standardizeFeaturesForCsvOutput = value;
             }
         }
 
@@ -703,6 +719,7 @@ namespace Extract.AttributeFinder
                     || other.TranslateUnknownCategory != TranslateUnknownCategory
                     || TranslateUnknownCategory && !string.Equals(other.TranslateUnknownCategoryTo, TranslateUnknownCategoryTo)
                     || !string.Equals(other.CsvOutputFile, CsvOutputFile)
+                    || other.StandardizeFeaturesForCsvOutput != StandardizeFeaturesForCsvOutput
                     )
                 {
                     return false;
@@ -891,52 +908,76 @@ namespace Extract.AttributeFinder
                 var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
                     updateStatus, cancellationToken, updateAnswerCodes: false);
 
+                var inputs = featureVectorsAndAnswers.Item1;
+                if (StandardizeFeaturesForCsvOutput)
+                {
+                    var mean = inputs.Mean();
+                    var sigma = inputs.StandardDeviation(mean);
+
+                    // Prevent divide by zero
+                    if (sigma.Any(factor => factor == 0))
+                    {
+                        sigma.ApplyInPlace(factor => factor + 0.0001);
+                    }
+
+                    // Standardize input
+                    inputs = inputs.Subtract(mean).ElementwiseDivide(sigma, inPlace: true);
+                }
+
+                var docIndex = featureVectorsAndAnswers.Item3.GroupBy(p => p).SelectMany(g => g.Select((p, i) => i)).ToArray();
+
                 // Training set
                 double[][] trainInputs = null;
                 int[] trainOutputs = null;
                 string[] trainFiles = null;
+                int[] trainFileIndices = null;
 
                 // Testing set
                 double[][] testInputs = null;
                 int[] testOutputs = null;
                 string[] testFiles = null;
+                int[] testFileIndices = null;
 
                 // Divide data into training and testing subsets
                 if (InputConfig.TrainingSetPercentage > 0)
                 {
                     var rng = new Random(RandomNumberSeed);
-                    GetIndexesOfSubsetsByCategory(Enumerable.Repeat(0, featureVectorsAndAnswers.Item2.Length).ToArray(),
+                    GetIndexesOfSubsetsByCategory(featureVectorsAndAnswers.Item2,
                         InputConfig.TrainingSetPercentage / 100.0, out List<int> trainIdx, out List<int> testIdx, rng);
 
                     // Training set
-                    trainInputs = featureVectorsAndAnswers.Item1.Submatrix(trainIdx);
+                    trainInputs = inputs.Submatrix(trainIdx);
                     trainOutputs = featureVectorsAndAnswers.Item2.Submatrix(trainIdx);
-                    trainFiles = ussFiles.Submatrix(trainIdx);
+                    trainFiles = featureVectorsAndAnswers.Item3.Submatrix(trainIdx);
+                    trainFileIndices = docIndex.Submatrix(trainIdx);
 
                     // Testing set
-                    testInputs = featureVectorsAndAnswers.Item1.Submatrix(testIdx);
+                    testInputs = inputs.Submatrix(testIdx);
                     testOutputs = featureVectorsAndAnswers.Item2.Submatrix(testIdx);
-                    testFiles = ussFiles.Submatrix(testIdx);
+                    testFiles = featureVectorsAndAnswers.Item3.Submatrix(testIdx);
+                    testFileIndices = docIndex.Submatrix(trainIdx);
                 }
                 else
                 {
                     // Testing set
-                    testInputs = featureVectorsAndAnswers.Item1;
+                    testInputs = inputs;
                     testOutputs = featureVectorsAndAnswers.Item2;
-                    testFiles = ussFiles;
+                    testFiles = featureVectorsAndAnswers.Item3;
+                    testFileIndices = docIndex;
                 }
 
-                int numColumns = featureVectorsAndAnswers.Item1[0].Length + 1;
+                int numColumns = inputs[0].Length + 1;
 
                 if (trainInputs != null && trainInputs.Any())
                 {
-                    var trainingData = trainFiles.Zip(trainInputs.Zip(trainOutputs, (f, a) => (features: f, answer: a)), (uss, d) =>
+                    var trainingData = trainFiles.Zip(trainFileIndices.Zip(trainInputs.Zip(trainOutputs, (f, a) => (features: f, answer: a)), (i, d) => (idx: i, features: d.features, answer: d.answer)), (uss, d) =>
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         updateStatus(new StatusArgs { StatusMessage = "Processing training set records: {0:N0}", Int32Value = 1 });
 
                         var data = new List<string>(numColumns);
                         data.Add(uss.Quote());
+                        data.Add(d.idx.ToString(CultureInfo.CurrentCulture));
                         data.Add(Encoder.AnswerCodeToName[d.answer].Quote());
                         data.AddRange(d.features.Select(n => n.ToString(CultureInfo.InvariantCulture)));
                         return string.Join(",", data);
@@ -945,13 +986,14 @@ namespace Extract.AttributeFinder
                     File.WriteAllLines(trainingCsv, trainingData);
                 }
 
-                var testingData = testFiles.Zip(testInputs.Zip(testOutputs, (f, a) => (features: f, answer: a)), (uss, d) =>
+                var testingData = testFiles.Zip(testFileIndices.Zip(testInputs.Zip(testOutputs, (f, a) => (features: f, answer: a)), (i, d) => (idx: i, features: d.features, answer: d.answer)), (uss, d) =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     updateStatus(new StatusArgs { StatusMessage = "Processing testing set records: {0:N0}", Int32Value = 1 });
 
                     var data = new List<string>(numColumns);
                     data.Add(uss.Quote());
+                    data.Add(d.idx.ToString(CultureInfo.CurrentCulture));
                     data.Add(Encoder.AnswerCodeToName[d.answer].Quote());
                     data.AddRange(d.features.Select(n => n.ToString(CultureInfo.InvariantCulture)));
                     return string.Join(",", data);
