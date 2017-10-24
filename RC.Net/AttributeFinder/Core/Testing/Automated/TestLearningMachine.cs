@@ -1249,6 +1249,136 @@ namespace Extract.AttributeFinder.Test
             lm.TrainMachine();
         }
 
+        // Write out features to a CSV and train a machine with the CSV
+        [Test, Category("LearningMachine")]
+        public static void CsvDocumentCategorization()
+        {
+            SetDocumentCategorizationFiles();
+            var inputConfig = new InputConfiguration
+            {
+                InputPath = _inputFolder.Last(),
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm = new LearningMachine
+            {
+                InputConfig = inputConfig,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier(),
+                CsvOutputFile = Path.Combine(_inputFolder.Last(), "features")
+            };
+            lm.ComputeEncodings();
+            lm.WriteDataToCsv(_ => { }, CancellationToken.None);
+
+            var trainPath = Path.Combine(_inputFolder.Last(), "features.train.csv");
+            var testPath = Path.Combine(_inputFolder.Last(), "features.test.csv");
+            Assert.That(File.Exists(trainPath));
+            Assert.That(File.Exists(testPath));
+
+            var trainingData = File.ReadAllLines(trainPath);
+
+            // CSV is uss path, index, class name, features
+            var trainInputs = trainingData.Select(l => l.Split(',').Skip(3).Select(s => Convert.ToDouble(s, CultureInfo.InvariantCulture)).ToArray()).ToArray();
+            var trainOutputs = trainingData.Select(l => l.Split(',').Skip(2).First()).Select(s => lm.Encoder.AnswerNameToCode[s.Unquote()]).ToArray();
+            lm.Classifier.TrainClassifier(trainInputs, trainOutputs, new Random(0));
+
+            var results = lm.TestMachine();
+            Assert.Greater(results.trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+            Assert.Greater(results.testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+
+
+            // Data is not standardized so all are integers
+            Assert.That(trainInputs.SelectMany(a => a).Select(d => d % 1).All(d => d == 0));
+
+            // Standardize
+            lm.StandardizeFeaturesForCsvOutput = true;
+            lm.WriteDataToCsv(_ => { }, CancellationToken.None);
+            trainingData = File.ReadAllLines(trainPath);
+            trainInputs = trainingData.Select(l => l.Split(',').Skip(3).Select(s => Convert.ToDouble(s, CultureInfo.InvariantCulture)).ToArray()).ToArray();
+
+            // At least some are not integers
+            Assert.That(trainInputs.SelectMany(a => a).Select(d => d % 1).Any(d => d != 0));
+        }
+
+        // Write out features to a CSV and train a machine with the CSV
+        [Test, Category("LearningMachine")]
+        public static void CsvPagination()
+        {
+            SetPaginationFiles();
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.protofeatures.voa",
+                    AnswerPath = "<SourceDocName>.eav",
+                    TrainingSetPercentage = 50
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, attributeFilter: "*@Feature"),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = true },
+                RandomNumberSeed = 1,
+                CsvOutputFile = Path.Combine(_inputFolder.Last(), "features")
+            };
+            lm.ComputeEncodings();
+            lm.WriteDataToCsv(_ => { }, CancellationToken.None);
+
+            var trainPath = Path.Combine(_inputFolder.Last(), "features.train.csv");
+            var testPath = Path.Combine(_inputFolder.Last(), "features.test.csv");
+            Assert.That(File.Exists(trainPath));
+            Assert.That(File.Exists(testPath));
+
+            var trainingData = File.ReadAllLines(trainPath);
+
+            // CSV is uss path, index, class name, features
+            var trainInputs = trainingData.Select(l => l.Split(',').Skip(3).Select(s => Convert.ToDouble(s, CultureInfo.InvariantCulture)).ToArray()).ToArray();
+            var trainOutputs = trainingData.Select(l => l.Split(',').Skip(2).First()).Select(s => lm.Encoder.AnswerNameToCode[s.Unquote()]).ToArray();
+            lm.Classifier.TrainClassifier(trainInputs, trainOutputs, new Random(1));
+
+            var results = lm.TestMachine();
+            Assert.Greater(results.trainingSet.Match(_ => Double.NaN, cm => cm.FScore), 0.9);
+            Assert.Greater(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
+        }
+
+        // Write out features to a CSV and train a machine with the CSV
+        [Test, Category("LearningMachine")]
+        public static void CsvAttributeCategorization()
+        {
+            SetPaginationFiles();
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.labeled.voa",
+                    TrainingSetPercentage = 80
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, attributeFilter: "*@Feature"),
+                Classifier = new MulticlassSupportVectorMachineClassifier(),
+                CsvOutputFile = Path.Combine(_inputFolder.Last(), "features")
+            };
+            lm.ComputeEncodings();
+            lm.WriteDataToCsv(_ => { }, CancellationToken.None);
+
+            var trainPath = Path.Combine(_inputFolder.Last(), "features.train.csv");
+            var testPath = Path.Combine(_inputFolder.Last(), "features.test.csv");
+            Assert.That(File.Exists(trainPath));
+            Assert.That(File.Exists(testPath));
+
+            var trainingData = File.ReadAllLines(trainPath);
+
+            // CSV is uss path, index, class name, features
+            var trainInputs = trainingData.Select(l => l.Split(',').Skip(3).Select(s => Convert.ToDouble(s, CultureInfo.InvariantCulture)).ToArray()).ToArray();
+            var trainOutputs = trainingData.Select(l => l.Split(',').Skip(2).First()).Select(s => lm.Encoder.AnswerNameToCode[s.Unquote()]).ToArray();
+            lm.Classifier.TrainClassifier(trainInputs, trainOutputs, new Random(0));
+
+            var results = lm.TestMachine();
+            Assert.AreEqual(1.0, results.trainingSet.Match(_ => Double.NaN, cm => cm.FScore));
+            Assert.Greater(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), 0.85);
+        }
 
         #endregion Tests
 

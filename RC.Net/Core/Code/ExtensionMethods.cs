@@ -126,6 +126,33 @@ namespace Extract
             }
         }
 
+        /// <summary>
+        /// Returns a unquoted version of the supplied string.
+        /// <example>If the input value is '"Hello World"' then the result
+        /// will be 'Hello World'.</example>
+        /// </summary>
+        /// <param name="value">The <see cref="String"/> to unquote.</param>
+        /// <returns>A version of the input string with one quote removed from the beginning and end.</returns>
+        /// <remarks>If there is not a quote character at the beginning and end of the string, the returned string will be the same as the input</remarks>
+        public static string Unquote(this string value)
+        {
+            try
+            {
+                if (value.Length > 1
+                    && value.StartsWith("\"", StringComparison.Ordinal)
+                    && value.EndsWith("\"", StringComparison.Ordinal))
+                {
+                    return value.Substring(1, value.Length - 2);
+                }
+
+                return value;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45008");
+            }
+        }
+
         #endregion String Methods
 
         #region Byte Array Methods

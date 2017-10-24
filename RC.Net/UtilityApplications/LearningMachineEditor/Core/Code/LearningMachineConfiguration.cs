@@ -629,6 +629,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 // Set machine controls
                 machineTypeComboBox.SelectEnumValue(CurrentLearningMachine.MachineType);
                 csvOutputTextBox.Text = CurrentLearningMachine.CsvOutputFile ?? "";
+                standardizeFeaturesForCsvOutputCheckBox.Checked = CurrentLearningMachine.StandardizeFeaturesForCsvOutput;
 
                 // Neural net
                 if (CurrentLearningMachine.MachineType == LearningMachineType.ActivationNetwork)
@@ -992,6 +993,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         {
             var machineType = machineTypeComboBox.ToEnumValue<LearningMachineType>();
             learningMachine.CsvOutputFile = csvOutputTextBox.Text;
+            learningMachine.StandardizeFeaturesForCsvOutput = standardizeFeaturesForCsvOutputCheckBox.Checked;
 
             // Neural Network Classifier
             if (machineType == LearningMachineType.ActivationNetwork)

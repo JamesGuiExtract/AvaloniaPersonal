@@ -849,8 +849,9 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                return GetFeatureVectorAndAnswerCollections(ussFilePaths, inputVOAFilePaths,
+                var triple = GetFeatureVectorAndAnswerCollections(ussFilePaths, inputVOAFilePaths,
                     answersOrAnswerFiles, _ => { }, CancellationToken.None, updateAnswerCodes);
+                return Tuple.Create(triple.Item1, triple.Item2);
             }
             catch (Exception e)
             {
@@ -869,9 +870,9 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
-        /// <returns>A tuple where the first item is an enumeration of feature vectors and the second
-        /// item is an enumeration of answer codes for each example</returns>
-        public Tuple<double[][], int[]> GetFeatureVectorAndAnswerCollections
+        /// <returns>A tuple where the first item is an enumeration of feature vectors, the second
+        /// item answer codes for each example and the third item the uss path for each example</returns>
+        public Tuple<double[][], int[], string[]> GetFeatureVectorAndAnswerCollections
             (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answersOrAnswerFiles,
                 Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool updateAnswerCodes)
         {
@@ -912,12 +913,14 @@ namespace Extract.AttributeFinder
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answers = new int[results.Length];
+                    string[] ussFilePaths2 = new string[results.Length];
                     for (int i = 0; i < results.Length; i++)
                     {
                         featureVectors[i] = results[i].Item1;
                         answers[i] = results[i].Item2;
+                        ussFilePaths2[i] = results[i].Item3;
                     }
-                    return Tuple.Create(featureVectors.ToArray(), answers.ToArray());
+                    return Tuple.Create(featureVectors, answers, ussFilePaths2);
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
@@ -929,12 +932,14 @@ namespace Extract.AttributeFinder
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answers = new int[results.Length];
+                    string[] ussFilePaths2 = new string[results.Length];
                     for (int i = 0; i < results.Length; i++)
                     {
                         featureVectors[i] = results[i].Item1;
                         answers[i] = results[i].Item2;
+                        ussFilePaths2[i] = results[i].Item3;
                     }
-                    return Tuple.Create(featureVectors.ToArray(), answers.ToArray());
+                    return Tuple.Create(featureVectors, answers, ussFilePaths2);
                 }
                 else
                 {
@@ -1355,8 +1360,8 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
-        /// <returns>A tuple of feature vectors and predictions</returns>
-        private Tuple<double[][], int[]> GetDocumentFeatureVectorAndAnswerCollection
+        /// <returns>A tuple of feature vectors, predictions and the uss path for each example</returns>
+        private Tuple<double[][], int[], string[]> GetDocumentFeatureVectorAndAnswerCollection
             (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answers,
                 Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool updateAnswerCodes)
         {
@@ -1430,7 +1435,7 @@ namespace Extract.AttributeFinder
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return Tuple.Create(featureVectors, answerCodes);
+                return Tuple.Create(featureVectors, answerCodes, ussFilePaths);
             }
             catch (Exception e)
             {
@@ -1481,15 +1486,15 @@ namespace Extract.AttributeFinder
         /// <param name="answerFiles">The VOAs with pagination boundary info for each input file</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        /// <returns>An array of feature vector to answer tuples</returns>
-        private Tuple<double[], int>[] GetPaginationFeatureVectorAndAnswerCollection
+        /// <returns>An array of feature vector, answer and uss path tuples</returns>
+        private Tuple<double[], int, string>[] GetPaginationFeatureVectorAndAnswerCollection
             (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answerFiles,
                 Action<StatusArgs> updateStatus,
                 CancellationToken cancellationToken)
         {
             try
             {
-                var results = new Tuple<double[], int>[ussFilePaths.Length][];
+                var results = new Tuple<double[], int, string>[ussFilePaths.Length][];
                 Parallel.For(0, ussFilePaths.Length, (i, loopState) =>
                 {
                     if (cancellationToken.IsCancellationRequested)
@@ -1545,10 +1550,10 @@ namespace Extract.AttributeFinder
                         return code;
                     }).ToList();
 
-                    results[i] = new Tuple<double[], int>[featureVectors.Count];
+                    results[i] = new Tuple<double[], int, string>[featureVectors.Count];
                     for (int j = 0; j < featureVectors.Count; j++)
                     {
-                        results[i][j] = (Tuple.Create(featureVectors[j], answerCodes[j]));
+                        results[i][j] = (Tuple.Create(featureVectors[j], answerCodes[j], ussFilePaths[i]));
                     }
 
                     updateStatus(new StatusArgs { StatusMessage = "Files processed: {0:N0}", Int32Value = 1 });
@@ -1571,8 +1576,8 @@ namespace Extract.AttributeFinder
         /// <param name="inputVOAFilePaths">The input VOA paths corresponding to each uss file</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        /// <returns>An array of feature vector to answer tuples</returns>
-        private Tuple<double[], int>[] GetAttributesFeatureVectorAndAnswerCollection
+        /// <returns>An array of feature vector, answer and uss path tuples</returns>
+        private Tuple<double[], int, string>[] GetAttributesFeatureVectorAndAnswerCollection
             (string[] ussFilePaths, string[] inputVOAFilePaths,
                 Action<StatusArgs> updateStatus,
                 CancellationToken cancellationToken)
@@ -1582,7 +1587,7 @@ namespace Extract.AttributeFinder
                 ExtractException.Assert("ELI41413", "Input VOA collection cannot be null",
                     inputVOAFilePaths != null);
 
-                var results = new Tuple<double[], int>[ussFilePaths.Length][];
+                var results = new Tuple<double[], int, string>[ussFilePaths.Length][];
                 Parallel.For(0, ussFilePaths.Length, (i, loopState) =>
                 {
                     if (cancellationToken.IsCancellationRequested)
@@ -1651,10 +1656,10 @@ namespace Extract.AttributeFinder
 
                     List<double[]> featureVectors = GetAttributesFeatureVectors(spatialString, filteredAttributes).ToList();
 
-                    results[i] = new Tuple<double[], int>[featureVectors.Count];
+                    results[i] = new Tuple<double[], int, string>[featureVectors.Count];
                     for (int j = 0; j < featureVectors.Count; j++)
                     {
-                        results[i][j] = (Tuple.Create(featureVectors[j], answerCodes[j]));
+                        results[i][j] = (Tuple.Create(featureVectors[j], answerCodes[j], ussFilePaths[i]));
                     }
 
                     updateStatus(new StatusArgs { StatusMessage = "Files processed: {0:N0}", Int32Value = 1 });

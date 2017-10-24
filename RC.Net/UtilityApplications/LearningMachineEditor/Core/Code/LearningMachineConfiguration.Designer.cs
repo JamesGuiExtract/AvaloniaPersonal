@@ -165,6 +165,7 @@
             this.openMachineButton = new System.Windows.Forms.Button();
             this.saveMachineButton = new System.Windows.Forms.Button();
             this.newMachineButton = new System.Windows.Forms.Button();
+            this.standardizeFeaturesForCsvOutputCheckBox = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.configurationTabControl.SuspendLayout();
             this.inputConfigurationTabPage.SuspendLayout();
@@ -984,6 +985,7 @@
             // 
             // featureConfigurationTabPage
             // 
+            this.featureConfigurationTabPage.Controls.Add(this.standardizeFeaturesForCsvOutputCheckBox);
             this.featureConfigurationTabPage.Controls.Add(this.label4);
             this.featureConfigurationTabPage.Controls.Add(this.csvOutputBrowseButton);
             this.featureConfigurationTabPage.Controls.Add(this.csvOutputTextBox);
@@ -1720,6 +1722,19 @@
             this.newMachineButton.UseVisualStyleBackColor = true;
             this.newMachineButton.Click += new System.EventHandler(this.HandleNewMachineButton_Click);
             // 
+            // standardizeFeaturesForCsvOutputCheckBox
+            // 
+            this.standardizeFeaturesForCsvOutputCheckBox.AutoSize = true;
+            this.standardizeFeaturesForCsvOutputCheckBox.Checked = true;
+            this.standardizeFeaturesForCsvOutputCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.standardizeFeaturesForCsvOutputCheckBox.Location = new System.Drawing.Point(114, 473);
+            this.standardizeFeaturesForCsvOutputCheckBox.Name = "standardizeFeaturesForCsvOutputCheckBox";
+            this.standardizeFeaturesForCsvOutputCheckBox.Size = new System.Drawing.Size(328, 17);
+            this.standardizeFeaturesForCsvOutputCheckBox.TabIndex = 13;
+            this.standardizeFeaturesForCsvOutputCheckBox.Text = "Standardize features (subtract mean and divide by std deviation)";
+            this.standardizeFeaturesForCsvOutputCheckBox.UseVisualStyleBackColor = true;
+            this.standardizeFeaturesForCsvOutputCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            // 
             // LearningMachineConfiguration
             // 
             this.AllowDrop = true;
@@ -1913,6 +1928,7 @@
         private Utilities.Forms.BrowseButton csvOutputBrowseButton;
         private System.Windows.Forms.TextBox csvOutputTextBox;
         private System.Windows.Forms.Button writeDataToCsvButton;
+        private System.Windows.Forms.CheckBox standardizeFeaturesForCsvOutputCheckBox;
     }
 }
 
