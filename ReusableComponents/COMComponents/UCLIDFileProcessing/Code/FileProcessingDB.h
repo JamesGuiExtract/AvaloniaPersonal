@@ -87,6 +87,8 @@ static const string gstrWORKFLOW = "Workflow";
 static const string gstrWORKFLOW_FILE = "WorkflowFile";
 static const string gstrWORKFLOWCHANGE = "WorkflowChange";
 static const string gstrWORKFLOWCHANGE_FILE = "WorkflowChangeFile";
+static const string gstrMLMODEL = "MLModel";
+static const string gstrMLDATA = "MLData";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB

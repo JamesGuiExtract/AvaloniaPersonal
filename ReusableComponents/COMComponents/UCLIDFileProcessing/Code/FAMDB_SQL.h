@@ -436,6 +436,24 @@ static const string gstrCREATE_WORKFLOWCHANGEFILE =
 	"	[DestWorkflowID]   INT NOT NULL, "
 	"	CONSTRAINT [PK_WorkflowChangeFile] PRIMARY KEY CLUSTERED([ID] ASC));";
 
+static const string gstrCREATE_MLMODEL =
+"CREATE TABLE [dbo].[MLModel]( "
+	"	[ID]   INT IDENTITY(1, 1) NOT NULL, "
+	"	[Name] INT NOT NULL, "
+	"   CONSTRAINT [PK_MLModel] PRIMARY KEY CLUSTERED ([ID] ASC));";
+
+static const string gstrCREATE_MLDATA =
+"CREATE TABLE [dbo].[MLData]( "
+	"   [ID]		     INT IDENTITY(1, 1) NOT NULL,"
+	"	[MLModelID]      INT NOT NULL, "
+	"	[FileID]         INT NOT NULL, "
+	"   [IsTrainingData] BIT NOT NULL DEFAULT 1, "
+	"   [DateTimeStamp]  DATETIME NOT NULL, "
+	"	[Data]           NVARCHAR(MAX) NOT NULL, "
+	"   [CanBeDeleted]	 BIT NOT NULL DEFAULT 0, "
+	"   CONSTRAINT [PK_MLData] PRIMARY KEY NONCLUSTERED ([ID] ASC), "
+	"	CONSTRAINT [IX_MLDataDateTimeStamp] UNIQUE CLUSTERED ([DateTimeStamp] ASC, [ID] ASC));";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -1110,6 +1128,20 @@ static const string gstrADD_FILE_HANDLER_WORKFLOW_FK =
 	"REFERENCES [dbo].[Workflow]([Name]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE SET NULL";
+
+static const string gstrADD_MLDATA_MLMODEL_FK =
+	"ALTER TABLE [MLData]  "
+	"WITH CHECK ADD CONSTRAINT [FK_MLData_MLModel] FOREIGN KEY([MLModelID]) "
+	"REFERENCES [MLModel] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_MLDATA_FAMFILE_FK =
+	"ALTER TABLE [MLData]  "
+	"WITH CHECK ADD CONSTRAINT [FK_MLData_FAMFile] FOREIGN KEY([FileID]) "
+	"REFERENCES [FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
 
 static const string gstrADD_DB_PROCEXECUTOR_ROLE =
 	"IF DATABASE_PRINCIPAL_ID('db_procexecutor') IS NULL \r\n"

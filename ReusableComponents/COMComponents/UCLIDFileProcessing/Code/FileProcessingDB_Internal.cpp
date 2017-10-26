@@ -1709,6 +1709,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK);
 		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE_INDEX);
+		vecQueries.push_back(gstrADD_MLDATA_MLMODEL_FK);
+		vecQueries.push_back(gstrADD_MLDATA_FAMFILE_FK);
 
 		if (bAddUserTables)
 		{
@@ -1877,6 +1879,8 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_WORKFLOWFILE);
 	vecQueries.push_back(gstrCREATE_WORKFLOWCHANGE);
 	vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE);
+	vecQueries.push_back(gstrCREATE_MLMODEL);
+	vecQueries.push_back(gstrCREATE_MLDATA);
 
 	return vecQueries;
 }
@@ -3358,6 +3362,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrWORKFLOW_FILE);
 	vecTables.push_back(gstrWORKFLOWCHANGE);
 	vecTables.push_back(gstrWORKFLOWCHANGE_FILE);
+	vecTables.push_back(gstrMLMODEL);
+	vecTables.push_back(gstrMLDATA);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
