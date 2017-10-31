@@ -46,6 +46,7 @@ public:
 	STDMETHOD(IsTextInZone)( IImageStats *pImageStats, long nConsecutiveRows, long nMinPercent, 
 		long nMaxPercent, VARIANT_BOOL *pResult);
 	STDMETHOD(GetImageStats)(BSTR strImage, IRasterZone * pRaster, IImageStats ** ppImageStats);
+	STDMETHOD(GetSpatialPageInfos)(BSTR bstrFileName, IIUnknownVector **pvecSpatialPageInfos);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

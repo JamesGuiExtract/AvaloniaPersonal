@@ -7,19 +7,9 @@ using WebAPI.Models;
 namespace Extract.Web.WebAPI.Test
 {
     [TestFixture]
-    [NUnit.Framework.Category("WebAPI")]
+    [NUnit.Framework.Category("DocumentAPI")]
     public class TestUsers
     {
-        #region Constants
-
-        /// <summary>
-        /// Names for the temporary databases that are extracted from the resource folder and
-        /// attached to the local database server, as needed for tests.
-        /// </summary>
-        static readonly string DbLabDE = "Demo_LabDE_Temp";
-
-        #endregion Constants
-
         #region Fields
 
         /// <summary>
@@ -59,13 +49,13 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void Test_Login()
         {
-            string dbName = DbLabDE + "10";
+            string dbName = "DocumentAPI_Test_Login";
 
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                Utils.SetDefaultApiContext(dbName);
+                ApiTestUtils.SetDefaultApiContext(dbName);
 
                 try
                 {
@@ -75,9 +65,9 @@ namespace Extract.Web.WebAPI.Test
                         Password = "a"
                     };
 
-                    using (var userData = new UserData(Utils.GetCurrentApiContext))
+                    using (var userData = new UserData(ApiTestUtils.GetCurrentApiContext))
                     {
-                        Assert.IsTrue(userData.MatchUser(user), "User did not match");
+                        userData.LoginUser(user);
                     }
                 }
                 catch (Exception)

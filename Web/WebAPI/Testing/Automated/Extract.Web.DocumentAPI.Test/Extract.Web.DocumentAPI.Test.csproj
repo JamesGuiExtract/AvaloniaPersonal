@@ -55,8 +55,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\RC.Net\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\..\..\RC.Net\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -77,21 +76,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APITestUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestDocumentAttributeSet.cs" />
     <Compile Include="TestDocument.cs" />
     <Compile Include="testUsers.cs" />
     <Compile Include="TestWorkflow.cs" />
-    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="ExtractInternalKey.snk" />
+    <EmbeddedResource Include="Resources\Image1.pdf.uss" />
+    <None Include="packages.config" />
     <EmbeddedResource Include="Resources\Demo_FlexIndex.bak" />
     <EmbeddedResource Include="Resources\Demo_IDShield.bak" />
     <EmbeddedResource Include="Resources\Demo_LabDE.bak" />
-    <EmbeddedResource Include="Resources\Image1.pdf.uss" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">

@@ -6,18 +6,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Data.SqlClient;
 using WebAPI.Models;
-
-using ApiUtils = WebAPI.Utils;
+using WebAPI;
 
 namespace Extract.Web.WebAPI.Test
 {
     [TestFixture]
-    [NUnit.Framework.Category("WebAPI")]
+    [NUnit.Framework.Category("DocumentAPI")]
     public class TestDocument
     {
         #region Constants
 
-        static readonly string DbLabDE = "Demo_LabDE_Temp";
         const int MaxDemo_LabDE_FileId = 18;
 
         #endregion Constants
@@ -67,18 +65,18 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void Test_SubmitFile()
         {
-            string dbName = DbLabDE + "3";
+            string dbName = "DocumentAPI_Test_SubmitFile";
 
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                Utils.SetDefaultApiContext(dbName);
+                ApiTestUtils.SetDefaultApiContext(dbName);
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 var stream = new FileStream(filename, FileMode.Open);
 
-                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                using (var data = new DocumentData(Utils.CurrentApiContext))
                 {
                     var result = data.SubmitFile(filename, stream).Result;
                     Assert.IsTrue(result != null, "Null result returned from submitfile");
@@ -90,7 +88,7 @@ namespace Extract.Web.WebAPI.Test
 
                     var (sourceFilename, errMsg, err) = data.GetSourceFileName(result.Id);
                     Assert.IsTrue(err != true, "Error signaled by GetSourceFileName, fileId: {0}", result.Id);
-                    Assert.IsTrue(String.IsNullOrEmpty(errMsg), "An error message was returned: {0}", errMsg);
+                    Assert.IsTrue(string.IsNullOrEmpty(errMsg), "An error message was returned: {0}", errMsg);
 
                     // Can't directly test that filenames are equivalent, because the web service takes the base filename
                     // and adds a GUID to it, so test that the returned filename contains the original filename.
@@ -119,21 +117,21 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void Test_SubmitText()
         {
-            string dbName = DbLabDE + "4";
+            string dbName = "DocumentAPI_Test_SubmitText";
 
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                Utils.SetDefaultApiContext(dbName);
+                ApiTestUtils.SetDefaultApiContext(dbName);
 
-                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                using (var data = new DocumentData(Utils.CurrentApiContext))
                 {
                     var result = data.SubmitText("Document 1, SSN: 111-22-3333, DOB: 10-04-1999").Result;
 
                     var (sourceFilename, errMsg, err) = data.GetSourceFileName(result.Id);
                     Assert.IsTrue(err != true, "Error signaled by GetSourceFileName, fileId: {0}", result.Id);
-                    Assert.IsTrue(String.IsNullOrEmpty(errMsg), "An error message was returned: {0}", errMsg);
+                    Assert.IsTrue(string.IsNullOrEmpty(errMsg), "An error message was returned: {0}", errMsg);
                 }
             }
             catch (Exception ex)
@@ -175,59 +173,18 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
-        static void UpdateWorkflowFileTable(string dbName)
-        {
-            string command = "INSERT INTO [dbo].[WorkflowFile] VALUES " +
-                             "(1, 1), " +
-                             "(1, 2), " +
-                             "(1, 3), " +
-                             "(1, 4), " +
-                             "(1, 5), " +
-                             "(1, 6), " +
-                             "(1, 7), " +
-                             "(1, 8), " +
-                             "(1, 9), " +
-                             "(1, 10), " +
-                             "(1, 11), " +
-                             "(1, 12), " +
-                             "(1, 13), " +
-                             "(1, 14), " +
-                             "(1, 15), " +
-                             "(1, 16), " +
-                             "(1, 17), " +
-                             "(1, 18);";
-
-            ModifyTable(dbName, command);
-        }
-
-        static void UpdateMetadataFieldValueTable(string dbName)
-        {
-            string command = "UPDATE [dbo].[FileMetadataFieldValue] " +
-                             "SET[Value] = '<SourceDocName>.result.tif' " +
-                             "WHERE[MetadataFieldID] = 6;";
-
-            ModifyTable(dbName, command);
-        }
-
-        static void UpdateWorkflowPostWorkflowAction(string dbName)
-        {
-            string command = "UPDATE[dbo].[Workflow] SET[PostWorkflowActionID] = 16 WHERE[Name] = 'CourtOffice'";
-            ModifyTable(dbName, command);
-        }
-
         [Test, Category("Automated")]
         public static void Test_GetStatus()
         {
-            string dbName = DbLabDE + "5";
+            string dbName = "DocumentAPI_Test_GetStatus";
 
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
-                UpdateWorkflowFileTable(dbName);
 
-                Utils.SetDefaultApiContext(dbName);
+                ApiTestUtils.SetDefaultApiContext(dbName);
 
-                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                using (var data = new DocumentData(Utils.CurrentApiContext))
                 {
                     for (int i = 1; i <= 10; ++i)
                     {
@@ -257,25 +214,22 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetFileResult()
         {
-            string dbName = DbLabDE + "6";
+            string dbName = "DocumentAPI_Test_GetFileResult";
 
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
-                UpdateWorkflowFileTable(dbName);
-                UpdateMetadataFieldValueTable(dbName);
-                UpdateWorkflowPostWorkflowAction(dbName);
 
-                Utils.SetDefaultApiContext(dbName);
+                ApiTestUtils.SetDefaultApiContext(dbName);
 
-                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                using (var data = new DocumentData(Utils.CurrentApiContext))
                 {
                     for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                     {
                         var (filename, isError, errMessage) = data.GetResult(fileId: i);
-                        Assert.IsTrue(!String.IsNullOrEmpty(filename), "Empty filename returned");
+                        Assert.IsTrue(!string.IsNullOrEmpty(filename), "Empty filename returned");
                         Assert.IsTrue(!isError, "An error was signaled");
-                        Assert.IsTrue(String.IsNullOrEmpty(errMessage), "An error message was returned");
+                        Assert.IsTrue(string.IsNullOrEmpty(errMessage), "An error message was returned");
                     }
                 }
             }
@@ -293,7 +247,7 @@ namespace Extract.Web.WebAPI.Test
 
         static void SetupTextResultTest(string filename, string dbName)
         {
-            string command = ApiUtils.Inv($"UPDATE [dbo].[FileMetadataFieldValue] SET Value='{filename}' ") +
+            string command = Utils.Inv($"UPDATE [dbo].[FileMetadataFieldValue] SET Value='{filename}' ") +
                                           "WHERE [FileID]=1 AND [MetadataFieldID]=6;";
             ModifyTable(dbName, command);
         }
@@ -302,24 +256,22 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetTextResult()
         {
-            string dbName = DbLabDE + "8";
+            string dbName = "DocumentAPI_Test_GetTextResult";
 
             try
             {   
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
-                UpdateWorkflowFileTable(dbName);
-                UpdateWorkflowPostWorkflowAction(dbName);
 
                 var filename = _testFiles.GetFile("Resources.ResultText.txt");
                 SetupTextResultTest(filename, dbName);
 
-                Utils.SetDefaultApiContext(dbName);
+                ApiTestUtils.SetDefaultApiContext(dbName);
 
-                using (var data = new DocumentData(ApiUtils.CurrentApiContext))
+                using (var data = new DocumentData(Utils.CurrentApiContext))
                 {
                     var result = data.GetTextResult(Id: 1).Result;
                     Assert.IsTrue(result.Error.ErrorOccurred == false, "error is indicated");
-                    Assert.IsTrue(String.IsNullOrEmpty(result.Error.Message), "error, message: {0}", result.Error.Message);
+                    Assert.IsTrue(string.IsNullOrEmpty(result.Error.Message), "error, message: {0}", result.Error.Message);
                 }
             }
             catch (Exception ex)
@@ -337,31 +289,30 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetDocumentType()
         {
-            string dbName = DbLabDE + "9";
+            string dbName = "DocumentAPI_Test_GetDocumentType";
 
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
-                UpdateWorkflowFileTable(dbName);
 
-                Utils.SetDefaultApiContext(dbName);
+                ApiTestUtils.SetDefaultApiContext(dbName);
 
-                using (var data = new DocumentData(ApiUtils.CurrentApiContext, useAttributeDbMgr: true))
+                using (var data = new DocumentData(Utils.CurrentApiContext))
                 {
                     for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                     {
                          var docType = data.GetDocumentType(id: i);
-                         Assert.IsTrue(!String.IsNullOrEmpty(docType.Text));
+                        Assert.IsTrue(!string.IsNullOrEmpty(docType.Text));
 
                          switch (i)
                          {
                              case 6:
                              case 8:
-                                 Assert.IsTrue(docType.Text.IsEquivalent("NonLab"), "Document type expected to be NonLab, is: {0}", docType);
+                                Assert.IsTrue(Utils.IsEquivalent(docType.Text, "NonLab"), "Document type expected to be NonLab, is: {0}", docType);
                                  break;
 
                              default:
-                                 Assert.IsTrue(docType.Text.IsEquivalent("Unknown"), "Document type expected to be Unknown, is: {0}", docType);
+                                Assert.IsTrue(Utils.IsEquivalent(docType.Text, "Unknown"), "Document type expected to be Unknown, is: {0}", docType);
                                  break;
                         }
                     }

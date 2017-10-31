@@ -1,16 +1,21 @@
 ﻿using Extract;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-using static WebAPI.Utils;
+using UCLID_IMAGEUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 using AttributeDBMgr = AttributeDbMgrComponentsLib.AttributeDBMgr;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 using EActionStatus = UCLID_FILEPROCESSINGLib.EActionStatus;
+using static WebAPI.Utils;
+using Newtonsoft.Json;
 
 namespace WebAPI.Models
 {
@@ -19,31 +24,24 @@ namespace WebAPI.Models
     /// </summary>
     public sealed class DocumentData: IDisposable
     {
+        ApiContext _apiContext;
         AttributeDBMgr _attributeDbMgr;
         FileApi _fileApi;
+        ImageUtils _imageUtils;
+        ImageConverter _imageConverter;
+        ClaimsPrincipal _user;
 
         /// <summary>
-        /// CTOR - this should be used only inside a using statement, so the fileApi in-use flag can be cleared.
+        /// Initializes a new instance of the <see cref="DocumentData"/> class.
         /// </summary>
-        /// <Comment>Any use of the CTOR MUST be inside a using statement, to ensure Dispose() is called!</Comment>
-        /// <param name="userContext">user's context instance (from the JWT claims)</param>
-        /// <param name="useAttributeDbMgr">defaults to false. Set this to true to create the attribute manager
-        /// (only needed for calls to GetDocumentResultSet and GetDocumentType)</param>
-        public DocumentData(ApiContext userContext, bool useAttributeDbMgr = false)
+        /// <para><b>Note</b></para>
+        /// This should be used only inside a using statement, so the fileApi in-use flag can be cleared.
+        /// <param name="apiContext">The API context.</param>
+        public DocumentData(ApiContext apiContext)
         {
             try
             {
-                // NOTE: By setting _fileApi using the userContext, which comes directly from the JWT Claims, then
-                // all references to context values on _fileApi are context values from the JWT.
-                _fileApi = FileApiMgr.GetInterface(userContext);
-
-                if (useAttributeDbMgr)
-                {
-                    _attributeDbMgr = new AttributeDBMgr();
-                    Contract.Assert(_attributeDbMgr != null, "Failure to create attributeDbMgr!");
-
-                    _attributeDbMgr.FAMDB = _fileApi.Interface;
-                }
+                _apiContext = apiContext;
             }
             catch (Exception ex)
             {
@@ -52,10 +50,39 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Dispose - used to reset the _fileApi in-use flag
+        /// Initializes a <see cref="DocumentData"/> instance.
+        /// <para><b>Note</b></para>
+        /// This should be used only inside a using statement, so the fileApi in-use flag can be cleared.
+        /// </summary>
+        /// <param name="user">The <see cref="ClaimsPrincipal"/> this instance should be specific to.</param>
+        public DocumentData(ClaimsPrincipal user)
+        {
+            try
+            {
+                _user = user;
+                _apiContext = ClaimsToContext(_user);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45276");
+            }
+        }
+
+        /// <summary>
+        /// Dispose - used to reset the FileApi in-use flag
         /// </summary>
         public void Dispose()
         {
+            if (_imageUtils != null)
+            {
+                _imageUtils = null;
+            }
+
+            if (_imageConverter != null)
+            {
+                _imageConverter = null;
+            }
+
             if (_attributeDbMgr != null)
             {
                 _attributeDbMgr = null;
@@ -66,6 +93,178 @@ namespace WebAPI.Models
             {
                 _fileApi.InUse = false;
                 _fileApi = null;
+            }
+        }
+
+        /// <summary>
+        /// Opens a session for the specified <see paramref="user"/>.
+        /// </summary>
+        /// <param name="user">The <see cref="ClaimsPrincipal"/> this instance is specific to.</param>
+        /// <param name="remoteIpAddress">The IP address of the web application user.s</param>
+        public void OpenSession(ClaimsPrincipal user, string remoteIpAddress)
+        {
+            try
+            {
+                _user = user;
+                FileApi.FileProcessingDB.RecordWebSessionStart(
+                    "WebRedactionVerification", FileApi.SessionId,
+                    remoteIpAddress, user.GetClaim("sub"));
+                FileApi.FileProcessingDB.RegisterActiveFAM();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45225");
+            }
+        }
+
+        /// <summary>
+        /// Closes the web application session.
+        /// </summary>
+        public void CloseSession()
+        {
+            try
+            {
+                ExtractException.Assert("ELI45234", "No active user", _user != null);
+
+                try
+                {
+                    if (FileApi.DocumentSession.IsOpen)
+                    {
+                        CloseDocument(false);
+                    }
+                }
+                finally
+                {
+                    FileApi.FileProcessingDB.UnregisterActiveFAM();
+                    FileApi.FileProcessingDB.RecordFAMSessionStop();
+                    FileApi.Expired = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45229");
+            }
+        }
+
+        /// <summary>
+        /// Gets the settings for the web application
+        /// </summary>
+        public WebAppSettings GetSettings()
+        {
+            try
+            {
+                var json = FileApi.FileProcessingDB.LoadWebAppSettings(-1, "RedactionVerificationSettings");
+
+                var result = JsonConvert.DeserializeObject<WebAppSettings>(json);
+                result.Error = Utils.MakeError(false, "", -1);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45272");
+            }
+        }
+
+        /// <summary>
+        /// Checkouts the document.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <returns></returns>
+        public DocumentId OpenDocument(int id)
+        {
+            try
+            {
+                RequestAssertion.AssertCondition("ELI45237", !FileApi.DocumentSession.IsOpen,
+                    "Previous document must be released before checking out a new one.");
+                ExtractException.Assert("ELI45235", "No active user", _user != null);
+
+                IFileRecord fileRecord = null;
+                if (id > 0)
+                {
+                    AssertRequestFileId("ELI45263", id);
+
+                    fileRecord = FileApi.FileProcessingDB.GetFileToProcess(id, FileApi.Workflow.VerifyAction);
+                }
+                else
+                {
+                    var fileRecords = FileApi.FileProcessingDB.GetFilesToProcess(FileApi.Workflow.VerifyAction, 1, false, "");
+                    if (fileRecords.Size() == 0)
+                    {
+                        return new DocumentId()
+                        {
+                            Id = -1,
+                            Error = MakeError(isError: false, message: "", code: 0)
+                        };
+                    }
+                    fileRecord = (IFileRecord)fileRecords.At(0);
+                }
+
+                var documentId = new DocumentId()
+                {
+                    Id = fileRecord.FileID,
+                    Error = MakeError(isError: false, message: "", code: 0)
+                };
+
+                // The GUID used here is a placeholder JIRA until a TaskClass is created for the web app:
+                // https://extract.atlassian.net/browse/ISSUE-15079
+                FileApi.DocumentSession =
+                (
+                    true,
+                    FileApi.FileProcessingDB.StartFileTaskSession("AD7F3F3F-20EC-4830-B014-EC118F6D4567", documentId.Id, fileRecord.ActionID),
+                    documentId.Id,
+                    DateTime.Now
+                );
+
+                return documentId;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45236");
+            }
+        }
+
+        /// <summary>
+        /// Releases the document.
+        /// </summary>
+        /// <param name="commit"></param>
+        public void CloseDocument(bool commit)
+        {
+            try
+            {
+                ExtractException.Assert("ELI45238", "No active user", _user != null);
+                AssertDocumentSession("ELI45239");
+
+                FileApi.FileProcessingDB.UpdateFileTaskSession(FileApi.DocumentSession.Id,
+                    (DateTime.Now - FileApi.DocumentSession.StartTime).TotalSeconds, 0);
+
+                int fileId = FileApi.DocumentSession.FileId;
+                if (commit)
+                {
+                    FileApi.FileProcessingDB.NotifyFileProcessed(fileId, FileApi.Workflow.VerifyAction, -1, true);
+                }
+                else
+                {
+                    FileApi.FileProcessingDB.SetStatusForFile(fileId, FileApi.Workflow.VerifyAction, -1,
+                        EActionStatus.kActionPending, false, true, out EActionStatus oldStatus);
+                }
+
+                try
+                {
+                    if (commit && !string.IsNullOrWhiteSpace(FileApi.Workflow.PostVerifyAction))
+                    {
+                        FileApi.FileProcessingDB.SetFileStatusToPending(fileId,
+                            FileApi.Workflow.PostVerifyAction, true);
+                    }
+                }
+                finally
+                {
+                    FileApi.DocumentSession = (false, 0, 0, new DateTime());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45240");
             }
         }
 
@@ -81,7 +280,7 @@ namespace WebAPI.Models
                 AssertFileInWorkflow(fileId);
 
                 var results = GetAttributeSetForFile(fileId);
-                var mapper = new AttributeMapper(results, _fileApi.GetWorkflow.Type);
+                var mapper = new AttributeMapper(results, FileApi.Workflow.Type);
                 return mapper.MapAttributesToDocumentAttributeSet();
             }
             catch (Exception ex)
@@ -106,7 +305,7 @@ namespace WebAPI.Models
                 attribute.Value.ReplaceAndDowngradeToNonSpatial(updatedData.ToString());
                 results.PushBack(attribute);
 
-                string fileName = _attributeDbMgr.FAMDB.GetFileNameFromFileID(fileId);
+                string fileName = AttributeDbMgr.FAMDB.GetFileNameFromFileID(fileId);
                 var translator = new AttributeTranslator(fileName, updatedData);
 
                 UpdateDocumentData(fileId, translator.ComAttributes);
@@ -129,14 +328,14 @@ namespace WebAPI.Models
             {
                 AssertFileInWorkflow(fileId);
 
-                var attrSetName = _fileApi.GetWorkflow.OutputAttributeSet;
+                var attrSetName = FileApi.Workflow.OutputAttributeSet;
 
                 try
                 {
                     Contract.Assert(!String.IsNullOrWhiteSpace(attrSetName),
                                     "the workflow: {0}, has OutputAttributeSet that is empty",
-                                    _fileApi.GetWorkflow.Name);
-                    Contract.Assert(_attributeDbMgr != null, "_attributeDbMgr is null");
+                                    FileApi.Workflow.Name);
+                    Contract.Assert(AttributeDbMgr != null, "AttributeDbMgr is null");
                 }
                 catch (Exception ex)
                 {
@@ -146,7 +345,7 @@ namespace WebAPI.Models
                 }
 
                 const int mostRecentSet = -1;
-                var results = _attributeDbMgr.GetAttributeSetForFile(fileId,
+                var results = AttributeDbMgr.GetAttributeSetForFile(fileId,
                                                                      attributeSetName: attrSetName,
                                                                      relativeIndex: mostRecentSet,
                                                                      closeConnection: true);
@@ -156,8 +355,8 @@ namespace WebAPI.Models
             {
                 var ee = ex.AsExtract("ELI42106");
                 ee.AddDebugData("FileID", fileId, encrypt: false);
-                ee.AddDebugData("AttributeSetName", _fileApi.GetWorkflow.OutputAttributeSet, encrypt: false);
-                ee.AddDebugData("Workflow", _fileApi.GetWorkflow.Name, encrypt: false);
+                ee.AddDebugData("AttributeSetName", FileApi.Workflow.OutputAttributeSet, encrypt: false);
+                ee.AddDebugData("Workflow", FileApi.Workflow.Name, encrypt: false);
 
                 throw ee;
             }
@@ -175,7 +374,7 @@ namespace WebAPI.Models
             {
                 Contract.Assert(!String.IsNullOrWhiteSpace(fileName), "File name is empty");
 
-                var workflow = _fileApi.GetWorkflow;
+                var workflow = FileApi.Workflow;
                 var uploads = workflow.DocumentFolder;
                 Contract.Assert(!String.IsNullOrWhiteSpace(uploads), "folder path is null or empty");
 
@@ -237,11 +436,11 @@ namespace WebAPI.Models
             try
             {
                 // Now add the file to the FAM queue
-                var fileProcessingDB = _fileApi.Interface;
-                var workflow = _fileApi.GetWorkflow;
+                var fileProcessingDB = FileApi.FileProcessingDB;
+                var workflow = FileApi.Workflow;
                 Contract.Assert(!String.IsNullOrWhiteSpace(workflow.StartAction), 
-                                "The workflow: {0}, must have a Start action", 
-                                _fileApi.WorkflowName);
+                                "The workflow: {0}, must have a Start action",
+                                FileApi.WorkflowName);
 
                 // Start a FAM session so that the active action is set. This in turn enables the output result file to be
                 // added to the FileMetadataFieldValue, for later retrieval by Get[File|Text]Result.
@@ -284,8 +483,8 @@ namespace WebAPI.Models
         {
             try
             {
-                var fileProcessingDB = _fileApi.Interface;
-                var workflow = _fileApi.GetWorkflow;
+                var fileProcessingDB = FileApi.FileProcessingDB;
+                var workflow = FileApi.Workflow;
 
                 fileProcessingDB.RecordFAMSessionStart(caller, workflow.StartAction, vbQueuing: false, vbProcessing: true);
 
@@ -297,7 +496,7 @@ namespace WebAPI.Models
                     // https://extract.atlassian.net/browse/ISSUE-15079
                     int fileTaskSessionId = fileProcessingDB.StartFileTaskSession("AD7F3F3F-20EC-4830-B014-EC118F6D4567", fileId, actionID);
 
-                    _attributeDbMgr.CreateNewAttributeSetForFile(fileTaskSessionId, workflow.OutputAttributeSet, fileData, true, true, true, false);
+                	AttributeDbMgr.CreateNewAttributeSetForFile(fileTaskSessionId, workflow.OutputAttributeSet, fileData, true, true, true, false);
 
                     fileProcessingDB.UpdateFileTaskSession(fileTaskSessionId, (DateTime.Now - start).TotalSeconds, 0);
                 }
@@ -321,7 +520,7 @@ namespace WebAPI.Models
         {
             try
             {
-                var workflow = _fileApi.GetWorkflow; 
+                var workflow = FileApi.Workflow; 
                 var uploads = workflow.DocumentFolder;
                 Contract.Assert(!String.IsNullOrWhiteSpace(uploads), "folder path is null or empty");
 
@@ -362,7 +561,7 @@ namespace WebAPI.Models
 
                 try
                 {
-                    status = _fileApi.Interface.GetWorkflowStatus(fileId);
+                    status = FileApi.FileProcessingDB.GetWorkflowStatus(fileId);
                 }
                 catch (Exception ex)
                 {
@@ -413,7 +612,7 @@ namespace WebAPI.Models
             {
                 AssertFileInWorkflow(fileId);
 
-                filename = _fileApi.Interface.GetFileNameFromFileID(fileId);
+                filename = FileApi.FileProcessingDB.GetFileNameFromFileID(fileId);
 
                 try
                 {
@@ -437,6 +636,70 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Gets the pages information.
+        /// </summary>
+        /// <param name="fileId">The file identifier.</param>
+        public PagesInfo GetPagesInfo(int fileId)
+        {
+            AssertFileInWorkflow(fileId);
+
+            AssertRequestFileId("ELI45262", fileId);
+
+            var pagesInfo = new PagesInfo()
+            {
+                PageInfos = new List<PageInfo>(),
+                Error = MakeError(isError: false, message: "", code: 0)
+            };
+
+            try
+            {
+                var (fileName, errorMsg, error) = GetSourceFileName(fileId);
+
+                IIUnknownVector spatialPageInfos = ImageUtils.GetSpatialPageInfos(fileName);
+                int count = spatialPageInfos.Size();
+                for (int i = 0; i < count; i++)
+                {
+                    pagesInfo.PageInfos.Add(new PageInfo(i + 1, (SpatialPageInfo)spatialPageInfos.At(i)));
+                }
+
+                pagesInfo.PageCount = pagesInfo.PageInfos.Count;
+
+                return pagesInfo;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45016");
+            }
+        }
+
+        /// <summary>
+        /// Gets the page image.
+        /// </summary>
+        /// <param name="pageNum">The page number.</param>
+        /// <param name="fileId">The file identifier.</param>
+        /// <returns></returns>
+        public byte[] GetPageImage(int fileId, int pageNum)
+        {
+            try
+            {
+                AssertFileInWorkflow(fileId);
+
+                AssertRequestFileId("ELI45172", fileId);
+                AssertRequestFileExists("ELI45173", fileId);
+                AssertRequestFilePage("ELI45174", fileId, pageNum);
+
+                var (fileName, errorMsg, error) = GetSourceFileName(fileId);
+                byte[] imageData = (byte[])ImageConverter.GetPDFImage(fileName, pageNum);
+
+                return imageData;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45264");
+            }
+        }
+
+        /// <summary>
         /// GetResult - used by several API calls
         /// </summary>
         /// <param name="fileId">the database file id to use</param>
@@ -452,10 +715,10 @@ namespace WebAPI.Models
 
                 try
                 {
-                    getFileTag = _fileApi.GetWorkflow.OutputFileMetadataField;
+                    getFileTag = FileApi.Workflow.OutputFileMetadataField;
                     Contract.Assert(!String.IsNullOrWhiteSpace(getFileTag), "Workflow does not have a defined OutputFileMetaDataField");
 
-                    filename = _fileApi.Interface.GetMetadataFieldValue(fileId, getFileTag);
+                    filename = FileApi.FileProcessingDB.GetMetadataFieldValue(fileId, getFileTag);
                     Contract.Assert(!String.IsNullOrWhiteSpace(filename), "No result file found for file ID: {0}", fileId);
                 }
                 catch (Exception ex)
@@ -464,13 +727,6 @@ namespace WebAPI.Models
                     ee.AddDebugData("MissingResource", ee.Message, false);
                     ee.AddDebugData("Filename", filename, false);
                     throw ee;
-                }
-
-                // Start the post action, if any, on this file.
-                var postAction = _fileApi.GetWorkflow.PostWorkflowAction;
-                if (!String.IsNullOrWhiteSpace(postAction))
-                {
-                    _fileApi.Interface.SetFileStatusToPending(fileId, postAction, vbAllowQueuedStatusOverride: false);
                 }
 
                 return (filename, error: false, errorMessage: "");
@@ -489,10 +745,12 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="Id">file id</param>
         /// <returns>TextResult instance, may contain error info</returns>
-        public async Task<TextResult> GetTextResult(int Id)
+        public async Task<TextResult> GetTextResult(int Id = -1)
         {
             try
             {
+                AssertFileInWorkflow(Id);
+
                 var (filename, isError, errMessage) = GetResult(Id);
                 Contract.Assert(!isError, "Error returned from GetResult");
 
@@ -522,6 +780,8 @@ namespace WebAPI.Models
         {
             try
             {
+                AssertFileInWorkflow(id);
+
                 var results = GetAttributeSetForFile(id);
                 var docType = GetDocumentType(results);
                 return MakeTextResult(docType);
@@ -529,6 +789,168 @@ namespace WebAPI.Models
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI43329");
+            }
+        }
+
+        /// <summary>
+        /// Asserts the document session.
+        /// </summary>
+        /// <param name="eliCode">The eli code.</param>
+        public void AssertDocumentSession(string eliCode)
+        {
+            if (!FileApi.DocumentSession.IsOpen)
+            {
+                throw new RequestAssertion(eliCode, "No document is currently open");
+            }
+        }
+
+        /// <summary>
+        /// Gets the request file identifier error.
+        /// </summary>
+        /// <param name="eliCode">The eli code.</param>
+        /// <param name="fileId">The file identifier.</param>
+        /// <returns></returns>
+        public void AssertRequestFileId(string eliCode, int fileId)
+        {
+            if (!FileApi.FileProcessingDB.IsFileInWorkflow(fileId, FileApi.Workflow.Id))
+            {
+                throw new RequestAssertion(eliCode,
+                    Utils.Inv($"File Id: {fileId} is not in the workflow: {FileApi.Workflow.Name}"));
+            }
+        }
+
+        /// <summary>
+        /// Gets the request file page error.
+        /// </summary>
+        /// <param name="eliCode">The eli code.</param>
+        /// <param name="fileId">The file identifier.</param>
+        /// <param name="page">The page.</param>
+        /// <returns></returns>
+        public void AssertRequestFilePage(string eliCode, int fileId, int page)
+        {
+            string fileName = FileApi.FileProcessingDB.GetFileNameFromFileID(fileId);
+
+            var fileRecord = FileApi.FileProcessingDB.GetFileRecord(fileName, FileApi.Workflow.StartAction);
+
+            if (page <= 0 || page > fileRecord.Pages)
+            {
+                var ee = new RequestAssertion(eliCode,
+                    Utils.Inv($"Page {page} is not valid for file Id: {fileId}"));
+                ee.AddDebugData("Filename", fileName, true);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Gets the request file exists error.
+        /// </summary>
+        /// <param name="eliCode">The eli code.</param>
+        /// <param name="fileId">The file identifier.</param>
+        /// <returns></returns>
+        public void AssertRequestFileExists(string eliCode, int fileId)
+        {
+            string fileName = FileApi.FileProcessingDB.GetFileNameFromFileID(fileId);
+
+            if (!File.Exists(fileName))
+            {
+                var ee = new RequestAssertion(eliCode, Utils.Inv($"File Id: {fileId} does not exist"));
+                ee.AddDebugData("Filename", fileName, true);
+                throw ee;
+            }
+        }
+
+        #region Private Members
+
+        FileApi FileApi
+        {
+            get
+            {
+                try
+                {
+                    if (_fileApi == null)
+                    {
+                        // NOTE: By setting _fileApi using the userContext, which comes directly from the JWT Claims, then
+                        // all references to context values on _fileApi are context values from the JWT.
+                        _fileApi = FileApiMgr.GetInterface(_apiContext, _user);
+                    }
+
+                    return _fileApi;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45024");
+                }
+            }
+        }
+
+        AttributeDBMgr AttributeDbMgr
+        {
+            get
+            {
+                try
+                {
+                    if (_attributeDbMgr == null)
+                    {
+                        _attributeDbMgr = new AttributeDBMgr();
+
+                        _attributeDbMgr.FAMDB = FileApi.FileProcessingDB;
+                    }
+
+                    return _attributeDbMgr;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45023");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ImageUtils ImageUtils
+        {
+            get
+            {
+                try
+                {
+                    if (_imageUtils == null)
+                    {
+                        _imageUtils = new ImageUtils();
+                    }
+
+                    return _imageUtils;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45023");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the image converter.
+        /// </summary>
+        /// <value>
+        /// The image converter.
+        /// </value>
+        ImageConverter ImageConverter
+        {
+            get
+            {
+                try
+                {
+                    if (_imageConverter == null)
+                    {
+                        _imageConverter = new ImageConverter();
+                    }
+
+                    return _imageConverter;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI0");
+                }
             }
         }
 
@@ -561,20 +983,36 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Gets the document session file identifier.
+        /// </summary>
+        /// <value>
+        /// The document session file identifier.
+        /// </value>
+        public int DocumentSessionFileId
+        {
+            get
+            {
+                AssertDocumentSession("ELI45270");
+
+                return FileApi.DocumentSession.FileId;
+            }
+        }
+
+        /// <summary>
         /// Utility method to enforce that the specified fileId is contained by the workflow
         /// </summary>
         /// <param name="fileId">file Id to test for inclusion</param>
         /// <remarks>the result of this method is an exception iff fileId is not a member of the workflow</remarks>
         void AssertFileInWorkflow(int fileId)
         {
-            bool isInWorkflow =  _fileApi.Interface.IsFileInWorkflow(fileId, _fileApi.GetWorkflow.Id);
+            bool isInWorkflow = FileApi.FileProcessingDB.IsFileInWorkflow(fileId, FileApi.Workflow.Id);
 
             try
             {
                 Contract.Assert(isInWorkflow,
                                 "The specified file Id: {0}, is not in the workflow: {1}",
                                 fileId,
-                                _fileApi.WorkflowName);
+                                FileApi.WorkflowName);
             }
             catch (Exception ex)
             {
@@ -583,5 +1021,7 @@ namespace WebAPI.Models
                 throw ee;
             }
         }
+
+        #endregion Private Members
     }
 }

@@ -4644,7 +4644,7 @@ void CFileProcessingDB::pingDB()
 	}
 
 	// Update the ping record. 
-	executeCmdQuery(getDBConnection(), 
+	executeCmdQuery(getDBConnection(),
 		"UPDATE [ActiveFAM] SET [LastPingTime]=GETUTCDATE() WHERE [ID] = " + asString(m_nActiveFAMID));
 
 	m_dwLastPingTime = GetTickCount();
@@ -6772,6 +6772,14 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 
 	ipWorkflowDefinition->LoadBalanceWeight = getLongField(ipFields, "LoadBalanceWeight");
 
+	string strSettings = getWebAppSettings(ipConnection, nID, "RedactionVerificationSettings");
+	if (!strSettings.empty())
+	{
+		
+		ipWorkflowDefinition->VerifyAction = _bstr_t(getWebAppSetting(strSettings, "VerifyAction").c_str()).Detach();
+		ipWorkflowDefinition->PostVerifyAction = _bstr_t(getWebAppSetting(strSettings, "PostVerifyAction").c_str()).Detach();
+	}
+
 	return ipWorkflowDefinition;
 }
 //-------------------------------------------------------------------------------------------------
@@ -7248,3 +7256,48 @@ void CFileProcessingDB::createTempTableOfSelectedFiles(ADODB::_ConnectionPtr &ip
 	executeVectorOfSQL(ipConnection, vecCreateTemp);
 }
 //--------------------------------------------------------------------------------------------------
+string CFileProcessingDB::getWebAppSettings(_ConnectionPtr ipConnection, long nWorkflowId, string strType)
+{
+	replaceVariable(strType, "'", "''");
+
+	string strQuery = Util::Format(
+		"SELECT [Settings] "
+		"	FROM dbo.[WebAppConfig] "
+		"	WHERE[Type] = '%s' AND[WorkflowID] = %d",
+		strType.c_str(), nWorkflowId);
+
+	// Create a pointer to a recordset
+	_RecordsetPtr ipWebAppSettings(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI45071", ipWebAppSettings != __nullptr);
+
+	ipWebAppSettings->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
+		adLockOptimistic, adCmdText);
+
+	if (ipWebAppSettings->adoEOF == VARIANT_TRUE)
+	{
+		return "";
+	}
+	else
+	{
+		return getStringField(ipWebAppSettings->Fields, "Settings");
+	}
+}
+//--------------------------------------------------------------------------------------------------
+string CFileProcessingDB::getWebAppSetting(const string& strSettings, const string& strSettingName)
+{
+	string searchString = Util::Format("\"%s\":\"", strSettingName.c_str());
+	size_t pos = strSettings.find(searchString);
+	if (pos != string::npos)
+	{
+		pos += searchString.length();
+		size_t endPos = strSettings.find("\"", pos);
+		if (endPos == string::npos)
+		{
+			throw new UCLIDException("ELI45228", "Failed to parse web app settings.");
+		}
+
+		return strSettings.substr(pos, endPos - pos);
+	}
+
+	return "";
+}

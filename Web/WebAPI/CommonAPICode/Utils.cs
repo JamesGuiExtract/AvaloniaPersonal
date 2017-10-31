@@ -282,7 +282,7 @@ namespace WebAPI
             {
                 lock (_apiContextLock)
                 {
-                    FileApiMgr.MakeInterface(CurrentApiContext);
+                    FileApiMgr.MakeInterface(CurrentApiContext, null);
                 }
             }
             catch (Exception ex)
@@ -339,8 +339,20 @@ namespace WebAPI
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI43662");
-                //throw new AuthenticationException("Unauthorized", ex);
             }
+        }
+
+        /// <summary>
+        /// Gets the value for the specified <see paramref="claimName"/>.
+        /// </summary>
+        /// <param name="claimsPrincipal">The claims principal.</param>
+        /// <param name="claimName">Name of the claim.</param>
+        /// <returns></returns>
+        public static string GetClaim(this ClaimsPrincipal claimsPrincipal, string claimName)
+        {
+            return claimsPrincipal.Claims
+                .Single(claim => claim.Type.Equals(claimName, StringComparison.OrdinalIgnoreCase))
+                .Value;
         }
 
         /// <summary>

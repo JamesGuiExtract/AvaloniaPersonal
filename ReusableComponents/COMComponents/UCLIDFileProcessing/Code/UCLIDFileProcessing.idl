@@ -751,6 +751,10 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(11), helpstring ("property OutputFilePathInitializationFunction")] HRESULT OutputFilePathInitializationFunction([in] BSTR newVal);
 		[propget, id(12), helpstring ("property LoadBalanceWeight")] HRESULT LoadBalanceWeight([out, retval] long* pnWeight);
 		[propput, id(12), helpstring ("property LoadBalanceWeight")] HRESULT LoadBalanceWeight([in] long nWeight);
+		[propget, id(13), helpstring ("property VerifyAction")] HRESULT VerifyAction([out, retval] BSTR* pVerifyAction);
+		[propput, id(13), helpstring ("property VerifyAction")] HRESULT VerifyAction([in] BSTR VerifyAction);
+		[propget, id(14), helpstring ("property PostVerifyAction")] HRESULT PostVerifyAction([out, retval] BSTR* pPostVerifyAction);
+		[propput, id(14), helpstring ("property PostVerifyAction")] HRESULT PostVerifyAction([in] BSTR PostVerifyAction);
 	}
 
 	[
@@ -1987,6 +1991,10 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Deletes the MLModel record with the specified name
 		[id(192), helpstring("method GetMLModels")] HRESULT GetMLModels([out,retval] IStrToStrMap ** pmapModelNameToID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Opens a session for a web application (Recorded in FAMSession table, same as FAM sessions.
+		[id(193), helpstring("method RecordWebSessionStart")] HRESULT RecordWebSessionStart( 
+			[in] BSTR bstrType, [in] BSTR bstrLoginId, [in] BSTR bstrIpAddress, [in] BSTR bstrUser);
 	};
 
 	[

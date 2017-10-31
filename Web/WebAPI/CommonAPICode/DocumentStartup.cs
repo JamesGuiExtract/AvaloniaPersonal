@@ -169,16 +169,6 @@ namespace WebAPI
         /// </summary>
         void InitializeDefaultValues()
         {
-            // VERY IMPORTANT - get the private encryption key value from the environment variable where it is stored.
-            // This must be set, or the service must shut down.
-            // NOTE: The more elaborate:
-            //_secretKey = Configuration.GetValue(typeof(string), "WebAPI_Private")?.ToString();
-            // has been documented as being capable of reading values of environment variables. However I have discovered
-            // that the indexer method just reads the value from whatever available configuration source has been
-            // configured. So the easier-to-read indexer method will get the value from appsettings, or env.
-            _secretKey = Configuration["WebAPI_Private"];
-            Contract.Assert(!String.IsNullOrWhiteSpace(_secretKey), "Failed to load required value from WebAPI_Private environment variable");
-
             var databaseServer = Configuration["DatabaseServer"];
             var databaseName = Configuration["DatabaseName"];
             var workflowName = Configuration["DefaultWorkflow"];

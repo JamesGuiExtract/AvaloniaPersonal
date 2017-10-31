@@ -26,40 +26,23 @@ namespace WebAPI.Controllers
         {
             try
             {
-                if (user == null)
-                {
-                    return BadRequest("null Model.User");
-                }
-                if (String.IsNullOrWhiteSpace(user.Username))
-                {
-                    return BadRequest("Username is empty");
-                }
-                if (String.IsNullOrWhiteSpace(user.Password))
-                {
-                    return BadRequest("Password is empty");
-                }
+                RequestAssertion.AssertSpecified("ELI45185", user.Username, "Username is empty");
+                RequestAssertion.AssertSpecified("ELI45186", user.Password, "Password is empty");
 
                 // The user may have specified a workflow - if so then ensure that the API context uses
                 // the specified workflow.
                 var context = LoginContext(user.WorkflowName);
                 using (var userData = new UserData(context))
                 {
-                    if (userData.MatchUser(user))
-                    {
-                        var token = AuthUtils.GenerateToken(user, context);
+                    userData.LoginUser(user);
+                    var token = AuthUtils.GenerateToken(user, context);
 
-                        return Ok(token);
-                    }
+                    return Ok(token);
                 }
-
-                return BadRequest("Unknown user or password");
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI42178");
-                Log.WriteLine(ee);
-
-                return BadRequest(ee.Message);
+                return this.GetAsHttpError(ex, "ELI45212");
             }
         }
     }

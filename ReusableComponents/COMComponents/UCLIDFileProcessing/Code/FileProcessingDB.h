@@ -353,6 +353,7 @@ public:
 	STDMETHOD(DefineNewMLModel)(BSTR strModelName, long* pnID);
 	STDMETHOD(DeleteMLModel)(BSTR strModelName);
 	STDMETHOD(GetMLModels)(IStrToStrMap** pmapModelNameToID);
+	STDMETHOD(RecordWebSessionStart)(BSTR bstrType, BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1283,6 +1284,12 @@ private:
 	// strQueryFrom is the query that selects the file ids to move
 	void createTempTableOfSelectedFiles(ADODB::_ConnectionPtr &ipConnection, std::string &strQueryFrom);
 
+	// Gets the web application settings for the specified workflow and type as a JSON string.
+	string getWebAppSettings(_ConnectionPtr ipConnection, long nWorkflowId, string strType);
+
+	// Gets a specific JSON string setting from a specified JSON string.
+	string getWebAppSetting(const string& strSettings, const string& strSettingName);
+
 	void validateLicense();
 
 	// Internal implementation methods
@@ -1370,6 +1377,7 @@ private:
 		LONGLONG* pllNewValue);
 	bool RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstrFPSFileName, BSTR bstrActionName,
 		VARIANT_BOOL vbQueuing, VARIANT_BOOL vbProcessing);
+	bool RecordWebSessionStart_Internal(bool bDBLocked);
 	bool RecordFAMSessionStop_Internal(bool bDBLocked);
 	bool RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeStamp, long nActionID,
 		long nEventCount, long nProcessID);

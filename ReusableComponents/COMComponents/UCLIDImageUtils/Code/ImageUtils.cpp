@@ -274,6 +274,64 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CImageUtils::GetSpatialPageInfos(BSTR bstrFileName, IIUnknownVector **pvecSpatialPageInfos)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI45167", pvecSpatialPageInfos != __nullptr);
+
+		string strFileName = asString(bstrFileName);
+		string strUssFileName = strFileName + ".uss";
+		ILongToObjectMapPtr ipPageInfos = __nullptr;
+		if (isFileOrFolderValid(strUssFileName))
+		{
+			ISpatialStringPtr ipUssData(CLSID_SpatialString);
+			ASSERT_RESOURCE_ALLOCATION("ELI45168", ipUssData != __nullptr);
+
+			ipUssData->LoadFrom(strUssFileName.c_str(), FALSE);
+			ipPageInfos = ipUssData->SpatialPageInfos;
+		}
+
+		IIUnknownVectorPtr ipSpatialPageInfos(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI45169", ipSpatialPageInfos != __nullptr);
+
+		int nPages = getNumberOfPagesInImage(strFileName);
+		for (int nPage = 1; nPage <= nPages; nPage++)
+		{
+			ISpatialPageInfoPtr ipSpatialPageInfo = __nullptr;
+
+			// Get page info from uss file if possible
+			if (ipPageInfos != __nullptr)
+			{
+				ipSpatialPageInfo = ipPageInfos->GetValue(nPage);
+			}
+			// Otherwise read it from the image itself (will not include rotation)
+			if (ipSpatialPageInfo == __nullptr)
+			{
+				ipSpatialPageInfo.CreateInstance(CLSID_SpatialPageInfo);
+				ASSERT_RESOURCE_ALLOCATION("ELI45170", ipSpatialPageInfo != __nullptr);
+
+				int nWidth = 0;
+				int nHeight = 0;
+				getImagePixelHeightAndWidth(strFileName, nHeight, nWidth, nPage);
+
+				ipSpatialPageInfo->Initialize(nWidth, nHeight, kRotNone, 0);
+			}
+
+			ipSpatialPageInfos->PushBack(ipSpatialPageInfo);
+		}
+
+		*pvecSpatialPageInfos = ipSpatialPageInfos.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45171");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent

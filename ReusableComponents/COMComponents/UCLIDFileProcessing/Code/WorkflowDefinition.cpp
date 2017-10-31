@@ -380,3 +380,59 @@ STDMETHODIMP CWorkflowDefinition::put_LoadBalanceWeight(LONG nWeight)
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkflowDefinition::get_VerifyAction(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI45213", pVal != __nullptr);
+
+		*pVal = get_bstr_t(m_strVerifyAction).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45214");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkflowDefinition::put_VerifyAction(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_strVerifyAction = asString(newVal);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45215");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkflowDefinition::get_PostVerifyAction(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI45216", pVal != __nullptr);
+
+		*pVal = get_bstr_t(m_strPostVerifyAction).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45217");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkflowDefinition::put_PostVerifyAction(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_strPostVerifyAction = asString(newVal);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45218");
+
+	return S_OK;
+}

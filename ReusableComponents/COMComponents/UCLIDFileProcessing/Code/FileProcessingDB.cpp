@@ -4578,6 +4578,30 @@ STDMETHODIMP CFileProcessingDB::GetMLModels(IStrToStrMap * * pmapModelNameToID)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45124");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RecordWebSessionStart(BSTR bstrType, BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Always lock the database for this call.
+		// Not having a lock here may have had to do with some of the errors reported in
+		// [LegacyRCAndUtils:6154]
+		// m_strUPI will be used by LockGuard to lock the DB; set session variables before locking the DB.
+		m_strFPSFileName = asString(bstrType);
+		m_strUPI = asString(bstrLoginId);
+		m_strMachineName = asString(bstrIpAddress);
+		m_strFAMUserName = asString(bstrUser);
+		
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+		RecordWebSessionStart_Internal(true);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45220");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

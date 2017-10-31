@@ -1,4 +1,6 @@
 ﻿using Extract;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Concurrent;
 
@@ -9,16 +11,24 @@ namespace WebAPI.Models
     /// </summary>
     public sealed class UserData: IDisposable
     {
+        ApiContext _apiContext;
         FileApi _fileApi;
 
         /// <summary>
-        /// UserData CTOR
+        /// Initializes an <see cref="UserData"/> instance.
         /// </summary>
-        /// <param name="apiContext">the api context to use for the fileApi</param>
-        //public UserData(FileApi fileApi)
+        /// <param name="apiContext"><see cref="ApiContext"/> that defines the user's database.</param>
         public UserData(ApiContext apiContext)
         {
-            _fileApi = FileApiMgr.GetInterface(apiContext);
+            try
+            {
+                _apiContext = apiContext;
+                _fileApi = FileApiMgr.GetInterface(apiContext);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45277");
+            }
         }
 
         /// <summary>
@@ -36,29 +46,29 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// check for match between user and known user
+        /// Attempts to authenticate the <see paramref="user"/> against the current <see cref="ApiContext"/>.
         /// </summary>
-        /// <param name="user"></param>
-        /// <remarks>verifying a user currently requires at least one and often two COM calls:
-        /// 1) login
-        /// 2) optionally must verify the workflow name if it is specified on login</remarks>
-        /// <returns>true if matches</returns>
-        public bool MatchUser(User user)
+        /// <param name="user">The <see cref="User"/> to authenticate.</param>
+        public void LoginUser(User user)
         {
             try
             {
-                var fileProcessingDB = _fileApi.Interface;
+                var fileProcessingDB = _fileApi.FileProcessingDB;
+                ExtractException.Assert("ELI45187",
+                    "Database connection failure",
+                    !string.IsNullOrWhiteSpace(fileProcessingDB.DatabaseID));
 
-                fileProcessingDB.LoginUser(user.Username, user.Password);
-
-                // Here when login worked - now check the Workflow name
-                var workflowName = user.WorkflowName;
-                if (!String.IsNullOrWhiteSpace(workflowName))
+                try
                 {
-                    return FindAssociatedWorkflow(workflowName);
+                    fileProcessingDB.LoginUser(user.Username, user.Password);
+                }
+                catch (Exception ex)
+                {
+                    throw new RequestAssertion("ELI45178", "Unknown user or password",
+                        StatusCodes.Status401Unauthorized, ex);
                 }
 
-                return true;
+                // The workflow will have already been validated by FileApi constructor.
             }
             catch (Exception ex)
             {
@@ -67,27 +77,6 @@ namespace WebAPI.Models
             finally
             {
                 _fileApi.InUse = false;
-            }
-        }
-
-        /// <summary>
-        /// find a workflow that corresponds to the specified workflow name
-        /// </summary>
-        /// <param name="workflowName">specified workflow name</param>
-        /// <returns>true if the workflow name matches an existing workflow</returns>
-        bool FindAssociatedWorkflow(string workflowName)
-        {
-            try
-            {
-                return (_fileApi.Interface.GetWorkflowID(workflowName) > 0);
-            }
-            catch (Exception ex)
-            {
-                var ee = ex.AsExtract("ELI42180");
-                ee.AddDebugData("(login) Verifying Workflow name failed", workflowName, encrypt: false);
-                Log.WriteLine(ee);
-
-                throw ee;
             }
         }
     }

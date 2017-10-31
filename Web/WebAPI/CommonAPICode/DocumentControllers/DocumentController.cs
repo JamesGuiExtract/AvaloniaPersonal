@@ -42,21 +42,20 @@ namespace WebAPI.Controllers
         {
             try
             {
-                Contract.Assert(ModelState.IsValid && Id > 0, "Invalid input Id");
+                this.AssertModel("ELI45200");
                 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = new DocumentData(ClaimsToContext(User), useAttributeDbMgr: true))
+                using (var data = new DocumentData(User))
                 {
+                    data.AssertRequestFileId("ELI45199", Id);
+
                     var result = data.GetDocumentResultSet(Id);
                     return result.Error.ErrorOccurred ? (IActionResult)BadRequest(result) : Ok(result);
                 }
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI43653");
-                Log.WriteLine(ee);
-                var result = MakeDocumentAttributeSetError(ee.Message);
-                return BadRequest(result);
+                return this.GetAsHttpError<DocumentAttributeSet>(ex, "ELI43653");
             }
         }
 
@@ -73,26 +72,23 @@ namespace WebAPI.Controllers
         {
             try
             {
-                Contract.Assert(file != null, "Null file has been submitted");
-                Contract.Assert(file.Length > 0, "Zero length file: {0}, has been submitted", file.FileName);
-
-                var fileName = file.FileName;
-                Contract.Assert(!String.IsNullOrWhiteSpace(fileName), "Empty filename");
+                RequestAssertion.AssertSpecified("ELI45196", file, "Null file has been submitted");
+                RequestAssertion.AssertCondition("ELI45197", file.Length > 0,
+                    Utils.Inv($"Zero length file submitted: {file.FileName} has been submitted"));
+                RequestAssertion.AssertSpecified("ELI45198", file.FileName, "Empty filename");
 
                 var fileStream = file.OpenReadStream();
                 Contract.Assert(fileStream != null, "Null filestream");
 
-                using (var data = new DocumentData(ClaimsToContext(User)))
+                using (var data = new DocumentData(User))
                 {
-                    var result = await data.SubmitFile(fileName, fileStream);
+                    var result = await data.SubmitFile(file.FileName, fileStream);
                     return Ok(result);
                 }
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI43654");
-                Log.WriteLine(ee);
-                return BadRequest(MakeDocumentSubmitResult(fileId: -1, isError: true, message: ee.Message, code: -1));
+                return this.GetAsHttpError<DocumentSubmitResult>(ex, "ELI43654");
             }
         }
 
@@ -107,9 +103,10 @@ namespace WebAPI.Controllers
         {
             try
             {
-                Contract.Assert(ModelState.IsValid && !String.IsNullOrWhiteSpace(args.Text), "Submitted text is empty");
+                this.AssertModel("ELI45195");
+                RequestAssertion.AssertSpecified("ELI45194", args?.Text, "Submitted text is empty");
 
-                using (var data = new DocumentData(ClaimsToContext(User)))
+                using (var data = new DocumentData(User))
                 {
                     var result = await data.SubmitText(args.Text);
                     return Ok(result);
@@ -117,9 +114,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI43655");
-                Log.WriteLine(ee);
-                return BadRequest(MakeDocumentSubmitResult(fileId: -1, isError: true, message: ee.Message, code: -1));
+                return this.GetAsHttpError<DocumentSubmitResult>(ex, "ELI43655");
             }
         }
 
@@ -134,24 +129,17 @@ namespace WebAPI.Controllers
         {
             try
             {
-                Contract.Assert(Id > 0, "Id is not valid");
-
-                using (var data = new DocumentData(ClaimsToContext(User)))
+                using (var data = new DocumentData(User))
                 {
+                    data.AssertRequestFileId("ELI45193", Id);
+
                     var result = data.GetStatus(Id);
                     return Ok(result);
                 }
             }   
             catch (Exception ex)
             {
-                ExtractException ee = ex.AsExtract("ELI43652");
-                Log.WriteLine(ee);
-
-                var err = MakeProcessingStatus(DocumentProcessingStatus.NotApplicable,
-                                               isError: true,
-                                               message: ee.Message,
-                                               code: -1);
-                return BadRequest(err);
+                return this.GetAsHttpError<ProcessingStatus>(ex, "ELI43652");
             }
         }
 
@@ -212,14 +200,12 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(ClaimsToContext(User)))
+                using (var data = new DocumentData(User))
                 {
-                    var (fileName, errorMsg, error) = data.GetSourceFileName(Id);
-                    if (error)
-                    {
-                        return BadRequest(errorMsg);
-                    }
+                    data.AssertRequestFileId("ELI45191", Id);
+                    data.AssertRequestFileExists("ELI45192", Id);
 
+                    var (fileName, errorMsg, error) = data.GetSourceFileName(Id);
                     var fileContentType = FileContentType(fileName);
                     var fileDownloadName = Path.GetFileName(fileName);
                     Contract.Assert(!String.IsNullOrWhiteSpace(fileDownloadName), 
@@ -231,12 +217,9 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI43656");
-                Log.WriteLine(ee);
-                return BadRequest(ee.Message);
+                return this.GetAsHttpError(ex, "ELI43656");
             }
         }
-
 
         /// <summary>
         /// Get the result file for the specified input document
@@ -249,12 +232,15 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(ClaimsToContext(User)))
+                using (var data = new DocumentData(User))
                 {
+                    data.AssertRequestFileId("ELI45202", Id);
+                    data.AssertRequestFileExists("ELI45203", Id);
+
                     var (filename, isError, errMessage) = data.GetResult(Id);
                     if (isError)
                     {
-                        return BadRequest(errMessage);
+                        throw new Exception(errMessage);
                     }
 
                     var fileContentType = FileContentType(filename);
@@ -263,20 +249,12 @@ namespace WebAPI.Controllers
                                     "path.GetFileName returned empty value for filename: {0}", 
                                     filename);
 
-                    if (!System.IO.File.Exists(filename))
-                    {
-                        return BadRequest(Inv($"result file: {filename}, not found"));
-                    }
-
                     return PhysicalFile(filename, fileContentType, fileDownloadName);
                 }
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI43657");
-                var message = Inv($"Exception: {ex.Message}, while returning file for fileId: {Id}");
-                Log.WriteLine(ee);
-                return BadRequest(ee.Message);
+                return this.GetAsHttpError(ex, "ELI43657");
             }
         }
 
@@ -291,16 +269,16 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(ClaimsToContext(User)))
+                using (var data = new DocumentData(User))
                 {
+                    data.AssertRequestFileId("ELI45204", Id);
+
                     return Ok(await data.GetTextResult(Id));
                 }
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI43658");
-                Log.WriteLine(ee);
-                return BadRequest(MakeTextResult("", isError: true, errorMessage: ee.Message));
+                return this.GetAsHttpError<TextResult>(ex, "ELI43658");
             }
         }
 
@@ -315,17 +293,18 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(ClaimsToContext(User), useAttributeDbMgr: true))
+                using (var data = new DocumentData(User))
                 {
+                    data.AssertRequestFileId("ELI45205", Id);
+                    data.AssertRequestFileExists("ELI45206", Id);
+
                     var result = data.GetDocumentType(Id);
                     return result.Error.ErrorOccurred ? (IActionResult)BadRequest(result) : Ok(result);
                 }
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI43659");
-                Log.WriteLine(ee);
-                return BadRequest(MakeTextResult("", isError: true, errorMessage: ee.Message));
+                return this.GetAsHttpError<TextResult>(ex, "ELI43659");
             }
         }
     }

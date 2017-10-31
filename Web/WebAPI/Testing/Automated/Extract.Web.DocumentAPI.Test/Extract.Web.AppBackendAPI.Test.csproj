@@ -55,8 +55,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\RC.Net\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\..\..\RC.Net\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -77,18 +76,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APITestUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestBackendAPI.cs" />
-    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="ExtractInternalKey.snk" />
-    <EmbeddedResource Include="Resources\Demo_FlexIndex.bak" />
     <EmbeddedResource Include="Resources\Demo_IDShield.bak" />
-    <EmbeddedResource Include="Resources\Demo_LabDE.bak" />
     <EmbeddedResource Include="Resources\Image1.pdf.uss" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\TestImage003.tif.uss" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">
@@ -204,6 +202,14 @@
       <Project>{6b284a4d-132c-4fe4-858f-06a9c476b19b}</Project>
       <Name>Extract.FileActionManager.Database.Test</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj">
+      <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
+      <Name>Extract.Imaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\CommonAPICode\AppBackendAPI.csproj">
       <Project>{d18e4b70-2d88-4730-a72c-ccc9fd58d516}</Project>
       <Name>DocumentAPI</Name>
@@ -214,6 +220,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\ResultText.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\TestImage003.tif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

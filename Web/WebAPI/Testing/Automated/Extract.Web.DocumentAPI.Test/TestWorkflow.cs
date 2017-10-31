@@ -3,27 +3,17 @@ using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
+using WebAPI;
 using WebAPI.Models;
 
-using ApiUtils = WebAPI.Utils;
 using WorkflowType = UCLID_FILEPROCESSINGLib.EWorkflowType;
 
 namespace Extract.Web.WebAPI.Test
 {
     [TestFixture]
-    [NUnit.Framework.Category("WebAPI")]
+    [NUnit.Framework.Category("DocumentAPI")]
     public class TestWorkflow
     {
-        #region Constants
-
-        /// <summary>
-        /// Names for the temporary databases that are extracted from the resource folder and
-        /// attached to the local database server, as needed for tests.
-        /// </summary>
-        static readonly string DbLabDE = "Demo_LabDE_Temp";
-
-        #endregion Constants
-
         #region Fields
 
         /// <summary>
@@ -64,18 +54,18 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetDefaultWorkflow()
         {
-            string dbName = DbLabDE + "11";
+            string dbName = "DocumentAPI_Test_GetDefaultWorkflow";
 
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                var c = Utils.SetDefaultApiContext(dbName);
+                var c = ApiTestUtils.SetDefaultApiContext(dbName);
                 var fileApi = FileApiMgr.GetInterface(c);
 
                 try
                 {
-                    var workflow = fileApi.GetWorkflow;
+                    var workflow = fileApi.Workflow;
                     Assert.IsTrue(workflow != null, "Couldn't get default workflow");
                     Assert.IsTrue(workflow.Name.IsEquivalent("CourtOffice"), "Incorrect value for name: {0}", workflow.Name);
                     Assert.IsTrue(workflow.Id == 1, "Incorrect value for Id: {0}", workflow.Id);
@@ -90,7 +80,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, ApiTestUtils.GetMethodName());
             }
             finally
             {
@@ -105,18 +95,18 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void Test_GetWorkflowStatus()
         {
-            string dbName = DbLabDE + "12";
+            string dbName = "DocumentAPI_Test_GetWorkflowStatus";
 
             try
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                var c = Utils.SetDefaultApiContext(dbName);
+                var c = ApiTestUtils.SetDefaultApiContext(dbName);
                 FileApiMgr.GetInterface(c);
 
                 try
                 {
-                    var workflowStatus = WorkflowData.GetWorkflowStatus(ApiUtils.CurrentApiContext);
+                    var workflowStatus = WorkflowData.GetWorkflowStatus(Utils.CurrentApiContext);
                     Assert.IsTrue(workflowStatus.Error.ErrorOccurred == false, "status should NOT have the error flag set and it is");
                 }
                 catch (Exception)
@@ -126,7 +116,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, ApiTestUtils.GetMethodName());
             }
             finally
             {

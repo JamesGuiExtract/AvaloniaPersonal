@@ -7,7 +7,7 @@ using ApiUtils = WebAPI.Utils;
 
 namespace Extract.Web.WebAPI.Test
 {
-    public static class Utils
+    public static class ApiTestUtils
     {
         const string DbDemoLabDE = "Demo_LabDE_Temp";
 

@@ -41,10 +41,10 @@ namespace WebAPI.Controllers
         {
             try
             {
-                Contract.Assert(args != null, "null args");
-                Contract.Assert(!String.IsNullOrWhiteSpace(args.DatabaseServerName), "database server name cannot be empty");
-                Contract.Assert(!String.IsNullOrWhiteSpace(args.DatabaseName), "database name cannot be empty");
-                Contract.Assert(!String.IsNullOrWhiteSpace(args.WorkflowName), "workflow name cannot be empty");
+                RequestAssertion.AssertSpecified("ELI45207", args, "null args");
+                RequestAssertion.AssertSpecified("ELI45208", args.DatabaseServerName, "database server name cannot be empty");
+                RequestAssertion.AssertSpecified("ELI45209", args.DatabaseName, "database name cannot be empty");
+                RequestAssertion.AssertSpecified("ELI45210", args.WorkflowName, "workflow name cannot be empty");
 
                 Utils.SetCurrentApiContext(args.DatabaseServerName, args.DatabaseName, args.WorkflowName);
                 Utils.ApplyCurrentApiContext();
@@ -53,9 +53,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                var message = Inv($"Exception: {ex.Message}, setting API context");
-                Log.WriteLine(message, "ELI43241");
-                return BadRequest(message);
+                return this.GetAsHttpError(ex, "ELI45211");
             }
         }
     }

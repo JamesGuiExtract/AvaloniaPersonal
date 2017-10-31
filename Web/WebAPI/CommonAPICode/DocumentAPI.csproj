@@ -75,6 +75,14 @@
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
+	<COMReference Include="UCLIDImageUtils.dll">
+      <Guid>d46831e6-669c-423f-8209-d6a7a80c2add</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
     <COMReference Include="ADODB.dll">
       <Guid>2a75196c-d9eb-4129-b803-931327f72d5c</Guid>
       <VersionMajor>2</VersionMajor>

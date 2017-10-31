@@ -5,7 +5,7 @@ namespace WebAPI.Models
     /// <summary>
     /// DTO for result of GetTextResult
     /// </summary>
-    public class TextResult
+    public class TextResult : IResultData
     {
         /// <summary>
         /// the Text of the result

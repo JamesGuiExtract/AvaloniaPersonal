@@ -21,7 +21,7 @@ namespace WebAPI.Models
             try
             {
                 fileApi = FileApiMgr.GetInterface(apiContext);
-                var fileProcessingDB = fileApi.Interface;
+                var fileProcessingDB = fileApi.FileProcessingDB;
     
                 fileProcessingDB.GetWorkflowStatusAllFiles(out int unattempted,
                                                            out int processing,

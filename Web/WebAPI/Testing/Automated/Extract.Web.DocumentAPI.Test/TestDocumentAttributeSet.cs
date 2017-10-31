@@ -21,7 +21,7 @@ namespace Extract.Web.WebAPI.Test
     /// test for DocumentAttributeSet, returned by Web API Document.GetResultSet(string fileId)
     /// </summary>
     [TestFixture]
-    [NUnit.Framework.Category("WebAPI")]
+    [NUnit.Framework.Category("DocumentAPI")]
     public class TestDocumentAttributeSet
     {
         /// <summary>
@@ -50,33 +50,25 @@ namespace Extract.Web.WebAPI.Test
         #region Constants
 
         /// <summary>
-        /// Names for the temporary databases that are extracted from the resource folder and
-        /// attached to the local database server, as needed for tests.
-        /// </summary>
-        static readonly string DbLabDE = "Demo_LabDE_Temp";
-        static readonly string DbFlexIndex = "Demo_FlexIndex_Temp";
-        static readonly string DbIDShield = "Demo_IDShield_Temp";
-
-        /// <summary>
         /// These dictionaries use fileId as the key for a FileInfo object that describes the
         /// parameters necessary to get an associated DocumentAttributeSet.
         /// </summary>
         static Dictionary<int, FileInfo> LabDEFileIdToFileInfo = new Dictionary<int, FileInfo>
         {
-            {1, new FileInfo {XmlFile = "Resources.A418.tif.restored.xml", DatabaseName = DbLabDE + "1", AttributeSetName = "DataFoundByRules" } },
-            {12, new FileInfo {XmlFile = "Resources.K151.tif.restored.xml", DatabaseName = DbLabDE + "2", AttributeSetName = "DataFoundByRules" } }
+            {1, new FileInfo {XmlFile = "Resources.A418.tif.restored.xml", AttributeSetName = "DataFoundByRules" } },
+            {12, new FileInfo {XmlFile = "Resources.K151.tif.restored.xml", AttributeSetName = "DataFoundByRules" } }
         };
 
         static Dictionary<int, FileInfo> IDShieldFileIdToFileInfo = new Dictionary<int, FileInfo>
         {
-            {2, new FileInfo {XmlFile = "Resources.TestImage002.tif.restored.xml", DatabaseName = DbIDShield + "1", AttributeSetName = "Attr" } },
-            {3, new FileInfo {XmlFile = "Resources.TestImage003.tif.restored.xml", DatabaseName = DbIDShield + "2", AttributeSetName = "Attr" } }
+            {2, new FileInfo {XmlFile = "Resources.TestImage002.tif.restored.xml", AttributeSetName = "Attr" } },
+            {3, new FileInfo {XmlFile = "Resources.TestImage003.tif.restored.xml", AttributeSetName = "Attr" } }
         };
 
         static Dictionary<int, FileInfo> FlexIndexFileIdToFileInfo = new Dictionary<int, FileInfo>
         {
-            {1, new FileInfo {XmlFile = "Resources.Example01.tif.restored.xml", DatabaseName = DbFlexIndex + "1", AttributeSetName = "Attr"} },
-            {3, new FileInfo {XmlFile = "Resources.Example03.tif.restored.xml", DatabaseName = DbFlexIndex + "2", AttributeSetName = "Attr"} }
+            {1, new FileInfo {XmlFile = "Resources.Example01.tif.restored.xml", AttributeSetName = "Attr"} },
+            {3, new FileInfo {XmlFile = "Resources.Example03.tif.restored.xml", AttributeSetName = "Attr"} }
         };
 
         // Index for FulllText node, always the zeroeth child node of parent nodes.
@@ -182,29 +174,28 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void TestLabDE_DocumentAttributeSets()
         {
-            string currentDatabaseName = null;
+            string currentDatabaseName = "DocumentAPI_TestLabDE_DocumentAttributeSets";
 
             try
             {
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", currentDatabaseName);
+
                 foreach (var kvpFileInfo in LabDEFileIdToFileInfo)
                 {
                     var fileId = kvpFileInfo.Key;
                     var fi = kvpFileInfo.Value;
-                    currentDatabaseName = fi.DatabaseName;
-                    _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", currentDatabaseName);
-                    UpdateWorkflowFile(currentDatabaseName, fileId);
 
-                    var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
-
-                    FileApiMgr.ReleaseAll();
-                    _testDbManager.RemoveDatabase(currentDatabaseName);
+                    var worked = TestFile(fileId, currentDatabaseName, fi.XmlFile, fi.AttributeSetName);
 
                     Assert.IsTrue(worked);
                 }
+
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(currentDatabaseName);
             }
             catch (Exception ex)
             {
-                Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());                
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, ApiTestUtils.GetMethodName());                
             }
         }
 
@@ -214,29 +205,28 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void TestIDShield_DocumentAttributeSets()
         {
-            string currentDatabaseName = null;
+            string currentDatabaseName = "DocumentAPI_TestIDShield_DocumentAttributeSets";
 
             try
             {
+                _testDbManager.GetDatabase("Resources.Demo_IDShield.bak", currentDatabaseName);
+
                 foreach (var kvpFileInfo in IDShieldFileIdToFileInfo)
                 {
                     var fileId = kvpFileInfo.Key;
                     var fi = kvpFileInfo.Value;
-                    currentDatabaseName = fi.DatabaseName;
-                    _testDbManager.GetDatabase("Resources.Demo_IDShield.bak", currentDatabaseName);
-                    UpdateWorkflowFile(currentDatabaseName, fileId);
 
-                    var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
-
-                    FileApiMgr.ReleaseAll();
-                    _testDbManager.RemoveDatabase(currentDatabaseName);
+                    var worked = TestFile(fileId, currentDatabaseName, fi.XmlFile, fi.AttributeSetName);
 
                     Assert.IsTrue(worked);
                 }
+
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(currentDatabaseName);
             }
             catch (Exception ex)
             {
-                Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, ApiTestUtils.GetMethodName());
             }
         }
 
@@ -246,29 +236,28 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void TestFlexIndex_DocumentAttributeSets()
         {
-            string currentDatabaseName = null;
+            string currentDatabaseName = "DocumentAPI_TestFlexIndex_DocumentAttributeSets";
 
             try
             {
+                _testDbManager.GetDatabase("Resources.Demo_FlexIndex.bak", currentDatabaseName);
+
                 foreach (var kvpFileInfo in FlexIndexFileIdToFileInfo)
                 {
                     var fileId = kvpFileInfo.Key;
                     var fi = kvpFileInfo.Value;
-                    currentDatabaseName = fi.DatabaseName;
-                    _testDbManager.GetDatabase("Resources.Demo_FlexIndex.bak", currentDatabaseName);
-                    UpdateWorkflowFile(currentDatabaseName, fileId, workflowId: 4);
 
-                    var worked = TestFile(fileId, fi.DatabaseName, fi.XmlFile, fi.AttributeSetName);
-
-                    FileApiMgr.ReleaseAll();
-                    _testDbManager.RemoveDatabase(currentDatabaseName);
+                    var worked = TestFile(fileId, currentDatabaseName, fi.XmlFile, fi.AttributeSetName);
 
                     Assert.IsTrue(worked);
                 }
+
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(currentDatabaseName);
             }
             catch (Exception ex)
             {
-                Assert.Fail("Exception: {0}, in: {1}", ex.Message, Utils.GetMethodName());
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, ApiTestUtils.GetMethodName());
             }
         }
 
@@ -280,9 +269,9 @@ namespace Extract.Web.WebAPI.Test
         {
             try
             {
-                Utils.SetDefaultApiContext(dbName);
+                ApiTestUtils.SetDefaultApiContext(dbName);
 
-                using (var data = new DocumentData(ApiUtils.CurrentApiContext, useAttributeDbMgr: true))
+                using (var data = new DocumentData(Utils.CurrentApiContext))
                 {
                     Assert.IsTrue(data != null, "null DocumentData reference");
                     return data.GetDocumentResultSet(fileId);
@@ -290,7 +279,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Debug.WriteLine($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
                 throw;
             }
             finally
@@ -341,7 +330,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
             }
         }
 
@@ -400,7 +389,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Debug.WriteLine($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
                 throw;
             }
         }
@@ -434,7 +423,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
             }
         }
 
@@ -449,7 +438,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
             }
         }
 
@@ -476,7 +465,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
             }
         }
 
@@ -559,7 +548,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
             }
         }
 
@@ -590,7 +579,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Assert.Fail($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
             }
 
             return true;
@@ -598,7 +587,7 @@ namespace Extract.Web.WebAPI.Test
 
         static void UpdateWorkflowFile(string dbName, int fileId, int workflowId = 1)
         {
-            string command = ApiUtils.Inv($"INSERT INTO [dbo].[WorkflowFile] VALUES ({workflowId}, {fileId});");
+            string command = Utils.Inv($"INSERT INTO [dbo].[WorkflowFile] VALUES ({workflowId}, {fileId});");
             TestDocument.ModifyTable(dbName, command);
         }
 
@@ -616,7 +605,7 @@ namespace Extract.Web.WebAPI.Test
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {Utils.GetMethodName()}");
+                Debug.WriteLine($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
                 return false;
             }
         }

@@ -61,12 +61,14 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// This method creates a JWT
+        /// This method creates a <see cref="ClaimsPrincipal"/> representing the authenticated
+        /// <see paramref="user"/>.
         /// </summary>
         /// <param name="user">the User DTO instance</param>
         /// <param name="context">the user's context</param>
-        /// <returns>JSON-encoded JWT</returns>
-        public static string GenerateToken(User user, ApiContext context)
+        /// <returns>JSON-encoded JWT and a <see cref="ClaimsPrincipal"/> representing the authenticated user.
+        /// </returns>
+        public static (string token, ClaimsPrincipal claimsPrincipal) GenerateToken(User user, ApiContext context)
         {
             try
             {
@@ -82,6 +84,8 @@ namespace WebAPI
                     // Add custom claims. The workflow name may be from the user login request.
                     new Claim("WorkflowName", context.WorkflowName)
                 };
+
+                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(null, claims));
 
                 // Create the JWT and write it to a string
                 var jwt = new JwtSecurityToken(
@@ -106,7 +110,7 @@ namespace WebAPI
                 };
 
                 var response = JsonConvert.SerializeObject(responseToken, serializerSettings);
-                return response;
+                return (response, claimsPrincipal);
             }
             catch (Exception ex)
             {

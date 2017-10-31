@@ -5,7 +5,7 @@ namespace WebAPI.Models
     /// <summary>
     /// Document attribute set - contains a (possibly empty) list of document attributes
     /// </summary>
-    public class DocumentAttributeSet
+    public class DocumentAttributeSet : IResultData
     {
         /// <summary>
         /// list of attributes - may be empty (on error WILL be empty)

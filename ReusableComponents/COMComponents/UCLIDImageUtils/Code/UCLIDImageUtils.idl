@@ -77,26 +77,8 @@ library UCLID_IMAGEUTILSLib
 		[id(8), helpstring("method GetImageStats")] HRESULT GetImageStats([in] BSTR strImage, 
 			[in] IRasterZone * pRaster, [out,retval] IImageStats ** ppImageStats);
 		//-----------------------------------------------------------------------------------------
-		// PROMISE:	This method applies the redaction areas specified by pZones in strImage and 
-		//          saves the result as annotations in strOutputImage.
-		// REQUIRE: Annotations must be licensed if vbRetainAnnotations or vbApplyAsAnnotations 
-		//          are VARIANT_TRUE.
-		// PARAMS:  strImage - The full path to the input (unredacted) image.
-		//          strOutputImage - The full path to output (redacted) image.
-		//          pZones - An IIUnknownVector of RasterZones where the redactions will be drawn.
-		//          lFillColor - The RGB fill color for all redactions.
-		//          lBorderColor - The RGB border color for all redactions.
-		//          strText - The text to print on all redactions.
-		//          lTextColor - The color of the text to print on all redactions.
-		//          vbRetainAnnotations - VARIANT_TRUE if annotations existing in strImage should 
-		//          be retained; VARIANT_FALSE if they should be discarded.
-		//          vbApplyAsAnnotations - VARIANT_TRUE if redactions should be drawn as tiff 
-		//          annotations; VARIANT_FALSE if redactions should be drawn directly to image.
-		/*[id(10), helpstring("method RedactImageArea")] HRESULT RedactImageArea(
-			[in] BSTR strImage, [in] BSTR strOutputImage, [in] IIUnknownVector *pZones,
-			[in] long lFillColor, [in] long lBorderColor, [in] BSTR strText, 
-			[in] long lTextColor, [in] VARIANT_BOOL vbRetainAnnotations, 
-			[in] VARIANT_BOOL vbApplyAsAnnotations);*/
+		[id(11), helpstring("method GetSpatialPageInfos")] HRESULT GetSpatialPageInfos(
+			[in] BSTR bstrFileName, [out, retval] IIUnknownVector **pvecSpatialPageInfos);
 	};
 
 	[
@@ -297,6 +279,20 @@ library UCLID_IMAGEUTILSLib
 		//-----------------------------------------------------------------------------------------
 	};
 
+	[
+		object,
+		uuid(075A2276-B6E1-4CFA-8529-66831F8E84CB),
+		dual,
+		helpstring("IImageConverter Interface"),
+		pointer_default(unique)
+	]
+	interface IImageConverter : IDispatch
+	{
+		// Gets the specified image page as a PDF.
+		[id(1), helpstring("method GetPDFImage")] HRESULT GetPDFImage(
+			[in] BSTR bstrFileName, [in] int nPage, [out, retval] VARIANT *pImageData);
+	}
+
 	//----------------------------------------------------------------------------------------------
 	//-C O C L A S S E S ---------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -330,4 +326,13 @@ library UCLID_IMAGEUTILSLib
 		interface ILicensedComponent;
 	};
 
+	[
+		uuid(E6975412-9E3F-4574-968D-1F21708C09B8),
+		helpstring("ImageConverter Class")
+	]
+	coclass ImageConverter
+	{
+		[default] interface IImageConverter;
+		interface ILicensedComponent;
+	};
 };

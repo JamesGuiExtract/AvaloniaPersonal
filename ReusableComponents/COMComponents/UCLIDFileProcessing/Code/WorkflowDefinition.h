@@ -73,6 +73,10 @@ public:
 	STDMETHOD(put_OutputFilePathInitializationFunction)(BSTR newVal);
 	STDMETHOD(get_LoadBalanceWeight)(LONG* pnWeight);
 	STDMETHOD(put_LoadBalanceWeight)(LONG nWeight);
+	STDMETHOD(get_VerifyAction)(BSTR* pVerifyAction);
+	STDMETHOD(put_VerifyAction)(BSTR VerifyAction);
+	STDMETHOD(get_PostVerifyAction)(BSTR* pPostVerifyAction);
+	STDMETHOD(put_PostVerifyAction)(BSTR PostVerifyAction);
 
 private:
 
@@ -88,6 +92,8 @@ private:
 	string m_strOutputAttributeSet;
 	string m_strOutputFileMetadataField;
 	string m_strOutputFilePathInitializationFunction;
+	string m_strVerifyAction;
+	string m_strPostVerifyAction;
 	long m_nLoadBalanceWeight;
 };
 

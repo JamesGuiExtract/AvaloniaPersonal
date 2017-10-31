@@ -6176,6 +6176,78 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked)
+{
+	try
+	{
+		try
+		{
+			string strFAMSessionQuery = "INSERT INTO [" + gstrFAM_SESSION + "] ";
+			strFAMSessionQuery += "([MachineID], [FAMUserID], [UPI], [FPSFileID], [ActionID], "
+				"[Queuing], [Processing]) ";
+			strFAMSessionQuery += "OUTPUT INSERTED.ID ";
+			strFAMSessionQuery += "VALUES (";
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			// Set the transaction guard
+			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
+
+			// Get FPSFileID, MachineID, and UserID (this will add records if they don't exist)
+			long nFPSFileID = getKeyID(ipConnection, gstrFPS_FILE, "FPSFileName",
+				m_strFPSFileName.empty() ? "<Unsaved FPS File>" : m_strFPSFileName);
+			long nMachineID = getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName);
+			long nUserID = getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName);
+			// A web application will always be processing, never queuing.
+			string strQueuing = "0";
+			string strProcessing = "1";
+
+			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
+				getWorkflowDefinition(ipConnection, getActiveWorkflowID(ipConnection));
+
+			string strActionName = asString(ipWorkflowDefinition->VerifyAction);
+			setActiveAction(ipConnection, strActionName);
+
+			strFAMSessionQuery += asString(nMachineID) + ", " + asString(nUserID) + ", '"
+				+ m_strUPI + "', " + asString(nFPSFileID) + ", " + asString(m_nActiveActionID) +
+				", " + strQueuing + ", " + strProcessing + ")";
+
+			// Insert the record into the FAMSession table
+			executeCmdQuery(ipConnection, strFAMSessionQuery, false, (long*)&m_nFAMSessionID);
+
+			// Whenever processing is started, re-get the secure counters as a way to force
+			// validation that the secure counters are in a good state.
+			m_ipSecureCounters = nullptr;
+
+			// Commit the transaction
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI45274");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45275");
+	}
+	catch (UCLIDException &ue)
+	{
+		m_strFPSFileName = "";
+
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::RecordFAMSessionStop_Internal(bool bDBLocked)
 {
 	try
@@ -11199,31 +11271,14 @@ bool CFileProcessingDB::LoadWebAppSettings_Internal(bool bDBLocked, long nWorkfl
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			string strType = asString(bstrType);
-			replaceVariable(strType, "'", "''");
-
-			string strQuery = Util::Format(
-				"SELECT [Settings] "
-				"	FROM dbo.[WebAppConfig] "
-				"	WHERE[Type] = '%s' AND[WorkflowID] = %d",
-				strType.c_str(), nWorkflowID);
-
-			// Create a pointer to a recordset
-			_RecordsetPtr ipWebAppSettings(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI45071", ipWebAppSettings != __nullptr);
-
-			ipWebAppSettings->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
-				adLockOptimistic, adCmdText);
-
-			// Check whether the file already exists in the database
-			if (ipWebAppSettings->adoEOF == VARIANT_TRUE)
+			if (nWorkflowID <= 0)
 			{
-				*pbstrSettings = _bstr_t("").Detach();
+				nWorkflowID = getActiveWorkflowID(ipConnection);
 			}
-			else
-			{
-				*pbstrSettings = _bstr_t(getStringField(ipWebAppSettings->Fields, "Settings").c_str()).Detach();
-			}
+
+			string strSettings = getWebAppSettings(ipConnection, nWorkflowID, asString(bstrType));
+
+			*pbstrSettings = _bstr_t(strSettings.c_str()).Detach();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI45060");
 		}

@@ -20,7 +20,7 @@
     /// <summary>
     /// This class is used to return File or Text submission result
     /// </summary>
-    public class DocumentSubmitResult
+    public class DocumentSubmitResult : IResultData
     {
         /// <summary>
         /// The identifier for the submitted file

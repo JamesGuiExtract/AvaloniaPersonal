@@ -3,7 +3,7 @@
     /// <summary>
     /// per document processing status
     /// </summary>
-    public class ProcessingStatus
+    public class ProcessingStatus : IResultData
     {
         /// <summary>
         /// error information, if Error.ErrorOccurred = true

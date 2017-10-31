@@ -3,24 +3,25 @@ using System;
 using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
+using WebAPI.Models;
 using static WebAPI.Utils;
 
 namespace WebAPI
 {
     public partial class Startup
     {
-        static string _secretKey;
-
         /// <summary>
         /// configure authorization
         /// </summary>
         /// <param name="app">application builder instance</param>
         private void ConfigureAuth(IApplicationBuilder app)
         {
-            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_secretKey));
+            FileApi fileApi = new FileApi(Utils.CurrentApiContext);
+            var secretKey = fileApi.FileProcessingDB.DatabaseID;
+            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
 
-            // This allows for token creation on authentication
-            AuthUtils.SecretKey = _secretKey;
+            // This is the encryption key used to generate authentication tokens.
+            AuthUtils.SecretKey = secretKey;
 
             var tokenValidationParameters = new TokenValidationParameters
             {

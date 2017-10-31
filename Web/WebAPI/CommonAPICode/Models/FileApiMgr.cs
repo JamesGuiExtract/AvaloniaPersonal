@@ -1,6 +1,9 @@
 ﻿using Extract;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using static WebAPI.Utils;
 
 namespace WebAPI.Models
@@ -17,8 +20,10 @@ namespace WebAPI.Models
         /// get (an existing unused interface) or make a FAM file processing DB interface
         /// </summary>
         /// <param name="apiContext">the API context to use</param>
+        /// <param name="sessionOwner">The <see cref="ClaimsPrincipal"/> this returned instance should be
+        /// specific to or <c>null</c> if the instance need not be specific to a particular user.</param>
         /// <returns>a FileApi instance</returns>
-        static public FileApi GetInterface(ApiContext apiContext)
+        static public FileApi GetInterface(ApiContext apiContext, ClaimsPrincipal sessionOwner = null)
         {
             try
             {
@@ -26,14 +31,14 @@ namespace WebAPI.Models
 
                 lock (_lock)
                 {
-                    var fileApi = FindAvailable(apiContext);
+                    var fileApi = FindAvailable(apiContext, sessionOwner);
                     if (fileApi != null)
                     {
                         fileApi.InUse = true;
                         return fileApi;
                     }
 
-                    var fa = new FileApi(apiContext, setInUse: true);
+                    var fa = new FileApi(apiContext, setInUse: true, sessionOwner: sessionOwner);
                     _interfaces.Add(fa);
                     Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"), "ELI43251");
 
@@ -59,17 +64,17 @@ namespace WebAPI.Models
         /// <summary>
         /// Make a new interface object - this is done whenever the default API context changes
         /// </summary>
-        static public void MakeInterface(ApiContext apiContext)
+        static public void MakeInterface(ApiContext apiContext, ClaimsPrincipal sessionOwner)
         {
             try
             {
                 lock (_lock)
                 {
                     // Only add the new interface if it is not already present and available
-                    var fileApi = FindAvailable(apiContext);
+                    var fileApi = FindAvailable(apiContext, sessionOwner);
                     if (fileApi == null)
                     {
-                        var fa = new FileApi(apiContext, setInUse: false);
+                        var fa = new FileApi(apiContext, setInUse: false, sessionOwner: sessionOwner);
                         _interfaces.Add(fa);
                         Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"), "ELI43252");
                     }
@@ -88,22 +93,29 @@ namespace WebAPI.Models
         }
 
 
-        static FileApi FindAvailable(ApiContext apiContext)
+        /// <summary>
+        /// Finds an available <see cref="FileApi"/> instance for the specified
+        /// <see paramref="apiContext"/> and <see paramref="sessionOwner"/>.
+        /// </summary>
+        /// <param name="apiContext">the API context to use</param>
+        /// <param name="sessionOwner">The <see cref="ClaimsPrincipal"/> this returned instance should be
+        /// specific to or <c>null</c> if the instance need not be specific to a particular user.</param>
+        /// <returns></returns>
+        static FileApi FindAvailable(ApiContext apiContext, ClaimsPrincipal sessionOwner = null)
         {
-            for (int i = 0; i < _interfaces.Count; ++i)
+            var availableInstance = _interfaces.FirstOrDefault(instance =>
+                 !instance.InUse &&
+                 instance.Workflow.Name.IsEquivalent(apiContext.WorkflowName) &&
+                 instance.Workflow.DatabaseServerName.IsEquivalent(apiContext.DatabaseServerName) &&
+                 instance.Workflow.DatabaseName.IsEquivalent(apiContext.DatabaseName) &&
+                 (sessionOwner == null || instance.SessionId.Equals(sessionOwner.GetClaim("jti"))));
+
+            if (availableInstance != null && availableInstance.Expired)
             {
-                var fileApi = _interfaces[i];
-                var workflow = fileApi.GetWorkflow;
-                if (fileApi.InUse == false &&
-                    workflow.Name.IsEquivalent(apiContext.WorkflowName) &&
-                    workflow.DatabaseServerName.IsEquivalent(apiContext.DatabaseServerName) &&
-                    workflow.DatabaseName.IsEquivalent(apiContext.DatabaseName))
-                {
-                    return fileApi;
-                }
+                throw new RequestAssertion("ELI45230", "Session expired", StatusCodes.Status401Unauthorized);
             }
 
-            return null;
+            return availableInstance;
         }
 
         /// <summary>
@@ -113,10 +125,9 @@ namespace WebAPI.Models
         {
             foreach (var inf in _interfaces)
             {
-                inf.Interface.CloseAllDBConnections();
+                inf.FileProcessingDB.CloseAllDBConnections();
             }
             _interfaces.Clear();
         }
-
     }
 }

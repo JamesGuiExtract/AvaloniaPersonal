@@ -11,14 +11,6 @@ namespace WebAPI.Models
     {
         private int _id;
         private string _name;
-        private EWorkflowType _type;
-        private string _description;
-        private string _startAction;
-        private string _endAction;
-        private string _postWorkflowAction;
-        private string _documentFolder;
-        private string _outputAttributeSet;
-        private string _outputFileMetadataField;
         private string _databaseServerName;
         private string _databaseName;
 
@@ -59,124 +51,53 @@ namespace WebAPI.Models
         /// <summary>
         /// the workflow Type value
         /// </summary>
-        public EWorkflowType Type
-        {
-            get
-            {
-                int iType = (int)_type;
-                return _type;
-            }
-            private set
-            {
-                _type = value;
-            }
-        }
+        public EWorkflowType Type { get; set; }
 
         /// <summary>
         /// description of the workflow
         /// </summary>
-        public string Description
-        {
-            get
-            {
-                return _description;
-            }
-            private set
-            {
-                _description = value;
-            }
-        }
+        public string Description { get; set; }
 
         /// <summary>
         /// the entry action for the workflow
         /// </summary>
-        public string StartAction
-        {
-            get
-            {
-                return _startAction;
-            }
-            private set
-            {
-                _startAction = value;
-            }
-        }
+        public string StartAction { get; set; }
+
+        /// <summary>
+        /// Gets or sets the post verify action.
+        /// </summary>
+        public string VerifyAction { get; set; }
+
+        /// <summary>
+        /// The action to be queued after verification
+        /// </summary>
+        public string PostVerifyAction { get; set; }
 
         /// <summary>
         /// The exit action for the workflow
         /// </summary>
-        public string EndAction
-        {
-            get
-            {
-                return _endAction;
-            }
-            private set
-            {
-                _endAction = value;
-            }
-        }
+        public string EndAction { get; set; }
 
         /// <summary>
         /// the run-after-results action for the workflow
         /// </summary>
-        public string PostWorkflowAction
-        {
-            get
-            {
-                return _postWorkflowAction;
-            }
-            private set
-            {
-                _postWorkflowAction = value;
-            }
-        }
+        public string PostWorkflowAction { get; set; }
 
         /// <summary>
         /// The workflow document folder name - this value is optional
         /// </summary>
-        public string DocumentFolder
-        {
-            get
-            {
-                return _documentFolder;
-            }
-            private set
-            {
-                _documentFolder = value;
-            }
-        }
+        public string DocumentFolder { get; set; }
 
         /// <summary>
         /// The workflow attribute set name
         /// </summary>
-        public string OutputAttributeSet
-        {
-            get
-            {
-                return _outputAttributeSet;
-            }
-            private set
-            {
-                _outputAttributeSet = value;
-            }
-        }
+        public string OutputAttributeSet { get; set; }
 
         /// <summary>
         /// The name used to retrieve the per-fileID meta-data field (which contains the path(s) of the result file(s))
         /// Note that this field is OPTIONAL.
         /// </summary>
-        public string OutputFileMetadataField
-        {
-            get
-            {
-                return _outputFileMetadataField;
-            }
-            private set
-            {
-                _outputFileMetadataField = value;
-            }
-        }
+        public string OutputFileMetadataField { get; set; }
 
         /// <summary>
         /// database server name
@@ -185,7 +106,6 @@ namespace WebAPI.Models
         {
             get
             {
-                Contract.Assert(!String.IsNullOrWhiteSpace(_databaseServerName), "DatabaseServerName is empty");
                 return _databaseServerName;
             }
             private set
@@ -202,7 +122,6 @@ namespace WebAPI.Models
         {
             get
             {
-                Contract.Assert(!String.IsNullOrWhiteSpace(_databaseName), "DatabaseName is empty");
                 return _databaseName;
             }
             private set
@@ -225,6 +144,8 @@ namespace WebAPI.Models
             Type = wd.Type;
             Description = wd.Description;
             StartAction = wd.StartAction;
+            VerifyAction = wd.VerifyAction;
+            PostVerifyAction = wd.PostVerifyAction;
             EndAction = wd.EndAction;
             PostWorkflowAction = wd.PostWorkflowAction;
             DocumentFolder = wd.DocumentFolder;

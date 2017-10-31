@@ -1,5 +1,6 @@
 ﻿using Extract;
 using System;
+using System.Security.Claims;
 using UCLID_FILEPROCESSINGLib;
 using static WebAPI.Utils;
 
@@ -14,15 +15,21 @@ namespace WebAPI.Models
     {
         private ApiContext _apiContext;
         private Workflow _workflow;
+        private ClaimsPrincipal _sessionOwner;
+        private string _sessionId = "";
 
         private FileProcessingDB _fileProcessingDB = null;
 
         /// <summary>
-        /// CTOR
+        /// Initialized a new <see cref="FileApi"/> instance.
         /// </summary>
-        /// <param name="apiContext">API context object</param>
-        /// <param name="setInUse">set the InUse flag on object creation, or not</param>
-        public FileApi(ApiContext apiContext, bool setInUse = false)
+        /// <param name="apiContext">The <see cref="ApiContext"/> defining the database environment
+        /// for this instance.</param>
+        /// <param name="setInUse"><c>true</c> to set the InUse flag on object creation;
+        /// otherwise, <c>false</c>.</param>
+        /// <param name="sessionOwner">The <see cref="ClaimsPrincipal"/> this instance should be
+        /// specific to or <c>null</c> if this instance should not be specific to a particular user.</param>
+        public FileApi(ApiContext apiContext, bool setInUse = false, ClaimsPrincipal sessionOwner = null)
         {
             try
             {
@@ -30,6 +37,12 @@ namespace WebAPI.Models
                 Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
                 _fileProcessingDB = (FileProcessingDB)Activator.CreateInstance(mgrType);
                 Contract.Assert(_fileProcessingDB != null, "Failed to create FileProcessingDB instance");
+
+                _sessionOwner = sessionOwner;
+                if (sessionOwner != null)
+                {
+                    _sessionId = sessionOwner.GetClaim("jti");
+                }
             }
             catch (Exception ex)
             {
@@ -78,7 +91,7 @@ namespace WebAPI.Models
         /// <summary>
         /// Get the fileProcessingDB instance
         /// </summary>
-        public FileProcessingDB Interface
+        public FileProcessingDB FileProcessingDB
         {
             get
             {
@@ -122,7 +135,7 @@ namespace WebAPI.Models
         /// <summary>
         /// get the workflow associated with this FileApi
         /// </summary>
-        public Workflow GetWorkflow
+        public Workflow Workflow
         {
             get
             {
@@ -132,9 +145,34 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Gets session ID (for instances specific to a <see cref="ClaimsPrincipal"/>.
+        /// </summary>
+        public string SessionId
+        {
+            get
+            {
+                return _sessionId;
+            }
+        }
+
+        /// <summary>
         /// Is this FileApi instance currently being used?
         /// </summary>
         public bool InUse { get; set; }
+
+        /// <summary>
+        /// Gets or sets the open state, ID, file ID and start time of a document session.
+        /// </summary>
+        public (bool IsOpen, int Id, int FileId, DateTime StartTime) DocumentSession { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the session is expired.
+        /// </summary>
+        public bool Expired
+        {
+            get;
+            set;
+        }
 
         Workflow MakeAssociatedWorkflow(string workflowName)
         {
@@ -143,7 +181,7 @@ namespace WebAPI.Models
                 int Id = -1;
                 try
                 {
-                    Id = Interface.GetWorkflowID(workflowName);
+                    Id = FileProcessingDB.GetWorkflowID(workflowName);
                 }
                 catch (Exception ex)
                 {
@@ -152,7 +190,7 @@ namespace WebAPI.Models
 
                 Contract.Assert(Id > 0, "Invalid workflow name: {0}", workflowName);
 
-                var definition = Interface.GetWorkflowDefinition(Id);
+                var definition = FileProcessingDB.GetWorkflowDefinition(Id);
                 Contract.Assert(definition != null, "Failed to get workflow definition for Id: {0}", Id);
 
                 var workflow = new Workflow(definition, DatabaseServer, DatabaseName);
