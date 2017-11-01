@@ -142,7 +142,7 @@ namespace Extract.FAMDBCounterManager
                 // Free buffers used to pass data to/from the p/invoke call.
                 if (inBuffer != IntPtr.Zero)
                 {
-                    Marshal.FreeCoTaskMem(outBuffer);
+                    Marshal.FreeCoTaskMem(inBuffer);
                 }
                 if (outBuffer != IntPtr.Zero)
                 {
