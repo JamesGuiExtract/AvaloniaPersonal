@@ -43,8 +43,10 @@ using namespace std;
 //			  EncounterFile and PatientFile needed to track submissions against encounter and patient
 // Version 11: https://extract.atlassian.net/browse/ISSUE-14199
 //			  Added index for LabDEEncounter.PatientMRN
+// Version 12: https://extract.atlassian.net/browse/ISSUE-14988
+//			  Increased size of OrderNumber Field in LabDEOrder and LabDEOrderFile
 // WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
-static const long glLABDE_DB_SCHEMA_VERSION = 11;
+static const long glLABDE_DB_SCHEMA_VERSION = 12;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -451,6 +453,56 @@ int UpdateToSchemaVersion11(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41641");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion12(_ConnectionPtr ipConnection,
+							long* pnNumSteps,
+							IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 12;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 10;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Drop OrderNumber related constraints on LabDEOrderFile table
+		vecQueries.push_back("ALTER TABLE [dbo].[LabDEOrderFile] DROP CONSTRAINT [FK_OrderFile_Order]");
+		vecQueries.push_back("ALTER TABLE [dbo].[LabDEOrderFile] DROP CONSTRAINT [PK_OrderFile]");
+		vecQueries.push_back("DROP INDEX [IX_OrderFile_Order] ON [dbo].[LabDEOrderFile]");
+
+		// Drop Primary key on LabDEOrder table
+		vecQueries.push_back("ALTER TABLE [dbo].[LabDEOrder] DROP CONSTRAINT PK_Order");
+
+		// Resize OrderNumber columns
+		vecQueries.push_back("ALTER TABLE [dbo].[LabDEOrderFile] ALTER COLUMN [OrderNumber] nvarchar(50) not null");
+		vecQueries.push_back("ALTER TABLE [dbo].[LabDEOrder] ALTER COLUMN [OrderNumber] nvarchar(50) not null");
+
+		// Add back Primary keys on LabDEOrder and LabDEOrderFile tables
+		vecQueries.push_back("ALTER TABLE [dbo].[LabDEOrder] ADD CONSTRAINT [PK_Order] PRIMARY KEY CLUSTERED ([OrderNumber])");
+		vecQueries.push_back("ALTER TABLE [dbo].[LabDEOrderFile] ADD CONSTRAINT [PK_OrderFile] PRIMARY KEY CLUSTERED ([OrderNumber], [FileID]) ");
+
+		// Add back LabDEOrder and LabDEOrderFile foreign key
+		vecQueries.push_back(gstrADD_FK_ORDERFILE_ORDER);
+
+		// Add back the LabDEOrderFile index on OrderNumber
+		vecQueries.push_back("CREATE NONCLUSTERED INDEX [IX_OrderFile_Order] ON [LabDEOrderFile]([OrderNumber])");
+		
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45026");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // CLabDEProductDBMgr
@@ -925,19 +977,26 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
                     }
 					// Intentionally leaving out break since both updates 8 and 9 take place within
 					// FAM schema 141.                   
-			case 9:	// The schema update from 8 to 9 needs to take place using FAM DB schema version 141
+			case 9:	// The schema update from 9 to 10 needs to take place using FAM DB schema version 141
 					if (nFAMDBSchemaVersion == 141)
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion10(ipConnection, pnNumSteps, NULL);
 					}
 					// Intentionally leaving out break since both updates 9 and 10 take place within
 					// FAM schema 141.                   
-			case 10:// The schema update from 9 to 10 needs to take place using FAM DB schema version 141
+			case 10:// The schema update from 10 to 11 needs to take place using FAM DB schema version 141
 					if (nFAMDBSchemaVersion == 141)
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion11(ipConnection, pnNumSteps, NULL);
 					}
-			case 11:	// current schema
+					break;
+
+			case 11:// The schema update from 11 to 12 needs to take place using FAM DB schema version 156	
+					if (nFAMDBSchemaVersion == 156)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion12(ipConnection, pnNumSteps, NULL);
+					}
+			case 12:	// current schema
 				break;
 
             default:
