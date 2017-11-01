@@ -43,7 +43,6 @@ LibDirs=$(VcppLibDirs)
 
 CScriptProgram=$(CSCRIPT_PATH)\cscript
 
-Label="$(VAULT_DIR)\vault" LABEL -server $(VAULT_SERVER) -repository "Extract"
 DelOptions=/Q /F /S
 ISCompile=Compile
 ISCompileOptions=-I"$(INSTALL_SHIELD_DIR)\Include"
@@ -131,9 +130,6 @@ SetupBuildEnv:
 	@SET INCLUDE=$(IncludeDirs)
 	@SET LIB=$(LibDirs)
 	@SET LIBPATH=C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\ATLMFC\LIB
-	
-LabelCommonDir:
-	$(Label) $$/Engineering/ProductDevelopment/Common "$(FlexIndexVersion)"
 	
 DisplayTimeStamp:
 	@ECHO.

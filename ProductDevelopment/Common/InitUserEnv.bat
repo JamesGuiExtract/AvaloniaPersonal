@@ -25,8 +25,6 @@ SET DevEnvDir=%VISUAL_STUDIO%\Common7\IDE
 SET VS_COMMON=%VISUAL_STUDIO%\Common7
 SET WINDOWS_SDK=C:\Program Files\Microsoft SDKs\Windows\v7.1
 
-SET VAULT_DIR=%PROGRAM_ROOT%\SourceGear\Vault Client
-
 SET DEV_STUDIO_DIR=%PROGRAM_ROOT%\InstallShield\2013 SP1 SAB
 SET DOTFUSCATOR=%PROGRAM_ROOT%\PreEmptive Solutions\Dotfuscator Professional Edition 4.10
 SET INSTALLSHIELD_PROJECTS_DIR=C:\InstallShield 2013 Projects
