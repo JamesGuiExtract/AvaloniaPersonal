@@ -93,6 +93,17 @@ static const string gstrCREATE_ORDER_TABLE_V3 =
 	" [ReferenceDateTime] DATETIME, "
 	" [ORMMessage] XML)";
 
+static const string gstrCREATE_ORDER_TABLE_V9 =
+	"CREATE TABLE [dbo].[LabDEOrder]( "
+	" [OrderNumber] NVARCHAR(20) NOT NULL CONSTRAINT [PK_Order] PRIMARY KEY CLUSTERED, "
+	" [OrderCode] NVARCHAR(30) NOT NULL, "
+	" [PatientMRN] NVARCHAR(20) NULL, "
+	" [ReceivedDateTime] DATETIME NOT NULL DEFAULT GETDATE(), "
+	" [OrderStatus] NCHAR(1) NOT NULL DEFAULT 'A', "
+	" [ReferenceDateTime] DATETIME, "
+	" [ORMMessage] XML, "
+	" [EncounterID] NVARCHAR(20) NULL)";
+
 static const string gstrADD_FK_ORDER_PATIENT_MRN_V1 = 
 	"ALTER TABLE [dbo].[Order]  "
 	" WITH CHECK ADD CONSTRAINT [FK_Order_Patient] FOREIGN KEY ([PatientMRN]) "
@@ -128,6 +139,17 @@ static const string gstrCREATE_ORDER_FILE_TABLE_V1 =
 	"CREATE TABLE [dbo].[OrderFile]( "
 	" [OrderNumber] NVARCHAR(20) NOT NULL, "
 	" [FileID] INT NOT NULL, "
+	" CONSTRAINT [PK_OrderFile] PRIMARY KEY CLUSTERED "
+	" ( "
+	"	[OrderNumber], "
+	"	[FileID]"
+	" ))";
+
+static const string gstrCREATE_ORDER_FILE_TABLE_V9 =
+	"CREATE TABLE [dbo].[LabDEOrderFile]( "
+	" [OrderNumber] NVARCHAR(20) NOT NULL, "
+	" [FileID] INT NOT NULL, "
+	" [CollectionDate] DATETIME, "
 	" CONSTRAINT [PK_OrderFile] PRIMARY KEY CLUSTERED "
 	" ( "
 	"	[OrderNumber], "

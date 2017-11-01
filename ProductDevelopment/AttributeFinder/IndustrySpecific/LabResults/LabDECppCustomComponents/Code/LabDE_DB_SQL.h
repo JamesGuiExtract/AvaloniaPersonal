@@ -105,7 +105,7 @@ static const string gstrLABDE_ORDER_TABLE = "LabDEOrder";
 
 static const string gstrCREATE_ORDER_TABLE = 
     "CREATE TABLE [dbo].[LabDEOrder]( "
-    " [OrderNumber] NVARCHAR(20) NOT NULL CONSTRAINT [PK_Order] PRIMARY KEY CLUSTERED, "
+    " [OrderNumber] NVARCHAR(50) NOT NULL CONSTRAINT [PK_Order] PRIMARY KEY CLUSTERED, "
     " [OrderCode] NVARCHAR(30) NOT NULL, "
     " [PatientMRN] NVARCHAR(20) NULL, "
     " [ReceivedDateTime] DATETIME NOT NULL DEFAULT GETDATE(), "
@@ -154,7 +154,7 @@ static const string gstrLABDE_ORDER_FILE_TABLE = "LabDEOrderFile";
 
 static const string gstrCREATE_ORDER_FILE_TABLE = 
     "CREATE TABLE [dbo].[LabDEOrderFile]( "
-    " [OrderNumber] NVARCHAR(20) NOT NULL, "
+    " [OrderNumber] NVARCHAR(50) NOT NULL, "
     " [FileID] INT NOT NULL, "
     " [CollectionDate] DATETIME, "
     " CONSTRAINT [PK_OrderFile] PRIMARY KEY CLUSTERED "

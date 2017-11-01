@@ -457,6 +457,14 @@ int UpdateToSchemaVersion11(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41641");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion12(_ConnectionPtr ipConnection,
+							long* pnNumSteps,
+							IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 12;
 
 		if (pnNumSteps != __nullptr)
 		{
@@ -498,6 +506,7 @@ int UpdateToSchemaVersion11(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45026");
 }
+
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion13(_ConnectionPtr ipConnection,
 	long* pnNumSteps,
@@ -1054,14 +1063,14 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
                     }
 					// Intentionally leaving out break since both updates 8 and 9 take place within
 					// FAM schema 141.                   
-			case 9:	// The schema update from 8 to 9 needs to take place using FAM DB schema version 141
+			case 9:	// The schema update from 9 to 10 needs to take place using FAM DB schema version 141
 					if (nFAMDBSchemaVersion == 141)
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion10(ipConnection, pnNumSteps, NULL);
 					}
 					// Intentionally leaving out break since both updates 9 and 10 take place within
 					// FAM schema 141.                   
-			case 10:// The schema update from 9 to 10 needs to take place using FAM DB schema version 141
+			case 10:// The schema update from 10 to 11 needs to take place using FAM DB schema version 141
 					if (nFAMDBSchemaVersion == 141)
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion11(ipConnection, pnNumSteps, NULL);
