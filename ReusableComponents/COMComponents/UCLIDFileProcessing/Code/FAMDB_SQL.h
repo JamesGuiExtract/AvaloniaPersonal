@@ -439,7 +439,8 @@ static const string gstrCREATE_WORKFLOWCHANGEFILE =
 static const string gstrCREATE_MLMODEL =
 "CREATE TABLE [dbo].[MLModel]( "
 	"	[ID]   INT IDENTITY(1, 1) NOT NULL, "
-	"	[Name] INT NOT NULL, "
+	"	[Name] NVARCHAR(255) NOT NULL, "
+	"   CONSTRAINT [IX_MLModelName] UNIQUE NONCLUSTERED ([Name] ASC), "
 	"   CONSTRAINT [PK_MLModel] PRIMARY KEY CLUSTERED ([ID] ASC));";
 
 static const string gstrCREATE_MLDATA =
