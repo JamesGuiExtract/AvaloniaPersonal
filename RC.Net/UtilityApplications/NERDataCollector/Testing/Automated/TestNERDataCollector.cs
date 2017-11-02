@@ -1,0 +1,412 @@
+﻿using AttributeDbMgrComponentsLib;
+using Extract.FileActionManager.Database.Test;
+using Extract.FileActionManager.FileProcessors;
+using Extract.Testing.Utilities;
+using Extract.Utilities;
+using Extract.UtilityApplications.NERAnnotator;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using UCLID_FILEPROCESSINGLib;
+
+namespace Extract.UtilityApplications.NERDataCollector.Test
+{
+    /// <summary>
+    /// Unit tests for NERDataCollector class
+    /// </summary>
+    [TestFixture]
+    [NUnit.Framework.Category("NERDataCollector")]
+    public class TestNERDataCollector
+    {
+        #region Fields
+
+        /// <summary>
+        /// Manages the test data files
+        /// </summary>
+        static TestFileManager<TestNERDataCollector> _testFiles;
+        static List<string> _inputFolder = new List<string>();
+
+        /// <summary>
+        /// Manages test FAM DBs.
+        /// </summary>
+        static FAMTestDBManager<TestNERDataCollector> _testDbManager;
+
+        static readonly string _DB_NAME = "_TestNERDataCollector_2DB1BD2B-2352-4F4D-AA62-AB215603B1C3";
+        static readonly string _ATTRIBUTE_SET_NAME = "Expected";
+        static readonly string _STORE_ATTRIBUTE_GUID = typeof(StoreAttributesInDBTask).GUID.ToString();
+        static readonly string _MODEL_NAME = "Test";
+
+        static readonly string _GET_MLDATA =
+            @"SELECT Data FROM MLData
+            JOIN MLModel ON MLData.MLModelID = MLModel.ID
+                WHERE Name = @Name
+                AND IsTrainingData = @IsTrainingData";
+
+        #endregion Fields
+
+        #region Overhead
+
+        /// <summary>
+        /// Setup method to initialize the testing environment.
+        /// </summary>
+        [TestFixtureSetUp]
+
+        public static void Setup()
+        {
+            GeneralMethods.TestSetup();
+            _testFiles = new TestFileManager<TestNERDataCollector>();
+            _testDbManager = new FAMTestDBManager<TestNERDataCollector>();
+        }
+
+        /// <summary>
+        /// Cleanup after all tests have run.
+        /// </summary>
+        [TestFixtureTearDown]
+        public static void FinalCleanup()
+        {
+            // Dispose of the test image manager
+            if (_testFiles != null)
+            {
+                _testFiles.Dispose();
+            }
+
+            // The first temp folder exists after it has been deleted (until I close nunit) so to
+            // safe, remove them from the list so as not to attempt to delete them more than once if you run
+            // test twice.
+            for (int i = _inputFolder.Count; i > 0;)
+            {
+                Directory.Delete(_inputFolder[--i], true);
+                _inputFolder.RemoveAt(i);
+            }
+
+            if (_testDbManager != null)
+            {
+                _testDbManager.Dispose();
+                _testDbManager = null;
+            }
+        }
+
+        // Helper function to put resource test files into a DB
+        // These images are from Demo_FlexIndex
+        private static void CreateDatabase()
+        {
+            // Create DB
+            var fileProcessingDB = _testDbManager.GetNewDatabase(_DB_NAME);
+            fileProcessingDB.DefineNewAction("a");
+            fileProcessingDB.DefineNewMLModel(_MODEL_NAME);
+            var attributeDBMgr = new AttributeDBMgr
+            {
+                FAMDB = fileProcessingDB
+            };
+            attributeDBMgr.CreateNewAttributeSetName(_ATTRIBUTE_SET_NAME);
+            var afutility = new UCLID_AFUTILSLib.AFUtility();
+            fileProcessingDB.RecordFAMSessionStart("DUMMY", "a", true, true);
+
+            // Populate DB
+            _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+            Directory.CreateDirectory(_inputFolder.Last());
+
+            var tokenFile = Path.Combine(_inputFolder.Last(), "en-token.nlp.etf");
+            _testFiles.GetFile("Resources.en-token.nlp.etf", tokenFile);
+            var sentenceFile = Path.Combine(_inputFolder.Last(), "en-sent.nlp.etf");
+            _testFiles.GetFile("Resources.en-sent.nlp.etf", sentenceFile);
+
+            int numFiles = 10;
+            for (int i = 1; i <= numFiles; i++)
+            {
+                var baseResourceName = "Resources.Example{0:D2}.tif{1}";
+                var baseName = "Example{0:D2}.tif{1}";
+
+                string resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, "");
+                string fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, "");
+                string path = Path.Combine(_inputFolder.Last(), fileName);
+                _testFiles.GetFile(resourceName, path);
+
+                var rec = fileProcessingDB.AddFile(path, "a", -1, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
+                    out var _, out var _);
+
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".uss");
+                fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".uss");
+                path = Path.Combine(_inputFolder.Last(), fileName);
+                _testFiles.GetFile(resourceName, path);
+
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".evoa");
+                fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".evoa");
+                path = Path.Combine(_inputFolder.Last(), fileName);
+                _testFiles.GetFile(resourceName, path);
+
+                var voaData = afutility.GetAttributesFromFile(path);
+                int fileTaskSessionID = fileProcessingDB.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, rec.FileID, rec.ActionID);
+                attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, _ATTRIBUTE_SET_NAME, voaData, false, true, true,
+                    closeConnection: i == numFiles);
+            }
+
+            fileProcessingDB.RecordFAMSessionStop();
+            fileProcessingDB.CloseAllDBConnections();
+        }
+
+        private static string GetDataFromDB(bool trainingData)
+        {
+            // Build the connection string from the settings
+            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+            {
+                DataSource = "(local)",
+                InitialCatalog = _DB_NAME,
+                IntegratedSecurity = true,
+                NetworkLibrary = "dbmssocn"
+            };
+
+            string trainingOutput = null;
+            using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+            {
+                connection.Open();
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = _GET_MLDATA;
+                    cmd.Parameters.AddWithValue("@Name", _MODEL_NAME);
+                    cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
+
+                    var lines = new List<string>();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lines.Add(reader.GetString(0));
+                        }
+
+                        trainingOutput = string.Join("", lines);
+                        reader.Close();
+                    }
+                }
+                connection.Close();
+            }
+            return trainingOutput;
+        }
+
+        #endregion Overhead
+
+        #region Tests
+
+
+        // Test Database mode
+        [Test, Category("NERDataCollector")]
+        public static void AllFilesExist()
+        {
+            try
+            {
+                CreateDatabase();
+
+                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
+                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
+
+                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
+                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
+                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+                collector.AnnotatorSettingsPath = annotatorSettingsPath;
+
+                collector.Process("(local)", _DB_NAME);
+
+                // Verify tags
+                var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
+                var expected = File.ReadAllText(expectedFile);
+
+                string trainingOutput = GetDataFromDB(trainingData: true);
+                Assert.AreEqual(expected, trainingOutput);
+
+                expectedFile = _testFiles.GetFile("Resources.opennlp.test.txt");
+                expected = File.ReadAllText(expectedFile);
+                var testingOutput = GetDataFromDB(trainingData: false);
+                Assert.AreEqual(expected, testingOutput);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(_DB_NAME);
+            }
+        }
+
+        // Image files need not exist
+        [Test, Category("NERDataCollector")]
+        public static void NoImageFilesExist()
+        {
+            try
+            {
+                CreateDatabase();
+                foreach(var fileName in Directory.GetFiles(_inputFolder.Last(), "*.tif"))
+                {
+                    File.Delete(fileName);
+                }
+
+                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
+                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
+
+                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
+                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
+                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+                collector.AnnotatorSettingsPath = annotatorSettingsPath;
+
+                collector.Process("(local)", _DB_NAME);
+
+                // Verify tags
+                var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
+                var expected = File.ReadAllText(expectedFile);
+
+                string trainingOutput = GetDataFromDB(trainingData: true);
+                Assert.AreEqual(expected, trainingOutput);
+
+                expectedFile = _testFiles.GetFile("Resources.opennlp.test.txt");
+                expected = File.ReadAllText(expectedFile);
+                var testingOutput = GetDataFromDB(trainingData: false);
+                Assert.AreEqual(expected, testingOutput);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(_DB_NAME);
+
+
+                // Reset test files object to avoid complaints about deleted files
+                _testFiles.Dispose();
+                _testFiles = new TestFileManager<TestNERDataCollector>();
+            }
+        }
+
+        // Missing USS files = no data
+        [Test, Category("NERDataCollector")]
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
+        public static void NoUSSFilesExist()
+        {
+            try
+            {
+                CreateDatabase();
+                foreach(var fileName in Directory.GetFiles(_inputFolder.Last(), "*.uss"))
+                {
+                    File.Delete(fileName);
+                }
+
+                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
+                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
+
+                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
+                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
+                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+                collector.AnnotatorSettingsPath = annotatorSettingsPath;
+
+                collector.Process("(local)", _DB_NAME);
+
+                // Verify empty data
+                var expected = "";
+
+                string trainingOutput = GetDataFromDB(trainingData: true);
+                Assert.AreEqual(expected, trainingOutput);
+
+                var testingOutput = GetDataFromDB(trainingData: false);
+                Assert.AreEqual(expected, testingOutput);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(_DB_NAME);
+                // Reset test files object to avoid complaints about deleted files
+                _testFiles.Dispose();
+                _testFiles = new TestFileManager<TestNERDataCollector>();
+            }
+        }
+
+        // Missing USS files = no data
+        // This exercises a different code path than the previous test due to no training/testing set division
+        [Test, Category("NERDataCollector")]
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
+        public static void NoUSSFilesExist2()
+        {
+            try
+            {
+                CreateDatabase();
+                foreach(var fileName in Directory.GetFiles(_inputFolder.Last(), "*.uss"))
+                {
+                    File.Delete(fileName);
+                }
+
+                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
+                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
+
+                // Update settings to change code-path used to handle missing uss file
+                var annotatorSettings = Settings.LoadFrom(annotatorSettingsPath);
+                annotatorSettings.PercentToUseForTestingSet = 0;
+                annotatorSettings.SaveTo(annotatorSettingsPath);
+
+                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
+                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
+                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+                collector.AnnotatorSettingsPath = annotatorSettingsPath;
+
+                collector.Process("(local)", _DB_NAME);
+
+                // Verify empty data
+                var expected = "";
+
+                string trainingOutput = GetDataFromDB(trainingData: true);
+                Assert.AreEqual(expected, trainingOutput);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(_DB_NAME);
+                // Reset test files object to avoid complaints about deleted files
+                _testFiles.Dispose();
+                _testFiles = new TestFileManager<TestNERDataCollector>();
+            }
+        }
+
+        // Test with some USS files missing
+        [Test, Category("NERDataCollector")]
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
+        public static void SomeUSSFilesExist()
+        {
+            try
+            {
+                CreateDatabase();
+                var files = Directory.GetFiles(_inputFolder.Last(), "*.uss");
+                CollectionMethods.Shuffle(files, new Random(0));
+                foreach(var fileName in files.Take(5))
+                {
+                    File.Delete(fileName);
+                }
+
+                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
+                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
+
+                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
+                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
+                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+                collector.AnnotatorSettingsPath = annotatorSettingsPath;
+
+                collector.Process("(local)", _DB_NAME);
+
+                // Verify that there is some data, but less than if all files existed
+                var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
+                var expected = File.ReadAllText(expectedFile);
+
+                string trainingOutput = GetDataFromDB(trainingData: true);
+                Assert.Less(0, trainingOutput.Length);
+                Assert.Greater(expected.Length, trainingOutput.Length);
+
+                expectedFile = _testFiles.GetFile("Resources.opennlp.test.txt");
+                expected = File.ReadAllText(expectedFile);
+                var testingOutput = GetDataFromDB(trainingData: false);
+                Assert.Less(0, testingOutput.Length);
+                Assert.Greater(expected.Length, testingOutput.Length);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(_DB_NAME);
+                // Reset test files object to avoid complaints about deleted files
+                _testFiles.Dispose();
+                _testFiles = new TestFileManager<TestNERDataCollector>();
+            }
+        }
+
+        #endregion Tests
+    }
+}

@@ -62,7 +62,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// Initializes a new instance of the <see cref="AnnotationConfigurationDialog"/>
         /// class.
         /// </summary>
-        /// <param name="settingsFilePath">The <see cref="LearningMachineConfiguration"/> instance to configure.
+        /// <param name="settingsFilePath">The <see cref="AnnotationConfigurationDialog"/> instance to configure.
         /// </param>
         public AnnotationConfigurationDialog(string settingsFilePath = null)
         {
@@ -788,7 +788,28 @@ namespace Extract.UtilityApplications.NERAnnotator
         public int? RandomSeedForSetDivision { get; set; }
 
         public string TypesVoaFunction { get; set; }
+
+        /// <summary>
+        /// Will be used to build the name of the training and testing data
+        /// output files (by adding .train.txt, e.g.) if they are not specified explicitly
+        /// </summary>
         public string OutputFileBaseName { get; set; } = "opennlp.annotated";
+
+        /// <summary>
+        /// Explicitly set the name of the file to write training data to
+        /// </summary>
+        public string TrainingOutputFileName { get; set; }
+
+        /// <summary>
+        /// Explicitly set the name of the file to write testing data to
+        /// </summary>
+        public string TestingOutputFileName { get; set; }
+
+        public bool UseDatabase { get; set; }
+        public string DatabaseServer { get; set; }
+        public string DatabaseName { get; set; }
+        public string ModelName { get; set; }
+        public string AttributeSetName { get; set; }
         public int PercentUninterestingPagesToInclude { get; set; }
         public int? RandomSeedForPageInclusion { get; set; }
 
@@ -818,6 +839,8 @@ namespace Extract.UtilityApplications.NERAnnotator
         public string TokenizerModelPath { get; set; } = "<ComponentDataDir>\\NER\\tokenizer.nlp.etf";
 
         public List<EntityDefinition> EntityDefinitions { get; set; } = new List<EntityDefinition>();
+        public long LastIDToProcess { get;  set; }
+        public long FirstIDToProcess { get; set; }
 
         public static Settings LoadFrom(string filename)
         {

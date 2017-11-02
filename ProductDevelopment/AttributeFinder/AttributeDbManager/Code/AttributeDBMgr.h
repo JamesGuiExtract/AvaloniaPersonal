@@ -84,7 +84,8 @@ public:
 											IIUnknownVector* pAttributes,
 											VARIANT_BOOL vbStoreDiscreteFields,
 											VARIANT_BOOL vbStoreRasterZone,
-											VARIANT_BOOL vbStoreEmptyAttributes);
+											VARIANT_BOOL vbStoreEmptyAttributes,
+											VARIANT_BOOL vbCloseConnection);
 
 	// relativeIndex: -1 for most recent, 1 for oldest
 	// decrement most recent value to get next most recent (-2)

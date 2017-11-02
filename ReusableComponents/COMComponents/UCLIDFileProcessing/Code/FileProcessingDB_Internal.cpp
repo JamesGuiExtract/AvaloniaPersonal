@@ -7247,3 +7247,4 @@ void CFileProcessingDB::createTempTableOfSelectedFiles(ADODB::_ConnectionPtr &ip
 
 	executeVectorOfSQL(ipConnection, vecCreateTemp);
 }
+//--------------------------------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 ﻿using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.NERAnnotator
@@ -19,11 +21,12 @@ namespace Extract.UtilityApplications.NERAnnotator
                 {
                     UtilityMethods.ShowMessageBox("Usage:" +
                         "\r\n  To open the editor:\r\n    NERAnnotator" +
-                        "\r\n  To create a labeled tokens file:\r\n    NERAnnotator <settingsFile> /p [/s] [/ef <exceptionFile>]" +
+                        "\r\n  To create a labeled tokens file:\r\n    NERAnnotator <settingsFile> /p [/s] [/ef <exceptionFile>] [--<propertyName> <propertyValue> ...]" +
                         "\r\n    /s = silent = no progress bar or exceptions displayed" +
                         "\r\n    /ef <exceptionFile> log exceptions to file" +
                         "\r\n       (supports propagate errors to FAM option)" +
                         "\r\n       (/ef also implies /s)" +
+                        "\r\n    /<propertyName> <propertyValue> override settings file properties" +
                         "\r\n  To edit a settings file:\r\n    NERAnnotator <settingsFile>", "NER Annotator", error);
                     return error ? -1 : 0;
                 }
@@ -35,13 +38,50 @@ namespace Extract.UtilityApplications.NERAnnotator
                 {
                     string action = null;
                     string settingsFile = null;
-                    foreach (var arg in args)
+                    List<(PropertyInfo property, object value)> propertiesToSet = new List<(PropertyInfo, object)>();
+                    for (int argNum = 0; argNum < args.Length; argNum++)
                     {
-                        if (saveErrors && uexName == null)
+                        var arg = args[argNum];
+
+                        if (arg.StartsWith("--", StringComparison.Ordinal))
                         {
-                            uexName = arg;
+                            var val = arg.Substring(2);
+                            if (UtilityMethods.TryGetProperty<Settings>(val, true, out var prop))
+                            {
+                                if (++argNum < args.Length)
+                                {
+                                    try
+                                    {
+                                        var type = prop.PropertyType;
+                                        var value = Convert.ChangeType(args[argNum], type);
+                                        propertiesToSet.Add((prop, value));
+                                        continue;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        var ue = new ExtractException("ELI45038", "Unable to set property", ex);
+                                        ue.AddDebugData("Property", val, false);
+                                        ue.AddDebugData("Value", args[argNum], false);
+                                        ue.Log();
+                                    }
+                                }
+                                else
+                                {
+                                    var ue = new ExtractException("ELI45039", "No value given for property");
+                                    ue.AddDebugData("Property", val, false);
+                                    ue.Log();
+                                    return usage(error: true);
+                                }
+                            }
+                            else
+                            {
+                                var ue = new ExtractException("ELI45054", "Unrecognized property");
+                                ue.AddDebugData("Property", val, false);
+                                ue.Log();
+                                return usage(error: true);
+                            }
                         }
-                        else if (action == null && arg.StartsWith("-", StringComparison.Ordinal)
+                        else if (arg.StartsWith("-", StringComparison.Ordinal)
                             || arg.StartsWith("/", StringComparison.Ordinal))
                         {
                             var val = arg.Substring(1);
@@ -52,9 +92,18 @@ namespace Extract.UtilityApplications.NERAnnotator
                             else if (val.Equals("ef", StringComparison.OrdinalIgnoreCase))
                             {
                                 saveErrors = true;
-                                // /ef implies /s
-                                // (else exceptions would be displayed)
+                                // /ef implies /s // (else exceptions would be displayed)
                                 silent = true;
+
+                                if (++argNum < args.Length)
+                                {
+                                    uexName = args[argNum];
+                                    continue;
+                                }
+                                else
+                                {
+                                    return usage(error: true);
+                                }
                             }
                             else
                             {
@@ -67,19 +116,23 @@ namespace Extract.UtilityApplications.NERAnnotator
                         }
                         else
                         {
-                            usage(error: true);
+                            return usage(error: true);
                         }
                     }
 
                     if (string.Equals(action, "h", StringComparison.OrdinalIgnoreCase)
                             || string.Equals(action, "?", StringComparison.OrdinalIgnoreCase))
                     {
-                        usage(error: false);
+                        return usage(error: false);
                     }
                     else if (string.Equals(action, "p", StringComparison.OrdinalIgnoreCase)
                         && !string.IsNullOrEmpty(settingsFile))
                     {
                         var settings = Settings.LoadFrom(settingsFile);
+                        foreach(var (property, value) in propertiesToSet)
+                        {
+                            property.SetValue(settings, value);
+                        }
                         if (silent)
                         {
                             NERAnnotator.Process(settings, _ => { }, System.Threading.CancellationToken.None);
@@ -96,7 +149,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     }
                     else
                     {
-                        usage(error: true);
+                        return usage(error: true);
                     }
                 }
                 else
@@ -116,7 +169,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     {
                         ue.Log(uexName);
                     }
-                    catch {}
+                    catch { }
                 }
                 else if (silent)
                 {

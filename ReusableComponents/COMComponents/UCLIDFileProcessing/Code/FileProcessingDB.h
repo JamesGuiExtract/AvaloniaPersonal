@@ -350,6 +350,8 @@ public:
 	STDMETHOD(IsFileNameInWorkflow)(BSTR bstrFileName, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 	STDMETHOD(SaveWebAppSettings)(long nWorkflowID, BSTR bstrType, BSTR bstrSettings);
 	STDMETHOD(LoadWebAppSettings)(long nWorkflowID, BSTR bstrType, BSTR *pbstrSettings);
+	STDMETHOD(DefineNewMLModel)(BSTR strModelName, long* pnID);
+	STDMETHOD(DeleteMLModel)(BSTR strModelName);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1453,6 +1455,8 @@ private:
 	bool IsFileNameInWorkflow_Internal(bool bDBLocked, BSTR bstrFileName, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 	bool SaveWebAppSettings_Internal(bool bDBLocked, long nWorkflowID, BSTR bstrType, BSTR bstrSettings);
 	bool LoadWebAppSettings_Internal(bool bDBLocked, long nWorkflowID, BSTR bstrType, BSTR *pbstrSettings);
+	bool DefineNewMLModel_Internal(bool bDBLocked, BSTR strModelName, long* pnID);
+	bool DeleteMLModel_Internal(bool bDBLocked, BSTR strModelName);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

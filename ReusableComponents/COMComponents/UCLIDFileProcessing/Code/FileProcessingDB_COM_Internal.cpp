@@ -11240,3 +11240,91 @@ bool CFileProcessingDB::LoadWebAppSettings_Internal(bool bDBLocked, long nWorkfl
 
 	return true;
 }
+
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::DefineNewMLModel_Internal(bool bDBLocked, BSTR bstrMLModel, long* pnID)
+{
+	try
+	{
+		try
+		{
+			string strMLModelName = asString(bstrMLModel);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Begin a transMLModel
+				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
+
+				*pnID = getKeyID(ipConnection, "MLModel", "Name", strMLModelName);
+
+				// Commit this transMLModel
+				tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI45044");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45046");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::DeleteMLModel_Internal(bool bDBLocked, BSTR bstrMLModel)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Begin a transMLModel
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+				// Delete the MLModel
+				string strMLModelName = asString(bstrMLModel);
+				replaceVariable(strMLModelName, "'", "''");
+
+				string strDeleteMLModelQuery = "DELETE [MLModel] WHERE [Name] = '" + strMLModelName + "'";
+				executeCmdQuery(ipConnection, strDeleteMLModelQuery);
+
+				// Commit this transMLModel
+				tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI45050");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45066");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}

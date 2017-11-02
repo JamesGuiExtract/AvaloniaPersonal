@@ -4515,6 +4515,50 @@ STDMETHODIMP CFileProcessingDB::LoadWebAppSettings(long nWorkflowID, BSTR bstrTy
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45069");
 }
 
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::DefineNewMLModel(BSTR strModelName, long* pnID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		if (!DefineNewMLModel_Internal(false, strModelName, pnID))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			DefineNewMLModel_Internal(true, strModelName, pnID);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45062");
+}
+
+//-------------------------------------------------------------------------------------------------
+
+STDMETHODIMP CFileProcessingDB::DeleteMLModel(BSTR strModelName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		if (!DeleteMLModel_Internal(false, strModelName))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			DeleteMLModel_Internal(true, strModelName);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45063");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

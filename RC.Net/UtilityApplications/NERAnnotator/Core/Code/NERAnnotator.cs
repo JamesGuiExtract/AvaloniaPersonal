@@ -5,6 +5,8 @@ using opennlp.tools.sentdetect;
 using opennlp.tools.tokenize;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,8 +17,31 @@ using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.UtilityApplications.NERAnnotator
 {
-    public class NERAnnotator
+    public class NERAnnotator : IDisposable
     {
+        #region Constants
+
+        readonly string _GET_FILE_LIST =
+            @"SELECT DISTINCT FAMFile.FileName FROM AttributeSetForFile
+            JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
+            JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID
+            JOIN FAMFile ON FileTaskSession.FileID = FAMFile.ID
+                WHERE Description = @AttributeSetName
+                AND AttributeSetForFile.ID >= @FirstIDToProcess
+                AND AttributeSetForFile.ID <= @LastIDToProcess";
+
+        readonly string _GET_VOA_FROM_DB =
+            @"SELECT TOP(1) AttributeSetForFile.VOA
+            FROM AttributeSetForFile
+            JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
+            JOIN FileTaskSession FTS ON AttributeSetForFile.FileTaskSessionID = FTS.ID
+            JOIN FAMFile ON FTS.FileID = FAMFile.ID
+                WHERE Description = @AttributeSetName
+                AND FamFile.FileName = @FileName
+            ORDER BY DateTimeStamp DESC";
+
+        #endregion Constants
+
         #region Fields
 
         Random _rng;
@@ -30,8 +55,13 @@ namespace Extract.UtilityApplications.NERAnnotator
         Func<IEnumerable<RasterZone>, SpatialString, bool, HashSet<int>> _getCharIndexesMemoized;
 
         Settings _settings;
+        string _trainingOutputFile;
+        string _testingOutputFile;
         Action<StatusArgs> _updateStatus;
         CancellationToken _cancellationToken;
+        SqlConnection _connection;
+
+        private bool disposedValue = false; // To detect redundant calls
 
         #endregion Fields
 
@@ -46,6 +76,37 @@ namespace Extract.UtilityApplications.NERAnnotator
         private NERAnnotator(Settings settings, Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             _settings = settings;
+            if (_settings.UseDatabase)
+            {
+                ExtractException.Assert("ELI45035", "DatabaseServer must be specified when UseDatabase is true",
+                    !string.IsNullOrWhiteSpace(_settings.DatabaseServer));
+                ExtractException.Assert("ELI45036", "DatabaseName must be specified when UseDatabase is true",
+                    !string.IsNullOrWhiteSpace(_settings.DatabaseName));
+                ExtractException.Assert("ELI45037", "AttributeSetName must be specified when UseDatabase is true",
+                    !string.IsNullOrWhiteSpace(_settings.AttributeSetName));
+
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(_settings.TrainingOutputFileName))
+                {
+                    _trainingOutputFile = _settings.OutputFileBaseName + ".train.txt";
+                }
+                else
+                {
+                    _trainingOutputFile = _settings.TrainingOutputFileName;
+                }
+
+                if (string.IsNullOrEmpty(_settings.TestingOutputFileName))
+                {
+                    _testingOutputFile = _settings.OutputFileBaseName + ".test.txt";
+                }
+                else
+                {
+                    _testingOutputFile = _settings.TestingOutputFileName;
+                }
+            }
+
             _updateStatus = updateStatus;
             _cancellationToken = cancellationToken;
             _searcher.SetIncludeDataOnBoundary(true);
@@ -67,7 +128,8 @@ namespace Extract.UtilityApplications.NERAnnotator
         {
             try
             {
-                new NERAnnotator(settings, updateStatus, cancellationToken).Process();
+                using (var a = new NERAnnotator(settings, updateStatus, cancellationToken))
+                    a.Process();
             }
             catch (Exception ex)
             {
@@ -96,16 +158,19 @@ namespace Extract.UtilityApplications.NERAnnotator
                     ? new Random(_settings.RandomSeedForPageInclusion.Value)
                     : new Random();
 
-                CheckOutputFile(_settings.OutputFileBaseName + ".train.txt");
+                CheckOutputFile(_trainingOutputFile);
 
                 _updateStatus(new StatusArgs { StatusMessage = "Getting input files..." });
 
                 (string, int)[] trainingFiles = null;
                 (string, int)[] testingFiles = null;
 
-                if (_settings.TestingSet == TestingSetType.RandomlyPickedFromTrainingSet)
+                if (_settings.UseDatabase ||
+                    _settings.TestingSet == TestingSetType.RandomlyPickedFromTrainingSet)
                 {
-                    trainingFiles = GetInputFiles(_settings.TrainingInput, getPages: true);
+                    trainingFiles = GetInputFiles(_settings.UseDatabase
+                        ? null
+                        : _settings.TrainingInput, getPages: true);
 
                     // Make a separate random generator for splitting the input
                     var rng = _settings.RandomSeedForSetDivision.HasValue
@@ -131,7 +196,7 @@ namespace Extract.UtilityApplications.NERAnnotator
 
                 if (testingFiles != null && !_settings.OutputSeparateFileForEachCategory)
                 {
-                    CheckOutputFile(_settings.OutputFileBaseName + ".test.txt");
+                    CheckOutputFile(_testingOutputFile);
                 }
 
                 if (_settings.Format == NamedEntityRecognizer.OpenNLP)
@@ -185,7 +250,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <param name="filename"></param>
         void CheckOutputFile(string filename)
         {
-            if (_settings.FailIfOutputFileExists && File.Exists(filename))
+            if (!_settings.UseDatabase && _settings.FailIfOutputFileExists && File.Exists(filename))
             {
                 var uex = new ExtractException("ELI44859", "Output file exists");
                 uex.AddDebugData("Filename", Path.GetFullPath(filename), false);
@@ -201,80 +266,106 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <returns>An array of filename to page number, one for each page in the specified input, if <see paramref="getPages"/>, or one per file if not <see paramref="getPages"/></returns>
         (string ussPath, int page)[] GetInputFiles(string path, bool getPages)
         {
+            SqlDataReader reader = null;
             try
             {
-                if (string.IsNullOrWhiteSpace(path))
+                IEnumerable<string> files = null;
+
+                if (_settings.UseDatabase)
+                {
+                    try
+                    {
+                        // Build the connection string from the settings
+                        SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                        {
+                            DataSource = _settings.DatabaseServer,
+                            InitialCatalog = _settings.DatabaseName,
+                            IntegratedSecurity = true,
+                            NetworkLibrary = "dbmssocn"
+                        };
+
+                        _connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
+                        _connection.Open();
+
+                        using (var cmd = _connection.CreateCommand())
+                        {
+                            cmd.CommandText = _GET_FILE_LIST;
+                            cmd.Parameters.AddWithValue("@AttributeSetName", _settings.AttributeSetName);
+                            cmd.Parameters.AddWithValue("@FirstIDToProcess", _settings.FirstIDToProcess);
+                            cmd.Parameters.AddWithValue("@LastIDToProcess", _settings.LastIDToProcess);
+
+                            // Set the timeout so that it waits indefinitely
+                            cmd.CommandTimeout = 0;
+                            reader = cmd.ExecuteReader();
+                            files = reader
+                                .Cast<IDataRecord>()
+                                .Select(record => record.GetString(0) + ".uss");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var ee = ex.AsExtract("ELI45027");
+                        ee.AddDebugData("Query", _GET_FILE_LIST, true);
+                        throw ee;
+                    }
+                }
+                else if (string.IsNullOrWhiteSpace(path))
                 {
                     return null;
                 }
-
                 // Folder
                 else if (Directory.Exists(path))
                 {
-                    if (getPages)
-                    {
-                        SpatialStringClass uss = new SpatialStringClass();
-                        return Directory.GetFiles(Path.GetFullPath(path), "*.uss", SearchOption.AllDirectories)
-                            .SelectMany(ussPath =>
-                            {
-                                if (_cancellationToken.IsCancellationRequested)
-                                {
-                                    throw new OperationCanceledException();
-                                }
-                                _updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0}", Int32Value = 1 });
-                                uss.LoadFrom(ussPath, false);
-                                uss.ReportMemoryUsage();
-                                return uss.HasSpatialInfo()
-                                    ? uss.GetPages(false, "").ToIEnumerable<SpatialString>()
-                                        .Select(page => (ussPath, page.GetFirstPageNumber()))
-                                    : Enumerable.Empty<(string, int)>();
-                            })
-                            .ToArray();
-                    }
-                    else
-                    {
-                        return Directory.GetFiles(Path.GetFullPath(path), "*.uss", SearchOption.AllDirectories)
-                            .Select(ussPath => (ussPath, 0))
-                            .ToArray();
-                    }
+                    files = Directory.GetFiles(Path.GetFullPath(path), "*.uss", SearchOption.AllDirectories);
                 }
-
                 // File list
                 else if (File.Exists(path))
                 {
-                    if (getPages)
-                    {
-                        SpatialStringClass uss = new SpatialStringClass();
-                        return File.ReadAllLines(Path.GetFullPath(path))
-                            .SelectMany(imagePath =>
+                    files = File.ReadAllLines(Path.GetFullPath(path))
+                            .Select(imagePath =>
                             {
-                                if (_cancellationToken.IsCancellationRequested)
-                                {
-                                    throw new OperationCanceledException();
-                                }
-                                _updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0}", Int32Value = 1 });
                                 imagePath = Path.GetFullPath(imagePath.Trim());
                                 var ussPath = imagePath.EndsWith(".uss", StringComparison.OrdinalIgnoreCase)
                                     ? imagePath
                                     : imagePath + ".uss";
+                                return ussPath;
+                            });
+
+                }
+
+                if (getPages)
+                {
+                    SpatialStringClass uss = new SpatialStringClass();
+                    return files.SelectMany(ussPath =>
+                        {
+                            if (_cancellationToken.IsCancellationRequested)
+                            {
+                                throw new OperationCanceledException();
+                            }
+                            _updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0}", Int32Value = 1 });
+
+                            if (File.Exists(ussPath))
+                            {
                                 uss.LoadFrom(ussPath, false);
                                 uss.ReportMemoryUsage();
                                 return uss.HasSpatialInfo()
                                     ? uss.GetPages(false, "").ToIEnumerable<SpatialString>()
                                         .Select(page => (ussPath, page.GetFirstPageNumber()))
                                     : Enumerable.Empty<(string, int)>();
-                            })
-                            .ToArray();
-                    }
-                    else
-                    {
-                        return File.ReadAllLines(Path.GetFullPath(path))
-                            .Select(imagePath => (Path.GetFullPath(imagePath.Trim()) + ".uss", 0))
-                            .ToArray();
-                    }
+                            }
+                            else
+                            {
+                                return Enumerable.Empty<(string, int)>();
+                            }
+                        })
+                        .ToArray();
                 }
-
-                return null;
+                else
+                {
+                    return files
+                        .Select(ussPath => (ussPath, 0))
+                        .ToArray();
+                }
             }
             catch (OperationCanceledException)
             {
@@ -283,6 +374,10 @@ namespace Extract.UtilityApplications.NERAnnotator
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI44870");
+            }
+            finally
+            {
+                reader?.Close();
             }
         }
 
@@ -294,9 +389,9 @@ namespace Extract.UtilityApplications.NERAnnotator
         void ProcessInput((string ussPath, int page)[] files, bool appendToTrainingSet)
         {
             var pathTags = new AttributeFinderPathTags();
-            var outputFile = _settings.OutputFileBaseName + (appendToTrainingSet ? ".train.txt" : ".test.txt");
+            var outputFile = appendToTrainingSet ? _trainingOutputFile : _testingOutputFile;
             var uss = new SpatialStringClass();
-            var typesVoa = new IUnknownVectorClass();
+            IUnknownVector typesVoa = new IUnknownVectorClass();
             foreach (var g in files.GroupBy(t => t.ussPath).OrderBy(g => g.Key))
             {
                 if (_cancellationToken.IsCancellationRequested)
@@ -317,71 +412,111 @@ namespace Extract.UtilityApplications.NERAnnotator
                     ? null
                     : g.Select(t => t.page).OrderBy(p => p).ToList();
 
-                uss.LoadFrom(ussPath, false);
-                uss.ReportMemoryUsage();
-
-                pathTags.Document = new AFDocumentClass { Text = uss };
-                var typesVoaFile = pathTags.Expand(_settings.TypesVoaFunction);
-
-                if (!File.Exists(typesVoaFile))
+                if (!File.Exists(ussPath))
                 {
                     // Report a skipped file to the caller
                     _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 0, 1 } });
+                    continue;
+                }
+
+                uss.LoadFrom(ussPath, false);
+                uss.ReportMemoryUsage();
+
+                if (_settings.UseDatabase)
+                {
+                    typesVoa = GetTypesVoaFromDB(ussPath.Substring(0, ussPath.Length - 4)) ?? typesVoa;
                 }
                 else
                 {
-                    typesVoa.LoadFrom(typesVoaFile, false);
-                    typesVoa.ReportMemoryUsage();
+                    pathTags.Document = new AFDocumentClass { Text = uss };
+                    var typesVoaFile = pathTags.Expand(_settings.TypesVoaFunction);
 
-                    var tokens = GetTokens(uss, pages, typesVoa);
-
-                    // Open NLP format: <START:EntityName> tok1 <END> tok2
-                    if (_settings.Format == NamedEntityRecognizer.OpenNLP)
+                    if (!File.Exists(typesVoaFile))
                     {
-                        bool startOfSentence = true;
-                        foreach (var (token, label, startOfEntity, endOfEntity, endOfSentence, endOfPage) in tokens)
-                        {
-                            if (!startOfSentence)
-                            {
-                                sb.Append(" ");
-                            }
-                            if (startOfEntity)
-                            {
-                                sb.Append(UtilityMethods.FormatInvariant($"<START:{label}> "));
-                            }
-                            sb.Append(token);
-                            if (endOfEntity)
-                            {
-                                sb.Append(" <END>");
-                            }
-                            if (endOfSentence)
-                            {
-                                sb.AppendLine();
-                                startOfSentence = true;
-                            }
-                            else
-                            {
-                                startOfSentence = false;
-                            }
-                        }
+                        // Report a skipped file to the caller
+                        _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 0, 1 } });
+                        continue;
                     }
-                    // Stanford format: tok1 EntityName
-                    //                  tok2 O
-                    //                  ...
                     else
                     {
-                        foreach (var (token, label) in tokens)
+                        typesVoa.LoadFrom(typesVoaFile, false);
+                        typesVoa.ReportMemoryUsage();
+                    }
+                }
+
+                var tokens = GetTokens(uss, pages, typesVoa);
+
+                // Open NLP format: <START:EntityName> tok1 <END> tok2
+                if (_settings.Format == NamedEntityRecognizer.OpenNLP)
+                {
+                    bool startOfSentence = true;
+                    foreach (var (token, label, startOfEntity, endOfEntity, endOfSentence, endOfPage) in tokens)
+                    {
+                        if (!startOfSentence)
                         {
-                            sb.Append(token);
-                            sb.Append("\t");
-                            sb.AppendLine(label ?? "O");
+                            sb.Append(" ");
+                        }
+                        if (startOfEntity)
+                        {
+                            sb.Append(UtilityMethods.FormatInvariant($"<START:{label}> "));
+                        }
+                        sb.Append(token);
+                        if (endOfEntity)
+                        {
+                            sb.Append(" <END>");
+                        }
+                        if (endOfSentence)
+                        {
+                            sb.AppendLine();
+                            startOfSentence = true;
+                        }
+                        else
+                        {
+                            startOfSentence = false;
                         }
                     }
-                    _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 1, 0 } });
+                }
+                // Stanford format: tok1 EntityName
+                //                  tok2 O
+                //                  ...
+                else
+                {
+                    foreach (var (token, label) in tokens)
+                    {
+                        sb.Append(token);
+                        sb.Append("\t");
+                        sb.AppendLine(label ?? "O");
+                    }
+                }
+                _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 1, 0 } });
+
+                if (sb.Length == 0)
+                {
+                    continue;
                 }
 
                 sb.AppendLine();
-                File.AppendAllText(outputFile, sb.ToString());
+                if (_settings.UseDatabase)
+                {
+                    using (var cmd = _connection.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
+                            SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
+                            FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
+                        cmd.Parameters.AddWithValue("@IsTrainingData", appendToTrainingSet.ToString());
+                        cmd.Parameters.AddWithValue("@Data", sb.ToString());
+                        cmd.Parameters.AddWithValue("@ModelName", _settings.ModelName);
+                        cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
+
+                        // Set the timeout so that it waits indefinitely
+                        cmd.CommandTimeout = 0;
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                else
+                {
+                    File.AppendAllText(outputFile, sb.ToString());
+                }
             }
         }
 
@@ -392,7 +527,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <param name="pages">The pages to be processed (null for all pages)</param>
         /// <param name="typesVoa">The attributes to be used to annotate the input</param>
         /// <returns>A list of tuples representing each token</returns>
-        IEnumerable<AnnotationToken> GetTokens(SpatialStringClass uss, IEnumerable<int> pages, IUnknownVectorClass typesVoa)
+        IEnumerable<AnnotationToken> GetTokens(SpatialStringClass uss, IEnumerable<int> pages, IUnknownVector typesVoa)
         {
             var tokensAndLabels = new List<AnnotationToken>();
             if (pages == null)
@@ -719,6 +854,61 @@ namespace Extract.UtilityApplications.NERAnnotator
             }
             return indexes;
         }
+
+        IUnknownVector GetTypesVoaFromDB(string imageName)
+        {
+            SqlDataReader reader = null;
+            try
+            {
+                using (var cmd = _connection.CreateCommand())
+                {
+                    cmd.CommandText = _GET_VOA_FROM_DB;
+                    cmd.Parameters.AddWithValue("@AttributeSetName", _settings.AttributeSetName);
+                    cmd.Parameters.AddWithValue("@FileName", imageName);
+
+                    reader = cmd.ExecuteReader();
+                    if (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        using (var stream = reader.GetStream(0))
+                        {
+                            var voa = AttributeMethods.GetVoaFromSqlBinary(stream);
+                            voa.ReportMemoryUsage();
+                            return voa;
+                        }
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            finally
+            {
+                reader?.Close();
+            }
+        }
+
+        #region IDisposable Support
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _connection?.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
 
         #endregion Private Methods
     }

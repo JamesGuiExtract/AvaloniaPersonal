@@ -1977,6 +1977,13 @@ library UCLID_FILEPROCESSINGLib
 		//			specified workflow.
 		[id(189), helpstring("method LoadWebAppSettings")] HRESULT LoadWebAppSettings(
 			[in] long nWorkflowID, [in] BSTR bstrType, [out, retval] BSTR *pbstrSettings);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Creates a new MLModel record with the specified name. Does nothing if the name already exists.
+		[id(190), helpstring("method DefineNewMLModel")] HRESULT DefineNewMLModel([in] BSTR strModelName,
+			[out, retval] long* pnID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Deletes the MLModel record with the specified name
+		[id(191), helpstring("method DeleteMLModel")] HRESULT DeleteMLModel([in] BSTR strModelName);
 	};
 
 	[

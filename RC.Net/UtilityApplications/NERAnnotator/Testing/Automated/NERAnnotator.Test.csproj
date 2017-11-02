@@ -47,6 +47,24 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+    <COMReference Include="UCLID_FILEPROCESSINGLib">
+      <Guid>{5FBC9199-D162-4F14-BAD9-090F6AB576C5}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="AttributeDbMgrComponentsLib">
+      <Guid>{0DF6DB5B-F788-42FC-AE9E-EF19CAA78D38}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
@@ -110,6 +128,14 @@
     <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
       <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
       <Name>Extract.Testing.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
+      <Project>{6B284A4D-132C-4FE4-858F-06A9C476B19B}</Project>
+      <Name>Extract.FileActionManager.Database.Test</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj">
+      <Project>{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}</Project>
+      <Name>Extract.FileActionManager.FileProcessors</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>

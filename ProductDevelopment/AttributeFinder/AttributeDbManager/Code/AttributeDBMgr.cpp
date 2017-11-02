@@ -1206,10 +1206,20 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessio
 														    IIUnknownVector* pAttributes,
   															VARIANT_BOOL vbStoreDiscreteFields,
 															VARIANT_BOOL vbStoreRasterZone,
-															VARIANT_BOOL vbStoreEmptyAttributes )
+															VARIANT_BOOL vbStoreEmptyAttributes,
+															VARIANT_BOOL vbCloseConnection)
 {
 	try
 	{
+		// Set connection to null on end of scope if requested to close it
+		shared_ptr<void> closeConnection(__nullptr, [&](void*)
+		{
+			if (asCppBool(vbCloseConnection))
+			{
+				m_ipDBConnection = __nullptr;
+			}
+		});
+
 		const bool bDbNotLocked = false;
 		auto bRet = CreateNewAttributeSetForFile_Internal( bDbNotLocked,
 														   nFileTaskSessionID,

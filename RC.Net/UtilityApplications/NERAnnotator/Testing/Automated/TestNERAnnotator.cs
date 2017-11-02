@@ -1,13 +1,17 @@
-﻿using Extract.Testing.Utilities;
+﻿using AttributeDbMgrComponentsLib;
+using Extract.FileActionManager.Database.Test;
+using Extract.FileActionManager.FileProcessors;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.UtilityApplications.NERAnnotator.Test
@@ -27,6 +31,22 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
         static TestFileManager<TestNERAnnotator> _testFiles;
         static List<string> _inputFolder = new List<string>();
 
+        /// <summary>
+        /// Manages test FAM DBs.
+        /// </summary>
+        static FAMTestDBManager<TestNERAnnotator> _testDbManager;
+
+        static readonly string _DB_NAME = "_TestNERAnnotator_2DB1BD2B-2352-4F4D-AA62-AB215603B1C3";
+        static readonly string _ATTRIBUTE_SET_NAME = "Expected";
+        static readonly string _STORE_ATTRIBUTE_GUID = typeof(StoreAttributesInDBTask).GUID.ToString();
+        static readonly string _MODEL_NAME = "Test";
+
+        static readonly string _GET_MLDATA =
+            @"SELECT Data FROM MLData
+            JOIN MLModel ON MLData.MLModelID = MLModel.ID
+                WHERE Name = @Name
+                AND IsTrainingData = @IsTrainingData";
+
         #endregion Fields
 
         #region Overhead
@@ -35,10 +55,12 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
         /// Setup method to initialize the testing environment.
         /// </summary>
         [TestFixtureSetUp]
+
         public static void Setup()
         {
             GeneralMethods.TestSetup();
             _testFiles = new TestFileManager<TestNERAnnotator>();
+            _testDbManager = new FAMTestDBManager<TestNERAnnotator>();
         }
 
         /// <summary>
@@ -53,14 +75,24 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
                 _testFiles.Dispose();
             }
 
-            foreach(var dir in _inputFolder.Where(dir => Directory.Exists(dir)))
+            // This class is haunted; The first temp folder keeps existing after it has been deleted so to
+            // safe, remove them from the list so as not to attempt to delete them more than once if you run
+            // test twice (they do go away after closing nunit).
+            for (int i = _inputFolder.Count; i > 0;)
             {
-                Directory.Delete(dir, true);
+                Directory.Delete(_inputFolder[--i], true);
+                _inputFolder.RemoveAt(i);
+            }
+
+            if (_testDbManager != null)
+            {
+                _testDbManager.Dispose();
+                _testDbManager = null;
             }
         }
 
-        // Helper function to build file lists for pagination testing
-        // These images are stapled together from Demo_LabDE images
+        // Helper function to put resource test files into folders
+        // These images are from Demo_FlexIndex
         private static void SetFiles()
         {
             _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
@@ -112,6 +144,35 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
                     _testFiles.GetFile(resourceName, path);
                 }
             }
+        }
+
+        private static void CreateDatabase()
+        {
+            var fileProcessingDB = _testDbManager.GetNewDatabase(_DB_NAME);
+            fileProcessingDB.DefineNewAction("a");
+            fileProcessingDB.DefineNewMLModel(_MODEL_NAME);
+            var attributeDBMgr = new AttributeDBMgr
+            {
+                FAMDB = fileProcessingDB
+            };
+            attributeDBMgr.CreateNewAttributeSetName(_ATTRIBUTE_SET_NAME);
+            var afutility = new UCLID_AFUTILSLib.AFUtility();
+            fileProcessingDB.RecordFAMSessionStart("DUMMY", "a", true, true);
+
+            var files = Directory.GetFiles(_inputFolder.Last() + "\\Train", "*.tif");
+            for (int i = 0; i < files.Length; i++)
+            {
+                var file = files[i];
+                var rec = fileProcessingDB.AddFile(file, "a", -1, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
+                    out var _, out var _);
+                var voaData = afutility.GetAttributesFromFile(file + ".evoa");
+                int fileTaskSessionID = fileProcessingDB.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, rec.FileID, rec.ActionID);
+                attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, _ATTRIBUTE_SET_NAME, voaData, false, true, true,
+                    closeConnection: i == (files.Length - 1));
+            }
+
+            fileProcessingDB.RecordFAMSessionStop();
+            fileProcessingDB.CloseAllDBConnections();
         }
 
         #endregion Overhead
@@ -627,6 +688,73 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
             var trainingOutput = File.ReadAllText(trainingOutputFile);
             Assert.AreEqual(expected, trainingOutput);
+        }
+
+        // Test Database mode
+        [Test, Category("NERAnnotator")]
+        public static void DatabaseMode()
+        {
+            try
+            {
+                SetFiles();
+                CreateDatabase();
+                var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.train_list.annotator");
+                _testFiles.GetFile("Resources.opennlp.train_list.annotator", settingsFile);
+                var settings = Settings.LoadFrom(settingsFile);
+                settings.UseDatabase = true;
+                settings.DatabaseServer = "(local)";
+                settings.DatabaseName = _DB_NAME;
+                settings.FirstIDToProcess = 0;
+                settings.LastIDToProcess = 10;
+                settings.AttributeSetName = _ATTRIBUTE_SET_NAME;
+                settings.ModelName = _MODEL_NAME;
+                NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
+
+                // Verify tags
+                var expectedFile = _testFiles.GetFile("Resources.opennlp.train_list.train.txt");
+                var expected = File.ReadAllText(expectedFile);
+
+
+                // Build the connection string from the settings
+                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                {
+                    DataSource = "(local)",
+                    InitialCatalog = _DB_NAME,
+                    IntegratedSecurity = true,
+                    NetworkLibrary = "dbmssocn"
+                };
+
+                string trainingOutput = null;
+                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                {
+                    connection.Open();
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = _GET_MLDATA;
+                        cmd.Parameters.AddWithValue("@Name", _MODEL_NAME);
+                        cmd.Parameters.AddWithValue("@IsTrainingData", true);
+
+                        var lines = new List<string>();
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                lines.Add(reader.GetString(0));
+                            }
+
+                            trainingOutput = string.Join("", lines);
+                            reader.Close();
+                        }
+                    }
+                    connection.Close();
+                }
+
+                Assert.AreEqual(expected, trainingOutput);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(_DB_NAME);
+            }
         }
 
         #endregion Tests

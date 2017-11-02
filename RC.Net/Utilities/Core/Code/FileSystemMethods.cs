@@ -41,9 +41,10 @@ namespace Extract.Utilities
         /// The path to the common components folder.
         /// Use the directory of this assembly to be more flexible in case in the future we allow
         /// the software to be installed to a different directory.
+        /// Changed from Location to CodeBase so that it works from unit tests
         /// </summary>
         static readonly string _COMMON_COMPONENTS_PATH =
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
 
         /// <summary>
         /// The full path to the Extract Systems application data folder.

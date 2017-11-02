@@ -880,6 +880,10 @@ namespace Extract.Database
                 {
                     dbConnection.Open();
 
+                    // No matter what I do, the connection that I open and use in .NET won't release the DB.
+                    // Setting SINGLE_USER fixes the problem
+                    ExecuteDBQuery(dbConnection, Invariant($"ALTER DATABASE [{databaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"));
+
                     ExecuteDBQuery(dbConnection, Invariant($"DROP DATABASE [{databaseName}]"));
                 }
             }

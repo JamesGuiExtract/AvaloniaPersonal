@@ -572,7 +572,8 @@ namespace Extract.FileActionManager.FileProcessors
                                                                       voaData,
                                                                       StoreDiscreteData,
                                                                       StoreRasterZones,
-                                                                      StoreEmptyAttributes);
+                                                                      StoreEmptyAttributes,
+                                                                      false);
 
                     pDB.UpdateFileTaskSession(fileTaskSessionID, timer.ElapsedSeconds, 0);
                 }

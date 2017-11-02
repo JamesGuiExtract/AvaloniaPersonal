@@ -1,3 +1,5 @@
+using Extract.Interop;
+using Extract.Interop.Zip;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -247,6 +249,49 @@ namespace Extract.AttributeFinder
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41683");
+            }
+        }
+
+        /// <summary>
+        /// Loads the IUnknownVector of attributes from the stream
+        /// </summary>
+        /// <param name="binaryAsStream">Stream containing the vector of attributes</param>
+        /// <returns>IUnknownVector of attributes that was in the stream</returns>
+        public static IUnknownVector GetVoaFromSqlBinary(Stream binaryAsStream)
+        {
+            try
+            {
+                // Check if the stream has any data
+                if (binaryAsStream.Length == 0)
+                {
+                    return new IUnknownVector();
+                }
+                // Unzip the data in the stream
+                var zipStream = new ManagedInflater(binaryAsStream);
+                using (var unZippedStream = zipStream.InflateToStream())
+                {
+                    // Advance the stream past the GUID
+                    unZippedStream.Seek(16, SeekOrigin.Begin);
+
+                    // Creating the IUnknownVector with the prog id because if the UCLID_COMUTILSLib reference property for Embed interop types
+                    // is set to false the IUnknownVector created with new is unable to get the IPersistStream interface
+                    Type type = Type.GetTypeFromProgID("UCLIDCOMUtils.IUnknownVector");
+                    IUnknownVector voa = (IUnknownVector)Activator.CreateInstance(type);
+                    IPersistStream persistVOA = voa as IPersistStream;
+                    ExtractException.Assert("ELI41533", "Unable to Obtain IPersistStream Interface.", persistVOA != null);
+
+                    // Wrap the unzipped stream for loading the VOA
+                    IStreamWrapper binaryIPersistStream = new IStreamWrapper(unZippedStream);
+                    if (persistVOA != null)
+                    {
+                        persistVOA.Load(binaryIPersistStream);
+                    }
+                    return voa;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41546");
             }
         }
 

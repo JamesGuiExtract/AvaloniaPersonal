@@ -46,7 +46,8 @@ library AttributeDbMgrComponentsLib
 											 [in] IIUnknownVector* ipAttributes, 
 											 [in] VARIANT_BOOL vbStoreDiscreteFields,
 											 [in] VARIANT_BOOL vbStoreRasterZone,
-											 [in] VARIANT_BOOL vbStoreEmptyAttributes);
+											 [in] VARIANT_BOOL vbStoreEmptyAttributes,
+												  VARIANT_BOOL closeConnection);
 
 		[id(3), helpstring("method GetAttributeSetForFile")] 
 		HRESULT GetAttributeSetForFile([in] long fileID, 

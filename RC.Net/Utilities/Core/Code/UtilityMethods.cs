@@ -899,6 +899,21 @@ namespace Extract.Utilities
         {
             return string.Join("", strings.Select(str => FormattableString.Invariant(str)));
         }
+
+        /// <summary>
+        /// Attempts to get a public instance <see cref="PropertyInfo">property</see> from a string
+        /// </summary>
+        /// <typeparam name="T">The type of the class containing the property</typeparam>
+        /// <param name="name">The name of the property</param>
+        /// <param name="ignoreCase">Whether to ignore case differences between the given name and the property name</param>
+        /// <param name="property">The <see cref="PropertyInfo"/> of the property</param>
+        /// <returns><c>true</c> if the property was found</returns>
+        public static bool TryGetProperty<T>(string name, bool ignoreCase, out PropertyInfo property)
+        {
+            var flags = BindingFlags.Public | BindingFlags.Instance | (ignoreCase ? BindingFlags.IgnoreCase : 0);
+            property = typeof(T).GetProperty(name, flags);
+            return property != null;
+        }
     }
 
     /// <summary>

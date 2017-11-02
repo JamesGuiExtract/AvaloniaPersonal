@@ -1,4 +1,3 @@
-
 35 Return To : NICHOLS MORTGAGE SERVICES , INC . <START:Address> 1811 NORTH MERIDIAN STREET INDIANAPOLIS , INDIANA 46202 <END> [ Space Above This Line For Recording Data ] FHA Case No . State of Indiana MORTGAGE 000 - 1234567 / 000 THIS MORTGAGE ( " Security Instrument " ) is given on June 21 , 2007 The Mortgagor is <START:Name> Jane D Doe <END> , WIFE AND HUSBAND AND <START:Name> John D Doe , <END> ( " Borrower " ) .
 This Security Instrument is given to NICHOLS MORTGAGE SERVICES , INC . which is organized and existing under the laws of THE STATE OF INDIANA , and whose address is <START:Address> 1811 NORTH MERIDIAN STREET INDIANAPOLIS , INDIANA 46202 <END> ( " Lender " ) .
 Borrower owes Lender the principal sum of One Hundred Twenty - Seven Thousand Nine Hundred Seventy - Four and 00 / 100 Dollars ( U . S . $ 127 , 974 . 00

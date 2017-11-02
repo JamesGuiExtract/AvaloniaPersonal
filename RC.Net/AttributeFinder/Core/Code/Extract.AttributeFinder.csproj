@@ -96,6 +96,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\binaries\Debug\Extract.Imaging.Utilities.dll</HintPath>
     </Reference>
+    <Reference Include="Extract.Interop.Zip, Version=1.0.6506.36945, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\binaries\Debug\Extract.Interop.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907" />
     <Reference Include="Lucene.Net, Version=3.0.3.0, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <HintPath>..\..\..\APIs\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll</HintPath>
