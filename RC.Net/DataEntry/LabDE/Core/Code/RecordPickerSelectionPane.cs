@@ -78,7 +78,7 @@ namespace Extract.DataEntry.LabDE
                 // already been filed.
                 _matchedRecordCellStyle = new DataGridViewCellStyle(_recordsDataGridView.DefaultCellStyle);
                 _matchedRecordCellStyle.BackColor = Color.Orange;
-                _matchedRecordCellStyle.SelectionForeColor = Color.Orange;
+                _matchedRecordCellStyle.SelectionForeColor = Color.PeachPuff;
             }
             catch (Exception ex)
             {
