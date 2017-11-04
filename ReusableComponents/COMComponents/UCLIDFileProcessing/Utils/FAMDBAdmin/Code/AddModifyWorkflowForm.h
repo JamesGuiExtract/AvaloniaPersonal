@@ -1,13 +1,18 @@
 #pragma once
+
+#include "RedactionVerificationSettings.h"
+
 namespace Extract {
 	namespace FAMDBAdmin {
 
 		using namespace System;
 		using namespace System::ComponentModel;
 		using namespace System::Collections;
-		using namespace System::Windows::Forms;
 		using namespace System::Data;
 		using namespace System::Drawing;
+		using namespace	System::Runtime::Serialization;
+		using namespace	System::Runtime::Serialization::Json;
+		using namespace System::Windows::Forms;
 		using namespace UCLID_FILEPROCESSINGLib;
 
 		/// <summary>
@@ -91,6 +96,8 @@ namespace Extract {
 
 #pragma region Event handlers
 
+			Void HandleRedactionVerifySettingsButton_Click(System::Object^  sender, System::EventArgs^  e);
+			Void HandleRedactionVerifyCheckBox_CheckedChanged(System::Object^  sender, System::EventArgs^  e);
 			Void HandleAddModifyWorkflowForm_Load(System::Object^  sender, System::EventArgs^  e);
 			Void HandleOkButton_Click(System::Object^  sender, System::EventArgs^  e);
 
@@ -115,6 +122,15 @@ namespace Extract {
 			// Loads the metadata fields into the outputFileMetadataFieldCombo
 			Void loadOutputFileMetadataFieldCombo();
 
+			// Loads web application settings of the specified type.
+			Object ^ loadWebAppSettings(Type^ type);
+
+			// Deletes existing web application settings of the specified type.
+			Void deleteWebAppSettings(Type^ type);
+
+			// Saves web application settings to the database.
+			Void saveWebAppSettings(Object^ settings);
+
 #pragma endregion
 
 #pragma region Variables
@@ -129,6 +145,10 @@ namespace Extract {
 
 			// workflow ID of the workflow being edited
 			int _workflowID;
+
+			// The settings for web-based redaction verification for the current workflow, or
+			// __nullptr if redaction verification is not configured for the current workflow.
+			RedactionVerificationSettings ^_redactionWebAppSettings;
 
 #pragma endregion
 
@@ -164,6 +184,11 @@ namespace Extract {
 		private: System::Windows::Forms::GroupBox^  groupBox1;
 		private: System::Windows::Forms::ComboBox^  _loadBalanceWeightComboBox;
 		private: System::Windows::Forms::Label^  label9;
+
+		private: System::Windows::Forms::CheckBox^  _redactionVerifyCheckBox;
+		private: System::Windows::Forms::Button^  _redactionVerifySettingsButton;
+
+
 
 
 		private:
@@ -204,6 +229,8 @@ namespace Extract {
 				this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
 				this->_loadBalanceWeightComboBox = (gcnew System::Windows::Forms::ComboBox());
 				this->label9 = (gcnew System::Windows::Forms::Label());
+				this->_redactionVerifyCheckBox = (gcnew System::Windows::Forms::CheckBox());
+				this->_redactionVerifySettingsButton = (gcnew System::Windows::Forms::Button());
 				this->groupBox1->SuspendLayout();
 				this->SuspendLayout();
 				// 
@@ -263,94 +290,94 @@ namespace Extract {
 				// label2
 				// 
 				this->label2->AutoSize = true;
-				this->label2->Location = System::Drawing::Point(10, 162);
+				this->label2->Location = System::Drawing::Point(9, 188);
 				this->label2->Name = L"label2";
 				this->label2->Size = System::Drawing::Size(61, 13);
-				this->label2->TabIndex = 6;
+				this->label2->TabIndex = 8;
 				this->label2->Text = L"Start action";
 				// 
 				// label3
 				// 
 				this->label3->AutoSize = true;
-				this->label3->Location = System::Drawing::Point(10, 189);
+				this->label3->Location = System::Drawing::Point(9, 215);
 				this->label3->Name = L"label3";
 				this->label3->Size = System::Drawing::Size(58, 13);
-				this->label3->TabIndex = 8;
+				this->label3->TabIndex = 10;
 				this->label3->Text = L"End action";
 				// 
 				// label4
 				// 
 				this->label4->AutoSize = true;
-				this->label4->Location = System::Drawing::Point(10, 216);
+				this->label4->Location = System::Drawing::Point(10, 241);
 				this->label4->Name = L"label4";
 				this->label4->Size = System::Drawing::Size(105, 13);
-				this->label4->TabIndex = 10;
+				this->label4->TabIndex = 12;
 				this->label4->Text = L"Post workflow action";
 				// 
 				// startActionComboBox
 				// 
 				this->startActionComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->startActionComboBox->FormattingEnabled = true;
-				this->startActionComboBox->Location = System::Drawing::Point(142, 158);
+				this->startActionComboBox->Location = System::Drawing::Point(141, 184);
 				this->startActionComboBox->Name = L"startActionComboBox";
 				this->startActionComboBox->Size = System::Drawing::Size(239, 21);
 				this->startActionComboBox->Sorted = true;
-				this->startActionComboBox->TabIndex = 7;
+				this->startActionComboBox->TabIndex = 9;
 				// 
 				// endActionComboBox
 				// 
 				this->endActionComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->endActionComboBox->FormattingEnabled = true;
-				this->endActionComboBox->Location = System::Drawing::Point(142, 185);
+				this->endActionComboBox->Location = System::Drawing::Point(141, 211);
 				this->endActionComboBox->Name = L"endActionComboBox";
 				this->endActionComboBox->Size = System::Drawing::Size(239, 21);
 				this->endActionComboBox->Sorted = true;
-				this->endActionComboBox->TabIndex = 9;
+				this->endActionComboBox->TabIndex = 11;
 				// 
 				// postWorkflowActionComboBox
 				// 
 				this->postWorkflowActionComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->postWorkflowActionComboBox->FormattingEnabled = true;
-				this->postWorkflowActionComboBox->Location = System::Drawing::Point(142, 212);
+				this->postWorkflowActionComboBox->Location = System::Drawing::Point(141, 238);
 				this->postWorkflowActionComboBox->Name = L"postWorkflowActionComboBox";
 				this->postWorkflowActionComboBox->Size = System::Drawing::Size(239, 21);
 				this->postWorkflowActionComboBox->Sorted = true;
-				this->postWorkflowActionComboBox->TabIndex = 11;
+				this->postWorkflowActionComboBox->TabIndex = 13;
 				// 
 				// label5
 				// 
 				this->label5->AutoSize = true;
-				this->label5->Location = System::Drawing::Point(10, 243);
+				this->label5->Location = System::Drawing::Point(9, 162);
 				this->label5->Name = L"label5";
 				this->label5->Size = System::Drawing::Size(85, 13);
-				this->label5->TabIndex = 12;
+				this->label5->TabIndex = 6;
 				this->label5->Text = L"Document folder";
 				// 
 				// documentFolderTextBox
 				// 
 				this->documentFolderTextBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
 					| System::Windows::Forms::AnchorStyles::Right));
-				this->documentFolderTextBox->Location = System::Drawing::Point(142, 239);
+				this->documentFolderTextBox->Location = System::Drawing::Point(141, 158);
 				this->documentFolderTextBox->Name = L"documentFolderTextBox";
 				this->documentFolderTextBox->Size = System::Drawing::Size(428, 20);
-				this->documentFolderTextBox->TabIndex = 13;
+				this->documentFolderTextBox->TabIndex = 7;
 				// 
 				// label6
 				// 
 				this->label6->AutoSize = true;
-				this->label6->Location = System::Drawing::Point(10, 296);
+				this->label6->Location = System::Drawing::Point(10, 325);
 				this->label6->Name = L"label6";
 				this->label6->Size = System::Drawing::Size(97, 13);
-				this->label6->TabIndex = 16;
+				this->label6->TabIndex = 18;
 				this->label6->Text = L"Output attribute set";
 				// 
 				// okButton
 				// 
 				this->okButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->okButton->Location = System::Drawing::Point(414, 410);
+				this->okButton->Location = System::Drawing::Point(414, 440);
 				this->okButton->Name = L"okButton";
 				this->okButton->Size = System::Drawing::Size(75, 23);
-				this->okButton->TabIndex = 19;
+				this->okButton->TabIndex = 21;
 				this->okButton->Text = L"O&K";
 				this->okButton->UseVisualStyleBackColor = true;
 				this->okButton->Click += gcnew System::EventHandler(this, &AddModifyWorkflowForm::HandleOkButton_Click);
@@ -360,10 +387,10 @@ namespace Extract {
 				this->cancelButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->cancelButton->CausesValidation = false;
 				this->cancelButton->DialogResult = System::Windows::Forms::DialogResult::Cancel;
-				this->cancelButton->Location = System::Drawing::Point(495, 410);
+				this->cancelButton->Location = System::Drawing::Point(495, 440);
 				this->cancelButton->Name = L"cancelButton";
 				this->cancelButton->Size = System::Drawing::Size(75, 23);
-				this->cancelButton->TabIndex = 20;
+				this->cancelButton->TabIndex = 22;
 				this->cancelButton->Text = L"&Cancel";
 				this->cancelButton->UseVisualStyleBackColor = true;
 				// 
@@ -373,10 +400,10 @@ namespace Extract {
 					| System::Windows::Forms::AnchorStyles::Right));
 				this->outputAttributeSetComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->outputAttributeSetComboBox->FormattingEnabled = true;
-				this->outputAttributeSetComboBox->Location = System::Drawing::Point(142, 292);
+				this->outputAttributeSetComboBox->Location = System::Drawing::Point(141, 321);
 				this->outputAttributeSetComboBox->Name = L"outputAttributeSetComboBox";
 				this->outputAttributeSetComboBox->Size = System::Drawing::Size(408, 21);
-				this->outputAttributeSetComboBox->TabIndex = 17;
+				this->outputAttributeSetComboBox->TabIndex = 19;
 				// 
 				// label7
 				// 
@@ -384,7 +411,7 @@ namespace Extract {
 				this->label7->Location = System::Drawing::Point(10, 25);
 				this->label7->Name = L"label7";
 				this->label7->Size = System::Drawing::Size(74, 13);
-				this->label7->TabIndex = 10;
+				this->label7->TabIndex = 0;
 				this->label7->Text = L"Metadata field";
 				// 
 				// outputFileMetadataFieldComboBox
@@ -393,19 +420,19 @@ namespace Extract {
 					| System::Windows::Forms::AnchorStyles::Right));
 				this->outputFileMetadataFieldComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 				this->outputFileMetadataFieldComboBox->FormattingEnabled = true;
-				this->outputFileMetadataFieldComboBox->Location = System::Drawing::Point(130, 22);
+				this->outputFileMetadataFieldComboBox->Location = System::Drawing::Point(129, 19);
 				this->outputFileMetadataFieldComboBox->Name = L"outputFileMetadataFieldComboBox";
 				this->outputFileMetadataFieldComboBox->Size = System::Drawing::Size(414, 21);
-				this->outputFileMetadataFieldComboBox->TabIndex = 11;
+				this->outputFileMetadataFieldComboBox->TabIndex = 1;
 				// 
 				// outputFilePathInitializationFunctionTextBox
 				// 
 				this->outputFilePathInitializationFunctionTextBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
 					| System::Windows::Forms::AnchorStyles::Right));
-				this->outputFilePathInitializationFunctionTextBox->Location = System::Drawing::Point(130, 49);
+				this->outputFilePathInitializationFunctionTextBox->Location = System::Drawing::Point(128, 49);
 				this->outputFilePathInitializationFunctionTextBox->Name = L"outputFilePathInitializationFunctionTextBox";
 				this->outputFilePathInitializationFunctionTextBox->Size = System::Drawing::Size(415, 20);
-				this->outputFilePathInitializationFunctionTextBox->TabIndex = 13;
+				this->outputFilePathInitializationFunctionTextBox->TabIndex = 3;
 				// 
 				// label8
 				// 
@@ -413,7 +440,7 @@ namespace Extract {
 				this->label8->Location = System::Drawing::Point(10, 52);
 				this->label8->Name = L"label8";
 				this->label8->Size = System::Drawing::Size(101, 13);
-				this->label8->TabIndex = 12;
+				this->label8->TabIndex = 2;
 				this->label8->Text = L"Initial value function";
 				// 
 				// groupBox1
@@ -424,10 +451,10 @@ namespace Extract {
 				this->groupBox1->Controls->Add(this->outputFilePathInitializationFunctionTextBox);
 				this->groupBox1->Controls->Add(this->outputFileMetadataFieldComboBox);
 				this->groupBox1->Controls->Add(this->label7);
-				this->groupBox1->Location = System::Drawing::Point(13, 319);
+				this->groupBox1->Location = System::Drawing::Point(13, 348);
 				this->groupBox1->Name = L"groupBox1";
 				this->groupBox1->Size = System::Drawing::Size(557, 84);
-				this->groupBox1->TabIndex = 18;
+				this->groupBox1->TabIndex = 20;
 				this->groupBox1->TabStop = false;
 				this->groupBox1->Text = L"Output file path configuration";
 				// 
@@ -439,19 +466,40 @@ namespace Extract {
 					L"1", L"2", L"3", L"4", L"5",
 						L"6", L"7", L"8", L"9", L"10"
 				});
-				this->_loadBalanceWeightComboBox->Location = System::Drawing::Point(142, 265);
+				this->_loadBalanceWeightComboBox->Location = System::Drawing::Point(141, 294);
 				this->_loadBalanceWeightComboBox->Name = L"_loadBalanceWeightComboBox";
 				this->_loadBalanceWeightComboBox->Size = System::Drawing::Size(52, 21);
-				this->_loadBalanceWeightComboBox->TabIndex = 15;
+				this->_loadBalanceWeightComboBox->TabIndex = 17;
 				// 
 				// label9
 				// 
 				this->label9->AutoSize = true;
-				this->label9->Location = System::Drawing::Point(10, 269);
+				this->label9->Location = System::Drawing::Point(10, 297);
 				this->label9->Name = L"label9";
 				this->label9->Size = System::Drawing::Size(106, 13);
-				this->label9->TabIndex = 14;
+				this->label9->TabIndex = 16;
 				this->label9->Text = L"Load balance weight";
+				// 
+				// _redactionVerifyCheckBox
+				// 
+				this->_redactionVerifyCheckBox->AutoSize = true;
+				this->_redactionVerifyCheckBox->Location = System::Drawing::Point(120, 270);
+				this->_redactionVerifyCheckBox->Name = L"_redactionVerifyCheckBox";
+				this->_redactionVerifyCheckBox->Size = System::Drawing::Size(15, 14);
+				this->_redactionVerifyCheckBox->TabIndex = 14;
+				this->_redactionVerifyCheckBox->UseVisualStyleBackColor = true;
+				this->_redactionVerifyCheckBox->CheckedChanged += gcnew System::EventHandler(this, &AddModifyWorkflowForm::HandleRedactionVerifyCheckBox_CheckedChanged);
+				// 
+				// _redactionVerifySettingsButton
+				// 
+				this->_redactionVerifySettingsButton->Enabled = false;
+				this->_redactionVerifySettingsButton->Location = System::Drawing::Point(141, 265);
+				this->_redactionVerifySettingsButton->Name = L"_redactionVerifySettingsButton";
+				this->_redactionVerifySettingsButton->Size = System::Drawing::Size(218, 23);
+				this->_redactionVerifySettingsButton->TabIndex = 15;
+				this->_redactionVerifySettingsButton->Text = L"Redaction Verification Settings";
+				this->_redactionVerifySettingsButton->UseVisualStyleBackColor = true;
+				this->_redactionVerifySettingsButton->Click += gcnew System::EventHandler(this, &AddModifyWorkflowForm::HandleRedactionVerifySettingsButton_Click);
 				// 
 				// AddModifyWorkflowForm
 				// 
@@ -459,7 +507,9 @@ namespace Extract {
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->cancelButton;
-				this->ClientSize = System::Drawing::Size(581, 443);
+				this->ClientSize = System::Drawing::Size(581, 473);
+				this->Controls->Add(this->_redactionVerifySettingsButton);
+				this->Controls->Add(this->_redactionVerifyCheckBox);
 				this->Controls->Add(this->_loadBalanceWeightComboBox);
 				this->Controls->Add(this->label9);
 				this->Controls->Add(this->groupBox1);
@@ -497,7 +547,6 @@ namespace Extract {
 
 			}
 #pragma endregion
-
-		};
+};
 	}
 }

@@ -455,6 +455,14 @@ static const string gstrCREATE_MLDATA =
 	"   CONSTRAINT [PK_MLData] PRIMARY KEY NONCLUSTERED ([ID] ASC), "
 	"	CONSTRAINT [IX_MLDataDateTimeStamp] UNIQUE CLUSTERED ([DateTimeStamp] ASC, [ID] ASC));";
 
+static const string gstrCREATE_WEB_APP_CONFIG =
+	"CREATE TABLE [dbo].[WebAppConfig]( "
+	"	[ID] INT IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_WebAppConfig] PRIMARY KEY CLUSTERED, "
+	"	[Type] NVARCHAR(100) NOT NULL, "
+	"	[WorkflowID] INT NOT NULL, "
+	"	[Settings] NTEXT, "
+	"	CONSTRAINT[IX_WEB_APP_TYPE] UNIQUE NONCLUSTERED ([Type], [WorkflowID]))";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -1141,6 +1149,13 @@ static const string gstrADD_MLDATA_FAMFILE_FK =
 	"ALTER TABLE [MLData]  "
 	"WITH CHECK ADD CONSTRAINT [FK_MLData_FAMFile] FOREIGN KEY([FileID]) "
 	"REFERENCES [FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_WEB_APP_CONFIG_WORKFLOW_FK =
+	"ALTER TABLE dbo.[WebAppConfig] "
+	"WITH CHECK ADD CONSTRAINT[FK_WebAppConfig_Workflow] FOREIGN KEY([WorkflowID]) "
+	"REFERENCES[Workflow]([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 

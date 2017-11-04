@@ -1966,6 +1966,17 @@ library UCLID_FILEPROCESSINGLib
 		//			If there are no workflows defined, the result will indicate whether the file ID is present in the DB.
 		[id(187), helpstring("method IsFileNameInWorkflow")] HRESULT IsFileNameInWorkflow([in] BSTR bstrFileName,
 			[in] long nWorkflowID, [out, retval] VARIANT_BOOL *pbIsInWorkflow);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Saves the JSON settings for a web verification application of the specified type to
+		//			the specified workflow.
+		//			NOTE: Saving with bstrSettings erases previously saved settings.
+		[id(188), helpstring("method SaveWebAppSettings")] HRESULT SaveWebAppSettings(
+			[in] long nWorkflowID, [in] BSTR bstrType, [in] BSTR bstrSettings);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Loads JSON settings for a web verification application of the specified type for the
+		//			specified workflow.
+		[id(189), helpstring("method LoadWebAppSettings")] HRESULT LoadWebAppSettings(
+			[in] long nWorkflowID, [in] BSTR bstrType, [out, retval] BSTR *pbstrSettings);
 	};
 
 	[

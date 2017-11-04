@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "AddModifyWorkflowForm.h"
+#include "WorkflowVerifySettingsForm.h"
 #include "ListCtrlHelper.h"
 
 #include <UCLIDException.h>
@@ -62,6 +63,42 @@ namespace Extract
 
 #pragma region Event handlers
 
+		Void AddModifyWorkflowForm::HandleRedactionVerifySettingsButton_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			try
+			{
+				WorkflowVerifySettingsForm ^verifySettingsForm;
+				try
+				{
+					if (_redactionWebAppSettings == __nullptr)
+					{
+						_redactionWebAppSettings = dynamic_cast<RedactionVerificationSettings ^>(
+							loadWebAppSettings(RedactionVerificationSettings::typeid));
+					}
+
+					verifySettingsForm = gcnew WorkflowVerifySettingsForm(_ipfamDatabase, _workflowID, _redactionWebAppSettings);
+					if (verifySettingsForm->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+					{
+						_redactionWebAppSettings = verifySettingsForm->Settings;
+					}
+				}
+				finally
+				{
+					delete verifySettingsForm;
+				}
+			}
+			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45064");
+		}
+
+		Void AddModifyWorkflowForm::HandleRedactionVerifyCheckBox_CheckedChanged(System::Object^  sender, System::EventArgs^  e)
+		{
+			try
+			{
+				_redactionVerifySettingsButton->Enabled = _redactionVerifyCheckBox->Checked;
+			}
+			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45072");
+		}
+
 		Void AddModifyWorkflowForm::HandleAddModifyWorkflowForm_Load(System::Object ^ sender, System::EventArgs ^ e)
 		{
 			try
@@ -74,6 +111,9 @@ namespace Extract
 				loadWorkflow();
 				_loadBalanceWeightComboBox->SelectedItem =
 					ipWorkflowDefinition->LoadBalanceWeight.ToString();
+
+				_redactionVerifyCheckBox->Checked =
+					(loadWebAppSettings(RedactionVerificationSettings::typeid) != __nullptr);
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41952");
 		}
@@ -97,6 +137,14 @@ namespace Extract
 					workflowNameTextBox->Focus();
 					return;
 				}
+
+				if (_redactionVerifyCheckBox->Checked && _redactionWebAppSettings == __nullptr)
+				{
+					MessageBox::Show("Redaction verification settings have not been configured.");
+					_redactionVerifySettingsButton->Focus();
+					return;
+				}
+
 				ipWorkflowDefinition->Name = context.marshal_as<BSTR>(workflowName);
 
 				// Set the description
@@ -197,6 +245,15 @@ namespace Extract
 
 				// Update the workflow definition
 				_ipfamDatabase->SetWorkflowDefinition(ipWorkflowDefinition);
+
+				if (_redactionVerifyCheckBox->Checked)
+				{
+					saveWebAppSettings(_redactionWebAppSettings);
+				}
+				else
+				{
+					deleteWebAppSettings(RedactionVerificationSettings::typeid);
+				}
 
 				// Successfully added/updated the workflow definition so set result to ok
 				DialogResult = System::Windows::Forms::DialogResult::OK;
@@ -337,6 +394,77 @@ namespace Extract
 
 			// Empty item at the first index
 			outputFileMetadataFieldComboBox->Items->Insert(0, "");
+		}
+
+		Object ^ AddModifyWorkflowForm::loadWebAppSettings(Type^ type)
+		{
+			marshal_context context;
+
+			BSTR bstrType = context.marshal_as<BSTR>(type->Name);
+
+			String ^jsonSettings = marshal_as<String ^>(_ipfamDatabase->LoadWebAppSettings(_workflowID, bstrType));
+
+			if (String::IsNullOrWhiteSpace(jsonSettings))
+			{
+				return __nullptr;
+			}
+			else
+			{
+				MemoryStream ^stream;
+				StreamWriter ^writer;
+				try
+				{
+					stream = gcnew MemoryStream();
+					writer = gcnew StreamWriter(stream);
+					writer->Write(jsonSettings);
+					writer->Flush();
+					stream->Position = 0;
+
+					auto serializer = gcnew DataContractJsonSerializer(type);
+					return serializer->ReadObject(stream);
+				}
+				finally
+				{
+					delete writer;
+					delete stream;
+				}
+			}
+		}
+
+		Void AddModifyWorkflowForm::deleteWebAppSettings(Type^ type)
+		{
+			marshal_context context;
+
+			BSTR bstrType = context.marshal_as<BSTR>(type->Name);
+
+			_ipfamDatabase->SaveWebAppSettings(_workflowID, bstrType, "");
+		}
+
+		Void AddModifyWorkflowForm::saveWebAppSettings(Object^ settings)
+		{
+			marshal_context context;
+
+			MemoryStream ^stream;
+			StreamReader ^reader;
+			try
+			{
+				Type ^type = settings->GetType();
+				auto serializer = gcnew DataContractJsonSerializer(type);
+				stream = gcnew MemoryStream();
+				serializer->WriteObject(stream, settings);
+				stream->Position = 0;
+				reader = gcnew StreamReader(stream);
+
+				BSTR bstrType = context.marshal_as<BSTR>(type->Name);
+				BSTR bstrSettings = context.marshal_as<BSTR>(reader->ReadToEnd());
+
+				_ipfamDatabase->SaveWebAppSettings(_workflowID, bstrType, bstrSettings);
+			}
+			finally
+			{
+				delete reader;
+				delete stream;
+			}
 		}
 
 #pragma endregion

@@ -4466,6 +4466,55 @@ STDMETHODIMP CFileProcessingDB::IsFileNameInWorkflow(BSTR bstrFileName, long nWo
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44846");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SaveWebAppSettings(long nWorkflowID, BSTR bstrType, BSTR bstrSettings)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI45057", bstrType != __nullptr);
+		ASSERT_ARGUMENT("ELI45058", bstrSettings != __nullptr);
+
+		if (!SaveWebAppSettings_Internal(false, nWorkflowID, bstrType, bstrSettings))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			SaveWebAppSettings_Internal(true, nWorkflowID, bstrType, bstrSettings);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45059");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::LoadWebAppSettings(long nWorkflowID, BSTR bstrType, BSTR *pbstrSettings)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI45067", bstrType != __nullptr);
+		ASSERT_ARGUMENT("ELI45068", pbstrSettings != __nullptr);
+
+		if (!LoadWebAppSettings_Internal(false, nWorkflowID, bstrType, pbstrSettings))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			LoadWebAppSettings_Internal(true, nWorkflowID, bstrType, pbstrSettings);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45069");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

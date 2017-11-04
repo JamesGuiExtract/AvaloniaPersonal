@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 156;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 157;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1989,6 +1989,34 @@ int UpdateToSchemaVersion156(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45014");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion157(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 157;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_WEB_APP_CONFIG);
+		vecQueries.push_back(gstrADD_WEB_APP_CONFIG_WORKFLOW_FK);
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45056");
+}
+
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
 //-------------------------------------------------------------------------------------------------
@@ -6949,7 +6977,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 153:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion154);
 				case 154:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion155);
 				case 155:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion156);
-				case 156:	break;
+				case 156:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion157);
+				case 157:	break;
 
 				default:
 					{
@@ -11077,6 +11106,128 @@ bool CFileProcessingDB::IsFileNameInWorkflow_Internal(bool bDBLocked, BSTR bstrF
 			END_CONNECTION_RETRY(ipConnection, "ELI44847");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI44848");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SaveWebAppSettings_Internal(bool bDBLocked, long nWorkflowID, BSTR bstrType,
+												    BSTR bstrSettings)
+{
+	try
+	{
+		try
+		{
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+			string strType = asString(bstrType);
+			replaceVariable(strType, "'", "''");
+
+			string strSettings = asString(bstrSettings);
+			replaceVariable(strSettings, "'", "''");
+
+			string strQuery;
+			if (strSettings.empty())
+			{
+				strQuery = Util::Format(
+					"DELETE FROM dbo.[WebAppConfig]"
+					"	WHERE [Type] = '%s' "
+					"	AND [WorkflowID] = %d",
+					strType.c_str(), nWorkflowID);
+			}
+			else
+			{
+				strQuery = Util::Format(
+					"UPDATE dbo.[WebAppConfig] SET [Settings] = '%s' "
+					"	WHERE [Type] = '%s' "
+					"	AND [WorkflowID] = %d "
+					"	IF @@ROWCOUNT = 0 "
+					"	INSERT INTO dbo.[WebAppConfig] ([Type], [WorkflowID], [Settings]) "
+					"	VALUES('%s', %d, '%s')",
+					strSettings.c_str(), strType.c_str(), nWorkflowID,
+					strType.c_str(), nWorkflowID, strSettings.c_str());
+			}
+
+			executeCmdQuery(ipConnection, strQuery);
+
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI45060");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45061");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::LoadWebAppSettings_Internal(bool bDBLocked, long nWorkflowID, BSTR bstrType,
+	BSTR *pbstrSettings)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI45070", pbstrSettings != __nullptr); 
+
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+			validateDBSchemaVersion();
+
+			string strType = asString(bstrType);
+			replaceVariable(strType, "'", "''");
+
+			string strQuery = Util::Format(
+				"SELECT [Settings] "
+				"	FROM dbo.[WebAppConfig] "
+				"	WHERE[Type] = '%s' AND[WorkflowID] = %d",
+				strType.c_str(), nWorkflowID);
+
+			// Create a pointer to a recordset
+			_RecordsetPtr ipWebAppSettings(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI45071", ipWebAppSettings != __nullptr);
+
+			ipWebAppSettings->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
+				adLockOptimistic, adCmdText);
+
+			// Check whether the file already exists in the database
+			if (ipWebAppSettings->adoEOF == VARIANT_TRUE)
+			{
+				*pbstrSettings = _bstr_t("").Detach();
+			}
+			else
+			{
+				*pbstrSettings = _bstr_t(getStringField(ipWebAppSettings->Fields, "Settings").c_str()).Detach();
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI45060");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45061");
 	}
 	catch (UCLIDException &ue)
 	{

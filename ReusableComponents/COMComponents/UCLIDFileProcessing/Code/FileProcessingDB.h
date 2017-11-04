@@ -89,6 +89,7 @@ static const string gstrWORKFLOWCHANGE = "WorkflowChange";
 static const string gstrWORKFLOWCHANGE_FILE = "WorkflowChangeFile";
 static const string gstrMLMODEL = "MLModel";
 static const string gstrMLDATA = "MLData";
+static const string gstrWEB_APP_CONFIG = "WebAppConfig";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -347,6 +348,8 @@ public:
 	STDMETHOD(GetAttributeValue)(BSTR bstrSourceDocName, BSTR bstrAttributeSetName, BSTR bstrAttributePath,
 		BSTR* pbstrValue);
 	STDMETHOD(IsFileNameInWorkflow)(BSTR bstrFileName, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
+	STDMETHOD(SaveWebAppSettings)(long nWorkflowID, BSTR bstrType, BSTR bstrSettings);
+	STDMETHOD(LoadWebAppSettings)(long nWorkflowID, BSTR bstrType, BSTR *pbstrSettings);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1448,6 +1451,8 @@ private:
 	bool GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSourceDocName, BSTR bstrAttributeSetName, BSTR bstrAttributePath,
 		BSTR* pbstrValue);
 	bool IsFileNameInWorkflow_Internal(bool bDBLocked, BSTR bstrFileName, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
+	bool SaveWebAppSettings_Internal(bool bDBLocked, long nWorkflowID, BSTR bstrType, BSTR bstrSettings);
+	bool LoadWebAppSettings_Internal(bool bDBLocked, long nWorkflowID, BSTR bstrType, BSTR *pbstrSettings);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 
