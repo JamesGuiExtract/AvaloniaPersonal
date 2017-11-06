@@ -1,6 +1,7 @@
 ﻿using Extract.AttributeFinder;
 using Extract.FileActionManager.Forms;
 using Extract.Imaging;
+using Extract.Imaging.Utilities;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -407,8 +408,11 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI44828", _COMPONENT_DESCRIPTION);
+				
+				// Unlock pdf support
+                UnlockLeadtools.UnlockPdfSupport(false);
 
-                 _codecs = new ImageCodecs();
+                _codecs = new ImageCodecs();
             }
             catch (Exception ex)
             {
@@ -668,6 +672,9 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 attributes = new IUnknownVector();
                 attributes.LoadFrom(voaFileName, false);
+
+				// Update source doc name on all attributes
+                AttributeMethods.UpdateSourceDocNameOfAttributes(attributes, sourceDocName);
                 attributes.ReportMemoryUsage();
             }
 
