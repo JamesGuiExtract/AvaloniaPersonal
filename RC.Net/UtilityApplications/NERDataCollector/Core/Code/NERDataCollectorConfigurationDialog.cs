@@ -127,17 +127,26 @@ namespace Extract.UtilityApplications.NERDataCollector
                 _settings.LastIDProcessed = (int)_lastIDProcessedNumericUpDown.Value;
 
                 Dirty = false;
+                DialogResult = DialogResult.OK;
+                Close();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45047");
             }
-            finally
-            {
-                Cursor.Current = Cursors.Default;
-            }
         }
 
+
+        /// <summary>
+        /// Closes the form without updating the settings object
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        private void HandleCancelButton_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+            Close();
+        }
 
         /// <summary>
         /// Update settings from UI controls

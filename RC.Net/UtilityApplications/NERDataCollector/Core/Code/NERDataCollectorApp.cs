@@ -24,7 +24,6 @@ namespace Extract.UtilityApplications.NERDataCollector
                 int usage(bool error = false)
                 {
                     UtilityMethods.ShowMessageBox("Usage:" +
-                        "\r\n  To open the editor:\r\n    NERDataCollector" +
                         "\r\n  To create/store data:\r\n    NERDataCollector <settingsFile> /databaseServer <server> /databaseName <name> [/s] [/ef <exceptionFile>]" +
                         "\r\n    /s = silent = no progress bar or exceptions displayed" +
                         "\r\n    /ef <exceptionFile> log exceptions to file" +
@@ -177,7 +176,8 @@ namespace Extract.UtilityApplications.NERDataCollector
                     {
                         using (var form = new NERDataCollectorConfigurationDialog(collector, databaseServer, databaseName))
                         {
-                            var result = form.ShowDialog();
+                            Application.Run(form);
+                            var result = form.DialogResult;
                             if (result == DialogResult.OK)
                             {
                                 File.WriteAllText(settingsFile, collector.SaveToString());

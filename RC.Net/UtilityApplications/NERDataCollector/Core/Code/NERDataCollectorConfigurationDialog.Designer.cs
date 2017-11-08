@@ -184,6 +184,7 @@ namespace Extract.UtilityApplications.NERDataCollector
             this._cancelButton.TabIndex = 2;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
+            this._cancelButton.Click += new System.EventHandler(this.HandleCancelButton_Click);
             // 
             // NERDataCollectorConfigurationDialog
             // 
