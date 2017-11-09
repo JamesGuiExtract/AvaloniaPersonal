@@ -1,6 +1,7 @@
+"C:\Program Files\PuTTY\pageant.exe" C:\Users\Product_builder\.ssh\pb.ppk
+
 CALL InitUserEnv.Bat
 CALL InitBuildEnv.Bat
-
 
 CALL %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common\TagLatest.bat %~1
 IF %ERRORLEVEL% NEQ 0 (

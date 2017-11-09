@@ -54,15 +54,15 @@ UpdateFileVersion="I:\Common\Engineering\Tools\Utils\UpdateFileVersion\UpdateFil
 DataEntryBranding=$(RCNETDir)\DataEntry\Utilities\DataEntryApplication\Core\Code\BrandingResources
 
 #Target path for symbolic links to shared installs - must have the ending 
-SharedInstallsPath=$(ENGSVR_INTERNAL_BASE)\ProductReleases\SharedInstalls
-MakeCommonLinks=$(CommonDirectory)\PowerShell\MakeLinksToCommonInstalls.ps1
-MakeSymLink=$(CommonDirectory)\PowerShell\MakeSymLink.ps1
+SharedInstallsPath=$(NAS_BUILD_BASE)\SharedInstalls
+MakeCommonLinks=$(CommonDirectory)\PowerShell\MakeLinksToCommonInstallsOnNas.ps1
+MakeSymLink=$(CommonDirectory)\PowerShell\MakeSymLinkOnNas.ps1
 LinkShared=powershell -NoProfile -ExecutionPolicy Bypass -Command
 
 #Version specific paths for install files
 AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
 BleedingEdgeVersionDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)
-BleedingEdgeVersionUNCDir=$(ENGSVR_INTERNAL_BASE)\ProductReleases\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)
+BleedingEdgeVersionUNCDir=$(NAS_BUILD_BASE)\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)
 
 #FLEXIndex install related paths
 FLEXIndexSetupFiles=$(BleedingEdgeVersionDir)\FLEXIndex\SetupFiles
@@ -93,7 +93,7 @@ LabDEExtractLMDir=$(LabDESetupFiles)\Extract Systems LM
 LabDEInstallDir=$(LabDESetupFiles)\LabDEInstall
 LabDESilentInstallDir=$(LabDESetupFiles)\SilentInstalls
 LabDELinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(LabDESetupFilesMKLink)\' '$(SharedInstallsPath)\'"
-LabDECorePointLink=$(LinkShared) "& '$(MakeSymLink)' 'EngSvr' '$(LabDESetupFilesMKLink)\' '$(SharedInstallsPath)\' 'Corepoint Integration Engine'"
+LabDECorePointLink=$(LinkShared) "& '$(MakeSymLink)' 'thoth' '$(LabDESetupFilesMKLink)\' '$(SharedInstallsPath)\' 'Corepoint Integration Engine'"
 
 #Other
 OtherSetupFiles=$(BleedingEdgeVersionDir)\Other

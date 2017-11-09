@@ -1,0 +1,24 @@
+1. From command prompt mkdir C:\Users\product_builder\.ssh
+3. Copy pb.ppk file to C:\Users\product_builder\.ssh
+3. Install Putty - this should have the tools pageant, plink and Putty
+4. Run: pageant c:\Users\product_builder\.ssh\pb.ppk
+    a. You will be prompted for the passphrase which will need to be entered
+    b. This will need to be done each time the build machine is rebooted or product_builder logs in after being logged out
+    c. if pageant has not had the key loaded the passphrase will need to be entered when ever the build calls plink
+5. Open Putty
+    a. Select onnection->SSH->Auth
+        1. Check Allow agent forwarding
+        2. Select the private key file for authentication:C:\Users\product_builder\.ssh\pb.ppk
+    b. Select Session
+        a. Session->Host name : product_builder@thoth
+        b. Saved Sessions: product_builder@thoth
+        c. Click Save - should now have saved session product_builder@thoth
+        d. Click  Open
+            a. There will be a message bout the server's host key is no cahced in registry
+            b. answer yes to save the host key 
+            c. If the key has been loaded in pageant it should have logged in
+                Using username "product_builder".
+                Authenticating with public key "rsa-key-20171108" from agent
+                product_builder@Thoth:~$
+            d. type exit or close window
+

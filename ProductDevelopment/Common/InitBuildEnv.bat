@@ -13,6 +13,7 @@ SET PATH=%PATH%;%WINDOWS_SDK%\BIN;%BUILD_VSS_ROOT%\Engineering\ReusableComponent
 SET INSTALL_PRODUCT_DEVELOPMENT_PATH=\\extract.local\Eng\General\productdevelopment
 SET ENGSVR_INTERNAL_BASE=D:\Internal
 SET BUILD_PRODUCT_RELEASE=\\extract.local\Eng\Builds
+SET NAS_BUILD_BASE=/volume8/Eng-Builds
 
 net use i: \\extract.local\All
 
