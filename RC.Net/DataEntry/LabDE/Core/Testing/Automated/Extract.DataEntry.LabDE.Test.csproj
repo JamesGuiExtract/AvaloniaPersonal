@@ -70,11 +70,16 @@
     <Compile Include="TestDataEntryUtils.cs" />
     <Compile Include="TestLabDEQueryUtilities.cs" />
     <Compile Include="TestOrderAndEncounterTables.cs" />
+    <Compile Include="TestLabDEStoredProcedures.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
       <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
       <Name>Extract.Testing.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
+      <Project>{6b284a4d-132c-4fe4-858f-06a9c476b19b}</Project>
+      <Name>Extract.FileActionManager.Database.Test</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
