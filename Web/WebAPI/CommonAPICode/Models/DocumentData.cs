@@ -297,7 +297,7 @@ namespace WebAPI.Models
                     // https://extract.atlassian.net/browse/ISSUE-15079
                     int fileTaskSessionId = fileProcessingDB.StartFileTaskSession("AD7F3F3F-20EC-4830-B014-EC118F6D4567", fileId, actionID);
 
-                    _attributeDbMgr.CreateNewAttributeSetForFile(fileTaskSessionId, workflow.OutputAttributeSet, fileData, true, true, true);
+                    _attributeDbMgr.CreateNewAttributeSetForFile(fileTaskSessionId, workflow.OutputAttributeSet, fileData, true, true, true, false);
 
                     fileProcessingDB.UpdateFileTaskSession(fileTaskSessionId, (DateTime.Now - start).TotalSeconds, 0);
                 }
