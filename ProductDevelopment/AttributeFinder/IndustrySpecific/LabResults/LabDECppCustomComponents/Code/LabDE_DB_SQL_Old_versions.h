@@ -177,6 +177,20 @@ static const string gstrCREATE_ORDERFILE_FAMFILE_INDEX_V1 =
 	"CREATE NONCLUSTERED INDEX [IX_OrderFile_FAMFile] ON [OrderFile]([FileID])";
 
 //--------------------------------------------------------------------------------------------------
+// LabDEEncounter table
+//--------------------------------------------------------------------------------------------------
+static const string gstrCREATE_ENCOUNTER_TABLE_V8 =
+"CREATE TABLE [dbo].[LabDEEncounter] ("
+" [CSN] NVARCHAR(20) NOT NULL CONSTRAINT[PK_Encounter] PRIMARY KEY CLUSTERED, "
+" [PatientMRN] NVARCHAR(20) NULL, "
+" [EncounterDateTime] DATETIME NOT NULL DEFAULT GETDATE(), "
+" [Department] NVARCHAR(256) NOT NULL, "
+" [EncounterType] NVARCHAR(256) NOT NULL, "
+" [EncounterProvider] NVARCHAR(256) NOT NULL, "
+" ADTMessage XML)";
+
+
+//--------------------------------------------------------------------------------------------------
 // Stored procedures
 //--------------------------------------------------------------------------------------------------
 static const string gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_V3 =

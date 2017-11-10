@@ -43,10 +43,12 @@ using namespace std;
 //			  EncounterFile and PatientFile needed to track submissions against encounter and patient
 // Version 11: https://extract.atlassian.net/browse/ISSUE-14199
 //			  Added index for LabDEEncounter.PatientMRN
-// Version 12: https://extract.atlassian.net/browse/ISSUE-14988
+// Version 12:https://extract.atlassian.net/browse/ISSUE-14988
 //			  Increased size of OrderNumber Field in LabDEOrder and LabDEOrderFile
+// Version 13:https://extract.atlassian.net/browse/ISSUE-15000
+//			  Added DischargeDate and AdmissionDate to LabDEEncounter table 
 // WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
-static const long glLABDE_DB_SCHEMA_VERSION = 12;
+static const long glLABDE_DB_SCHEMA_VERSION = 13;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -337,7 +339,7 @@ int UpdateToSchemaVersion8(_ConnectionPtr ipConnection,
         vector<string> vecQueries;
 
         // Now create the Encounter table
-        vecQueries.push_back(gstrCREATE_ENCOUNTER_TABLE);
+        vecQueries.push_back(gstrCREATE_ENCOUNTER_TABLE_V8);
         vecQueries.push_back(gstrADD_FK_ENCOUNTER_PATIENT);
 
         // Add EncounterID column to LabDEOrder table.
@@ -502,7 +504,44 @@ int UpdateToSchemaVersion12(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45026");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion13(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 13;
 
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 10;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE [dbo].[LabDEEncounter] ADD [DischargeDate] DATETIME NULL");
+		vecQueries.push_back("ALTER TABLE [dbo].[LabDEEncounter] ADD [AdmissionDate] DATETIME NULL");
+		// redefining these stored procedures to use the new ones
+		vecQueries.push_back("DROP PROCEDURE [dbo].[LabDEAddOrUpdateEncounter]");
+		vecQueries.push_back("DROP PROCEDURE [dbo].[LabDEAddOrUpdateOrderWithEncounter]");
+		// The new stored procedures need to be created before the older names
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_AND_IP_DATES);
+		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_AND_IP_DATES);
+
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER);
+		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45095");
+}
 
 //-------------------------------------------------------------------------------------------------
 // CLabDEProductDBMgr
@@ -673,6 +712,10 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
             // Add stored procedures
             vecCreateQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
             vecCreateQueries.push_back(gstrCREATE_PROCEDURE_MERGE_PATIENTS);
+			// The new stored procedures need to be created before the older names
+			vecCreateQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_AND_IP_DATES);
+			vecCreateQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_AND_IP_DATES);
+
             vecCreateQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER);
             vecCreateQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER);
         }
@@ -990,13 +1033,19 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 						*pnProdSchemaVersion = UpdateToSchemaVersion11(ipConnection, pnNumSteps, NULL);
 					}
 					break;
-
 			case 11:// The schema update from 11 to 12 needs to take place using FAM DB schema version 156	
 					if (nFAMDBSchemaVersion == 156)
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion12(ipConnection, pnNumSteps, NULL);
 					}
-			case 12:	// current schema
+					break;
+			case 12:// The schema update from 12 to 13 needs to take place using FAM DB schema version 157
+					if (nFAMDBSchemaVersion == 157)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion13(ipConnection, pnNumSteps, NULL);
+					}
+
+			case 13:	// current schema
 				break;
 
             default:
