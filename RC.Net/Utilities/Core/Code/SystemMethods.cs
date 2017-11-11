@@ -1,4 +1,6 @@
+using Extract;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Management;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.ServiceProcess;
 using System.Windows.Forms;
@@ -369,6 +372,114 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Runs an executable
+        /// </summary>
+        /// <param name="command">The exe file and arguments.</param>
+        /// <param name="standardOutput">The output of the process</param>
+        /// <param name="standardError">The error message of the process</param>
+        /// <returns>The exit code of the process or 1460 ("This operation returned because the
+        /// timeout period expired.") if timeToWait has expired.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
+        public static int RunExecutable(string command, out string standardOutput,
+            out string standardError)
+        {
+            try
+            {
+                var args = CommandLineToArgs(command);
+                var exeName = args.FirstOrDefault();
+                ExtractException.Assert("ELI45098", "No executable given",
+                    exeName != null,
+                    "Command", command);
+
+                return RunExecutable(exeName, args.Skip(1),
+                    out standardOutput, out standardError);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45099");
+            }
+        }
+
+        /// <summary>
+        /// Runs an executable
+        /// </summary>
+        /// <param name="exeFile">The exe file.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <param name="standardOutput">The output of the process</param>
+        /// <param name="standardError">The error message of the process</param>
+        /// <returns>The exit code of the process or 1460 ("This operation returned because the
+        /// timeout period expired.") if timeToWait has expired.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
+        public static int RunExecutable(string exeFile, IEnumerable<string> arguments,
+            out string standardOutput, out string standardError)
+        {
+            try
+            {
+                string argumentString = string.Join(" ", arguments
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s)
+                    .ToArray());
+
+                return RunExecutable(exeFile, argumentString,
+                    out standardOutput, out standardError);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45113");
+            }
+        }
+
+        /// <summary>
+        /// Runs an executable
+        /// </summary>
+        /// <param name="exeFile">The exe file.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <param name="standardOutput">The output of the process</param>
+        /// <param name="standardError">The error message of the process</param>
+        /// <returns>The exit code of the process or 1460 ("This operation returned because the
+        /// timeout period expired.") if timeToWait has expired.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
+        private static int RunExecutable(string exeFile, string argumentString,
+            out string standardOutput, out string standardError)
+        {
+            try
+            {
+                // Verify this object is either licensed OR
+                // is called from Extract code
+                if (!LicenseUtilities.IsLicensed(LicenseIdName.ExtractCoreObjects)
+                    && !LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()))
+                {
+                    var ee = new ExtractException("ELI45114", "Object is not licensed.");
+                    ee.AddDebugData("Object Name", _OBJECT_NAME, false);
+                    throw ee;
+                }
+
+                using (var process = new Process())
+                {
+                    process.StartInfo = new ProcessStartInfo(exeFile, argumentString)
+                    {
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    };
+                    process.Start();
+                    standardOutput = process.StandardOutput.ReadToEnd();
+                    standardError = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+                    return process.ExitCode;
+                }
+            }
+            catch (Exception ex)
+            {
+                var ue = ex.AsExtract("ELI45115");
+                ue.AddDebugData("Executable", exeFile, false);
+                ue.AddDebugData("Arguments", argumentString, false);
+                throw ue;
+            }
+        }
+
+        /// <summary>
         /// Runs the specified executable with the specified arguments, appends a /ef [TempFile]
         /// to the argument list. If an exception is logged to the temp file, it will be
         /// loaded and thrown.
@@ -506,6 +617,43 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39370");
+            }
+        }
+
+        /// <summary>
+        /// Converts a command-line string into an array of args, including the program name
+        /// </summary>
+        /// <remarks>
+        /// Taken from https://stackoverflow.com/a/749653
+        /// </remarks>
+        /// <param name="commandLine">The command-line to split</param>
+        /// <returns>Array of arguments</returns>
+        public static string[] CommandLineToArgs(string commandLine)
+        {
+            IntPtr argv = IntPtr.Zero;
+            try
+            {
+                argv = NativeMethods.CommandLineToArgvW(commandLine, out int argc);
+                ExtractException.Assert("ELI45097", "Unable to parse input", argv != IntPtr.Zero);
+
+                var args = new string[argc];
+                for (var i = 0; i < args.Length; i++)
+                {
+                    var p = Marshal.ReadIntPtr(argv, i * IntPtr.Size);
+                    args[i] = Marshal.PtrToStringUni(p);
+                }
+                return args;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45096");
+            }
+            finally
+            {
+                if (argv != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(argv);
+                }
             }
         }
     }

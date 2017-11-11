@@ -36,7 +36,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
         /// </summary>
         static FAMTestDBManager<TestNERDataCollector> _testDbManager;
 
-        static readonly string _DB_NAME = "_TestNERDataCollector_2DB1BD2B-2352-4F4D-AA62-AB215603B1C3";
+        public static readonly string DBName = "_TestNERDataCollector_2DB1BD2B-2352-4F4D-AA62-AB215603B1C3";
         static readonly string _ATTRIBUTE_SET_NAME = "Expected";
         static readonly string _STORE_ATTRIBUTE_GUID = typeof(StoreAttributesInDBTask).GUID.ToString();
         static readonly string _MODEL_NAME = "Test";
@@ -91,72 +91,89 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             }
         }
 
-        // Helper function to put resource test files into a DB
-        // These images are from Demo_FlexIndex
-        private static void CreateDatabase()
+        #endregion Overhead
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Put resource test files into a DB. These images are from Demo_FlexIndex
+        /// </summary>
+        /// <returns>The path to the temp dir of documents in the DB</returns>
+        public static void CreateDatabase()
         {
-            // Create DB
-            var fileProcessingDB = _testDbManager.GetNewDatabase(_DB_NAME);
-            fileProcessingDB.DefineNewAction("a");
-            fileProcessingDB.DefineNewMLModel(_MODEL_NAME);
-            var attributeDBMgr = new AttributeDBMgr
+            try
             {
-                FAMDB = fileProcessingDB
-            };
-            attributeDBMgr.CreateNewAttributeSetName(_ATTRIBUTE_SET_NAME);
-            var afutility = new UCLID_AFUTILSLib.AFUtility();
-            fileProcessingDB.RecordFAMSessionStart("DUMMY", "a", true, true);
+                // Create DB
+                var fileProcessingDB = _testDbManager.GetNewDatabase(DBName);
+                fileProcessingDB.DefineNewAction("a");
+                fileProcessingDB.DefineNewMLModel(_MODEL_NAME);
+                var attributeDBMgr = new AttributeDBMgr
+                {
+                    FAMDB = fileProcessingDB
+                };
+                attributeDBMgr.CreateNewAttributeSetName(_ATTRIBUTE_SET_NAME);
+                var afutility = new UCLID_AFUTILSLib.AFUtility();
+                fileProcessingDB.RecordFAMSessionStart("DUMMY", "a", true, true);
 
-            // Populate DB
-            _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-            Directory.CreateDirectory(_inputFolder.Last());
+                // Populate DB
+                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+                Directory.CreateDirectory(_inputFolder.Last());
 
-            var tokenFile = Path.Combine(_inputFolder.Last(), "en-token.nlp.etf");
-            _testFiles.GetFile("Resources.en-token.nlp.etf", tokenFile);
-            var sentenceFile = Path.Combine(_inputFolder.Last(), "en-sent.nlp.etf");
-            _testFiles.GetFile("Resources.en-sent.nlp.etf", sentenceFile);
+                var tokenFile = Path.Combine(_inputFolder.Last(), "en-token.nlp.etf");
+                _testFiles.GetFile("Resources.en-token.nlp.etf", tokenFile);
+                var sentenceFile = Path.Combine(_inputFolder.Last(), "en-sent.nlp.etf");
+                _testFiles.GetFile("Resources.en-sent.nlp.etf", sentenceFile);
 
-            int numFiles = 10;
-            for (int i = 1; i <= numFiles; i++)
-            {
-                var baseResourceName = "Resources.Example{0:D2}.tif{1}";
-                var baseName = "Example{0:D2}.tif{1}";
+                int numFiles = 10;
+                for (int i = 1; i <= numFiles; i++)
+                {
+                    var baseResourceName = "Resources.Example{0:D2}.tif{1}";
+                    var baseName = "Example{0:D2}.tif{1}";
 
-                string resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, "");
-                string fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, "");
-                string path = Path.Combine(_inputFolder.Last(), fileName);
-                _testFiles.GetFile(resourceName, path);
+                    string resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, "");
+                    string fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, "");
+                    string path = Path.Combine(_inputFolder.Last(), fileName);
+                    _testFiles.GetFile(resourceName, path);
 
-                var rec = fileProcessingDB.AddFile(path, "a", -1, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
-                    out var _, out var _);
+                    var rec = fileProcessingDB.AddFile(path, "a", -1, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
+                        out var _, out var _);
 
-                resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".uss");
-                fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".uss");
-                path = Path.Combine(_inputFolder.Last(), fileName);
-                _testFiles.GetFile(resourceName, path);
+                    resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".uss");
+                    fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".uss");
+                    path = Path.Combine(_inputFolder.Last(), fileName);
+                    _testFiles.GetFile(resourceName, path);
 
-                resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".evoa");
-                fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".evoa");
-                path = Path.Combine(_inputFolder.Last(), fileName);
-                _testFiles.GetFile(resourceName, path);
+                    resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".evoa");
+                    fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".evoa");
+                    path = Path.Combine(_inputFolder.Last(), fileName);
+                    _testFiles.GetFile(resourceName, path);
 
-                var voaData = afutility.GetAttributesFromFile(path);
-                int fileTaskSessionID = fileProcessingDB.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, rec.FileID, rec.ActionID);
-                attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, _ATTRIBUTE_SET_NAME, voaData, false, true, true,
-                    closeConnection: i == numFiles);
+                    var voaData = afutility.GetAttributesFromFile(path);
+                    int fileTaskSessionID = fileProcessingDB.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, rec.FileID, rec.ActionID);
+                    attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, _ATTRIBUTE_SET_NAME, voaData, false, true, true,
+                        closeConnection: i == numFiles);
+                }
+
+                fileProcessingDB.RecordFAMSessionStop();
+                fileProcessingDB.CloseAllDBConnections();
             }
-
-            fileProcessingDB.RecordFAMSessionStop();
-            fileProcessingDB.CloseAllDBConnections();
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45129");
+            }
         }
 
+        /// <summary>
+        /// Retrieves MLData
+        /// </summary>
+        /// <param name="trainingData">Whether to retrieve training data (if <c>true</c>) or testing data (if <c>false</c>)</param>
         private static string GetDataFromDB(bool trainingData)
         {
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
             {
                 DataSource = "(local)",
-                InitialCatalog = _DB_NAME,
+                InitialCatalog = DBName,
                 IntegratedSecurity = true,
                 NetworkLibrary = "dbmssocn"
             };
@@ -188,10 +205,32 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             return trainingOutput;
         }
 
-        #endregion Overhead
+        /// <summary>
+        /// Runs the data collector process
+        /// </summary>
+        public static void Process()
+        {
+            try
+            {
+                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
+                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
+
+                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
+                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
+                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+                collector.AnnotatorSettingsPath = annotatorSettingsPath;
+
+                collector.Process("(local)", DBName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45128");
+            }
+        }
+
+        #endregion Helper Methods
 
         #region Tests
-
 
         // Test Database mode
         [Test, Category("NERDataCollector")]
@@ -201,15 +240,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             {
                 CreateDatabase();
 
-                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
-                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
-
-                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
-                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
-                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
-                collector.AnnotatorSettingsPath = annotatorSettingsPath;
-
-                collector.Process("(local)", _DB_NAME);
+                Process();
 
                 // Verify tags
                 var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
@@ -225,7 +256,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(DBName);
             }
         }
 
@@ -241,15 +272,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
                     File.Delete(fileName);
                 }
 
-                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
-                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
-
-                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
-                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
-                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
-                collector.AnnotatorSettingsPath = annotatorSettingsPath;
-
-                collector.Process("(local)", _DB_NAME);
+                Process();
 
                 // Verify tags
                 var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
@@ -265,7 +288,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(DBName);
 
 
                 // Reset test files object to avoid complaints about deleted files
@@ -287,15 +310,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
                     File.Delete(fileName);
                 }
 
-                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
-                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
-
-                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
-                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
-                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
-                collector.AnnotatorSettingsPath = annotatorSettingsPath;
-
-                collector.Process("(local)", _DB_NAME);
+                Process();
 
                 // Verify empty data
                 var expected = "";
@@ -308,7 +323,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(DBName);
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
                 _testFiles = new TestFileManager<TestNERDataCollector>();
@@ -342,7 +357,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
                 var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
                 collector.AnnotatorSettingsPath = annotatorSettingsPath;
 
-                collector.Process("(local)", _DB_NAME);
+                collector.Process("(local)", DBName);
 
                 // Verify empty data
                 var expected = "";
@@ -352,7 +367,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(DBName);
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
                 _testFiles = new TestFileManager<TestNERDataCollector>();
@@ -374,15 +389,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
                     File.Delete(fileName);
                 }
 
-                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
-                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
-
-                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
-                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
-                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
-                collector.AnnotatorSettingsPath = annotatorSettingsPath;
-
-                collector.Process("(local)", _DB_NAME);
+                Process();
 
                 // Verify that there is some data, but less than if all files existed
                 var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
@@ -400,7 +407,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(DBName);
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
                 _testFiles = new TestFileManager<TestNERDataCollector>();

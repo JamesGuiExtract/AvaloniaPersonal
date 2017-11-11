@@ -840,6 +840,13 @@ namespace Extract.Utilities
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool isInternalToolsLicensed();
 
+        /// <summary>
+        /// Converts a command-line string into an array of args, including the program name
+        /// </summary>
+        [DllImport("shell32.dll", SetLastError = true)]
+        internal static extern IntPtr CommandLineToArgvW(
+            [MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
+
         #endregion NativeMethods P/Invokes
 
         #region NativeMethods Methods

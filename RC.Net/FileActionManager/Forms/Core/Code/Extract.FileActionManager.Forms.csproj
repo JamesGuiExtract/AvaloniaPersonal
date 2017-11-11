@@ -86,6 +86,12 @@
     <Compile Include="FileTagAddedEventArgs.cs" />
     <Compile Include="FileTagClickedEventArgs.cs" />
     <Compile Include="FileTagComparer.cs" />
+    <Compile Include="AddMLModel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddMLModel.Designer.cs">
+      <DependentUpon>AddMLModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="FileTagDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -202,6 +208,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AddMLModel.resx">
+      <DependentUpon>AddMLModel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="FileTagDialog.resx">
       <DependentUpon>FileTagDialog.cs</DependentUpon>
       <SubType>Designer</SubType>

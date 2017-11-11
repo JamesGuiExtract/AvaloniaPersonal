@@ -1984,6 +1984,9 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Deletes the MLModel record with the specified name
 		[id(191), helpstring("method DeleteMLModel")] HRESULT DeleteMLModel([in] BSTR strModelName);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Deletes the MLModel record with the specified name
+		[id(192), helpstring("method GetMLModels")] HRESULT GetMLModels([out,retval] IStrToStrMap ** pmapModelNameToID);
 	};
 
 	[

@@ -39,6 +39,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     string action = null;
                     string settingsFile = null;
                     List<(PropertyInfo property, object value)> propertiesToSet = new List<(PropertyInfo, object)>();
+                    Type settingsType = typeof(Settings);
                     for (int argNum = 0; argNum < args.Length; argNum++)
                     {
                         var arg = args[argNum];
@@ -46,7 +47,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                         if (arg.StartsWith("--", StringComparison.Ordinal))
                         {
                             var val = arg.Substring(2);
-                            if (UtilityMethods.TryGetProperty<Settings>(val, true, out var prop))
+                            if (settingsType.TryGetProperty(val, true, out var prop))
                             {
                                 if (++argNum < args.Length)
                                 {

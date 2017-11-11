@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{36FBD81E-ACC8-4BED-9D8A-308BDD904092}</ProjectGuid>
+    <ProjectGuid>{A7FAD56F-541D-41A0-9DA7-683572F50A20}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>NERAnnotator</RootNamespace>
-    <AssemblyName>NERAnnotator</AssemblyName>
+    <RootNamespace>NERTrainer</RootNamespace>
+    <AssemblyName>NERTrainer</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -42,90 +42,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="IKVM.AWT.WinForms, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.AWT.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Beans, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Beans.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Charsets, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Charsets.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Cldrdata, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Cldrdata.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Corba, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Corba.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Core, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Jdbc, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Jdbc.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Localedata, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Localedata.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Management, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Management.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Media, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Media.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Misc, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Misc.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Naming, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Naming.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Nashorn, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Nashorn.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Remoting, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Remoting.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Security, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Security.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.SwingAWT, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.SwingAWT.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Text, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Text.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Tools, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Tools.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Util, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Util.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.API, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.XML.API.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.Bind, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.XML.Bind.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.Crypto, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.XML.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.Parse, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.XML.Parse.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.Transform, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.XML.Transform.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.WebServices, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.XML.WebServices.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.XPath, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.XML.XPath.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.Runtime, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.Runtime.JNI, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.Runtime.JNI.dll</HintPath>
-    </Reference>
     <Reference Include="OpenNLP.IKVM">
       <HintPath>..\..\..\..\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.dll</HintPath>
     </Reference>
@@ -242,6 +158,10 @@
       <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
+      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
+      <Name>Extract.FileActionManager.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
@@ -260,21 +180,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnnotationConfigurationDialog.cs">
+    <Compile Include="NERTrainerConfigurationDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AnnotationConfigurationDialog.Designer.cs">
-      <DependentUpon>AnnotationConfigurationDialog.cs</DependentUpon>
+    <Compile Include="NERTrainerConfigurationDialog.Designer.cs">
+      <DependentUpon>NERTrainerConfigurationDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="AnnotatonStatus.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AnnotatonStatus.Designer.cs">
-      <DependentUpon>AnnotatonStatus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EntityDefinition.cs" />
-    <Compile Include="NERAnnotator.cs" />
-    <Compile Include="NERAnnotatorApp.cs" />
+    <Compile Include="NERTrainer.cs" />
+    <Compile Include="NERTrainerApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -282,11 +195,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AnnotationConfigurationDialog.resx">
-      <DependentUpon>AnnotationConfigurationDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="AnnotatonStatus.resx">
-      <DependentUpon>AnnotatonStatus.cs</DependentUpon>
+    <EmbeddedResource Include="NERTrainerConfigurationDialog.resx">
+      <DependentUpon>NERTrainerConfigurationDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

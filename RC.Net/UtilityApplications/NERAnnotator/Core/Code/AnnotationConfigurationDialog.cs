@@ -1,18 +1,16 @@
-﻿using Extract.AttributeFinder;
-using Extract.AttributeFinder.Rules;
+﻿using Extract.AttributeFinder.Rules;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Windows.Forms;
 using YamlDotNet.Serialization;
 
 namespace Extract.UtilityApplications.NERAnnotator
 {
     /// <summary>
-    /// Dialog to configure and run attribute labeling
+    /// Dialog to configure and run NER data annotation
     /// </summary>
     /// <seealso cref="System.Windows.Forms.Form" />
     public partial class AnnotationConfigurationDialog : Form
@@ -772,8 +770,6 @@ namespace Extract.UtilityApplications.NERAnnotator
         Specified = 1
     }
 
-    // Don't rename because it could break serialization
-    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class Settings
     {
         private bool _outputSeparateFileForEachCategory;

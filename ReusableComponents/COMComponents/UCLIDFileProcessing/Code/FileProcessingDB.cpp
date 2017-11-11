@@ -4536,9 +4536,7 @@ STDMETHODIMP CFileProcessingDB::DefineNewMLModel(BSTR strModelName, long* pnID)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45062");
 }
-
 //-------------------------------------------------------------------------------------------------
-
 STDMETHODIMP CFileProcessingDB::DeleteMLModel(BSTR strModelName)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -4558,6 +4556,27 @@ STDMETHODIMP CFileProcessingDB::DeleteMLModel(BSTR strModelName)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45063");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetMLModels(IStrToStrMap * * pmapModelNameToID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		if (!GetMLModels_Internal(false, pmapModelNameToID))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+			
+			GetMLModels_Internal(true, pmapModelNameToID);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45124");
 }
 
 //-------------------------------------------------------------------------------------------------

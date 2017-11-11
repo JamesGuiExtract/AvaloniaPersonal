@@ -1,31 +1,31 @@
-﻿using AttributeDbMgrComponentsLib;
-using Extract.FileActionManager.Forms;
+﻿using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using System;
 using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.UtilityApplications.NERDataCollector
+namespace Extract.UtilityApplications.NERTrainer
 {
     /// <summary>
-    /// Dialog to configure and run NER data collection
+    /// Dialog to configure and run NER training
     /// </summary>
     /// <seealso cref="System.Windows.Forms.Form" />
-    public partial class NERDataCollectorConfigurationDialog : Form
+    public partial class NERTrainerConfigurationDialog : Form
     {
         #region Fields
 
         // Flag to short-circuit value-changed handler
-        private bool _suspendUpdatesToSettingsObject;
+        bool _suspendUpdatesToSettingsObject;
 
-        private NERDataCollector _settings;
-        private bool _dirty;
+        NERTrainer _settings;
+        bool _dirty;
 
-        private static readonly string _TITLE_TEXT = "NER training data collector";
-        private static readonly string _TITLE_TEXT_DIRTY = "*" + _TITLE_TEXT;
-        private string _databaseServer;
-        private string _databaseName;
+
+        static readonly string _TITLE_TEXT = "NER trainer";
+        static readonly string _TITLE_TEXT_DIRTY = "*" + _TITLE_TEXT;
+        string _databaseServer;
+        string _databaseName;
         FileProcessingDB _database;
 
         #endregion Fields
@@ -55,12 +55,12 @@ namespace Extract.UtilityApplications.NERDataCollector
         #region Constructors
 
         /// <summary>
-        /// Creates a configuration dialogue for an <see cref="NERDataCollector"/>
+        /// Creates a configuration dialogue for an <see cref="NERTrainer"/>
         /// </summary>
         /// <param name="collector">The instance to configure</param>
         /// <param name="databaseServer">The server to use to resolve MLModel.Names and AttributeSetNames</param>
         /// <param name="databaseName">The database to use to resolve MLModel.Names and AttributeSetNames</param>
-        public NERDataCollectorConfigurationDialog(NERDataCollector collector, string databaseServer, string databaseName)
+        public NERTrainerConfigurationDialog(NERTrainer collector, string databaseServer, string databaseName)
         {
             try
             {
@@ -74,8 +74,8 @@ namespace Extract.UtilityApplications.NERDataCollector
             }
             catch (Exception ex)
             {
-                _settings = new NERDataCollector();
-                ex.ExtractDisplay("ELI45043");
+                _settings = new NERTrainer();
+                ex.ExtractDisplay("ELI45109");
             }
         }
 
@@ -110,7 +110,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                 if (string.IsNullOrWhiteSpace(_databaseServer) || string.IsNullOrWhiteSpace(_databaseName))
                 {
                     var result = _database.ShowSelectDB("Select database", false, false);
-                    ExtractException.Assert("ELI45130", "No database configured", result);
+                    ExtractException.Assert("ELI45126", "No database configured", result);
 
                     _databaseServer = _database.DatabaseServer;
                     _databaseName = _database.DatabaseName;
@@ -119,16 +119,22 @@ namespace Extract.UtilityApplications.NERDataCollector
                 var models = _database.GetMLModels().GetKeys().ToIEnumerable<string>().ToArray();
                 _modelNameComboBox.Items.AddRange(models);
 
-                var attributeDBMgr = new AttributeDBMgr
-                {
-                    FAMDB = _database
-                };
-                var attributeSets = attributeDBMgr.GetAllAttributeSetNames().GetKeys().ToIEnumerable<string>().ToArray();
-                _attributeSetNameComboBox.Items.AddRange(attributeSets);
+                _trainingCommandPathTagsButton.PathTags.AddTag(NERTrainer.DataFilePathTag, null);
+                _trainingCommandPathTagsButton.PathTags.AddTag(NERTrainer.TempModelPathTag, null);
+
+                _testingCommandPathTagsButton.PathTags.AddTag(NERTrainer.DataFilePathTag, null);
+                _testingCommandPathTagsButton.PathTags.AddTag(NERTrainer.TempModelPathTag, null);
+
+                _testingCommandPathTagsButton.PathTags.BuiltInTagFilter = 
+                    _trainingCommandPathTagsButton.PathTags.BuiltInTagFilter =
+                    new[] { SourceDocumentPathTags.CommonComponentsDir, NERTrainer.DataFilePathTag, NERTrainer.TempModelPathTag };
+
+                _modelDestinationPathTagsButton.PathTags.BuiltInTagFilter =
+                    new[] { SourceDocumentPathTags.CommonComponentsDir };
             }
             catch (Exception ex)
             {
-                ex.AsExtract("ELI45045").Display();
+                ex.AsExtract("ELI45110").Display();
                 Close();
             }
         }
@@ -151,12 +157,9 @@ namespace Extract.UtilityApplications.NERDataCollector
                 ExtractException.Assert("ELI45127", "Model name is undefined", ValidateModel(), "Model name", modelName);
                 _settings.ModelName = modelName;
 
-                var attributeSet = _attributeSetNameComboBox.Text;
-                ExtractException.Assert("ELI45131", "Attribute set is undefined", ValidateAttributeSet(), "Attribute set", attributeSet);
-                _settings.AttributeSetName = attributeSet;
-
-                _settings.AnnotatorSettingsPath = _annotatorSettingsPathTextBox.Text;
-                _settings.LastIDProcessed = (int)_lastIDProcessedNumericUpDown.Value;
+                _settings.TrainingCommand = _trainingCommandTextBox.Text;
+                _settings.TestingCommand = _testingCommandTextBox.Text;
+                _settings.ModelDestination = _modelDestinationPathTextBox.Text;
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
@@ -164,9 +167,10 @@ namespace Extract.UtilityApplications.NERDataCollector
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45047");
+                ex.ExtractDisplay("ELI45111");
             }
         }
+
 
         /// <summary>
         /// Closes the form without updating the settings object
@@ -197,9 +201,10 @@ namespace Extract.UtilityApplications.NERDataCollector
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45048");
+                ex.ExtractDisplay("ELI45112");
             }
         }
+
 
         /// <summary>
         /// Shows an AddMLModel dialog
@@ -224,7 +229,7 @@ namespace Extract.UtilityApplications.NERDataCollector
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45132");
+                ex.ExtractDisplay("ELI45133");
             }
         }
 
@@ -241,10 +246,10 @@ namespace Extract.UtilityApplications.NERDataCollector
             {
                 _suspendUpdatesToSettingsObject = true;
 
-                _attributeSetNameComboBox.Text = _settings.AttributeSetName;
                 _modelNameComboBox.Text = _settings.ModelName;
-                _annotatorSettingsPathTextBox.Text = _settings.AnnotatorSettingsPath;
-                _lastIDProcessedNumericUpDown.Value = _settings.LastIDProcessed;
+                _trainingCommandTextBox.Text = _settings.TrainingCommand;
+                _testingCommandTextBox.Text = _settings.TestingCommand;
+                _modelDestinationPathTextBox.Text = _settings.ModelDestination;
 
                 Dirty = false;
 
@@ -258,6 +263,7 @@ namespace Extract.UtilityApplications.NERDataCollector
         /// <summary>
         /// Checks the FAM DB for model name existence
         /// </summary>
+        /// <returns></returns>
         bool ValidateModel()
         {
             var modelName = _modelNameComboBox.Text;
@@ -266,26 +272,6 @@ namespace Extract.UtilityApplications.NERDataCollector
             if (!valid)
             {
                 _modelNameComboBox.Focus();
-            }
-
-            return valid;
-        }
-
-        /// <summary>
-        /// Checks the FAM DB for attribute set existence
-        /// </summary>
-        bool ValidateAttributeSet()
-        {
-            var attributeSet = _attributeSetNameComboBox.Text;
-            var attributeDBMgr = new AttributeDBMgr
-            {
-                FAMDB = _database
-            };
-            var attributeSets = attributeDBMgr.GetAllAttributeSetNames().GetKeys().ToIEnumerable<string>().ToArray();
-            var valid = attributeSets.Contains(attributeSet, StringComparer.OrdinalIgnoreCase);
-            if (!valid)
-            {
-                _attributeSetNameComboBox.Focus();
             }
 
             return valid;

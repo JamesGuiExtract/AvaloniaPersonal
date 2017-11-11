@@ -1,13 +1,10 @@
 ﻿using Extract.Utilities;
 using System;
 using System.ComponentModel;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Extract.UtilityApplications.NERAnnotator
 {
-    // Don't rename because it could break serialization
-    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class EntityDefinition : INotifyPropertyChanged
     {
         private string _category;

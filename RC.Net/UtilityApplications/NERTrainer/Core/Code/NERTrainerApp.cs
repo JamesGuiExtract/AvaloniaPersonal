@@ -6,12 +6,12 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace Extract.UtilityApplications.NERDataCollector
+namespace Extract.UtilityApplications.NERTrainer
 {
     /// <summary>
-    /// Application to be used to test the NERDataCollector, which is to be a ServiceProcess
+    /// Application to be used to test the NERTrainer, which is to be a ServiceProcess
     /// </summary>
-    public class NERDataCollectorApp
+    public class NERTrainerApp
     {
         [STAThread]
         static int Main(string[] args)
@@ -24,12 +24,12 @@ namespace Extract.UtilityApplications.NERDataCollector
                 int usage(bool error = false)
                 {
                     UtilityMethods.ShowMessageBox("Usage:" +
-                        "\r\n  To create/store data:\r\n    NERDataCollector <settingsFile> /databaseServer <server> /databaseName <name> [/s] [/ef <exceptionFile>]" +
+                        "\r\n  To train/test a machine:\r\n    NERTrainer <settingsFile> /databaseServer <server> /databaseName <name> [/s] [/ef <exceptionFile>]" +
                         "\r\n    /s = silent = no progress bar or exceptions displayed" +
                         "\r\n    /ef <exceptionFile> log exceptions to file" +
                         "\r\n       (supports propagate errors to FAM option)" +
                         "\r\n       (/ef also implies /s)" +
-                        "\r\n  To edit a settings file:\r\n    NERDataCollector /c <settingsFile> [/databaseServer <server>] [/databaseName <name>]", "NER Data Collector", error);
+                        "\r\n  To edit a settings file:\r\n    NERTrainer /c <settingsFile> [/databaseServer <server>] [/databaseName <name>]", "NER Trainer", error);
                     return error ? -1 : 0;
                 }
 
@@ -43,7 +43,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                     string databaseServer = null;
                     string databaseName = null;
                     List<(PropertyInfo property, object value)> propertiesToSet = new List<(PropertyInfo, object)>();
-                    Type collectorType = typeof(NERDataCollector);
+                    Type trainerType = typeof(NERTrainer);
                     for (int argNum = 0; argNum < args.Length; argNum++)
                     {
                         var arg = args[argNum];
@@ -51,7 +51,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                         if (arg.StartsWith("--", StringComparison.Ordinal))
                         {
                             var val = arg.Substring(2);
-                            if (collectorType.TryGetProperty(val, true, out var prop))
+                            if (trainerType.TryGetProperty(val, true, out var prop))
                             {
                                 if (++argNum < args.Length)
                                 {
@@ -64,7 +64,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                                     }
                                     catch (Exception ex)
                                     {
-                                        var ue = new ExtractException("ELI45038", "Unable to set property", ex);
+                                        var ue = new ExtractException("ELI45101", "Unable to set property", ex);
                                         ue.AddDebugData("Property", val, false);
                                         ue.AddDebugData("Value", args[argNum], false);
                                         ue.Log();
@@ -72,7 +72,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                                 }
                                 else
                                 {
-                                    var ue = new ExtractException("ELI45039", "No value given for property");
+                                    var ue = new ExtractException("ELI45102", "No value given for property");
                                     ue.AddDebugData("Property", val, false);
                                     ue.Log();
                                     return usage(error: true);
@@ -80,7 +80,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                             }
                             else
                             {
-                                var ue = new ExtractException("ELI45055", "Unrecognized property");
+                                var ue = new ExtractException("ELI45103", "Unrecognized property");
                                 ue.AddDebugData("Property", val, false);
                                 ue.Log();
                                 return usage(error: true);
@@ -145,7 +145,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                             }
                             else
                             {
-                                var ue = new ExtractException("ELI45052", "Unrecognized option!");
+                                var ue = new ExtractException("ELI45104", "Unrecognized option!");
                                 ue.AddDebugData("Option", val, false);
                                 ue.Log();
                                 return usage(error: true);
@@ -157,37 +157,41 @@ namespace Extract.UtilityApplications.NERDataCollector
                         }
                         else
                         {
-                            var ue = new ExtractException("ELI45053", "Unrecognized argument!");
+                            var ue = new ExtractException("ELI45105", "Unrecognized argument!");
                             ue.AddDebugData("Argument", arg, false);
                             ue.Log();
                             return usage(error: true);
                         }
                     }
 
-                    var collector = File.Exists(settingsFile)
-                        ? NERDataCollector.LoadFromString(File.ReadAllText(settingsFile))
-                        : new NERDataCollector();
+                    var trainer = File.Exists(settingsFile)
+                        ? NERTrainer.LoadFromString(File.ReadAllText(settingsFile))
+                        : new NERTrainer();
 
                     foreach(var (property, value) in propertiesToSet)
                     {
-                        property.SetValue(collector, value);
+                        property.SetValue(trainer, value);
                     }
 
                     if (configure)
                     {
-                        using (var form = new NERDataCollectorConfigurationDialog(collector, databaseServer, databaseName))
+                        using (var form = new NERTrainerConfigurationDialog(trainer, databaseServer, databaseName))
                         {
                             Application.Run(form);
                             var result = form.DialogResult;
                             if (result == DialogResult.OK)
                             {
-                                File.WriteAllText(settingsFile, collector.SaveToString());
+                                File.WriteAllText(settingsFile, trainer.SaveToString());
                             }
                         }
+
+                        // Prevent COM Exception Caught being logged
+                        // https://extract.atlassian.net/browse/ISSUE-14980
+                        GC.Collect();
                     }
                     else
                     {
-                        collector.Process(databaseServer, databaseName);
+                        trainer.Process(databaseServer, databaseName);
                     }
                 }
                 else
@@ -199,7 +203,7 @@ namespace Extract.UtilityApplications.NERDataCollector
             }
             catch (Exception ex)
             {
-                var ue = ex.AsExtract("ELI45051");
+                var ue = ex.AsExtract("ELI45106");
 
                 if (saveErrors && uexName != null)
                 {

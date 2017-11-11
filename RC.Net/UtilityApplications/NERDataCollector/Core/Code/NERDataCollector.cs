@@ -4,13 +4,10 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
-using System.Windows.Forms;
 using YamlDotNet.Serialization;
 
 namespace Extract.UtilityApplications.NERDataCollector
 {
-    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class NERDataCollector
     {
         #region Constants

@@ -11328,3 +11328,75 @@ bool CFileProcessingDB::DeleteMLModel_Internal(bool bDBLocked, BSTR bstrMLModel)
 	}
 	return true;
 }
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetMLModels_Internal(bool bDBLocked, IStrToStrMap * * pmapModelNameToID)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipModelSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI45119", ipModelSet != __nullptr);
+
+				string strQuery = "SELECT * FROM [MLModel]";
+
+				ipModelSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
+					adLockReadOnly, adCmdText);
+
+				// Create StrToStrMap to return the list of models
+				IStrToStrMapPtr ipModels(CLSID_StrToStrMap);
+				ASSERT_RESOURCE_ALLOCATION("ELI45120", ipModels != __nullptr);
+
+				ipModels->CaseSensitive = VARIANT_FALSE;
+
+				// Step through all records
+				while (ipModelSet->adoEOF == VARIANT_FALSE)
+				{
+					// Get the fields from the record set
+					FieldsPtr ipFields = ipModelSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI45121", ipFields != __nullptr);
+
+					// get the model name
+					string strModelName = getStringField(ipFields, "Name");
+
+					// get the model ID
+					long lID = getLongField(ipFields, "ID");
+					string strID = asString(lID);
+
+					// Put the values in the StrToStrMap
+					ipModels->Set(strModelName.c_str(), strID.c_str());
+
+					// Move to the next record in the table
+					ipModelSet->MoveNext();
+				}
+
+				// return the StrToStrMap containing all models
+				*pmapModelNameToID = ipModels.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI45122");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45123");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}

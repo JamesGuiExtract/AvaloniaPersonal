@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Extract.Licensing;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Extract.Utilities
 {
@@ -166,6 +167,29 @@ namespace Extract.Utilities
             key = tuple.Key;
             value = tuple.Value;
         }
+
+        /// <summary>
+        /// Attempts to get a public instance <see cref="PropertyInfo">property</see> from a string
+        /// </summary>
+        /// <param name="type">The type of the class containing the property</typeparam>
+        /// <param name="name">The name of the property</param>
+        /// <param name="ignoreCase">Whether to ignore case differences between the given name and the property name</param>
+        /// <param name="property">The <see cref="PropertyInfo"/> of the property</param>
+        /// <returns><c>true</c> if the property was found</returns>
+        public static bool TryGetProperty(this Type type, string name, bool ignoreCase, out PropertyInfo property)
+        {
+            try
+            {
+                var flags = BindingFlags.Public | BindingFlags.Instance | (ignoreCase ? BindingFlags.IgnoreCase : 0);
+                property = type.GetProperty(name, flags);
+                return property != null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45100");
+            }
+        }
+
 
         #endregion Methods
 
