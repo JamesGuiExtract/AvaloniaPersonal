@@ -39,6 +39,6 @@ IF DEFINED BUILD_INSTALL_FILES (
 IF DEFINED BUILD_INTERNAL_INSTALLS (
 	net use s: %BUILD_INTERNAL_INSTALLS%
 ) ELSE (
-	net use s: \\extract.local\Eng\All\ProductReleases_InternalUseOnly
+	net use s: \\extract.local\Eng\General\ProductReleases_InternalUseOnly
 )
 
