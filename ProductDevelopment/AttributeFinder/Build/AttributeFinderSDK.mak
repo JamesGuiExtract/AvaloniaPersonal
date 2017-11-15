@@ -57,7 +57,7 @@ LabDEBuildDir=$(PDRootDir)\DataEntry\LabDE\Build
 DeveloperLicensing=I:\Common\Engineering\Tools\SecureClients\COMLicense_Developer\Current
 RuleWriterLicensing=I:\Common\Engineering\Tools\SecureClients\COMLicense_RuleWriter\Current
 SupportLicensing=I:\Common\Engineering\Tools\SecureClients\COMLicense\Current
-WebAPI=$(EngineeringRootDirectory)\Web\WebAPI\Core\CommonAPICode\bin\Release\net46\win7-x86
+WebAPI=$(EngineeringRootDirectory)\Web\WebAPI\CommonAPICode\bin\Release\net46\win7-x86
 
 # determine the name of the release output directory based upon the build
 # configuration that is being built
