@@ -3,6 +3,7 @@ using Extract.Imaging.Utilities;
 using Extract.Utilities;
 using Leadtools;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -130,7 +131,7 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                if (FunctionName == "Levenshtein")
+                if (FunctionName == XPathContext.LevenshteinFunction)
                 {
                     // Translate node sets into strings. Return null if a node set is empty
                     var stringArgs = args.Select(a =>
@@ -164,7 +165,7 @@ namespace Extract.AttributeFinder
                     }
                     return UtilityMethods.LevenshteinDistance(stringArgs[0], stringArgs[1]);
                 }
-                else if (FunctionName == "Bitmap")
+                else if (FunctionName == XPathContext.BitmapFunction)
                 {
                     if (args[0] is double width
                         && args[1] is double height
@@ -173,17 +174,54 @@ namespace Extract.AttributeFinder
                         if (nodeIterator.MoveNext())
                         {
                             var attr = (new XPathContext.XPathIterator(nodeIterator, Context)).CurrentAttribute;
-                            return InvokeBitmapFunction(Convert.ToInt32(width, CultureInfo.CurrentCulture),
-                                                        Convert.ToInt32(height, CultureInfo.CurrentCulture),
-                                                        attr);
+
+                            if (args.Length == 3)
+                            {
+                                return InvokeBitmapFunction(Convert.ToInt32(width, CultureInfo.CurrentCulture),
+                                                            Convert.ToInt32(height, CultureInfo.CurrentCulture),
+                                                            attr);
+
+                            }
+                            else if (args.Length == 5
+                                && args[3] is double minValue
+                                && args[4] is double maxValue)
+                            {
+                                ExtractException.Assert("ELI45137", "Bad range", minValue < maxValue, "Min", minValue, "Max", maxValue);
+                                return InvokeBitmapFunction(Convert.ToInt32(width, CultureInfo.CurrentCulture),
+                                                            Convert.ToInt32(height, CultureInfo.CurrentCulture),
+                                                            attr,
+                                                            true,
+                                                            minValue,
+                                                            maxValue);
+                            }
+                            else
+                            {
+                                ThrowBadBitmapArgsException();
+                            }
                         }
                     }
                     else
                     {
-                        throw new ExtractException("ELI44669",
-                        UtilityMethods.FormatInvariant($"Bad arguments. ",
-                            $"Expected Double * Double * XPathSelectionIterator, ",
-                            $"received {args[0].GetType().Name} * {args[1].GetType().Name} * {args[2].GetType().Name}"));
+                        ThrowBadBitmapArgsException();
+                    }
+
+                    void ThrowBadBitmapArgsException()
+                    {
+                        var messages = new List<FormattableString>
+                        {
+                            $"Bad arguments. ",
+                            $"Expected Double * Double * XPathSelectionIterator [ * Double * Double ], ",
+                            $"received {args[0].GetType().Name} * {args[1].GetType().Name} * {args[2].GetType().Name}"
+                        };
+                        if (args.Length > 3)
+                        {
+                            messages.Add($" * {args[3].GetType().Name}");
+                            if (args.Length > 4)
+                            {
+                                messages.Add($" * {args[4].GetType().Name}");
+                            }
+                        }
+                        throw new ExtractException("ELI44669", UtilityMethods.FormatInvariant(messages.ToArray()));
                     }
                 }
 
@@ -201,8 +239,22 @@ namespace Extract.AttributeFinder
         /// <param name="width">The width of the resulting bitmap</param>
         /// <param name="height">The height of the resulting bitmap</param>
         /// <param name="attr">The attribute to be used to generate the bitmap</param>
-        /// <returns></returns>
         static string InvokeBitmapFunction(int width, int height, IAttribute attr)
+        {
+            return InvokeBitmapFunction(width, height, attr, false, 0, 0);
+        }
+
+        /// <summary>
+        /// Invokes the es:Bitmap function to scale and encode an attribute's area as a bitmap
+        /// </summary>
+        /// <param name="width">The width of the resulting bitmap</param>
+        /// <param name="height">The height of the resulting bitmap</param>
+        /// <param name="attr">The attribute to be used to generate the bitmap</param>
+        /// <param name="scaleIntensityRange">Whether to scale the output values to be in a new range</param>
+        /// <param name="minValue">The minimum value of the output range</param>
+        /// <param name="maxValue">The maximum value of the output range</param>
+        static string InvokeBitmapFunction(int width, int height, IAttribute attr,
+            bool scaleIntensityRange, double minValue, double maxValue)
         {
             try
             {
@@ -218,6 +270,12 @@ namespace Extract.AttributeFinder
                 if (!value.HasSpatialInfo())
                 {
                     return "";
+                }
+
+                double scaleFactor = 1;
+                if (scaleIntensityRange)
+                {
+                    scaleFactor = (maxValue - minValue) / 255;
                 }
 
                 var zones = value.GetOriginalImageRasterZones();
@@ -271,8 +329,20 @@ namespace Extract.AttributeFinder
                 }
                 bitmap.UnlockBits(bitmapData);
 
+                var pixelStrings = pixelValues.Select(b =>
+                {
+                    if (scaleIntensityRange)
+                    {
+                        return (b * scaleFactor + minValue).ToString(CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        return b.ToString(CultureInfo.InvariantCulture);
+                    }
+                });
+
                 var formattedString = UtilityMethods.FormatInvariant($"Bitmap: {width} x {height} = ") +
-                    string.Join(",", pixelValues);
+                    string.Join(",", pixelStrings);
 
                 return formattedString;
             }
