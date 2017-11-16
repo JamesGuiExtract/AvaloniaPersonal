@@ -35,7 +35,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.RuleSetEditorUIObject,
-                    "ELI00000", _OBJECT_NAME);
+                    "ELI45221", _OBJECT_NAME);
 
                 Settings = settings;
 
@@ -43,7 +43,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI00000");
+                throw ex.AsExtract("ELI45222");
             }
         }
 
@@ -80,11 +80,12 @@ namespace Extract.AttributeFinder.Rules
                 if (Settings != null)
                 {
                     _templatesDirTextBox.Text = Settings.TemplatesDir ?? "";
+                    _redactionPredictorOptionsTextBox.Text = Settings.RedactionPredictorOptions ?? "";
                 }
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI00000");
+                ex.ExtractDisplay("ELI45223");
             }
         }
 
@@ -110,12 +111,13 @@ namespace Extract.AttributeFinder.Rules
                 }
 
                 Settings.TemplatesDir = _templatesDirTextBox.Text;
+                Settings.RedactionPredictorOptions = _redactionPredictorOptionsTextBox.Text;
 
                 DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI00000");
+                ex.ExtractDisplay("ELI45224");
             }
         }
 

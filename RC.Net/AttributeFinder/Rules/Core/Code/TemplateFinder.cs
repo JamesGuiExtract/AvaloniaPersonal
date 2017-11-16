@@ -30,6 +30,11 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <remarks>Can contain path tags/functions</remarks>
         string TemplatesDir { get; set; }
+
+        /// <summary>
+        /// Additional CLI options to pass to the RedactionPredictor
+        /// </summary>
+        string RedactionPredictorOptions { get; set; }
     }
 
     /// <summary>
@@ -50,12 +55,18 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Current version.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
         const LicenseIdName _LICENSE_ID = LicenseIdName.FlexIndexIDShieldCoreObjects;
+
+        /// <summary>
+        /// The path to the NERAnnotator application
+        /// </summary>
+        static readonly string _REDACTION_PREDICTOR_APPLICATION =
+            Path.Combine(FileSystemMethods.CommonComponentsPath, "RedactionPredictor.exe");
 
         #endregion Constants
 
@@ -71,7 +82,10 @@ namespace Extract.AttributeFinder.Rules
         /// <see langword="false"/> if no changes have been made since it was created.
         /// </summary>
         bool _dirty;
-        private string _templatesDir;
+
+        string _templatesDir;
+
+        string _redactionPredictorOptions;
 
         #endregion Fields
 
@@ -133,6 +147,25 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
+        /// <summary>
+        /// Additional CLI options to pass to the RedactionPredictor
+        /// </summary>
+        public string RedactionPredictorOptions
+        {
+            get
+            {
+                return _redactionPredictorOptions;
+            }
+            set
+            {
+                if (string.CompareOrdinal(value, _redactionPredictorOptions) != 0)
+                {
+                    _redactionPredictorOptions = value;
+                    _dirty = true;
+                }
+            }
+        }
+
         #endregion Properties
 
         #region IAttributeFindingRule
@@ -162,7 +195,7 @@ namespace Extract.AttributeFinder.Rules
 
                 var input = pDocument.Text;
 
-                var returnValue = ApplyTemplate(templatesDir, input);
+                var returnValue = ApplyTemplate(templatesDir, input, RedactionPredictorOptions);
 
                 // So that the garbage collector knows of and properly manages the associated
                 // memory from the created return value.
@@ -304,6 +337,9 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <returns><see langword="true"/> if the component is licensed; <see langword="false"/> 
         /// if the component is not licensed.</returns>
+        /// <summary>
+        /// Additional CLI options to pass to the RedactionPredictor
+        /// </summary>
         public bool IsLicensed()
         {
             return LicenseUtilities.IsLicensed(_LICENSE_ID);
@@ -346,6 +382,11 @@ namespace Extract.AttributeFinder.Rules
                 {
                     TemplatesDir = reader.ReadString();
 
+                    if (reader.Version == 2)
+                    {
+                        RedactionPredictorOptions = reader.ReadString();
+                    }
+
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
@@ -375,6 +416,7 @@ namespace Extract.AttributeFinder.Rules
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
                     writer.Write(TemplatesDir);
+                    writer.Write(RedactionPredictorOptions);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -440,6 +482,7 @@ namespace Extract.AttributeFinder.Rules
         void CopyFrom(TemplateFinder source)
         {
             TemplatesDir = source.TemplatesDir;
+            RedactionPredictorOptions = source.RedactionPredictorOptions;
 
             _dirty = true;
         }
@@ -450,189 +493,39 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="templateDir">The directory where the template files are located</param>
         /// <param name="imagePath">The path to the source document</param>
         /// <param name="pageInfoMap">The map of page numbers to page info of the source document</param>
-        /// <returns></returns>
-        private static IUnknownVector ApplyTemplate(string templateDir, SpatialString input)
+        private static IUnknownVector ApplyTemplate(string templateDir, SpatialString input, string options)
         {
-            IntPtr[] templates = null;
-            IntPtr fileHandle = IntPtr.Zero;
-            try
+            var pages = input.GetPages(false, "")
+                .ToIEnumerable<SpatialString>()
+                .Select(s => s.GetFirstPageNumber())
+                .ToRangeString();
+
+            using (var outputFile = new TemporaryFile(extension: ".voa", sensitive: true))
             {
-                var voa = new IUnknownVectorClass();
-                var imagePath = input.SourceDocName;
-                var pageInfoMap = input.SpatialPageInfos;
-                if (Directory.Exists(templateDir))
+                var args = new List<string>
                 {
-                    ThrowIfFails(() => RecAPI.kRecSetLicense(null, "9d478fe171d5"), "ELI44797", "Unable to license Nuance API");
-                    ThrowIfFails(() => RecAPI.kRecInit(null, null), "ELI44798", "Unable to initialize Nuance engine");
-                    var templateFiles = Directory.GetFiles(templateDir, "*.tpt");
-                    templates = templateFiles.Select(templatePath =>
-                        {
-                            IntPtr templateHandle = IntPtr.Zero;
-                            ThrowIfFails(() => RecAPI.kRecLoadFormTemplate(0, out templateHandle, templatePath), "ELI44799", "Unable to load template",
-                                new KeyValuePair<string, string>("Path", templatePath));
-                            return templateHandle;
-                        }).ToArray();
+                    "--pages",
+                    pages,
+                    "--apply-template",
+                    templateDir,
+                    input.SourceDocName,
+                    outputFile.FileName
+                };
+
+                string argumentString = string.Join(" ", args
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s));
+
+                if (!string.IsNullOrWhiteSpace(options))
+                {
+                    argumentString += (" " + options);
                 }
 
-                if (templates != null)
-                {
-                    int pageCount = 0;
-                    ThrowIfFails(() => RecAPI.kRecOpenImgFile(imagePath, out fileHandle, FILEOPENMODE.IMGF_READ, IMF_FORMAT.FF_TIFNO), "ELI44800", "Unable to open image",
-                        new KeyValuePair<string, string>("Image path", imagePath));
-                    ThrowIfFails(() => RecAPI.kRecGetImgFilePageCount(fileHandle, out pageCount), "ELI44801", "Unable to obtain page count",
-                        new KeyValuePair<string, string>("Image path", imagePath));
+                SystemMethods.RunExtractExecutable(_REDACTION_PREDICTOR_APPLICATION, argumentString);
 
-                    for (int pageNum = 1; pageNum <= pageCount; pageNum++)
-                    {
-                        if (input.GetSpecifiedPages(pageNum, pageNum).HasSpatialInfo())
-                        {
-                            ApplyTemplateToPage(templates, fileHandle, imagePath, pageNum, pageInfoMap, voa);
-                        }
-                    }
-                }
-                return voa;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI44802");
-            }
-            finally
-            {
-                try
-                {
-                    if (fileHandle != IntPtr.Zero)
-                    {
-                        RecAPI.kRecCloseImgFile(fileHandle);
-                    }
-
-                    if (templates != null)
-                    {
-                        foreach (var template in templates)
-                        {
-                            RecAPI.kRecFreeFormTemplate(template);
-                        }
-                    }
-                }
-                catch { }
-                try
-                {
-
-                    RecAPI.kRecQuit();
-                }
-                catch { }
-            }
-        }
-
-        private static void ApplyTemplateToPage(IntPtr[] templates, IntPtr fileHandle, string imagePath, int pageNum, LongToObjectMap pageInfoMap, IUnknownVector voa)
-        {
-            IntPtr pageHandle = IntPtr.Zero;
-            IntPtr formTmplCollection = IntPtr.Zero;
-            try
-            {
-                string matchName = null;
-                IntPtr bestMatchingID = IntPtr.Zero;
-
-                ThrowIfFails(() => RecAPI.kRecLoadImg(0, fileHandle, out pageHandle, pageNum - 1), "ELI44803", "Unable to load image page",
-                    new KeyValuePair<string, string>("File name", imagePath),
-                    new KeyValuePair<string, string>("Page number", pageNum.AsString()));
-                RecAPI.kRecFindFormTemplate(0, pageHandle, templates, out formTmplCollection, out bestMatchingID, out var confidence, out var numMatching);
-                if (numMatching > 0)
-                {
-                    RecAPI.kRecGetMatchingInfo(bestMatchingID, out matchName);
-                }
-                else
-                {
-                    formTmplCollection = IntPtr.Zero;
-                }
-
-                if (matchName != null)
-                {
-                    RecAPI.kRecApplyFormTemplateEx(0, pageHandle, bestMatchingID);
-                    RecAPI.kRecGetZoneCount(pageHandle, out int numZones);
-                    for (int i=0; i < numZones; i++)
-                    {
-                        RecAPI.kRecGetZoneAttribute(pageHandle, i, "VoaIndex", out string voaIndex);
-                        if (!string.IsNullOrEmpty(voaIndex))
-                        {
-                            RecAPI.kRecGetZoneAttribute(pageHandle, i, "Type", out string attributeType);
-                            RecAPI.kRecGetZoneName(pageHandle, i, out string attributeName);
-                            RecAPI.kRecGetZoneInfo(pageHandle, IMAGEINDEX.II_CURRENT, out var userZone, i);
-                            var spatialString = ZoneToSpatialString(userZone, " ", imagePath, pageNum, pageInfoMap);
-
-                            var attribute = new AttributeClass
-                            {
-                                Name = attributeName,
-                                Type = attributeType ?? "",
-                                Value = spatialString
-                            };
-                            voa.PushBack(attribute);
-
-                            var templateNameSpatialString = new SpatialStringClass();
-                            templateNameSpatialString.CreateNonSpatialString(matchName, imagePath);
-                            var templateNameAttribute = new AttributeClass
-                            {
-                                Name = "TemplateName",
-                                Value = templateNameSpatialString
-                            };
-                            attribute.SubAttributes.PushBack(templateNameAttribute);
-
-                            RecAPI.kRecGetZoneAttribute(pageHandle, i, "FormField", out string formField);
-                            if (formField != null && int.TryParse(formField, out int zoneIndex))
-                            {
-                                RecAPI.kRecGetZoneInfo(pageHandle, IMAGEINDEX.II_CURRENT, out var formFieldZone, zoneIndex);
-                                RecAPI.kRecGetZoneName(pageHandle, zoneIndex, out string fieldName);
-                                spatialString = ZoneToSpatialString(formFieldZone, fieldName, imagePath, pageNum, pageInfoMap);
-                                var formFieldAttribute = new AttributeClass
-                                {
-                                    Name = "FormField",
-                                    Value = spatialString
-                                };
-                                attribute.SubAttributes.PushBack(formFieldAttribute);
-                            }
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                try
-                {
-                    if (pageHandle != IntPtr.Zero)
-                    {
-                        RecAPI.kRecFreeImg(pageHandle);
-                    }
-
-                    // Freeing this collection causes exceptions sometimes
-                    //if (formTmplCollection != IntPtr.Zero)
-                    //{
-                    //    RecAPI.kRecFreeFormTemplateCollection(formTmplCollection);
-                    //}
-                }
-                catch { }
-            }
-        }
-
-        private static SpatialString ZoneToSpatialString(ZONE userZone, string value, string imagePath, int pageNum, LongToObjectMap pageInfoMap)
-        {
-            var sourceRect = userZone.rectBBox;
-            var rect = new LongRectangleClass();
-            rect.SetBounds(sourceRect.left, sourceRect.top, sourceRect.right, sourceRect.bottom);
-            var zone = new RasterZoneClass();
-            zone.CreateFromLongRectangle(rect, pageNum);
-            var spatialString = new SpatialStringClass();
-            spatialString.CreatePseudoSpatialString(zone, value, imagePath, pageInfoMap);
-            return spatialString;
-        }
-
-        private static void ThrowIfFails(Func<RECERR> recApiMethod, string eli, string message, params KeyValuePair<string, string>[] debugData)
-        {
-            RECERR rc = recApiMethod();
-            if (rc != RECERR.REC_OK && rc != RECERR.API_INIT_WARN)
-            {
-                var uex = new ExtractException(eli, message);
-                foreach (var kv in debugData)
-                    uex.AddDebugData(kv.Key, kv.Value, false);
-                throw uex;
+                var attributes = new IUnknownVectorClass();
+                attributes.LoadFrom(outputFile.FileName, false);
+                return attributes;
             }
         }
 

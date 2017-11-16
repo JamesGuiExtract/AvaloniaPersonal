@@ -2,21 +2,45 @@
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace RedactionPredictor
 {
     public partial class Templates
     {
-        static int Main(string[] args)
+        static int Main(string[] argv)
         {
+            bool saveErrors = false;
+            string uexName = null;
             int usage(bool error = false)
             {
                 var message = "Usage:\r\n" +
                 "  To create a template:\r\n" +
-                "    RedactionPredictor <--create-template|-c|/c> <imagePath> <pageNum> <voaPath> <outputDir>\r\n" +
+                "    RedactionPredictor\r\n" +
+                "        <--create-template|-c|/c>\r\n" +
+                "        <imagePath>\r\n" +
+                "        <pageNum>\r\n" +
+                "        <voaPath>\r\n" +
+                "        <outputDir>\r\n" +
+                "        [/ef <exceptionFile>]\r\n\r\n" +
                 "  To apply a template/templates:\r\n" +
-                "    RedactionPredictor <--apply-template|-a|/a> <templateDir> <imagePath> <outputVoaPath>";
+                "    RedactionPredictor\r\n" +
+                "        <--apply-template|-a|/a>\r\n" +
+                "        <templateDir>\r\n" +
+                "        <imagePath>\r\n" +
+                "        <outputVoaPath>\r\n" +
+                "        [--pages <pageRange>]\r\n" +
+                "        [--classifyAttributes]\r\n" +
+                "        [--outputAllFormFields]\r\n" +
+                "        [/ef <exceptionFile>]";
+
+                if (saveErrors)
+                {
+                    var ue = new ExtractException("ELI45278", error ? "Bad arguments" : "RedactionPredictor usage");
+                    ue.AddDebugData("Usage", message, true);
+                    throw ue;
+                }
                 UtilityMethods.ShowMessageBox(message, "RedactionPredictor Usage", error);
 
                 return error ? -1 : 0;
@@ -26,7 +50,61 @@ namespace RedactionPredictor
             {
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
-                if (args.Length < 4)
+                // Check for optional args
+                var args = new List<string>(argv.Length);
+                string pageRange = null;
+                bool classifyAttributes = false;
+                bool outputAllFormFields = false;
+                for (int argNum = 0; argNum < argv.Length; argNum++)
+                {
+                    var arg = argv[argNum];
+                    if (arg.StartsWith("-", StringComparison.Ordinal)
+                        || arg.StartsWith("/", StringComparison.Ordinal))
+                    {
+                        var val = arg.Substring(1);
+                        if (val.Equals("ef", StringComparison.OrdinalIgnoreCase))
+                        {
+                            saveErrors = true;
+
+                            if (++argNum < argv.Length)
+                            {
+                                uexName = argv[argNum];
+                                continue;
+                            }
+                            else
+                            {
+                                return usage(error: true);
+                            }
+                        }
+                        else if (val.Equals("-pages"))
+                        {
+                            if (++argNum < argv.Length)
+                            {
+                                pageRange = argv[argNum];
+                                continue;
+                            }
+                            else
+                            {
+                                return usage(error: true);
+                            }
+                        }
+                        else if (val.Equals("-classifyAttributes"))
+                        {
+                            classifyAttributes = true;
+                            continue;
+                        }
+                        else if (val.Equals("-outputAllFormFields"))
+                        {
+                            outputAllFormFields = true;
+                            continue;
+                        }
+                    }
+
+                    args.Add(arg);
+                }
+
+                // Process standard args
+                if (args.Count < 4)
                 {
                     Console.Error.WriteLine("Not enough args");
                     return usage(error: true);
@@ -38,7 +116,7 @@ namespace RedactionPredictor
                     case "--create-template":
                     case "-c":
                     case "/c":
-                        if (args.Length == 5 && int.TryParse(args[2], out int pageNum))
+                        if (args.Count == 5 && int.TryParse(args[2], out int pageNum))
                         {
                             var imagePath = Path.GetFullPath(args[1]);
                             var voaPath = Path.GetFullPath(args[3]);
@@ -55,11 +133,19 @@ namespace RedactionPredictor
                     case "-a":
                     case "/a":
                         {
-                            var templateDir = Path.GetFullPath(args[1]);
-                            var imagePath = Path.GetFullPath(args[2]);
-                            var voaPath = Path.GetFullPath(args[3]);
-                            ApplyTemplate(templateDir, imagePath, voaPath);
-                            break;
+                            if (args.Count == 4)
+                            {
+                                var templateDir = Path.GetFullPath(args[1]);
+                                var imagePath = Path.GetFullPath(args[2]);
+                                var voaPath = Path.GetFullPath(args[3]);
+                                ApplyTemplate(templateDir, imagePath, pageRange, voaPath, classifyAttributes, outputAllFormFields);
+                                break;
+                            }
+                            else
+                            {
+                                Console.Error.WriteLine("Incorrect args");
+                                return usage(error: true);
+                            }
                         }
                     default:
                         Console.Error.WriteLine("Unrecognized task");
@@ -68,8 +154,17 @@ namespace RedactionPredictor
             }
             catch (Exception ex)
             {
-                ex.ExtractLog("ELI44686");
-                Console.Error.WriteLine("Error occurred");
+                var ue = ex.AsExtract("ELI44686");
+
+                if (saveErrors)
+                {
+                    ue.Log(uexName);
+                }
+                else
+                {
+                    ue.Display();
+                }
+
                 return -1;
             }
 
