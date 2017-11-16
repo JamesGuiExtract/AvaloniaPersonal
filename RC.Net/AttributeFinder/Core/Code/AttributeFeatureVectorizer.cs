@@ -28,8 +28,6 @@ namespace Extract.AttributeFinder
         /// </summary>
         const int _CURRENT_VERSION = 2;
 
-        const string _BITMAP_PATTERN = @"(?in)\ABitmap: (?'width'\d+) x (?'height'\d+) = (?'data'\d+(,\d+)*)\z";
-
         #endregion Constants
 
         #region Fields
@@ -387,18 +385,16 @@ namespace Extract.AttributeFinder
                     {
                         CountOfNonnumericValuesOccurred++;
 
-                        Match match;
                         if ((FeatureType == FeatureVectorizerType.Exists || FeatureType == FeatureVectorizerType.Bitmap)
                             && protoFeature.StartsWith("Bitmap", StringComparison.OrdinalIgnoreCase)
-                            && (match = Regex.Match(protoFeature, _BITMAP_PATTERN)).Success
-                            && int.TryParse(match.Groups["width"].Value, out int width)
-                            && int.TryParse(match.Groups["height"].Value, out int height))
+                            && XPathContext.TryGetBitmapDataFromString(protoFeature,
+                                out int width, out int height, out double[] data))
                         {
                             // Validate dimensions
-                            int dataSize = match.Groups["data"].Value.Split(new[] { ',' }).Length;
+                            int dataSize = data.Length;
                             ExtractException.Assert("ELI44670",
                                 UtilityMethods.FormatInvariant($"Invalid/mismatched bitmap data for feature {Name}"),
-                                dataSize == width * height && (BitmapSize == 0 || dataSize == BitmapSize));
+                                BitmapSize == 0 || dataSize == BitmapSize);
 
                             BitmapSize = dataSize;
                             FeatureType = FeatureVectorizerType.Bitmap;
@@ -499,22 +495,22 @@ namespace Extract.AttributeFinder
 
                     case FeatureVectorizerType.Bitmap:
                         var firstMatch = values.Select(value =>
-                            Regex.Match(value, _BITMAP_PATTERN))
-                            .FirstOrDefault(match => match.Success);
+                            XPathContext.TryGetBitmapDataFromString(value, out var _, out var _, out var data)
+                            ? data
+                            : null)
+                            .FirstOrDefault(data => data != null);
 
                         if (firstMatch == null)
                         {
                             return new double[BitmapSize].Concat(new[] { exists }).ToArray();
                         }
-                        var data = firstMatch.Groups["data"].Value.Split(new[] { ',' });
-                        if (data.Length != BitmapSize)
+                        if (firstMatch.Length != BitmapSize)
                         {
                             return new double[BitmapSize].Concat(new[] { exists }).ToArray();
                         }
                         else
                         {
-                            return data.Select(s => double.TryParse(s, out double d) ? (d - 128)/128 : 0.0) // Scale and zero center to improve training speed when used in online fashion
-                                .Concat(new[] { exists }).ToArray();
+                            return firstMatch.Concat(new[] { exists }).ToArray();
                         }
                     default:
                         throw new ExtractException("ELI39525", "Unsupported FeatureType: " + FeatureType.ToString());

@@ -1138,47 +1138,60 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Trains the machine using data specified
         /// </summary>
+        /// <param name="spatialString">The input document/partial document</param>
+        /// <param name="inputAttributes">The input attributes (candidates and/or feature attributes)</param>
+        /// <param name="answer">The expected category (or <c>null</c> if not needed, e.g., for attribute categorization)</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        public void IncrementallyTrainMachine(SpatialString spatialString, IUnknownVector inputVoa, string answer)
+        public void IncrementallyTrainMachine(SpatialString spatialString, IUnknownVector inputAttributes, string answer)
         {
             try
             {
                 var spatialStrings = new[] { spatialString };
-                var inputVOAs = new[] { inputVoa };
+                var inputVOAs = new[] { inputAttributes };
                 var answers = answer is null ? null : new[] { answer };
 
                 IncrementallyTrainMachine(spatialStrings, inputVOAs, answers);
             }
-            catch (ExtractException uex)
+            catch (ExtractException)
             {
-                throw uex;
+                throw;
             }
         }
 
         /// <summary>
         /// Trains the machine using data specified
         /// </summary>
+        /// <param name="spatialStrings">The input documents/partial documents</param>
+        /// <param name="inputAttributes">The input attributes (candidates and/or feature attributes)</param>
+        /// <param name="answers">The expected categories (or <c>null</c> if not needed, e.g., for attribute categorization)</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        public void IncrementallyTrainMachine(SpatialString[] spatialStrings, IUnknownVector[] inputVoa, string[] answers)
+        public void IncrementallyTrainMachine(SpatialString[] spatialStrings, IUnknownVector[] inputAttributes, string[] answers)
         {
-            ExtractException.Assert("ELI44719", "Machine is not fully configured", Encoder != null && Classifier != null);
-            if (Classifier is IIncrementallyTrainableClassifier classifier)
+            try
             {
-                if (!Encoder.AreEncodingsComputed)
+                ExtractException.Assert("ELI44719", "Machine is not fully configured", Encoder != null && Classifier != null);
+                if (Classifier is IIncrementallyTrainableClassifier classifier)
                 {
-                    Encoder.ComputeEncodings(spatialStrings, inputVoa, answers);
-                }
+                    if (!Encoder.AreEncodingsComputed)
+                    {
+                        Encoder.ComputeEncodings(spatialStrings, inputAttributes, answers);
+                    }
 
-                var (trainInputs, trainOutputs) = Encoder.GetFeatureVectorAndAnswerCollections(spatialStrings, inputVoa, answers, true);
-                var numberOfClasses = trainOutputs.Max() + 1;
-                for (int i = 0; i < trainInputs.Length; i++)
+                    var (trainInputs, trainOutputs) = Encoder.GetFeatureVectorAndAnswerCollections(spatialStrings, inputAttributes, answers, true);
+                    var numberOfClasses = trainOutputs.Max() + 1;
+                    for (int i = 0; i < trainInputs.Length; i++)
+                    {
+                        classifier.TrainClassifier(trainInputs[i], trainOutputs[i], numberOfClasses);
+                    }
+                }
+                else
                 {
-                    classifier.TrainClassifier(trainInputs[i], trainOutputs[i], numberOfClasses);
+                    throw new ExtractException("ELI44720", "Machine does not support incremental training");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                throw new ExtractException("ELI44720", "Machine does not support incremental training");
+                throw ex.AsExtract("ELI45136");
             }
         }
 

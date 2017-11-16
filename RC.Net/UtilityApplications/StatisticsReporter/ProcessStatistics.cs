@@ -453,8 +453,8 @@ namespace StatisticsReporter
                                 using (foundStream)
                                 {
                                     // Get the VOAs from the streams
-                                    IUnknownVector ExpectedAttributes = AttributeMethods.GetVoaFromSqlBinary(expectedStream);
-                                    IUnknownVector FoundAttributes = AttributeMethods.GetVoaFromSqlBinary(foundStream);
+                                    IUnknownVector ExpectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(expectedStream);
+                                    IUnknownVector FoundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(foundStream);
 
                                     var foundXPathContext = new Lazy<XPathContext>(
                                         () => new XPathContext(FoundAttributes));

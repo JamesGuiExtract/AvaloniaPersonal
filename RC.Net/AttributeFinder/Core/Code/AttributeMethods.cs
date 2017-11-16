@@ -257,7 +257,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="binaryAsStream">Stream containing the vector of attributes</param>
         /// <returns>IUnknownVector of attributes that was in the stream</returns>
-        public static IUnknownVector GetVoaFromSqlBinary(Stream binaryAsStream)
+        public static IUnknownVector GetVectorOfAttributesFromSqlBinary(Stream binaryAsStream)
         {
             try
             {

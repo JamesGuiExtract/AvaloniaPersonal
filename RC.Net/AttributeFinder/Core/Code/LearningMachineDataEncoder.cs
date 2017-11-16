@@ -839,14 +839,14 @@ namespace Extract.AttributeFinder
         /// generated with this instance.
         /// </summary>
         /// <param name="ussFilePaths">The paths to the USS files to be used to configure this object</param>
-        /// <param name="inputVOAFilePaths">The paths to the proto-feature VOA files to be used to
+        /// <param name="inputAttributes">The paths to the proto-feature VOA files to be used to
         /// configure this object</param>
         /// <param name="answersOrAnswerFiles">The predictions for each example (if <see cref="MachineUsage"/> is
         /// <see cref="LearningMachineUsage.DocumentCategorization"/>) or the paths to VOA files of predictions
         /// (if <see cref="MachineUsage"/> is <see cref="LearningMachineUsage.Pagination"/></param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        public void ComputeEncodings(SpatialString[] spatialStrings, IUnknownVector[] inputVoas, string[] answers)
+        public void ComputeEncodings(SpatialString[] spatialStrings, IUnknownVector[] inputAttributes, string[] answers)
         {
             try
             {
@@ -855,11 +855,11 @@ namespace Extract.AttributeFinder
 
                 if (MachineUsage == LearningMachineUsage.DocumentCategorization)
                 {
-                    ComputeDocumentEncodings(spatialStrings, inputVoas, answers);
+                    ComputeDocumentEncodings(spatialStrings, inputAttributes, answers);
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
-                    ComputeAttributesEncodings(spatialStrings, inputVoas);
+                    ComputeAttributesEncodings(spatialStrings, inputAttributes);
                 }
                 else
                 {
@@ -1006,20 +1006,29 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Gets enumerations of feature vectors and answer codes for enumerations of input files
+        /// </summary>
+        /// <param name="spatialStrings">The spatial strings to be used to generate the feature vectors</param>
+        /// <param name="inputAttributes">The VOAs to be used to generate the feature vectors</param>
+        /// <param name="answers">The predictions for each example
+        /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
+        /// <returns>A tuple where the first item is an enumeration of feature vectors, the second
+        /// item answer codes for each example and the third item the uss path for each example</returns>
         public (double[][] featureVector, int[] answers) GetFeatureVectorAndAnswerCollections
-            (SpatialString[] spatialStrings, IUnknownVector[] inputVoas, string[] answers, bool updateAnswerCodes)
+            (SpatialString[] spatialStrings, IUnknownVector[] inputAttributes, string[] answers, bool updateAnswerCodes)
         {
             try
             {
                 ExtractException.Assert("ELI44714", "Encodings have not been computed", AreEncodingsComputed);
 
                 // Null or empty VOA collection is OK. Set to null to simplify code
-                if (inputVoas != null && inputVoas.Length == 0)
+                if (inputAttributes != null && inputAttributes.Length == 0)
                 {
-                    inputVoas = null;
+                    inputAttributes = null;
                 }
 
-                if ( inputVoas != null && inputVoas.Length != spatialStrings.Length
+                if ( inputAttributes != null && inputAttributes.Length != spatialStrings.Length
                     || answers != null && answers.Length != spatialStrings.Length)
                 {
                     throw new ExtractException("ELI44715", "Arguments are of different lengths");
@@ -1027,7 +1036,7 @@ namespace Extract.AttributeFinder
 
                 if (MachineUsage == LearningMachineUsage.DocumentCategorization)
                 {
-                    return GetDocumentFeatureVectorAndAnswerCollection(spatialStrings, inputVoas, answers, updateAnswerCodes);
+                    return GetDocumentFeatureVectorAndAnswerCollection(spatialStrings, inputAttributes, answers, updateAnswerCodes);
                 }
                 else if (MachineUsage == LearningMachineUsage.Pagination)
                 {
@@ -1035,7 +1044,7 @@ namespace Extract.AttributeFinder
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
-                    var results = GetAttributesFeatureVectorAndAnswerCollection(spatialStrings, inputVoas);
+                    var results = GetAttributesFeatureVectorAndAnswerCollection(spatialStrings, inputAttributes);
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answerCodes = new int[results.Length];

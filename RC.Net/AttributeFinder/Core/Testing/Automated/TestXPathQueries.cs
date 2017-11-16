@@ -449,6 +449,144 @@ namespace Extract.AttributeFinder.Test
                 , result);
         }
 
+        [Test, Category("XPath")]
+        public static void Test20_Bitmap_No_Range()
+        {
+            var imagePath = _testImages.GetFile("Resources.A418.tif");
+            var voaPath = _testImages.GetFile("Resources.A418.tif.voa");
+            var voa = new IUnknownVector();
+            voa.LoadFrom(voaPath, false);
+            voa.UpdateSourceDocNameOfAttributes(imagePath);
+            var xpathContext = new XPathContext(voa);
+
+            var result = xpathContext.Evaluate(
+                "es:Bitmap(8, 8, /*/Test/Component/Flag)");
+
+            Assert.IsInstanceOf<string>(result);
+            Assert.That(ValidateBitmapRange((string)result, 0, 255));
+            Assert.AreEqual("Bitmap: 8 x 8 = " +
+                "51,59,33,142,208,29,20,109," +
+                "186,38,208,255,255,121,158,222," +
+                "220,101,255,255,250,55,255,255," +
+                "128,43,84,85,67,130,255,255," +
+                "52,160,155,160,34,212,255,255," +
+                "133,255,255,255,70,255,255,239," +
+                "134,243,233,107,83,196,119,84," +
+                "91,211,163,74,81,88,75,97"
+                , result);
+        }
+
+        /// <summary>
+        /// Range from 0 to 255, which should be the same as no range given
+        /// </summary>
+        [Test, Category("XPath")]
+        public static void Test21_Bitmap_Range_0_255()
+        {
+            var imagePath = _testImages.GetFile("Resources.A418.tif");
+            var voaPath = _testImages.GetFile("Resources.A418.tif.voa");
+            var voa = new IUnknownVector();
+            voa.LoadFrom(voaPath, false);
+            voa.UpdateSourceDocNameOfAttributes(imagePath);
+            var xpathContext = new XPathContext(voa);
+
+            var result = xpathContext.Evaluate(
+                "es:Bitmap(8, 8, /*/Test/Component/Flag, 0, 255)");
+
+            Assert.IsInstanceOf<string>(result);
+            Assert.That(ValidateBitmapRange((string)result, 0, 255));
+            Assert.AreEqual("Bitmap: 8 x 8 = " +
+                "51,59,33,142,208,29,20,109," +
+                "186,38,208,255,255,121,158,222," +
+                "220,101,255,255,250,55,255,255," +
+                "128,43,84,85,67,130,255,255," +
+                "52,160,155,160,34,212,255,255," +
+                "133,255,255,255,70,255,255,239," +
+                "134,243,233,107,83,196,119,84," +
+                "91,211,163,74,81,88,75,97"
+                , result);
+        }
+
+        /// <summary>
+        /// Range from 0 to 1
+        /// </summary>
+        [Test, Category("XPath")]
+        public static void Test22_Bitmap_Range_0_1()
+        {
+            var imagePath = _testImages.GetFile("Resources.A418.tif");
+            var voaPath = _testImages.GetFile("Resources.A418.tif.voa");
+            var voa = new IUnknownVector();
+            voa.LoadFrom(voaPath, false);
+            voa.UpdateSourceDocNameOfAttributes(imagePath);
+            var xpathContext = new XPathContext(voa);
+
+            var result = xpathContext.Evaluate(
+                "es:Bitmap(8, 8, /*/Test/Component/Flag, 0, 1)");
+
+            Assert.IsInstanceOf<string>(result);
+            Assert.That(ValidateBitmapRange((string)result, 0, 1));
+            Assert.AreEqual("Bitmap: 8 x 8 = " +
+                "0.2,0.231372549019608,0.129411764705882,0.556862745098039,0.815686274509804,0.113725490196078,0.0784313725490196,0.427450980392157," +
+                "0.729411764705882,0.149019607843137,0.815686274509804,1,1,0.474509803921569,0.619607843137255,0.870588235294118," +
+                "0.862745098039216,0.396078431372549,1,1,0.980392156862745,0.215686274509804,1,1," +
+                "0.501960784313725,0.168627450980392,0.329411764705882,0.333333333333333,0.262745098039216,0.509803921568627,1,1," +
+                "0.203921568627451,0.627450980392157,0.607843137254902,0.627450980392157,0.133333333333333,0.831372549019608,1,1," +
+                "0.52156862745098,1,1,1,0.274509803921569,1,1,0.937254901960784," +
+                "0.525490196078431,0.952941176470588,0.913725490196078,0.419607843137255,0.325490196078431,0.768627450980392,0.466666666666667,0.329411764705882," +
+                "0.356862745098039,0.827450980392157,0.63921568627451,0.290196078431373,0.317647058823529,0.345098039215686,0.294117647058824,0.380392156862745"
+                , result);
+        }
+
+        /// <summary>
+        /// Range from -1 to 1
+        /// </summary>
+        [Test, Category("XPath")]
+        public static void Test23_Bitmap_Range_1_1()
+        {
+            var imagePath = _testImages.GetFile("Resources.A418.tif");
+            var voaPath = _testImages.GetFile("Resources.A418.tif.voa");
+            var voa = new IUnknownVector();
+            voa.LoadFrom(voaPath, false);
+            voa.UpdateSourceDocNameOfAttributes(imagePath);
+            var xpathContext = new XPathContext(voa);
+
+            var result = xpathContext.Evaluate(
+                "es:Bitmap(8, 8, /*/Test/Component/Flag, -1, 1)");
+
+            Assert.IsInstanceOf<string>(result);
+            Assert.That(ValidateBitmapRange((string)result, -1, 1));
+            Assert.AreEqual("Bitmap: 8 x 8 = " +
+                "-0.6,-0.537254901960784,-0.741176470588235,0.113725490196078,0.631372549019608,-0.772549019607843,-0.843137254901961,-0.145098039215686," +
+                "0.458823529411765,-0.701960784313725,0.631372549019608,1,1,-0.0509803921568628,0.23921568627451,0.741176470588235," +
+                "0.725490196078431,-0.207843137254902,1,1,0.96078431372549,-0.568627450980392,1,1," +
+                "0.00392156862745097,-0.662745098039216,-0.341176470588235,-0.333333333333333,-0.474509803921569,0.0196078431372548,1,1," +
+                "-0.592156862745098,0.254901960784314,0.215686274509804,0.254901960784314,-0.733333333333333,0.662745098039216,1,1," +
+                "0.0431372549019609,1,1,1,-0.450980392156863,1,1,0.874509803921569," +
+                "0.0509803921568628,0.905882352941176,0.827450980392157,-0.16078431372549,-0.349019607843137,0.537254901960784,-0.0666666666666667,-0.341176470588235," +
+                "-0.286274509803922,0.654901960784314,0.27843137254902,-0.419607843137255,-0.364705882352941,-0.309803921568627,-0.411764705882353,-0.23921568627451"
+                , result);
+        }
+
+        /// <summary>
+        /// Invalid range
+        /// </summary>
+        [Test, Category("XPath")]
+        public static void Test23_Bitmap_Range_2_1()
+        {
+            var imagePath = _testImages.GetFile("Resources.A418.tif");
+            var voaPath = _testImages.GetFile("Resources.A418.tif.voa");
+            var voa = new IUnknownVector();
+            voa.LoadFrom(voaPath, false);
+            voa.UpdateSourceDocNameOfAttributes(imagePath);
+            var xpathContext = new XPathContext(voa);
+
+            var ue = Assert.Throws<ExtractException>(() => xpathContext.Evaluate(
+                "es:Bitmap(8, 8, /*/Test/Component/Flag, 2, 1)"));
+
+            Assert.AreEqual("Function 'es:Bitmap()' has failed.", ue.Message);
+            Assert.AreEqual("Bad range", ue.InnerException.Message);
+        }
+
+
         #endregion Tests
 
         #region Helper Functions
@@ -460,6 +598,17 @@ namespace Extract.AttributeFinder.Test
             return new XPathContext(_attributes);
         }
 
+        static bool ValidateBitmapRange(string bmp, double min, double max)
+        {
+            if (XPathContext.TryGetBitmapDataFromString(bmp, out var _, out var _, out var data))
+            {
+                return data.All(d => d >= min && d <= max);
+            }
+            else
+            {
+                return false;
+            }
+        }
         #endregion Helper Functions
     }
 }

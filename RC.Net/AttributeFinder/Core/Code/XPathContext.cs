@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
@@ -32,6 +33,11 @@ namespace Extract.AttributeFinder
         /// The URI for this context's namespace.
         /// </summary>
         const string _XPATH_NAMESPACE_URI = "http://extractSystemsXPath";
+
+        internal const string LevenshteinFunction = "Levenshtein";
+        internal const string BitmapFunction = "Bitmap";
+
+        const string _BITMAP_PATTERN = @"(?in)\ABitmap: (?'width'\d+) x (?'height'\d+) = (?'data'-?\d+(\.\d+)?(,-?\d+(\.\d+)?)*)\z";
 
         #endregion Constants
 
@@ -482,6 +488,47 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Parses the string output of the es:Bitmap() function into discrete, numerical data.
+        /// </summary>
+        /// <remarks>Validates the bitmap dimensions</remarks>
+        /// <param name="bmp">The string representation of a bitmap</param>
+        /// <param name="width">The width of the bitmap</param>
+        /// <param name="height">The data array</param>
+        /// <param name="data">The data array</param>
+        /// <returns><c>true</c> if parsing was successful, else <c>false</c></returns>
+        public static bool TryGetBitmapDataFromString(string bmp, out int width, out int height, out double[] data)
+        {
+            try
+            {
+                var match = Regex.Match(bmp, _BITMAP_PATTERN);
+                if (match.Success
+                    && int.TryParse(match.Groups["width"].Value, out width)
+                    && int.TryParse(match.Groups["height"].Value, out height))
+                {
+                    data = match.Groups["data"].Value
+                        .Split(new[] { ',' })
+                        .Select(s => double.TryParse(s, out double d) ? d : 0.0)
+                        .ToArray();
+
+                    // Validate dimensions
+                    int dataSize = data.Length;
+                    ExtractException.Assert("ELI45138", "Invalid bitmap data", dataSize == width * height);
+                    return true;
+                }
+                else
+                {
+                    width = height = 0;
+                    data = null;
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45139");
+            }
+        }
+
         #endregion Public Members
 
         #region Overrides
@@ -509,12 +556,12 @@ namespace Extract.AttributeFinder
                 {
                     switch (name)
                     {
-                        case "Levenshtein":
+                        case LevenshteinFunction:
                             return new XPathContextFunctions(2, 2, XPathResultType.Number,
-                                ArgTypes, "Levenshtein", this);
-                        case "Bitmap":
-                            return new XPathContextFunctions(3, 3, XPathResultType.String,
-                                ArgTypes, "Bitmap", this);
+                                ArgTypes, LevenshteinFunction, this);
+                        case BitmapFunction:
+                            return new XPathContextFunctions(3, 5, XPathResultType.String,
+                                ArgTypes, BitmapFunction, this);
                     }
                 }
 

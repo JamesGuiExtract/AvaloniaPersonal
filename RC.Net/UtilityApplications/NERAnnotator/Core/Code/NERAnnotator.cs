@@ -871,7 +871,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     {
                         using (var stream = reader.GetStream(0))
                         {
-                            var voa = AttributeMethods.GetVoaFromSqlBinary(stream);
+                            var voa = AttributeMethods.GetVectorOfAttributesFromSqlBinary(stream);
                             voa.ReportMemoryUsage();
                             return voa;
                         }
