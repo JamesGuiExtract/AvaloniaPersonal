@@ -6,6 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{7284BD5B-8E51-4AB8-ADFC-8A8B2F9D9E80}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extract.UtilityApplications.NERAnnotator.Test</RootNamespace>
     <AssemblyName>Extract.UtilityApplications.NERAnnotator.Test</AssemblyName>
