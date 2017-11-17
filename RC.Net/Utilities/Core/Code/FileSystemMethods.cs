@@ -42,9 +42,10 @@ namespace Extract.Utilities
         /// Use the directory of this assembly to be more flexible in case in the future we allow
         /// the software to be installed to a different directory.
         /// Changed from Location to CodeBase so that it works from unit tests
+        /// Added Uri stuff to fix https://extract.atlassian.net/browse/ISSUE-15093
         /// </summary>
         static readonly string _COMMON_COMPONENTS_PATH =
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+            new Uri( Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
 
         /// <summary>
         /// The full path to the Extract Systems application data folder.
