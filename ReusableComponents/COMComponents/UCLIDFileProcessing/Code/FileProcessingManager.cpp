@@ -1080,6 +1080,7 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				getFPMDB()->AutoCreateAction(bstrActionName);
 
 				getFPMDB()->ActiveWorkflow = m_strActiveWorkflow.c_str();
+				m_ipFAMTagManager->Workflow = m_strActiveWorkflow.c_str();
 
 				getFPMDB()->RecordFAMSessionStart(
 					m_strFPSFileName.c_str(), bstrActionName, vbQueue, vbProcess);
