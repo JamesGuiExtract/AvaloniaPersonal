@@ -382,7 +382,7 @@ namespace Extract.AttributeFinder.Rules
                 {
                     TemplatesDir = reader.ReadString();
 
-                    if (reader.Version == 2)
+                    if (reader.Version >= 2)
                     {
                         RedactionPredictorOptions = reader.ReadString();
                     }
