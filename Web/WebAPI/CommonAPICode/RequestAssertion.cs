@@ -63,9 +63,8 @@ namespace WebAPI
         /// <param name="message">The message to assign on error.</param>
         public static void AssertSpecified(string eliCode, object value, string message)
         {
-            var valueAsString = value as string;
             if (value == null ||
-                (valueAsString != null && string.IsNullOrWhiteSpace(valueAsString)))
+                ((value is string valueAsString) && string.IsNullOrWhiteSpace(valueAsString)))
             {
                 throw new RequestAssertion(eliCode, message);
             }

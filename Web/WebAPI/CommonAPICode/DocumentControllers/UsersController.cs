@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
+using System.Security.Claims;
 using WebAPI.Models;
 using static WebAPI.Utils;
 
@@ -35,7 +36,7 @@ namespace WebAPI.Controllers
                 using (var userData = new UserData(context))
                 {
                     userData.LoginUser(user);
-                    var token = AuthUtils.GenerateToken(user, context);
+                    (string token, ClaimsPrincipal claimsPrincipal) = AuthUtils.GenerateToken(user, context);
 
                     return Ok(token);
                 }

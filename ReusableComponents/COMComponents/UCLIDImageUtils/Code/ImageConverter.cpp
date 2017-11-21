@@ -196,23 +196,13 @@ void CImageConverter::initNuanceEngineAndLicense()
 		RECERR rc = kRecSetLicense(__nullptr, gpszOEM_KEY);
 		if (rc != REC_OK && rc != API_INIT_WARN)
 		{
-			// create the exception object to throw to outer scope
-			try
-			{
-				THROW_UE("ELI45148", "Unable to load Nuance engine license file!", rc);
-			}
-			catch (UCLIDException& ue)
-			{
-				loadScansoftRecErrInfo(ue, rc);
-				throw ue;
-			}
+			THROW_UE("ELI45148", "Unable to load Nuance engine license file!", rc);
 		}
 
 		// Initialization of OCR engine	
 		rc = kRecInit("Extract Systems", "ImageFormatConverter");
 		if (rc != REC_OK && rc != API_INIT_WARN)
 		{
-			// create the exception object to throw to outer scope
 			THROW_UE("ELI45149", "Unable to initialize Nuance engine!", rc);
 		}
 

@@ -6776,8 +6776,8 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 	if (!strSettings.empty())
 	{
 		
-		ipWorkflowDefinition->VerifyAction = _bstr_t(getWebAppSetting(strSettings, "VerifyAction").c_str()).Detach();
-		ipWorkflowDefinition->PostVerifyAction = _bstr_t(getWebAppSetting(strSettings, "PostVerifyAction").c_str()).Detach();
+		ipWorkflowDefinition->VerifyAction = get_bstr_t(getWebAppSetting(strSettings, "VerifyAction"));
+		ipWorkflowDefinition->PostVerifyAction = get_bstr_t(getWebAppSetting(strSettings, "PostVerifyAction"));
 	}
 
 	return ipWorkflowDefinition;

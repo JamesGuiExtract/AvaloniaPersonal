@@ -21,7 +21,7 @@ namespace WebAPI.Models
         private FileProcessingDB _fileProcessingDB = null;
 
         /// <summary>
-        /// Initialized a new <see cref="FileApi"/> instance.
+        /// Initializes a new <see cref="FileApi"/> instance.
         /// </summary>
         /// <param name="apiContext">The <see cref="ApiContext"/> defining the database environment
         /// for this instance.</param>

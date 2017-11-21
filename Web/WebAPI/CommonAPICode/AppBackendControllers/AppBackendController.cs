@@ -231,7 +231,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI45190");
+                return this.GetAsHttpError(ex, "ELI45279");
             }
         }
 
@@ -242,6 +242,7 @@ namespace WebAPI.Controllers
         /// <returns></returns>
         [HttpPost("SaveDocumentData")]
         [Produces(typeof(GenericResult))]
+        [Authorize]
         public IActionResult SaveDocumentData([FromBody] BareDocumentAttributeSet documentData)
         {
             try

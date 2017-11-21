@@ -160,7 +160,7 @@ namespace WebAPI.Models
     /// <summary>
     /// overall status information of a workflow
     /// </summary>
-    public class WorkflowStatus
+    public class WorkflowStatus : IResultData
     {
         /// <summary>
         /// error information, when Error.ErrorOccurred == true

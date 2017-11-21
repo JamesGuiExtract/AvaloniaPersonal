@@ -10,8 +10,6 @@ namespace WebAPI
 {
     public partial class Startup
     {
-        static string _secretKey;
-
         /// <summary>
         /// configure authorization
         /// </summary>

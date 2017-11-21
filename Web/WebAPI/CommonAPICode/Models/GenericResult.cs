@@ -4,7 +4,7 @@ namespace WebAPI.Models
     /// <summary>
     /// Represents an API return value with nothing except <see cref="ErrorInfo"/>.
     /// </summary>
-    public class GenericResult
+    public class GenericResult : IResultData
     {
         /// <summary>
         /// Gets or sets the error.
