@@ -228,6 +228,32 @@ namespace Extract.UtilityApplications.NERDataCollector
             }
         }
 
+        /// <summary>
+        /// Shows a ManageMLModels dialog
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void Handle_ManageMLModelsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var form = new EditTableData(_databaseServer, _databaseName, "MLModel"))
+                {
+                    var result = form.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        var models = _database.GetMLModels().GetKeys().ToIEnumerable<string>().ToArray();
+                        _modelNameComboBox.Items.Clear();
+                        _modelNameComboBox.Items.AddRange(models);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45267");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods

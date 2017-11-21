@@ -40,6 +40,7 @@ namespace Extract.UtilityApplications.NERTrainer
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NERTrainerConfigurationDialog));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this._manageMLModelsButton = new System.Windows.Forms.Button();
             this._addModelButton = new System.Windows.Forms.Button();
             this._modelNameComboBox = new System.Windows.Forms.ComboBox();
             this._modelDestinationPathBrowseButton = new Extract.Utilities.Forms.BrowseButton();
@@ -63,6 +64,7 @@ namespace Extract.UtilityApplications.NERTrainer
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this._manageMLModelsButton);
             this.groupBox1.Controls.Add(this._addModelButton);
             this.groupBox1.Controls.Add(this._modelNameComboBox);
             this.groupBox1.Controls.Add(this._modelDestinationPathBrowseButton);
@@ -82,10 +84,21 @@ namespace Extract.UtilityApplications.NERTrainer
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             // 
+            // _manageMLModelsButton
+            // 
+            this._manageMLModelsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._manageMLModelsButton.Location = new System.Drawing.Point(559, 18);
+            this._manageMLModelsButton.Name = "_manageMLModelsButton";
+            this._manageMLModelsButton.Size = new System.Drawing.Size(63, 23);
+            this._manageMLModelsButton.TabIndex = 2;
+            this._manageMLModelsButton.Text = "Manage...";
+            this._manageMLModelsButton.UseVisualStyleBackColor = true;
+            this._manageMLModelsButton.Click += new System.EventHandler(this.Handle_ManageMLModelsButton_Click);
+            // 
             // _addModelButton
             // 
             this._addModelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._addModelButton.Location = new System.Drawing.Point(493, 18);
+            this._addModelButton.Location = new System.Drawing.Point(477, 18);
             this._addModelButton.Name = "_addModelButton";
             this._addModelButton.Size = new System.Drawing.Size(75, 23);
             this._addModelButton.TabIndex = 1;
@@ -100,7 +113,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._modelNameComboBox.FormattingEnabled = true;
             this._modelNameComboBox.Location = new System.Drawing.Point(120, 19);
             this._modelNameComboBox.Name = "_modelNameComboBox";
-            this._modelNameComboBox.Size = new System.Drawing.Size(367, 21);
+            this._modelNameComboBox.Size = new System.Drawing.Size(351, 21);
             this._modelNameComboBox.TabIndex = 0;
             // 
             // _modelDestinationPathBrowseButton
@@ -108,10 +121,10 @@ namespace Extract.UtilityApplications.NERTrainer
             this._modelDestinationPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._modelDestinationPathBrowseButton.EnsureFileExists = false;
             this._modelDestinationPathBrowseButton.EnsurePathExists = false;
-            this._modelDestinationPathBrowseButton.Location = new System.Drawing.Point(597, 98);
+            this._modelDestinationPathBrowseButton.Location = new System.Drawing.Point(593, 98);
             this._modelDestinationPathBrowseButton.Name = "_modelDestinationPathBrowseButton";
-            this._modelDestinationPathBrowseButton.Size = new System.Drawing.Size(27, 20);
-            this._modelDestinationPathBrowseButton.TabIndex = 8;
+            this._modelDestinationPathBrowseButton.Size = new System.Drawing.Size(29, 20);
+            this._modelDestinationPathBrowseButton.TabIndex = 9;
             this._modelDestinationPathBrowseButton.Text = "...";
             this._modelDestinationPathBrowseButton.TextControl = this._modelDestinationPathTextBox;
             this._modelDestinationPathBrowseButton.UseVisualStyleBackColor = true;
@@ -122,18 +135,18 @@ namespace Extract.UtilityApplications.NERTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._modelDestinationPathTextBox.Location = new System.Drawing.Point(120, 98);
             this._modelDestinationPathTextBox.Name = "_modelDestinationPathTextBox";
-            this._modelDestinationPathTextBox.Size = new System.Drawing.Size(448, 20);
-            this._modelDestinationPathTextBox.TabIndex = 6;
+            this._modelDestinationPathTextBox.Size = new System.Drawing.Size(432, 20);
+            this._modelDestinationPathTextBox.TabIndex = 7;
             // 
             // _modelDestinationPathTagsButton
             // 
             this._modelDestinationPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._modelDestinationPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_modelDestinationPathTagsButton.Image")));
-            this._modelDestinationPathTagsButton.Location = new System.Drawing.Point(575, 98);
+            this._modelDestinationPathTagsButton.Location = new System.Drawing.Point(559, 98);
             this._modelDestinationPathTagsButton.Name = "_modelDestinationPathTagsButton";
             this._modelDestinationPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
-            this._modelDestinationPathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._modelDestinationPathTagsButton.TabIndex = 7;
+            this._modelDestinationPathTagsButton.Size = new System.Drawing.Size(28, 20);
+            this._modelDestinationPathTagsButton.TabIndex = 8;
             this._modelDestinationPathTagsButton.TextControl = this._modelDestinationPathTextBox;
             this._modelDestinationPathTagsButton.UseVisualStyleBackColor = true;
             // 
@@ -152,11 +165,11 @@ namespace Extract.UtilityApplications.NERTrainer
             // 
             this._trainingCommandPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._trainingCommandPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_trainingCommandPathTagsButton.Image")));
-            this._trainingCommandPathTagsButton.Location = new System.Drawing.Point(575, 46);
+            this._trainingCommandPathTagsButton.Location = new System.Drawing.Point(559, 46);
             this._trainingCommandPathTagsButton.Name = "_trainingCommandPathTagsButton";
             this._trainingCommandPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
-            this._trainingCommandPathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._trainingCommandPathTagsButton.TabIndex = 3;
+            this._trainingCommandPathTagsButton.Size = new System.Drawing.Size(28, 20);
+            this._trainingCommandPathTagsButton.TabIndex = 4;
             this._trainingCommandPathTagsButton.TextControl = this._trainingCommandTextBox;
             this._trainingCommandPathTagsButton.UseVisualStyleBackColor = true;
             // 
@@ -166,19 +179,19 @@ namespace Extract.UtilityApplications.NERTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._trainingCommandTextBox.Location = new System.Drawing.Point(120, 46);
             this._trainingCommandTextBox.Name = "_trainingCommandTextBox";
-            this._trainingCommandTextBox.Size = new System.Drawing.Size(448, 20);
-            this._trainingCommandTextBox.TabIndex = 2;
+            this._trainingCommandTextBox.Size = new System.Drawing.Size(432, 20);
+            this._trainingCommandTextBox.TabIndex = 3;
             this._trainingCommandTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _testingCommandPathTagsButton
             // 
             this._testingCommandPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._testingCommandPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_testingCommandPathTagsButton.Image")));
-            this._testingCommandPathTagsButton.Location = new System.Drawing.Point(575, 72);
+            this._testingCommandPathTagsButton.Location = new System.Drawing.Point(559, 72);
             this._testingCommandPathTagsButton.Name = "_testingCommandPathTagsButton";
             this._testingCommandPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
-            this._testingCommandPathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._testingCommandPathTagsButton.TabIndex = 5;
+            this._testingCommandPathTagsButton.Size = new System.Drawing.Size(28, 20);
+            this._testingCommandPathTagsButton.TabIndex = 6;
             this._testingCommandPathTagsButton.TextControl = this._testingCommandTextBox;
             this._testingCommandPathTagsButton.UseVisualStyleBackColor = true;
             // 
@@ -188,8 +201,8 @@ namespace Extract.UtilityApplications.NERTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._testingCommandTextBox.Location = new System.Drawing.Point(120, 72);
             this._testingCommandTextBox.Name = "_testingCommandTextBox";
-            this._testingCommandTextBox.Size = new System.Drawing.Size(448, 20);
-            this._testingCommandTextBox.TabIndex = 4;
+            this._testingCommandTextBox.Size = new System.Drawing.Size(432, 20);
+            this._testingCommandTextBox.TabIndex = 5;
             this._testingCommandTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label1
@@ -298,5 +311,6 @@ namespace Extract.UtilityApplications.NERTrainer
         private System.Windows.Forms.TextBox _updateCommandTextBox;
         private System.Windows.Forms.ComboBox _modelNameComboBox;
         private System.Windows.Forms.Button _addModelButton;
+        private System.Windows.Forms.Button _manageMLModelsButton;
     }
 }
