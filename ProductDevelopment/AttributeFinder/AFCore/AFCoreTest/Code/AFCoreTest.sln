@@ -797,6 +797,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppBackendAPI", "..\..\..\.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Web.AppBackendAPI.Test", "..\..\..\..\..\Web\WebAPI\Testing\Automated\Extract.Web.DocumentAPI.Test\Extract.Web.AppBackendAPI.Test.csproj", "{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}"
 	ProjectSection(ProjectDependencies) = postProject
+		{16007C96-12DC-416B-998A-E4584A651458} = {16007C96-12DC-416B-998A-E4584A651458}
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB} = {E769CBBA-485E-4DE4-9776-623DADB6D9EB}
 	EndProjectSection
 EndProject
