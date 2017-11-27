@@ -10,7 +10,7 @@ $tempScriptFile = New-TemporaryFile
 $LinkPath=($BaseDestPath + $InstallFolder) -replace '\\', '/'
 $TargetPath=($BaseTargetPath + $InstallFolder) -replace '\\', '/'
 
-$linkCmd="ln --symbolic ""$LinkPath"" ""$TargetPath"""
+$linkCmd="ln --symbolic ""$TargetPath"" ""$LinkPath"""
 
 $linkCmd | Out-File -Encoding ascii -Append $tempScriptFile.FullName
 

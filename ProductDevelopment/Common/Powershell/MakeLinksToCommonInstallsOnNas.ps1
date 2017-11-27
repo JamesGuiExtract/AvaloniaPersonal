@@ -19,7 +19,7 @@ foreach ($path in $linkPaths){
 	$TargetPath=($BaseTargetPath + $path) -replace '\\', '/'
 
 	# command to run on thoth
-	$linkCmd="ln --symbolic ""$LinkPath"" ""$TargetPath"""
+	$linkCmd="ln --symbolic ""$TargetPath"" ""$LinkPath"""
 	
 	$linkCmd | Out-File -Encoding ascii -Append $tempScriptFile.FullName
 }
