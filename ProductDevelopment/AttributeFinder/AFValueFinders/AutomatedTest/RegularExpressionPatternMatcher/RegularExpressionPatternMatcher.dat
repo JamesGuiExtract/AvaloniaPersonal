@@ -63,3 +63,6 @@
 
 // Test pattern not matching anything
 <TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+
+// Find-if-x-of tests
+<TESTCASE>;FindIfXOf.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;FindIfXOf.eav

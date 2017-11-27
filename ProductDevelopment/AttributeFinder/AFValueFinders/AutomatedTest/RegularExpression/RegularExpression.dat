@@ -162,3 +162,7 @@
 
 // Fuzzy search test
 <TESTCASE>;TestBF4.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF4.eav
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Find-if-x-of
+<TESTCASE>;FindIfXOf.rsd;..\..\..\AFCore\AutomatedTest\Images\image1.tif.uss;;FindIfXOf.eav
