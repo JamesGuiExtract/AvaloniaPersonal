@@ -414,6 +414,21 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             }
         }
 
+        // Test loading/saving
+        [Test, Category("NERDataCollector")]
+        public static void LoadingSaving()
+        {
+            var collectorSettings = _testFiles.GetFile("Resources.collectorSettings.txt");
+            var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+            collector.AnnotatorSettingsPath = "DUMMY_PATH";
+            var updatedSettings = collector.SaveToString();
+
+            Assert.AreNotEqual(collectorSettings, updatedSettings);
+            var updatedCollector = NERDataCollector.LoadFromString(updatedSettings);
+
+            Assert.AreEqual("DUMMY_PATH", updatedCollector.AnnotatorSettingsPath);
+        }
+
         #endregion Tests
     }
 }
