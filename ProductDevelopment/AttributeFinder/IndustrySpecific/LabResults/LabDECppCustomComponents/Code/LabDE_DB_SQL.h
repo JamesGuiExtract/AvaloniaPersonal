@@ -112,7 +112,8 @@ static const string gstrCREATE_ORDER_TABLE =
     " [OrderStatus] NCHAR(1) NOT NULL DEFAULT 'A', "
     " [ReferenceDateTime] DATETIME, "
     " [ORMMessage] XML, "
-    " [EncounterID] NVARCHAR(20) NULL)";
+    " [EncounterID] NVARCHAR(20) NULL, "
+	" [AccessionNumber] NVARCHAR(50) NULL )";
 
 static const string gstrADD_FK_ORDER_PATIENT_MRN = 
     "ALTER TABLE [dbo].[LabDEOrder]  "
@@ -271,32 +272,58 @@ static const string gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER =
     // SET NOCOUNT ON added to prevent extra result sets from interfering with SELECT statements.
     "	SET NOCOUNT ON; "
     // Cull empty XML nodes from the ORM XML.
-    "	SET @ORMMessage.modify('delete (//*[not(text())][not(*//text())])') "
-
-    "	DECLARE @orderExists INT "
-    "	SELECT @orderExists = COUNT([OrderNumber]) FROM [LabDEOrder] "
-    "		WHERE [OrderNumber] = @OrderNumber "
-
-    "	IF @orderExists = 1 "
-    "		BEGIN "
-    "			UPDATE [LabDEOrder] SET "
-    "					[OrderCode] = @OrderCode, "
-    "					[PatientMRN] = @PatientMRN, "
-    "					[ReceivedDateTime] = GETDATE(), "
-    "					[ReferenceDateTime] = @ReferenceDateTime, "
-    "					[OrderStatus] = @OrderStatus, "
-    "					[ORMMessage] = @ORMMessage "
-    "				WHERE [OrderNumber] = @OrderNumber "
-    "		END "
-    "	ELSE  "
-    "		BEGIN "
-    "			INSERT INTO [LabDEOrder] "
-    "				([OrderNumber], [OrderCode], [PatientMRN], [ReceivedDateTime], "
-    "					[ReferenceDateTime], [OrderStatus], [ORMMessage]) "
-    "			VALUES (@OrderNumber, @OrderCode, @PatientMRN, GETDATE(), "
-    "				@ReferenceDateTime, @OrderStatus, @ORMMessage) "
-    "		END "
+	"	EXEC [dbo].LabDEAddOrUpdateOrderWithAccession "
+	"						@OrderNumber = @OrderNumber, "
+	"						@OrderCode = @OrderCode, "
+	"						@PatientMRN = @PatientMRN, "
+	"						@ReferenceDateTime = @ReferenceDateTime, "
+	"						@OrderStatus = @OrderStatus, "
+	"						@ORMMessage = @ORMMessage, "
+	"						@AccessionNumber = NULL "
     "END";
+
+static const string gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ACCESSION =
+"CREATE PROCEDURE [dbo].[LabDEAddOrUpdateOrderWithAccession] "
+"	@OrderNumber NVARCHAR(50), "
+"	@OrderCode NVARCHAR(30), "
+"	@PatientMRN NVARCHAR(20), "
+"	@ReferenceDateTime DATETIME, "
+"	@OrderStatus NVARCHAR(1), "
+"	@ORMMessage XML, "
+"   @AccessionNumber NVARCHAR(50) = NULL "
+"AS "
+"BEGIN "
+// SET NOCOUNT ON added to prevent extra result sets from interfering with SELECT statements.
+"	SET NOCOUNT ON; "
+// Cull empty XML nodes from the ORM XML.
+"	SET @ORMMessage.modify('delete (//*[not(text())][not(*//text())])') "
+
+"	DECLARE @orderExists INT "
+"	SELECT @orderExists = COUNT([OrderNumber]) FROM [LabDEOrder] "
+"		WHERE [OrderNumber] = @OrderNumber "
+
+"	IF @orderExists = 1 "
+"		BEGIN "
+"			UPDATE [LabDEOrder] SET "
+"					[OrderCode] = @OrderCode, "
+"					[PatientMRN] = @PatientMRN, "
+"					[ReceivedDateTime] = GETDATE(), "
+"					[ReferenceDateTime] = @ReferenceDateTime, "
+"					[OrderStatus] = @OrderStatus, "
+"					[ORMMessage] = @ORMMessage, "
+"					[AccessionNumber] = @AccessionNumber "
+"				WHERE [OrderNumber] = @OrderNumber "
+"		END "
+"	ELSE  "
+"		BEGIN "
+"			INSERT INTO [LabDEOrder] "
+"				([OrderNumber], [OrderCode], [PatientMRN], [ReceivedDateTime], "
+"					[ReferenceDateTime], [OrderStatus], [ORMMessage], [AccessionNumber]) "
+"			VALUES (@OrderNumber, @OrderCode, @PatientMRN, GETDATE(), "
+"				@ReferenceDateTime, @OrderStatus, @ORMMessage, @AccessionNumber) "
+"		END "
+"END";
+
 
 // Will merge or un-merge records in the LabDEPatient table.
 // The result of the procedure will be NULL for unqualified success or a string warning in the case
@@ -466,8 +493,9 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
     "                                                        @EncounterProvider NVARCHAR(256),                  \r\n"
     "                                                        @ADTMessage        XML,                            \r\n"
 	"                                                        @AdmissionDate     DATETIME = NULL,                \r\n"
-	"                                                        @DischargeDate     DATETIME = NULL		            \r\n"
-		"AS                                                                                                     \r\n"
+	"                                                        @DischargeDate     DATETIME = NULL,		        \r\n"
+	"														 @AccessionNumber NVARCHAR(50) = NULL				\r\n"
+	"	  AS                                                                                                     \r\n"
     "     BEGIN                                                                                                 \r\n"
     "         -- SET NOCOUNT ON added to prevent extra result sets from interfering with SELECT statements.     \r\n"
     "         SET NOCOUNT ON;                                                                                   \r\n"
@@ -489,7 +517,7 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
     "                       EncounterProvider = @EncounterProvider,                                             \r\n"
     "                       ADTMessage = @ADTMessage,                                                           \r\n"
 	"                       AdmissionDate = @AdmissionDate,                                                     \r\n"
-	"                       DischargeDate = @DischargeDate                                                      \r\n"
+	"                       DischargeDate = @DischargeDate														\r\n"
 	"                 WHERE CSN = @EncounterID;                                                                 \r\n"
     "             END;                                                                                          \r\n"
     "         ELSE                                                                                              \r\n"
@@ -535,7 +563,8 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
     "                       ReferenceDateTime = @ReferenceDateTime,                                             \r\n"
     "                       OrderStatus = @OrderStatus,                                                         \r\n"
     "                       EncounterID = @EncounterID,                                                         \r\n"
-    "                       ORMMessage = @ADTMessage                                                            \r\n"
+	"						AccessionNumber = @AccessionNumber,													\r\n"
+	"                       ORMMessage = @ADTMessage                                                            \r\n"
     "                 WHERE OrderNumber = @OrderNumber;                                                         \r\n"
     "             END;                                                                                          \r\n"
     "         ELSE                                                                                              \r\n"
@@ -548,6 +577,7 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
     "                  ReferenceDateTime,                                                                       \r\n"
     "                  OrderStatus,                                                                             \r\n"
     "                  EncounterID,                                                                             \r\n"
+	"				   AccessionNumber,																			\r\n"	
     "                  ORMMessage                                                                               \r\n"
     "                 )                                                                                         \r\n"
     "                 VALUES                                                                                    \r\n"
@@ -558,6 +588,7 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
     "                  @ReferenceDateTime,                                                                      \r\n"
     "                  @OrderStatus,                                                                            \r\n"
     "                  @EncounterID,                                                                            \r\n"
+	"				   @AccessionNumber,																		\r\n"
     "                  @ADTMessage                                                                              \r\n"
     "                 );                                                                                        \r\n"
     "             END;                                                                                          \r\n"
@@ -593,7 +624,8 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
 		"			@EncounterProvider = @EncounterProvider,														\r\n"
 		"			@ADTMessage = @ADTMessage,																		\r\n"
 		"			@AdmissionDate = NULL,																			\r\n"
-		"			@DischargeDate = NULL																			\r\n"
+		"			@DischargeDate = NULL,																			\r\n"
+		"			@AccessionNumber = NULL																			\r\n"
 		"	 END																									\r\n";
 
 

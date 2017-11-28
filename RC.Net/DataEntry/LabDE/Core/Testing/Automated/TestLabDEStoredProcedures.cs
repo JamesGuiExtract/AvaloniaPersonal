@@ -46,6 +46,7 @@ namespace Extract.DataEntry.LabDE.Test
             , "ReferenceDateTime"
             , "ORMMessage"
             , "EncounterID"
+            , "AccessionNumber"
         };
 
         /// <summary>
@@ -74,6 +75,7 @@ namespace Extract.DataEntry.LabDE.Test
             "      ,[ReferenceDateTime]" +
             "      ,CONVERT(nvarchar(MAX), [ORMMessage]) as [ORMMessage]" +
             "      ,[EncounterID]" +
+            "      ,[AccessionNumber] " +
             "FROM[dbo].[LabDEOrder] "; 
 
         #endregion
@@ -177,7 +179,7 @@ namespace Extract.DataEntry.LabDE.Test
         [Test, Category("Automated")]
         public void LabDEAddOrUpdateOrderTest()
         {
-            string testDBName = "Test_LabDEAddOrUpdateOrderr";
+            string testDBName = "Test_LabDEAddOrUpdateOrder";
 
             try
             {
@@ -192,6 +194,7 @@ namespace Extract.DataEntry.LabDE.Test
                     "A",
                     "2010/01/14 09:39:00 AM",
                     "<unused>unused</unused>",
+                    "NULL",
                     "NULL");
 
                 LabDEAddOrUpdateOrder(_famDB, dataDictionary);
@@ -208,9 +211,62 @@ namespace Extract.DataEntry.LabDE.Test
                     "C",
                     "2011/01/14 09:39:00 AM",
                     "<unused>unused2</unused>",
+                    "NULL",
                     "NULL");
 
                 LabDEAddOrUpdateOrder(_famDB, dataDictionary);
+
+                CheckResults(_famDB, dataDictionary.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDBName);
+            }
+        }
+
+
+        /// <summary>
+        /// Test the LabDEAddOrUpdateOrderWithAccession stored procedure
+        /// </summary>
+        [Test, Category("Automated")]
+        public void LabDEAddOrUpdateOrderWithAccessionTest()
+        {
+            string testDBName = "Test_LabDEAddOrUpdateOrderWithAccession";
+
+            try
+            {
+                IFileProcessingDB _famDB = CreateTestDatabase(testDBName);
+
+                // Set up the data to use for the test
+                var dataDictionary = new Dictionary<string, Tuple<string, string>>();
+                LabDEOrderValues(dataDictionary,
+                    "12345678901234567890123456789012345678901234567890",
+                    "GLU",
+                    "0000000000000000001",
+                    "A",
+                    "2010/01/14 09:39:00 AM",
+                    "<unused>unused</unused>",
+                    "NULL",
+                    "12345678901234567890123456789012345678901234567890");
+
+                LabDEAddOrUpdateOrderWithAccession(_famDB, dataDictionary);
+
+                string orderQuery = _LABDE_ORDER_QUERY + " WHERE OrderNumber = '12345678901234567890123456789012345678901234567890' ";
+
+                CheckResults(_famDB, dataDictionary.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
+
+                // Call again to update data
+                LabDEOrderValues(dataDictionary,
+                    "12345678901234567890123456789012345678901234567890",
+                    "GLYH",
+                    "0000000000000000002",
+                    "C",
+                    "2011/01/14 09:39:00 AM",
+                    "<unused>unused2</unused>",
+                    "NULL",
+                    "78901234567890123456789012345678901234567890123456");
+
+                LabDEAddOrUpdateOrderWithAccession(_famDB, dataDictionary);
 
                 CheckResults(_famDB, dataDictionary.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
             }
@@ -306,7 +362,8 @@ namespace Extract.DataEntry.LabDE.Test
                     "A",
                     "2010/01/14 09:39:00 AM",
                     dataDictionary["ADTMessage"].Item2,
-                    "11111111111111111111");
+                    "11111111111111111111",
+                    "NULL");
 
                 LabDEAddOrUpdateOrderWithEncounter(_famDB, dataDictionary);
 
@@ -336,7 +393,8 @@ namespace Extract.DataEntry.LabDE.Test
                     "C",
                     "2011/01/14 09:39:00 AM",
                     dataDictionary["ADTMessage"].Item2,
-                    "11111111111111111111");
+                    "11111111111111111111",
+                    "NULL");
 
                 LabDEAddOrUpdateOrderWithEncounter(_famDB, dataDictionary);
 
@@ -383,7 +441,8 @@ namespace Extract.DataEntry.LabDE.Test
                     "A",
                     "2010/01/14 09:39:00 AM",
                     dataDictionary["ADTMessage"].Item2,
-                    "11111111111111111111");
+                    "11111111111111111111",
+                    "12345678901234567890123456789012345678901234567890");
 
                 LabDEAddOrUpdateOrderWithEncounterAndIPDates(_famDB, dataDictionary);
 
@@ -413,7 +472,8 @@ namespace Extract.DataEntry.LabDE.Test
                     "C",
                     "2011/01/14 09:39:00 AM",
                     dataDictionary["ADTMessage"].Item2,
-                    "11111111111111111111");
+                    "11111111111111111111",
+                    "78901234567890123456789012345678901234567890123456");
 
                 LabDEAddOrUpdateOrderWithEncounterAndIPDates(_famDB, dataDictionary);
 
@@ -580,10 +640,17 @@ namespace Extract.DataEntry.LabDE.Test
         /// <param name="ReferenctDateTime"></param>
         /// <param name="ORMMessage"></param>
         /// <param name="EncounterID"></param>
+        /// <param name="AccessionNumber"></param>
         /// <returns>The dictionary with the field data</returns>
-        static Dictionary<string, Tuple<string, string>> LabDEOrderValues(Dictionary<string, Tuple<string, string>> dict,
-            string OrderNumber, string OrderCode, string PatientMRN, string OrderStatus,
-            string ReferenctDateTime, string ORMMessage, string EncounterID)
+        static Dictionary<string, Tuple<string, string>> LabDEOrderValues(Dictionary<string, Tuple<string, string>> dict, 
+            string OrderNumber, 
+            string OrderCode, 
+            string PatientMRN, 
+            string OrderStatus, 
+            string ReferenctDateTime, 
+            string ORMMessage, 
+            string EncounterID, 
+            string AccessionNumber)
         {
             dict["OrderNumber"] = new Tuple<string, string>("@OrderNumber", OrderNumber);
             dict["OrderCode"] = new Tuple<string, string>("@OrderCode", OrderCode);
@@ -592,6 +659,7 @@ namespace Extract.DataEntry.LabDE.Test
             dict["ReferenceDateTime"] = new Tuple<string, string>("@ReferenceDateTime", ReferenctDateTime);
             dict["ORMMessage"] = new Tuple<string, string>("@ORMMessage", ORMMessage);
             dict["EncounterID"] = new Tuple<string, string>("@EncounterID", EncounterID);
+            dict["AccessionNumber"] = new Tuple<string, string>("@AccessionNumber", AccessionNumber);
 
             return dict;
         }
@@ -629,7 +697,7 @@ namespace Extract.DataEntry.LabDE.Test
         /// <param name="dataValues">The parameter values to use for the stored procedure call</param>
         static void LabDEAddOrUpdateOrderWithEncounter(IFileProcessingDB dB, Dictionary<string, Tuple<string, string>> dataValues)
         {
-            List<string> fieldsToExclude = new List<string> { "CSN", "AdmissionDate", "DischargeDate", "ORMMessage" };
+            List<string> fieldsToExclude = new List<string> { "CSN", "AdmissionDate", "DischargeDate", "ORMMessage", "AccessionNumber" };
             List<string> fieldsToInclude = _ENCOUNTER_FIELDS.Union(_ORDER_FIELDS).Except(fieldsToExclude).ToList();
 
             var data = dataValues.Where(s => fieldsToInclude.Contains(s.Key));
@@ -657,11 +725,25 @@ namespace Extract.DataEntry.LabDE.Test
         /// <param name="dataValues">The parameter values to use for the stored procedure call</param>
         static void LabDEAddOrUpdateOrder(IFileProcessingDB dB, Dictionary<string, Tuple<string, string>> dataValues)
         {
-            List<string> fieldsToExclude = new List<string> { "EncounterID" };
+            List<string> fieldsToExclude = new List<string> { "EncounterID", "AccessionNumber" };
             List<string> fieldsToInclude = _ORDER_FIELDS.Except(fieldsToExclude).ToList();
 
             var data = dataValues.Where(s => fieldsToInclude.Contains(s.Key));
             dB.ExecuteCommandQuery(BuildProcCall("[dbo].[LabDEAddOrUpdateOrder]", data));
+        }
+
+        /// <summary>
+        /// Executes the LabDEAddOrUpdateOrderWithAccession stored procedure on the given database with the dataValues
+        /// </summary>
+        /// <param name="dB">The <see cref="FileProcessingDB"/> to execute the stored procedure on</param>
+        /// <param name="dataValues">The parameter values to use for the stored procedure call</param>
+        static void LabDEAddOrUpdateOrderWithAccession(IFileProcessingDB dB, Dictionary<string, Tuple<string, string>> dataValues)
+        {
+            List<string> fieldsToExclude = new List<string> { "EncounterID" };
+            List<string> fieldsToInclude = _ORDER_FIELDS.Except(fieldsToExclude).ToList();
+
+            var data = dataValues.Where(s => fieldsToInclude.Contains(s.Key));
+            dB.ExecuteCommandQuery(BuildProcCall("[dbo].[LabDEAddOrUpdateOrderWithAccession]", data));
         }
 
         /// <summary>
