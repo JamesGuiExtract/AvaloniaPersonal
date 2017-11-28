@@ -1,2 +1,6 @@
 // Test on image with a match
 <TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\GrayAreas.tif.uss;;test1.eav
+
+// Test handling of empty form field name
+// https://extract.atlassian.net/browse/ISSUE-14918
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage006.tif.uss;;test2.eav

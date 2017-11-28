@@ -86,6 +86,9 @@ namespace RedactionPredictor
                                 rect.top < otherRect.bottom && rect.bottom > otherRect.top )
                             {
                                 RecAPI.kRecGetZoneName(pageHandle, i, out string formFieldName);
+
+                                // Template creator/finder needs to handle empty form field names
+                                // https://extract.atlassian.net/browse/ISSUE-14918
                                 if (string.IsNullOrEmpty(formFieldName))
                                 {
                                     RecAPI.kRecSetZoneName(pageHandle, i, "NO_NAME");
