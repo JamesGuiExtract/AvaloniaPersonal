@@ -240,8 +240,10 @@ namespace RedactionPredictor
         {
             IntPtr pageHandle = IntPtr.Zero;
             RECERR rc = RecAPI.kRecLoadImg(0, fileHandle, out pageHandle, pageNum - 1);
+            // Added IMG_DPI_WARN for https://extract.atlassian.net/browse/ISSUE-15073
+            // (since there seems to be no issue with processing these, low-DPI images)
             if (rc != RECERR.REC_OK && rc != RECERR.IMF_PASSWORD_WARN && rc != RECERR.IMG_NOMORE_WARN
-                && rc != RECERR.IMF_READ_WARN && rc != RECERR.IMF_COMP_WARN)
+                && rc != RECERR.IMF_READ_WARN && rc != RECERR.IMF_COMP_WARN && rc != RECERR.IMG_DPI_WARN)
             {
                 // Determine whether this page was able to be loaded despite errors in the document
                 bool fail = pageHandle == IntPtr.Zero;
