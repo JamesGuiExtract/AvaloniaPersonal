@@ -46,9 +46,11 @@ using namespace std;
 // Version 12:https://extract.atlassian.net/browse/ISSUE-14988
 //			  Increased size of OrderNumber Field in LabDEOrder and LabDEOrderFile
 // Version 13:https://extract.atlassian.net/browse/ISSUE-15000
-//			  Added DischargeDate and AdmissionDate to LabDEEncounter table 
+//			  Added DischargeDate and AdmissionDate to LabDEEncounter table
+// Version 14:https://extract.atlassian.net/browse/ISSUE-15106
+//			  Added AccessionNunmber - there was also a change to reorder the main sql schema version because this was also placed in 10.6.3
 // WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
-static const long glLABDE_DB_SCHEMA_VERSION = 13;
+static const long glLABDE_DB_SCHEMA_VERSION = 14;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -534,6 +536,45 @@ int UpdateToSchemaVersion13(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45095");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion14(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 14;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 10;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE [dbo].[LabDEOrder] ADD [AccessionNumber] NVARCHAR(50) NULL");
+		// redefining these stored procedures to use the new ones
+		vecQueries.push_back("DROP PROCEDURE [dbo].[LabDEAddOrUpdateOrderWithEncounter]");
+		vecQueries.push_back("DROP PROCEDURE [dbo].[LabDEAddOrUpdateOrderWithEncounterAndIPDates]");
+		vecQueries.push_back("DROP PROCEDURE [dbo].[LabDEAddOrUpdateOrder]");
+		// The new stored procedures need to be created before the older names
+		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_AND_IP_DATES);
+
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ACCESSION);
+
+		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER);
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45286");
+}
 
 //-------------------------------------------------------------------------------------------------
 // CLabDEProductDBMgr
@@ -702,12 +743,13 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
         if (!asCppBool(bOnlyTables))
         {
             // Add stored procedures
-            vecCreateQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
             vecCreateQueries.push_back(gstrCREATE_PROCEDURE_MERGE_PATIENTS);
 			// The new stored procedures need to be created before the older names
 			vecCreateQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_AND_IP_DATES);
 			vecCreateQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_AND_IP_DATES);
+			vecCreateQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ACCESSION);
 
+            vecCreateQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
             vecCreateQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER);
             vecCreateQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER);
         }
@@ -1037,7 +1079,13 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 						*pnProdSchemaVersion = UpdateToSchemaVersion13(ipConnection, pnNumSteps, NULL);
 					}
 
-			case 13:	// current schema
+			case 13:
+					if (nFAMDBSchemaVersion == 157)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion14(ipConnection, pnNumSteps, NULL);
+					}
+
+			case 14: // current schema
 				break;
 
             default:
