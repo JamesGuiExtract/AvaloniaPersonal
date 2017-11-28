@@ -76,7 +76,6 @@ CopyFilesToInstallFolder: CreateDestinationFolders
 	
     @ECHO Copying the Binary files to installation directory...
     @COPY /V  "$(BinariesFolder)\RuleSetEditor.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
-    @COPY /V  "$(BinariesFolder)\EncryptFile.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
     @COPY /V  "$(BinariesFolder)\TestHarness.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
     @COPY /V  "$(BinariesFolder)\DocumentSorterConsoleApp.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
     @COPY /V  "$(BinariesFolder)\IndexConverter.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"

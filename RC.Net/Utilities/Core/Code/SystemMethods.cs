@@ -292,11 +292,12 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="exeFile">The exe file.</param>
         /// <param name="arguments">The arguments.</param>
+        /// <param name="createNoWindow">Whether to eschew shell execution to avoid showing a cmd window</param>
         /// <returns>The exit code of the process or 1460 ("This operation returned because the
         /// timeout period expired.") if timeToWait has expired.</returns>
-        public static int RunExecutable(string exeFile, IEnumerable<string> arguments)
+        public static int RunExecutable(string exeFile, IEnumerable<string> arguments, bool createNoWindow = false)
         {
-            return RunExecutable(exeFile, arguments, int.MaxValue);
+            return RunExecutable(exeFile, arguments, int.MaxValue, createNoWindow);
         }
 
         /// <summary>
@@ -307,10 +308,11 @@ namespace Extract.Utilities
         /// <param name="exeFile">The exe file.</param>
         /// <param name="arguments">The arguments.</param>
         /// <param name="timeToWait">The time to wait.</param>
+        /// <param name="createNoWindow">Whether to eschew shell execution to avoid showing a cmd window</param>
         /// <returns>The exit code of the process or 1460 ("This operation returned because the
         /// timeout period expired.") if timeToWait has expired.</returns>
         public static int RunExecutable(string exeFile, IEnumerable<string> arguments,
-            int timeToWait)
+            int timeToWait, bool createNoWindow = false)
         {
             try
             {
@@ -319,7 +321,7 @@ namespace Extract.Utilities
                     .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s)
                     .ToArray());
 
-                return RunExecutable(exeFile, argumentString, timeToWait);
+                return RunExecutable(exeFile, argumentString, timeToWait, createNoWindow);
             }
             catch (Exception ex)
             {
@@ -335,9 +337,10 @@ namespace Extract.Utilities
         /// <param name="exeFile">The exe file.</param>
         /// <param name="arguments">The arguments.</param>
         /// <param name="timeToWait">The time to wait.</param>
+        /// <param name="createNoWindow">Whether to eschew shell execution to avoid showing a cmd window</param>
         /// <returns>The exit code of the process or 1460 ("This operation returned because the
         /// timeout period expired.") if timeToWait has expired.</returns>
-        public static int RunExecutable(string exeFile, string arguments, int timeToWait)
+        public static int RunExecutable(string exeFile, string arguments, int timeToWait, bool createNoWindow = false)
         {
             try
             {
@@ -353,7 +356,11 @@ namespace Extract.Utilities
 
                 using (var process = new Process())
                 {
-                    process.StartInfo = new ProcessStartInfo(exeFile, arguments);
+                    process.StartInfo = new ProcessStartInfo(exeFile, arguments)
+                    {
+                        UseShellExecute = !createNoWindow,
+                        CreateNoWindow = createNoWindow
+                    };
                     process.Start();
                     if (process.WaitForExit(timeToWait))
                     {

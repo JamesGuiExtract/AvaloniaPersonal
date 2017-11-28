@@ -12,19 +12,39 @@ namespace Extract.UtilityApplications.NERTrainer
     {
         #region Constants
 
+        /// <summary>
+        /// Query to get MLData from the FAM DB
+        /// </summary>
         static readonly string _GET_MLDATA =
             @"SELECT Data FROM MLData
             JOIN MLModel ON MLData.MLModelID = MLModel.ID
                 WHERE Name = @Name
                 AND IsTrainingData = @IsTrainingData";
 
+        /// <summary>
+        /// Path tag that will resolve to the temporary file containing ML training/testing data
+        /// </summary>
         internal static readonly string DataFilePathTag = "<DataFile>";
+
+        /// <summary>
+        /// Path tag that will resolve to the temporary model file created by the training process
+        /// </summary>
         internal static readonly string TempModelPathTag = "<TempModelPath>";
+
+        /// <summary>
+        /// Pattern to match the output of the open nlp NER testing command
+        /// </summary>
         readonly string _TOTAL_ACCURACY_PATTERN =
             @"(?minx)^\s+TOTAL:
                 \s+precision:\s+(?'precision'[\d.]+)%;
                 \s+recall:\s+(?'recall'[\d.]+)%;
                 \s+F1:\s+(?'f1'[\d.]+)%";
+
+        /// <summary>
+        /// The path to the EncryptFile application
+        /// </summary>
+        static readonly string _ENCRYPT_FILE_APPLICATION =
+            Path.Combine(FileSystemMethods.CommonComponentsPath, "EncryptFile.exe");
 
         #endregion Constants
 
@@ -138,11 +158,16 @@ namespace Extract.UtilityApplications.NERTrainer
                         var dest = ModelDestination;
                         if (dest.EndsWith(".etf", StringComparison.OrdinalIgnoreCase))
                         {
-                            // TODO: Add support for creating an encrypted file. Currently this requires RDT license...
-                            dest = dest.Substring(0, dest.Length - 4);
+                            int exitCode = SystemMethods.RunExecutable(
+                                _ENCRYPT_FILE_APPLICATION,
+                                new[] { tempModelFile.FileName, dest },
+                                createNoWindow: true);
+                            ExtractException.Assert("ELI45285", "Failed to create output file", exitCode == 0, "Destination file", dest);
                         }
-
-                        FileSystemMethods.MoveFile(tempModelFile.FileName, dest, true);
+                        else
+                        {
+                            FileSystemMethods.MoveFile(tempModelFile.FileName, dest, true);
+                        }
                     }
                 }
             }

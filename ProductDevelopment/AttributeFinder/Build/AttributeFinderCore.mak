@@ -378,6 +378,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	
 	@COPY /V "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\*.*" "$(RequiredInstallsDir)\LogicNP"
 	@COPY /V "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\RegisterExtensionDotNet40_x*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
+	@COPY /V  "$(BinariesFolder)\EncryptFile.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	
 # Copy testing dlls to archive
 	@IF NOT EXIST "$(InternalUseBuildFilesArchive)\NUnitDlls" @MKDIR "$(InternalUseBuildFilesArchive)\NUnitDlls"

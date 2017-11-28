@@ -42,8 +42,9 @@ void printUsage()
 //-------------------------------------------------------------------------------------------------
 void validateLicense()
 {
-	// RDT license is required to run this utility
-	VALIDATE_LICENSE( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS, "ELI07071", "Encrypt File" );
+	// Don't require RDT license to run this utility
+	// https://extract.atlassian.net/browse/ISSUE-15098
+	VALIDATE_LICENSE( gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI07071", "Encrypt File" );
 }
 //-------------------------------------------------------------------------------------------------
 bool verifyArguments(int argc, char* argv[])

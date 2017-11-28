@@ -294,6 +294,38 @@ namespace Extract.UtilityApplications.NERTrainer.Test
             }
         }
 
+        // Test that an encrypted output file is created
+        [Test, Category("NERTrainer")]
+        public static void EncryptedOutput()
+        {
+            try
+            {
+                CreateDatabase();
+
+                var trainingExe = Path.Combine(_inputFolder.Last(), "train.bat");
+                _testFiles.GetFile("Resources.train.bat", trainingExe);
+                using (var dest = new TemporaryFile(".etf", false))
+                {
+                    var trainer = new NERTrainer
+                    {
+                        ModelName = _MODEL_NAME,
+                        ModelDestination = dest.FileName,
+                        TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\""
+                    };
+
+                    trainer.Process("(local)", _DB_NAME);
+
+                    var expected = new byte [] { 134, 229, 5, 229, 22, 201, 81, 37, 94, 70, 57, 40, 127, 77, 225, 36 };
+                    var trainingOutput = File.ReadAllBytes(dest.FileName);
+                    CollectionAssert.AreEqual(expected, trainingOutput);
+                }
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(_DB_NAME);
+            }
+        }
+
         #endregion Tests
     }
 }
