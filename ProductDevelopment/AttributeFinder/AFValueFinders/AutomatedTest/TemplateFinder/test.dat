@@ -4,3 +4,7 @@
 // Test handling of empty form field name
 // https://extract.atlassian.net/browse/ISSUE-14918
 <TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage006.tif.uss;;test2.eav
+
+// Test page restriction
+// https://extract.atlassian.net/browse/ISSUE-14898
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\TwoStapledIDShieldDemoImages.tif.uss;;test3.eav
