@@ -271,8 +271,7 @@ static const string gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER =
     "BEGIN "
     // SET NOCOUNT ON added to prevent extra result sets from interfering with SELECT statements.
     "	SET NOCOUNT ON; "
-    // Cull empty XML nodes from the ORM XML.
-	"	EXEC [dbo].LabDEAddOrUpdateOrderWithAccession "
+    "	EXEC [dbo].LabDEAddOrUpdateOrderWithAccession "
 	"						@OrderNumber = @OrderNumber, "
 	"						@OrderCode = @OrderCode, "
 	"						@PatientMRN = @PatientMRN, "
