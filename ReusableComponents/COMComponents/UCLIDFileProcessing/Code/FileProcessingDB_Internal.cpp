@@ -1706,6 +1706,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_PAGINATION_ORIGINALFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_PAGINATION_FILETASKSESSION_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWFILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_WORKFLOWFILE_WORKFLOW_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGE_WORKFLOW_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK);
@@ -1722,7 +1723,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			vecQueries.push_back(gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK);
 			// Foreign key for OutputAttributeSetID is added in AttributeDBMgr
 			vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
-			vecQueries.push_back(gstrADD_WORKFLOWFILE_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_FILE_HANDLER_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_WEB_APP_CONFIG_WORKFLOW_FK);
 
