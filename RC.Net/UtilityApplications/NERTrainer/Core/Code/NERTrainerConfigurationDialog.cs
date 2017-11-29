@@ -57,14 +57,14 @@ namespace Extract.UtilityApplications.NERTrainer
         /// <summary>
         /// Creates a configuration dialogue for an <see cref="NERTrainer"/>
         /// </summary>
-        /// <param name="collector">The instance to configure</param>
+        /// <param name="trainer">The instance to configure</param>
         /// <param name="databaseServer">The server to use to resolve MLModel.Names and AttributeSetNames</param>
         /// <param name="databaseName">The database to use to resolve MLModel.Names and AttributeSetNames</param>
-        public NERTrainerConfigurationDialog(NERTrainer collector, string databaseServer, string databaseName)
+        public NERTrainerConfigurationDialog(NERTrainer trainer, string databaseServer, string databaseName)
         {
             try
             {
-                _settings = collector;
+                _settings = trainer;
                 _databaseServer = databaseServer;
                 _databaseName = databaseName;
 
@@ -160,6 +160,14 @@ namespace Extract.UtilityApplications.NERTrainer
                 _settings.TrainingCommand = _trainingCommandTextBox.Text;
                 _settings.TestingCommand = _testingCommandTextBox.Text;
                 _settings.ModelDestination = _modelDestinationPathTextBox.Text;
+                _settings.LastIDProcessed = (int)_lastIDProcessedNumericUpDown.Value;
+                _settings.LastF1Score = (double)_lastF1ScoreNumericUpDown.Value;
+                _settings.MinimumF1Score = (double)_minF1ScoreNumericUpDown.Value;
+                _settings.AllowableAccuracyDrop = (double)_allowableAccuracyDropNumericUpDown.Value;
+                _settings.MaximumTrainingDocuments = (int)_maxTrainingDocsNumericUpDown.Value;
+                _settings.MaximumTestingDocuments = (int)_maxTestingDocsNumericUpDown.Value;
+                _settings.EmailAddressesToNotifyOnFailure = _emailAddressesTextBox.Text;
+                _settings.EmailSubject = _emailSubjectTextBox.Text;
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
@@ -276,9 +284,16 @@ namespace Extract.UtilityApplications.NERTrainer
                 _trainingCommandTextBox.Text = _settings.TrainingCommand;
                 _testingCommandTextBox.Text = _settings.TestingCommand;
                 _modelDestinationPathTextBox.Text = _settings.ModelDestination;
+                _lastIDProcessedNumericUpDown.Value = _settings.LastIDProcessed;
+                _lastF1ScoreNumericUpDown.Value = (decimal)_settings.LastF1Score;
+                _minF1ScoreNumericUpDown.Value = (decimal)_settings.MinimumF1Score;
+                _allowableAccuracyDropNumericUpDown.Value = (decimal)_settings.AllowableAccuracyDrop;
+                _maxTrainingDocsNumericUpDown.Value = _settings.MaximumTrainingDocuments;
+                _maxTestingDocsNumericUpDown.Value = _settings.MaximumTestingDocuments;
+                _emailAddressesTextBox.Text = _settings.EmailAddressesToNotifyOnFailure;
+                _emailSubjectTextBox.Text = _settings.EmailSubject;
 
                 Dirty = false;
-
             }
             finally
             {

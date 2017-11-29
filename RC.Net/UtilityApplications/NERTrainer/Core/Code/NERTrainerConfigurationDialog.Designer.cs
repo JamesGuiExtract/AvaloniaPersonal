@@ -46,18 +46,44 @@ namespace Extract.UtilityApplications.NERTrainer
             this._modelDestinationPathBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._modelDestinationPathTextBox = new System.Windows.Forms.TextBox();
             this._modelDestinationPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this._trainingCommandPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._trainingCommandTextBox = new System.Windows.Forms.TextBox();
             this._testingCommandPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._testingCommandTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this._updateCommandTextBox = new System.Windows.Forms.TextBox();
+            this._maxTestingDocsNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label10 = new System.Windows.Forms.Label();
+            this._minF1ScoreNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label8 = new System.Windows.Forms.Label();
+            this._maxTrainingDocsNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label9 = new System.Windows.Forms.Label();
+            this._allowableAccuracyDropNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label7 = new System.Windows.Forms.Label();
+            this._lastIDProcessedNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label5 = new System.Windows.Forms.Label();
+            this._lastF1ScoreNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this._emailSubjectTextBox = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this._emailAddressesTextBox = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._maxTestingDocsNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._minF1ScoreNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maxTrainingDocsNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._allowableAccuracyDropNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._lastF1ScoreNumericUpDown)).BeginInit();
+            this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -69,14 +95,14 @@ namespace Extract.UtilityApplications.NERTrainer
             this.groupBox1.Controls.Add(this._modelNameComboBox);
             this.groupBox1.Controls.Add(this._modelDestinationPathBrowseButton);
             this.groupBox1.Controls.Add(this._modelDestinationPathTagsButton);
-            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this._modelDestinationPathTextBox);
             this.groupBox1.Controls.Add(this._trainingCommandPathTagsButton);
             this.groupBox1.Controls.Add(this._testingCommandPathTagsButton);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this._trainingCommandTextBox);
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.label9);
+            this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this._testingCommandTextBox);
             this.groupBox1.Location = new System.Drawing.Point(7, 12);
             this.groupBox1.Name = "groupBox1";
@@ -90,7 +116,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._manageMLModelsButton.Location = new System.Drawing.Point(559, 18);
             this._manageMLModelsButton.Name = "_manageMLModelsButton";
             this._manageMLModelsButton.Size = new System.Drawing.Size(63, 23);
-            this._manageMLModelsButton.TabIndex = 2;
+            this._manageMLModelsButton.TabIndex = 3;
             this._manageMLModelsButton.Text = "Manage...";
             this._manageMLModelsButton.UseVisualStyleBackColor = true;
             this._manageMLModelsButton.Click += new System.EventHandler(this.Handle_ManageMLModelsButton_Click);
@@ -101,7 +127,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._addModelButton.Location = new System.Drawing.Point(477, 18);
             this._addModelButton.Name = "_addModelButton";
             this._addModelButton.Size = new System.Drawing.Size(75, 23);
-            this._addModelButton.TabIndex = 1;
+            this._addModelButton.TabIndex = 2;
             this._addModelButton.Text = "Add new...";
             this._addModelButton.UseVisualStyleBackColor = true;
             this._addModelButton.Click += new System.EventHandler(this.HandleAddModelButton_Click);
@@ -114,7 +140,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._modelNameComboBox.Location = new System.Drawing.Point(120, 19);
             this._modelNameComboBox.Name = "_modelNameComboBox";
             this._modelNameComboBox.Size = new System.Drawing.Size(351, 21);
-            this._modelNameComboBox.TabIndex = 0;
+            this._modelNameComboBox.TabIndex = 1;
             // 
             // _modelDestinationPathBrowseButton
             // 
@@ -124,7 +150,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._modelDestinationPathBrowseButton.Location = new System.Drawing.Point(593, 98);
             this._modelDestinationPathBrowseButton.Name = "_modelDestinationPathBrowseButton";
             this._modelDestinationPathBrowseButton.Size = new System.Drawing.Size(29, 20);
-            this._modelDestinationPathBrowseButton.TabIndex = 9;
+            this._modelDestinationPathBrowseButton.TabIndex = 13;
             this._modelDestinationPathBrowseButton.Text = "...";
             this._modelDestinationPathBrowseButton.TextControl = this._modelDestinationPathTextBox;
             this._modelDestinationPathBrowseButton.UseVisualStyleBackColor = true;
@@ -136,7 +162,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._modelDestinationPathTextBox.Location = new System.Drawing.Point(120, 98);
             this._modelDestinationPathTextBox.Name = "_modelDestinationPathTextBox";
             this._modelDestinationPathTextBox.Size = new System.Drawing.Size(432, 20);
-            this._modelDestinationPathTextBox.TabIndex = 7;
+            this._modelDestinationPathTextBox.TabIndex = 11;
             // 
             // _modelDestinationPathTagsButton
             // 
@@ -146,20 +172,20 @@ namespace Extract.UtilityApplications.NERTrainer
             this._modelDestinationPathTagsButton.Name = "_modelDestinationPathTagsButton";
             this._modelDestinationPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this._modelDestinationPathTagsButton.Size = new System.Drawing.Size(28, 20);
-            this._modelDestinationPathTagsButton.TabIndex = 8;
+            this._modelDestinationPathTagsButton.TabIndex = 12;
             this._modelDestinationPathTagsButton.TextControl = this._modelDestinationPathTextBox;
             this._modelDestinationPathTagsButton.UseVisualStyleBackColor = true;
             // 
-            // label3
+            // label4
             // 
-            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 100);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(84, 13);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "Destination path";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 100);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(84, 13);
+            this.label4.TabIndex = 10;
+            this.label4.Text = "Destination path";
             // 
             // _trainingCommandPathTagsButton
             // 
@@ -169,7 +195,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._trainingCommandPathTagsButton.Name = "_trainingCommandPathTagsButton";
             this._trainingCommandPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this._trainingCommandPathTagsButton.Size = new System.Drawing.Size(28, 20);
-            this._trainingCommandPathTagsButton.TabIndex = 4;
+            this._trainingCommandPathTagsButton.TabIndex = 6;
             this._trainingCommandPathTagsButton.TextControl = this._trainingCommandTextBox;
             this._trainingCommandPathTagsButton.UseVisualStyleBackColor = true;
             // 
@@ -180,7 +206,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._trainingCommandTextBox.Location = new System.Drawing.Point(120, 46);
             this._trainingCommandTextBox.Name = "_trainingCommandTextBox";
             this._trainingCommandTextBox.Size = new System.Drawing.Size(432, 20);
-            this._trainingCommandTextBox.TabIndex = 3;
+            this._trainingCommandTextBox.TabIndex = 5;
             this._trainingCommandTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _testingCommandPathTagsButton
@@ -191,7 +217,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._testingCommandPathTagsButton.Name = "_testingCommandPathTagsButton";
             this._testingCommandPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this._testingCommandPathTagsButton.Size = new System.Drawing.Size(28, 20);
-            this._testingCommandPathTagsButton.TabIndex = 6;
+            this._testingCommandPathTagsButton.TabIndex = 9;
             this._testingCommandPathTagsButton.TextControl = this._testingCommandTextBox;
             this._testingCommandPathTagsButton.UseVisualStyleBackColor = true;
             // 
@@ -202,7 +228,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._testingCommandTextBox.Location = new System.Drawing.Point(120, 72);
             this._testingCommandTextBox.Name = "_testingCommandTextBox";
             this._testingCommandTextBox.Size = new System.Drawing.Size(432, 20);
-            this._testingCommandTextBox.TabIndex = 5;
+            this._testingCommandTextBox.TabIndex = 8;
             this._testingCommandTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label1
@@ -224,28 +250,28 @@ namespace Extract.UtilityApplications.NERTrainer
             this.label2.Location = new System.Drawing.Point(6, 47);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(94, 13);
-            this.label2.TabIndex = 0;
+            this.label2.TabIndex = 4;
             this.label2.Text = "Training command";
             // 
-            // label9
+            // label3
             // 
-            this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(5, 74);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(91, 13);
-            this.label9.TabIndex = 1;
-            this.label9.Text = "Testing command";
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(5, 74);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(91, 13);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Testing command";
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(512, 147);
+            this._okButton.Location = new System.Drawing.Point(512, 390);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(60, 23);
-            this._okButton.TabIndex = 1;
+            this._okButton.TabIndex = 3;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButton_Click);
@@ -254,10 +280,10 @@ namespace Extract.UtilityApplications.NERTrainer
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(578, 147);
+            this._cancelButton.Location = new System.Drawing.Point(578, 390);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(60, 23);
-            this._cancelButton.TabIndex = 2;
+            this._cancelButton.TabIndex = 4;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             this._cancelButton.Click += new System.EventHandler(this.HandleCancelButton_Click);
@@ -271,24 +297,257 @@ namespace Extract.UtilityApplications.NERTrainer
             this._updateCommandTextBox.Size = new System.Drawing.Size(448, 20);
             this._updateCommandTextBox.TabIndex = 7;
             // 
+            // _maxTestingDocsNumericUpDown
+            // 
+            this._maxTestingDocsNumericUpDown.Location = new System.Drawing.Point(160, 40);
+            this._maxTestingDocsNumericUpDown.Maximum = new decimal(new int[] {
+            2147483647,
+            0,
+            0,
+            0});
+            this._maxTestingDocsNumericUpDown.Name = "_maxTestingDocsNumericUpDown";
+            this._maxTestingDocsNumericUpDown.Size = new System.Drawing.Size(120, 20);
+            this._maxTestingDocsNumericUpDown.TabIndex = 3;
+            this._maxTestingDocsNumericUpDown.ThousandsSeparator = true;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(6, 42);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(140, 13);
+            this.label10.TabIndex = 2;
+            this.label10.Text = "Maximum testing documents";
+            // 
+            // _minF1ScoreNumericUpDown
+            // 
+            this._minF1ScoreNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._minF1ScoreNumericUpDown.DecimalPlaces = 6;
+            this._minF1ScoreNumericUpDown.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+            this._minF1ScoreNumericUpDown.Location = new System.Drawing.Point(553, 40);
+            this._minF1ScoreNumericUpDown.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this._minF1ScoreNumericUpDown.Name = "_minF1ScoreNumericUpDown";
+            this._minF1ScoreNumericUpDown.Size = new System.Drawing.Size(69, 20);
+            this._minF1ScoreNumericUpDown.TabIndex = 7;
+            // 
+            // label8
+            // 
+            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(405, 42);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(139, 13);
+            this.label8.TabIndex = 6;
+            this.label8.Text = "Minimum allowable F1 score";
+            // 
+            // _maxTrainingDocsNumericUpDown
+            // 
+            this._maxTrainingDocsNumericUpDown.Location = new System.Drawing.Point(160, 14);
+            this._maxTrainingDocsNumericUpDown.Maximum = new decimal(new int[] {
+            2147483647,
+            0,
+            0,
+            0});
+            this._maxTrainingDocsNumericUpDown.Name = "_maxTrainingDocsNumericUpDown";
+            this._maxTrainingDocsNumericUpDown.Size = new System.Drawing.Size(120, 20);
+            this._maxTrainingDocsNumericUpDown.TabIndex = 1;
+            this._maxTrainingDocsNumericUpDown.ThousandsSeparator = true;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(7, 16);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(143, 13);
+            this.label9.TabIndex = 0;
+            this.label9.Text = "Maximum training documents";
+            // 
+            // _allowableAccuracyDropNumericUpDown
+            // 
+            this._allowableAccuracyDropNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._allowableAccuracyDropNumericUpDown.DecimalPlaces = 6;
+            this._allowableAccuracyDropNumericUpDown.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+            this._allowableAccuracyDropNumericUpDown.Location = new System.Drawing.Point(553, 14);
+            this._allowableAccuracyDropNumericUpDown.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this._allowableAccuracyDropNumericUpDown.Name = "_allowableAccuracyDropNumericUpDown";
+            this._allowableAccuracyDropNumericUpDown.Size = new System.Drawing.Size(69, 20);
+            this._allowableAccuracyDropNumericUpDown.TabIndex = 5;
+            // 
+            // label7
+            // 
+            this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(421, 16);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(123, 13);
+            this.label7.TabIndex = 4;
+            this.label7.Text = "Allowable accuracy drop";
+            // 
+            // _lastIDProcessedNumericUpDown
+            // 
+            this._lastIDProcessedNumericUpDown.Location = new System.Drawing.Point(120, 14);
+            this._lastIDProcessedNumericUpDown.Name = "_lastIDProcessedNumericUpDown";
+            this._lastIDProcessedNumericUpDown.Size = new System.Drawing.Size(120, 20);
+            this._lastIDProcessedNumericUpDown.TabIndex = 1;
+            this._lastIDProcessedNumericUpDown.ThousandsSeparator = true;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(7, 16);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(93, 13);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "Last ID processed";
+            // 
+            // _lastF1ScoreNumericUpDown
+            // 
+            this._lastF1ScoreNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lastF1ScoreNumericUpDown.DecimalPlaces = 6;
+            this._lastF1ScoreNumericUpDown.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+            this._lastF1ScoreNumericUpDown.Location = new System.Drawing.Point(553, 14);
+            this._lastF1ScoreNumericUpDown.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this._lastF1ScoreNumericUpDown.Name = "_lastF1ScoreNumericUpDown";
+            this._lastF1ScoreNumericUpDown.Size = new System.Drawing.Size(69, 20);
+            this._lastF1ScoreNumericUpDown.TabIndex = 3;
+            // 
+            // label6
+            // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(424, 16);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(120, 13);
+            this.label6.TabIndex = 2;
+            this.label6.Text = "Last measured F1 score";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this._lastF1ScoreNumericUpDown);
+            this.groupBox2.Controls.Add(this._lastIDProcessedNumericUpDown);
+            this.groupBox2.Controls.Add(this.label6);
+            this.groupBox2.Controls.Add(this.label5);
+            this.groupBox2.Location = new System.Drawing.Point(7, 331);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(631, 44);
+            this.groupBox2.TabIndex = 2;
+            this.groupBox2.TabStop = false;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this._emailSubjectTextBox);
+            this.groupBox3.Controls.Add(this.label12);
+            this.groupBox3.Controls.Add(this._emailAddressesTextBox);
+            this.groupBox3.Controls.Add(this.label11);
+            this.groupBox3.Controls.Add(this._allowableAccuracyDropNumericUpDown);
+            this.groupBox3.Controls.Add(this.label9);
+            this.groupBox3.Controls.Add(this.label7);
+            this.groupBox3.Controls.Add(this._minF1ScoreNumericUpDown);
+            this.groupBox3.Controls.Add(this.label10);
+            this.groupBox3.Controls.Add(this.label8);
+            this.groupBox3.Controls.Add(this._maxTrainingDocsNumericUpDown);
+            this.groupBox3.Controls.Add(this._maxTestingDocsNumericUpDown);
+            this.groupBox3.Location = new System.Drawing.Point(7, 147);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(631, 178);
+            this.groupBox3.TabIndex = 1;
+            this.groupBox3.TabStop = false;
+            // 
+            // _emailSubjectTextBox
+            // 
+            this._emailSubjectTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._emailSubjectTextBox.Location = new System.Drawing.Point(9, 147);
+            this._emailSubjectTextBox.Name = "_emailSubjectTextBox";
+            this._emailSubjectTextBox.Size = new System.Drawing.Size(614, 20);
+            this._emailSubjectTextBox.TabIndex = 11;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(7, 126);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(69, 13);
+            this.label12.TabIndex = 10;
+            this.label12.Text = "Email subject";
+            // 
+            // _emailAddressesTextBox
+            // 
+            this._emailAddressesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._emailAddressesTextBox.Location = new System.Drawing.Point(8, 96);
+            this._emailAddressesTextBox.Name = "_emailAddressesTextBox";
+            this._emailAddressesTextBox.Size = new System.Drawing.Size(614, 20);
+            this._emailAddressesTextBox.TabIndex = 9;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 75);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(563, 13);
+            this.label11.TabIndex = 8;
+            this.label11.Text = "Send email to these addresses if testing result doesn\'t meet accuracy requirement" +
+    "s (separate addresses with a comma)";
+            // 
             // NERTrainerConfigurationDialog
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(645, 177);
+            this.ClientSize = new System.Drawing.Size(645, 420);
+            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this.groupBox1);
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(632, 216);
+            this.MinimumSize = new System.Drawing.Size(632, 459);
             this.Name = "NERTrainerConfigurationDialog";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "NER trainer";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._maxTestingDocsNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._minF1ScoreNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maxTrainingDocsNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._allowableAccuracyDropNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._lastF1ScoreNumericUpDown)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -297,7 +556,7 @@ namespace Extract.UtilityApplications.NERTrainer
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox _testingCommandTextBox;
-        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Label label1;
@@ -306,11 +565,29 @@ namespace Extract.UtilityApplications.NERTrainer
         private Utilities.Forms.PathTagsButton _testingCommandPathTagsButton;
         private Utilities.Forms.PathTagsButton _modelDestinationPathTagsButton;
         private System.Windows.Forms.TextBox _modelDestinationPathTextBox;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
         private Utilities.Forms.BrowseButton _modelDestinationPathBrowseButton;
         private System.Windows.Forms.TextBox _updateCommandTextBox;
         private System.Windows.Forms.ComboBox _modelNameComboBox;
         private System.Windows.Forms.Button _addModelButton;
         private System.Windows.Forms.Button _manageMLModelsButton;
+        private System.Windows.Forms.NumericUpDown _lastIDProcessedNumericUpDown;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.NumericUpDown _lastF1ScoreNumericUpDown;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.NumericUpDown _allowableAccuracyDropNumericUpDown;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown _maxTrainingDocsNumericUpDown;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.NumericUpDown _minF1ScoreNumericUpDown;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.NumericUpDown _maxTestingDocsNumericUpDown;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TextBox _emailAddressesTextBox;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox _emailSubjectTextBox;
+        private System.Windows.Forms.Label label12;
     }
 }
