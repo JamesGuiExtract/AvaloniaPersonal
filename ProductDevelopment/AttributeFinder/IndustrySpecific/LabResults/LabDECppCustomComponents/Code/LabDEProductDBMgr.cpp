@@ -48,7 +48,7 @@ using namespace std;
 // Version 13:https://extract.atlassian.net/browse/ISSUE-15000
 //			  Added DischargeDate and AdmissionDate to LabDEEncounter table
 // Version 14:https://extract.atlassian.net/browse/ISSUE-15106
-//			  Added AccessionNunmber - there was also a change to reorder the main sql schema version because this was also placed in 10.6.3
+//			  Added AccessionNunmber
 // WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 static const long glLABDE_DB_SCHEMA_VERSION = 14;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
@@ -376,8 +376,8 @@ int UpdateToSchemaVersion9(_ConnectionPtr ipConnection,
 
         vector<string> vecQueries;
 
-        vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER);
-        vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER);
+        vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_V9);
+        vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_V9);
 
         vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
             "' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
@@ -529,11 +529,11 @@ int UpdateToSchemaVersion13(_ConnectionPtr ipConnection,
 		vecQueries.push_back("DROP PROCEDURE [dbo].[LabDEAddOrUpdateEncounter]");
 		vecQueries.push_back("DROP PROCEDURE [dbo].[LabDEAddOrUpdateOrderWithEncounter]");
 		// The new stored procedures need to be created before the older names
-		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_AND_IP_DATES);
-		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_AND_IP_DATES);
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_AND_IP_DATES_V13);
+		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_AND_IP_DATES_V13);
 
-		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER);
-		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER);
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_V13);
+		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_V13);
 
 		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
 			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
@@ -1087,7 +1087,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 						*pnProdSchemaVersion = UpdateToSchemaVersion13(ipConnection, pnNumSteps, NULL);
 					}
 
-			case 13:
+			case 13:// The schema update from 13 to 14 needs to take place using FAM DB schema version 157
 					if (nFAMDBSchemaVersion == 157)
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion14(ipConnection, pnNumSteps, NULL);
