@@ -138,7 +138,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._legalDescriptionTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._legalDescriptionTextBox.AttributeName = "FullText";
-            this._legalDescriptionTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this._legalDescriptionTextBox.AutoCompleteMode = DataEntryAutoCompleteMode.SuggestAppend;
             this._legalDescriptionTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._legalDescriptionTextBox.AutoUpdateQuery = "";
             this._legalDescriptionTextBox.Location = new System.Drawing.Point(3, 469);
@@ -220,7 +220,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // _considerationAmountTextBox
             // 
             this._considerationAmountTextBox.AttributeName = "ConsiderationAmount";
-            this._considerationAmountTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this._considerationAmountTextBox.AutoCompleteMode = DataEntryAutoCompleteMode.SuggestAppend;
             this._considerationAmountTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._considerationAmountTextBox.Location = new System.Drawing.Point(157, 19);
             this._considerationAmountTextBox.Name = "_considerationAmountTextBox";
@@ -290,7 +290,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // _parcelNumberTextBox
             // 
             this._parcelNumberTextBox.AttributeName = "ParcelNumber";
-            this._parcelNumberTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this._parcelNumberTextBox.AutoCompleteMode = DataEntryAutoCompleteMode.SuggestAppend;
             this._parcelNumberTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._parcelNumberTextBox.Location = new System.Drawing.Point(3, 19);
             this._parcelNumberTextBox.Name = "_parcelNumberTextBox";

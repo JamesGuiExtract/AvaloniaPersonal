@@ -9,6 +9,49 @@ using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.DataEntry
 {
+    public enum DataEntryAutoCompleteMode
+    {
+        /// <summary>
+        /// Disables the automatic completion feature for the System.Windows.Forms.ComboBox
+        /// and System.Windows.Forms.TextBox controls.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// Displays the auxiliary drop-down list associated with the edit control. This
+        /// drop-down is populated with one or more suggested completion strings.
+        /// </summary>
+        Suggest = 1,
+
+        /// <summary>
+        /// Appends the remainder of the most likely candidate string to the existing characters,
+        /// highlighting the appended characters.
+        /// </summary>
+        Append = 2,
+
+        /// <summary>
+        /// Applies both Suggest and Append options.
+        /// </summary>
+        SuggestAppend = 3,
+
+        /// <summary>
+        /// Use <see cref="LuceneAutoSuggest"/> to show a suggestion list
+        /// </summary>
+        SuggestLucene = 4,
+    }
+
+    /// <summary>
+    /// Interface to support use of <see cref="DataEntryAutoCompleteMode"/>
+    /// </summary>
+    public interface IDataEntryAutoCompleteControl
+    {
+        DataEntryAutoCompleteMode AutoCompleteMode
+        {
+            get;
+            set;
+        }
+    }
+
     /// <summary>
     /// Defines a interface that allows a control to act as a data entry control in the data
     /// entry control framework.

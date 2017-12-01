@@ -1,18 +1,11 @@
 using Extract.Licensing;
-using Extract.Imaging.Forms;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Design;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Security.Permissions;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -25,7 +18,7 @@ namespace Extract.DataEntry
     /// A <see cref="IDataEntryControl"/> which allows the <see langref="string"/> value associated
     /// with an <see cref="IAttribute"/> to be viewed and edited.
     /// </summary>
-    public partial class DataEntryTextBox : TextBox, IDataEntryControl, IRequiresErrorProvider
+    public partial class DataEntryTextBox : TextBox, IDataEntryControl, IRequiresErrorProvider, IDataEntryAutoCompleteControl
     {
         #region Constants
 
@@ -180,6 +173,8 @@ namespace Extract.DataEntry
         /// </summary>
         int _lastSelectionLength;
 
+        LuceneAutoSuggest _luceneAutoSuggest;
+
         #endregion Fields
 
         #region Delegates
@@ -225,6 +220,8 @@ namespace Extract.DataEntry
 
                 _lastSelectionStart = SelectionStart;
                 _lastSelectionLength = SelectionLength;
+
+                _luceneAutoSuggest = new LuceneAutoSuggest(this);
             }
             catch (Exception ex)
             {
@@ -579,6 +576,11 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// The <see cref="DataEntryAutoCompleteMode"/> to use
+        /// </summary>
+        public new DataEntryAutoCompleteMode AutoCompleteMode { get; set; } = DataEntryAutoCompleteMode.SuggestLucene;
+
         #endregion Properties
 
         #region Overrides
@@ -810,9 +812,10 @@ namespace Extract.DataEntry
                 // auto-complete to prevent some apparent memory issues with auto-complete that can
                 // otherwise cause garbage characters to appear at the end of the field.
                 if ((e.KeyCode == Keys.Up || e.KeyCode == Keys.Down) &&
+                    AutoCompleteMode == DataEntryAutoCompleteMode.SuggestAppend &&
                     SelectionStart == Text.Length && !FormsMethods.IsAutoCompleteDisplayed())
                 {
-                    AutoCompleteMode = AutoCompleteMode.None;
+                    base.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.None;
                 }
 
                 base.OnPreviewKeyDown(e);
@@ -837,9 +840,10 @@ namespace Extract.DataEntry
 
                 // If auto-complete was temporarily disabled to prevent arrow keys from exposing
                 // memory issues with auto-complete, re-enable autocomplete now.
-                if (AutoCompleteMode == AutoCompleteMode.None && AutoCompleteCustomSource.Count > 0)
+                if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestAppend &&
+                    base.AutoCompleteMode == System.Windows.Forms.AutoCompleteMode.None)
                 {
-                    AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                    base.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
                 }
             }
             catch (Exception ex)
@@ -1738,16 +1742,24 @@ namespace Extract.DataEntry
                 }
 
                 // Get updated values for the auto-complete fields if an update is required.
-                AutoCompleteMode autoCompleteMode = AutoCompleteMode;
-                AutoCompleteSource autoCompleteSource = AutoCompleteSource;
-                AutoCompleteStringCollection autoCompleteList = AutoCompleteCustomSource;
-                string[] autoCompleteValues;
-                if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
-                        ref autoCompleteSource, ref autoCompleteList, out autoCompleteValues))
+                if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene &&  _activeValidator != null)
                 {
-                    AutoCompleteMode = autoCompleteMode;
-                    AutoCompleteSource = autoCompleteSource;
-                    AutoCompleteCustomSource = autoCompleteList;
+                    var autoCompleteValues = _activeValidator.GetAutoCompleteValues();
+                    _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);
+                }
+                else
+                {
+                    AutoCompleteMode autoCompleteMode = base.AutoCompleteMode;
+                    AutoCompleteSource autoCompleteSource = AutoCompleteSource;
+                    AutoCompleteStringCollection autoCompleteList = AutoCompleteCustomSource;
+                    string[] autoCompleteValues;
+                    if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
+                            ref autoCompleteSource, ref autoCompleteList, out autoCompleteValues))
+                    {
+                        base.AutoCompleteMode = autoCompleteMode;
+                        AutoCompleteSource = autoCompleteSource;
+                        AutoCompleteCustomSource = autoCompleteList;
+                    }
                 }
             }
             catch (Exception ex)
@@ -1852,5 +1864,6 @@ namespace Extract.DataEntry
         }
 
         #endregion Private Members
+
     }
 }

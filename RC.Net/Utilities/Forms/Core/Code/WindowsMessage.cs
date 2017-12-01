@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace Extract.Utilities.Forms
 {
@@ -470,6 +471,26 @@ namespace Extract.Utilities.Forms
             {
                 throw ex.AsExtract("ELI37754");
             }
+        }
+
+        /// <summary>
+        /// Sends the specified message to a window or windows. The SendMessage function calls the
+        /// window procedure for the specified window and does not return until the window procedure
+        /// has processed the message. 
+        /// </summary>
+        /// <param name="hWnd">Handle to the window whose window procedure will receive the message.
+        /// If this parameter is HWND_BROADCAST, the message is sent to all top-level windows in the
+        /// system, including disabled or invisible unowned windows, overlapped windows, and pop-up
+        /// windows; but the message is not sent to child windows.</param>
+        /// <param name="msg">Specifies the message to be sent.</param>
+        /// <param name="wParam">Specifies additional message-specific information.</param>
+        /// <param name="lParam">Specifies additional message-specific information.</param>
+        /// <returns>The return value specifies the result of the message processing and depends on 
+        /// the message sent.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
+        public static IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
+        {
+            return NativeMethods.SendMessage(hWnd, msg, wParam, lParam);
         }
 
         #endregion Methods

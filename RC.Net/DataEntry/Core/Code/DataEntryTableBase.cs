@@ -23,7 +23,7 @@ namespace Extract.DataEntry
     /// A base of common code needed by any <see cref="IDataEntryControl"/> that extends
     /// <see cref="DataGridView"/>.
     /// </summary>
-    public abstract partial class DataEntryTableBase : DataGridView, IDataEntryControl, ISupportInitialize
+    public abstract partial class DataEntryTableBase : DataGridView, IDataEntryControl, ISupportInitialize, IDataEntryAutoCompleteControl
     {
         #region Constants
 
@@ -220,6 +220,8 @@ namespace Extract.DataEntry
         /// to prevent the table from getting into a bad state.
         /// </summary>
         bool _preventProgrammaticEndEdit;
+
+        LuceneAutoSuggest _luceneAutoSuggest;
 
         #endregion Fields
 
@@ -650,6 +652,12 @@ namespace Extract.DataEntry
                 OnSelectionChanged(new EventArgs());
             }
         }
+
+        /// <summary>
+        /// The <see cref="DataEntryAutoCompleteMode"/> to use for text box editing controls
+        /// </summary>
+        [Category("Data Entry Table")]
+        public DataEntryAutoCompleteMode AutoCompleteMode { get; set; } = DataEntryAutoCompleteMode.SuggestLucene;
 
         #endregion Properties
 
@@ -1327,39 +1335,50 @@ namespace Extract.DataEntry
                     // changes to the value.
                     else if (dataEntryCell.Attribute != null)
                     {
+
                         textEditingControl = (DataGridViewTextBoxEditingControl)_editingControl;
                         textEditingControl.TextChanged += HandleCellTextChanged;
                         IDataEntryValidator validator =
                             AttributeStatusInfo.GetStatusInfo(dataEntryCell.Attribute).Validator;
 
-                        AutoCompleteMode autoCompleteMode = textEditingControl.AutoCompleteMode;
-                        AutoCompleteSource autoCompleteSource =
-                            textEditingControl.AutoCompleteSource;
-                        AutoCompleteStringCollection autoCompleteList =
-                            textEditingControl.AutoCompleteCustomSource;
-                        string[] autoCompleteValues;
-                        if (DataEntryMethods.UpdateAutoCompleteList(validator, ref autoCompleteMode,
-                                ref autoCompleteSource, ref autoCompleteList, out autoCompleteValues))
+                        if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene && validator != null)
                         {
-                            // If auto-complete has been turned on/off from its previous state,
-                            // update the registration for the EditingControlPreviewKeyDown event.
-                            if (textEditingControl.AutoCompleteMode != autoCompleteMode)
-                            {
-                                if (autoCompleteMode == AutoCompleteMode.None)
-                                {
-                                    textEditingControl.PreviewKeyDown -=
-                                        HandleEditingControlPreviewKeyDown;
-                                }
-                                else
-                                {
-                                    textEditingControl.PreviewKeyDown +=
-                                        HandleEditingControlPreviewKeyDown;
-                                }
-                            }
+                            var autoCompleteValues = validator.GetAutoCompleteValues();
+                            _luceneAutoSuggest?.Dispose();
+                            _luceneAutoSuggest = new LuceneAutoSuggest(textEditingControl, this);
+                            _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);
 
-                            textEditingControl.AutoCompleteMode = autoCompleteMode;
-                            textEditingControl.AutoCompleteSource = autoCompleteSource;
-                            textEditingControl.AutoCompleteCustomSource = autoCompleteList;
+                        }
+                        else
+                        {
+                            AutoCompleteMode autoCompleteMode = textEditingControl.AutoCompleteMode;
+                            AutoCompleteSource autoCompleteSource =
+                                textEditingControl.AutoCompleteSource;
+                            AutoCompleteStringCollection autoCompleteList =
+                                textEditingControl.AutoCompleteCustomSource;
+                            if (DataEntryMethods.UpdateAutoCompleteList(validator, ref autoCompleteMode,
+                                    ref autoCompleteSource, ref autoCompleteList, out string[] autoCompleteValues))
+                            {
+                                // If auto-complete has been turned on/off from its previous state,
+                                // update the registration for the EditingControlPreviewKeyDown event.
+                                if (textEditingControl.AutoCompleteMode != autoCompleteMode)
+                                {
+                                    if (autoCompleteMode == System.Windows.Forms.AutoCompleteMode.None)
+                                    {
+                                        textEditingControl.PreviewKeyDown -=
+                                            HandleEditingControlPreviewKeyDown;
+                                    }
+                                    else
+                                    {
+                                        textEditingControl.PreviewKeyDown +=
+                                            HandleEditingControlPreviewKeyDown;
+                                    }
+                                }
+
+                                textEditingControl.AutoCompleteMode = autoCompleteMode;
+                                textEditingControl.AutoCompleteSource = autoCompleteSource;
+                                textEditingControl.AutoCompleteCustomSource = autoCompleteList;
+                            }
                         }
                     }
                 }
@@ -1376,7 +1395,7 @@ namespace Extract.DataEntry
                     textEditingControl = _editingControl as DataGridViewTextBoxEditingControl;
                     if (textEditingControl != null)
                     {
-                        textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
+                        textEditingControl.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.None;
                     }
                 }
             }
@@ -2385,6 +2404,12 @@ namespace Extract.DataEntry
                         _boldFont = null;
                     }
 
+                    if (_luceneAutoSuggest != null)
+                    {
+                        _luceneAutoSuggest.Dispose();
+                        _luceneAutoSuggest = null;
+                    }
+
                 } catch { }
             }
             // Dispose of unmanaged resources
@@ -3067,7 +3092,7 @@ namespace Extract.DataEntry
                     DataGridViewTextBoxEditingControl textEditingControl =
                                 (DataGridViewTextBoxEditingControl)EditingControl;
 
-                    if (textEditingControl.AutoCompleteMode != AutoCompleteMode.None &&
+                    if (textEditingControl.AutoCompleteMode != System.Windows.Forms.AutoCompleteMode.None &&
                         textEditingControl.SelectionStart == textEditingControl.Text.Length &&
                         !FormsMethods.IsAutoCompleteDisplayed())
                     {
@@ -3075,7 +3100,7 @@ namespace Extract.DataEntry
                         // mode prevents the user from seeing corrupted characters, gflags indicates
                         // that memory has still been stomped on. If auto-complete is disabled
                         // first, gflags does not detect any memory corruption.
-                        textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
+                        textEditingControl.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.None;
 
                         // Ensure the arrow key changes cell selection in this circumstance by first
                         // ending edit mode...

@@ -1,19 +1,10 @@
 using Extract.Licensing;
-using Extract.Imaging.Forms;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Design;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Security.Permissions;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -27,7 +18,7 @@ namespace Extract.DataEntry
     /// with an <see cref="IAttribute"/> to be viewed and changed to one of list of pre-defined
     /// values.
     /// </summary>
-    public partial class DataEntryComboBox : ComboBox, IDataEntryControl, IRequiresErrorProvider
+    public partial class DataEntryComboBox : ComboBox, IDataEntryControl, IRequiresErrorProvider, IDataEntryAutoCompleteControl
     {
         #region Constants
 
@@ -170,6 +161,8 @@ namespace Extract.DataEntry
         /// </summary>
         FontStyle _fontStyle;
 
+        LuceneAutoSuggest _luceneAutoSuggest;
+
         #endregion Fields
 
         #region Delegates
@@ -212,6 +205,8 @@ namespace Extract.DataEntry
                 InitializeComponent();
 
                 _fontStyle = Font.Style;
+
+                _luceneAutoSuggest = new LuceneAutoSuggest(this);
             }
             catch (Exception ex)
             {
@@ -565,6 +560,11 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// The <see cref="DataEntryAutoCompleteMode"/> to use
+        /// </summary>
+        public new DataEntryAutoCompleteMode AutoCompleteMode { get; set; } = DataEntryAutoCompleteMode.SuggestLucene;
+
         #endregion Properties
 
         #region Overrides
@@ -764,10 +764,11 @@ namespace Extract.DataEntry
                 // auto-complete to prevent some apparent memory issues with auto-complete that can
                 // otherwise cause garbage characters to appear at the end of the field.
                 if ((e.KeyCode == Keys.Up || e.KeyCode == Keys.Down) &&
+                    AutoCompleteMode == DataEntryAutoCompleteMode.SuggestAppend &&
                     DropDownStyle != ComboBoxStyle.DropDownList &&
                     SelectionStart == Text.Length && !FormsMethods.IsAutoCompleteDisplayed())
                 {
-                    AutoCompleteMode = AutoCompleteMode.None;
+                    base.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.None;
                 }
 
                 base.OnPreviewKeyDown(e);
@@ -793,9 +794,10 @@ namespace Extract.DataEntry
                 // If auto-complete was temporarily disabled to prevent arrow keys from exposing
                 // memory issues with auto-complete, re-enable autocomplete now.
                 if (DropDownStyle != ComboBoxStyle.DropDownList &&
-                    AutoCompleteMode == AutoCompleteMode.None && AutoCompleteCustomSource.Count > 0)
+                    AutoCompleteMode == DataEntryAutoCompleteMode.SuggestAppend &&
+                    base.AutoCompleteMode == System.Windows.Forms.AutoCompleteMode.None)
                 {
-                    AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                    base.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
                 }
             }
             catch (Exception ex)
@@ -1709,21 +1711,10 @@ namespace Extract.DataEntry
                 }
 
                 // Get updated values for the auto-complete fields if an update is required.
-                AutoCompleteMode autoCompleteMode = AutoCompleteMode;
-                AutoCompleteSource autoCompleteSource = AutoCompleteSource;
-                AutoCompleteStringCollection autoCompleteCollection = AutoCompleteCustomSource;
-                string[] autoCompleteValues;
-                if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
-                        ref autoCompleteSource, ref autoCompleteCollection, out autoCompleteValues))
+                if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene && _activeValidator != null)
                 {
-                    var statusInfo = AttributeStatusInfo.GetStatusInfo(_attribute);
-
-                    if (DropDownStyle != ComboBoxStyle.DropDownList)
-                    {
-                        AutoCompleteMode = autoCompleteMode;
-                        AutoCompleteSource = autoCompleteSource;
-                        AutoCompleteCustomSource = autoCompleteCollection;
-                    }
+                    var autoCompleteValues = _activeValidator.GetAutoCompleteValues();
+                    _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);
 
                     Items.Clear();
                     Items.AddRange(autoCompleteValues);
@@ -1731,9 +1722,39 @@ namespace Extract.DataEntry
                     // If a LastAppliedStringValue is available, use to ensure a value applied
                     // previously programmatically is correctly set after the Items list has been
                     // prepared.
+                    var statusInfo = AttributeStatusInfo.GetStatusInfo(_attribute);
                     if (statusInfo.LastAppliedStringValue != null && Items.Contains(statusInfo.LastAppliedStringValue))
                     {
                         Text = statusInfo.LastAppliedStringValue;
+                    }
+                }
+                else
+                {
+                    AutoCompleteMode autoCompleteMode = base.AutoCompleteMode;
+                    AutoCompleteSource autoCompleteSource = AutoCompleteSource;
+                    AutoCompleteStringCollection autoCompleteCollection = AutoCompleteCustomSource;
+                    if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
+                            ref autoCompleteSource, ref autoCompleteCollection, out string[] autoCompleteValues))
+                    {
+                        var statusInfo = AttributeStatusInfo.GetStatusInfo(_attribute);
+
+                        if (DropDownStyle != ComboBoxStyle.DropDownList)
+                        {
+                            base.AutoCompleteMode = autoCompleteMode;
+                            AutoCompleteSource = autoCompleteSource;
+                            AutoCompleteCustomSource = autoCompleteCollection;
+                        }
+
+                        Items.Clear();
+                        Items.AddRange(autoCompleteValues);
+
+                        // If a LastAppliedStringValue is available, use to ensure a value applied
+                        // previously programmatically is correctly set after the Items list has been
+                        // prepared.
+                        if (statusInfo.LastAppliedStringValue != null && Items.Contains(statusInfo.LastAppliedStringValue))
+                        {
+                            Text = statusInfo.LastAppliedStringValue;
+                        }
                     }
                 }
             }

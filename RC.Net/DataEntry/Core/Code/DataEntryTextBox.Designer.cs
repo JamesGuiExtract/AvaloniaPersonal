@@ -13,9 +13,18 @@ namespace Extract.DataEntry
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
-                components.Dispose();
+                if (components != null)
+                {
+                    components.Dispose();
+                }
+
+                if (_luceneAutoSuggest != null)
+                {
+                    _luceneAutoSuggest.Dispose();
+                    _luceneAutoSuggest = null;
+                }
             }
             base.Dispose(disposing);
         }

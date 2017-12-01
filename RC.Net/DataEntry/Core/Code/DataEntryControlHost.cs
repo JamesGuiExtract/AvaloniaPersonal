@@ -713,6 +713,17 @@ namespace Extract.DataEntry
         /// </summary>
         Control _propertyDumpTarget;
 
+        /// <summary>
+        /// Type to enable delegate field for PreFilterMessage method
+        /// </summary>
+        private delegate bool MessageFilterType(ref Message m);
+
+        /// <summary>
+        /// Message filter delegates. With some exceptions, e.g., Undo/Redo actions, these filters will be run
+        /// before this instance's PreFilterMessage method does anything
+        /// </summary>
+        private MessageFilterType _messageFilters;
+
         #endregion Fields
 
         #region Delegates
@@ -991,7 +1002,7 @@ namespace Extract.DataEntry
                             "Highlights must be specified in ascending OCR confidence order!",
                             lastConfidenceLevel < confidenceTier.MaxOcrConfidence);
 
-                        lastConfidenceLevel = confidenceTier.MaxOcrConfidence; 
+                        lastConfidenceLevel = confidenceTier.MaxOcrConfidence;
                     }
 
                     ExtractException.Assert("ELI25383",
@@ -1063,7 +1074,7 @@ namespace Extract.DataEntry
                 }
             }
         }
-        
+
         /// <summary>
         /// Gets or sets a comma separated list of names of <see cref="IDataEntryControl"/>s on
         /// which validation should be disabled.
@@ -1425,7 +1436,7 @@ namespace Extract.DataEntry
                 try
                 {
                     if (value != _imageViewer)
-                    { 
+                    {
                         // Unregister from previously subscribed-to events
                         if (_imageViewer != null && _active)
                         {
@@ -1523,6 +1534,11 @@ namespace Extract.DataEntry
                     _isIdle = false;
                 }
 
+                if (_messageFilters?.Invoke(ref m) ?? false)
+                {
+                    return true;
+                }
+
                 if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.KeyUp)
                 {
                     if (DisableKeyboardInput)
@@ -1558,7 +1574,7 @@ namespace Extract.DataEntry
                         // or keyup event.
                         _shiftKeyDown = (m.Msg == WindowsMessage.KeyDown);
                     }
-                    else if (m.WParam == (IntPtr)Keys.Tab && 
+                    else if (m.WParam == (IntPtr)Keys.Tab &&
                         (_smartTagManager == null || !_smartTagManager.IsActive))
                     {
                         _tabKeyDown = (m.Msg == WindowsMessage.KeyDown);
@@ -1585,14 +1601,14 @@ namespace Extract.DataEntry
                         }
                     }
                 }
-                else if (!ContainsFocus && (m.Msg == WindowsMessage.LeftButtonDown || 
+                else if (!ContainsFocus && (m.Msg == WindowsMessage.LeftButtonDown ||
                     m.Msg == WindowsMessage.RightButtonDown))
                 {
                     // Attempt to find a data entry control that should receive active status and 
                     // focus as the result of the mouse click.
                     _clickedDataEntryControl = FindClickedDataEntryControl(m);
                 }
-                else if (m.Msg == WindowsMessage.LeftButtonUp || 
+                else if (m.Msg == WindowsMessage.LeftButtonUp ||
                     m.Msg == WindowsMessage.RightButtonUp)
                 {
                     // Make sure to clear the _clickedDataEntryControl on mouse up. 
@@ -1689,7 +1705,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (attributes != null && attributes.Size() > 0 && 
+                if (attributes != null && attributes.Size() > 0 &&
                     AttributeStatusInfo.IsLoggingEnabled(LogCategories.DataLoad))
                 {
                     AttributeStatusInfo.Logger.LogEvent(LogCategories.DataLoad, null,
@@ -1992,7 +2008,7 @@ namespace Extract.DataEntry
 
                             // Create a copy of the data to be saved so that attributes that should
                             // not be persisted can be removed.
-                            ICloneIdentifiableObject copyThis = (ICloneIdentifiableObject) _attributes;
+                            ICloneIdentifiableObject copyThis = (ICloneIdentifiableObject)_attributes;
                             _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
                             _mostRecentlySaveAttributes.ReportMemoryUsage();
 
@@ -2075,7 +2091,7 @@ namespace Extract.DataEntry
                     // Attempt to find and propagate the next unviewed attribute
                     if (GetNextUnviewedAttribute() == null)
                     {
-                        MessageBox.Show(this, "There are no unviewed items.", 
+                        MessageBox.Show(this, "There are no unviewed items.",
                             _dataEntryApp.ApplicationTitle, MessageBoxButtons.OK,
                             MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
 
@@ -2112,7 +2128,7 @@ namespace Extract.DataEntry
                 {
                     if (GetNextInvalidAttribute(true) == null)
                     {
-                        MessageBox.Show(this, "There are no invalid items.", 
+                        MessageBox.Show(this, "There are no invalid items.",
                             _dataEntryApp.ApplicationTitle, MessageBoxButtons.OK,
                             MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
 
@@ -2154,7 +2170,7 @@ namespace Extract.DataEntry
 
                     // [DataEntry:821]
                     // Show and hide the error icons along with the tooltips.
-                    ShowAllErrorIcons(false);                    
+                    ShowAllErrorIcons(false);
 
                     // Remove the hoverAttribute's tooltip.
                     if (_hoverAttribute != null && _hoverToolTip != null)
@@ -2247,7 +2263,7 @@ namespace Extract.DataEntry
                 if (spatialInfoConfirmed)
                 {
                     DrawHighlights(false);
-                    
+
                     // Raise item selection changed to report on the new status of the selected
                     // attribute(s). (i.e., that they no longer contain unaccepted highlights).
                     OnItemSelectionChanged();
@@ -2435,7 +2451,7 @@ namespace Extract.DataEntry
                         _refreshActiveControlHighlights = true;
 
                         DrawHighlights(true);
-                        
+
                         // Call IndicateActive on the active data control after the undo operation
                         // to ensure the selected attributes get marked viewed as appropriate.
                         if (_activeDataControl != null)
@@ -2453,12 +2469,12 @@ namespace Extract.DataEntry
                         {
                             if (undo)
                             {
-                                ExecuteOnIdle("ELI34415", () => 
+                                ExecuteOnIdle("ELI34415", () =>
                                     {
                                         AttributeStatusInfo.UndoManager.EndUndo();
                                         AttributeStatusInfo.BlockAutoUpdateQueries = false;
                                         OnDataChanged();
-                                        
+
                                         if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.Undo))
                                         {
                                             AttributeStatusInfo.Logger.LogEvent(
@@ -2553,7 +2569,7 @@ namespace Extract.DataEntry
                             // and there is a _lastNonZoomedToSelectionViewArea, restore the view
                             // area to _lastNonZoomedToSelectionViewArea.
                             _performingProgrammaticZoom = true;
-                            
+
                             // [DataEntry:1187]
                             // If the current field will not visible after restoring
                             // _lastNonZoomedToSelectionViewArea, center
@@ -2814,6 +2830,24 @@ namespace Extract.DataEntry
             {
                 throw ex.AsExtract("ELI40236");
             }
+        }
+
+        /// <summary>
+        /// Add a message filter that will run, mostly, before this instance handles messages
+        /// </summary>
+        /// <param name="messageFilter">The <see cref="IMessageFilter"/> to add</param>
+        public void AddMessageFilter(IMessageFilter messageFilter)
+        {
+            _messageFilters += messageFilter.PreFilterMessage;
+        }
+
+        /// <summary>
+        /// Add a message filter that will run, mostly, before this instance handles messages
+        /// </summary>
+        /// <param name="messageFilter">The <see cref="IMessageFilter"/> to remove</param>
+        public void RemoveMessageFilter(IMessageFilter messageFilter)
+        {
+            _messageFilters -= messageFilter.PreFilterMessage;
         }
 
         #endregion Methods
