@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Security.Claims;
@@ -41,6 +40,8 @@ namespace WebAPI.Controllers
                 {
                     userData.LoginUser(user);
                     (LoginToken token, ClaimsPrincipal claimsPrincipal) = AuthUtils.GenerateToken(user, context);
+                    // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
+                    // exists, this is likely a unit test; assume 127.0.0.1.
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
                     data.OpenSession(claimsPrincipal, ipAddress);
 
@@ -107,8 +108,8 @@ namespace WebAPI.Controllers
         /// Reserves a document. The document will not be accessible by others
         /// until CloseDocument is called.
         /// </summary>
-        /// <param name="id">The file ID to open. If not specified (or -1), the next
-        /// queued document will be opened.</param>
+        /// <param name="id">The file ID to open. If -1, the next queued document will be opened.
+        /// </param>
         [HttpPost("OpenDocument/{id}")]
         [Produces(typeof(DocumentId))]
         [Authorize]

@@ -1,24 +1,17 @@
 ﻿using Extract.FileActionManager.Database.Test;
+using Extract.FileActionManager.FileProcessors;
 using Extract.Imaging;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Net;
+using System.Linq;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI.Controllers;
 using WebAPI.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Routing;
-using Newtonsoft.Json.Linq;
-using AttributeDbMgrComponentsLib;
-using System.Linq;
 
 namespace Extract.Web.WebAPI.Test
 {
@@ -30,7 +23,9 @@ namespace Extract.Web.WebAPI.Test
 
         static readonly string _TEST_FILE1 = "Resources.TestImage003.tif";
         static readonly string _TEST_FILE1_USS = "Resources.TestImage003.tif.uss";
-        static readonly string _ACTION_NAME = "Verify";
+        static readonly string _TEST_FILE1_VOA = "Resources.TestImage003.tif.voa";
+        static readonly string _COMPUTE_ACTION = "Compute";
+        static readonly string _VERIFY_ACTION = "Verify";
 
         #endregion Constants
 
@@ -93,15 +88,16 @@ namespace Extract.Web.WebAPI.Test
 
                 var result = controller.Login(user);
                 var loginToken = result.AssertGoodResult<LoginToken>();
+                // Actually validating the token data looks tricky; verify that it looks right at least.
                 Assert.IsTrue(loginToken.access_token.ToString().StartsWith("eyJhb", StringComparison.OrdinalIgnoreCase));
 
                 // Login should register an active FAM session
                 Assert.IsTrue(fileProcessingDb.IsAnyFAMActive());
 
-                // Login should close the FAM session
                 result = controller.Logout();
                 result.AssertGoodResult<GenericResult>();
 
+                // Logout should close the FAM session
                 Assert.IsFalse(fileProcessingDb.IsAnyFAMActive());
             }
             catch (Exception ex)
@@ -135,7 +131,6 @@ namespace Extract.Web.WebAPI.Test
                 Assert.IsTrue(settings.RedactionTypes.SequenceEqual(
                     new[] { "DOB", "SSN",  "TestType" }), "Failed to retrieve redaction types");
 
-                // Login should close the FAM session
                 result = controller.Logout();
                 result.AssertGoodResult<GenericResult>();
             }
@@ -168,22 +163,22 @@ namespace Extract.Web.WebAPI.Test
                 var openDocumentResult = result.AssertGoodResult<DocumentId>();
                 Assert.AreEqual(1, openDocumentResult.Id);
 
-                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.CloseDocument(commit: false);
                 result.AssertGoodResult<GenericResult>();
 
-                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.OpenDocument();
                 result.AssertGoodResult<DocumentId>();
 
-                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.CloseDocument(commit: true);
                 result.AssertGoodResult<GenericResult>();
 
-                Assert.AreEqual(EActionStatus.kActionCompleted, fileProcessingDb.GetFileStatus(1, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionCompleted, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.Logout();
                 result.AssertGoodResult<GenericResult>();
@@ -213,23 +208,23 @@ namespace Extract.Web.WebAPI.Test
                 var openDocumentResult = result.AssertGoodResult<DocumentId>();
                 Assert.AreEqual(1, openDocumentResult.Id);
 
-                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.CloseDocument(commit: false);
                 result.AssertGoodResult<GenericResult>();
 
-                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.OpenDocument(2);
                 openDocumentResult = result.AssertGoodResult<DocumentId>();
                 Assert.AreEqual(2, openDocumentResult.Id);
 
-                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(2, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(2, _VERIFY_ACTION, false));
 
                 result = controller.CloseDocument(commit: true);
                 result.AssertGoodResult<GenericResult>();
 
-                Assert.AreEqual(EActionStatus.kActionCompleted, fileProcessingDb.GetFileStatus(2, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionCompleted, fileProcessingDb.GetFileStatus(2, _VERIFY_ACTION, false));
 
                 result = controller.Logout();
                 result.AssertGoodResult<GenericResult>();
@@ -259,7 +254,7 @@ namespace Extract.Web.WebAPI.Test
                 result = controller.CloseDocument(commit: false);
                 result.AssertGoodResult<GenericResult>();
 
-                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(2, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(2, _VERIFY_ACTION, false));
 
                 result = controller.OpenDocument(2);
                 var openDocumentResult = result.AssertGoodResult<DocumentId>();
@@ -275,8 +270,8 @@ namespace Extract.Web.WebAPI.Test
                 result = controller.CloseDocument(commit: false);
                 result.AssertGoodResult<GenericResult>();
 
-                // After document is closed, the first file should be the file opened, not the 2nd
-                // file that had been specified originally.
+                // After document is closed, OpenDocument should open the first file in the queue,
+                // not the 2nd file that had been specified originally.
                 result = controller.OpenDocument();
                 openDocumentResult = result.AssertGoodResult<DocumentId>();
                 Assert.AreEqual(1, openDocumentResult.Id);
@@ -312,12 +307,12 @@ namespace Extract.Web.WebAPI.Test
                 var openDocumentResult = result.AssertGoodResult<DocumentId>();
                 Assert.AreEqual(1, openDocumentResult.Id);
 
-                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.Logout();
                 result.AssertGoodResult<GenericResult>();
 
-                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _ACTION_NAME, false));
+                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
             }
             finally
             {
@@ -340,7 +335,7 @@ namespace Extract.Web.WebAPI.Test
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
 
                 var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, _ACTION_NAME, 1, EFilePriority.kPriorityHigh, false, false,
+                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
                     EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
                 int fileId = fileRecord.FileID;
 
@@ -360,8 +355,10 @@ namespace Extract.Web.WebAPI.Test
                 {
                     var pageInfo = pagesInfo.PageInfos[page - 1];
                     Assert.AreEqual(page, pageInfo.Page, "Unexpected page number");
+                    // Page 2 is rotated 90 degrees to the right.
                     Assert.AreEqual((page == 2) ? 2200 : 1712, pageInfo.Width, "Unexpected page width");
                     Assert.AreEqual((page == 2) ? 1712 : 2200, pageInfo.Height, "Unexpected page height");
+                    // With no USS, the DisplayOrientation will still be zero.
                     Assert.AreEqual(0, pageInfo.DisplayOrientation, "Unexpected page orientation");
                 }
 
@@ -392,7 +389,7 @@ namespace Extract.Web.WebAPI.Test
                 _testFiles.GetFile(_TEST_FILE1_USS);
 
                 var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, _ACTION_NAME, 1, EFilePriority.kPriorityHigh, false, false,
+                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
                     EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
                 int fileId = fileRecord.FileID;
 
@@ -413,6 +410,7 @@ namespace Extract.Web.WebAPI.Test
                     var pageInfo = pagesInfo.PageInfos[page - 1];
 
                     Assert.AreEqual(page, pageInfo.Page, "Unexpected page number");
+                    // Page 2 is rotated 90 degrees to the right.
                     Assert.AreEqual((page == 2) ? 2200 : 1712, pageInfo.Width, "Unexpected page width");
                     Assert.AreEqual((page == 2) ? 1712 : 2200, pageInfo.Height, "Unexpected page height");
                     Assert.AreEqual((page == 2) ? 270 : 0, pageInfo.DisplayOrientation, "Unexpected page orientation");
@@ -448,7 +446,7 @@ namespace Extract.Web.WebAPI.Test
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
 
                 var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, _ACTION_NAME, 1, EFilePriority.kPriorityHigh, false, false,
+                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
                     EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
 
                 var result = controller.Login(user);
@@ -502,11 +500,8 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [Test, Category("Automated")]
-        public static void AppBackendAPI_Test_GetDocumentData()
+        public static void Test_GetDocumentData()
         {
             string dbName = "AppBackendAPI_Test_GetDocumentData";
 
@@ -528,7 +523,7 @@ namespace Extract.Web.WebAPI.Test
                 Assert.IsTrue(attributeSet.Attributes.Count > 0);
                 foreach (var attribute in attributeSet.Attributes)
                 {
-                    // Per discussion with GGK, non-spacial attributes will not be sent.
+                    // Per discussion with GGK, non-spatial attributes will not be sent.
                     Assert.IsTrue(attribute.HasPositionInfo);
                 }
 
@@ -542,11 +537,8 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [Test, Category("Automated")]
-        public static void AppBackendAPI_Test_SaveDocumentData()
+        public static void Test_SaveDocumentData()
         {
             string dbName = "AppBackendAPI_Test_SaveDocumentData";
 
@@ -555,6 +547,30 @@ namespace Extract.Web.WebAPI.Test
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
                         ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+
+                // Since the uss file will need to be used to translate the saved data into a VOA,
+                // we can't use pre-existing files in the database that may or may not actually
+                // exist on disk.
+                string testFileName = _testFiles.GetFile(_TEST_FILE1);
+                _testFiles.GetFile(_TEST_FILE1_USS);
+                _testFiles.GetFile(_TEST_FILE1_VOA);
+
+                var fileRecord = fileProcessingDb.AddFile(
+                    testFileName, _COMPUTE_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
+                    EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
+                int fileId = fileRecord.FileID;
+
+                var taskConfig = new StoreAttributesInDBTask();
+                taskConfig.AttributeSetName = "Attr";
+                var task = (IFileProcessingTask)taskConfig;
+
+                using (var famSession = new FAMProcessingSession(
+                    fileProcessingDb, _COMPUTE_ACTION, ApiTestUtils.CurrentApiContext.WorkflowName, task))
+                {
+                    famSession.WaitForProcessingToComplete();
+                }
+
+                fileProcessingDb.SetFileStatusToPending(fileId, _VERIFY_ACTION, false);
 
                 var result = controller.Login(user);
                 result.AssertGoodResult<LoginToken>();
@@ -588,6 +604,10 @@ namespace Extract.Web.WebAPI.Test
             {
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
+
+                _testFiles.RemoveFile(_TEST_FILE1);
+                _testFiles.RemoveFile(_TEST_FILE1_USS);
+                _testFiles.RemoveFile(_TEST_FILE1_VOA);
             }
         }
 

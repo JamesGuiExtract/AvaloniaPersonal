@@ -11,7 +11,7 @@ using static WebAPI.Utils;
 namespace WebAPI
 {
     /// <summary>
-    /// 
+    /// Utility methods for generating authentication tokens.
     /// </summary>
     static public class AuthUtils
     {
@@ -110,7 +110,6 @@ namespace WebAPI
                     expires_in = AuthUtils.TokenTimeoutInSeconds
                 };
 
-                //var response = JsonConvert.SerializeObject(responseToken, serializerSettings);
                 return (responseToken, claimsPrincipal);
             }
             catch (Exception ex)

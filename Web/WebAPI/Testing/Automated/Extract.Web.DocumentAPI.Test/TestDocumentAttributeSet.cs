@@ -160,7 +160,7 @@ namespace Extract.Web.WebAPI.Test
                 voa.PushBack(attr);
 
                 var mapper = new AttributeMapper(voa, UCLID_FILEPROCESSINGLib.EWorkflowType.kExtraction);
-                var docAttrr = mapper.MapAttributesToDocumentAttributeSet(true);
+                var docAttrr = mapper.MapAttributesToDocumentAttributeSet(includeNonSpatial: true);
                 Assert.AreEqual(0, docAttrr.Attributes.Where(a =>
                     a.SpatialPosition.Pages.Count != a.SpatialPosition.Pages.Distinct().Count()).Count());
             }

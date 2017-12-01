@@ -281,8 +281,10 @@ namespace WebAPI.Models
         /// <summary>
         /// get the document attribute set
         /// </summary>
-        /// <param name="fileId"></param>
-        /// <param name="includeNonSpatial"></param>
+        /// <param name="fileId">The ID of the file for which to retrieve data.</param>
+        /// <param name="includeNonSpatial"><c>true</c> to include non-spatial attributes in the resulting data;
+        /// otherwise, <c>false</c>. NOTE: If false, a non-spatial attribute will be excluded even if it has
+        /// spatial children.</param>
         /// <returns>DocumentAttributeSet instance, including error info iff there is an error</returns>
         /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
         public DocumentAttributeSet GetDocumentResultSet(int fileId, bool includeNonSpatial = true)

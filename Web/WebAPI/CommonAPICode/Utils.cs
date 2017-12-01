@@ -221,26 +221,35 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// Gets the test session identifier.
+        /// Creates a session ID to use for unit tests. Once created, this will be used in place of
+        /// the JWT's jti claim when associating a call with an existing session.
         /// </summary>
-        /// <value>
-        /// The test session identifier.
-        /// </value>
+        public static void CreateTestSessionID()
+        {
+            try
+            {
+                lock (_apiContextLock)
+                {
+                    if (string.IsNullOrWhiteSpace(_testSessionID))
+                    {
+                        _testSessionID = Guid.NewGuid().ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45302");
+            }
+        }
+
+        /// <summary>
+        /// Gets a session ID to use for unit tests. This will be used in place of the JWT's jti
+        /// claim when associating a call with an existing session.
+        /// </summary>
         public static string TestSessionID
         {
             get
             {
-                // Might be a good idea to limit setting this to Extract software, but deferring on
-                // how to for now (don't want to add links to more Extract assemblies)
-                //ExtractException.Assert("ELI45295",
-                //    "Test session IDs are only available in Extract testing environments.",
-                //    SystemMethods.IsExtractInternal());
-
-                if (string.IsNullOrWhiteSpace(_testSessionID))
-                {
-                    _testSessionID = Guid.NewGuid().ToString();
-                }
-
                 return _testSessionID;
             }
         }
