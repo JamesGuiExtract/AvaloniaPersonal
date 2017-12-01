@@ -13,7 +13,7 @@ namespace WebAPI
     /// <summary>
     /// 
     /// </summary>
-    static internal class AuthUtils
+    static public class AuthUtils
     {
         static TimeSpan _expiration = TimeSpan.FromHours(12);
 
@@ -68,17 +68,18 @@ namespace WebAPI
         /// <param name="context">the user's context</param>
         /// <returns>JSON-encoded JWT and a <see cref="ClaimsPrincipal"/> representing the authenticated user.
         /// </returns>
-        public static (string token, ClaimsPrincipal claimsPrincipal) GenerateToken(User user, ApiContext context)
+        internal static (LoginToken token, ClaimsPrincipal claimsPrincipal) GenerateToken(User user, ApiContext context)
         {
             try
             {
                 var now = DateTime.UtcNow;
+                string sessionID = Utils.TestSessionID ?? Guid.NewGuid().ToString();
 
                 // Specifically add the jti (nonce), iat (issued timestamp), and sub (subject/user) claims.
                 var claims = new Claim[]
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Jti, sessionID),
                     new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
 
                     // Add custom claims. The workflow name may be from the user login request.
@@ -103,14 +104,14 @@ namespace WebAPI
                     Formatting = Formatting.Indented
                 };
 
-                var responseToken = new
+                var responseToken = new LoginToken()
                 {
                     access_token = encodedJwt,
                     expires_in = AuthUtils.TokenTimeoutInSeconds
                 };
 
-                var response = JsonConvert.SerializeObject(responseToken, serializerSettings);
-                return (response, claimsPrincipal);
+                //var response = JsonConvert.SerializeObject(responseToken, serializerSettings);
+                return (responseToken, claimsPrincipal);
             }
             catch (Exception ex)
             {

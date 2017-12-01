@@ -175,9 +175,19 @@ namespace WebAPI.Models
         {
             try
             {
-                RequestAssertion.AssertCondition("ELI45237", !FileApi.DocumentSession.IsOpen,
-                    "Previous document must be released before checking out a new one.");
                 ExtractException.Assert("ELI45235", "No active user", _user != null);
+
+                // Per GGK request, if a document is already open, return the already open ID
+                // without error
+                // https://extract.atlassian.net/browse/WEB-55
+                if (FileApi.DocumentSession.IsOpen)
+                {
+                    return new DocumentId()
+                    {
+                        Id = FileApi.DocumentSession.FileId,
+                        Error = MakeError(isError: false, message: "", code: 0)
+                    };
+                }
 
                 IFileRecord fileRecord = null;
                 if (id > 0)
@@ -271,9 +281,11 @@ namespace WebAPI.Models
         /// <summary>
         /// get the document attribute set
         /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="includeNonSpatial"></param>
         /// <returns>DocumentAttributeSet instance, including error info iff there is an error</returns>
         /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
-        public DocumentAttributeSet GetDocumentResultSet(int fileId)
+        public DocumentAttributeSet GetDocumentResultSet(int fileId, bool includeNonSpatial = true)
         {
             try
             {
@@ -281,7 +293,7 @@ namespace WebAPI.Models
 
                 var results = GetAttributeSetForFile(fileId);
                 var mapper = new AttributeMapper(results, FileApi.Workflow.Type);
-                return mapper.MapAttributesToDocumentAttributeSet();
+                return mapper.MapAttributesToDocumentAttributeSet(includeNonSpatial);
             }
             catch (Exception ex)
             {
@@ -478,32 +490,14 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="fileId">The FAM file ID for which data should be updated.</param>
         /// <param name="fileData">The file data.</param>
-        /// <param name="caller"></param>
-        public void UpdateDocumentData(int fileId, IUnknownVector fileData, [CallerMemberName] string caller = "")
+        public void UpdateDocumentData(int fileId, IUnknownVector fileData)
         {
             try
             {
-                var fileProcessingDB = FileApi.FileProcessingDB;
-                var workflow = FileApi.Workflow;
+                AssertDocumentSession("ELI45297");
 
-                fileProcessingDB.RecordFAMSessionStart(caller, workflow.StartAction, vbQueuing: false, vbProcessing: true);
-
-                try
-                {
-                    int actionID = fileProcessingDB.GetActionIDForWorkflow(workflow.EndAction, workflow.Id);
-                    DateTime start = DateTime.Now;
-                    // This is a placeholder JIRA until a TaskClass is created for the web app:
-                    // https://extract.atlassian.net/browse/ISSUE-15079
-                    int fileTaskSessionId = fileProcessingDB.StartFileTaskSession("AD7F3F3F-20EC-4830-B014-EC118F6D4567", fileId, actionID);
-
-                	AttributeDbMgr.CreateNewAttributeSetForFile(fileTaskSessionId, workflow.OutputAttributeSet, fileData, true, true, true, false);
-
-                    fileProcessingDB.UpdateFileTaskSession(fileTaskSessionId, (DateTime.Now - start).TotalSeconds, 0);
-                }
-                finally
-                {
-                    fileProcessingDB.RecordFAMSessionStop();
-                }
+                AttributeDbMgr.CreateNewAttributeSetForFile(
+                    FileApi.DocumentSession.Id, FileApi.Workflow.OutputAttributeSet, fileData, true, true, true, false);
             }
             catch (Exception ex)
             {

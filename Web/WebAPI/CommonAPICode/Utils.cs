@@ -17,6 +17,7 @@ namespace WebAPI
     {
         private static IHostingEnvironment _environment = null;
         private static ApiContext _currentApiContext = null;
+        private static string _testSessionID;
         private static object _apiContextLock = new Object();
 
         /// <summary>
@@ -220,6 +221,31 @@ namespace WebAPI
         }
 
         /// <summary>
+        /// Gets the test session identifier.
+        /// </summary>
+        /// <value>
+        /// The test session identifier.
+        /// </value>
+        public static string TestSessionID
+        {
+            get
+            {
+                // Might be a good idea to limit setting this to Extract software, but deferring on
+                // how to for now (don't want to add links to more Extract assemblies)
+                //ExtractException.Assert("ELI45295",
+                //    "Test session IDs are only available in Extract testing environments.",
+                //    SystemMethods.IsExtractInternal());
+
+                if (string.IsNullOrWhiteSpace(_testSessionID))
+                {
+                    _testSessionID = Guid.NewGuid().ToString();
+                }
+
+                return _testSessionID;
+            }
+        }
+
+        /// <summary>
         /// set the default API context instance
         /// </summary>
         /// <param name="databaseServerName">database server name</param>
@@ -326,7 +352,7 @@ namespace WebAPI
         {
             try
             {
-                var workflowName = user.Claims.Where(claim => claim.Type == "WorkflowName").Select(claim => claim.Value).First();
+                var workflowName = user.Claims.Where(claim => claim.Type == "WorkflowName").Select(claim => claim.Value).FirstOrDefault();
                 var databaseServerName = CurrentApiContext.DatabaseServerName;
                 var databaseName = CurrentApiContext.DatabaseName;
 
@@ -372,7 +398,5 @@ namespace WebAPI
 
             return new ApiContext(databaseServerName, databaseName, namedWorkflow);
         }
-
-
     }
 }

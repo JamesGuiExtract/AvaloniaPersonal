@@ -65,7 +65,7 @@ namespace Extract.Web.WebAPI.Test
                         Password = "a"
                     };
 
-                    using (var userData = new UserData(ApiTestUtils.GetCurrentApiContext))
+                    using (var userData = new UserData(ApiTestUtils.CurrentApiContext))
                     {
                         userData.LoginUser(user);
                     }

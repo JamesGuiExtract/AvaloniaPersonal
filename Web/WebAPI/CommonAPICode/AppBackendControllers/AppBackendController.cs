@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using System;
+using System.Net;
 using System.Security.Claims;
 using WebAPI.Models;
 
@@ -39,8 +40,9 @@ namespace WebAPI.Controllers
                 using (var data = new DocumentData(context))
                 {
                     userData.LoginUser(user);
-                    (string token, ClaimsPrincipal claimsPrincipal) = AuthUtils.GenerateToken(user, context);
-                    data.OpenSession(claimsPrincipal, Request.HttpContext.Connection.RemoteIpAddress.ToString());
+                    (LoginToken token, ClaimsPrincipal claimsPrincipal) = AuthUtils.GenerateToken(user, context);
+                    string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
+                    data.OpenSession(claimsPrincipal, ipAddress);
 
                     return Ok(token);
                 }
@@ -82,7 +84,7 @@ namespace WebAPI.Controllers
         /// Gets settings for the application.
         /// </summary>
         [HttpGet("GetSettings")]
-        [Produces(typeof(DocumentId))]
+        [Produces(typeof(WebAppSettings))]
         [Authorize]
         public IActionResult GetSettings()
         {
@@ -105,9 +107,9 @@ namespace WebAPI.Controllers
         /// Reserves a document. The document will not be accessible by others
         /// until CloseDocument is called.
         /// </summary>
-        /// <param name="id">The file ID to open (optional). If not specified (or -1), the next
+        /// <param name="id">The file ID to open. If not specified (or -1), the next
         /// queued document will be opened.</param>
-        [HttpPost("OpenDocument/{Id?}")]
+        [HttpPost("OpenDocument/{id}")]
         [Produces(typeof(DocumentId))]
         [Authorize]
         public IActionResult OpenDocument(int id = -1)
@@ -161,7 +163,7 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetPageInfo")]
-        [Produces(typeof(PageInfo))]
+        [Produces(typeof(PagesInfo))]
         [Authorize]
         public IActionResult GetPageInfo()
         {
@@ -224,7 +226,9 @@ namespace WebAPI.Controllers
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(User))
                 {
-                    var result = data.GetDocumentResultSet(data.DocumentSessionFileId);
+                    // https://extract.atlassian.net/browse/WEB-59
+                    // Per discussion with GGK, non-spatial attributes will not be sent to the web app.
+                    var result = data.GetDocumentResultSet(data.DocumentSessionFileId, includeNonSpatial: false);
 
                     return Ok(result);
                 }

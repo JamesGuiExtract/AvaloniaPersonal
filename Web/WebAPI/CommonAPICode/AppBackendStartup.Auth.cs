@@ -11,6 +11,18 @@ namespace WebAPI
     public partial class Startup
     {
         /// <summary>
+        /// Gets or sets the authentication options.
+        /// </summary>
+        /// <value>
+        /// The authentication options.
+        /// </value>
+        public JwtBearerOptions AuthenticationOptions
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// configure authorization
         /// </summary>
         /// <param name="app">application builder instance</param>
@@ -44,12 +56,15 @@ namespace WebAPI
                 ClockSkew = TimeSpan.Zero
             };
 
-            app.UseJwtBearerAuthentication(new JwtBearerOptions
-            {
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true,
-                TokenValidationParameters = tokenValidationParameters
-            });
+            AuthenticationOptions =
+                new JwtBearerOptions
+                {
+                    AutomaticAuthenticate = true,
+                    AutomaticChallenge = true,
+                    TokenValidationParameters = tokenValidationParameters
+                };
+
+            app.UseJwtBearerAuthentication(AuthenticationOptions);
 
             // Removed for now, as it causes http return values of 400 instead of 401 when enabled, probably because
             // there is no handler for cookie-based auth.

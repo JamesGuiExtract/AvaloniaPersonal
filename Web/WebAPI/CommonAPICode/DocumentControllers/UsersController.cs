@@ -36,7 +36,7 @@ namespace WebAPI.Controllers
                 using (var userData = new UserData(context))
                 {
                     userData.LoginUser(user);
-                    (string token, ClaimsPrincipal claimsPrincipal) = AuthUtils.GenerateToken(user, context);
+                    (LoginToken token, ClaimsPrincipal claimsPrincipal) = AuthUtils.GenerateToken(user, context);
 
                     return Ok(token);
                 }

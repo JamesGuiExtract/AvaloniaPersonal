@@ -312,8 +312,9 @@ namespace WebAPI
         /// <summary>
         /// map IUnknownVector (of iAttribute) to a document attribute set.
         /// </summary>
+        /// <param name="includeNonSpatial"></param>
         /// <returns>corresponding DocumentAttributeSet</returns>
-        public DocumentAttributeSet MapAttributesToDocumentAttributeSet()
+        public DocumentAttributeSet MapAttributesToDocumentAttributeSet(bool includeNonSpatial)
         {
             IAttribute attr = null;
 
@@ -329,8 +330,7 @@ namespace WebAPI
                                     i, 
                                     _attributes.Size());
 
-                    // Do not transfer metadata attributes to the web API.
-                    if (attr.Name.StartsWith("_"))
+                    if (attr.Name.StartsWith("_") || (!includeNonSpatial && !attr.Value.HasSpatialInfo()))
                     {
                         continue;
                     }
