@@ -1,19 +1,11 @@
-﻿using AttributeDbMgrComponentsLib;
-using Extract.FileActionManager.Database.Test;
-using Extract.FileActionManager.FileProcessors;
+﻿using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using Extract.UtilityApplications.NERDataCollector.Test;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.UtilityApplications.NERTrainer.Test
 {

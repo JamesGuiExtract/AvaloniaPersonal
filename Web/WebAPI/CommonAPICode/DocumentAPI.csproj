@@ -42,6 +42,8 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
+      <Private>false</Private>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
     </COMReference>
     <COMReference Include="UCLID_AFCORELib.dll">
       <Guid>69d40760-8162-4822-85d6-c10b02044e9d</Guid>
