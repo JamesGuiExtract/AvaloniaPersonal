@@ -607,7 +607,23 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 					nBitsPerPixel = fileInfo.BitsPerPixel;					
 
 					// Set output format
-					nType = (nBitsPerPixel == 1) ? FILE_RAS_PDF_G4 : FILE_RAS_PDF_JPEG;
+					nType = FILE_UNKNOWN_FORMAT;
+					if (nBitsPerPixel == 1)
+					{
+						nType = FILE_RAS_PDF_G4;
+					}
+					else
+					{
+						nType = FILE_RAS_PDF_JPEG;
+
+						// https://extract.atlassian.net/browse/ISSUE-15132
+						// FILE_RAS_PDF_JPEG is 24-bit JPEG and fails if color depth is 32-bit, e.g.
+						// Allow 8 or 24 bit per documentation
+						if (nBitsPerPixel != 8)
+						{
+							nBitsPerPixel = 24;
+						}
+					}
 					nQFactor = getCompressionFactor(nType);
 
 					// This flag will cause the out put image to have the same( or nearly the same ) 

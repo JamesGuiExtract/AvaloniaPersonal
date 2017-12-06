@@ -508,9 +508,22 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						if (fileInfo.Format == FILE_RAS_PDF ||
 							(bOutputIsPdf && !isPDF(fileInfo.Format)))
 						{
-							fileInfo.Format = (fileInfo.BitsPerPixel == 1) 
-								? FILE_RAS_PDF_G4
-								: FILE_RAS_PDF_JPEG;
+							if (fileInfo.BitsPerPixel == 1)
+							{
+								fileInfo.Format = FILE_RAS_PDF_G4;
+							}
+							else
+							{
+								fileInfo.Format = FILE_RAS_PDF_JPEG;
+
+								// https://extract.atlassian.net/browse/ISSUE-15132
+								// FILE_RAS_PDF_JPEG is 24-bit JPEG and fails if color depth is 32-bit, e.g.
+								// Allow 8 or 24 bit per documentation
+								if (fileInfo.BitsPerPixel != 8)
+								{
+									fileInfo.BitsPerPixel = 24;
+								}
+							}
 						}
 
 						bool bLoadExistingAnnotations = bRetainAnnotations
