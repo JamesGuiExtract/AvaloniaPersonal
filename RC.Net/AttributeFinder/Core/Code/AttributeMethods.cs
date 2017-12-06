@@ -228,6 +228,22 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Returns an enumeration of all <see paramref="attributes"/> and their subattributes, recursively.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s to enumerate.</param>
+        /// <returns>An enumeration of <see paramref="attribute"/> and its subattributes, recursively</returns>
+        public static IEnumerable<IAttribute> EnumerateDepthFirst(this IUnknownVector attributes)
+        {
+            foreach (var attribute in attributes.ToIEnumerable<IAttribute>())
+            {
+                foreach (var descendant in EnumerateDepthFirst(attribute))
+                {
+                    yield return descendant;
+                }
+            }
+        }
+
+        /// <summary>
         /// Recursively updates the source document name of a vector of attributes.
         /// </summary>
         /// <param name="attributes">The attributes.</param>

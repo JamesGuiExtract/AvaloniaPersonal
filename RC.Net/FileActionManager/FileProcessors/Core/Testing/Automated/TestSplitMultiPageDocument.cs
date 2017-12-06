@@ -3,6 +3,7 @@ using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using UCLID_AFCORELib;
@@ -79,13 +80,10 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
         #region Unit Tests
 
-        /// <summary>
-        /// Tests XML syntax validation.
-        /// </summary>
         [Test, Category("Automated")]
         public static void TestSplitTif()
         {
-            string testDbName = "TestSplitTif";
+            string testDbName = "SplitMultiPageDocument_TestSplitTif";
 
             try
             {
@@ -94,8 +92,8 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 string testFile = _testFiles.GetFile(_TEST_TIF_MULTI_PAGE);
                 _testFiles.GetFile(_TEST_TIF_MULTI_PAGE + ".uss");
                 _testFiles.GetFile(_TEST_TIF_MULTI_PAGE + ".voa");
-                var fileID = fileProcessingDb.AddTestFiles(_testFiles,
-                    new[] { (_TEST_TIF_MULTI_PAGE, _ACTION_NAME, -1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal) });
+                var fileID = fileProcessingDb.AddTestFiles<TestSplitMultiPageDocument>(_testFiles,
+                    (_TEST_TIF_MULTI_PAGE, _ACTION_NAME, -1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal));
 
                 var taskConfig = new SplitMultipageDocumentTask();
                 taskConfig.VOAPath = "<SourceDocName>.voa";
@@ -137,6 +135,52 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 }
 
                 Assert.AreEqual(0, spatialAttributeTotal, Invariant($"Not all attributes accounted for: {spatialAttributeTotal}"));
+            }
+            finally
+            {
+                _testFiles.RemoveFile(_TEST_TIF_MULTI_PAGE);
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        [Test, Category("Automated")]
+        public static void TestSplitTifTwice()
+        {
+            string testDbName = "SplitMultiPageDocument_TestSplitTifTwice";
+
+            try
+            {
+                var fileProcessingDb = _testDbManager.GetDatabase(_FAMDB, testDbName);
+
+                string testFile = _testFiles.GetFile(_TEST_TIF_MULTI_PAGE);
+                _testFiles.GetFile(_TEST_TIF_MULTI_PAGE + ".uss");
+                _testFiles.GetFile(_TEST_TIF_MULTI_PAGE + ".voa");
+                var fileIDStrings = fileProcessingDb.AddTestFiles<TestSplitMultiPageDocument>(_testFiles,
+                    (_TEST_TIF_MULTI_PAGE, _ACTION_NAME, -1, EActionStatus.kActionPending, EFilePriority.kPriorityNormal));
+                int fileId = int.Parse(fileIDStrings[1], CultureInfo.InvariantCulture);
+
+                var taskConfig = new SplitMultipageDocumentTask();
+                taskConfig.VOAPath = "<SourceDocName>.voa";
+                taskConfig.OutputPath =
+                    @"$DirOf(<SourceDocName>)\Split_$FileOf(<SourceDocName>)\$InsertBeforeExt($FileOf(<SourceDocName>),.<PageNumber>)";
+                var task = (IFileProcessingTask)taskConfig;
+
+                using (var famSession = new FAMProcessingSession(fileProcessingDb, _ACTION_NAME, "", task))
+                {
+
+                    System.Diagnostics.Trace.WriteLine($"Processed {famSession.WaitForProcessingToComplete()} file(s)");
+                    //Assert.AreEqual(1, famSession.WaitForProcessingToComplete());
+                }
+
+                // Now process it again and ensure there are no errors for duplicate entries in pagination table.
+                fileProcessingDb.SetFileStatusToPending(fileId, _ACTION_NAME, false);
+                using (var famSession = new FAMProcessingSession(fileProcessingDb, _ACTION_NAME, "", task))
+                {
+                    //Assert.AreEqual(1, famSession.WaitForProcessingToComplete());
+                    System.Diagnostics.Trace.WriteLine($"Processed {famSession.WaitForProcessingToComplete()} file(s)");
+                }
+
+                UtilityMethods.ShowMessageBox("Test", "Test", false);
             }
             finally
             {

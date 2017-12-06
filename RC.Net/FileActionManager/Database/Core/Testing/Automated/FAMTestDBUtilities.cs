@@ -90,8 +90,8 @@ namespace Extract.FileActionManager.Database.Test
         /// the priority for the file.</param>
         /// <returns>An array of the indices as strings with index 0 as "" so that the indices of the
         /// returned files IDs are 1-based to coincide with like FAM file IDs.</returns>
-        public static string[] AddTestFiles(this IFileProcessingDB fileProcessingDB,
-            TestFileManager<TestFAMFileProcessing> testFiles,
+        public static string[] AddTestFiles<T>(this IFileProcessingDB fileProcessingDB,
+            TestFileManager<T> testFiles,
             params (string fileName,
                     string actionName,
                     int workflowID,
