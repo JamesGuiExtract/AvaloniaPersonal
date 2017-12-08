@@ -322,6 +322,16 @@ namespace Extract.DataEntry.LabDE.Test
                 LabDEAddOrUpdateEncounterAndIPDates(_famDB, dataDictionary);
 
                 CheckResults(_famDB, dataDictionary.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
+
+                var saveData = new Dictionary<string, Tuple<string, string>>(dataDictionary);
+
+                // Test that passing null values keeps the original dates
+                dataDictionary["AdmissionDate"] = new Tuple<string, string>("@AdmissionDate", "NULL");
+                dataDictionary["DischargeDate"] = new Tuple<string, string>("@DischargeDate", "NULL");
+
+                LabDEAddOrUpdateEncounterAndIPDates(_famDB, dataDictionary);
+
+                CheckResults(_famDB, saveData.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
             }
             finally
             {
@@ -480,6 +490,18 @@ namespace Extract.DataEntry.LabDE.Test
                 CheckResults(_famDB, dataDictionary.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
 
                 CheckResults(_famDB, dataDictionary.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
+
+                var saveData = new Dictionary<string, Tuple<string, string>>(dataDictionary);
+
+                // Test that passing null values keeps the original dates
+                dataDictionary["AdmissionDate"] = new Tuple<string, string>("@AdmissionDate", "NULL");
+                dataDictionary["DischargeDate"] = new Tuple<string, string>("@DischargeDate", "NULL");
+
+                LabDEAddOrUpdateOrderWithEncounterAndIPDates(_famDB, dataDictionary);
+
+                CheckResults(_famDB, saveData.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
+
+                CheckResults(_famDB, saveData.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
             }
             finally
             {
