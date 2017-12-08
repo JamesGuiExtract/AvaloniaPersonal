@@ -713,7 +713,12 @@ namespace Extract.DataEntry.LabDE
                             // Setting the record ID cell as active helps indicate that a value
                             // was applied.
                             DataGridView.ClearSelection();
-                            DataGridView.CurrentCell = recordIdCell;
+                            
+                            // https://extract.atlassian.net/browse/ISSUE-15137
+                            if (recordIdCell.Visible)
+                            {
+                                DataGridView.CurrentCell = recordIdCell;
+                            }
                         }
                     }
                 }
