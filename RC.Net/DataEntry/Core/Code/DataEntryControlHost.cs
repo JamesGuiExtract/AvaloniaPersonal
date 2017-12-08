@@ -2864,6 +2864,11 @@ namespace Extract.DataEntry
         /// </summary>
         public event EventHandler<EventArgs> DataSaved;
 
+        /// <summary>
+        /// Occurs when a document has finished loading.
+        /// </summary>
+        public event EventHandler<EventArgs> DocumentLoaded;
+
         #endregion Events
 
         #region Overrides
@@ -5396,6 +5401,14 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Called when a document has finished loading.
+        /// </summary>
+        protected virtual void OnDocumentLoaded()
+        {
+            DocumentLoaded?.Invoke(this, new EventArgs());
+        }
+
+        /// <summary>
         /// Raises the <see cref="MessageHandled"/> event.
         /// </summary>
         /// <param name="e">The data associated with the event.</param>
@@ -5418,7 +5431,7 @@ namespace Extract.DataEntry
         /// Raises the <see cref="UpdateEnded"/> event.
         /// </summary>
         /// <param name="e"></param>
-        void OnUpdateEnded(EventArgs e)
+        protected virtual void OnUpdateEnded(EventArgs e)
         {
             try
             {
@@ -5436,7 +5449,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Raises the <see cref="DataSaved"/> event.
         /// </summary>
-        void OnDataSaved()
+        protected virtual void OnDataSaved()
         {
             try
             {
@@ -7974,7 +7987,11 @@ namespace Extract.DataEntry
                 // else.
                 ExecuteOnIdle("ELI37382", () => AttributeStatusInfo.ForgetLastAppliedStringValues());
 
-                ExecuteOnIdle("ELI39651", () => _isDocumentLoaded = true);
+                ExecuteOnIdle("ELI39651", () =>
+                {
+                    _isDocumentLoaded = true;
+                    OnDocumentLoaded();
+                });
 
                 if (_attributes != null && _attributes.Size() > 0 &&
                     AttributeStatusInfo.IsLoggingEnabled(LogCategories.DataLoad))
