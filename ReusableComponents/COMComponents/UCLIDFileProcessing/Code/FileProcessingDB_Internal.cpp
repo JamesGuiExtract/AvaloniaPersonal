@@ -1935,6 +1935,7 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		vecQueries.push_back(gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES);
 		vecQueries.push_back(gstrINSERT_PAGINATION_TASK_CLASS);
 		vecQueries.push_back(gstrSPLIT_MULTI_PAGE_DOCUMENT_TASK_CLASS);
+		vecQueries.push_back(gstrINSERT_TASKCLASS_WEB_VERIFICATION);
 
 		// Initialize the DB Info settings if necessary
 		if (bInitializeUserTables)
