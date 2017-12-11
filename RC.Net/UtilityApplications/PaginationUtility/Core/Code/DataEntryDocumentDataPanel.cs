@@ -226,6 +226,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return false;
                 }
 
+                // GetData contains attributes that have been prepared for output.
+                var attributes = GetData(validateData);
+                if (attributes == null)
+                {
+                    // DataCanBeSaved should have caught any cases where data cannot be saved, but
+                    // it is possible for GetData to return null if for some reason there is a
+                    // reason data cannot be saved that DataCanBeSaved did not detect.
+                    return false;
+                }
+                attributes.ReportMemoryUsage();
+
                 var dataEntryData = (DataEntryPaginationDocumentData)data;
                 if (!Config.Settings.PerformanceTesting)
                 {
@@ -233,9 +244,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 dataEntryData.UndoState = AttributeStatusInfo.UndoManager.GetState();
 
-                // GetData contains attributes that have been prepared for output.
-                data.Attributes = GetData(validateData);
-                data.Attributes.ReportMemoryUsage();
+                data.Attributes = attributes;
 
                 return true;
             }

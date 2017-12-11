@@ -5104,7 +5104,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns><see langword="true"/> if data can be saved, <see langword="false"/> if the
         /// data cannot be saved at this time.</returns>
-        protected bool DataCanBeSaved()
+        protected virtual bool DataCanBeSaved()
         {
             // Keep track of the currently selected attribute and whether selection is changed by
             // this method so that the selection can be restored at the end of this method.
