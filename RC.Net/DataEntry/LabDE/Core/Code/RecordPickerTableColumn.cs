@@ -503,9 +503,12 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    _famData.RowDataUpdated -= HandleFamData_RowDataUpdated;
-                    _famData.Dispose();
-                    _famData = null;
+                    if (_famData != null)
+                    {
+                        _famData.RowDataUpdated -= HandleFamData_RowDataUpdated;
+                        _famData.Dispose();
+                        _famData = null;
+                    }
 
                     _recordIDColumn = null;
                     _dataEntryControlHost = null;
