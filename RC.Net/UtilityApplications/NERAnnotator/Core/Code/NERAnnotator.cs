@@ -546,9 +546,9 @@ namespace Extract.UtilityApplications.NERAnnotator
                 // Collect all candidate attributes for this page
                 var attributesOnThisPage = typesVoa
                     .ToIEnumerable<IAttribute>()
-                    .Where(a =>
-                        a.Value.HasSpatialInfo()
-                        && a.Value.GetSpecifiedPages(pageNum, pageNum).HasSpatialInfo())
+                    .Where(a => a.EnumerateDepthFirst().Any(c =>
+                        c.Value.HasSpatialInfo()
+                        && c.Value.GetSpecifiedPages(pageNum, pageNum).HasSpatialInfo()))
                     .ToIUnknownVector();
 
                 var sourceOfLabels = new XPathContext(attributesOnThisPage);
