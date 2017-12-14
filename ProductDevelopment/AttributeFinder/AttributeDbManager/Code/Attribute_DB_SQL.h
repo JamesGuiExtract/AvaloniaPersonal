@@ -139,4 +139,108 @@ static const std::string gstrCREATE_FILEID_ATTRIBUTE_SET_NAME_ID_INDEX =
 // version 2 update- add a binary column to AttributeSetForFile, to store the complete spatial string for the document.
 static const std::string gstrADD_ATTRIBUTE_SET_FOR_FILE_VOA_COLUMN = 
 	"ALTER TABLE [dbo].[AttributeSetForFile] ADD [VOA] [varbinary](max) NULL";
+
+// Added AccuracyData table for 10.7
+static const std::string gstrREPORTING_REDACTION_ACCURACY_TABLE = "ReportingRedactionAccuracy";
+static const std::string gstrREPORTING_DATA_CAPTURE_ACCURACY_TABLE = "ReportingDataCaptureAccuracy";
+
+static const std::string gstrCREATE_REPORTING_REDACTION_ACCURACY_TABLE =
+	"CREATE TABLE [dbo].[ReportingRedactionAccuracy]( "
+	"	[ID][bigint] IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_ReportingRedactionAccuracy] PRIMARY KEY CLUSTERED, "
+	"   [DatabaseServiceID] [INT] NOT NULL, "
+	"	[FoundAttributeSetForFileID][BIGINT] NOT NULL, "
+	"	[ExpectedAttributeSetForFileID][BIGINT] NOT NULL, "
+	"	[FileID][INT] NOT NULL, "
+	"   [Page][INT] NOT NULL, "
+	"	[Attribute][nvarchar](MAX) NOT NULL, "
+	"	[Expected][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyExpected DEFAULT(0), "
+	"	[Found][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyFound DEFAULT(0), "
+	"	[Correct][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyCorrect DEFAULT(0), "
+	"	[FalsePositives][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyFalsePositives DEFAULT(0), "
+	"	[OverRedacted][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyOverRedacted DEFAULT(0), "
+	"	[UnderRedacted][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyUnderRedacted DEFAULT(0), "
+	"	[Missed][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyMissed DEFAULT(0) "
+	") ";
+
+static const std::string gstrADD_REPORTING_REDACTION_ACCURACY_ATTRIBUTE_SET_FOR_FILE_EXPECTED_FK =
+	"ALTER TABLE[dbo].[ReportingRedactionAccuracy]  "
+	"	WITH CHECK ADD  CONSTRAINT [FK_ReportingRedactionAccuracy_AttributeSetForFile_Expected] FOREIGN KEY([ExpectedAttributeSetForFileID]) "
+	"	REFERENCES[dbo].[AttributeSetForFile]([ID]) "
+	"	ON UPDATE NO ACTION "
+	"	ON DELETE NO ACTION";
+
+static const std::string gstrADD_REPORTING_REDACTION_ATTRIBUTE_SET_FOR_FILE_FOUND_FK =
+	"ALTER TABLE[dbo].[ReportingRedactionAccuracy]  "
+	"	WITH CHECK ADD  CONSTRAINT [FK_ReportingRedactionAccuracy_AttributeSetForFile_Found] FOREIGN KEY([FoundAttributeSetForFileID]) "
+	"	REFERENCES[dbo].[AttributeSetForFile]([ID]) "
+	"	ON UPDATE NO ACTION "
+	"	ON DELETE NO ACTION";
+
+static const std::string gstrADD_REPORTING_REDACTION_FAMFILE_FK =
+	"ALTER TABLE[dbo].[ReportingRedactionAccuracy]  "
+	"	WITH CHECK ADD  CONSTRAINT [FK_ReportingRedactionAccuracy_FAMFile] FOREIGN KEY([FileID]) "
+	"	REFERENCES[dbo].[FAMFile]([ID]) "
+	"	ON UPDATE CASCADE "
+	"	ON DELETE CASCADE"; 
+
+static const std::string gstrADD_REPORTING_REDACTION_DATABASE_SERVICE_FK =
+	"ALTER TABLE[dbo].[ReportingRedactionAccuracy]  "
+	"	WITH CHECK ADD  CONSTRAINT [FK_ReportingRedactionAccuracy_DatabaseService] FOREIGN KEY([DatabaseServiceID]) "
+	"	REFERENCES[dbo].[DatabaseService]([ID]) "
+	"	ON UPDATE CASCADE "
+	"	ON DELETE CASCADE";
+
+static const std::string gstrCREATE_REPORTING_REDACTION_FILEID_DATABASE_SERVICE_IX =
+	"CREATE NONCLUSTERED INDEX[IX_ReportingRedactionAccuracy_FileID_DatabaseServiceID] ON[dbo].[ReportingRedactionAccuracy] "
+	"( "
+	"	[FileID] ASC, "
+	"	[DatabaseServiceID] ASC "
+	") ";
 	
+static const std::string gstrCREATE_REPORTING_DATA_CAPTURE_ACCURACY_TABLE =
+"CREATE TABLE [dbo].[ReportingDataCaptureAccuracy]( "
+"	[ID][bigint] IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_ReportingDataCaptureAccuracy] PRIMARY KEY CLUSTERED, "
+"   [DatabaseServiceID] [INT] NOT NULL, "
+"	[FoundAttributeSetForFileID][BIGINT] NOT NULL, "
+"	[ExpectedAttributeSetForFileID][BIGINT] NOT NULL, "
+"	[FileID][INT] NOT NULL, "
+"	[Attribute][nvarchar](MAX) NOT NULL, "
+"	[Correct][bigint] NOT NULL CONSTRAINT DF_ReportingDataCaptureAccuracyCorrect DEFAULT(0), "
+"	[Expected][bigint] NOT NULL CONSTRAINT DF_ReportingDataCaptureAccuracyExpected DEFAULT(0), "
+"	[Incorrect][bigint] NOT NULL CONSTRAINT DF_ReportingDataCaptureAccuracyIncorrect DEFAULT(0) "
+") ";
+
+static const std::string gstrADD_REPORTING_DATA_CAPTURE_ACCURACY_ATTRIBUTE_SET_FOR_FILE_EXPECTED_FK =
+"ALTER TABLE[dbo].[ReportingDataCaptureAccuracy]  "
+"	WITH CHECK ADD  CONSTRAINT [FK_ReportingDataCaptureAccuracy_AttributeSetForFile_Expected] FOREIGN KEY([ExpectedAttributeSetForFileID]) "
+"	REFERENCES[dbo].[AttributeSetForFile]([ID]) "
+"	ON UPDATE NO ACTION "
+"	ON DELETE NO ACTION";
+
+static const std::string gstrADD_REPORTING_DATA_CAPTURE_ATTRIBUTE_SET_FOR_FILE_FOUND_FK =
+"ALTER TABLE[dbo].[ReportingDataCaptureAccuracy]  "
+"	WITH CHECK ADD  CONSTRAINT [FK_ReportingDataCaptureAccuracy_AttributeSetForFile_Found] FOREIGN KEY([FoundAttributeSetForFileID]) "
+"	REFERENCES[dbo].[AttributeSetForFile]([ID]) "
+"	ON UPDATE NO ACTION "
+"	ON DELETE NO ACTION";
+
+static const std::string gstrADD_REPORTING_DATA_CAPTURE_FAMFILE_FK =
+"ALTER TABLE[dbo].[ReportingDataCaptureAccuracy]  "
+"	WITH CHECK ADD  CONSTRAINT [FK_ReportingDataCaptureAccuracy_FAMFile] FOREIGN KEY([FileID]) "
+"	REFERENCES[dbo].[FAMFile]([ID]) "
+"	ON UPDATE CASCADE "
+"	ON DELETE CASCADE";
+
+static const std::string gstrADD_REPORTING_DATA_CAPTURE_DATABASE_SERVICE_FK =
+"ALTER TABLE[dbo].[ReportingDataCaptureAccuracy]  "
+"	WITH CHECK ADD  CONSTRAINT [FK_ReportingDataCaptureAccuracy_DatabaseService] FOREIGN KEY([DatabaseServiceID]) "
+"	REFERENCES[dbo].[DatabaseService]([ID]) "
+"	ON UPDATE CASCADE "
+"	ON DELETE CASCADE";
+
+static const std::string gstrCREATE_REPORTING_DATA_CAPTURE_FILEID_DATABASE_SERVICE_IX =
+"CREATE NONCLUSTERED INDEX[IX_ReportingDataCaptureAccuracy_FileID_DatabaseServiceID] ON[dbo].[ReportingDataCaptureAccuracy] "
+"( "
+"	[FileID] ASC, "
+"	[DatabaseServiceID] ASC "
+") ";

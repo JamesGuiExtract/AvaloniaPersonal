@@ -31,7 +31,6 @@
     <RegisterForComInterop>false</RegisterForComInterop>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-   
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -44,7 +43,6 @@
     <RegisterForComInterop>false</RegisterForComInterop>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-   
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
@@ -66,6 +64,7 @@
   <ItemGroup>
     <Compile Include="FileFilter.cs" />
     <Compile Include="FileReceiver.cs" />
+    <Compile Include="IDatabaseService.cs" />
     <Compile Include="IErrorEmailTask.cs" />
     <Compile Include="IFileBrowser.cs" />
     <Compile Include="IMemoryManager.cs" />

@@ -234,6 +234,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\NERTrainer.exe" /mapout:"$(BinariesFolder)\Map\mapNERTrainer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DashboardCreator.exe" /mapout:"$(BinariesFolder)\Map\mapDashboardCreator.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DashboardViewer.exe" /mapout:"$(BinariesFolder)\Map\mapDashboardViewer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.ETL.dll" /mapout:"$(BinariesFolder)\Map\mapDExtract.ETL.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
     
     @ECHO.
     @DATE /T
@@ -392,6 +393,7 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY /V "$(BinariesFolder)\Obfuscated\ESAppMonitorService.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(RCNETDir)\UtilityApplications\Services\ESAppMonitorService\Core\Install ESAppMonitorService.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.ExceptionUtilities.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.ETL.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(PDUtilsRootDir)\DetectAndReportFailure\Misc\DetectAndReportFailure.ini" "$(AFCoreInstallFilesRootDir)\ProgramDataFiles"
 	
 	@COPY /V "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\*.*" "$(RequiredInstallsDir)\LogicNP"

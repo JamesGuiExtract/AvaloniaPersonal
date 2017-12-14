@@ -37,7 +37,7 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 3;
+	const long glSCHEMA_VERSION = 4;
 	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
@@ -56,6 +56,8 @@ namespace
 		names.push_back( gstrATTRIBUTE_INSTANCE_TYPE );
 		names.push_back( gstrATTRIBUTE );
 		names.push_back( gstrRASTER_ZONE );
+		names.push_back( gstrREPORTING_REDACTION_ACCURACY_TABLE );
+		names.push_back( gstrREPORTING_DATA_CAPTURE_ACCURACY_TABLE );
 
 		return names;
 	}
@@ -161,9 +163,29 @@ namespace
 		return queries;
 	}
 
+	VectorOfString GetSchema_v4(bool bAddUserTables)
+	{
+		VectorOfString queries = GetSchema_v3(bAddUserTables);
+		queries.push_back(gstrCREATE_REPORTING_REDACTION_ACCURACY_TABLE);
+		queries.push_back(gstrADD_REPORTING_REDACTION_ACCURACY_ATTRIBUTE_SET_FOR_FILE_EXPECTED_FK);
+		queries.push_back(gstrADD_REPORTING_REDACTION_ATTRIBUTE_SET_FOR_FILE_FOUND_FK);
+		queries.push_back(gstrADD_REPORTING_REDACTION_FAMFILE_FK);
+		queries.push_back(gstrADD_REPORTING_REDACTION_DATABASE_SERVICE_FK);
+		queries.push_back(gstrCREATE_REPORTING_REDACTION_FILEID_DATABASE_SERVICE_IX);
+
+		queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_ACCURACY_TABLE);
+		queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_ACCURACY_ATTRIBUTE_SET_FOR_FILE_EXPECTED_FK);
+		queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_ATTRIBUTE_SET_FOR_FILE_FOUND_FK);
+		queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_FAMFILE_FK);
+		queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_DATABASE_SERVICE_FK);
+		queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_FILEID_DATABASE_SERVICE_IX);
+
+		return queries;
+	}
+
 	VectorOfString GetCurrentSchema( bool bAddUserTables = true )
 	{
-		return GetSchema_v3( bAddUserTables );
+		return GetSchema_v4( bAddUserTables );
 	}
 
 
@@ -233,6 +255,42 @@ namespace
 			return nNewSchemaVersion;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41922");
+	}
+	//-------------------------------------------------------------------------------------------------
+	int UpdateToSchemaVersion4(_ConnectionPtr ipConnection, long* pnNumSteps)
+	{
+		try
+		{
+			const int nNewSchemaVersion = 4;
+
+			if (pnNumSteps != __nullptr)
+			{
+				*pnNumSteps += 1;
+				return nNewSchemaVersion;
+			}
+
+			vector<string> queries;
+			queries.push_back(gstrCREATE_REPORTING_REDACTION_ACCURACY_TABLE);
+			queries.push_back(gstrADD_REPORTING_REDACTION_ACCURACY_ATTRIBUTE_SET_FOR_FILE_EXPECTED_FK);
+			queries.push_back(gstrADD_REPORTING_REDACTION_ATTRIBUTE_SET_FOR_FILE_FOUND_FK);
+			queries.push_back(gstrADD_REPORTING_REDACTION_FAMFILE_FK);
+			queries.push_back(gstrADD_REPORTING_REDACTION_DATABASE_SERVICE_FK);
+			queries.push_back(gstrCREATE_REPORTING_REDACTION_FILEID_DATABASE_SERVICE_IX);
+
+			queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_ACCURACY_TABLE);
+			queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_ACCURACY_ATTRIBUTE_SET_FOR_FILE_EXPECTED_FK);
+			queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_ATTRIBUTE_SET_FOR_FILE_FOUND_FK);
+			queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_FAMFILE_FK);
+			queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_DATABASE_SERVICE_FK);
+			queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_FILEID_DATABASE_SERVICE_IX);
+			
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
+
+			executeVectorOfSQL(ipConnection, queries);
+
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45336");
 	}
 }
 
@@ -576,6 +634,13 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				break;
 
 			case 3:
+				if (nFAMDBSchemaVersion == 159)
+				{
+					*pnProdSchemaVersion = UpdateToSchemaVersion4(ipConnection, pnNumSteps);
+				}
+				break;
+
+			case 4:
 				break;
 
 			default:

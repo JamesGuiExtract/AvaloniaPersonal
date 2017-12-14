@@ -1552,6 +1552,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrWORKFLOW_TYPE);
 			eraseFromVector(vecTables, gstrWORKFLOW);
 			eraseFromVector(vecTables, gstrWEB_APP_CONFIG);
+			eraseFromVector(vecTables, gstrDATABASE_SERVICE);
 		}
 
 		// Never drop these tables
@@ -1725,7 +1726,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
 			vecQueries.push_back(gstrADD_FILE_HANDLER_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_WEB_APP_CONFIG_WORKFLOW_FK);
-
+			
 			// Add triggers
 			vecQueries.push_back(gstrCREATE_ACTION_ON_DELETE_TRIGGER);
 			vecQueries.push_back(gstrCREATE_WORKFLOW_ON_DELETE_TRIGGER);
@@ -1844,6 +1845,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_WORKFLOW_TYPE);
 		vecQueries.push_back(gstrCREATE_WORKFLOW);
 		vecQueries.push_back(gstrCREATE_WEB_APP_CONFIG);
+		vecQueries.push_back(gstrCREATE_DATABASE_SERVICE_TABLE);
 	}
 
 	// Add queries to create tables to the vector
@@ -3369,6 +3371,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrMLMODEL);
 	vecTables.push_back(gstrMLDATA);
 	vecTables.push_back(gstrWEB_APP_CONFIG);
+	vecTables.push_back(gstrDATABASE_SERVICE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

@@ -2052,7 +2052,7 @@ static const string gstrGET_ATTRIBUTE_VALUE =
 	"	WHERE [AttributeSetName].[Description] = '<AttributeSetName>' \r\n"
 	"	AND [FileName] = '<SourceDocName>' \r\n"
 	"), \r\n"
-	"AttributeHierarchy AS \r\n"
+	"AttributeHierarchy AS \r\n" 
 	"(\r\n"
 	"	SELECT \r\n"
 	"		CAST(NULL AS BIGINT) AS [ID], \r\n"
@@ -2076,3 +2076,10 @@ static const string gstrGET_ATTRIBUTE_VALUE =
 	"		END) \r\n"
 	") \r\n"
 	"SELECT [Value] FROM [AttributeHierarchy] WHERE LEN([RemainingPath]) = 0";
+
+static const string gstrCREATE_DATABASE_SERVICE_TABLE =
+	"CREATE TABLE [dbo].[DatabaseService]( "
+	"	[ID][int] IDENTITY(1, 1) NOT NULL CONSTRAINT[PK_DatabaseService] PRIMARY KEY CLUSTERED, "
+	"	[Description] NVARCHAR(MAX) NULL, "
+	"	[Settings] NVARCHAR(MAX) NOT NULL, "
+	"   [Status] NVARCHAR(MAX) NULL) ";
