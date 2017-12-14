@@ -372,6 +372,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         _editDocumentDataButton.Checked = true;
 
+                        args.DocumentDataPanel.DataPanelChanged += DocumentDataPanel_DataPanelChanged;
+
                         // Ensure this control gets sized based upon the added _documentDataPanelControl.
                         PerformLayout();
                     }
@@ -443,7 +445,9 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         documentDataPanel.ClearData();
                     }
-                    
+
+                    documentDataPanel.DataPanelChanged -= DocumentDataPanel_DataPanelChanged;
+
                     // Report the DEP to be closed before it is removed so that events that trigger
                     // as part of its removal do not assume the DEP to be open and usable.
                     _documentDataPanelControl = null;
@@ -742,6 +746,25 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40180");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DocumentDataPanel.DataPanelChanged"/> event of the active panel.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void DocumentDataPanel_DataPanelChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // https://extract.atlassian.net/browse/ISSUE-15139
+                // Ensure this control gets sized based upon the added _documentDataPanelControl.
+                PerformLayout();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45337");
             }
         }
 
