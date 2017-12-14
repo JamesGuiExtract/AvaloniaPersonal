@@ -75,7 +75,7 @@ namespace Extract.DataEntry.LabDE
 
                 // Select the matching order numbers into a table variable.                
                 string declarationsClause =
-                    "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
+                    "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(MAX)) \r\n" +
                         "INSERT INTO @OrderNumbers\r\n" + GetSelectedRecordIdsQuery();
 
                 // If we haven't yet cached the order numbers, set up query components to retrieve the
@@ -86,7 +86,7 @@ namespace Extract.DataEntry.LabDE
                     // Create a column to select the order numbers in a comma delimited format that can
                     // be re-used in subsequent queries.
                     columnsClause =
-                        "(SELECT CAST([OrderNumber] AS NVARCHAR(20)) + ''','''  " +
+                        "(SELECT CAST([OrderNumber] AS NVARCHAR(MAX)) + ''','''  " +
                             "FROM @OrderNumbers FOR XML PATH('')) [OrderNumbers], \r\n";
                 }
 

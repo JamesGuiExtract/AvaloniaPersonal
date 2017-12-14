@@ -75,7 +75,7 @@ namespace Extract.DataEntry.LabDE
 
                 // Select the matching order numbers into a table variable.                
                 string declarationsClause =
-                    "DECLARE @CSN TABLE ([CSN] NVARCHAR(20)) \r\n" +
+                    "DECLARE @CSN TABLE ([CSN] NVARCHAR(MAX)) \r\n" +
                         "INSERT INTO @CSN\r\n" + GetSelectedRecordIdsQuery();
 
                 // If we haven't yet cached the CSNs, set up query components to retrieve the
@@ -86,7 +86,7 @@ namespace Extract.DataEntry.LabDE
                     // Create a column to select the CSNs in a comma delimited format that can
                     // be re-used in subsequent queries.
                     columnsClause =
-                        "(SELECT CAST([CSN] AS NVARCHAR(20)) + ''','''  " +
+                        "(SELECT CAST([CSN] AS NVARCHAR(MAX)) + ''','''  " +
                             "FROM @CSN FOR XML PATH('')) [CSNs], \r\n";
                 }
 
