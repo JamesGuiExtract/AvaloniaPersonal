@@ -316,7 +316,7 @@ namespace Extract.DataEntry.LabDE
                 string declarationsClause = "";
                 if (selectViaQuery)
                 {
-                    declarationsClause = "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
+                    declarationsClause = "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(MAX)) \r\n" +
                         "INSERT INTO @OrderNumbers\r\n" + recordIds;
                 }
 

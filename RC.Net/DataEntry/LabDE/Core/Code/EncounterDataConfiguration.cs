@@ -287,7 +287,7 @@ namespace Extract.DataEntry.LabDE
                 string declarationsClause = "";
                 if (selectViaQuery)
                 {
-                    declarationsClause = "DECLARE @CSNs TABLE ([CSN] NVARCHAR(20)) \r\n" +
+                    declarationsClause = "DECLARE @CSNs TABLE ([CSN] NVARCHAR(MAX)) \r\n" +
                         "INSERT INTO @CSNs\r\n" + recordIds;
                 }
 
