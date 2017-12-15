@@ -1094,10 +1094,10 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 	if (!ms_mapWorkflowContextTags.empty())
 	{
 		// Workflow being asked for may not have entries in the context tag provider so change to default values(workflow="")
-		stringCSIS workflowToUse = m_strWorkflow;
-		if (ms_mapWorkflowContextTags.find(m_strWorkflow) == ms_mapWorkflowContextTags.end())
+		stringCSIS workflowToUse(m_strWorkflow, false);
+		if (ms_mapWorkflowContextTags.find(workflowToUse) == ms_mapWorkflowContextTags.end())
 		{
-			workflowToUse = "";
+			workflowToUse.assign("");
 		}
 		
 		long nTagCount = ms_mapWorkflowContextTags[workflowToUse].size();
