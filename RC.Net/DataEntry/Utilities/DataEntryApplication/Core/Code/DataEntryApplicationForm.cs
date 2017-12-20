@@ -885,17 +885,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _paginationPanel.FileTaskSessionID = null;
                 }
 
-                StartFileTaskSession();
-
                 _tagFileToolStripButton.Database = fileProcessingDB;
                 _tagFileToolStripButton.FileId = fileID;
                 // For consistency with other buttons, keep disabled until the file is loaded.
                 _tagFileToolStripButton.Enabled = false;
 
+                // Create input event tracker before file task session is started
+                // because StartFileTaskSession() registers this form with the tracker
                 if (_settings.InputEventTrackingEnabled && _inputEventTracker == null)
                 {
                     _inputEventTracker = new InputEventTracker(fileProcessingDB, actionID);
                 }
+
+                StartFileTaskSession();
 
                 if (_dataEntryDatabaseManager == null && fileProcessingDB != null)
                 {
