@@ -1067,6 +1067,13 @@ namespace Extract.DataEntry.LabDE
                     }
                 }
             }
+
+            // https://extract.atlassian.net/browse/ISSUE-15162
+            // Ensure queries fire whenever auto-population occurs.
+            if (pendingAutoPopulation.Any())
+            {
+                AttributeStatusInfo.EndEdit();
+            }
         }
 
         /// <summary>
