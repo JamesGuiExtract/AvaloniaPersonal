@@ -93,7 +93,20 @@ SetVersions:
     @DATE /T
     @TIME /T
     @ECHO.
-
+	
+BuildDashboards: BuildPDUtils
+	@ECHO Building Dashboard apps...
+	@Echo.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+    @CD "$(RCNETDir)\Dashboards"
+    @devenv Dashboards.sln /BUILD $(BuildConfig) 
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+	
 BuildPDUtils: BuildAttributeFinderCore
 	@ECHO Building PD Utils...
     @ECHO.
@@ -310,7 +323,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /v "$(BinariesFolder)\DataEntryCC.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v "$(BinariesFolder)\StatisticsReporter.exe.config" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v "$(BinariesFolder)\zstdlib_x86.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /v "$(BinariesFolder)\OpenNLP.IKVM.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /v "$(BinariesFolder)\OpenNLP.IKVM.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY "$(LEADTOOLS_API_DOTNET)\*.*"  "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY "$(RCNETDir)\APIs\ScintillaNET v2.4\Dist\*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	
@@ -345,7 +358,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 # Copy to DotNetGAC for Installshield
 	@XCOPY "$(RCNETDir)\APIs\IKVM.8.1.5717.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /v /s /e /y
 	@XCOPY "$(RCNETDir)\APIs\Stanford.NLP.NER.3.7.0.1\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
-	@COPY /V "$(RCNETDir)\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(RCNETDir)\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(RCNETDir)\APIs\YamlDotNet.Signed.4.2.1\lib\net35\YamlDotNet.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	
     @COPY /V "$(BinariesFolder)\ImageEdit.ocx" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
