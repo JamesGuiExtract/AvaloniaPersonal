@@ -205,7 +205,7 @@ namespace WebAPI.Controllers
                     data.AssertRequestFileId("ELI45191", Id);
                     data.AssertRequestFileExists("ELI45192", Id);
 
-                    var (fileName, errorMsg, error) = data.GetSourceFileName(Id);
+                    var fileName= data.GetSourceFileName(Id);
                     var fileContentType = FileContentType(fileName);
                     var fileDownloadName = Path.GetFileName(fileName);
                     Contract.Assert(!String.IsNullOrWhiteSpace(fileDownloadName), 

@@ -9,9 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using UCLID_RASTERANDOCRMGMTLib;
 using WebAPI.Controllers;
 using WebAPI.Models;
+
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 
 namespace Extract.Web.WebAPI.Test
 {
@@ -608,6 +612,74 @@ namespace Extract.Web.WebAPI.Test
                 _testFiles.RemoveFile(_TEST_FILE1);
                 _testFiles.RemoveFile(_TEST_FILE1_USS);
                 _testFiles.RemoveFile(_TEST_FILE1_VOA);
+            }
+        }
+
+        [Test, Category("Automated")]
+        public static void Test_GetDocumentWordZones()
+        {
+            string dbName = "AppBackendAPI_Test_GetDocumentWordZones";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
+                   _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
+                       ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+
+                string testFileName = _testFiles.GetFile(_TEST_FILE1);
+                string ussFileName = _testFiles.GetFile(_TEST_FILE1_USS);
+
+                var fileRecord = fileProcessingDb.AddFile(
+                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
+                    EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
+                int fileId = fileRecord.FileID;
+
+                var result = controller.Login(user);
+                result.AssertGoodResult<LoginToken>();
+
+                result = controller.OpenDocument();
+                result.AssertGoodResult<DocumentId>();
+
+                var documentText = new SpatialString();
+                documentText.LoadFrom(ussFileName, false);
+
+                var documentPages = documentText.GetPages(false, "");
+
+                for (int page = 1; page <= documentPages.Size(); page++)
+                {
+                    var pageText = documentText.GetSpecifiedPages(page, page);
+                    IUnknownVector pageWords = pageText.GetWords();
+
+                    result = controller.GetPageWordZones(page);
+                    var wordZoneData = result.AssertGoodResult<WordZoneData>();
+                    Assert.AreEqual(pageWords.Size(), wordZoneData.Zones.Count(), "Unexpected number of words");
+
+                    for (int i = 0; i < wordZoneData.Zones.Count(); i++)
+                    {
+                        var wordZone = wordZoneData.Zones[i];
+
+                        SpatialString spatialStringWord = (SpatialString)pageWords.At(i);
+                        var spatialStringZone = (ComRasterZone)spatialStringWord.GetOriginalImageRasterZones().At(0);
+
+                        Assert.AreEqual(page, wordZone.PageNumber, "Incorrect page");
+                        Assert.AreEqual(spatialStringZone.StartX, wordZone.StartX, "Incorrect StartX");
+                        Assert.AreEqual(spatialStringZone.StartY, wordZone.StartY, "Incorrect StartY");
+                        Assert.AreEqual(spatialStringZone.EndX, wordZone.EndX, "Incorrect EndX");
+                        Assert.AreEqual(spatialStringZone.EndY, wordZone.EndY, "Incorrect EndY");
+                        Assert.AreEqual(spatialStringZone.Height, wordZone.Height, "Incorrect height");
+                    }
+                }
+
+                result = controller.Logout();
+                result.AssertGoodResult<GenericResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+
+                _testFiles.RemoveFile(_TEST_FILE1);
+                _testFiles.RemoveFile(_TEST_FILE1_USS);
             }
         }
 

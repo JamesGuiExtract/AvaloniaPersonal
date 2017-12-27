@@ -86,9 +86,7 @@ namespace Extract.Web.WebAPI.Test
                     var result2 = data.SubmitFile(filename, stream).Result;
                     Assert.IsTrue(result2 != null, "Null result returned from second submitfile");
 
-                    var (sourceFilename, errMsg, err) = data.GetSourceFileName(result.Id);
-                    Assert.IsTrue(err != true, "Error signaled by GetSourceFileName, fileId: {0}", result.Id);
-                    Assert.IsTrue(string.IsNullOrEmpty(errMsg), "An error message was returned: {0}", errMsg);
+                    var sourceFilename = data.GetSourceFileName(result.Id);
 
                     // Can't directly test that filenames are equivalent, because the web service takes the base filename
                     // and adds a GUID to it, so test that the returned filename contains the original filename.
@@ -129,9 +127,7 @@ namespace Extract.Web.WebAPI.Test
                 {
                     var result = data.SubmitText("Document 1, SSN: 111-22-3333, DOB: 10-04-1999").Result;
 
-                    var (sourceFilename, errMsg, err) = data.GetSourceFileName(result.Id);
-                    Assert.IsTrue(err != true, "Error signaled by GetSourceFileName, fileId: {0}", result.Id);
-                    Assert.IsTrue(string.IsNullOrEmpty(errMsg), "An error message was returned: {0}", errMsg);
+                    var sourceFilename = data.GetSourceFileName(result.Id);
                 }
             }
             catch (Exception ex)

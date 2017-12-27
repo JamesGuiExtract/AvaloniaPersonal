@@ -269,5 +269,31 @@ namespace WebAPI.Controllers
                 return this.GetAsHttpError(ex, "ELI45271");
             }
         }
+
+        /// <summary>
+        /// Gets the page word zones.
+        /// </summary>
+        /// <param name="page">The page.</param>
+        /// <returns></returns>
+        [HttpPost("GetPageWordZones")]
+        [Produces(typeof(WordZoneData))]
+        [Authorize]
+        public IActionResult GetPageWordZones(int page)
+        {
+            try
+            {
+                // using ensures that the underlying FileApi.InUse flag is cleared on exit
+                using (var data = new DocumentData(User))
+                {
+                    var result = data.GetWordZoneData(page);
+
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI45357");
+            }
+        }
     }
 }

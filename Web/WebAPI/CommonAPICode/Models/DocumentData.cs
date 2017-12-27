@@ -30,6 +30,7 @@ namespace WebAPI.Models
         ImageUtils _imageUtils;
         ImageConverter _imageConverter;
         ClaimsPrincipal _user;
+        SpatialString _cachedUssData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentData"/> class.
@@ -237,13 +238,16 @@ namespace WebAPI.Models
         /// <summary>
         /// Releases the document.
         /// </summary>
-        /// <param name="commit"></param>
+        /// <param name="commit"><c>true</c> to commit the document so that it advances in the
+        /// workflow; <c>false</c> to save the document without advancing in the workflow.</param>
         public void CloseDocument(bool commit)
         {
             try
             {
                 ExtractException.Assert("ELI45238", "No active user", _user != null);
                 AssertDocumentSession("ELI45239");
+
+                _cachedUssData = null;
 
                 FileApi.FileProcessingDB.UpdateFileTaskSession(FileApi.DocumentSession.Id,
                     (DateTime.Now - FileApi.DocumentSession.StartTime).TotalSeconds, 0);
@@ -373,6 +377,31 @@ namespace WebAPI.Models
                 ee.AddDebugData("Workflow", FileApi.Workflow.Name, encrypt: false);
 
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Gets the word zone data.
+        /// </summary>
+        /// <param name="page">The page.</param>
+        public WordZoneData GetWordZoneData(int page)
+        {
+            try
+            {
+                AssertDocumentSession("ELI45358");
+                
+                var ussFileName = GetSourceFileName(FileApi.DocumentSession.FileId) + ".uss";
+
+                ExtractException.Assert("ELI45362", "Word data is not available for document",
+                    File.Exists(ussFileName));
+
+                var pageData = UssData.GetSpecifiedPages(page, page);
+                var wordZoneData = pageData.MapSpatialStringToWordZoneData();
+                return wordZoneData;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI42124");
             }
         }
 
@@ -600,7 +629,7 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="fileId">file id</param>
         /// <returns>the full path + filename of the original source file</returns>
-        public (string filename, string errorMessage, bool error) GetSourceFileName(int fileId)
+        public string GetSourceFileName(int fileId)
         {
             string filename = "";
 
@@ -623,7 +652,7 @@ namespace WebAPI.Models
                     throw ee;
                 }
 
-                return (filename: filename, errorMessage: "", error: false);
+                return filename;
             }
             catch (Exception ex)
             {
@@ -649,7 +678,7 @@ namespace WebAPI.Models
 
             try
             {
-                var (fileName, errorMsg, error) = GetSourceFileName(fileId);
+                var fileName = GetSourceFileName(fileId);
 
                 IIUnknownVector spatialPageInfos = ImageUtils.GetSpatialPageInfos(fileName);
                 int count = spatialPageInfos.Size();
@@ -684,7 +713,7 @@ namespace WebAPI.Models
                 AssertRequestFileExists("ELI45173", fileId);
                 AssertRequestFilePage("ELI45174", fileId, pageNum);
 
-                var (fileName, errorMsg, error) = GetSourceFileName(fileId);
+                var fileName = GetSourceFileName(fileId);
                 byte[] imageData = (byte[])ImageConverter.GetPDFImage(fileName, pageNum);
 
                 return imageData;
@@ -991,6 +1020,28 @@ namespace WebAPI.Models
                 AssertDocumentSession("ELI45270");
 
                 return FileApi.DocumentSession.FileId;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="SpatialString"/> from the uss file representing the currently open
+        /// document's OCR results.
+        /// </summary>
+        /// <value>
+        /// The <see cref="SpatialString"/> representing the currently open document's OCR results.
+        /// </value>
+        SpatialString UssData
+        {
+            get
+            {
+                if (_cachedUssData == null)
+                {
+                    var ussFileName = GetSourceFileName(FileApi.DocumentSession.FileId) + ".uss";
+                    _cachedUssData = new SpatialString();
+                    _cachedUssData.LoadFrom(ussFileName, false);
+                }
+
+                return _cachedUssData;
             }
         }
 
