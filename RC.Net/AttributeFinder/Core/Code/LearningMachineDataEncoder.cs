@@ -301,6 +301,14 @@ namespace Extract.AttributeFinder
         // For pagination, the query for answer page range attributes
         static readonly string _PAGE_ATTRIBUTE_QUERY = "Document/Pages";
 
+        /// <summary>
+        /// The name of the flag attributes used to indicate a situation that won't work for pagination training,
+        /// e.g., rearranged or duplicated pages
+        /// https://extract.atlassian.net/browse/ISSUE-14923
+        /// </summary>
+        public static readonly string IncompatibleWithPaginationTrainingAttributeName =
+            "IncompatibleWithPaginationTraining";
+
         public static readonly string CategoryAttributeName = "AttributeType";
 
         #endregion Constants
@@ -638,48 +646,58 @@ namespace Extract.AttributeFinder
                 var attributes = _afUtility.Value.GetAttributesFromFile(attributesFilePath);
                 attributes.ReportMemoryUsage();
 
-                // Parse Pages attributes with regex
-                var pageRanges = _afUtility.Value.QueryAttributes(attributes, _PAGE_ATTRIBUTE_QUERY, false)
-                    .ToIEnumerable<ComAttribute>()
-                    .SelectMany(attr => _pageRangeRegex.Value.Matches(attr.Value.String).Cast<Match>())
-                    .Select(pageRange =>
-                    {
-                        int startPage = 0;
-                        int endPage = 0;
-                        bool hasEndPage = false;
-                        if (Int32.TryParse(pageRange.Groups["start"].Value, out startPage))
-                        {
-                            var endGroup = pageRange.Groups["end"];
-                            if (endGroup.Success && Int32.TryParse(endGroup.Value, out endPage))
-                            {
-                                hasEndPage = true;
-                            }
-                        }
-                        return new {startPage, endPage, hasEndPage};
-                    });
-
                 var documentBreaks = Enumerable.Repeat(NotFirstPageCategory, numberOfPages - 1).ToArray();
-                foreach(var pageRange in pageRanges)
-                {
-                    if (pageRange.startPage > 1)
-                    {
-                        // Since documentBreaks starts at page 2, startPage - 2 is the index of the starting page
-                        documentBreaks[pageRange.startPage - 2] = _FIRST_PAGE_CATEGORY;
-                    }
 
-                    // In case of gaps between documents, set a document break after each end page.
-                    if (pageRange.hasEndPage && pageRange.endPage + 1 < numberOfPages)
+                // Check for a Flag attribute that means this document should be treated as
+                // if there were no pagination
+                // https://extract.atlassian.net/browse/ISSUE-14923
+                var flags = _afUtility.Value.QueryAttributes(attributes,
+                    IncompatibleWithPaginationTrainingAttributeName, false);
+                if (flags.Size() == 0)
+                {
+                    // No flags so parse Pages attributes with regex and mark any document breaks
+                    var pageRanges = _afUtility.Value.QueryAttributes(attributes, _PAGE_ATTRIBUTE_QUERY, false)
+                        .ToIEnumerable<ComAttribute>()
+                        .SelectMany(attr => _pageRangeRegex.Value.Matches(attr.Value.String).Cast<Match>())
+                        .Select(pageRange =>
+                        {
+                            int startPage = 0;
+                            int endPage = 0;
+                            bool hasEndPage = false;
+                            if (Int32.TryParse(pageRange.Groups["start"].Value, out startPage))
+                            {
+                                var endGroup = pageRange.Groups["end"];
+                                if (endGroup.Success && Int32.TryParse(endGroup.Value, out endPage))
+                                {
+                                    hasEndPage = true;
+                                }
+                            }
+                            return new { startPage, endPage, hasEndPage };
+                        });
+
+                    foreach (var pageRange in pageRanges)
                     {
-                        // Since documentBreaks starts at page 2, endPage - 1 is the index of the next starting page
-                        documentBreaks[pageRange.endPage - 1] = _FIRST_PAGE_CATEGORY;
-                    }
-                    // If no end page then set a break after start page (this is a one-page sub-document)
-                    else if (!pageRange.hasEndPage && pageRange.startPage + 1 < numberOfPages)
-                    {
-                        // Since documentBreaks starts at page 2, startPage - 1 is the index of the next starting page
-                        documentBreaks[pageRange.startPage - 1] = _FIRST_PAGE_CATEGORY;
+                        if (pageRange.startPage > 1)
+                        {
+                            // Since documentBreaks starts at page 2, startPage - 2 is the index of the starting page
+                            documentBreaks[pageRange.startPage - 2] = _FIRST_PAGE_CATEGORY;
+                        }
+
+                        // In case of gaps between documents, set a document break after each end page.
+                        if (pageRange.hasEndPage && pageRange.endPage + 1 < numberOfPages)
+                        {
+                            // Since documentBreaks starts at page 2, endPage - 1 is the index of the next starting page
+                            documentBreaks[pageRange.endPage - 1] = _FIRST_PAGE_CATEGORY;
+                        }
+                        // If no end page then set a break after start page (this is a one-page sub-document)
+                        else if (!pageRange.hasEndPage && pageRange.startPage + 1 < numberOfPages)
+                        {
+                            // Since documentBreaks starts at page 2, startPage - 1 is the index of the next starting page
+                            documentBreaks[pageRange.startPage - 1] = _FIRST_PAGE_CATEGORY;
+                        }
                     }
                 }
+
                 return documentBreaks;
             }
             catch (Exception e)

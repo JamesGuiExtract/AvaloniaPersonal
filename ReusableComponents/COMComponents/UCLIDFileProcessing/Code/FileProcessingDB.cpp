@@ -3841,6 +3841,7 @@ STDMETHODIMP CFileProcessingDB::AddFileNoQueue(BSTR bstrFile, long long llFileSi
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::AddPaginationHistory(BSTR bstrOutputFile,
 													 IIUnknownVector* pSourcePageInfo,
+													 IIUnknownVector* pDeletedSourcePageInfo,
 													 long nFileTaskSessionID)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
@@ -3849,13 +3850,13 @@ STDMETHODIMP CFileProcessingDB::AddPaginationHistory(BSTR bstrOutputFile,
 	{
 		validateLicense();
 		
-		if (!AddPaginationHistory_Internal(false, bstrOutputFile, pSourcePageInfo, nFileTaskSessionID))
+		if (!AddPaginationHistory_Internal(false, bstrOutputFile, pSourcePageInfo, pDeletedSourcePageInfo, nFileTaskSessionID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
 				gstrMAIN_DB_LOCK);
 
-			AddPaginationHistory_Internal(true, bstrOutputFile, pSourcePageInfo, nFileTaskSessionID);
+			AddPaginationHistory_Internal(true, bstrOutputFile, pSourcePageInfo, pDeletedSourcePageInfo, nFileTaskSessionID);
 		}
 		return S_OK;
 	}

@@ -1014,17 +1014,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .Page.OriginalDocumentName));
                 sourceDocumentsNotOutput.ExceptWith(sourceFormSourceDocuments);
 
-                // Build map of source document pages to destinations so that pagination history
-                // can be recorded for deleted pages.
-                // This map needs to be created before any documents are output because outputting destroys
-                // their page controls
-                Dictionary<string, List<Tuple<OutputDocument, int>>[]> sourceDocumentsToDestinationDocuments =
-                    CreateSourceDocumentsToDestinationDocumentsMap(
-                        _pendingDocuments.Concat(documentsToRemove),
-                        documentsToCommit);
-
-                // Write pagination history for deleted pages
-                WritePaginationHistoryForDeletedPages(sourceDocumentsToDestinationDocuments);
+                // Write pagination history for documents with only deleted pages
+                // (all other history will be written as documents are removed from the panel)
+                WritePaginationHistoryForDocumentsWithOnlyDeletedPages(documentsToCommit);
 
                 // Generate the paginated output.
                 foreach (var outputDocument in outputDocuments)
@@ -1118,79 +1110,33 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Creates source documents to destination documents map to be used to output pagination history
+        /// Records pagination history for documents that contain only deleted pages
         /// </summary>
-        /// <param name="pendingDocuments">The documents pending user approval</param>
-        /// <param name="modifiedDocuments">The pending documents that are not in source form</param>
-        /// <returns>A dictionary that maps source documents to destinations for each page</returns>
-        private Dictionary<string, List<Tuple<OutputDocument, int>>[]>
-            CreateSourceDocumentsToDestinationDocumentsMap(
-                IEnumerable<OutputDocument> pendingDocuments,
-                IEnumerable<OutputDocument> modifiedDocuments)
-        {
-            var sourceNames = new HashSet<string>(pendingDocuments
-                .Where(document => !CommitOnlySelection || document.Selected)
-                .SelectMany(outputDocument =>
-                    outputDocument.PageControls.Select(p => p.Page.OriginalDocumentName)
-                    // Consider original pages too, since a document may not have any PageControls
-                    // https://extract.atlassian.net/browse/ISSUE-13998
-                    .Concat(outputDocument.OriginalPages.Select(p => p.OriginalDocumentName))));
-            var relevantSourceDocuments = _sourceDocuments
-                .Where(doc => sourceNames.Contains(doc.FileName))
-                .Distinct();
-
-            var sourceDocumentsToDestinationDocuments = relevantSourceDocuments.ToDictionary(
-                    doc => doc.FileName,
-                    doc => new List<Tuple<OutputDocument, int>>[doc.Pages.Count]);
-
-            foreach (var document in modifiedDocuments
-                .Where(doc => doc.PageControls.Any(c => !c.Deleted)))
-            {
-                foreach (var pageControl in document.PageControls
-                    .Where(pageControl => !pageControl.Deleted)
-                    .OrderBy(pageControl => pageControl.PageNumber))
-                {
-                    var originalDocumentName = pageControl.Page.OriginalDocumentName;
-                    var originalPageNumber = pageControl.Page.OriginalPageNumber;
-                    var destinations = sourceDocumentsToDestinationDocuments[originalDocumentName];
-                    if (destinations[originalPageNumber - 1] == null)
-                    {
-                        destinations[originalPageNumber - 1] = new List<Tuple<OutputDocument, int>>();
-                    }
-                    destinations[originalPageNumber - 1]
-                        .Add(Tuple.Create(document, pageControl.PageNumber));
-                }
-            }
-
-            return sourceDocumentsToDestinationDocuments;
-        }
-
-        /// <summary>
-        /// Writes pagination history for deleted pages to the FileProcessingDB
-        /// </summary>
-        /// <param name="sourceDocumentsToDestinationDocuments">Map of source documents to destination documents.</param>
-        private void WritePaginationHistoryForDeletedPages(
-            Dictionary<string, List<Tuple<OutputDocument, int>>[]> sourceDocumentsToDestinationDocuments)
+        /// <param name="documentsToCommit">The pending documents to be committed</param>
+        void WritePaginationHistoryForDocumentsWithOnlyDeletedPages(IEnumerable<OutputDocument> documentsToCommit)
         {
             ExtractException.Assert("ELI39699", "FileTaskSession was not started.",
                 FileTaskSessionID.HasValue);
 
-            // Add info for deleted pages
-            foreach (var inputToDestinations in sourceDocumentsToDestinationDocuments)
+            var info = new IUnknownVectorClass();
+            foreach (var document in documentsToCommit
+                .Where(doc => doc.PageControls.All(c => c.Deleted)))
             {
-                string inputDocumentName = inputToDestinations.Key;
-                var sourcePageInfo = Enumerable.Range(1, inputToDestinations.Value.Length)
-                    .Where(page => inputToDestinations.Value[page - 1] == null)
-                    .Select(page => new StringPairClass
-                    {
-                        StringKey = inputDocumentName,
-                        StringValue = page.ToString(CultureInfo.InvariantCulture)
-                    });
-
-                if (sourcePageInfo.Any())
+                foreach (var pageControl in document.PageControls)
                 {
-                    FileProcessingDB.AddPaginationHistory(null, sourcePageInfo.ToIUnknownVector(), FileTaskSessionID.Value);
+                    var originalDocumentName = pageControl.Page.OriginalDocumentName;
+                    var originalPageNumber = pageControl.Page.OriginalPageNumber;
+                    info.PushBack(new StringPairClass
+                    {
+                        StringKey = originalDocumentName,
+                        StringValue = originalPageNumber.ToString(CultureInfo.InvariantCulture)
+                    });
                 }
+            }
+
+            if (info.Size() > 0)
+            {
+                FileProcessingDB.AddPaginationHistory(null, null, info, FileTaskSessionID.Value);
             }
         }
 
@@ -1422,6 +1368,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             {
                                 string sourceFileName = null;
                                 IUnknownVector sourcePageInfo = null;
+                                IUnknownVector deletedSourcePageInfo = null;
                                 if (acceptingPagination)
                                 {
                                     // Build source page info vector while page controls are intact
@@ -1438,6 +1385,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                                     sourcePageInfo = outputDocument
                                         .PageControls
                                         .Where(c => !c.Deleted)
+                                        .Select(c => new StringPairClass
+                                        {
+                                            StringKey = c.Page.OriginalDocumentName,
+                                            StringValue = c.Page.OriginalPageNumber.ToString(CultureInfo.InvariantCulture)
+                                        })
+                                        .ToIUnknownVector();
+
+                                    deletedSourcePageInfo = outputDocument
+                                        .PageControls
+                                        .Where(c => c.Deleted)
                                         .Select(c => new StringPairClass
                                         {
                                             StringKey = c.Page.OriginalDocumentName,
@@ -1464,7 +1421,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 // Add pagination history records to DB if got this far without error
                                 if (acceptingPagination)
                                 {
-                                    FileProcessingDB.AddPaginationHistory(sourceFileName, sourcePageInfo, FileTaskSessionID.Value);
+                                    FileProcessingDB.AddPaginationHistory(sourceFileName, sourcePageInfo, deletedSourcePageInfo, FileTaskSessionID.Value);
                                 }
                             }
 
@@ -2294,11 +2251,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 bool pagesEqual = Page.PagesAreEqual(originalPages, currentPages);
 
                 var sourcePageInfo = outputDocument.PageControls
-                    .Where(c => !c.Deleted)
                     .Select(c => new PageInfo
                     {
                         DocumentName = c.Page.OriginalDocumentName,
-                        Page = c.Page.OriginalPageNumber
+                        Page = c.Page.OriginalPageNumber,
+                        Deleted = c.Deleted
                     });
 
                 int pageCount = 0;
@@ -3232,7 +3189,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     @"SELECT [Pages],[SourcePage],[DestFileID],[DestPage],[FileTaskSessionID] " +
                      "FROM [FAMFile] JOIN [Pagination] " +
                      "ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
-                     "WHERE [FileName] = '{0}'", sourceDocName.Replace("'", "''"));
+                     "WHERE [FileName] = '{0}' " +
+                     // Do not select records that represent multiple generations of pagination
+                     // (i.e., the source is also a destination)
+                     // https://extract.atlassian.net/browse/ISSUE-14923
+                     "AND [SourceFileID] = [OriginalFileID]"
+                     , sourceDocName.Replace("'", "''"));
 
                 var records = GetResultsForQuery(query).Rows.Cast<DataRow>();
 
@@ -3241,45 +3203,116 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return;
                 }
 
-                var documents = new List<string>();
+                var documents = new List<(string pages, string deletedPages)>();
                 var lastSession = records.Max(r => r["FileTaskSessionID"] as int?);
+                var flags = new List<string>();
 
                 // If no pagination occurred, then the expected data should be a single document for
                 // the entire range
                 if (lastSession == null)
                 {
                     int numberOfPages = (int)records.First()["Pages"];
-                    documents.Add(Enumerable.Range(1, numberOfPages).ToRangeString());
+                    documents.Add((Enumerable.Range(1, numberOfPages).ToRangeString(), ""));
                 }
                 // Otherwise, output one document for each destination file
+                // Output each page, deleted or not, that appeared as part of the output document
+                // and also collect deleted pages (they will be counted twice)
                 else
                 {
                     var outputDocuments = records
                         .Where(r => r["FileTaskSessionID"] as int? == lastSession)
-                        .OrderBy(r => r["DestPage"] as int? ?? (int)r["SourcePage"])
                         .GroupBy(r => r["DestFileID"] as int?,
-                                 r => (int)r["SourcePage"]); // Select only the source pages for each group
+                                 r => (sourcePage: (int)r["SourcePage"], // Select only the source pages for each group
+                                       destPage: r["DestPage"] as int?));
 
                     foreach (var documentPages in outputDocuments)
                     {
-                        documents.Add(documentPages.ToRangeString());
+                        var allPages = documentPages
+                            .Where(x => x.destPage != null)
+                            .OrderBy(x => x.destPage)
+                            .Select(x => x.sourcePage)
+                            .ToList();
+                        var deletedPages = documentPages
+                            .Where(x => x.destPage == null)
+                            .OrderBy(x => x.sourcePage)
+                            .Select(x => x.sourcePage)
+                            .ToList();
+                        // Insert deleted pages where they make the most sense (to make ranges clean)
+                        foreach(var deletedPage in deletedPages)
+                        {
+                            var i = allPages.FindIndex(page => page > deletedPage);
+                            if (i >= 0)
+                            {
+                                allPages.Insert(i, deletedPage);
+                            }
+                            else
+                            {
+                                allPages.Add(deletedPage);
+                            }
+                        }
+                        documents.Add((allPages.ToRangeString(), deletedPages.ToRangeString()));
+
+                        // Generate flags for unusual situations that won't be handled
+                        // well by a pagination LM
+                        // https://extract.atlassian.net/browse/ISSUE-14923
+                        var sourceOrdering = allPages.OrderBy(p => p).ToList();
+                        if (!allPages.SequenceEqual(sourceOrdering))
+                        {
+                            flags.Add("Pages have been rearranged");
+                        }
+                    }
+
+                    // Generate a flag for the case where a page appears multiple times
+                    // in the output
+                    // https://extract.atlassian.net/browse/ISSUE-14923
+                    var sourcePages = outputDocuments
+                        .SelectMany(g => g.Select(x => x.sourcePage))
+                        .ToList();
+                    if (sourcePages.Distinct().Count() < sourcePages.Count)
+                    {
+                        flags.Add("Pages have been duplicated");
                     }
                 }
 
                 // Create the hierarchy
-                documents.Select(pages =>
+                documents.Select(doc =>
                 {
                     var ss = new SpatialStringClass();
                     ss.CreateNonSpatialString(_DOCUMENT_PLACEHOLDER_TEXT, sourceDocName);
                     var documentAttribute = new ComAttribute { Name = "Document", Value = ss };
 
-                    // Add a Pages attribute to denote the range of pages in this document
-                    ss = new SpatialStringClass();
-                    ss.CreateNonSpatialString(pages, sourceDocName);
-                    documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "Pages", Value = ss });
+                    // Add a Pages attribute to denote the range(s) of pages in this document
+                    if (!string.IsNullOrEmpty(doc.pages))
+                    {
+                        ss = new SpatialStringClass();
+                        ss.CreateNonSpatialString(doc.pages, sourceDocName);
+                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "Pages", Value = ss });
+                    }
+
+                    // Add a DeletedPages attribute to denote the range(s) of deleted pages in this document
+                    if (!string.IsNullOrEmpty(doc.deletedPages))
+                    {
+                        ss = new SpatialStringClass();
+                        ss.CreateNonSpatialString(doc.deletedPages, sourceDocName);
+                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "DeletedPages", Value = ss });
+                    }
                     return documentAttribute;
                 })
-                    .SaveToIUnknownVector(outputFileName);
+
+                // Add flags for unusual situations
+                // https://extract.atlassian.net/browse/ISSUE-14923
+                .Concat(flags.Distinct().Select(flag =>
+                    {
+                        var ss = new SpatialStringClass();
+                        ss.CreateNonSpatialString(flag, sourceDocName);
+                        return new ComAttribute
+                        {
+                            Name = LearningMachineDataEncoder.IncompatibleWithPaginationTrainingAttributeName,
+                            Value = ss
+                        };
+                    }
+                ))
+                .SaveToIUnknownVector(outputFileName);
 
             }
             catch (Exception e)

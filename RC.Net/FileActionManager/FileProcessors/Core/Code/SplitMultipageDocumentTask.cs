@@ -790,7 +790,7 @@ namespace Extract.FileActionManager.FileProcessors
                         StringValue = pageNum.ToString(CultureInfo.InvariantCulture)
                     }
                 ).ToIUnknownVector();
-            pDB.AddPaginationHistory(outputDocName, sourcePageInfo, fileTaskSessionID);
+            pDB.AddPaginationHistory(outputDocName, sourcePageInfo, null, fileTaskSessionID);
         }
 
         /// <summary>
