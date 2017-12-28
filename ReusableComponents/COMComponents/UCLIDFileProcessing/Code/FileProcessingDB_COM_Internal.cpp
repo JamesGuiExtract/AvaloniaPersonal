@@ -9821,6 +9821,7 @@ bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, l
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrOutputFile,
 													  IIUnknownVector* pSourcePageInfo,
+													  IIUnknownVector* pDeletedSourcePageInfo,
 													  long nFileTaskSessionID)
 {
 	try
@@ -9828,7 +9829,9 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 		try
 		{
 			IIUnknownVectorPtr ipSourcePageInfo(pSourcePageInfo);
-			ASSERT_ARGUMENT("ELI39683", ipSourcePageInfo != __nullptr);
+			IIUnknownVectorPtr ipDeletedSourcePageInfo(pDeletedSourcePageInfo);
+			ASSERT_ARGUMENT("ELI39683", ipSourcePageInfo != __nullptr
+										|| ipDeletedSourcePageInfo != __nullptr);
 
 			string strOutputFile = "NULL";
 			if (bstrOutputFile != __nullptr)
@@ -9840,22 +9843,48 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 			// Compile selection queries that will produce a result set with the corresponding
 			// source and destination pages for all pages in the output document.
 			vector<string> vecPageSelections;
-			long nCount = ipSourcePageInfo->Size();
-			for (long i = 0; i < nCount; i++)
+			if (ipSourcePageInfo != __nullptr)
 			{
-				IStringPairPtr ipPageInfo = ipSourcePageInfo->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI39688", ipPageInfo != nullptr);
+				long nCount = ipSourcePageInfo->Size();
+				for (long i = 0; i < nCount; i++)
+				{
+					IStringPairPtr ipPageInfo = ipSourcePageInfo->At(i);
+					ASSERT_RESOURCE_ALLOCATION("ELI39688", ipPageInfo != nullptr);
 
-				string strSourceDocName = asString(ipPageInfo->StringKey);
-				replaceVariable(strSourceDocName, "'", "''");
-				string strPageNum = asString(ipPageInfo->StringValue);
+					string strSourceDocName = asString(ipPageInfo->StringKey);
+					replaceVariable(strSourceDocName, "'", "''");
+					string strPageNum = asString(ipPageInfo->StringValue);
+					string strDestPage = bstrOutputFile == __nullptr ? "NULL" : asString(i + 1);
 
-				string strPageSelection = gstrSELECT_SINGLE_PAGINATED_PAGE;
-				replaceVariable(strPageSelection, "<SourceFileName>",  strSourceDocName);
-				replaceVariable(strPageSelection, "<SourcePage>",  strPageNum);
-				replaceVariable(strPageSelection, "<DestPage>",  strOutputFile == "NULL" ? "NULL" : asString(i + 1));
+					string strPageSelection = gstrSELECT_SINGLE_PAGINATED_PAGE;
+					replaceVariable(strPageSelection, "<SourceFileName>", strSourceDocName);
+					replaceVariable(strPageSelection, "<SourcePage>", strPageNum);
+					replaceVariable(strPageSelection, "<DestPage>", strDestPage);
 
-				vecPageSelections.push_back(strPageSelection);
+					vecPageSelections.push_back(strPageSelection);
+				}
+			}
+
+			if (ipDeletedSourcePageInfo != __nullptr)
+			{
+				long nCount = ipDeletedSourcePageInfo->Size();
+				for (long i = 0; i < nCount; i++)
+				{
+					IStringPairPtr ipPageInfo = ipDeletedSourcePageInfo->At(i);
+					ASSERT_RESOURCE_ALLOCATION("ELI45365", ipPageInfo != nullptr);
+
+					string strSourceDocName = asString(ipPageInfo->StringKey);
+					replaceVariable(strSourceDocName, "'", "''");
+					string strPageNum = asString(ipPageInfo->StringValue);
+					string strDestPage = "NULL";
+
+					string strPageSelection = gstrSELECT_SINGLE_PAGINATED_PAGE;
+					replaceVariable(strPageSelection, "<SourceFileName>", strSourceDocName);
+					replaceVariable(strPageSelection, "<SourcePage>", strPageNum);
+					replaceVariable(strPageSelection, "<DestPage>", strDestPage);
+
+					vecPageSelections.push_back(strPageSelection);
+				}
 			}
 
 			// Use this data in gstrINSERT_INTO_PAGINATION which will compute the OriginalFileID

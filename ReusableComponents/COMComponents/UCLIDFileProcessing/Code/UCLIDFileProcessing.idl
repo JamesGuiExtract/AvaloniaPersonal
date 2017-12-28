@@ -1813,7 +1813,7 @@ library UCLID_FILEPROCESSINGLib
 		//			page number.
 		[id(160), helpstring("method AddPaginationHistory")] HRESULT AddPaginationHistory(
 			[in] BSTR bstrOutputFile, [in] IIUnknownVector* pSourcePageInfo,
-			[in] long nFileTaskSessionID);
+			IIUnknownVector* pDeletedSourcePageInfo, [in] long nFileTaskSessionID);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Applies the specified durations to the specified FileTaskSession row. The
 		//			DateTimeStamp will also be applied.

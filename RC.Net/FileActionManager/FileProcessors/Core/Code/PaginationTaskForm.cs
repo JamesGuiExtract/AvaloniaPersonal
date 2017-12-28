@@ -1048,6 +1048,15 @@ namespace Extract.FileActionManager.FileProcessors
                 // https://extract.atlassian.net/browse/ISSUE-13760
                 // Format source page info into an IUnknownVector of StringPairs (filename, page).
                 var sourcePageInfo = e.SourcePageInfo
+                    .Where(info => !info.Deleted)
+                    .Select(info => new StringPairClass()
+                    {
+                        StringKey = info.DocumentName,
+                        StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
+                    })
+                    .ToIUnknownVector();
+                var deletedSourcePageInfo = e.SourcePageInfo
+                    .Where(info => info.Deleted)
                     .Select(info => new StringPairClass()
                     {
                         StringKey = info.DocumentName,
@@ -1059,7 +1068,7 @@ namespace Extract.FileActionManager.FileProcessors
                     _fileTaskSessionID.HasValue);
 
                 FileProcessingDB.AddPaginationHistory(
-                    e.OutputFileName, sourcePageInfo, _fileTaskSessionID.Value);
+                    e.OutputFileName, sourcePageInfo, deletedSourcePageInfo, _fileTaskSessionID.Value);
 
                 // Produce a uss file for the paginated document using the uss data from the
                 // source documents

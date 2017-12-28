@@ -308,6 +308,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             get;
             set;
         }
+
+        /// <summary>
+        /// Whether the page is deleted
+        /// </summary>
+        public bool Deleted { get; set; }
     }
 
     /// <summary>

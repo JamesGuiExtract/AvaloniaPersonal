@@ -314,7 +314,7 @@ public:
 	STDMETHOD(AddFileNoQueue)(BSTR bstrFile, long long llFileSize, long lPageCount,
 		EFilePriority ePriority, long nWorkflowID, long* pnID);
 	STDMETHOD(AddPaginationHistory)(BSTR bstrOutputFile, IIUnknownVector* pSourcePageInfo,
-		long nFileTaskSessionID);
+		IIUnknownVector* pDeletedSourcePageInfo, long nFileTaskSessionID);
 	STDMETHOD(AddWorkflow)(BSTR bstrName, EWorkflowType eType, long* pnID);
 	STDMETHOD(DeleteWorkflow)(long nID);
 	STDMETHOD(GetWorkflowDefinition)(long nID, IWorkflowDefinition** ppWorkflowDefinition);
@@ -1422,7 +1422,7 @@ private:
 	bool AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, long long llFileSize, long lPageCount,
 		EFilePriority ePriority, long nWorkflowID, long* pnID);
 	bool AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrOutputFile, IIUnknownVector* pSourcePageInfo,
-		long nFileTaskSessionID);
+		IIUnknownVector* pDeletedSourcePageInfo, long nFileTaskSessionID);
 	bool AddWorkflow_Internal(bool bDBLocked, BSTR bstrName, EWorkflowType eType, long* pnID);
 	bool DeleteWorkflow_Internal(bool bDBLocked, long nID);
 	bool GetWorkflowDefinition_Internal(bool bDBLocked, long nID, IWorkflowDefinition** ppWorkflowDefinition);
