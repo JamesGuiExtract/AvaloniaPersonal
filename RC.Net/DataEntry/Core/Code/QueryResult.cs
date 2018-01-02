@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using TextFieldParser = Microsoft.VisualBasic.FileIO.TextFieldParser;
 
 namespace Extract.DataEntry
 {
@@ -813,6 +815,18 @@ namespace Extract.DataEntry
                             stringList.Add(spatialString.String);
                         }
                     }
+                    else if (_queryNode.SplitCsv)
+                    {
+                        foreach(string line in _stringResults)
+                        {
+                            using (var sr = new StringReader(line))
+                            using (var csvReader = new TextFieldParser(sr) { Delimiters = new[] { ", " } })
+                            {
+                                var fields = csvReader.ReadFields();
+                                stringList.Add(fields[0]);
+                            }
+                        }
+                    }
                     else
                     {
                         stringList = _stringResults;
@@ -833,6 +847,69 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28916", ex);
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of <see langword="string"/>s that represents the current
+        /// <see cref="QueryResult"/>.
+        /// </summary>
+        /// <returns>A list <see langword="string"/>s that represents the current
+        /// <see cref="QueryResult"/>.</returns>
+        public string[][] ToArrayOfStringArrays()
+        {
+            try
+            {
+                List<string[]> stringList = new List<string[]>();
+
+                if (!IsEmpty && _nextValue == null)
+                {
+                    if (_attributeResults != null)
+                    {
+                        foreach (IAttribute attribute in _attributeResults)
+                        {
+                            stringList.Add(new[] { attribute.Value.String });
+                        }
+                    }
+                    else if (_spatialResults != null)
+                    {
+                        foreach (SpatialString spatialString in _spatialResults)
+                        {
+                            stringList.Add(new[] { spatialString.String });
+                        }
+                    }
+                    else if (_queryNode.SplitCsv)
+                    {
+                        foreach(string line in _stringResults)
+                        {
+                            using (var sr = new StringReader(line))
+                            using (var csvReader = new TextFieldParser(sr) { Delimiters = new[] { ", " } })
+                            {
+                                var fields = csvReader.ReadFields();
+                                stringList.Add(fields);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        stringList = _stringResults.Select(s => new[] { s }).ToList();
+                    }
+                }
+                else if (!IsEmpty)
+                {
+                    stringList.Add(new[] { FirstString });
+
+                    if (NextValue != null)
+                    {
+                        stringList.AddRange(NextValue.ToArrayOfStringArrays());
+                    }
+                }
+
+                return stringList.ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45369");
             }
         }
 

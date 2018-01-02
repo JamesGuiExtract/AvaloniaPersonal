@@ -1343,7 +1343,7 @@ namespace Extract.DataEntry
 
                         if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene && validator != null)
                         {
-                            var autoCompleteValues = validator.GetAutoCompleteValues();
+                            var autoCompleteValues = validator.AutoCompleteValuesDictionary;
                             _luceneAutoSuggest?.Dispose();
                             _luceneAutoSuggest = new LuceneAutoSuggest(textEditingControl, this);
                             _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);

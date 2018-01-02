@@ -331,12 +331,14 @@ namespace Extract.Database
         /// string array.</param>
         /// <param name="columnSeparator">The string used to separate multiple column results.
         /// (Will not be included in any result with less than 2 columns)</param>
-        /// <returns></returns>
+        /// <remarks>Any values that contain a column separator will be quoted with double quotes. Any
+        /// double quote characters in a quoted value will be escaped by doubling them.</remarks>
         public static string[] ToStringArray(this DataTable dataTable, string columnSeparator)
         {
             try
             {
                 List<string> results = new List<string>();
+                bool quoteWhenNeeded = !string.IsNullOrEmpty(columnSeparator);
 
                 // Loop throw each row of the results.
                 for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
@@ -366,6 +368,11 @@ namespace Extract.Database
                             // Reset the pending column delimiters
                             pendingColumnDelimiters = new StringBuilder();
 
+                            // Quote string if it contains a column separator
+                            if (quoteWhenNeeded && columnValue.Contains(columnSeparator))
+                            {
+                                columnValue = "\"" + columnValue.Replace("\"", "\"\"") + "\"";
+                            }
                             result.Append(columnValue);
                         }
                     }

@@ -1714,7 +1714,7 @@ namespace Extract.DataEntry
                 if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene && _activeValidator != null)
                 {
                     var autoCompleteValues = _activeValidator.GetAutoCompleteValues();
-                    _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);
+                    _luceneAutoSuggest.UpdateAutoCompleteList(_activeValidator.AutoCompleteValuesDictionary);
 
                     Items.Clear();
                     Items.AddRange(autoCompleteValues);

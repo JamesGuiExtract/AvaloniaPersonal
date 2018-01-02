@@ -1744,7 +1744,7 @@ namespace Extract.DataEntry
                 // Get updated values for the auto-complete fields if an update is required.
                 if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene &&  _activeValidator != null)
                 {
-                    var autoCompleteValues = _activeValidator.GetAutoCompleteValues();
+                    var autoCompleteValues = _activeValidator.AutoCompleteValuesDictionary;
                     _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);
                 }
                 else

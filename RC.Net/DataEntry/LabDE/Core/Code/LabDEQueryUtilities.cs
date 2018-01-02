@@ -4,11 +4,11 @@ using Extract.Utilities;
 using Spring.Core.TypeResolution;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Extract.DataEntry.LabDE
@@ -387,6 +387,123 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
+        /// <summary>
+        /// Gets all official names and valid AKAs for the given order code
+        /// </summary>
+        /// <param name="customerDB">A <see cref="DbConnection"/> to the
+        /// customer-specific OrderMappingDB.</param>
+        /// <param name="componentDataDB">>A <see cref="DbConnection"/> to the URS OrderMappingDB.
+        /// </param>
+        /// <param name="orderCode">If not empty, the returned names will be restricted to
+        /// components mapped to the specified order.</param>
+        /// <returns>An array of CSV records where the first item is
+        /// the official name and the second, optional, item is an alternate name</returns>
+        public static string[] GetComponentNamesAndAKAs(DbConnection customerDB,
+            DbConnection componentDataDB, string orderCode)
+        {
+            try
+            {
+                var safeOrderCode = (orderCode.Length > 25 ? orderCode.Substring(0, 25) : orderCode)
+                    .Replace("'", "''");
+
+                // Populate mapping of names to es test codes using customer-specific DB
+                var query = "SELECT [OfficialName], [AKA], [ESComponentCode] FROM [LabTest]"
+                    + " JOIN [LabOrderTest] ON [LabOrderTest].[TestCode] = [LabTest].[TestCode]"
+                    + " LEFT JOIN (SELECT [TestCode], [Name] AS [AKA]"
+                    + "   FROM [AlternateTestName] WHERE [StatusCode] = 'A') [AKAs]"
+                    + " ON [LabTest].[TestCode] = [AKAs].[TestCode]"
+                    + " LEFT JOIN [ComponentToESComponentMap] ON [LabTest].[TestCode] = [ComponentCode]"
+                    + (string.IsNullOrWhiteSpace(safeOrderCode)
+                        ? ""
+                        : " WHERE [LabOrderTest].[OrderCode] = '" + safeOrderCode + "'");
+
+                var results = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+                var esCodesToNames = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+                var dt = DBMethods.ExecuteDBQuery(customerDB, query);
+                foreach (DataRow row in dt.Rows)
+                {
+                    string officialName = row.ItemArray[0] as string;
+                    string aka = row.ItemArray[1] as string;
+                    string esComponentCode = row.ItemArray[2] as string;
+
+                    List<string> akas = results.GetOrAdd(officialName, () => new List<string>());
+                    if (aka != null)
+                    {
+                        akas.Add(aka);
+                    }
+
+                    if (esComponentCode != null)
+                    {
+                        List<string> names = esCodesToNames.GetOrAdd(esComponentCode, () => new List<string>());
+                        names.Add(officialName);
+                    }
+                }
+
+                // Get set of disabled ESComponentAKAs
+                var disabledESComponentAKAs = new HashSet<Tuple<string, string>>();
+                query = "SELECT [ESComponentCode], [ESComponentAKA] FROM [DisabledESComponentAKA]";
+                dt = DBMethods.ExecuteDBQuery(customerDB, query);
+                foreach (DataRow row in dt.Rows)
+                {
+                    string code = ((string)row.ItemArray[0]).ToUpperInvariant();
+                    string aka = ((string)row.ItemArray[1]).ToUpperInvariant();
+
+                    disabledESComponentAKAs.Add(Tuple.Create(code, aka));
+                }
+
+                // Add additional names using the component data (URS) database
+                if (esCodesToNames.Any())
+                {
+                    query = "SELECT [ESComponentCode], [Name] FROM [ESComponentAKA]"
+                            + " WHERE [ESComponent].[Code] IN ('"
+                            + string.Join("','", esCodesToNames.Keys.Select(code => code.Replace("'", "''")))
+                            + "')";
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        string code = ((string)row.ItemArray[0]);
+                        string aka = ((string)row.ItemArray[1]);
+
+                        // Skip if this AKA has been disabled by the customer order mapping DB
+                        if (disabledESComponentAKAs.Contains(Tuple.Create(code.ToUpperInvariant(), aka.ToUpperInvariant())))
+                        {
+                            continue;
+                        }
+
+                        foreach (var officialName in esCodesToNames[code])
+                        {
+                            List<string> akas = results.GetOrAdd(officialName, () => new List<string>());
+                            akas.Add(aka);
+                        }
+                    }
+                }
+
+                var resultsTable = new DataTable();
+                resultsTable.Columns.Add("Name", typeof(string));
+                resultsTable.Columns.Add("AKA", typeof(string));
+                var rows = resultsTable.Rows;
+                foreach (var (officialName, akas) in results)
+                {
+                    if (!akas.Any())
+                    {
+                        rows.Add(officialName, null);
+                    }
+                    else
+                    {
+                        foreach (var aka in akas)
+                        {
+                            rows.Add(officialName, aka);
+                        }
+                    }
+                }
+
+                return resultsTable.ToStringArray(", ");
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39269");
+            }
+        }
         /// <summary>
         /// Accepts a date in a variety of formats, and returns a normalized date.
         /// </summary>

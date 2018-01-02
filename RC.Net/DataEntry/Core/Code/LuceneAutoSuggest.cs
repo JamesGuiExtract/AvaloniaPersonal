@@ -16,7 +16,7 @@ namespace Extract.DataEntry
         IDataEntryAutoCompleteControl _dataEntryControl;
         ListBox _listBoxChild;
         bool _msgFilterActive = false;
-        LuceneSuggestionProvider<string> _providerSource;
+        LuceneSuggestionProvider<KeyValuePair<string, List<string>>> _providerSource;
         Action _unregister;
         int _ignoreTextChange;
 
@@ -25,7 +25,7 @@ namespace Extract.DataEntry
         #region Properties
 
         // The object that manages the Lucene index
-        LuceneSuggestionProvider<string> ProviderSource
+        LuceneSuggestionProvider<KeyValuePair<string, List<string>>> ProviderSource
         {
             get
             {
@@ -459,11 +459,13 @@ namespace Extract.DataEntry
             Dispose(true);
         }
 
-        internal void UpdateAutoCompleteList(IEnumerable<string> autoCompleteValues)
+        internal void UpdateAutoCompleteList(Dictionary<string, List<string>> autoCompleteValues)
         {
-            ProviderSource = new LuceneSuggestionProvider<string>(autoCompleteValues,
-                s => s,
-                s => new KeyValuePair<string, string>("Name", s));
+            ProviderSource = new LuceneSuggestionProvider<KeyValuePair<string, List<string>>>(
+                autoCompleteValues.AsEnumerable(),
+                s => s.Key,
+                s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s.Key), 1)
+                    .Concat(s.Value.Select(aka => new KeyValuePair<string, string>("AKA", aka))));
         }
         #endregion
     }

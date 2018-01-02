@@ -461,6 +461,35 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
+        /// Tests splitting multiple fields with SplitCsv option
+        /// </summary>
+        [Test, Category("TestSqlQuery")]
+        public static void TestSplitCsvSqlQuery()
+        {
+            string xml = @"<Query SplitCsv='true'><SQL>SELECT [Abbreviation], [Name] FROM [State] WHERE [Name] = 'Wisconsin'</SQL></Query>";
+
+            using (DbConnection dbConnection =
+                    GetDatabaseConnection(_testImages.GetFile(_FLEX_INDEX_DATABASE)))
+            {
+                dbConnection.Open();
+
+                DataEntryQuery query = DataEntryQuery.Create(xml, null, dbConnection);
+
+                QueryResult result = query.Evaluate();
+
+                Assert.AreEqual("WI", result.ToString());
+
+                CollectionAssert.AreEqual(
+                    new string[] { "WI" },
+                    result.ToStringArray());
+
+                CollectionAssert.AreEqual(
+                    new string[][] { new string[] { "WI", "Wisconsin" } },
+                    result.ToArrayOfStringArrays());
+            }
+        }
+
+        /// <summary>
         /// Tests the <see cref="ResultQueryNode"/> using the simple syntax.
         /// </summary>
         [Test, Category("ResultQueryNode")]

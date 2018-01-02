@@ -49,12 +49,11 @@ namespace Extract.DataEntry
         /// <param name="suggestionsSource">A collection of objects to extract suggestion</param>
         /// <param name="nameExtractor">A function that returns the name of the suggestion
         /// (the value that will be listed by <see cref="GetSuggestions(string)"/>)</param>
-        /// <param name="fieldValueExtractors">One or more functions to get the searchable fields
-        /// (typically this will contain at least one function, which returns the name)</param>
+        /// <param name="fieldValuesExtractor">Function to get one or more searchable fields</param>
         public LuceneSuggestionProvider(
             IEnumerable<T> suggestionsSource,
             Func<T, string> nameExtractor,
-            params Func<T, KeyValuePair<string, string>>[] fieldValueExtractors)
+            Func<T, IEnumerable<KeyValuePair<string, string>>> fieldValuesExtractor)
         {
             try
             {
@@ -66,7 +65,7 @@ namespace Extract.DataEntry
                 string tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 _tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
                 _directory = FSDirectory.Open(_tempDirectory);
-                _analyzer = new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30, new HashSet<string>());
+                _analyzer = new WhitespacePlusAnalyzer();
                 using (var writer = new IndexWriter(_directory, _analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED))
                 {
                     foreach (var suggestion in suggestionsSource)
@@ -76,12 +75,10 @@ namespace Extract.DataEntry
                         var doc = new Document();
                         doc.Add(new Field("Name", name, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
-                        foreach (var extractor in fieldValueExtractors)
+                        foreach (var (f, value) in fieldValuesExtractor(suggestion))
                         {
-                            var (field, value) = extractor(suggestion);
-
                             // Ensure no collision with Name field
-                            field = "_" + field;
+                            var field = "_" + f;
                             _fields.Add(field);
                             if (!string.IsNullOrWhiteSpace(value))
                             {
@@ -122,8 +119,8 @@ namespace Extract.DataEntry
                 var trimmed = searchString.Trim();
                 var escaped = QueryParser.Escape(trimmed);
 
-                // The StandardAnalyzer lower-cases the terms so convert the search string to match
-                var terms = Regex.Replace(trimmed.ToLower(CultureInfo.CurrentCulture), @"\W", " ")
+                // The analyzer lower-cases the terms so convert the search string to match
+                var terms = Regex.Replace(trimmed.ToLower(CultureInfo.CurrentCulture), @"[\W-[%#]]", " ")
                     .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                 var query = new BooleanQuery();
@@ -133,6 +130,7 @@ namespace Extract.DataEntry
                     // that was used for building the index
                     var parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, field, _analyzer);
                     var clause = parser.Parse(escaped);
+                    clause.Boost = field == "Name" ? 2 : 1;
                     query.Add(clause, Occur.SHOULD);
 
                     if (terms.Any())
@@ -142,16 +140,19 @@ namespace Extract.DataEntry
                         // the term appears as the first term in the field
                         clause = new SpanFirstQuery(new SpanTermQuery(
                             new Term(field, terms.First())), 1);
+                        clause.Boost = field == "Name" ? 2 : 1;
                         query.Add(clause, Occur.SHOULD);
 
                         // Add a wildcard query based on the last term, since this
                         // is likely an incomplete word being typed
                         var lastTerm = terms.Last();
                         clause = new WildcardQuery(new Term(field, lastTerm + "*"));
+                        clause.Boost = field == "Name" ? 2 : 1;
                         query.Add(clause, Occur.SHOULD);
 
                         // Add a fuzzy query for the last term in case it is a complete word
                         clause = new FuzzyQuery(new Term(field, lastTerm), 0.5f);
+                        clause.Boost = field == "Name" ? 2 : 1;
                         query.Add(clause, Occur.SHOULD);
                     }
 
@@ -159,6 +160,7 @@ namespace Extract.DataEntry
                     foreach (var term in terms.Take(terms.Length - 1))
                     {
                         clause = new FuzzyQuery(new Term(field, term), 0.5f);
+                        clause.Boost = field == "Name" ? 2 : 1;
                         query.Add(clause, Occur.SHOULD);
                     }
 
@@ -231,5 +233,13 @@ namespace Extract.DataEntry
             Dispose(true);
         }
         #endregion
+    }
+
+    sealed class WhitespacePlusAnalyzer : Analyzer
+    {
+        public override TokenStream TokenStream(string fieldName, TextReader reader)
+        {
+            return new LowerCaseFilter(new WhitespaceTokenizer(reader));
+        }
     }
 }

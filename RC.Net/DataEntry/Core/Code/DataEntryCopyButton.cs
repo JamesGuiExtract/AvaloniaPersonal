@@ -329,6 +329,12 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Unused. The copy button does not provide any auto-complete list.
+        /// </summary>
+        /// <returns><see <c>null</c></returns>
+        public Dictionary<string, List<string>> AutoCompleteValuesDictionary => null;
+
+        /// <summary>
         /// The copy button's validation is not specific to any given attribute; the same instance
         /// can be used to validate multiple attributes.
         /// </summary>

@@ -664,6 +664,15 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Whether to split each resulting row as a CSV
+        /// </summary>
+        public bool SplitCsv
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Pushes the <see paramref="distinctResult"/> to use for the current evaluation scope.
         /// </summary>
         /// <param name="distinctResult">The <see cref="QueryResult"/> to use as the distinct value
@@ -872,6 +881,11 @@ namespace Extract.DataEntry
                 if (_properties.TryGetValue("AbortIfEmpty", out xmlAttributeValue))
                 {
                     AbortIfEmpty = xmlAttributeValue.ToBoolean();
+                }
+
+                if (_properties.TryGetValue("SplitCsv", out xmlAttributeValue))
+                {
+                    SplitCsv = xmlAttributeValue.ToBoolean();
                 }
             }
             catch (Exception ex)

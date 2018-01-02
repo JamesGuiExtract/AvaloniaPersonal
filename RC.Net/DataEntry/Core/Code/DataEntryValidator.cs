@@ -1,4 +1,5 @@
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,6 +7,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 using System.Text;
@@ -87,7 +89,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The list of values that comprise the auto-complete options that should be available.
         /// </summary>
-        List<string> _autoCompleteValues;
+        Dictionary<string, List<string>> _autoCompleteValues;
 
         /// <summary>
         /// Specifies whether validation lists will be checked for matches case-sensitively.
@@ -247,6 +249,11 @@ namespace Extract.DataEntry
                 _validationErrorMessage = value;
             }
         }
+
+        /// <summary>
+        /// Get the dictionary of autocomplete values to akas
+        /// </summary>
+        public Dictionary<string, List<string>> AutoCompleteValuesDictionary => _autoCompleteValues;
 
         #endregion Properties
 
@@ -575,7 +582,7 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    return _autoCompleteValues.ToArray();
+                    return _autoCompleteValues.Keys.ToArray();
                 }
             }
             catch (Exception ex)
@@ -588,18 +595,19 @@ namespace Extract.DataEntry
         /// Sets the values that should be provided to the user in an auto-complete list.
         /// </summary>
         /// <param name="values">An array of values that should be provided to the user in an
-        /// auto-complete list associated with the data's control.</param>
-        public void SetAutoCompleteValues(string[] values)
+        /// auto-complete list associated with the data's control. The first item in each row should
+        /// be the valid value. Subsequent items are other fields to be queried, e.g., AKAs</param>
+        public void SetAutoCompleteValues(string[][] values)
         {
             try
             {
                 // Populate the validation list dictionary.
-                _autoCompleteValues = new List<string>();
+                _autoCompleteValues = new Dictionary<string, List<string>>();
                 if (values != null)
                 {
-                    foreach (string item in values)
+                    foreach (string[] items in values)
                     {
-                        string trimmedItem = item.Trim();
+                        string trimmedItem = items[0].Trim();
 
                         // [DataEntry:188] Add support of "blank" as a valid value.
                         if (string.Compare(trimmedItem, _BLANK_VALUE,
@@ -608,7 +616,8 @@ namespace Extract.DataEntry
                             trimmedItem = "";
                         }
 
-                        _autoCompleteValues.Add(trimmedItem);
+                        var akas = _autoCompleteValues.GetOrAdd(trimmedItem, () => new List<string>());
+                        akas.AddRange(items.Skip(1));
                     }
                 }
 
