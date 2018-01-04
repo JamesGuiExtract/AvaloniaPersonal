@@ -39,3 +39,6 @@
 
 // OpenNLP: learnable tokenizer, but trained using simple tokenizer
 <TESTCASE>;oner.settings_crossed.name.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test14.eav
+
+// OpenNLP: output confidence subattribute
+<TESTCASE>;oner.sent.conf.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test15.eav

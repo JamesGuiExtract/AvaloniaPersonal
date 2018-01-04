@@ -55,10 +55,24 @@
             this._toolKitGroupBox = new System.Windows.Forms.GroupBox();
             this._stanfordNerRadioButton = new System.Windows.Forms.RadioButton();
             this._openNlpRadioButton = new System.Windows.Forms.RadioButton();
+            this._confidenceGroupBox = new System.Windows.Forms.GroupBox();
+            this._logXMidNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this._logXMidLabel = new System.Windows.Forms.Label();
+            this._convertToPercentCheckBox = new System.Windows.Forms.CheckBox();
+            this._logSteepnessNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this._logBaseNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this._logSteepnessLabel = new System.Windows.Forms.Label();
+            this._logBaseLabel = new System.Windows.Forms.Label();
+            this._applyLogFunctionCheckBox = new System.Windows.Forms.CheckBox();
+            this._outputConfidenceCheckBox = new System.Windows.Forms.CheckBox();
             this._nameFinderGroupBox.SuspendLayout();
             this._tokenizerGroupBox.SuspendLayout();
             this._sentenceDetectorGroupBox.SuspendLayout();
             this._toolKitGroupBox.SuspendLayout();
+            this._confidenceGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._logXMidNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._logSteepnessNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._logBaseNumericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -109,6 +123,8 @@
             // _classifierPathBrowseButton
             // 
             this._classifierPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._classifierPathBrowseButton.EnsureFileExists = false;
+            this._classifierPathBrowseButton.EnsurePathExists = false;
             this._classifierPathBrowseButton.Location = new System.Drawing.Point(542, 36);
             this._classifierPathBrowseButton.Name = "_classifierPathBrowseButton";
             this._classifierPathBrowseButton.Size = new System.Drawing.Size(24, 22);
@@ -141,6 +157,8 @@
             // _tokenizerPathBrowseButton
             // 
             this._tokenizerPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._tokenizerPathBrowseButton.EnsureFileExists = false;
+            this._tokenizerPathBrowseButton.EnsurePathExists = false;
             this._tokenizerPathBrowseButton.Location = new System.Drawing.Point(545, 108);
             this._tokenizerPathBrowseButton.Name = "_tokenizerPathBrowseButton";
             this._tokenizerPathBrowseButton.Size = new System.Drawing.Size(24, 22);
@@ -184,10 +202,10 @@
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(517, 446);
+            this._cancelButton.Location = new System.Drawing.Point(517, 546);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 5;
+            this._cancelButton.TabIndex = 6;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
@@ -195,10 +213,10 @@
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(436, 446);
+            this._okButton.Location = new System.Drawing.Point(436, 546);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 4;
+            this._okButton.TabIndex = 5;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -285,6 +303,8 @@
             // browseButton1
             // 
             this.browseButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.browseButton1.EnsureFileExists = false;
+            this.browseButton1.EnsurePathExists = false;
             this.browseButton1.Location = new System.Drawing.Point(542, 55);
             this.browseButton1.Name = "browseButton1";
             this.browseButton1.Size = new System.Drawing.Size(24, 22);
@@ -359,13 +379,142 @@
             this._openNlpRadioButton.Text = "OpenNLP";
             this._openNlpRadioButton.UseVisualStyleBackColor = true;
             // 
+            // _confidenceGroupBox
+            // 
+            this._confidenceGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._confidenceGroupBox.Controls.Add(this._logXMidNumericUpDown);
+            this._confidenceGroupBox.Controls.Add(this._logXMidLabel);
+            this._confidenceGroupBox.Controls.Add(this._convertToPercentCheckBox);
+            this._confidenceGroupBox.Controls.Add(this._logSteepnessNumericUpDown);
+            this._confidenceGroupBox.Controls.Add(this._logBaseNumericUpDown);
+            this._confidenceGroupBox.Controls.Add(this._logSteepnessLabel);
+            this._confidenceGroupBox.Controls.Add(this._logBaseLabel);
+            this._confidenceGroupBox.Controls.Add(this._applyLogFunctionCheckBox);
+            this._confidenceGroupBox.Controls.Add(this._outputConfidenceCheckBox);
+            this._confidenceGroupBox.Location = new System.Drawing.Point(12, 446);
+            this._confidenceGroupBox.Name = "_confidenceGroupBox";
+            this._confidenceGroupBox.Size = new System.Drawing.Size(580, 91);
+            this._confidenceGroupBox.TabIndex = 4;
+            this._confidenceGroupBox.TabStop = false;
+            this._confidenceGroupBox.Text = "Confidence subattribute";
+            // 
+            // _logXMidNumericUpDown
+            // 
+            this._logXMidNumericUpDown.DecimalPlaces = 2;
+            this._logXMidNumericUpDown.Location = new System.Drawing.Point(517, 42);
+            this._logXMidNumericUpDown.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+            this._logXMidNumericUpDown.Name = "_logXMidNumericUpDown";
+            this._logXMidNumericUpDown.Size = new System.Drawing.Size(48, 20);
+            this._logXMidNumericUpDown.TabIndex = 7;
+            this._logXMidNumericUpDown.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            // 
+            // _logXMidLabel
+            // 
+            this._logXMidLabel.AutoSize = true;
+            this._logXMidLabel.Location = new System.Drawing.Point(496, 44);
+            this._logXMidLabel.Name = "_logXMidLabel";
+            this._logXMidLabel.Size = new System.Drawing.Size(15, 13);
+            this._logXMidLabel.TabIndex = 6;
+            this._logXMidLabel.Text = "m";
+            // 
+            // _convertToPercentCheckBox
+            // 
+            this._convertToPercentCheckBox.AutoSize = true;
+            this._convertToPercentCheckBox.Location = new System.Drawing.Point(6, 65);
+            this._convertToPercentCheckBox.Name = "_convertToPercentCheckBox";
+            this._convertToPercentCheckBox.Size = new System.Drawing.Size(300, 17);
+            this._convertToPercentCheckBox.TabIndex = 8;
+            this._convertToPercentCheckBox.Text = "Convert to % (multiply by 100 and round to nearest integer)";
+            this._convertToPercentCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _logSteepnessNumericUpDown
+            // 
+            this._logSteepnessNumericUpDown.DecimalPlaces = 2;
+            this._logSteepnessNumericUpDown.Location = new System.Drawing.Point(437, 42);
+            this._logSteepnessNumericUpDown.Name = "_logSteepnessNumericUpDown";
+            this._logSteepnessNumericUpDown.Size = new System.Drawing.Size(48, 20);
+            this._logSteepnessNumericUpDown.TabIndex = 5;
+            this._logSteepnessNumericUpDown.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            // 
+            // _logBaseNumericUpDown
+            // 
+            this._logBaseNumericUpDown.DecimalPlaces = 2;
+            this._logBaseNumericUpDown.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this._logBaseNumericUpDown.Location = new System.Drawing.Point(360, 42);
+            this._logBaseNumericUpDown.Name = "_logBaseNumericUpDown";
+            this._logBaseNumericUpDown.Size = new System.Drawing.Size(48, 20);
+            this._logBaseNumericUpDown.TabIndex = 3;
+            this._logBaseNumericUpDown.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            // 
+            // _logSteepnessLabel
+            // 
+            this._logSteepnessLabel.AutoSize = true;
+            this._logSteepnessLabel.Location = new System.Drawing.Point(418, 46);
+            this._logSteepnessLabel.Name = "_logSteepnessLabel";
+            this._logSteepnessLabel.Size = new System.Drawing.Size(13, 13);
+            this._logSteepnessLabel.TabIndex = 4;
+            this._logSteepnessLabel.Text = "k";
+            // 
+            // _logBaseLabel
+            // 
+            this._logBaseLabel.AutoSize = true;
+            this._logBaseLabel.Location = new System.Drawing.Point(341, 46);
+            this._logBaseLabel.Name = "_logBaseLabel";
+            this._logBaseLabel.Size = new System.Drawing.Size(13, 13);
+            this._logBaseLabel.TabIndex = 2;
+            this._logBaseLabel.Text = "b";
+            // 
+            // _applyLogFunctionCheckBox
+            // 
+            this._applyLogFunctionCheckBox.AutoSize = true;
+            this._applyLogFunctionCheckBox.Location = new System.Drawing.Point(6, 42);
+            this._applyLogFunctionCheckBox.Name = "_applyLogFunctionCheckBox";
+            this._applyLogFunctionCheckBox.Size = new System.Drawing.Size(260, 17);
+            this._applyLogFunctionCheckBox.TabIndex = 1;
+            this._applyLogFunctionCheckBox.Text = "Apply the logistic function: f(x) = 1/(1+b^(-k*(x-m)))";
+            this._applyLogFunctionCheckBox.UseVisualStyleBackColor = true;
+            this._applyLogFunctionCheckBox.CheckedChanged += new System.EventHandler(this.ApplyLogFunctionCheckBox_CheckedChanged);
+            // 
+            // _outputConfidenceCheckBox
+            // 
+            this._outputConfidenceCheckBox.AutoSize = true;
+            this._outputConfidenceCheckBox.Location = new System.Drawing.Point(6, 19);
+            this._outputConfidenceCheckBox.Name = "_outputConfidenceCheckBox";
+            this._outputConfidenceCheckBox.Size = new System.Drawing.Size(304, 17);
+            this._outputConfidenceCheckBox.TabIndex = 0;
+            this._outputConfidenceCheckBox.Text = "Output a confidence-level subattribute (named Confidence)";
+            this._outputConfidenceCheckBox.UseVisualStyleBackColor = true;
+            this._outputConfidenceCheckBox.CheckedChanged += new System.EventHandler(this.OutputConfidenceCheckBox_CheckedChanged);
+            // 
             // NERFinderSettingsDialog
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(604, 481);
+            this.ClientSize = new System.Drawing.Size(604, 581);
+            this.Controls.Add(this._confidenceGroupBox);
             this.Controls.Add(this._toolKitGroupBox);
             this.Controls.Add(this._sentenceDetectorGroupBox);
             this.Controls.Add(this._tokenizerGroupBox);
@@ -374,9 +523,9 @@
             this.Controls.Add(this._cancelButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(1024, 520);
+            this.MaximumSize = new System.Drawing.Size(1024, 620);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(620, 520);
+            this.MinimumSize = new System.Drawing.Size(620, 620);
             this.Name = "NERFinderSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
@@ -391,6 +540,11 @@
             this._sentenceDetectorGroupBox.PerformLayout();
             this._toolKitGroupBox.ResumeLayout(false);
             this._toolKitGroupBox.PerformLayout();
+            this._confidenceGroupBox.ResumeLayout(false);
+            this._confidenceGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._logXMidNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._logSteepnessNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._logBaseNumericUpDown)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -423,5 +577,15 @@
         private System.Windows.Forms.GroupBox _toolKitGroupBox;
         private System.Windows.Forms.RadioButton _stanfordNerRadioButton;
         private System.Windows.Forms.RadioButton _openNlpRadioButton;
+        private System.Windows.Forms.GroupBox _confidenceGroupBox;
+        private System.Windows.Forms.CheckBox _convertToPercentCheckBox;
+        private System.Windows.Forms.NumericUpDown _logSteepnessNumericUpDown;
+        private System.Windows.Forms.Label _logSteepnessLabel;
+        private System.Windows.Forms.CheckBox _applyLogFunctionCheckBox;
+        private System.Windows.Forms.CheckBox _outputConfidenceCheckBox;
+        private System.Windows.Forms.NumericUpDown _logXMidNumericUpDown;
+        private System.Windows.Forms.Label _logXMidLabel;
+        private System.Windows.Forms.NumericUpDown _logBaseNumericUpDown;
+        private System.Windows.Forms.Label _logBaseLabel;
     }
 }
