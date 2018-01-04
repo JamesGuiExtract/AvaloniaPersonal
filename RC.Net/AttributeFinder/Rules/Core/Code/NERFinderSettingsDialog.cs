@@ -42,6 +42,17 @@ namespace Extract.AttributeFinder.Rules
 
                 _sentenceDetectorPathTextBox.Enabled = _splitIntoSentencesCheckBox.Checked;
                 _tokenizerPathTextBox.Enabled = _learnableTokenizerRadioButton.Checked;
+                _applyLogFunctionCheckBox.Enabled =
+                    _convertToPercentCheckBox.Enabled =
+                        _outputConfidenceCheckBox.Checked;
+                _logBaseLabel.Enabled =
+                _logBaseNumericUpDown.Enabled =
+                _logSteepnessLabel.Enabled =
+                _logSteepnessNumericUpDown.Enabled =
+                _logXMidLabel.Enabled =
+                _logXMidNumericUpDown.Enabled =
+                    _applyLogFunctionCheckBox.Enabled
+                    && _applyLogFunctionCheckBox.Checked;
             }
             catch (Exception ex)
             {
@@ -106,6 +117,13 @@ namespace Extract.AttributeFinder.Rules
                     _tokenizerPathTextBox.Text = Settings.TokenizerPath ?? "";
                     _nameFinderPathTextBox.Text = Settings.NameFinderPath ?? "";
                     _typesToReturnTextBox.Text = Settings.EntityTypes ?? "";
+
+                    _outputConfidenceCheckBox.Checked = Settings.OutputConfidenceSubAttribute;
+                    _applyLogFunctionCheckBox.Checked = Settings.ApplyLogFunctionToConfidence;
+                    _logBaseNumericUpDown.Value = (decimal)Settings.LogBase;
+                    _logSteepnessNumericUpDown.Value = (decimal)Settings.LogSteepness;
+                    _logXMidNumericUpDown.Value = (decimal)Settings.LogXValueOfMiddle;
+                    _convertToPercentCheckBox.Checked = Settings.ConvertConfidenceToPercent;
                 }
             }
             catch (Exception ex)
@@ -161,7 +179,12 @@ namespace Extract.AttributeFinder.Rules
                 Settings.TokenizerPath = _tokenizerPathTextBox.Text;
                 Settings.NameFinderPath = _nameFinderPathTextBox.Text;
                 Settings.EntityTypes = _typesToReturnTextBox.Text;
-
+                Settings.OutputConfidenceSubAttribute = _outputConfidenceCheckBox.Checked;
+                Settings.ApplyLogFunctionToConfidence = _applyLogFunctionCheckBox.Checked;
+                Settings.LogBase = (double)_logBaseNumericUpDown.Value;
+                Settings.LogSteepness = (double)_logSteepnessNumericUpDown.Value;
+                Settings.LogXValueOfMiddle = (double)_logXMidNumericUpDown.Value;
+                Settings.ConvertConfidenceToPercent = _convertToPercentCheckBox.Checked;
                 DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
@@ -236,6 +259,34 @@ namespace Extract.AttributeFinder.Rules
             _sentenceDetectorGroupBox.Enabled =
                 _tokenizerGroupBox.Enabled =
                     _openNlpRadioButton.Checked;
+        }
+
+        private void OutputConfidenceCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            _applyLogFunctionCheckBox.Enabled =
+                _convertToPercentCheckBox.Enabled =
+                    _outputConfidenceCheckBox.Checked;
+
+            _logBaseLabel.Enabled =
+            _logBaseNumericUpDown.Enabled =
+            _logSteepnessLabel.Enabled =
+            _logSteepnessNumericUpDown.Enabled =
+            _logXMidLabel.Enabled =
+            _logXMidNumericUpDown.Enabled =
+                _applyLogFunctionCheckBox.Enabled
+                && _applyLogFunctionCheckBox.Checked;
+        }
+
+        private void ApplyLogFunctionCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            _logBaseLabel.Enabled =
+            _logBaseNumericUpDown.Enabled =
+            _logSteepnessLabel.Enabled =
+            _logSteepnessNumericUpDown.Enabled =
+            _logXMidLabel.Enabled =
+            _logXMidNumericUpDown.Enabled =
+                _applyLogFunctionCheckBox.Enabled
+                && _applyLogFunctionCheckBox.Checked;
         }
 
         #endregion Private Members

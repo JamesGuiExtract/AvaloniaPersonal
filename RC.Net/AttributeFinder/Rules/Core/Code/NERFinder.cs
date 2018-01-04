@@ -18,6 +18,7 @@ using opennlp.tools.sentdetect;
 using opennlp.tools.util.model;
 using opennlp.tools.tokenize;
 using opennlp.tools.namefind;
+using System.Globalization;
 
 namespace Extract.AttributeFinder.Rules
 {
@@ -90,6 +91,38 @@ namespace Extract.AttributeFinder.Rules
         /// The entity types to be used to create the resulting attributes (a subset of the entity types recognized by the classifier)
         /// </summary>
         string EntityTypes { get; set; }
+
+        /// <summary>
+        /// Whether to output a subattribute to indicate model confidence in the attribute
+        /// </summary>
+        bool OutputConfidenceSubAttribute { get; set; }
+
+        /// <summary>
+        /// Whether to apply the logistic function to the confidence value in order
+        /// to make it prettier (e.g., make average values higher)
+        /// </summary>
+        bool ApplyLogFunctionToConfidence { get; set; }
+
+        /// <summary>
+        /// The base for the log function
+        /// </summary>
+        double LogBase { get; set; }
+
+        /// <summary>
+        /// The steepness of the log function
+        /// </summary>
+        double LogSteepness { get; set; }
+
+        /// <summary>
+        /// The x value of the middle of the sigmoid curve
+        /// </summary>
+        double LogXValueOfMiddle { get; set; }
+
+        /// <summary>
+        /// Whether to convert the confidence value from a real number between 0 and 1 to
+        /// an integer percent
+        /// </summary>
+        bool ConvertConfidenceToPercent { get; set; }
     }
 
     /// <summary>
@@ -111,7 +144,10 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Current version.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        /// <remarks>
+        /// Version 2: Added OutputConfidenceSubattribute and related settings
+        /// </remarks>
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -156,6 +192,12 @@ namespace Extract.AttributeFinder.Rules
         private string _sentenceDetectorPath;
         private OpenNlpTokenizer _tokenizerType = OpenNlpTokenizer.SimpleTokenizer;
         private NamedEntityRecognizer _nameFinderType = NamedEntityRecognizer.OpenNLP;
+        private bool _outputConfidenceSubattribute = true;
+        private bool _applyLogFunctionToConfidence = true;
+        private double _logBase = 2;
+        private double _logSteepness = 10;
+        private bool _convertConfidenceToPercent = true;
+        private double _logXValueOfMiddle = 0.1;
 
         #endregion Fields
 
@@ -332,6 +374,122 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
+        /// <summary>
+        /// Whether to output a subattribute to indicate model confidence in the attribute
+        /// </summary>
+        public bool OutputConfidenceSubAttribute
+        {
+            get
+            {
+                return _outputConfidenceSubattribute;
+            }
+            set
+            {
+                if (value != _outputConfidenceSubattribute)
+                {
+                    _outputConfidenceSubattribute = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether to apply the logistic function to the confidence value in order
+        /// to make it prettier (e.g., make average values higher)
+        /// </summary>
+        public bool ApplyLogFunctionToConfidence
+        {
+            get
+            {
+                return _applyLogFunctionToConfidence;
+            }
+            set
+            {
+                if (value != _applyLogFunctionToConfidence)
+                {
+                    _applyLogFunctionToConfidence = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The base for the log function
+        /// </summary>
+        public double LogBase
+        {
+            get
+            {
+                return _logBase;
+            }
+            set
+            {
+                if (value != _logBase)
+                {
+                    _logBase = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The steepness of the log function
+        /// </summary>
+        public double LogSteepness
+        {
+            get
+            {
+                return _logSteepness;
+            }
+            set
+            {
+                if (value != _logSteepness)
+                {
+                    _logSteepness = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether to convert the confidence value from a real number between 0 and 1 to
+        /// an integer percent
+        /// </summary>
+        public bool ConvertConfidenceToPercent
+        {
+            get
+            {
+                return _convertConfidenceToPercent;
+            }
+            set
+            {
+                if (value != _convertConfidenceToPercent)
+                {
+                    _convertConfidenceToPercent = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The x value of the middle of the sigmoid curve
+        /// </summary>
+        public double LogXValueOfMiddle
+        {
+            get
+            {
+                return _logXValueOfMiddle;
+            }
+            set
+            {
+                if (value != _logXValueOfMiddle)
+                {
+                    _logXValueOfMiddle = value;
+                    _dirty = true;
+                }
+            }
+        }
+
         #endregion Properties
 
         #region IAttributeFindingRule
@@ -439,7 +597,8 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
-                return !string.IsNullOrWhiteSpace(NameFinderPath) && !string.IsNullOrWhiteSpace(TokenizerPath);
+                return !string.IsNullOrWhiteSpace(NameFinderPath)
+                    && !(TokenizerType == OpenNlpTokenizer.LearnableTokenizer && string.IsNullOrWhiteSpace(TokenizerPath));
             }
             catch (Exception ex)
             {
@@ -565,6 +724,20 @@ namespace Extract.AttributeFinder.Rules
                     NameFinderPath = reader.ReadString();
                     EntityTypes = reader.ReadString();
 
+                    if (reader.Version >=2)
+                    {
+                        OutputConfidenceSubAttribute = reader.ReadBoolean();
+                        ApplyLogFunctionToConfidence = reader.ReadBoolean();
+                        LogBase = reader.ReadDouble();
+                        LogSteepness = reader.ReadDouble();
+                        LogXValueOfMiddle = reader.ReadDouble();
+                        ConvertConfidenceToPercent = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        OutputConfidenceSubAttribute = false;
+                    }
+
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
@@ -603,6 +776,13 @@ namespace Extract.AttributeFinder.Rules
 
                     writer.Write(NameFinderPath);
                     writer.Write(EntityTypes);
+
+                    writer.Write(OutputConfidenceSubAttribute);
+                    writer.Write(ApplyLogFunctionToConfidence);
+                    writer.Write(LogBase);
+                    writer.Write(LogSteepness);
+                    writer.Write(LogXValueOfMiddle);
+                    writer.Write(ConvertConfidenceToPercent);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -727,6 +907,7 @@ namespace Extract.AttributeFinder.Rules
 
                     opennlp.tools.util.Span[] nameSpans = nameFinder.find(tokens);
 
+                    double probability = 0;
                     foreach (var span in nameSpans)
                     {
                         var type = span.getType();
@@ -746,6 +927,37 @@ namespace Extract.AttributeFinder.Rules
                                 Type = type
                             };
                             result.PushBack(at);
+
+                            if (OutputConfidenceSubAttribute)
+                            {
+                                probability = span.getProb();
+                                var confidenceSpatialString = new SpatialString();
+
+                                if (ApplyLogFunctionToConfidence)
+                                {
+                                    probability = 1 / (1 + Math.Pow(LogBase, -LogSteepness * (probability-LogXValueOfMiddle)));
+                                }
+
+                                if (ConvertConfidenceToPercent)
+                                {
+                                    int conf = (int)Math.Round(100 * probability);
+                                    confidenceSpatialString.CreateNonSpatialString(
+                                        conf.ToString("G", CultureInfo.CurrentCulture),
+                                        text.SourceDocName);
+                                }
+                                else
+                                {
+                                    confidenceSpatialString.CreateNonSpatialString(
+                                        probability.ToString("r", CultureInfo.CurrentCulture),
+                                        text.SourceDocName);
+                                }
+
+                                at.SubAttributes.PushBack(new AttributeClass
+                                {
+                                    Name = "Confidence",
+                                    Value = confidenceSpatialString
+                                });
+                            }
                         }
                     }
                 }
@@ -877,6 +1089,12 @@ namespace Extract.AttributeFinder.Rules
             TokenizerPath = source.TokenizerPath;
             NameFinderPath = source.NameFinderPath;
             EntityTypes = source.EntityTypes;
+            OutputConfidenceSubAttribute = source.OutputConfidenceSubAttribute;
+            ApplyLogFunctionToConfidence = source.ApplyLogFunctionToConfidence;
+            LogBase = source.LogBase;
+            LogSteepness = source.LogSteepness;
+            LogXValueOfMiddle = source.LogXValueOfMiddle;
+            ConvertConfidenceToPercent = source.ConvertConfidenceToPercent;
 
             _dirty = true;
         }
