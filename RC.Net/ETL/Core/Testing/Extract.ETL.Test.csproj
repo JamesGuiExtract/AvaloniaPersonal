@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="TestAccuracyServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestRedactionAccuracyServices.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
@@ -142,6 +143,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\AccuracyDemo_LabDE-rerun1.bak" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RedactionDemo_IDShield_first.bak" />
+    <EmbeddedResource Include="Resources\RedactionDemo_IDShield_second.bak" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

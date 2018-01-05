@@ -9,7 +9,12 @@ namespace Extract.DataCaptureStats
         ContainerOnly = 0,
         Expected = 1,
         Correct = 2,
-        Incorrect = 3
+        Incorrect = 3,
+        Found = 4,
+        FalsePositives = 5,
+        OverRedacted = 6,
+        UnderRedacted = 7,
+        Missed = 8
     }
     /// <summary>
     /// Holds the label, path and numeric value of an accuracy detail
