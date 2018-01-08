@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Extract.AttributeFinder;
 using Extract.DataCaptureStats;
@@ -17,17 +18,17 @@ namespace Extract.ETL
         /// <summary>
         /// Property for the redaction area percentage that indicates an over redaction
         /// </summary>
-        public static double OverRedactionERAP { get; private set; } = 30;
+        public static double OverRedactionERAP { get; } = 30;
 
         /// <summary>
         /// Property for indicating an under redaction
         /// </summary>
-        public static double OverLapLeniencyPercent { get; private set; } = 80;
+        public static double OverlapLeniencyPercent { get; } = 80;
 
         /// <summary>
         /// Minimum percent to be considered overlapping
         /// </summary>
-        public static double OverLapMinimumPercent { get; private set; } = 10.0;
+        public static double OverlapMinimumPercent { get; } = 10.0;
 
         #endregion
 
@@ -57,20 +58,6 @@ namespace Extract.ETL
             // attributes being compared
             public IAttribute ExpectedAttribute;
             public IAttribute FoundAttribute;
-
-            /// <summary>
-            /// Copy constructor
-            /// </summary>
-            /// <param name="miCopy"></param>
-            public MatchInfo(MatchInfo miCopy)
-            {
-                AreaOfExpectedRedaction = miCopy.AreaOfExpectedRedaction;
-                AreaOfFoundRedaction = miCopy.AreaOfFoundRedaction;
-                AreaOfOverlap = miCopy.AreaOfOverlap;
-
-                ExpectedAttribute = miCopy.ExpectedAttribute;
-                FoundAttribute = miCopy.FoundAttribute;
-            }
 
             /// <summary>
             /// Default constructor
@@ -106,158 +93,165 @@ namespace Extract.ETL
         public static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
             string XPathOfSensitiveAttributes)
         {
-            // if XPathOfSensitiveAttributes is empty throw an exception
-            if (string.IsNullOrWhiteSpace(XPathOfSensitiveAttributes))
+            try
             {
-                ExtractException ee = new ExtractException("ELI45396", "XPathOfSensitiveAttributes must be set.");
-                throw ee;
-            }
-
-            var foundContext = new XPathContext(found);
-            var expectedContext = new XPathContext(expected);
-
-            // Get enumerator for expected and found
-            var expectedEnumerator = expectedContext.FindAllOfType<IAttribute>(XPathOfSensitiveAttributes);
-            var foundEnumerator = foundContext.FindAllOfType<IAttribute>(XPathOfSensitiveAttributes);
-
-            // Get the count of expected and found
-            int expectedCount = expectedEnumerator.Count();
-            int foundCount = foundEnumerator.Count();
-
-            // Create list that will contain the output
-            List<AccuracyDetail> accuracyList = new List<AccuracyDetail>();
-
-            // if there are both expected and found attributes compare them
-            if (expectedCount != 0 && foundCount != 0)
-            {
-                // initialize the matchInfo array
-                MatchInfo[,] matchInfos = new MatchInfo[expectedCount, foundCount];
-                int expectedIndex = 0;
-                foreach (var expectedAttribute in expectedEnumerator)
+                // if XPathOfSensitiveAttributes is empty throw an exception
+                if (string.IsNullOrWhiteSpace(XPathOfSensitiveAttributes))
                 {
-                    int foundIndex = 0;
-                    foreach (var foundAttribute in foundEnumerator)
-                    {
-                        MatchInfo newMatchInfo = new MatchInfo();
-                        matchInfos[expectedIndex, foundIndex] = newMatchInfo;
-                        getMatchInfo(matchInfos[expectedIndex, foundIndex],
-                            expectedAttribute,
-                            foundAttribute);
-                        foundIndex++;
-                    }
-                    expectedIndex++;
+                    ExtractException ee = new ExtractException("ELI45396", "XPathOfSensitiveAttributes must be set.");
+                    throw ee;
                 }
 
-                HashSet<int> OverlappingFounds = new HashSet<int>();
-                HashSet<int> OverRedactions = new HashSet<int>();
+                var foundContext = new XPathContext(found);
+                var expectedContext = new XPathContext(expected);
 
-                for (expectedIndex = 0; expectedIndex < expectedCount; expectedIndex++)
+                // Get enumerator for expected and found
+                var expectedEnumerator = expectedContext.FindAllOfType<IAttribute>(XPathOfSensitiveAttributes);
+                var foundEnumerator = foundContext.FindAllOfType<IAttribute>(XPathOfSensitiveAttributes);
+
+                // Get the count of expected and found
+                int expectedCount = expectedEnumerator.Count();
+                int foundCount = foundEnumerator.Count();
+
+                // Create list that will contain the output
+                List<AccuracyDetail> accuracyList = new List<AccuracyDetail>();
+
+                // if there are both expected and found attributes compare them
+                if (expectedCount != 0 && foundCount != 0)
                 {
-                    bool foundCorrectRedaction = false;
-
-                    // Add the expected count to the output
-                    accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Expected,
-                        matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
-
-                    for (int foundIndex = 0; foundIndex < foundCount; foundIndex++)
+                    // initialize the matchInfo array
+                    MatchInfo[,] matchInfos = new MatchInfo[expectedCount, foundCount];
+                    int expectedIndex = 0;
+                    foreach (var expectedAttribute in expectedEnumerator)
                     {
-                        // if this the first time through the loop add the found count to the output
-                        if (expectedIndex == 0)
+                        int foundIndex = 0;
+                        foreach (var foundAttribute in foundEnumerator)
                         {
-                            accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Found,
-                                matchInfos[0, foundIndex].FoundAttribute.Type, 1));
+                            MatchInfo newMatchInfo = new MatchInfo();
+                            matchInfos[expectedIndex, foundIndex] = newMatchInfo;
+                            getMatchInfo(matchInfos[expectedIndex, foundIndex],
+                                expectedAttribute,
+                                foundAttribute);
+                            foundIndex++;
                         }
+                        expectedIndex++;
+                    }
 
-                        MatchInfo tempMatch = matchInfos[expectedIndex, foundIndex];
+                    HashSet<int> OverlappingFounds = new HashSet<int>();
+                    HashSet<int> OverRedactions = new HashSet<int>();
 
-                        if (!(Math.Abs(tempMatch.AreaOfOverlap) < ZERO))
+                    for (expectedIndex = 0; expectedIndex < expectedCount; expectedIndex++)
+                    {
+                        bool foundCorrectRedaction = false;
+
+                        // Add the expected count to the output
+                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Expected,
+                            matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
+
+                        for (int foundIndex = 0; foundIndex < foundCount; foundIndex++)
                         {
-                            OverlappingFounds.Add(foundIndex);
-
-                            if (tempMatch.getPercentOfExpectedAreaRedacted() < OverLapLeniencyPercent)
+                            // if this the first time through the loop add the found count to the output
+                            if (expectedIndex == 0)
                             {
-                                accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.UnderRedacted,
+                                accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Found,
                                     matchInfos[0, foundIndex].FoundAttribute.Type, 1));
                             }
-                            else
+
+                            MatchInfo tempMatch = matchInfos[expectedIndex, foundIndex];
+
+                            if (!(Math.Abs(tempMatch.AreaOfOverlap) < ZERO))
                             {
-                                // The expected redaction is completely covered. Record a "correct" redaction
-                                // unless one has already been recorded for this expected redaction.
-                                if (!foundCorrectRedaction)
+                                OverlappingFounds.Add(foundIndex);
+
+                                if (tempMatch.getPercentOfExpectedAreaRedacted() < OverlapLeniencyPercent)
                                 {
-                                    foundCorrectRedaction = true;
-                                    accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Correct,
-                                        matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
-                                }
-
-                                // Look to see if we have already determined the found attribute to be an
-                                // over-redaction.
-                                bool bOverRedaction = OverRedactions.Contains(foundIndex);
-
-                                // If not, calculate whether it is an over-redaction.
-                                if (!bOverRedaction)
-                                {
-                                    bOverRedaction = IsOverredaction(matchInfos, foundIndex, expectedCount);
-                                }
-
-                                if (bOverRedaction)
-                                {
-                                    // Record an over-redaction.
-                                    OverRedactions.Add(foundIndex);
-
-                                    accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.OverRedacted,
+                                    accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.UnderRedacted,
                                         matchInfos[0, foundIndex].FoundAttribute.Type, 1));
+                                }
+                                else
+                                {
+                                    // The expected redaction is completely covered. Record a "correct" redaction
+                                    // unless one has already been recorded for this expected redaction.
+                                    if (!foundCorrectRedaction)
+                                    {
+                                        foundCorrectRedaction = true;
+                                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Correct,
+                                            matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
+                                    }
+
+                                    // Look to see if we have already determined the found attribute to be an
+                                    // over-redaction.
+                                    bool bOverRedaction = OverRedactions.Contains(foundIndex);
+
+                                    // If not, calculate whether it is an over-redaction.
+                                    if (!bOverRedaction)
+                                    {
+                                        bOverRedaction = IsOverredaction(matchInfos, foundIndex, expectedCount);
+                                    }
+
+                                    if (bOverRedaction)
+                                    {
+                                        // Record an over-redaction.
+                                        OverRedactions.Add(foundIndex);
+
+                                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.OverRedacted,
+                                            matchInfos[0, foundIndex].FoundAttribute.Type, 1));
+                                    }
                                 }
                             }
                         }
+
+                        // if expected wasn't found count as missed
+                        if (!foundCorrectRedaction)
+                        {
+                            accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Missed,
+                                matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
+                        }
                     }
 
-                    // if expected wasn't found count as missed
-                    if (!foundCorrectRedaction)
+                    //--------------------------------------------------------
+                    // Record all false positives
+                    //--------------------------------------------------------
+                    for (int foundIndex = 0; foundIndex < foundCount; foundIndex++)
                     {
+                        // A found redaction is a false positive if it was not already found to overlap an
+                        // expected redaction.
+                        if (!OverlappingFounds.Contains(foundIndex))
+                        {
+                            accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.FalsePositives,
+                                    matchInfos[0, foundIndex].FoundAttribute.Type, 1));
+                        }
+                    }
+                }
+                else
+                {
+                    // Add any expected attribute counts as missed
+                    foreach (var expectedAttribute in expectedEnumerator)
+                    {
+                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Expected,
+                            expectedAttribute.Type, 1));
                         accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Missed,
-                            matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
+                            expectedAttribute.Type, 1));
                     }
-                }
 
-                //--------------------------------------------------------
-                // Record all false positives
-                //--------------------------------------------------------
-                for (int foundIndex = 0; foundIndex < foundCount; foundIndex++)
-                {
-                    // A found redaction is a false positive if it was not already found to overlap an
-                    // expected redaction.
-                    if (!OverlappingFounds.Contains(foundIndex))
+                    // Add any found attributes as false positives
+                    foreach (var foundAttribute in foundEnumerator)
                     {
+                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Found,
+                            foundAttribute.Type, 1));
+
                         accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.FalsePositives,
-                                matchInfos[0, foundIndex].FoundAttribute.Type, 1));
+                            foundAttribute.Type, 1));
                     }
                 }
+
+                // replace this
+                return accuracyList;
             }
-            else
+            catch (Exception ex)
             {
-                // Add any expected attribute counts as missed
-                foreach (var expectedAttribute in expectedEnumerator)
-                {
-                    accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Expected,
-                        expectedAttribute.Type, 1));
-                    accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Missed,
-                        expectedAttribute.Type, 1));
-                }
-
-                // Add any found attributes as false positives
-                foreach (var foundAttribute in foundEnumerator)
-                {
-                    accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Found,
-                        foundAttribute.Type, 1));
-
-                    accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.FalsePositives,
-                        foundAttribute.Type, 1));
-                }
+                throw ex.AsExtract("ELI45398");
             }
-
-            // replace this
-            return accuracyList;
         }
 
         #endregion
@@ -376,7 +370,7 @@ namespace Extract.ETL
 
                                 // [FlexIDSCore:4104] Ensure at least one raster zone overlaps by
                                 // m_dOverlapMinimumPercent before allowing any overlap to be reported.
-                                if (overlapPercent >= OverLapMinimumPercent)
+                                if (overlapPercent >= OverlapMinimumPercent)
                                 {
                                     attributesOverlap = true;
                                 }

@@ -339,6 +339,23 @@ STDMETHODIMP CFileProcessingManagerProcess::get_KeepProcessingAsFilesAdded(VARIA
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35273");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManagerProcess::get_ConnectionString(BSTR* pbstrConnectionString)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI45392", pbstrConnectionString != __nullptr);
+
+		*pbstrConnectionString = m_ipFPM->ConnectionString;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45393");
+}
 
 //--------------------------------------------------------------------------------------------------
 // Private helper methods

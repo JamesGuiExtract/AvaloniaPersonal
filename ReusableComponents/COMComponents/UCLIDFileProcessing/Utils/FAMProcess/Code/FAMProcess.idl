@@ -56,6 +56,10 @@ interface IFileProcessingManagerProcess : IDispatch
 	[propget, id(10), helpstring("property KeepProcessingAsFilesAdded")] HRESULT KeepProcessingAsFilesAdded(
 		[out, retval]  VARIANT_BOOL *pbValue);
 	//----------------------------------------------------------------------------------------------
+	// Gets the connection string used to connect based on the current database server,
+	// name and advanced connection string properties.
+	[propget, id(11), helpstring("property ConnectionString")] HRESULT ConnectionString(
+		[out, retval]  BSTR *pbstrConnectionString);
 };
 
 [

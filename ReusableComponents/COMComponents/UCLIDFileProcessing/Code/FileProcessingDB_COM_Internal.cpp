@@ -6195,11 +6195,24 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 				string strQueuing = (asCppBool(vbQueuing) ? "1" : "0");
 				string strProcessing = (asCppBool(vbProcessing) ? "1" : "0");
 
+				// https://extract.atlassian.net/browse/ISSUE-14974
+				// ESFAMService will run IDatabaseProcess instances and record the processing
+				// under a session without any action.
+				string strActionID;
 				string strActionName = asString(bstrActionName);
-				setActiveAction(ipConnection, strActionName);
+				if (!strActionName.empty())
+				{
+					setActiveAction(ipConnection, strActionName);
+					strActionID = asString(m_nActiveActionID);
+				}
+				else
+				{
+					m_nActiveActionID = -1;
+					strActionID = "null";
+				}
 
 				strFAMSessionQuery += asString(nMachineID) + ", " + asString(nUserID) + ", '"
-					+ m_strUPI + "', " + asString(nFPSFileID) + ", " + asString(m_nActiveActionID) +
+					+ m_strUPI + "', " + asString(nFPSFileID) + ", " + strActionID +
 					", " + strQueuing + ", " + strProcessing + ")";
 
 				// Insert the record into the FAMSession table

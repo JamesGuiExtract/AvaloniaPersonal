@@ -1,11 +1,13 @@
 ﻿
 
+using System;
+
 namespace Extract.Interfaces
 {
     /// <summary>
     /// Defines the interface for processes that will be performed by a service
     /// </summary>
-    public interface IDatabaseService
+    public interface IDatabaseService : IDisposable
     {
         /// <summary>
         /// Description of the database service item
@@ -26,7 +28,7 @@ namespace Extract.Interfaces
         }
 
         /// <summary>
-        /// Name of the Server. This value is not include in the settings
+        /// Name of the Server. This value is not included in the settings
         /// </summary>
         string DatabaseServer
         {
@@ -44,22 +46,44 @@ namespace Extract.Interfaces
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance is enabled.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if enabled; otherwise, <c>false</c>.
+        /// </value>
+        bool Enabled
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IScheduledEvent"/> instance that determines when Process will be run.
+        /// </summary>
+        IScheduledEvent Schedule
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is processing.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if processing; otherwise, <c>false</c>.
+        /// </value>
+        bool Processing
+        {
+            get;
+        }
+
+        /// <summary>
         /// Performs the processing defined the database service record
         /// </summary>
         void Process();
 
         /// <summary>
-        /// Loads the settings for this database service process
-        /// </summary>
-        /// <param name="ID">ID of the record in the DatabaseService table</param>
-        /// <param name="settings">The settings in json format that provide the settings for the particular service class</param>
-        void Load(int ID, string settings);
-
-        /// <summary>
         /// Returns the settings in a json string
         /// </summary>
         string GetSettings();
-
     }
-
 }

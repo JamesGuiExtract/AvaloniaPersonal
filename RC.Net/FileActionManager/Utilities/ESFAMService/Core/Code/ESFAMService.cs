@@ -4,6 +4,7 @@ using Extract.Utilities;
 using FAMProcessLib;
 using Microsoft.Win32.SafeHandles;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -147,6 +148,13 @@ namespace Extract.FileActionManager.Utilities
         /// The count of threads that required authentication to run.
         /// </summary>
         volatile int _threadsThatRequireAuthentication;
+
+        /// <summary>
+        /// Associates all connection strings encountered for FAM instances with a
+        /// <see cref="DatabaseServiceManager"/> to run against the database.
+        /// </summary>
+        ConcurrentDictionary<string, DatabaseServiceManager> _databaseServiceManagers =
+            new ConcurrentDictionary<string, DatabaseServiceManager>();
 
         /// <summary>
         /// Mutex to provide synchronized access to data.
@@ -528,6 +536,14 @@ namespace Extract.FileActionManager.Utilities
                         {
                             // Start processing
                             famProcess.Start(numberOfFilesToProcess);
+
+                            // Spawn a DatabaseServiceManager instance for the database if one has
+                            // not been spawned already.
+                            if (!_databaseServiceManagers.ContainsKey(famProcess.ConnectionString))
+                            {
+                                _databaseServiceManagers.TryAdd(
+                                    famProcess.ConnectionString, new DatabaseServiceManager(famProcess.ConnectionString));
+                            }
 
                             ExtractException ee = new ExtractException("ELI29808",
                                 "Application trace: Started new FAM instance.");
@@ -1102,9 +1118,24 @@ namespace Extract.FileActionManager.Utilities
                 // Signal the threads to stop
                 _stopProcessing.Set();
 
+                foreach (var dbServiceManager in _databaseServiceManagers)
+                {
+                    dbServiceManager.Value.Stop();
+                }
+
+                var stoppedEvents = _databaseServiceManagers
+                    .Values
+                    .Select(mgr => mgr.StoppedWaitHandle)
+                    .Cast<WaitHandle>()
+                    .ToArray();
+                if (_threadsStopped != null)
+                {
+                    stoppedEvents = stoppedEvents.Union(new[] { _threadsStopped.WaitHandle }).ToArray();
+                }
+
                 // Only wait if there is a wait handle
                 // and the caller has specified to wait
-                while (canRequestAdditionalTime && _threadsStopped != null && !_threadsStopped.Wait(1000))
+                while (canRequestAdditionalTime && !WaitHandle.WaitAll(stoppedEvents, 1000))
                 {
                     RequestAdditionalTime(1200);
                 }
@@ -1134,6 +1165,8 @@ namespace Extract.FileActionManager.Utilities
                         _threadsStopped.Dispose();
                         _threadsStopped = null;
                     }
+
+                    CollectionMethods.ClearAndDispose(_databaseServiceManagers);
 
                     // Set the threads that required authentication back to 0
                     _threadsThatRequireAuthentication = 0;

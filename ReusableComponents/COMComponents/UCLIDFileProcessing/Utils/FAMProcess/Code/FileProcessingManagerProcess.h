@@ -64,6 +64,7 @@ END_COM_MAP()
 	STDMETHOD(get_AuthenticationRequired)(VARIANT_BOOL* vbAuthenticationRequired);
 	STDMETHOD(AuthenticateService)(BSTR bstrValue);
 	STDMETHOD(get_KeepProcessingAsFilesAdded)(VARIANT_BOOL *pbValue);
+	STDMETHOD(get_ConnectionString)(BSTR* pbstrConnectionString);
 
 private:
 	//----------------------------------------------------------------------------------------------
@@ -73,7 +74,7 @@ private:
 
 	// The FPS file to process
 	string m_strFPSFile;
-
+	
 	// The File processing manager used to perform processing
 	IFileProcessingManagerPtr m_ipFPM;
 

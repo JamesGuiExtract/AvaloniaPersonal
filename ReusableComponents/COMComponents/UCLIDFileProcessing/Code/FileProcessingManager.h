@@ -106,6 +106,7 @@ public:
 	STDMETHOD(put_RequireAdminEdit)(VARIANT_BOOL bRequireAdminEdit);
 	STDMETHOD(WaitForProcessingCompleted)();
 	STDMETHOD(get_ProcessingDisplaysUI)(VARIANT_BOOL *pProcessingDisplaysUI);
+	STDMETHOD(get_ConnectionString)(BSTR* pbstrConnectionString);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);

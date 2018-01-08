@@ -552,6 +552,12 @@ library UCLID_FILEPROCESSINGLib
 		[id(61), helpstring("method WaitForProcessingCompleted")] HRESULT WaitForProcessingCompleted();
 		// PROMISE: Gets whether any of the processing Displays a UI
 		[propget, id(62), helpstring("property ProcessingDisplaysUI")] HRESULT ProcessingDisplaysUI([out, retval] VARIANT_BOOL* pProcessingDisplaysUI);
+		//-----------------------------------------------------------------------------------------
+		// RETURNS: The connection string used to connect based on the current database server,
+		//			name and advanced connection string properties.
+		// NOTE:	Throws an exception if the database server and name have not been specified.
+		[propget, id(63), helpstring("property ConnectionString")]
+		HRESULT ConnectionString([out, retval] BSTR* pbstrConnectionString);
 	};
 
 	[

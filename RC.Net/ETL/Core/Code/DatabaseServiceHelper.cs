@@ -20,18 +20,11 @@ namespace Extract.ETL
         {
             try
             {
-                JObject settingsObject = JObject.Parse(settings);
-
-                // Get the type from the settings object
-                string typeString = (string)settingsObject["Type"];
-                Type serviceType = JsonConvert.DeserializeObject<Type>(typeString);
-
                 // Create instance of the saved type
-                IDatabaseService service = (IDatabaseService)Activator.CreateInstance(serviceType);
+                IDatabaseService service = (IDatabaseService)JsonConvert.DeserializeObject(settings,
+                    new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
 
-                service.Load(id, settings);
                 return service;
-
             }
             catch (Exception ex)
             {

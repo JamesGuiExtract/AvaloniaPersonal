@@ -1428,6 +1428,23 @@ STDMETHODIMP CFileProcessingManager::get_ProcessingDisplaysUI(VARIANT_BOOL * pPr
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44994");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_ConnectionString(BSTR* pbstrConnectionString)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI45390", pbstrConnectionString != __nullptr);
+
+		*pbstrConnectionString = getFPMDB()->ConnectionString;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45391");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods

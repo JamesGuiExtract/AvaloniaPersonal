@@ -6,9 +6,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using Extract.AttributeFinder;
 using Extract.DataCaptureStats;
 using Extract.Interfaces;
+using Extract.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UCLID_COMUTILSLib;
@@ -19,6 +21,8 @@ namespace Extract.ETL
     /// <summary>
     /// Class to implement the Database service for Data Capture accuracy stats
     /// </summary>
+    [DataContract]
+    [KnownType(typeof(ScheduledEvent))]
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
     public class DataCaptureAccuracy : IDatabaseService
     {
@@ -124,6 +128,20 @@ namespace Extract.ETL
 
         #endregion
 
+        #region Fields
+
+        /// <summary>
+        /// Indicates whether this instance is enabled.
+        /// </summary>
+        bool _enabled = true;
+
+        /// <summary>
+        /// Indicates whether the Process method is currently executing.
+        /// </summary>
+        bool _processing;
+
+        #endregion Fields
+
         #region Constructors
 
         /// <summary>
@@ -133,7 +151,7 @@ namespace Extract.ETL
         {
         }
 
-        #endregion
+        #endregion Constructors
 
         #region IDatabaseService implementation
 
@@ -142,6 +160,7 @@ namespace Extract.ETL
         /// <summary>
         /// Description of the database service item
         /// </summary>
+        [DataMember]
         public string Description { get; set; } = string.Empty;
 
         /// <summary>
@@ -159,8 +178,72 @@ namespace Extract.ETL
         /// </summary>
         public int DatabaseServiceID { get; set; } = 0;
 
+        /// <summary>
+        /// Gets or sets the <see cref="ScheduledEvent"/> instance that determines when Process
+        /// will be run.
+        /// </summary>
+        [DataMember]
+        ScheduledEvent ScheduledEvent { get; set; } = null;
 
-        #endregion
+        /// <summary>
+        /// Gets the <see cref="IScheduledEvent"/> instance that determines when Process will be run.
+        /// </summary>
+        public IScheduledEvent Schedule
+        {
+            get
+            {
+                return ScheduledEvent;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is enabled.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if enabled; otherwise, <c>false</c>.
+        /// </value>
+        public bool Enabled
+        {
+            get
+            {
+                return _enabled;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _enabled)
+                    {
+                        _enabled = value;
+                        if (ScheduledEvent != null)
+                        {
+                            ScheduledEvent.Enabled = value;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45397");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is processing.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if processing; otherwise, <c>false</c>.
+        /// </value>
+        public bool Processing
+        {
+            get
+            {
+                return _processing;
+            }
+        }
+
+        #endregion IDatabaseService Properties
 
         #region IDatabaseService Methods
 
@@ -171,6 +254,7 @@ namespace Extract.ETL
         {
             try
             {
+                _processing = true;
 
                 using (var connection = new SqlConnection(getConnectionString()))
                 {
@@ -289,44 +373,9 @@ namespace Extract.ETL
             {
                 throw ex.AsExtract("ELI45366");
             }
-        }
-
-        /// <summary>
-        /// Loads the settings for DataCaptureAccuracy object from the <paramref name="settings"/>
-        /// </summary>
-        /// <param name="ID">ID of the record in the DatabaseService table</param>
-        /// <param name="settings">The settings in json format that provide the settings this DataCaptureAccuracy instance</param>
-        public void Load(int ID, string settings)
-        {
-            try
+            finally
             {
-                DatabaseServiceID = ID;
-
-                JObject settingsObject = JObject.Parse(settings);
-
-                // Version will be needed for future versions
-                string versionString = (string)settingsObject["Version"];
-                int version = JsonConvert.DeserializeObject<int>(versionString);
-                
-                if (version > CURRENT_VERSION)
-                {
-                    ExtractException ee = new ExtractException("ELI45382", "Settings were saved with a newer version.");
-                    ee.AddDebugData("SavedVersion", version, false);
-                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
-                    throw ee;
-                }
-
-                // Get the Version 1 properties
-                Description = JsonConvert.DeserializeObject<string>((string)settingsObject["Description"]);
-                XPathOfAttributesToIgnore = JsonConvert.DeserializeObject<string>((string)settingsObject["XPathOfAttributesToIgnore"]);
-                XPathOfContainerOnlyAttributes = JsonConvert.DeserializeObject<string>((string)settingsObject["XPathOfContainerOnlyAttributes"]);
-
-                ExpectedAttributeSetName = JsonConvert.DeserializeObject<string>((string)settingsObject["ExpectedAttributeSetName"]);
-                FoundAttributeSetName = JsonConvert.DeserializeObject<string>((string)settingsObject["FoundAttributeSetName"]);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45367");
+                _processing = false;
             }
         }
 
@@ -337,17 +386,8 @@ namespace Extract.ETL
         {
             try
             {
-                JObject settingsObject = new JObject();
-                settingsObject["Type"] = JsonConvert.SerializeObject(GetType());
-
-                settingsObject["Version"] = JsonConvert.SerializeObject(CURRENT_VERSION);
-                settingsObject["Description"] = JsonConvert.SerializeObject(Description);
-                settingsObject["XPathOfAttributesToIgnore"] = JsonConvert.SerializeObject(XPathOfAttributesToIgnore);
-                settingsObject["XPathOfContainerOnlyAttributes"] = JsonConvert.SerializeObject(XPathOfContainerOnlyAttributes);
-                settingsObject["ExpectedAttributeSetName"] = JsonConvert.SerializeObject(ExpectedAttributeSetName);
-                settingsObject["FoundAttributeSetName"] = JsonConvert.SerializeObject(FoundAttributeSetName);
-
-                return settingsObject.ToString();
+                string settings = JsonConvert.SerializeObject(this, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+                return settings;
             }
             catch (Exception ex)
             {
@@ -364,26 +404,80 @@ namespace Extract.ETL
         /// <summary>
         /// XPath query of attributes the be ignored when comparing attributes
         /// </summary>
-        public string XPathOfAttributesToIgnore { get; set; } = "";                   
+        [DataMember]
+        public string XPathOfAttributesToIgnore { get; set; } = "";
 
         /// <summary>
         /// XPath of Attributes that are only considered containers when comparing attributes
         /// </summary>
+        [DataMember]
         public string XPathOfContainerOnlyAttributes { get; set; } = "";
 
         /// <summary>
         /// The set name of the expected attributes when doing the comparison
         /// </summary>
+        [DataMember]
         public string ExpectedAttributeSetName { get; set; } = "DataSavedByOperator";
 
         /// <summary>
         /// The set name of the found attributes when doing the comparison
         /// </summary>
+        [DataMember]
         public string FoundAttributeSetName { get; set; } = "DataFoundByRules";
+
+        [DataMember]
+        public int Version { get; } = CURRENT_VERSION;
 
         #endregion
 
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="DataCaptureAccuracy"/>. Also deletes
+        /// the temporary file being managed by this class.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="DataCaptureAccuracy"/>. Also
+        /// deletes the temporary file being managed by this class.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Dispose of managed resources
+                ScheduledEvent?.Dispose();
+                ScheduledEvent = null;
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable Members
+
         #region Private Methods
+
+        /// <summary>
+        /// Called after this instance is deserialized.
+        /// </summary>
+        [OnDeserialized]
+        void OnDeserialized(StreamingContext context)
+        {
+            if (Version > CURRENT_VERSION)
+            {
+                ExtractException ee = new ExtractException("ELI45382", "Settings were saved with a newer version.");
+                ee.AddDebugData("SavedVersion", Version, false);
+                ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                throw ee;
+            }
+        }
 
         /// <summary>
         /// Returns the connection string using the configured DatabaseServer and DatabaseName

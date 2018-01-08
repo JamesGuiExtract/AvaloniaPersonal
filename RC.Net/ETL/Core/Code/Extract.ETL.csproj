@@ -41,6 +41,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -88,6 +89,10 @@
     <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221b-52c3-490b-a98f-7a51ebeb2a2b}</Project>
       <Name>Extract.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
