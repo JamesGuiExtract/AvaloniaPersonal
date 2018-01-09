@@ -246,14 +246,16 @@ namespace Extract.Database
         /// <returns>A string array representing the results of the query where each
         /// value is a separate row and where the values are delimited by
         /// <see paramref="columnSeparator"/>.</returns>
+        /// <param name="checkForExistingSeparators">Whether to check for existing separators,
+        /// and if found, to quote values</param>
         public static string[] GetQueryResultsAsStringArray(DbConnection dbConnection, string query,
-            Dictionary<string, string> parameters, string columnSeparator)
+            Dictionary<string, string> parameters, string columnSeparator, bool checkForExistingSeparators = false)
         {
             try
             {
                 using (DataTable resultsTable = ExecuteDBQuery(dbConnection, query, parameters))
                 {
-                    return resultsTable.ToStringArray(columnSeparator);
+                    return resultsTable.ToStringArray(columnSeparator, checkForExistingSeparators);
                 }
             }
             catch (Exception ex)
@@ -333,12 +335,15 @@ namespace Extract.Database
         /// (Will not be included in any result with less than 2 columns)</param>
         /// <remarks>Any values that contain a column separator will be quoted with double quotes. Any
         /// double quote characters in a quoted value will be escaped by doubling them.</remarks>
-        public static string[] ToStringArray(this DataTable dataTable, string columnSeparator)
+        /// <param name="checkForExistingSeparators">Whether to check for existing separators,
+        /// and if found, to quote values</param>
+        public static string[] ToStringArray(this DataTable dataTable,
+            string columnSeparator, bool checkForExistingSeparators = false)
         {
             try
             {
                 List<string> results = new List<string>();
-                bool quoteWhenNeeded = !string.IsNullOrEmpty(columnSeparator);
+                bool quoteWhenNeeded = checkForExistingSeparators && !string.IsNullOrEmpty(columnSeparator);
 
                 // Loop throw each row of the results.
                 for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)

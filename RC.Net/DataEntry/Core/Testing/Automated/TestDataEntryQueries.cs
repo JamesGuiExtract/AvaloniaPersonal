@@ -490,6 +490,27 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
+        /// Tests that fields aren't quoted if SplitCsv=false
+        /// </summary>
+        [Test, Category("TestSqlQuery")]
+        public static void TestSplitCsvFalseSqlQuery()
+        {
+            string xml = @"<Query><SQL>SELECT [Name] + ', and so forth' FROM [DocumentType] WHERE [ID] = 1</SQL></Query>";
+
+            using (DbConnection dbConnection =
+                    GetDatabaseConnection(_testImages.GetFile(_FLEX_INDEX_DATABASE)))
+            {
+                dbConnection.Open();
+
+                DataEntryQuery query = DataEntryQuery.Create(xml, null, dbConnection);
+
+                QueryResult result = query.Evaluate();
+
+                Assert.AreEqual("Assignment of Deed of Trust, and so forth", result.ToString());
+            }
+        }
+
+        /// <summary>
         /// Tests the <see cref="ResultQueryNode"/> using the simple syntax.
         /// </summary>
         [Test, Category("ResultQueryNode")]

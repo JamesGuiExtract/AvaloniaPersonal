@@ -271,7 +271,7 @@ namespace Extract.DataEntry
 
                     // Execute the query.
                     queryResults = DBMethods.GetQueryResultsAsStringArray(
-                        _currentConnection.DbConnection, sqlQuery.ToString(), parameters, ", ");
+                        _currentConnection.DbConnection, sqlQuery.ToString(), parameters, ", ", SplitCsv);
 
                     if (AllowCaching && !FlushCache)
                     {
