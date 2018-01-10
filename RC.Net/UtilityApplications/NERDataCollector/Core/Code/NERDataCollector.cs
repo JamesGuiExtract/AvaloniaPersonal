@@ -1,16 +1,23 @@
-﻿using Extract.Utilities;
+﻿using Extract.Interfaces;
+using Extract.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Serialization;
 using YamlDotNet.Serialization;
 
 namespace Extract.UtilityApplications.NERDataCollector
 {
-    public class NERDataCollector
+    [DataContract]
+    [KnownType(typeof(ScheduledEvent))]
+    public class NERDataCollector : IDatabaseService
     {
         #region Constants
+
+        const int CURRENT_VERSION = 1;
 
         /// <summary>
         /// The path to the NERAnnotator application
@@ -27,29 +34,113 @@ namespace Extract.UtilityApplications.NERDataCollector
 
         #endregion Constants
 
+        #region Fields
+
+        bool _enabled;
+        bool _processing;
+
+        #endregion Fields
+
         #region Properties
 
         /// <summary>
         /// The name used to group training/testing data in FAMDB (table MLModel)
         /// </summary>
+        [DataMember]
         public string ModelName { get; set; }
-
 
         /// <summary>
         /// The path to saved NERAnnotator settings
         /// </summary>
+        [DataMember]
         public string AnnotatorSettingsPath { get; set; }
 
         /// <summary>
         /// The attribute set (VOAs stored in the DB) that will both determine which files get
         /// processed and be the source of annotation categories
         /// </summary>
+        [DataMember]
         public string AttributeSetName { get; set; }
 
         /// <summary>
         /// The last AttributeSetForFile.ID that was processed by this application
         /// </summary>
+        [DataMember]
         public long LastIDProcessed { get; set; }
+
+        /// <summary>
+        /// The description
+        /// </summary>
+        [DataMember]
+        [YamlIgnore]
+        public string Description { get; set; } = "";
+
+        [YamlIgnore]
+        public string DatabaseName { get; set; } = "";
+
+        [YamlIgnore]
+        public string DatabaseServer { get; set; } = "";
+
+        [YamlIgnore]
+        public int DatabaseServiceID { get; set; }
+
+        /// <summary>
+        /// The schedule
+        /// </summary>
+        [DataMember]
+        [YamlIgnore]
+        ScheduledEvent ScheduledEvent { get; set; }
+
+        /// <summary>
+        /// Whether enabled
+        /// </summary>
+        [YamlIgnore]
+        public bool Enabled
+        {
+            get
+            {
+                return _enabled;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _enabled)
+                    {
+                        _enabled = value;
+                        if (ScheduledEvent != null)
+                        {
+                            ScheduledEvent.Enabled = value;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45418");
+                }
+            }
+        }
+
+        /// <summary>
+        /// The schedule
+        /// </summary>
+        [YamlIgnore]
+        public IScheduledEvent Schedule => ScheduledEvent;
+
+        /// <summary>
+        /// Whether processing
+        /// </summary>
+        [YamlIgnore]
+        public bool Processing => _processing;
+
+
+        /// <summary>
+        /// The version
+        /// </summary>
+        [DataMember]
+        [YamlIgnore]
+        public int Version { get; } = CURRENT_VERSION;
 
         #endregion Properties
 
@@ -75,6 +166,8 @@ namespace Extract.UtilityApplications.NERDataCollector
         {
             try
             {
+                _processing = true;
+
                 // Build the connection string from the settings
                 SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
                 {
@@ -126,6 +219,10 @@ namespace Extract.UtilityApplications.NERDataCollector
             {
                 throw ex.AsExtract("ELI45040");
             }
+            finally
+            {
+                _processing = false;
+            }
         }
 
         /// <summary>
@@ -163,6 +260,74 @@ namespace Extract.UtilityApplications.NERDataCollector
             }
         }
 
+        /// <summary>
+        /// Processes using configured DB
+        /// </summary>
+        public void Process()
+        {
+            Process(DatabaseServer, DatabaseName);
+        }
+
+        /// <summary>
+        /// Serializes to JSON string
+        /// </summary>
+        public string GetSettings()
+        {
+            return JsonConvert.SerializeObject(this,
+                new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+        }
+
         #endregion Public Methods
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="NERDataCollector"/>. Also deletes
+        /// the temporary file being managed by this class.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="NERDataCollector"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Dispose of managed resources
+                ScheduledEvent?.Dispose();
+                ScheduledEvent = null;
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable Members
+
+        #region Private Methods
+
+        /// <summary>
+        /// Called after this instance is deserialized.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserialized]
+        void OnDeserialized(StreamingContext context)
+        {
+            if (Version > CURRENT_VERSION)
+            {
+                ExtractException ee = new ExtractException("ELI45417", "Settings were saved with a newer version.");
+                ee.AddDebugData("SavedVersion", Version, false);
+                ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                throw ee;
+            }
+        }
+
+        #endregion Private Methods
     }
 }

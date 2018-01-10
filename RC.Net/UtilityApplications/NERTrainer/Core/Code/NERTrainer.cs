@@ -1,16 +1,21 @@
-﻿using Extract.Utilities;
+﻿using Extract.Interfaces;
+using Extract.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using YamlDotNet.Serialization;
 
 namespace Extract.UtilityApplications.NERTrainer
 {
-    public class NERTrainer
+    public class NERTrainer : IDatabaseService
     {
         #region Constants
+
+        const int CURRENT_VERSION = 1;
 
         /// <summary>
         /// Query to get MLData from the FAM DB
@@ -67,69 +72,161 @@ namespace Extract.UtilityApplications.NERTrainer
 
         #endregion Constants
 
+        #region Fields
+
+        bool _enabled;
+        bool _processing;
+
+        #endregion Fields
+
         #region Properties
 
         /// <summary>
         /// The name used to group training/testing data in FAMDB (table MLModel)
         /// </summary>
+        [DataMember]
         public string ModelName { get; set; }
-
 
         /// <summary>
         /// Training command
         /// </summary>
+        [DataMember]
         public string TrainingCommand { get; set; }
 
         /// <summary>
         /// The attribute set (VOAs stored in the DB) that will both determine which files get
         /// processed and be the source of annotation categories
         /// </summary>
+        [DataMember]
         public string TestingCommand { get; set; }
 
         /// <summary>
         /// The path to which to write the trained model
         /// </summary>
+        [DataMember]
         public string ModelDestination { get; set; }
 
         /// <summary>
         /// The ID of the last MLData record processed
         /// </summary>
+        [DataMember]
         public int LastIDProcessed { get; set; }
 
         /// <summary>
         /// The average F1Score from the last time the testing command was successfully executed
         /// </summary>
+        [DataMember]
         public double LastF1Score { get; set; }
 
         /// <summary>
         /// The lowest acceptable average F1 score
         /// </summary>
+        [DataMember]
         public double MinimumF1Score { get; set; }
 
         /// <summary>
         /// The maximum decrease in F1 score before the testing result is considered unacceptable
         /// </summary>
+        [DataMember]
         public double AllowableAccuracyDrop { get; set; }
 
         /// <summary>
         /// The maximum number of MLData records that will be used for training
         /// </summary>
+        [DataMember]
         public int MaximumTrainingDocuments { get; set; }
 
         /// <summary>
         /// The maximum number of MLData records that will be used for testing
         /// </summary>
+        [DataMember]
         public int MaximumTestingDocuments { get; set; }
 
         /// <summary>
         /// A comma-separated list of email addresses to notify in the event of failure/unacceptable testing result
         /// </summary>
+        [DataMember]
         public string EmailAddressesToNotifyOnFailure { get; set; }
 
         /// <summary>
         /// The subject to use for emails sent upon failure
         /// </summary>
+        [DataMember]
         public string EmailSubject { get; set; }
+
+        /// <summary>
+        /// The description
+        /// </summary>
+        [DataMember]
+        [YamlIgnore]
+        public string Description { get; set; } = "";
+
+        [YamlIgnore]
+        public string DatabaseName { get; set; } = "";
+
+        [YamlIgnore]
+        public string DatabaseServer { get; set; } = "";
+
+        [YamlIgnore]
+        public int DatabaseServiceID { get; set; }
+
+        /// <summary>
+        /// The schedule
+        /// </summary>
+        [DataMember]
+        [YamlIgnore]
+        ScheduledEvent ScheduledEvent { get; set; }
+
+        /// <summary>
+        /// Whether enabled
+        /// </summary>
+        [YamlIgnore]
+        public bool Enabled
+        {
+            get
+            {
+                return _enabled;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _enabled)
+                    {
+                        _enabled = value;
+                        if (ScheduledEvent != null)
+                        {
+                            ScheduledEvent.Enabled = value;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45418");
+                }
+            }
+        }
+
+        /// <summary>
+        /// The schedule
+        /// </summary>
+        [YamlIgnore]
+        public IScheduledEvent Schedule => ScheduledEvent;
+
+        /// <summary>
+        /// Whether processing
+        /// </summary>
+        [YamlIgnore]
+        public bool Processing => _processing;
+
+
+        /// <summary>
+        /// The version
+        /// </summary>
+        [DataMember]
+        [YamlIgnore]
+        public int Version { get; } = CURRENT_VERSION;
 
         #endregion Properties
 
@@ -147,6 +244,23 @@ namespace Extract.UtilityApplications.NERTrainer
         #region Public Methods
 
         /// <summary>
+        /// Processes using configured DB
+        /// </summary>
+        public void Process()
+        {
+            Process(DatabaseServer, DatabaseName);
+        }
+
+        /// <summary>
+        /// Serializes to JSON string
+        /// </summary>
+        public string GetSettings()
+        {
+            return JsonConvert.SerializeObject(this,
+                new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+        }
+
+        /// <summary>
         /// Runs the training/testing process
         /// </summary>
         /// <param name="databaseServer">The database server</param>
@@ -155,6 +269,8 @@ namespace Extract.UtilityApplications.NERTrainer
         {
             try
             {
+                _processing = true;
+
                 using (var tempModelFile = new TemporaryFile(true))
                 using (var tempExceptionLog = new TemporaryFile(".uex", false))
                 {
@@ -228,7 +344,82 @@ namespace Extract.UtilityApplications.NERTrainer
             {
                 throw ex.AsExtract("ELI45094");
             }
+            finally
+            {
+                _processing = false;
+            }
         }
+
+        /// <summary>
+        /// Load instance from a YAML string
+        /// </summary>
+        /// <param name="settings">The string containing the serialized object</param>
+        public static NERTrainer LoadFromString(string settings)
+        {
+            try
+            {
+                var deserializer = new Deserializer();
+                return deserializer.Deserialize<NERTrainer>(settings);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45107");
+            }
+        }
+
+        /// <summary>
+        /// Save this instance to a string as YAML
+        /// </summary>
+        public string SaveToString()
+        {
+            try
+            {
+                var sb = new SerializerBuilder();
+                sb.EmitDefaults();
+                var serializer = sb.Build();
+                return serializer.Serialize(this);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45108");
+            }
+        }
+
+        #endregion Public Methods
+
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="NERDataCollector"/>. Also deletes
+        /// the temporary file being managed by this class.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="NERDataCollector"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Dispose of managed resources
+                ScheduledEvent?.Dispose();
+                ScheduledEvent = null;
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable Members
+
+        #region Private Methods
 
         private int Train(SourceDocumentPathTags pathTags, string databaseServer, string databaseName, string logFileToEmail)
         {
@@ -404,45 +595,6 @@ namespace Extract.UtilityApplications.NERTrainer
             return (criteriaMet, lastIDProcessed);
         }
 
-        /// <summary>
-        /// Load instance from a YAML string
-        /// </summary>
-        /// <param name="settings">The string containing the serialized object</param>
-        public static NERTrainer LoadFromString(string settings)
-        {
-            try
-            {
-                var deserializer = new Deserializer();
-                return deserializer.Deserialize<NERTrainer>(settings);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45107");
-            }
-        }
-
-        /// <summary>
-        /// Save this instance to a string as YAML
-        /// </summary>
-        public string SaveToString()
-        {
-            try
-            {
-                var sb = new SerializerBuilder();
-                sb.EmitDefaults();
-                var serializer = sb.Build();
-                return serializer.Serialize(this);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45108");
-            }
-        }
-
-        #endregion Public Methods
-
-        #region Private Methods
-
         (string data, int currentCount, int lastCount, int lastIDProcessed) GetDataFromDB(string dbserver, string dbname, string model, bool trainingData, int maxRecords)
         {
             try
@@ -554,6 +706,22 @@ namespace Extract.UtilityApplications.NERTrainer
 
             double nextValue = BitConverter.Int64BitsToDouble(bits + 1);
             return nextValue - value;
+        }
+
+        /// <summary>
+        /// Called after this instance is deserialized.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserialized]
+        void OnDeserialized(StreamingContext context)
+        {
+            if (Version > CURRENT_VERSION)
+            {
+                ExtractException ee = new ExtractException("ELI45417", "Settings were saved with a newer version.");
+                ee.AddDebugData("SavedVersion", Version, false);
+                ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                throw ee;
+            }
         }
 
         #endregion Private Methods

@@ -2,6 +2,7 @@
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using Extract.UtilityApplications.NERDataCollector.Test;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -555,6 +556,54 @@ namespace Extract.UtilityApplications.NERTrainer.Test
             {
                 _testDbManager.RemoveDatabase(_DB_NAME);
             }
+        }
+
+        // Test loading/saving
+        [Test, Category("NERTrainer")]
+        public static void LoadingSaving()
+        {
+            var trainerSettings = _testFiles.GetFile("Resources.NERTrainerSettings.txt");
+            var trainer = NERTrainer.LoadFromString(File.ReadAllText(trainerSettings));
+            trainer.EmailSubject = "DUMMY_SUBJECT";
+            var updatedSettings = trainer.SaveToString();
+
+            Assert.AreNotEqual(trainerSettings, updatedSettings);
+            var updatedtrainer = NERTrainer.LoadFromString(updatedSettings);
+
+            Assert.AreEqual("DUMMY_SUBJECT", updatedtrainer.EmailSubject);
+        }
+
+        // Test loading/saving from JSON
+        [Test, Category("NERTrainer")]
+        public static void LoadingSavingFromJSON()
+        {
+            var trainerSettings = _testFiles.GetFile("Resources.NERTrainerSettings.txt");
+            var trainer = NERTrainer.LoadFromString(File.ReadAllText(trainerSettings));
+
+            var jsonSettings = trainer.GetSettings();
+            trainer.EmailSubject = "DUMMY_SUBJECT";
+            var updatedJsonSettings = trainer.GetSettings();
+
+            Assert.AreNotEqual(jsonSettings, updatedJsonSettings);
+
+            var updatedtrainer = (NERTrainer)JsonConvert.DeserializeObject(updatedJsonSettings,
+                    new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+
+            Assert.AreEqual("DUMMY_SUBJECT", updatedtrainer.EmailSubject);
+
+            // Verify that other, persisted settings are the same
+            Assert.AreEqual(trainer.AllowableAccuracyDrop, updatedtrainer.AllowableAccuracyDrop);
+            Assert.AreEqual(trainer.Description, updatedtrainer.Description);
+            Assert.AreEqual(trainer.EmailAddressesToNotifyOnFailure, updatedtrainer.EmailAddressesToNotifyOnFailure);
+            Assert.AreEqual(trainer.LastF1Score, updatedtrainer.LastF1Score);
+            Assert.AreEqual(trainer.LastIDProcessed, updatedtrainer.LastIDProcessed);
+            Assert.AreEqual(trainer.MaximumTestingDocuments, updatedtrainer.MaximumTestingDocuments);
+            Assert.AreEqual(trainer.MaximumTrainingDocuments, updatedtrainer.MaximumTrainingDocuments);
+            Assert.AreEqual(trainer.MinimumF1Score, updatedtrainer.MinimumF1Score);
+            Assert.AreEqual(trainer.ModelDestination, updatedtrainer.ModelDestination);
+            Assert.AreEqual(trainer.ModelName, updatedtrainer.ModelName);
+            Assert.AreEqual(trainer.TestingCommand, updatedtrainer.TestingCommand);
+            Assert.AreEqual(trainer.TrainingCommand, updatedtrainer.TrainingCommand);
         }
 
         #endregion Tests

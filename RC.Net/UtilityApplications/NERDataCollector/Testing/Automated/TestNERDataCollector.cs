@@ -4,6 +4,7 @@ using Extract.FileActionManager.FileProcessors;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using Extract.UtilityApplications.NERAnnotator;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -427,6 +428,32 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             var updatedCollector = NERDataCollector.LoadFromString(updatedSettings);
 
             Assert.AreEqual("DUMMY_PATH", updatedCollector.AnnotatorSettingsPath);
+        }
+
+        // Test loading/saving from JSON
+        [Test, Category("NERDataCollector")]
+        public static void LoadingSavingFromJSON()
+        {
+            var collectorSettings = _testFiles.GetFile("Resources.collectorSettings.txt");
+            var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+
+            var jsonSettings = collector.GetSettings();
+            collector.AnnotatorSettingsPath = "DUMMY_PATH";
+            var updatedJsonSettings = collector.GetSettings();
+
+            Assert.AreNotEqual(jsonSettings, updatedJsonSettings);
+
+            var updatedCollector = (NERDataCollector)JsonConvert.DeserializeObject(updatedJsonSettings,
+                    new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+
+            Assert.AreEqual("DUMMY_PATH", updatedCollector.AnnotatorSettingsPath);
+
+            // Verify that other, persisted settings are the same
+            Assert.AreEqual(collector.AnnotatorSettingsPath, updatedCollector.AnnotatorSettingsPath);
+            Assert.AreEqual(collector.AttributeSetName, updatedCollector.AttributeSetName);
+            Assert.AreEqual(collector.Description, updatedCollector.Description);
+            Assert.AreEqual(collector.LastIDProcessed, updatedCollector.LastIDProcessed);
+            Assert.AreEqual(collector.ModelName, updatedCollector.ModelName);
         }
 
         #endregion Tests

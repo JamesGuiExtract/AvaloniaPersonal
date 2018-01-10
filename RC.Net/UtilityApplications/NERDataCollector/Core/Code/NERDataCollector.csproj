@@ -42,6 +42,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="OpenNLP.IKVM">
       <HintPath>..\..\..\..\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe</HintPath>
     </Reference>
@@ -52,6 +55,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
@@ -170,6 +174,10 @@
     <ProjectReference Include="..\..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
       <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
       <Name>Extract.FileActionManager.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221b-52c3-490b-a98f-7a51ebeb2a2b}</Project>
+      <Name>Extract.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
