@@ -165,7 +165,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                     }
 
                     var collector = File.Exists(settingsFile)
-                        ? NERDataCollector.LoadFromString(File.ReadAllText(settingsFile))
+                        ? NERDataCollector.FromJson(File.ReadAllText(settingsFile))
                         : new NERDataCollector();
 
                     foreach(var (property, value) in propertiesToSet)
@@ -181,7 +181,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                             var result = form.DialogResult;
                             if (result == DialogResult.OK)
                             {
-                                File.WriteAllText(settingsFile, collector.SaveToString());
+                                File.WriteAllText(settingsFile, collector.ToJson());
                             }
                         }
                     }

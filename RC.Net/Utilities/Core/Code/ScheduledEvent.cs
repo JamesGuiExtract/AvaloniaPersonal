@@ -14,7 +14,7 @@ namespace Extract.Utilities
     /// Describes a scheduled event that may recur.
     /// </summary>
     [DataContract]  
-    public class ScheduledEvent : IScheduledEvent, IDisposable
+    public class ScheduledEvent : IDisposable
     {
         #region Constants
 
@@ -233,7 +233,7 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="T:Extract.Interfaces.IDatabaseService" /> is enabled.
+        /// Gets or sets a value indicating whether this <see cref="T:Extract.Interfaces.DatabaseService" /> is enabled.
         /// </summary>
         /// <value>
         /// <c>true</c> if enabled; otherwise, <c>false</c>.

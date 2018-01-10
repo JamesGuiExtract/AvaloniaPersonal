@@ -1,3 +1,1 @@
-AttributeSetName: Expected
-ModelName: Test
-LastIDProcessed: 0
+{"$type":"Extract.UtilityApplications.NERDataCollector.NERDataCollector, NERDataCollector","ModelName":"Test","AnnotatorSettingsPath":null,"AttributeSetName":"Expected","LastIDProcessed":0,"Version":1,"Description":"","Schedule":null}

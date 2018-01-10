@@ -87,16 +87,16 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="expected">Expected attributes</param>
         /// <param name="found">Found attributes</param>
-        /// <param name="XPathOfSensitiveAttributes">XPath to select the attributes to compare</param>
+        /// <param name="xPathOfSensitiveAttributes">XPath to select the attributes to compare</param>
         /// <returns>IEnumerable of AccuracyDetail</returns>
         [CLSCompliant(false)]
         public static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
-            string XPathOfSensitiveAttributes)
+            string xPathOfSensitiveAttributes)
         {
             try
             {
                 // if XPathOfSensitiveAttributes is empty throw an exception
-                if (string.IsNullOrWhiteSpace(XPathOfSensitiveAttributes))
+                if (string.IsNullOrWhiteSpace(xPathOfSensitiveAttributes))
                 {
                     ExtractException ee = new ExtractException("ELI45396", "XPathOfSensitiveAttributes must be set.");
                     throw ee;
@@ -106,8 +106,8 @@ namespace Extract.ETL
                 var expectedContext = new XPathContext(expected);
 
                 // Get enumerator for expected and found
-                var expectedEnumerator = expectedContext.FindAllOfType<IAttribute>(XPathOfSensitiveAttributes);
-                var foundEnumerator = foundContext.FindAllOfType<IAttribute>(XPathOfSensitiveAttributes);
+                var expectedEnumerator = expectedContext.FindAllOfType<IAttribute>(xPathOfSensitiveAttributes);
+                var foundEnumerator = foundContext.FindAllOfType<IAttribute>(xPathOfSensitiveAttributes);
 
                 // Get the count of expected and found
                 int expectedCount = expectedEnumerator.Count();

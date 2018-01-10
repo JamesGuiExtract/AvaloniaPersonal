@@ -286,9 +286,9 @@ namespace Extract.ETL.Test
             dataCaptureAccuracy.XPathOfContainerOnlyAttributes = "XPath of Container Only test";
             dataCaptureAccuracy.Description = "Test Description";
 
-            string settings = dataCaptureAccuracy.GetSettings();
+            string settings = dataCaptureAccuracy.ToJson();
 
-            var newDCAFromSettings = DatabaseServiceHelper.CreateServiceFromSettings(1, settings);
+            var newDCAFromSettings = DatabaseService.FromJson(settings);
 
             Assert.IsNullOrEmpty(newDCAFromSettings.DatabaseName);
             Assert.IsNullOrEmpty(newDCAFromSettings.DatabaseServer);

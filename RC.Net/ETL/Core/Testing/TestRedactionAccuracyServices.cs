@@ -249,9 +249,9 @@ namespace Extract.ETL.Test
             
             redactionAccuracy.Description = "Test Description";
 
-            string settings = redactionAccuracy.GetSettings();
+            string settings = redactionAccuracy.ToJson();
 
-            var newDCAFromSettings = DatabaseServiceHelper.CreateServiceFromSettings(1, settings);
+            var newDCAFromSettings = DatabaseService.FromJson(settings);
 
             Assert.IsNullOrEmpty(newDCAFromSettings.DatabaseName);
             Assert.IsNullOrEmpty(newDCAFromSettings.DatabaseServer);

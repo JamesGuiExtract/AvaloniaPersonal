@@ -218,7 +218,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
 
                 var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
                 _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
-                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+                var collector = NERDataCollector.FromJson(File.ReadAllText(collectorSettings));
                 collector.AnnotatorSettingsPath = annotatorSettingsPath;
 
                 collector.Process("(local)", DBName);
@@ -355,7 +355,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
 
                 var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
                 _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
-                var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+                var collector = NERDataCollector.FromJson(File.ReadAllText(collectorSettings));
                 collector.AnnotatorSettingsPath = annotatorSettingsPath;
 
                 collector.Process("(local)", DBName);
@@ -415,31 +415,16 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
             }
         }
 
-        // Test loading/saving
-        [Test, Category("NERDataCollector")]
-        public static void LoadingSaving()
-        {
-            var collectorSettings = _testFiles.GetFile("Resources.collectorSettings.txt");
-            var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
-            collector.AnnotatorSettingsPath = "DUMMY_PATH";
-            var updatedSettings = collector.SaveToString();
-
-            Assert.AreNotEqual(collectorSettings, updatedSettings);
-            var updatedCollector = NERDataCollector.LoadFromString(updatedSettings);
-
-            Assert.AreEqual("DUMMY_PATH", updatedCollector.AnnotatorSettingsPath);
-        }
-
         // Test loading/saving from JSON
         [Test, Category("NERDataCollector")]
-        public static void LoadingSavingFromJSON()
+        public static void LoadingSavingFromJson()
         {
             var collectorSettings = _testFiles.GetFile("Resources.collectorSettings.txt");
-            var collector = NERDataCollector.LoadFromString(File.ReadAllText(collectorSettings));
+            var collector = NERDataCollector.FromJson(File.ReadAllText(collectorSettings));
 
-            var jsonSettings = collector.GetSettings();
+            var jsonSettings = collector.ToJson();
             collector.AnnotatorSettingsPath = "DUMMY_PATH";
-            var updatedJsonSettings = collector.GetSettings();
+            var updatedJsonSettings = collector.ToJson();
 
             Assert.AreNotEqual(jsonSettings, updatedJsonSettings);
 

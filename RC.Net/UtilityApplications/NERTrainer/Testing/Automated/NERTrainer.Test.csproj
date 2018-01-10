@@ -125,6 +125,10 @@
       <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
       <Name>Extract.Testing.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ETL\Core\Code\Extract.ETL.csproj">
+      <Project>{e26b63cd-4948-43ac-a726-8b46c420f152}</Project>
+      <Name>Extract.ETL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
       <Project>{6B284A4D-132C-4FE4-858F-06A9C476B19B}</Project>
       <Name>Extract.FileActionManager.Database.Test</Name>

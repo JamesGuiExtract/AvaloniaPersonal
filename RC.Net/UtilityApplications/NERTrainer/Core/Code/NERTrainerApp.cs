@@ -165,7 +165,7 @@ namespace Extract.UtilityApplications.NERTrainer
                     }
 
                     var trainer = File.Exists(settingsFile)
-                        ? NERTrainer.LoadFromString(File.ReadAllText(settingsFile))
+                        ? NERTrainer.FromJson(File.ReadAllText(settingsFile))
                         : new NERTrainer();
 
                     foreach(var (property, value) in propertiesToSet)
@@ -181,7 +181,7 @@ namespace Extract.UtilityApplications.NERTrainer
                             var result = form.DialogResult;
                             if (result == DialogResult.OK)
                             {
-                                File.WriteAllText(settingsFile, trainer.SaveToString());
+                                File.WriteAllText(settingsFile, trainer.ToJson());
                             }
                         }
 

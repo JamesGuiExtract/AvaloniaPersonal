@@ -15,14 +15,14 @@ using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Utilities
 {
-    // Manages the execution of all IDatabaseService instances defined in a FAM database.
+    // Manages the execution of all DatabaseService instances defined in a FAM database.
     internal class DatabaseServiceManager : IDisposable
     {
         #region Fields
 
-        // Map the of the IScheduledEvent for each service to the corresponding service to execute.
-        ConcurrentDictionary<IScheduledEvent, IDatabaseService> _databaseServices =
-            new ConcurrentDictionary<IScheduledEvent, IDatabaseService>();
+        // Map the of the ScheduledEvent for each service to the corresponding service to execute.
+        ConcurrentDictionary<ScheduledEvent, DatabaseService> _databaseServices =
+            new ConcurrentDictionary<ScheduledEvent, DatabaseService>();
 
         /// <summary>
         /// Indicates whether the manager is currently running.
@@ -48,7 +48,7 @@ namespace Extract.FileActionManager.Utilities
 
         /// <summary>
         /// A <see cref="FileProcessingDB"/> used to create FAMSession rows such that only one
-        /// service instance will try to run IDatabaseServices if ESFAMServices are running.
+        /// service instance will try to run DatabaseServices if ESFAMServices are running.
         /// </summary>
         FileProcessingDB _fileProcessingDb;
 
@@ -158,7 +158,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                IDatabaseService dbService = _databaseServices[(IScheduledEvent)sender];
+                DatabaseService dbService = _databaseServices[(ScheduledEvent)sender];
                 lock (_processingLock)
                 {
                     if (_running &&
@@ -217,7 +217,7 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Starts running the <see cref="IDatabaseService"/> instances in the database.
+        /// Starts running the <see cref="DatabaseService"/> instances in the database.
         /// </summary>
         void Start()
         {
@@ -235,8 +235,7 @@ namespace Extract.FileActionManager.Utilities
                     {
                         foreach (DataRow dbServiceRow in dbServiceDefinitions.Rows)
                         {
-                            var dbService = (IDatabaseService)JsonConvert.DeserializeObject((string)dbServiceRow["Settings"],
-                                new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+                            var dbService = DatabaseService.FromJson((string)dbServiceRow["Settings"]);
 
                             dbService.DatabaseServiceID = (int)dbServiceRow["ID"];
                             dbService.DatabaseServer = _oleDbConnection.DataSource;

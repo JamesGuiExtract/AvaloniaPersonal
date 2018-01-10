@@ -24,7 +24,7 @@ namespace Extract.ETL
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
-    public class RedactionAccuracy : IDatabaseService
+    public class RedactionAccuracy : DatabaseService
     {
         #region Constants
 
@@ -131,11 +131,6 @@ namespace Extract.ETL
         #region Fields
 
         /// <summary>
-        /// Indicates whether this instance is enabled.
-        /// </summary>
-        bool _enabled = true;
-
-        /// <summary>
         /// Indicates whether the Process method is currently executing.
         /// </summary>
         bool _processing;
@@ -153,81 +148,10 @@ namespace Extract.ETL
 
         #endregion Constructors
 
-        #region IDatabaseService implementation
+        #region DatabaseService implementation
 
-        #region IDatabaseService Properties
+        #region DatabaseService Properties
 
-        /// <summary>
-        /// Description of the database service item
-        /// </summary>
-        [DataMember]
-        public string Description { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Name of the Server. This value is not include in the settings
-        /// </summary>
-        public string DatabaseServer { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Name of the database. This value is not included in the settings
-        /// </summary>
-        public string DatabaseName { get; set; } = string.Empty;
-
-        /// <summary>
-        /// This is the id from the DatabaseService table.  This value is not included in the settings
-        /// </summary>
-        public int DatabaseServiceID { get; set; } = 0;
-
-        /// <summary>
-        /// Gets or sets the <see cref="ScheduledEvent"/> instance that determines when Process
-        /// will be run.
-        /// </summary>
-        [DataMember]
-        ScheduledEvent ScheduledEvent { get; set; } = null;
-
-        /// <summary>
-        /// Gets the <see cref="IScheduledEvent"/> instance that determines when Process will be run.
-        /// </summary>
-        public IScheduledEvent Schedule
-        {
-            get
-            {
-                return ScheduledEvent;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is enabled.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if enabled; otherwise, <c>false</c>.
-        /// </value>
-        public bool Enabled
-        {
-            get
-            {
-                return _enabled;
-            }
-
-            set
-            {
-                try
-                {
-                    if (value != _enabled)
-                    {
-                        _enabled = value;
-                        if (ScheduledEvent != null)
-                        {
-                            ScheduledEvent.Enabled = value;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI45399");
-                }
-            }
-        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is processing.
@@ -235,7 +159,7 @@ namespace Extract.ETL
         /// <value>
         ///   <c>true</c> if processing; otherwise, <c>false</c>.
         /// </value>
-        public bool Processing
+        public override bool Processing
         {
             get
             {
@@ -243,19 +167,17 @@ namespace Extract.ETL
             }
         }
 
-        #endregion IDatabaseService Properties
+        #endregion DatabaseService Properties
 
-        #region IDatabaseService Methods
+        #region DatabaseService Methods
 
         /// <summary>
         /// Performs the processing needed for the records in ReportingRedactionAccuracy table
         /// </summary>
-        public void Process()
+        public override void Process()
         {
             try
             {
-                //var settings = GetSettings();
-
                 _processing = true;
 
                 using (var connection = new SqlConnection(getConnectionString()))
@@ -395,32 +317,6 @@ namespace Extract.ETL
             }
         }
 
-        /// <summary>
-        /// Returns the settings in a json string
-        /// </summary>
-        public string GetSettings()
-        {
-            try
-            {
-                string settings = JsonConvert.SerializeObject(this, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
-                return settings;
-                //JObject settingsObject = new JObject();
-                //settingsObject["Type"] = JsonConvert.SerializeObject(GetType());
-
-                //settingsObject["Version"] = JsonConvert.SerializeObject(CURRENT_VERSION);
-                //settingsObject["Description"] = JsonConvert.SerializeObject(Description);
-                //settingsObject["XPathOfSensitiveAttributes"] = JsonConvert.SerializeObject(XPathOfSensitiveAttributes);
-                //settingsObject["ExpectedAttributeSetName"] = JsonConvert.SerializeObject(ExpectedAttributeSetName);
-                //settingsObject["FoundAttributeSetName"] = JsonConvert.SerializeObject(FoundAttributeSetName);
-
-                //return settingsObject.ToString();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45387");
-            }
-        }
-
         #endregion
 
         #endregion
@@ -450,41 +346,9 @@ namespace Extract.ETL
         public string FoundAttributeSetName { get; set; } = "DataFoundByRules";
 
         [DataMember]
-        public int Version { get; } = CURRENT_VERSION;
+        public override int Version { get; protected set; } = CURRENT_VERSION;
 
         #endregion
-
-        #region IDisposable Members
-
-        /// <summary>
-        /// Releases all resources used by the <see cref="RedactionAccuracy"/>. Also deletes
-        /// the temporary file being managed by this class.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="RedactionAccuracy"/>. Also
-        /// deletes the temporary file being managed by this class.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
-        /// resources; <see langword="false"/> to release only unmanaged resources.</param>
-        void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // Dispose of managed resources
-                ScheduledEvent?.Dispose();
-                ScheduledEvent = null;
-            }
-
-            // Dispose of unmanaged resources
-        }
-
-        #endregion IDisposable Members
 
         #region Private Methods
 
@@ -502,6 +366,8 @@ namespace Extract.ETL
                 ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
                 throw ee;
             }
+
+            Version = CURRENT_VERSION;
         }
 
         /// <summary>

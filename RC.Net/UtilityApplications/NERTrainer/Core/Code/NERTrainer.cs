@@ -1,17 +1,15 @@
-﻿using Extract.Interfaces;
+﻿using Extract.ETL;
 using Extract.Utilities;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using YamlDotNet.Serialization;
 
 namespace Extract.UtilityApplications.NERTrainer
 {
-    public class NERTrainer : IDatabaseService
+    public class NERTrainer : DatabaseService
     {
         #region Constants
 
@@ -74,7 +72,6 @@ namespace Extract.UtilityApplications.NERTrainer
 
         #region Fields
 
-        bool _enabled;
         bool _processing;
 
         #endregion Fields
@@ -155,78 +152,12 @@ namespace Extract.UtilityApplications.NERTrainer
         public string EmailSubject { get; set; }
 
         /// <summary>
-        /// The description
-        /// </summary>
-        [DataMember]
-        [YamlIgnore]
-        public string Description { get; set; } = "";
-
-        [YamlIgnore]
-        public string DatabaseName { get; set; } = "";
-
-        [YamlIgnore]
-        public string DatabaseServer { get; set; } = "";
-
-        [YamlIgnore]
-        public int DatabaseServiceID { get; set; }
-
-        /// <summary>
-        /// The schedule
-        /// </summary>
-        [DataMember]
-        [YamlIgnore]
-        ScheduledEvent ScheduledEvent { get; set; }
-
-        /// <summary>
-        /// Whether enabled
-        /// </summary>
-        [YamlIgnore]
-        public bool Enabled
-        {
-            get
-            {
-                return _enabled;
-            }
-
-            set
-            {
-                try
-                {
-                    if (value != _enabled)
-                    {
-                        _enabled = value;
-                        if (ScheduledEvent != null)
-                        {
-                            ScheduledEvent.Enabled = value;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI45418");
-                }
-            }
-        }
-
-        /// <summary>
-        /// The schedule
-        /// </summary>
-        [YamlIgnore]
-        public IScheduledEvent Schedule => ScheduledEvent;
-
-        /// <summary>
-        /// Whether processing
-        /// </summary>
-        [YamlIgnore]
-        public bool Processing => _processing;
-
-
-        /// <summary>
         /// The version
         /// </summary>
         [DataMember]
-        [YamlIgnore]
-        public int Version { get; } = CURRENT_VERSION;
+        public override int Version { get; protected set; } = CURRENT_VERSION;
+
+        public override bool Processing => _processing;
 
         #endregion Properties
 
@@ -246,18 +177,9 @@ namespace Extract.UtilityApplications.NERTrainer
         /// <summary>
         /// Processes using configured DB
         /// </summary>
-        public void Process()
+        public override void Process()
         {
             Process(DatabaseServer, DatabaseName);
-        }
-
-        /// <summary>
-        /// Serializes to JSON string
-        /// </summary>
-        public string GetSettings()
-        {
-            return JsonConvert.SerializeObject(this,
-                new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
         }
 
         /// <summary>
@@ -351,15 +273,14 @@ namespace Extract.UtilityApplications.NERTrainer
         }
 
         /// <summary>
-        /// Load instance from a YAML string
+        /// Deserializes a <see cref="NERTrainer"/> instance from a JSON string
         /// </summary>
-        /// <param name="settings">The string containing the serialized object</param>
-        public static NERTrainer LoadFromString(string settings)
+        /// <param name="settings">The JSON string to which a <see cref="NERTrainer"/> was previously saved</param>
+        public static new NERTrainer FromJson(string settings)
         {
             try
             {
-                var deserializer = new Deserializer();
-                return deserializer.Deserialize<NERTrainer>(settings);
+                return (NERTrainer)DatabaseService.FromJson(settings);
             }
             catch (Exception ex)
             {
@@ -367,57 +288,7 @@ namespace Extract.UtilityApplications.NERTrainer
             }
         }
 
-        /// <summary>
-        /// Save this instance to a string as YAML
-        /// </summary>
-        public string SaveToString()
-        {
-            try
-            {
-                var sb = new SerializerBuilder();
-                sb.EmitDefaults();
-                var serializer = sb.Build();
-                return serializer.Serialize(this);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45108");
-            }
-        }
-
         #endregion Public Methods
-
-
-        #region IDisposable Members
-
-        /// <summary>
-        /// Releases all resources used by the <see cref="NERDataCollector"/>. Also deletes
-        /// the temporary file being managed by this class.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="NERDataCollector"/>.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
-        /// resources; <see langword="false"/> to release only unmanaged resources.</param>
-        void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // Dispose of managed resources
-                ScheduledEvent?.Dispose();
-                ScheduledEvent = null;
-            }
-
-            // Dispose of unmanaged resources
-        }
-
-        #endregion IDisposable Members
 
         #region Private Methods
 
@@ -717,11 +588,13 @@ namespace Extract.UtilityApplications.NERTrainer
         {
             if (Version > CURRENT_VERSION)
             {
-                ExtractException ee = new ExtractException("ELI45417", "Settings were saved with a newer version.");
+                ExtractException ee = new ExtractException("ELI45430", "Settings were saved with a newer version.");
                 ee.AddDebugData("SavedVersion", Version, false);
                 ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
                 throw ee;
             }
+
+            Version = CURRENT_VERSION;
         }
 
         #endregion Private Methods

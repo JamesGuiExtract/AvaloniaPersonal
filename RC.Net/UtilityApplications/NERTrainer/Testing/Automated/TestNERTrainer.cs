@@ -558,31 +558,16 @@ namespace Extract.UtilityApplications.NERTrainer.Test
             }
         }
 
-        // Test loading/saving
-        [Test, Category("NERTrainer")]
-        public static void LoadingSaving()
-        {
-            var trainerSettings = _testFiles.GetFile("Resources.NERTrainerSettings.txt");
-            var trainer = NERTrainer.LoadFromString(File.ReadAllText(trainerSettings));
-            trainer.EmailSubject = "DUMMY_SUBJECT";
-            var updatedSettings = trainer.SaveToString();
-
-            Assert.AreNotEqual(trainerSettings, updatedSettings);
-            var updatedtrainer = NERTrainer.LoadFromString(updatedSettings);
-
-            Assert.AreEqual("DUMMY_SUBJECT", updatedtrainer.EmailSubject);
-        }
-
         // Test loading/saving from JSON
         [Test, Category("NERTrainer")]
-        public static void LoadingSavingFromJSON()
+        public static void LoadingSavingFromJson()
         {
             var trainerSettings = _testFiles.GetFile("Resources.NERTrainerSettings.txt");
-            var trainer = NERTrainer.LoadFromString(File.ReadAllText(trainerSettings));
+            var trainer = NERTrainer.FromJson(File.ReadAllText(trainerSettings));
 
-            var jsonSettings = trainer.GetSettings();
+            var jsonSettings = trainer.ToJson();
             trainer.EmailSubject = "DUMMY_SUBJECT";
-            var updatedJsonSettings = trainer.GetSettings();
+            var updatedJsonSettings = trainer.ToJson();
 
             Assert.AreNotEqual(jsonSettings, updatedJsonSettings);
 
