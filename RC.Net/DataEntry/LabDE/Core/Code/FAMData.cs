@@ -140,7 +140,7 @@ namespace Extract.DataEntry.LabDE
                         _alreadyMappedRecordIDs = _rowData.Values
                             .Select(row => row.IdField.Value)
                             .Where(id => !string.IsNullOrWhiteSpace(id))
-                            .Select(id => "'" + id + "'")
+                            .Select(id => "'" + id.Replace("'", "''") + "'")
                             .ToList();
                     }
 
