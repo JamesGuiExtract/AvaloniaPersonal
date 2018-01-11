@@ -7,6 +7,7 @@ using System.Linq;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
+using Extract.ETL;
 
 namespace Extract.ETL.Test
 {
