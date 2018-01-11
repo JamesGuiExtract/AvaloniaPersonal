@@ -12,7 +12,7 @@ namespace Extract.ETL
     [KnownType(typeof(ScheduledEvent))]
     public abstract class DatabaseService : IDisposable
     {
-        private bool _enabled;
+        bool _enabled = true;
 
         /// <summary>
         /// Description of the database service item
