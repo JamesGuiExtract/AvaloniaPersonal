@@ -408,20 +408,29 @@ namespace Extract.Utilities
                         {
                             int quarterNumber = (dateTime.Month - 1) / 3 + 1;
                             DateTime firstDayOfQuarter = new DateTime(dateTime.Year, (quarterNumber - 1) * 3 + 1, 1);
-                            return firstDayOfQuarter.AddMonths(3);
+                            // If the dateTime is already on a year boundary, it does not need to be modified.
+                            return (dateTime == firstDayOfQuarter)
+                                ? dateTime
+                                : firstDayOfQuarter.AddMonths(3);
                         }
                     case DateTimeUnit.Year:
                         {
                             // Special case; years are not a constant length of time do to leap years.
                             DateTime yearStart = new DateTime(dateTime.Year, 1, 1);
-                            return yearStart.AddYears(1);
+                            // If the dateTime is already on a year boundary, it does not need to be modified.
+                            return (dateTime == yearStart)
+                                ? dateTime
+                                : yearStart.AddYears(1);
                         }
 
                     case DateTimeUnit.Month:
                         {
                             // Special case; months are not a constant number of days.
-                            DateTime yearStart = new DateTime(dateTime.Year, dateTime.Month, 1);
-                            return yearStart.AddMonths(1);
+                            DateTime monthStart = new DateTime(dateTime.Year, dateTime.Month, 1);
+                            // If the dateTime is already on a month boundary, it does not need to be modified.
+                            return (dateTime == monthStart)
+                                ? dateTime
+                                : monthStart.AddMonths(1);
                         }
 
                     case DateTimeUnit.Week:
@@ -546,7 +555,9 @@ namespace Extract.Utilities
                         throw new ExtractException("ELI41580", "Unexpected relative time period.");
                 }
                 startDate = referenceDate.Floor(dateTimePart);
-                endDate = referenceDate.Ceiling(dateTimePart);
+                // Ensure a reference date that falls directly on a timeframe boundary does not
+                // yield an instantaneous range.
+                endDate = referenceDate.Add(new TimeSpan(ticks: 1)).Ceiling(dateTimePart);
                 return new Tuple<DateTime, DateTime>(startDate, endDate);
             }
             catch (Exception ex)

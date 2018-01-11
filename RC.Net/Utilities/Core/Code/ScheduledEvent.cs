@@ -189,7 +189,6 @@ namespace Extract.Utilities
                     throw ex.AsExtract("ELI45403");
                 }
             }
-
         }
 
         /// <summary>
@@ -208,11 +207,11 @@ namespace Extract.Utilities
         /// <summary>
         /// Gets or sets time periods over which the event should be excluded from executing.
         /// </summary>
-        public IReadOnlyCollection<ScheduledEvent> Exclusions
+        public IEnumerable<ScheduledEvent> Exclusions
         {
             get
             {
-                return _exclusions.AsReadOnly();
+                return _exclusions.ToArray();
             }
 
             set
@@ -222,6 +221,10 @@ namespace Extract.Utilities
                     if (!value.SequenceEqual(_exclusions))
                     {
                         _exclusions = new List<ScheduledEvent>(value);
+
+                        ExtractException.Assert("ELI45442", "Schedule exlusions must have a defined duration.",
+                            _exclusions.Any(exclusion => exclusion.Duration != null));
+
                         SetTimer();
                     }
                 }
@@ -266,33 +269,59 @@ namespace Extract.Utilities
         /// Gets the <see cref="DateTime"/> of the next occurrence or <c>null</c> if there are no
         /// more occurrences.
         /// </summary>
-        public DateTime? NextOccurrence
+        /// <param name="dateTime">The <see cref="DateTime"/> for which the next occurence should be found.
+        /// </param>
+        /// <param name="ignoreExclusions"><c>true</c> to get the next occurence even if it falls in a
+        /// a time that has been excluded via <see cref="Exlclusions"/>; <c>false</c> to get the next
+        /// schduled occurence including exclusions.</param>
+        public DateTime? GetNextOccurrence(DateTime? dateTime = null, bool ignoreExclusions = false)
         {
-            get
+            try
             {
-                try
-                {
-                    DateTime? nextOccurrence = null;
+                dateTime = dateTime ?? DateTime.Now;
+                DateTime? nextOccurrence = null;
 
-                    if (RecurrenceUnit.HasValue)
-                    {
-                        var offset = Start - Start.Floor(RecurrenceUnit.Value);
-                        nextOccurrence = (DateTime.Now - offset).Ceiling(RecurrenceUnit.Value) + offset;
-                    }
-                    else
+                if (RecurrenceUnit.HasValue)
+                {
+                    var offset = Start - Start.Floor(RecurrenceUnit.Value);
+                    nextOccurrence = (dateTime.Value - offset).Ceiling(RecurrenceUnit.Value) + offset;
+                    if (nextOccurrence < Start)
                     {
                         nextOccurrence = Start;
                     }
-
-                    return (nextOccurrence >= DateTime.Now &&
-                            (End == null || nextOccurrence <= End))
-                        ? nextOccurrence
-                        : null;
                 }
-                catch (Exception ex)
+                else
                 {
-                    throw ex.AsExtract("ELI45407");
+                    nextOccurrence = Start;
                 }
+
+                if (nextOccurrence < dateTime.Value || (End != null && nextOccurrence > End))
+                {
+                    return null;
+                }
+
+                if (!ignoreExclusions && GetIsInExcludedTime(nextOccurrence))
+                {
+                    // Prevent infinite loop by not looking past the timeframe that could potentially be excluded.
+                    var maxUnit = Exclusions.Max(exclusion => exclusion.RecurrenceUnit);
+                    var maxNextOccurence = dateTime.Value
+                        .Ceiling(maxUnit.Value).AddTicks(1)
+                        .Ceiling(maxUnit.Value);
+
+                    // Loop for the last occurrence that is not in an excluded timeframe.
+                    while (nextOccurrence.HasValue && 
+                           nextOccurrence.Value < maxNextOccurence &&
+                           GetIsInExcludedTime(nextOccurrence))
+                    {
+                        nextOccurrence = GetNextOccurrence(nextOccurrence.Value.AddTicks(1), true);
+                    }
+                }
+
+                return nextOccurrence;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45407");
             }
         }
 
@@ -300,31 +329,59 @@ namespace Extract.Utilities
         /// Gets the <see cref="DateTime"/> of the last occurrence or <c>null</c> if there were no
         /// previous occurrences.
         /// </summary>
-        public DateTime? LastOccurrence
+        /// <param name="dateTime">The <see cref="DateTime"/> for which the next occurence should be found.
+        /// </param>
+        /// <param name="ignoreExclusions"><c>true</c> to get the next occurence even if it falls in a
+        /// a time that has been excluded via <see cref="Exlclusions"/>; <c>false</c> to get the next
+        /// schduled occurence including exclusions.</param>
+        public DateTime? GetLastOccurrence(DateTime? dateTime = null, bool ignoreExclusions = false)
         {
-            get
+            try
             {
-                try
-                {
-                    DateTime? lastOccurrence = null;
-                    if (RecurrenceUnit.HasValue)
-                    {
-                        var offset = Start - Start.Floor(RecurrenceUnit.Value);
-                        lastOccurrence = (DateTime.Now - offset).Floor(RecurrenceUnit.Value) + offset;
-                    }
-                    else
-                    {
-                        lastOccurrence = Start;
-                    }
+                dateTime = dateTime ?? DateTime.Now;
+                DateTime? lastOccurrence = null;
 
-                    return (lastOccurrence <= DateTime.Now)
-                        ? lastOccurrence
-                        : null;
-                }
-                catch (Exception ex)
+                if (RecurrenceUnit.HasValue)
                 {
-                    throw ex.AsExtract("ELI45408");
+                    var offset = Start - Start.Floor(RecurrenceUnit.Value);
+                    lastOccurrence = (dateTime.Value - offset).Floor(RecurrenceUnit.Value) + offset;
+                    if (End != null && lastOccurrence > End)
+                    {
+                        lastOccurrence = GetLastOccurrence(End);
+                    }
                 }
+                else
+                {
+                    lastOccurrence = Start;
+                }
+
+                if (lastOccurrence > dateTime || lastOccurrence < Start)
+                {
+                    return null;
+                }
+
+                if (!ignoreExclusions && GetIsInExcludedTime(lastOccurrence))
+                {
+                    // Prevent infinite loop by not looking past the timeframe that could potentially be excluded.
+                    var maxUnit = Exclusions.Max(exclusion => exclusion.RecurrenceUnit);
+                    var minNextOccurence = dateTime.Value
+                        .Floor(maxUnit.Value).AddTicks(-1)
+                        .Floor(maxUnit.Value);
+
+                    // Loop for the previous occurrence that is not in an excluded timeframe.
+                    while (lastOccurrence.HasValue &&
+                           lastOccurrence.Value >= minNextOccurence &&
+                           GetIsInExcludedTime(lastOccurrence))
+                    {
+                        lastOccurrence = GetLastOccurrence(lastOccurrence.Value.AddTicks(-1), true);
+                    }
+                }
+
+                return lastOccurrence;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45408");
             }
         }
 
@@ -332,21 +389,25 @@ namespace Extract.Utilities
         /// Gets a value indicating whether the current time is within a time frame where an
         /// instance of the event is on-going.
         /// </summary>
-        public bool InScheduledEvent
+        public bool GetIsInScheduledEvent(DateTime? dateTime = null)
         {
-            get
+            try
             {
-                try
+                dateTime = dateTime ?? DateTime.Now;
+
+                var startOfLastOccurrence = GetLastOccurrence(dateTime);
+                if (startOfLastOccurrence.HasValue && Duration != null)
                 {
-                    var endOfLastOccurrence = LastOccurrence + Duration;
-                    return (endOfLastOccurrence.HasValue &&
-                        LastOccurrence.Value > DateTime.Now &&
-                        (End == null || LastOccurrence.Value <= End));
+                    var endOfLastOccurrence = startOfLastOccurrence + Duration.Value;
+                    return (dateTime < endOfLastOccurrence.Value &&
+                            dateTime >= startOfLastOccurrence.Value);
                 }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI45409");
-                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45409");
             }
         }
 
@@ -354,11 +415,15 @@ namespace Extract.Utilities
         /// Gets a value indicating whether the current time is within a time frame where the event
         /// is excluded from occurring.
         /// </summary>
-        public bool InExcludedTime
+        public bool GetIsInExcludedTime(DateTime? dateTime = null)
         {
-            get
+            try
             {
-                return Exclusions.Any(ex => ex.InScheduledEvent);
+                return Exclusions.Any(ex => ex.GetIsInScheduledEvent(dateTime));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45432");
             }
         }
 
@@ -447,7 +512,8 @@ namespace Extract.Utilities
                     return;
                 }
 
-                var milliseconds = (NextOccurrence - DateTime.Now).Value.TotalMilliseconds;
+                var now = DateTime.Now;
+                var milliseconds = (GetNextOccurrence(now) - now).Value.TotalMilliseconds;
                 if (milliseconds > 0)
                 {
                     _timer = new Timer(milliseconds);
@@ -457,7 +523,7 @@ namespace Extract.Utilities
                         {
                             lock (_lock)
                             {
-                                if (Enabled && o == _timer && !InExcludedTime)
+                                if (Enabled && o == _timer && !GetIsInExcludedTime(now))
                                 {
                                     // Avoid deadlocks if an event handler were to in turn attempt
                                     // to update or dispose of this instance

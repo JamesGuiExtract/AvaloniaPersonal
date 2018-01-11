@@ -164,7 +164,7 @@ namespace Extract.FileActionManager.Utilities
                     if (_running &&
                         !_stoppedEvent.WaitOne(0) &&
                         dbService.Enabled &&
-                        !dbService.Schedule.InExcludedTime)
+                        !dbService.Schedule.GetIsInExcludedTime())
                     {
                         dbService.Process();
                     }
