@@ -860,9 +860,9 @@ namespace Extract.AttributeFinder.Test
             // algorithms sort the same
             var spatialStringVectorizer = encoder.AutoBagOfWords;
             var attributeVectorizer = encoder.AttributeFeatureVectorizers.First();
-            CollectionAssert.AreEqual(
-                spatialStringVectorizer.RecognizedValues,
-                attributeVectorizer.RecognizedValues);
+            var spatialRecognizedValues = spatialStringVectorizer.RecognizedValues.ToArray();
+            var attributeRecognizedValues = attributeVectorizer.RecognizedValues.ToArray();
+            CollectionAssert.AreEqual(spatialRecognizedValues, attributeRecognizedValues);
         }
 
         // DocumentCategorization: Test that attribute feature vectorizers sort terms by tf*idf score
@@ -894,13 +894,10 @@ namespace Extract.AttributeFinder.Test
             // Compare top terms from the spatial string vectorizer with attribute vectorizer to check that the
             // algorithms sort the same
             var spatialStringVectorizer = encoder.AutoBagOfWords;
+
             var attributeVectorizer = encoder.AttributeFeatureVectorizers.First();
             var spatialStringFeatures = spatialStringVectorizer.RecognizedValues.ToArray();
             var attributeFeatures = attributeVectorizer.RecognizedValues.Take(2000).ToArray();
-
-            // There is a slight difference in the two collections. Probably a result of different max term-frequency since
-            // the attribute feature vectorizer can't rely on terms being unique per document
-            UtilityMethods.Swap(ref attributeFeatures[89], ref attributeFeatures[90]);
 
             CollectionAssert.AreEqual(spatialStringFeatures, attributeFeatures);
         }

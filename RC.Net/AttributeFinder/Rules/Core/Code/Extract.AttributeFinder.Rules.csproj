@@ -134,6 +134,25 @@
     <Reference Include="IKVM.Runtime.JNI, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.Runtime.JNI.dll</HintPath>
     </Reference>
+    <Reference Include="Lucene.Net">
+      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net.Analysis.Common">
+      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Analysis.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net.Facet">
+      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Facet.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net.Grouping">
+      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Grouping.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net.Join">
+      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Join.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net.Queries">
+      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Queries.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="OpenNLP.IKVM, Version=1.8.1.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe</HintPath>
     </Reference>
