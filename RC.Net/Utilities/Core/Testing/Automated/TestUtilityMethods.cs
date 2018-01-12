@@ -377,16 +377,6 @@ namespace Extract.Utilities.Test
             CollectionAssert.AreEqual(expected2, array2);
         }
 
-        // Helper method to generate all permutations of an array
-        private static IEnumerable<IEnumerable<T>>
-            GetPermutations<T>(IEnumerable<T> list, int length)
-        {
-            if (length == 1) return list.Select(t => new T[] { t });
-            return GetPermutations(list, length - 1)
-                .SelectMany(t => list.Where(o => !t.Contains(o)),
-                    (t1, t2) => t1.Concat(new T[] { t2 }));
-        }
-
         /// <summary>
         /// Tests shuffling an array with no specified seed.
         /// </summary>
@@ -394,7 +384,7 @@ namespace Extract.Utilities.Test
         [CLSCompliant(false)]
         public static void ShuffleWithoutSeed()
         {
-            Dictionary<string, int> results = GetPermutations(new[] { 1, 2, 3, 4 }, 4)
+            Dictionary<string, int> results = (new[] { 1, 2, 3, 4 }).GetPermutations(4)
                 .Select(a => Tuple.Create(String.Join("", a), 0))
                 .ToDictionary(t => t.Item1, t => t.Item2);
 
@@ -411,7 +401,7 @@ namespace Extract.Utilities.Test
                 "There is a (slight) chance of the random distributions being very unbalanced so this assertion might fail.");
 
             // Repeat the process in order to test that the same distribution does not happen each time
-            Dictionary<string, int> results2 = GetPermutations(new[] { 1, 2, 3, 4 }, 4)
+            Dictionary<string, int> results2 = (new[] { 1, 2, 3, 4 }).GetPermutations(4)
                 .Select(a => Tuple.Create(String.Join("", a), 0))
                 .ToDictionary(t => t.Item1, t => t.Item2);
 
@@ -437,11 +427,11 @@ namespace Extract.Utilities.Test
         [CLSCompliant(false)]
         public static void Shuffle2WithoutSeed()
         {
-            Dictionary<string, int> results1 = GetPermutations(new[] { 1, 2, 3, 4 }, 4)
+            Dictionary<string, int> results1 = (new[] { 1, 2, 3, 4 }).GetPermutations(4)
                 .Select(a => Tuple.Create(String.Join("", a), 0))
                 .ToDictionary(t => t.Item1, t => t.Item2);
 
-            Dictionary<string, int> results2 = GetPermutations(new[] { "one", "two", "three", "four" }, 4)
+            Dictionary<string, int> results2 = (new[] { "one", "two", "three", "four" }).GetPermutations(4)
                 .Select(a => Tuple.Create(String.Join("", a), 0))
                 .ToDictionary(t => t.Item1, t => t.Item2);
 

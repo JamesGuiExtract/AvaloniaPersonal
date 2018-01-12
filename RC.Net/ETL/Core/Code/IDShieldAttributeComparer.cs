@@ -90,6 +90,7 @@ namespace Extract.ETL
         /// <param name="xPathOfSensitiveAttributes">XPath to select the attributes to compare</param>
         /// <returns>IEnumerable of AccuracyDetail</returns>
         [CLSCompliant(false)]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "x")]
         public static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
             string xPathOfSensitiveAttributes)
         {

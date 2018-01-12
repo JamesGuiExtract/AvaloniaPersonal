@@ -7,8 +7,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder
 {
@@ -681,25 +679,26 @@ namespace Extract.AttributeFinder
                             : 1
                 }).ToDictionary(o => o.category, o => o.maxTF, StringComparer.Ordinal);
 
-            var orderedTerms = _distinctValuesSeen.Select(term =>
+            TermInfo getTermInfo(string term)
             {
                 double augmentedTermFrequency = 0.0;
                 foreach (var category in _termFrequency)
                 {
                     var categoryName = category.Key;
                     var tfForCategory = category.Value;
-                    int tf = 0;
-                    tfForCategory.TryGetValue(term, out tf);
+                    tfForCategory.TryGetValue(term, out int tf);
                     double maxTf = categoryToMaxTermFrequency[categoryName];
                     augmentedTermFrequency += tf / maxTf;
                 }
-                return new TermInfo(
+                var termInfo = new TermInfo(
                     text: term,
                     termFrequency: augmentedTermFrequency,
                     documentFrequency: _termToDocument[term].Count,
                     numberOfExamples: numberOfExamples,
                     numberOfCategories: numberOfCategories);
-            })
+                return termInfo;
+            }
+            var orderedTerms = _distinctValuesSeen.Select(getTermInfo)
             .OrderByDescending(termInfo => termInfo.TermFrequencyInverseDocumentFrequency)
             .ThenBy(o => o.Text)
             .Select(o => o.Text)

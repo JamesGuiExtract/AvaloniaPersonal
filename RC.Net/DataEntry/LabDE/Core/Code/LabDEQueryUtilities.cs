@@ -398,6 +398,8 @@ namespace Extract.DataEntry.LabDE
         /// components mapped to the specified order.</param>
         /// <returns>An array of CSV records where the first item is
         /// the official name and the second, optional, item is an alternate name</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "AKAs")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "AKAs")]
         public static string[] GetComponentNamesAndAKAs(DbConnection customerDB,
             DbConnection componentDataDB, string orderCode)
         {
@@ -479,7 +481,7 @@ namespace Extract.DataEntry.LabDE
                     }
                 }
 
-                var resultsTable = new DataTable();
+                var resultsTable = new DataTable { Locale = CultureInfo.CurrentCulture };
                 resultsTable.Columns.Add("Name", typeof(string));
                 resultsTable.Columns.Add("AKA", typeof(string));
                 var rows = resultsTable.Rows;

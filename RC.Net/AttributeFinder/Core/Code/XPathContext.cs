@@ -497,6 +497,7 @@ namespace Extract.AttributeFinder
         /// <param name="height">The data array</param>
         /// <param name="data">The data array</param>
         /// <returns><c>true</c> if parsing was successful, else <c>false</c></returns>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public static bool TryGetBitmapDataFromString(string bmp, out int width, out int height, out double[] data)
         {
             try

@@ -1,23 +1,30 @@
 ﻿using Extract.Utilities;
 using Lucene.Net.Analysis;
+using Lucene.Net.Analysis.Core;
+using Lucene.Net.Analysis.En;
+using Lucene.Net.Analysis.Miscellaneous;
 using Lucene.Net.Analysis.Shingle;
 using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Analysis.Tokenattributes;
+using Lucene.Net.Analysis.TokenAttributes;
 using Lucene.Net.Documents;
+using Lucene.Net.Facet;
+using Lucene.Net.Facet.Taxonomy;
+using Lucene.Net.Facet.Taxonomy.Directory;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
+using Lucene.Net.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using UCLID_RASTERANDOCRMGMTLib;
-using ComAttribute = UCLID_AFCORELib.Attribute;
 using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.AttributeFinder
 {
@@ -30,6 +37,19 @@ namespace Extract.AttributeFinder
     [Obfuscation(Feature = "renaming", Exclude = true)]
     public class SpatialStringFeatureVectorizer : IFeatureVectorizer
     {
+        #region Constants
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        static readonly LuceneVersion _LUCENE_VERSION = LuceneVersion.LUCENE_30;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        /// <summary>
+        /// Version 2: Add versioning
+        /// </summary>
+        const int _CURRENT_VERSION = 2;
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -43,6 +63,9 @@ namespace Extract.AttributeFinder
         private bool _enabled;
         private int _shingleSize;
         private int _maxFeatures;
+
+        [OptionalField(VersionAdded = 2)]
+        private int _version = _CURRENT_VERSION;
 
         #endregion Fields
 
@@ -311,7 +334,7 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         internal void ComputeEncodingsFromDocumentTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answers,
-            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             try
             {
@@ -337,7 +360,7 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         internal void ComputeEncodingsFromPaginationTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answerFiles,
-            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             try
             {
@@ -543,11 +566,7 @@ namespace Extract.AttributeFinder
         /// In VS 2015 could use this: [CallerMemberName] String propertyName = ""
         private void NotifyPropertyChanged(string propertyName = "")
         {
-            var eventHandler = PropertyChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         /// <summary>
@@ -629,19 +648,22 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         private void SetBagOfWords(IEnumerable<Tuple<string, string>> textsAndCategories,
-            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
-            string tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            DirectoryInfo tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
+            string tempDirForMainIndexPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            string tempDirForFacetIndexPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            DirectoryInfo tempDirForMainIndex = System.IO.Directory.CreateDirectory(tempDirForMainIndexPath);
+            DirectoryInfo tempDirForFacetIndex = System.IO.Directory.CreateDirectory(tempDirForFacetIndexPath);
             try
             {
-                using (var directory = FSDirectory.Open(tempDirectory))
+                using (var mainDir = FSDirectory.Open(tempDirForMainIndex))
+                using (var facetDir = FSDirectory.Open(tempDirForFacetIndex))
                 {
                     // Create a Lucene inverted index out of the input texts
-                    WriteTermsToIndex(directory, textsAndCategories, updateStatus, cancellationToken);
+                    WriteTermsToIndex(mainDir, facetDir, textsAndCategories, updateStatus, cancellationToken);
 
                     // Use the index to score the terms and pick the top scoring
-                    string[] topScoringTerms = GetTopScoringTerms(directory, updateStatus, cancellationToken);
+                    string[] topScoringTerms = GetTopScoringTerms(mainDir, facetDir, updateStatus, cancellationToken);
 
                     // Create the bag-of-words object
                     _bagOfWords = new Accord.MachineLearning.BagOfWords(topScoringTerms);
@@ -654,11 +676,17 @@ namespace Extract.AttributeFinder
             finally
             {
                 // Delete index
-                foreach (var file in System.IO.Directory.GetFiles(tempDirectoryPath))
+                foreach (var file in System.IO.Directory.GetFiles(tempDirForMainIndexPath))
                 {
                     FileSystemMethods.DeleteFile(file);
                 }
-                System.IO.Directory.Delete(tempDirectoryPath, true);
+                System.IO.Directory.Delete(tempDirForMainIndexPath, true);
+
+                foreach (var file in System.IO.Directory.GetFiles(tempDirForFacetIndexPath))
+                {
+                    FileSystemMethods.DeleteFile(file);
+                }
+                System.IO.Directory.Delete(tempDirForFacetIndexPath, true);
             }
         }
 
@@ -666,17 +694,20 @@ namespace Extract.AttributeFinder
         /// Builds a Lucene inverted index out of the <see paramref="inputTexts"/> so that there is
         /// one document for each distinct value of <see paramref="textCategories"/>.
         /// </summary>
-        /// <param name="directory">The <see cref="FSDirectory"/> in which to write the index files.</param>
+        /// <param name="mainDir">The <see cref="FSDirectory"/> in which to write the index files.</param>
+        /// <param name="facetDir">The <see cref="FSDirectory"/> in which to write the facet index files.</param>
         /// <param name="textAndCategoryCollection">Collection of text and category pairs</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>The number of examples (<see paramref="inputTexts"/>) written</returns>
-        private void WriteTermsToIndex(FSDirectory directory, IEnumerable<Tuple<string, string>> textAndCategoryCollection,
-            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+        private void WriteTermsToIndex(FSDirectory mainDir, FSDirectory facetDir, IEnumerable<Tuple<string, string>> textAndCategoryCollection,
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             // I don't think it makes any difference which analyzer is used since an already-tokenized streams are passed in
-            var analyzer = new SimpleAnalyzer();
-            using (var writer = new IndexWriter(directory, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED))
+            var analyzer = new SimpleAnalyzer(_LUCENE_VERSION);
+            FacetsConfig config = new FacetsConfig();
+            using (var writer = new IndexWriter(mainDir, new IndexWriterConfig(_LUCENE_VERSION, analyzer)))
+            using (var taxoWriter = new DirectoryTaxonomyWriter(facetDir))
             {
                 Parallel.ForEach(textAndCategoryCollection, (textAndCategory, loopState) =>
                 {
@@ -688,19 +719,19 @@ namespace Extract.AttributeFinder
                     var text = textAndCategory.Item1;
                     var category = textAndCategory.Item2;
                     var tokenStream = GetTokenStream(text);
-                    var document = new Document();
-                    document.Add(new Field("category", category, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                    document.Add(new Field("shingles", tokenStream));
-                    writer.AddDocument(document);
+                    var document = new Document
+                    {
+                        new FacetField("category", category),
+                        new TextField("shingles", tokenStream)
+                    };
+                    writer.AddDocument(config.Build(taxoWriter, document));
                     updateStatus(new StatusArgs { StatusMessage = "Writing terms to index... Texts processed: {0:N0}", Int32Value = 1 });
                 });
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                writer.Optimize();
-                cancellationToken.ThrowIfCancellationRequested();
-
                 writer.Commit();
+                taxoWriter.Commit();
             }
         }
 
@@ -719,60 +750,65 @@ namespace Extract.AttributeFinder
         /// each document is a collection of terms for a single classification category built
         /// by <see cref="WriteTermsToIndex"/>.
         /// </summary>
-        /// <param name="directory">The <see cref="FSDirectory"/> where the index files have been written.</param>
+        /// <param name="mainDir">The <see cref="FSDirectory"/> where the index files have been written.</param>
+        /// <param name="facetDir">The <see cref="FSDirectory"/> where the facet index files have been written.</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>The <see cref="MaxFeatures"/> top-scoring terms in the index.</returns>
-        private string[] GetTopScoringTerms(FSDirectory directory,
-            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+        private string[] GetTopScoringTerms(FSDirectory mainDir, FSDirectory facetDir,
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             // Collect all terms (words and shingles)
-            using (var reader = DirectoryReader.Open(directory, true))
+            using (var reader = DirectoryReader.Open(mainDir))
+            using (var taxoReader = new DirectoryTaxonomyReader(facetDir))
             {
-                var searcher = new SimpleFacetedSearch(reader, "category");
+                FacetsConfig config = new FacetsConfig();
+                var facetCollector = new FacetsCollector();
+                var indexSearcher = new IndexSearcher(reader);
                 Query allDocsQuery = new MatchAllDocsQuery();
-                var allDocsHits = searcher.Search(allDocsQuery);
-                int numberOfExamples = (int)allDocsHits.TotalHitCount;
-                int numberOfCategories = allDocsHits.HitsPerFacet.Length;
+                FacetsCollector.Search(indexSearcher, allDocsQuery, int.MaxValue, facetCollector); 
+                Facets facets = new FastTaxonomyFacetCounts(taxoReader, config, facetCollector);
+                var results = facets.GetAllDims(int.MaxValue).First().LabelValues;
+
+                int numberOfExamples = (int)results.Sum(result => result.Value);
+                int numberOfCategories = results.Count();
 
                 // Store the number of documents for each category in order to normalize term frequency numbers
                 var documentsForCategory = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                foreach (var hitsPerFacet in allDocsHits.HitsPerFacet)
+                foreach (var category in results)
                 {
-                    documentsForCategory[hitsPerFacet.Name[0]] = (int)hitsPerFacet.HitCount;
+                    documentsForCategory[category.Label] = (int)category.Value;
                 }
 
-                var terms = reader.Terms();
-                var topTerms = IterateUntilFalse(() => !cancellationToken.IsCancellationRequested && terms.Next())
-                    .Select(_ => terms.Term)
-                    .Where(term => term.Field != "category")
-                    .Select(term =>
+                TermInfo getTermInfo(Term term)
+                {
+                    double augmentedTermFrequency = 0.0;
+                    var query = new TermQuery(term);
+                    facetCollector = new FacetsCollector();
+                    var hits = FacetsCollector.Search(indexSearcher, query, int.MaxValue, facetCollector);
+                    facets = new FastTaxonomyFacetCounts(taxoReader, config, facetCollector);
+                    results = facets.GetAllDims(int.MaxValue).First().LabelValues;
+                    foreach (var category in results)
                     {
-                        double augmentedTermFrequency = 0.0;
-                        var query = new TermQuery(term);
-                        var hits = searcher.Search(query);
-                        var categoriesForTerm = hits.HitsPerFacet
-                            .Where(h => h.HitCount > 0)
-                            .ToList();
-                        foreach (var category in categoriesForTerm)
-                        {
-                            var categoryName = category.Name[0];
-                            double tf = category.HitCount;
-                            // Because using a DistinctFilter, the maximum possible term frequency for a category
-                            // is the number of documents in that category. Use this number to normalize the
-                            // term-frequency number.
-                            double maxTf = documentsForCategory[categoryName];
-                            augmentedTermFrequency += tf / maxTf;
-                        }
-                        updateStatus(new StatusArgs { StatusMessage = "Scoring Terms... Terms processed: {0:N0}", Int32Value = 1 });
+                        var categoryName = category.Label;
+                        double tf = category.Value;
+                        double maxTf = documentsForCategory[categoryName];
+                        augmentedTermFrequency += tf / maxTf;
+                    }
+                    updateStatus(new StatusArgs { StatusMessage = "Scoring Terms... Terms processed: {0:N0}", Int32Value = 1 });
 
-                        return new TermInfo(
-                            text: term.Text,
-                            termFrequency: augmentedTermFrequency,
-                            documentFrequency: hits.TotalHitCount,
-                            numberOfExamples: numberOfExamples,
-                            numberOfCategories: numberOfCategories);
-                    })
+                    var termInfo = new TermInfo(
+                        text: term.Text(),
+                        termFrequency: augmentedTermFrequency,
+                        documentFrequency: hits.TotalHits,
+                        numberOfExamples: numberOfExamples,
+                        numberOfCategories: numberOfCategories);
+                    return termInfo;
+                }
+                var terms = MultiFields.GetTerms(reader, "shingles")?.GetIterator(null);
+                var topTerms = IterateUntilFalse(() => !cancellationToken.IsCancellationRequested && terms?.Next() != null)
+                    .Select(_ => new Term("shingles", terms.Term))
+                    .Select(getTermInfo)
                     .OrderByDescending(termInfo => termInfo.TermFrequencyInverseDocumentFrequency)
                     .ThenBy(o => o.Text)
                     .Take(MaxFeatures)
@@ -792,19 +828,34 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="input">The source text.</param>
         /// <returns>The <see cref="TokenFilter"/></returns>
-        private TokenFilter GetTokenStream(string input)
+        private TokenStream GetTokenStream(string input)
         {
-            var reader = new System.IO.StringReader(input.ToUpper(System.Globalization.CultureInfo.InvariantCulture));
-            var tokenizer = new StandardTokenizer(Lucene.Net.Util.Version.LUCENE_30, reader);
-            var stdFilter = new StandardFilter(tokenizer);
-            var lengthFilter = new LengthFilter(stdFilter, 2, 500);
-            TokenFilter shingleFilter = lengthFilter;
+            var reader = new StringReader(input.ToUpper(System.Globalization.CultureInfo.InvariantCulture));
+            TokenStream result = new StandardTokenizer(_LUCENE_VERSION, reader);
+            result = new StandardFilter(_LUCENE_VERSION, result);
+
+            // With LUCENE_30, the StandardFilter already handles possessives but starting with the next version
+            // it doesn't so the EnglishPossessiveFilter needs to be added to the chain
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (_LUCENE_VERSION > LuceneVersion.LUCENE_30)
+            {
+                result = new EnglishPossessiveFilter(_LUCENE_VERSION, result);
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            // To maintain LUCENE 3.03 behavior, the deprecated setPositionIncrements=false setting
+            // is necessary or else single character tokens that the length filter removes will be replaced with underscores
+            // by the shingle filter (NOTE: this will not work starting with LUCENE_44)
+#pragma warning disable CS0618 // Type or member is obsolete
+            result = new LengthFilter(_LUCENE_VERSION, false, result, 2, 500);
+#pragma warning restore CS0618 // Type or member is obsolete
+
             if (ShingleSize > 1)
             {
-                shingleFilter = new ShingleFilter(lengthFilter, ShingleSize);
+                result = new ShingleFilter(result, ShingleSize);
             }
-            var distinctFilter = new DistinctFilter(shingleFilter);
-            return distinctFilter;
+            result = new DistinctFilter(result);
+            return result;
         }
 
         /// <summary>
@@ -812,12 +863,15 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="input">The source text.</param>
         /// <returns>An enumeration of distinct, upper-case string values</returns>
-        internal IEnumerable<string> GetTerms(string input)
+        public IEnumerable<string> GetTerms(string input)
         {
-            using(var stream = GetTokenStream(input))
-            while(stream.IncrementToken())
+            using (var stream = GetTokenStream(input))
             {
-                yield return stream.GetAttribute<ITermAttribute>().Term;
+                stream.Reset();
+                while (stream.IncrementToken())
+                {
+                    yield return stream.GetAttribute<ICharTermAttribute>().ToString();
+                }
             }
         }
 
@@ -829,6 +883,31 @@ namespace Extract.AttributeFinder
             _bagOfWords = null;
         }
 
+        /// <summary>
+        /// Called when deserializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+            _version = 1;
+        }
+
+        /// <summary>
+        /// Called when deserialized
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            ExtractException.Assert("ELI45477", "Cannot load newer SpatialStringFeatureVectorizer",
+                _version <= _CURRENT_VERSION,
+                "Current version", _CURRENT_VERSION,
+                "Version to load", _version);
+
+            _version = _CURRENT_VERSION;
+        }
+
         #endregion Private Methods
 
         #region Private Classes
@@ -836,7 +915,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Token filter that produces only distinct terms for each input
         /// </summary>
-        private class DistinctFilter : TokenFilter
+        private sealed class DistinctFilter : TokenFilter
         {
             private HashSet<string> tokensSeen = new HashSet<string>();
             public DistinctFilter(TokenStream tokenStream)
@@ -844,9 +923,9 @@ namespace Extract.AttributeFinder
 
             public override bool IncrementToken()
             {
-                while (input.IncrementToken())
+                while (m_input.IncrementToken())
                 {
-                    string currentTerm = input.GetAttribute<ITermAttribute>().Term;
+                    string currentTerm = m_input.GetAttribute<ICharTermAttribute>().ToString();
                     if (tokensSeen.Add(currentTerm))
                     {
                         return true;

@@ -1,5 +1,4 @@
 ﻿using Accord.MachineLearning.VectorMachines;
-using Accord.MachineLearning.VectorMachines.Learning;
 using Accord.Math;
 using Accord.Statistics;
 using Accord.Statistics.Analysis;

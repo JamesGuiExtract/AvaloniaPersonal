@@ -1,4 +1,5 @@
-﻿using Extract.Utilities.Forms;
+﻿using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -37,7 +38,7 @@ namespace Extract.DataEntry
                 {
                     var old = _providerSource;
                     _providerSource = value;
-                    Provider = _providerSource.GetSuggestions;
+                    Provider = s => _providerSource.GetSuggestions(s);
                     old?.Dispose();
                 }
             }

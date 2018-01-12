@@ -1,12 +1,15 @@
 ﻿using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
+using opennlp.tools.namefind;
+using opennlp.tools.sentdetect;
+using opennlp.tools.tokenize;
+using opennlp.tools.util.model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
+using System.Globalization;
 using System.Linq;
-using System.Runtime.Caching;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -14,11 +17,6 @@ using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
-using opennlp.tools.sentdetect;
-using opennlp.tools.util.model;
-using opennlp.tools.tokenize;
-using opennlp.tools.namefind;
-using System.Globalization;
 
 namespace Extract.AttributeFinder.Rules
 {
@@ -140,7 +138,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         const string _COMPONENT_DESCRIPTION = "Named entity recognition finder";
 
-        const string _AUTO_ENCRYPT_KEY = @"Software\Extract Systems\AttributeFinder\Settings\AutoEncrypt";
         /// <summary>
         /// Current version.
         /// </summary>
@@ -155,21 +152,6 @@ namespace Extract.AttributeFinder.Rules
         const LicenseIdName _LICENSE_ID = LicenseIdName.FlexIndexIDShieldCoreObjects;
 
         #endregion Constants
-
-        #region Static Fields
-
-        /// <summary>
-        /// Locks to prevent multiple threads from trying to load the same model into cache
-        /// </summary>
-        static ConcurrentDictionary<string, object> _locks =
-            new ConcurrentDictionary<string, object>(StringComparer.Ordinal);
-
-        /// <summary>
-        /// Used to get data from encrypted files
-        /// </summary>
-        static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtilsClass());
-
-        #endregion Static Fields
 
         #region Fields
 
@@ -1019,31 +1001,18 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
-                var cache = MemoryCache.Default;
-                var fullPath = Path.GetFullPath(modelPath);
-                var model = cache.Get(fullPath) as TModel;
-                if (model == null)
-                {
-                    lock (_locks.GetOrAdd(fullPath, _ => new object()))
+                var model = FileDerivedResourceCache.GetCachedObject(
+                    path: modelPath,
+                    creator: () =>
                     {
-                        model = cache.Get(fullPath) as TModel;
-                        if (model == null)
-                        {
-                            CacheItemPolicy policy = new CacheItemPolicy();
-                            policy.ChangeMonitors.Add(new HostFileChangeMonitor(new[] { fullPath }));
-                            if (fullPath.EndsWith(".etf", StringComparison.OrdinalIgnoreCase))
-                            {
-                                _miscUtils.Value.AutoEncryptFile(fullPath, _AUTO_ENCRYPT_KEY);
-                                policy.ChangeMonitors.Add(new HostFileChangeMonitor(new[] { Path.ChangeExtension(fullPath, null) }));
-                            }
-                            var str = _miscUtils.Value.GetBase64StringFromFile(fullPath);
+                            var str = FileDerivedResourceCache.ThreadLocalMiscUtils.GetBase64StringFromFile(modelPath);
                             var bytes = Convert.FromBase64String(str);
                             var modelIn = new java.io.ByteArrayInputStream(bytes);
-                            model = thunk(modelIn);
-                            cache.Set(fullPath, model, policy);
-                        }
-                    }
-                }
+                            return thunk(modelIn);
+                    },
+                    slidingExpiration: TimeSpan.MaxValue,
+                    removedCallback: x => (x.CacheItem.Value as IDisposable)?.Dispose());
+
                 return model;
             }
             catch (Exception ex)

@@ -595,6 +595,32 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Generate all permutations of an enumerable
+        /// </summary>
+        /// <typeparam name="T">The type of the enumerable element</typeparam>
+        /// <param name="list">The enumerable to get permutations of</param>
+        /// <param name="length">The length of each permutation</param>
+        /// <returns>An enumeration of permutions of the input</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public static IEnumerable<IEnumerable<T>> GetPermutations<T>(this IEnumerable<T> list, int length)
+        {
+            try
+            {
+                if (length == 1)
+                {
+                    return list.Select(t => new T[] { t });
+                }
+
+                return GetPermutations(list, length - 1)
+                    .SelectMany(t => list.Where(o => !t.Contains(o)),
+                        (t1, t2) => t1.Concat(new T[] { t2 }));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45450");
+            }
+        }
 
         #endregion Public Methods
     }

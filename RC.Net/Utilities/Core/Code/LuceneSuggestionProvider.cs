@@ -1,23 +1,22 @@
-﻿using Extract.Utilities;
-using Lucene.Net.Analysis;
-using Lucene.Net.Analysis.Standard;
+﻿using Lucene.Net.Analysis;
+using Lucene.Net.Analysis.Synonym;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using Lucene.Net.QueryParsers;
+using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
 using Lucene.Net.Search.Spans;
 using Lucene.Net.Store;
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Extract.DataEntry
+namespace Extract.Utilities
 {
-    class LuceneSuggestionProvider<T> : IDisposable
+    public class LuceneSuggestionProvider<T> : IDisposable
     {
 
         #region Fields
@@ -25,21 +24,12 @@ namespace Extract.DataEntry
         FSDirectory _directory;
         Analyzer _analyzer;
         DirectoryInfo _tempDirectory;
+        private DirectoryReader _directoryReader;
         IndexSearcher _searcher;
         List<string> _items = new List<string>();
         HashSet<string> _fields = new HashSet<string>();
 
         #endregion Fields
-
-        #region Properties
-
-        /// <summary>
-        /// The maximum number of items to be returned by <see cref="GetSuggestions(string)"/>.
-        /// Default is <see cref="int.MaxValue"/>
-        /// </summary>
-        public int MaxSuggestions { get; set; } = int.MaxValue;
-
-        #endregion Properties
 
         #region Constructors
 
@@ -50,10 +40,13 @@ namespace Extract.DataEntry
         /// <param name="nameExtractor">A function that returns the name of the suggestion
         /// (the value that will be listed by <see cref="GetSuggestions(string)"/>)</param>
         /// <param name="fieldValuesExtractor">Function to get one or more searchable fields</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public LuceneSuggestionProvider(
             IEnumerable<T> suggestionsSource,
             Func<T, string> nameExtractor,
-            Func<T, IEnumerable<KeyValuePair<string, string>>> fieldValuesExtractor)
+            Func<T, IEnumerable<KeyValuePair<string, string>>> fieldValuesExtractor,
+            SynonymMap synonyms = null
+            )
         {
             try
             {
@@ -65,33 +58,34 @@ namespace Extract.DataEntry
                 string tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 _tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
                 _directory = FSDirectory.Open(_tempDirectory);
-                _analyzer = new WhitespacePlusAnalyzer();
-                using (var writer = new IndexWriter(_directory, _analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED))
+                _analyzer = new LuceneSuggestionAnalyzer { Synonyms = synonyms };
+                using (var writer = new IndexWriter(_directory, new IndexWriterConfig(Lucene.Net.Util.LuceneVersion.LUCENE_48, _analyzer)))
                 {
+                    int rank = 0;
                     foreach (var suggestion in suggestionsSource)
                     {
                         var name = nameExtractor(suggestion);
                         _items.Add(name);
                         var doc = new Document();
-                        doc.Add(new Field("Name", name, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                        doc.Add(new StringField("Name", name, Field.Store.YES));
+                        doc.Add(new StringField("Rank", (rank++).ToString(CultureInfo.InvariantCulture), Field.Store.YES));
 
                         foreach (var (f, value) in fieldValuesExtractor(suggestion))
                         {
-                            // Ensure no collision with Name field
+                            // Ensure no collision with built-in fields
                             var field = "_" + f;
                             _fields.Add(field);
                             if (!string.IsNullOrWhiteSpace(value))
                             {
-                                doc.Add(new Field(field, value, Field.Store.YES, Field.Index.ANALYZED));
+                                doc.Add(new TextField(field, value, Field.Store.YES));
                             }
                         }
                         writer.AddDocument(doc);
                     }
-                    writer.Optimize();
                     writer.Commit();
                 }
-
-                _searcher = new IndexSearcher(_directory, true);
+                _directoryReader = DirectoryReader.Open(_directory);
+                _searcher = new IndexSearcher(_directoryReader);
             }
             catch (Exception ex)
             {
@@ -106,21 +100,47 @@ namespace Extract.DataEntry
         /// <summary>
         /// Get suggestions for a search string
         /// </summary>
-        /// <param name="searchString">The substring or related phrase to search with</param>
-        public IEnumerable<string> GetSuggestions(string searchString)
+        /// <param name="searchPhrase">The substring or related phrase to search with</param>
+        /// <param name="maxSuggestions">The maximim number of suggestions to return</param>
+        public IEnumerable<string> GetSuggestions(string searchPhrase, int maxSuggestions = int.MaxValue)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(searchString) || _items.Count == 0)
+                if (string.IsNullOrWhiteSpace(searchPhrase) || _items.Count == 0)
                 {
                     return _items;
                 }
+                else
+                {
+                    return GetSuggestionsAndScores(searchPhrase, maxSuggestions).Select(t => t.Item1);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45447");
+            }
+        }
 
-                var trimmed = searchString.Trim();
-                var escaped = QueryParser.Escape(trimmed);
+        /// <summary>
+        /// Get suggestions for a search string
+        /// </summary>
+        /// <param name="searchPhrase">The substring or related phrase to search with</param>
+        /// <param name="maxSuggestions">The maximim number of suggestions to return</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public IEnumerable<Tuple<string, double>> GetSuggestionsAndScores(string searchPhrase, int maxSuggestions = int.MaxValue)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(searchPhrase) || _items.Count == 0)
+                {
+                    return _items.Select(s => Tuple.Create(s, 0.0));
+                }
 
-                // The analyzer lower-cases the terms so convert the search string to match
-                var terms = Regex.Replace(trimmed.ToLower(CultureInfo.CurrentCulture), @"[\W-[%#]]", " ")
+                var trimmed = searchPhrase.Trim();
+                var escaped = QueryParserBase.Escape(trimmed);
+
+                // The analyzer lower-cases and stems the terms so convert the search string to match
+                var terms = Regex.Replace(LuceneSuggestionAnalyzer.ProcessString(trimmed), @"[\W-[%#]]", " ")
                     .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                 var query = new BooleanQuery();
@@ -128,9 +148,8 @@ namespace Extract.DataEntry
                 {
                     // Parse the search string into a query clause using the same analyzer
                     // that was used for building the index
-                    var parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, field, _analyzer);
+                    var parser = new QueryParser(Lucene.Net.Util.LuceneVersion.LUCENE_48, field, _analyzer);
                     var clause = parser.Parse(escaped);
-                    clause.Boost = field == "Name" ? 2 : 1;
                     query.Add(clause, Occur.SHOULD);
 
                     if (terms.Any())
@@ -140,27 +159,26 @@ namespace Extract.DataEntry
                         // the term appears as the first term in the field
                         clause = new SpanFirstQuery(new SpanTermQuery(
                             new Term(field, terms.First())), 1);
-                        clause.Boost = field == "Name" ? 2 : 1;
                         query.Add(clause, Occur.SHOULD);
 
                         // Add a wildcard query based on the last term, since this
                         // is likely an incomplete word being typed
                         var lastTerm = terms.Last();
                         clause = new WildcardQuery(new Term(field, lastTerm + "*"));
-                        clause.Boost = field == "Name" ? 2 : 1;
                         query.Add(clause, Occur.SHOULD);
 
                         // Add a fuzzy query for the last term in case it is a complete word
-                        clause = new FuzzyQuery(new Term(field, lastTerm), 0.5f);
-                        clause.Boost = field == "Name" ? 2 : 1;
-                        query.Add(clause, Occur.SHOULD);
+                        if (lastTerm.Length > 1)
+                        {
+                            clause = new FuzzyQuery(new Term(field, lastTerm), lastTerm.Length > 3 ? 2 : 1);
+                            query.Add(clause, Occur.SHOULD);
+                        }
                     }
 
                     // Add a fuzzy query for each term except the last, which was added above.
-                    foreach (var term in terms.Take(terms.Length - 1))
+                    foreach (var term in terms.Take(terms.Length - 1).Where(t => t.Length > 1))
                     {
-                        clause = new FuzzyQuery(new Term(field, term), 0.5f);
-                        clause.Boost = field == "Name" ? 2 : 1;
+                        clause = new FuzzyQuery(new Term(field, term), term.Length > 3 ? 2 : 1);
                         query.Add(clause, Occur.SHOULD);
                     }
 
@@ -169,18 +187,22 @@ namespace Extract.DataEntry
                     query.Add(new MatchAllDocsQuery(), Occur.SHOULD);
                 }
 
-                var topDocs = _searcher.Search(query, MaxSuggestions);
+                var topDocs = _searcher.Search(query, maxSuggestions);
                 var scoreDocs = topDocs.ScoreDocs;
+
+                // Order by descending score, then by rank, which is the original ordering of the targets
                 return scoreDocs
                     .Select(d => (name: _searcher.Doc(d.Doc).Get("Name"),
-                                  score: d.Score))
-                    .OrderByDescending(d => d.score)
-                    .Select(d => d.name);
+                                  score: d.Score,
+                                  rank: _searcher.Doc(d.Doc).Get("Rank")))
+                    .OrderByDescending(t => t.score)
+                    .ThenBy(t => t.rank)
+                    .Select(t => Tuple.Create<string, double>(t.name, t.score));
             }
             catch (Exception ex)
             {
                 ex.ExtractLog("ELI45356");
-                return Enumerable.Empty<string>();
+                return Enumerable.Empty<Tuple<string, double>>();
             }
         }
 
@@ -198,7 +220,7 @@ namespace Extract.DataEntry
                 {
                     _analyzer?.Dispose();
                     _directory?.Dispose();
-                    _searcher?.Dispose();
+                    _directoryReader?.Dispose();
                 }
 
                 // Delete index
@@ -208,7 +230,6 @@ namespace Extract.DataEntry
                     {
                         try
                         {
-                            // FileSystemMethods.DeleteFile(file);
                             File.Delete(file);
                         }
                         catch
@@ -226,20 +247,12 @@ namespace Extract.DataEntry
             }
         }
 
-        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
-        #endregion
-    }
 
-    sealed class WhitespacePlusAnalyzer : Analyzer
-    {
-        public override TokenStream TokenStream(string fieldName, TextReader reader)
-        {
-            return new LowerCaseFilter(new WhitespaceTokenizer(reader));
-        }
+        #endregion
     }
 }
