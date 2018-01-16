@@ -459,6 +459,7 @@ namespace Extract.DataEntry.LabDE
                             + " WHERE [ESComponent].[Code] IN ('"
                             + string.Join("','", esCodesToNames.Keys.Select(code => code.Replace("'", "''")))
                             + "')";
+                    dt = DBMethods.ExecuteDBQuery(componentDataDB, query);
                     foreach (DataRow row in dt.Rows)
                     {
                         string code = ((string)row.ItemArray[0]);
