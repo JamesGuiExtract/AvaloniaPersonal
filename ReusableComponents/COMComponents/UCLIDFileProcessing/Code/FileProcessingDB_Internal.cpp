@@ -1714,6 +1714,11 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE_INDEX);
 		vecQueries.push_back(gstrADD_MLDATA_MLMODEL_FK);
 		vecQueries.push_back(gstrADD_MLDATA_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_DATABASE_SERVICE_FK);
+		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_ACTION_FK);
+		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_TASK_CLASS_FK);
+		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_FILE_TASK_SESSION_FK);
 
 		if (bAddUserTables)
 		{
@@ -1886,6 +1891,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE);
 	vecQueries.push_back(gstrCREATE_MLMODEL);
 	vecQueries.push_back(gstrCREATE_MLDATA);
+	vecQueries.push_back(gstrCREATE_REPORTING_VERIFICATION_RATES);
 
 	return vecQueries;
 }
@@ -3372,6 +3378,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrMLDATA);
 	vecTables.push_back(gstrWEB_APP_CONFIG);
 	vecTables.push_back(gstrDATABASE_SERVICE);
+	vecTables.push_back(gstrREPORTING_VERIFICATION_RATES);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

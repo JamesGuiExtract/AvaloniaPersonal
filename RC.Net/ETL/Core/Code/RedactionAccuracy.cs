@@ -180,7 +180,7 @@ namespace Extract.ETL
             {
                 _processing = true;
 
-                using (var connection = new SqlConnection(getConnectionString()))
+                using (var connection = getNewSqlDbConnection())
                 {
                     // Open the connection
                     connection.Open();
@@ -368,22 +368,6 @@ namespace Extract.ETL
             }
 
             Version = CURRENT_VERSION;
-        }
-
-        /// <summary>
-        /// Returns the connection string using the configured DatabaseServer and DatabaseName
-        /// </summary>
-        /// <returns>Connection string to connect to the configured DatabaseServer and DatabaseName</returns>
-        string getConnectionString()
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return sqlConnectionBuild.ConnectionString;
         }
 
         /// <summary>

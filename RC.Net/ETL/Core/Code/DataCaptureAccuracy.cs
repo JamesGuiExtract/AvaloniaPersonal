@@ -179,7 +179,7 @@ namespace Extract.ETL
             {
                 _processing = true;
 
-                using (var connection = new SqlConnection(getConnectionString()))
+                using (var connection = getNewSqlDbConnection())
                 {
                     // Open the connection
                     connection.Open();
@@ -357,22 +357,6 @@ namespace Extract.ETL
         }
 
         /// <summary>
-        /// Returns the connection string using the configured DatabaseServer and DatabaseName
-        /// </summary>
-        /// <returns>Connection string to connect to the configured DatabaseServer and DatabaseName</returns>
-        string getConnectionString()
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return sqlConnectionBuild.ConnectionString;
-        }
-
-        /// <summary>
         /// Adds the following parameters using the configured properties
         ///     @FoundSetName - Set to FoundAttributeSetName
         ///     @ExpectedSetName - Set to ExpectedAttributeSetName
@@ -392,7 +376,7 @@ namespace Extract.ETL
         /// <summary>
         /// Runs the query to remove the records that will be replaced
         /// </summary>
-        /// <param name="connection">Database connnection to perform the deletion</param>
+        /// <param name="connection">Database connection to perform the deletion</param>
         void deleteOldRecords(SqlConnection connection)
         {
             // Remove records to be replaced

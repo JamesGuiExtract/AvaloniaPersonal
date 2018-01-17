@@ -2083,3 +2083,51 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 	"	[Description] NVARCHAR(MAX) NULL, "
 	"	[Settings] NVARCHAR(MAX) NOT NULL, "
 	"   [Status] NVARCHAR(MAX) NULL) ";
+
+static const string gstrCREATE_REPORTING_VERIFICATION_RATES =
+	"CREATE TABLE [dbo].[ReportingVerificationRates]( "
+	"   [ID][int] IDENTITY(1, 1) NOT NULL CONSTRAINT[PK_ReportingVerificationRates] PRIMARY KEY NONCLUSTERED, "
+	"   [DatabaseServiceID] [INT] NOT NULL, "
+	"	[FileID] [int] NOT NULL, "
+	"	[ActionID] [int] NULL,"
+	"	[TaskClassID] [int] NOT NULL, "
+	"   [LastFileTaskSessionID] [int] NOT NULL, "
+	"	[Duration] [float] NOT NULL CONSTRAINT [DF_Duration] DEFAULT(0.0), "
+	"	[OverheadTime] [float] NOT NULL CONSTRAINT [DF_OverheadTime] DEFAULT(0.0), "
+	"	[ActiveMinutes][float] NOT NULL CONSTRAINT [DF_ActiveMinutes] DEFAULT(0.0) "
+	"   CONSTRAINT [IX_ReportingVerificationRatesFileActionTask] UNIQUE CLUSTERED([FileID],[ActionID],[TaskClassID],[DatabaseServiceID]))";
+
+
+static const std::string gstrADD_REPORTING_VERIFICATION_RATES_FAMFILE_FK =
+	"ALTER TABLE[dbo].[ReportingVerificationRates]  "
+	"	WITH CHECK ADD  CONSTRAINT [FK_ReportingVerificationRates_FAMFile] FOREIGN KEY([FileID]) "
+	"	REFERENCES[dbo].[FAMFile]([ID]) "
+	"	ON UPDATE CASCADE "
+	"	ON DELETE CASCADE";
+
+static const std::string gstrADD_REPORTING_VERIFICATION_RATES_DATABASE_SERVICE_FK =
+	"ALTER TABLE[dbo].[ReportingVerificationRates]  "
+	"	WITH CHECK ADD  CONSTRAINT [FK_ReportingVerificationRates_DatabaseService] FOREIGN KEY([DatabaseServiceID]) "
+	"	REFERENCES[dbo].[DatabaseService]([ID]) "
+	"	ON UPDATE CASCADE "
+	"	ON DELETE CASCADE";
+
+static const std::string gstrADD_REPORTING_VERIFICATION_RATES_ACTION_FK =
+	"ALTER TABLE[dbo].[ReportingVerificationRates]  "
+	"	WITH CHECK ADD  CONSTRAINT [FK_ReportingVerificationRates_Action] FOREIGN KEY([ActionID]) "
+	"	REFERENCES[dbo].[Action]([ID]) "
+	"	ON UPDATE CASCADE "
+	"	ON DELETE CASCADE";
+
+static const std::string gstrADD_REPORTING_VERIFICATION_RATES_TASK_CLASS_FK =
+	"ALTER TABLE[dbo].[ReportingVerificationRates]  "
+	"	WITH CHECK ADD  CONSTRAINT [FK_ReportingVerificationRates_TaskClass] FOREIGN KEY([TaskClassID]) "
+	"	REFERENCES[dbo].[TaskClass]([ID]) "
+	"	ON UPDATE CASCADE "
+	"	ON DELETE CASCADE";
+static const std::string gstrADD_REPORTING_VERIFICATION_RATES_FILE_TASK_SESSION_FK =
+	"ALTER TABLE[dbo].[ReportingVerificationRates]  "
+	"	WITH CHECK ADD  CONSTRAINT [FK_ReportingVerificationRates_FileTaskSession] FOREIGN KEY([LastFileTaskSessionID]) "
+	"	REFERENCES[dbo].[FileTaskSession]([ID]) "
+	"	ON UPDATE CASCADE "
+	"	ON DELETE CASCADE";

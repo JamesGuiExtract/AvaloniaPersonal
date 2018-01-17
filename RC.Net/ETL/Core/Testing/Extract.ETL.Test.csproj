@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="TestAccuracyServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestDocumentVerificationRatesService.cs" />
     <Compile Include="TestRedactionAccuracyServices.cs" />
     <Compile Include="TestAttributeExpander.cs" />
   </ItemGroup>
@@ -158,6 +159,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\ExpandAttribute_ExpectedResults.bak" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\TestImage001.tif" />
+    <EmbeddedResource Include="Resources\TestImage002.tif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

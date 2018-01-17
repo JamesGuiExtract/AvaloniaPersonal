@@ -1,6 +1,7 @@
 ﻿using Extract.Utilities;
 using Newtonsoft.Json;
 using System;
+using System.Data.SqlClient;
 using System.Runtime.Serialization;
 
 namespace Extract.ETL
@@ -92,7 +93,7 @@ namespace Extract.ETL
             try
             {
                 return JsonConvert.SerializeObject(this,
-                    new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+                    new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects, Formatting = Formatting.Indented });
             }
             catch (Exception ex)
             {
@@ -147,5 +148,25 @@ namespace Extract.ETL
         }
 
         #endregion IDisposable Members
+
+        #region Helper members
+
+        /// <summary>
+        /// Returns a connection to the configured database. Can be overridden if needed
+        /// </summary>
+        /// <returns>SqlConnection that connects to the <see cref="DatabaseServer"/> and <see cref="DatabaseName"/></returns>
+        protected virtual SqlConnection getNewSqlDbConnection()
+        {
+            // Build the connection string from the settings
+            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
+            sqlConnectionBuild.DataSource = DatabaseServer;
+            sqlConnectionBuild.InitialCatalog = DatabaseName;
+            sqlConnectionBuild.IntegratedSecurity = true;
+            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
+            sqlConnectionBuild.MultipleActiveResultSets = true;
+            return new SqlConnection( sqlConnectionBuild.ConnectionString);
+        }
+
+        #endregion
     }
 }

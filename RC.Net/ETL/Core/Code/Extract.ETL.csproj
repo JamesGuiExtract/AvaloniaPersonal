@@ -52,7 +52,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseService.cs" />
+    <Compile Include="DatabaseServiceStatus.cs" />
     <Compile Include="DataCaptureAccuracy.cs" />
+    <Compile Include="DocumentVerificationRates.cs" />
     <Compile Include="ExpandAttributes.cs" />
     <Compile Include="IDShieldAttributeComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -104,7 +106,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
     <COMReference Include="AttributeDbMgrComponentsLib">
       <Guid>{0DF6DB5B-F788-42FC-AE9E-EF19CAA78D38}</Guid>
