@@ -35,6 +35,11 @@ namespace Extract.DataEntry
         /// </summary>
         static readonly string _BLANK_VALUE = "[BLANK]";
 
+        /// <summary>
+        /// The default error message
+        /// </summary>
+        static readonly string _DEFAULT_ERROR_MESSAGE = "Invalid value";
+
         #endregion Constants
 
         #region Struct
@@ -103,7 +108,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The error message that should be displayed upon validation failure.
         /// </summary>
-        string _validationErrorMessage = "Invalid value";
+        string _validationErrorMessage = _DEFAULT_ERROR_MESSAGE;
 
         /// <summary>
         /// The error message that should be displayed instead of _validationErrorMessage based on
@@ -241,10 +246,7 @@ namespace Extract.DataEntry
 
             set
             {
-                ExtractException.Assert("ELI24323", "ValidationErrorMessage cannot be null!", 
-                    value != null);
-
-                _validationErrorMessage = value;
+                _validationErrorMessage = value ?? _DEFAULT_ERROR_MESSAGE;
             }
         }
 

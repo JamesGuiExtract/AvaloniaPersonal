@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
@@ -191,7 +190,7 @@ namespace Extract.Utilities
                                 }
                             }
 
-                            if (remainingTimeout >= 0 && !recheckEvent.WaitOne(remainingTimeout))
+                            if (!recheckEvent.WaitOne(remainingTimeout))
                             {
                                 throw new ExtractException("ELI39520",
                                     "Timeout waiting for next object in sequence.");

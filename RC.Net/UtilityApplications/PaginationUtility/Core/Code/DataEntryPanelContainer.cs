@@ -4,6 +4,7 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -22,6 +23,53 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// <seealso cref="Extract.UtilityApplications.PaginationUtility.IPaginationDocumentDataPanel" />
     public partial class DataEntryPanelContainer : UserControl, IPaginationDocumentDataPanel
     {
+        /// <summary>
+        /// Class to attach <see cref="PaginationPanel"/> specific properties to a
+        /// <see cref="DataEntryConfiguration"/>.
+        /// </summary>
+        class PaginationCustomSettings
+        {
+            /// <summary>
+            /// The data entry query text used to generate a summary for the document.
+            /// </summary>
+            public string SummaryQuery;
+
+            /// <summary>
+            /// Function that when set is to be used so that the panel can specify whether a
+            /// document is to be sent for rules reprocessing.
+            /// </summary>
+            public Func<DataEntryPaginationDocumentData, bool?> SendForReprocessingFunc;
+        }
+
+        /// <summary>
+        /// Struct that encapsulates document status meta-data to be displayed in a pagination
+        /// document header.
+        /// </summary>
+        struct DocumentStatus
+        {
+            /// <summary>
+            /// Indicates whether data for the document has been modified in the DEP.
+            /// </summary>
+            public bool DataModified;
+
+            /// <summary>
+            /// Indicates whether there is an active data validation error for the document's data.
+            /// </summary>
+            public bool DataError;
+
+            /// <summary>
+            /// Indicates whether this document is to be sent for reprocessing (or <c>null</c> to
+            /// make the determination based on whether pagination has been changed or pages have
+            /// been rotated.
+            /// </summary>
+            public bool? Reprocess;
+
+            /// <summary>
+            /// The summary text to display for the document.
+            /// </summary>
+            public string Summary;
+        }
+
         #region Fields
 
         /// <summary>
@@ -88,6 +136,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _loading;
 
+        /// <summary>
+        /// Configuration managers used for running UpdateDocumentStatus threads in the background.
+        /// </summary>
+        List<DataEntryConfigurationManager<Properties.Settings>> _backgroundConfigManagers =
+            new List<DataEntry.DataEntryConfigurationManager<Properties.Settings>>();
+
+        /// <summary>
+        /// Synchronizes access to _backgroundConfigManagers.
+        /// </summary>
+        object _lock = new object();
+
         #endregion Fields
 
         #region Constructors
@@ -147,6 +206,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _configManager = new DataEntryConfigurationManager<Properties.Settings>(
                     dataEntryApp, tagUtility, configSettings, imageViewer, _documentTypeComboBox);
 
+                _configManager.ConfigurationInitialized += HandleConfigManager_ConfigurationInitialized;
                 _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
                 _configManager.LoadDataEntryConfigurations(_expandedConfigFileName);
 
@@ -578,6 +638,32 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Event Handlers
 
         /// <summary>
+        /// Handles the ConfigurationInitialized event of the _configManager control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="ConfigurationInitializedEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleConfigManager_ConfigurationInitialized(object sender, ConfigurationInitializedEventArgs e)
+        {
+            try
+            {
+                var paginationPanel = e.DataEntryConfiguration.DataEntryControlHost as DataEntryDocumentDataPanel;
+                if (paginationPanel != null)
+                {
+                    e.DataEntryConfiguration.CustomBackgroundLoadSettings = new PaginationCustomSettings
+                    {
+                        SummaryQuery = paginationPanel.SummaryQuery,
+                        SendForReprocessingFunc = paginationPanel.SendForReprocessingFunc
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45514");
+            }
+        }
+
+        /// <summary>
         /// Handles the ConfigurationChanged event of the _configManager control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -664,6 +750,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _documentData.SetModified(AttributeStatusInfo.UndoManager.UndoOperationAvailable);
                     _documentData.SetDataError(ActiveDataEntryPanel.DataValidity == DataValidity.Invalid);
                     _documentData.SetSummary(ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString());
+                    if (ActiveDataEntryPanel.SendForReprocessingFunc != null)
+                    {
+                        _documentData.SetSendForReprocessing(ActiveDataEntryPanel.SendForReprocessingFunc(_documentData));
+                    }
                 }
             }
             catch (Exception ex)
@@ -828,13 +918,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// document status should be updated.</param>
         void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData)
         {
-            string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
-
             if (!_pendingDocumentStatusUpdate.TryAdd(documentData, 0))
             {
                 // Document status is already being updated.
                 return;
             }
+
+            string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
 
             var thread = new Thread(new ThreadStart(() =>
             {
@@ -878,10 +968,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             bool registeredThread = false;
             bool gotSemaphore = false;
             ExtractException ee = null;
-            bool dataModified = false;
-            bool dataError = false;
-            bool? reprocess = false;
-            string summary = null;
+
+            var documentStatus = new DocumentStatus() { Reprocess = false };
 
             try
             {
@@ -916,28 +1004,32 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return;
                 }
 
+                // Initialize the root directory the DataEntry framework should use when resolving
+                // relative paths.
+                DataEntryMethods.SolutionRootDirectory = Path.GetDirectoryName(_expandedConfigFileName);
+
                 var miscUtils = new MiscUtils();
                 var deserializedAttributes = (IUnknownVector)miscUtils.GetObjectFromStringizedByteStream(serializedAttributes);
 
-                using (var form = new InvisibleForm())
-                using (var imageViewer = new ImageViewer())
-                using (var tempPanel = new DataEntryPanelContainer(
-                    _expandedConfigFileName, _dataEntryApp, _tagUtility, imageViewer, StatusUpdateThreadManager))
+                var backgroundConfigManager = _configManager.CreateBackgroundManager();
+                lock (_lock)
                 {
-                    form.Show();
-                    form.Controls.Add(tempPanel);
-                    form.Controls.Add(imageViewer);
+                    _backgroundConfigManagers.Add(backgroundConfigManager);
+                }
 
-                    using (var tempData = new DataEntryPaginationDocumentData(deserializedAttributes, documentData.SourceDocName))
+                using (var tempData = new DataEntryPaginationDocumentData(deserializedAttributes, documentData.SourceDocName))
+                {
+                    AttributeStatusInfo.ShareDBConnections = true;
+
+                    if (backgroundConfigManager.ExecuteNoUILoad(tempData.Attributes, documentData.SourceDocName))
                     {
-                        tempPanel.LoadData(tempData, forDisplay: false);
-                        dataModified = tempPanel.UndoOperationAvailable;
-                        reprocess = tempData.SendForReprocessing;
-                        if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)
-                        {
-                            dataError = (tempPanel.ActiveDataEntryPanel.DataValidity == DataValidity.Invalid);
-                        }
-                        summary = tempPanel.ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString();
+                        AttributeStatusInfo.ShareDBConnections = false;
+
+                        documentStatus = GetDocumentStatusFromNoUILoad(backgroundConfigManager, tempData);
+                    }
+                    else
+                    {
+                        documentStatus = GetDocumentDataFromUILoad(tempData);
                     }
                 }
             }
@@ -974,10 +1066,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (_pendingDocumentStatusUpdate.ContainsKey(documentData))
                     {
-                        documentData.SetModified(dataModified);
-                        documentData.SetDataError(dataError);
-                        documentData.SetSummary(summary);
-                        documentData.SetSendForReprocessing(reprocess);
+                        documentData.SetModified(documentStatus.DataModified);
+                        documentData.SetDataError(documentStatus.DataError);
+                        documentData.SetSummary(documentStatus.Summary);
+                        documentData.SetSendForReprocessing(documentStatus.Reprocess);
                         documentData.SetInitialized();
                     }
                 }
@@ -985,8 +1077,90 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     int temp;
                     _pendingDocumentStatusUpdate.TryRemove(documentData, out temp);
+
+                    // Once any active batch of status updates is complete, clear shared cache data.
+                    if (_pendingDocumentStatusUpdate.Count == 0)
+                    {
+                        lock (_lock)
+                        {
+                            // Re-check that no status update is queued after locking.
+                            if (_pendingDocumentStatusUpdate.Count == 0)
+                            {
+                                AttributeStatusInfo.ClearProcessWideCache();
+
+                                CollectionMethods.ClearAndDispose(_backgroundConfigManagers);
+                            }
+                        }
+                    };
                 }
             });
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DocumentStatus"/> for the <see paramref="documentData"/> which have
+        /// been transformed by a no-UI load.
+        /// </summary>
+        /// <param name="backgroundConfigManager">The configuration manager to use.</param>
+        /// <param name="documentData"><see cref="DataEntryPaginationDocumentData"/> representing
+        /// the document's data.</param>
+        /// <returns>The <see cref="DocumentStatus"/>.</returns>
+        static DocumentStatus GetDocumentStatusFromNoUILoad(DataEntryConfigurationManager<Properties.Settings> backgroundConfigManager,
+            DataEntryPaginationDocumentData documentData)
+        {
+            var documentStatus = new DocumentStatus();
+
+            documentStatus.DataModified = AttributeStatusInfo.UndoManager.UndoOperationAvailable;
+            if (!backgroundConfigManager.ActiveDataEntryConfiguration.Config.Settings.PerformanceTesting)
+            {
+                documentStatus.DataError =
+                    (AttributeStatusInfo.FindNextInvalidAttribute(documentData.Attributes, false, null, true, false) != null);
+            }
+            var customData = backgroundConfigManager.ActiveDataEntryConfiguration.CustomBackgroundLoadSettings as PaginationCustomSettings;
+            if (customData?.SummaryQuery != null)
+            {
+                var query = DataEntryQuery.Create(
+                    customData?.SummaryQuery,
+                    null,
+                    backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections());
+                documentStatus.Summary = query.Evaluate().ToString();
+            }
+            documentStatus.Reprocess = customData?.SendForReprocessingFunc?.Invoke(documentData);
+
+            return documentStatus;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DocumentStatus"/> for the <see paramref="documentData"/> by loading
+        /// it into DEP controls.
+        /// </summary>
+        /// <param name="backgroundConfigManager">The configuration manager to use.</param>
+        /// <param name="documentData"><see cref="DataEntryPaginationDocumentData"/> representing
+        /// the document's data.</param>
+        /// <returns>The <see cref="DocumentStatus"/>.</returns>
+        DocumentStatus GetDocumentDataFromUILoad(DataEntryPaginationDocumentData tempData)
+        {
+            var documentStatus = new DocumentStatus();
+
+            using (var form = new InvisibleForm())
+            using (var imageViewer = new ImageViewer())
+            using (var tempPanel = new DataEntryPanelContainer(
+                _expandedConfigFileName, _dataEntryApp, _tagUtility, imageViewer, StatusUpdateThreadManager))
+            {
+                form.Show();
+                form.Controls.Add(tempPanel);
+                form.Controls.Add(imageViewer);
+
+                tempPanel.LoadData(tempData, forDisplay: false);
+                documentStatus.DataModified = tempPanel.UndoOperationAvailable;
+                if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)
+                {
+                    documentStatus.DataError = (tempPanel.ActiveDataEntryPanel.DataValidity == DataValidity.Invalid);
+                }
+                documentStatus.Reprocess = tempData.SendForReprocessing;
+                documentStatus.Summary = tempPanel.ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString();
+            }
+
+            return documentStatus;
         }
 
         /// <summary>

@@ -568,7 +568,7 @@ namespace Extract.DataEntry
                     // cost.
                     AttributeStatusInfo.Validate(_targetAttribute, false);
 
-                    statusInfo.OwningControl.RefreshAttributes(false, _targetAttribute);
+                    statusInfo.OwningControl?.RefreshAttributes(false, _targetAttribute);
 
                     return true;
                 }
@@ -668,7 +668,7 @@ namespace Extract.DataEntry
 
                 // After applying the value, direct the control that contains it to
                 // refresh the value.
-                AttributeStatusInfo.GetOwningControl(_targetAttribute).
+                AttributeStatusInfo.GetOwningControl(_targetAttribute)?.
                     RefreshAttributes(queryResult.IsSpatial, _targetAttribute);
 
                 // https://extract.atlassian.net/browse/ISSUE-13506

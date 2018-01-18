@@ -150,10 +150,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
+                OnThumbnailRequested();
+
                 lock (_lock)
                 {
-                    OnThumbnailRequested();
-
                     return (_thumbnailImage != null && !_thumbnailImage.IsDisposed)
                         ? _thumbnailImage.Clone()
                         : null;

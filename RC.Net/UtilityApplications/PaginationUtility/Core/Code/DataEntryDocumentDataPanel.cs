@@ -4,6 +4,7 @@ using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -80,6 +81,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             get;
             set;
         }
+
+        /// <summary>
+        /// Function that when set is to be used so that the panel can specify whether a document is
+        /// to be sent for rules reprocessing.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public Func<DataEntryPaginationDocumentData, bool?> SendForReprocessingFunc = null;
 
         #endregion Properties
 
@@ -174,6 +183,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_imageViewer.Visible)
                 {
                     _documentData.SetSummary(SummaryDataEntryQuery?.Evaluate().ToString());
+                    if (SendForReprocessingFunc != null)
+                    {
+                        _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
+                    }
                     _documentData.SetModified(UndoOperationAvailable);
                     if (!Config.Settings.PerformanceTesting)
                     {
@@ -598,6 +611,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentData?.SetSummary(
                     SummaryDataEntryQuery?.Evaluate().ToString());
+                if (SendForReprocessingFunc != null)
+                {
+                    _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
+                }
             }
             catch (Exception ex)
             {

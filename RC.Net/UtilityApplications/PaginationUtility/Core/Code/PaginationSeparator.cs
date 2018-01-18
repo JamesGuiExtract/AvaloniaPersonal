@@ -68,6 +68,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _showSelectionCheckBox;
 
+        /// <summary>
+        /// Indicates whether document status information has been applied to this separator.
+        /// </summary>
+        bool _hasAppliedStatus;
+
+        /// <summary>
+        /// Indicates whether layout has been deferred because the separator is not currently visible.
+        /// </summary>
+        bool _deferredLayout;
+
         #endregion Fields
 
         #region Constructors
@@ -555,6 +565,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     Height = _tableLayoutPanel.Height;
                 }
 
+                if (_deferredLayout)
+                {
+                    UpdateControls();
+                }
+
+                _deferredLayout = false;
+
                 base.OnLayout(e);
             }
             catch (Exception ex)
@@ -792,30 +809,42 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool UpdateControls()
         {
+            if (!Parent.ClientRectangle.IntersectsWith(Bounds))
+            {
+                _deferredLayout = true;
+                return false;
+            }
+
             bool doLayout = false;
             if (Document != null)
             {
+                doLayout = _deferredLayout;
                 if (Document.PaginationSeparator != this)
                 {
                     Document.PaginationSeparator = this;
 
                     // Force a follow-up layout to occur after assigning this separator to a new document.
-                    doLayout = true;
+                    doLayout |= _hasAppliedStatus;
                     UpdateRequired = true;
                 }
             }
 
-            if (doLayout || Document?.DocumentData?.Initialized == true)
+            doLayout |= (Document?.DocumentData?.Initialized == true);
+
+            if (doLayout)
             {
-                _collapseDocumentButton.Visible = true;
+                _hasAppliedStatus = true;
                 _selectedCheckBox.Visible = _showSelectionCheckBox;
                 _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
+                _collapseDocumentButton.Visible = true;
                 _collapseDocumentButton.Image = Document.Collapsed
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;
                 _editDocumentDataButton.Visible =
                     Document.DocumentData != null && Document.DocumentData.AllowDataEdit;
+                _summaryLabel.Visible = true;
                 _summaryLabel.Text = Document.Summary;
+                _pagesLabel.Visible = true;
                 int pageCount = Document.PageControls.Count(c => !c.Deleted);
                 _pagesLabel.Text = string.Format(CultureInfo.CurrentCulture,
                     "{0} page{1}", pageCount, (pageCount == 1) ? "" : "s");
@@ -840,16 +869,20 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             else
             {
-                _collapseDocumentButton.Visible = false;
-                _selectedCheckBox.Visible = false;
-                _editDocumentDataButton.Visible = false;
-                _summaryLabel.Text = "";
-                _pagesLabel.Text = "";
-                _newDocumentGlyph.Visible = false;
-                _editedPaginationGlyph.Visible = false;
-                _reprocessDocumentPictureBox.Visible = false;
-                _editedDataPictureBox.Visible = false;
-                _dataErrorPictureBox.Visible = false;
+                if (_hasAppliedStatus)
+                {
+                    _hasAppliedStatus = false;
+                    _collapseDocumentButton.Visible = false;
+                    _selectedCheckBox.Visible = false;
+                    _editDocumentDataButton.Visible = false;
+                    _summaryLabel.Text = "";
+                    _pagesLabel.Text = "";
+                    _newDocumentGlyph.Visible = false;
+                    _editedPaginationGlyph.Visible = false;
+                    _reprocessDocumentPictureBox.Visible = false;
+                    _editedDataPictureBox.Visible = false;
+                    _dataErrorPictureBox.Visible = false;
+                }
 
                 return false;
             }

@@ -3148,7 +3148,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         if (e.SourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
                         {
-                            DataEntryControlHost.PruneNonPersistingAttributes(attributesCopy);
+                            DataEntryMethods.PruneNonPersistingAttributes(attributesCopy);
                         }
 
                         AttributeMethods.TranslateAttributesToNewDocument(

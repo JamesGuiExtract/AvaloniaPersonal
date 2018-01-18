@@ -599,6 +599,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return;
             }
 
+            var thumbnail = _page.ThumbnailImage;
+
             // Since the thumbnail may be changed by a background thread and we don't want the work
             // of the background worker to be held up waiting on messages currently being
             // handled in the UI thread, invoke the image change to occur on the UI thread.
@@ -608,7 +610,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (!IsDisposed && _page != null && !_page.IsDisposed)
                 {
                     // RasterPictureBox does dispose of the old image.
-                    _rasterPictureBox.Image = _page.ThumbnailImage;
+                    _rasterPictureBox.Image = thumbnail;
                     _rasterPictureBox.Invalidate();
                 }
             });

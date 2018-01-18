@@ -1938,7 +1938,7 @@ namespace Extract.DataEntry
                     _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
                     _mostRecentlySaveAttributes.ReportMemoryUsage();
 
-                    PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
+                    DataEntryMethods.PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
                     return _mostRecentlySaveAttributes;
                 }
@@ -1996,7 +1996,7 @@ namespace Extract.DataEntry
                             _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
                             _mostRecentlySaveAttributes.ReportMemoryUsage();
 
-                            PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
+                            DataEntryMethods.PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
                             OnDataSaving(_mostRecentlySaveAttributes, forCommit: validateData);
 
@@ -4616,43 +4616,6 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI36172");
-            }
-        }
-
-        /// <summary>
-        /// Removes all <see cref="IAttribute"/>s not marked as persistable from the provided
-        /// attribute hierarchy.
-        /// </summary>
-        /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
-        /// non-persistable attributes should be removed.</param>
-        internal static void PruneNonPersistingAttributes(IUnknownVector attributes)
-        {
-            try
-            {
-                int count = attributes.Size();
-                for (int i = 0; i < count; i++)
-                {
-                    IAttribute attribute = (IAttribute)attributes.At(i);
-                    if (AttributeStatusInfo.IsAttributePersistable(attribute))
-                    {
-                        PruneNonPersistingAttributes(attribute.SubAttributes);
-                    }
-                    else
-                    {
-                        attributes.Remove(i);
-                        count--;
-                        i--;
-
-                        // [DataEntry:693]
-                        // Since these attributes will no longer be accessed by the DataEntry,
-                        // the DataObject needs to be set to null to prevent handle leaks.
-                        attribute.DataObject = null;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI40243");
             }
         }
 

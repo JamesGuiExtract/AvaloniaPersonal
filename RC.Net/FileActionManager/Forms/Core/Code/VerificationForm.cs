@@ -171,7 +171,7 @@ namespace Extract.FileActionManager.Forms
         /// file is running on). The files are in order of the time that they entered the queue and,
         /// thus, will be processed in that same order.
         /// </summary>
-        Sequencer<int> _waitingFileSequencer = new Sequencer<int>(100);
+        Sequencer<int> _waitingFileSequencer = new Sequencer<int>(50);
 
         /// <summary>
         /// The IDs of all files for which a request has been made to delay processing.

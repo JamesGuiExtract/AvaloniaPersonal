@@ -458,12 +458,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<PageDeletedEventArgs> PageDeleted;
 
         /// <summary>
-        /// Raised when not all pages from a document could be loaded without exceeding
-        /// _MAX_LOADED_PAGES.
-        /// </summary>
-        public event EventHandler<PagesPendingLoadEventArgs> PagesPendingLoad;
-
-        /// <summary>
         /// Raised when references have been removed from pages and, therefore, some files may no
         /// longer be referenced.
         /// </summary>
@@ -1019,11 +1013,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                             .Contains(page.OriginalPageNumber))
                         .ToArray();
 
-                bool allPagesCanBeLoaded = true;
                 if (position == -1)
                 {
                     // Handle case that loading pagesToLoad would exceed _MAX_LOADED_PAGES.
-                    allPagesCanBeLoaded = CanAllPagesBeLoaded(ref pagesToLoad);
+                    AssertAllPagesBeLoaded(pagesToLoad.Length);
                 }
 
                 // Retrieve spatialPageInfos, which will trigger auto-page rotation, only if
@@ -1056,11 +1049,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
-                // As long as all pages could be loaded and we haven't appended to the end of an
-                // existing document, indicate that if the document is output in its present
-                // form, it can simply be copied to the output path rather than require it to be
-                // re-assembled.
-                if (allPagesCanBeLoaded && !usingExistingDocument)
+                // As long as we haven't appended to the end of an existing document, indicate that
+                // if the document is output in its present form, it can simply be copied to the
+                // output path rather than require it to be re-assembled.
+                if (!usingExistingDocument)
                 {
                     outputDocument.SetOriginalForm();
                 }
@@ -3751,39 +3743,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// without exceeding <see cref="PaginationUtilityForm._MAX_LOADED_PAGES"/> and if not takes
         /// appropriate action (including adjusting the pages in <see paramref="pagesToLoad"/>).
         /// </summary>
-        /// <param name="pagesToLoad">The <see cref="Page"/>s to load, if possible.</param>
-        /// <returns><see langword="true"/> if all pages can be loaded; otherwise,
-        /// <see langword="false"/>.</returns>
-        bool CanAllPagesBeLoaded(ref Page[] pagesToLoad)
+        /// <param name="pageCountToLoad">The number of <see cref="Page"/>s to about to be loaded.
+        /// </param>
+        void AssertAllPagesBeLoaded(int pageCountToLoad)
         {
-            int numToLoad = PaginationUtilityForm._MAX_LOADED_PAGES - PageCount;
-            int pagesInReserveCount = 0;
-            if (numToLoad < pagesToLoad.Length)
+            int remainingPages = PaginationUtilityForm._MAX_LOADED_PAGES - PageCount;
+            if (remainingPages < pageCountToLoad)
             {
-                MessageBox.Show("No more than " +
+                throw new ExtractException("ELI45516",
+                    "No more than " +
                     PaginationUtilityForm._MAX_LOADED_PAGES.ToString(CultureInfo.CurrentCulture) +
-                    " pages may be loaded at once.\r\n\r\n" +
-                    "Some pages have not been loaded. These pages will be loaded as\r\n" +
-                    "existing pages are output or deleted.", "Page limit reached",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
-
-                pagesInReserveCount = pagesToLoad.Length - numToLoad;
-                Page[] pagesInReserve = new Page[pagesInReserveCount];
-                Array.Copy(pagesToLoad, numToLoad, pagesInReserve, 0, pagesInReserveCount);
-                Array.Resize(ref pagesToLoad, numToLoad);
-
-                foreach (Page page in pagesInReserve)
-                {
-                    // So that a source document isn't considered "processed" before all pages have
-                    // been loaded into the UI, reference all pages pending load.
-                    page.AddReference(this);
-                }
-
-                OnPagesPendingLoad(pagesInReserve);
+                    " pages may be loaded at once.\r\n\r\n");
             }
-
-            return (pagesInReserveCount == 0);
         }
 
         /// <summary>
@@ -4652,19 +4623,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (eventHandler != null)
             {
                 eventHandler(this, new PageDeletedEventArgs(page, outputDocument));
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="PagesPendingLoad"/> event.
-        /// </summary>
-        /// <param name="pagesPendingLoad">The <see cref="Page"/>s are pending to be loaded.</param>
-        void OnPagesPendingLoad(Page[] pagesPendingLoad)
-        {
-            var eventHandler = PagesPendingLoad;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new PagesPendingLoadEventArgs(pagesPendingLoad));
             }
         }
 

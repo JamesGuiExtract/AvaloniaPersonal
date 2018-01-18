@@ -130,6 +130,11 @@ namespace Extract.DataEntry
         #region Events
 
         /// <summary>
+        /// Raised when each of this instances <see cref="DataEntryConfiguration"/>s has finished initializing.
+        /// </summary>
+        public event EventHandler<ConfigurationInitializedEventArgs> ConfigurationInitialized;
+
+        /// <summary>
         /// Raised when the active configuration is about to change (initial load or when doc type
         /// changes).
         /// </summary>
@@ -337,7 +342,7 @@ namespace Extract.DataEntry
                             throw ee;
                         }
 
-                        _documentTypeComboBox.Items.Add(documentType);
+                        _documentTypeComboBox?.Items.Add(documentType);
                         _documentTypeConfigurations[documentType] = config;
                     }
                     while (documentTypeNode.MoveToNext());
@@ -345,11 +350,71 @@ namespace Extract.DataEntry
                 while (configurationNode.MoveToNext());
 
                 // Register to be notified when the user selects a new document type.
-                _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeSelectedIndexChanged;
+                if (_documentTypeConfigurations != null)
+                {
+                    _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeSelectedIndexChanged;
+                }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41595");
+            }
+        }
+
+        /// <summary>
+        /// Creates a copy of this instance for use in background data loading.
+        /// </summary>
+        public DataEntryConfigurationManager<T> CreateBackgroundManager()
+        {
+            try
+            {
+                var manager = new DataEntryConfigurationManager<T>(
+                    new NullDataEntryApp(), _tagUtility, _applicationConfig, null, null);
+
+                manager._defaultDataEntryConfig = _defaultDataEntryConfig;
+                manager.ChangeActiveDocumentType(null, true);
+
+                if (_documentTypeConfigurations != null)
+                {
+                    manager._documentTypeConfigurations = new Dictionary<string, DataEntryConfiguration>();
+
+                    foreach (var configuration in _documentTypeConfigurations)
+                    {
+                        // Connections will be shared across background loading threads; establish
+                        // the connections to be shared.
+                        configuration.Value.OpenDatabaseConnections();
+
+                        // Create a background configuration as long as the configuration supports a NoUI load.
+                        DataEntryConfiguration backgroundConfig = null;
+                        if (configuration.Value.Config.Settings.SupportsNoUILoad)
+                        {
+                            backgroundConfig = configuration.Value.CreateNoUIConfiguration();
+                            manager._documentTypeConfigurations[configuration.Key] = backgroundConfig;
+                        }
+                        else
+                        {
+                            backgroundConfig = new DataEntryConfiguration(
+                                configuration.Value.Config, _tagUtility, configuration.Value.FileProcessingDB);
+                            manager._documentTypeConfigurations[configuration.Key] = backgroundConfig;
+                        }
+
+                        // Initialize active and default configurations
+                        if (_activeDataEntryConfig == configuration.Value)
+                        {
+                            manager._activeDataEntryConfig = backgroundConfig;
+                        }
+                        if (_defaultDataEntryConfig == configuration.Value)
+                        {
+                            manager._defaultDataEntryConfig = backgroundConfig;
+                        }
+                    }
+                }
+
+                return manager;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45509");
             }
         }
 
@@ -510,6 +575,8 @@ namespace Extract.DataEntry
                 }
                 config.ApplyObjectSettings(configuration.DataEntryControlHost);
 
+                OnConfigurationInitialized(configuration);
+
                 return configuration;
             }
             catch (Exception ex)
@@ -595,14 +662,17 @@ namespace Extract.DataEntry
                     GetDocumentTypeAttribute();
                     string documentType = _documentTypeAttribute?.Value.String;
 
-                    // If there is a default configuration, add the original document type to the
-                    // document type combo and allow the document to be saved with the undefined
-                    // document type.
-                    if (_defaultDataEntryConfig != null &&
-                        _documentTypeComboBox.FindStringExact(documentType) == -1)
+                    if (_documentTypeComboBox != null)
                     {
-                        _temporaryDocumentType = documentType;
-                        _documentTypeComboBox.Items.Insert(0, documentType);
+                        // If there is a default configuration, add the original document type to the
+                        // document type combo and allow the document to be saved with the undefined
+                        // document type.
+                        if (_defaultDataEntryConfig != null &&
+                            _documentTypeComboBox.FindStringExact(documentType) == -1)
+                        {
+                            _temporaryDocumentType = documentType;
+                            _documentTypeComboBox.Items.Insert(0, documentType);
+                        }
                     }
 
                     changedDocumentType = ChangeActiveDocumentType(documentType, true);
@@ -617,6 +687,36 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35079");
+            }
+        }
+
+        /// <summary>
+        /// Attempts to load and transform the <see paramref="attributes"/> without a UI.
+        /// </summary>
+        /// <param name="attributes">The attributes to load/transform</param>
+        /// <param name="sourceDocName">Name of the source document.</param>
+        /// <returns><c>true</c> if the data was loaded in the background; <c>false</c> if no UI
+        /// loading is not supported in this configuration.</returns>
+        public bool ExecuteNoUILoad(IUnknownVector attributes, string sourceDocName)
+        {
+            try
+            {
+                LoadCorrectConfigForData(attributes);
+                if (!ActiveDataEntryConfiguration.Config.Settings.SupportsNoUILoad)
+                {
+                    return false;
+                }
+
+                AttributeStatusInfo.ExecuteNoUILoad(attributes, sourceDocName,
+                    ActiveDataEntryConfiguration.GetDatabaseConnections(),
+                    ActiveDataEntryConfiguration.BackgroundFieldModels);
+                DataEntryMethods.PruneNonPersistingAttributes(attributes);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45511");
             }
         }
 
@@ -679,17 +779,20 @@ namespace Extract.DataEntry
                             SetDocumentTypeAttribute(documentType);
                         }
 
-                        if (blockedConfigurationChange ||
-                            _documentTypeComboBox.FindStringExact(documentType) == -1)
+                        if (_documentTypeComboBox != null)
                         {
-                            // The new documentType is not valid.
-                            _documentTypeComboBox.SelectedIndex = -1;
-                        }
-                        else
-                        {
-                            // Assign the new document type.
-                            _activeDocumentType = documentType;
-                            _documentTypeComboBox.Text = documentType;
+                            if (blockedConfigurationChange ||
+                                _documentTypeComboBox.FindStringExact(documentType) == -1)
+                            {
+                                // The new documentType is not valid.
+                                _documentTypeComboBox.SelectedIndex = -1;
+                            }
+                            else
+                            {
+                                // Assign the new document type.
+                                _activeDocumentType = documentType;
+                                _documentTypeComboBox.Text = documentType;
+                            }
                         }
                     }
                 }
@@ -827,6 +930,16 @@ namespace Extract.DataEntry
                 // not be able to be correctly saved.
                 OnConfigurationChangeError(ee);
             }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ConfigurationInitialized"/> event.
+        /// </summary>
+        /// <param name="dataEntryConfig">The <see cref="DataEntryConfiguration"/> that has been initialized.
+        /// </param>
+        void OnConfigurationInitialized(DataEntryConfiguration dataEntryConfig)
+        {
+            ConfigurationInitialized?.Invoke(this, new ConfigurationInitializedEventArgs(dataEntryConfig));
         }
 
         /// <summary>

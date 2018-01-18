@@ -2297,6 +2297,15 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Creates a <see cref="BackgroundFieldModel"/> for representing this control during
+        /// a background data load.
+        /// </summary>
+        public virtual BackgroundFieldModel GetBackgroundFieldModel()
+        {
+            return null;
+        }
+
         #endregion IDataEntryControl Members
 
         #region Abstract IDataEntryControl Members
@@ -2324,7 +2333,6 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/>s in which the control should find its mapping(s).</param>
         /// <seealso cref="IDataEntryControl"/>
         public abstract void SetAttributes(IUnknownVector sourceAttributes);
-
 
         /// <summary>
         /// Requests that the table process the supplied <see cref="SpatialString"/> as input.

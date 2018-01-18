@@ -1132,7 +1132,7 @@ namespace Extract.DataEntry
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(_attributeName,
                         _multipleMatchSelectionMode, !string.IsNullOrEmpty(_attributeName),
-                        sourceAttributes, null, this, 0, false, _tabStopMode, _validatorTemplate,
+                        sourceAttributes, null, this, null, false, _tabStopMode, _validatorTemplate,
                         _autoUpdateQuery, _validationQuery);
 
                     // Update the combo box using the new attribute's validator (if there is one).
@@ -1445,6 +1445,36 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI31071", ex);
+            }
+        }
+
+        /// <summary>
+        /// Creates a <see cref="BackgroundFieldModel"/> for representing this control during
+        /// a background data load.
+        /// </summary>
+        public BackgroundFieldModel GetBackgroundFieldModel()
+        {
+            try
+            {
+                var fieldModel = new BackgroundFieldModel()
+                {
+                    Name = AttributeName,
+                    ParentAttributeControl = ParentDataEntryControl,
+                    AutoUpdateQuery = AutoUpdateQuery,
+                    ValidationQuery = ValidationQuery,
+                    DisplayOrder = DataEntryMethods.GetTabIndices(this),
+                    IsViewable = Visible,
+                    PersistAttribute = PersistAttribute,
+                    ValidationErrorMessage = ValidationErrorMessage,
+                    ValidationPattern = ValidationPattern,
+                    ValidationCorrectsCase = ValidationCorrectsCase
+                };
+
+                return fieldModel;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45507");
             }
         }
 

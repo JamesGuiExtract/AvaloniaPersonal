@@ -30,7 +30,9 @@ namespace Extract.DataEntry
         // used in a multi-threaded FPS file, the connection (originally assigned via 
         // DataEntryQuery.Create()) in one thread may be inappropriately used in another thread.
         [ThreadStatic]
-        static Dictionary<string, DbConnectionWrapper> _connectionInfo;
+        static Dictionary<string, DbConnectionWrapper> _threadConnectionInfo;
+
+        static Dictionary<string, DbConnectionWrapper> _processConnectionInfo;
 
         #endregion Statics
 
@@ -92,19 +94,29 @@ namespace Extract.DataEntry
         [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
         static SqlQueryNode()
         {
-            Application.ThreadExit += (o, e) =>
+            if (AttributeStatusInfo.ShareDBConnections)
             {
-                // https://extract.atlassian.net/browse/ISSUE-12987
-                // dotMemory indicates leaks related to the _connectionInfo dictionary when
-                // processing is stopped and restarted (causing a new UI thread to be created). Even
-                // though the cached data for each DbConnectionWrapper is cleared when the UI thread
-                // exits, the dictionary still has space reserved for cached data. If the thread is
-                // exiting, remove references to all DbConnectionWrapper instances.
-                if (_connectionInfo != null)
+                AttributeStatusInfo.ClearedProcessWideCache += (o, e) =>
                 {
-                    _connectionInfo.Clear();
-                }
-            };
+                    lock (_lock)
+                    {
+                        _processConnectionInfo = null;
+                    }
+                };
+            }
+            else
+            {
+                Application.ThreadExit += (o, e) =>
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-12987
+                    // dotMemory indicates leaks related to the _connectionInfo dictionary when
+                    // processing is stopped and restarted (causing a new UI thread to be created). Even
+                    // though the cached data for each DbConnectionWrapper is cleared when the UI thread
+                    // exits, the dictionary still has space reserved for cached data. If the thread is
+                    // exiting, remove references to all DbConnectionWrapper instances.
+                    _threadConnectionInfo?.Clear();
+                };
+            }
         }
 
         /// <summary>
@@ -158,29 +170,37 @@ namespace Extract.DataEntry
                 ExtractException.Assert("ELI37783", "Database must be specified for SQL query nodes.",
                     DatabaseConnections != null && DatabaseConnections.ContainsKey(connectionName));
 
-                // _connectionInfo is ThreadStatic; ensure it is created per-thread.
-                if (_connectionInfo == null)
+                lock (_lock)
                 {
-                    _connectionInfo = new Dictionary<string, DbConnectionWrapper>();
-                }
+                    var connectionInfo = AttributeStatusInfo.ShareDBConnections
+                        ? _processConnectionInfo ?? (_processConnectionInfo = new Dictionary<string, DbConnectionWrapper>())
+                        : _threadConnectionInfo ?? (_threadConnectionInfo = new Dictionary<string, DbConnectionWrapper>()); 
 
-                // Look for an existing DbConnectionWrapper under this name.
-                if (_connectionInfo.TryGetValue(connectionName, out _currentConnection))
-                {
-                    // If the connection itself has changed since the last time DbConnectionWrapper
-                    // was used (such as if an SQL CE OrderMappingDB has been updated), the static
-                    // cache needs to be cleared.
-                    if (_currentConnection.DbConnection != DatabaseConnections[connectionName])
+                    // _connectionInfo is ThreadStatic; ensure it is created per-thread.
+                    if (connectionInfo == null)
                     {
-                        _currentConnection.CachedResults.Clear();
-                        _currentConnection.DbConnection = DatabaseConnections[connectionName];
+                        connectionInfo = new Dictionary<string, DbConnectionWrapper>();
                     }
-                }
-                else
-                {
-                    // A DbConnectionWrapper needs to be created for this name.
-                    _currentConnection = new DbConnectionWrapper(DatabaseConnections[connectionName]);
-                    _connectionInfo[connectionName] = _currentConnection;
+
+                    // Look for an existing DbConnectionWrapper under this name.
+                    if (connectionInfo.TryGetValue(connectionName, out _currentConnection))
+                    {
+                        // If the connection itself has changed since the last time DbConnectionWrapper
+                        // was used (such as if an SQL CE OrderMappingDB has been updated), the static
+                        // cache needs to be cleared.
+                        if (!AttributeStatusInfo.ShareDBConnections &&
+                            _currentConnection.DbConnection != DatabaseConnections[connectionName])
+                        {
+                            _currentConnection.CachedResults.Clear();
+                            _currentConnection.DbConnection = DatabaseConnections[connectionName];
+                        }
+                    }
+                    else
+                    {
+                        // A DbConnectionWrapper needs to be created for this name.
+                        _currentConnection = new DbConnectionWrapper(DatabaseConnections[connectionName]);
+                        connectionInfo[connectionName] = _currentConnection;
+                    }
                 }
 
                 string dbType = _currentConnection.DbConnection.GetType().ToString();
@@ -205,6 +225,8 @@ namespace Extract.DataEntry
                 throw ex.AsExtract("ELI37797");
             }
         }
+
+        static object _lock = new object();
 
         /// <summary>
         /// Evaluates the query by using the combined result of all child
@@ -251,7 +273,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                if (FlushCache)
+                if (FlushCache && !AttributeStatusInfo.ShareDBConnections)
                 {
                     _currentConnection.CachedResults.Clear();
                 }
@@ -267,18 +289,21 @@ namespace Extract.DataEntry
                 // Otherwise, execute the query and submit the results for caching.
                 else if (!string.IsNullOrWhiteSpace(sqlQuery.ToString()))
                 {
-                    DateTime startTime = DateTime.Now;
-
-                    // Execute the query.
-                    queryResults = DBMethods.GetQueryResultsAsStringArray(
-                        _currentConnection.DbConnection, sqlQuery.ToString(), parameters, ", ");
-
-                    if (AllowCaching && !FlushCache)
+                    lock (_lock)
                     {
-                        // Attempt to cache the results.
-                        double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
-                        cachedResults = new CachedQueryData<string[]>(queryResults, executionTime);
-                        _currentConnection.CachedResults.CacheData(cacheKey, cachedResults);
+                        DateTime startTime = DateTime.Now;
+
+                        // Execute the query.
+                        queryResults = DBMethods.GetQueryResultsAsStringArray(
+                            _currentConnection.DbConnection, sqlQuery.ToString(), parameters, ", ");
+
+                        if (AllowCaching && !FlushCache)
+                        {
+                            // Attempt to cache the results.
+                            double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
+                            cachedResults = new CachedQueryData<string[]>(queryResults, executionTime);
+                            _currentConnection.CachedResults.CacheData(cacheKey, cachedResults);
+                        }
                     }
                 }
                 else
@@ -305,7 +330,7 @@ namespace Extract.DataEntry
             base.HandleQueryCacheCleared(sender, e);
 
             // Clear the db wrapper's cache too
-            if (_currentConnection != null)
+            if (_currentConnection != null && !AttributeStatusInfo.ShareDBConnections)
             {
                 _currentConnection.CachedResults.Clear();
             }

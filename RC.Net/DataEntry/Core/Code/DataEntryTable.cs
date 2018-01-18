@@ -2047,6 +2047,65 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Creates a <see cref="BackgroundFieldModel"/> for representing this control during
+        /// a background data load.
+        /// </summary>
+        public override BackgroundFieldModel GetBackgroundFieldModel()
+        {
+            try
+            {
+                var displayOrder = DataEntryMethods.GetTabIndices(this);
+                var fieldModel = new BackgroundFieldModel()
+                {
+                    Name = AttributeName,
+                    ParentAttributeControl = ParentDataEntryControl,
+                    DisplayOrder = displayOrder
+                };
+
+                var identityColumn = Columns
+                    .OfType<DataEntryTableColumn>()
+                    .SingleOrDefault(c => c.AttributeName == ".");
+                if (identityColumn != null)
+                {
+                    fieldModel.AutoUpdateQuery = identityColumn.AutoUpdateQuery;
+                    fieldModel.ValidationQuery = identityColumn.ValidationQuery;
+                    fieldModel.IsViewable = Visible && identityColumn.Visible;
+                    fieldModel.PersistAttribute = identityColumn.PersistAttribute;
+                    fieldModel.ValidationErrorMessage = identityColumn.ValidationErrorMessage;
+                    fieldModel.ValidationPattern = identityColumn.ValidationPattern;
+                    fieldModel.ValidationCorrectsCase = identityColumn.ValidationCorrectsCase;
+                }
+
+                foreach (var dataEntryColumn in Columns.OfType<DataEntryTableColumn>())
+                {
+                    if (dataEntryColumn.AttributeName != ".")
+                    {
+                        var childFieldModel = new BackgroundFieldModel()
+                        {
+                            Name = dataEntryColumn.AttributeName,
+                            AutoUpdateQuery = dataEntryColumn.AutoUpdateQuery,
+                            ValidationQuery = dataEntryColumn.ValidationQuery,
+                            DisplayOrder = displayOrder.Concat(new[] { dataEntryColumn.Index + 1 }),
+                            IsViewable = Visible && dataEntryColumn.Visible,
+                            PersistAttribute = dataEntryColumn.PersistAttribute,
+                            ValidationErrorMessage = dataEntryColumn.ValidationErrorMessage,
+                            ValidationPattern = dataEntryColumn.ValidationPattern,
+                            ValidationCorrectsCase = dataEntryColumn.ValidationCorrectsCase
+                        };
+
+                        fieldModel.Children.Add(childFieldModel);
+                    }
+                }
+
+                return fieldModel;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45506");
+            }
+        }
+
         #endregion IDataEntryControl Methods
 
         #region Event Handlers
@@ -2859,6 +2918,8 @@ namespace Extract.DataEntry
                         IDataEntryTableCell dataEntryCell = (IDataEntryTableCell)
                             Rows[rowIndex].Cells[column.Index];
 
+                        var displayOrder = DataEntryMethods.GetTabIndices(this).Concat(new[] { column.Index + 1 });
+
                         IAttribute subAttribute;
                         if (dataEntryTableColumn.AttributeName == ".")
                         {
@@ -2871,7 +2932,7 @@ namespace Extract.DataEntry
                             // raises the AttributeInitialized event for all attributes mapped into
                             // the table.
                             AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this,
-                                column.Index + 1, false, dataEntryTableColumn.TabStopMode,
+                                displayOrder, false, dataEntryTableColumn.TabStopMode,
                                 dataEntryCell.ValidatorTemplate, dataEntryTableColumn.AutoUpdateQuery,
                                 dataEntryTableColumn.ValidationQuery);
                         }
@@ -2882,7 +2943,7 @@ namespace Extract.DataEntry
                             subAttribute = DataEntryMethods.InitializeAttribute(
                                 dataEntryTableColumn.AttributeName,
                                 dataEntryTableColumn.MultipleMatchSelectionMode,
-                                true, attribute.SubAttributes, null, this, column.Index + 1, true,
+                                true, attribute.SubAttributes, null, this, displayOrder, true,
                                 dataEntryTableColumn.TabStopMode, dataEntryCell.ValidatorTemplate,
                                 dataEntryTableColumn.AutoUpdateQuery,
                                 dataEntryTableColumn.ValidationQuery);
@@ -2927,7 +2988,7 @@ namespace Extract.DataEntry
                     // It is important to call initialize here to ensure AttributeStatusInfo
                     // raises the AttributeInitialized event for all attributes mapped into the
                     // table.
-                    AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, 0, false,
+                    AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, null, false,
                         TabStopMode.Never, null, null, null);
                 }
 
@@ -4088,7 +4149,7 @@ namespace Extract.DataEntry
                     // This was added to make sure that the place holder will be after the last attribute
                     // in the set. 
                     // https://extract.atlassian.net/browse/ISSUE-1163
-                    int displayOrder = _sourceAttributes.Size();
+                    var displayOrder = DataEntryMethods.GetTabIndices(this).Concat(new[] { _sourceAttributes.Size() });
 
                     // If no placeholder attribute has been created for this set, create one now.
                     tabOrderPlaceholderAttribute = DataEntryMethods.InitializeAttribute(

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -657,7 +658,7 @@ namespace Extract.DataEntry
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(base.AttributeName,
                         _multipleMatchSelectionMode, !string.IsNullOrEmpty(base.AttributeName),
-                        sourceAttributes, null, this, 0, false, TabStopMode.Never, null, null, null);
+                        sourceAttributes, null, this, null, false, TabStopMode.Never, null, null, null);
 
                     // Use the primarily mapped attribute map the attribute for each row.
                     ApplyAttribute();
@@ -768,6 +769,65 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Creates a <see cref="BackgroundFieldModel"/> for representing this control during
+        /// a background data load.
+        /// </summary>
+        public override BackgroundFieldModel GetBackgroundFieldModel()
+        {
+            try
+            {
+                var displayOrder = DataEntryMethods.GetTabIndices(this);
+                var fieldModel = new BackgroundFieldModel()
+                {
+                    Name = AttributeName,
+                    ParentAttributeControl = ParentDataEntryControl,
+                    DisplayOrder = displayOrder
+                };
+
+                var identityColumn = Columns
+                    .OfType<DataEntryTableColumn>()
+                    .SingleOrDefault(c => c.AttributeName == ".");
+                if (identityColumn != null)
+                {
+                    fieldModel.AutoUpdateQuery = identityColumn.AutoUpdateQuery;
+                    fieldModel.ValidationQuery = identityColumn.ValidationQuery;
+                    fieldModel.IsViewable = Visible && identityColumn.Visible;
+                    fieldModel.PersistAttribute = identityColumn.PersistAttribute;
+                    fieldModel.ValidationErrorMessage = identityColumn.ValidationErrorMessage;
+                    fieldModel.ValidationPattern = identityColumn.ValidationPattern;
+                    fieldModel.ValidationCorrectsCase = identityColumn.ValidationCorrectsCase;
+                }
+
+                foreach (var dataEntryRow in Rows.OfType<DataEntryTableRow>())
+                {
+                    if (dataEntryRow.AttributeName != ".")
+                    {
+                        var childFieldModel = new BackgroundFieldModel()
+                        {
+                            Name = dataEntryRow.AttributeName,
+                            AutoUpdateQuery = dataEntryRow.AutoUpdateQuery,
+                            ValidationQuery = dataEntryRow.ValidationQuery,
+                            DisplayOrder = displayOrder.Concat(new[] { dataEntryRow.Index + 1 }),
+                            IsViewable = Visible && dataEntryRow.Visible,
+                            PersistAttribute = dataEntryRow.PersistAttribute,
+                            ValidationErrorMessage = dataEntryRow.ValidationErrorMessage,
+                            ValidationPattern = dataEntryRow.ValidationPattern,
+                            ValidationCorrectsCase = dataEntryRow.ValidationCorrectsCase
+                        };
+
+                        fieldModel.Children.Add(childFieldModel);
+                    }
+                }
+
+                return fieldModel;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45508");
+            }
+        }
+
         #endregion IDataEntryControl Methods
 
         #region Private Members
@@ -806,7 +866,7 @@ namespace Extract.DataEntry
                 _sourceAttributes.Insert(index, _attribute);
 
                 // Initialize the newly swiped attribute's status information.
-                AttributeStatusInfo.Initialize(newAttribute, _sourceAttributes, this, 0, false,
+                AttributeStatusInfo.Initialize(newAttribute, _sourceAttributes, this, null, false,
                    TabStopMode.Never, null, null, null);
 
                 // Use the primarily mapped attribute map the attribute for each row.
@@ -955,6 +1015,8 @@ namespace Extract.DataEntry
             {
                 IDataEntryTableCell dataEntryCell = (IDataEntryTableCell)row.Cells[0];
 
+                var displayOrder = DataEntryMethods.GetTabIndices(this).Concat(new[] { row.Index + 1 });
+
                 if (_attribute == null)
                 {
                     // If the table is not currently mapped to any attribute, clear the cell.
@@ -964,7 +1026,7 @@ namespace Extract.DataEntry
                 else if (row.AttributeName == ".")
                 {
                     // "." indicates that the parent attribute should be used in this row.
-                    AttributeStatusInfo.Initialize(_attribute, _sourceAttributes, this, row.Index,
+                    AttributeStatusInfo.Initialize(_attribute, _sourceAttributes, this, displayOrder,
                         false, row.TabStopMode, dataEntryCell.ValidatorTemplate, row.AutoUpdateQuery,
                         row.ValidationQuery);
                     row.Cells[0].Value = _attribute;
@@ -975,7 +1037,7 @@ namespace Extract.DataEntry
                     // Attempts to map an appropriate sub-attribute to the row.
                     row.Cells[0].Value = DataEntryMethods.InitializeAttribute(row.AttributeName,
                         row.MultipleMatchSelectionMode, true, _attribute.SubAttributes, null,
-                        this, row.Index, true, row.TabStopMode, dataEntryCell.ValidatorTemplate,
+                        this, displayOrder, true, row.TabStopMode, dataEntryCell.ValidatorTemplate,
                         row.AutoUpdateQuery, row.ValidationQuery);
                 }
 

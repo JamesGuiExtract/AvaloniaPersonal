@@ -252,7 +252,7 @@ namespace Extract.DataEntry
         internal static IAttribute InitializeAttribute(string attributeName,
             MultipleMatchSelectionMode selectionMode, bool createIfNotFound,
             IUnknownVector sourceAttributes, IUnknownVector removedMatches, 
-            IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
+            IDataEntryControl owningControl, IEnumerable<int> displayOrder, bool considerPropagated,
             TabStopMode? tabStopMode, IDataEntryValidator validatorTemplate, string autoUpdateQuery,
             string validationQuery)
         {
@@ -370,7 +370,7 @@ namespace Extract.DataEntry
         internal static IUnknownVector InitializeAttributes(string attributeName,
             MultipleMatchSelectionMode selectionMode, IUnknownVector sourceAttributes,
             IUnknownVector removedMatches, IDataEntryControl owningControl,
-            int? displayOrder, bool considerPropagated, TabStopMode? tabStopMode,
+            IEnumerable<int> displayOrder, bool considerPropagated, TabStopMode? tabStopMode,
             IDataEntryValidator validatorTemplate, string autoUpdateQuery, string validationQuery)
         {
             try
@@ -570,6 +570,43 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI25433", ex);
+            }
+        }
+
+        /// <summary>
+        /// Removes all <see cref="IAttribute"/>s not marked as persistable from the provided
+        /// attribute hierarchy.
+        /// </summary>
+        /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
+        /// non-persistable attributes should be removed.</param>
+        internal static void PruneNonPersistingAttributes(IUnknownVector attributes)
+        {
+            try
+            {
+                int count = attributes.Size();
+                for (int i = 0; i < count; i++)
+                {
+                    IAttribute attribute = (IAttribute)attributes.At(i);
+                    if (AttributeStatusInfo.IsAttributePersistable(attribute))
+                    {
+                        PruneNonPersistingAttributes(attribute.SubAttributes);
+                    }
+                    else
+                    {
+                        attributes.Remove(i);
+                        count--;
+                        i--;
+
+                        // [DataEntry:693]
+                        // Since these attributes will no longer be accessed by the DataEntry,
+                        // the DataObject needs to be set to null to prevent handle leaks.
+                        attribute.DataObject = null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40243");
             }
         }
 
@@ -1037,30 +1074,23 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="control">The <see cref="Control"/> for which a tab index value is needed.
         /// </param>
-        /// <returns>A <see langword="string"/> representing the tab index values of it and its 
-        /// ancestors.</returns>
-        internal static string GetTabIndex(Control control)
+        /// <returns></returns>
+        internal static IEnumerable<int> GetTabIndices(Control control)
         {
             try
             {
-                // [DataEntry:1004]
-                // Since this value will be compared using the string class, pad zeros so that tab
-                // indices of up to 999 can be compared.
-                string paddedTabIndex =
-                    string.Format(CultureInfo.InvariantCulture, "{0:D3}", control.TabIndex);
+                var indices = new Stack<int>();
 
-                if (control.Parent != null && !(control.Parent is DataEntryControlHost))
+                // Recursively include the tab index of all ancestors beneath the
+                // DataEntryControlHost
+                while (control != null && !(control is DataEntryControlHost))
                 {
-                    // Recursively include the tab index of all ancestors beneath the
-                    // DataEntryControlHost
-                    return GetTabIndex(control.Parent) + "." + paddedTabIndex;
+                    indices.Push(control.TabIndex);
+
+                    control = control.Parent;
                 }
-                else
-                {
-                    // There are no parents, just return a string representing this control's
-                    // TabIndex.
-                    return paddedTabIndex;
-                }
+
+                return indices;
             }
             catch (Exception ex)
             {

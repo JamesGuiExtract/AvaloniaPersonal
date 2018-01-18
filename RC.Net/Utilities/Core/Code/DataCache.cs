@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Extract.Licensing;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace Extract.Utilities
 {
@@ -163,12 +165,17 @@ namespace Extract.Utilities
         /// <summary>
         /// To allow for quick retrieval of cached data referenced by a key.
         /// </summary>
-        Dictionary<TKeyType, DataItem> _cachedData;
+        ConcurrentDictionary<TKeyType, DataItem> _cachedData;
 
         /// <summary>
         /// To rank the cached data items based on their score.
         /// </summary>
         SortedSet<DataItem> _rankedData = new SortedSet<DataItem>();
+
+        /// <summary>
+        /// Synchronizes access to cached items.
+        /// </summary>
+        object _lock = new object();
 
         #endregion Fields
 
@@ -197,7 +204,7 @@ namespace Extract.Utilities
 
                 MaxCacheCount = maxCacheCount;
                 _scoreDataDelegate = scoreDataDelegate;
-                _cachedData = new Dictionary<TKeyType, DataItem>(_maxCacheCount);
+                _cachedData = new ConcurrentDictionary<TKeyType, DataItem>();
             }
             catch (Exception ex)
             {
@@ -300,15 +307,35 @@ namespace Extract.Utilities
                 DataItem dataItem;
                 if (_cachedData.TryGetValue(key, out dataItem))
                 {
-                    data = dataItem.Data;
+                    data = dataItem?.Data;
+                    if (data == null)
+                    {
+                        return false;
+                    }
 
-                    // Re-rank the retrieved data based on an updated score every time it is
-                    // retrieved.
-                    _rankedData.Remove(dataItem);
-                    dataItem.Score = (_scoreDataDelegate == null) 
-                        ? _defaultScore++
-                        : _scoreDataDelegate(data);
-                    _rankedData.Add(dataItem);
+                    bool lockTaken = false;
+                    try
+                    {
+                        Monitor.TryEnter(_lock, ref lockTaken);
+
+                        // Re-rank the retrieved data based on an updated score every time it is
+                        // retrieved-- but for performance, don't hang if the lock is already taken.
+                        if (lockTaken)
+                        {
+                            _rankedData.Remove(dataItem);
+                            dataItem.Score = (_scoreDataDelegate == null)
+                                ? _defaultScore++
+                                : _scoreDataDelegate(data);
+                            _rankedData.Add(dataItem);
+                        }
+                    }
+                    finally
+                    {
+                        if (lockTaken)
+                        {
+                            Monitor.Exit(_lock);
+                        }
+                    }
 
                     return true;
                 }
@@ -342,51 +369,54 @@ namespace Extract.Utilities
                     return false;
                 }
 
-                // If data that is already cached is being re-cached, re-add the data in case it has
-                // been updated.
-                DataItem existingData;
-                if (_cachedData.TryGetValue(key, out existingData))
+                lock (_lock)
                 {
-                    _rankedData.Remove(existingData);
-                    _cachedData.Remove(key);
-                }
-
-                double score = (_scoreDataDelegate == null)
-                    ? _defaultScore++
-                    : _scoreDataDelegate(data);
-
-                // Check if the score meets the QualifyingPercentile if the cache is nearly full to
-                // minimize cache-thrashing. Find the index that represents QualifyingPercentile.
-                // This index should be decreased by the number of open slots such that if more
-                // that QualifyingPercentile of the cache's slots are open, the data will be added
-                // regardless of its score. No need for this check if _scoreDataDelegate has not
-                // been provided.
-                if (_scoreDataDelegate != null)
-                {
-                    int referenceIndex = _qualifyingIndex - (MaxCacheCount - _cachedData.Count);
-                    if (referenceIndex >= 0)
+                    // If data that is already cached is being re-cached, re-add the data in case it has
+                    // been updated.
+                    DataItem existingData;
+                    if (_cachedData.TryGetValue(key, out existingData))
                     {
-                        if (score <= _rankedData.ElementAt(referenceIndex).Score)
+                        _rankedData.Remove(existingData);
+                        _cachedData.TryRemove(key, out var value);
+                    }
+
+                    double score = (_scoreDataDelegate == null)
+                        ? _defaultScore++
+                        : _scoreDataDelegate(data);
+
+                    // Check if the score meets the QualifyingPercentile if the cache is nearly full to
+                    // minimize cache-thrashing. Find the index that represents QualifyingPercentile.
+                    // This index should be decreased by the number of open slots such that if more
+                    // that QualifyingPercentile of the cache's slots are open, the data will be added
+                    // regardless of its score. No need for this check if _scoreDataDelegate has not
+                    // been provided.
+                    if (_scoreDataDelegate != null)
+                    {
+                        int referenceIndex = _qualifyingIndex - (MaxCacheCount - _cachedData.Count);
+                        if (referenceIndex >= 0)
                         {
-                            return false;
+                            if (score <= _rankedData.ElementAt(referenceIndex).Score)
+                            {
+                                return false;
+                            }
                         }
                     }
+
+                    // Wrap the data in a DataItem.
+                    var newItem = new DataItem(key, data, score);
+
+                    // If the cache if full, evict the lowest scoring DataItem that is currently cached
+                    // to make room for the new item.
+                    if (_cachedData.Count >= _maxCacheCount)
+                    {
+                        DataItem dataItemToEvict = _rankedData.First();
+                        _rankedData.Remove(dataItemToEvict);
+                        _cachedData.TryRemove(dataItemToEvict.Key, out var value);
+                    }
+
+                    _cachedData[key] = newItem;
+                    _rankedData.Add(newItem);
                 }
-
-                // Wrap the data in a DataItem.
-                var newItem = new DataItem(key, data, score);
-
-                // If the cache if full, evict the lowest scoring DataItem that is currently cached
-                // to make room for the new item.
-                if (_cachedData.Count >= _maxCacheCount)
-                {
-                    DataItem dataItemToEvict = _rankedData.First();
-                    _rankedData.Remove(dataItemToEvict);
-                    _cachedData.Remove(dataItemToEvict.Key);
-                }
-
-                _cachedData[key] = newItem;
-                _rankedData.Add(newItem);
 
                 return true;
             }
@@ -417,8 +447,11 @@ namespace Extract.Utilities
         {
             try
             {
-                _cachedData.Clear();
-                _rankedData.Clear();
+                lock (_lock)
+                {
+                    _cachedData.Clear();
+                    _rankedData.Clear();
+                }
             }
             catch (Exception ex)
             {

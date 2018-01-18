@@ -1146,34 +1146,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="PageLayoutControl.PagesPendingLoad"/> event of an
-        /// <see cref="PageLayoutControl"/>
-        /// control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="PagesPendingLoadEventArgs"/> instance containing the
-        /// event data.</param>
-        void HandlePageLayoutControl_PagesPendingLoad(object sender, PagesPendingLoadEventArgs e)
-        {
-            try
-            {
-                foreach (Page page in e.Pages)
-                {
-                    _pagesPendingLoad.Enqueue(page);
-                }
-
-                // The load next document command should be disabled until all pending pages have
-                // been loaded.
-                _loadNextDocumentMenuItem.Enabled = false;
-                _primaryPageLayoutControl.EnableLoadNextDocument = false;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI35674");
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="PageLayoutControl.PagesDereferenced"/> event of an
         /// <see cref="PageLayoutControl"/>.
         /// </summary>
@@ -1754,7 +1726,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 _primaryPageLayoutControl.StateChanged -= HandlePageLayoutControl_StateChanged;
                 _primaryPageLayoutControl.PageDeleted -= HandlePageLayoutControl_PageDeleted;
-                _primaryPageLayoutControl.PagesPendingLoad -= HandlePageLayoutControl_PagesPendingLoad;
                 _primaryPageLayoutControl.PagesDereferenced -= HandlePageLayoutControl_PagesDereferenced;
                 _primaryPageLayoutControl.LoadNextDocumentRequest -= HandleLayoutControl_LoadNextDocumentRequest;
                 // If the control contains a lot of pagination controls, it can take a long time to
@@ -1776,7 +1747,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.LoadNextDocumentVisible = true;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.PageDeleted += HandlePageLayoutControl_PageDeleted;
-            _primaryPageLayoutControl.PagesPendingLoad += HandlePageLayoutControl_PagesPendingLoad;
             _primaryPageLayoutControl.PagesDereferenced += HandlePageLayoutControl_PagesDereferenced;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandleLayoutControl_LoadNextDocumentRequest;
             _pageLayoutToolStripContainer.ContentPanel.Controls.Add(_primaryPageLayoutControl);
