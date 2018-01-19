@@ -775,6 +775,15 @@ namespace Extract.FileActionManager.FileProcessors
                     return EFileProcessingResult.kProcessingCancelled;
                 }
 
+                // https://extract.atlassian.net/browse/ISSUE-15205
+                // Assign any alternate component data directory root defined in the database
+                // to be used in addition to the default component data directory.
+                if (pDB != null)
+                {
+                    DataEntryMethods.AlternateComponentDataDir =
+                        pDB.GetDBInfoSetting("AlternateComponentDataDir", false);
+                }
+
                 EFileProcessingResult result = _form.ShowDocument(pFileRecord.Name, pFileRecord.FileID,
                     nActionID, pFAMTM, pDB);
 
