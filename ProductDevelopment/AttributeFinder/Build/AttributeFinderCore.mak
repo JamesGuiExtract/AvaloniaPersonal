@@ -311,6 +311,8 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY "$(RCNETDir)\APIs\Aspose\Aspose.Pdf for .Net 9.8\Bin\net4.0\Aspose.Pdf.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Common.Logging.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 # This includes System.ValueTuple in the install
 	@COPY "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
