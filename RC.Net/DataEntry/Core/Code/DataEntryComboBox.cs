@@ -1717,7 +1717,10 @@ namespace Extract.DataEntry
                     _luceneAutoSuggest.UpdateAutoCompleteList(_activeValidator.AutoCompleteValuesDictionary);
 
                     Items.Clear();
-                    Items.AddRange(autoCompleteValues);
+                    if (autoCompleteValues != null)
+                    {
+                        Items.AddRange(autoCompleteValues);
+                    }
 
                     // If a LastAppliedStringValue is available, use to ensure a value applied
                     // previously programmatically is correctly set after the Items list has been
