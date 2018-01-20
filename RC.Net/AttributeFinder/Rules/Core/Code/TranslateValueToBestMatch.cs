@@ -768,7 +768,12 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
-        static LuceneSuggestionProvider<string> GetLuceneSuggestionProvider(string sourceListPath, string synonymMapPath)
+        /// <summary>
+        /// Get/update cached provider object
+        /// </summary>
+        /// <param name="sourceListPath">The expanded path to the source list, either a text file or an encrypted text file</param>
+        /// <param name="synonymMapPath">Path to CSV defining synonym groups. Can be a text file or an encrypted text file</param>
+        static LuceneBestMatchProvider GetLuceneSuggestionProvider(string sourceListPath, string synonymMapPath)
         {
             var paths = new List<string> { sourceListPath };
             if (!string.IsNullOrWhiteSpace(synonymMapPath))
@@ -785,7 +790,7 @@ namespace Extract.AttributeFinder.Rules
             return provider;
         }
 
-        static LuceneSuggestionProvider<string> BuildProvider(string sourceListPath, string synonymMapPath)
+        static LuceneBestMatchProvider BuildProvider(string sourceListPath, string synonymMapPath)
         {
             var values = FileDerivedResourceCache.ThreadLocalMiscUtils.GetStringOptionallyFromFile(sourceListPath)
                 .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -793,55 +798,84 @@ namespace Extract.AttributeFinder.Rules
             SynonymMap synonymMap = null;
             if (!string.IsNullOrWhiteSpace(synonymMapPath))
             {
-                var map = new SynonymMap.Builder(true);
-                var mapSource = new StringReader(FileDerivedResourceCache.ThreadLocalMiscUtils.GetStringOptionallyFromFile(synonymMapPath));
-                using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(mapSource))
+                synonymMap = BuildSynonymMap(synonymMapPath);
+            }
+
+            var provider = new LuceneBestMatchProvider(values, synonymMap);
+
+            return provider;
+        }
+
+        static SynonymMap BuildSynonymMap(string synonymMapPath)
+        {
+            var map = new SynonymMap.Builder(true);
+            var mapSource = new StringReader(FileDerivedResourceCache.ThreadLocalMiscUtils.GetStringOptionallyFromFile(synonymMapPath));
+            var lineSets = new List<HashSet<string>>();
+            using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(mapSource))
+            {
+                csvReader.Delimiters = new[] { "," };
+                int rowsRead = 0;
+                while (!csvReader.EndOfData)
                 {
-                    csvReader.Delimiters = new[] { "," };
-                    int rowsRead = 0;
-                    while (!csvReader.EndOfData)
+                    string[] fields;
+                    try
                     {
-                        string[] fields;
-                        try
-                        {
-                            fields = csvReader.ReadFields();
-                            rowsRead++;
-                        }
-                        catch (Exception e)
-                        {
-                            var ue = new ExtractException("ELI45467", "Error parsing CSV synonym map file", e);
-                            ue.AddDebugData("CSV path", synonymMapPath, false);
-                            throw ue;
-                        }
+                        fields = csvReader.ReadFields();
+                        rowsRead++;
+                    }
+                    catch (Exception e)
+                    {
+                        var ue = new ExtractException("ELI45467", "Error parsing CSV synonym map file", e);
+                        ue.AddDebugData("CSV path", synonymMapPath, false);
+                        throw ue;
+                    }
 
-                        ExtractException.Assert("ELI45468", "CSV rows should contain at least two fields",
-                            fields.Length > 1,
-                            "Field count", fields.Length,
-                            "Row number", rowsRead);
+                    ExtractException.Assert("ELI45468", "CSV rows should contain at least two fields",
+                        fields.Length > 1,
+                        "Field count", fields.Length,
+                        "Row number", rowsRead);
 
-                        // Process the string with the same filters that will be used to analyze the input
-                        // and queries so that, e.g., non-word chars are removed and words are stemmed
-                        for (int i = 0; i < fields.Length; i++)
+                    // Process the string with the same filters that will be used to analyze the input
+                    // and queries so that, e.g., non-word chars are removed and words are stemmed
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        fields[i] = LuceneSuggestionAnalyzer.ProcessString(fields[i]);
+                    }
+
+                    // Merge this row with any others that have the same term
+                    fields = fields.Where(f => !string.IsNullOrWhiteSpace(f)).ToArray();
+                    if (fields.Length > 1)
+                    {
+                        var overlap = lineSets.FirstOrDefault(s => fields.Any(f => s.Contains(f)));
+                        if (overlap == null)
                         {
-                            fields[i] = LuceneSuggestionAnalyzer.ProcessString(fields[i]);
+                            lineSets.Add(new HashSet<string>(fields));
                         }
-
-                        foreach (var p in fields.GetPermutations(2).Select(p => p.ToList()))
+                        else
                         {
-                            map.Add(new Lucene.Net.Util.CharsRef(p[0]), new Lucene.Net.Util.CharsRef(p[1]), true);
+                            foreach (var f in fields)
+                            {
+                                overlap.Add(f);
+                            }
                         }
                     }
                 }
-                synonymMap = map.Build();
             }
-
-            var provider = new LuceneSuggestionProvider<string>(
-                values,
-                s => s,
-                s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s), 1),
-                synonymMap);
-
-            return provider;
+            
+            // Work-around Lucene multi-word synonym shortcomings by expanding everything to the largest value
+            foreach(var fields in lineSets)
+            {
+                var sorted = fields
+                    .OrderByDescending(f => f.Split(' ').Length)
+                    .ThenByDescending(f => f.Length)
+                    .ThenBy(f => f)
+                    .ToList();
+                foreach (var f in sorted.Skip(1))
+                {
+                    map.Add(new Lucene.Net.Util.CharsRef(f), new Lucene.Net.Util.CharsRef(sorted[0]), includeOrig: false);
+                }
+            }
+            return map.Build();
         }
 
         #endregion Private Members

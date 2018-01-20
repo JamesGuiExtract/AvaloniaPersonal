@@ -64,6 +64,7 @@
       <HintPath>..\..\..\..\APIs\Accord.Statistics.3.0.2\lib\net45\Accord.Statistics.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
@@ -87,6 +88,7 @@
     <Compile Include="TestLearningMachineOutputHandler.cs" />
     <Compile Include="TestAFUtils.cs" />
     <Compile Include="TestFKB.cs" />
+    <Compile Include="TestTranslateToBestMatch.cs" />
     <Compile Include="TestLocateImageRegion.cs" />
     <Compile Include="TestLearningMachine.cs" />
     <Compile Include="TestLearningMachineDataEncoder.cs" />
@@ -439,6 +441,15 @@
     <EmbeddedResource Include="Resources\LearningMachine\Bitmap\030.tif" />
     <EmbeddedResource Include="Resources\LearningMachine\Bitmap\030.tif.evoa" />
     <EmbeddedResource Include="Resources\LearningMachine\Bitmap\030.tif.uss" />
+    <EmbeddedResource Include="Resources\TranslateToBestMatch\mn_rice_correct.csv" />
+    <EmbeddedResource Include="Resources\TranslateToBestMatch\mn_rice_identity.csv" />
+    <EmbeddedResource Include="Resources\TranslateToBestMatch\mn_rice_incorrect.csv" />
+    <EmbeddedResource Include="Resources\TranslateToBestMatch\subdivisions.dat" />
+    <EmbeddedResource Include="Resources\TranslateToBestMatch\synonyms.dat" />
+    <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial1.csv" />
+    <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial2.csv" />
+    <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial_subdivisions1.dat" />
+    <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial_subdivisions2.dat" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

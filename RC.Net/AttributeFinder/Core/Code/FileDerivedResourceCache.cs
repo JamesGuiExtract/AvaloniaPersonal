@@ -25,29 +25,7 @@ namespace Extract.AttributeFinder
         #region Fields
 
         /// <summary>
-        /// Static finalizer to clean-up cached lucene search provider temporary files stored in the memory cache
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        static readonly Finalizer finalizer = new Finalizer();
-        sealed class Finalizer
-        {
-            ~Finalizer()
-            {
-                try
-                {
-                    var cache = MemoryCache.Default;
-                    foreach (var key in _sourceLists.Keys)
-                    {
-                        cache.Remove(key);                                                
-                    }
-                }
-                catch { }
-            }
-        }
-
-        /// <summary>
-        /// Locks to prevent multiple threads from trying to create the same suggestion provider
-        /// This list is also used to clean-up temporary files on application exit
+        /// Locks to prevent multiple threads from trying to create the same cached item
         /// </summary>
         static ConcurrentDictionary<string, object> _sourceLists =
             new ConcurrentDictionary<string, object>(StringComparer.Ordinal);

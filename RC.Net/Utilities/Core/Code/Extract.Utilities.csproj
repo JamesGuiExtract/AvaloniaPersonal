@@ -112,6 +112,7 @@
     <Compile Include="ExtractFileLock.cs" />
     <Compile Include="HashCode.cs" />
     <Compile Include="IdentifiableObject.cs" />
+    <Compile Include="LuceneBestMatchProvider.cs" />
     <Compile Include="LuceneSuggestionProvider.cs" />
     <Compile Include="LuceneSuggestionAnalyzer.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

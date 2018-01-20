@@ -1,5 +1,4 @@
 ﻿using Lucene.Net.Analysis;
-using Lucene.Net.Analysis.Synonym;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers.Classic;
@@ -44,8 +43,7 @@ namespace Extract.Utilities
         public LuceneSuggestionProvider(
             IEnumerable<T> suggestionsSource,
             Func<T, string> nameExtractor,
-            Func<T, IEnumerable<KeyValuePair<string, string>>> fieldValuesExtractor,
-            SynonymMap synonyms = null
+            Func<T, IEnumerable<KeyValuePair<string, string>>> fieldValuesExtractor
             )
         {
             try
@@ -58,7 +56,7 @@ namespace Extract.Utilities
                 string tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 _tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
                 _directory = FSDirectory.Open(_tempDirectory);
-                _analyzer = new LuceneSuggestionAnalyzer { Synonyms = synonyms };
+                _analyzer = new LuceneSuggestionAnalyzer();
                 using (var writer = new IndexWriter(_directory, new IndexWriterConfig(Lucene.Net.Util.LuceneVersion.LUCENE_48, _analyzer)))
                 {
                     int rank = 0;
