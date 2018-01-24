@@ -111,6 +111,7 @@ CopyFilesToInstallFolder: CreateDestinationFolders
 	@COPY /V  "$(BinariesFolder)\Extract.DataEntry.DEP.*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V  "$(BinariesFolder)\Extract.DataCaptureStats.Test.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon"
  	@COPY /V  "$(BinariesFolder)\NERAnnotator.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
+	@COPY /V  "$(BinariesFolder)\Obfuscated\DashboardCreator.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.nl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"
