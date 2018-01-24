@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Extract.Web.DocumentAPI.Test")]
+[assembly: AssemblyTitle("Extract.Web.AppBackendAPI.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("Extract.Web.DocumentAPI.Test")]
+[assembly: AssemblyProduct("Extract.Web.AppBackendAPI.Test")]
 [assembly: AssemblyCopyright("Copyright © Microsoft 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("e769cbba-485e-4de4-9776-623dadb6d9eb")]
+[assembly: Guid("b6bbd0a6-55ae-43e2-85da-4a85399abb5e")]
 
 // Version information for an assembly consists of the following four values:
 //
