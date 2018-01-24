@@ -64,6 +64,7 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="nunit.framework">
       <HintPath>..\..\..\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
     </Reference>
@@ -84,6 +85,7 @@
     <Compile Include="TestDataEntryQueries.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TestLuceneSuggestionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
@@ -230,6 +232,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Test.tif.voa" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\LuceneSuggestionProvider\urs_names_and_akas.csv" />
+    <EmbeddedResource Include="Resources\LuceneSuggestionProvider\demo_lab_display_names.csv" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

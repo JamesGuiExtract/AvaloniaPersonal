@@ -131,15 +131,19 @@ namespace Extract.Utilities
             {
                 if (string.IsNullOrWhiteSpace(searchPhrase) || _items.Count == 0)
                 {
-                    return _items.Select(s => Tuple.Create(s, 0.0));
+                    return _items.Select(s => Tuple.Create(s, 0.0)).Take(maxSuggestions);
                 }
 
-                var trimmed = searchPhrase.Trim();
-                var escaped = QueryParserBase.Escape(trimmed);
-
                 // The analyzer lower-cases and stems the terms so convert the search string to match
-                var terms = Regex.Replace(LuceneSuggestionAnalyzer.ProcessString(trimmed), @"[\W-[%#]]", " ")
+                var terms = LuceneSuggestionAnalyzer.ProcessString(searchPhrase)
                     .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (!terms.Any())
+                {
+                    return _items.Select(s => Tuple.Create(s, 0.0)).Take(maxSuggestions);
+                }
+
+                var escaped = QueryParser.Escape(string.Join(" ", terms));
 
                 var query = new BooleanQuery();
                 foreach (var field in _fields)
@@ -150,27 +154,24 @@ namespace Extract.Utilities
                     var clause = parser.Parse(escaped);
                     query.Add(clause, Occur.SHOULD);
 
-                    if (terms.Any())
+                    // Add a SpanFirstQuery for the first term to give it extra weight.
+                    // This query will use position info and will only match items where
+                    // the term appears as the first term in the field
+                    clause = new SpanFirstQuery(new SpanTermQuery(
+                        new Term(field, terms.First())), 1);
+                    query.Add(clause, Occur.SHOULD);
+
+                    // Add a wildcard query based on the last term, since this
+                    // is likely an incomplete word being typed
+                    var lastTerm = terms.Last();
+                    clause = new WildcardQuery(new Term(field, lastTerm + "*"));
+                    query.Add(clause, Occur.SHOULD);
+
+                    // Add a fuzzy query for the last term in case it is a complete word
+                    if (lastTerm.Length > 1)
                     {
-                        // Add a SpanFirstQuery for the first term to give it extra weight.
-                        // This query will use position info and will only match items where
-                        // the term appears as the first term in the field
-                        clause = new SpanFirstQuery(new SpanTermQuery(
-                            new Term(field, terms.First())), 1);
+                        clause = new FuzzyQuery(new Term(field, lastTerm), lastTerm.Length > 3 ? 2 : 1);
                         query.Add(clause, Occur.SHOULD);
-
-                        // Add a wildcard query based on the last term, since this
-                        // is likely an incomplete word being typed
-                        var lastTerm = terms.Last();
-                        clause = new WildcardQuery(new Term(field, lastTerm + "*"));
-                        query.Add(clause, Occur.SHOULD);
-
-                        // Add a fuzzy query for the last term in case it is a complete word
-                        if (lastTerm.Length > 1)
-                        {
-                            clause = new FuzzyQuery(new Term(field, lastTerm), lastTerm.Length > 3 ? 2 : 1);
-                            query.Add(clause, Occur.SHOULD);
-                        }
                     }
 
                     // Add a fuzzy query for each term except the last, which was added above.
@@ -189,13 +190,15 @@ namespace Extract.Utilities
                 var scoreDocs = topDocs.ScoreDocs;
 
                 // Order by descending score, then by rank, which is the original ordering of the targets
-                return scoreDocs
+                var result = scoreDocs
                     .Select(d => (name: _searcher.Doc(d.Doc).Get("Name"),
                                   score: d.Score,
                                   rank: _searcher.Doc(d.Doc).Get("Rank")))
                     .OrderByDescending(t => t.score)
                     .ThenBy(t => t.rank)
                     .Select(t => Tuple.Create<string, double>(t.name, t.score));
+
+                return result;
             }
             catch (Exception ex)
             {
