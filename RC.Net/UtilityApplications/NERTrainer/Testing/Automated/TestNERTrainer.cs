@@ -1,7 +1,7 @@
 ﻿using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
-using Extract.UtilityApplications.NERDataCollector.Test;
+using Extract.UtilityApplications.TrainingDataCollector.Test;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -296,9 +296,9 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         {
             try
             {
-                TestNERDataCollector.Setup();
-                TestNERDataCollector.CreateDatabase();
-                TestNERDataCollector.Process();
+                TestTrainingDataCollector.Setup();
+                TestTrainingDataCollector.CreateDatabase();
+                TestTrainingDataCollector.Process();
 
                 _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
                 Directory.CreateDirectory(_inputFolder.Last());
@@ -316,7 +316,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
 
                     };
 
-                    trainer.Process("(local)", TestNERDataCollector.DBName);
+                    trainer.Process("(local)", TestTrainingDataCollector.DBName);
 
                     var trainingOutput = File.ReadAllText(dest.FileName);
                     Assert.AreEqual(18346, trainingOutput.Length);
@@ -325,7 +325,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
             }
             finally
             {
-                TestNERDataCollector.FinalCleanup();
+                TestTrainingDataCollector.FinalCleanup();
             }
         }
 

@@ -373,10 +373,10 @@ namespace Extract.Database
                             // Reset the pending column delimiters
                             pendingColumnDelimiters = new StringBuilder();
 
-                            // Quote string if it contains a column separator
-                            if (quoteWhenNeeded && columnValue.Contains(columnSeparator))
+                            // Quote string if it contains a column separator or a quote character
+                            if (quoteWhenNeeded)
                             {
-                                columnValue = "\"" + columnValue.Replace("\"", "\"\"") + "\"";
+                                columnValue = columnValue.QuoteIfNeeded("\"", columnSeparator);
                             }
                             result.Append(columnValue);
                         }

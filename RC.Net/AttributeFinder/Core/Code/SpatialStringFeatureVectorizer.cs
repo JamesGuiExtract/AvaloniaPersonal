@@ -935,11 +935,6 @@ namespace Extract.AttributeFinder
             }
         }
 
-        internal IEnumerable<string> ComputeEncodingsFromAttributesTrainingData(SpatialString[] spatialStrings, IUnknownVector[] labeledCandidateAttributes)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion Private Classes
     }
 }

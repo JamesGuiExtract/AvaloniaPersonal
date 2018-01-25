@@ -53,28 +53,25 @@ namespace Extract.AttributeFinder
         /// Gets or creates an object based on a primary source path and the caller
         /// </summary>
         /// <typeparam name="T">The type of the cached object</typeparam>
-        /// <param name="primaryPath">The paths of the files that the cached object is derived from</param>
         /// <param name="creator">A function to create the cached object</param>
-        /// <param name="slidingExpiration">The time after last access before the cache entry is removed</param>
-        /// <param name="removedCallback">A function that will be called when the cache entry is removed</param>
+        /// <param name="paths">The paths of the files that the cached object is derived from</param>
         /// <remarks>
         /// If any of the monitored paths end in ".etf" then auto-encryption will be run and
         /// the non-etf files will be monitored for changes as well.
         /// All cache entries will be removed if the application exits normally.
         /// </remarks>
-        public static T GetCachedObject<T>(string path, Func<T> creator, TimeSpan slidingExpiration,
-            CacheEntryRemovedCallback removedCallback)
+        public static T GetCachedObject<T>(Func<T> creator, params string[] paths)
             where T : class
         {
-            return GetCachedObject(Enumerable.Repeat(path, 1), creator, slidingExpiration, removedCallback);
+            return GetCachedObject(creator, paths, null, null);
         }
 
         /// <summary>
         /// Gets or creates an object based on a primary source path and the caller
         /// </summary>
         /// <typeparam name="T">The type of the cached object</typeparam>
-        /// <param name="primaryPath">The paths of the files that the cached object is derived from</param>
         /// <param name="creator">A function to create the cached object</param>
+        /// <param name="paths">The paths of the files that the cached object is derived from</param>
         /// <param name="slidingExpiration">The time after last access before the cache entry is removed</param>
         /// <param name="removedCallback">A function that will be called when the cache entry is removed</param>
         /// <remarks>
@@ -82,13 +79,15 @@ namespace Extract.AttributeFinder
         /// the non-etf files will be monitored for changes as well.
         /// All cache entries will be removed if the application exits normally.
         /// </remarks>
-        public static T GetCachedObject<T>(IEnumerable<string> paths, Func<T> creator, TimeSpan slidingExpiration,
-            CacheEntryRemovedCallback removedCallback)
+        public static T GetCachedObject<T>(Func<T> creator, IEnumerable<string> paths,
+            TimeSpan? slidingExpiration = null,
+            CacheEntryRemovedCallback removedCallback = null)
             where T : class
         {
             try
             {
                 List<string> monitorPaths = new List<string>();
+                List<string> etfPaths = new List<string>();
 
                 string key = typeof(T).AssemblyQualifiedName;
                 foreach (var p in paths.OrderBy(p=>p))
@@ -98,7 +97,7 @@ namespace Extract.AttributeFinder
                     monitorPaths.Add(fullPath);
                     if (fullPath.EndsWith(".etf", StringComparison.OrdinalIgnoreCase))
                     {
-                        ThreadLocalMiscUtils.AutoEncryptFile(fullPath, _AUTO_ENCRYPT_KEY);
+                        etfPaths.Add(fullPath);
                         monitorPaths.Add(Path.ChangeExtension(fullPath, null));
                     }
                 }
@@ -112,10 +111,21 @@ namespace Extract.AttributeFinder
                         result = cache.Get(key) as T;
                         if (result == null)
                         {
+                            foreach (var fullPath in etfPaths)
+                            {
+                                ThreadLocalMiscUtils.AutoEncryptFile(fullPath, _AUTO_ENCRYPT_KEY);
+                            }
                             CacheItemPolicy policy = new CacheItemPolicy();
                             policy.ChangeMonitors.Add(new HostFileChangeMonitor(monitorPaths.Where(p => File.Exists(p)).ToList()));
-                            policy.SlidingExpiration = slidingExpiration;
-                            policy.RemovedCallback = removedCallback;
+
+                            if (slidingExpiration.HasValue)
+                            {
+                                policy.SlidingExpiration = slidingExpiration.Value;
+                            }
+                            if (removedCallback != null)
+                            {
+                                policy.RemovedCallback = removedCallback;
+                            }
 
                             result = creator();
                             cache.Set(key, result, policy);

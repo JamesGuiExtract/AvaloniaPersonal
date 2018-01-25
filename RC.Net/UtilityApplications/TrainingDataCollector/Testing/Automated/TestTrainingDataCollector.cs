@@ -15,29 +15,29 @@ using System.IO;
 using System.Linq;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.UtilityApplications.NERDataCollector.Test
+namespace Extract.UtilityApplications.TrainingDataCollector.Test
 {
     /// <summary>
-    /// Unit tests for NERDataCollector class
+    /// Unit tests for TrainingDataCollector class
     /// </summary>
     [TestFixture]
-    [NUnit.Framework.Category("NERDataCollector")]
-    public class TestNERDataCollector
+    [NUnit.Framework.Category("TrainingDataCollector")]
+    public class TestTrainingDataCollector
     {
         #region Fields
 
         /// <summary>
         /// Manages the test data files
         /// </summary>
-        static TestFileManager<TestNERDataCollector> _testFiles;
+        static TestFileManager<TestTrainingDataCollector> _testFiles;
         static List<string> _inputFolder = new List<string>();
 
         /// <summary>
         /// Manages test FAM DBs.
         /// </summary>
-        static FAMTestDBManager<TestNERDataCollector> _testDbManager;
+        static FAMTestDBManager<TestTrainingDataCollector> _testDbManager;
 
-        public static readonly string DBName = "_TestNERDataCollector_2DB1BD2B-2352-4F4D-AA62-AB215603B1C3";
+        public static readonly string DBName = "_TestTrainingDataCollector_2DB1BD2B-2352-4F4D-AA62-AB215603B1C3";
         static readonly string _ATTRIBUTE_SET_NAME = "Expected";
         static readonly string _STORE_ATTRIBUTE_GUID = typeof(StoreAttributesInDBTask).GUID.ToString();
         static readonly string _MODEL_NAME = "Test";
@@ -60,8 +60,8 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
         public static void Setup()
         {
             GeneralMethods.TestSetup();
-            _testFiles = new TestFileManager<TestNERDataCollector>();
-            _testDbManager = new FAMTestDBManager<TestNERDataCollector>();
+            _testFiles = new TestFileManager<TestTrainingDataCollector>();
+            _testDbManager = new FAMTestDBManager<TestTrainingDataCollector>();
         }
 
         /// <summary>
@@ -218,8 +218,8 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
 
                 var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
                 _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
-                var collector = NERDataCollector.FromJson(File.ReadAllText(collectorSettings));
-                collector.AnnotatorSettingsPath = annotatorSettingsPath;
+                var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
+                collector.DataGeneratorPath = annotatorSettingsPath;
 
                 collector.Process("(local)", DBName);
             }
@@ -234,7 +234,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
         #region Tests
 
         // Test Database mode
-        [Test, Category("NERDataCollector")]
+        [Test, Category("TrainingDataCollector")]
         public static void AllFilesExist()
         {
             try
@@ -262,7 +262,7 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
         }
 
         // Image files need not exist
-        [Test, Category("NERDataCollector")]
+        [Test, Category("TrainingDataCollector")]
         public static void NoImageFilesExist()
         {
             try
@@ -294,12 +294,12 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
 
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
-                _testFiles = new TestFileManager<TestNERDataCollector>();
+                _testFiles = new TestFileManager<TestTrainingDataCollector>();
             }
         }
 
         // Missing USS files = no data
-        [Test, Category("NERDataCollector")]
+        [Test, Category("TrainingDataCollector")]
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
         public static void NoUSSFilesExist()
         {
@@ -327,13 +327,13 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
                 _testDbManager.RemoveDatabase(DBName);
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
-                _testFiles = new TestFileManager<TestNERDataCollector>();
+                _testFiles = new TestFileManager<TestTrainingDataCollector>();
             }
         }
 
         // Missing USS files = no data
         // This exercises a different code path than the previous test due to no training/testing set division
-        [Test, Category("NERDataCollector")]
+        [Test, Category("TrainingDataCollector")]
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
         public static void NoUSSFilesExist2()
         {
@@ -355,8 +355,8 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
 
                 var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
                 _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
-                var collector = NERDataCollector.FromJson(File.ReadAllText(collectorSettings));
-                collector.AnnotatorSettingsPath = annotatorSettingsPath;
+                var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
+                collector.DataGeneratorPath = annotatorSettingsPath;
 
                 collector.Process("(local)", DBName);
 
@@ -371,12 +371,12 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
                 _testDbManager.RemoveDatabase(DBName);
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
-                _testFiles = new TestFileManager<TestNERDataCollector>();
+                _testFiles = new TestFileManager<TestTrainingDataCollector>();
             }
         }
 
         // Test with some USS files missing
-        [Test, Category("NERDataCollector")]
+        [Test, Category("TrainingDataCollector")]
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
         public static void SomeUSSFilesExist()
         {
@@ -411,30 +411,30 @@ namespace Extract.UtilityApplications.NERDataCollector.Test
                 _testDbManager.RemoveDatabase(DBName);
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
-                _testFiles = new TestFileManager<TestNERDataCollector>();
+                _testFiles = new TestFileManager<TestTrainingDataCollector>();
             }
         }
 
         // Test loading/saving from JSON
-        [Test, Category("NERDataCollector")]
+        [Test, Category("TrainingDataCollector")]
         public static void LoadingSavingFromJson()
         {
             var collectorSettings = _testFiles.GetFile("Resources.collectorSettings.txt");
-            var collector = NERDataCollector.FromJson(File.ReadAllText(collectorSettings));
+            var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
 
             var jsonSettings = collector.ToJson();
-            collector.AnnotatorSettingsPath = "DUMMY_PATH";
+            collector.DataGeneratorPath = "DUMMY_PATH";
             var updatedJsonSettings = collector.ToJson();
 
             Assert.AreNotEqual(jsonSettings, updatedJsonSettings);
 
-            var updatedCollector = (NERDataCollector)JsonConvert.DeserializeObject(updatedJsonSettings,
+            var updatedCollector = (TrainingDataCollector)JsonConvert.DeserializeObject(updatedJsonSettings,
                     new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
 
-            Assert.AreEqual("DUMMY_PATH", updatedCollector.AnnotatorSettingsPath);
+            Assert.AreEqual("DUMMY_PATH", updatedCollector.DataGeneratorPath);
 
             // Verify that other, persisted settings are the same
-            Assert.AreEqual(collector.AnnotatorSettingsPath, updatedCollector.AnnotatorSettingsPath);
+            Assert.AreEqual(collector.DataGeneratorPath, updatedCollector.DataGeneratorPath);
             Assert.AreEqual(collector.AttributeSetName, updatedCollector.AttributeSetName);
             Assert.AreEqual(collector.Description, updatedCollector.Description);
             Assert.AreEqual(collector.LastIDProcessed, updatedCollector.LastIDProcessed);

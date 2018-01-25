@@ -6,23 +6,23 @@ using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.UtilityApplications.NERDataCollector
+namespace Extract.UtilityApplications.TrainingDataCollector
 {
     /// <summary>
-    /// Dialog to configure and run NER data collection
+    /// Dialog to configure and run training data collection
     /// </summary>
     /// <seealso cref="System.Windows.Forms.Form" />
-    public partial class NERDataCollectorConfigurationDialog : Form
+    public partial class TrainingDataCollectorConfigurationDialog : Form
     {
         #region Fields
 
         // Flag to short-circuit value-changed handler
         private bool _suspendUpdatesToSettingsObject;
 
-        private NERDataCollector _settings;
+        private TrainingDataCollector _settings;
         private bool _dirty;
 
-        private static readonly string _TITLE_TEXT = "NER training data collector";
+        private static readonly string _TITLE_TEXT = "Training data collector";
         private static readonly string _TITLE_TEXT_DIRTY = "*" + _TITLE_TEXT;
         private string _databaseServer;
         private string _databaseName;
@@ -55,12 +55,12 @@ namespace Extract.UtilityApplications.NERDataCollector
         #region Constructors
 
         /// <summary>
-        /// Creates a configuration dialogue for an <see cref="NERDataCollector"/>
+        /// Creates a configuration dialogue for an <see cref="TrainingDataCollector"/>
         /// </summary>
         /// <param name="collector">The instance to configure</param>
         /// <param name="databaseServer">The server to use to resolve MLModel.Names and AttributeSetNames</param>
         /// <param name="databaseName">The database to use to resolve MLModel.Names and AttributeSetNames</param>
-        public NERDataCollectorConfigurationDialog(NERDataCollector collector, string databaseServer, string databaseName)
+        public TrainingDataCollectorConfigurationDialog(TrainingDataCollector collector, string databaseServer, string databaseName)
         {
             try
             {
@@ -70,11 +70,13 @@ namespace Extract.UtilityApplications.NERDataCollector
 
                 InitializeComponent();
 
+                _lastIDProcessedNumericUpDown.Maximum = long.MaxValue;
+
                 SetControlValues();
             }
             catch (Exception ex)
             {
-                _settings = new NERDataCollector();
+                _settings = new TrainingDataCollector();
                 ex.ExtractDisplay("ELI45043");
             }
         }
@@ -155,8 +157,17 @@ namespace Extract.UtilityApplications.NERDataCollector
                 ExtractException.Assert("ELI45131", "Attribute set is undefined", ValidateAttributeSet(), "Attribute set", attributeSet);
                 _settings.AttributeSetName = attributeSet;
 
-                _settings.AnnotatorSettingsPath = _annotatorSettingsPathTextBox.Text;
                 _settings.LastIDProcessed = (int)_lastIDProcessedNumericUpDown.Value;
+
+                if (_lmModelTypeRadioButton.Checked)
+                {
+                    _settings.ModelType = ModelType.LearningMachine;
+                }
+                else
+                {
+                    _settings.ModelType = ModelType.NamedEntityRecognition;
+                }
+                _settings.DataGeneratorPath = _dataGeneratorPathTextBox.Text;
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
@@ -269,8 +280,10 @@ namespace Extract.UtilityApplications.NERDataCollector
 
                 _attributeSetNameComboBox.Text = _settings.AttributeSetName;
                 _modelNameComboBox.Text = _settings.ModelName;
-                _annotatorSettingsPathTextBox.Text = _settings.AnnotatorSettingsPath;
                 _lastIDProcessedNumericUpDown.Value = _settings.LastIDProcessed;
+                _lmModelTypeRadioButton.Checked = _settings.ModelType == ModelType.LearningMachine;
+                _nerModelTypeRadioButton.Checked = _settings.ModelType == ModelType.NamedEntityRecognition;
+                _dataGeneratorPathTextBox.Text = _settings.DataGeneratorPath;
 
                 Dirty = false;
 

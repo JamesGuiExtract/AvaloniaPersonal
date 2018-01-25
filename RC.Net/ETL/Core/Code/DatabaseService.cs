@@ -121,7 +121,7 @@ namespace Extract.ETL
         #region IDisposable Members
 
         /// <summary>
-        /// Releases all resources used by the <see cref="NERDataCollector"/>. Also deletes
+        /// Releases all resources
         /// the temporary file being managed by this class.
         /// </summary>
         public void Dispose()
@@ -131,7 +131,7 @@ namespace Extract.ETL
         }
 
         /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="NERDataCollector"/>.
+        /// Releases all unmanaged resources
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>

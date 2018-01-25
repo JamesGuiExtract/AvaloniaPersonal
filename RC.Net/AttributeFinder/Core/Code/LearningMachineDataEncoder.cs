@@ -864,7 +864,8 @@ namespace Extract.AttributeFinder
         /// (if <see cref="MachineUsage"/> is <see cref="LearningMachineUsage.Pagination"/></param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        public void ComputeEncodings(SpatialString[] spatialStrings, IUnknownVector[] inputAttributes, string[] answers)
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="answersOrAnswerPaths")]
+        public void ComputeEncodings(SpatialString[] spatialStrings, IUnknownVector[] inputAttributes, string[] answersOrAnswerPaths)
         {
             try
             {
@@ -873,7 +874,9 @@ namespace Extract.AttributeFinder
 
                 if (MachineUsage == LearningMachineUsage.DocumentCategorization)
                 {
-                    ComputeDocumentEncodings(spatialStrings, inputAttributes, answers);
+                    // TODO: Implement doc categorization
+                    //ComputeDocumentEncodings(spatialStrings, inputAttributes, answersOrAnswerPaths);
+                    throw new NotImplementedException();
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
@@ -944,7 +947,7 @@ namespace Extract.AttributeFinder
         /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
         /// <returns>A tuple where the first item is an enumeration of feature vectors, the second
         /// item answer codes for each example and the third item the uss path for each example</returns>
-        public Tuple<double[][], int[], string[]> GetFeatureVectorAndAnswerCollections
+        public (double[][] featureVectors, int[] answerCodes, string[] ussPathsPerExample) GetFeatureVectorAndAnswerCollections
             (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answersOrAnswerFiles,
                 Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool updateAnswerCodes)
         {
@@ -985,14 +988,14 @@ namespace Extract.AttributeFinder
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answers = new int[results.Length];
-                    string[] ussFilePaths2 = new string[results.Length];
+                    string[] ussPathsPerExample = new string[results.Length];
                     for (int i = 0; i < results.Length; i++)
                     {
                         featureVectors[i] = results[i].Item1;
                         answers[i] = results[i].Item2;
-                        ussFilePaths2[i] = results[i].Item3;
+                        ussPathsPerExample[i] = results[i].Item3;
                     }
-                    return Tuple.Create(featureVectors, answers, ussFilePaths2);
+                    return (featureVectors, answers, ussPathsPerExample);
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
@@ -1004,14 +1007,14 @@ namespace Extract.AttributeFinder
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answers = new int[results.Length];
-                    string[] ussFilePaths2 = new string[results.Length];
+                    string[] ussPathsPerExample = new string[results.Length];
                     for (int i = 0; i < results.Length; i++)
                     {
                         featureVectors[i] = results[i].Item1;
                         answers[i] = results[i].Item2;
-                        ussFilePaths2[i] = results[i].Item3;
+                        ussPathsPerExample[i] = results[i].Item3;
                     }
-                    return Tuple.Create(featureVectors, answers, ussFilePaths2);
+                    return (featureVectors, answers, ussPathsPerExample);
                 }
                 else
                 {
@@ -1580,7 +1583,7 @@ namespace Extract.AttributeFinder
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
         /// <returns>A tuple of feature vectors, predictions and the uss path for each example</returns>
-        private Tuple<double[][], int[], string[]> GetDocumentFeatureVectorAndAnswerCollection
+        private (double[][] featureVectors, int[] answerCodes, string[] ussPathsPerExample) GetDocumentFeatureVectorAndAnswerCollection
             (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answers,
                 Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool updateAnswerCodes)
         {
@@ -1654,7 +1657,7 @@ namespace Extract.AttributeFinder
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return Tuple.Create(featureVectors, answerCodes, ussFilePaths);
+                return (featureVectors, answerCodes, ussFilePaths);
             }
             catch (Exception e)
             {
@@ -2115,20 +2118,18 @@ namespace Extract.AttributeFinder
             InitializeAnswerCodeMappings(answers, NegativeClassName);
         }
 
-        private void ComputeDocumentEncodings(SpatialString[] spatialStrings, IUnknownVector[] inputVOAs, string[] answers)
-        {
-            throw new NotImplementedException();
-        }
-
+        // TODO: Implement bag of words
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="spatialStrings")]
         private void ComputeAttributesEncodings(SpatialString[] spatialStrings, IUnknownVector[] labeledCandidateAttributes)
         {
             // Configure SpatialStringFeatureVectorizer
             List<string> answers = null;
             if (AutoBagOfWords != null)
             {
-                answers = AutoBagOfWords.ComputeEncodingsFromAttributesTrainingData
-                    (spatialStrings, labeledCandidateAttributes)
-                    .ToList();
+                //answers = AutoBagOfWords.ComputeEncodingsFromAttributesTrainingData
+                //    (spatialStrings, labeledCandidateAttributes)
+                //    .ToList();
+                throw new NotImplementedException();
             }
             else
             {

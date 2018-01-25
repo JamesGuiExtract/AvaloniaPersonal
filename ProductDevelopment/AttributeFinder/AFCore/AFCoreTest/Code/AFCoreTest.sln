@@ -778,9 +778,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedactionPredictor", "..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PredictionEvaluator", "..\..\..\IndustrySpecific\Redaction\Utils\PredictionEvaluator\PredictionEvaluator.csproj", "{BA8E5E7C-3071-4594-9348-5374EA684D3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NERDataCollector", "..\..\..\..\..\RC.Net\UtilityApplications\NERDataCollector\Core\Code\NERDataCollector.csproj", "{020455B5-0838-4CCF-AF73-46D539FCF787}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingDataCollector", "..\..\..\..\..\RC.Net\UtilityApplications\TrainingDataCollector\Core\Code\TrainingDataCollector.csproj", "{020455B5-0838-4CCF-AF73-46D539FCF787}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NERDataCollector.Test", "..\..\..\..\..\RC.Net\UtilityApplications\NERDataCollector\Testing\Automated\NERDataCollector.Test.csproj", "{2E1B43FD-5367-4A29-B509-0E8B42E5DA9C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingDataCollector.Test", "..\..\..\..\..\RC.Net\UtilityApplications\TrainingDataCollector\Testing\Automated\TrainingDataCollector.Test.csproj", "{2E1B43FD-5367-4A29-B509-0E8B42E5DA9C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppBackendAPI", "..\..\..\..\..\Web\WebAPI\CommonAPICode\AppBackendAPI.csproj", "{16007C96-12DC-416B-998A-E4584A651458}"
 	ProjectSection(ProjectDependencies) = postProject

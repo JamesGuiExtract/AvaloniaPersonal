@@ -1,4 +1,5 @@
-﻿using Extract.ETL;
+﻿using Extract.AttributeFinder;
+using Extract.ETL;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -7,10 +8,23 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 
-namespace Extract.UtilityApplications.NERDataCollector
+namespace Extract.UtilityApplications.TrainingDataCollector
 {
+
+    /// <summary>
+    /// The type of model to collect data for
+    /// </summary>
+    public enum ModelType
+    {
+        NamedEntityRecognition = 0,
+        LearningMachine = 1
+    }
+
+    /// <summary>
+    /// A <see cref="DatabaseService"/> that collects training/testing data for NER or other ML
+    /// </summary>
     [DataContract]
-    public class NERDataCollector : DatabaseService
+    public class TrainingDataCollector : DatabaseService
     {
         #region Constants
 
@@ -19,10 +33,10 @@ namespace Extract.UtilityApplications.NERDataCollector
         /// <summary>
         /// The path to the NERAnnotator application
         /// </summary>
-        private static readonly string _NER_ANNOTATOR_APPLICATION =
+        static readonly string _NER_ANNOTATOR_APPLICATION =
             Path.Combine(FileSystemMethods.CommonComponentsPath, "NERAnnotator.exe");
 
-        private static readonly string _GET_HIGHEST_ID_TO_PROCESS =
+        static readonly string _GET_HIGHEST_ID_TO_PROCESS =
             @"SELECT MAX(AttributeSetForFile.ID)
             FROM AttributeSetForFile
             JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
@@ -46,14 +60,14 @@ namespace Extract.UtilityApplications.NERDataCollector
         public string ModelName { get; set; }
 
         /// <summary>
-        /// The path to saved NERAnnotator settings
+        /// The path to saved NERAnnotator or LearningMachine settings
         /// </summary>
         [DataMember]
-        public string AnnotatorSettingsPath { get; set; }
+        public string DataGeneratorPath { get; set; }
 
         /// <summary>
         /// The attribute set (VOAs stored in the DB) that will both determine which files get
-        /// processed and be the source of annotation categories
+        /// processed and be the source of annotation categories, for NER, or DocumentTypes, for doc classifier LM
         /// </summary>
         [DataMember]
         public string AttributeSetName { get; set; }
@@ -69,12 +83,14 @@ namespace Extract.UtilityApplications.NERDataCollector
         /// </summary>
         public override bool Processing => _processing;
 
-
         /// <summary>
         /// The version
         /// </summary>
         [DataMember]
         public override int Version { get; protected set; } = CURRENT_VERSION;
+
+        [DataMember]
+        public ModelType ModelType { get; set; }
 
         #endregion Properties
 
@@ -83,7 +99,7 @@ namespace Extract.UtilityApplications.NERDataCollector
         /// <summary>
         /// Create an instance
         /// </summary>
-        public NERDataCollector()
+        public TrainingDataCollector()
         {
         }
 
@@ -129,7 +145,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                         var arguments = new List<string>
                         {
                             "-p",
-                            AnnotatorSettingsPath,
+                            DataGeneratorPath,
                             "--UseDatabase",
                             "true",
                             "--DatabaseServer",
@@ -145,7 +161,22 @@ namespace Extract.UtilityApplications.NERDataCollector
                             "--LastIDToProcess",
                             highestIDToProcess.ToString(CultureInfo.InvariantCulture),
                         };
-                        SystemMethods.RunExtractExecutable(_NER_ANNOTATOR_APPLICATION, arguments);
+
+                        if (ModelType == ModelType.NamedEntityRecognition)
+                        {
+                            SystemMethods.RunExtractExecutable(_NER_ANNOTATOR_APPLICATION, arguments);
+                        }
+                        else if (ModelType == ModelType.LearningMachine)
+                        {
+                            using (var machine = LearningMachine.Load(DataGeneratorPath))
+                            {
+                                machine.WriteDataToDatabase(databaseServer, databaseName, AttributeSetName, ModelName, lowestIDToProcess, highestIDToProcess);
+                            }
+                        }
+                        else
+                        {
+                            throw new ExtractException("ELI45434", "Unknown model type");
+                        }
                     }
                 }
             }
@@ -160,14 +191,14 @@ namespace Extract.UtilityApplications.NERDataCollector
         }
 
         /// <summary>
-        /// Deserializes a <see cref="NERDataCollector"/> instance from a JSON string
+        /// Deserializes a <see cref="TrainingDataCollector"/> instance from a JSON string
         /// </summary>
-        /// <param name="settings">The JSON string to which a <see cref="NERDataCollector"/> was previously saved</param>
-        public static new NERDataCollector FromJson(string settings)
+        /// <param name="settings">The JSON string to which a <see cref="TrainingDataCollector"/> was previously saved</param>
+        public static new TrainingDataCollector FromJson(string settings)
         {
             try
             {
-                return (NERDataCollector)DatabaseService.FromJson(settings);
+                return (TrainingDataCollector)DatabaseService.FromJson(settings);
             }
             catch (Exception ex)
             {

@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Threading;
 using UCLID_RASTERANDOCRMGMTLib;
 
@@ -160,7 +159,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Gets array of image paths and maybe of answers from specification
         /// </summary>
-        internal Tuple<string[], string[]> GetImagePaths(Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+        internal Tuple<string[], string[]> GetImagePaths(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             try
             {
@@ -264,33 +263,36 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Builds data arrays from specification
+        /// Builds data arrays from specification using provided uss paths
         /// </summary>
-        /// <param name="spatialStringFilePaths">Computed paths to USS input files</param>
+        /// <param name="spatialStringFilePaths">The USS input files that related paths are based on</param>
         /// <param name="attributeFilePaths">Computed paths to feature VOA files</param>
         /// <param name="answersOrAnswerFilePaths">Computed answer strings or paths to answer files</param>
-        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
-        public void GetInputData(out string[] spatialStringFilePaths, out string[] attributeFilePaths,
+        public void GetRelatedInputData(string[] imageFiles, string[] maybeAnswers,
+            out string[] spatialStringFilePaths,
+            out string[] attributeFilePaths,
             out string[] answersOrAnswerFilePaths,
-            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
             try
             {
-                ExtractException.Assert("ELI41448", "This instance has not been fully configured", IsConfigured);
+                ExtractException.Assert("ELI45440", "This instance has not been fully configured", IsConfigured);
 
                 spatialStringFilePaths = new string[0];
                 attributeFilePaths = new string[0];
                 answersOrAnswerFilePaths = new string[0];
 
-                var imagesAndMaybeAnswers = GetImagePaths(updateStatus, cancellationToken);
-                string[] imageFiles = imagesAndMaybeAnswers.Item1;
-
-                answersOrAnswerFilePaths = imagesAndMaybeAnswers.Item2
-                    ?? (AnswerPath == null
-                        ? null
-                        : new string[imageFiles.Length]);
+                bool needAnswers = maybeAnswers == null && AnswerPath != null;
+                if (needAnswers)
+                {
+                    answersOrAnswerFilePaths = new string[imageFiles.Length];
+                }
+                else
+                {
+                    answersOrAnswerFilePaths = maybeAnswers;
+                }
 
                 spatialStringFilePaths = new string[imageFiles.Length];
 
@@ -309,11 +311,38 @@ namespace Extract.AttributeFinder
                     {
                         attributeFilePaths[i] = pathTags.Expand(AttributesPath);
                     }
-                    if (!string.IsNullOrWhiteSpace(AnswerPath))
+                    if (needAnswers)
                     {
                         answersOrAnswerFilePaths[i] = pathTags.Expand(AnswerPath);
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI45441");
+            }
+        }
+
+        /// <summary>
+        /// Builds data arrays from specification
+        /// </summary>
+        /// <param name="spatialStringFilePaths">Computed paths to USS input files</param>
+        /// <param name="attributeFilePaths">Computed paths to feature VOA files</param>
+        /// <param name="answersOrAnswerFilePaths">Computed answer strings or paths to answer files</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
+        public void GetInputData(out string[] spatialStringFilePaths, out string[] attributeFilePaths,
+            out string[] answersOrAnswerFilePaths,
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        {
+            try
+            {
+                ExtractException.Assert("ELI41448", "This instance has not been fully configured", IsConfigured);
+
+                var imagesAndMaybeAnswers = GetImagePaths(updateStatus, cancellationToken);
+                GetRelatedInputData(imagesAndMaybeAnswers.Item1, imagesAndMaybeAnswers.Item2, out spatialStringFilePaths,
+                    out attributeFilePaths, out answersOrAnswerFilePaths, cancellationToken);
             }
             catch (Exception e)
             {

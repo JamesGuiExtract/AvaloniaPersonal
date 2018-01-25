@@ -141,9 +141,9 @@
       <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\NERDataCollector\Testing\Automated\NERDataCollector.Test.csproj">
+    <ProjectReference Include="..\..\..\TrainingDataCollector\Testing\Automated\TrainingDataCollector.Test.csproj">
       <Project>{2E1B43FD-5367-4A29-B509-0E8B42E5DA9C}</Project>
-      <Name>NERDataCollector.Test</Name>
+      <Name>TrainingDataCollector.Test</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Core\Code\NERTrainer.csproj">
       <Project>{A7FAD56F-541D-41A0-9DA7-683572F50A20}</Project>

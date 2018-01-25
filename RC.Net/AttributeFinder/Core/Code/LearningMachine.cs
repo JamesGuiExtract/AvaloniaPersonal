@@ -7,6 +7,8 @@ using Extract.Utilities;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -16,6 +18,8 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading;
+using System.Transactions;
+using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ZstdNet;
@@ -61,6 +65,24 @@ namespace Extract.AttributeFinder
 
         // Used for document categorization to represent low probability classification
         private static readonly string _UNKNOWN_CATEGORY = "Unknown";
+
+        static readonly string _GET_FILE_LIST =
+            @"SELECT DISTINCT FAMFile.FileName FROM AttributeSetForFile
+            JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
+            JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID
+            JOIN FAMFile ON FileTaskSession.FileID = FAMFile.ID
+                WHERE Description = @AttributeSetName
+                AND AttributeSetForFile.ID >= @FirstIDToProcess
+                AND AttributeSetForFile.ID <= @LastIDToProcess";
+
+        static readonly string _GET_FILE_LIST_AND_VOA =
+            @"SELECT DISTINCT FAMFile.FileName, AttributeSetForFile.VOA FROM AttributeSetForFile
+            JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
+            JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID
+            JOIN FAMFile ON FileTaskSession.FileID = FAMFile.ID
+                WHERE Description = @AttributeSetName
+                AND AttributeSetForFile.ID >= @FirstIDToProcess
+                AND AttributeSetForFile.ID <= @LastIDToProcess";
 
         #endregion Constants
 
@@ -888,7 +910,7 @@ namespace Extract.AttributeFinder
                 var savedMachine = new System.IO.MemoryStream();
                 Save(savedMachine);
                 savedMachine.Position = 0;
-                return LearningMachine.Load(savedMachine);
+                return Load(savedMachine);
             }
             catch (Exception e)
             {
@@ -915,101 +937,22 @@ namespace Extract.AttributeFinder
                 ExtractException.Assert("ELI44891", "No inputs available to train/test machine",
                     ussFiles.Length > 0);
 
-                var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
+                var (featureVectors, answerCodes, ussPathsPerExample) = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
                     updateStatus, cancellationToken, updateAnswerCodes: false);
 
-                var inputs = featureVectorsAndAnswers.Item1;
-                if (StandardizeFeaturesForCsvOutput)
+                var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, updateStatus, cancellationToken);
+
+                if (trainingData.Any())
                 {
-                    var mean = inputs.Mean();
-                    var sigma = inputs.StandardDeviation(mean);
-
-                    // Prevent divide by zero
-                    if (sigma.Any(factor => factor == 0))
-                    {
-                        sigma.ApplyInPlace(factor => factor + 0.0001);
-                    }
-
-                    // Standardize input
-                    inputs = inputs.Subtract(mean).ElementwiseDivide(sigma, inPlace: true);
-                }
-
-                var docIndex = featureVectorsAndAnswers.Item3.GroupBy(p => p).SelectMany(g => g.Select((p, i) => i)).ToArray();
-
-                // Training set
-                double[][] trainInputs = null;
-                int[] trainOutputs = null;
-                string[] trainFiles = null;
-                int[] trainFileIndices = null;
-
-                // Testing set
-                double[][] testInputs = null;
-                int[] testOutputs = null;
-                string[] testFiles = null;
-                int[] testFileIndices = null;
-
-                // Divide data into training and testing subsets
-                if (InputConfig.TrainingSetPercentage > 0)
-                {
-                    var rng = new Random(RandomNumberSeed);
-                    GetIndexesOfSubsetsByCategory(featureVectorsAndAnswers.Item2,
-                        InputConfig.TrainingSetPercentage / 100.0, out List<int> trainIdx, out List<int> testIdx, rng);
-
-                    // Training set
-                    trainInputs = inputs.Submatrix(trainIdx);
-                    trainOutputs = featureVectorsAndAnswers.Item2.Submatrix(trainIdx);
-                    trainFiles = featureVectorsAndAnswers.Item3.Submatrix(trainIdx);
-                    trainFileIndices = docIndex.Submatrix(trainIdx);
-
-                    // Testing set
-                    testInputs = inputs.Submatrix(testIdx);
-                    testOutputs = featureVectorsAndAnswers.Item2.Submatrix(testIdx);
-                    testFiles = featureVectorsAndAnswers.Item3.Submatrix(testIdx);
-                    testFileIndices = docIndex.Submatrix(trainIdx);
-                }
-                else
-                {
-                    // Testing set
-                    testInputs = inputs;
-                    testOutputs = featureVectorsAndAnswers.Item2;
-                    testFiles = featureVectorsAndAnswers.Item3;
-                    testFileIndices = docIndex;
-                }
-
-                int numColumns = inputs[0].Length + 1;
-
-                if (trainInputs != null && trainInputs.Any())
-                {
-                    var trainingData = trainFiles.Zip(trainFileIndices.Zip(trainInputs.Zip(trainOutputs, (f, a) => (features: f, answer: a)), (i, d) => (idx: i, features: d.features, answer: d.answer)), (uss, d) =>
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        updateStatus(new StatusArgs { StatusMessage = "Processing training set records: {0:N0}", Int32Value = 1 });
-
-                        var data = new List<string>(numColumns);
-                        data.Add(uss.Quote());
-                        data.Add(d.idx.ToString(CultureInfo.CurrentCulture));
-                        data.Add(Encoder.AnswerCodeToName[d.answer].Quote());
-                        data.AddRange(d.features.Select(n => n.ToString(CultureInfo.InvariantCulture)));
-                        return string.Join(",", data);
-                    });
                     var trainingCsv = CsvOutputFile + ".train.csv";
-                    File.WriteAllLines(trainingCsv, trainingData);
+                    File.WriteAllLines(trainingCsv, trainingData.Select(l => string.Join(",", l.Select(f => f.QuoteIfNeeded("\"", ",")))));
                 }
 
-                var testingData = testFiles.Zip(testFileIndices.Zip(testInputs.Zip(testOutputs, (f, a) => (features: f, answer: a)), (i, d) => (idx: i, features: d.features, answer: d.answer)), (uss, d) =>
+                if (testingData.Any())
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    updateStatus(new StatusArgs { StatusMessage = "Processing testing set records: {0:N0}", Int32Value = 1 });
-
-                    var data = new List<string>(numColumns);
-                    data.Add(uss.Quote());
-                    data.Add(d.idx.ToString(CultureInfo.CurrentCulture));
-                    data.Add(Encoder.AnswerCodeToName[d.answer].Quote());
-                    data.AddRange(d.features.Select(n => n.ToString(CultureInfo.InvariantCulture)));
-                    return string.Join(",", data);
-                });
-                var testingCsv = CsvOutputFile + ".test.csv";
-                File.WriteAllLines(testingCsv, testingData);
+                    var testingCsv = CsvOutputFile + ".test.csv";
+                    File.WriteAllLines(testingCsv, testingData.Select(l => string.Join(",", l.Select(f => f.QuoteIfNeeded("\"", ",")))));
+                }
             }
             catch (Exception ex)
             {
@@ -1017,109 +960,73 @@ namespace Extract.AttributeFinder
             }
         }
 
-        #endregion Public Methods
-
-        #region Overrides
-
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Writes out feature vectors and answers as CSV to a database
         /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
-        public override string ToString()
+        /// <remarks>The CSV fields are: "answer", features...</remarks>
+        public void WriteDataToDatabase(string databaseServer, string databaseName, string attributeSetName, string modelName, long lowestIDToProcess, long highestIDToProcess)
         {
-            var baseWriter = new StringWriter(CultureInfo.CurrentCulture);
-            var writer = new IndentedTextWriter(baseWriter, "  ");
-            writer.WriteLine("LearningMachine:");
-            writer.Indent++;
-            writer.WriteLine("Usage: {0}", Usage);
-            writer.WriteLine("RandomNumberSeed: {0}", RandomNumberSeed);
-            writer.WriteLine("InputConfig:");
-            InputConfig.PrettyPrint(writer);
-            writer.WriteLine("Encoder:");
-            Encoder.PrettyPrint(writer);
-            writer.WriteLine("Classifier ({0}):", MachineType);
-            Classifier.PrettyPrint(writer);
-            if (UseUnknownCategory)
+            try
             {
-                writer.WriteLine("UnknownCategoryCutoff: {0}", UnknownCategoryCutoff);
-            }
-            if (TranslateUnknownCategory)
-            {
-                writer.WriteLine("TranslateUnknownTo: {0}", TranslateUnknownCategoryTo);
-            }
-            return baseWriter.ToString().Trim();
-        }
+                ExtractException.Assert("ELI45436", "Machine is not fully configured", IsConfigured);
+                ExtractException.Assert("ELI45437", "Encodings are not computed", Encoder.AreEncodingsComputed);
 
-        #endregion Overrides
+                // Compute input files and answers
+                var (imageFiles, answers) = GetImageFileListFromDB(databaseServer, databaseName, attributeSetName, lowestIDToProcess, highestIDToProcess);
 
-        #region Private Methods
+                ExtractException.Assert("ELI45438", "No inputs available to train/test machine",
+                    imageFiles.Length > 0);
 
-        /// <summary>
-        /// Optionally trains and then tests the machine using files specified with <see cref="InputConfig"/>
-        /// </summary>
-        /// <param name="testOnly">Whether to only test, not train and test</param>
-        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
-        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        private (AccuracyData trainingSet, AccuracyData testingSet) TrainAndTestMachine(bool testOnly, Action<StatusArgs> updateStatus,
-            CancellationToken cancellationToken)
-        {
-            ExtractException.Assert("ELI39840", "Machine is not fully configured", IsConfigured);
+                InputConfig.GetRelatedInputData(imageFiles, answers, out string[] ussFiles, out string[] voaFiles, out string[] answersOrAnswerFiles, CancellationToken.None);
 
-            // Compute input files and answers
-            string[] ussFiles, voaFiles, answersOrAnswerFiles;
-            InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles, updateStatus, cancellationToken);
+                var (featureVectors, answerCodes, ussPathsPerExample) = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
+                    _ => { }, CancellationToken.None, updateAnswerCodes: true);
 
-            ExtractException.Assert("ELI41834", "No inputs available to train/test machine",
-                ussFiles.Length > 0);
+                var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, _ => { }, CancellationToken.None);
 
-            if (!Encoder.AreEncodingsComputed)
-            {
-                Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles, updateStatus, cancellationToken);
-            }
-
-            var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
-                updateStatus, cancellationToken, updateAnswerCodes: !testOnly);
-
-            // Divide data into training and testing subsets
-            if (InputConfig.TrainingSetPercentage > 0)
-            {
-                var rng = new Random(RandomNumberSeed);
-                List<int> trainIdx, testIdx;
-                GetIndexesOfSubsetsByCategory(featureVectorsAndAnswers.Item2,
-                    InputConfig.TrainingSetPercentage / 100.0, out trainIdx, out testIdx, rng);
-
-                // Training set
-                double[][] trainInputs = featureVectorsAndAnswers.Item1.Submatrix(trainIdx);
-                int[] trainOutputs = featureVectorsAndAnswers.Item2.Submatrix(trainIdx);
-
-                // Testing set
-                double[][] testInputs = featureVectorsAndAnswers.Item1.Submatrix(testIdx);
-                int[] testOutputs = featureVectorsAndAnswers.Item2.Submatrix(testIdx);
-
-                // Train the classifier
-                if (!testOnly)
+                void WriteCsvToDB(List<List<string>> data, bool isTrainingSet)
                 {
-                    Classifier.TrainClassifier(trainInputs, trainOutputs, rng, updateStatus, cancellationToken);
+                    // Build the connection string from the settings
+                    SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                    {
+                        DataSource = databaseServer,
+                        InitialCatalog = databaseName,
+                        IntegratedSecurity = true,
+                        NetworkLibrary = "dbmssocn"
+                    };
+
+                    using (var scope = new TransactionScope())
+                    {
+                        using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                        {
+                            connection.Open();
+
+                            var cmdText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
+                            SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
+                            FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
+                            foreach (var record in data)
+                            {
+                                using (var cmd = new SqlCommand(cmdText, connection))
+                                {
+                                    cmd.Parameters.AddWithValue("@IsTrainingData", isTrainingSet.ToString());
+                                    cmd.Parameters.AddWithValue("@ModelName", modelName);
+                                    var ussPath = record[0];
+                                    cmd.Parameters.AddWithValue("@Data", string.Join(",", record.Skip(2).Select(s => s.QuoteIfNeeded("\"", ","))));
+                                    cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                        scope.Complete();
+                    }
                 }
 
-                cancellationToken.ThrowIfCancellationRequested();
-
-                var trainResult = GetAccuracyScore(trainInputs, trainOutputs);
-                var testResult = GetAccuracyScore(testInputs, testOutputs);
-                AccuracyData =
-                    (train: new SerializableConfusionMatrix(Encoder, trainResult),
-                    test: new SerializableConfusionMatrix(Encoder, testResult));
-                return (trainResult, testResult);
+                WriteCsvToDB(trainingData, true);
+                WriteCsvToDB(testingData, false);
             }
-            // If no training data, just test testing set
-            else
+            catch (Exception ex)
             {
-                var testResult = GetAccuracyScore(featureVectorsAndAnswers.Item1, featureVectorsAndAnswers.Item2);
-                AccuracyData = (train: null, test: new SerializableConfusionMatrix(Encoder, testResult));
-                return (null, testResult);
+                throw ex.AsExtract("ELI45439");
             }
         }
 
@@ -1181,6 +1088,288 @@ namespace Extract.AttributeFinder
             {
                 throw ex.AsExtract("ELI45136");
             }
+        }
+
+        #endregion Public Methods
+
+        #region Overrides
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            var baseWriter = new StringWriter(CultureInfo.CurrentCulture);
+            var writer = new IndentedTextWriter(baseWriter, "  ");
+            writer.WriteLine("LearningMachine:");
+            writer.Indent++;
+            writer.WriteLine("Usage: {0}", Usage);
+            writer.WriteLine("RandomNumberSeed: {0}", RandomNumberSeed);
+            writer.WriteLine("InputConfig:");
+            InputConfig.PrettyPrint(writer);
+            writer.WriteLine("Encoder:");
+            Encoder.PrettyPrint(writer);
+            writer.WriteLine("Classifier ({0}):", MachineType);
+            Classifier.PrettyPrint(writer);
+            if (UseUnknownCategory)
+            {
+                writer.WriteLine("UnknownCategoryCutoff: {0}", UnknownCategoryCutoff);
+            }
+            if (TranslateUnknownCategory)
+            {
+                writer.WriteLine("TranslateUnknownTo: {0}", TranslateUnknownCategoryTo);
+            }
+            return baseWriter.ToString().Trim();
+        }
+
+        #endregion Overrides
+
+        #region Private Methods
+
+        /// <summary>
+        /// Optionally trains and then tests the machine using files specified with <see cref="InputConfig"/>
+        /// </summary>
+        /// <param name="testOnly">Whether to only test, not train and test</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
+        private (AccuracyData trainingSet, AccuracyData testingSet) TrainAndTestMachine(bool testOnly,
+            Action<StatusArgs> updateStatus,
+            CancellationToken cancellationToken)
+        {
+            ExtractException.Assert("ELI39840", "Machine is not fully configured", IsConfigured);
+
+            // Compute input files and answers
+            InputConfig.GetInputData(out string[] ussFiles, out string[] voaFiles, out string[] answersOrAnswerFiles, updateStatus, cancellationToken);
+
+            ExtractException.Assert("ELI41834", "No inputs available to train/test machine",
+                ussFiles.Length > 0);
+
+            if (!Encoder.AreEncodingsComputed)
+            {
+                Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles, updateStatus, cancellationToken);
+            }
+
+            var (featureVectors, answerCodes, _) =
+                Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
+                    updateStatus, cancellationToken, updateAnswerCodes: !testOnly);
+
+            // Divide data into training and testing subsets
+            if (InputConfig.TrainingSetPercentage > 0)
+            {
+                var rng = new Random(RandomNumberSeed);
+                GetIndexesOfSubsetsByCategory(answerCodes,
+                    InputConfig.TrainingSetPercentage / 100.0, out List<int> trainIdx, out List<int> testIdx, rng);
+
+                // Training set
+                double[][] trainInputs = featureVectors.Submatrix(trainIdx);
+                int[] trainOutputs = answerCodes.Submatrix(trainIdx);
+
+                // Testing set
+                double[][] testInputs = featureVectors.Submatrix(testIdx);
+                int[] testOutputs = answerCodes.Submatrix(testIdx);
+
+                // Train the classifier
+                if (!testOnly)
+                {
+                    Classifier.TrainClassifier(trainInputs, trainOutputs, rng, updateStatus, cancellationToken);
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var trainResult = GetAccuracyScore(trainInputs, trainOutputs);
+                var testResult = GetAccuracyScore(testInputs, testOutputs);
+                AccuracyData =
+                    (train: new SerializableConfusionMatrix(Encoder, trainResult),
+                    test: new SerializableConfusionMatrix(Encoder, testResult));
+                return (trainResult, testResult);
+            }
+            // If no training data, just test testing set
+            else
+            {
+                var testResult = GetAccuracyScore(featureVectors, answerCodes);
+                AccuracyData = (train: null, test: new SerializableConfusionMatrix(Encoder, testResult));
+                return (null, testResult);
+            }
+        }
+
+
+        /// <summary>
+        /// Gets the image file list and, if usage is doc classification, the answers from the DB
+        /// </summary>
+        private (string[] imagePaths, string[] maybeAnswers) GetImageFileListFromDB(
+            string databaseServer,
+            string databaseName,
+            string attributeSetName,
+            long lowestIDToProcess,
+            long highestIDToProcess)
+        {
+            try
+            {
+                // Build the connection string from the settings
+                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                {
+                    DataSource = databaseServer,
+                    InitialCatalog = databaseName,
+                    IntegratedSecurity = true,
+                    NetworkLibrary = "dbmssocn"
+                };
+
+                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                {
+                    connection.Open();
+
+                    bool getDocTypeFromVoa = Usage == LearningMachineUsage.DocumentCategorization;
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = getDocTypeFromVoa
+                            ? _GET_FILE_LIST_AND_VOA
+                            : _GET_FILE_LIST;
+                        cmd.Parameters.AddWithValue("@AttributeSetName", attributeSetName);
+                        cmd.Parameters.AddWithValue("@FirstIDToProcess", lowestIDToProcess);
+                        cmd.Parameters.AddWithValue("@LastIDToProcess", highestIDToProcess);
+
+                        // Set the timeout so that it waits indefinitely
+                        cmd.CommandTimeout = 0;
+                        var reader = cmd.ExecuteReader();
+                        var imagePaths = new List<string>();
+                        var answers = getDocTypeFromVoa
+                            ? new List<string>()
+                            : null;
+                        var afutil = new AFUtilityClass();
+                        foreach (IDataRecord record in reader)
+                        {
+                            imagePaths.Add(record.GetString(0));
+
+                            if (getDocTypeFromVoa)
+                            {
+                                string answer = null;
+                                if (!reader.IsDBNull(1))
+                                {
+                                    IUnknownVector voa = null;
+                                    using (var stream = reader.GetStream(1))
+                                    {
+                                        voa = AttributeMethods.GetVectorOfAttributesFromSqlBinary(stream);
+                                        voa.ReportMemoryUsage();
+                                        answer = afutil.QueryAttributes(voa, "DocumentType", false)
+                                            .ToIEnumerable<ComAttribute>()
+                                            .FirstOrDefault()?.Value.String;
+                                    }
+                                }
+                                answers.Add(answer ?? "");
+                            }
+                        }
+                        return (imagePaths.ToArray(), answers?.ToArray());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45435");
+            }
+        }
+
+        /// <summary>
+        /// Prepares training/testing data for writing to CSV or DB by zipping the separate collections together and,
+        /// if <see cref="StandardizeFeaturesForCsvOutput"/> = <c>true</c>, converts to the features to Z-scores
+        /// </summary>
+        private (List<List<string>> training, List<List<string>> testing) CombineFeatureVectorsAndAnswers(
+            double[][] featureVectors,
+            int[] answerCodes,
+            string[] ussPaths,
+            Action<StatusArgs> updateStatus,
+            CancellationToken cancellationToken)
+        {
+            if (StandardizeFeaturesForCsvOutput)
+            {
+                var mean = featureVectors.Mean();
+                var sigma = featureVectors.StandardDeviation(mean);
+
+                // Prevent divide by zero
+                if (sigma.Any(factor => factor == 0))
+                {
+                    sigma.ApplyInPlace(factor => factor + 0.0001);
+                }
+
+                // Standardize input
+                featureVectors = featureVectors.Subtract(mean).ElementwiseDivide(sigma, inPlace: true);
+            }
+
+            var docIndex = ussPaths.GroupBy(p => p)
+                .SelectMany(g => g.Select((p, i) => i))
+                .ToArray();
+
+            // Training set
+            double[][] trainInputs = null;
+            int[] trainOutputs = null;
+            string[] trainFiles = null;
+            int[] trainFileIndices = null;
+
+            // Testing set
+            double[][] testInputs = null;
+            int[] testOutputs = null;
+            string[] testFiles = null;
+            int[] testFileIndices = null;
+
+            // Divide data into training and testing subsets
+            if (InputConfig.TrainingSetPercentage > 0)
+            {
+                var rng = new Random(RandomNumberSeed);
+                GetIndexesOfSubsetsByCategory(answerCodes,
+                    InputConfig.TrainingSetPercentage / 100.0, out List<int> trainIdx, out List<int> testIdx, rng);
+
+                // Training set
+                trainInputs = featureVectors.Submatrix(trainIdx);
+                trainOutputs = answerCodes.Submatrix(trainIdx);
+                trainFiles = ussPaths.Submatrix(trainIdx);
+                trainFileIndices = docIndex.Submatrix(trainIdx);
+
+                // Testing set
+                testInputs = featureVectors.Submatrix(testIdx);
+                testOutputs = answerCodes.Submatrix(testIdx);
+                testFiles = ussPaths.Submatrix(testIdx);
+                testFileIndices = docIndex.Submatrix(trainIdx);
+            }
+            else
+            {
+                // Testing set
+                testInputs = featureVectors;
+                testOutputs = answerCodes;
+                testFiles = ussPaths;
+                testFileIndices = docIndex;
+            }
+
+            int numColumns = featureVectors[0].Length + 1;
+
+            // Zip each subset together
+            List<List<string>> zip(string[] subsetFiles, int[] subsetFileIndices, double[][] subsetInputs, int[] subsetOutputs, string setName)
+            {
+                List<List<string>> result = new List<List<string>>(subsetFiles.Length);
+                for (int num = 0; num < subsetFiles.Length; num++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    updateStatus(new StatusArgs { StatusMessage = "Processing " + setName + " set records: {0:N0}", Int32Value = 1 });
+
+                    var data = new List<string>(numColumns)
+                    {
+                        subsetFiles[num],
+                        subsetFileIndices[num].ToString(CultureInfo.CurrentCulture),
+                        Encoder.AnswerCodeToName[subsetOutputs[num]],
+                    };
+                    data.AddRange(subsetInputs[num].Select(n => n.ToString(CultureInfo.InvariantCulture)));
+                    result.Add(data);
+                }
+                return result;
+            }
+            var trainingData = trainInputs != null && trainInputs.Any()
+                ? zip(trainFiles, trainFileIndices, trainInputs, trainOutputs, "training")
+                : new List<List<string>>(0);
+            var testingData = zip(testFiles, testFileIndices, testInputs, testOutputs, "testing");
+
+            return (trainingData, testingData);
         }
 
         /// <summary>
@@ -1466,8 +1655,7 @@ namespace Extract.AttributeFinder
         {
             if (disposing)
             {
-                var disposable = Classifier as IDisposable;
-                if (disposable != null)
+                if (Classifier is IDisposable disposable)
                 {
                     disposable.Dispose();
                 }
@@ -1567,10 +1755,8 @@ namespace Extract.AttributeFinder
             try
             {
                 var machine = FileDerivedResourceCache.GetCachedObject(
-                    path: learningMachinePath,
-                    creator: () => Load(learningMachinePath),
-                    slidingExpiration: TimeSpan.FromMinutes(5),
-                    removedCallback: x => (x.CacheItem.Value as IDisposable)?.Dispose());
+                    paths: learningMachinePath,
+                    creator: () => Load(learningMachinePath));
 
                 machine.ComputeAnswer(document, attributeVector, preserveInputAttributes);
             }

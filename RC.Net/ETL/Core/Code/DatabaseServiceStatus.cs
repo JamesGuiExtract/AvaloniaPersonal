@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Extract.Utilities;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Data;
 using System.Data.SqlClient;

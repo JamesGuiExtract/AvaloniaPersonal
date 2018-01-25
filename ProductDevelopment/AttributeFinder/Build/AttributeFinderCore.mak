@@ -230,7 +230,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.DataCaptureStats.dll" /mapout:"$(BinariesFolder)\Map\Extract.DataCaptureStats.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ZstdNet.dll" /mapout:"$(BinariesFolder)\Map\ZstdNet.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\NERAnnotator.exe" /mapout:"$(BinariesFolder)\Map\mapNERAnnotator.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\NERDataCollector.exe" /mapout:"$(BinariesFolder)\Map\mapNERDataCollector.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\TrainingDataCollector.exe" /mapout:"$(BinariesFolder)\Map\mapTrainingDataCollector.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\NERTrainer.exe" /mapout:"$(BinariesFolder)\Map\mapNERTrainer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DashboardCreator.exe" /mapout:"$(BinariesFolder)\Map\mapDashboardCreator.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DashboardViewer.exe" /mapout:"$(BinariesFolder)\Map\mapDashboardViewer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
@@ -306,7 +306,7 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\ResolutionNormalizer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\DashboardViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\NERAnnotator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /v  "$(BinariesFolder)\NERDataCollector.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /v  "$(BinariesFolder)\TrainingDataCollector.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\NERTrainer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\RedactionPredictor.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\PredictionEvaluator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"

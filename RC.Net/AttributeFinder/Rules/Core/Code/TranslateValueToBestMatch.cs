@@ -783,9 +783,7 @@ namespace Extract.AttributeFinder.Rules
 
             var provider = FileDerivedResourceCache.GetCachedObject(
                 paths: paths,
-                creator: () => BuildProvider(sourceListPath, synonymMapPath),
-                slidingExpiration: TimeSpan.FromMinutes(5),
-                removedCallback: x => (x.CacheItem.Value as IDisposable)?.Dispose());
+                creator: () => BuildProvider(sourceListPath, synonymMapPath));
 
             return provider;
         }

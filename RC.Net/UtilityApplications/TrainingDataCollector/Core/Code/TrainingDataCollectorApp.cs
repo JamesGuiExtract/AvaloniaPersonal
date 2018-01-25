@@ -6,12 +6,12 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace Extract.UtilityApplications.NERDataCollector
+namespace Extract.UtilityApplications.TrainingDataCollector
 {
     /// <summary>
-    /// Application to be used to test the NERDataCollector, which is to be a ServiceProcess
+    /// Application to be used to test the TrainingDataCollector, which is to be a ServiceProcess
     /// </summary>
-    public class NERDataCollectorApp
+    public class TrainingDataCollectorApp
     {
         [STAThread]
         static int Main(string[] args)
@@ -24,12 +24,12 @@ namespace Extract.UtilityApplications.NERDataCollector
                 int usage(bool error = false)
                 {
                     UtilityMethods.ShowMessageBox("Usage:" +
-                        "\r\n  To create/store data:\r\n    NERDataCollector <settingsFile> /databaseServer <server> /databaseName <name> [/s] [/ef <exceptionFile>]" +
+                        "\r\n  To create/store data:\r\n    TrainingDataCollector <settingsFile> /databaseServer <server> /databaseName <name> [/s] [/ef <exceptionFile>]" +
                         "\r\n    /s = silent = no progress bar or exceptions displayed" +
                         "\r\n    /ef <exceptionFile> log exceptions to file" +
                         "\r\n       (supports propagate errors to FAM option)" +
                         "\r\n       (/ef also implies /s)" +
-                        "\r\n  To edit a settings file:\r\n    NERDataCollector /c <settingsFile> [/databaseServer <server>] [/databaseName <name>]", "NER Data Collector", error);
+                        "\r\n  To edit a settings file:\r\n    TrainingDataCollector /c <settingsFile> [/databaseServer <server>] [/databaseName <name>]", "NER Data Collector", error);
                     return error ? -1 : 0;
                 }
 
@@ -43,7 +43,7 @@ namespace Extract.UtilityApplications.NERDataCollector
                     string databaseServer = null;
                     string databaseName = null;
                     List<(PropertyInfo property, object value)> propertiesToSet = new List<(PropertyInfo, object)>();
-                    Type collectorType = typeof(NERDataCollector);
+                    Type collectorType = typeof(TrainingDataCollector);
                     for (int argNum = 0; argNum < args.Length; argNum++)
                     {
                         var arg = args[argNum];
@@ -165,8 +165,8 @@ namespace Extract.UtilityApplications.NERDataCollector
                     }
 
                     var collector = File.Exists(settingsFile)
-                        ? NERDataCollector.FromJson(File.ReadAllText(settingsFile))
-                        : new NERDataCollector();
+                        ? TrainingDataCollector.FromJson(File.ReadAllText(settingsFile))
+                        : new TrainingDataCollector();
 
                     foreach(var (property, value) in propertiesToSet)
                     {
@@ -175,7 +175,7 @@ namespace Extract.UtilityApplications.NERDataCollector
 
                     if (configure)
                     {
-                        using (var form = new NERDataCollectorConfigurationDialog(collector, databaseServer, databaseName))
+                        using (var form = new TrainingDataCollectorConfigurationDialog(collector, databaseServer, databaseName))
                         {
                             Application.Run(form);
                             var result = form.DialogResult;
@@ -184,10 +184,14 @@ namespace Extract.UtilityApplications.NERDataCollector
                                 File.WriteAllText(settingsFile, collector.ToJson());
                             }
                         }
+                        // Prevent COM Exception Caught being logged
+                        // https://extract.atlassian.net/browse/ISSUE-14980
+                        GC.Collect();
                     }
                     else
                     {
                         collector.Process(databaseServer, databaseName);
+                        File.WriteAllText(settingsFile, collector.ToJson());
                     }
                 }
                 else

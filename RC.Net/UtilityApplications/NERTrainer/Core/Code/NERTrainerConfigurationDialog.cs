@@ -70,6 +70,8 @@ namespace Extract.UtilityApplications.NERTrainer
 
                 InitializeComponent();
 
+                _lastIDProcessedNumericUpDown.Maximum = long.MaxValue;
+
                 SetControlValues();
             }
             catch (Exception ex)

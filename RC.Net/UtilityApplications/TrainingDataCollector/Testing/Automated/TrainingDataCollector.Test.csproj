@@ -8,8 +8,8 @@
     <OutputType>Library</OutputType>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.UtilityApplications.NERDataCollector.Test</RootNamespace>
-    <AssemblyName>Extract.UtilityApplications.NERDataCollector.Test</AssemblyName>
+    <RootNamespace>Extract.UtilityApplications.TrainingDataCollector.Test</RootNamespace>
+    <AssemblyName>Extract.UtilityApplications.TrainingDataCollector.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -117,7 +117,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestNERDataCollector.cs" />
+    <Compile Include="TestTrainingDataCollector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -153,9 +153,9 @@
       <Project>{36FBD81E-ACC8-4BED-9D8A-308BDD904092}</Project>
       <Name>NERAnnotator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Core\Code\NERDataCollector.csproj">
+    <ProjectReference Include="..\..\Core\Code\TrainingDataCollector.csproj">
       <Project>{020455B5-0838-4CCF-AF73-46D539FCF787}</Project>
-      <Name>NERDataCollector</Name>
+      <Name>TrainingDataCollector</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -21,7 +21,7 @@ namespace Extract.UtilityApplications.NERAnnotator
     {
         #region Constants
 
-        readonly string _GET_FILE_LIST =
+        static readonly string _GET_FILE_LIST =
             @"SELECT DISTINCT FAMFile.FileName FROM AttributeSetForFile
             JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
             JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID
@@ -30,7 +30,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                 AND AttributeSetForFile.ID >= @FirstIDToProcess
                 AND AttributeSetForFile.ID <= @LastIDToProcess";
 
-        readonly string _GET_VOA_FROM_DB =
+        static readonly string _GET_VOA_FROM_DB =
             @"SELECT TOP(1) AttributeSetForFile.VOA
             FROM AttributeSetForFile
             JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID

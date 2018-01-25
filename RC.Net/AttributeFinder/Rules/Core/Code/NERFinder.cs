@@ -1002,16 +1002,14 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 var model = FileDerivedResourceCache.GetCachedObject(
-                    path: modelPath,
+                    paths: modelPath,
                     creator: () =>
                     {
-                            var str = FileDerivedResourceCache.ThreadLocalMiscUtils.GetBase64StringFromFile(modelPath);
-                            var bytes = Convert.FromBase64String(str);
-                            var modelIn = new java.io.ByteArrayInputStream(bytes);
-                            return thunk(modelIn);
-                    },
-                    slidingExpiration: TimeSpan.MaxValue,
-                    removedCallback: x => (x.CacheItem.Value as IDisposable)?.Dispose());
+                        var str = FileDerivedResourceCache.ThreadLocalMiscUtils.GetBase64StringFromFile(modelPath);
+                        var bytes = Convert.FromBase64String(str);
+                        var modelIn = new java.io.ByteArrayInputStream(bytes);
+                        return thunk(modelIn);
+                    });
 
                 return model;
             }

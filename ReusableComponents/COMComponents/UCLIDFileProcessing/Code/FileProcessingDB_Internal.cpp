@@ -1851,6 +1851,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_WORKFLOW);
 		vecQueries.push_back(gstrCREATE_WEB_APP_CONFIG);
 		vecQueries.push_back(gstrCREATE_DATABASE_SERVICE_TABLE);
+		vecQueries.push_back(gstrCREATE_MLMODEL);
 	}
 
 	// Add queries to create tables to the vector
@@ -1889,7 +1890,6 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_WORKFLOWFILE);
 	vecQueries.push_back(gstrCREATE_WORKFLOWCHANGE);
 	vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE);
-	vecQueries.push_back(gstrCREATE_MLMODEL);
 	vecQueries.push_back(gstrCREATE_MLDATA);
 	vecQueries.push_back(gstrCREATE_REPORTING_VERIFICATION_RATES);
 
