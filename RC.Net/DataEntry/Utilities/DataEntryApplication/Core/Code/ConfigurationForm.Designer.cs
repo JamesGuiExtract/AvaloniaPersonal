@@ -34,7 +34,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._fileBrowseButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
-            this._enableInputTrackingCheckBox = new System.Windows.Forms.CheckBox();
             this._enableCountersCheckBox = new System.Windows.Forms.CheckBox();
             this._fileNameTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._tagSettingsButton = new System.Windows.Forms.Button();
@@ -76,7 +75,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(327, 144);
+            this._okButton.Location = new System.Drawing.Point(327, 120);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 10;
@@ -87,27 +86,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(408, 144);
+            this._cancelButton.Location = new System.Drawing.Point(408, 120);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 11;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
-            // _enableInputTrackingCheckBox
-            // 
-            this._enableInputTrackingCheckBox.AutoSize = true;
-            this._enableInputTrackingCheckBox.Location = new System.Drawing.Point(15, 79);
-            this._enableInputTrackingCheckBox.Name = "_enableInputTrackingCheckBox";
-            this._enableInputTrackingCheckBox.Size = new System.Drawing.Size(156, 17);
-            this._enableInputTrackingCheckBox.TabIndex = 6;
-            this._enableInputTrackingCheckBox.Text = "Enable input event tracking";
-            this._enableInputTrackingCheckBox.UseVisualStyleBackColor = true;
-            // 
             // _enableCountersCheckBox
             // 
             this._enableCountersCheckBox.AutoSize = true;
-            this._enableCountersCheckBox.Location = new System.Drawing.Point(15, 103);
+            this._enableCountersCheckBox.Location = new System.Drawing.Point(15, 79);
             this._enableCountersCheckBox.Name = "_enableCountersCheckBox";
             this._enableCountersCheckBox.Size = new System.Drawing.Size(153, 17);
             this._enableCountersCheckBox.TabIndex = 7;
@@ -120,6 +109,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._fileNameTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_fileNameTagsButton.Image")));
             this._fileNameTagsButton.Location = new System.Drawing.Point(435, 24);
             this._fileNameTagsButton.Name = "_fileNameTagsButton";
+            this._fileNameTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._fileNameTagsButton.Size = new System.Drawing.Size(18, 23);
             this._fileNameTagsButton.TabIndex = 2;
             this._fileNameTagsButton.TextControl = this._configFileNameTextBox;
@@ -149,7 +139,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _paginationCheckBox
             // 
             this._paginationCheckBox.AutoSize = true;
-            this._paginationCheckBox.Location = new System.Drawing.Point(15, 126);
+            this._paginationCheckBox.Location = new System.Drawing.Point(15, 102);
             this._paginationCheckBox.Name = "_paginationCheckBox";
             this._paginationCheckBox.Size = new System.Drawing.Size(111, 17);
             this._paginationCheckBox.TabIndex = 8;
@@ -159,7 +149,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _paginationSettingsButton
             // 
-            this._paginationSettingsButton.Location = new System.Drawing.Point(143, 122);
+            this._paginationSettingsButton.Location = new System.Drawing.Point(143, 98);
             this._paginationSettingsButton.Name = "_paginationSettingsButton";
             this._paginationSettingsButton.Size = new System.Drawing.Size(75, 23);
             this._paginationSettingsButton.TabIndex = 9;
@@ -171,7 +161,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(495, 179);
+            this.ClientSize = new System.Drawing.Size(495, 177);
             this.ControlBox = false;
             this.Controls.Add(this._paginationSettingsButton);
             this.Controls.Add(this._paginationCheckBox);
@@ -179,13 +169,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this.Controls.Add(this._allowTagsCheckBox);
             this.Controls.Add(this._fileNameTagsButton);
             this.Controls.Add(this._enableCountersCheckBox);
-            this.Controls.Add(this._enableInputTrackingCheckBox);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._fileBrowseButton);
             this.Controls.Add(this._configFileNameTextBox);
             this.Controls.Add(this._label1);
-            this.MinimumSize = new System.Drawing.Size(511, 217);
+            this.MinimumSize = new System.Drawing.Size(511, 193);
             this.Name = "ConfigurationForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
@@ -203,7 +192,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.Button _fileBrowseButton;
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
-        private System.Windows.Forms.CheckBox _enableInputTrackingCheckBox;
         private System.Windows.Forms.CheckBox _enableCountersCheckBox;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _fileNameTagsButton;
         private System.Windows.Forms.Button _tagSettingsButton;

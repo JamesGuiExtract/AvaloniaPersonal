@@ -470,7 +470,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 double duration = (DateTime.Now - startTime).TotalSeconds;
-                pDB.UpdateFileTaskSession(fileTaskSessionID, duration, 0);
+                pDB.UpdateFileTaskSession(fileTaskSessionID, duration, 0, 0);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }

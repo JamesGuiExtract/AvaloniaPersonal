@@ -47,7 +47,9 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <para>Version 10</para>
         /// Added Verification mode settings (resume verification, verify QA)
-        const int _CURRENT_VERSION = 10;
+        /// <para>Version 11</para>
+        /// Removed enable input event tracking setting, since it is always on.
+        const int _CURRENT_VERSION = 11;
         
         #endregion Constants
 

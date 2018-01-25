@@ -584,8 +584,8 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcess
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long nFileTaskSessionID,
-		double dDuration, double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound,
-		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
+		double dDuration, double dOverheadTime, double dActivityTime, long lNumHCDataFound, 
+		long lNumMCDataFound, long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
 		long lTotalManualRedactions, long lNumPagesAutoAdvanced)
 {
 	try
@@ -593,7 +593,7 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long nFileTaskSessionID,
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		// UpdateFileTaskSession has it's own optimistic locking, no need to do so here.
-		m_ipFAMDB->UpdateFileTaskSession(nFileTaskSessionID, dDuration, dOverheadTime);
+		m_ipFAMDB->UpdateFileTaskSession(nFileTaskSessionID, dDuration, dOverheadTime, dActivityTime);
 
 		if (!AddIDShieldData_Internal(false, nFileTaskSessionID, lNumHCDataFound, lNumMCDataFound,
 			lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, lTotalManualRedactions,

@@ -58,7 +58,6 @@ namespace Extract.Redaction.Verification
             this._seamlessNavigationCheckBox = new System.Windows.Forms.CheckBox();
             this._verifyAllItemsCheckBox = new System.Windows.Forms.CheckBox();
             this._launchFullScreenCheckBox = new System.Windows.Forms.CheckBox();
-            this._enableInputEventTrackingCheckBox = new System.Windows.Forms.CheckBox();
             this._feedbackSettingsButton = new System.Windows.Forms.Button();
             this._collectFeedbackCheckBox = new System.Windows.Forms.CheckBox();
             this._requireExemptionsCheckBox = new System.Windows.Forms.CheckBox();
@@ -107,7 +106,7 @@ namespace Extract.Redaction.Verification
             groupBox3.Controls.Add(this._backdropImageBrowseButton);
             groupBox3.Controls.Add(this._backdropImageTextBox);
             groupBox3.Controls.Add(this._backdropImageCheckBox);
-            groupBox3.Location = new System.Drawing.Point(6, 148);
+            groupBox3.Location = new System.Drawing.Point(6, 144);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new System.Drawing.Size(429, 76);
             groupBox3.TabIndex = 2;
@@ -140,6 +139,8 @@ namespace Extract.Redaction.Verification
             // 
             this._backdropImageBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._backdropImageBrowseButton.Enabled = false;
+            this._backdropImageBrowseButton.EnsureFileExists = false;
+            this._backdropImageBrowseButton.EnsurePathExists = false;
             this._backdropImageBrowseButton.Location = new System.Drawing.Point(396, 41);
             this._backdropImageBrowseButton.Name = "_backdropImageBrowseButton";
             this._backdropImageBrowseButton.Size = new System.Drawing.Size(27, 20);
@@ -313,19 +314,9 @@ namespace Extract.Redaction.Verification
             this._launchFullScreenCheckBox.Text = "Open verification window in full screen mode";
             this._launchFullScreenCheckBox.UseVisualStyleBackColor = true;
             // 
-            // _enableInputEventTrackingCheckBox
-            // 
-            this._enableInputEventTrackingCheckBox.AutoSize = true;
-            this._enableInputEventTrackingCheckBox.Location = new System.Drawing.Point(6, 42);
-            this._enableInputEventTrackingCheckBox.Name = "_enableInputEventTrackingCheckBox";
-            this._enableInputEventTrackingCheckBox.Size = new System.Drawing.Size(156, 17);
-            this._enableInputEventTrackingCheckBox.TabIndex = 2;
-            this._enableInputEventTrackingCheckBox.Text = "Enable input event tracking";
-            this._enableInputEventTrackingCheckBox.UseVisualStyleBackColor = true;
-            // 
             // _feedbackSettingsButton
             // 
-            this._feedbackSettingsButton.Location = new System.Drawing.Point(273, 15);
+            this._feedbackSettingsButton.Location = new System.Drawing.Point(273, 19);
             this._feedbackSettingsButton.Name = "_feedbackSettingsButton";
             this._feedbackSettingsButton.Size = new System.Drawing.Size(150, 23);
             this._feedbackSettingsButton.TabIndex = 1;
@@ -336,7 +327,7 @@ namespace Extract.Redaction.Verification
             // _collectFeedbackCheckBox
             // 
             this._collectFeedbackCheckBox.AutoSize = true;
-            this._collectFeedbackCheckBox.Location = new System.Drawing.Point(6, 19);
+            this._collectFeedbackCheckBox.Location = new System.Drawing.Point(6, 23);
             this._collectFeedbackCheckBox.Name = "_collectFeedbackCheckBox";
             this._collectFeedbackCheckBox.Size = new System.Drawing.Size(261, 17);
             this._collectFeedbackCheckBox.TabIndex = 0;
@@ -480,13 +471,13 @@ namespace Extract.Redaction.Verification
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Verification mode";
             // 
-            // _redactionQaExplanatoryTextBox
+            // _redactionQaExplanatoryLabel
             // 
             this._redactionQaExplanatoryLabel.AutoSize = true;
-            this._redactionQaExplanatoryLabel.MaximumSize = new System.Drawing.Size(382, 0);
             this._redactionQaExplanatoryLabel.Location = new System.Drawing.Point(22, 114);
-            this._redactionQaExplanatoryLabel.Name = "_redactionQaExplanatoryTextBox";
-            this._redactionQaExplanatoryLabel.Size = new System.Drawing.Size(377, 31);
+            this._redactionQaExplanatoryLabel.MaximumSize = new System.Drawing.Size(382, 0);
+            this._redactionQaExplanatoryLabel.Name = "_redactionQaExplanatoryLabel";
+            this._redactionQaExplanatoryLabel.Size = new System.Drawing.Size(360, 26);
             this._redactionQaExplanatoryLabel.TabIndex = 7;
             this._redactionQaExplanatoryLabel.Text = "(You will see viewed status of redaction items and pages as of the time the docum" +
     "entation most recently verified)";
@@ -575,18 +566,17 @@ namespace Extract.Redaction.Verification
             // 
             // groupBox7
             // 
-            this.groupBox7.Controls.Add(this._enableInputEventTrackingCheckBox);
             this.groupBox7.Controls.Add(this._feedbackSettingsButton);
             this.groupBox7.Controls.Add(this._collectFeedbackCheckBox);
             this.groupBox7.Location = new System.Drawing.Point(6, 6);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(429, 70);
+            this.groupBox7.Size = new System.Drawing.Size(429, 60);
             this.groupBox7.TabIndex = 0;
             this.groupBox7.TabStop = false;
             // 
             // _dataFileControl
             // 
-            this._dataFileControl.Location = new System.Drawing.Point(6, 82);
+            this._dataFileControl.Location = new System.Drawing.Point(6, 78);
             this._dataFileControl.Name = "_dataFileControl";
             this._dataFileControl.Size = new System.Drawing.Size(429, 60);
             this._dataFileControl.TabIndex = 0;
@@ -644,7 +634,6 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;
         private DataFileControl _dataFileControl;
-        private System.Windows.Forms.CheckBox _enableInputEventTrackingCheckBox;
         private System.Windows.Forms.CheckBox _backdropImageCheckBox;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _backdropImagePathTagsButton;
         private Extract.Utilities.Forms.BrowseButton _backdropImageBrowseButton;

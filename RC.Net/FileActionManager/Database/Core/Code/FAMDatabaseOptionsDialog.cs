@@ -36,8 +36,6 @@ namespace Extract.FileActionManager.Database
         const string _UPDATE_QUEUE_EVENT_TABLE = "UpdateQueueEventTable";
         const string _STORE_SOURCE_DOC_NAME_CHANGE_HISTORY = "StoreDocNameChangeHistory";
         const string _STORE_DOC_TAG_HISTORY = "StoreDocTagHistory";
-        const string _ENABLE_INPUT_EVENT_TRACKING = "EnableInputEventTracking";
-        const string _INPUT_EVENT_HISTORY_SIZE = "InputEventHistorySize";
         const string _STORE_DB_INFO_HISTORY = "StoreDBInfoChangeHistory";
         const string _STORE_FTP_EVENT_HISTORY = "StoreFTPEventHistory";
 
@@ -218,16 +216,6 @@ namespace Extract.FileActionManager.Database
                 _alternateComponentDataDirectoryTextBox.Text =
                     settings.GetValue(_ALTERNATE_COMPONENT_DATA_DIR);
 
-                // Set the input event history value
-                int dayCount = 0;
-                string days = settings.GetValue(_INPUT_EVENT_HISTORY_SIZE);
-                if (!int.TryParse(days, out dayCount)
-                    || dayCount > 365 || dayCount < 1)
-                {
-                    dayCount = 30;
-                }
-                _upDownInputEventHistory.Value = dayCount;
-
                 // Check for product specific entries
                 // There are no longer any settings associated with IDShield.
                 bool enableIdShield = false; //settings.Contains(_ID_SHIELD_SCHEMA_VERSION_NAME);
@@ -339,7 +327,6 @@ namespace Extract.FileActionManager.Database
         void UpdateEnabledStates()
         {
             UpdateAutoRevertEnabledState();
-            UpdateInputTrackingEnabledState();
             UpdateSkipMachinesEnabledState();
         }
 
@@ -352,14 +339,6 @@ namespace Extract.FileActionManager.Database
 
             _buttonModifyEmail.Enabled = count == 1;
             _buttonRemoveEmail.Enabled = count > 0;
-        }
-
-        /// <summary>
-        /// Updates the enabled state of the input tracking controls.
-        /// </summary>
-        void UpdateInputTrackingEnabledState()
-        {
-            _upDownInputEventHistory.Enabled = _checkStoreInputEventTracking.Checked;
         }
 
         /// <summary>
@@ -389,7 +368,6 @@ namespace Extract.FileActionManager.Database
             dictionary[_UPDATE_QUEUE_EVENT_TABLE] = _checkStoreQueueEventHistory;
             dictionary[_STORE_SOURCE_DOC_NAME_CHANGE_HISTORY] = _checkStoreSourceDocChangeHistory;
             dictionary[_STORE_DOC_TAG_HISTORY] = _checkStoreDocTagHistory;
-            dictionary[_ENABLE_INPUT_EVENT_TRACKING] = _checkStoreInputEventTracking;
             dictionary[_REQUIRE_PASSWORD_TO_PROCESS_SKIPPED] = _checkRequirePasswordForSkipped;
             dictionary[_REQUIRE_AUTHENTICATION_BEFORE_RUN] = _checkRequireAuthenticationToRun;
             dictionary[_STORE_DB_INFO_HISTORY] = _checkStoreDBSettingsChangeHistory;
@@ -486,57 +464,6 @@ namespace Extract.FileActionManager.Database
         }
 
         /// <summary>
-        /// Handles the input event history value corrected event.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        private void HandleInputEventHistoryValueCorrectedEvent(object sender, EventArgs e)
-        {
-            try
-            {
-                UtilityMethods.ShowMessageBox(
-                    "The number of days to store input event history must be between 1 and 365.",
-                    "Invalid Number Of Days", true);
-
-                // Re-select the _upDownInputEventHistory control, but only after any other events
-                // in the message queue have been processed so those event don't undo this selection.
-                BeginInvoke((MethodInvoker)(() =>
-                {
-                    try
-                    {
-                        _tabControlSettings.SelectedTab = _tabHistory;
-                        _upDownInputEventHistory.Focus();
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.ExtractDisplay("ELI31918");
-                    }
-                }));
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI31919");
-            }
-        }
-
-        /// <summary>
-        /// Handles the input event history check changed event.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        private void HandleInputEventHistoryCheckChangedEvent(object sender, EventArgs e)
-        {
-            try
-            {
-                UpdateInputTrackingEnabledState();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI31921");
-            }
-        }
-
-        /// <summary>
         /// Handles the ok clicked.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -577,12 +504,6 @@ namespace Extract.FileActionManager.Database
                     string.Join(";", _listAutoRevertEmailList.Items.Cast<string>())
                     : string.Empty;
                 map.Set(_AUTO_REVERT_NOTIFY_EMAIL_LIST, value);
-
-                if (_checkStoreInputEventTracking.Checked)
-                {
-                    map.Set(_INPUT_EVENT_HISTORY_SIZE,
-                        _upDownInputEventHistory.Value.ToString(CultureInfo.InvariantCulture));
-                }
 
                 string machines = _listMachinesToAuthenticate.Items.Count > 0 ?
                     string.Join(";", _listMachinesToAuthenticate.Items.Cast<string>()) :

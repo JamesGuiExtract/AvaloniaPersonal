@@ -62,6 +62,8 @@ static const string gstrLICENSE_CONTACT_ORGANIZATION = "LicenseContactOrganizati
 static const string gstrLICENSE_CONTACT_EMAIL = "LicenseContactEmail";
 static const string gstrLICENSE_CONTACT_PHONE = "LicenseContactPhone";
 
+static const string gstrINPUT_ACTIVITY_TIMEOUT = "InputActivityTimeout";
+
 
 // Feature names
 static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";

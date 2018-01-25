@@ -128,14 +128,13 @@ namespace Extract.Redaction.Verification
             bool useBackdropImage = _backdropImageCheckBox.Checked;
             string backdropImage = _backdropImageTextBox.Text;
             SetFileActionStatusSettings action = GetActionStatusSettings();
-            bool enableInputTracking = _enableInputEventTrackingCheckBox.Checked;
             bool launchInFullScreenMode = _launchFullScreenCheckBox.Checked;
             SlideshowSettings slideshowSettings = GetSlideshowSettings();
             bool allowTags = _allowTagsCheckBox.Checked;
             VerificationModeSetting verificationModeSetting = GetVerificationModeSetting();
 
             return new VerificationSettings(general, feedback, dataFile, useBackdropImage,
-                backdropImage, action, enableInputTracking, launchInFullScreenMode,
+                backdropImage, action, launchInFullScreenMode,
                 slideshowSettings, allowTags, _tagSettings, verificationModeSetting);
         }
 
@@ -442,7 +441,6 @@ namespace Extract.Redaction.Verification
                 _seamlessNavigationCheckBox.Checked = _settings.General.AllowSeamlessNavigation;
                 _feedback = _settings.Feedback;
                 _collectFeedbackCheckBox.Checked = _feedback.Collect;
-                _enableInputEventTrackingCheckBox.Checked = _settings.EnableInputTracking;
                 _launchFullScreenCheckBox.Checked = _settings.LaunchInFullScreenMode;
                 _promptForSaveUntilCommit.Checked = _settings.General.PromptForSaveUntilCommit;
 

@@ -2138,8 +2138,6 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrNUMBER_CONNECTION_RETRIES] = "10";
 	mapDefaultValues[gstrCONNECTION_RETRY_TIMEOUT] = "120";
 	mapDefaultValues[gstrSTORE_FAM_SESSION_HISTORY] = "1";
-	mapDefaultValues[gstrENABLE_INPUT_EVENT_TRACKING] = "0";
-	mapDefaultValues[gstrINPUT_EVENT_HISTORY_SIZE] = "30";
 	mapDefaultValues[gstrREQUIRE_AUTHENTICATION_BEFORE_RUN] = "0";
 	mapDefaultValues[gstrAUTO_CREATE_ACTIONS] = "0";
 	mapDefaultValues[gstrSKIP_AUTHENTICATION_ON_MACHINES] = "";
@@ -2175,6 +2173,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrLICENSE_CONTACT_ORGANIZATION] = "";
 	mapDefaultValues[gstrLICENSE_CONTACT_EMAIL] = "";
 	mapDefaultValues[gstrLICENSE_CONTACT_PHONE] = "";
+	mapDefaultValues[gstrINPUT_ACTIVITY_TIMEOUT] = "30";
 
 	// Create a new database ID  or use existing if it has been set
 	ByteStream bsDatabaseID;
@@ -4991,43 +4990,6 @@ void CFileProcessingDB::ensureFAMRegistration(string strActionName)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::isInputEventTrackingEnabled(const _ConnectionPtr& ipConnection)
-{
-	try
-	{
-		// Check the DB setting (only check once per session)
-		static bool bInputTrackingEnabled =
-			getDBInfoSetting(ipConnection, gstrENABLE_INPUT_EVENT_TRACKING, true) == "1";
-
-		return bInputTrackingEnabled;
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28967");
-}
-//--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::deleteOldInputEvents(const _ConnectionPtr& ipConnection)
-{
-	static CTime lastTime(1970, 1,1, 0, 0, 0);
-
-	try
-	{
-		// Get the current time and compute the time span between the current and the last
-		// delete operation
-		CTime currentTime = CTime::GetCurrentTime();
-		CTimeSpan span = currentTime - lastTime;
-
-		// Only execute the query if it hasn't been run in the past day
-		if (span.GetDays() > 1)
-		{
-			// Set the last time to the current time
-			lastTime = currentTime;
-
-			// Execute the delete old input event records query
-			executeCmdQuery(ipConnection, gstrDELETE_OLD_INPUT_EVENT_RECORDS);
-		}
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28941");
-}
-//--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isMachineInListOfMachinesToSkipUserAuthentication(
 	const _ConnectionPtr& ipConnection)
 {
@@ -5870,6 +5832,10 @@ void CFileProcessingDB::addOldDBInfoValues(map<string, string>& mapOldValues)
 	// https://extract.atlassian.net/browse/ISSUE-12789
 	// Version 128 - Storing FAMSession data is now mandatory.
 	mapOldValues["StoreFAMSessionHistory"] = "";
+	// https://extract.atlassian.net/browse/ISSUE-15054
+	// Version 161 - Input event tracking is always enabled
+	mapOldValues["EnableInputEventTracking"] = "";
+	mapOldValues["InputEventHistorySize"] = "";
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addOldTables(vector<string>& vecTables)

@@ -65,7 +65,6 @@ namespace IDShieldOnDemand
                     "",
                     null,
                     false,
-                    false,
                     new SlideshowSettings(false, false, "", false, "", EActionStatus.kActionUnattempted,
                         false, new ObjectWithDescription(), false, false, 1, false),
                     false,

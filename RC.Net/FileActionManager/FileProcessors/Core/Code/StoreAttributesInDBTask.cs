@@ -575,7 +575,7 @@ namespace Extract.FileActionManager.FileProcessors
                                                                       StoreEmptyAttributes,
                                                                       false);
 
-                    pDB.UpdateFileTaskSession(fileTaskSessionID, timer.ElapsedSeconds, 0);
+                    pDB.UpdateFileTaskSession(fileTaskSessionID, timer.ElapsedSeconds, 0, 0);
                 }
                 else
                 {

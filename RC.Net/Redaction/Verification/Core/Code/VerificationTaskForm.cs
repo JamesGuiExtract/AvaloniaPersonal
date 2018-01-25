@@ -419,6 +419,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         string _commentFromDB;
 
+        /// <summary>
+        /// The IntputActivityTimeout from database DBInfo, default is 30 sec
+        /// </summary>
+        int _intputActivityTimeout = 30;
+
         #endregion Fields
 
         #region Events
@@ -1018,7 +1023,7 @@ namespace Extract.Redaction.Verification
 
                 // Add the data to the database
                 AddDatabaseData(memento.FileTaskSessionID.Value, counts,
-                    _screenTimeInterval.ElapsedSeconds, _overheadTimeInterval.ElapsedSeconds);
+                    _screenTimeInterval.ElapsedSeconds, _overheadTimeInterval.ElapsedSeconds, _inputEventTracker?.StopActivityTimer() ?? 0);
             }
         }
 
@@ -1034,9 +1039,9 @@ namespace Extract.Redaction.Verification
         /// displayed (or the first since the last call to <see cref="Standby"/>, this time will be 0.
         /// </param>
         void AddDatabaseData(int fileTaskSessionID, RedactionCounts counts, double screenTime,
-            double overheadTime)
+            double overheadTime, double activityTime)
         {
-            _idShieldDatabase.AddIDShieldData(fileTaskSessionID, screenTime, overheadTime,
+            _idShieldDatabase.AddIDShieldData(fileTaskSessionID, screenTime, overheadTime, activityTime,
                 counts.HighConfidence, counts.MediumConfidence, counts.LowConfidence,
                 counts.Clues, counts.Total, counts.Manual, _setSlideshowAdvancedPages.Count);
         }
@@ -1412,6 +1417,8 @@ namespace Extract.Redaction.Verification
                 _overheadTimeInterval = new TimeInterval(DateTime.Now, 0);
                 _processingTimer.Start();
             }
+
+            _inputEventTracker?.StartActivityTimer(_intputActivityTimeout);
 
             // If _verificationRateStatusLabel exists, update it.
             if (_verificationRateStatusLabel != null)
@@ -2844,6 +2851,13 @@ namespace Extract.Redaction.Verification
                     _tagFileToolStripSeparator.Visible = true;
                 }
 
+                // Get the InputActivityTimeout from the database
+                string activityTimeout = _fileDatabase.GetDBInfoSetting("InputActivityTimeout", false);
+                if (!string.IsNullOrWhiteSpace(activityTimeout))
+                {
+                    _intputActivityTimeout = int.Parse(activityTimeout);
+                }
+
                 // Create the IDShield database wrapper
                 FAMDBUtils dbUtils = new FAMDBUtils();
                 Type mgrType = Type.GetTypeFromProgID(dbUtils.GetIDShieldDBProgId());
@@ -4200,8 +4214,7 @@ namespace Extract.Redaction.Verification
                 StoreDatabase(fileProcessingDB);
 
                 // Enable input tracking if specified and there is a database
-                if (_inputEventTracker == null && _settings.EnableInputTracking
-                    && fileProcessingDB != null)
+                if (_inputEventTracker == null && fileProcessingDB != null)
                 {
                     _inputEventTracker = new InputEventTracker(fileProcessingDB, actionID, this);
                 }

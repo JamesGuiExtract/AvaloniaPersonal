@@ -103,6 +103,7 @@ namespace Extract.ETL
               ,[FileID]
               , COALESCE([Duration], 0.0) [Duration]
               , COALESCE([OverheadTime], 0.0) [OverheadTime]
+              , COALESCE([ActivityTime], 0.0) [ActivityTime] 
           FROM [dbo].[FileTaskSession] 
             INNER JOIN [dbo].[TaskClass] ON [TaskClass].[ID] = [FileTaskSession].[TaskClassID]
             LEFT JOIN [dbo].[ActiveFAM] ON [FileTaskSession].[FAMSessionID] = [ActiveFAM].[FAMSessionID]
@@ -218,6 +219,7 @@ namespace Extract.ETL
                             Int32 fileID = sourceReader.GetInt32(sourceReader.GetOrdinal("FileID"));
                             Double duration = sourceReader.GetDouble(sourceReader.GetOrdinal("Duration"));
                             Double overhead = sourceReader.GetDouble(sourceReader.GetOrdinal("OverheadTime"));
+                            Double activityTime = sourceReader.GetDouble(sourceReader.GetOrdinal("ActivityTime"));
 
                             status.LastFileTaskSessionIDProcessed = fileTaskSessionID;
 
@@ -245,7 +247,7 @@ namespace Extract.ETL
                                     saveCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = fileTaskSessionID;
                                     saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = duration;
                                     saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = overhead;
-                                    saveCmd.Parameters.Add("@ActiveMinutes", SqlDbType.Float).Value = 0.0;
+                                    saveCmd.Parameters.Add("@ActiveMinutes", SqlDbType.Float).Value = activityTime;
                                     saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
 
                                     try

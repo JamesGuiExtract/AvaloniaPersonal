@@ -674,7 +674,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 
             // Add the IDShieldData record to the database
             ipIDSDB->AddIDShieldData(nFileTaskSessionID,
-                swProcessingTime.getElapsedTime(), 0, 
+                swProcessingTime.getElapsedTime(), 0, 0,
                 idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
                 idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions,
                 idsData.m_lNumPagesAutoAdvanced);

@@ -570,7 +570,7 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
         //          given values.
         [id(5), helpstring("method AddIDShieldData")] HRESULT AddIDShieldData(
 			[in] long nFileTaskSessionID, 
-            [in] double dDuration, [in] double dOverheadTime, [in] long lNumHCDataFound,
+            [in] double dDuration, [in] double dOverheadTime, [in] double dActivityTime, [in] long lNumHCDataFound,
 			[in] long lNumMCDataFound, [in] long lNumLCDataFound, [in] long lNumCluesDataFound,
 			[in] long lTotalRedactions, [in] long lTotalManualRedactions,
 			[in] long lNumPagesAutoAdvanced);

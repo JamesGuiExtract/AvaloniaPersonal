@@ -55,19 +55,19 @@ namespace Extract.ETL.Test
 
         static VerificationRatesList _PROCESS1_EXPECTED = new VerificationRatesList
         {
-            (1, 1, 1, 6, 1, 10.0, 1.0, 0.0)
+            (1, 1, 1, 6, 1, 10.0, 1.0, 10.0)
         };
 
         static VerificationRatesList _PROCESS2_EXPECTED = new VerificationRatesList
         {
-            (1, 1, 1, 6, 1, 10.0, 1.0, 0.0),
-            (1, 2, 1, 6, 2, 20.0, 2.0, 0.0)
+            (1, 1, 1, 6, 1, 10.0, 1.0, 10.0),
+            (1, 2, 1, 6, 2, 20.0, 2.0, 20.0)
         };
         
         static VerificationRatesList _PROCESS4_EXPECTED = new VerificationRatesList
         {
-            (1, 1, 1, 6, 1, 10.0, 1.0, 0.0),
-            (1, 2, 1, 6, 3, 50.0, 5.0, 0.0)
+            (1, 1, 1, 6, 1, 10.0, 1.0, 10.0),
+            (1, 2, 1, 6, 3, 50.0, 5.0, 50.0)
         };
 
         #endregion
@@ -168,7 +168,7 @@ namespace Extract.ETL.Test
 
                 int fileTaskSessionID = fileProcessingDb.StartFileTaskSession(_REDACTION_VERIFY_GUID, fileRecord1.FileID, actionID1);
 
-                fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 10.0, 1.0);
+                fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 10.0, 1.0, 10.0);
                 fileProcessingDb.RecordFAMSessionStop();
                 fileProcessingDb.UnregisterActiveFAM();
 
@@ -191,7 +191,7 @@ namespace Extract.ETL.Test
                 Assert.That(status.SetOfActiveFileTaskIDs.Count == 1 && status.SetOfActiveFileTaskIDs.Contains(2),
                     "There is one FileTaskSession pending due to Active processing");
 
-                fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 20.0, 2.0);
+                fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 20.0, 2.0, 20.0);
                 rates.Process();
 
                 status = GetStatus(rates);
@@ -213,7 +213,7 @@ namespace Extract.ETL.Test
 
                 fileTaskSessionID = fileProcessingDb.StartFileTaskSession(_REDACTION_VERIFY_GUID, fileRecord2.FileID, actionID1);
 
-                fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 30.0, 3.0);
+                fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 30.0, 3.0, 30.0);
                 fileProcessingDb.RecordFAMSessionStop();
                 fileProcessingDb.UnregisterActiveFAM();
 

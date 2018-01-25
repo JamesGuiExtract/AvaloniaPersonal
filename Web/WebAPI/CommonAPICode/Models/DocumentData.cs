@@ -249,8 +249,9 @@ namespace WebAPI.Models
 
                 _cachedUssData = null;
 
+                double duration = (DateTime.Now - FileApi.DocumentSession.StartTime).TotalSeconds;
                 FileApi.FileProcessingDB.UpdateFileTaskSession(FileApi.DocumentSession.Id,
-                    (DateTime.Now - FileApi.DocumentSession.StartTime).TotalSeconds, 0);
+                    duration, 0, 0);
 
                 int fileId = FileApi.DocumentSession.FileId;
                 if (commit)

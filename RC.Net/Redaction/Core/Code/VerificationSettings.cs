@@ -44,12 +44,7 @@ namespace Extract.Redaction
         readonly SetFileActionStatusSettings _actionStatusSettings;
 
         /// <summary>
-        /// Whether input event tracking should be enabled.
-        /// </summary>
-        readonly bool _enableInputTracking;
-
-        /// <summary>
-        /// Indicates whether to lauch the verification UI in full screen mode.
+        /// Indicates whether to launch the verification UI in full screen mode.
         /// </summary>
         readonly bool _launchInFullScreenMode;
 
@@ -78,7 +73,7 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class.
         /// </summary>
         public VerificationSettings() 
-            : this(null, null, null, false, null, null, false, false, null, true, null, null)
+            : this(null, null, null, false, null, null, false, null, true, null, null)
         {
 
         }
@@ -89,8 +84,8 @@ namespace Extract.Redaction
         /// </summary>
         public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback, 
             string inputFile, bool useBackdropImage, string backdropImage, 
-            SetFileActionStatusSettings actionStatus, bool enableInputTracking,
-            bool launchInFullScreenMode, SlideshowSettings slideshowSettings, bool allowTags,
+            SetFileActionStatusSettings actionStatus, bool launchInFullScreenMode, 
+            SlideshowSettings slideshowSettings, bool allowTags,
             FileTagSelectionSettings tagSettings, VerificationModeSetting verificationModeSetting)
         {
             _generalSettings = general ?? new GeneralVerificationSettings();
@@ -99,7 +94,6 @@ namespace Extract.Redaction
             _useBackdropImage = useBackdropImage;
             _backdropImage = backdropImage;
             _actionStatusSettings = actionStatus ?? new SetFileActionStatusSettings();
-            _enableInputTracking = enableInputTracking;
             _launchInFullScreenMode = launchInFullScreenMode;
             _slideshowSettings = slideshowSettings ?? new SlideshowSettings();
             _allowTags = allowTags;
@@ -187,19 +181,6 @@ namespace Extract.Redaction
             get
             {
                 return _actionStatusSettings;
-            }
-        }
-
-        /// <summary>
-        /// Gets whether input event tracking should be enabled.
-        /// </summary>
-        /// <returns><see langword="true"/> if input event tracking should be enabled and
-        /// <see langword="false"/> otherwise.</returns>
-        public bool EnableInputTracking
-        {
-            get
-            {
-                return _enableInputTracking;
             }
         }
 
@@ -306,7 +287,7 @@ namespace Extract.Redaction
                     reader.ReadBoolean();
                     reader.ReadString();
                 }
-                if (reader.Version >= 3)
+                if (reader.Version >= 3 && reader.Version <= 10)
                 {
                     enableInputTracking = reader.ReadBoolean();
                 }
@@ -343,9 +324,8 @@ namespace Extract.Redaction
                 }
 
                 return new VerificationSettings(general, feedback, inputFile, useBackdropImage,
-                    backdropImage, actionStatusSettings, enableInputTracking,
-                    launchInFullScreenMode, slideshowSettings, allowTags, tagSettings,
-                    verificationModeSetting);
+                    backdropImage, actionStatusSettings, launchInFullScreenMode, 
+                    slideshowSettings, allowTags, tagSettings, verificationModeSetting);
             }
             catch (Exception ex)
             {
@@ -367,7 +347,6 @@ namespace Extract.Redaction
                 _generalSettings.WriteTo(writer);
                 _feedbackSettings.WriteTo(writer);
                 writer.Write(_inputFile);
-                writer.Write(_enableInputTracking);
                 _actionStatusSettings.WriteTo(writer);
                 writer.Write(_useBackdropImage);
                 writer.Write(_backdropImage);

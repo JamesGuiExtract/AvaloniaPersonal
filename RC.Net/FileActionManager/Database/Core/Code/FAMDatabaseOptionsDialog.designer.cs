@@ -31,7 +31,6 @@
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label4;
             System.Windows.Forms.Label label3;
-            System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label5;
             System.Windows.Forms.Label label6;
             System.Windows.Forms.Label label7;
@@ -53,11 +52,9 @@
             this._checkStoreFTPEventHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreDBSettingsChangeHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreDocTagHistory = new System.Windows.Forms.CheckBox();
-            this._checkStoreInputEventTracking = new System.Windows.Forms.CheckBox();
             this._checkStoreQueueEventHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreFASTHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreSourceDocChangeHistory = new System.Windows.Forms.CheckBox();
-            this._upDownInputEventHistory = new Extract.Utilities.Forms.BetterNumericUpDown();
             this._tabSecurity = new System.Windows.Forms.TabPage();
             this._buttonRemoveMachine = new System.Windows.Forms.Button();
             this._buttonModifyMachine = new System.Windows.Forms.Button();
@@ -78,7 +75,6 @@
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
-            label1 = new System.Windows.Forms.Label();
             label5 = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
             label7 = new System.Windows.Forms.Label();
@@ -87,7 +83,6 @@
             this._tabGeneral.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._upDownRevertMinutes)).BeginInit();
             this._tabHistory.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._upDownInputEventHistory)).BeginInit();
             this._tabSecurity.SuspendLayout();
             this._tabProductSpecific.SuspendLayout();
             this._productSpecificLayout.SuspendLayout();
@@ -121,15 +116,6 @@
             label3.Size = new System.Drawing.Size(170, 13);
             label3.TabIndex = 4;
             label3.Text = "Automatically revert file status after";
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(256, 99);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(35, 13);
-            label1.TabIndex = 20;
-            label1.Text = "day(s)";
             // 
             // label5
             // 
@@ -343,12 +329,9 @@
             this._tabHistory.Controls.Add(this._checkStoreFTPEventHistory);
             this._tabHistory.Controls.Add(this._checkStoreDBSettingsChangeHistory);
             this._tabHistory.Controls.Add(this._checkStoreDocTagHistory);
-            this._tabHistory.Controls.Add(label1);
-            this._tabHistory.Controls.Add(this._checkStoreInputEventTracking);
             this._tabHistory.Controls.Add(this._checkStoreQueueEventHistory);
             this._tabHistory.Controls.Add(this._checkStoreFASTHistory);
             this._tabHistory.Controls.Add(this._checkStoreSourceDocChangeHistory);
-            this._tabHistory.Controls.Add(this._upDownInputEventHistory);
             this._tabHistory.Location = new System.Drawing.Point(4, 22);
             this._tabHistory.Name = "_tabHistory";
             this._tabHistory.Padding = new System.Windows.Forms.Padding(3);
@@ -361,7 +344,7 @@
             // _checkStoreFTPEventHistory
             // 
             this._checkStoreFTPEventHistory.AutoSize = true;
-            this._checkStoreFTPEventHistory.Location = new System.Drawing.Point(6, 144);
+            this._checkStoreFTPEventHistory.Location = new System.Drawing.Point(6, 121);
             this._checkStoreFTPEventHistory.Name = "_checkStoreFTPEventHistory";
             this._checkStoreFTPEventHistory.Size = new System.Drawing.Size(137, 17);
             this._checkStoreFTPEventHistory.TabIndex = 21;
@@ -371,7 +354,7 @@
             // _checkStoreDBSettingsChangeHistory
             // 
             this._checkStoreDBSettingsChangeHistory.AutoSize = true;
-            this._checkStoreDBSettingsChangeHistory.Location = new System.Drawing.Point(6, 121);
+            this._checkStoreDBSettingsChangeHistory.Location = new System.Drawing.Point(6, 98);
             this._checkStoreDBSettingsChangeHistory.Name = "_checkStoreDBSettingsChangeHistory";
             this._checkStoreDBSettingsChangeHistory.Size = new System.Drawing.Size(209, 17);
             this._checkStoreDBSettingsChangeHistory.TabIndex = 7;
@@ -387,17 +370,6 @@
             this._checkStoreDocTagHistory.TabIndex = 3;
             this._checkStoreDocTagHistory.Text = "Store document tag history";
             this._checkStoreDocTagHistory.UseVisualStyleBackColor = true;
-            // 
-            // _checkStoreInputEventTracking
-            // 
-            this._checkStoreInputEventTracking.AutoSize = true;
-            this._checkStoreInputEventTracking.Location = new System.Drawing.Point(6, 98);
-            this._checkStoreInputEventTracking.Name = "_checkStoreInputEventTracking";
-            this._checkStoreInputEventTracking.Size = new System.Drawing.Size(196, 17);
-            this._checkStoreInputEventTracking.TabIndex = 5;
-            this._checkStoreInputEventTracking.Text = "Store input event tracking history for";
-            this._checkStoreInputEventTracking.UseVisualStyleBackColor = true;
-            this._checkStoreInputEventTracking.CheckedChanged += new System.EventHandler(this.HandleInputEventHistoryCheckChangedEvent);
             // 
             // _checkStoreQueueEventHistory
             // 
@@ -428,29 +400,6 @@
             this._checkStoreSourceDocChangeHistory.TabIndex = 2;
             this._checkStoreSourceDocChangeHistory.Text = "Store source document name change history";
             this._checkStoreSourceDocChangeHistory.UseVisualStyleBackColor = true;
-            // 
-            // _upDownInputEventHistory
-            // 
-            this._upDownInputEventHistory.Location = new System.Drawing.Point(210, 97);
-            this._upDownInputEventHistory.Maximum = new decimal(new int[] {
-            365,
-            0,
-            0,
-            0});
-            this._upDownInputEventHistory.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this._upDownInputEventHistory.Name = "_upDownInputEventHistory";
-            this._upDownInputEventHistory.Size = new System.Drawing.Size(40, 20);
-            this._upDownInputEventHistory.TabIndex = 6;
-            this._upDownInputEventHistory.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this._upDownInputEventHistory.UserTextCorrected += new System.EventHandler<System.EventArgs>(this.HandleInputEventHistoryValueCorrectedEvent);
             // 
             // _tabSecurity
             // 
@@ -664,7 +613,6 @@
             ((System.ComponentModel.ISupportInitialize)(this._upDownRevertMinutes)).EndInit();
             this._tabHistory.ResumeLayout(false);
             this._tabHistory.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._upDownInputEventHistory)).EndInit();
             this._tabSecurity.ResumeLayout(false);
             this._tabSecurity.PerformLayout();
             this._tabProductSpecific.ResumeLayout(false);
@@ -691,7 +639,6 @@
         private System.Windows.Forms.CheckBox _checkAutoCreateActions;
         private System.Windows.Forms.CheckBox _checkAllowdynamicTagCreation;
         private System.Windows.Forms.ListBox _listAutoRevertEmailList;
-        private System.Windows.Forms.CheckBox _checkStoreInputEventTracking;
         private System.Windows.Forms.CheckBox _checkStoreQueueEventHistory;
         private System.Windows.Forms.CheckBox _checkStoreFASTHistory;
         private System.Windows.Forms.CheckBox _checkStoreSourceDocChangeHistory;
@@ -707,7 +654,6 @@
         private System.Windows.Forms.CheckBox _checkDataEntryEnableCounters;
         private System.Windows.Forms.FlowLayoutPanel _productSpecificLayout;
         private Utilities.Forms.BetterNumericUpDown _upDownRevertMinutes;
-        private Utilities.Forms.BetterNumericUpDown _upDownInputEventHistory;
         private System.Windows.Forms.CheckBox _checkStoreDocTagHistory;
         private System.Windows.Forms.CheckBox _checkStoreDBSettingsChangeHistory;
         private Utilities.Forms.NumericEntryTextBox _numberMaxTimeBetweenChecks;

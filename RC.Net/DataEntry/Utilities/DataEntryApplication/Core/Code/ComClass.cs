@@ -45,9 +45,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <item>4: Added _countersEnabled</item>
         /// <item>5: Added file tag selection settings</item>
         /// <item>6: Added pagination</item>
+        /// <time>7: Removed _inputEventTrackingEnabled - now always enabled</time>
         /// </list>
         /// </summary>
-        static readonly int _CURRENT_VERSION = 6;
+        static readonly int _CURRENT_VERSION = 7;
 
         #endregion Constants
 
@@ -118,7 +119,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
         }
 
-        #endregion Contructors
+        #endregion Constructors
 
         #region Properties
 
@@ -294,7 +295,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Returns a value indicating that the task displasy a UI
+        /// Returns a value indicating that the task displays a UI
         /// </summary>
         public bool DisplaysUI
         {
@@ -326,15 +327,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException.Assert("ELI43413", 
                     "Verification is not supported for <All workflows>", !pDB.RunningAllWorkflows);
 
-                if (_settings.InputEventTrackingEnabled || _settings.CountersEnabled)
+                if (_settings.CountersEnabled)
                 {
                     ExtractException.Assert("ELI29827", "Cannot enable " +
-                        ((_settings.InputEventTrackingEnabled || _settings.CountersEnabled) 
-                            ? "input tracking or data counters"
-                            : _settings.InputEventTrackingEnabled 
-                                ? "input tracking"
-                                : "counters") +
-                        " without access to a file processing database!", pDB != null);
+                        "data counters without access to a file processing database!", pDB != null);
                 }
 
                 _fileProcessingDB = pDB;
@@ -474,7 +470,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// This call will be made on a different thread than the other calls, so the Standby call
         /// must be thread-safe. This allows the file processor to block on the Standby call, but
         /// it also means that call to <see cref="ProcessFile"/> or <see cref="Close"/> may come
-        /// while the Standby call is still ocurring. If this happens, the return value of Standby
+        /// while the Standby call is still occurring. If this happens, the return value of Standby
         /// will be ignored; however, Standby should promptly return in this case to avoid
         /// needlessly keeping a thread alive.
         /// </summary>

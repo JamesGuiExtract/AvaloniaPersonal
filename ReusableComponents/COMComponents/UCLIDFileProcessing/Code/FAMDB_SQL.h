@@ -357,7 +357,8 @@ static const string gstrCREATE_FILE_TASK_SESSION =
 	" [FileID] [int] NOT NULL, "
 	" [DateTimeStamp] [datetime] NULL, "
 	" [Duration] [float] NULL, "
-	" [OverheadTime] [float] NULL)";
+	" [OverheadTime] [float] NULL, "
+	" [ActivityTime] [float] NULL)";
 
 static const string gstrCREATE_SECURE_COUNTER =
 	"CREATE TABLE dbo.[SecureCounter] ( "
@@ -1287,13 +1288,6 @@ static const string gstrINSERT_EMAIL_ENABLE_SETTINGS_WITH_VALUE =
 "END\r\n"
 "INSERT INTO [DBInfo] (Name, Value) VALUES (\'EmailEnableSettings\', @boolText)";
 
-
-// Query to delete old input event records from the InputEvent table
-static const string gstrDELETE_OLD_INPUT_EVENT_RECORDS =
-	"DELETE FROM InputEvent WHERE DATEDIFF(d, GETDATE(), [TimeStamp]) > (SELECT COALESCE("
-	"(SELECT CAST([Value] AS int) FROM [DBInfo] WHERE [Name] = '"
-	+ gstrINPUT_EVENT_HISTORY_SIZE + "'), 30))";
-
 // Query to use to calculate and insert new ActionStatistics records for the ActionIDs when the id
 // to recreate is determined by the <ActionIDWhereClause> which needs to be substituted in.
 // NOTE: This query will throw and exception if the ActionStatistics record for that action id 
@@ -1850,7 +1844,8 @@ static const string gstrUPDATE_FILETASKSESSION_DATA =
 	"UPDATE [dbo].[FileTaskSession] SET "
 	"		[DateTimeStamp] = GETDATE(), "
 	"		[Duration] = <Duration>, "
-	"		[OverheadTime] = <OverheadTime> "
+	"		[OverheadTime] = <OverheadTime>, "
+	"       [ActivityTime] = <ActivityTime> "
 	"	WHERE [ID] = <FileTaskSessionID>";
 
 static const string gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES = 

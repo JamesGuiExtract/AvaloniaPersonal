@@ -157,14 +157,30 @@ namespace Extract.FileActionManager.Forms
         readonly int _processId;
 
         /// <summary>
-        /// Whether the input events should be tracked in the database or not.
-        /// </summary>
-        readonly bool _trackEvents;
-
-        /// <summary>
         /// Mutex for getting/setting the current minute data
         /// </summary>
         readonly static object _lock = new object();
+
+        /// <summary>
+        /// Keeps track of the time since the last input event
+        /// </summary>
+        Stopwatch _timeSinceLastEvent = new Stopwatch();
+
+        /// <summary>
+        /// The total timespan with activity
+        /// </summary>
+        TimeSpan _totalActivityTimeSpan = new TimeSpan();
+
+        /// <summary>
+        /// Used to track the time with activity
+        /// </summary>
+        Stopwatch _timeActivity = new Stopwatch();
+
+        /// <summary>
+        /// If the time since the last event is greater than this amount then
+        /// the time since the last event is not counted as activity
+        /// </summary>
+        int _activityTimeOut = 30;
 
         #endregion Fields
 
@@ -209,25 +225,19 @@ namespace Extract.FileActionManager.Forms
                     _processId = process.Id;
                 }
 
-                // Check whether event tracking is enabled
-                _trackEvents = _database.GetDBInfoSetting("EnableInputEventTracking", true)
-                    .Equals("1", StringComparison.OrdinalIgnoreCase);
+                // Create the threads and set the threading model to multi-threaded apartment
+                _activeSecondThread = new Thread(ActiveSecondTimer);
+                _activeSecondThread.SetApartmentState(ApartmentState.MTA);
+                _activeMinuteThread = new Thread(ActiveMinuteTimer);
+                _activeMinuteThread.SetApartmentState(ApartmentState.MTA);
+                _updateDatabaseThread = new Thread(UpdateDatabase);
+                _updateDatabaseThread.SetApartmentState(ApartmentState.MTA);
 
-                if (_trackEvents)
-                {
-                    // Create the threads and set the threading model to multi-threaded apartment
-                    _activeSecondThread = new Thread(ActiveSecondTimer);
-                    _activeSecondThread.SetApartmentState(ApartmentState.MTA);
-                    _activeMinuteThread = new Thread(ActiveMinuteTimer);
-                    _activeMinuteThread.SetApartmentState(ApartmentState.MTA);
-                    _updateDatabaseThread = new Thread(UpdateDatabase);
-                    _updateDatabaseThread.SetApartmentState(ApartmentState.MTA);
+                // Start the threads
+                _activeSecondThread.Start();
+                _activeMinuteThread.Start();
+                _updateDatabaseThread.Start();
 
-                    // Start the threads
-                    _activeSecondThread.Start();
-                    _activeMinuteThread.Start();
-                    _updateDatabaseThread.Start();
-                }
             }
             catch (Exception ex)
             {
@@ -274,6 +284,7 @@ namespace Extract.FileActionManager.Forms
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28949", ex);
                 ee.AddDebugData("Control", control, false);
+                throw ee;
             }
         }
 
@@ -297,6 +308,7 @@ namespace Extract.FileActionManager.Forms
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28951", ex);
                 ee.AddDebugData("Control", control, false);
+                throw ee;
             }
         }
 
@@ -312,9 +324,63 @@ namespace Extract.FileActionManager.Forms
         /// </summary>
         public void NotifyOfInputEvent()
         {
-            if (_trackEvents && Active)
+            if (Active)
             {
                 _inputCount++;
+                UpdateActivityTime();
+            }
+        }
+
+        /// <summary>
+        /// Start the Activity timer, resets the total time 
+        /// </summary>
+        /// <param name="timeout">If the time since the last event is greater than this amount then
+        /// the time since the last event is not counted as activity</param>
+        public void StartActivityTimer(int timeout)
+        {
+            try
+            {
+                if (_timeActivity.IsRunning)
+                {
+                    return;
+                }
+                _timeActivity.Restart();
+                _timeSinceLastEvent.Restart();
+                _activityTimeOut = timeout;
+                _totalActivityTimeSpan = new TimeSpan(0);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI45497", "Unable to start activity time", ex);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Stops the timers for measuring activity and update the total activity time
+        /// </summary>
+        /// <returns>The number of seconds of total activity time since <see cref="StartActivityTimer(int)"/>
+        /// was called.</returns>
+        public double StopActivityTimer()
+        {
+            try
+            {
+                _timeSinceLastEvent.Stop();
+                _timeActivity.Stop();
+
+                _totalActivityTimeSpan = _totalActivityTimeSpan.Add(_timeActivity.Elapsed);
+
+                // Check if additional time since last event should be subtracted from the total
+                if (_timeSinceLastEvent.Elapsed.TotalSeconds > _activityTimeOut)
+                {
+                    _totalActivityTimeSpan = _totalActivityTimeSpan.Subtract(_timeSinceLastEvent.Elapsed);
+                }
+                return _totalActivityTimeSpan.TotalSeconds;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI45498", "Unable to Stop activity time", ex);
+                throw ee;
             }
         }
 
@@ -327,6 +393,21 @@ namespace Extract.FileActionManager.Forms
             // Update the InputEvent table
             _database.RecordInputEvent(data.TimeStamp.ToString("g", DateTimeFormatInfo.InvariantInfo),
                 _actionId, data.ActiveSecondCount, _processId);
+        }
+
+        /// <summary>
+        /// Checks if the time since last input event is > than the timeout if it is stop the
+        /// timer since last event subtract the elapsed from the total activity time and reset the 
+        /// timer since last event
+        /// </summary>
+        void UpdateActivityTime()
+        {
+            var elapstedSinceLastActivity = _timeSinceLastEvent.Elapsed;
+            _timeSinceLastEvent.Restart();
+            if (elapstedSinceLastActivity.TotalSeconds > _activityTimeOut)
+            {
+                _totalActivityTimeSpan = _totalActivityTimeSpan.Subtract(elapstedSinceLastActivity);
+            }
         }
 
         #endregion Methods
@@ -344,7 +425,7 @@ namespace Extract.FileActionManager.Forms
                 int sleepTime = 1000 - DateTime.Now.Millisecond;
                 while (!_endThreads.WaitOne(sleepTime))
                 {
-                    // Get the current tickcount
+                    // Get the current tick count
                     int tickCount = Environment.TickCount;
                     if (_inputCount > 0)
                     {
@@ -492,7 +573,7 @@ namespace Extract.FileActionManager.Forms
             try
             {
                 // Only check the message if event tracking is on
-                if (_trackEvents && Active)
+                if (Active)
                 {
                     switch (message.Msg)
                     {
@@ -506,6 +587,7 @@ namespace Extract.FileActionManager.Forms
                         case WindowsMessage.NonClientRightButtonDown:
                         case WindowsMessage.NonClientMiddleButtonDown:
                             _inputCount++;
+                            UpdateActivityTime();
                             break;
                     }
                 }

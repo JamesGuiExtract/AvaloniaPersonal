@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestInputEventTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestFileActionManagerPathTags.cs" />
   </ItemGroup>
@@ -73,6 +74,14 @@
     <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
+      <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
+      <Project>{6B284A4D-132C-4FE4-858F-06A9C476B19B}</Project>
+      <Name>Extract.FileActionManager.Database.Test</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Code\Extract.FileActionManager.Forms.csproj">
       <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>

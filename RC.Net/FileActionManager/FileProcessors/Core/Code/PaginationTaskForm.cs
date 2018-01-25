@@ -1606,7 +1606,7 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 _fileProcessingDB.UpdateFileTaskSession(
-                    _fileTaskSessionID.Value, 0, 0);
+                    _fileTaskSessionID.Value, 0, 0, 0);
             }
             catch (Exception ex)
             {

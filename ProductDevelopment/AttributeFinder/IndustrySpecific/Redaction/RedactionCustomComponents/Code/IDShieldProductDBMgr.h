@@ -73,8 +73,8 @@ public:
 
 // IIDShieldProductDBMgr Methods
 	STDMETHOD(AddIDShieldData)(long nFileTaskSessionID, double dDuration,
-		double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound,
-		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
+		double dOverheadTime, double dActivityTime, long lNumHCDataFound, long lNumMCDataFound, 
+		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
 		long lNumPagesAutoAdvanced);
 	STDMETHOD(GetResultsForQuery)(BSTR bstrQuery, _Recordset** ppVal);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* plFileID);

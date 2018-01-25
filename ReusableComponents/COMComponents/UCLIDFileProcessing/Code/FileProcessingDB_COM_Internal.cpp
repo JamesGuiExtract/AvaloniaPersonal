@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 160;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 161;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2100,6 +2100,44 @@ int UpdateToSchemaVersion160(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45476");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion161(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 161;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		
+		vecQueries.push_back("ALTER TABLE dbo.[FileTaskSession] ADD [ActivityTime] [float] NULL");
+
+		string strInputActivityTimeout = gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY;
+		replaceVariable(strInputActivityTimeout, gstrSETTING_NAME, "InputActivityTimeout");
+		replaceVariable(strInputActivityTimeout, gstrSETTING_VALUE, "30");
+		vecQueries.push_back(strInputActivityTimeout);
+
+		// Remove EnableInputEventTracking
+		vecQueries.push_back("DELETE FROM [DBINFO] WHERE [Name] = 'EnableInputEventTracking'");
+
+		// Remove InputEventHistorSize
+		vecQueries.push_back("DELETE FROM [DBINFO] WHERE [Name] = 'InputEventHistorySize'");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45501");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6422,11 +6460,6 @@ bool CFileProcessingDB::RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeS
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				if (!isInputEventTrackingEnabled(ipConnection))
-				{
-					throw UCLIDException("ELI28966", "Input event tracking is not currently enabled.");
-				}
-
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
@@ -6482,9 +6515,6 @@ bool CFileProcessingDB::RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeS
 					// Update the table
 					ipSeconds->Update();
 				}
-
-				// Delete the old input events
-				deleteOldInputEvents(ipConnection);
 
 				// Commit the transaction
 				tg.CommitTrans();
@@ -7151,7 +7181,9 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 157:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion158);
 				case 158:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion159);
 				case 159:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion160);
-				case 160:	break;
+				case 160:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion161);
+				case 161:
+					break;
 
 				default:
 					{
@@ -9313,7 +9345,7 @@ bool CFileProcessingDB::StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrT
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::UpdateFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID,
-	double dDuration, double dOverheadTime)
+	double dDuration, double dOverheadTime, double dActivityTime)
 {
 	try
 	{
@@ -9333,6 +9365,7 @@ bool CFileProcessingDB::UpdateFileTaskSession_Internal(bool bDBLocked, long nFil
 			replaceVariable(strUpdateSQL, "<FileTaskSessionID>", asString(nFileTaskSessionID));
 			replaceVariable(strUpdateSQL, "<Duration>", asString(dDuration));
 			replaceVariable(strUpdateSQL, "<OverheadTime>", asString(dOverheadTime));
+			replaceVariable(strUpdateSQL, "<ActivityTime>", asString(dActivityTime));
 
 			executeCmdQuery(ipConnection, strUpdateSQL);
 			

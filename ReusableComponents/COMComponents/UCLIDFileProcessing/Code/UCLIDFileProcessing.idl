@@ -1835,7 +1835,7 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Applies the specified durations to the specified FileTaskSession row. The
 		//			DateTimeStamp will also be applied.
 		[id(161), helpstring("methods UpdateFileTaskSession")] HRESULT UpdateFileTaskSession(
-			[in] long nFileTaskSessionID, [in] double dDuration, [in] double dOverheadTime);
+			[in] long nFileTaskSessionID, [in] double dDuration, [in] double dOverheadTime, [in] double dActivityTime);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Adds a new workflow to the database
 		[id(162), helpstring("methods AddWorkflow")] HRESULT AddWorkflow(

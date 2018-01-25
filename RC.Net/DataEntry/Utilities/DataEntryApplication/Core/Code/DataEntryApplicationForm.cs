@@ -411,6 +411,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         bool _disposeThreadPending;
 
+        /// <summary>
+        /// The InputActivityTimeout from database DBInfo, default is 30 sec
+        /// </summary>
+        int _inputActivityTimeout = 30;
+
         #endregion Fields
 
         #region Constructors
@@ -473,7 +478,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 _tagUtility = (ITagUtility)tagManager;
 
-                string expandedConfigFileName = 
+                string expandedConfigFileName =
                     tagManager.ExpandTagsAndFunctions(settings.ConfigFileName, null);
 
                 // Initialize the root directory the DataEntry framework should use when resolving
@@ -507,14 +512,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _actionId = actionId;
                 _fileRequestHandler = fileRequestHandler;
 
-                if (settings.InputEventTrackingEnabled || settings.CountersEnabled)
+                if (settings.CountersEnabled)
                 {
-                    ExtractException.Assert("ELI29828", "Cannot enable " +
-                        ((settings.InputEventTrackingEnabled && settings.CountersEnabled)
-                            ? "input tracking or data counters"
-                            : settings.InputEventTrackingEnabled
-                                ? "input tracking"
-                                : "counters") +
+                    ExtractException.Assert("ELI29828", "Cannot enable data counters" +
                         " without access to a file processing database!", _fileProcessingDb != null);
                 }
 
@@ -532,7 +532,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     _actionName = _fileProcessingDb.GetActionName(_actionId);
                 }
-                
+
+                if (_fileProcessingDb != null)
+                {
+                    // Get the InputActivityTimeout from the database
+                    string activityTimeout = _fileProcessingDb.GetDBInfoSetting("InputActivityTimeout", false);
+                    if (!string.IsNullOrWhiteSpace(activityTimeout))
+                    {
+                        _inputActivityTimeout = int.Parse(activityTimeout);
+                    }
+                }
+
                 InitializeComponent();
 
                 if (_brandingResources.ApplicationIcon != null)
@@ -892,7 +902,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // Create input event tracker before file task session is started
                 // because StartFileTaskSession() registers this form with the tracker
-                if (_settings.InputEventTrackingEnabled && _inputEventTracker == null)
+                if (_inputEventTracker == null && fileProcessingDB != null)
                 {
                     _inputEventTracker = new InputEventTracker(fileProcessingDB, actionID);
                 }
@@ -1814,7 +1824,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     if (oldDataEntryControlHost != null)
                     {
                         // Make sure to update the attribute collection that the config manager is using
-                        // so that the correct docuement type attribute is updated.
+                        // so that the correct document type attribute is updated.
                         // https://extract.atlassian.net/browse/ISSUE-14347
                         // Ignore the attributes if none were ever loaded (the default config's control
                         // host will have an empty attribute vector initially)
@@ -1832,10 +1842,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         oldDataEntryControlHost.DataValidityChanged -= HandleDataValidityChanged;
                         oldDataEntryControlHost.UnviewedDataStateChanged -= HandleUnviewedDataStateChanged;
                         oldDataEntryControlHost.ItemSelectionChanged -= HandleItemSelectionChanged;
-                        if (_settings.InputEventTrackingEnabled)
-                        {
-                            oldDataEntryControlHost.MessageHandled -= HandleMessageFilterMessageHandled;
-                        }
+                        oldDataEntryControlHost.MessageHandled -= HandleMessageFilterMessageHandled;
 
                         _gotoNextInvalidCommand.ShortcutHandler = null;
                         _gotoNextUnviewedCommand.ShortcutHandler = null;
@@ -1863,10 +1870,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         newDataEntryControlHost.DataValidityChanged += HandleDataValidityChanged;
                         newDataEntryControlHost.UnviewedDataStateChanged += HandleUnviewedDataStateChanged;
                         newDataEntryControlHost.ItemSelectionChanged += HandleItemSelectionChanged;
-                        if (_settings.InputEventTrackingEnabled)
-                        {
-                            newDataEntryControlHost.MessageHandled += HandleMessageFilterMessageHandled;
-                        }
+                        newDataEntryControlHost.MessageHandled += HandleMessageFilterMessageHandled;
 
                         _gotoNextInvalidCommand.ShortcutHandler =
                             newDataEntryControlHost.GoToNextInvalid;
@@ -4334,11 +4338,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _imageWindowShortcutsMessageFilter = new ShortcutsMessageFilter(
                         ShortcutsEnabled, _imageViewer.Shortcuts, this);
 
-                    if (_settings.InputEventTrackingEnabled)
-                    {
-                        _imageWindowShortcutsMessageFilter.MessageHandled +=
+                    _imageWindowShortcutsMessageFilter.MessageHandled +=
                             HandleMessageFilterMessageHandled;
-                    }
 
                     // Move the image viewer to the new form.
                     _splitContainer.Panel2.MoveControls(_imageViewerForm, _imageViewer);
@@ -4436,11 +4437,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             if (_imageViewerForm != null)
             {
-                if (_settings.InputEventTrackingEnabled)
-                {
-                    _imageWindowShortcutsMessageFilter.MessageHandled -=
-                        HandleMessageFilterMessageHandled;
-                }
+
+                _imageWindowShortcutsMessageFilter.MessageHandled -=
+                    HandleMessageFilterMessageHandled;
+
 
                 _imageWindowShortcutsMessageFilter.Dispose();
                 _imageWindowShortcutsMessageFilter = null;
@@ -4529,6 +4529,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (_inputEventTracker != null)
                 {
                     _inputEventTracker.RegisterControl(this);
+                    _inputEventTracker.StartActivityTimer(_inputActivityTimeout);// Change timeout to get it from dbinfo table
                 }
             }
             catch (Exception ex)
@@ -4556,8 +4557,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
                     _fileProcessingStopwatch.Restart();
 
+                    double activityTime = _inputEventTracker?.StopActivityTimer() ?? 0.0;
+
                     _fileProcessingDb.UpdateFileTaskSession(
-                        _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value);
+                        _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value, activityTime);
                 }
             }
             catch (Exception ex)

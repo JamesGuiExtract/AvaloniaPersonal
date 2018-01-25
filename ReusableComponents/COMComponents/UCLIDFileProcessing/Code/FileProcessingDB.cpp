@@ -3524,7 +3524,7 @@ STDMETHODIMP CFileProcessingDB::StartFileTaskSession(BSTR bstrTaskClassGuid, lon
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::UpdateFileTaskSession(long nFileTaskSessionID,
-													  double dDuration, double dOverheadTime)
+													  double dDuration, double dOverheadTime, double dActivityTime)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -3532,12 +3532,12 @@ STDMETHODIMP CFileProcessingDB::UpdateFileTaskSession(long nFileTaskSessionID,
 	{
 		validateLicense();
 
-		if (!UpdateFileTaskSession_Internal(false, nFileTaskSessionID, dDuration, dOverheadTime))
+		if (!UpdateFileTaskSession_Internal(false, nFileTaskSessionID, dDuration, dOverheadTime, dActivityTime))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			UpdateFileTaskSession_Internal(true, nFileTaskSessionID, dDuration, dOverheadTime);
+			UpdateFileTaskSession_Internal(true, nFileTaskSessionID, dDuration, dOverheadTime, dActivityTime);
 		}
 		
 		return S_OK;

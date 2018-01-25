@@ -104,7 +104,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // Initialize the form's controls
                 _configFileNameTextBox.Text = _settings.ConfigFileName;
-                _enableInputTrackingCheckBox.Checked = _settings.InputEventTrackingEnabled;
                 _enableCountersCheckBox.Checked = _settings.CountersEnabled;
                 _allowTagsCheckBox.Checked = _settings.AllowTags;
                 _tagSettingsButton.Enabled = _allowTagsCheckBox.Checked;
@@ -117,7 +116,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     _settings = new VerificationSettings(
                         _configFileNameTextBox.Text,
-                        _enableInputTrackingCheckBox.Checked,
                         _enableCountersCheckBox.Checked,
                         _allowTagsCheckBox.Checked,
                         _tagSettings,

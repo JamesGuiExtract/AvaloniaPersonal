@@ -304,7 +304,7 @@ public:
 	STDMETHOD(get_ActiveFAMID)(long *pnActiveFAMID);
 	STDMETHOD(get_FAMSessionID)(long *pnFAMSessionID);
 	STDMETHOD(StartFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, long nActionID, long *pnFileTaskSessionID);
-	STDMETHOD(UpdateFileTaskSession)(long nFileTaskSessionID, double dDuration, double dOverheadTime);
+	STDMETHOD(UpdateFileTaskSession)(long nFileTaskSessionID, double dDuration, double dOverheadTime, double dActivityTime);
 	STDMETHOD(GetFileNameFromFileID)( /*[in]*/ long fileID, /*[out, retval]*/ BSTR* pbstrFileName );
 	STDMETHOD(GetSecureCounters)(VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	STDMETHOD(GetSecureCounterName)(long nCounterID, BSTR *pstrCounterName);
@@ -1107,12 +1107,6 @@ private:
 	// Method that creates a thread to send the mail message
 	void emailMessage(const string& strMessage);
 
-	// Method to check whether input event tracking is on in the database
-	bool isInputEventTrackingEnabled(const _ConnectionPtr& ipConnection);
-
-	// Method to remove old Input events from the InputEvents table
-	void deleteOldInputEvents(const _ConnectionPtr& ipConnection);
-
 	// Checks if the current machine is in the list of machines to skip user authentication
 	// when running as a service
 	bool isMachineInListOfMachinesToSkipUserAuthentication(const _ConnectionPtr& ipConnection);
@@ -1431,7 +1425,7 @@ private:
 	bool DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMetadataFieldName);
 	bool RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
 	bool StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, long nActionID, long *pnFileTaskSessionID);
-	bool UpdateFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID, double dDuration, double dOverheadTime);
+	bool UpdateFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID, double dDuration, double dOverheadTime, double dActivityTime);
 	bool GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	bool GetSecureCounterName_Internal(bool bDBLocked, long nCounterID, BSTR *pstrCounterName);
 	bool ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode, BSTR *pbstrResult);
