@@ -94,6 +94,7 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <EmbeddedResource Include="Resources\Demo_LabDE.bak" />
     <None Include="Resources\ReceiveAdtEncounterMessage.nix" />
     <None Include="Resources\ReceiveOrmEncounterMessage.nix" />
   </ItemGroup>

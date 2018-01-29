@@ -49,8 +49,10 @@ using namespace std;
 //			  Added DischargeDate and AdmissionDate to LabDEEncounter table
 // Version 14:https://extract.atlassian.net/browse/ISSUE-15106
 //			  Added AccessionNunmber
+// Version 15:https://extract.atlassian.net/browse/ISSUE-15225
+//			  This just drops and recreates the LabDEAddOrUpdateEncounterAndIPDates stored procedure
 // WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
-static const long glLABDE_DB_SCHEMA_VERSION = 14;
+static const long glLABDE_DB_SCHEMA_VERSION = 15;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -583,6 +585,36 @@ int UpdateToSchemaVersion14(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45286");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion15(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 15;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("DROP PROCEDURE [dbo].[LabDEAddOrUpdateEncounterAndIPDates]");
+
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_AND_IP_DATES);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45493");
+}
 
 //-------------------------------------------------------------------------------------------------
 // CLabDEProductDBMgr
@@ -1093,7 +1125,13 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 						*pnProdSchemaVersion = UpdateToSchemaVersion14(ipConnection, pnNumSteps, NULL);
 					}
 
-			case 14: // current schema
+			case 14: // The schema update from 14 to 15 needs to take place using FAM DB schema version 154 for 10.6
+					if (nFAMDBSchemaVersion == 154)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion15(ipConnection, pnNumSteps, NULL);
+					}
+				
+			case 15: // current schema
 				break;
 
             default:

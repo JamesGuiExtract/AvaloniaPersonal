@@ -19,6 +19,11 @@ namespace Extract.DataEntry.LabDE.Test
         #region Constants/Read-only fields
 
         /// <summary>
+		/// Test database
+		/// </summary>
+		static readonly string Demo_LabDE_DB = "Resources.Demo_LabDE.bak";
+
+        /// <summary>
         /// Field names for the LabDEEncounter table
         /// </summary>
         static readonly List<string> _ENCOUNTER_FIELDS = new List<string>
@@ -283,10 +288,14 @@ namespace Extract.DataEntry.LabDE.Test
         public void LabDEAddOrUpdateEncounterAndIPDatesTest()
         {
             string testDBName = "Test_LabDEAddOrUpdateEncounterAndIPDates";
+            string testDBNameNew = "Test_LabDEAddOrUpdateEncounterAndIPDates_NewDB";
 
             try
             {
-                IFileProcessingDB _famDB = CreateTestDatabase(testDBName);
+                FileProcessingDB _famDB = _testDbManager.GetDatabase(Demo_LabDE_DB, testDBName);  
+                AddTestPatients(_famDB);
+
+                IFileProcessingDB _NewFAMDB = CreateTestDatabase(testDBNameNew);
 
                 // Set up the data to use for the test
                 var dataDictionary = new Dictionary<string, Tuple<string, string>>();
@@ -302,10 +311,12 @@ namespace Extract.DataEntry.LabDE.Test
                     "NULL");
 
                 LabDEAddOrUpdateEncounterAndIPDates(_famDB, dataDictionary);
+                LabDEAddOrUpdateEncounterAndIPDates(_NewFAMDB, dataDictionary);
 
                 string encounterQuery = _LABDE_ENCOUNTER_QUERY + " WHERE CSN = '11111111111111111111' ";
 
                 CheckResults(_famDB, dataDictionary.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
+                CheckResults(_NewFAMDB, dataDictionary.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
 
                 // Call again to update data
                 LabDEEncounterValues(dataDictionary,
@@ -323,6 +334,10 @@ namespace Extract.DataEntry.LabDE.Test
 
                 CheckResults(_famDB, dataDictionary.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
 
+                LabDEAddOrUpdateEncounterAndIPDates(_NewFAMDB, dataDictionary);
+
+                CheckResults(_NewFAMDB, dataDictionary.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
+
                 var saveData = new Dictionary<string, Tuple<string, string>>(dataDictionary);
 
                 // Test that passing null values keeps the original dates
@@ -332,6 +347,11 @@ namespace Extract.DataEntry.LabDE.Test
                 LabDEAddOrUpdateEncounterAndIPDates(_famDB, dataDictionary);
 
                 CheckResults(_famDB, saveData.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
+
+
+                LabDEAddOrUpdateEncounterAndIPDates(_NewFAMDB, dataDictionary);
+
+                CheckResults(_NewFAMDB, saveData.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
             }
             finally
             {
@@ -522,6 +542,17 @@ namespace Extract.DataEntry.LabDE.Test
         {
             var fileProcessingDB = _testDbManager.GetNewDatabase(DBName);
 
+            AddTestPatients(fileProcessingDB);
+
+            return fileProcessingDB;
+        }
+
+        /// <summary>
+        /// Adds 2 test patients to the database
+        /// </summary>
+        /// <param name="fileProcessingDB">Database to add patients to</param>
+        private static void AddTestPatients(FileProcessingDB fileProcessingDB)
+        {
             fileProcessingDB.ExecuteCommandQuery(
                 "INSERT INTO [dbo].[LabDEPatient] \r\n" +
                 "([MRN] \r\n" +
@@ -536,11 +567,9 @@ namespace Extract.DataEntry.LabDE.Test
                 " VALUES \r\n" +
                 "('0000000000000000001', 'John', '', 'Doe', '', '1970/01/01 10:00:00 AM', 'M', NULL, '0000000000000000001'), \r\n" +
                 "('0000000000000000002', 'John', 'M', 'Doe', '', '1970/01/01 10:00:00 AM', 'M', NULL, '0000000000000000002')");
-
-            return fileProcessingDB;
         }
 
-       /// <summary>
+        /// <summary>
         /// Compares the data returned by the query with the expected data
         /// </summary>
         /// <param name="_famDB">The <see cref="FileProcessingDB"/> to get the results from</param>
