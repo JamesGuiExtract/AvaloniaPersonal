@@ -559,7 +559,7 @@ namespace Extract.AttributeFinder
                 ExtractException.Assert("ELI41629", "Attribute vector cannot be null", attributeVector != null);
 
                 IEnumerable<double[]> inputs = Encoder.GetFeatureVectors(document, attributeVector);
-                var outputs = inputs.Select(Classifier.ComputeAnswer);
+                var outputs = inputs.Select(v => Classifier.ComputeAnswer(v));
                 if (Usage == LearningMachineUsage.DocumentCategorization)
                 {
                     IEnumerable<ComAttribute> categories = outputs.Select(res =>
@@ -662,13 +662,15 @@ namespace Extract.AttributeFinder
         /// by <see cref="UseUnknownCategory"/> and <see cref="UnknownCategoryCutoff"/> settings</remarks>
         /// <param name="inputs">The feature vectors</param>
         /// <param name="outputs">The expected results</param>
+        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
+        /// <returns>The answer code and score</returns>
         /// <returns>An <see cref="AccuracyData"/> instance </returns>
-        public AccuracyData GetAccuracyScore(double[][] inputs, int[] outputs)
+        public AccuracyData GetAccuracyScore(double[][] inputs, int[] outputs, bool standardizeInputs = true)
         {
             try
             {
                 bool unknownCategoryUsed = false;
-                int[] predictions = inputs.Apply(Classifier.ComputeAnswer)
+                int[] predictions = inputs.Apply(v => Classifier.ComputeAnswer(v, standardizeInputs))
                     .Select(t =>
                         {
                             if (UseUnknownCategory && t.score.HasValue
@@ -985,7 +987,7 @@ namespace Extract.AttributeFinder
 
                 var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, _ => { }, cancelToken);
 
-                void WriteCsvToDB(List<List<string>> data, bool isTrainingSet)
+                void WriteCsvToDB(IEnumerable<IEnumerable<string>> data, bool isTrainingSet)
                 {
                     // Build the connection string from the settings
                     SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
@@ -1011,7 +1013,7 @@ namespace Extract.AttributeFinder
                                 {
                                     cmd.Parameters.AddWithValue("@IsTrainingData", isTrainingSet.ToString());
                                     cmd.Parameters.AddWithValue("@ModelName", modelName);
-                                    var ussPath = record[0];
+                                    var ussPath = record.First();
                                     cmd.Parameters.AddWithValue("@Data", string.Join(",", record.Skip(2).Select(s => s.QuoteIfNeeded("\"", ","))));
                                     cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
                                     cmd.ExecuteNonQuery();
@@ -1111,6 +1113,7 @@ namespace Extract.AttributeFinder
             writer.WriteLine("RandomNumberSeed: {0}", RandomNumberSeed);
             writer.WriteLine("InputConfig:");
             InputConfig.PrettyPrint(writer);
+            writer.WriteLine("CSV data basename: {0}", CsvOutputFile ?? "");
             writer.WriteLine("Encoder:");
             Encoder.PrettyPrint(writer);
             writer.WriteLine("Classifier ({0}):", MachineType);
@@ -1137,7 +1140,8 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        private (AccuracyData trainingSet, AccuracyData testingSet) TrainAndTestMachine(bool testOnly,
+        private (AccuracyData trainingSet, AccuracyData testingSet) TrainAndTestMachine(
+            bool testOnly,
             Action<StatusArgs> updateStatus,
             CancellationToken cancellationToken)
         {
@@ -1181,7 +1185,9 @@ namespace Extract.AttributeFinder
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var trainResult = GetAccuracyScore(trainInputs, trainOutputs);
+                // Training mutates the trainInputs array in order to save memory so don't modify it again
+                // if training has taken place
+                var trainResult = GetAccuracyScore(trainInputs, trainOutputs, standardizeInputs: testOnly);
                 var testResult = GetAccuracyScore(testInputs, testOutputs);
                 AccuracyData =
                     (train: new SerializableConfusionMatrix(Encoder, trainResult),
@@ -1196,7 +1202,6 @@ namespace Extract.AttributeFinder
                 return (null, testResult);
             }
         }
-
 
         /// <summary>
         /// Gets the image file list and, if usage is doc classification, the answers from the DB
@@ -1274,10 +1279,104 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Optionally trains and then tests the machine using CSV data
+        /// </summary>
+        /// <param name="testOnly">Whether to only test, not train and test</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public (AccuracyData trainingSet, AccuracyData testingSet) TrainAndTestWithCsvData(
+            bool testOnly,
+            Action<StatusArgs> updateStatus,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                ExtractException.Assert("ELI45517", "Machine is not fully configured", IsConfigured);
+
+                var trainingCsv = CsvOutputFile + ".train.csv";
+                var testingCsv = CsvOutputFile + ".test.csv";
+
+                (double[][] inputs, List<string> answers) GetDataFromCsv(string path)
+                {
+                    var row = 0;
+                    List<double[]> features = new List<double[]>();
+                    List<string> answers = new List<string>();
+                    using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(path))
+                    {
+                        csvReader.Delimiters = new[] { "," };
+                        csvReader.CommentTokens = new[] { "//", "#" };
+                        while (!csvReader.EndOfData)
+                        {
+                            row++;
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            string[] fields;
+                            try
+                            {
+                                fields = csvReader.ReadFields();
+                            }
+                            catch (Exception e)
+                            {
+                                var ue = new ExtractException("ELI45518", "Error parsing CSV input file", e);
+                                ue.AddDebugData("CSV path", path, false);
+                                throw ue;
+                            }
+
+                            ExtractException.Assert("ELI45519", "CSV rows should contain at least four fields",
+                                fields.Length >= 4,
+                                "Field count", fields.Length,
+                                "Row number", row);
+
+                            string answer = fields[2];
+                            answers.Add(answer);
+
+                            double[] featureVector = fields.Skip(3).Select(s => double.TryParse(s, out var d) ? d : 0).ToArray();
+                            features.Add(featureVector);
+
+                            updateStatus(new StatusArgs { StatusMessage = "Getting input data: {0:N0} records", Int32Value = 1 });
+                        }
+                    }
+                    return (features.ToArray(), answers);
+                }
+                var (trainInputs, trainAnswers) = GetDataFromCsv(trainingCsv);
+                var (testInputs, testAnswers) = GetDataFromCsv(testingCsv);
+
+                Encoder.InitializeAnswerCodeMappings(trainAnswers.Concat(testAnswers), Encoder.NegativeClassName);
+                var trainOutputs = trainAnswers.Select(a => Encoder.AnswerNameToCode[a]).ToArray();
+                var testOutputs = testAnswers.Select(a => Encoder.AnswerNameToCode[a]).ToArray();
+
+                // Train the classifier
+                if (!testOnly && trainInputs.Any())
+                {
+                    var rng = new Random(RandomNumberSeed);
+                    Classifier.TrainClassifier(trainInputs, trainOutputs, rng, updateStatus, cancellationToken);
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // Training mutates the trainInputs array in order to save memory so don't modify it again
+                // if training has taken place
+                var trainResult = GetAccuracyScore(trainInputs, trainOutputs, standardizeInputs: testOnly);
+                var testResult = GetAccuracyScore(testInputs, testOutputs);
+                AccuracyData =
+                    (train: new SerializableConfusionMatrix(Encoder, trainResult),
+                    test: new SerializableConfusionMatrix(Encoder, testResult));
+                return (trainResult, testResult);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45533");
+            }
+        }
+
+        /// <summary>
         /// Prepares training/testing data for writing to CSV or DB by zipping the separate collections together and,
         /// if <see cref="StandardizeFeaturesForCsvOutput"/> = <c>true</c>, converts to the features to Z-scores
         /// </summary>
-        private (List<List<string>> training, List<List<string>> testing) CombineFeatureVectorsAndAnswers(
+        private (IEnumerable<IEnumerable<string>> training, IEnumerable<IEnumerable<string>> testing)
+            CombineFeatureVectorsAndAnswers(
             double[][] featureVectors,
             int[] answerCodes,
             string[] ussPaths,
@@ -1286,17 +1385,7 @@ namespace Extract.AttributeFinder
         {
             if (StandardizeFeaturesForCsvOutput)
             {
-                var mean = featureVectors.Mean();
-                var sigma = featureVectors.StandardDeviation(mean);
-
-                // Prevent divide by zero
-                if (sigma.Any(factor => factor == 0))
-                {
-                    sigma.ApplyInPlace(factor => factor + 0.0001);
-                }
-
-                // Standardize input
-                featureVectors = featureVectors.Subtract(mean).ElementwiseDivide(sigma, inPlace: true);
+                StandardizeFeatures(featureVectors);
             }
 
             var docIndex = ussPaths.GroupBy(p => p)
@@ -1346,9 +1435,8 @@ namespace Extract.AttributeFinder
             int numColumns = featureVectors[0].Length + 1;
 
             // Zip each subset together
-            List<List<string>> zip(string[] subsetFiles, int[] subsetFileIndices, double[][] subsetInputs, int[] subsetOutputs, string setName)
+            IEnumerable<IEnumerable<string>> zip(string[] subsetFiles, int[] subsetFileIndices, double[][] subsetInputs, int[] subsetOutputs, string setName)
             {
-                List<List<string>> result = new List<List<string>>(subsetFiles.Length);
                 for (int num = 0; num < subsetFiles.Length; num++)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -1361,16 +1449,49 @@ namespace Extract.AttributeFinder
                         Encoder.AnswerCodeToName[subsetOutputs[num]],
                     };
                     data.AddRange(subsetInputs[num].Select(n => n.ToString(CultureInfo.InvariantCulture)));
-                    result.Add(data);
+                    yield return data;
                 }
-                return result;
             }
+
             var trainingData = trainInputs != null && trainInputs.Any()
                 ? zip(trainFiles, trainFileIndices, trainInputs, trainOutputs, "training")
                 : new List<List<string>>(0);
             var testingData = zip(testFiles, testFileIndices, testInputs, testOutputs, "testing");
 
             return (trainingData, testingData);
+        }
+
+        /// <summary>
+        /// Standardizes feature values by subracting the mean and dividing by the standard deviation
+        /// </summary>
+        /// <param name="featureVectors">Feature vectors for the training data</param>
+        /// <returns>The calculated mean and standard deviation</returns>
+        public static (double[] mean, double[] sigma) StandardizeFeatures(double[][] featureVectors)
+        {
+            try
+            {
+                var mean = featureVectors.Mean();
+                var sigma = featureVectors.StandardDeviation(mean);
+
+                // Prevent divide by zero
+                if (sigma.Any(factor => factor == 0))
+                {
+                    sigma.ApplyInPlace(factor => factor + 0.0001);
+                }
+
+                // Standardize input
+                foreach (var v in featureVectors)
+                {
+                    v.Subtract(mean, inPlace: true);
+                }
+                featureVectors.ElementwiseDivide(sigma, inPlace: true);
+
+                return (mean, sigma);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45536");
+            }
         }
 
         /// <summary>
@@ -1658,7 +1779,8 @@ namespace Extract.AttributeFinder
             {
                 if (Classifier is IDisposable disposable)
                 {
-                    disposable.Dispose();
+                    disposable?.Dispose();
+                    Classifier = null;
                 }
             }
 
@@ -1716,12 +1838,16 @@ namespace Extract.AttributeFinder
         /// <param name="classifier">The <see cref="ITrainableClassifier"/> to use to compute answers</param>
         /// <param name="inputs">The feature vectors</param>
         /// <param name="outputs">The expected results</param>
+        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
         /// <returns>The F1 score if there are two classes else the overall agreement</returns>
-        public static double GetAccuracyScore(ITrainableClassifier classifier, double[][] inputs, int[] outputs)
+        public static double GetAccuracyScore(ITrainableClassifier classifier, double[][] inputs, int[] outputs,
+            bool standardizeInputs = true)
         {
             try
             {
-                int[] predictions = inputs.Apply(classifier.ComputeAnswer).Select(t => t.Item1).ToArray();
+                int[] predictions = inputs.Apply(v => classifier.ComputeAnswer(v, standardizeInputs))
+                    .Select(t => t.answerCode)
+                    .ToArray();
                 if (classifier.NumberOfClasses == 2)
                 {
                     var cm = new ConfusionMatrix(predictions, outputs);

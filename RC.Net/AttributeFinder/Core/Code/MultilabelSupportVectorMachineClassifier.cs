@@ -176,8 +176,9 @@ namespace Extract.AttributeFinder
         /// <remarks>Answer score will be null unless <see cref="CalibrateMachineToProduceProbabilities"/>
         /// was <see langword="true"/> when this instance was trained</remarks>
         /// <param name="inputs">The feature vector</param>
+        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
         /// <returns>The answer code and score</returns>
-        public override (int answerCode, double? score) ComputeAnswer(double[] inputs)
+        public override (int answerCode, double? score) ComputeAnswer(double[] inputs, bool standardizeInputs = true)
         {
             try
             {
@@ -186,7 +187,12 @@ namespace Extract.AttributeFinder
                 var classifier = (MultilabelSupportVectorMachine)Classifier;
 
                 // Scale inputs
-                inputs = inputs.Subtract(FeatureMean).ElementwiseDivide(FeatureScaleFactor);
+                if (standardizeInputs
+                    && FeatureMean != null
+                    && FeatureScaleFactor != null)
+                {
+                    inputs = inputs.Subtract(FeatureMean).ElementwiseDivide(FeatureScaleFactor);
+                }
 
                 classifier.Compute(inputs, out double[] responses);
 

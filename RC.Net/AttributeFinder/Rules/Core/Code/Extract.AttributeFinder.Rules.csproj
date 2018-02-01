@@ -162,15 +162,10 @@
     <Reference Include="Spring.Core, Version=1.3.1.40711, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll</HintPath>
     </Reference>
-    <Reference Include="stanford-ner, Version=3.7.0.1, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\Stanford.NLP.NER.3.7.0.1\lib\stanford-ner.dll</HintPath>
-    </Reference>
     <Reference Include="CAPI_PInvoke, Version=19.11.0.0, Culture=neutral, PublicKeyToken=d277acbc760e5eaf, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_19\Bin\CAPI_PInvoke.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
+    </Reference><Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">

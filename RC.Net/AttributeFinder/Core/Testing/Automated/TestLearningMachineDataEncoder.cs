@@ -826,15 +826,6 @@ namespace Extract.AttributeFinder.Test
             SetPaginationFiles();
             LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, null, "*@Feature");
             encoder.ComputeEncodings(_ussFiles, _voaFiles, _eavFiles);
-            using (var stream = new System.IO.MemoryStream())
-            {
-                var serializer = new System.Runtime.Serialization.NetDataContractSerializer();
-                serializer.AssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple;
-                serializer.Serialize(stream, encoder);
-                stream.Flush();
-                stream.Position = 0;
-                encoder = (LearningMachineDataEncoder)serializer.Deserialize(stream);
-            }
             var nameDiff01 = encoder.AttributeFeatureVectorizers.First(v => v.Name == "NameDiff01");
             Assert.That(nameDiff01.FeatureType == FeatureVectorizerType.Numeric);
             // Change to discrete terms type so that the recognized values ordering can be checked

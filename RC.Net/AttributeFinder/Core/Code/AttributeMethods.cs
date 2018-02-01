@@ -311,6 +311,87 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Since QueryAttributes is very slow from .NET, this can be used for simple queries
+        /// </summary>
+        /// <param name="attributes">The attributes to query</param>
+        /// <param name="query">The AFQuery</param>
+        /// <param name="matching">The attributes that matched the query</param>
+        /// <param name="notMatching">The attributes that didn't match the query</param>
+        /// <returns><c>true</c> if the query was successfully applied</returns>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
+        public static bool TryDivideAttributesWithSimpleQuery(
+            this IEnumerable<ComAttribute> attributes,
+            string query,
+            out IEnumerable<ComAttribute> matching,
+            out IEnumerable<ComAttribute> notMatching)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(query))
+                {
+                    matching = Enumerable.Empty<ComAttribute>();
+                    notMatching = attributes;
+                    return true;
+                }
+                else if (query.IndexOfAny(new[] { '/', '{' }) > 0)
+                {
+                    matching = Enumerable.Empty<ComAttribute>();
+                    notMatching = Enumerable.Empty<ComAttribute>();
+                    return false;
+                }
+
+                // Make a test function from the query
+                var isMatch = query
+                    .Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select<string, Func<ComAttribute, bool>>(q =>
+                    {
+                    // Query is Name[@Type]
+                    // '*@' = type must be empty so don't remove empty entries from split
+                    var queryParts = q.Split('@');
+                        var name = queryParts[0].Trim();
+                        var checkName = !string.Equals(name, "*", StringComparison.Ordinal);
+                        var checkType = queryParts.Length > 1;
+                        var type = checkType
+                            ? queryParts[1].Trim()
+                            : null;
+                        var typeMustBeEmpty = checkType && string.IsNullOrEmpty(type);
+
+                        return at =>
+                        {
+                            var atType = at.Type;
+                            return (!checkName || string.Equals(name, at.Name, StringComparison.OrdinalIgnoreCase))
+                                && !(typeMustBeEmpty && !string.IsNullOrEmpty(atType))
+                                && (!checkType || atType.Split('+').Any(t =>
+                                        string.Equals(type, t, StringComparison.OrdinalIgnoreCase)));
+                        };
+                    })
+                    .Aggregate((f1, f2) => at => f1(at) || f2(at));
+
+
+                var m = new List<ComAttribute>();
+                var not = new List<ComAttribute>();
+                foreach (var at in attributes)
+                {
+                    if (isMatch(at))
+                    {
+                        m.Add(at);
+                    }
+                    else
+                    {
+                        not.Add(at);
+                    }
+                }
+                matching = m;
+                notMatching = not;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45540");
+            }
+        }
+
         #endregion Public Methods
 
         #region Private Methods

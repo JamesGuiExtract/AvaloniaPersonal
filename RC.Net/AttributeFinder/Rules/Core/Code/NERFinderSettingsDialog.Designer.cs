@@ -123,8 +123,6 @@
             // _classifierPathBrowseButton
             // 
             this._classifierPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._classifierPathBrowseButton.EnsureFileExists = false;
-            this._classifierPathBrowseButton.EnsurePathExists = false;
             this._classifierPathBrowseButton.Location = new System.Drawing.Point(542, 36);
             this._classifierPathBrowseButton.Name = "_classifierPathBrowseButton";
             this._classifierPathBrowseButton.Size = new System.Drawing.Size(24, 22);
@@ -157,8 +155,6 @@
             // _tokenizerPathBrowseButton
             // 
             this._tokenizerPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._tokenizerPathBrowseButton.EnsureFileExists = false;
-            this._tokenizerPathBrowseButton.EnsurePathExists = false;
             this._tokenizerPathBrowseButton.Location = new System.Drawing.Point(545, 108);
             this._tokenizerPathBrowseButton.Name = "_tokenizerPathBrowseButton";
             this._tokenizerPathBrowseButton.Size = new System.Drawing.Size(24, 22);
@@ -303,8 +299,6 @@
             // browseButton1
             // 
             this.browseButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseButton1.EnsureFileExists = false;
-            this.browseButton1.EnsurePathExists = false;
             this.browseButton1.Location = new System.Drawing.Point(542, 55);
             this.browseButton1.Name = "browseButton1";
             this.browseButton1.Size = new System.Drawing.Size(24, 22);
@@ -349,6 +343,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._toolKitGroupBox.Controls.Add(this._stanfordNerRadioButton);
             this._toolKitGroupBox.Controls.Add(this._openNlpRadioButton);
+            this._toolKitGroupBox.Enabled = false;
             this._toolKitGroupBox.Location = new System.Drawing.Point(12, 12);
             this._toolKitGroupBox.Name = "_toolKitGroupBox";
             this._toolKitGroupBox.Size = new System.Drawing.Size(580, 69);

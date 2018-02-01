@@ -129,10 +129,6 @@
     <Reference Include="OpenNLP.IKVM">
       <HintPath>..\..\..\..\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe</HintPath>
     </Reference>
-    <Reference Include="stanford-ner, Version=3.7.0.1, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\Stanford.NLP.NER.3.7.0.1\lib\stanford-ner.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />

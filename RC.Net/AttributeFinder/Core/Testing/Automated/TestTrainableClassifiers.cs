@@ -85,7 +85,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(classifier.IsTrained);
             // Complexity value will have been chosen to be a non-negative number
             Assert.Greater(classifier.Complexity, 0);
-            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
             Assert.AreEqual(1.0, f1Score);
         }
 
@@ -104,7 +104,7 @@ namespace Extract.AttributeFinder.Test
             Utilities.CollectionMethods.Shuffle(inputs, outputs, new System.Random(0));
 
             classifier.TrainClassifier(inputs, outputs, new System.Random(0));
-            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
 
             // Missed one example
             Assert.AreEqual(14.0/15.0, f1Score);
@@ -127,7 +127,7 @@ namespace Extract.AttributeFinder.Test
 
             // Complexity value will have been chosen to be a non-negative number
             Assert.Greater(classifier.Complexity, 0);
-            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
             Assert.AreEqual(1.0, f1Score);
         }
 
@@ -141,7 +141,7 @@ namespace Extract.AttributeFinder.Test
             int[] outputs = results.Item2;
             var classifier = new MultilabelSupportVectorMachineClassifier { CalibrateMachineToProduceProbabilities = true };
             classifier.TrainClassifier(inputs, outputs, new System.Random(0));
-            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
             Assert.AreEqual(1.0, f1Score);
 
             // Example has good probability score
@@ -160,7 +160,7 @@ namespace Extract.AttributeFinder.Test
 
             // Train without one category
             classifier.TrainClassifier(inputs.Take(9).ToArray(), outputs.Take(9).ToArray(), new System.Random(0));
-            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
 
             // Gets one wrong
             Assert.AreEqual(0.9, f1Score);
@@ -181,7 +181,7 @@ namespace Extract.AttributeFinder.Test
             Assert.Throws<ExtractException>(() => classifier.ComputeAnswer(inputs[0]));
             classifier.TrainClassifier(inputs, outputs, new System.Random(0));
             Assert.That(classifier.IsTrained);
-            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
             Assert.AreEqual(1.0, f1Score);
         }
 
@@ -197,7 +197,7 @@ namespace Extract.AttributeFinder.Test
             Assert.Throws<ExtractException>(() => classifier.ComputeAnswer(inputs[0]));
             classifier.TrainClassifier(inputs, outputs, new System.Random(0));
             Assert.That(classifier.IsTrained);
-            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
 
             // Network performance hurt by extra features
             Assert.Greater(f1Score, 0.85);
@@ -213,7 +213,7 @@ namespace Extract.AttributeFinder.Test
             int[] outputs = results.Item2;
             var classifier = new MulticlassSupportVectorMachineClassifier();
             classifier.TrainClassifier(inputs, outputs, new System.Random(0));
-            double accuracy = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double accuracy = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
             Assert.AreEqual(1.0, accuracy);
         }
 
@@ -227,7 +227,7 @@ namespace Extract.AttributeFinder.Test
             int[] outputs = results.Item2;
             var classifier = new MultilabelSupportVectorMachineClassifier();
             classifier.TrainClassifier(inputs, outputs, new System.Random(0));
-            double accuracy = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double accuracy = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
             Assert.AreEqual(1.0, accuracy);
         }
 
@@ -240,7 +240,7 @@ namespace Extract.AttributeFinder.Test
             int[] outputs = results.Item2;
             var classifier = new NeuralNetworkClassifier();
             classifier.TrainClassifier(inputs, outputs, new System.Random(0));
-            double accuracy = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double accuracy = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
             Assert.AreEqual(1.0, accuracy);
         }
 
@@ -253,7 +253,7 @@ namespace Extract.AttributeFinder.Test
             int[] outputs = results.Item2;
             var classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false, MaxTrainingIterations = 10};
             classifier.TrainClassifier(inputs, outputs, new System.Random(0));
-            double accuracy = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
+            double accuracy = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
             Assert.AreEqual(0.8, accuracy);
         }
 
@@ -430,14 +430,20 @@ namespace Extract.AttributeFinder.Test
             int[] outputs = results.Item2;
 
             // Make conflicting data
-            inputs = Enumerable.Repeat(inputs, 100).SelectMany(x => x).ToArray();
+            var expandedInputs = new double[inputs.Length * 100][];
+            for (int i = 0; i < expandedInputs.Length; i++)
+            {
+                expandedInputs[i] = (double[])inputs[i % inputs.Length].Clone();
+            }
             var rng = new Random(0);
-            outputs = inputs.Select(_ => rng.Next(0, 2)).ToArray();
+            outputs = expandedInputs.Select(_ => rng.Next(0, 2)).ToArray();
 
             var classifier = new MulticlassSupportVectorMachineClassifier();
             bool unableToConvergeWhenChoosing = false;
-            classifier.TrainClassifier(inputs, outputs, new System.Random(0),
-                (status => unableToConvergeWhenChoosing |= Regex.IsMatch(status.GetFormattedValue(), "Choosing.*Unable to attain convergence")),
+            void a(StatusArgs status) =>
+                unableToConvergeWhenChoosing |= Regex.IsMatch(status.GetFormattedValue(), "Choosing.*Unable to attain convergence");
+            classifier.TrainClassifier(expandedInputs, outputs, new System.Random(0),
+                a,
                 CancellationToken.None);
 
             Assert.That(unableToConvergeWhenChoosing);
@@ -454,8 +460,10 @@ namespace Extract.AttributeFinder.Test
 
             var classifier = new MulticlassSupportVectorMachineClassifier { Complexity = 50000, AutomaticallyChooseComplexityValue = false };
             bool unableToConvergeWhenTraining = false;
+            void a(StatusArgs status) =>
+                unableToConvergeWhenTraining |= Regex.IsMatch(status.GetFormattedValue(), @"^ *Unable to attain convergence");
             classifier.TrainClassifier(inputs, outputs, new System.Random(0),
-                (status => unableToConvergeWhenTraining |= Regex.IsMatch(status.GetFormattedValue(), @"^ *Unable to attain convergence")),
+                a,
                 CancellationToken.None);
 
             Assert.That(unableToConvergeWhenTraining);

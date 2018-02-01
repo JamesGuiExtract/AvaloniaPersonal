@@ -201,6 +201,7 @@ namespace Extract.AttributeFinder
                         using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(InputPath))
                         {
                             csvReader.Delimiters = new[] { "," };
+                            csvReader.CommentTokens = new[] { "//", "#" };
                             while (!csvReader.EndOfData)
                             {
                                 cancellationToken.ThrowIfCancellationRequested();

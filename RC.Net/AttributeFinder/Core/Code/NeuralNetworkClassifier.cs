@@ -2,6 +2,7 @@
 using Accord.Neuro;
 using Accord.Statistics;
 using AForge.Neuro;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -235,6 +236,7 @@ namespace Extract.AttributeFinder
         /// <param name="inputs">The input feature vectors</param>
         /// <param name="outputs">The classes for each input</param>
         /// <param name="randomGenerator">Optional random number generator to use for randomness</param>
+        /// <remarks>This method will modify the input arrays (standardize the features)</remarks>
         public void TrainClassifier(double[][] inputs, int[] outputs, Random randomGenerator=null)
         {
             try
@@ -255,6 +257,7 @@ namespace Extract.AttributeFinder
         /// <param name="randomGenerator">Random number generator to use for randomness</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <remarks>This method will modify the input arrays (standardize the features)</remarks>
         public void TrainClassifier(double[][] inputs, int[] outputs, Random randomGenerator, Action<StatusArgs> updateStatus,
             CancellationToken cancellationToken)
         {
@@ -283,18 +286,7 @@ namespace Extract.AttributeFinder
 
                 NumberOfClasses = outputs.Max() + 1;
 
-                // Calculate standardization values
-                _featureMean = inputs.Mean();
-                _featureScaleFactor = inputs.StandardDeviation(_featureMean);
-
-                // Prevent divide by zero
-                if (_featureScaleFactor.Any(factor => factor == 0))
-                {
-                    _featureScaleFactor.ApplyInPlace(factor => factor + 0.0001);
-                }
-
-                // Standardize input
-                inputs = inputs.Subtract(_featureMean).ElementwiseDivide(_featureScaleFactor, inPlace: true);
+                (_featureMean, _featureScaleFactor) = LearningMachine.StandardizeFeatures(inputs);
 
                 // Expand output into one-hot vectors
                 double[][] expandedOutputs = Accord.Statistics.Tools.Expand(outputs, NumberOfClasses, negative: -1.0, positive: 1.0);
@@ -361,15 +353,18 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <remarks>Answer score will always be null</remarks>
         /// <param name="inputs">The feature vector</param>
+        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
         /// <returns>The answer code and score</returns>
-        public (int answerCode, double? score) ComputeAnswer(double[] inputs)
+        public (int answerCode, double? score) ComputeAnswer(double[] inputs, bool standardizeInputs = true)
         {
             try
             {
                 ExtractException.Assert("ELI39736", "This classifier has not been trained", IsTrained);
 
                 // Scale inputs
-                if (_featureMean != null && _featureScaleFactor != null)
+                if (standardizeInputs
+                    && _featureMean != null
+                    && _featureScaleFactor != null)
                 {
                     inputs = inputs.Subtract(_featureMean).ElementwiseDivide(_featureScaleFactor);
                 }
@@ -452,6 +447,7 @@ namespace Extract.AttributeFinder
                 writer.WriteLine("SigmoidAlpha: {0}", SigmoidAlpha);
                 writer.WriteLine("NumberOfCandidateNetworksToBuild: {0}", NumberOfCandidateNetworksToBuild);
                 writer.WriteLine("UseCrossValidationSets: {0}", UseCrossValidationSets);
+                writer.WriteLine("MaxTrainingIterations: {0}", MaxTrainingIterations);
                 writer.Indent = oldIndent;
             }
             catch (Exception e)
@@ -588,61 +584,67 @@ namespace Extract.AttributeFinder
             initializer.Randomize();
             var teacher = new Accord.Neuro.Learning.ParallelResilientBackpropagationLearning(ann);
 
-            var history = new Queue<Tuple<System.IO.MemoryStream, double>>(_WINDOW_SIZE);
+            var history = new Queue<Tuple<TemporaryFile, double>>(_WINDOW_SIZE);
+            List<TemporaryFile> files = null;
             int trainSize = trainOutputs.Length;
             int cvSize = cvOutputs.Length;
 
-            for (int i = 1; i <= MaxTrainingIterations; i++)
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                double trainError = teacher.RunEpoch(trainInputs, trainOutputs) / trainSize;;
-                double cvError = teacher.ComputeError(cvInputs, cvOutputs) / cvSize;
-                updateStatus(new StatusArgs
+                for (int i = 1; i <= MaxTrainingIterations; i++)
                 {
-                    TaskName = "RunEpoch",
-                    ReplaceLastStatus = true,
-                    StatusMessage = string.Format(CultureInfo.CurrentCulture,
-                        "Training iteration: {0} Training error: {1:N4} Validation error: {2:N4}", i, trainError, cvError)
-                });
-                
-                var savedNN = new System.IO.MemoryStream();
-                ann.Save(savedNN);
-                history.Enqueue(Tuple.Create(savedNN, cvError));
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                if (i >= _WINDOW_SIZE)
-                {
-                    // Stop training if the results are not changing
-                    // https://extract.atlassian.net/browse/ISSUE-14873
-                    if (history.All(t => t.Item2 == history.Peek().Item2))
+                    double trainError = teacher.RunEpoch(trainInputs, trainOutputs) / trainSize; ;
+                    double cvError = teacher.ComputeError(cvInputs, cvOutputs) / cvSize;
+                    updateStatus(new StatusArgs
                     {
-                        break;
-                    }
+                        TaskName = "RunEpoch",
+                        ReplaceLastStatus = true,
+                        StatusMessage = string.Format(CultureInfo.CurrentCulture,
+                            "Training iteration: {0} Training error: {1:N4} Validation error: {2:N4}", i, trainError, cvError)
+                    });
 
-                    var avgCVLast = history.Skip(_WINDOW_SIZE/2).Average(t => t.Item2);
-                    var avgCVPrevLast = history.Take(_WINDOW_SIZE/2).Average(t => t.Item2);
+                    var savedNN = new TemporaryFile(false);
+                    ann.Save(savedNN.FileName);
+                    history.Enqueue(Tuple.Create(savedNN, cvError));
 
-                    // Break if CV error is trending upward
-                    if (avgCVLast > avgCVPrevLast)
+                    if (i >= _WINDOW_SIZE)
                     {
-                        break;
+                        // Stop training if the results are not changing
+                        // https://extract.atlassian.net/browse/ISSUE-14873
+                        if (history.All(t => t.Item2 == history.Peek().Item2))
+                        {
+                            break;
+                        }
+
+                        var avgCVLast = history.Skip(_WINDOW_SIZE / 2).Average(t => t.Item2);
+                        var avgCVPrevLast = history.Take(_WINDOW_SIZE / 2).Average(t => t.Item2);
+
+                        // Break if CV error is trending upward
+                        if (avgCVLast > avgCVPrevLast)
+                        {
+                            break;
+                        }
+
+                        // Throw away oldest saved NN
+                        history.Dequeue();
                     }
-                                    
-                    // Throw away oldest saved NN
-                    history.Dequeue();
                 }
+
+                // Retrieve the best NN
+                files = history.Select(t => t.Item1).ToList();
+                var errors = history.Select(t => t.Item2).ToArray();
+                double lowestError = errors.Min(out int iMin);
+                var bestFile = files[iMin];
+
+                trainedNetwork = (ActivationNetwork)Network.Load(bestFile.FileName);
+                return lowestError;
             }
-
-            // Retrieve the best NN
-            var streams = history.Select(t => t.Item1).ToArray();
-            var errors = history.Select(t => t.Item2).ToArray();
-            int iMin;
-            double lowestError = errors.Min(out iMin);
-            var bestStream = streams[iMin];
-            bestStream.Position = 0;
-
-            trainedNetwork = (ActivationNetwork)ActivationNetwork.Load(bestStream);
-            return lowestError;
+            finally
+            {
+                files?.ClearAndDispose();
+            }
         }
 
         /// <summary>

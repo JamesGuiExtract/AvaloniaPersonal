@@ -4,26 +4,14 @@
 // OpenNLP, learnable tokenizer, sentence splitting, second image
 <TESTCASE>;oner.sent.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test2.eav
 
-// SNER
-<TESTCASE>;sner.unit.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test3.eav
-
 // OpenNLP: Only Address specified to be returned
 <TESTCASE>;oner.sent.address.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test4.eav
-
-// SNER: Only Address specified to be returned
-<TESTCASE>;sner.unit.address.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test5.eav
 
 // OpenNLP: Name specified to be returned
 <TESTCASE>;oner.sent.name.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test6.eav
 
-// SNER: Name specified to be returned
-<TESTCASE>;sner.unit.name.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test7.eav
-
 // OpenNLP: name and address specified to be returned
 <TESTCASE>;oner.sent.name&address.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test8.eav
-
-// SNER: Name and address specified to be returned
-<TESTCASE>;sner.unit.name&address.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test9.eav
 
 // OpenNLP: learnable tokenizer, no sentence splitting
 <TESTCASE>;oner.no_sent.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;test10.eav

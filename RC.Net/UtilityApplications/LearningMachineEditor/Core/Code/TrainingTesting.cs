@@ -296,6 +296,18 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
+        private void HandleLoadDataFromCsvRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateControlsAndFlags();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45545");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -347,11 +359,49 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             Func<Action<StatusArgs>, CancellationToken, ValueTuple<AccuracyData, AccuracyData>> operation = null;
             if (testOnly)
             {
-                operation = learningMachine.TestMachine;
+                if (loadDataFromCsvRadioButton.Checked)
+                {
+                    operation = (u, c) => learningMachine.TrainAndTestWithCsvData(true, u, c);
+                }
+                else if (saveFeatureVectorsToCsvsCheckBox.Checked)
+                {
+                    operation = (u, c) =>
+                    {
+                        if (!learningMachine.Encoder.AreEncodingsComputed)
+                        {
+                            learningMachine.ComputeEncodings(u, c);
+                        }
+                        learningMachine.WriteDataToCsv(u, c);
+                        return learningMachine.TrainAndTestWithCsvData(true, u, c);
+                    };
+                }
+                else
+                {
+                    operation = learningMachine.TestMachine;
+                }
             }
             else
             {
-                operation = learningMachine.TrainMachine;
+                if (loadDataFromCsvRadioButton.Checked)
+                {
+                    operation = (u, c) => learningMachine.TrainAndTestWithCsvData(false, u, c);
+                }
+                else if (saveFeatureVectorsToCsvsCheckBox.Checked)
+                {
+                    operation = (u, c) =>
+                    {
+                        if (!learningMachine.Encoder.AreEncodingsComputed)
+                        {
+                            learningMachine.ComputeEncodings(u, c);
+                        }
+                        learningMachine.WriteDataToCsv(u, c);
+                        return learningMachine.TrainAndTestWithCsvData(false, u, c);
+                    };
+                }
+                else
+                {
+                    operation = learningMachine.TrainMachine;
+                }
             }
 
             // Train/test machine
@@ -483,20 +533,31 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// </summary>
         private void UpdateControlsAndFlags()
         {
-            // Set control values based on flags
-            // Don't change useCurrent/recompute if last training was canceled
-            if (_cancellationTokenSource == null || !_cancellationTokenSource.IsCancellationRequested)
-            {
-                useCurrentFeaturesRadioButton.Checked = _editor.CurrentLearningMachine.Encoder.AreEncodingsComputed;
-            }
-            testButton.Enabled = _editor.CurrentLearningMachine.Classifier.IsTrained;
+            computeFeaturesGroupBox.Enabled = true;
 
-            // Disable controls based on flags
-            computeFeaturesGroupBox.Enabled = _editor.CurrentLearningMachine.Encoder.AreEncodingsComputed;
+            // Disable controls based on machine state
+            testButton.Enabled = _editor.CurrentLearningMachine.Classifier.IsTrained;
+            useCurrentFeaturesRadioButton.Enabled = _editor.CurrentLearningMachine.Encoder.AreEncodingsComputed;
+            saveFeatureVectorsToCsvsCheckBox.Enabled =
+                !loadDataFromCsvRadioButton.Checked
+                && !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.CsvOutputFile);
+
+            loadDataFromCsvRadioButton.Enabled =
+                !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.CsvOutputFile);
 
             trainTestButton.Enabled = _editor.CurrentLearningMachine.InputConfig.TrainingSetPercentage > 0;
             clearLogToolStripMenuItem.Enabled = !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.TrainingLog);
             detailsButton.Enabled = _editor.CurrentLearningMachine.AccuracyData != null;
+
+            // Set control values based on enabled states
+            if (!loadDataFromCsvRadioButton.Enabled && loadDataFromCsvRadioButton.Checked)
+            {
+                useCurrentFeaturesRadioButton.Checked = true;
+            }
+            if (!useCurrentFeaturesRadioButton.Enabled && useCurrentFeaturesRadioButton.Checked)
+            {
+                recomputeFeaturesRadioButton.Checked = true;
+            }
 
             _processing = false;
         }
