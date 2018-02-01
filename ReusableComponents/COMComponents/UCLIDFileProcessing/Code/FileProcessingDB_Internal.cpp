@@ -1712,7 +1712,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWCHANGEFILE_WORKFLOWCHANGE_FK);
 		vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE_INDEX);
-		vecQueries.push_back(gstrADD_MLDATA_MLMODEL_FK);
 		vecQueries.push_back(gstrADD_MLDATA_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_DATABASE_SERVICE_FK);
@@ -1731,6 +1730,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
 			vecQueries.push_back(gstrADD_FILE_HANDLER_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_WEB_APP_CONFIG_WORKFLOW_FK);
+			vecQueries.push_back(gstrADD_MLDATA_MLMODEL_FK);
 			
 			// Add triggers
 			vecQueries.push_back(gstrCREATE_ACTION_ON_DELETE_TRIGGER);
