@@ -53,6 +53,8 @@
             this.clearLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelButton = new System.Windows.Forms.Button();
             this.computeFeaturesGroupBox = new System.Windows.Forms.GroupBox();
+            this.saveFeatureVectorsToCsvsCheckBox = new System.Windows.Forms.CheckBox();
+            this.loadDataFromCsvRadioButton = new System.Windows.Forms.RadioButton();
             this.recomputeFeaturesRadioButton = new System.Windows.Forms.RadioButton();
             this.useCurrentFeaturesRadioButton = new System.Windows.Forms.RadioButton();
             this.detailsButton = new System.Windows.Forms.Button();
@@ -64,10 +66,10 @@
             // trainTestButton
             // 
             this.trainTestButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.trainTestButton.Location = new System.Drawing.Point(12, 569);
+            this.trainTestButton.Location = new System.Drawing.Point(12, 619);
             this.trainTestButton.Name = "trainTestButton";
             this.trainTestButton.Size = new System.Drawing.Size(75, 23);
-            this.trainTestButton.TabIndex = 0;
+            this.trainTestButton.TabIndex = 2;
             this.trainTestButton.Text = "Train/Test";
             this.trainTestButton.UseVisualStyleBackColor = true;
             this.trainTestButton.Click += new System.EventHandler(this.HandleTrainAndTestButton_Click);
@@ -75,10 +77,10 @@
             // testButton
             // 
             this.testButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.testButton.Location = new System.Drawing.Point(93, 569);
+            this.testButton.Location = new System.Drawing.Point(93, 619);
             this.testButton.Name = "testButton";
             this.testButton.Size = new System.Drawing.Size(75, 23);
-            this.testButton.TabIndex = 1;
+            this.testButton.TabIndex = 3;
             this.testButton.Text = "Test";
             this.testButton.UseVisualStyleBackColor = true;
             this.testButton.Click += new System.EventHandler(this.HandleTestButton_Click);
@@ -87,10 +89,10 @@
             // 
             this.closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.closeButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.closeButton.Location = new System.Drawing.Point(469, 569);
+            this.closeButton.Location = new System.Drawing.Point(469, 619);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 23);
-            this.closeButton.TabIndex = 2;
+            this.closeButton.TabIndex = 6;
             this.closeButton.Text = "Close";
             this.closeButton.UseVisualStyleBackColor = true;
             // 
@@ -102,8 +104,8 @@
             this.groupBox1.Controls.Add(this.textBox1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(532, 481);
-            this.groupBox1.TabIndex = 5;
+            this.groupBox1.Size = new System.Drawing.Size(532, 479);
+            this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Training/testing results";
             // 
@@ -119,7 +121,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(520, 456);
+            this.textBox1.Size = new System.Drawing.Size(520, 454);
             this.textBox1.TabIndex = 0;
             // 
             // trainingLogContextMenuStrip
@@ -171,10 +173,10 @@
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cancelButton.Enabled = false;
-            this.cancelButton.Location = new System.Drawing.Point(174, 569);
+            this.cancelButton.Location = new System.Drawing.Point(174, 619);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelButton.TabIndex = 6;
+            this.cancelButton.TabIndex = 4;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.HandleCancelButton_Click);
@@ -183,17 +185,39 @@
             // 
             this.computeFeaturesGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.computeFeaturesGroupBox.Controls.Add(this.saveFeatureVectorsToCsvsCheckBox);
+            this.computeFeaturesGroupBox.Controls.Add(this.loadDataFromCsvRadioButton);
             this.computeFeaturesGroupBox.Controls.Add(this.recomputeFeaturesRadioButton);
             this.computeFeaturesGroupBox.Controls.Add(this.useCurrentFeaturesRadioButton);
-            this.computeFeaturesGroupBox.Location = new System.Drawing.Point(13, 493);
+            this.computeFeaturesGroupBox.Location = new System.Drawing.Point(13, 491);
             this.computeFeaturesGroupBox.Name = "computeFeaturesGroupBox";
-            this.computeFeaturesGroupBox.Size = new System.Drawing.Size(531, 70);
-            this.computeFeaturesGroupBox.TabIndex = 9;
+            this.computeFeaturesGroupBox.Size = new System.Drawing.Size(531, 114);
+            this.computeFeaturesGroupBox.TabIndex = 1;
             this.computeFeaturesGroupBox.TabStop = false;
+            // 
+            // saveFeatureVectorsToCsvsCheckBox
+            // 
+            this.saveFeatureVectorsToCsvsCheckBox.AutoSize = true;
+            this.saveFeatureVectorsToCsvsCheckBox.Location = new System.Drawing.Point(6, 88);
+            this.saveFeatureVectorsToCsvsCheckBox.Name = "saveFeatureVectorsToCsvsCheckBox";
+            this.saveFeatureVectorsToCsvsCheckBox.Size = new System.Drawing.Size(166, 17);
+            this.saveFeatureVectorsToCsvsCheckBox.TabIndex = 12;
+            this.saveFeatureVectorsToCsvsCheckBox.Text = "Save feature vectors to CSVs";
+            this.saveFeatureVectorsToCsvsCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // loadDataFromCsvRadioButton
+            // 
+            this.loadDataFromCsvRadioButton.AutoSize = true;
+            this.loadDataFromCsvRadioButton.Location = new System.Drawing.Point(6, 65);
+            this.loadDataFromCsvRadioButton.Name = "loadDataFromCsvRadioButton";
+            this.loadDataFromCsvRadioButton.Size = new System.Drawing.Size(193, 17);
+            this.loadDataFromCsvRadioButton.TabIndex = 11;
+            this.loadDataFromCsvRadioButton.Text = "Load training/testing data from CSV";
+            this.loadDataFromCsvRadioButton.UseVisualStyleBackColor = true;
+            this.loadDataFromCsvRadioButton.CheckedChanged += new System.EventHandler(this.HandleLoadDataFromCsvRadioButton_CheckedChanged);
             // 
             // recomputeFeaturesRadioButton
             // 
-            this.recomputeFeaturesRadioButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.recomputeFeaturesRadioButton.AutoSize = true;
             this.recomputeFeaturesRadioButton.Checked = true;
             this.recomputeFeaturesRadioButton.Location = new System.Drawing.Point(6, 19);
@@ -206,7 +230,6 @@
             // 
             // useCurrentFeaturesRadioButton
             // 
-            this.useCurrentFeaturesRadioButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.useCurrentFeaturesRadioButton.AutoSize = true;
             this.useCurrentFeaturesRadioButton.Location = new System.Drawing.Point(6, 42);
             this.useCurrentFeaturesRadioButton.Name = "useCurrentFeaturesRadioButton";
@@ -218,10 +241,10 @@
             // detailsButton
             // 
             this.detailsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.detailsButton.Location = new System.Drawing.Point(318, 569);
+            this.detailsButton.Location = new System.Drawing.Point(318, 619);
             this.detailsButton.Name = "detailsButton";
             this.detailsButton.Size = new System.Drawing.Size(75, 23);
-            this.detailsButton.TabIndex = 10;
+            this.detailsButton.TabIndex = 5;
             this.detailsButton.Text = "Details...";
             this.detailsButton.UseVisualStyleBackColor = true;
             this.detailsButton.Click += new System.EventHandler(this.HandleDetailsButton_Click);
@@ -232,7 +255,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.closeButton;
-            this.ClientSize = new System.Drawing.Size(556, 604);
+            this.ClientSize = new System.Drawing.Size(556, 654);
             this.Controls.Add(this.detailsButton);
             this.Controls.Add(this.computeFeaturesGroupBox);
             this.Controls.Add(this.cancelButton);
@@ -275,5 +298,7 @@
         private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.Button detailsButton;
+        private System.Windows.Forms.RadioButton loadDataFromCsvRadioButton;
+        private System.Windows.Forms.CheckBox saveFeatureVectorsToCsvsCheckBox;
     }
 }

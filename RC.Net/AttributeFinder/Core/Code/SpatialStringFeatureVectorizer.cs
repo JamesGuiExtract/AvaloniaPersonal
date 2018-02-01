@@ -23,7 +23,6 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.AttributeFinder
@@ -145,8 +144,8 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Whether this feature vectorizer will produce a feature vector of length
-        /// <see cref="FeatureVectorLength"/> (if <see langword="true"/>) or of zero length (if <see langword="false"/>)
+        /// Whether this feature vectorizer will produce a feature vector of greater than
+        /// zero length (if <c>true</c>) or of zero length (if <c>false</c>)
         /// </summary>
         public bool Enabled
         {
@@ -255,11 +254,53 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// The length of the feature vector that this vectorizer will produce.
         /// </summary>
+        /// <remarks>If pagination usage then the true length might differ from this value</remarks>
         public int FeatureVectorLength
         {
             get
             {
                 return RecognizedValues.Count();
+            }
+        }
+
+        /// <summary>
+        /// The length of the feature vector that this vectorizer will produce when
+        /// used for pagination.
+        /// </summary>
+        public int FeatureVectorLengthForPagination
+        {
+            get
+            {
+                var pagesPer = PagesPerPaginationCandidate;
+                var baseLength = FeatureVectorLength;
+                if (pagesPer <= 2)
+                {
+                    return baseLength * pagesPer;
+                }
+                else
+                {
+                    return baseLength * pagesPer + pagesPer - 2;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The numer of pages per candidate
+        /// </summary>
+        /// <remarks>This is the integer value of PagesToProcess or 1 if PagesToProcess is empty or unparseable</remarks>
+        public int PagesPerPaginationCandidate
+        {
+            get
+            {
+                var range = 1;
+                if (!string.IsNullOrWhiteSpace(PagesToProcess)
+                    && int.TryParse(PagesToProcess, out int parsed)
+                    && parsed > 0)
+                {
+                    range = parsed;
+                }
+
+                return range;
             }
         }
 
@@ -364,7 +405,7 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                var inputTextsCollection = ussFiles.Select(GetPaginationTexts);
+                var inputTextsCollection = ussFiles.Select(file => GetPaginationTexts(file));
 
                 // Pass the page count of each image along so that missing pages in the answer VOA can be filled in
                 var textsAndCategories = inputTextsCollection.Zip(answerFiles, (examples, answerFile) =>
@@ -456,11 +497,75 @@ namespace Extract.AttributeFinder
             {
                 ExtractException.Assert("ELI39531", "Bag of Words has not been computed", _bagOfWords != null);
 
-                return GetPaginationTexts(document).Select(s =>
+                int totalPagesPer = PagesPerPaginationCandidate;
+                int priorPages = totalPagesPer / 2;
+                int postPages = totalPagesPer - priorPages;
+
+                var pageFeatures = GetPaginationTexts(document, priorPages > 0)
+                    .Select(text => GetTerms(text).ToArray())
+                    .Select(_bagOfWords.GetFeatureVector)
+                    .ToList();
+
+                var firstCandidateIdx = priorPages > 0
+                    ? 1
+                    : 0;
+                var pages = new double[pageFeatures.Count - firstCandidateIdx][];
+
+                // Add subvectors for preceeding pages
+                int featureVectorLength = FeatureVectorLengthForPagination;
+                for (int candidateIdx = firstCandidateIdx, resultIdx = 0;
+                    resultIdx < pages.Length;
+                    candidateIdx++, resultIdx++)
                 {
-                    string[] terms = GetTerms(s).ToArray();
-                    return _bagOfWords.GetFeatureVector(terms).Select(i => (double)i).ToArray();
-                });
+                    var featureVector = new double[featureVectorLength];
+                    pages[resultIdx] = featureVector;
+                    int featureVectorSubsetStart = 0;
+                    for (int i = priorPages; i > 0; i--)
+                    {
+                        int pageOfInterestIdx = candidateIdx - i;
+                        if (pageOfInterestIdx >= 0)
+                        {
+                            // Add flag for pages that aren't always there
+                            if (i > 1)
+                            {
+                                featureVector[featureVectorSubsetStart] = 1;
+                                featureVectorSubsetStart++;
+                            }
+
+                            // Copy page feature values into larger array
+                            var pageOfinterest = pageFeatures[pageOfInterestIdx];
+                            for (int j = 0; j < pageOfinterest.Length; j++)
+                            {
+                                featureVector[featureVectorSubsetStart + j] = pageOfinterest[j];
+                            }
+                        }
+                        featureVectorSubsetStart += FeatureVectorLength;
+                    }
+
+                    // Add subvectors for following pages
+                    for (int i = 0; i < postPages; i++)
+                    {
+                        int pageOfInterestIdx = candidateIdx + i;
+                        if (pageOfInterestIdx < pages.Length)
+                        {
+                            // Add flag for pages that aren't always there
+                            if (i > 0)
+                            {
+                                featureVector[featureVectorSubsetStart] = 1;
+                                featureVectorSubsetStart++;
+                            }
+
+                            // Copy page feature values into larger array
+                            var pageOfinterest = pageFeatures[pageOfInterestIdx];
+                            for (int j = 0; j < pageOfinterest.Length; j++)
+                            {
+                                featureVector[featureVectorSubsetStart + j] = pageOfinterest[j];
+                            }
+                        }
+                        featureVectorSubsetStart += FeatureVectorLength;
+                    }
+                }
+                return pages;
             }
             catch (Exception e)
             {
@@ -614,10 +719,20 @@ namespace Extract.AttributeFinder
         /// <param name="document">The <see cref="ISpatialString"/> from which to get text.</param>
         /// <returns>An enumeration of strings containing the text for each candidate first page
         /// (first page after possible pagination boundary)</returns>
-        internal static IEnumerable<string> GetPaginationTexts(ISpatialString document)
+        internal static IEnumerable<string> GetPaginationTexts(ISpatialString document, bool includeFirstPage = false)
         {
-            var pages = document.GetPages(true, " ").ToIEnumerable<ISpatialString>();
-            return pages.Skip(1).Select(s => s.String);
+            var pages = document.GetPages(true, " ")
+                .ToIEnumerable<ISpatialString>()
+                .Select(s => s.String);
+
+            if (includeFirstPage)
+            {
+                return pages;
+            }
+            else
+            {
+                return pages.Skip(1);
+            }
         }
 
         /// <summary>
@@ -626,14 +741,14 @@ namespace Extract.AttributeFinder
         /// <param name="ussPath">The path to the USS file</param>
         /// <returns>An enumeration of strings containing the text for each candidate first page
         /// (first page after possible pagination boundary)</returns>
-        private static IEnumerable<string> GetPaginationTexts(string ussPath)
+        private static IEnumerable<string> GetPaginationTexts(string ussPath, bool includeFirstPage = false)
         {
             try
             {
                 var document = new SpatialStringClass();
                 document.LoadFrom(ussPath, false);
                 document.ReportMemoryUsage();
-                return GetPaginationTexts(document);
+                return GetPaginationTexts(document, includeFirstPage);
             }
             catch (Exception e)
             {
@@ -736,16 +851,6 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Helper function to turn a while loop into an <see langword="IEnumerable"/>
-        /// </summary>
-        /// <param name="condition"></param>
-        /// <returns></returns>
-        private static IEnumerable<bool> IterateUntilFalse(Func<bool> condition) 
-        { 
-            while (condition()) yield return true; 
-        }
-
-        /// <summary>
         /// Computes a relevance score for each term in a Lucene inverted index in which
         /// each document is a collection of terms for a single classification category built
         /// by <see cref="WriteTermsToIndex"/>.
@@ -780,8 +885,9 @@ namespace Extract.AttributeFinder
                     documentsForCategory[category.Label] = (int)category.Value;
                 }
 
-                TermInfo getTermInfo(Term term)
+                TermInfo getTermInfo(BytesRef termBytes)
                 {
+                    var term = new Term("shingles", termBytes);
                     double augmentedTermFrequency = 0.0;
                     var query = new TermQuery(term);
                     facetCollector = new FacetsCollector();
@@ -796,6 +902,7 @@ namespace Extract.AttributeFinder
                         augmentedTermFrequency += tf / maxTf;
                     }
                     updateStatus(new StatusArgs { StatusMessage = "Scoring Terms... Terms processed: {0:N0}", Int32Value = 1 });
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     var termInfo = new TermInfo(
                         text: term.Text(),
@@ -805,19 +912,32 @@ namespace Extract.AttributeFinder
                         numberOfCategories: numberOfCategories);
                     return termInfo;
                 }
-                var terms = MultiFields.GetTerms(reader, "shingles")?.GetIterator(null);
-                var topTerms = IterateUntilFalse(() => !cancellationToken.IsCancellationRequested && terms?.Next() != null)
-                    .Select(_ => new Term("shingles", terms.Term))
-                    .Select(getTermInfo)
-                    .OrderByDescending(termInfo => termInfo.TermFrequencyInverseDocumentFrequency)
-                    .ThenBy(o => o.Text)
-                    .Take(MaxFeatures)
-                    .Select(result => result.Text)
-                    .ToArray();
+
+                // Since the 'tf-idf' is very similar to doc frequency, which is _much_ faster to get, start by limiting terms by that measure
+                // Use a size-limited set to conserve memory
+                var termPoolSize = MaxFeatures * numberOfCategories * 10;
+                var topDocFreqTerms = new LimitedSizeSortedSet<(BytesRef term, int docFreq)>(new DocFreqComparer(), termPoolSize);
+                var termsEnum = MultiFields.GetTerms(reader, "shingles")?.GetIterator(null);
+                if (termsEnum != null)
+                {
+                    BytesRef bytes = null;
+                    while ((bytes = termsEnum.Next()) != null)
+                    {
+                        topDocFreqTerms.Add((BytesRef.DeepCopyOf(bytes), termsEnum.DocFreq));
+                    }
+                }
+
+                var topTerms = new LimitedSizeSortedSet<TermInfo>(topDocFreqTerms.Select(t => getTermInfo(t.term)), new TfIdfComparer(), MaxFeatures);
+                string[] topTermsArray = new string[topTerms.Count];
+                int count = 0;
+                foreach(var term in topTerms.Reverse())
+                {
+                    topTermsArray[count++] = term.Text;
+                }
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return topTerms;
+                return topTermsArray;
             }
         }
 
@@ -933,11 +1053,6 @@ namespace Extract.AttributeFinder
                 }
                 return false;
             }
-        }
-
-        internal IEnumerable<string> ComputeEncodingsFromAttributesTrainingData(SpatialString[] spatialStrings, IUnknownVector[] labeledCandidateAttributes)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion Private Classes

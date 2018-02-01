@@ -511,7 +511,8 @@ namespace Extract.AttributeFinder.Rules
                 }
                 else
                 {
-                    returnValue = FindNamesWithSner(input, typesToReturn);
+                    throw new ExtractException("ELI45539","Unsupported NamedEntityRecognizer: "
+                        + NameFinderType.ToString());
                 }
 
                 // So that the garbage collector knows of and properly manages the associated
@@ -952,39 +953,6 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
-        IUnknownVector FindNamesWithSner(SpatialString text, Dictionary<string, string> typesToReturn)
-        {
-            var finderPath = _pathTags.Expand(NameFinderPath);
-            var classifier = edu.stanford.nlp.ie.crf.CRFClassifier.getClassifierNoExceptions(finderPath);
-
-            var offsets = classifier.classifyToCharacterOffsets(text.String).toArray().Cast<edu.stanford.nlp.util.Triple>();
-            var result = new IUnknownVectorClass();
-            foreach (var triple in offsets)
-            {
-                var type = (string)triple.first();
-
-                // Limit to specified types, if any
-                // Use letter case of type provided by user
-                if (typesToReturn == null || typesToReturn.TryGetValue(type, out type))
-                {
-                    var start = ((java.lang.Integer)triple.second()).intValue();
-                    var end = ((java.lang.Integer)triple.third()).intValue();
-
-                    // End index points to the character after the end of the entity
-                    // https://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/ie/AbstractSequenceClassifier.html#classifyToCharacterOffsets-java.lang.String- 
-                    var value = text.GetSubString(start, end-1);
-                    var at = new AttributeClass
-                    {
-                        Value = value,
-                        Type = type
-                    };
-                    result.PushBack(at);
-                }
-            }
-
-            return result;
-        }
-
         /// <summary>
         /// Get/cache a, possibly encrypted, tokenizer, sentence detector or name finder model
         /// </summary>
@@ -1002,16 +970,14 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 var model = FileDerivedResourceCache.GetCachedObject(
-                    path: modelPath,
+                    paths: modelPath,
                     creator: () =>
                     {
-                            var str = FileDerivedResourceCache.ThreadLocalMiscUtils.GetBase64StringFromFile(modelPath);
-                            var bytes = Convert.FromBase64String(str);
-                            var modelIn = new java.io.ByteArrayInputStream(bytes);
-                            return thunk(modelIn);
-                    },
-                    slidingExpiration: TimeSpan.MaxValue,
-                    removedCallback: x => (x.CacheItem.Value as IDisposable)?.Dispose());
+                        var str = FileDerivedResourceCache.ThreadLocalMiscUtils.GetBase64StringFromFile(modelPath);
+                        var bytes = Convert.FromBase64String(str);
+                        var modelIn = new java.io.ByteArrayInputStream(bytes);
+                        return thunk(modelIn);
+                    });
 
                 return model;
             }

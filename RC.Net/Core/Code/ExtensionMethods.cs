@@ -127,22 +127,98 @@ namespace Extract
         }
 
         /// <summary>
+        /// Returns a quoted version of the supplied string if quotes are needed, else the original string.
+        /// <example>For quote char as single-quote and the input value is "Hello World"
+        /// then the result will be "Hello World" but if the input is "Hello World's Best Dad" then
+        /// the output will be "'Hello World''s Best Dad'".</example>
+        /// </summary>
+        /// <param name="value">The <see cref="String"/> to quote.</param>
+        /// <param name="quote">The char to use for quoting</param>
+        /// <param name="delimiter">A string the presence of which requires the string be quoted (e.g., comma in CSV)</param>
+        /// <returns>A quoted version of the input string.</returns>
+        public static string QuoteIfNeeded(this string value, string quote, string delimiter)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    return value;
+                }
+                else if (string.IsNullOrWhiteSpace(value))
+                {
+                    return quote + value + quote;
+                }
+                else if (value.Contains(quote) || value.Contains(delimiter))
+                {
+                    return quote + value.Replace(quote, quote + quote) + quote;
+                }
+                else
+                {
+                    return value;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45494");
+            }
+        }
+
+        /// <summary>
+        /// Returns a quoted version of the supplied string if quotes are needed, else the original string.
+        /// <example>For quote char as single-quote and the input value is "Hello World"
+        /// then the result will be "Hello World" but if the input is "Hello World's Best Dad" then
+        /// the output will be "'Hello World''s Best Dad'".</example>
+        /// </summary>
+        /// <param name="value">The <see cref="String"/> to quote.</param>
+        /// <param name="quote">The char to use for quoting</param>
+        /// <param name="specialCharacters">Any other special chars that require quoting (e.g., comma in CSV)</param>
+        /// <returns>A quoted version of the input string.</returns>
+        public static string QuoteIfNeeded(this string value, string quote, params char[] specialCharacters)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    return value;
+                }
+                else if (string.IsNullOrWhiteSpace(value))
+                {
+                    return quote + value + quote;
+                }
+                else if (value.Contains(quote) || value.IndexOfAny(specialCharacters) > 0)
+                {
+                    return quote + value.Replace(quote, quote + quote) + quote;
+                }
+                else
+                {
+                    return value;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45444");
+            }
+        }
+
+        /// <summary>
         /// Returns a unquoted version of the supplied string.
         /// <example>If the input value is '"Hello World"' then the result
         /// will be 'Hello World'.</example>
         /// </summary>
         /// <param name="value">The <see cref="String"/> to unquote.</param>
+        /// <param name="quote">The char used for quoting</param>
         /// <returns>A version of the input string with one quote removed from the beginning and end.</returns>
         /// <remarks>If there is not a quote character at the beginning and end of the string, the returned string will be the same as the input</remarks>
-        public static string Unquote(this string value)
+        public static string Unquote(this string value, string quote = "\"")
         {
             try
             {
                 if (value.Length > 1
-                    && value.StartsWith("\"", StringComparison.Ordinal)
-                    && value.EndsWith("\"", StringComparison.Ordinal))
+                    && value.StartsWith(quote, StringComparison.Ordinal)
+                    && value.EndsWith(quote, StringComparison.Ordinal))
                 {
-                    return value.Substring(1, value.Length - 2);
+                    return value.Substring(1, value.Length - 2)
+                        .Replace(quote + quote, quote);
                 }
 
                 return value;

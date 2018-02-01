@@ -179,9 +179,6 @@
     <EmbeddedResource Include="Resources\opennlp.both_dirs.annotator" />
     <EmbeddedResource Include="Resources\opennlp.explicit_categories.annotator" />
     <EmbeddedResource Include="Resources\opennlp.single_output_file.train.txt" />
-    <EmbeddedResource Include="Resources\sner.annotator" />
-    <EmbeddedResource Include="Resources\sner.annotated.train.txt" />
-    <EmbeddedResource Include="Resources\sner.annotated.test.txt" />
     <EmbeddedResource Include="Resources\opennlp.overlapping_expected.annotator" />
     <EmbeddedResource Include="Resources\opennlp.overlapping_expected.train.txt" />
     <EmbeddedResource Include="Resources\overlapping_expected.txt" />

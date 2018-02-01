@@ -51,6 +51,7 @@ namespace Extract.AttributeFinder.Rules
             VariantVector pAttributeNames, string bstrParallelSemaphoreName, ProgressStatus pProgressStatus)
         {
             ThreadPoolThrottle throttle = null;
+            ThreadLocal<RuleSet> ruleset = null;
             try
             {
                 string[] attributeNames = pAttributeNames
@@ -78,7 +79,7 @@ namespace Extract.AttributeFinder.Rules
                     // Reason it cannot be saved could be that the ruleset contains a,
                     // disabled, deprecated object (legacy AddressFinder, e.g.)
                 }
-                var ruleset = new ThreadLocal<RuleSet>(() =>
+                ruleset = new ThreadLocal<RuleSet>(() =>
                 {
                     RuleSet rsd = null;
                     if (stringizedRuleset != null)
@@ -283,6 +284,8 @@ namespace Extract.AttributeFinder.Rules
             {
                 // This will release all acquired global semaphore counts
                 throttle?.Dispose();
+
+                ruleset?.Dispose();
             }
         }
 

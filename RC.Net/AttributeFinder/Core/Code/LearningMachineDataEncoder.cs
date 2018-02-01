@@ -185,11 +185,23 @@ namespace Extract.AttributeFinder
                 {
                     _nameToFeatureValues = MakeDictionary(attributes);
                 }
+                else if (attributes.TryDivideAttributesWithSimpleQuery(
+                    queryForAttributesToTokenize, out var tokenize, out var noTokenize))
+                {
+                    _nameToFeatureValues = MakeDictionary(noTokenize);
+                    var tokenizer = new SpatialStringFeatureVectorizer(null, shingleSize, -1);
+                    foreach (var attribute in tokenize)
+                    {
+                        var text = attribute.Value.String;
+                        var values = _nameToFeatureValues.GetOrAdd(attribute.Name,
+                            () => new List<string>());
+                        values.AddRange(tokenizer.GetTerms(text));
+                    }
+                }
                 else
                 {
-                    var afutil = new AFUtilityClass();
                     var attributesVector = attributes.ToIUnknownVector();
-                    var attributesToTokenize = afutil.QueryAttributes(attributesVector,
+                    var attributesToTokenize = LearningMachineDataEncoder._afUtility.Value.QueryAttributes(attributesVector,
                         queryForAttributesToTokenize, bRemoveMatches: true)
                         .ToIEnumerable<ComAttribute>();
 
@@ -317,7 +329,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// <see cref="IAFUtility"/> to be used by this thread to resolve attribute queries
         /// </summary>
-        private static readonly ThreadLocal<IAFUtility> _afUtility = new ThreadLocal<IAFUtility>(() => new AFUtilityClass());
+        internal static readonly ThreadLocal<IAFUtility> _afUtility = new ThreadLocal<IAFUtility>(() => new AFUtilityClass());
 
         /// <summary>
         /// Regex used to parse page ranges of pagination expected VOA files
@@ -440,9 +452,13 @@ namespace Extract.AttributeFinder
         {
             get
             {
-                return AutoBagOfWords != null && AutoBagOfWords.Enabled
-                    ? AutoBagOfWords.FeatureVectorLength + AttributeFeatureVectorLength
-                    : AttributeFeatureVectorLength;
+                var autoBoWSize = AutoBagOfWords != null && AutoBagOfWords.Enabled
+                    ? MachineUsage == LearningMachineUsage.Pagination
+                        ? AutoBagOfWords.FeatureVectorLengthForPagination
+                        : AutoBagOfWords.FeatureVectorLength
+                    : 0;
+
+                return autoBoWSize + AttributeFeatureVectorLength;
             }
         }
 
@@ -839,14 +855,15 @@ namespace Extract.AttributeFinder
         /// generated with this instance.
         /// </summary>
         /// <param name="ussFilePaths">The paths to the USS files to be used to configure this object</param>
-        /// <param name="inputVOAFilePaths">The paths to the proto-feature VOA files to be used to
+        /// <param name="inputAttributes">The paths to the proto-feature VOA files to be used to
         /// configure this object</param>
         /// <param name="answersOrAnswerFiles">The predictions for each example (if <see cref="MachineUsage"/> is
         /// <see cref="LearningMachineUsage.DocumentCategorization"/>) or the paths to VOA files of predictions
         /// (if <see cref="MachineUsage"/> is <see cref="LearningMachineUsage.Pagination"/></param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        public void ComputeEncodings(SpatialString[] spatialStrings, IUnknownVector[] inputVoas, string[] answers)
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="answersOrAnswerPaths")]
+        public void ComputeEncodings(SpatialString[] spatialStrings, IUnknownVector[] inputAttributes, string[] answersOrAnswerPaths)
         {
             try
             {
@@ -855,11 +872,13 @@ namespace Extract.AttributeFinder
 
                 if (MachineUsage == LearningMachineUsage.DocumentCategorization)
                 {
-                    ComputeDocumentEncodings(spatialStrings, inputVoas, answers);
+                    // TODO: Implement doc categorization
+                    //ComputeDocumentEncodings(spatialStrings, inputAttributes, answersOrAnswerPaths);
+                    throw new NotImplementedException();
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
-                    ComputeAttributesEncodings(spatialStrings, inputVoas);
+                    ComputeAttributesEncodings(spatialStrings, inputAttributes);
                 }
                 else
                 {
@@ -926,7 +945,7 @@ namespace Extract.AttributeFinder
         /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
         /// <returns>A tuple where the first item is an enumeration of feature vectors, the second
         /// item answer codes for each example and the third item the uss path for each example</returns>
-        public Tuple<double[][], int[], string[]> GetFeatureVectorAndAnswerCollections
+        public (double[][] featureVectors, int[] answerCodes, string[] ussPathsPerExample) GetFeatureVectorAndAnswerCollections
             (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answersOrAnswerFiles,
                 Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool updateAnswerCodes)
         {
@@ -967,14 +986,14 @@ namespace Extract.AttributeFinder
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answers = new int[results.Length];
-                    string[] ussFilePaths2 = new string[results.Length];
+                    string[] ussPathsPerExample = new string[results.Length];
                     for (int i = 0; i < results.Length; i++)
                     {
                         featureVectors[i] = results[i].Item1;
                         answers[i] = results[i].Item2;
-                        ussFilePaths2[i] = results[i].Item3;
+                        ussPathsPerExample[i] = results[i].Item3;
                     }
-                    return Tuple.Create(featureVectors, answers, ussFilePaths2);
+                    return (featureVectors, answers, ussPathsPerExample);
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
@@ -986,14 +1005,14 @@ namespace Extract.AttributeFinder
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answers = new int[results.Length];
-                    string[] ussFilePaths2 = new string[results.Length];
+                    string[] ussPathsPerExample = new string[results.Length];
                     for (int i = 0; i < results.Length; i++)
                     {
                         featureVectors[i] = results[i].Item1;
                         answers[i] = results[i].Item2;
-                        ussFilePaths2[i] = results[i].Item3;
+                        ussPathsPerExample[i] = results[i].Item3;
                     }
-                    return Tuple.Create(featureVectors, answers, ussFilePaths2);
+                    return (featureVectors, answers, ussPathsPerExample);
                 }
                 else
                 {
@@ -1006,20 +1025,29 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Gets enumerations of feature vectors and answer codes for enumerations of input files
+        /// </summary>
+        /// <param name="spatialStrings">The spatial strings to be used to generate the feature vectors</param>
+        /// <param name="inputAttributes">The VOAs to be used to generate the feature vectors</param>
+        /// <param name="answers">The predictions for each example
+        /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
+        /// <returns>A tuple where the first item is an enumeration of feature vectors, the second
+        /// item answer codes for each example and the third item the uss path for each example</returns>
         public (double[][] featureVector, int[] answers) GetFeatureVectorAndAnswerCollections
-            (SpatialString[] spatialStrings, IUnknownVector[] inputVoas, string[] answers, bool updateAnswerCodes)
+            (SpatialString[] spatialStrings, IUnknownVector[] inputAttributes, string[] answers, bool updateAnswerCodes)
         {
             try
             {
                 ExtractException.Assert("ELI44714", "Encodings have not been computed", AreEncodingsComputed);
 
                 // Null or empty VOA collection is OK. Set to null to simplify code
-                if (inputVoas != null && inputVoas.Length == 0)
+                if (inputAttributes != null && inputAttributes.Length == 0)
                 {
-                    inputVoas = null;
+                    inputAttributes = null;
                 }
 
-                if ( inputVoas != null && inputVoas.Length != spatialStrings.Length
+                if ( inputAttributes != null && inputAttributes.Length != spatialStrings.Length
                     || answers != null && answers.Length != spatialStrings.Length)
                 {
                     throw new ExtractException("ELI44715", "Arguments are of different lengths");
@@ -1027,7 +1055,7 @@ namespace Extract.AttributeFinder
 
                 if (MachineUsage == LearningMachineUsage.DocumentCategorization)
                 {
-                    return GetDocumentFeatureVectorAndAnswerCollection(spatialStrings, inputVoas, answers, updateAnswerCodes);
+                    return GetDocumentFeatureVectorAndAnswerCollection(spatialStrings, inputAttributes, answers, updateAnswerCodes);
                 }
                 else if (MachineUsage == LearningMachineUsage.Pagination)
                 {
@@ -1035,7 +1063,7 @@ namespace Extract.AttributeFinder
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
-                    var results = GetAttributesFeatureVectorAndAnswerCollection(spatialStrings, inputVoas);
+                    var results = GetAttributesFeatureVectorAndAnswerCollection(spatialStrings, inputAttributes);
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answerCodes = new int[results.Length];
@@ -1462,6 +1490,7 @@ namespace Extract.AttributeFinder
                 numberOfExamples = protoFeatureGroups.Count();
 
                 // NOTE: vectorizers return an empty enumerable if not enabled
+                // TODO: pass along cancelation token!
                 attributeFeatures = AttributeFeatureVectorizers
                     .Select(vectorizer => vectorizer.GetFeatureVectorsForEachGroup(protoFeatureGroups)
                     .ToList());
@@ -1471,7 +1500,6 @@ namespace Extract.AttributeFinder
                 var protoFeatureGroups = SpatialStringFeatureVectorizer.GetPaginationTexts(document).Select(_ =>
                     Enumerable.Empty<NameToProtoFeaturesMap>()
                 );
-
             }
 
             if (AutoBagOfWords == null || !AutoBagOfWords.Enabled)
@@ -1553,7 +1581,7 @@ namespace Extract.AttributeFinder
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <param name="updateAnswerCodes">Whether to update answer code to name mappings to reflect the input</param>
         /// <returns>A tuple of feature vectors, predictions and the uss path for each example</returns>
-        private Tuple<double[][], int[], string[]> GetDocumentFeatureVectorAndAnswerCollection
+        private (double[][] featureVectors, int[] answerCodes, string[] ussPathsPerExample) GetDocumentFeatureVectorAndAnswerCollection
             (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answers,
                 Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool updateAnswerCodes)
         {
@@ -1567,7 +1595,14 @@ namespace Extract.AttributeFinder
 
                 double[][] featureVectors = new double[ussFilePaths.Length][];
                 int[] answerCodes = new int[ussFilePaths.Length];
-                Parallel.For(0, ussFilePaths.Length, (i, loopState) =>
+
+                // Prevent too much memory consumption when loading large documents
+                var opts = new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Environment.ProcessorCount
+                };
+                using (var spatialString = new ThreadLocal<SpatialStringClass>(() => new SpatialStringClass()))
+                Parallel.For(0, ussFilePaths.Length, opts, (i, loopState) =>
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
@@ -1576,15 +1611,13 @@ namespace Extract.AttributeFinder
 
                     string answer = answers[i];
 
-                    SpatialString spatialString = null;
                     if (AutoBagOfWords != null)
                     {
                         string uss = ussFilePaths[i];
                         try
                         {
-                            spatialString = new SpatialStringClass();
-                            spatialString.LoadFrom(uss, false);
-                            spatialString.ReportMemoryUsage();
+                            spatialString.Value.LoadFrom(uss, false);
+                            spatialString.Value.ReportMemoryUsage();
                         }
                         catch (Exception e)
                         {
@@ -1611,7 +1644,7 @@ namespace Extract.AttributeFinder
                         }
                     }
 
-                    double[] featureVector = GetDocumentFeatureVector(spatialString, attributes);
+                    double[] featureVector = GetDocumentFeatureVector(spatialString.Value, attributes);
 
                     int answerCode;
                     if (!AnswerNameToCode.TryGetValue(answer, out answerCode))
@@ -1627,7 +1660,7 @@ namespace Extract.AttributeFinder
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return Tuple.Create(featureVectors, answerCodes, ussFilePaths);
+                return (featureVectors, answerCodes, ussFilePaths);
             }
             catch (Exception e)
             {
@@ -1641,7 +1674,7 @@ namespace Extract.AttributeFinder
         /// <param name="answers">The answer names/categories. Can contain repeats</param>
         /// <param name="negativeCategory">The value to be used for the negative category if there
         /// are only two categories total</param>
-        private void InitializeAnswerCodeMappings(IEnumerable<string> answers, string negativeCategory = null)
+        internal void InitializeAnswerCodeMappings(IEnumerable<string> answers, string negativeCategory = null)
         {
             AnswerCodeToName.Clear();
             AnswerNameToCode.Clear();
@@ -1654,7 +1687,7 @@ namespace Extract.AttributeFinder
 
             // Add category code for each name seen
             int nextCategoryCode = 0;
-            foreach (var category in answers.Distinct()
+            foreach (var category in answers.Distinct(StringComparer.OrdinalIgnoreCase)
                 .Where(k => !k.Equals(otherCategory, StringComparison.OrdinalIgnoreCase))
                 .OrderBy(s => s, StringComparer.OrdinalIgnoreCase))
             {
@@ -1687,7 +1720,15 @@ namespace Extract.AttributeFinder
             try
             {
                 var results = new Tuple<double[], int, string>[ussFilePaths.Length][];
-                Parallel.For(0, ussFilePaths.Length, (i, loopState) =>
+
+                // Prevent too much memory consumption when loading large documents
+                var opts = new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Environment.ProcessorCount
+                };
+                using (var spatialString = new ThreadLocal<SpatialStringClass>(() => new SpatialStringClass()))
+                using (var attributes = new ThreadLocal<IUnknownVectorClass>(() => new IUnknownVectorClass()))
+                Parallel.For(0, ussFilePaths.Length, opts, (i, loopState) =>
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
@@ -1696,15 +1737,13 @@ namespace Extract.AttributeFinder
 
                     string answerFile = answerFiles[i];
 
-                    SpatialString spatialString = null;
                     if (AutoBagOfWords != null)
                     {
                         string uss = ussFilePaths[i];
                         try
                         {
-                            spatialString = new SpatialStringClass();
-                            spatialString.LoadFrom(uss, false);
-                            spatialString.ReportMemoryUsage();
+                            spatialString.Value.LoadFrom(uss, false);
+                            spatialString.Value.ReportMemoryUsage();
                         }
                         catch (Exception e)
                         {
@@ -1714,20 +1753,19 @@ namespace Extract.AttributeFinder
                         }
                     }
 
-                    IUnknownVector attributes = null;
                     if (AttributeFeatureVectorizers.Any() && inputVOAFilePaths != null)
                     {
                         string voa = inputVOAFilePaths[i];
                         ExtractException.Assert("ELI39690", "Input VOA file doesn't exist", File.Exists(voa),
                             "Filename", voa);
-                        attributes = _afUtility.Value.GetAttributesFromFile(voa);
-                        attributes.ReportMemoryUsage();
+                        attributes.Value.LoadFrom(voa, false);
+                        attributes.Value.ReportMemoryUsage();
                     }
 
-                    List<double[]> featureVectors = GetPaginationFeatureVectors(spatialString, attributes).ToList();
+                    List<double[]> featureVectors = GetPaginationFeatureVectors(spatialString.Value, attributes.Value).ToList();
 
-                    // Get page count so that missing page numbers in the answer VOA can be filled in.
-                    int pageCount = featureVectors.Count + 1;
+                // Get page count so that missing page numbers in the answer VOA can be filled in.
+                int pageCount = featureVectors.Count + 1;
                     var expandedAnswers = ExpandPaginationAnswerVOA(answerFile, pageCount).ToList();
 
                     var answerCodes = expandedAnswers.Select(answer =>
@@ -1780,22 +1818,27 @@ namespace Extract.AttributeFinder
                     inputVOAFilePaths != null);
 
                 var results = new Tuple<double[], int, string>[ussFilePaths.Length][];
-                Parallel.For(0, ussFilePaths.Length, (i, loopState) =>
+
+                // Prevent too much memory consumption when loading large documents
+                var opts = new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Environment.ProcessorCount
+                };
+                using (var spatialString = new ThreadLocal<SpatialStringClass>(() => new SpatialStringClass()))
+                Parallel.For(0, ussFilePaths.Length, opts, (i, loopState) =>
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
                         loopState.Stop();
                     }
 
-                    SpatialString spatialString = null;
                     if (AutoBagOfWords != null)
                     {
                         string uss = ussFilePaths[i];
                         try
                         {
-                            spatialString = new SpatialStringClass();
-                            spatialString.LoadFrom(uss, false);
-                            spatialString.ReportMemoryUsage();
+                            spatialString.Value.LoadFrom(uss, false);
+                            spatialString.Value.ReportMemoryUsage();
                         }
                         catch (Exception e)
                         {
@@ -1846,7 +1889,7 @@ namespace Extract.AttributeFinder
                         answerCodes.Add(code);
                     }
 
-                    List<double[]> featureVectors = GetAttributesFeatureVectors(spatialString, filteredAttributes).ToList();
+                    List<double[]> featureVectors = GetAttributesFeatureVectors(spatialString.Value, filteredAttributes).ToList();
 
                     results[i] = new Tuple<double[], int, string>[featureVectors.Count];
                     for (int j = 0; j < featureVectors.Count; j++)
@@ -2088,20 +2131,18 @@ namespace Extract.AttributeFinder
             InitializeAnswerCodeMappings(answers, NegativeClassName);
         }
 
-        private void ComputeDocumentEncodings(SpatialString[] spatialStrings, IUnknownVector[] inputVOAs, string[] answers)
-        {
-            throw new NotImplementedException();
-        }
-
+        // TODO: Implement bag of words
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="spatialStrings")]
         private void ComputeAttributesEncodings(SpatialString[] spatialStrings, IUnknownVector[] labeledCandidateAttributes)
         {
             // Configure SpatialStringFeatureVectorizer
             List<string> answers = null;
             if (AutoBagOfWords != null)
             {
-                answers = AutoBagOfWords.ComputeEncodingsFromAttributesTrainingData
-                    (spatialStrings, labeledCandidateAttributes)
-                    .ToList();
+                //answers = AutoBagOfWords.ComputeEncodingsFromAttributesTrainingData
+                //    (spatialStrings, labeledCandidateAttributes)
+                //    .ToList();
+                throw new NotImplementedException();
             }
             else
             {
@@ -2207,6 +2248,14 @@ namespace Extract.AttributeFinder
             if (string.IsNullOrWhiteSpace(AttributeFilter) || protoFeatures.Size() == 0)
             {
                 return protoFeatures.ToIEnumerable<ComAttribute>();
+            }
+
+            if (protoFeatures.ToIEnumerable<ComAttribute>().TryDivideAttributesWithSimpleQuery(
+                AttributeFilter, out var matched, out var rest))
+            {
+                return NegateFilter
+                    ? rest
+                    : matched;
             }
 
             var matching = _afUtility.Value.QueryAttributes(protoFeatures, AttributeFilter, false)

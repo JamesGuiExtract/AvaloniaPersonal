@@ -359,7 +359,6 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@XCOPY "$(RCNETDir)\APIs\IKVM.8.1.5717.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 # Copy to DotNetGAC for Installshield
 	@XCOPY "$(RCNETDir)\APIs\IKVM.8.1.5717.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /v /s /e /y
-	@XCOPY "$(RCNETDir)\APIs\Stanford.NLP.NER.3.7.0.1\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 	@COPY /V "$(RCNETDir)\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(RCNETDir)\APIs\YamlDotNet.Signed.4.2.1\lib\net35\YamlDotNet.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	

@@ -90,15 +90,21 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <remarks>Answer score will always be null</remarks>
         /// <param name="inputs">The feature vector</param>
+        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
         /// <returns>The answer code and score</returns>
-        public override (int answerCode, double? score) ComputeAnswer(double[] inputs)
+        public override (int answerCode, double? score) ComputeAnswer(double[] inputs, bool standardizeInputs = true)
         {
             try
             {
                 ExtractException.Assert("ELI39729", "This classifier has not been trained", IsTrained);
 
                 // Scale inputs
-                inputs = inputs.Subtract(FeatureMean).ElementwiseDivide(FeatureScaleFactor);
+                if (standardizeInputs
+                    && FeatureMean != null
+                    && FeatureScaleFactor != null)
+                {
+                    inputs = inputs.Subtract(FeatureMean).ElementwiseDivide(FeatureScaleFactor);
+                }
 
                 int answer = ((MulticlassSupportVectorMachine)Classifier).Compute(inputs);
 

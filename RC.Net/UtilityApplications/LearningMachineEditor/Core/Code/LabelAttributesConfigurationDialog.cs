@@ -1,14 +1,6 @@
 ﻿using Extract.AttributeFinder;
-using Extract.Utilities;
-using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.LearningMachineEditor

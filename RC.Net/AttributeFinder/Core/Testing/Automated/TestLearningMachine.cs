@@ -1181,7 +1181,7 @@ namespace Extract.AttributeFinder.Test
             }
             // Finished in less time than possible if loading 100 times
             // (finishes in ~ 2 seconds on my dev machine)
-            Assert.Less(stopwatch.ElapsedMilliseconds, 5000);
+            Assert.Less(stopwatch.ElapsedMilliseconds, 10000);
 
             // There were no exceptions (e.g., no out-of-memory issues with 100 62MB LMs)
             CollectionAssert.IsEmpty(exceptions);
@@ -1260,6 +1260,17 @@ namespace Extract.AttributeFinder.Test
             Assert.Greater(results.testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.93);
         }
 
+        // https://extract.atlassian.net/browse/ISSUE-14979
+        [SuppressMessage("Microsoft.Globalization", "CA1308")]
+        [Test, Category("LearningMachine")]
+        public static void MultiplyCasedDocType()
+        {
+            SetDocumentCategorizationFiles();
+            var csvContents = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories)
+                .Select(imagePath => string.Join(",", imagePath, Path.GetFileName(Path.GetDirectoryName(imagePath)))).ToList();
+            csvContents.Add(csvContents.Last().ToUpperInvariant());
+            csvContents.Add(csvContents.Last().ToLowerInvariant());
+            File.WriteAllLines(_csvPath, csvContents);
 
             var lm = new LearningMachine
             {
@@ -1310,15 +1321,16 @@ namespace Extract.AttributeFinder.Test
             // CSV is uss path, index, class name, features
             var trainInputs = trainingData.Select(l => l.Split(',').Skip(3).Select(s => Convert.ToDouble(s, CultureInfo.InvariantCulture)).ToArray()).ToArray();
             var trainOutputs = trainingData.Select(l => l.Split(',').Skip(2).First()).Select(s => lm.Encoder.AnswerNameToCode[s.Unquote()]).ToArray();
+
+            // Data is not standardized so all are integers
+            // (Moved this here because now running training will standardize the input array, so as to save memory required to copy the whole thing)
+            Assert.That(trainInputs.SelectMany(a => a).Select(d => d % 1).All(d => d == 0));
+
             lm.Classifier.TrainClassifier(trainInputs, trainOutputs, new Random(0));
 
             var results = lm.TestMachine();
             Assert.Greater(results.trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
             Assert.Greater(results.testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
-
-
-            // Data is not standardized so all are integers
-            Assert.That(trainInputs.SelectMany(a => a).Select(d => d % 1).All(d => d == 0));
 
             // Standardize
             lm.StandardizeFeaturesForCsvOutput = true;

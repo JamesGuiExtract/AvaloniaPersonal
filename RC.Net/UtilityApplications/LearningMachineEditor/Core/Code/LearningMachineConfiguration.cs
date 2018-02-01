@@ -203,8 +203,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 base.OnLoad(e);
 
                 // Set window size, now that controls are in their proper places
-                Height = 643;
-                Width = 572;
+                Size = MinimumSize;
 
                 // Anchor stacked controls
                 paginationInputPanel.Anchor
@@ -935,6 +934,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 try
                 {
                     string pagesToProcess = specifiedPagesTextBox.Enabled ? specifiedPagesTextBox.Text : null;
+                    if (usage == LearningMachineUsage.Pagination && pagesToProcess != null)
+                    {
+                        ExtractException.Assert("ELI45541", "Value must be a positive integer",
+                            int.TryParse(pagesToProcess, out int page) && page > 0);
+                    }
                     autoBoW = new SpatialStringFeatureVectorizer(pagesToProcess, shingleSize, maxFeatures);
                 }
                 catch (ExtractException ue)
@@ -1261,7 +1265,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                                           = useAutoBagOfWordsCheckBox.Checked;
 
             specifiedPagesCheckBox.Enabled = useAutoBagOfWordsCheckBox.Checked;
-            specifiedPagesTextBox.Enabled = specifiedPagesCheckBox.Enabled && specifiedPagesCheckBox.Checked;
+            specifiedPagesTextBox.Enabled = 
+                paginationPagesLabel.Enabled =
+                specifiedPagesCheckBox.Enabled && specifiedPagesCheckBox.Checked;
 
             attributeFeatureFilterTextBox.Enabled = useAttributeFeatureFilterCheckBox.Checked;
             attributeFeatureFilterComboBox.Enabled = useAttributeFeatureFilterCheckBox.Checked;

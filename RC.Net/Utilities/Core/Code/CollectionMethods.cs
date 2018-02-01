@@ -93,7 +93,7 @@ namespace Extract.Utilities
         /// </summary>
         /// <typeparam name="T">The type stored in the list.</typeparam>
         /// <param name="list">The list of items to be cleared and disposed.</param>
-        public static void ClearAndDispose<T>(IList<T> list) where T : class, IDisposable
+        public static void ClearAndDispose<T>(this IList<T> list) where T : class, IDisposable
         {
             try
             {

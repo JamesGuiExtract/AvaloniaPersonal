@@ -234,9 +234,17 @@ namespace Extract.AttributeFinder
                             string.Format(CultureInfo.CurrentCulture,
                                 "{0:G4}\u2013{1:G4}", double.MinValue, double.MaxValue), 1);
                     case FeatureVectorizerType.DiscreteTerms:
-                        return _bagOfWords.Value.CodeToString
-                            .OrderBy(p => p.Key)
-                            .Select(p => p.Value);
+                        // If BoW hasn't yet been created, skip that step
+                        if (!_bagOfWords.IsValueCreated)
+                        {
+                            return GetBagOfWordsVocab();
+                        }
+                        else
+                        {
+                            return _bagOfWords.Value.CodeToString
+                                .OrderBy(p => p.Key)
+                                .Select(p => p.Value);
+                        }
                     case FeatureVectorizerType.Bitmap:
                         return Enumerable.Repeat(string.Format(CultureInfo.CurrentCulture, "Bitmap of length {0:N0}", BitmapSize), 1);
 
@@ -336,6 +344,13 @@ namespace Extract.AttributeFinder
                     _bagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
                         new Accord.MachineLearning.BagOfWords(topTerms));
 
+                    // Instantiate the lazy object
+                    if (_bagOfWords.Value != null) { }
+
+                    // Clear full list
+                    // https://extract.atlassian.net/browse/ISSUE-15231
+                    _distinctValuesSeen.Clear();
+                    
                     NotifyPropertyChanged("RecognizedValues");
                 }
             }
@@ -626,6 +641,19 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Called when serializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnSerializing]
+        private void OnSerializing(StreamingContext context)
+        {
+            // https://extract.atlassian.net/browse/ISSUE-15231
+            // This limits ones ability to change feature type after save/load but
+            // it is the simplest way to save storage space
+            _distinctValuesSeen.Clear();
+        }
+
+        /// <summary>
         /// Called when deserializing
         /// </summary>
         /// <param name="context">The context.</param>
@@ -659,6 +687,16 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <returns></returns>
         private Accord.MachineLearning.BagOfWords CreateInitialBagOfWords()
+        {
+            var vocab = GetBagOfWordsVocab().ToArray();
+            return new Accord.MachineLearning.BagOfWords(vocab);
+        }
+
+        /// <summary>
+        /// Creates the BagOfWords object using a TFIDF-ordered collection of terms
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<string> GetBagOfWordsVocab()
         {
             // _termFrequency, etc, data is not persisted but Lazy<T> objects are instantiated when they
             // are serialized (I just discovered) so we will never get here when the collections are empty.
@@ -701,10 +739,9 @@ namespace Extract.AttributeFinder
             var orderedTerms = _distinctValuesSeen.Select(getTermInfo)
             .OrderByDescending(termInfo => termInfo.TermFrequencyInverseDocumentFrequency)
             .ThenBy(o => o.Text)
-            .Select(o => o.Text)
-            .ToArray();
+            .Select(o => o.Text);
 
-            return new Accord.MachineLearning.BagOfWords(orderedTerms);
+            return orderedTerms;
         }
 
         #endregion Private Methods

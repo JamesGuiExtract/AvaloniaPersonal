@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Lucene.Net.Index;
+using Lucene.Net.Util;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace Extract.AttributeFinder
@@ -54,6 +58,107 @@ namespace Extract.AttributeFinder
             {
                 throw ex.AsExtract("ELI41830");
             }
+        }
+    }
+
+    /// <summary>
+    /// A size-limited version of a SortedSet. Keeps only greatest items when size is exceeded
+    /// </summary>
+    internal sealed class LimitedSizeSortedSet<T> : IEnumerable<T>
+    {
+        readonly int _size;
+        readonly SortedSet<T> _items;
+
+        public LimitedSizeSortedSet(IComparer<T> comparer, int size)
+        {
+            _size  = size;
+            _items = new SortedSet<T>(comparer);
+        }
+
+        public LimitedSizeSortedSet(IEnumerable<T> collection, IComparer<T> comparer, int size)
+        {
+            _size  = size;
+            _items = new SortedSet<T>(comparer);
+            foreach(var item in collection)
+            {
+                Add(item);
+            }
+        }
+
+        public void Add(T item)
+        {
+            if (_items.Contains(item))
+            {
+                return;
+            }
+
+            if (_items.Count < _size)
+            {
+                _items.Add(item);
+                return;
+            }
+
+            if (_items.Comparer.Compare(item, _items.Min) <= 0)
+            {
+                return;
+            }
+
+            _items.Remove(_items.Min);
+            _items.Add(item);
+        }
+
+        public void Clear()
+        {
+            _items.Clear();
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _items.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable<T>)_items).GetEnumerator();
+        }
+
+        public int Count => _items.Count;
+
+        public IEnumerable<T> Reverse() => _items.Reverse();
+    }
+
+    /// <summary>
+    /// Compare terms by document frequency then by text
+    /// </summary>
+    /// <remarks>Compares such that lower DF comes first but for ties, alphabetically higher comes first</remarks>
+    internal sealed class DocFreqComparer : IComparer<(BytesRef term, int docFreq)>
+    {
+        public int Compare((BytesRef term, int docFreq) a, (BytesRef term, int docFreq) b)
+        {
+            int res = (a.docFreq).CompareTo((b.docFreq));
+            if (res == 0)
+            {
+                res = string.Compare(b.term.Utf8ToString(), a.term.Utf8ToString(), StringComparison.CurrentCulture);
+            }
+            return res;
+        }
+    }
+
+    /// <summary>
+    /// Compare terms by 'tf-idf'
+    /// </summary>
+    /// <remarks>Compares such that lower TfIdf comes first but for ties, alphabetically higher comes first</remarks>
+    internal sealed class TfIdfComparer : IComparer<TermInfo>
+    {
+        public int Compare(TermInfo a, TermInfo b)
+        {
+            int res = (a.TermFrequencyInverseDocumentFrequency)
+                .CompareTo(b.TermFrequencyInverseDocumentFrequency);
+            if (res == 0)
+            {
+                res = string.Compare(b.Text, a.Text, StringComparison.CurrentCulture);
+            }
+            return res;
         }
     }
 }

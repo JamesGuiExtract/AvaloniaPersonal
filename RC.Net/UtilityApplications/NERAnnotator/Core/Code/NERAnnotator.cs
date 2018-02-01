@@ -22,7 +22,6 @@ namespace Extract.UtilityApplications.NERAnnotator
         Random _rng;
         Tokenizer _tokenizer;
         SentenceDetectorME _sentenceDetector;
-        edu.stanford.nlp.process.TokenizerFactory _tokenizerFactory = edu.stanford.nlp.process.PTBTokenizer.factory();
         UCLID_AFUTILSLib.AFUtilityClass _afutil = new UCLID_AFUTILSLib.AFUtilityClass();
         SpatialStringSearcher _searcher = new SpatialStringSearcher();
 
@@ -365,17 +364,9 @@ namespace Extract.UtilityApplications.NERAnnotator
                             }
                         }
                     }
-                    // Stanford format: tok1 EntityName
-                    //                  tok2 O
-                    //                  ...
                     else
                     {
-                        foreach (var (token, label) in tokens)
-                        {
-                            sb.Append(token);
-                            sb.Append("\t");
-                            sb.AppendLine(label ?? "O");
-                        }
+                        throw new ExtractException("ELI45543", "Unsupported NER format: " + _settings.Format.ToString());
                     }
                     _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 1, 0 } });
                 }
@@ -481,11 +472,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     }
                     else
                     {
-                        tokenSpans =
-                            _tokenizerFactory.getTokenizer(new java.io.StringReader(input)).tokenize().toArray()
-                            .Cast<edu.stanford.nlp.ling.Word>()
-                            .Select(tok => (tokenStart: tok.beginPosition(), tokenEndExclusive: tok.endPosition(), value: tok.value()))
-                            .ToList();
+                        throw new ExtractException("ELI45542", "Unsupported NER format: " + _settings.Format.ToString());
                     }
 
                     // Iterate through the tokens. In order to pick the longest match, this algorithm will continue to track overlapping matches until all

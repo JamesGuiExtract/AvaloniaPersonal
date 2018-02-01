@@ -160,7 +160,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Gets array of image paths and maybe of answers from specification
         /// </summary>
-        internal Tuple<string[], string[]> GetImagePaths(Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+        internal Tuple<string[], string[]> GetImagePaths(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             try
             {
@@ -202,6 +202,7 @@ namespace Extract.AttributeFinder
                         using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(InputPath))
                         {
                             csvReader.Delimiters = new[] { "," };
+                            csvReader.CommentTokens = new[] { "//", "#" };
                             while (!csvReader.EndOfData)
                             {
                                 cancellationToken.ThrowIfCancellationRequested();

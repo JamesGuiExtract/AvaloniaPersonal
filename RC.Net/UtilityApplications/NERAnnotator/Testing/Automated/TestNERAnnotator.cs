@@ -118,30 +118,6 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
 
         #region Tests
 
-        // Test Stanford format output
-        [Test, Category("NERAnnotator")]
-        public static void StanfordNER()
-        {
-            SetFiles();
-            var settingsFile = Path.Combine(_inputFolder.Last(), "sner.annotator");
-            _testFiles.GetFile("Resources.sner.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
-            NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
-            Directory.SetCurrentDirectory(settings.WorkingDir);
-
-            var expectedFile = _testFiles.GetFile("Resources.sner.annotated.train.txt");
-            var expected = File.ReadAllText(expectedFile);
-            var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
-
-            expectedFile = _testFiles.GetFile("Resources.sner.annotated.test.txt");
-            expected = File.ReadAllText(expectedFile);
-            var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
-            var testingOutput = File.ReadAllText(testingOutputFile);
-            Assert.AreEqual(expected, testingOutput);
-        }
-
         // Test OpenNLP format without sentence detection, with a learnable tokenizer
         [Test, Category("NERAnnotator")]
         public static void OpenNlpNoSentLearnableTokenizer()
