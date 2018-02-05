@@ -285,13 +285,6 @@
     <Compile Include="SetDocumentTagsSettingsDialog.Designer.cs">
       <DependentUpon>SetDocumentTagsSettingsDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="TemplateFinder.cs" />
-    <Compile Include="TemplateFinderSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TemplateFinderSettingsDialog.Designer.cs">
-      <DependentUpon>TemplateFinderSettingsDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="ValueConditionSelector.cs" />
     <Compile Include="ValueConditionSelectorSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -504,9 +497,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SetDocumentTagsSettingsDialog.resx">
       <DependentUpon>SetDocumentTagsSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TemplateFinderSettingsDialog.resx">
-      <DependentUpon>TemplateFinderSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ValueConditionSelectorSettingsDialog.resx">
       <DependentUpon>ValueConditionSelectorSettingsDialog.cs</DependentUpon>
