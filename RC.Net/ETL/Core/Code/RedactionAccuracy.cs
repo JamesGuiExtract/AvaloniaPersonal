@@ -7,12 +7,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Transactions;
 using Extract.AttributeFinder;
 using Extract.DataCaptureStats;
-using Extract.Interfaces;
 using Extract.Utilities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using UCLID_COMUTILSLib;
 
 
@@ -230,56 +228,63 @@ namespace Extract.ETL
                                         // Compare the VOAs
                                         var output = IDShieldAttributeComparer.CompareAttributes(ExpectedAttributes, FoundAttributes, XPathOfSensitiveAttributes).ToList();
 
-                                        // Add the comparison results to the Results
-                                        var statsToSave = output.AggregateStatistics();
-
-                                        var lookup = statsToSave.ToLookup(a => new { a.Path, a.Label });
-
-                                        var attributePaths = statsToSave
-                                            .Select(a => a.Path)
-                                            .Distinct()
-                                            .OrderBy(p => p)
-                                            .ToList();
-
-                                        List<string> valuesToAdd = new List<string>();
-                                        foreach (var p in attributePaths)
+                                        // process output for each page
+                                        foreach (var pageKeyPair in output)
                                         {
-                                            int expected = lookup[new { Path = p, Label = AccuracyDetailLabel.Expected }].Sum(a => a.Value);
-                                            int found = lookup[new { Path = p, Label = AccuracyDetailLabel.Found }].Sum(a => a.Value);
-                                            int correct = lookup[new { Path = p, Label = AccuracyDetailLabel.Correct }].Sum(a => a.Value);
-                                            int falsePositives = lookup[new { Path = p, Label = AccuracyDetailLabel.FalsePositives }].Sum(a => a.Value);
-                                            int overRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.OverRedacted }].Sum(a => a.Value);
-                                            int underRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.UnderRedacted }].Sum(a => a.Value);
-                                            int missed = lookup[new { Path = p, Label = AccuracyDetailLabel.Missed }].Sum(a => a.Value);
-                                            int page = 0;
+                                            // Add the comparison results to the Results
+                                            var statsToSave = pageKeyPair.Value.AggregateStatistics();
 
-                                            if (expected != 0 || found != 0 || correct != 0 || falsePositives != 0 
-                                                || overRedacted != 0 || underRedacted != 0 || missed != 0)
+                                            var lookup = statsToSave.ToLookup(a => new { a.Path, a.Label });
+
+                                            var attributePaths = statsToSave
+                                                .Select(a => a.Path)
+                                                .Distinct()
+                                                .OrderBy(p => p)
+                                                .ToList();
+
+                                            List<string> valuesToAdd = new List<string>();
+                                            foreach (var p in attributePaths)
                                             {
-                                                valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
-                                                    @"({0}, {1}, {2}, {3}, {4}, '{5}', {6}, {7}, {8}, {9}, {10}, {11}, {12})"
-                                                    , DatabaseServiceID
-                                                    , foundID
-                                                    , expectedID
-                                                    , fileID
-                                                    , page
-                                                    , p
-                                                    , expected
-                                                    , found
-                                                    , correct
-                                                    , falsePositives
-                                                    , overRedacted
-                                                    , underRedacted
-                                                    , missed
-                                                    ));
+                                                int expected = lookup[new { Path = p, Label = AccuracyDetailLabel.Expected }].Sum(a => a.Value);
+                                                int found = lookup[new { Path = p, Label = AccuracyDetailLabel.Found }].Sum(a => a.Value);
+                                                int correct = lookup[new { Path = p, Label = AccuracyDetailLabel.Correct }].Sum(a => a.Value);
+                                                int falsePositives = lookup[new { Path = p, Label = AccuracyDetailLabel.FalsePositives }].Sum(a => a.Value);
+                                                int overRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.OverRedacted }].Sum(a => a.Value);
+                                                int underRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.UnderRedacted }].Sum(a => a.Value);
+                                                int missed = lookup[new { Path = p, Label = AccuracyDetailLabel.Missed }].Sum(a => a.Value);
+                                                int page = pageKeyPair.Key;
+
+                                                if (expected != 0 || found != 0 || correct != 0 || falsePositives != 0
+                                                    || overRedacted != 0 || underRedacted != 0 || missed != 0)
+                                                {
+                                                    valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
+                                                        @"({0}, {1}, {2}, {3}, {4}, '{5}', {6}, {7}, {8}, {9}, {10}, {11}, {12})"
+                                                        , DatabaseServiceID
+                                                        , foundID
+                                                        , expectedID
+                                                        , fileID
+                                                        , page
+                                                        , p
+                                                        , expected
+                                                        , found
+                                                        , correct
+                                                        , falsePositives
+                                                        , overRedacted
+                                                        , underRedacted
+                                                        , missed
+                                                        ));
+                                                }
                                             }
-                                        }
 
-                                        // Add the data to the ReportingRedactionAccuracy table
-                                        var saveCmd = connection.CreateCommand();
+                                            using (TransactionScope scope = new TransactionScope())
+                                            using (var saveConnection = getNewSqlDbConnection())
+                                            {
+                                                saveConnection.Open();
+                                                // Add the data to the ReportingRedactionAccuracy table
+                                                var saveCmd = saveConnection.CreateCommand();
 
-                                        saveCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
-                                            @"INSERT INTO [dbo].[ReportingRedactionAccuracy]
+                                                saveCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
+                                                    @"INSERT INTO [dbo].[ReportingRedactionAccuracy]
                                                        ([DatabaseServiceID]
                                                        ,[FoundAttributeSetForFileID]
                                                        ,[ExpectedAttributeSetForFileID]
@@ -295,7 +300,10 @@ namespace Extract.ETL
                                                        ,[Missed])
                                                      VALUES
                                                            {0};", string.Join(",\r\n", valuesToAdd));
-                                        saveCmd.ExecuteNonQuery();
+                                                saveCmd.ExecuteNonQuery();
+                                                scope.Complete();
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -390,7 +398,7 @@ namespace Extract.ETL
         /// <summary>
         /// Runs the query to remove the records that will be replaced
         /// </summary>
-        /// <param name="connection">Database connnection to perform the deletion</param>
+        /// <param name="connection">Database connection to perform the deletion</param>
         void deleteOldRecords(SqlConnection connection)
         {
             // Remove records to be replaced

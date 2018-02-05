@@ -88,10 +88,10 @@ namespace Extract.ETL
         /// <param name="expected">Expected attributes</param>
         /// <param name="found">Found attributes</param>
         /// <param name="xPathOfSensitiveAttributes">XPath to select the attributes to compare</param>
-        /// <returns>IEnumerable of AccuracyDetail</returns>
+        /// <returns>Dictionary that contains a List of AccuracyDetail for each page</returns>
         [CLSCompliant(false)]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "x")]
-        public static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
+        public static Dictionary<Int32, List<AccuracyDetail>> CompareAttributes(IUnknownVector expected, IUnknownVector found,
             string xPathOfSensitiveAttributes)
         {
             try
@@ -115,19 +115,28 @@ namespace Extract.ETL
                 int foundCount = foundEnumerator.Count();
 
                 // Create list that will contain the output
-                List<AccuracyDetail> accuracyList = new List<AccuracyDetail>();
+                Dictionary<Int32, List<AccuracyDetail>> pageAccuracy = new Dictionary<int, List<AccuracyDetail>>();
 
                 // if there are both expected and found attributes compare them
                 if (expectedCount != 0 && foundCount != 0)
                 {
+                    HashSet<Int32> pagesWithExpectedOrFound = new HashSet<Int32>();
+
                     // initialize the matchInfo array
                     MatchInfo[,] matchInfos = new MatchInfo[expectedCount, foundCount];
                     int expectedIndex = 0;
                     foreach (var expectedAttribute in expectedEnumerator)
                     {
                         int foundIndex = 0;
+                        pagesWithExpectedOrFound.Add(GetAttributePage(expectedAttribute));
+                            
                         foreach (var foundAttribute in foundEnumerator)
                         {
+                            // Include page in hash set only need to do this the first time through
+                            if (expectedIndex == 0)
+                            {
+                                pagesWithExpectedOrFound.Add(GetAttributePage(foundAttribute));
+                            }
                             MatchInfo newMatchInfo = new MatchInfo();
                             matchInfos[expectedIndex, foundIndex] = newMatchInfo;
                             getMatchInfo(matchInfos[expectedIndex, foundIndex],
@@ -138,6 +147,12 @@ namespace Extract.ETL
                         expectedIndex++;
                     }
 
+                    // initialize dictionary
+                    foreach (Int32 page in pagesWithExpectedOrFound)
+                    {
+                        pageAccuracy[page] = new List<AccuracyDetail>();
+                    }
+
                     HashSet<int> OverlappingFounds = new HashSet<int>();
                     HashSet<int> OverRedactions = new HashSet<int>();
 
@@ -146,16 +161,18 @@ namespace Extract.ETL
                         bool foundCorrectRedaction = false;
 
                         // Add the expected count to the output
-                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Expected,
-                            matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
+                        pageAccuracy[GetAttributePage(matchInfos[expectedIndex, 0].ExpectedAttribute)]
+                            .Add(new AccuracyDetail(AccuracyDetailLabel.Expected,
+                                matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
 
                         for (int foundIndex = 0; foundIndex < foundCount; foundIndex++)
                         {
                             // if this the first time through the loop add the found count to the output
                             if (expectedIndex == 0)
                             {
-                                accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Found,
-                                    matchInfos[0, foundIndex].FoundAttribute.Type, 1));
+                                pageAccuracy[GetAttributePage(matchInfos[0, foundIndex].FoundAttribute)]
+                                    .Add(new AccuracyDetail(AccuracyDetailLabel.Found,
+                                        matchInfos[0, foundIndex].FoundAttribute.Type, 1));
                             }
 
                             MatchInfo tempMatch = matchInfos[expectedIndex, foundIndex];
@@ -166,8 +183,9 @@ namespace Extract.ETL
 
                                 if (tempMatch.getPercentOfExpectedAreaRedacted() < OverlapLeniencyPercent)
                                 {
-                                    accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.UnderRedacted,
-                                        matchInfos[0, foundIndex].FoundAttribute.Type, 1));
+                                    pageAccuracy[GetAttributePage(matchInfos[0, foundIndex].FoundAttribute)]
+                                        .Add(new AccuracyDetail(AccuracyDetailLabel.UnderRedacted,
+                                            matchInfos[0, foundIndex].FoundAttribute.Type, 1));
                                 }
                                 else
                                 {
@@ -176,8 +194,9 @@ namespace Extract.ETL
                                     if (!foundCorrectRedaction)
                                     {
                                         foundCorrectRedaction = true;
-                                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Correct,
-                                            matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
+                                        pageAccuracy[GetAttributePage(matchInfos[expectedIndex, 0].ExpectedAttribute)]
+                                            .Add(new AccuracyDetail(AccuracyDetailLabel.Correct,
+                                                matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
                                     }
 
                                     // Look to see if we have already determined the found attribute to be an
@@ -195,8 +214,9 @@ namespace Extract.ETL
                                         // Record an over-redaction.
                                         OverRedactions.Add(foundIndex);
 
-                                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.OverRedacted,
-                                            matchInfos[0, foundIndex].FoundAttribute.Type, 1));
+                                        pageAccuracy[GetAttributePage(matchInfos[0, foundIndex].FoundAttribute)]
+                                            .Add(new AccuracyDetail(AccuracyDetailLabel.OverRedacted,
+                                                matchInfos[0, foundIndex].FoundAttribute.Type, 1));
                                     }
                                 }
                             }
@@ -205,8 +225,9 @@ namespace Extract.ETL
                         // if expected wasn't found count as missed
                         if (!foundCorrectRedaction)
                         {
-                            accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Missed,
-                                matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
+                            pageAccuracy[GetAttributePage(matchInfos[expectedIndex, 0].ExpectedAttribute)]
+                                .Add(new AccuracyDetail(AccuracyDetailLabel.Missed,
+                                    matchInfos[expectedIndex, 0].ExpectedAttribute.Type, 1));
                         }
                     }
 
@@ -219,7 +240,8 @@ namespace Extract.ETL
                         // expected redaction.
                         if (!OverlappingFounds.Contains(foundIndex))
                         {
-                            accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.FalsePositives,
+                            pageAccuracy[GetAttributePage(matchInfos[0, foundIndex].FoundAttribute)]
+                                .Add(new AccuracyDetail(AccuracyDetailLabel.FalsePositives,
                                     matchInfos[0, foundIndex].FoundAttribute.Type, 1));
                         }
                     }
@@ -229,25 +251,34 @@ namespace Extract.ETL
                     // Add any expected attribute counts as missed
                     foreach (var expectedAttribute in expectedEnumerator)
                     {
-                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Expected,
-                            expectedAttribute.Type, 1));
-                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Missed,
-                            expectedAttribute.Type, 1));
+                        int page = GetAttributePage(expectedAttribute);
+                        if (!pageAccuracy.ContainsKey(page))
+                        {
+                            pageAccuracy[page] = new List<AccuracyDetail>();
+                        }
+                        pageAccuracy[page].Add(new AccuracyDetail(AccuracyDetailLabel.Expected,
+                                expectedAttribute.Type, 1));
+                        pageAccuracy[page].Add(new AccuracyDetail(AccuracyDetailLabel.Missed,
+                                expectedAttribute.Type, 1));
                     }
 
                     // Add any found attributes as false positives
                     foreach (var foundAttribute in foundEnumerator)
                     {
-                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.Found,
+                        int page = GetAttributePage(foundAttribute);
+                        if (!pageAccuracy.ContainsKey(page))
+                        {
+                            pageAccuracy[page] = new List<AccuracyDetail>();
+                        }
+                        pageAccuracy[page].Add(new AccuracyDetail(AccuracyDetailLabel.Found,
                             foundAttribute.Type, 1));
 
-                        accuracyList.Add(new AccuracyDetail(AccuracyDetailLabel.FalsePositives,
+                        pageAccuracy[page].Add(new AccuracyDetail(AccuracyDetailLabel.FalsePositives,
                             foundAttribute.Type, 1));
                     }
                 }
 
-                // replace this
-                return accuracyList;
+                return pageAccuracy;
             }
             catch (Exception ex)
             {
@@ -430,7 +461,19 @@ namespace Extract.ETL
             }
             return false;
         }
+        
+        /// <summary>
+        /// Gets the first page number for the given attribute
+        /// </summary>
+        /// <param name="attribute">Attribute to get the first page number for</param>
+        /// <returns>First page number of the attribute or if the string is non spatial returns 0</returns>
+        static Int32 GetAttributePage(IAttribute attribute)
+        {
+            return (attribute.Value.GetMode() == ESpatialStringMode.kNonSpatialMode) ?
+                                0 : attribute.Value.GetFirstPageNumber();
+        }
 
-        #endregion    }
+
+        #endregion
     }
 }
