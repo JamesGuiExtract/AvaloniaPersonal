@@ -325,9 +325,11 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 # This includes System.ValueTuple in the install
-	@COPY "$(RCNETDir)\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 # This makes System.ValueTuple available when installshield runs regasm
-	@COPY "$(RCNETDir)\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 
 
 	@COPY "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\LogicNP.EZShellExtensions.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
