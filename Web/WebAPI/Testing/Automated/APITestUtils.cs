@@ -126,6 +126,21 @@ namespace Extract.Web.WebAPI.Test
         }
 
         /// <summary>
+        /// Resets the test session identifier to allow a second test session to be opened.
+        /// </summary>
+        public static void ResetTestSessionID()
+        {
+            try
+            {
+                Utils.ResetTestSessionID();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45526");
+            }
+        }
+
+        /// <summary>
         /// Creates a <see cref="User"/> instance.
         /// </summary>
         /// <param name="username">The username.</param>

@@ -168,6 +168,32 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Gets the number of document, pages and active users in the current verification queue.
+        /// </summary>
+        public QueueStatus GetQueueStatus()
+        {
+            try
+            {
+                var stats = FileApi.FileProcessingDB.GetStats(FileApi.FileProcessingDB.ActiveActionID, false);
+                var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.Workflow.VerifyAction);
+
+                var result = new QueueStatus();
+
+                result.PendingDocuments = stats.NumDocumentsPending;
+                result.PendingPages = stats.NumPagesPending;
+                result.ActiveUsers = users.Size;
+
+                result.Error = Utils.MakeError(false, "", -1);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45525");
+            }
+        }
+
+        /// <summary>
         /// Checkouts the document.
         /// </summary>
         /// <param name="id">The identifier.</param>

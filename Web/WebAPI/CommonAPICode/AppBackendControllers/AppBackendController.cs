@@ -105,6 +105,29 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// Gets the number of document, pages and active users in the current verification queue.
+        /// </summary>
+        [HttpGet("GetQueueStatus")]
+        [Produces(typeof(QueueStatus))]
+        [Authorize]
+        public IActionResult GetQueueStatus()
+        {
+            try
+            {
+                using (var data = new DocumentData(User))
+                {
+                    var result = data.GetQueueStatus();
+
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI45524");
+            }
+        }
+
+        /// <summary>
         /// Reserves a document. The document will not be accessible by others
         /// until CloseDocument is called.
         /// </summary>

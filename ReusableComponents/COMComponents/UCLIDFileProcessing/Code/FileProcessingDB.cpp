@@ -4603,6 +4603,26 @@ STDMETHODIMP CFileProcessingDB::RecordWebSessionStart(BSTR bstrType, BSTR bstrLo
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45220");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetActiveUsers(BSTR bstrAction, IVariantVector** ppvecUserNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetActiveUsers_Internal(false, bstrAction, ppvecUserNames))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			GetActiveUsers_Internal(true, bstrAction, ppvecUserNames);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45523");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

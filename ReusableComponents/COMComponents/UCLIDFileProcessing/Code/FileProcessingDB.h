@@ -357,6 +357,7 @@ public:
 	STDMETHOD(DeleteMLModel)(BSTR strModelName);
 	STDMETHOD(GetMLModels)(IStrToStrMap** pmapModelNameToID);
 	STDMETHOD(RecordWebSessionStart)(BSTR bstrType, BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser);
+	STDMETHOD(GetActiveUsers)(BSTR bstrAction, IVariantVector** ppvecUserNames);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1464,6 +1465,7 @@ private:
 	bool DefineNewMLModel_Internal(bool bDBLocked, BSTR strModelName, long* pnID);
 	bool DeleteMLModel_Internal(bool bDBLocked, BSTR strModelName);
 	bool GetMLModels_Internal(bool bDBLocked, IStrToStrMap * * pmapModelNameToID);
+	bool GetActiveUsers_Internal(bool bDBLocked, BSTR bstrAction, IVariantVector** ppvecUserNames);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

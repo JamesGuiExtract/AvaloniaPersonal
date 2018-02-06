@@ -11618,3 +11618,68 @@ bool CFileProcessingDB::GetMLModels_Internal(bool bDBLocked, IStrToStrMap * * pm
 
 	return true;
 }
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetActiveUsers_Internal(bool bDBLocked, BSTR bstrAction,
+												IVariantVector** ppvecUserNames)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			string strQuery = "SELECT DISTINCT [UserName] "
+				"FROM [ActiveFAM] "
+				"INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID] "
+				"INNER JOIN [FAMUser] ON [FAMUserID] = [FAMUser].[ID] "
+				"WHERE [ActionID] = <ActionID> AND [Processing] = 1";
+
+			// <All workflows> is not valid for a verification task, so this will be a single ID.
+			string strActionID = getActionIDsForActiveWorkflow(ipConnection, asString(bstrAction));
+
+			replaceVariable(strQuery, "<ActionID>", strActionID);
+
+			// Recordset to contain the files to process
+			_RecordsetPtr ipUserNames(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI45528", ipUserNames != __nullptr);
+
+			ipUserNames->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly,
+				adLockReadOnly, adCmdText);
+
+			IVariantVectorPtr ipVecUserNames(CLSID_VariantVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI45529", ipVecUserNames != __nullptr);
+
+			while (ipUserNames->adoEOF == VARIANT_FALSE)
+			{
+				FieldsPtr ipFields = ipUserNames->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI45530", ipFields != __nullptr);
+
+				string strUserName = getStringField(ipFields, "UserName");
+
+				ipVecUserNames->PushBack(strUserName.c_str());
+
+				ipUserNames->MoveNext();
+			}
+
+			*ppvecUserNames = ipVecUserNames.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI45531");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45532");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}

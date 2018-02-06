@@ -241,6 +241,84 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
+        public static void Test_GetQueueStatus()
+        {
+            string dbName = "AppBackendAPI_Test_GetQueueStatus";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user1, AppBackendController controller1) =
+                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
+                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+
+                var result = controller1.Login(user1);
+                result.AssertGoodResult<LoginToken>();
+
+                result = controller1.GetQueueStatus();
+                var queueStatus = result.AssertGoodResult<QueueStatus>();
+                Assert.AreEqual(1, queueStatus.ActiveUsers);
+                Assert.AreEqual(4, queueStatus.PendingDocuments);
+
+                result = controller1.OpenDocument();
+                result.AssertGoodResult<DocumentId>();
+
+                result = controller1.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatus>();
+                Assert.AreEqual(1, queueStatus.ActiveUsers);
+                Assert.AreEqual(3, queueStatus.PendingDocuments);
+
+                // In order to start a 2nd session with a different user, the static TestSessionID
+                // needs to be reset.
+                ApiTestUtils.ResetTestSessionID();
+                User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
+                var controller2 = ApiTestUtils.CreateController<AppBackendController>(user2);
+
+                result = controller2.Login(user2);
+                result.AssertGoodResult<LoginToken>();
+
+                result = controller1.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatus>();
+                Assert.AreEqual(2, queueStatus.ActiveUsers);
+                Assert.AreEqual(3, queueStatus.PendingDocuments);
+
+                result = controller1.CloseDocument(commit: true);
+                result.AssertGoodResult<GenericResult>();
+
+                result = controller1.OpenDocument();
+                result.AssertGoodResult<DocumentId>();
+
+                result = controller2.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatus>();
+                Assert.AreEqual(2, queueStatus.ActiveUsers);
+                Assert.AreEqual(2, queueStatus.PendingDocuments);
+
+                result = controller2.OpenDocument();
+                result.AssertGoodResult<DocumentId>();
+
+                result = controller2.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatus>();
+                Assert.AreEqual(2, queueStatus.ActiveUsers);
+                Assert.AreEqual(1, queueStatus.PendingDocuments);
+
+                result = controller1.Logout();
+                result.AssertGoodResult<GenericResult>();
+
+                result = controller2.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatus>();
+                Assert.AreEqual(1, queueStatus.ActiveUsers);
+                Assert.AreEqual(2, queueStatus.PendingDocuments);
+
+                result = controller2.Logout();
+                result.AssertGoodResult<GenericResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test, Category("Automated")]
         public static void Test_ReOpenDocument()
         {
             string dbName = "AppBackendAPI_Test_ReOpenDocument";

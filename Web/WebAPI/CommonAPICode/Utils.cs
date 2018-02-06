@@ -243,6 +243,24 @@ namespace WebAPI
         }
 
         /// <summary>
+        /// Creates a new session ID to use for unit tests when more than one session is needed.
+        /// </summary>
+        public static void ResetTestSessionID()
+        {
+            try
+            {
+                lock (_apiContextLock)
+                {
+                    _testSessionID = Guid.NewGuid().ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45527");
+            }
+        }
+
+        /// <summary>
         /// Gets a session ID to use for unit tests. This will be used in place of the JWT's jti
         /// claim when associating a call with an existing session.
         /// </summary>
