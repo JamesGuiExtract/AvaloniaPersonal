@@ -18,9 +18,9 @@ namespace Extract.DataEntry.LabDE.Test
     {
         #region Constants/Read-only fields
 
-		/// <summary>
-		/// Test database
-		/// </summary>
+        /// <summary>
+        /// Test database
+        /// </summary>
         static readonly string Demo_LabDE_DB = "Resources.Demo_LabDE.bak";
 
         /// <summary>
@@ -131,10 +131,11 @@ namespace Extract.DataEntry.LabDE.Test
         public void LabDEAddOrUpdateEncounterTest()
         {
             string testDBName = "Test_LabDEAddOrUpdateEncounter";
+            IFileProcessingDB _famDB = null;
 
             try
             {
-                IFileProcessingDB _famDB = CreateTestDatabase(testDBName);
+                _famDB = CreateTestDatabase(testDBName);
 
                 // Set up the data to use for the test
                 var dataDictionary = new Dictionary<string, Tuple<string, string>>();
@@ -174,6 +175,8 @@ namespace Extract.DataEntry.LabDE.Test
             }
             finally
             {
+                _famDB?.CloseAllDBConnections();
+                _famDB = null;
                 _testDbManager.RemoveDatabase(testDBName);
             }
         }
@@ -185,10 +188,11 @@ namespace Extract.DataEntry.LabDE.Test
         public void LabDEAddOrUpdateOrderTest()
         {
             string testDBName = "Test_LabDEAddOrUpdateOrder";
+            IFileProcessingDB _famDB = null;
 
             try
             {
-                IFileProcessingDB _famDB = CreateTestDatabase(testDBName);
+                _famDB = CreateTestDatabase(testDBName);
                 
                 // Set up the data to use for the test
                 var dataDictionary = new Dictionary<string, Tuple<string, string>>();
@@ -225,6 +229,8 @@ namespace Extract.DataEntry.LabDE.Test
             }
             finally
             {
+                _famDB?.CloseAllDBConnections();
+                _famDB = null;
                 _testDbManager.RemoveDatabase(testDBName);
             }
         }
@@ -237,10 +243,11 @@ namespace Extract.DataEntry.LabDE.Test
         public void LabDEAddOrUpdateOrderWithAccessionTest()
         {
             string testDBName = "Test_LabDEAddOrUpdateOrderWithAccession";
+            IFileProcessingDB _famDB = null;
 
             try
             {
-                IFileProcessingDB _famDB = CreateTestDatabase(testDBName);
+                _famDB = CreateTestDatabase(testDBName);
 
                 // Set up the data to use for the test
                 var dataDictionary = new Dictionary<string, Tuple<string, string>>();
@@ -277,6 +284,8 @@ namespace Extract.DataEntry.LabDE.Test
             }
             finally
             {
+                _famDB?.CloseAllDBConnections();
+                _famDB = null;
                 _testDbManager.RemoveDatabase(testDBName);
             }
         }
@@ -289,13 +298,15 @@ namespace Extract.DataEntry.LabDE.Test
         {
             string testDBName = "Test_LabDEAddOrUpdateEncounterAndIPDates";
             string testDBNameNew = "Test_LabDEAddOrUpdateEncounterAndIPDates_NewDB";
+            FileProcessingDB _famDB = null;
+            IFileProcessingDB _NewFAMDB = null;
 
             try
             {
-                FileProcessingDB _famDB = _testDbManager.GetDatabase(Demo_LabDE_DB, testDBName);  
+                _famDB = _testDbManager.GetDatabase(Demo_LabDE_DB, testDBName);  
                 AddTestPatients(_famDB);
 
-                IFileProcessingDB _NewFAMDB = CreateTestDatabase(testDBNameNew);
+                _NewFAMDB = CreateTestDatabase(testDBNameNew);
 
                 // Set up the data to use for the test
                 var dataDictionary = new Dictionary<string, Tuple<string, string>>();
@@ -355,7 +366,12 @@ namespace Extract.DataEntry.LabDE.Test
             }
             finally
             {
+                _famDB?.CloseAllDBConnections();
+                _famDB = null;
+                _NewFAMDB?.CloseAllDBConnections();
+                _NewFAMDB = null;
                 _testDbManager.RemoveDatabase(testDBName);
+                _testDbManager.RemoveDatabase(testDBNameNew);
             }
         }
 
@@ -367,10 +383,11 @@ namespace Extract.DataEntry.LabDE.Test
         public void LabDEAddOrUpdateOrderWithEncounterTest()
         {
             string testDBName = "Test_LabDEAddOrUpdateOrderWithEncounter";
+            IFileProcessingDB _famDB = null;
 
             try
             {
-                IFileProcessingDB _famDB = CreateTestDatabase(testDBName);
+                _famDB = CreateTestDatabase(testDBName);
 
                 // Set up the data to use for the test
                 var dataDictionary = new Dictionary<string, Tuple<string, string>>();
@@ -434,6 +451,8 @@ namespace Extract.DataEntry.LabDE.Test
             }
             finally
             {
+                _famDB?.CloseAllDBConnections();
+                _famDB = null;
                 _testDbManager.RemoveDatabase(testDBName);
             }
         }
@@ -446,10 +465,16 @@ namespace Extract.DataEntry.LabDE.Test
         public void LabDEAddOrUpdateOrderWithEncounterAndIPDatesTest()
         {
             string testDBName = "Test_LabDEAddOrUpdateOrderWithEncounterAndIPDates";
+            string testDBNameNew = "Test_LabDEAddOrUpdateOrderWithEncounterAndIPDates_NewDB";
+            FileProcessingDB _famDB = null;
+            IFileProcessingDB _NewFAMDB = null;
 
             try
             {
-                IFileProcessingDB _famDB = CreateTestDatabase(testDBName);
+                _famDB = _testDbManager.GetDatabase(Demo_LabDE_DB, testDBName);
+                AddTestPatients(_famDB);
+
+                _NewFAMDB = CreateTestDatabase(testDBNameNew);
 
                 // Set up the data to use for the test
                 var dataDictionary = new Dictionary<string, Tuple<string, string>>();
@@ -475,12 +500,15 @@ namespace Extract.DataEntry.LabDE.Test
                     "12345678901234567890123456789012345678901234567890");
 
                 LabDEAddOrUpdateOrderWithEncounterAndIPDates(_famDB, dataDictionary);
+                LabDEAddOrUpdateOrderWithEncounterAndIPDates(_NewFAMDB, dataDictionary);
 
                 string encounterQuery = _LABDE_ENCOUNTER_QUERY + " WHERE CSN = '11111111111111111111' ";
                 CheckResults(_famDB, dataDictionary.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
+                CheckResults(_NewFAMDB, dataDictionary.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
 
                 string orderQuery = _LABDE_ORDER_QUERY + " WHERE OrderNumber = '12345678901234567890123456789012345678901234567890' ";
                 CheckResults(_famDB, dataDictionary.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
+                CheckResults(_NewFAMDB, dataDictionary.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
 
                 // Call again to update data
                 LabDEEncounterValues(dataDictionary,
@@ -506,10 +534,13 @@ namespace Extract.DataEntry.LabDE.Test
                     "78901234567890123456789012345678901234567890123456");
 
                 LabDEAddOrUpdateOrderWithEncounterAndIPDates(_famDB, dataDictionary);
+                LabDEAddOrUpdateOrderWithEncounterAndIPDates(_NewFAMDB, dataDictionary);
 
                 CheckResults(_famDB, dataDictionary.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
+                CheckResults(_NewFAMDB, dataDictionary.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
 
                 CheckResults(_famDB, dataDictionary.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
+                CheckResults(_NewFAMDB, dataDictionary.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
 
                 var saveData = new Dictionary<string, Tuple<string, string>>(dataDictionary);
 
@@ -518,14 +549,22 @@ namespace Extract.DataEntry.LabDE.Test
                 dataDictionary["DischargeDate"] = new Tuple<string, string>("@DischargeDate", "NULL");
 
                 LabDEAddOrUpdateOrderWithEncounterAndIPDates(_famDB, dataDictionary);
+                LabDEAddOrUpdateOrderWithEncounterAndIPDates(_NewFAMDB, dataDictionary);
 
                 CheckResults(_famDB, saveData.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
+                CheckResults(_NewFAMDB, saveData.Where(s => _ENCOUNTER_FIELDS.Contains(s.Key)), encounterQuery);
 
                 CheckResults(_famDB, saveData.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
+                CheckResults(_NewFAMDB, saveData.Where(s => _ORDER_FIELDS.Contains(s.Key)), orderQuery);
             }
             finally
             {
+                _famDB?.CloseAllDBConnections();
+                _famDB = null;
+                _NewFAMDB?.CloseAllDBConnections();
+                _NewFAMDB = null;
                 _testDbManager.RemoveDatabase(testDBName);
+                _testDbManager.RemoveDatabase(testDBNameNew);
             }
         }
 
