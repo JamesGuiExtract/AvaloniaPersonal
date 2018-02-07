@@ -2089,7 +2089,7 @@ static const string gstrCREATE_REPORTING_VERIFICATION_RATES =
 	"   [LastFileTaskSessionID] [int] NOT NULL, "
 	"	[Duration] [float] NOT NULL CONSTRAINT [DF_Duration] DEFAULT(0.0), "
 	"	[OverheadTime] [float] NOT NULL CONSTRAINT [DF_OverheadTime] DEFAULT(0.0), "
-	"	[ActiveMinutes][float] NOT NULL CONSTRAINT [DF_ActiveMinutes] DEFAULT(0.0) "
+	"	[ActivityTime][float] NOT NULL CONSTRAINT [DF_ActivityTime] DEFAULT(0.0) "
 	"   CONSTRAINT [IX_ReportingVerificationRatesFileActionTask] UNIQUE CLUSTERED([FileID],[ActionID],[TaskClassID],[DatabaseServiceID]))";
 
 

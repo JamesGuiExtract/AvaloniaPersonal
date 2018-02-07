@@ -126,7 +126,7 @@ namespace Extract.ETL
         ///     @TaskClassID INT
         ///     @Duration FLOAT
         ///     @Overhead FLOAT
-        ///     @ActiveMinutes FLOAT
+        ///     @ActivityTime FLOAT
         ///     @LastFileTaskSessionID INT
         ///     @DatabaseServiceID INT
         ///     
@@ -140,7 +140,7 @@ namespace Extract.ETL
                 SET 
                     [Duration] = [Duration] + @Duration,
                     [OverheadTime] = [OverheadTime] + @Overhead,
-                    [ActiveMinutes] = [ActiveMinutes] + @ActiveMinutes,
+                    [ActivityTime] = [ActivityTime] + @ActivityTime,
                     [LastFileTaskSessionID] = @LastFileTaskSessionID
                 WHERE [FileID] = @FileID AND [ActionID] = @ActionID AND [TaskClassID] = @TaskClassID AND [DatabaseServiceID] = @DatabaseServiceID
             END ELSE BEGIN
@@ -148,9 +148,9 @@ namespace Extract.ETL
                 IF (ABS(@Duration) > 0.00001 AND ABS(@Overhead) > 0.00001) 
                 BEGIN
                     INSERT INTO [ReportingVerificationRates]
-                        ([DatabaseServiceID], [FileID], [ActionID], [TaskClassID], [LastFileTaskSessionID], [Duration], [OverheadTime], [ActiveMinutes])
+                        ([DatabaseServiceID], [FileID], [ActionID], [TaskClassID], [LastFileTaskSessionID], [Duration], [OverheadTime], [ActivityTime])
                     VALUES 
-                        (@DatabaseServiceID, @FileID,  @ActionID, @TaskClassID,  @LastFileTaskSessionID,  @Duration,  @Overhead,  @ActiveMinutes)
+                        (@DatabaseServiceID, @FileID,  @ActionID, @TaskClassID,  @LastFileTaskSessionID,  @Duration,  @Overhead,  @ActivityTime)
                 END
             END
             ";
@@ -247,7 +247,7 @@ namespace Extract.ETL
                                     saveCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = fileTaskSessionID;
                                     saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = duration;
                                     saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = overhead;
-                                    saveCmd.Parameters.Add("@ActiveMinutes", SqlDbType.Float).Value = activityTime;
+                                    saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = activityTime;
                                     saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
 
                                     try

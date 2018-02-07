@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 161;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 162;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2086,7 +2086,7 @@ int UpdateToSchemaVersion160(_ConnectionPtr ipConnection,
 
 		vector<string> vecQueries;
 		
-		vecQueries.push_back(gstrCREATE_REPORTING_VERIFICATION_RATES);
+		vecQueries.push_back(gstrCREATE_REPORTING_VERIFICATION_RATES_V160);
 		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_DATABASE_SERVICE_FK);
 		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_ACTION_FK);
@@ -2138,6 +2138,33 @@ int UpdateToSchemaVersion161(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45501");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion162(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 162;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("sp_rename '[ReportingVerificationRates].ActiveMinutes', 'ActivityTime', 'COLUMN';");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45535");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -7182,7 +7209,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 158:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion159);
 				case 159:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion160);
 				case 160:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion161);
-				case 161:
+				case 161:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion162);
+				case 162:
 					break;
 
 				default:

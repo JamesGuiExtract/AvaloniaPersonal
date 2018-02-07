@@ -21,7 +21,7 @@ namespace Extract.ETL.Test
             Int32 LastFileTaskSessionID,
             Double Duration,
             Double OverheadTime,
-            Double ActiveMinutes)>;
+            Double ActivityTime)>;
 
     /// <summary>
     /// Class to test the AttributeExpander
@@ -323,7 +323,7 @@ namespace Extract.ETL.Test
                         LastFileTaskSessionID: r.GetInt32(r.GetOrdinal("LastFileTaskSessionID")),
                         Duration: r.GetDouble(r.GetOrdinal("Duration")),
                         OverheadTime: r.GetDouble(r.GetOrdinal("OverheadTime")),
-                        ActiveMinutes: r.GetDouble(r.GetOrdinal("ActiveMinutes"))
+                        ActivityTime: r.GetDouble(r.GetOrdinal("ActivityTime"))
                     )).ToList();
 
                     Assert.AreEqual(resultsInTuples.Count, expected.Count,

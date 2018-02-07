@@ -273,4 +273,19 @@ static const string gstrADD_FILE_TASK_SESSION_ACTION_FK_V148 =
 "WITH CHECK ADD  CONSTRAINT [FK_FileTaskSession_Action] FOREIGN KEY([ActionID])"
 "REFERENCES [dbo].[Action] ([ID])";
 
+// used for schema version 160-161
+static const string gstrCREATE_REPORTING_VERIFICATION_RATES_V160 =
+"CREATE TABLE [dbo].[ReportingVerificationRates]( "
+"   [ID][int] IDENTITY(1, 1) NOT NULL CONSTRAINT[PK_ReportingVerificationRates] PRIMARY KEY NONCLUSTERED, "
+"   [DatabaseServiceID] [INT] NOT NULL, "
+"	[FileID] [int] NOT NULL, "
+"	[ActionID] [int] NULL,"
+"	[TaskClassID] [int] NOT NULL, "
+"   [LastFileTaskSessionID] [int] NOT NULL, "
+"	[Duration] [float] NOT NULL CONSTRAINT [DF_Duration] DEFAULT(0.0), "
+"	[OverheadTime] [float] NOT NULL CONSTRAINT [DF_OverheadTime] DEFAULT(0.0), "
+"	[ActiveMinutes][float] NOT NULL CONSTRAINT [DF_ActiveMinutes] DEFAULT(0.0) "
+"   CONSTRAINT [IX_ReportingVerificationRatesFileActionTask] UNIQUE CLUSTERED([FileID],[ActionID],[TaskClassID],[DatabaseServiceID]))";
+
+
 
