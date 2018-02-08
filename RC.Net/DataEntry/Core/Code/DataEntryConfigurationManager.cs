@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml.XPath;
 using UCLID_AFCORELib;
@@ -182,6 +183,19 @@ namespace Extract.DataEntry
             get
             {
                 return _activeDataEntryConfig;
+            }
+        }
+
+        /// <summary>
+        /// Gets all the <see cref="DataEntryConfiguration"/>s.
+        /// </summary>
+        public IEnumerable<DataEntryConfiguration> Configurations
+        {
+            get
+            {
+                return (_documentTypeConfigurations == null)
+                    ? new[] { DefaultDataEntryConfiguration }
+                    : _documentTypeConfigurations.Values.OfType<DataEntryConfiguration>();
             }
         }
 
@@ -394,7 +408,8 @@ namespace Extract.DataEntry
                         else
                         {
                             backgroundConfig = new DataEntryConfiguration(
-                                configuration.Value.Config, _tagUtility, configuration.Value.FileProcessingDB);
+                                configuration.Value.Config, _tagUtility, configuration.Value.FileProcessingDB,
+                                configuration.Value);
                             manager._documentTypeConfigurations[configuration.Key] = backgroundConfig;
                         }
 

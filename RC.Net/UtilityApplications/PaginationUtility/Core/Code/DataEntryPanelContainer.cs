@@ -152,7 +152,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataEntryPanelContainer" /> class.
+        /// Initializes a new instance of the <see cref="DataEntryPanelContainer" /> class to be
+        /// used as the foreground container.
         /// </summary>
         /// <param name="configFileName">The name of the config file defining the data entry
         /// configuration.</param>
@@ -162,35 +163,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         /// <param name="imageViewer">The <see cref="ImageViewer"/> to use.</param>
         public DataEntryPanelContainer(string configFileName, IDataEntryApplication dataEntryApp,
-            ITagUtility tagUtility, ImageViewer imageViewer)
-            : this(configFileName, dataEntryApp, tagUtility, imageViewer, null)
-        {
-            // Thread manager can't be passed into this() above since "this" doesn't exist at that
-            // point.
-            StatusUpdateThreadManager = new ThreadManager(this);
-        }
-
-        /// <summary>
-        /// Private initialization of a new instance of the <see cref="DataEntryPanelContainer" /> class.
-        /// Can be used to create an instance with a shared <see cref="ThreadManager"/>.
-        /// </summary>
-        /// <param name="configFileName">The name of the config file defining the data entry
-        /// configuration.</param>
-        /// <param name="dataEntryApp">The <see cref="IDataEntryApplication"/> for which this
-        /// instance is being used.</param>
-        /// <param name="tagUtility">The <see cref="ITagUtility"/> to expand path tags/functions.
-        /// </param>
-        /// <param name="imageViewer">The <see cref="ImageViewer"/> to use.</param>
-        /// <param name="threadManager">The <see cref="ThreadManager"/> to use to manage
-        /// <see cref="UpdateDocumentStatus"/> threads.</param>
-        DataEntryPanelContainer(string configFileName, IDataEntryApplication dataEntryApp,
-            ITagUtility tagUtility, ImageViewer imageViewer, ThreadManager threadManager)
+        ITagUtility tagUtility, ImageViewer imageViewer)
         {
             try
             {
                 InitializeComponent();
 
-                StatusUpdateThreadManager = threadManager;
+                StatusUpdateThreadManager = new ThreadManager(this);
 
                 _expandedConfigFileName = tagUtility.ExpandTagsAndFunctions(configFileName, null, null);
                 _dataEntryApp = dataEntryApp;
@@ -223,6 +202,72 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41598");
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataEntryPanelContainer"/> class to be used
+        /// for background loading in <see cref="UpdateDocumentStatusThread"/>.
+        /// </summary>
+        /// <param name="configManager">The <see cref="DataEntryConfigurationManager{T}"/> to be
+        /// used to load documents in the background.
+        /// configuration.</param>
+        /// <param name="dataEntryApp">The <see cref="IDataEntryApplication"/> for which this
+        /// instance is being used.</param>
+        /// <param name="tagUtility">The <see cref="ITagUtility"/> to expand path tags/functions.
+        /// </param>
+        /// <param name="imageViewer">The <see cref="ImageViewer"/> to use.</param>
+        /// <param name="threadManager">The <see cref="ThreadManager"/> to use to manage
+        /// <see cref="UpdateDocumentStatus"/> threads.</param>
+        DataEntryPanelContainer(DataEntryConfigurationManager<Properties.Settings> configManager,
+            IDataEntryApplication dataEntryApp, ITagUtility tagUtility, ImageViewer imageViewer,
+            ThreadManager threadManager)
+        {
+            try
+            {
+                InitializeComponent();
+
+                StatusUpdateThreadManager = threadManager;
+
+                _dataEntryApp = dataEntryApp;
+                _tagUtility = tagUtility;
+                _imageViewer = imageViewer;
+
+                _configManager = configManager;
+                _configManager.ConfigurationInitialized += HandleConfigManager_ConfigurationInitialized;
+
+                bool loadRequiresUI = false;
+
+                // When initializing a background manager, the configurations will already have been
+                // initialized. Instead of handling ConfigurationInitialized, immediately assign
+                // CustomBackgroundLoadSettings.
+                foreach (var config in configManager.Configurations)
+                {
+                    if (!config.Config.Settings.SupportsNoUILoad)
+                    {
+                        loadRequiresUI = true;
+                    }
+
+                    var paginationPanel = config.DataEntryControlHost as DataEntryDocumentDataPanel;
+                    if (paginationPanel != null)
+                    {
+                        config.CustomBackgroundLoadSettings = new PaginationCustomSettings
+                        {
+                            SummaryQuery = paginationPanel.SummaryQuery,
+                            SendForReprocessingFunc = paginationPanel.SendForReprocessingFunc
+                        };
+                    }
+                }
+
+                if (loadRequiresUI)
+                {
+                    LoadDataEntryControlHostPanel();
+                }
+                _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45544");
             }
         }
 
@@ -870,7 +915,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void LoadDataEntryControlHostPanel()
         {
-            ActiveDataEntryPanel?.SetImageViewer(_imageViewer);
+            if (ActiveDataEntryPanel != null)
+            {
+                ActiveDataEntryPanel.SetImageViewer(_imageViewer);
+
+                // The DataEntryApplication will already be set for the primary foreground
+                // container, but it will need to be set here for background loading.
+                ActiveDataEntryPanel.DataEntryApplication = _dataEntryApp;
+            }
 
             try
             {
@@ -906,7 +958,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _scrollPanel.ResumeLayout(true);
                 // I don't understand why, but if dock or any other sizing is set prior to the
                 // initial layout call, ActiveDataEntryPanel ends up wider than _scrollPanel.
-                ActiveDataEntryPanel.Dock = DockStyle.Fill;
+                if (ActiveDataEntryPanel != null)
+                {
+                    ActiveDataEntryPanel.Dock = DockStyle.Fill;
+                }
             }
         }
 
@@ -925,12 +980,17 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
+            var backgroundConfigManager = _configManager.CreateBackgroundManager();
+            lock (_lock)
+            {
+                _backgroundConfigManagers.Add(backgroundConfigManager);
+            }
 
             var thread = new Thread(new ThreadStart(() =>
             {
                 try
                 {
-                    UpdateDocumentStatusThread(documentData, serializedAttributes);
+                    UpdateDocumentStatusThread(backgroundConfigManager, documentData, serializedAttributes);
                 }
                 catch (Exception ex)
                 {
@@ -961,9 +1021,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Code running in a background thread in support of <see cref="UpdateDocumentStatus"/>
         /// </summary>
+        /// <param name="backgroundConfigManager">The manager to use to load the data.</param>
         /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
         /// data validity should be checked.</param>
-        void UpdateDocumentStatusThread(DataEntryPaginationDocumentData documentData, string serializedAttributes)
+        void UpdateDocumentStatusThread(DataEntryConfigurationManager<Properties.Settings> backgroundConfigManager,
+            DataEntryPaginationDocumentData documentData, string serializedAttributes)
         {
             bool registeredThread = false;
             bool gotSemaphore = false;
@@ -1011,12 +1073,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var miscUtils = new MiscUtils();
                 var deserializedAttributes = (IUnknownVector)miscUtils.GetObjectFromStringizedByteStream(serializedAttributes);
 
-                var backgroundConfigManager = _configManager.CreateBackgroundManager();
-                lock (_lock)
-                {
-                    _backgroundConfigManagers.Add(backgroundConfigManager);
-                }
-
                 using (var tempData = new DataEntryPaginationDocumentData(deserializedAttributes, documentData.SourceDocName))
                 {
                     AttributeStatusInfo.ShareDBConnections = true;
@@ -1029,7 +1085,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     else
                     {
-                        documentStatus = GetDocumentDataFromUILoad(tempData);
+                        documentStatus = GetDocumentDataFromUILoad(backgroundConfigManager, tempData);
                     }
                 }
             }
@@ -1137,14 +1193,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="documentData"><see cref="DataEntryPaginationDocumentData"/> representing
         /// the document's data.</param>
         /// <returns>The <see cref="DocumentStatus"/>.</returns>
-        DocumentStatus GetDocumentDataFromUILoad(DataEntryPaginationDocumentData tempData)
+        DocumentStatus GetDocumentDataFromUILoad(DataEntryConfigurationManager<Properties.Settings> configManager,
+            DataEntryPaginationDocumentData tempData)
         {
             var documentStatus = new DocumentStatus();
 
             using (var form = new InvisibleForm())
             using (var imageViewer = new ImageViewer())
             using (var tempPanel = new DataEntryPanelContainer(
-                _expandedConfigFileName, _dataEntryApp, _tagUtility, imageViewer, StatusUpdateThreadManager))
+                configManager, _dataEntryApp, _tagUtility, imageViewer, StatusUpdateThreadManager))
             {
                 form.Show();
                 form.Controls.Add(tempPanel);

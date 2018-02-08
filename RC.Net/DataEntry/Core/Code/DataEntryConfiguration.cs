@@ -93,9 +93,12 @@ namespace Extract.DataEntry
         /// <param name="tagUtility">The <see cref="ITagUtility"/> interface provided to expand path
         /// tags/functions.</param>
         /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
+        /// <param name="backgroundConfigModel>The <see cref="DataEntryConfiguration"/> this
+        /// configuration represents in the context of background loading operations.
         public DataEntryConfiguration(
             ConfigSettings<Extract.DataEntry.Properties.Settings> config,
-            ITagUtility tagUtility, FileProcessingDB fileProcessingDB)
+            ITagUtility tagUtility, FileProcessingDB fileProcessingDB,
+            DataEntryConfiguration backgroundConfigModel = null)
         {
             try
             {
@@ -113,6 +116,16 @@ namespace Extract.DataEntry
                 if (Config.Settings.SupportsNoUILoad)
                 {
                     _backgroundFieldModels = BuildFieldModels(config);
+                }
+
+                if (backgroundConfigModel != null)
+                {
+                    lock (_lock)
+                    {
+                        _isBackgroundConfig = true;
+                        _dbConnections = backgroundConfigModel._dbConnections
+                            .ToDictionary(item => item.Key, item => item.Value);
+                    }
                 }
             }
             catch (Exception ex)
