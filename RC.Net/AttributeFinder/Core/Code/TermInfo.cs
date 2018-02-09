@@ -1,5 +1,4 @@
-﻿using Lucene.Net.Index;
-using Lucene.Net.Util;
+﻿using Lucene.Net.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -131,14 +130,14 @@ namespace Extract.AttributeFinder
     /// Compare terms by document frequency then by text
     /// </summary>
     /// <remarks>Compares such that lower DF comes first but for ties, alphabetically higher comes first</remarks>
-    internal sealed class DocFreqComparer : IComparer<(BytesRef term, int docFreq)>
+    internal sealed class DocFreqComparer : IComparer<Tuple<BytesRef, int>>
     {
-        public int Compare((BytesRef term, int docFreq) a, (BytesRef term, int docFreq) b)
+        public int Compare(Tuple<BytesRef, int> a, Tuple<BytesRef, int> b)
         {
-            int res = (a.docFreq).CompareTo((b.docFreq));
+            int res = (a.Item2).CompareTo((b.Item2));
             if (res == 0)
             {
-                res = string.Compare(b.term.Utf8ToString(), a.term.Utf8ToString(), StringComparison.CurrentCulture);
+                res = string.Compare(b.Item1.Utf8ToString(), a.Item1.Utf8ToString(), StringComparison.CurrentCulture);
             }
             return res;
         }
