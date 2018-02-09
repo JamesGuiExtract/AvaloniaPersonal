@@ -916,18 +916,18 @@ namespace Extract.AttributeFinder
                 // Since the 'tf-idf' is very similar to doc frequency, which is _much_ faster to get, start by limiting terms by that measure
                 // Use a size-limited set to conserve memory
                 var termPoolSize = MaxFeatures * numberOfCategories * 10;
-                var topDocFreqTerms = new LimitedSizeSortedSet<(BytesRef term, int docFreq)>(new DocFreqComparer(), termPoolSize);
+                var topDocFreqTerms = new LimitedSizeSortedSet<Tuple<BytesRef, int>>(new DocFreqComparer(), termPoolSize);
                 var termsEnum = MultiFields.GetTerms(reader, "shingles")?.GetIterator(null);
                 if (termsEnum != null)
                 {
                     BytesRef bytes = null;
                     while ((bytes = termsEnum.Next()) != null)
                     {
-                        topDocFreqTerms.Add((BytesRef.DeepCopyOf(bytes), termsEnum.DocFreq));
+                        topDocFreqTerms.Add(Tuple.Create(BytesRef.DeepCopyOf(bytes), termsEnum.DocFreq));
                     }
                 }
 
-                var topTerms = new LimitedSizeSortedSet<TermInfo>(topDocFreqTerms.Select(t => getTermInfo(t.term)), new TfIdfComparer(), MaxFeatures);
+                var topTerms = new LimitedSizeSortedSet<TermInfo>(topDocFreqTerms.Select(t => getTermInfo(t.Item1)), new TfIdfComparer(), MaxFeatures);
                 string[] topTermsArray = new string[topTerms.Count];
                 int count = 0;
                 foreach(var term in topTerms.Reverse())
