@@ -29,7 +29,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                         "\r\n       (supports propagate errors to FAM option)" +
                         "\r\n       (/ef also implies /s)" +
                         "\r\n    /CancelTokenName <CancelTokenName> used when called from another Extract application to" +
-                        "\r\n       allow calling application to cancel using CacellationToken." +
+                        "\r\n       allow calling application to cancel using CancellationToken." +
                         "\r\n       (/CancelTokenName implies /s)" +
                         "\r\n    /<propertyName> <propertyValue> override settings file properties" +
                         "\r\n  To edit a settings file:\r\n    NERAnnotator <settingsFile>", "NER Annotator", error);

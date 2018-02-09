@@ -10,6 +10,12 @@ namespace TestAppForSystemMethods
 {
     class Program
     {
+        /// <summary>
+        /// This application is to be used as a test application used in testing the RunExecutable and RunExtractExecutable
+        /// methods for SystemMethods. Used by Extract.Utilities.Test.TestSystemMethods class
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         static int Main(string[] args)
         {
             // Default to 0
