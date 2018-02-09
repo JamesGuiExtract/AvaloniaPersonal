@@ -756,9 +756,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 UpdateRequired = true;
 
-                // Whenever the associated document is updated, invalidate to ensure displayed icons
-                // reflect the current document state.
-                Invalidate();
+                // https://extract.atlassian.net/browse/ISSUE-15261
+                // In some operations, the separator may be removed from the panel before the
+                // document is invalid. We shouldn't invalidate controls no longer in the UI
+                if (Parent != null)
+                {
+                    // Whenever the associated document is updated, invalidate to ensure displayed icons
+                    // reflect the current document state.
+                    Invalidate();
+                }
             }
             catch (Exception ex)
             {
@@ -809,7 +815,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool UpdateControls()
         {
-            if (!Parent.ClientRectangle.IntersectsWith(Bounds))
+            if (Parent == null || !Parent.ClientRectangle.IntersectsWith(Bounds))
             {
                 _deferredLayout = true;
                 return false;
