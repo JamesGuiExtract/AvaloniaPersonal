@@ -1,10 +1,11 @@
-﻿using Extract.Licensing;
-using Extract.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
+using Extract.Licensing;
+using Extract.Utilities;
 
 namespace Extract.UtilityApplications.NERTrainer
 {
@@ -29,6 +30,9 @@ namespace Extract.UtilityApplications.NERTrainer
                         "\r\n    /ef <exceptionFile> log exceptions to file" +
                         "\r\n       (supports propagate errors to FAM option)" +
                         "\r\n       (/ef also implies /s)" +
+                        "\r\n    /CancelTokenName <CancelTokenName> used when called from another Extract application to" +
+                        "\r\n       allow calling application to cancel using CacellationToken." +
+                        "\r\n       (/CancelTokenName implies /s)" +
                         "\r\n  To edit a settings file:\r\n    NERTrainer /c <settingsFile> [/databaseServer <server>] [/databaseName <name>]", "NER Trainer", error);
                     return error ? -1 : 0;
                 }
@@ -42,6 +46,7 @@ namespace Extract.UtilityApplications.NERTrainer
                     string settingsFile = null;
                     string databaseServer = null;
                     string databaseName = null;
+                    string cancelTokenName = null;
                     List<(PropertyInfo property, object value)> propertiesToSet = new List<(PropertyInfo, object)>();
                     Type trainerType = typeof(NERTrainer);
                     for (int argNum = 0; argNum < args.Length; argNum++)
@@ -112,6 +117,20 @@ namespace Extract.UtilityApplications.NERTrainer
                                 if (++argNum < args.Length)
                                 {
                                     uexName = args[argNum];
+                                    continue;
+                                }
+                                else
+                                {
+                                    return usage(error: true);
+                                }
+                            }
+                            else if (val.Equals("CancelTokenName", StringComparison.OrdinalIgnoreCase))
+                            {
+                                silent = true;
+
+                                if (++argNum < args.Length)
+                                {
+                                    cancelTokenName = args[argNum];
                                     continue;
                                 }
                                 else
@@ -191,7 +210,15 @@ namespace Extract.UtilityApplications.NERTrainer
                     }
                     else
                     {
-                        trainer.Process(databaseServer, databaseName);
+                        NamedTokenSource namedTokenSource = null;
+                        CancellationToken cancelToken = CancellationToken.None;
+                        if (!string.IsNullOrWhiteSpace(cancelTokenName))
+                        {
+                            namedTokenSource = new NamedTokenSource(cancelTokenName);
+                            cancelToken = namedTokenSource.Token;
+                        }
+
+                        trainer.Process(databaseServer, databaseName, cancelToken);
                     }
                 }
                 else

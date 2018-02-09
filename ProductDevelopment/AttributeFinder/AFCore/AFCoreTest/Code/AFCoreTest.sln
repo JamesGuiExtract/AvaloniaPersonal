@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFConditions", "..\..\..\AFConditions\Code\AFConditions.vcxproj", "{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -472,6 +472,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Test", "..\..\..\..\..\RC.Net\Utilities\Core\Testing\Automated\Extract.Utilities.Test.csproj", "{160F85ED-2A01-422C-98DD-AD062C084F92}"
 	ProjectSection(ProjectDependencies) = postProject
 		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4} = {09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFAMService", "..\..\..\..\..\RC.Net\FileActionManager\Utilities\ESFAMService\Core\Code\ESFAMService.csproj", "{2524969C-E82D-49E4-907A-AD6BDF9354DC}"
@@ -819,6 +820,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.ETL.Test", "..\..\.
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAppForSystemMethods", "..\..\..\..\..\RC.Net\UtilityApplications\TestAppForSystemMethods\TestAppForSystemMethods.csproj", "{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -5367,6 +5370,36 @@ Global
 		{E93F7316-8840-44E8-AB10-EF65BC4D13E2}.Template|x64.Build.0 = Release|Any CPU
 		{E93F7316-8840-44E8-AB10-EF65BC4D13E2}.Template|x86.ActiveCfg = Release|Any CPU
 		{E93F7316-8840-44E8-AB10-EF65BC4D13E2}.Template|x86.Build.0 = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Debug|Win32.Build.0 = Debug|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Debug|x64.Build.0 = Debug|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Debug|x86.Build.0 = Debug|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Release|Win32.ActiveCfg = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Release|Win32.Build.0 = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Release|x64.ActiveCfg = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Release|x64.Build.0 = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Release|x86.ActiveCfg = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Release|x86.Build.0 = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Template|Any CPU.ActiveCfg = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Template|Any CPU.Build.0 = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Template|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Template|Mixed Platforms.Build.0 = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Template|Win32.ActiveCfg = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Template|Win32.Build.0 = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Template|x64.ActiveCfg = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Template|x64.Build.0 = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Template|x86.ActiveCfg = Release|Any CPU
+		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}.Template|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

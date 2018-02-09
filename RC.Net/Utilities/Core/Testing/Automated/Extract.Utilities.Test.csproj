@@ -89,6 +89,7 @@
     <Compile Include="TestExtractSettings.cs" />
     <Compile Include="TestScheduledEvent.cs" />
     <Compile Include="TestSequencer.cs" />
+    <Compile Include="TestSystemMethods.cs" />
     <Compile Include="TestUtilityMethods.cs" />
   </ItemGroup>
   <ItemGroup>

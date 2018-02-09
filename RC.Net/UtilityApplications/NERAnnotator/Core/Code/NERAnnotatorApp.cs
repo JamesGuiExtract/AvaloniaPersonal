@@ -1,9 +1,10 @@
-﻿using Extract.Licensing;
-using Extract.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
+using Extract.Licensing;
+using Extract.Utilities;
 
 namespace Extract.UtilityApplications.NERAnnotator
 {
@@ -15,6 +16,7 @@ namespace Extract.UtilityApplications.NERAnnotator
             bool silent = false;
             bool saveErrors = false;
             string uexName = null;
+            string cancelTokenName = null;
             try
             {
                 int usage(bool error = false)
@@ -26,6 +28,9 @@ namespace Extract.UtilityApplications.NERAnnotator
                         "\r\n    /ef <exceptionFile> log exceptions to file" +
                         "\r\n       (supports propagate errors to FAM option)" +
                         "\r\n       (/ef also implies /s)" +
+                        "\r\n    /CancelTokenName <CancelTokenName> used when called from another Extract application to" +
+                        "\r\n       allow calling application to cancel using CacellationToken." +
+                        "\r\n       (/CancelTokenName implies /s)" +
                         "\r\n    /<propertyName> <propertyValue> override settings file properties" +
                         "\r\n  To edit a settings file:\r\n    NERAnnotator <settingsFile>", "NER Annotator", error);
                     return error ? -1 : 0;
@@ -106,6 +111,20 @@ namespace Extract.UtilityApplications.NERAnnotator
                                     return usage(error: true);
                                 }
                             }
+                            else if (val.Equals("CancelTokenName", StringComparison.OrdinalIgnoreCase))
+                            {
+                                silent = true;
+
+                                if (++argNum < args.Length)
+                                {
+                                    cancelTokenName = args[argNum];
+                                    continue;
+                                }
+                                else
+                                {
+                                    return usage(error: true);
+                                }
+                            }
                             else
                             {
                                 action = val;
@@ -136,7 +155,14 @@ namespace Extract.UtilityApplications.NERAnnotator
                         }
                         if (silent)
                         {
-                            NERAnnotator.Process(settings, _ => { }, System.Threading.CancellationToken.None);
+                            NamedTokenSource namedTokenSource = null;
+                            CancellationToken cancelToken = CancellationToken.None;
+                            if (!string.IsNullOrWhiteSpace(cancelTokenName))
+                            {
+                                namedTokenSource = new NamedTokenSource(cancelTokenName);
+                                cancelToken = namedTokenSource.Token;
+                            }
+                            NERAnnotator.Process(settings, _ => { }, cancelToken);
                         }
                         else
                         {

@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Threading;
+using Extract.Database;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
-using Extract.Database;
-using System.Security.AccessControl;
-using System.IO;
 
 namespace Extract.ETL.Test
 {
@@ -73,29 +72,15 @@ namespace Extract.ETL.Test
 
         #region Fields
 
+        static CancellationToken _noCancel = new CancellationToken(false);
+        static CancellationToken _cancel = new CancellationToken(true);
+
         /// <summary>
         /// Manages test FAM DBs
         /// </summary>
         static FAMTestDBManager<TestAttributeExpander> _testDbManager;
 
         static TestFileManager<TestAttributeExpander> _testFileManager;
-
-        /// <summary>
-        /// List containing the names of the RasterZone fields
-        /// </summary>
-        static List<string> RasterZoneFields = new List<string>()
-        {
-              "Top"
-              ,"Left"
-              ,"Bottom"
-              ,"Right"
-              ,"StartX"
-              ,"StartY"
-              ,"EndX"
-              ,"EndY"
-              ,"PageNumber"
-              ,"Height"        
-        };
 
         #endregion
 
@@ -134,8 +119,9 @@ namespace Extract.ETL.Test
         /// <summary>
         /// Test Expand Attributes with StoreSpatialInfo=true and StoreEmptyAttributes=false
         /// </summary>
-        [Test, Category("Automated")]
-        public void TestExpandAttributes()
+        [Test]
+        [Category("Automated")]
+        public static void TestExpandAttributes()
         {
             string testDBName = "ExpandAttribute_Test";
             string resultDBName = "ExpandAttribute_Results_Test";
@@ -165,8 +151,9 @@ namespace Extract.ETL.Test
         /// <summary>
         /// Test Expand Attributes with StoreSpatialInfo=false and StoreEmptyAttributes=false
         /// </summary>
-        [Test, Category("Automated")]
-        public void TestExpandAttributesNoSpatial()
+        [Test]
+        [Category("Automated")]
+        public static void TestExpandAttributesNoSpatial()
         {
             string testDBName = "ExpandAttributeNoSpatial_Test";
             string resultDBName = "ExpandAttribute_Results_Test";
@@ -196,8 +183,9 @@ namespace Extract.ETL.Test
         /// <summary>
         /// Test Expand Attributes with StoreSpatialInfo=true and StoreEmptyAttributes=true
         /// </summary>
-        [Test, Category("Automated")]
-        public void TestExpandAttributesWithEmpty()
+        [Test]
+        [Category("Automated")]
+        public static void TestExpandAttributesWithEmpty()
         {
             string testDBName = "ExpandAttribute_Test";
             string resultDBName = "ExpandAttribute_Results_Test";
@@ -227,8 +215,9 @@ namespace Extract.ETL.Test
         /// <summary>
         /// Test Expand Attributes with StoreSpatialInfo=false and StoreEmptyAttributes=true
         /// </summary>
-        [Test, Category("Automated")]
-        public void TestExpandAttributesNoSpatialWithEmpty()
+        [Test]
+        [Category("Automated")]
+        public static void TestExpandAttributesNoSpatialWithEmpty()
         {
             string testDBName = "ExpandAttributeNoSpatial_Test";
             string resultDBName = "ExpandAttribute_Results_Test";
@@ -258,8 +247,9 @@ namespace Extract.ETL.Test
         /// <summary>
         /// Tests the serialization of the ExpandAttribute object
         /// </summary>
-        [Test, Category("Automated")]
-        public void TestExpandAttributesSerialization()
+        [Test]
+        [Category("Automated")]
+        public static void TestExpandAttributesSerialization()
         {
             ExpandAttributes expandAttributes = new ExpandAttributes();
             expandAttributes.DatabaseServer = "server";
@@ -281,13 +271,13 @@ namespace Extract.ETL.Test
             Assert.AreEqual(expandAttributes.StoreSpatialInfo, test.StoreSpatialInfo, "StoreSpatialInfo serialization worked.");
             Assert.That(test.DatabaseServiceID == 0, "Default DatabaseServiceID is zero.");
             Assert.That(test.Enabled == !expandAttributes.Enabled);
-        } 
+        }
 
         #endregion
 
         #region Helper methods
 
-        void processTest(string resultsDbName, ExpandAttributes expandAttributes, string expectedResultsSQL)
+        static void processTest(string resultsDbName, ExpandAttributes expandAttributes, string expectedResultsSQL)
         {
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
@@ -308,8 +298,12 @@ namespace Extract.ETL.Test
 
                 expandAttributes.DatabaseServiceID = (int)cmd.ExecuteScalar();
 
+                expandAttributes.Process(_cancel);
+                cmd.CommandText = "SELECT COUNT(ID) FROM Attribute ";
+                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
+
                 // Process using the settings
-                expandAttributes.Process();
+                expandAttributes.Process(_noCancel);
 
                 // Get the results
                 cmd.CommandText = _QUERY_ATTRIBUTE_RESULTS;
@@ -336,7 +330,7 @@ namespace Extract.ETL.Test
             }
         }
 
-        bool isEqual(IDataRecord a, IDataRecord b)
+        static bool isEqual(IDataRecord a, IDataRecord b)
         {
             if (a.FieldCount != b.FieldCount || a.FieldCount != 17)
             {
@@ -345,7 +339,7 @@ namespace Extract.ETL.Test
 
             bool returnValue = true;
 
-            for (int i = 0; returnValue &&  i < a.FieldCount; i++)
+            for (int i = 0; returnValue && i < a.FieldCount; i++)
             {
                 if (a.IsDBNull(i))
                 {
@@ -357,13 +351,13 @@ namespace Extract.ETL.Test
                     returnValue = returnValue && a.IsDBNull(i);
                     continue;
                 }
-                returnValue = returnValue && a[i].Equals( b[i]);
+                returnValue = returnValue && a[i].Equals(b[i]);
             }
 
             return returnValue;
         }
 
-        void addExpectedResultsDB(string dbName)
+        static void addExpectedResultsDB(string dbName)
         {
             // Add the database with expected results
             var expectedBackupDB = _testFileManager.GetFile(_RESULTS_DATABASE);
@@ -380,7 +374,7 @@ namespace Extract.ETL.Test
 
         }
 
-        void removeExpectedResultsDB(string dbName)
+        static void removeExpectedResultsDB(string dbName)
         {
             try
             {

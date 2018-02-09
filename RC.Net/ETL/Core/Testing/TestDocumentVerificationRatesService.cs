@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
@@ -42,6 +43,9 @@ namespace Extract.ETL.Test
         #endregion
 
         #region Fields
+
+        static CancellationToken _noCancel = new CancellationToken(false);
+        static CancellationToken _cancel = new CancellationToken(true);
 
         /// <summary>
         /// Manages test FAM DBs
@@ -104,7 +108,7 @@ namespace Extract.ETL.Test
         #region Unit tests
 
         [Test, Category("Automated")]
-        public void TestDocumentVerificationRatesServiceSerialization()
+        static public void TestDocumentVerificationRatesServiceSerialization()
         {
             DocumentVerificationRates verificationRates = new DocumentVerificationRates();
             verificationRates.DatabaseServer = "TestService";
@@ -131,7 +135,7 @@ namespace Extract.ETL.Test
         }
 
         [Test, Category("Automated")]
-        public void TestDocumentVerificationStatusSerialization()
+        static public void TestDocumentVerificationStatusSerialization()
         {
             DocumentVerificationStatus serviceStatus = new DocumentVerificationStatus();
             serviceStatus.LastFileTaskSessionIDProcessed = 1;
@@ -181,7 +185,12 @@ namespace Extract.ETL.Test
                 rates.DatabaseServer = fileProcessingDb.DatabaseServer;
                 rates.DatabaseName = fileProcessingDb.DatabaseName;
                 rates.DatabaseServiceID = StoreDatabaseServiceRecord(rates);
-                rates.Process();
+
+                // This should not process any results
+                rates.Process(_cancel);
+                CheckResults(rates, new VerificationRatesList());
+
+                rates.Process(_noCancel);
 
                 CheckResults(rates, _PROCESS1_EXPECTED);
 
@@ -192,7 +201,7 @@ namespace Extract.ETL.Test
                     "There is one FileTaskSession pending due to Active processing");
 
                 fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 20.0, 2.0, 20.0);
-                rates.Process();
+                rates.Process(_noCancel);
 
                 status = GetStatus(rates);
                 Assert.AreEqual(status.LastFileTaskSessionIDProcessed, 2, "LastFileTaskSessionIDProcessed is 2.");
@@ -204,7 +213,7 @@ namespace Extract.ETL.Test
                 fileProcessingDb.RecordFAMSessionStop();
                 fileProcessingDb.UnregisterActiveFAM();
 
-                rates.Process();
+                rates.Process(_noCancel);
 
                 CheckResults(rates, _PROCESS2_EXPECTED);
 
@@ -217,7 +226,7 @@ namespace Extract.ETL.Test
                 fileProcessingDb.RecordFAMSessionStop();
                 fileProcessingDb.UnregisterActiveFAM();
 
-                rates.Process();
+                rates.Process(_noCancel);
 
                 CheckResults(rates, _PROCESS4_EXPECTED);
             }
@@ -307,6 +316,10 @@ namespace Extract.ETL.Test
                 connection.Open();
 
                 var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "SELECT COUNT(ID) FROM [dbo].[ReportingVerificationRates]";
+
+                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, expected.Count);
 
                 cmd.CommandText = "SELECT * FROM [dbo].[ReportingVerificationRates]";
 

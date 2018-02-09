@@ -7,12 +7,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
 using Extract.AttributeFinder;
 using Extract.DataCaptureStats;
-using Extract.Interfaces;
 using Extract.Utilities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using UCLID_COMUTILSLib;
 
 
@@ -173,13 +171,14 @@ namespace Extract.ETL
         /// <summary>
         /// Performs the processing needed for the records in ReportingDataCaptureAccuracy table
         /// </summary>
-        public override void Process()
+        /// <param name="cancelToken">Cancel token to indicate that processing should stop</param>
+        public override void Process(CancellationToken cancelToken)
         {
             try
             {
                 _processing = true;
 
-                using (var connection = getNewSqlDbConnection())
+                using (var connection = NewSqlDBConnection())
                 {
                     // Open the connection
                     connection.Open();
@@ -206,7 +205,7 @@ namespace Extract.ETL
                         int fileIDColumn = ExpectedAndFoundReader.GetOrdinal("FileID");
 
                         // Process the found records
-                        while (ExpectedAndFoundReader.Read())
+                        while (ExpectedAndFoundReader.Read() && !cancelToken.IsCancellationRequested)
                         {
                             // Get the streams for the expected and found voa data (the thread will read the voa from the stream
                             Stream expectedStream = ExpectedAndFoundReader.GetStream(expectedVOAColumn);

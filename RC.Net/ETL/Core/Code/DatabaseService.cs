@@ -1,8 +1,9 @@
-﻿using Extract.Utilities;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Data.SqlClient;
 using System.Runtime.Serialization;
+using System.Threading;
+using Extract.Utilities;
+using Newtonsoft.Json;
 
 namespace Extract.ETL
 {
@@ -83,7 +84,8 @@ namespace Extract.ETL
         /// <summary>
         /// Performs the processing defined the database service record
         /// </summary>
-        public abstract void Process();
+        /// <param name="cancelToken">Token that will cancel the processing</param>
+        public abstract void Process(CancellationToken cancelToken);
 
         /// <summary>
         /// Returns the settings in a JSON string
@@ -155,7 +157,7 @@ namespace Extract.ETL
         /// Returns a connection to the configured database. Can be overridden if needed
         /// </summary>
         /// <returns>SqlConnection that connects to the <see cref="DatabaseServer"/> and <see cref="DatabaseName"/></returns>
-        protected virtual SqlConnection getNewSqlDbConnection()
+        protected virtual SqlConnection NewSqlDBConnection()
         {
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();

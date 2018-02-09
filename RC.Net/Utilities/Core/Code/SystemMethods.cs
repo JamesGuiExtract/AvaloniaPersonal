@@ -1,6 +1,3 @@
-using Extract;
-using Extract.Licensing;
-using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +9,10 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.ServiceProcess;
+using System.Threading;
 using System.Windows.Forms;
+using Extract.Licensing;
+using Microsoft.Win32.SafeHandles;
 
 namespace Extract.Utilities
 {
@@ -31,7 +31,12 @@ namespace Extract.Utilities
         /// <summary>
         /// "This operation returned because the timeout period expired."
         /// </summary>
-        static int _OPERATION_TIMEOUT_EXIT_CODE = 1460;
+        public static int OperationTimeoutExitCode { get; private set; } = 1460;
+
+        /// <summary>
+        /// This operation returned because it was canceled
+        /// </summary>
+        public static int OperationCanceledExitCode { get; private set; } = 1461;
 
         #endregion Constants
 
@@ -74,7 +79,7 @@ namespace Extract.Utilities
         /// <param name="wmiObject">The <see cref="ManagementObject"/> to retrieve the property from.
         /// </param>
         /// <param name="propertyName">The name of the property to retrieve. Properties on
-        /// see cref="ManagementObject"/>s  can be referenced with a '.' following the child
+        /// <see cref="ManagementObject"/>s  can be referenced with a '.' following the child
         /// object's property name.</param>
         /// <returns></returns>
         internal static object GetWmiProperty(ManagementBaseObject wmiObject, string propertyName)
@@ -293,11 +298,13 @@ namespace Extract.Utilities
         /// <param name="exeFile">The exe file.</param>
         /// <param name="arguments">The arguments.</param>
         /// <param name="createNoWindow">Whether to eschew shell execution to avoid showing a cmd window</param>
-        /// <returns>The exit code of the process or 1460 ("This operation returned because the
-        /// timeout period expired.") if timeToWait has expired.</returns>
-        public static int RunExecutable(string exeFile, IEnumerable<string> arguments, bool createNoWindow = false)
+        /// <param name="cancelToken">Used to cancel, which will kill the process</param>
+        /// <returns>The exit code of the process or  
+        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        public static int RunExecutable(string exeFile, IEnumerable<string> arguments, bool createNoWindow = false,
+            CancellationToken cancelToken = default(CancellationToken))
         {
-            return RunExecutable(exeFile, arguments, int.MaxValue, createNoWindow);
+            return RunExecutable(exeFile, arguments, int.MaxValue, createNoWindow, cancelToken);
         }
 
         /// <summary>
@@ -309,10 +316,11 @@ namespace Extract.Utilities
         /// <param name="arguments">The arguments.</param>
         /// <param name="timeToWait">The time to wait.</param>
         /// <param name="createNoWindow">Whether to eschew shell execution to avoid showing a cmd window</param>
-        /// <returns>The exit code of the process or 1460 ("This operation returned because the
-        /// timeout period expired.") if timeToWait has expired.</returns>
+        /// <returns>The exit code of the process or <see cref="OperationTimeoutExitCode"/> ("This operation returned because the
+        /// timeout period expired.") if timeToWait has expired. 
+        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
         public static int RunExecutable(string exeFile, IEnumerable<string> arguments,
-            int timeToWait, bool createNoWindow = false)
+            int timeToWait, bool createNoWindow = false, CancellationToken cancelToken = default(CancellationToken))
         {
             try
             {
@@ -321,7 +329,7 @@ namespace Extract.Utilities
                     .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s)
                     .ToArray());
 
-                return RunExecutable(exeFile, argumentString, timeToWait, createNoWindow);
+                return RunExecutable(exeFile, argumentString, timeToWait, createNoWindow, cancelToken);
             }
             catch (Exception ex)
             {
@@ -338,9 +346,12 @@ namespace Extract.Utilities
         /// <param name="arguments">The arguments.</param>
         /// <param name="timeToWait">The time to wait.</param>
         /// <param name="createNoWindow">Whether to eschew shell execution to avoid showing a cmd window</param>
-        /// <returns>The exit code of the process or 1460 ("This operation returned because the
-        /// timeout period expired.") if timeToWait has expired.</returns>
-        public static int RunExecutable(string exeFile, string arguments, int timeToWait, bool createNoWindow = false)
+        /// <param name="cancelToken"><see cref="CancellationToken"/> that can be used to cancel the execution</param>
+        /// <returns>The exit code of the process or <see cref="OperationTimeoutExitCode"/> ("This operation returned because the
+        /// timeout period expired.") if timeToWait has expired. 
+        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        public static int RunExecutable(string exeFile, string arguments, int timeToWait, bool createNoWindow = false,
+            CancellationToken cancelToken = default(CancellationToken))
         {
             try
             {
@@ -362,14 +373,25 @@ namespace Extract.Utilities
                         CreateNoWindow = createNoWindow
                     };
                     process.Start();
-                    if (process.WaitForExit(timeToWait))
+                    ManualResetEvent exitEvent = new ManualResetEvent(true);
+                    exitEvent.SafeWaitHandle = new SafeWaitHandle(process.Handle, false);
+                    int waitResult = (WaitHandle.WaitAny(
+                        new WaitHandle[]
+                        {
+                            exitEvent,
+                            cancelToken.WaitHandle
+                        },
+                        timeToWait));
+                    switch (waitResult)
                     {
-                        return process.ExitCode;
+                        case WaitHandle.WaitTimeout:
+                            process.CloseMainWindow();
+                            return OperationTimeoutExitCode;
+                        case 1:
+                            process.CloseMainWindow();
+                            return OperationCanceledExitCode;
                     }
-                    else
-                    {
-                        return _OPERATION_TIMEOUT_EXIT_CODE;
-                    }
+                    return process.ExitCode;
                 }
             }
             catch (Exception ex)
@@ -384,11 +406,11 @@ namespace Extract.Utilities
         /// <param name="command">The exe file and arguments.</param>
         /// <param name="standardOutput">The output of the process</param>
         /// <param name="standardError">The error message of the process</param>
-        /// <returns>The exit code of the process or 1460 ("This operation returned because the
-        /// timeout period expired.") if timeToWait has expired.</returns>
+        /// <returns>The exit code of the process or 
+        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public static int RunExecutable(string command, out string standardOutput,
-            out string standardError)
+            out string standardError, CancellationToken cancelToken = default(CancellationToken))
         {
             try
             {
@@ -399,7 +421,7 @@ namespace Extract.Utilities
                     "Command", command);
 
                 return RunExecutable(exeName, args.Skip(1),
-                    out standardOutput, out standardError);
+                    out standardOutput, out standardError, cancelToken);
             }
             catch (Exception ex)
             {
@@ -414,11 +436,11 @@ namespace Extract.Utilities
         /// <param name="arguments">The arguments.</param>
         /// <param name="standardOutput">The output of the process</param>
         /// <param name="standardError">The error message of the process</param>
-        /// <returns>The exit code of the process or 1460 ("This operation returned because the
-        /// timeout period expired.") if timeToWait has expired.</returns>
+        /// <returns>The exit code of the process or
+        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public static int RunExecutable(string exeFile, IEnumerable<string> arguments,
-            out string standardOutput, out string standardError)
+            out string standardOutput, out string standardError, CancellationToken cancelToken = default(CancellationToken))
         {
             try
             {
@@ -428,7 +450,7 @@ namespace Extract.Utilities
                     .ToArray());
 
                 return RunExecutable(exeFile, argumentString,
-                    out standardOutput, out standardError);
+                    out standardOutput, out standardError, cancelToken);
             }
             catch (Exception ex)
             {
@@ -443,11 +465,11 @@ namespace Extract.Utilities
         /// <param name="arguments">The arguments.</param>
         /// <param name="standardOutput">The output of the process</param>
         /// <param name="standardError">The error message of the process</param>
-        /// <returns>The exit code of the process or 1460 ("This operation returned because the
-        /// timeout period expired.") if timeToWait has expired.</returns>
+        /// <returns>The exit code of the process or 
+        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
-        private static int RunExecutable(string exeFile, string argumentString,
-            out string standardOutput, out string standardError)
+        static int RunExecutable(string exeFile, string argumentString,
+            out string standardOutput, out string standardError, CancellationToken cancelToken = default(CancellationToken))
         {
             try
             {
@@ -473,7 +495,22 @@ namespace Extract.Utilities
                     process.Start();
                     standardOutput = process.StandardOutput.ReadToEnd();
                     standardError = process.StandardError.ReadToEnd();
-                    process.WaitForExit();
+
+                    ManualResetEvent exitEvent = new ManualResetEvent(true);
+                    exitEvent.SafeWaitHandle = new SafeWaitHandle(process.Handle, false);
+                    int waitResult = (WaitHandle.WaitAny(
+                        new WaitHandle[]
+                        {
+                            exitEvent,
+                            cancelToken.WaitHandle
+                        }));
+
+                    if (waitResult == 1)
+                    {
+                        process.CloseMainWindow();
+						return OperationCanceledExitCode;
+                    }
+
                     return process.ExitCode;
                 }
             }
@@ -493,9 +530,14 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="exeFile">The executable to run.</param>
         /// <param name="arguments">The command line arguments for the executable.</param>
-        /// <returns>The exit code of the process or 1460 ("This operation returned because the
-        /// timeout period expired.") if timeToWait has expired.</returns>
-        public static int RunExtractExecutable(string exeFile, IEnumerable<string> arguments)
+        /// <param name="cancelToken"><see cref="CancellationToken"/> that can be used to cancel the execution</param>
+        /// <param name="addCancellableNameAsArgument">If <c>true</c> another argument will be added to the argument list 
+        /// /CancelTokenName "eventName"
+        /// if <c>false</c> there will be no changes</param>
+        /// <returns>The exit code of the process or  
+        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        public static int RunExtractExecutable(string exeFile, IEnumerable<string> arguments,
+            CancellationToken cancelToken = default(CancellationToken), bool addCancellableNameAsArgument = false)
         {
             try
             {
@@ -504,7 +546,7 @@ namespace Extract.Utilities
                     .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s)
                     .ToArray());
 
-                return RunExtractExecutable(exeFile, argumentString);
+                return RunExtractExecutable(exeFile, argumentString, cancelToken, addCancellableNameAsArgument);
             }
             catch (Exception ex)
             {
@@ -519,26 +561,49 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="exeFile">The executable to run.</param>
         /// <param name="arguments">The command line arguments for the executable.</param>
-        /// <returns>The exit code of the process or 1460 ("This operation returned because the
-        /// timeout period expired.") if timeToWait has expired.</returns>
-        public static int RunExtractExecutable(string exeFile, string arguments)
+        /// <param name="cancelToken"><see cref="CancellationToken"/> that can be used to cancel the execution</param>
+        /// <param name="addCancellableNameAsArgument">If <c>true</c> another argument will be added to the argument list 
+        /// /CancelTokenName "eventName"
+        /// if <c>false</c> there will be no changes</param>
+        /// <returns>The exit code of the process or 
+        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        public static int RunExtractExecutable(string exeFile, string arguments,
+            CancellationToken cancelToken = default(CancellationToken), bool addCancellableNameAsArgument = false)
         {
             try
             {
-                using (var tempFile = new TemporaryFile(".uex", false))
+                // use a guid as an event name
+                string cancelEventName = @"Global\" + Guid.NewGuid().ToString(); ;
+                NamedTokenSource namedTokenSource = new NamedTokenSource(cancelEventName);
+                cancelEventName = @"Global\" + Guid.NewGuid().ToString();
+                namedTokenSource = new NamedTokenSource(cancelEventName);
+
+                // Register the Cancel method for the named token with the passed in cancel token
+                // this will cause the 
+                using (var tokenRegistration = cancelToken.Register(() => namedTokenSource.Cancel()))
                 {
-                    arguments += " /ef " + tempFile.FileName.Quote();
-
-                    // Run the executable and wait for it to exit
-                    int exitCode = RunExecutable(exeFile, arguments, int.MaxValue);
-
-                    var info = new FileInfo(tempFile.FileName);
-                    if (info.Length > 0)
+                    using (var tempFile = new TemporaryFile(".uex", false))
                     {
-                        throw ExtractException.LoadFromFile("ELI31875", tempFile.FileName);
-                    }
+                        arguments += (addCancellableNameAsArgument) ? " /CancelTokenName " + cancelEventName.Quote() : string.Empty;
+                        arguments += " /ef " + tempFile.FileName.Quote();
 
-                    return exitCode;
+                        // If passing the Cancellable name as an argument it is expected that the called program will
+                        // exit when the Cancel source associated with the Name  is canceled so pass the default that 
+                        // will not cancel, otherwise pass the cancelToken argument so the executable will attempt 
+                        // to be closed if cancelToken is canceled
+                        CancellationToken cancelTokenToPass = (addCancellableNameAsArgument) ? default(CancellationToken) : cancelToken;
+
+                        // Run the executable and wait for it to exit
+                        int exitCode = RunExecutable(exeFile, arguments, int.MaxValue, cancelToken: cancelTokenToPass);
+
+                        var info = new FileInfo(tempFile.FileName);
+                        if (info.Length > 0)
+                        {
+                            throw ExtractException.LoadFromFile("ELI31875", tempFile.FileName);
+                        }
+
+                        return exitCode;
+                    }
                 }
             }
             catch (Exception ex)
