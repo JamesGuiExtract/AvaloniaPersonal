@@ -117,10 +117,7 @@ namespace WebAPI
                 if (lineCount > 0)
                 {
                     position.LineInfo = new List<SpatialLine>();
-                    if (verboseSpatialData)
-                    {
-                        position.Pages = new List<int>();
-                    }
+                    position.Pages = new List<int>();
 
                     for (int i = 0; i < lineCount; ++i)
                     {
@@ -134,20 +131,14 @@ namespace WebAPI
                         var spatialLine = MakeLineInfo(line, includeBounds: verboseSpatialData);
                         position.LineInfo.AddRange(spatialLine);
 
-                        if (verboseSpatialData)
+                        var pages = spatialLine.Select(sl => sl.SpatialLineZone.PageNumber);
+                        foreach (var page in pages)
                         {
-                            var pages = spatialLine.Select(sl => sl.SpatialLineBounds.PageNumber);
-                            foreach (var page in pages)
-                            {
-                                setOfPages.Add(page);
-                            }
+                            setOfPages.Add(page);
                         }
                     }
 
-                    if (verboseSpatialData)
-                    {
-                        position.Pages = setOfPages.ToList();
-                    }
+                    position.Pages = setOfPages.ToList();
                 }
 
                 return position;
