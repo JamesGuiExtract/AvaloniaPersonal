@@ -50,6 +50,10 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ScintillaNET, Version=2.4.0.0, Culture=neutral, PublicKeyToken=948d6c9751444115, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\APIs\ScintillaNET v2.4\ScintillaNET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
@@ -62,6 +66,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompareAttributesCondition.cs" />
+    <Compile Include="CompareAttributesConditionSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CompareAttributesConditionSettingsDialog.Designer.cs">
+      <DependentUpon>CompareAttributesConditionSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="DatabaseContentsConditionSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -137,6 +148,10 @@
       <Project>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</Project>
       <Name>Extract.Database</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\DataCaptureStats\Core\Code\Extract.DataCaptureStats.csproj">
+      <Project>{32679A70-BC10-4DD9-9155-9B3E08586EE9}</Project>
+      <Name>Extract.DataCaptureStats</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\DataEntry\Core\Code\Extract.DataEntry.csproj">
       <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
       <Name>Extract.DataEntry</Name>
@@ -183,6 +198,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="CompareAttributesConditionSettingsDialog.resx">
+      <DependentUpon>CompareAttributesConditionSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DatabaseContentsConditionSettingsDialog.resx">
       <DependentUpon>DatabaseContentsConditionSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -215,6 +233,15 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
       <Private>True</Private>
+    </COMReference>
+    <COMReference Include="AttributeDbMgrComponentsLib">
+      <Guid>{0DF6DB5B-F788-42FC-AE9E-EF19CAA78D38}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>

@@ -48,6 +48,12 @@ library AttributeDbMgrComponentsLib
 											 [in] VARIANT_BOOL vbStoreRasterZone,
 											 [in] VARIANT_BOOL vbStoreEmptyAttributes);
 
+		//-----------------------------------------------------------------------------------------
+		// Gets the VOA stored for file
+		// Relative index is determines which version is retrieved:
+		//		Positive relative index is 1-based index from first stored to nth stored,
+		//		Negative relative index is 1-based index from last stored (-1) to nth most recently stored (-n)
+		//		A relativeIndex of -1 gets the most recently stored VOA
 		[id(3), helpstring("method GetAttributeSetForFile")] 
 		HRESULT GetAttributeSetForFile([in] long fileID, 
 									   [in] BSTR attributeSetName,
