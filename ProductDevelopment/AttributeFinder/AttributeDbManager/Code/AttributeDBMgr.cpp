@@ -914,7 +914,9 @@ namespace
 		return insert;
 	}
 
-	// This query gets one top-level attribute.
+	// This query gets one IUnknown Vector Of Attributes
+	// A positive relative index is 1-based index from first stored to nth stored,
+	// A negative relative index is 1-based index from last stored (-1) to nth most recently stored (-n)
 	std::string GetQueryForAttributeSetForFile( long fileID,
 												BSTR attributeSetName,
 												long relativeIndex )
