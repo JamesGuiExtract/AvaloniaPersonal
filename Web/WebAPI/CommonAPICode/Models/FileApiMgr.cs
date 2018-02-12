@@ -104,11 +104,11 @@ namespace WebAPI.Models
         static FileApi FindAvailable(ApiContext apiContext, ClaimsPrincipal sessionOwner = null)
         {
             var availableInstance = _interfaces.FirstOrDefault(instance =>
-                 !instance.InUse &&
+                 ((sessionOwner == null && !instance.InUse) ||
+                    (sessionOwner != null && instance.SessionId.Equals(sessionOwner.GetClaim("jti")))) &&
                  instance.Workflow.Name.IsEquivalent(apiContext.WorkflowName) &&
                  instance.Workflow.DatabaseServerName.IsEquivalent(apiContext.DatabaseServerName) &&
-                 instance.Workflow.DatabaseName.IsEquivalent(apiContext.DatabaseName) &&
-                 (sessionOwner == null || instance.SessionId.Equals(sessionOwner.GetClaim("jti"))));
+                 instance.Workflow.DatabaseName.IsEquivalent(apiContext.DatabaseName));
 
             if (availableInstance != null && availableInstance.Expired)
             {

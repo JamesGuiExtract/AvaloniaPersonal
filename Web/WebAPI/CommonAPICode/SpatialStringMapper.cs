@@ -99,8 +99,11 @@ namespace WebAPI
         /// Adds spatial information to an existing Position object
         /// </summary>
         /// <param name="spatialString">a SpatialString object</param>
+        /// <param name="verboseSpatialData"><c>false</c> to include only the spatial data needed for
+        /// extract software to represent spatial strings; <c>true</c> to include data that may be
+        /// useful to 3rd party integrators.</param>
         /// <returns>Position object</returns>
-        public static Position SetSpatialPosition(this SpatialString spatialString)
+        public static Position SetSpatialPosition(this SpatialString spatialString, bool verboseSpatialData)
         {
             try
             {
@@ -114,7 +117,10 @@ namespace WebAPI
                 if (lineCount > 0)
                 {
                     position.LineInfo = new List<SpatialLine>();
-                    position.Pages = new List<int>();
+                    if (verboseSpatialData)
+                    {
+                        position.Pages = new List<int>();
+                    }
 
                     for (int i = 0; i < lineCount; ++i)
                     {
@@ -125,17 +131,23 @@ namespace WebAPI
                             continue;
                         }
 
-                        var spatialLine = MakeLineInfo(line, true);
+                        var spatialLine = MakeLineInfo(line, includeBounds: verboseSpatialData);
                         position.LineInfo.AddRange(spatialLine);
 
-                        var pages = spatialLine.Select(sl => sl.SpatialLineBounds.PageNumber);
-                        foreach (var page in pages)
+                        if (verboseSpatialData)
                         {
-                            setOfPages.Add(page);
+                            var pages = spatialLine.Select(sl => sl.SpatialLineBounds.PageNumber);
+                            foreach (var page in pages)
+                            {
+                                setOfPages.Add(page);
+                            }
                         }
                     }
 
-                    position.Pages = setOfPages.ToList();
+                    if (verboseSpatialData)
+                    {
+                        position.Pages = setOfPages.ToList();
+                    }
                 }
 
                 return position;

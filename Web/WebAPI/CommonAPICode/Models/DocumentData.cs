@@ -316,9 +316,13 @@ namespace WebAPI.Models
         /// <param name="includeNonSpatial"><c>true</c> to include non-spatial attributes in the resulting data;
         /// otherwise, <c>false</c>. NOTE: If false, a non-spatial attribute will be excluded even if it has
         /// spatial children.</param>
+        /// <param name="verboseSpatialData"><c>false</c> to include only the spatial data needed for
+        /// extract software to represent spatial strings; <c>true</c> to include data that may be
+        /// useful to 3rd party integrators.</param>
         /// <returns>DocumentAttributeSet instance, including error info iff there is an error</returns>
         /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
-        public DocumentAttributeSet GetDocumentResultSet(int fileId, bool includeNonSpatial = true)
+        public DocumentAttributeSet GetDocumentResultSet(int fileId, 
+            bool includeNonSpatial = true, bool verboseSpatialData = true)
         {
             try
             {
@@ -326,7 +330,7 @@ namespace WebAPI.Models
 
                 var results = GetAttributeSetForFile(fileId);
                 var mapper = new AttributeMapper(results, FileApi.Workflow.Type);
-                return mapper.MapAttributesToDocumentAttributeSet(includeNonSpatial);
+                return mapper.MapAttributesToDocumentAttributeSet(includeNonSpatial, verboseSpatialData);
             }
             catch (Exception ex)
             {

@@ -252,7 +252,8 @@ namespace WebAPI.Controllers
                 {
                     // https://extract.atlassian.net/browse/WEB-59
                     // Per discussion with GGK, non-spatial attributes will not be sent to the web app.
-                    var result = data.GetDocumentResultSet(data.DocumentSessionFileId, includeNonSpatial: false);
+                    var result = data.GetDocumentResultSet(
+                        data.DocumentSessionFileId, includeNonSpatial: false, verboseSpatialData: false);
 
                     return Ok(result);
                 }
@@ -298,7 +299,7 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="page">The page.</param>
         /// <returns></returns>
-        [HttpPost("GetPageWordZones")]
+        [HttpGet("GetPageWordZones")]
         [Produces(typeof(WordZoneData))]
         [Authorize]
         public IActionResult GetPageWordZones(int page)

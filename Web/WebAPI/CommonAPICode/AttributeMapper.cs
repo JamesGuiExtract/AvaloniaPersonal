@@ -107,8 +107,11 @@ namespace WebAPI
         /// map an IAttribute to a (top-level) DocumentAtribute instance
         /// </summary>
         /// <param name="attr">Attribute instance</param>
+        /// <param name="verboseSpatialData"><c>false</c> to include only the spatial data needed for
+        /// extract software to represent spatial strings; <c>true</c> to include data that may be
+        /// useful to 3rd party integrators.</param>
         /// <returns>DocumentAttribute object</returns>
-        private DocumentAttribute MapAttribute(IAttribute attr)
+        private DocumentAttribute MapAttribute(IAttribute attr, bool verboseSpatialData)
         {
             var docAttr = new DocumentAttribute();
 
@@ -130,7 +133,7 @@ namespace WebAPI
                 docAttr.ConfidenceLevel = DetermineRedactionConfidence(attr.Name);
                 docAttr.HasPositionInfo = spatialString.HasSpatialInfo();
 
-                docAttr.SpatialPosition = spatialString.SetSpatialPosition();
+                docAttr.SpatialPosition = spatialString.SetSpatialPosition(verboseSpatialData);
 
                 // Process subattributes, if any
                 var childAttrs = attr.SubAttributes;
@@ -151,7 +154,7 @@ namespace WebAPI
                                 continue;
                             }
 
-                            var childDocAttr = MapAttribute(childAttr);
+                            var childDocAttr = MapAttribute(childAttr, verboseSpatialData);
                             docAttr.ChildAttributes.Add(childDocAttr);
                         }
                     }
@@ -172,8 +175,11 @@ namespace WebAPI
         /// <param name="includeNonSpatial"><c>true</c> to include non-spatial attributes in the resulting data;
         /// otherwise, <c>false</c>. NOTE: If false, a non-spatial attribute will be excluded even if it has
         /// spatial children.</param>
+        /// <param name="verboseSpatialData"><c>false</c> to include only the spatial data needed for
+        /// extract software to represent spatial strings; <c>true</c> to include data that may be
+        /// useful to 3rd party integrators.</param>
         /// <returns>corresponding DocumentAttributeSet</returns>
-        public DocumentAttributeSet MapAttributesToDocumentAttributeSet(bool includeNonSpatial)
+        public DocumentAttributeSet MapAttributesToDocumentAttributeSet(bool includeNonSpatial, bool verboseSpatialData)
         {
             IAttribute attr = null;
 
@@ -195,7 +201,7 @@ namespace WebAPI
                         continue;
                     }
 
-                    var docAttr = MapAttribute(attr);
+                    var docAttr = MapAttribute(attr, verboseSpatialData);
                     rootDocAttrSet.Attributes.Add(docAttr);
                 }
 
