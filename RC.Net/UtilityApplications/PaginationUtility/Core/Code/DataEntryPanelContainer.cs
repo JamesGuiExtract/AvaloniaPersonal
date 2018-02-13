@@ -1079,12 +1079,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (backgroundConfigManager.ExecuteNoUILoad(tempData.Attributes, documentData.SourceDocName))
                     {
-                        AttributeStatusInfo.ShareDBConnections = false;
-
                         documentStatus = GetDocumentStatusFromNoUILoad(backgroundConfigManager, tempData);
                     }
                     else
                     {
+                        // While the configuration's shared connections are already open,
+                        // OpenDatabaseConnections is needed to assign those connection to the DEP.
+                        backgroundConfigManager.ActiveDataEntryConfiguration.OpenDatabaseConnections();
+
                         documentStatus = GetDocumentDataFromUILoad(backgroundConfigManager, tempData);
                     }
                 }
