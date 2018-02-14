@@ -590,6 +590,11 @@ namespace Extract.DataEntry
                 }
                 config.ApplyObjectSettings(configuration.DataEntryControlHost);
 
+                if (config.Settings.SupportsNoUILoad)
+                {
+                    configuration.BuildFieldModels(config);
+                }
+
                 OnConfigurationInitialized(configuration);
 
                 return configuration;

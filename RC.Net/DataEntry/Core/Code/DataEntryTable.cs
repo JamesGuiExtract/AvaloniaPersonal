@@ -2060,7 +2060,8 @@ namespace Extract.DataEntry
                 {
                     Name = AttributeName,
                     ParentAttributeControl = ParentDataEntryControl,
-                    DisplayOrder = displayOrder
+                    DisplayOrder = displayOrder,
+                    AutoCreate = (MinimumNumberOfRows > 0)
                 };
 
                 var identityColumn = Columns

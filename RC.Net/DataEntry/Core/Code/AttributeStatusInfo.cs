@@ -1209,12 +1209,11 @@ namespace Extract.DataEntry
         {
             try
             {
-                // If using attribute models instead of a DEP, create a new attribute for any model
-                // that does not already have one.
+                // If using attribute models instead of a DEP, create a new attribute for any
+                // AutoCreate model that does not already have one.
                 if (fieldModels != null)
                 {
-                    foreach (var fieldModel in fieldModels
-                        .Where(model => !string.IsNullOrEmpty(model.Name)))
+                    foreach (var fieldModel in fieldModels.Where(model => model.AutoCreate))
                     {
                         if (!attributes
                                 .ToIEnumerable<IAttribute>()

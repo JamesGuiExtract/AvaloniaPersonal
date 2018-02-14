@@ -70,6 +70,12 @@ namespace Extract.DataEntry
         [DataMember]
         public bool ValidationCorrectsCase { get; set; } = false;
 
+        /// <summary>
+        /// Whether at attribute should be automatically created for this field.
+        /// </summary>
+        [DataMember]
+        public bool AutoCreate { get; set; } = true;
+
         // The models that should be mapped to subattributes of the current field's attributes.
         [DataMember]
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

@@ -113,11 +113,6 @@ namespace Extract.DataEntry
                 // Create a DataEntryControlHost instance from the specified assembly
                 _dataEntryControlHost = CreateDataEntryControlHost(dataEntryPanelFileName);
 
-                if (Config.Settings.SupportsNoUILoad)
-                {
-                    _backgroundFieldModels = BuildFieldModels(config);
-                }
-
                 if (backgroundConfigModel != null)
                 {
                     lock (_lock)
@@ -364,6 +359,45 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI26159");
+            }
+        }
+
+        /// <summary>
+        /// Builds a hierarchy of <see cref="BackgroundFieldModel"/> that represent the fields in
+        /// the DEP for the specified <see paramref="config"/>.
+        /// </summary>
+        /// <param name="config">The <see cref="ConfigSettings{Properties.Settings}"/> for which field models
+        /// are to be created.</param>
+        internal void BuildFieldModels(ConfigSettings<Properties.Settings> config)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(Config.Settings.NoUILoadConfig))
+                {
+                    _backgroundFieldModels = BuildFieldModels(_dataEntryControlHost);
+                }
+                else
+                {
+                    string noUiLoadConfigFile = DataEntryMethods.ResolvePath(config.Settings.NoUILoadConfig);
+                    if (File.Exists(noUiLoadConfigFile))
+                    {
+                        string noUiLoadConfig = File.ReadAllText(noUiLoadConfigFile);
+                        _backgroundFieldModels = JsonConvert.DeserializeObject<IEnumerable<BackgroundFieldModel>>(noUiLoadConfig);
+                    }
+                    else
+                    {
+                        var fieldModels = BuildFieldModels(_dataEntryControlHost);
+                        string noUiLoadConfig =
+                            JsonConvert.SerializeObject(fieldModels, Newtonsoft.Json.Formatting.Indented);
+                        File.WriteAllText(noUiLoadConfigFile, noUiLoadConfig);
+
+                        _backgroundFieldModels = fieldModels;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45569");
             }
         }
 
@@ -653,39 +687,6 @@ namespace Extract.DataEntry
                 throw ee;
             }
         }
-
-        /// <summary>
-        /// Builds a hierarchy of <see cref="BackgroundFieldModel"/> that represent the fields in
-        /// the DEP for the specified <see paramref="config"/>.
-        /// </summary>
-        /// <param name="config">The <see cref="ConfigSettings{Properties.Settings}"/> for which field models
-        /// are to be created.</param>
-        IEnumerable<BackgroundFieldModel> BuildFieldModels(ConfigSettings<Properties.Settings> config)
-        {
-            if (string.IsNullOrWhiteSpace(Config.Settings.NoUILoadConfig))
-            {
-                return BuildFieldModels(_dataEntryControlHost);
-            }
-            else
-            {
-                string noUiLoadConfigFile = DataEntryMethods.ResolvePath(config.Settings.NoUILoadConfig);
-                if (File.Exists(noUiLoadConfigFile))
-                {
-                    string noUiLoadConfig = File.ReadAllText(noUiLoadConfigFile);
-                    return JsonConvert.DeserializeObject<IEnumerable<BackgroundFieldModel>>(noUiLoadConfig);
-                }
-                else
-                {
-                    var fieldModels = BuildFieldModels(_dataEntryControlHost);
-                    string noUiLoadConfig =
-                        JsonConvert.SerializeObject(_backgroundFieldModels, Newtonsoft.Json.Formatting.Indented);
-                    File.WriteAllText(noUiLoadConfigFile, noUiLoadConfig);
-
-                    return fieldModels;
-                }
-            }
-        }
-
 
         /// <summary>
         /// Builds a hierarchy of <see cref="BackgroundFieldModel"/> that represent the fields in
