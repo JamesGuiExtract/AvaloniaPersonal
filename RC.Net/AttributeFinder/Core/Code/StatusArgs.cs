@@ -88,7 +88,11 @@ namespace Extract.AttributeFinder
                 Int32Value += other.Int32Value;
                 if (DoubleValues.Any())
                 {
-                    DoubleValues = DoubleValues.Zip(other.DoubleValues, (a, b) => a + b);
+                    // Evaluate immediately to prevent SO exception
+                    // https://extract.atlassian.net/browse/ISSUE-15268
+                    DoubleValues = DoubleValues
+                        .Zip(other.DoubleValues, (a, b) => a + b)
+                        .ToList();
                 }
             }
             catch (Exception e)

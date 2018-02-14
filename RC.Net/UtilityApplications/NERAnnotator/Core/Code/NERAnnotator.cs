@@ -402,8 +402,15 @@ namespace Extract.UtilityApplications.NERAnnotator
                     ? "Files processed/skipped for training set: {0:N0} / {1:N0}"
                     : "Files processed/skipped for testing set:  {0:N0} / {1:N0}";
 
-                StringBuilder sb = new StringBuilder();
                 var ussPath = g.Key;
+                if (!File.Exists(ussPath))
+                {
+                    // Report a skipped file to the caller
+                    _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 0, 1 } });
+                    continue;
+                }
+
+                StringBuilder sb = new StringBuilder();
 
                 // If a file is specified with 0 as the page number that means all pages should be processed.
                 // Pass null to GetTokens for this case
