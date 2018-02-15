@@ -437,8 +437,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         _statusUpdates.Enqueue(
                             new StatusArgs { StatusMessage = completedMessage + ". Time elapsed: " + elapsedTime + "\r\n" });
 
-                        Action<AccuracyData> writeAccuracyData =
-                            accuracyData => accuracyData.Match(
+                        void writeAccuracyData(AccuracyData accuracyData, SerializableConfusionMatrix confusionMatrix) => accuracyData.Match(
                             gcm =>
                             {
                                 _statusUpdates.Enqueue(new StatusArgs
@@ -451,6 +450,17 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                                     StatusMessage = "  Overall agreement: {0:N4}\r\n  Chance agreement: {1:N4}",
                                     DoubleValues = new[] { gcm.OverallAgreement, gcm.ChanceAgreement }
                                 });
+                                if (confusionMatrix != null)
+                                {
+                                    var negativeClasses = string.Join(", ", confusionMatrix.NegativeClassIndexes().Select(i => confusionMatrix.Labels[i]));
+                                    _statusUpdates.Enqueue(new StatusArgs
+                                    {
+                                        StatusMessage = "  F1 Score (micro avg): {0:N4}" +
+                                            "\r\n  Precision (micro avg): {1:N4}, Recall (micro avg): {2:N4}" +
+                                            "\r\n  (" + negativeClasses + " = negative classes)",
+                                        DoubleValues = new[] { confusionMatrix.FScoreMicroAverage(), confusionMatrix.PrecisionMicroAverage(), confusionMatrix.RecallMicroAverage() }
+                                    });
+                                }
                             },
                             cm =>
                             {
@@ -477,15 +487,18 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         var trainingAccuracyData = task.Result.Item1;
                         var testingAccuracyData = task.Result.Item2;
 
+                        var trainingAccuracyData2 = learningMachine.AccuracyData?.train;
+                        var testingAccuracyData2 = learningMachine.AccuracyData?.test;
+
                         // Training data may not be present (if training % was 0)
                         if (trainingAccuracyData != null)
                         {
                             _statusUpdates.Enqueue(new StatusArgs { StatusMessage = "Training Set Accuracy:" });
-                            writeAccuracyData(trainingAccuracyData);
+                            writeAccuracyData(trainingAccuracyData, trainingAccuracyData2);
                         }
 
                         _statusUpdates.Enqueue(new StatusArgs { StatusMessage = "Testing Set Accuracy:" });
-                        writeAccuracyData(testingAccuracyData);
+                        writeAccuracyData(testingAccuracyData, testingAccuracyData2);
                     }
                     else
                     {

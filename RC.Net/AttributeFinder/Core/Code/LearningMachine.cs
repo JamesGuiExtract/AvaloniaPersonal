@@ -1300,6 +1300,11 @@ namespace Extract.AttributeFinder
 
                 (double[][] inputs, List<string> answers) GetDataFromCsv(string path)
                 {
+                    if (!File.Exists(path))
+                    {
+                        return (new double[0][], new List<string>(0));
+                    }
+
                     var row = 0;
                     List<double[]> features = new List<double[]>();
                     List<string> answers = new List<string>();
@@ -1343,7 +1348,14 @@ namespace Extract.AttributeFinder
                 var (trainInputs, trainAnswers) = GetDataFromCsv(trainingCsv);
                 var (testInputs, testAnswers) = GetDataFromCsv(testingCsv);
 
-                Encoder.InitializeAnswerCodeMappings(trainAnswers.Concat(testAnswers), Encoder.NegativeClassName);
+                // If training then init the answer codes otherwise they need to stay the same as when the machine was
+                // trained.
+                // https://extract.atlassian.net/browse/ISSUE-15275
+                if (!testOnly)
+                {
+                    Encoder.InitializeAnswerCodeMappings(trainAnswers.Concat(testAnswers), Encoder.NegativeClassName);
+                }
+
                 var trainOutputs = trainAnswers.Select(a => Encoder.AnswerNameToCode[a]).ToArray();
                 var testOutputs = testAnswers.Select(a => Encoder.AnswerNameToCode[a]).ToArray();
 
