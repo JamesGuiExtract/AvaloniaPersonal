@@ -456,8 +456,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                                     _statusUpdates.Enqueue(new StatusArgs
                                     {
                                         StatusMessage = "  F1 Score (micro avg): {0:N4}" +
-                                            "\r\n  Precision (micro avg): {1:N4}, Recall (micro avg): {2:N4}" +
-                                            "\r\n  (" + negativeClasses + " = negative classes)",
+                                            "\r\n  Precision (micro avg): {1:N4}" +
+                                            "\r\n  Recall (micro avg): {2:N4}" +
+                                            "\r\n  Negative class: " + negativeClasses,
                                         DoubleValues = new[] { confusionMatrix.FScoreMicroAverage(), confusionMatrix.PrecisionMicroAverage(), confusionMatrix.RecallMicroAverage() }
                                     });
                                 }
@@ -478,8 +479,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                                 _statusUpdates.Enqueue(new StatusArgs
                                 {
                                     StatusMessage = "  F1 Score: {0:N4}" +
-                                        "\r\n  Precision: {1:N4}, Recall: {2:N4}" +
-                                        "\r\n  (" + positiveCategory + " = positive case)",
+                                        "\r\n  Precision: {1:N4}" +
+                                        "\r\n  Recall: {2:N4}" +
+                                        "\r\n  Positive class: " + positiveCategory,
                                     DoubleValues = new[] { cm.FScore, cm.Precision, cm.Recall }
                                 });
                             });
