@@ -106,15 +106,15 @@ namespace Extract.DataEntry
                 _tagUtility = tagUtility;
                 _fileProcessingDB = fileProcessingDB;
 
-                // Retrieve the name of the DEP assembly
-                string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
-                    config.Settings.DataEntryPanelFileName);
-
-                // Create a DataEntryControlHost instance from the specified assembly
-                _dataEntryControlHost = CreateDataEntryControlHost(dataEntryPanelFileName);
-
-                if (backgroundConfigModel != null)
+                if (backgroundConfigModel == null)
                 {
+                    // Foreground configuration; create DEP immediately.
+                    _dataEntryControlHost = CreateDataEntryControlHost();
+                }
+                else
+                {
+                    // Background configuration; DEP creation can be delayed until it is known to be
+                    // needed (it may never be).
                     lock (_lock)
                     {
                         _isBackgroundConfig = true;
@@ -151,7 +151,21 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _dataEntryControlHost;
+                try
+                {
+                    if (_dataEntryControlHost == null &&
+                                (!_isBackgroundConfig || !_config.Settings.SupportsNoUILoad))
+                    {
+                        _dataEntryControlHost = CreateDataEntryControlHost();
+                        _dataEntryControlHost.SetDatabaseConnections(GetDatabaseConnections());
+                    }
+
+                    return _dataEntryControlHost;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45573");
+                }
             }
         }
 
@@ -214,7 +228,15 @@ namespace Extract.DataEntry
         {
             try
             {
-                DataEntryControlHost?.SetDatabaseConnections(GetDatabaseConnections());
+                // This call ensures _dbConnections is set (even if there currently no DEP to apply
+                // them to).
+                var dbConnections = GetDatabaseConnections();
+
+                // Background configurations will defer DEP creation until needed.
+                if (_dataEntryControlHost != null)
+                {
+                    _dataEntryControlHost?.SetDatabaseConnections(dbConnections);
+                }
             }
             catch (Exception ex)
             {
@@ -659,18 +681,21 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Instantiates the one and only <see cref="DataEntryControlHost"/> implemented by the
-        /// specified assembly.
+        /// configuration's specified DataEntryPanelFileName.
         /// </summary>
-        /// <param name="assemblyFileName">The filename of the assembly to use.</param>
         /// <returns>A <see cref="DataEntryControlHost"/> instantiated from the specified assembly.
         /// </returns>
-        DataEntryControlHost CreateDataEntryControlHost(string assemblyFileName)
+        DataEntryControlHost CreateDataEntryControlHost()
         {
             try
             {
+                // Retrieve the name of the DEP assembly
+                string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
+                    _config.Settings.DataEntryPanelFileName);
+
                 // A variable to store the return value
                 DataEntryControlHost dataEntryControlHost =
-                    UtilityMethods.CreateTypeFromAssembly<DataEntryControlHost>(assemblyFileName);
+                    UtilityMethods.CreateTypeFromAssembly<DataEntryControlHost>(dataEntryPanelFileName);
 
                 ExtractException.Assert("ELI23676",
                     "Failed to find data entry control host implementation!", dataEntryControlHost != null);
@@ -683,7 +708,6 @@ namespace Extract.DataEntry
             {
                 ExtractException ee = new ExtractException("ELI23677",
                     "Unable to initialize data entry control host!", ex);
-                ee.AddDebugData("Assembly Name", assemblyFileName, false);
                 throw ee;
             }
         }

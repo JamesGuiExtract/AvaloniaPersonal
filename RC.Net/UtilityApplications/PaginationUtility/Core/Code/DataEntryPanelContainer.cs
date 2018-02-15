@@ -136,17 +136,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _loading;
 
-        /// <summary>
-        /// Configuration managers used for running UpdateDocumentStatus threads in the background.
-        /// </summary>
-        List<DataEntryConfigurationManager<Properties.Settings>> _backgroundConfigManagers =
-            new List<DataEntry.DataEntryConfigurationManager<Properties.Settings>>();
-
-        /// <summary>
-        /// Synchronizes access to _backgroundConfigManagers.
-        /// </summary>
-        object _lock = new object();
-
         #endregion Fields
 
         #region Constructors
@@ -981,10 +970,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
             var backgroundConfigManager = _configManager.CreateBackgroundManager();
-            lock (_lock)
-            {
-                _backgroundConfigManagers.Add(backgroundConfigManager);
-            }
 
             var thread = new Thread(new ThreadStart(() =>
             {
@@ -1004,6 +989,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 finally
                 {
+                    backgroundConfigManager.Dispose();
+
                     AttributeStatusInfo.DisposeThread();
 
                     // https://extract.atlassian.net/browse/ISSUE-14246
@@ -1089,6 +1076,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         documentStatus = GetDocumentDataFromUILoad(backgroundConfigManager, tempData);
                     }
+
+                    backgroundConfigManager.Dispose();
                 }
             }
             catch (Exception ex)
@@ -1133,22 +1122,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 finally
                 {
-                    int temp;
-                    _pendingDocumentStatusUpdate.TryRemove(documentData, out temp);
+                    int pendingStatusCount;
+                    _pendingDocumentStatusUpdate.TryRemove(documentData, out pendingStatusCount);
 
                     // Once any active batch of status updates is complete, clear shared cache data.
-                    if (_pendingDocumentStatusUpdate.Count == 0)
+                    if (pendingStatusCount == 0)
                     {
-                        lock (_lock)
-                        {
-                            // Re-check that no status update is queued after locking.
-                            if (_pendingDocumentStatusUpdate.Count == 0)
-                            {
-                                AttributeStatusInfo.ClearProcessWideCache();
-
-                                CollectionMethods.ClearAndDispose(_backgroundConfigManagers);
-                            }
-                        }
+                        AttributeStatusInfo.ClearProcessWideCache();
                     };
                 }
             });
