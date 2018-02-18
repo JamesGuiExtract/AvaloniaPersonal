@@ -21,7 +21,7 @@ namespace Extract.DataEntry
         #region Statics
 
         /// <summary>
-        /// Cached SQL query results for frequently used or expensive queries.
+        /// Cached SQL query results for frequently used or expensive queries (per DB connection string).
         /// </summary>
         // https://extract.atlassian.net/browse/ISSUE-12827
         // The data query framework (primarily AttributeStatusInfo) is set up to run independently
@@ -30,9 +30,9 @@ namespace Extract.DataEntry
         // used in a multi-threaded FPS file, the connection (originally assigned via 
         // DataEntryQuery.Create()) in one thread may be inappropriately used in another thread.
         [ThreadStatic]
-        static Dictionary<string, DbConnectionWrapper> _threadConnectionInfo;
+        static Dictionary<string, DbConnectionWrapper> _threadConnectionInfo = new Dictionary<string, DbConnectionWrapper>(StringComparer.OrdinalIgnoreCase);
 
-        static Dictionary<string, DbConnectionWrapper> _processConnectionInfo;
+        static Dictionary<string, DbConnectionWrapper> _processConnectionInfo = new Dictionary<string, DbConnectionWrapper>(StringComparer.OrdinalIgnoreCase);
 
         #endregion Statics
 
@@ -62,6 +62,26 @@ namespace Extract.DataEntry
             public DbConnectionWrapper(DbConnection dbConnection)
             {
                 DbConnection = dbConnection;
+                DbConnection.Disposed += Handle_DbConnectionDisposed;
+            }
+
+            /// <summary>
+            /// Handles the Disposed event of the DbConnection control.
+            /// </summary>
+            /// <param name="sender">The source of the event.</param>
+            /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+            void Handle_DbConnectionDisposed(object sender, EventArgs e)
+            {
+                try
+                {
+                    // Ensure this wrapper is not re-used after the connection is disposed.
+                    CachedResults.Clear();
+                    DbConnection = null;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45577");
+                }
             }
         }
 
@@ -182,8 +202,11 @@ namespace Extract.DataEntry
                         connectionInfo = new Dictionary<string, DbConnectionWrapper>();
                     }
 
+                    string connectionString = DatabaseConnections[connectionName].ConnectionString;
+
                     // Look for an existing DbConnectionWrapper under this name.
-                    if (connectionInfo.TryGetValue(connectionName, out _currentConnection))
+                    if (connectionInfo.TryGetValue(connectionString, out _currentConnection)
+                        && _currentConnection.DbConnection != null)
                     {
                         // If the connection itself has changed since the last time DbConnectionWrapper
                         // was used (such as if an SQL CE OrderMappingDB has been updated), the static
@@ -199,7 +222,7 @@ namespace Extract.DataEntry
                     {
                         // A DbConnectionWrapper needs to be created for this name.
                         _currentConnection = new DbConnectionWrapper(DatabaseConnections[connectionName]);
-                        connectionInfo[connectionName] = _currentConnection;
+                        connectionInfo[connectionString] = _currentConnection;
                     }
                 }
 

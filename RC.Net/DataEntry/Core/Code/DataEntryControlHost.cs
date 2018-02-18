@@ -7839,9 +7839,10 @@ namespace Extract.DataEntry
         /// or <see langword="false"/> to release the lock and allow updates again.</param>
         void LockControlUpdates(bool lockUpdates)
         {
-            if (lockUpdates == _controlUpdatesLocked)
+            if (Parent == null || lockUpdates == _controlUpdatesLocked)
             {
-                // If the requested state is the same as the current state, there is nothing to do.
+                // If the DEP is not yet added to a form or the requested state is the same as the
+                // current state, there is nothing to do.
                 return;
             }
             else

@@ -4,7 +4,6 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -393,8 +392,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // If this data is getting loaded, there is no need to proceed with any pending
                 // document status update.
-                int temp;
-                _pendingDocumentStatusUpdate.TryRemove(data, out temp);
+                if (forDisplay)
+                {
+                    int temp;
+                    _pendingDocumentStatusUpdate.TryRemove(data, out temp);
+                }
 
                 // Return quickly if this thread is being stopped
                 if (AttributeStatusInfo.ThreadEnding)
@@ -644,6 +646,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // Signal to avoid unneeded/unwanted processing still to occur in this instance.
                         AttributeStatusInfo.ThreadEnding = true;
                     }
+                }
+
+                if (!_configManager.IsBackgroundManager)
+                {
+                    AttributeStatusInfo.ClearProcessWideCache();
                 }
 
                 if (components != null)
@@ -1063,7 +1070,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 using (var tempData = new DataEntryPaginationDocumentData(deserializedAttributes, documentData.SourceDocName))
                 {
                     AttributeStatusInfo.ShareDBConnections = true;
-
                     if (backgroundConfigManager.ExecuteNoUILoad(tempData.Attributes, documentData.SourceDocName))
                     {
                         documentStatus = GetDocumentStatusFromNoUILoad(backgroundConfigManager, tempData);
@@ -1123,13 +1129,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 finally
                 {
                     int pendingStatusCount;
-                    _pendingDocumentStatusUpdate.TryRemove(documentData, out pendingStatusCount);
-
-                    // Once any active batch of status updates is complete, clear shared cache data.
-                    if (pendingStatusCount == 0)
+                    if (_pendingDocumentStatusUpdate.TryRemove(documentData, out pendingStatusCount)
+                        && _pendingDocumentStatusUpdate.Count == 0)
                     {
+                        // Once any active batch of status updates is complete, clear shared cache data.
                         AttributeStatusInfo.ClearProcessWideCache();
-                    };
+                    }
                 }
             });
         }

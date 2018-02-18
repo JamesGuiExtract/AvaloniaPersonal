@@ -214,6 +214,12 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is a background manager for
+        /// loading document status information.
+        /// </summary>
+        public bool IsBackgroundManager { get; set; }
+
         #endregion Properties
 
         #region Methods
@@ -385,7 +391,7 @@ namespace Extract.DataEntry
                 var manager = new DataEntryConfigurationManager<T>(
                     new NullDataEntryApp(), _tagUtility, _applicationConfig, null, null);
 
-                manager._defaultDataEntryConfig = _defaultDataEntryConfig;
+                manager.IsBackgroundManager = true;
                 manager.ChangeActiveDocumentType(null, true);
 
                 if (_documentTypeConfigurations != null)
@@ -394,24 +400,9 @@ namespace Extract.DataEntry
 
                     foreach (var configuration in _documentTypeConfigurations)
                     {
-                        // Connections will be shared across background loading threads; establish
-                        // the connections to be shared.
-                        configuration.Value.OpenDatabaseConnections();
+                        var backgroundConfig = CreateBackgroundConfiguration(configuration.Value);
 
-                        // Create a background configuration as long as the configuration supports a NoUI load.
-                        DataEntryConfiguration backgroundConfig = null;
-                        if (configuration.Value.Config.Settings.SupportsNoUILoad)
-                        {
-                            backgroundConfig = configuration.Value.CreateNoUIConfiguration();
-                            manager._documentTypeConfigurations[configuration.Key] = backgroundConfig;
-                        }
-                        else
-                        {
-                            backgroundConfig = new DataEntryConfiguration(
-                                configuration.Value.Config, _tagUtility, configuration.Value.FileProcessingDB,
-                                configuration.Value);
-                            manager._documentTypeConfigurations[configuration.Key] = backgroundConfig;
-                        }
+                        manager._documentTypeConfigurations[configuration.Key] = backgroundConfig;
 
                         // Initialize active and default configurations
                         if (_activeDataEntryConfig == configuration.Value)
@@ -423,6 +414,11 @@ namespace Extract.DataEntry
                             manager._defaultDataEntryConfig = backgroundConfig;
                         }
                     }
+                }
+                else
+                {
+                    manager._defaultDataEntryConfig = CreateBackgroundConfiguration(_defaultDataEntryConfig);
+                    manager._activeDataEntryConfig = manager._defaultDataEntryConfig;
                 }
 
                 return manager;
@@ -708,6 +704,35 @@ namespace Extract.DataEntry
             {
                 throw ex.AsExtract("ELI35079");
             }
+        }
+
+        /// <summary>
+        /// Creates a <see cref="DataEntryConfiguration"/> to be used for background document status
+        /// loading based on the specified source <see paramref="configuration"/>.
+        /// </summary>
+        /// <param name="configuration">The <see cref="DataEntryConfiguration"/> on which this
+        /// background configuration is based.</param>
+        /// <returns></returns>
+        DataEntryConfiguration CreateBackgroundConfiguration(DataEntryConfiguration configuration)
+        {
+            // Connections will be shared across background loading threads; establish
+            // the connections to be shared.
+            configuration.OpenDatabaseConnections();
+
+            // Create a background configuration as long as the configuration supports a NoUI load.
+            DataEntryConfiguration backgroundConfig = null;
+            if (configuration.Config.Settings.SupportsNoUILoad)
+            {
+                backgroundConfig = configuration.CreateNoUIConfiguration();
+            }
+            else
+            {
+                backgroundConfig = new DataEntryConfiguration(
+                    configuration.Config, _tagUtility, configuration.FileProcessingDB,
+                    configuration);
+            }
+
+            return backgroundConfig;
         }
 
         /// <summary>
