@@ -2,11 +2,8 @@
 using Extract.Utilities;
 using Microsoft.Data.ConnectionUI;
 using System;
-using System.Collections.Concurrent;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using System.Windows;
 
 namespace Extract.Database
 {
@@ -30,9 +27,9 @@ namespace Extract.Database
 
         /// <summary>
         /// For SQL CE database connection opened, keeps track of the local database copy to use.
+        /// The same file will be used for all threads accessing this this instance.
         /// </summary>
-        ThreadLocal<TemporaryFileCopyManager> _localDatabaseCopyManager = new ThreadLocal<TemporaryFileCopyManager>(
-            () => new TemporaryFileCopyManager());
+        TemporaryFileCopyManager _localDatabaseCopyManager = new TemporaryFileCopyManager();
 
         /// <summary>
         /// The type of connection if not provided via the <see cref="DataProvider"/> property.
@@ -50,18 +47,21 @@ namespace Extract.Database
         /// not need to manually handle connection availability and updates of SQL CE files. For
         /// SQL CE connections, a temporary local copy will be created, updated and deleted
         /// automatically.
+        /// NOTE:
+        /// https://extract.atlassian.net/browse/ISSUE-15276
+        /// As a result of some sporadic database errors that appear to be the result of thread safety
+        /// (at least with SQL CE DBs), each thread will now using it's own managed DB connection.
+        /// Connection pooling should continue to allow DB connections to be shared in the background,
+        /// but will shift thread safety responsibility with the connections.
         /// </summary>
+        [ThreadStatic]
         DbConnection _managedDbConnection;
 
         /// <summary>
         /// The connection string associated with the current <see cref="_managedDbConnection"/>.
         /// </summary>
+        [ThreadStatic]
         string _managedConnectionString;
-
-        /// <summary>
-        /// The <see cref="ConnectionString"/> property with any path tags/functions expanded.
-        /// </summary>
-        string _expandedConnectionString;
 
         /// <summary>
         /// If this instance represents an SQL CE connection and <see cref="UseLocalSqlCeCopy"/> is
@@ -69,6 +69,16 @@ namespace Extract.Database
         /// currently in use.
         /// </summary>
         string _activeSqlCeDb;
+
+        /// <summary>
+        /// Synchronizes access for thread safety.
+        /// </summary>
+        object _lock = new object();
+
+        /// <summary>
+        /// Handler to allow disposal of this instance to close all thread-specific connections.
+        /// </summary>
+        ThreadSpecificEventHandler<EventArgs> _disposeHandler = new ThreadSpecificEventHandler<EventArgs>();
 
         #endregion Fields
 
@@ -198,17 +208,20 @@ namespace Extract.Database
             {
                 try
                 {
-                    if (_targetConnectionType != null)
+                    lock (_lock)
                     {
-                        return _targetConnectionType;
-                    }
-                    else if (DataProvider != null)
-                    {
-                        return DataProvider.TargetConnectionType;
-                    }
-                    else
-                    {
-                        return null;
+                        if (_targetConnectionType != null)
+                        {
+                            return _targetConnectionType;
+                        }
+                        else if (DataProvider != null)
+                        {
+                            return DataProvider.TargetConnectionType;
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -221,18 +234,21 @@ namespace Extract.Database
             {
                 try
                 {
-                    if (value != _targetConnectionType)
+                    lock (_lock)
                     {
-                        // If there is an existing DataProvider with a connection type that
-                        // conflicts with the provided type, clear the DataProvider and DataSource
-                        // and use only the newly provided connection type.
-                        if (DataProvider != null && DataProvider.TargetConnectionType != value)
+                        if (value != _targetConnectionType)
                         {
-                            DataProvider = null;
-                            DataSource = null;
-                        }
+                            // If there is an existing DataProvider with a connection type that
+                            // conflicts with the provided type, clear the DataProvider and DataSource
+                            // and use only the newly provided connection type.
+                            if (DataProvider != null && DataProvider.TargetConnectionType != value)
+                            {
+                                DataProvider = null;
+                                DataSource = null;
+                            }
 
-                        _targetConnectionType = value;
+                            _targetConnectionType = value;
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -252,20 +268,26 @@ namespace Extract.Database
         {
             get
             {
-                return (DataSource == null) ? "" : DataSource.DisplayName;
+                lock (_lock)
+                {
+                    return (DataSource == null) ? "" : DataSource.DisplayName;
+                }
             }
 
             set
             {
                 try
                 {
-                    if (value != DataSourceName)
+                    lock (_lock)
                     {
-                        DataSource = null;
-
-                        if (!string.IsNullOrWhiteSpace(value))
+                        if (value != DataSourceName)
                         {
-                            DataSource = _connectionConfig.GetDataSourceFromName(value);
+                            DataSource = null;
+
+                            if (!string.IsNullOrWhiteSpace(value))
+                            {
+                                DataSource = _connectionConfig.GetDataSourceFromName(value);
+                            }
                         }
                     }
                 }
@@ -298,21 +320,27 @@ namespace Extract.Database
         {
             get
             {
-                return (DataProvider == null) ? "" : DataProvider.DisplayName;
+                lock (_lock)
+                {
+                    return (DataProvider == null) ? "" : DataProvider.DisplayName;
+                }
             }
 
             set
             {
                 try
                 {
-                    if (value != DataProviderName)
+                    lock (_lock)
                     {
-                        DataProvider = null;
-
-                        if (!string.IsNullOrWhiteSpace(value))
+                        if (value != DataProviderName)
                         {
-                            DataProvider = _connectionConfig.GetDataProviderFromName(value);
-                        }
+                            DataProvider = null;
+
+                            if (!string.IsNullOrWhiteSpace(value))
+                            {
+                                DataProvider = _connectionConfig.GetDataProviderFromName(value);
+                            }
+                        } 
                     }
                 }
                 catch (Exception ex)
@@ -384,20 +412,25 @@ namespace Extract.Database
             {
                 try
                 {
+                    bool recreateConnection = false;
+
                     if (_managedDbConnection != null)
                     {
-                        // The connection should be reset if any of the connection properties have
-                        // changed.
-                        bool recreateConnection =
-                            _managedDbConnection.GetType() != TargetConnectionType ||
-                            _managedConnectionString != ConnectionString;
-
-                        // The connection should also be reset if we are using a SQL CE connection
-                        // to a local DB copy and the master copy has been updated.
-                        if (!recreateConnection && _activeSqlCeDb != null &&
-                            _localDatabaseCopyManager.Value.HasFileBeenModified(_activeSqlCeDb))
+                        lock (_lock)
                         {
-                            recreateConnection = true;
+                            // The connection should be reset if any of the connection properties have
+                            // changed.
+                            recreateConnection =
+                                _managedDbConnection.GetType() != TargetConnectionType ||
+                                _managedConnectionString != ConnectionString;
+
+                            // The connection should also be reset if we are using a SQL CE connection
+                            // to a local DB copy and the master copy has been updated.
+                            if (!recreateConnection && _activeSqlCeDb != null &&
+                                _localDatabaseCopyManager.HasFileBeenModified(_activeSqlCeDb))
+                            {
+                                recreateConnection = true;
+                            } 
                         }
 
                         if (recreateConnection)
@@ -407,12 +440,24 @@ namespace Extract.Database
                     }
 
                     // Open a new connection if needed.
-                    if (_managedDbConnection == null &&
-                        TargetConnectionType != null &&
-                        !string.IsNullOrWhiteSpace(ConnectionString))
+                    if (_managedDbConnection == null)
                     {
-                        _managedDbConnection = OpenConnection();
-                        _managedConnectionString = ConnectionString;
+                        lock (_lock)
+                        {
+                            if (TargetConnectionType != null &&
+                                !string.IsNullOrWhiteSpace(ConnectionString))
+                            {
+                                _managedDbConnection = OpenConnection();
+                                _managedConnectionString = ConnectionString;
+                            }
+                        }
+
+                        if (!recreateConnection)
+                        {
+                            // If !recreateConnection, this is the initial managed connection on
+                            // this thread. Add an event handler to clean it up.
+                            _disposeHandler.AddEventHandler(HandleDispose);
+                        }
                     }
 
                     return _managedDbConnection;
@@ -436,18 +481,21 @@ namespace Extract.Database
         {
             try
             {
-                try
+                lock (_lock)
                 {
-                    _connectionConfig.LoadConfiguration(connectionDialog);
-                }
-                catch (Exception ex)
-                {
-                    var ee = new ExtractException("ELI34797",
-                        "Failed to load connection configuration; attempting to reset.", ex);
-                    ee.Log();
+                    try
+                    {
+                        _connectionConfig.LoadConfiguration(connectionDialog);
+                    }
+                    catch (Exception ex)
+                    {
+                        var ee = new ExtractException("ELI34797",
+                            "Failed to load connection configuration; attempting to reset.", ex);
+                        ee.Log();
 
-                    _connectionConfig.ResetConfiguration();
-                    _connectionConfig.LoadConfiguration(connectionDialog);
+                        _connectionConfig.ResetConfiguration();
+                        _connectionConfig.LoadConfiguration(connectionDialog);
+                    }
                 }
             }
             catch (Exception ex)
@@ -464,7 +512,10 @@ namespace Extract.Database
         {
             try
             {
-                _connectionConfig.SaveConfiguration(connectionDialog);
+                lock (_lock)
+                {
+                    _connectionConfig.SaveConfiguration(connectionDialog);
+                }
             }
             catch (Exception ex)
             {
@@ -480,30 +531,33 @@ namespace Extract.Database
         {
             try
             {
-                ExtractException.Assert("ELI34758", "Database provider has not been specified.",
-                    TargetConnectionType != null);
-
-                DbConnection dbConnection =
-                    (DbConnection)Activator.CreateInstance(TargetConnectionType);
-                _expandedConnectionString = (PathTags == null)
-                    ? ConnectionString
-                    : PathTags.Expand(ConnectionString);
-
-                if (UseLocalSqlCeCopy &&
-                    TargetConnectionType.Name.Equals("SqlCeConnection", StringComparison.Ordinal))
+                lock (_lock)
                 {
-                    string connectionString = GetLocalSqlCeConnectionString(_expandedConnectionString, out _activeSqlCeDb);
-                    dbConnection.ConnectionString = connectionString;
-                }
-                else
-                {
-                    _activeSqlCeDb = null;
-                    dbConnection.ConnectionString = _expandedConnectionString;
-                }
+                    ExtractException.Assert("ELI34758", "Database provider has not been specified.",
+                        TargetConnectionType != null);
 
-                dbConnection.Open();
+                    DbConnection dbConnection =
+                        (DbConnection)Activator.CreateInstance(TargetConnectionType);
+                    var expandedConnectionString = (PathTags == null)
+                        ? ConnectionString
+                        : PathTags.Expand(ConnectionString);
 
-                return dbConnection;
+                    if (UseLocalSqlCeCopy &&
+                        TargetConnectionType.Name.Equals("SqlCeConnection", StringComparison.Ordinal))
+                    {
+                        string connectionString = GetLocalSqlCeConnectionString(expandedConnectionString, out _activeSqlCeDb);
+                        dbConnection.ConnectionString = connectionString;
+                    }
+                    else
+                    {
+                        _activeSqlCeDb = null;
+                        dbConnection.ConnectionString = expandedConnectionString;
+                    }
+
+                    dbConnection.Open();
+
+                    return dbConnection; 
+                }
             }
             catch (Exception ex)
             {
@@ -511,7 +565,7 @@ namespace Extract.Database
                 {
                     try
                     {
-                        _localDatabaseCopyManager.Value.Dereference(_activeSqlCeDb, this);
+                        _localDatabaseCopyManager.Dereference(_activeSqlCeDb, this);
                     }
                     catch (Exception ex2)
                     {
@@ -542,7 +596,7 @@ namespace Extract.Database
                     _managedConnectionString = null;
                     if (_activeSqlCeDb != null)
                     {
-                        _localDatabaseCopyManager.Value.Dereference((string)_activeSqlCeDb, this);
+                        _localDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
                         _activeSqlCeDb = null;
                     }
                 }
@@ -568,6 +622,7 @@ namespace Extract.Database
         {
             try
             {
+                // Should this be locked?
                 return (TargetConnectionType == null) ? 0 : TargetConnectionType.GetHashCode() ^
                        DataSourceName.GetHashCode() ^
                        DataProviderName.GetHashCode() ^
@@ -614,6 +669,7 @@ namespace Extract.Database
                     return false;
                 }
 
+                // Should this be locked?
                 // Return true if the fields match:
                 return (TargetConnectionType == other.TargetConnectionType &&
                     DataSourceName == other.DataSourceName &&
@@ -652,15 +708,15 @@ namespace Extract.Database
             {
                 try
                 {
-                    if (_managedDbConnection != null)
+                    if (_disposeHandler != null)
                     {
-                        _managedDbConnection.Dispose();
-                        _managedDbConnection = null;
+                        _disposeHandler.ThreadEventHandler?.Invoke(this, new EventArgs());
+                        _disposeHandler = null;
                     }
 
                     if (_activeSqlCeDb != null)
                     {
-                        _localDatabaseCopyManager.Value.Dereference((string)_activeSqlCeDb, this);
+                        _localDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
                         _activeSqlCeDb = null;
                     }
 
@@ -674,6 +730,25 @@ namespace Extract.Database
             }
 
             // Dispose of unmanaged resources
+        }
+
+        /// <summary>
+        /// Handler to allow the disposal of all thread-specific _managedDbConnections
+        /// </summary>
+        void HandleDispose(object sender, EventArgs args)
+        {
+            try
+            {
+                if (_managedDbConnection != null)
+                {
+                    _managedDbConnection.Dispose();
+                    _managedDbConnection = null;
+                }
+
+                // We are now done with this thread.
+                _disposeHandler.DisposeThread();
+            }
+            catch { }
         }
 
         #endregion IDisposable
@@ -716,7 +791,7 @@ namespace Extract.Database
             // with the database maintaining read-only status since changes to this copy will not
             // affect the original. Ensure read-only is off so the database can be used.
             connectionStringBuilder.Add(parameterName,
-                _localDatabaseCopyManager.Value.GetCurrentTemporaryFileName(
+                _localDatabaseCopyManager.GetCurrentTemporaryFileName(
                     sqlceDatabaseFile, this, true, true));
             return connectionStringBuilder.ConnectionString;
         }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 
 namespace Extract.Utilities
@@ -166,7 +167,7 @@ namespace Extract.Utilities
         /// <param name="eventArgs">The event args.</param>
         void HandleThreadEvent(object sender, T eventArgs)
         {
-            foreach (EventHandler<T> eventHandler in _eventHandlers.Value)
+            foreach (EventHandler<T> eventHandler in _eventHandlers.Value.ToList())
             {
                 if (eventHandler != null)
                 {

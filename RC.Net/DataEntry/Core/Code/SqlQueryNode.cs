@@ -196,12 +196,6 @@ namespace Extract.DataEntry
                         ? _processConnectionInfo ?? (_processConnectionInfo = new Dictionary<string, DbConnectionWrapper>())
                         : _threadConnectionInfo ?? (_threadConnectionInfo = new Dictionary<string, DbConnectionWrapper>()); 
 
-                    // _connectionInfo is ThreadStatic; ensure it is created per-thread.
-                    if (connectionInfo == null)
-                    {
-                        connectionInfo = new Dictionary<string, DbConnectionWrapper>();
-                    }
-
                     string connectionString = DatabaseConnections[connectionName].ConnectionString;
 
                     // Look for an existing DbConnectionWrapper under this name.

@@ -404,7 +404,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // If this data is getting loaded, there is no need to proceed with any pending
                 // document status update.
-                _pendingDocumentStatusUpdate.TryRemove(data, out int temp);
+                _pendingDocumentStatusUpdate.TryRemove(data, out int _);
 
                 // Return quickly if this thread is being stopped
                 if (AttributeStatusInfo.ThreadEnding)
@@ -1180,7 +1180,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                             if (documentData.DataError)
                             {
-                                // Reset to contain only this documet to prevent any subsequent document data
+                                // Reset to contain only this document to prevent any subsequent document data
                                 // errors from being displayed. (If not fixed subsequent errors on the next
                                 // commit attempt).
                                 _pendingDocumentStatusUpdate.Clear();
@@ -1206,7 +1206,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 finally
                 {
-                    if (_pendingDocumentStatusUpdate.TryRemove(documentData, out int temp)
+                    if (_pendingDocumentStatusUpdate.TryRemove(documentData, out int _)
                         && _pendingDocumentStatusUpdate.Count == 0)
                     {
                         // Once any active batch of status updates is complete, clear shared cache data.
@@ -1339,7 +1339,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     tempPanel.SaveData(tempData, false);
 
                     var miscUtils = new MiscUtils();
-                    documentStatus.StringizedData = miscUtils.GetObjectAsStringizedByteStream(tempData);
+                    documentStatus.StringizedData = miscUtils.GetObjectAsStringizedByteStream(tempData.Attributes);
                 }
                 else
                 {
