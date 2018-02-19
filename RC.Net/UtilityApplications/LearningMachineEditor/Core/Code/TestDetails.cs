@@ -2,9 +2,11 @@
 using Extract.Utilities;
 using Leadtools;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -21,6 +23,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
         bool _normalizeByColumn = true;
         bool _testingAccuracy = true;
+        bool _updateInProgress = false;
 
         #endregion Fields
 
@@ -89,6 +92,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
         #region Private Methods
 
+        /// <summary>
+        /// Sets the data of the gridview and text fields using the current confusion matrix
+        /// </summary>
         private void InitDataGridView()
         {
             _memoizedGetMaxValue = ((Func<int, int>)GetMaxValue).Memoize();
@@ -114,13 +120,19 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
             testDetailsDataGridView.Rows[CM.Labels.Length].HeaderCell.Value = "Total";
 
-            // Add asterisk to text of negative class columns/rows
-            // to explain how precision/recall numbers are calculated
-            foreach (var idx in CM.NegativeClassIndexes())
+            try
             {
-                testDetailsDataGridView.Columns[idx].HeaderText += "*";
-                testDetailsDataGridView.Rows[idx].HeaderCell.Value += "*";
+                _updateInProgress = true;
+                negativeClassesTextBox.Text =
+                    string.Join(", ", CM.NegativeClasses().Select(s => s.QuoteIfNeeded("\"", ',')));
             }
+            finally
+            {
+                _updateInProgress = false;
+            }
+
+            UpdateClassLabels();
+            SetScoreTextBoxValue();
         }
 
         int GetMaxValue(int rowOrColumn)
@@ -153,18 +165,73 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             return Color.FromArgb(rgb.R, rgb.G, rgb.B);
         }
 
+        /// <summary>
+        /// Adds/removes asterisk denoting negative class from column and row headers
+        /// </summary>
+        private void UpdateClassLabels()
+        {
+            HashSet<int> needsAsterisk = new HashSet<int>(CM.NegativeClassIndexes());
+
+            // Set column and row header values
+            for (int i = 0; i < CM.Labels.Length; i++)
+            {
+                bool needsUpdate = false;
+                var label = CM.Labels[i];
+                var col = testDetailsDataGridView.Columns[i];
+                var colHeader = col.HeaderCell;
+                var rowHeader = testDetailsDataGridView.Rows[i].HeaderCell;
+                var oldLabel = col.HeaderText;
+
+                // Add asterisk to text of negative class columns/rows
+                // to explain how precision/recall numbers are calculated
+                if (oldLabel.EndsWith("*", StringComparison.Ordinal))
+                {
+                    needsUpdate = true;
+                }
+
+                col.HeaderText = label;
+                rowHeader.Value = label;
+
+                // Add asterisk to text of negative class columns/rows
+                // to explain how precision/recall numbers are calculated
+                if (needsAsterisk.Contains(i))
+                {
+                    col.HeaderText += "*";
+                    rowHeader.Value += "*";
+                    needsUpdate = !needsUpdate;
+                }
+
+                if (needsUpdate)
+                {
+                    testDetailsDataGridView.InvalidateCell(colHeader);
+                    testDetailsDataGridView.InvalidateCell(rowHeader);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates P/R/F1Score and updates the score text box
+        /// </summary>
+        private void SetScoreTextBoxValue()
+        {
+            var p = CM.PrecisionMicroAverage();
+            var r = CM.RecallMicroAverage();
+            var f = 2 * p * r / (p + r);
+            scoreTextBox.Text = UtilityMethods.FormatInvariant(
+                $"F1: {f:N4}, Precision: {p:N4}, Recall: {r:N4}");
+        }
+
+
         #endregion Private Methods
 
         #region Event Handlers
+
 
         private void TestDetailsDataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
         {
             if (e.RowIndex >= CM.Labels.Length && e.ColumnIndex >= CM.Labels.Length)
             {
-                var p = CM.PrecisionMicroAverage();
-                var r = CM.RecallMicroAverage();
-                var f = 2 * p * r / (p + r);
-                e.Value = UtilityMethods.FormatInvariant($"P: {p:N2}, R: {r:N2}, F1: {f:N2}  *negative class(s)");
+                return;
             }
             else if (e.RowIndex == CM.Labels.Length)
             {
@@ -179,6 +246,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 e.Value = CM.Data[e.RowIndex][e.ColumnIndex];
             }
         }
+
         private void TestDetailsDataGridView_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
         {
             if (e.RowIndex >= CM.Labels.Length && e.ColumnIndex >= CM.Labels.Length)
@@ -216,11 +284,21 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 CM.RowTotals[e.RowIndex] += dif;
                 CM.ColumnTotals[e.ColumnIndex] += dif;
 
-                testDetailsDataGridView.Refresh();
+                testDetailsDataGridView.InvalidateCell(testDetailsDataGridView
+                    .Rows[e.RowIndex]
+                    .Cells[CM.Labels.Length]);
+
+                testDetailsDataGridView.InvalidateCell(testDetailsDataGridView
+                    .Rows[CM.Labels.Length]
+                    .Cells[e.ColumnIndex]);
+
+                SetScoreTextBoxValue();
             }
         }
 
-
+        /// <summary>
+        /// Sets text orientation of column headers and background colors of cells
+        /// </summary>
         private void DataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
             // Vertical text from column 0
@@ -240,6 +318,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
+        /// <summary>
+        /// Changes how cell colors are calculated
+        /// </summary>
         private void HandleNormalizeByColumnsRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             _normalizeByColumn = normalizeByColumnsRadioButton.Checked;
@@ -248,12 +329,50 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             testDetailsDataGridView.Refresh();
         }
 
+        /// <summary>
+        /// Changes which set of data is shown
+        /// </summary>
         private void HandleShowAccuracyForTrainingSetRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             _testingAccuracy = showAccuracyForTestingSetRadioButton.Checked;
             InitDataGridView();
             testDetailsDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCellsExceptHeader);
             testDetailsDataGridView.Refresh();
+        }
+
+        /// <summary>
+        /// Updated the negative class indexes of the confusion matrix being shown
+        /// </summary>
+        private void HandleNegativeClassesTextBox_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_updateInProgress)
+                {
+                    return;
+                }
+
+                var classes = new List<string>();
+                using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(
+                    new StringReader(negativeClassesTextBox.Text)))
+                {
+                    csvReader.Delimiters = new[] { "," };
+                    csvReader.CommentTokens = new[] { "//", "#" };
+                    while (!csvReader.EndOfData)
+                    {
+                        string[] fields = csvReader.ReadFields();
+                        classes.AddRange(fields);
+                    }
+                }
+
+                CM.SetNegativeClasses(classes);
+                UpdateClassLabels();
+                SetScoreTextBoxValue();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45575");
+            }
         }
 
         #endregion Event Handlers

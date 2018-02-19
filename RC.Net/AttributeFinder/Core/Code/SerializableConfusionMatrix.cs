@@ -1,5 +1,6 @@
 ﻿using Extract.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -284,6 +285,28 @@ namespace Extract.AttributeFinder
         public int[] NegativeClassIndexes()
         {
             return Enumerable.Range(0, _labels.Length).Except(_positiveIndexes).ToArray();
+        }
+
+        public IEnumerable<string> NegativeClasses()
+        {
+            return Enumerable.Range(0, _labels.Length)
+                .Except(_positiveIndexes)
+                .Select(i => _labels[i]);
+        }
+
+        public void SetNegativeClasses(IEnumerable<string> classes)
+        {
+            try
+            {
+                var negativeLabels = new HashSet<string>(classes);
+                _positiveIndexes = Enumerable.Range(0, _labels.Length)
+                    .Where(i => !negativeLabels.Contains(_labels[i]))
+                    .ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45576");
+            }
         }
     }
 }
