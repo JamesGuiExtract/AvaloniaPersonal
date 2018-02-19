@@ -1056,10 +1056,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             if (useCrossValidationSetsCheckBox.Checked)
             {
                 if (!int.TryParse(numberOfCandidateNetwordsTextBox.Text, NumberStyles.Integer, CultureInfo.InvariantCulture,
-                    out numberOfCandidateNetworks) || numberOfCandidateNetworks < 2)
+                    out numberOfCandidateNetworks) || numberOfCandidateNetworks < 1)
                 {
                     numberOfCandidateNetwordsTextBox.SetError(configurationErrorProvider,
-                        "Number of candidate networks to try must be greater than one");
+                        "Number of candidate networks to try must be greater than zero");
                     _valid = false;
                 }
             }
