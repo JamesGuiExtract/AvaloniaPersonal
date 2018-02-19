@@ -148,7 +148,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Updates the document data status.
         /// </summary>
-        void UpdateDocumentDataStatus(PaginationDocumentData data);
+        /// <param name="data">The <see cref="PaginationDocumentData"/> whose status will be checked.
+        /// </param>
+        /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
+        /// queries that manipulate the data) should be saved or <c>false</c> to update the status
+        /// bar.</param>
+        void UpdateDocumentDataStatus(PaginationDocumentData data, bool saveData);
+
+        /// <summary>
+        /// Waits for all documents status updates (started via <see cref="UpdateDocumentDataStatus"/>)
+        /// to complete.
+        /// </summary>
+        void WaitForDocumentStatusUpdates();
 
         /// <summary>
         /// Provides a message to be displayed.

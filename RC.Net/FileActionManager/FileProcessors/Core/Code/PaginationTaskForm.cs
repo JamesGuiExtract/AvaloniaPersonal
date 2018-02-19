@@ -1819,7 +1819,10 @@ namespace Extract.FileActionManager.FileProcessors
                     ex.ExtractLog("ELI44678");
                 }
 
-                _paginationPanel.SuspendUIUpdates = false;
+                if (!_paginationPanel.IsCommittingChanges)
+                {
+                    _paginationPanel.SuspendUIUpdates = false;
+                }
             }
         }
 

@@ -837,6 +837,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             doLayout |= (Document?.DocumentData?.Initialized == true);
 
+            if (doLayout && (Parent as PageLayoutControl)?.UIUpdatesSuspended == true)
+            {
+                _deferredLayout = true;
+                doLayout = false;
+            }
+
             if (doLayout)
             {
                 _hasAppliedStatus = true;

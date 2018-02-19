@@ -347,6 +347,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Runtime Properties
 
         /// <summary>
+        /// Gets whenther the panel is currently commiting changes.
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
+        public bool IsCommittingChanges
+        {
+            get
+            {
+                return _committingChanges;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether there are any uncommitted changes to document pagination.
         /// </summary>
         /// <value><see langword="true"/> if there are uncommitted changes to document pagination;
@@ -936,7 +949,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SuspendUIUpdatesForOperation();
+                SuspendUIUpdates = true;
                 _committingChanges = true;
 
                 if (!CanSelectedDocumentsBeCommitted())
@@ -1101,6 +1114,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 try
                 {
                     _committingChanges = false;
+                    SuspendUIUpdates = false;
                     if (_outputDocumentPositions != null)
                     {
                         _outputDocumentPositions.Clear();
@@ -1306,7 +1320,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 outputDocument.DocumentData.Revert();
                                 if (_documentDataPanel != null)
                                 {
-                                    _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData);
+                                    _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData, false);
                                 }
                             }
                             _pendingDocuments.Add(outputDocument);
@@ -1354,7 +1368,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             outputDocument.DocumentData.Revert();
                             if (_documentDataPanel != null)
                             {
-                                _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData);
+                                _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData, false);
                             }
                         }
                     }
@@ -3012,23 +3026,32 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
             }
 
-            foreach (var document in _pendingDocuments.Where(document =>
+            var documentsToSave = _pendingDocuments.Where(document =>
                 document != openData &&
                 document.PageControls.Any(c => !c.Deleted) &&
-                (!selectedDocumentsOnly || document.Selected)))
-            {
-                // To account for the case that the panel may manipulate raw data; make
-                // sure the data has been loaded into a panel before saving.
-                _documentDataPanel.LoadData(document.DocumentData, forDisplay: false);
-                Application.DoEvents();
-                bool dataIsValid = _documentDataPanel.SaveData(document.DocumentData, validateData);
+                (!selectedDocumentsOnly || document.Selected))
+                .ToArray();
 
-                if (validateData && !dataIsValid)
+            if (documentsToSave.Length > 0)
+            {
+                foreach (var document in documentsToSave)
+                {
+                    _documentDataPanel.UpdateDocumentDataStatus(document.DocumentData, true);
+                }
+
+                _documentDataPanel.WaitForDocumentStatusUpdates();
+            }
+
+            if (validateData)
+            {
+                var erroredDocument = documentsToSave.FirstOrDefault(document => document.DocumentData.DataError);
+
+                if (erroredDocument != null)
                 {
                     this.SafeBeginInvoke("ELI41669", () =>
                     {
-                        _primaryPageLayoutControl.SelectDocument(document);
-                        document.PaginationSeparator.OpenDataPanel();
+                        _primaryPageLayoutControl.SelectDocument(erroredDocument);
+                        erroredDocument.PaginationSeparator.OpenDataPanel();
                     });
 
                     return false;
@@ -3138,7 +3161,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _primaryPageLayoutControl.UIUpdatesSuspended = true;
                             EnablePageDisplay = false;
                         }
-                        else
+                        // Document loads that being in the midst committing documents was turning off
+                        // SuspendUIUpdates and allowing flickering to occur.
+                        else if (!_committingChanges)
                         {
                             _uiUpdatesSuspended = false;
                             EnablePageDisplay = true;
