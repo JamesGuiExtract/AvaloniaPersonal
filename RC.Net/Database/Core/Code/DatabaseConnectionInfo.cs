@@ -10,6 +10,9 @@ namespace Extract.Database
     /// <summary>
     /// Represents the information necessary to open a connection to a database that has been
     /// configured with the <see cref="DataConnectionDialog"/>.
+    /// <para><b>NOTE</b></para>
+    /// This class is thread-safe as long as it's properties are not modified once it goes into use.
+    /// When used across multiple threads, each thread will use a separate thread-specific ManagedDBConnection.
     /// </summary>
     [CLSCompliant(false)]
     public class DatabaseConnectionInfo : IDisposable
@@ -622,7 +625,6 @@ namespace Extract.Database
         {
             try
             {
-                // Should this be locked?
                 return (TargetConnectionType == null) ? 0 : TargetConnectionType.GetHashCode() ^
                        DataSourceName.GetHashCode() ^
                        DataProviderName.GetHashCode() ^
@@ -669,7 +671,6 @@ namespace Extract.Database
                     return false;
                 }
 
-                // Should this be locked?
                 // Return true if the fields match:
                 return (TargetConnectionType == other.TargetConnectionType &&
                     DataSourceName == other.DataSourceName &&
