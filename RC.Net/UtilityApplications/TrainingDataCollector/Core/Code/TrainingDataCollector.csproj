@@ -168,6 +168,10 @@
       <Project>{E26B63CD-4948-43AC-A726-8B46C420F152}</Project>
       <Name>Extract.ETL</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ExtractCodeAttributes\Core\Code\Extract.Code.Attributes.csproj">
+      <Project>{9ca28a56-27b0-4f3a-bd61-970b3de2a793}</Project>
+      <Name>Extract.Code.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
       <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
       <Name>Extract.FileActionManager.Forms</Name>

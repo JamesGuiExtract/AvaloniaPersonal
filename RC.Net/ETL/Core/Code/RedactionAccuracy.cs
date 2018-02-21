@@ -13,7 +13,7 @@ using Extract.AttributeFinder;
 using Extract.DataCaptureStats;
 using Extract.Utilities;
 using UCLID_COMUTILSLib;
-
+using Extract.Code.Attributes;
 
 namespace Extract.ETL
 {
@@ -23,6 +23,7 @@ namespace Extract.ETL
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
+    [ExtractCategory("DatabaseService")]
     public class RedactionAccuracy : DatabaseService
     {
         #region Constants

@@ -12,12 +12,16 @@ using Extract.Utilities;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using Extract.Code.Attributes;
 
 namespace Extract.ETL
 {
     /// <summary>
     /// Database service to expand attributes using voa saved in AttributeSetForFile table
     /// </summary>
+    [DataContract]
+    [KnownType(typeof(ScheduledEvent))]
+    [ExtractCategory("DatabaseService")]
     public class ExpandAttributes : DatabaseService
     {
         #region Constants

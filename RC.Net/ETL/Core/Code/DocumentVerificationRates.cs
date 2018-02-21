@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.Threading;
 using Extract.Utilities;
+using Extract.Code.Attributes;
 
 namespace Extract.ETL
 {
@@ -14,6 +15,7 @@ namespace Extract.ETL
     /// </summary>
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
+    [ExtractCategory("DatabaseService")]
     public class DocumentVerificationRates : DatabaseService
     {
         #region Internal classes

@@ -27,11 +27,6 @@
 #define IDR_MENU_SUMMARY_ROW_HEADER     144
 #define IDR_MENU_SUMMARY_TOTAL_COLUMN   145
 #define IDD_DIALOG_MANAGE_ATTRIBUTE_SETS 146
-
-
-// Database Page ID's
-// These ID's need to be the same in every .h project that uses the Database Page object
-// These ID's are defined in FAMUtils
 #define IDC_BUTTON_DB_NAME_BROWSE       1000
 #define IDC_EDIT_DB_SERVER              1001
 #define IDC_EDIT_DB_NAME                1002
@@ -45,15 +40,10 @@
 #define IDC_EDIT_ADDITIONAL_CONN_STR_ATTR 1010
 #define IDC_BUTTON_DEFAULT              1011
 #define IDC_BUTTON_USE_CURRENT_CONTEXT  1012
-#define IDC_BUTTON_SELECT_CONTEXT		1015
+#define IDC_BUTTON_SELECT_CONTEXT       1015
 #define IDC_STATIC_WORKFLOW_WARNING     1016
-// End Database Page ID's
-
-// This ID's are the same as in BaseUtils resource.h
 #define IDC_EDIT_LOGIN_USER_NAME        1031
 #define IDC_EDIT_LOGIN_PASSWORD         1032
-// End of BaseUtils ID's
-
 #define IDC_RDSETTO                     2001
 #define IDC_RDCOPYFROM                  2002
 #define IDC_CMB_STATUS                  2003
@@ -187,13 +177,14 @@
 #define ID_TOOLS_COUNTERS               32810
 #define ID_MANAGE_RULE_COUNTERS         32811
 #define ID_TOOLS_MOVE_FILES_TO_WORKFLOW 32812
+#define ID_MANAGE_DATABASESERVICES      32813
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        148
-#define _APS_NEXT_COMMAND_VALUE         32813
+#define _APS_NEXT_COMMAND_VALUE         32814
 #define _APS_NEXT_CONTROL_VALUE         2125
 #define _APS_NEXT_SYMED_VALUE           2122
 #endif

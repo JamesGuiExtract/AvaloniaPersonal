@@ -8,6 +8,7 @@ using System.Threading;
 using Extract.AttributeFinder;
 using Extract.ETL;
 using Extract.Utilities;
+using Extract.Code.Attributes;
 
 namespace Extract.UtilityApplications.TrainingDataCollector
 {
@@ -25,6 +26,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
     /// A <see cref="DatabaseService"/> that collects training/testing data for NER or other ML
     /// </summary>
     [DataContract]
+    [ExtractCategory("DatabaseService")]
     public class TrainingDataCollector : DatabaseService
     {
         #region Constants

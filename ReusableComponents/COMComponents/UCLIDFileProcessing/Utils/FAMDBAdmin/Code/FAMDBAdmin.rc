@@ -535,6 +535,8 @@ BEGIN
         MENUITEM "&Users...",                   ID_MANAGE_USERS
         MENUITEM SEPARATOR
         MENUITEM "&Rule execution counters...\tCtrl+R", ID_MANAGE_RULE_COUNTERS
+        MENUITEM SEPARATOR
+        MENUITEM "&Database Services...",       ID_MANAGE_DATABASESERVICES
     END
     POPUP "&Tools"
     BEGIN

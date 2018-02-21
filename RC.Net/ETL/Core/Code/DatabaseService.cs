@@ -4,14 +4,19 @@ using System.Runtime.Serialization;
 using System.Threading;
 using Extract.Utilities;
 using Newtonsoft.Json;
+using Extract.Code.Attributes;
+
 
 namespace Extract.ETL
 {
+
+
     /// <summary>
     /// Defines the base class for processes that will be performed by a service
     /// </summary>
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
+    [DatabaseService]
     public abstract class DatabaseService : IDisposable
     {
         bool _enabled = true;

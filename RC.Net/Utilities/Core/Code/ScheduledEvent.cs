@@ -222,7 +222,7 @@ namespace Extract.Utilities
                     {
                         _exclusions = new List<ScheduledEvent>(value);
 
-                        ExtractException.Assert("ELI45442", "Schedule exlusions must have a defined duration.",
+                        ExtractException.Assert("ELI45442", "Schedule exclusions must have a defined duration.",
                             _exclusions.Any(exclusion => exclusion.Duration != null));
 
                         SetTimer();
@@ -269,11 +269,11 @@ namespace Extract.Utilities
         /// Gets the <see cref="DateTime"/> of the next occurrence or <c>null</c> if there are no
         /// more occurrences.
         /// </summary>
-        /// <param name="dateTime">The <see cref="DateTime"/> for which the next occurence should be found.
+        /// <param name="dateTime">The <see cref="DateTime"/> for which the next occurrence should be found.
         /// </param>
-        /// <param name="ignoreExclusions"><c>true</c> to get the next occurence even if it falls in a
+        /// <param name="ignoreExclusions"><c>true</c> to get the next occurrence even if it falls in a
         /// a time that has been excluded via <see cref="Exlclusions"/>; <c>false</c> to get the next
-        /// schduled occurence including exclusions.</param>
+        /// scheduled occurrence including exclusions.</param>
         public DateTime? GetNextOccurrence(DateTime? dateTime = null, bool ignoreExclusions = false)
         {
             try
@@ -302,13 +302,13 @@ namespace Extract.Utilities
 
                 if (!ignoreExclusions && GetIsInExcludedTime(nextOccurrence))
                 {
-                    // Prevent infinite loop by not looking past the timeframe that could potentially be excluded.
+                    // Prevent infinite loop by not looking past the time-frame that could potentially be excluded.
                     var maxUnit = Exclusions.Max(exclusion => exclusion.RecurrenceUnit);
                     var maxNextOccurence = dateTime.Value
                         .Ceiling(maxUnit.Value).AddTicks(1)
                         .Ceiling(maxUnit.Value);
 
-                    // Loop for the last occurrence that is not in an excluded timeframe.
+                    // Loop for the last occurrence that is not in an excluded time-frame.
                     while (nextOccurrence.HasValue && 
                            nextOccurrence.Value < maxNextOccurence &&
                            GetIsInExcludedTime(nextOccurrence))
@@ -329,11 +329,11 @@ namespace Extract.Utilities
         /// Gets the <see cref="DateTime"/> of the last occurrence or <c>null</c> if there were no
         /// previous occurrences.
         /// </summary>
-        /// <param name="dateTime">The <see cref="DateTime"/> for which the next occurence should be found.
+        /// <param name="dateTime">The <see cref="DateTime"/> for which the next occurrence should be found.
         /// </param>
-        /// <param name="ignoreExclusions"><c>true</c> to get the next occurence even if it falls in a
+        /// <param name="ignoreExclusions"><c>true</c> to get the next occurrence even if it falls in a
         /// a time that has been excluded via <see cref="Exlclusions"/>; <c>false</c> to get the next
-        /// schduled occurence including exclusions.</param>
+        /// scheduled occurrence including exclusions.</param>
         public DateTime? GetLastOccurrence(DateTime? dateTime = null, bool ignoreExclusions = false)
         {
             try
@@ -362,13 +362,13 @@ namespace Extract.Utilities
 
                 if (!ignoreExclusions && GetIsInExcludedTime(lastOccurrence))
                 {
-                    // Prevent infinite loop by not looking past the timeframe that could potentially be excluded.
+                    // Prevent infinite loop by not looking past the time-frame that could potentially be excluded.
                     var maxUnit = Exclusions.Max(exclusion => exclusion.RecurrenceUnit);
                     var minNextOccurence = dateTime.Value
                         .Floor(maxUnit.Value).AddTicks(-1)
                         .Floor(maxUnit.Value);
 
-                    // Loop for the previous occurrence that is not in an excluded timeframe.
+                    // Loop for the previous occurrence that is not in an excluded time-frame.
                     while (lastOccurrence.HasValue &&
                            lastOccurrence.Value >= minNextOccurence &&
                            GetIsInExcludedTime(lastOccurrence))

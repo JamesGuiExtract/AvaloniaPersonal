@@ -171,6 +171,10 @@
       <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
       <Name>Extract.Encryption</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\ExtractCodeAttributes\Core\Code\Extract.Code.Attributes.csproj">
+      <Project>{9ca28a56-27b0-4f3a-bd61-970b3de2a793}</Project>
+      <Name>Extract.Code.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
       <Name>Extract.Interfaces</Name>

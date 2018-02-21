@@ -12,6 +12,7 @@ using Extract.AttributeFinder;
 using Extract.DataCaptureStats;
 using Extract.Utilities;
 using UCLID_COMUTILSLib;
+using Extract.Code.Attributes;
 
 
 namespace Extract.ETL
@@ -21,6 +22,7 @@ namespace Extract.ETL
     /// </summary>
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
+    [ExtractCategory("DatabaseService")]
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
     public class DataCaptureAccuracy : DatabaseService
     {

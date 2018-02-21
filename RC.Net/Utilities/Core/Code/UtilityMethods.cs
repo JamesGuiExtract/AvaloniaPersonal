@@ -11,6 +11,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using static System.FormattableString;
+using Extract.Code.Attributes;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace Extract.Utilities
 {
@@ -898,6 +901,78 @@ namespace Extract.Utilities
         {
             return string.Join("", strings.Select(str => FormattableString.Invariant(str)));
         }
+
+
+        /// <summary>
+        /// Returns as dictionary of the Extract categories, if the ExtractCategories.json file doesn't exist it will be created
+        /// Categories are found by looking for types that have the ExtractCategoryAttribute applied to the class
+        /// </summary>
+        /// <param name="createNew">if <see langword="false"/> any existing ExtractCategories.json file will be deleted and new one
+        /// will be created. if <see langword="false"/> then if ExtractCategories.json exists it will be used.</param>
+        /// <returns></returns>
+        public static Dictionary<string, HashSet<string>> GetExtractCategoriesJson(bool createNew = false)
+        {
+            try
+            {
+                Dictionary<string, HashSet<string>> categoriesWithTypes = new Dictionary<string, HashSet<string>>();
+                string categoriesPath = Path.Combine(FileSystemMethods.CommonApplicationDataPath, "CategoryFiles", "ExtractCategories.json");
+                if (File.Exists(categoriesPath))
+                {
+                    if (createNew)
+                    {
+                        File.Delete(categoriesPath);
+                    }
+                    return  JsonConvert.DeserializeObject<Dictionary<string, HashSet<string>>>(File.ReadAllText(categoriesPath));
+                }
+
+                List<string> filesToCheck = new List<string>();
+
+                // Check all dll's that begin with Extract and all exe's in CommonComponent folder
+                filesToCheck.AddRange(Directory.GetFiles(FileSystemMethods.CommonComponentsPath, "Extract.*.dll"));
+                filesToCheck.AddRange(Directory.GetFiles(FileSystemMethods.CommonComponentsPath, "*.exe"));
+
+                foreach (var f in filesToCheck)
+                {
+                    Assembly asm;
+                    try
+                    {
+                        // Test if file is a .NET assembly
+                        System.Reflection.AssemblyName.GetAssemblyName(f);
+                        asm = Assembly.LoadFile(f);
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        // Check types for ExtractCategoryAttribute
+                        foreach (Type type in asm.GetTypes())
+                        {
+                            var categoryAttributes = type.GetCustomAttributes<ExtractCategoryAttribute>(true);
+                            foreach (var a in categoryAttributes)
+                            {
+                                categoriesWithTypes.GetOrAdd(a.Name, () => new HashSet<string>())
+                                    .Add(type.FullName + ", " + type.Assembly.GetName().Name);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+
+                        continue;
+                    }
+                }
+                File.WriteAllText(categoriesPath, JsonConvert.SerializeObject(categoriesWithTypes, Formatting.Indented));
+                return categoriesWithTypes;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45602");
+            }
+        }
     }
 
     /// <summary>
@@ -950,5 +1025,6 @@ namespace Extract.Utilities
                 throw e.AsExtract("ELI40198");
             }
         }
+
     }
 }

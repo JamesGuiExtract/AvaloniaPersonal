@@ -90,6 +90,10 @@
       <Project>{32679A70-BC10-4DD9-9155-9B3E08586EE9}</Project>
       <Name>Extract.DataCaptureStats</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\ExtractCodeAttributes\Core\Code\Extract.Code.Attributes.csproj">
+      <Project>{9ca28a56-27b0-4f3a-bd61-970b3de2a793}</Project>
+      <Name>Extract.Code.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221b-52c3-490b-a98f-7a51ebeb2a2b}</Project>
       <Name>Extract.Interfaces</Name>

@@ -33,6 +33,8 @@
 #endif
 
 using namespace Extract::FAMDBAdmin;
+using namespace Extract::ETL::Management;
+using namespace System::Collections::Generic;
 
 
 //-------------------------------------------------------------------------------------------------
@@ -135,6 +137,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_MANAGE_METADATA, &CFAMDBAdminDlg::OnManageMetadataFields)
 	ON_COMMAND(ID_MANAGE_ATTRIBUTESETS, &CFAMDBAdminDlg::OnManageAttributeSets)
 	ON_COMMAND(ID_MANAGE_RULE_COUNTERS, &CFAMDBAdminDlg::OnManageRuleCounters)
+	ON_COMMAND(ID_MANAGE_DATABASESERVICES,&CFAMDBAdminDlg::OnManageDatabaseServices)
 	//}}AFX_MSG_MAP
 	ON_CBN_SELCHANGE(IDC_WORKFLOW_COMBO, &CFAMDBAdminDlg::OnCbnSelchangeWorkflowCombo)
 	ON_COMMAND(ID_TOOLS_MOVE_FILES_TO_WORKFLOW, &CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow)
@@ -226,6 +229,11 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 		m_strCurrentWorkflow = gstrALL_WORKFLOWS;
 		m_nCurrentWorkflowID = -1;
 
+	}
+	// This is needed because .net exception causes crash if not handled
+	catch (Exception ^ex)
+	{
+		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI45606");
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14870");
 
@@ -810,8 +818,16 @@ void CFAMDBAdminDlg::OnToolsCheckForNewComponents()
 
 		getCategoryManager()->CheckForNewComponents(ipCategoryNames);
 
+		// Create a new ExtractCategories.json 
+		Extract::Utilities::UtilityMethods::GetExtractCategoriesJson(true);
+
 		// Update the menus to reflect any components that were found
 		enableMenus();
+	}
+	// This is needed because .net exception causes crash if not handled
+	catch (Exception ^ex)
+	{
+		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI45603");
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18159");
 }
@@ -904,6 +920,11 @@ void CFAMDBAdminDlg::OnManageWorkflowActions()
 			if (currentWindow)
 				currentWindow->ReleaseHandle();
 		}
+	}
+	// This is needed because .net exception causes crash if not handled
+	catch (Exception ^ex)
+	{
+		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI45604");
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29104");
 }
@@ -1030,7 +1051,41 @@ void CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow()
 	{
 		showMoveToWorkflowDialog(m_bUnaffiliatedFiles);
 	}
+	// This is needed because .net exception causes crash if not handled
+	catch (Exception ^ex)
+	{
+		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI45603");
+	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43362");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnManageDatabaseServices()
+{
+	try
+	{
+		ManageDatabaseServicesForm^ manageDatabaseServices = 
+			gcnew ManageDatabaseServicesForm(marshal_as<String^>(m_ipFAMDB->DatabaseServer),
+				marshal_as<String^>(m_ipFAMDB->DatabaseName));
+
+		NativeWindow ^currentWindow = __nullptr;
+		try
+		{
+			IntPtr managedHWND(this->GetSafeHwnd());
+			currentWindow = NativeWindow::FromHandle(managedHWND);
+			manageDatabaseServices->ShowDialog(currentWindow);
+		}
+		finally
+		{
+			if (currentWindow)
+				currentWindow->ReleaseHandle();
+		}
+	}
+	// This is needed because .net exception causes crash if not handled
+	catch (Exception ^ex)
+	{
+		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI45605");
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45585");
 }
 
 //-------------------------------------------------------------------------------------------------

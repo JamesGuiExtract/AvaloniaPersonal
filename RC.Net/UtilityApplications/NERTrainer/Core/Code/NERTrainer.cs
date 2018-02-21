@@ -1,4 +1,5 @@
-﻿using Extract.ETL;
+﻿using Extract.Code.Attributes;
+using Extract.ETL;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Threading;
 
 namespace Extract.UtilityApplications.NERTrainer
 {
+    [ExtractCategory("DatabaseService")]
     public class NERTrainer : DatabaseService
     {
         #region Constants
