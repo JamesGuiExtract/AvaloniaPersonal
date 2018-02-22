@@ -689,6 +689,20 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Gets a value indicating whether the form supports displaying multiple documents
+        /// simultaneously (one for each processing thread).
+        /// </summary>
+        /// <value><c>true</c> if the form supports multiple documents, <c>false</c> if only one
+        /// document at a time can be loaded.</value>
+        public bool SupportsMultipleDocuments
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Gets whether the currently viewed document is a history document.
         /// </summary>
         /// <value><see langword="true"/> if a document from the history is what is currently viewed;
@@ -1371,12 +1385,14 @@ namespace Extract.Redaction.Verification
                 // Close current image before opening a new one. [FIDSC #3824]
                 _imageViewer.CloseImage();
 
+                int savedFileID = _savedMemento.FileId;
+
                 // Clear the current memo when closing the image
                 // [FIDSC #4237]
                 _savedMemento = null;
 
                 // Successfully complete this file
-                OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
+                OnFileComplete(new FileCompleteEventArgs(savedFileID, EFileProcessingResult.kProcessingSuccessful));
             }
         }
 
@@ -3260,7 +3276,7 @@ namespace Extract.Redaction.Verification
                         // Close current image before opening a new one. [FIDSC #3824]
                         _imageViewer.CloseImage();
 
-                        OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
+                        OnFileComplete(new FileCompleteEventArgs(memento.FileId, EFileProcessingResult.kProcessingSkipped));
                     }
                 }
             }

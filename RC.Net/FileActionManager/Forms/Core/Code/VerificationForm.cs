@@ -1,6 +1,7 @@
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
@@ -63,7 +64,7 @@ namespace Extract.FileActionManager.Forms
         /// <summary>
         /// An event to indicate a document is done processing.
         /// </summary>
-        EventWaitHandle _fileCompletedEvent = new AutoResetEvent(false);
+        EventWaitHandle _fileCompletedEvent = new ManualResetEvent(false);
 
         /// <summary>
         /// An event to indicate the verification session has been aborted.
@@ -138,19 +139,14 @@ namespace Extract.FileActionManager.Forms
         volatile int _exceptionDisplayBlockThreadId = -1;
 
         /// <summary>
-        /// The processing result of the file being shown.
-        /// </summary>
-        EFileProcessingResult _fileProcessingResult;
-
-        /// <summary>
         /// A reference count of the number of files currently in <see cref="ShowDocument"/>.
         /// </summary>
         long _processingFileCount;
 
         /// <summary>
-        /// The ID of the file currently displayed for verification.
+        /// The IDs of the file currently displayed for verification.
         /// </summary>
-        volatile int _currentFileID = -1;
+        ConcurrentDictionary<int, int> _currentFileIDs = new ConcurrentDictionary<int, int>();
 
         /// <summary>
         /// Specifies the ID of a file that has been requested to be displayed ahead of all others.
@@ -177,6 +173,12 @@ namespace Extract.FileActionManager.Forms
         /// The IDs of all files for which a request has been made to delay processing.
         /// </summary>
         HashSet<int> _delayedFiles = new HashSet<int>();
+
+        /// <summary>
+        /// The IDs of files that have been completed with the associated <see cref="EFileProcessingResult"/>
+        /// for each completion.
+        /// </summary>
+        ConcurrentDictionary<int, EFileProcessingResult> _completedFiles = new ConcurrentDictionary<int, EFileProcessingResult>();
 
         /// <summary>
         /// Used to protect access to <see cref="VerificationForm{TForm}"/>.
@@ -419,7 +421,7 @@ namespace Extract.FileActionManager.Forms
             }
 
             bool haveLock = false;
-            EFileProcessingResult fileProcessingResult;
+            EFileProcessingResult fileProcessingResult = EFileProcessingResult.kProcessingSuccessful;
 
             try
             {
@@ -428,124 +430,135 @@ namespace Extract.FileActionManager.Forms
                     _fileProcessingEvent.Set();
                 }
 
-                // If currently waiting on a request file, asserts that the requested file is fileID.
-                CheckForRequestedFile(fileID);
-
-                // Attempt to get the lock for the verification UI thread, but don't block at this
-                // point if its not available. Although unlikely, from my reading it appears the
-                // lock could attempt here could allow a new file to sneak past already waiting
-                // files. Therefore, only try for the lock if we know of no currently waiting files.
-                haveLock = _waitingFileSequencer.Count == 0 && _lock.TryLock();
-
-                if (!haveLock)
+                // If the form can support multiple documents, send the document straight to the
+                // Open call. Otherwise, using synchronizaton mechanisms to send all but one file to
+                // Prefetch and to hold there while taking requested and delayed files into
+                // consideration.
+                if (MainForm.SupportsMultipleDocuments)
                 {
-                    lock (_lockFileRequest)
+                    _currentFileIDs.TryAdd(fileID, 0);
+                }
+                else
+                {
+                    // If currently waiting on a request file, asserts that the requested file is fileID.
+                    CheckForRequestedFile(fileID);
+
+                    // Attempt to get the lock for the verification UI thread, but don't block at this
+                    // point if its not available. Although unlikely, from my reading it appears the
+                    // lock could attempt here could allow a new file to sneak past already waiting
+                    // files. Therefore, only try for the lock if we know of no currently waiting files.
+                    haveLock = _waitingFileSequencer.Count == 0 && _lock.TryLock();
+
+                    if (!haveLock)
                     {
-                        _waitingFileIDQueue.Add(fileID);
-                        _waitingFileSequencer.AddToQueue(fileID);
-                    }
-
-                    // Wait until the UI thread has finished loading its document before
-                    // pre-fetching. Even with multiple cores, disk I/O from the prefetch can
-                    // cause the UI thread to load slower.
-                    _fileLoadedEvent.WaitOne();
-
-                    // Need to log exception when loading prefetched file
-                    try
-                    {
-                        _waitingFileSequencer.WaitForTurn(fileID);
-
-                        // While waiting for the verification UI thread, prefetch data so that
-                        // MainForm.Open call on this thread will have less work to do and execute
-                        // faster.
-                        MainForm.Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Just log this exception another exception will be thrown when the file
-                        // is loaded into the UI
-                        ExtractException ee = new ExtractException("ELI37889", "Unable to prefetch file.", ex);
-                        ee.AddDebugData("Filename", fileName, false);
-                        ee.Log();
-                    }
-
-                    // Loop in case we need to wait on a requested file or a request has been made
-                    // to delay processing of currently waiting files.
-                    while (!haveLock && IsUIReady)
-                    {
-                        // Now request the lock for the verification UI thread again. We won't get
-                        // out of this loop until we have the lock, the file has been delayed or
-                        // processing is stopped.
-                        _lock.Lock(ref haveLock, _fileDelayedEvent);
-
-                        // Check to see if the lock was released in order to release a delayed file.
                         lock (_lockFileRequest)
                         {
-                            if (_delayedFiles.Contains(fileID))
-                            {
-                                _waitingFileIDQueue.Remove(fileID);
-                                _waitingFileSequencer.Remove(fileID);
-                                _delayedFiles.Remove(fileID);
+                            _waitingFileIDQueue.Add(fileID);
+                            _waitingFileSequencer.AddToQueue(fileID);
+                        }
 
-                                // If all files requested to be released have been released, reset
-                                // _fileReleasedEvent so that files stop spinning until the next file
-                                // is needed or delayed.
-                                if (_delayedFiles.Count == 0)
+                        // Wait until the UI thread has finished loading its document before
+                        // pre-fetching. Even with multiple cores, disk I/O from the prefetch can
+                        // cause the UI thread to load slower.
+                        _fileLoadedEvent.WaitOne();
+
+                        // Need to log exception when loading prefetched file
+                        try
+                        {
+                            _waitingFileSequencer.WaitForTurn(fileID);
+
+                            // While waiting for the verification UI thread, prefetch data so that
+                            // MainForm.Open call on this thread will have less work to do and execute
+                            // faster.
+                            MainForm.Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Just log this exception another exception will be thrown when the file
+                            // is loaded into the UI
+                            ExtractException ee = new ExtractException("ELI37889", "Unable to prefetch file.", ex);
+                            ee.AddDebugData("Filename", fileName, false);
+                            ee.Log();
+                        }
+
+                        // Loop in case we need to wait on a requested file or a request has been made
+                        // to delay processing of currently waiting files.
+                        while (!haveLock && IsUIReady)
+                        {
+                            // Now request the lock for the verification UI thread again. We won't get
+                            // out of this loop until we have the lock, the file has been delayed or
+                            // processing is stopped.
+                            _lock.Lock(ref haveLock, _fileDelayedEvent);
+
+                            // Check to see if the lock was released in order to release a delayed file.
+                            lock (_lockFileRequest)
+                            {
+                                if (_delayedFiles.Contains(fileID))
                                 {
-                                    _fileDelayedEvent.Reset();
+                                    _waitingFileIDQueue.Remove(fileID);
+                                    _waitingFileSequencer.Remove(fileID);
+                                    _delayedFiles.Remove(fileID);
+
+                                    // If all files requested to be released have been released, reset
+                                    // _fileReleasedEvent so that files stop spinning until the next file
+                                    // is needed or delayed.
+                                    if (_delayedFiles.Count == 0)
+                                    {
+                                        _fileDelayedEvent.Reset();
+                                    }
+                                    return EFileProcessingResult.kProcessingDelayed;
                                 }
-                                return EFileProcessingResult.kProcessingDelayed;
                             }
-                        }
 
-                        if (!haveLock)
-                        {
-                            // Ensure against a tight loop
-                            Thread.Sleep(100);
-                            continue;
-                        }
-
-                        // If we have the lock, but a specific file is requested and this is not
-                        // that file or there is another waiting file that came in before this one,
-                        // release the lock and remain in this loop so that the appropriate file can
-                        // get through.
-                        if ((_requestedFileID != -1 && _requestedFileID != fileID) ||
-                            (_requestedFileID == -1 && _waitingFileIDQueue[0] != fileID))
-                        {
-                            _lock.Unlock();
-                            haveLock = false;
-
-                            if (_requestedFileID != -1)
+                            if (!haveLock)
                             {
-                                // In case the requested file is not already waiting, wait until it
-                                // comes in before trying to obtain the lock again.
-                                _waitRequestedFile.WaitOne();
-                            }
-                            else
-                            {
-                                // Ensure against a tight loop.
+                                // Ensure against a tight loop
                                 Thread.Sleep(100);
+                                continue;
+                            }
+
+                            // If we have the lock, but a specific file is requested and this is not
+                            // that file or there is another waiting file that came in before this one,
+                            // release the lock and remain in this loop so that the appropriate file can
+                            // get through.
+                            if ((_requestedFileID != -1 && _requestedFileID != fileID) ||
+                                (_requestedFileID == -1 && _waitingFileIDQueue[0] != fileID))
+                            {
+                                _lock.Unlock();
+                                haveLock = false;
+
+                                if (_requestedFileID != -1)
+                                {
+                                    // In case the requested file is not already waiting, wait until it
+                                    // comes in before trying to obtain the lock again.
+                                    _waitRequestedFile.WaitOne();
+                                }
+                                else
+                                {
+                                    // Ensure against a tight loop.
+                                    Thread.Sleep(100);
+                                }
                             }
                         }
                     }
-                }
 
-                // Needs to be set before file is removed from _prefetchSequencer so RequestFile
-                // can know for sure whether a requested file is available.
-                _currentFileID = fileID;
+                    // Needs to be set before file is removed from _prefetchSequencer so RequestFile
+                    // can know for sure whether a requested file is available.
+                    _currentFileIDs.TryAdd(fileID, 0);
 
-                // If this file is the currently requested file ID, clear the request so that other
-                // files that are being held are free to continue processing after this one.
-                lock (_lockFileRequest)
-                {
-                    if (fileID == _requestedFileID)
+                    // If this file is the currently requested file ID, clear the request so that other
+                    // files that are being held are free to continue processing after this one.
+                    lock (_lockFileRequest)
                     {
-                        _requestedFileID = -1;
-                        _waitRequestedFile.Set();
-                    }
+                        if (fileID == _requestedFileID)
+                        {
+                            _requestedFileID = -1;
+                            _waitRequestedFile.Set();
+                        }
 
-                    _waitingFileIDQueue.Remove(fileID);
-                    _waitingFileSequencer.Remove(fileID);
+                        _waitingFileIDQueue.Remove(fileID);
+                        _waitingFileSequencer.Remove(fileID);
+                    }
                 }
 
                 _fileLoadedEvent.Reset();
@@ -582,25 +595,25 @@ namespace Extract.FileActionManager.Forms
 
                     // Ensure the verification form has been properly initialized.
                     EnsureInitialization();
-
-                    // Open the file
-                    MainForm.Open(fileName, fileID, actionID, tagManager, fileProcessingDB);
                 }
+
+                // Open the file
+                MainForm.Open(fileName, fileID, actionID, tagManager, fileProcessingDB);
 
                 _fileLoadedEvent.Set();
-
-                // Wait until the document is either saved or the verification form is closed.
-                WaitForEvent(_fileCompletedEvent);
-
-                if (Aborted)
+                
+                do
                 {
-                    return EFileProcessingResult.kProcessingCancelled;
-                }
+                    // When files are completed in when MainForm.SupportsMultipleDocuments, protect
+                    // against a tight loop while other threads are checking if they are completed
+                    Thread.Sleep(100);
 
-                // The file processing result needs to be noted before exiting the locked block,
-                // but we need to exit the lock block before returning so that Sleep is called
-                // to prevent one or more files from becoming stuck on other threads.
-                fileProcessingResult = _fileProcessingResult;
+                    // Wait until the document is either saved or the verification form is closed.
+                    WaitForEvent(_fileCompletedEvent);
+                }
+                // Loop because in case of SupportsMultipleDocuments, multiple docouments may be
+                // waiting in this loop-- only exit if it was this thread's document that completed.
+                while (IsUIReady && !_completedFiles.TryRemove(fileID, out fileProcessingResult));
             }
             catch (Exception ex)
             {
@@ -636,7 +649,15 @@ namespace Extract.FileActionManager.Forms
             }
             finally
             {
-                _currentFileID = -1;
+                _currentFileIDs.TryRemove(fileID, out int _);
+                _completedFiles.TryRemove(fileID, out var _);
+
+                // Only reset _fileCompletedEvent once every thread has had the opportunity to see
+                // if it was the one completed.
+                if (_completedFiles.Count == 0)
+                {
+                    _fileCompletedEvent.Reset();
+                }
 
                 if (haveLock)
                 {
@@ -654,7 +675,9 @@ namespace Extract.FileActionManager.Forms
             // _lock section before Windows gives the waiting thread(s) an opportunity to proceed.
             Thread.Sleep(0);
 
-            return fileProcessingResult;
+            return Aborted
+                ? EFileProcessingResult.kProcessingCancelled
+                : fileProcessingResult;
         }
 
         /// <summary>
@@ -897,7 +920,7 @@ namespace Extract.FileActionManager.Forms
                 {
                     _requestedFileID = fileID;
 
-                    if (_currentFileID == fileID || _waitingFileIDQueue.Contains(fileID))
+                    if (_currentFileIDs.ContainsKey(fileID) || _waitingFileIDQueue.Contains(fileID))
                     {
                         // The form is already holding the requested file. Return true to indicate
                         // it is available and will be guaranteed to be the next file displayed.
@@ -1058,7 +1081,7 @@ namespace Extract.FileActionManager.Forms
         /// <see cref="IVerificationForm.FileComplete"/> event.</param>
         void HandleFileComplete(object sender, FileCompleteEventArgs e)
         {
-            _fileProcessingResult = e.FileProcessingResult;
+            _completedFiles[e.FileId] = e.FileProcessingResult;
 
             if (e.FileProcessingResult == EFileProcessingResult.kProcessingCancelled)
             {

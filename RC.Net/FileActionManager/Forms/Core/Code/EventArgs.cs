@@ -10,23 +10,29 @@ namespace Extract.FileActionManager.Forms
     public class FileCompleteEventArgs : EventArgs
     {
         /// <summary>
-        /// Specifies under what circumstances verification of the file completed.
-        /// </summary>
-        readonly EFileProcessingResult _fileProcessingResult;
-
-        /// <summary>
         /// Initializes a new <see cref="FileCompleteEventArgs"/> instance.
         /// </summary>
+        /// <param name="fileId">The ID of the file that has been completed.</param>
         /// <param name="fileProcessingResult">
         /// <see cref="EFileProcessingResult.kProcessingSuccessful"/> if verification of the
         /// document completed successfully, <see cref="EFileProcessingResult.kProcessingCancelled"/>
         /// if verification of the document was cancelled by the user or
         /// <see cref="EFileProcessingResult.kProcessingSkipped"/> if verification of the current file
         /// was skipped, but the user wishes to continue viewing subsequent documents.</param>
-        public FileCompleteEventArgs(EFileProcessingResult fileProcessingResult)
+        public FileCompleteEventArgs(int fileId, EFileProcessingResult fileProcessingResult)
             : base()
         {
-            _fileProcessingResult = fileProcessingResult;
+            FileId = fileId;
+            FileProcessingResult = fileProcessingResult;
+        }
+
+        /// <summary>
+        /// Gets the ID of the file that has been completed.
+        /// </summary>
+        public int FileId
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -35,10 +41,8 @@ namespace Extract.FileActionManager.Forms
         /// <returns></returns>
         public EFileProcessingResult FileProcessingResult
         {
-            get
-            {
-                return _fileProcessingResult;
-            }
+            get;
+            private set;
         }
     }
 

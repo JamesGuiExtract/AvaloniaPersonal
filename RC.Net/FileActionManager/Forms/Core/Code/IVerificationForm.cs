@@ -96,6 +96,17 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
+        /// Gets a value indicating whether the form supports displaying multiple documents
+        /// simultaneously (one for each processing thread).
+        /// </summary>
+        /// <value><c>true</c> if the form supports multiple documents, <c>false</c> if only one
+        /// document at a time can be loaded.</value>
+        bool SupportsMultipleDocuments
+        {
+            get;
+        }
+
+        /// <summary>
         /// A thread-safe method that opens a document for verification.
         /// </summary>
         /// <param name="fileName">The filename of the document to open.</param>

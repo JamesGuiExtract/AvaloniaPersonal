@@ -2389,14 +2389,14 @@ void CFileProcessingMgmtRole::executeErrorTask(FileProcessingRecord &task,
 	// Log a cancellation during error task execution
 	if (eResult == kProcessingCancelled)
 	{
-		UCLIDException ue("ELI18060","Application trace: Processing cancelled while executing error task.");
+		UCLIDException ue("ELI18060","Application trace: Error task cancelled.");
 		ue.addDebugInfo("File", task.getFileName());
 		ue.addDebugInfo("Task", asString(getErrorHandlingTask()->Description));
 		ue.log();
 	}
 	else if (eResult == kProcessingDelayed)
 	{
-		UCLIDException ue("ELI37480","Application trace: Processing delayed while executing error task.");
+		UCLIDException ue("ELI37480","Application trace: Error task delayed.");
 		ue.addDebugInfo("File", task.getFileName());
 		ue.addDebugInfo("Task", asString(getErrorHandlingTask()->Description));
 		ue.log();

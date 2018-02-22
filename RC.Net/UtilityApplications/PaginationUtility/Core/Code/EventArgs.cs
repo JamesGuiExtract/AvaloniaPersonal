@@ -481,6 +481,42 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
+    /// The event arguments for the <see cref="PaginationPanel.CommittingChanges"/>
+    /// event.
+    /// </summary>
+    public class FileTaskSessionRequestEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileTaskSessionRequestEventArgs"/> class.
+        /// </summary>
+        /// <param name="fileID">The ID of the file for which the corresponding file task session ID
+        /// is needed.</param>
+        public FileTaskSessionRequestEventArgs(int fileID)
+        {
+            FileID = fileID;
+        }
+
+        /// <summary>
+        /// Gets the ID of the file for which the corresponding file task session ID
+        /// is needed.
+        /// </summary>
+        public int FileID
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets the corresponding file task session ID for the <see cref="FileID"/>.
+        /// </summary>
+        public int? FileTaskSessionID
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
     /// The event arguments for the <see cref="PageLayoutControl.PageDeleted"/> event.
     /// </summary>
     public class PageLoadRequestEventArgs : EventArgs

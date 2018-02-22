@@ -685,6 +685,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Gets a value indicating whether the form supports displaying multiple documents
+        /// simultaneously (one for each processing thread).
+        /// </summary>
+        /// <value><c>true</c> if the form supports multiple documents, <c>false</c> if only one
+        /// document at a time can be loaded.</value>
+        public bool SupportsMultipleDocuments
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Gets the active <see cref="DataEntryControlHost"/>.
         /// </summary>
         public DataEntryControlHost ActiveDataEntryControlHost
@@ -879,11 +893,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _fileId = fileID;
                 _fileName = fileName;
                 _fileTaskSessionID = null;
-
-                if (_paginationPanel != null)
-                {
-                    _paginationPanel.FileTaskSessionID = null;
-                }
 
                 StartFileTaskSession();
 
@@ -1323,6 +1332,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Register for OutputDocumentCreated event in order to set status for the
                     // PaginationOutputAction _after_ the document has been created
                     _paginationPanel.OutputDocumentCreated += HandlePaginationPanel_OutputDocumentCreated;
+                    _paginationPanel.FileTaskSessionIdRequest += (o, args) => args.FileTaskSessionID = _fileTaskSessionID;
 
                     if (_configManager.RegisteredDocumentTypes.Any())
                     {
@@ -2180,7 +2190,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // https://extract.atlassian.net/browse/ISSUE-13051
                         // Consider removing code that would cancel processing in response to the
                         // ImageFileClosing event.
-                        OnFileComplete(EFileProcessingResult.kProcessingCancelled);
+                        OnFileComplete(_fileId, EFileProcessingResult.kProcessingCancelled);
                     }
                 }
             }
@@ -3794,14 +3804,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
+        /// <param name="fileId">The ID of the file that completed.</param>
         /// <param name="fileProcessingResult">Specifies under what circumstances
         /// verification of the file completed.</param>
-        void OnFileComplete(EFileProcessingResult fileProcessingResult)
+        void OnFileComplete(int fileId, EFileProcessingResult fileProcessingResult)
         {
             var eventHandler = FileComplete;
             if (eventHandler != null)
             {
-                eventHandler(this, new FileCompleteEventArgs(fileProcessingResult));
+                eventHandler(this, new FileCompleteEventArgs(fileId, fileProcessingResult));
             }
         }
 
@@ -3912,12 +3923,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         RecordCounts(onLoad: false,
                             attributes: DataEntryControlHost.MostRecentlySavedAttributes);
                         EndFileTaskSession();
-
-                        _fileId = -1;
-                        _fileName = null;
                     }
 
-                    OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
+                    OnFileComplete(_fileId, EFileProcessingResult.kProcessingSuccessful);
+
+                    _fileId = -1;
+                    _fileName = null;
                 }
             }
             catch (Exception ex)
@@ -4103,10 +4114,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 RecordCounts(onLoad: false, attributes: null);
                 EndFileTaskSession();
 
+                OnFileComplete(_fileId, processingResult);
+
                 _fileId = -1;
                 _fileName = null;
-
-                OnFileComplete(processingResult);
             }
         }
 
@@ -4501,11 +4512,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _recordedDatabaseData = false;
 
                 _fileTaskSessionID = FileProcessingDB.StartFileTaskSession(_VERIFICATION_TASK_GUID, _fileId, _actionId);
-
-                if (_paginationPanel != null)
-                {
-                    _paginationPanel.FileTaskSessionID = _fileTaskSessionID;
-                }
 
                 // If the timer is currently running, its current time will be the overhead time
                 // (time since the previous document was saved. Restart the timer to track the

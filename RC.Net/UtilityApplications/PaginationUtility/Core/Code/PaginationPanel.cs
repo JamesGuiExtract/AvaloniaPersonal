@@ -241,6 +241,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<EventArgs> RevertedChanges;
 
+        /// <summary>
+        /// Occurs when [file task session identifier request].
+        /// </summary>
+        public event EventHandler<FileTaskSessionRequestEventArgs> FileTaskSessionIdRequest;
+
         #endregion Events
 
         #region Configuration Properties
@@ -612,17 +617,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [Browsable(false)]
         public UCLID_FILEPROCESSINGLib.FileProcessingDB FileProcessingDB
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets/sets the ID of the currently active FileTaskSession row.
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [Browsable(false)]
-        public int? FileTaskSessionID
         {
             get;
             set;
@@ -1129,9 +1123,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="documentsToCommit">The pending documents to be committed</param>
         void WritePaginationHistoryForDocumentsWithOnlyDeletedPages(IEnumerable<OutputDocument> documentsToCommit)
         {
-            ExtractException.Assert("ELI39699", "FileTaskSession was not started.",
-                FileTaskSessionID.HasValue);
-
+            int? firstSourceFileID = null;
             var info = new IUnknownVectorClass();
             foreach (var document in documentsToCommit
                 .Where(doc => doc.PageControls.All(c => c.Deleted)))
@@ -1145,12 +1137,22 @@ namespace Extract.UtilityApplications.PaginationUtility
                         StringKey = originalDocumentName,
                         StringValue = originalPageNumber.ToString(CultureInfo.InvariantCulture)
                     });
+                    if (!firstSourceFileID.HasValue)
+                    {
+                        firstSourceFileID = firstSourceFileID ?? FileProcessingDB.GetFileID(originalDocumentName);
+                    }
                 }
             }
 
             if (info.Size() > 0)
             {
-                FileProcessingDB.AddPaginationHistory(null, null, info, FileTaskSessionID.Value);
+                var sessionIdRequestArgs = new FileTaskSessionRequestEventArgs(firstSourceFileID.Value);
+                FileTaskSessionIdRequest?.Invoke(this, sessionIdRequestArgs);
+
+                ExtractException.Assert("ELI45596", "Session not available", 
+                    sessionIdRequestArgs.FileTaskSessionID.HasValue);
+
+                FileProcessingDB.AddPaginationHistory(null, null, info, sessionIdRequestArgs.FileTaskSessionID.Value);
             }
         }
 
@@ -1375,9 +1377,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                                     .Any(c => c.Page.SourceDocument == sourceDocument))
                                 .ToArray();
 
-                            ExtractException.Assert("ELI41281", "FileTaskSession was not started.",
-                                FileTaskSessionID.HasValue);
-
                             foreach (var outputDocument in documentsToDelete)
                             {
                                 string sourceFileName = null;
@@ -1435,7 +1434,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 // Add pagination history records to DB if got this far without error
                                 if (acceptingPagination)
                                 {
-                                    FileProcessingDB.AddPaginationHistory(sourceFileName, sourcePageInfo, deletedSourcePageInfo, FileTaskSessionID.Value);
+                                    int sourceFileId = FileProcessingDB.GetFileID(sourceFileName);
+                                    var sessionIdRequestArgs = new FileTaskSessionRequestEventArgs(sourceFileId);
+                                    FileTaskSessionIdRequest?.Invoke(this, sessionIdRequestArgs);
+
+                                    ExtractException.Assert("ELI45596", "Session not available",
+                                        sessionIdRequestArgs.FileTaskSessionID.HasValue);
+
+                                    FileProcessingDB.AddPaginationHistory(sourceFileName, sourcePageInfo, deletedSourcePageInfo,
+                                        sessionIdRequestArgs.FileTaskSessionID.Value);
                                 }
                             }
 
