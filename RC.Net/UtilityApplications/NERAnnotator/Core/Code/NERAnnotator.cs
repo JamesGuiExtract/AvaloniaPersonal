@@ -366,10 +366,6 @@ namespace Extract.UtilityApplications.NERAnnotator
                         .ToArray();
                 }
             }
-            catch (OperationCanceledException)
-            {
-                return null;
-            }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI44870");
