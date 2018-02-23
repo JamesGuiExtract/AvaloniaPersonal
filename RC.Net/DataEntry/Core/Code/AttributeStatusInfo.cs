@@ -269,11 +269,11 @@ namespace Extract.DataEntry
         static bool _threadEnding;
 
         /// <summary>
-        /// Indicates whether database connections in this thread should be shared with with other
-        /// threads (for the purpose of background loading efficiency).
+        /// Indicates whether cached data should be be shared with with other threads in this process
+        /// (for the purpose of background loading efficiency).
         /// </summary>
         [ThreadStatic]
-        static bool _shareDBConnections;
+        static bool _processWideDataCache;
 
         /// <summary>
         /// Registered event handlers for the <see cref="DataReset"/> event.
@@ -865,22 +865,22 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether database connections in this thread should be
-        /// shared with with other threads (for the purpose of background loading efficiency).
+        /// Gets or sets a value indicating whether cached data should be be shared with with other
+        /// threads in this process (for the purpose of background loading efficiency).
         /// </summary>
         /// <value>
         ///   <c>true</c> if [block automatic update queries]; otherwise, <c>false</c>.
         /// </value>
-        public static bool ShareDBConnections
+        public static bool ProcessWideDataCache
         {
             get
             {
-                return _shareDBConnections;
+                return _processWideDataCache;
             }
 
             set
             {
-                _shareDBConnections = value;
+                _processWideDataCache = value;
             }
         }
 

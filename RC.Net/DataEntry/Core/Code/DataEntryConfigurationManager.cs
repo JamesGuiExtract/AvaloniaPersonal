@@ -547,7 +547,7 @@ namespace Extract.DataEntry
                         configFileName, masterConfigFileName, false, false, _tagUtility);
 
                 DataEntryConfiguration configuration =
-                    new DataEntryConfiguration(config, _tagUtility, _dataEntryApp.FileProcessingDB);
+                    new DataEntryConfiguration(config, _tagUtility, _dataEntryApp.FileProcessingDB, false);
 
                 // Tie the newly created DEP to this application and its ImageViewer.
                 configuration.DataEntryControlHost.DataEntryApplication = _dataEntryApp;
@@ -715,10 +715,6 @@ namespace Extract.DataEntry
         /// <returns></returns>
         DataEntryConfiguration CreateBackgroundConfiguration(DataEntryConfiguration configuration)
         {
-            // Connections will be shared across background loading threads; establish
-            // the connections to be shared.
-            configuration.OpenDatabaseConnections();
-
             // Create a background configuration as long as the configuration supports a NoUI load.
             DataEntryConfiguration backgroundConfig = null;
             if (configuration.Config.Settings.SupportsNoUILoad)
@@ -728,8 +724,7 @@ namespace Extract.DataEntry
             else
             {
                 backgroundConfig = new DataEntryConfiguration(
-                    configuration.Config, _tagUtility, configuration.FileProcessingDB,
-                    configuration);
+                    configuration.Config, _tagUtility, configuration.FileProcessingDB, true);
             }
 
             return backgroundConfig;

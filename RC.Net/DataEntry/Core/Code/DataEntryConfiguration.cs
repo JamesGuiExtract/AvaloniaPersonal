@@ -35,7 +35,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Protects access to non-thread-safe code.
         /// </summary>
-        static object _lock = new object();
+        object _lock = new object();
 
         /// <summary>
         /// The configuration settings specified via config file.
@@ -93,12 +93,11 @@ namespace Extract.DataEntry
         /// <param name="tagUtility">The <see cref="ITagUtility"/> interface provided to expand path
         /// tags/functions.</param>
         /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
-        /// <param name="backgroundConfigModel>The <see cref="DataEntryConfiguration"/> this
-        /// configuration represents in the context of background loading operations.
+        /// <param name="isBackgroundConfig"><c>true</c> if this instance is for loading data in the
+        /// background; <c>false</c> if it is for loading data into a foreground form.</param>
         public DataEntryConfiguration(
             ConfigSettings<Extract.DataEntry.Properties.Settings> config,
-            ITagUtility tagUtility, FileProcessingDB fileProcessingDB,
-            DataEntryConfiguration backgroundConfigModel = null)
+            ITagUtility tagUtility, FileProcessingDB fileProcessingDB, bool isBackgroundConfig)
         {
             try
             {
@@ -106,21 +105,11 @@ namespace Extract.DataEntry
                 _tagUtility = tagUtility;
                 _fileProcessingDB = fileProcessingDB;
 
-                if (backgroundConfigModel == null)
+                _isBackgroundConfig = isBackgroundConfig;
+                if (!isBackgroundConfig)
                 {
                     // Foreground configuration; create DEP immediately.
                     _dataEntryControlHost = CreateDataEntryControlHost();
-                }
-                else
-                {
-                    // Background configuration; DEP creation can be delayed until it is known to be
-                    // needed (it may never be).
-                    lock (_lock)
-                    {
-                        _isBackgroundConfig = true;
-                        _dbConnections = backgroundConfigModel._dbConnections
-                            .ToDictionary(item => item.Key, item => item.Value);
-                    }
                 }
             }
             catch (Exception ex)
@@ -157,7 +146,6 @@ namespace Extract.DataEntry
                                 (!_isBackgroundConfig || !_config.Settings.SupportsNoUILoad))
                     {
                         _dataEntryControlHost = CreateDataEntryControlHost();
-                        _dataEntryControlHost.SetDatabaseConnections(GetDatabaseConnections());
                     }
 
                     return _dataEntryControlHost;
@@ -233,9 +221,9 @@ namespace Extract.DataEntry
                 var dbConnections = GetDatabaseConnections();
 
                 // Background configurations will defer DEP creation until needed.
-                if (_dataEntryControlHost != null)
+                if (!_config.Settings.SupportsNoUILoad)
                 {
-                    _dataEntryControlHost?.SetDatabaseConnections(dbConnections);
+                    DataEntryControlHost.SetDatabaseConnections(dbConnections);
                 }
             }
             catch (Exception ex)
@@ -290,11 +278,6 @@ namespace Extract.DataEntry
                 configuration._fileProcessingDB = _fileProcessingDB;
                 configuration._backgroundFieldModels = _backgroundFieldModels;
 
-                lock (_lock)
-                {
-                    configuration._dbConnections = _dbConnections.ToDictionary(item => item.Key, item => item.Value);
-                }
-
                 return configuration;
             }
             catch (Exception ex)
@@ -339,6 +322,7 @@ namespace Extract.DataEntry
                                     bool isDefaultConnection = false;
                                     var connectionInfo =
                                         LoadDatabaseConnection(databaseConnectionsNode, out isDefaultConnection);
+                                    connectionInfo.ShareLocalDBCopy = _isBackgroundConfig;
 
                                     ExtractException.Assert("ELI37781",
                                         "Multiple default connections are defined.",
@@ -456,9 +440,7 @@ namespace Extract.DataEntry
 
                 lock (_lock)
                 {
-                    // Connections are shared for background loading configurations-- it is up to the
-                    // source configuration to dispose of these connections.
-                    if (_dbConnections != null && !_isBackgroundConfig)
+                    if (_dbConnections != null)
                     {
                         CollectionMethods.ClearAndDispose(_dbConnections);
                     }

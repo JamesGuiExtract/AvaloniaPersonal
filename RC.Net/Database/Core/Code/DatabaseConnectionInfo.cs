@@ -29,10 +29,16 @@ namespace Extract.Database
         #region Fields
 
         /// <summary>
-        /// For SQL CE database connection opened, keeps track of the local database copy to use.
-        /// The same file will be used for all threads accessing this this instance.
+        /// For SQL CE database connection opened, keeps track of a local database copy to use across
+        /// instances in this process for case <see cref="ShareLocalDBCopy"/> is <c>true</c>.
         /// </summary>
-        TemporaryFileCopyManager _localDatabaseCopyManager = new TemporaryFileCopyManager();
+        static TemporaryFileCopyManager _multiThreadedLocalDatabaseCopyManager = new TemporaryFileCopyManager();
+
+        /// <summary>
+        /// For SQL CE database connection opened, keeps track of the local database copy to use
+        /// for this instance only for case <see cref="ShareLocalDBCopy"/> is <c>false</c>.
+        /// </summary>
+        TemporaryFileCopyManager _localDatabaseCopyManager;
 
         /// <summary>
         /// The type of connection if not provided via the <see cref="DataProvider"/> property.
@@ -430,7 +436,7 @@ namespace Extract.Database
                             // The connection should also be reset if we are using a SQL CE connection
                             // to a local DB copy and the master copy has been updated.
                             if (!recreateConnection && _activeSqlCeDb != null &&
-                                _localDatabaseCopyManager.HasFileBeenModified(_activeSqlCeDb))
+                                LocalDatabaseCopyManager.HasFileBeenModified(_activeSqlCeDb))
                             {
                                 recreateConnection = true;
                             } 
@@ -470,6 +476,18 @@ namespace Extract.Database
                     throw ex.AsExtract("ELI37790");
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets or sets whether local SqlCe database copies should be shared with other instances
+        /// in this processes.
+        /// </summary>
+        /// <value><c>true</c> to share local SqlCe database copies with other <see cref="DatabaseConnectionInfo"/>
+        /// instances; <c>false</c> to keep the local copy for use by this instance only.</value>
+        public bool ShareLocalDBCopy
+        {
+            get;
+            set;
         }
 
         #endregion Properties
@@ -568,7 +586,7 @@ namespace Extract.Database
                 {
                     try
                     {
-                        _localDatabaseCopyManager.Dereference(_activeSqlCeDb, this);
+                        LocalDatabaseCopyManager.Dereference(_activeSqlCeDb, this);
                     }
                     catch (Exception ex2)
                     {
@@ -599,7 +617,7 @@ namespace Extract.Database
                     _managedConnectionString = null;
                     if (_activeSqlCeDb != null)
                     {
-                        _localDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
+                        LocalDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
                         _activeSqlCeDb = null;
                     }
                 }
@@ -717,11 +735,11 @@ namespace Extract.Database
 
                     if (_activeSqlCeDb != null)
                     {
-                        _localDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
+                        LocalDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
                         _activeSqlCeDb = null;
                     }
 
-                    if (_localDatabaseCopyManager != null)
+                    if (!ShareLocalDBCopy && _localDatabaseCopyManager != null)
                     {
                         _localDatabaseCopyManager.Dispose();
                         _localDatabaseCopyManager = null;
@@ -755,6 +773,25 @@ namespace Extract.Database
         #endregion IDisposable
 
         #region Private Members
+
+        /// <summary>
+        /// Gets the <see cref="TemporaryFileCopyManager"/> to manage local SqlCe copy instances
+        /// based on the value of <see cref="ShareLocalDBCopy"/>.
+        /// </summary>
+        TemporaryFileCopyManager LocalDatabaseCopyManager
+        {
+            get
+            {
+                if (_localDatabaseCopyManager == null)
+                {
+                    _localDatabaseCopyManager = ShareLocalDBCopy
+                        ? _multiThreadedLocalDatabaseCopyManager
+                        : new TemporaryFileCopyManager();
+                }
+
+                return _localDatabaseCopyManager;
+            }
+        }
 
         /// <summary>
         /// Creates a version of the specified <see paramref="connectionString"/> that points to a
@@ -792,7 +829,7 @@ namespace Extract.Database
             // with the database maintaining read-only status since changes to this copy will not
             // affect the original. Ensure read-only is off so the database can be used.
             connectionStringBuilder.Add(parameterName,
-                _localDatabaseCopyManager.GetCurrentTemporaryFileName(
+                LocalDatabaseCopyManager.GetCurrentTemporaryFileName(
                     sqlceDatabaseFile, this, true, true));
             return connectionStringBuilder.ConnectionString;
         }

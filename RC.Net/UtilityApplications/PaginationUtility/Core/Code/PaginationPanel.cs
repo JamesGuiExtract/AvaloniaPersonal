@@ -1139,7 +1139,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     });
                     if (!firstSourceFileID.HasValue)
                     {
-                        firstSourceFileID = firstSourceFileID ?? FileProcessingDB.GetFileID(originalDocumentName);
+                        firstSourceFileID = FileProcessingDB.GetFileID(originalDocumentName);
                     }
                 }
             }

@@ -414,6 +414,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentData = (DataEntryPaginationDocumentData)data;
                 _configManager.LoadCorrectConfigForData(_documentData.WorkingAttributes);
+                _configManager.ActiveDataEntryConfiguration.OpenDatabaseConnections();
 
                 ActiveDataEntryPanel.LoadData(data, forDisplay);
 
@@ -1114,17 +1115,13 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 using (var tempData = new DataEntryPaginationDocumentData(deserializedAttributes, documentData.SourceDocName))
                 {
-                    AttributeStatusInfo.ShareDBConnections = true;
+                    AttributeStatusInfo.ProcessWideDataCache = true;
                     if (backgroundConfigManager.ExecuteNoUILoad(tempData.Attributes, documentData.SourceDocName))
                     {
                         documentStatus = GetDocumentStatusFromNoUILoad(backgroundConfigManager, tempData, saveData);
                     }
                     else
                     {
-                        // While the configuration's shared connections are already open,
-                        // OpenDatabaseConnections is needed to assign those connection to the DEP.
-                        backgroundConfigManager.ActiveDataEntryConfiguration.OpenDatabaseConnections();
-
                         documentStatus = GetDocumentDataFromUILoad(backgroundConfigManager, tempData, saveData);
                     }
 
