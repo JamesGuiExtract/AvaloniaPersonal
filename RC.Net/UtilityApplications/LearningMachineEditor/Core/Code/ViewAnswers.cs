@@ -43,11 +43,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
             // Initialize the DataGridView.
             answerCategoriesDataGridView.AutoGenerateColumns = false;
-            var dataSource = new BindingList<KeyValueClass>(
-                _encoder.AnswerCodeToName
-                .Select(kv => new KeyValueClass{Key= kv.Key, Value= kv.Value})
-                .OrderBy(kv => kv.Key)
-                .ToList());
+            var dataSource = new BindingList<KeyValueClass>();
+            for (int i=0; i < _encoder.AnswerCodeToName.Count; i++)
+            {
+                dataSource.Add(new KeyValueClass { Key = i, Value = _encoder.AnswerCodeToName[i] });
+            }
             dataSource.AllowEdit = true;
             answerCategoriesDataGridView.DataSource = dataSource;
 
@@ -114,10 +114,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             .Replace("%2", fileNameB.Quote());
 
                         // Write answer category names to the temp file
-                        File.WriteAllLines(fileNameA,
-                            _encoder.AnswerCodeToName
-                            .OrderBy(kv => kv.Key)
-                            .Select(kv => kv.Value));
+                        File.WriteAllLines(fileNameA, _encoder.AnswerCodeToName);
 
                         var p = new System.Diagnostics.Process();
                         p.StartInfo.UseShellExecute = true;
@@ -148,9 +145,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         {
             try
             {
-                var lines = _encoder.AnswerCodeToName
-                                .OrderBy(kv => kv.Key)
-                                .Select(kv => kv.Value);
+                var lines = _encoder.AnswerCodeToName;
 
                 using (var saveDialog = new SaveFileDialog())
                 {
@@ -216,6 +211,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
         private class KeyValueClass
         {
+            [SuppressMessage("Microsoft.Performance", "CA1811:NoUpstreamCallers")]
             public int Key { get; set; }
 
             [SuppressMessage("Microsoft.Performance", "CA1811:NoUpstreamCallers")]

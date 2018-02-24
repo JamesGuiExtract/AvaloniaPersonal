@@ -1,12 +1,16 @@
-﻿using Extract.Utilities;
+﻿using Extract.Encryption;
+using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters;
 
 namespace Extract.AttributeFinder
 {
@@ -23,8 +27,17 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Version 2: Added field _bitmapSize to ensure compatible Bitmaps (used for FeatureVectorType.Bitmap)
+        /// Version 3: Changed to store some fields encrypted so that the whole encoder doesn't need to be encrypted anymore
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
+
+        // Encryption password for serialization, renamed to obfuscate purpose
+        private static readonly byte[] _CONVERGENCE_MATRIX = new byte[64]
+            {
+                185, 105, 109, 83, 148, 254, 79, 173, 128, 172, 12, 76, 61, 131, 66, 69, 236, 2, 76, 172, 158,
+                197, 70, 243, 131, 95, 163, 206, 89, 164, 145, 134, 6, 25, 175, 201, 97, 177, 190, 24, 163, 144,
+                141, 55, 75, 250, 20, 9, 176, 172, 55, 107, 172, 231, 69, 151, 34, 7, 232, 26, 112, 63, 202, 33
+            };
 
         #endregion Constants
 
@@ -41,7 +54,11 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Bag-of-words object to be created if/when it is needed
         /// </summary>
+        [Obsolete("Use _nonSerializedBagOfWords")]
         private Lazy<Accord.MachineLearning.BagOfWords> _bagOfWords;
+
+        [NonSerialized]
+        private Lazy<Accord.MachineLearning.BagOfWords> _nonSerializedBagOfWords;
 
         /// <summary>
         /// Set of values seen during configuration
@@ -53,6 +70,9 @@ namespace Extract.AttributeFinder
 
         [OptionalField(VersionAdded = 2)]
         private int _bitmapSize;
+
+        [OptionalField(VersionAdded = 3)]
+        private byte[] _encryptedVocabulary;
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // Non-serialized collections to track term frequency information in order to compute tf*idf score (used as a relevance heuristic)
@@ -81,7 +101,7 @@ namespace Extract.AttributeFinder
             FeatureType = FeatureVectorizerType.Exists;
 
             // Set up initialization of the bag of words object for if/when it is used
-            _bagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() => CreateInitialBagOfWords());
+            _nonSerializedBagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() => CreateInitialBagOfWords());
         }
 
         #endregion Constructors
@@ -235,13 +255,13 @@ namespace Extract.AttributeFinder
                                 "{0:G4}\u2013{1:G4}", double.MinValue, double.MaxValue), 1);
                     case FeatureVectorizerType.DiscreteTerms:
                         // If BoW hasn't yet been created, skip that step
-                        if (!_bagOfWords.IsValueCreated)
+                        if (!_nonSerializedBagOfWords.IsValueCreated)
                         {
                             return GetBagOfWordsVocab();
                         }
                         else
                         {
-                            return _bagOfWords.Value.CodeToString
+                            return _nonSerializedBagOfWords.Value.CodeToString
                                 .OrderBy(p => p.Key)
                                 .Select(p => p.Value);
                         }
@@ -341,11 +361,11 @@ namespace Extract.AttributeFinder
                 if (FeatureType == FeatureVectorizerType.DiscreteTerms)
                 {
                     var topTerms = RecognizedValues.Take(limit).ToArray();
-                    _bagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
+                    _nonSerializedBagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
                         new Accord.MachineLearning.BagOfWords(topTerms));
 
                     // Instantiate the lazy object
-                    if (_bagOfWords.Value != null) { }
+                    if (_nonSerializedBagOfWords.Value != null) { }
 
                     // Clear full list
                     // https://extract.atlassian.net/browse/ISSUE-15231
@@ -452,9 +472,9 @@ namespace Extract.AttributeFinder
                     FeatureType = FeatureVectorizerType.DiscreteTerms;
                 }
 
-                if (_bagOfWords.IsValueCreated)
+                if (_nonSerializedBagOfWords.IsValueCreated)
                 {
-                    _bagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
+                    _nonSerializedBagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
                         CreateInitialBagOfWords());
                 }
             }
@@ -503,7 +523,7 @@ namespace Extract.AttributeFinder
 
                     // Return BoW feature vector + exists/not exists value
                     case FeatureVectorizerType.DiscreteTerms:
-                        var features = _bagOfWords.Value.GetFeatureVector(values.ToArray()).Select(i => (double)i);
+                        var features = _nonSerializedBagOfWords.Value.GetFeatureVector(values.ToArray()).Select(i => (double)i);
                         return features.Concat(new[] { exists }).ToArray();
 
                     case FeatureVectorizerType.Bitmap:
@@ -651,6 +671,23 @@ namespace Extract.AttributeFinder
             // This limits ones ability to change feature type after save/load but
             // it is the simplest way to save storage space
             _distinctValuesSeen.Clear();
+
+            var vocab = _nonSerializedBagOfWords.Value.CodeToString
+                .OrderBy(kv => kv.Key)
+                .Select(kv => kv.Value)
+                .ToArray();
+
+            var ml = new MapLabel();
+            using (var unencryptedStream = new MemoryStream())
+            using (var encryptedStream = new MemoryStream())
+            {
+                var serializer = new NetDataContractSerializer();
+                serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
+                serializer.Serialize(unencryptedStream, vocab);
+                unencryptedStream.Position = 0;
+                ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _CONVERGENCE_MATRIX, ml);
+                _encryptedVocabulary = encryptedStream.ToArray();
+            }
         }
 
         /// <summary>
@@ -661,6 +698,26 @@ namespace Extract.AttributeFinder
         private void OnDeserializing(StreamingContext context)
         {
             _bitmapSize = 0;
+            _termFrequency = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
+            _termToDocument = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+            _categoriesSeen = new HashSet<string>(StringComparer.Ordinal);
+            _documentsSeen = new HashSet<string>(StringComparer.Ordinal);
+            _encryptedVocabulary = null;
+            _nonSerializedBagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
+            {
+                ExtractException.Assert("ELI45610", "Logic error: vocabulary is null", _encryptedVocabulary != null);
+
+                var ml = new MapLabel();
+                using (var encryptedStream = new MemoryStream(_encryptedVocabulary))
+                using (var unencryptedStream = new MemoryStream())
+                {
+                    ExtractEncryption.DecryptStream(encryptedStream, unencryptedStream, _CONVERGENCE_MATRIX, ml);
+                    unencryptedStream.Position = 0;
+                    var serializer = new NetDataContractSerializer();
+                    serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
+                    return new Accord.MachineLearning.BagOfWords((string[])serializer.Deserialize(unencryptedStream));
+                }
+            });
         }
 
         /// <summary>
@@ -675,11 +732,15 @@ namespace Extract.AttributeFinder
                 "Current version", _CURRENT_VERSION,
                 "Version to load", _version);
 
+            if (_version < 3)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                _nonSerializedBagOfWords = _bagOfWords;
+                _bagOfWords = null;
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+
             _version = _CURRENT_VERSION;
-            _termFrequency = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
-            _termToDocument = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
-            _categoriesSeen = new HashSet<string>(StringComparer.Ordinal);
-            _documentsSeen = new HashSet<string>(StringComparer.Ordinal);
         }
 
         /// <summary>

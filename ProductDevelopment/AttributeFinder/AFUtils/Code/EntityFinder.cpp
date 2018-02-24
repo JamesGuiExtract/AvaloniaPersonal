@@ -99,6 +99,7 @@ STDMETHODIMP CEntityFinder::FindEntities(ISpatialString* pText)
 		// This is such an obscure method (only used by MERS modifier)
 		// that it doesn't seem worth it to ensure that a specific FKB is used.
 		// This will result in the use of the entity finder from the Latest FKB
+		// https://extract.atlassian.net/browse/ISSUE-15361
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
 		ASSERT_RESOURCE_ALLOCATION( "ELI45674", ipAFDoc != __nullptr);
 		m_ipKeys->Init(ipAFDoc);

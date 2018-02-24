@@ -1,4 +1,6 @@
-﻿using Extract.Utilities;
+﻿using Extract.Encryption;
+using Extract.Licensing;
+using Extract.Utilities;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Core;
 using Lucene.Net.Analysis.En;
@@ -21,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,8 +49,17 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Version 2: Add versioning
         /// Version 3: Add _useFeatureHashing
+        /// Version 4: Changed to store some fields encrypted so that the whole encoder doesn't need to be encrypted anymore
         /// </summary>
-        const int _CURRENT_VERSION = 3;
+        const int _CURRENT_VERSION = 4;
+
+        // Encryption password for serialization, renamed to obfuscate purpose
+        private static readonly byte[] _CONVERGENCE_MATRIX = new byte[64]
+            {
+                185, 105, 109, 83, 148, 254, 79, 173, 128, 172, 12, 76, 61, 131, 66, 69, 236, 2, 76, 172, 158,
+                197, 70, 243, 131, 95, 163, 206, 89, 164, 145, 134, 6, 25, 175, 201, 97, 177, 190, 24, 163, 144,
+                141, 55, 75, 250, 20, 9, 176, 172, 55, 107, 172, 231, 69, 151, 34, 7, 232, 26, 112, 63, 202, 33
+            };
 
         #endregion Constants
 
@@ -56,7 +68,11 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Bag-of-words object used to create this object's feature vector
         /// </summary>
+        [Obsolete("Use _nonSerializedBagOfWords")]
         private Accord.MachineLearning.BagOfWords _bagOfWords;
+
+        [NonSerialized]
+        private Accord.MachineLearning.BagOfWords _nonSerializedBagOfWords;
 
         // Backing fields for properties
         private string _pagesToProcess;
@@ -70,6 +86,9 @@ namespace Extract.AttributeFinder
 
         [OptionalField(VersionAdded = 3)]
         private bool _useFeatureHashing;
+
+        [OptionalField(VersionAdded = 4)]
+        private byte[] _encryptedVocabulary;
 
         #endregion Fields
 
@@ -250,9 +269,9 @@ namespace Extract.AttributeFinder
                 // Order by code to match original order of terms passed to constructor
                 // This could be interesting to see (since terms will have been ordered by TFIDF score)
                 // and simplifies reconstructing the bag of words when cloning
-                return _bagOfWords == null
+                return _nonSerializedBagOfWords == null
                     ? Enumerable.Empty<string>()
-                    : _bagOfWords.CodeToString.OrderBy(p => p.Key).Select(p => p.Value);
+                    : _nonSerializedBagOfWords.CodeToString.OrderBy(p => p.Key).Select(p => p.Value);
             }
         }
 
@@ -323,7 +342,7 @@ namespace Extract.AttributeFinder
         {
             get
             {
-                return _bagOfWords != null || _useFeatureHashing;
+                return _nonSerializedBagOfWords != null || _useFeatureHashing;
             }
         }
 
@@ -363,7 +382,7 @@ namespace Extract.AttributeFinder
                 var valuesSeen = RecognizedValues.ToArray();
                 if (valuesSeen.Length > 0)
                 {
-                    clone._bagOfWords = new Accord.MachineLearning.BagOfWords(valuesSeen);
+                    clone._nonSerializedBagOfWords = new Accord.MachineLearning.BagOfWords(valuesSeen);
                 }
                 return clone;
             }
@@ -382,7 +401,7 @@ namespace Extract.AttributeFinder
             try
             {
                 var topTerms = RecognizedValues.Take(limit).ToArray();
-                _bagOfWords = new Accord.MachineLearning.BagOfWords(topTerms);
+                _nonSerializedBagOfWords = new Accord.MachineLearning.BagOfWords(topTerms);
 
                 NotifyPropertyChanged("DistinctValuesSeen");
             }
@@ -500,7 +519,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Get feature vector from document text using computed <see cref="_bagOfWords"/>. Throws
+        /// Get feature vector from document text using computed <see cref="_nonSerializedBagOfWords"/>. Throws
         /// an exception if <see cref="ComputeEncodingsFromDocumentTrainingData"/> has not been called.
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> to be used to generate the feature vector.</param>
@@ -538,12 +557,12 @@ namespace Extract.AttributeFinder
             else
             {
                 string[] terms = GetTerms(text).ToArray();
-                return _bagOfWords.GetFeatureVector(terms).Select(i => (double)i).ToArray();
+                return _nonSerializedBagOfWords.GetFeatureVector(terms).Select(i => (double)i).ToArray();
             }
         }
 
         /// <summary>
-        /// Get feature vectors from page text using computed <see cref="_bagOfWords"/>. Throws
+        /// Get feature vectors from page text using computed <see cref="_nonSerializedBagOfWords"/>. Throws
         /// an exception if <see cref="ComputeEncodingsFromPaginationTrainingData"/> has not been called.
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> to be used to generate the feature vectors.</param>
@@ -677,8 +696,8 @@ namespace Extract.AttributeFinder
             if (other == null
                 || !IsConfigurationEqualTo(other)
                 || other.FeatureVectorLength != FeatureVectorLength
-                || other._bagOfWords != null && _bagOfWords != null &&
-                    !other._bagOfWords.CodeToString.SequenceEqual(_bagOfWords.CodeToString)
+                || other._nonSerializedBagOfWords != null && _nonSerializedBagOfWords != null &&
+                    !other._nonSerializedBagOfWords.CodeToString.SequenceEqual(_nonSerializedBagOfWords.CodeToString)
                 )
             {
                 return false;
@@ -700,7 +719,7 @@ namespace Extract.AttributeFinder
                 .Hash(Name)
                 .Hash(PagesToProcess)
                 .Hash(ShingleSize);
-            foreach (var keyValuePair in _bagOfWords.CodeToString)
+            foreach (var keyValuePair in _nonSerializedBagOfWords.CodeToString)
             {
                 hash = hash.Hash(keyValuePair.Value);
             }
@@ -839,7 +858,7 @@ namespace Extract.AttributeFinder
                     string[] topScoringTerms = GetTopScoringTerms(mainDir, facetDir, updateStatus, cancellationToken);
 
                     // Create the bag-of-words object
-                    _bagOfWords = new Accord.MachineLearning.BagOfWords(topScoringTerms);
+                    _nonSerializedBagOfWords = new Accord.MachineLearning.BagOfWords(topScoringTerms);
                 }
             }
             catch (Exception e)
@@ -1058,24 +1077,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         internal void Clear()
         {
-            _bagOfWords = null;
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is safe (won't behave differently)
-        /// if used by software that is unaware of features added in <see cref="_version" />
-        /// </summary>
-        /// <param name="version">The version in question.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is compatible with the specified version
-        /// </returns>
-        internal bool IsCompatibleWithVersion(int version)
-        {
-            if (_version == 3 && version == 2)
-            {
-                return !UseFeatureHashing;
-            }
-            return _version <= version;
+            _nonSerializedBagOfWords = null;
         }
 
         /// <summary>
@@ -1085,17 +1087,25 @@ namespace Extract.AttributeFinder
         [OnSerializing]
         private void OnSerializing(StreamingContext context)
         {
-            if (_version == 3 && IsCompatibleWithVersion(2))
+            if (_nonSerializedBagOfWords != null)
             {
-                _version = 2;
-            }
-        }
+                var vocab = _nonSerializedBagOfWords.CodeToString
+                    .OrderBy(kv => kv.Key)
+                    .Select(kv => kv.Value)
+                    .ToArray();
 
-        [OnSerialized]
-        private void OnSerialized(StreamingContext context)
-        {
-            // Reset the version that may have been decremented for serialization
-            _version = _CURRENT_VERSION;
+                var ml = new MapLabel();
+                using (var unencryptedStream = new MemoryStream())
+                using (var encryptedStream = new MemoryStream())
+                {
+                    var serializer = new NetDataContractSerializer();
+                    serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
+                    serializer.Serialize(unencryptedStream, vocab);
+                    unencryptedStream.Position = 0;
+                    ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _CONVERGENCE_MATRIX, ml);
+                    _encryptedVocabulary = encryptedStream.ToArray();
+                }
+            }
         }
 
         /// <summary>
@@ -1107,6 +1117,8 @@ namespace Extract.AttributeFinder
         {
             _version = 1;
             _useFeatureHashing = false;
+            _encryptedVocabulary = null;
+            _nonSerializedBagOfWords = null;
         }
 
         /// <summary>
@@ -1120,6 +1132,29 @@ namespace Extract.AttributeFinder
                 _version <= _CURRENT_VERSION,
                 "Current version", _CURRENT_VERSION,
                 "Version to load", _version);
+
+            if (_version < 3)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                _nonSerializedBagOfWords = _bagOfWords;
+                _bagOfWords = null;
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+
+            // Build bag of words from vocab
+            if (_encryptedVocabulary != null)
+            {
+                var ml = new MapLabel();
+                using (var encryptedStream = new MemoryStream(_encryptedVocabulary))
+                using (var unencryptedStream = new MemoryStream())
+                {
+                    ExtractEncryption.DecryptStream(encryptedStream, unencryptedStream, _CONVERGENCE_MATRIX, ml);
+                    unencryptedStream.Position = 0;
+                    var serializer = new NetDataContractSerializer();
+                    serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
+                    _nonSerializedBagOfWords = new Accord.MachineLearning.BagOfWords((string[])serializer.Deserialize(unencryptedStream));
+                }
+            }
 
             _version = _CURRENT_VERSION;
         }

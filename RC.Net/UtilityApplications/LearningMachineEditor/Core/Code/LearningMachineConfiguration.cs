@@ -1675,9 +1675,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     win.ShowDialog();
                 }
                 if (!copy.AnswerCodeToName
-                        .OrderBy(kv => kv.Key).Select(kv => kv.Value)
-                    .SequenceEqual(_currentLearningMachine.Encoder.AnswerCodeToName
-                        .OrderBy(kv => kv.Key).Select(kv => kv.Value)))
+                    .SequenceEqual(_currentLearningMachine.Encoder.AnswerCodeToName))
                 {
                     _currentLearningMachine.Encoder = copy;
                     Dirty = true;

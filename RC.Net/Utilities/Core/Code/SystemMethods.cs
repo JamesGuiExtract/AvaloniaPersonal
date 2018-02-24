@@ -9,7 +9,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.ServiceProcess;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Extract.Licensing;
 using Microsoft.Win32.SafeHandles;
@@ -48,6 +50,9 @@ namespace Extract.Utilities
         static bool? _isExtractInternal;
 
         #endregion Fields
+
+
+        #region Internal Methods
 
         /// <summary>
         /// Enumerates all <see cref="ManagementObject"/>s of the specified class.
@@ -110,6 +115,11 @@ namespace Extract.Utilities
                 throw ExtractException.AsExtractException("ELI27319", ex);
             }
         }
+
+        #endregion Internal Methods
+
+
+        #region Public Methods
 
         /// <summary>
         /// Checks to see if the specified process is running, returns <see langword="true"/> if
@@ -492,9 +502,11 @@ namespace Extract.Utilities
                         RedirectStandardError = true,
                         CreateNoWindow = true
                     };
+
                     process.Start();
-                    standardOutput = process.StandardOutput.ReadToEnd();
-                    standardError = process.StandardError.ReadToEnd();
+
+                    Task<string> standardOutputTask = ConsumeOutput(process.StandardOutput);
+                    Task<string> standardErrorTask = ConsumeOutput(process.StandardError);
 
                     ManualResetEvent exitEvent = new ManualResetEvent(true);
                     exitEvent.SafeWaitHandle = new SafeWaitHandle(process.Handle, false);
@@ -508,8 +520,18 @@ namespace Extract.Utilities
                     if (waitResult == 1)
                     {
                         process.CloseMainWindow();
+                        standardOutputTask.Wait();
+                        standardErrorTask.Wait();
+                        standardOutput = standardOutputTask.Result;
+                        standardError = standardErrorTask.Result;
+
 						return OperationCanceledExitCode;
                     }
+
+                    standardOutputTask.Wait();
+                    standardErrorTask.Wait();
+                    standardOutput = standardOutputTask.Result;
+                    standardError = standardErrorTask.Result;
 
                     return process.ExitCode;
                 }
@@ -726,5 +748,52 @@ namespace Extract.Utilities
                 }
             }
         }
+
+        #endregion Public Methods
+
+        #region Private Methods
+
+        /// <summary>
+        /// Handle output stream of a process so that a '\r' not followed by a '\n' causes the previous text on the line to be overwritten (as with the console)
+        /// </summary>
+        /// <param name="reader">The text reader to handle, e.g., Process.StandardOutput</param>
+        static async Task<string> ConsumeOutput(TextReader reader)
+        {
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.AutoFlush = true;
+
+            long outputDataStartOfLine = 0;
+            char lastChar = '\n';
+            char[] buffer = new char[256];
+            int charsRead;
+            while ((charsRead = await reader.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            {
+                for (int i = 0; i < charsRead; i++)
+                {
+                    char thisChar = buffer[i];
+
+                    // Handle carriage return
+                    if (lastChar == '\r' && thisChar != '\n')
+                    {
+                        stream.Position = outputDataStartOfLine;
+                    }
+
+                    writer.Write(thisChar);
+
+                    if (thisChar == '\n')
+                    {
+                        outputDataStartOfLine = stream.Position;
+                    }
+
+                    lastChar = thisChar;
+                }
+            }
+            stream.Position = 0;
+
+            return new StreamReader(stream).ReadToEnd();
+        }
+
+        #endregion Private Methods
     }
 }

@@ -19,7 +19,7 @@
 	<assembly path="Extract.Web.AppBackendAPI.Test.dll" />	
     <assembly path="Extract.UtilityApplications.NERAnnotator.Test.dll" />
     <assembly path="Extract.UtilityApplications.TrainingDataCollector.Test.dll" />
-    <assembly path="Extract.UtilityApplications.NERTrainer.Test.dll" />
+    <assembly path="Extract.UtilityApplications.MLModelTrainer.Test.dll" />
 	<assembly path="Extract.ETL.Test.dll" />
   </Config>
   <Config name="Release" binpathtype="Auto" runtimeFramework="any">
@@ -41,7 +41,7 @@
 	<assembly path="Extract.Web.AppBackendAPI.Test.dll" />	
     <assembly path="Extract.UtilityApplications.NERAnnotator.Test.dll" />
     <assembly path="Extract.UtilityApplications.TrainingDataCollector.Test.dll" />
-    <assembly path="Extract.UtilityApplications.NERTrainer.Test.dll" />
+    <assembly path="Extract.UtilityApplications.MLModelTrainer.Test.dll" />
 	<assembly path="Extract.ETL.Test.dll" />
   </Config>
 </NUnitProject>

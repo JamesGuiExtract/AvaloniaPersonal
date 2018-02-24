@@ -148,6 +148,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\UtilityApplications\LearningMachineTrainer\Code\LearningMachineMethods.cs">
+      <Link>LearningMachineMethods.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\UtilityApplications\LearningMachineTrainer\Code\NeuralNetMethods.cs">
+      <Link>NeuralNetMethods.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\UtilityApplications\LearningMachineTrainer\Code\SvmMethods.cs">
+      <Link>SvmMethods.cs</Link>
+    </Compile>
     <Compile Include="AttributeComparer.cs" />
     <Compile Include="AttributeCreator.cs" />
     <Compile Include="AttributeFinderPathTags.cs" />
@@ -180,6 +189,7 @@
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
     <Compile Include="SerializableConfusionMatrix.cs" />
+    <Compile Include="SharedTrainingMethods.cs" />
     <Compile Include="SpatialStringFeatureVectorizer.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>

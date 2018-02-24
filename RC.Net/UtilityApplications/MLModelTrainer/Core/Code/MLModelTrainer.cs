@@ -1,18 +1,22 @@
-﻿using Extract.Code.Attributes;
+﻿using Extract.AttributeFinder;
+using Extract.Code.Attributes;
 using Extract.ETL;
 using Extract.Utilities;
+using Extract.UtilityApplications.TrainingDataCollector;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
+using YamlDotNet.RepresentationModel;
 
-namespace Extract.UtilityApplications.NERTrainer
+namespace Extract.UtilityApplications.MLModelTrainer
 {
-    [ExtractCategory("DatabaseService", "NER trainer")]
-    public class NERTrainer : DatabaseService, IConfigSettings
+    [ExtractCategory("DatabaseService", "ML Model Trainer")]
+    public class MLModelTrainer : DatabaseService, IConfigSettings
     {
         #region Constants
 
@@ -53,7 +57,7 @@ namespace Extract.UtilityApplications.NERTrainer
         /// <summary>
         /// Pattern to match the output of the open nlp NER testing command
         /// </summary>
-        readonly string _TOTAL_ACCURACY_PATTERN =
+        readonly string _TOTAL_ACCURACY_PATTERN_NER =
             @"(?minx)^\s+TOTAL:
                 \s+precision:\s+(?'precision'[\d.]+)%;
                 \s+recall:\s+(?'recall'[\d.]+)%;
@@ -160,6 +164,10 @@ namespace Extract.UtilityApplications.NERTrainer
         [DataMember]
         public override int Version { get; protected set; } = CURRENT_VERSION;
 
+
+        [DataMember]
+        public ModelType ModelType { get; set; }
+
         public override bool Processing => _processing;
 
         #endregion Properties
@@ -169,7 +177,7 @@ namespace Extract.UtilityApplications.NERTrainer
         /// <summary>
         /// Create an instance
         /// </summary>
-        public NERTrainer()
+        public MLModelTrainer()
         {
         }
 
@@ -205,6 +213,11 @@ namespace Extract.UtilityApplications.NERTrainer
                     bool copyToDestination = false;
                     int lastIDProcessed = -1;
 
+                    if (ModelType == ModelType.LearningMachine)
+                    {
+                        File.Copy(ModelDestination, tempModelFile.FileName, true);
+                    }
+
                     // Train
                     if (!string.IsNullOrWhiteSpace(TrainingCommand))
                     {
@@ -218,6 +231,21 @@ namespace Extract.UtilityApplications.NERTrainer
                         var result = Test(pathTags, databaseServer, databaseName, tempExceptionLog.FileName, cancelToken);
                         copyToDestination = result.criteriaMet;
                         lastIDProcessed = Math.Max(lastIDProcessed, result.lastIDProcessed);
+                    }
+
+                    // Verify that the machine was saved correctly
+                    if (ModelType == ModelType.LearningMachine && copyToDestination)
+                    {
+                        try
+                        {
+                            var lm = LearningMachine.Load(ModelDestination);
+                        }
+                        catch (Exception ex)
+                        {
+                            var ue = new ExtractException("ELI45704", "Failed to write LearningMachine correctly", ex);
+                            ue.Log();
+                            copyToDestination = false;
+                        }
                     }
 
                     LastIDProcessed = Math.Max(LastIDProcessed, lastIDProcessed);
@@ -276,14 +304,14 @@ namespace Extract.UtilityApplications.NERTrainer
         }
 
         /// <summary>
-        /// Deserializes a <see cref="NERTrainer"/> instance from a JSON string
+        /// Deserializes a <see cref="MLModelTrainer"/> instance from a JSON string
         /// </summary>
-        /// <param name="settings">The JSON string to which a <see cref="NERTrainer"/> was previously saved</param>
-        public static new NERTrainer FromJson(string settings)
+        /// <param name="settings">The JSON string to which a <see cref="MLModelTrainer"/> was previously saved</param>
+        public static new MLModelTrainer FromJson(string settings)
         {
             try
             {
-                return (NERTrainer)DatabaseService.FromJson(settings);
+                return (MLModelTrainer)DatabaseService.FromJson(settings);
             }
             catch (Exception ex)
             {
@@ -302,7 +330,7 @@ namespace Extract.UtilityApplications.NERTrainer
         public bool Configure()
         {
 
-            NERTrainerConfigurationDialog configurationDialog = new NERTrainerConfigurationDialog(this, DatabaseServer, DatabaseName);
+            MLModelTrainerConfigurationDialog configurationDialog = new MLModelTrainerConfigurationDialog(this, DatabaseServer, DatabaseName);
             
             return configurationDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK;
         }
@@ -333,7 +361,7 @@ namespace Extract.UtilityApplications.NERTrainer
                 try
                 {
                     (string trainingData, int currentCount, int lastCount, int lastProcessedID) =
-                        GetDataFromDB(databaseServer, databaseName, ModelName, true, maxToProcess);
+                        GetDataFromDB(databaseServer, databaseName, true, maxToProcess);
 
                     ExtractException.Assert("ELI45287", "No training data found",
                         currentCount > 0, "Model", ModelName);
@@ -409,7 +437,7 @@ namespace Extract.UtilityApplications.NERTrainer
                 try
                 {
                     (string testingData, int currentCount, int lastCount, int lastProcessedID) =
-                        GetDataFromDB(databaseServer, databaseName, ModelName, false, maxToProcess);
+                        GetDataFromDB(databaseServer, databaseName, false, maxToProcess);
 
                     ExtractException.Assert("ELI45289", "No testing data found",
                         currentCount > 0, "Model", ModelName);
@@ -429,22 +457,57 @@ namespace Extract.UtilityApplications.NERTrainer
                             MaximumTestingDocuments = maxToProcess;
 
                             var appTrace = new ExtractException("ELI45118", "Application trace: Testing complete");
-                            var match = Regex.Match(output, _TOTAL_ACCURACY_PATTERN);
 
-                            if (match.Success && double.TryParse(match.Groups["f1"].Value, out var f1Percent))
+                            if (ModelType == ModelType.NamedEntityRecognition)
                             {
-                                var f1 = f1Percent / 100;
-                                var h = ULP(f1) / 2;
-                                appTrace.AddDebugData("F1", f1, false);
-                                criteriaMet = (f1 + h) >= MinimumF1Score && (f1 + h + AllowableAccuracyDrop) >= LastF1Score;
-                                if (criteriaMet)
+                                var match = Regex.Match(output, _TOTAL_ACCURACY_PATTERN_NER);
+
+                                if (match.Success && double.TryParse(match.Groups["f1"].Value, out var f1Percent))
                                 {
-                                    LastF1Score = f1;
+                                    var f1 = f1Percent / 100;
+                                    var h = ULP(f1) / 2;
+                                    appTrace.AddDebugData("F1", f1, false);
+                                    criteriaMet = (f1 + h) >= MinimumF1Score && (f1 + h + AllowableAccuracyDrop) >= LastF1Score;
+                                    if (criteriaMet)
+                                    {
+                                        LastF1Score = f1;
+                                    }
+                                }
+                                else
+                                {
+                                    criteriaMet = false;
                                 }
                             }
-                            else
+                            else if (ModelType == ModelType.LearningMachine)
                             {
-                                criteriaMet = false;
+                                var yaml = new YamlStream();
+                                yaml.Load(new StringReader(output));
+                                var mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+
+                                if (mapping
+                                    .FirstOrDefault(node => ((YamlScalarNode)node.Key).Value.Equals("Testing Set Accuracy",
+                                        StringComparison.OrdinalIgnoreCase))
+                                    .Value is YamlMappingNode testingSetAccuracy
+                                    &&
+                                    testingSetAccuracy
+                                    .FirstOrDefault(node => ((YamlScalarNode)node.Key).Value.Equals("F1 Score (micro avg)",
+                                        StringComparison.OrdinalIgnoreCase))
+                                    .Value is YamlScalarNode f1Node
+                                    &&
+                                    double.TryParse(f1Node.Value, out var f1))
+                                {
+                                    var h = ULP(f1) / 2;
+                                    appTrace.AddDebugData("F1", f1, false);
+                                    criteriaMet = (f1 + h) >= MinimumF1Score && (f1 + h + AllowableAccuracyDrop) >= LastF1Score;
+                                    if (criteriaMet)
+                                    {
+                                        LastF1Score = f1;
+                                    }
+                                }
+                                else
+                                {
+                                    criteriaMet = false;
+                                }
                             }
 
                             appTrace.Log();
@@ -496,7 +559,7 @@ namespace Extract.UtilityApplications.NERTrainer
             return (criteriaMet, lastIDProcessed);
         }
 
-        (string data, int currentCount, int lastCount, int lastIDProcessed) GetDataFromDB(string dbserver, string dbname, string model, bool trainingData, int maxRecords)
+        (string data, int currentCount, int lastCount, int lastIDProcessed) GetDataFromDB(string dbserver, string dbname, bool trainingData, int maxRecords)
         {
             try
             {
@@ -521,7 +584,7 @@ namespace Extract.UtilityApplications.NERTrainer
                     using (var cmd = connection.CreateCommand())
                     {
                         cmd.CommandText = _GET_LAST_PROCESSED_COUNT;
-                        cmd.Parameters.AddWithValue("@Name", model);
+                        cmd.Parameters.AddWithValue("@Name", ModelName);
                         cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
                         cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
 
@@ -540,7 +603,7 @@ namespace Extract.UtilityApplications.NERTrainer
                     using (var cmd = connection.CreateCommand())
                     {
                         cmd.CommandText = _GET_MLDATA;
-                        cmd.Parameters.AddWithValue("@Name", model);
+                        cmd.Parameters.AddWithValue("@Name", ModelName);
                         cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
                         cmd.Parameters.AddWithValue("@Max", maxRecords);
 
@@ -561,7 +624,10 @@ namespace Extract.UtilityApplications.NERTrainer
                             // Reverse the data so that it is in inserted order
                             lines.Reverse();
 
-                            trainingOutput = string.Join("", lines);
+                            string separator = ModelType == ModelType.LearningMachine
+                                ? "\r\n"
+                                : "";
+                            trainingOutput = string.Join(separator, lines);
                             reader.Close();
                         }
                     }
@@ -575,7 +641,7 @@ namespace Extract.UtilityApplications.NERTrainer
                 var ue = ex.AsExtract("ELI45093");
                 ue.AddDebugData("Database Server", dbserver, false);
                 ue.AddDebugData("Database Name", dbname, false);
-                ue.AddDebugData("MLModel", model, false);
+                ue.AddDebugData("MLModel", ModelName, false);
                 throw ue;
             }
         }

@@ -1,6 +1,8 @@
-﻿using Extract.FileActionManager.Database.Test;
+﻿using Extract.AttributeFinder;
+using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
+using Extract.UtilityApplications.TrainingDataCollector;
 using Extract.UtilityApplications.TrainingDataCollector.Test;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -9,32 +11,33 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.UtilityApplications.NERTrainer.Test
+namespace Extract.UtilityApplications.MLModelTrainer.Test
 {
     /// <summary>
-    /// Unit tests for NERTrainer class
+    /// Unit tests for MLModelTrainer class
     /// </summary>
     [TestFixture]
-    [NUnit.Framework.Category("NERTrainer")]
-    public class TestNERTrainer
+    [NUnit.Framework.Category("MLModelTrainer")]
+    public class TestMLModelTrainer
     {
         #region Fields
 
         /// <summary>
         /// Manages the test data files
         /// </summary>
-        static TestFileManager<TestNERTrainer> _testFiles;
+        static TestFileManager<TestMLModelTrainer> _testFiles;
         static List<string> _inputFolder = new List<string>();
 
         /// <summary>
         /// Manages test FAM DBs.
         /// </summary>
-        static FAMTestDBManager<TestNERTrainer> _testDbManager;
+        static FAMTestDBManager<TestMLModelTrainer> _testDbManager;
 
-        static readonly string _DB_NAME = "_TestNERTrainer_14394B59-A748-4418-B11A-A5682E3C5A5B";
+        static readonly string _DB_NAME = "_TestMLModelTrainer_14394B59-A748-4418-B11A-A5682E3C5A5B";
         static readonly string _MODEL_NAME = "Test";
 
         #endregion Fields
@@ -49,8 +52,8 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         public static void Setup()
         {
             GeneralMethods.TestSetup();
-            _testFiles = new TestFileManager<TestNERTrainer>();
-            _testDbManager = new FAMTestDBManager<TestNERTrainer>();
+            _testFiles = new TestFileManager<TestMLModelTrainer>();
+            _testDbManager = new FAMTestDBManager<TestMLModelTrainer>();
         }
 
         /// <summary>
@@ -129,7 +132,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         #region Tests
 
         // Test that the training process runs without error
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void DummyTrainingCommand()
         {
             try
@@ -140,7 +143,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
                 _testFiles.GetFile("Resources.train.bat", trainingExe);
                 using (var dest = new TemporaryFile(false))
                 {
-                    var trainer = new NERTrainer
+                    var trainer = new MLModelTrainer
                     {
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
@@ -162,7 +165,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         }
 
         // Test that the testing process runs without error
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void DummyTestingCommand()
         {
             try
@@ -173,7 +176,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
                 _testFiles.GetFile("Resources.test1.bat", testingExe);
                 using (var dest = new TemporaryFile(false))
                 {
-                    var trainer = new NERTrainer
+                    var trainer = new MLModelTrainer
                     {
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
@@ -195,7 +198,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         }
 
         // Test that both training and testing processes run without error
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void DummyCommands()
         {
             try
@@ -208,7 +211,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
                 _testFiles.GetFile("Resources.test2.bat", testingExe);
                 using (var dest = new TemporaryFile(false))
                 {
-                    var trainer = new NERTrainer
+                    var trainer = new MLModelTrainer
                     {
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
@@ -232,7 +235,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         }
 
         // Test exit code handling
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void FailedTrainingCommand()
         {
             try
@@ -242,7 +245,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
                 var trainingExe = Path.Combine(_inputFolder.Last(), "train.bad.bat");
                 _testFiles.GetFile("Resources.train.bad.bat", trainingExe);
                 var dest = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                var trainer = new NERTrainer
+                var trainer = new MLModelTrainer
                 {
                     ModelName = _MODEL_NAME,
                     ModelDestination = dest,
@@ -261,7 +264,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         }
 
         // Test exit code handling
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void FailedTestingCommand()
         {
             try
@@ -271,7 +274,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
                 var testingExe = Path.Combine(_inputFolder.Last(), "test.bad.bat");
                 _testFiles.GetFile("Resources.test.bad.bat", testingExe);
                 var dest = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                var trainer = new NERTrainer
+                var trainer = new MLModelTrainer
                 {
                     ModelName = _MODEL_NAME,
                     ModelDestination = dest,
@@ -291,7 +294,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         }
 
         // Confirm that the process correctly retrieves data from the DB
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void GetDataFromDB()
         {
             try
@@ -307,7 +310,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
                 _testFiles.GetFile("Resources.copy.bat", trainingExe);
                 using (var dest = new TemporaryFile(false))
                 {
-                    var trainer = new NERTrainer
+                    var trainer = new MLModelTrainer
                     {
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
@@ -330,7 +333,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         }
 
         // Test that an encrypted output file is created
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void EncryptedOutput()
         {
             try
@@ -341,7 +344,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
                 _testFiles.GetFile("Resources.train.bat", trainingExe);
                 using (var dest = new TemporaryFile(".etf", false))
                 {
-                    var trainer = new NERTrainer
+                    var trainer = new MLModelTrainer
                     {
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
@@ -362,6 +365,49 @@ namespace Extract.UtilityApplications.NERTrainer.Test
             }
         }
 
+        // Train a learning machine classifier
+        [Test, Category("MLModelTrainer")]
+        public static void TestLearningMachine()
+        {
+            try
+            {
+                TestTrainingDataCollector.Setup();
+                TestTrainingDataCollector.CreateDatabase();
+                TestTrainingDataCollector.Process(learningMachine: true);
+
+                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+                Directory.CreateDirectory(_inputFolder.Last());
+
+                string ccdir =
+                    new Uri( Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
+                var trainingExe = Path.Combine(ccdir, "LearningMachineTrainer.exe");
+
+                var dest = _testFiles.GetFile("Resources.docClassifier.lm");
+                LearningMachine lm = LearningMachine.Load(dest);
+                Assert.That(!lm.IsTrained);
+
+                var trainer = new MLModelTrainer
+                {
+                    ModelType = ModelType.LearningMachine,
+                    ModelName = _MODEL_NAME,
+                    ModelDestination = dest,
+                    TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\" /csvName \"<DataFile>\" /s",
+                    TestingCommand = trainingExe.Quote() + " \"<TempModelPath>\" /csvName \"<DataFile>\" /testOnly /s",
+                    MaximumTrainingDocuments = 10000,
+                    MaximumTestingDocuments = 10000
+                };
+
+                trainer.Process("(local)", TestTrainingDataCollector.DBName);
+
+                lm = LearningMachine.Load(dest);
+                Assert.That(lm.IsTrained);
+            }
+            finally
+            {
+                TestTrainingDataCollector.FinalCleanup();
+            }
+        }
+
         static void SimulateTrainingAndTesting(double lastF1Score, double minimumF1Score, double allowableAccuracyDrop, bool expectSuccess = true, bool interactive = false)
         {
             var trainingExe = Path.Combine(_inputFolder.Last(), "train.bat");
@@ -369,7 +415,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
             using (var testingExe = new TemporaryFile(".bat", false))
             using (var dest = new TemporaryFile(false))
             {
-                var trainer = new NERTrainer
+                var trainer = new MLModelTrainer
                 {
                     ModelName = _MODEL_NAME
                     , ModelDestination = dest.FileName
@@ -386,7 +432,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
                 {
                     UtilityMethods.ShowMessageBox("Configure/confirm email settings with EmailFile.exe /c", "", false);
                     UtilityMethods.ShowMessageBox("Fill in email address and subject fields on the next screen and click OK", "", false);
-                    using (var form = new NERTrainerConfigurationDialog(trainer, "(local)", _DB_NAME))
+                    using (var form = new MLModelTrainerConfigurationDialog(trainer, "(local)", _DB_NAME))
                     {
                         Application.Run(form);
                         var result = form.DialogResult;
@@ -430,7 +476,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         // Test acceptable test result: f1 score stays the same, drops an allowable amount or increases
         // train.bat will write the word "Training" to the <TempModelPath>
         // if the testing result is deemed acceptable, this file will be copied to the destination
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void AcceptableResult()
         {
             try
@@ -458,7 +504,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         // Test unacceptable result: f1 score drops more than the allowable amount or drops below the minimum allowed
         // train.bat will write the word "Training" to the <TempModelPath>
         // if the testing result is deemed acceptable, this file will be copied to the destination
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void UnacceptableResult()
         {
             try
@@ -496,7 +542,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
             }
         }
 
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void SimulateOutOfMemory()
         {
             try
@@ -506,7 +552,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
                 using (var testingExe = new TemporaryFile(".bat", false))
                 using (var dest = new TemporaryFile(false))
                 {
-                    var trainer = new NERTrainer
+                    var trainer = new MLModelTrainer
                     {
                         ModelName = _MODEL_NAME
                         , ModelDestination = dest.FileName
@@ -559,11 +605,11 @@ namespace Extract.UtilityApplications.NERTrainer.Test
         }
 
         // Test loading/saving from JSON
-        [Test, Category("NERTrainer")]
+        [Test, Category("MLModelTrainer")]
         public static void LoadingSavingFromJson()
         {
-            var trainerSettings = _testFiles.GetFile("Resources.NERTrainerSettings.txt");
-            var trainer = NERTrainer.FromJson(File.ReadAllText(trainerSettings));
+            var trainerSettings = _testFiles.GetFile("Resources.MLModelTrainerSettings.txt");
+            var trainer = MLModelTrainer.FromJson(File.ReadAllText(trainerSettings));
 
             var jsonSettings = trainer.ToJson();
             trainer.EmailSubject = "DUMMY_SUBJECT";
@@ -571,7 +617,7 @@ namespace Extract.UtilityApplications.NERTrainer.Test
 
             Assert.AreNotEqual(jsonSettings, updatedJsonSettings);
 
-            var updatedtrainer = (NERTrainer)JsonConvert.DeserializeObject(updatedJsonSettings,
+            var updatedtrainer = (MLModelTrainer)JsonConvert.DeserializeObject(updatedJsonSettings,
                     new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
 
             Assert.AreEqual("DUMMY_SUBJECT", updatedtrainer.EmailSubject);

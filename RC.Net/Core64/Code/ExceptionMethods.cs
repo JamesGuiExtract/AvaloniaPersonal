@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
@@ -13,16 +14,10 @@ namespace Extract64.Core
     public static class ExceptionMethods
     {
         /// <summary>
-        /// Path to the Extract systems folder in the program files directory.
-        /// </summary>
-        static readonly string _EXTRACT_FOLDER = Path.Combine(
-            Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "Extract Systems");
-
-        /// <summary>
         /// Path to the Extract common components folder.
         /// </summary>
         static readonly string _COMMON_COMPONENTS =
-            Path.Combine(_EXTRACT_FOLDER, "CommonComponents");
+            new Uri( Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
 
         /// <summary>
         /// Path to the exception helper application.
@@ -75,7 +70,7 @@ namespace Extract64.Core
                 arguments.Append('"');
                 if (display)
                 {
-                    arguments.Append(" /d");
+                    arguments.Append(" /display");
                 }
 
                 // Launch the helper app

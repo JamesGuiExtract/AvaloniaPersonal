@@ -1,17 +1,8 @@
-﻿using Accord.Math; using Accord.Statistics.Analysis;
-using Extract.Utilities;
+﻿using Accord.Math;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters;
-using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
-using ComAttribute = UCLID_AFCORELib.Attribute;
-using System.Threading;
 
 namespace Extract.AttributeFinder
 {

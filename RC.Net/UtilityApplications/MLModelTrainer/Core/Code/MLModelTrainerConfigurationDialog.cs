@@ -5,20 +5,20 @@ using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.UtilityApplications.NERTrainer
+namespace Extract.UtilityApplications.MLModelTrainer
 {
     /// <summary>
     /// Dialog to configure and run NER training
     /// </summary>
     /// <seealso cref="System.Windows.Forms.Form" />
-    public partial class NERTrainerConfigurationDialog : Form
+    public partial class MLModelTrainerConfigurationDialog : Form
     {
         #region Fields
 
         // Flag to short-circuit value-changed handler
         bool _suspendUpdatesToSettingsObject;
 
-        NERTrainer _settings;
+        MLModelTrainer _settings;
         bool _dirty;
 
 
@@ -55,12 +55,12 @@ namespace Extract.UtilityApplications.NERTrainer
         #region Constructors
 
         /// <summary>
-        /// Creates a configuration dialog for an <see cref="NERTrainer"/>
+        /// Creates a configuration dialog for an <see cref="MLModelTrainer"/>
         /// </summary>
         /// <param name="trainer">The instance to configure</param>
         /// <param name="databaseServer">The server to use to resolve MLModel.Names and AttributeSetNames</param>
         /// <param name="databaseName">The database to use to resolve MLModel.Names and AttributeSetNames</param>
-        public NERTrainerConfigurationDialog(NERTrainer trainer, string databaseServer, string databaseName)
+        public MLModelTrainerConfigurationDialog(MLModelTrainer trainer, string databaseServer, string databaseName)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace Extract.UtilityApplications.NERTrainer
             }
             catch (Exception ex)
             {
-                _settings = new NERTrainer();
+                _settings = new MLModelTrainer();
                 ex.ExtractDisplay("ELI45109");
             }
         }
@@ -121,15 +121,15 @@ namespace Extract.UtilityApplications.NERTrainer
                 var models = _database.GetMLModels().GetKeys().ToIEnumerable<string>().ToArray();
                 _modelNameComboBox.Items.AddRange(models);
 
-                _trainingCommandPathTagsButton.PathTags.AddTag(NERTrainer.DataFilePathTag, null);
-                _trainingCommandPathTagsButton.PathTags.AddTag(NERTrainer.TempModelPathTag, null);
+                _trainingCommandPathTagsButton.PathTags.AddTag(MLModelTrainer.DataFilePathTag, null);
+                _trainingCommandPathTagsButton.PathTags.AddTag(MLModelTrainer.TempModelPathTag, null);
 
-                _testingCommandPathTagsButton.PathTags.AddTag(NERTrainer.DataFilePathTag, null);
-                _testingCommandPathTagsButton.PathTags.AddTag(NERTrainer.TempModelPathTag, null);
+                _testingCommandPathTagsButton.PathTags.AddTag(MLModelTrainer.DataFilePathTag, null);
+                _testingCommandPathTagsButton.PathTags.AddTag(MLModelTrainer.TempModelPathTag, null);
 
                 _testingCommandPathTagsButton.PathTags.BuiltInTagFilter =
                     _trainingCommandPathTagsButton.PathTags.BuiltInTagFilter =
-                    new[] { SourceDocumentPathTags.CommonComponentsDir, NERTrainer.DataFilePathTag, NERTrainer.TempModelPathTag };
+                    new[] { SourceDocumentPathTags.CommonComponentsDir, MLModelTrainer.DataFilePathTag, MLModelTrainer.TempModelPathTag };
 
                 _modelDestinationPathTagsButton.PathTags.BuiltInTagFilter =
                     new[] { SourceDocumentPathTags.CommonComponentsDir };
@@ -155,6 +155,10 @@ namespace Extract.UtilityApplications.NERTrainer
         {
             try
             {
+                _settings.ModelType = _nerModelTypeRadioButton.Checked
+                    ? TrainingDataCollector.ModelType.NamedEntityRecognition
+                    : TrainingDataCollector.ModelType.LearningMachine;
+
                 var modelName = _modelNameComboBox.Text;
                 _modelNameComboBox.Focus();
                 ExtractException.Assert("ELI45127", "Model name is undefined", ValidateModel(), "Model name", modelName);
@@ -291,6 +295,8 @@ namespace Extract.UtilityApplications.NERTrainer
             {
                 _suspendUpdatesToSettingsObject = true;
 
+                _nerModelTypeRadioButton.Checked = _settings.ModelType == TrainingDataCollector.ModelType.NamedEntityRecognition;
+                _lmModelTypeRadioButton.Checked = _settings.ModelType == TrainingDataCollector.ModelType.LearningMachine;
                 _modelNameComboBox.Text = _settings.ModelName;
                 _trainingCommandTextBox.Text = _settings.TrainingCommand;
                 _testingCommandTextBox.Text = _settings.TestingCommand;

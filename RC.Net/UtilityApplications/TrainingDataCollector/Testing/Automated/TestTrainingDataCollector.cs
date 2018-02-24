@@ -168,7 +168,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
         /// Retrieves MLData
         /// </summary>
         /// <param name="trainingData">Whether to retrieve training data (if <c>true</c>) or testing data (if <c>false</c>)</param>
-        private static string GetDataFromDB(bool trainingData)
+        private static string GetDataFromDB(bool trainingData, string recordSeparator = "")
         {
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
@@ -197,7 +197,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                             lines.Add(reader.GetString(0));
                         }
 
-                        trainingOutput = string.Join("", lines);
+                        trainingOutput = string.Join(recordSeparator, lines);
                         reader.Close();
                     }
                 }
@@ -209,19 +209,35 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
         /// <summary>
         /// Runs the data collector process
         /// </summary>
-        public static void Process()
+        public static void Process(bool learningMachine = false)
         {
             try
             {
-                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
-                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
+                if (learningMachine)
+                {
+                    var learningMachinePath = Path.Combine(_inputFolder.Last(), "docClassifier.lm");
+                    _testFiles.GetFile("Resources.docClassifier.lm", learningMachinePath);
 
-                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
-                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
-                var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
-                collector.DataGeneratorPath = annotatorSettingsPath;
+                    var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
+                    _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
+                    var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
+                    collector.DataGeneratorPath = learningMachinePath;
+                    collector.ModelType = ModelType.LearningMachine;
 
-                collector.Process("(local)", DBName,System.Threading.CancellationToken.None);
+                    collector.Process("(local)", DBName, System.Threading.CancellationToken.None);
+                }
+                else
+                {
+                    var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
+                    _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
+
+                    var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
+                    _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
+                    var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
+                    collector.DataGeneratorPath = annotatorSettingsPath;
+
+                    collector.Process("(local)", DBName, System.Threading.CancellationToken.None);
+                }
             }
             catch (Exception ex)
             {
@@ -412,6 +428,32 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
                 _testFiles = new TestFileManager<TestTrainingDataCollector>();
+            }
+        }
+
+        // Test LearningMachine data collection
+        [Test, Category("TrainingDataCollector")]
+        public static void LearningMachineDataCollection()
+        {
+            try
+            {
+                CreateDatabase();
+
+                Process(learningMachine: true);
+
+                var expectedFile = _testFiles.GetFile("Resources.learningMachine.train.txt");
+                var expected = File.ReadAllText(expectedFile);
+                string trainingOutput = GetDataFromDB(trainingData: true, recordSeparator: "\r\n");
+                CollectionAssert.AreEqual(expected, trainingOutput);
+
+                expectedFile = _testFiles.GetFile("Resources.learningMachine.test.txt");
+                expected = File.ReadAllText(expectedFile);
+                string testingOutput = GetDataFromDB(trainingData: false, recordSeparator: "\r\n");
+                CollectionAssert.AreEqual(expected, testingOutput);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(DBName);
             }
         }
 

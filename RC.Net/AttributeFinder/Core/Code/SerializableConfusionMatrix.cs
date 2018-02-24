@@ -1,4 +1,4 @@
-﻿using Extract.Utilities;
+﻿using LearningMachineTrainer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -38,26 +38,13 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="encoder">The <see cref="LearningMachineDataEncoder"/> to use to obtain class names and codes</param>
         /// <param name="accuracyData">The confusion matrix</param>
-        public SerializableConfusionMatrix(LearningMachineDataEncoder encoder, AccuracyData accuracyData)
+        public SerializableConfusionMatrix(ILearningMachineDataEncoderModel encoder, AccuracyData accuracyData)
         {
             try
             {
                 int[,] sourceData = null;
 
-                // Whether to swap rows for columns (to match more customary presentation)
-                bool swapAxes = accuracyData.Match(gcm => true, cm => false);
-
-                int GetCellValue(int row, int col)
-                {
-                    if (swapAxes)
-                    {
-                        UtilityMethods.Swap(ref row, ref col);
-                    }
-
-                    return sourceData[row, col];
-                }
-
-                var labels = encoder.AnswerCodeToName.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToList();
+                var labels = encoder.AnswerCodeToName;
 
                 accuracyData.Match(gcm =>
                 {
@@ -88,17 +75,13 @@ namespace Extract.AttributeFinder
                     _columnTotals = cm.ColumnTotals;
                 });
 
-                if (swapAxes)
-                {
-                    UtilityMethods.Swap(ref _rowTotals, ref _columnTotals);
-                }
                 _data = new int[sourceData.GetLength(0)][];
                 for (int row = 0; row < _data.Length; row++)
                 {
                     _data[row] = new int[_data.Length];
                     for (int col = 0; col < _data.Length; col++)
                     {
-                        _data[row][col] = GetCellValue(row, col);
+                        _data[row][col] = sourceData[row, col];
                     }
                 }
             }

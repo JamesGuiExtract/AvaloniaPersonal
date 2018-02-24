@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LearningMachineTrainer;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
@@ -7,7 +8,7 @@ namespace Extract.AttributeFinder
     /// <summary>
     /// Interface for learning machine classifiers
     /// </summary>
-    public interface ITrainableClassifier
+    public interface ITrainableClassifier : IClassifierModel
     {
         /// <summary>
         /// Trains the classifier to recognize classifications
@@ -36,22 +37,6 @@ namespace Extract.AttributeFinder
         /// <returns>The answer code and score</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         (int answerCode, double? score) ComputeAnswer(double[] inputs, bool standardizeInputs = true);
-
-        /// <summary>
-        /// The number of classes that this classifier can recognize
-        /// </summary>
-        int NumberOfClasses { get; }
-
-        /// <summary>
-        /// Whether this classifier has been trained and is ready to compute answers
-        /// </summary>
-        /// <returns>Whether this classifier has been trained and is ready to compute answers</returns>
-        bool IsTrained { get; }
-
-        /// <summary>
-        /// The <see cref="DateTime"/> that this classifier was last trained
-        /// </summary>
-        DateTime LastTrainedOn { get; }
 
         /// <summary>
         /// Whether this instance has the same configured properties as another

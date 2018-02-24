@@ -7,12 +7,12 @@ using System.Windows.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
 
-namespace Extract.UtilityApplications.NERTrainer
+namespace Extract.UtilityApplications.MLModelTrainer
 {
     /// <summary>
-    /// Application to be used to test the NERTrainer, which is to be a ServiceProcess
+    /// Application to be used to test the MLModelTrainer, which is to be a ServiceProcess
     /// </summary>
-    public class NERTrainerApp
+    public class MLModelTrainerApp
     {
         [STAThread]
         static int Main(string[] args)
@@ -25,15 +25,15 @@ namespace Extract.UtilityApplications.NERTrainer
                 int usage(bool error = false)
                 {
                     UtilityMethods.ShowMessageBox("Usage:" +
-                        "\r\n  To train/test a machine:\r\n    NERTrainer <settingsFile> /databaseServer <server> /databaseName <name> [/s] [/ef <exceptionFile>]" +
+                        "\r\n  To train/test a machine:\r\n    MLModelTrainer <settingsFile> /databaseServer <server> /databaseName <name> [/s] [/ef <exceptionFile>]" +
                         "\r\n    /s = silent = no progress bar or exceptions displayed" +
                         "\r\n    /ef <exceptionFile> log exceptions to file" +
                         "\r\n       (supports propagate errors to FAM option)" +
                         "\r\n       (/ef also implies /s)" +
                         "\r\n    /CancelTokenName <CancelTokenName> used when called from another Extract application to" +
-                        "\r\n       allow calling application to cancel using CacellationToken." +
+                        "\r\n       allow calling application to cancel using CancellationToken." +
                         "\r\n       (/CancelTokenName implies /s)" +
-                        "\r\n  To edit a settings file:\r\n    NERTrainer /c <settingsFile> [/databaseServer <server>] [/databaseName <name>]", "NER Trainer", error);
+                        "\r\n  To edit a settings file:\r\n    MLModelTrainer /c <settingsFile> [/databaseServer <server>] [/databaseName <name>]", "ML Model Trainer", error);
                     return error ? -1 : 0;
                 }
 
@@ -48,7 +48,7 @@ namespace Extract.UtilityApplications.NERTrainer
                     string databaseName = null;
                     string cancelTokenName = null;
                     List<(PropertyInfo property, object value)> propertiesToSet = new List<(PropertyInfo, object)>();
-                    Type trainerType = typeof(NERTrainer);
+                    Type trainerType = typeof(MLModelTrainer);
                     for (int argNum = 0; argNum < args.Length; argNum++)
                     {
                         var arg = args[argNum];
@@ -184,8 +184,8 @@ namespace Extract.UtilityApplications.NERTrainer
                     }
 
                     var trainer = File.Exists(settingsFile)
-                        ? NERTrainer.FromJson(File.ReadAllText(settingsFile))
-                        : new NERTrainer();
+                        ? MLModelTrainer.FromJson(File.ReadAllText(settingsFile))
+                        : new MLModelTrainer();
 
                     foreach(var (property, value) in propertiesToSet)
                     {
@@ -194,7 +194,7 @@ namespace Extract.UtilityApplications.NERTrainer
 
                     if (configure)
                     {
-                        using (var form = new NERTrainerConfigurationDialog(trainer, databaseServer, databaseName))
+                        using (var form = new MLModelTrainerConfigurationDialog(trainer, databaseServer, databaseName))
                         {
                             Application.Run(form);
                             var result = form.DialogResult;

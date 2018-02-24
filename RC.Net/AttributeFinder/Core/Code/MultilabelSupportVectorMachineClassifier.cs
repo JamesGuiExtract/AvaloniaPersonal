@@ -2,6 +2,7 @@
 using Accord.MachineLearning.VectorMachines.Learning;
 using Accord.Math;
 using Accord.Statistics.Kernels;
+using LearningMachineTrainer;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace Extract.AttributeFinder
     [Serializable]
     // Don't rename because it could break serialization
     [Obfuscation(Feature = "renaming", Exclude = true)]
-    public class MultilabelSupportVectorMachineClassifier : SupportVectorMachineClassifier, IDisposable
+    public class MultilabelSupportVectorMachineClassifier : SupportVectorMachineClassifier, IMultilabelSupportVectorMachineModel, IDisposable
     {
         #region Constants
 
@@ -93,82 +94,6 @@ namespace Extract.AttributeFinder
         #endregion Constructors
 
         #region Overrides
-
-        /// <summary>
-        /// Trains the classifier to be able to predict classes for inputs
-        /// </summary>
-        /// <param name="inputs">Array of feature vectors</param>
-        /// <param name="outputs">Array of classes (category codes) for each input</param>
-        /// <param name="complexity">Complexity value to use for training</param>
-        /// <param name="choosingComplexity">Whether this method is being called as part of figuring out what Complexity parameter is the best
-        /// (and thus no need to calibrate the machine for probabilities, e.g.)</param>
-        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
-        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        protected override void TrainClassifier(double[][] inputs, int[] outputs, double complexity, bool choosingComplexity,
-            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
-        {
-            // Build classifier
-            IKernel kernel = new Linear();
-            var classifier = new MultilabelSupportVectorMachine(FeatureVectorLength, kernel, NumberOfClasses);
-
-            // Train classifier
-            var teacher = new MultilabelSupportVectorLearning(classifier, inputs, outputs)
-            {
-                Algorithm = (svm, classInputs, classOutputs, positiveClassIndex, _) =>
-                {
-                    var f = new SequentialMinimalOptimization(svm, classInputs, classOutputs)
-                    {
-                        Complexity = complexity,
-                        Compact = (kernel is Linear) && CreateCompactMachine
-                    };
-
-                    // Only set WeightRatio if there is a specifed weight ratio that should always be applied,
-                    // or one that should be conditionally applied and it is true that the positive class of this
-                    // machine is the designated overall negative class. (e.g., LearningMachineDataEncoder._NOT_FIRST_PAGE_CATEGORY_CODE)
-                    // NOTE: The positive class is compared because the function is only passed a valid
-                    // positive class index (the negative class index param is just the positive index with the sign changed)
-                    if (PositiveToNegativeWeightRatio.HasValue
-                        && (!ConditionallyApplyWeightRatio || positiveClassIndex == 0))
-                    {
-                        f.WeightRatio = PositiveToNegativeWeightRatio.Value;
-                    }
-
-                    if (TrainingAlgorithmCacheSize.HasValue)
-                    {
-                        f.CacheSize = TrainingAlgorithmCacheSize.Value;
-                    }
-
-                    return f;
-                }
-            };
-            teacher.SubproblemFinished +=
-                delegate
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    updateStatus(new StatusArgs { StatusMessage = "Sub-problems finished: {0:N0}", Int32Value = 1 });
-                };
-
-            var error = teacher.Run(true);
-            updateStatus(new StatusArgs { StatusMessage = "Training error: {0:N4}", DoubleValues = new[] { error } });
-
-            double likelihood = 0;
-            if (!choosingComplexity && CalibrateMachineToProduceProbabilities)
-            {
-                updateStatus(new StatusArgs { StatusMessage = "Calibrating..." });
-                Parallel.For(0, classifier.Machines.Length, i =>
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    var machine = classifier.Machines[i];
-                    var outputsForMachine = outputs.Apply(y => y == i ? 1 : -1);
-                    var calibration = new ProbabilisticOutputCalibration(machine, inputs, outputsForMachine);
-                    likelihood += calibration.Run() / inputs.Length;
-                });
-                updateStatus(new StatusArgs { StatusMessage = "Calibrated. Average log-likelihood: {0:N4}",
-                    DoubleValues = new[] { likelihood / classifier.Machines.Length },
-                    ReplaceLastStatus = true });
-            }
-            Classifier = classifier;
-        }
 
         /// <summary>
         /// Computes answer code and score for the input feature vector
@@ -285,7 +210,7 @@ namespace Extract.AttributeFinder
         {
             if (disposing)
             {
-                ((MultilabelSupportVectorMachine)Classifier).Dispose();
+                ((MultilabelSupportVectorMachine)Classifier)?.Dispose();
             }
 
             // Dispose of unmanaged resources

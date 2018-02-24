@@ -796,9 +796,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppBackendAPI", "..\..\..\.
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NERTrainer", "..\..\..\..\..\RC.Net\UtilityApplications\NERTrainer\Core\Code\NERTrainer.csproj", "{A7FAD56F-541D-41A0-9DA7-683572F50A20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLModelTrainer", "..\..\..\..\..\RC.Net\UtilityApplications\MLModelTrainer\Core\Code\MLModelTrainer.csproj", "{A7FAD56F-541D-41A0-9DA7-683572F50A20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NERTrainer.Test", "..\..\..\..\..\RC.Net\UtilityApplications\NERTrainer\Testing\Automated\NERTrainer.Test.csproj", "{FDE02587-149C-4548-8A5B-16FD7BA085CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLModelTrainer.Test", "..\..\..\..\..\RC.Net\UtilityApplications\MLModelTrainer\Testing\Automated\MLModelTrainer.Test.csproj", "{FDE02587-149C-4548-8A5B-16FD7BA085CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Web.AppBackendAPI.Test", "..\..\..\..\..\Web\WebAPI\Testing\Automated\Extract.Web.AppBackendAPI.Test\Extract.Web.AppBackendAPI.Test.csproj", "{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}"
 EndProject

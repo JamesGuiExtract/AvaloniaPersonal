@@ -8,8 +8,8 @@
     <OutputType>Library</OutputType>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.UtilityApplications.NERTrainer.Test</RootNamespace>
-    <AssemblyName>Extract.UtilityApplications.NERTrainer.Test</AssemblyName>
+    <RootNamespace>Extract.UtilityApplications.MLModelTrainer.Test</RootNamespace>
+    <AssemblyName>Extract.UtilityApplications.MLModelTrainer.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -109,7 +109,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestNERTrainer.cs" />
+    <Compile Include="TestMLModelTrainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -141,13 +141,17 @@
       <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\TrainingDataCollector\Core\Code\TrainingDataCollector.csproj">
+      <Project>{020455B5-0838-4CCF-AF73-46D539FCF787}</Project>
+      <Name>TrainingDataCollector</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\TrainingDataCollector\Testing\Automated\TrainingDataCollector.Test.csproj">
       <Project>{2E1B43FD-5367-4A29-B509-0E8B42E5DA9C}</Project>
       <Name>TrainingDataCollector.Test</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Core\Code\NERTrainer.csproj">
+    <ProjectReference Include="..\..\Core\Code\MLModelTrainer.csproj">
       <Project>{A7FAD56F-541D-41A0-9DA7-683572F50A20}</Project>
-      <Name>NERTrainer</Name>
+      <Name>MLModelTrainer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -157,7 +161,8 @@
     <EmbeddedResource Include="Resources\train.bad.bat" />
     <EmbeddedResource Include="Resources\test.bad.bat" />
     <EmbeddedResource Include="Resources\copy.bat" />
-    <EmbeddedResource Include="Resources\NERTrainerSettings.txt" />
+    <EmbeddedResource Include="Resources\MLModelTrainerSettings.txt" />
+    <EmbeddedResource Include="Resources\docClassifier.lm" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

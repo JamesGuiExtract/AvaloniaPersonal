@@ -4,6 +4,7 @@ using Accord.Statistics.Analysis;
 using Extract.Encryption;
 using Extract.Licensing;
 using Extract.Utilities;
+using LearningMachineTrainer;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace Extract.AttributeFinder
     [Serializable]
     // Don't rename because it could break serialization
     [Obfuscation(Feature = "renaming", Exclude = true)]
-    public class LearningMachine : IDisposable
+    public sealed class LearningMachine : ILearningMachineModel, IDisposable
     {
         #region Constants
 
@@ -47,8 +48,9 @@ namespace Extract.AttributeFinder
         /// Version 4: Add TranslateUnknownCategory property and backing field
         ///            TranslateUnknownCategoryTo property and backing field
         /// Version 5: Add CsvOutputFile property and backing field
+        /// Version 6: No longer encrypt Encoder and training log
         /// </summary>
-        const int _CURRENT_VERSION = 5;
+        const int _CURRENT_VERSION = 6;
 
         // Encryption password for serialization, renamed to obfuscate purpose
         private static readonly byte[] _CONVERGENCE_MATRIX = new byte[64]
@@ -103,14 +105,12 @@ namespace Extract.AttributeFinder
         // Don't serialize fields with potentially sensitive information in them
         [NonSerialized]
         private InputConfiguration _inputConfig;
-        [NonSerialized]
-        private LearningMachineDataEncoder _encoder;
-        [NonSerialized]
-        private string _trainingLog;
 
         // Encrypted versions of potentially sensitive fields
-        private Byte[] _encryptedEncoder;
+        [Obsolete("Use _encoder instead")]
+        private byte[] _encryptedEncoder;
         private byte[] _encryptedInputConfig;
+        [Obsolete("Use _trainingLog instead")]
         private string _encryptedTrainingLog;
 
         // Only serialize the label attributes settings if Usage is AttributeCategorization
@@ -134,6 +134,12 @@ namespace Extract.AttributeFinder
 
         [OptionalField(VersionAdded = 5)]
         private (SerializableConfusionMatrix train, SerializableConfusionMatrix test)? _accuracyData;
+
+        [OptionalField(VersionAdded = 6)]
+        private LearningMachineDataEncoder _encoder;
+
+        [OptionalField(VersionAdded = 6)]
+        private string _trainingLog;
 
         #endregion Fields
 
@@ -425,6 +431,18 @@ namespace Extract.AttributeFinder
             }
         }
 
+        IClassifierModel ILearningMachineModel.Classifier { get => Classifier; set => Classifier = value as ITrainableClassifier; }
+
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        List<string> ILearningMachineModel.AnswerCodeToName { get => Encoder.AnswerCodeToName; set => Encoder.AnswerCodeToName = value; }
+
+        Dictionary<string, int> ILearningMachineModel.AnswerNameToCode => Encoder.AnswerNameToCode;
+
+        string ILearningMachineModel.NegativeClassName => Encoder.NegativeClassName;
+
+        ILearningMachineDataEncoderModel ILearningMachineModel.Encoder { get => Encoder; set => Encoder = value as LearningMachineDataEncoder; }
+
         #endregion Properties
 
         #region Public Methods
@@ -709,7 +727,7 @@ namespace Extract.AttributeFinder
                 }
                 else
                 {
-                    var confusionMatrix = new GeneralConfusionMatrix(numberOfClasses, predictions, outputs);
+                    var confusionMatrix = new GeneralConfusionMatrix(numberOfClasses, outputs, predictions);
                     accuracyData = new AccuracyData(confusionMatrix);
                 }
 
@@ -832,6 +850,7 @@ namespace Extract.AttributeFinder
             try
             {
                 var serializer = new NetDataContractSerializer();
+                serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
                 serializer.Serialize(stream, this);
             }
             catch (Exception e)
@@ -909,10 +928,12 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                var savedMachine = new System.IO.MemoryStream();
-                Save(savedMachine);
-                savedMachine.Position = 0;
-                return Load(savedMachine);
+                using (var savedMachine = new MemoryStream())
+                {
+                    Save(savedMachine);
+                    savedMachine.Position = 0;
+                    return Load(savedMachine);
+                }
             }
             catch (Exception e)
             {
@@ -1279,111 +1300,6 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Optionally trains and then tests the machine using CSV data
-        /// </summary>
-        /// <param name="testOnly">Whether to only test, not train and test</param>
-        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
-        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public (AccuracyData trainingSet, AccuracyData testingSet) TrainAndTestWithCsvData(
-            bool testOnly,
-            Action<StatusArgs> updateStatus,
-            CancellationToken cancellationToken)
-        {
-            try
-            {
-                ExtractException.Assert("ELI45517", "Machine is not fully configured", IsConfigured);
-
-                var trainingCsv = CsvOutputFile + ".train.csv";
-                var testingCsv = CsvOutputFile + ".test.csv";
-
-                (double[][] inputs, List<string> answers) GetDataFromCsv(string path)
-                {
-                    if (!File.Exists(path))
-                    {
-                        return (new double[0][], new List<string>(0));
-                    }
-
-                    var row = 0;
-                    List<double[]> features = new List<double[]>();
-                    List<string> answers = new List<string>();
-                    using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(path))
-                    {
-                        csvReader.Delimiters = new[] { "," };
-                        csvReader.CommentTokens = new[] { "//", "#" };
-                        while (!csvReader.EndOfData)
-                        {
-                            row++;
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            string[] fields;
-                            try
-                            {
-                                fields = csvReader.ReadFields();
-                            }
-                            catch (Exception e)
-                            {
-                                var ue = new ExtractException("ELI45518", "Error parsing CSV input file", e);
-                                ue.AddDebugData("CSV path", path, false);
-                                throw ue;
-                            }
-
-                            ExtractException.Assert("ELI45519", "CSV rows should contain at least four fields",
-                                fields.Length >= 4,
-                                "Field count", fields.Length,
-                                "Row number", row);
-
-                            string answer = fields[2];
-                            answers.Add(answer);
-
-                            double[] featureVector = fields.Skip(3).Select(s => double.TryParse(s, out var d) ? d : 0).ToArray();
-                            features.Add(featureVector);
-
-                            updateStatus(new StatusArgs { StatusMessage = "Getting input data: {0:N0} records", Int32Value = 1 });
-                        }
-                    }
-                    return (features.ToArray(), answers);
-                }
-                var (trainInputs, trainAnswers) = GetDataFromCsv(trainingCsv);
-                var (testInputs, testAnswers) = GetDataFromCsv(testingCsv);
-
-                // If training then init the answer codes otherwise they need to stay the same as when the machine was
-                // trained.
-                // https://extract.atlassian.net/browse/ISSUE-15275
-                if (!testOnly)
-                {
-                    Encoder.InitializeAnswerCodeMappings(trainAnswers.Concat(testAnswers), Encoder.NegativeClassName);
-                }
-
-                var trainOutputs = trainAnswers.Select(a => Encoder.AnswerNameToCode[a]).ToArray();
-                var testOutputs = testAnswers.Select(a => Encoder.AnswerNameToCode[a]).ToArray();
-
-                // Train the classifier
-                if (!testOnly && trainInputs.Any())
-                {
-                    var rng = new Random(RandomNumberSeed);
-                    Classifier.TrainClassifier(trainInputs, trainOutputs, rng, updateStatus, cancellationToken);
-                }
-
-                cancellationToken.ThrowIfCancellationRequested();
-
-                // Training mutates the trainInputs array in order to save memory so don't modify it again
-                // if training has taken place
-                var trainResult = GetAccuracyScore(trainInputs, trainOutputs, standardizeInputs: testOnly);
-                var testResult = GetAccuracyScore(testInputs, testOutputs);
-                AccuracyData =
-                    (train: new SerializableConfusionMatrix(Encoder, trainResult),
-                    test: new SerializableConfusionMatrix(Encoder, testResult));
-                return (trainResult, testResult);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45533");
-            }
-        }
-
-        /// <summary>
         /// Prepares training/testing data for writing to CSV or DB by zipping the separate collections together and,
         /// if <see cref="StandardizeFeaturesForCsvOutput"/> = <c>true</c>, converts to the features to Z-scores
         /// </summary>
@@ -1526,24 +1442,6 @@ namespace Extract.AttributeFinder
                 _encryptedInputConfig = encryptedStream.ToArray();
             }
 
-            // Encrypt data encoder
-            using (var unencryptedStream = new MemoryStream())
-            using (var encryptedStream = new MemoryStream())
-            {
-                var serializer = new NetDataContractSerializer();
-                serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
-                serializer.Serialize(unencryptedStream, Encoder);
-                unencryptedStream.Position = 0;
-                ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _CONVERGENCE_MATRIX, ml);
-                _encryptedEncoder = encryptedStream.ToArray();
-            }
-
-            // Encrypt training log
-            if (TrainingLog != null)
-            {
-                _encryptedTrainingLog = ExtractEncryption.EncryptString(TrainingLog, ml);
-            }
-
             // Set the label attributes settings if usage is AttributeCategorization
             if (Usage == LearningMachineUsage.AttributeCategorization)
             {
@@ -1553,35 +1451,6 @@ namespace Extract.AttributeFinder
             {
                 _labelAttributesPersistedSettings = null;
             }
-
-            if (_version == 5)
-            {
-                if (IsCompatibleWithVersion(4))
-                {
-                    _version = 4;
-                }
-            }
-
-            if (_version == 4)
-            {
-                if (IsCompatibleWithVersion(3))
-                {
-                    _version = 3;
-                }
-            }
-
-            // Since v1 of LearningMachineDataEncoder had no versioning, this object's version
-            // was incremented at the same time versioning was added to that object so as to prevent
-            // incompatible usage.
-            // But, in order to allow for use in older software when possible, decrease the version if this object
-            // is compatible with the previous version
-            if (_version == 3)
-            {
-                if (IsCompatibleWithVersion(2))
-                {
-                    _version = 2;
-                }
-            }
         }
 
         [OnSerialized]
@@ -1589,39 +1458,6 @@ namespace Extract.AttributeFinder
         {
             // Reset the version that may have been decremented for serialization
             _version = _CURRENT_VERSION;
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is safe (won't behave differently)
-        /// if used by software that is unaware of features added in <see cref="_version" />
-        /// </summary>
-        /// <param name="version">The version in question.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is compatible with the specified version
-        /// </returns>
-        internal bool IsCompatibleWithVersion(int version)
-        {
-            if (_version == 5 && version == 4)
-            {
-                return string.IsNullOrEmpty(CsvOutputFile);
-            }
-
-            if (_version == 4 && version == 3)
-            {
-                if (TranslateUnknownCategory
-                    && !string.Equals(TranslateUnknownCategoryTo, "Unknown", StringComparison.Ordinal))
-                {
-                    return false;
-                }
-                return true;
-            }
-
-            if (_version == 3 && version == 2)
-            {
-                // LearningMachineDataEncoder v1 corresponds to LearningMachine v2
-                return Encoder.IsCompatibleWithVersion(1);
-            }
-            return _version <= version;
         }
 
         /// <summary>
@@ -1634,6 +1470,8 @@ namespace Extract.AttributeFinder
             _labelAttributesPersistedSettings = null;
             _translateUnknownCategory = false;
             _translateUnknownCategoryTo = null;
+            _encoder = null;
+            _trainingLog = null;
         }
 
         /// <summary>
@@ -1649,9 +1487,6 @@ namespace Extract.AttributeFinder
                 "Current version", _CURRENT_VERSION,
                 "Version to load", _version);
 
-            // Update version number
-            _version = _CURRENT_VERSION;
-
             // Decrypt input configuration
             var ml = new MapLabel();
             using (var encryptedStream = new MemoryStream(_encryptedInputConfig))
@@ -1663,26 +1498,38 @@ namespace Extract.AttributeFinder
                 serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
                 InputConfig = (InputConfiguration)serializer.Deserialize(unencryptedStream);
             }
+            _encryptedInputConfig = null;
 
+#pragma warning disable CS0618 // Type or member is obsolete
             // Decrypt data encoder
-            using (var encryptedStream = new MemoryStream(_encryptedEncoder))
-            using (var unencryptedStream = new MemoryStream())
+            if (_version < 6)
             {
-                ExtractEncryption.DecryptStream(encryptedStream, unencryptedStream, _CONVERGENCE_MATRIX, ml);
-                unencryptedStream.Position = 0;
-                var serializer = new NetDataContractSerializer();
-                serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
-                Encoder = (LearningMachineDataEncoder)serializer.Deserialize(unencryptedStream);
-            }
+                using (var encryptedStream = new MemoryStream(_encryptedEncoder))
+                using (var unencryptedStream = new MemoryStream())
+                {
+                    ExtractEncryption.DecryptStream(encryptedStream, unencryptedStream, _CONVERGENCE_MATRIX, ml);
+                    unencryptedStream.Position = 0;
+                    var serializer = new NetDataContractSerializer();
+                    serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
+                    Encoder = (LearningMachineDataEncoder)serializer.Deserialize(unencryptedStream);
+                }
+                _encryptedEncoder = null;
 
-            // Decrypt training log
-            if (_encryptedTrainingLog != null)
-            {
-                TrainingLog = ExtractEncryption.DecryptString(_encryptedTrainingLog, ml);
+                // Decrypt training log
+                if (_encryptedTrainingLog != null)
+                {
+                    TrainingLog = ExtractEncryption.DecryptString(_encryptedTrainingLog, ml);
+                }
             }
+            _encryptedEncoder = null;
+            _encryptedTrainingLog = null;
+#pragma warning restore CS0618 // Type or member is obsolete
 
             // Update property from persisted value
             LabelAttributesSettings = _labelAttributesPersistedSettings;
+
+            // Update version number
+            _version = _CURRENT_VERSION;
         }
 
         /// <summary> Creates a collection of document <see cref="ComAttribute"/>s that represents pagination boundaries
@@ -1785,7 +1632,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        protected virtual void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -1867,7 +1714,7 @@ namespace Extract.AttributeFinder
                 }
                 else
                 {
-                    var gc = new GeneralConfusionMatrix(classifier.NumberOfClasses, predictions, outputs);
+                    var gc = new GeneralConfusionMatrix(classifier.NumberOfClasses, outputs, predictions);
                     return gc.OverallAgreement;
                 }
             }

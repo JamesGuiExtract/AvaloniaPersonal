@@ -3,6 +3,7 @@ using Accord.Neuro;
 using Accord.Statistics;
 using AForge.Neuro;
 using Extract.Utilities;
+using LearningMachineTrainer;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,17 +17,11 @@ namespace Extract.AttributeFinder
     /// Classifier that uses an Activation Network
     /// </summary>
     [Serializable]
+    [CLSCompliant(false)]
     // Don't rename because it could break serialization
     [Obfuscation(Feature = "renaming", Exclude = true)]
-    public class NeuralNetworkClassifier : ITrainableClassifier, IIncrementallyTrainableClassifier
+    public class NeuralNetworkClassifier : INeuralNetModel, ITrainableClassifier, IIncrementallyTrainableClassifier
     {
-
-        #region Constants
-
-        private static readonly int _WINDOW_SIZE = 20;
-
-        #endregion Constants
-
         #region Private Fields
 
         /// <summary>
@@ -155,6 +150,42 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// The feature vector length that this classifier requires
+        /// </summary>
+        public int FeatureVectorLength
+        {
+            get
+            {
+                return _featureVectorLength;
+            }
+            set
+            {
+                if (value != _featureVectorLength)
+                {
+                    _featureVectorLength = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The underlying classifier
+        /// </summary>
+        public ActivationNetwork Classifier
+        {
+            get
+            {
+                return _classifier;
+            }
+            set
+            {
+                if (value != _classifier)
+                {
+                    _classifier = value;
+                }
+            }
+        }
+        
         #endregion Properties
 
         #region Constructors
@@ -184,7 +215,7 @@ namespace Extract.AttributeFinder
             {
                 return _numberOfClasses;
             }
-            private set
+            set
             {
                 if (value != _numberOfClasses)
                 {
@@ -203,7 +234,7 @@ namespace Extract.AttributeFinder
             {
                 return _isTrained;
             }
-            private set
+            set
             {
                 if (value != _isTrained)
                 {
@@ -221,7 +252,7 @@ namespace Extract.AttributeFinder
             {
                 return _lastTrainedOn;
             }
-            private set
+            set
             {
                 if (value != _lastTrainedOn)
                 {
@@ -229,6 +260,25 @@ namespace Extract.AttributeFinder
                 }
             }
         }
+
+        /// <summary>
+        /// Vector of feature means. These values will be subtracted from input feature vectors.
+        /// </summary>
+        public double[] FeatureMean
+        {
+            get => _featureMean;
+            set => _featureMean = value;
+        }
+
+        /// <summary>
+        /// Vector of feature means. These values will be subtracted from input feature vectors.
+        /// </summary>
+        public double[] FeatureScaleFactor
+        {
+            get => _featureScaleFactor;
+            set => _featureScaleFactor = value;
+        }
+
 
         /// <summary>
         /// Trains the classifier to recognize classifications
@@ -263,84 +313,10 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                // Indent sub-status messages
-                Action<StatusArgs> updateStatus2 = args =>
-                    {
-                        args.Indent++;
-                        updateStatus(args);
-                    };
-
                 ExtractException.Assert("ELI39717", "No inputs given", inputs != null && inputs.Length > 0);
                 ExtractException.Assert("ELI39718", "Inputs and outputs are different lengths", inputs.Length == outputs.Length);
 
-                // If a random number generator was specified, then specify the random number generator
-                // for neuron initialization so that results are reproducible
-                if (randomGenerator != null)
-                {
-                    AForge.Neuro.Neuron.RandGenerator = new AForge.ThreadSafeRandom(randomGenerator.Next());
-                }
-
-                _featureVectorLength = inputs[0].Length;
-                ExtractException.Assert("ELI39719", "Inputs are different lengths",
-                    inputs.All(vector => vector.Length == _featureVectorLength));
-
-                NumberOfClasses = outputs.Max() + 1;
-
-                (_featureMean, _featureScaleFactor) = LearningMachine.StandardizeFeatures(inputs);
-
-                // Expand output into one-hot vectors
-                double[][] expandedOutputs = Accord.Statistics.Tools.Expand(outputs, NumberOfClasses, negative: -1.0, positive: 1.0);
-
-                int[] layers = HiddenLayers.Concat(new int[] { NumberOfClasses }).ToArray();
-
-                // Run training algorithm
-                if (!UseCrossValidationSets)
-                {
-                    updateStatus(new StatusArgs { StatusMessage = "Training classifier:" });
-                    _classifier = TrainClassifier(inputs, expandedOutputs, layers, updateStatus2, cancellationToken);
-                }
-                else
-                {
-                    updateStatus(new StatusArgs { StatusMessage = "Building classifier:" });
-
-                    int numberOfNetworks = Math.Max(1, NumberOfCandidateNetworksToBuild);
-                    double lowestError = double.MaxValue;
-                    for (int i = 0; i < numberOfNetworks; i++)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        updateStatus2(new StatusArgs
-                        {
-                            TaskName = "TrainCandidateNet",
-                            ReplaceLastStatus = true,
-                            StatusMessage = string.Format(CultureInfo.CurrentCulture,
-                                "Training candidate classifier {0}", i + 1)
-                        });
-
-                        // Split data into training and validation sets by getting random subsets of each
-                        // category. This is to ensure at least one example of each class exists.
-                        // Compute indexes for the two sets of data
-                        List<int> trainIdx, cvIdx;
-                        LearningMachine.GetIndexesOfSubsetsByCategory(outputs, 0.8, out trainIdx, out cvIdx, randomGenerator);
-
-                        double[][] trainInputs = inputs.Submatrix(trainIdx);
-                        double[][] trainOutputs = expandedOutputs.Submatrix(trainIdx);
-
-                        double[][] cvInputs = inputs.Submatrix(cvIdx);
-                        double[][] cvOutputs = expandedOutputs.Submatrix(cvIdx);
-
-                        // Train the classifier
-                        ActivationNetwork ann;
-                        double cvError = TrainClassifier(trainInputs, trainOutputs, cvInputs, cvOutputs, layers, out ann,
-                            updateStatus2, cancellationToken);
-                        if (cvError < lowestError)
-                        {
-                            _classifier = ann;
-                        }
-                    }
-                }
-
-                IsTrained = true;
-                LastTrainedOn = DateTime.Now;
+                NeuralNetMethods.TrainClassifier(this, inputs, outputs, randomGenerator, updateStatus, cancellationToken);
             }
             catch (Exception e)
             {
@@ -363,10 +339,10 @@ namespace Extract.AttributeFinder
 
                 // Scale inputs
                 if (standardizeInputs
-                    && _featureMean != null
-                    && _featureScaleFactor != null)
+                    && FeatureMean != null
+                    && FeatureScaleFactor != null)
                 {
-                    inputs = inputs.Subtract(_featureMean).ElementwiseDivide(_featureScaleFactor);
+                    inputs = inputs.Subtract(FeatureMean).ElementwiseDivide(FeatureScaleFactor);
                 }
 
                 double[] responses = _classifier.Compute(inputs);
@@ -497,9 +473,9 @@ namespace Extract.AttributeFinder
 
 
                 // Standardize input
-                if (_featureMean != null && _featureScaleFactor != null && _featureScaleFactor.All(n => n != 0))
+                if (FeatureMean != null && FeatureScaleFactor != null && FeatureScaleFactor.All(n => n != 0))
                 {
-                    input = input.Subtract(_featureMean).ElementwiseDivide(_featureScaleFactor);
+                    input = input.Subtract(FeatureMean).ElementwiseDivide(FeatureScaleFactor);
                 }
 
                 // Expand output into one-hot vector
@@ -525,127 +501,6 @@ namespace Extract.AttributeFinder
 
 
         #region Private Methods
-
-        /// <summary>
-        /// Trains a classifier by running the training algorithm <see cref="MaxTrainingIterations"/> times.
-        /// </summary>
-        /// <param name="trainInputs">Feature vectors to train with</param>
-        /// <param name="trainOutputs">Classes (category codes) for each training input</param>
-        /// <param name="layers">Sizes of hidden and output layers</param>
-        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
-        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        /// <returns>The resulting network</returns>
-        private ActivationNetwork TrainClassifier(double[][] trainInputs, double[][] trainOutputs, int[] layers,
-            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
-        {
-            var ann = new ActivationNetwork(new BipolarSigmoidFunction(SigmoidAlpha), _featureVectorLength, layers);
-            var initializer = new NguyenWidrow(ann);
-            initializer.Randomize();
-            var teacher = new Accord.Neuro.Learning.ParallelResilientBackpropagationLearning(ann);
-            int sampleSize = trainOutputs.Length;
-            for (int i = 1; i <= MaxTrainingIterations; i++)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                double error = teacher.RunEpoch(trainInputs, trainOutputs) / sampleSize;
-                updateStatus(new StatusArgs
-                {
-                    TaskName = "RunEpoch",
-                    ReplaceLastStatus = true,
-                    StatusMessage = string.Format(CultureInfo.CurrentCulture,
-                        "Training iteration: {0} Training error: {1:N4}", i, error)
-                });
-            }
-
-            return ann;
-        }
-
-        /// <summary>
-        /// Trains a classifier using a cross-validation set to stop before <see cref="MaxTrainingIterations"/> are reached.
-        /// Assumes that <see cref="MaxTrainingIterations"/> is at least <see cref="_WINDOW_SIZE"/>
-        /// </summary>
-        /// <param name="trainInputs">Feature vectors to train with</param>
-        /// <param name="trainOutputs">Classes (category codes) for each training input</param>
-        /// <param name="cvInputs">Cross-validation set; feature vectors to check training progress against</param>
-        /// <param name="cvOutputs">Array of classes (category codes) for each cross-validation input</param>
-        /// <param name="layers">Sizes of hidden and output layers</param>
-        /// <param name="trainedNetwork">The resulting network</param>
-        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
-        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        /// <returns>The cross-validation error value of the resulting network</returns>
-        private double TrainClassifier(double[][] trainInputs, double[][] trainOutputs,
-            double[][] cvInputs, double[][] cvOutputs, int[] layers, out ActivationNetwork trainedNetwork,
-            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
-        {
-            ExtractException.Assert("ELI39725", "MaxTrainingIterations must be at least " + _WINDOW_SIZE,
-                MaxTrainingIterations >= _WINDOW_SIZE);
-
-            var ann = new ActivationNetwork(new BipolarSigmoidFunction(SigmoidAlpha), _featureVectorLength, layers);
-            var initializer = new NguyenWidrow(ann);
-            initializer.Randomize();
-            var teacher = new Accord.Neuro.Learning.ParallelResilientBackpropagationLearning(ann);
-
-            var history = new Queue<Tuple<TemporaryFile, double>>(_WINDOW_SIZE);
-            List<TemporaryFile> files = null;
-            int trainSize = trainOutputs.Length;
-            int cvSize = cvOutputs.Length;
-
-            try
-            {
-                for (int i = 1; i <= MaxTrainingIterations; i++)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    double trainError = teacher.RunEpoch(trainInputs, trainOutputs) / trainSize; ;
-                    double cvError = teacher.ComputeError(cvInputs, cvOutputs) / cvSize;
-                    updateStatus(new StatusArgs
-                    {
-                        TaskName = "RunEpoch",
-                        ReplaceLastStatus = true,
-                        StatusMessage = string.Format(CultureInfo.CurrentCulture,
-                            "Training iteration: {0} Training error: {1:N4} Validation error: {2:N4}", i, trainError, cvError)
-                    });
-
-                    var savedNN = new TemporaryFile(false);
-                    ann.Save(savedNN.FileName);
-                    history.Enqueue(Tuple.Create(savedNN, cvError));
-
-                    if (i >= _WINDOW_SIZE)
-                    {
-                        // Stop training if the results are not changing
-                        // https://extract.atlassian.net/browse/ISSUE-14873
-                        if (history.All(t => t.Item2 == history.Peek().Item2))
-                        {
-                            break;
-                        }
-
-                        var avgCVLast = history.Skip(_WINDOW_SIZE / 2).Average(t => t.Item2);
-                        var avgCVPrevLast = history.Take(_WINDOW_SIZE / 2).Average(t => t.Item2);
-
-                        // Break if CV error is trending upward
-                        if (avgCVLast > avgCVPrevLast)
-                        {
-                            break;
-                        }
-
-                        // Throw away oldest saved NN
-                        history.Dequeue();
-                    }
-                }
-
-                // Retrieve the best NN
-                files = history.Select(t => t.Item1).ToList();
-                var errors = history.Select(t => t.Item2).ToArray();
-                double lowestError = errors.Min(out int iMin);
-                var bestFile = files[iMin];
-
-                trainedNetwork = (ActivationNetwork)Network.Load(bestFile.FileName);
-                return lowestError;
-            }
-            finally
-            {
-                files?.ClearAndDispose();
-            }
-        }
 
         /// <summary>
         /// Trains a classifier by running the training algorithm <see cref="MaxTrainingIterations"/> times.

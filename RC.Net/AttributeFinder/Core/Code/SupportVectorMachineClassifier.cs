@@ -1,12 +1,7 @@
 ﻿using Accord.MachineLearning.VectorMachines;
-using Accord.Math;
-using Accord.Statistics;
-using Accord.Statistics.Analysis;
+using LearningMachineTrainer;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -30,7 +25,7 @@ namespace Extract.AttributeFinder
     [Serializable]
     // Don't rename because it could break serialization
     [Obfuscation(Feature = "renaming", Exclude = true)]
-    public abstract class SupportVectorMachineClassifier : ITrainableClassifier
+    public abstract class SupportVectorMachineClassifier : ITrainableClassifier, ISupportVectorMachineModel
     {
         #region Constants
 
@@ -92,7 +87,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// The feature vector length that this classifier requires
         /// </summary>
-        protected int FeatureVectorLength
+        public int FeatureVectorLength
         {
             get
             {
@@ -110,7 +105,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// The underlying classifier
         /// </summary>
-        protected ISupportVectorMachine Classifier
+        public ISupportVectorMachine Classifier
         {
             get
             {
@@ -248,7 +243,7 @@ namespace Extract.AttributeFinder
             {
                 return _numberOfClasses;
             }
-            private set
+            set
             {
                 if (value != _numberOfClasses)
                 {
@@ -268,7 +263,7 @@ namespace Extract.AttributeFinder
             {
                 return _isTrained;
             }
-            private set
+            set
             {
                 if (value != _isTrained)
                 {
@@ -286,7 +281,7 @@ namespace Extract.AttributeFinder
             {
                 return _lastTrainedOn;
             }
-            private set
+            set
             {
                 if (value != _lastTrainedOn)
                 {
@@ -313,6 +308,14 @@ namespace Extract.AttributeFinder
                 _smoCacheSize = value;
             }
         }
+
+        [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
+        double[] IClassifierModel.FeatureMean { get => FeatureMean; set => FeatureMean = value; }
+
+        [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
+        double[] IClassifierModel.FeatureScaleFactor { get => FeatureScaleFactor; set => FeatureScaleFactor = value; }
+
+        public int Version { get => _version; set => _version = value; }
 
         /// <summary>
         /// Trains the classifier to recognize classifications
@@ -350,232 +353,7 @@ namespace Extract.AttributeFinder
                 ExtractException.Assert("ELI40262", "No inputs given", inputs != null && inputs.Length > 0);
                 ExtractException.Assert("ELI40263", "Inputs and outputs are different lengths", inputs.Length == outputs.Length);
 
-                // Indent sub-status messages
-                Action<StatusArgs> updateStatus2 = args =>
-                    {
-                        args.Indent++;
-                        updateStatus(args);
-                    };
-
-                FeatureVectorLength = inputs[0].Length;
-                ExtractException.Assert("ELI40264", "Inputs are different lengths",
-                    inputs.All(vector => vector.Length == FeatureVectorLength));
-
-                NumberOfClasses = outputs.Max() + 1;
-
-                string accuracyType;
-                if (ScoreTypeToUseForComplexityChoosingAlgorithm == MachineScoreType.Precision)
-                {
-                    accuracyType = "Precision";
-                }
-                else if (ScoreTypeToUseForComplexityChoosingAlgorithm == MachineScoreType.Recall)
-                {
-                    accuracyType = "Recall";
-                }
-                else
-                {
-                    accuracyType = NumberOfClasses == 2 ? "F1-Score" : "Accuracy";
-                }
-
-                (FeatureMean, FeatureScaleFactor) = LearningMachine.StandardizeFeatures(inputs);
-
-                // Run training algorithm against subsets to pick a good Complexity value
-                if (AutomaticallyChooseComplexityValue)
-                {
-                    // Split data into training and validation sets by getting random subsets of each
-                    // category. This is to ensure at least one example of each class exists.
-                    // Compute indexes for the two sets of data
-                    // NOTE: Changed to be 50/50 sets because arguably this will give more accurate results (and it is faster)
-                    LearningMachine.GetIndexesOfSubsetsByCategory(outputs, 0.5, out List<int> trainIdx, out List<int> cvIdx, randomGenerator);
-
-                    double[][] trainInputs = inputs.Submatrix(trainIdx);
-                    int[] trainOutputs = outputs.Submatrix(trainIdx);
-
-                    double[][] cvInputs = inputs.Submatrix(cvIdx);
-                    int[] cvOutputs = outputs.Submatrix(cvIdx);
-
-                    var complexitiesTried = new Dictionary<double, double>();
-                    Func<double, bool, double> search = (start, fineTune) =>
-                    {
-                        double bestScore = 0;
-                        var previousBestComplexities = new List<double>();
-                        var bestComplexities = new List<double>();
-                        int i = 1;
-                        int decreasingRun = 0;
-                        int equalRun = 0;
-                        double startE = 0, endE = 0;
-                        double midE = Math.Round(Math.Log(start, 2));
-                        double step = 1;
-                        if (fineTune)
-                        {
-                            startE = midE - 1;
-                            endE = midE + 1;
-                            step = 0.25;
-                        }
-                        else
-                        {
-                            startE = midE - 10;
-                            endE = midE + 10;
-                        }
-                        for (double exp = startE; exp <= endE; i++, exp += step)
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            double complexity = Math.Pow(2, exp);
-
-                            updateStatus2(new StatusArgs
-                            {
-                                TaskName = "ChoosingComplexity",
-                                StatusMessage = String.Format(CultureInfo.CurrentCulture,
-                                fineTune
-                                    ? "Fine-tuning complexity value: Iteration {0}, C={1:N6}"
-                                    : "Choosing complexity value: Iteration {0}, C={1:N6}",
-                                i, complexity)
-                            });
-                            try
-                            {
-                                double score = 0;
-                                bool alreadyDone = complexitiesTried.TryGetValue(complexity, out score);
-                                if (!alreadyDone)
-                                {
-                                    TrainClassifier(trainInputs, trainOutputs, complexity, choosingComplexity: true, updateStatus: _ => { }, cancellationToken: cancellationToken);
-                                    score = GetAccuracyScore(cvInputs, cvOutputs, ScoreTypeToUseForComplexityChoosingAlgorithm);
-                                    complexitiesTried[complexity] = score;
-                                }
-
-                                updateStatus2(new StatusArgs
-                                {
-                                    TaskName = "ChoosingComplexity",
-                                    ReplaceLastStatus = true,
-                                    StatusMessage = String.Format(CultureInfo.CurrentCulture,
-                                    fineTune
-                                        ? alreadyDone ? "Fine-tuning complexity value: Iteration {0}, C={1:N6}, CV {2}={3:N4} (already done)"
-                                                      : "Fine-tuning complexity value: Iteration {0}, C={1:N6}, CV {2}={3:N4}"
-                                        : "Choosing complexity value: Iteration {0}, C={1:N6}, CV {2}={3:N4}",
-                                    i, complexity, accuracyType, score)
-                                });
-                                if (score >= bestScore)
-                                {
-                                    if (score > bestScore)
-                                    {
-                                        bestScore = score;
-                                        previousBestComplexities = bestComplexities;
-                                        bestComplexities = new List<double>();
-                                        equalRun = 0;
-                                    }
-                                    else
-                                    {
-                                        ++equalRun;
-                                        // https://extract.atlassian.net/browse/ISSUE-14727
-                                        if (!fineTune && equalRun == 3 && complexity > 1)
-                                        {
-                                            break;
-                                        }
-                                    }
-                                    bestComplexities.Add(complexity);
-                                    decreasingRun = 0;
-                                }
-                                else
-                                {
-                                    ++decreasingRun;
-                                    equalRun = 0;
-                                    if (!fineTune && decreasingRun == 3)
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                            catch (AggregateException ae)
-                            {
-                                ae.Handle(ex => ex is Accord.ConvergenceException);
-
-                                updateStatus2(new StatusArgs
-                                {
-                                    TaskName = "ChoosingComplexity",
-                                    ReplaceLastStatus = true,
-                                    StatusMessage = String.Format(CultureInfo.CurrentCulture,
-                                    "Choosing complexity value: Iteration {0}, C={1:N6}, Unable to attain convergence!",
-                                    i,
-                                    complexity)
-                                });
-
-                                // https://extract.atlassian.net/browse/ISSUE-14113
-                                // Handle convergence exception as a signal that the complexity value
-                                // being tried is too high
-                                if (bestComplexities.Any())
-                                {
-                                    // Use previous list of bests if there is only one current best (too close to non-convergence)
-                                    if (decreasingRun == 0 && previousBestComplexities.Any() && bestComplexities.Count == 1)
-                                    {
-                                        bestComplexities = previousBestComplexities;
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Pick the middle value for complexities, using lower value if there is an even number of bests
-                        // use '1' if there are no bests
-                        double chosen = bestComplexities.Count == 0
-                            ? 1
-                            : bestComplexities[(bestComplexities.Count - 1) / 2];
-
-                        return chosen;
-                    };
-
-                    // Pick best region
-                    Complexity = search(1, false);
-
-                    // Fine-tune
-                    Complexity = search(Complexity, true);
-
-                    updateStatus2(new StatusArgs
-                    {
-                        StatusMessage = String.Format(CultureInfo.CurrentCulture,
-                        "Complexity chosen: C={0}",
-                        Complexity)
-                    });
-                }
-
-                bool success = false;
-                do
-                {
-                    try
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        // Train classifier
-                        updateStatus(new StatusArgs { StatusMessage = "Training classifier:" });
-                        TrainClassifier(inputs, outputs, Complexity, choosingComplexity: false, updateStatus: updateStatus2, cancellationToken: cancellationToken);
-
-                        success = IsTrained = true;
-                        LastTrainedOn = DateTime.Now;
-                    }
-                    // https://extract.atlassian.net/browse/ISSUE-14113
-                    // Handle convergence exception as a signal that the complexity value being tried
-                    // is too high
-                    catch (AggregateException ae)
-                    {
-                        ae.Handle(ex => ex is Accord.ConvergenceException);
-
-                        updateStatus2(new StatusArgs
-                        {
-                            StatusMessage = String.Format(CultureInfo.CurrentCulture,
-                            "Unable to attain convergence: C={0:N6}",
-                            Complexity)
-                        });
-
-                        // Try lower complexity value
-                        Complexity *= 0.75;
-                        updateStatus2(new StatusArgs
-                        {
-                            StatusMessage = String.Format(CultureInfo.CurrentCulture,
-                            "Trying again with lower Complexity value: C={0:N6}",
-                            Complexity)
-                        });
-                    }
-                }
-                while (!success);
+                SvmMethods.TrainClassifier(this, inputs, outputs, randomGenerator, updateStatus, cancellationToken);
             }
             catch (Exception e)
             {
@@ -670,69 +448,7 @@ namespace Extract.AttributeFinder
 
         #endregion ITrainableClassifier
 
-        #region Protected Methods
-
-        /// <summary>
-        /// Trains the classifier to be able to predict classes for inputs
-        /// </summary>
-        /// <param name="inputs">Array of feature vectors</param>
-        /// <param name="outputs">Array of classes (category codes) for each input</param>
-        /// <param name="complexity">Complexity value to use for training</param>
-        /// <param name="choosingComplexity">Whether this method is being called as part of figuring out what Complexity parameter is the best
-        /// (and thus no need to calibrate the machine for probabilities, e.g.)</param>
-        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
-        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        protected abstract void TrainClassifier(double[][] inputs, int[] outputs, double complexity, bool choosingComplexity,
-            Action<StatusArgs> updateStatus, CancellationToken cancellationToken);
-
-        #endregion Protected Methods
-
         #region Private Methods
-
-        /// <summary>
-        /// Computes the accuracy, precision, recall or F1 score of the <see cref="Classifier"/>
-        /// </summary>
-        /// <param name="inputs">The feature vectors</param>
-        /// <param name="outputs">The expected results</param>
-        /// <param name="scoreType">The type of measure to return as accuracy</param>
-        /// <returns>The specified score type if there are two classes else the overall agreement</returns>
-        private double GetAccuracyScore(double[][] inputs, int[] outputs, MachineScoreType scoreType = MachineScoreType.OverallAgreementOrF1)
-        {
-            try
-            {
-                int[] predictions = inputs.Apply(x =>
-                {
-                    double _;
-                    return Classifier.Compute(x, out _);
-                });
-
-                if (NumberOfClasses == 2)
-                {
-                    var cm = new ConfusionMatrix(predictions, outputs);
-                    if (scoreType == MachineScoreType.Precision)
-                    {
-                        return cm.Precision;
-                    }
-                    else if (scoreType == MachineScoreType.Recall)
-                    {
-                        return cm.Recall;
-                    }
-                    else
-                    {
-                        return cm.FScore;
-                    }
-                }
-                else
-                {
-                    var gc = new GeneralConfusionMatrix(NumberOfClasses, predictions, outputs);
-                    return gc.OverallAgreement;
-                }
-            }
-            catch (Exception e)
-            {
-                throw e.AsExtract("ELI40374");
-            }
-        }
 
         /// <summary>
         /// Called when deserializing

@@ -2,11 +2,11 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Extract.UtilityApplications.NERTrainer.Test")]
+[assembly: AssemblyTitle("Extract.UtilityApplications.MLModelTrainer.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Extract.UtilityApplications.NERTrainer.Test")]
+[assembly: AssemblyProduct("Extract.UtilityApplications.MLModelTrainer.Test")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

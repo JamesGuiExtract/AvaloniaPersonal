@@ -1,8 +1,8 @@
 ﻿using Extract.FileActionManager.Forms;
 
-namespace Extract.UtilityApplications.NERTrainer
+namespace Extract.UtilityApplications.MLModelTrainer
 {
-    partial class NERTrainerConfigurationDialog
+    partial class MLModelTrainerConfigurationDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -38,7 +38,7 @@ namespace Extract.UtilityApplications.NERTrainer
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NERTrainerConfigurationDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MLModelTrainerConfigurationDialog));
             Extract.Utilities.ScheduledEvent scheduledEvent2 = new Extract.Utilities.ScheduledEvent();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._manageMLModelsButton = new System.Windows.Forms.Button();
@@ -80,6 +80,9 @@ namespace Extract.UtilityApplications.NERTrainer
             this.label13 = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this._settingsTabPage = new System.Windows.Forms.TabPage();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this._lmModelTypeRadioButton = new System.Windows.Forms.RadioButton();
+            this._nerModelTypeRadioButton = new System.Windows.Forms.RadioButton();
             this._scheduleTabPage = new System.Windows.Forms.TabPage();
             this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
             this.groupBox1.SuspendLayout();
@@ -93,6 +96,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this.groupBox3.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this._settingsTabPage.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this._scheduleTabPage.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -114,16 +118,16 @@ namespace Extract.UtilityApplications.NERTrainer
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this._testingCommandTextBox);
-            this.groupBox1.Location = new System.Drawing.Point(3, 6);
+            this.groupBox1.Location = new System.Drawing.Point(7, 62);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(602, 129);
-            this.groupBox1.TabIndex = 3;
+            this.groupBox1.Size = new System.Drawing.Size(608, 129);
+            this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             // 
             // _manageMLModelsButton
             // 
             this._manageMLModelsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._manageMLModelsButton.Location = new System.Drawing.Point(530, 18);
+            this._manageMLModelsButton.Location = new System.Drawing.Point(536, 18);
             this._manageMLModelsButton.Name = "_manageMLModelsButton";
             this._manageMLModelsButton.Size = new System.Drawing.Size(63, 23);
             this._manageMLModelsButton.TabIndex = 6;
@@ -134,7 +138,7 @@ namespace Extract.UtilityApplications.NERTrainer
             // _addModelButton
             // 
             this._addModelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._addModelButton.Location = new System.Drawing.Point(448, 18);
+            this._addModelButton.Location = new System.Drawing.Point(454, 18);
             this._addModelButton.Name = "_addModelButton";
             this._addModelButton.Size = new System.Drawing.Size(75, 23);
             this._addModelButton.TabIndex = 5;
@@ -149,7 +153,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._modelNameComboBox.FormattingEnabled = true;
             this._modelNameComboBox.Location = new System.Drawing.Point(120, 19);
             this._modelNameComboBox.Name = "_modelNameComboBox";
-            this._modelNameComboBox.Size = new System.Drawing.Size(322, 21);
+            this._modelNameComboBox.Size = new System.Drawing.Size(328, 21);
             this._modelNameComboBox.TabIndex = 4;
             // 
             // _modelDestinationPathBrowseButton
@@ -157,7 +161,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._modelDestinationPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._modelDestinationPathBrowseButton.EnsureFileExists = false;
             this._modelDestinationPathBrowseButton.EnsurePathExists = false;
-            this._modelDestinationPathBrowseButton.Location = new System.Drawing.Point(564, 98);
+            this._modelDestinationPathBrowseButton.Location = new System.Drawing.Point(570, 98);
             this._modelDestinationPathBrowseButton.Name = "_modelDestinationPathBrowseButton";
             this._modelDestinationPathBrowseButton.Size = new System.Drawing.Size(29, 20);
             this._modelDestinationPathBrowseButton.TabIndex = 13;
@@ -171,15 +175,16 @@ namespace Extract.UtilityApplications.NERTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._modelDestinationPathTextBox.Location = new System.Drawing.Point(120, 98);
             this._modelDestinationPathTextBox.Name = "_modelDestinationPathTextBox";
-            this._modelDestinationPathTextBox.Size = new System.Drawing.Size(403, 20);
+            this._modelDestinationPathTextBox.Size = new System.Drawing.Size(409, 20);
             this._modelDestinationPathTextBox.TabIndex = 11;
             // 
             // _modelDestinationPathTagsButton
             // 
             this._modelDestinationPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._modelDestinationPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_modelDestinationPathTagsButton.Image")));
-            this._modelDestinationPathTagsButton.Location = new System.Drawing.Point(530, 98);
+            this._modelDestinationPathTagsButton.Location = new System.Drawing.Point(536, 98);
             this._modelDestinationPathTagsButton.Name = "_modelDestinationPathTagsButton";
+            this._modelDestinationPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this._modelDestinationPathTagsButton.Size = new System.Drawing.Size(28, 20);
             this._modelDestinationPathTagsButton.TabIndex = 12;
             this._modelDestinationPathTagsButton.TextControl = this._modelDestinationPathTextBox;
@@ -200,8 +205,9 @@ namespace Extract.UtilityApplications.NERTrainer
             // 
             this._trainingCommandPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._trainingCommandPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_trainingCommandPathTagsButton.Image")));
-            this._trainingCommandPathTagsButton.Location = new System.Drawing.Point(530, 46);
+            this._trainingCommandPathTagsButton.Location = new System.Drawing.Point(536, 46);
             this._trainingCommandPathTagsButton.Name = "_trainingCommandPathTagsButton";
+            this._trainingCommandPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this._trainingCommandPathTagsButton.Size = new System.Drawing.Size(28, 20);
             this._trainingCommandPathTagsButton.TabIndex = 8;
             this._trainingCommandPathTagsButton.TextControl = this._trainingCommandTextBox;
@@ -213,7 +219,7 @@ namespace Extract.UtilityApplications.NERTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._trainingCommandTextBox.Location = new System.Drawing.Point(120, 46);
             this._trainingCommandTextBox.Name = "_trainingCommandTextBox";
-            this._trainingCommandTextBox.Size = new System.Drawing.Size(403, 20);
+            this._trainingCommandTextBox.Size = new System.Drawing.Size(409, 20);
             this._trainingCommandTextBox.TabIndex = 7;
             this._trainingCommandTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
@@ -221,8 +227,9 @@ namespace Extract.UtilityApplications.NERTrainer
             // 
             this._testingCommandPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._testingCommandPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_testingCommandPathTagsButton.Image")));
-            this._testingCommandPathTagsButton.Location = new System.Drawing.Point(530, 72);
+            this._testingCommandPathTagsButton.Location = new System.Drawing.Point(536, 72);
             this._testingCommandPathTagsButton.Name = "_testingCommandPathTagsButton";
+            this._testingCommandPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this._testingCommandPathTagsButton.Size = new System.Drawing.Size(28, 20);
             this._testingCommandPathTagsButton.TabIndex = 10;
             this._testingCommandPathTagsButton.TextControl = this._testingCommandTextBox;
@@ -234,7 +241,7 @@ namespace Extract.UtilityApplications.NERTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._testingCommandTextBox.Location = new System.Drawing.Point(120, 72);
             this._testingCommandTextBox.Name = "_testingCommandTextBox";
-            this._testingCommandTextBox.Size = new System.Drawing.Size(403, 20);
+            this._testingCommandTextBox.Size = new System.Drawing.Size(409, 20);
             this._testingCommandTextBox.TabIndex = 9;
             this._testingCommandTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
@@ -275,7 +282,7 @@ namespace Extract.UtilityApplications.NERTrainer
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(481, 460);
+            this._okButton.Location = new System.Drawing.Point(487, 524);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 24;
@@ -287,7 +294,7 @@ namespace Extract.UtilityApplications.NERTrainer
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(562, 460);
+            this._cancelButton.Location = new System.Drawing.Point(568, 524);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 25;
@@ -335,7 +342,7 @@ namespace Extract.UtilityApplications.NERTrainer
             0,
             0,
             131072});
-            this._minF1ScoreNumericUpDown.Location = new System.Drawing.Point(524, 40);
+            this._minF1ScoreNumericUpDown.Location = new System.Drawing.Point(530, 40);
             this._minF1ScoreNumericUpDown.Maximum = new decimal(new int[] {
             1,
             0,
@@ -349,7 +356,7 @@ namespace Extract.UtilityApplications.NERTrainer
             // 
             this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(376, 42);
+            this.label8.Location = new System.Drawing.Point(382, 42);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(139, 13);
             this.label8.TabIndex = 6;
@@ -386,7 +393,7 @@ namespace Extract.UtilityApplications.NERTrainer
             0,
             0,
             131072});
-            this._allowableAccuracyDropNumericUpDown.Location = new System.Drawing.Point(524, 14);
+            this._allowableAccuracyDropNumericUpDown.Location = new System.Drawing.Point(530, 14);
             this._allowableAccuracyDropNumericUpDown.Maximum = new decimal(new int[] {
             1,
             0,
@@ -400,7 +407,7 @@ namespace Extract.UtilityApplications.NERTrainer
             // 
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(392, 16);
+            this.label7.Location = new System.Drawing.Point(398, 16);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(123, 13);
             this.label7.TabIndex = 4;
@@ -432,7 +439,7 @@ namespace Extract.UtilityApplications.NERTrainer
             0,
             0,
             131072});
-            this._lastF1ScoreNumericUpDown.Location = new System.Drawing.Point(524, 14);
+            this._lastF1ScoreNumericUpDown.Location = new System.Drawing.Point(530, 14);
             this._lastF1ScoreNumericUpDown.Maximum = new decimal(new int[] {
             1,
             0,
@@ -446,7 +453,7 @@ namespace Extract.UtilityApplications.NERTrainer
             // 
             this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(395, 16);
+            this.label6.Location = new System.Drawing.Point(401, 16);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(120, 13);
             this.label6.TabIndex = 2;
@@ -460,10 +467,10 @@ namespace Extract.UtilityApplications.NERTrainer
             this.groupBox2.Controls.Add(this._lastIDProcessedNumericUpDown);
             this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.label5);
-            this.groupBox2.Location = new System.Drawing.Point(3, 325);
+            this.groupBox2.Location = new System.Drawing.Point(7, 384);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(602, 44);
-            this.groupBox2.TabIndex = 20;
+            this.groupBox2.Size = new System.Drawing.Size(608, 44);
+            this.groupBox2.TabIndex = 3;
             this.groupBox2.TabStop = false;
             // 
             // groupBox3
@@ -482,10 +489,10 @@ namespace Extract.UtilityApplications.NERTrainer
             this.groupBox3.Controls.Add(this.label8);
             this.groupBox3.Controls.Add(this._maxTrainingDocsNumericUpDown);
             this.groupBox3.Controls.Add(this._maxTestingDocsNumericUpDown);
-            this.groupBox3.Location = new System.Drawing.Point(3, 141);
+            this.groupBox3.Location = new System.Drawing.Point(7, 200);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(602, 178);
-            this.groupBox3.TabIndex = 13;
+            this.groupBox3.Size = new System.Drawing.Size(608, 178);
+            this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             // 
             // _emailSubjectTextBox
@@ -494,7 +501,7 @@ namespace Extract.UtilityApplications.NERTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._emailSubjectTextBox.Location = new System.Drawing.Point(9, 147);
             this._emailSubjectTextBox.Name = "_emailSubjectTextBox";
-            this._emailSubjectTextBox.Size = new System.Drawing.Size(585, 20);
+            this._emailSubjectTextBox.Size = new System.Drawing.Size(591, 20);
             this._emailSubjectTextBox.TabIndex = 19;
             // 
             // label12
@@ -512,7 +519,7 @@ namespace Extract.UtilityApplications.NERTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._emailAddressesTextBox.Location = new System.Drawing.Point(8, 96);
             this._emailAddressesTextBox.Name = "_emailAddressesTextBox";
-            this._emailAddressesTextBox.Size = new System.Drawing.Size(585, 20);
+            this._emailAddressesTextBox.Size = new System.Drawing.Size(591, 20);
             this._emailAddressesTextBox.TabIndex = 18;
             // 
             // label11
@@ -531,7 +538,7 @@ namespace Extract.UtilityApplications.NERTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._descriptionTextBox.Location = new System.Drawing.Point(80, 9);
             this._descriptionTextBox.Name = "_descriptionTextBox";
-            this._descriptionTextBox.Size = new System.Drawing.Size(557, 20);
+            this._descriptionTextBox.Size = new System.Drawing.Size(563, 20);
             this._descriptionTextBox.TabIndex = 1;
             // 
             // label13
@@ -553,7 +560,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this.tabControl1.Location = new System.Drawing.Point(15, 48);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(622, 406);
+            this.tabControl1.Size = new System.Drawing.Size(630, 463);
             this.tabControl1.TabIndex = 2;
             // 
             // _settingsTabPage
@@ -562,12 +569,49 @@ namespace Extract.UtilityApplications.NERTrainer
             this._settingsTabPage.Controls.Add(this.groupBox1);
             this._settingsTabPage.Controls.Add(this.groupBox2);
             this._settingsTabPage.Controls.Add(this.groupBox3);
+            this._settingsTabPage.Controls.Add(this.groupBox4);
             this._settingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._settingsTabPage.Name = "_settingsTabPage";
             this._settingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._settingsTabPage.Size = new System.Drawing.Size(614, 380);
+            this._settingsTabPage.Size = new System.Drawing.Size(622, 437);
             this._settingsTabPage.TabIndex = 0;
             this._settingsTabPage.Text = "Settings";
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox4.Controls.Add(this._lmModelTypeRadioButton);
+            this.groupBox4.Controls.Add(this._nerModelTypeRadioButton);
+            this.groupBox4.Location = new System.Drawing.Point(7, 12);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(608, 44);
+            this.groupBox4.TabIndex = 0;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Model type";
+            // 
+            // _lmModelTypeRadioButton
+            // 
+            this._lmModelTypeRadioButton.AutoSize = true;
+            this._lmModelTypeRadioButton.Location = new System.Drawing.Point(245, 19);
+            this._lmModelTypeRadioButton.Name = "_lmModelTypeRadioButton";
+            this._lmModelTypeRadioButton.Size = new System.Drawing.Size(110, 17);
+            this._lmModelTypeRadioButton.TabIndex = 15;
+            this._lmModelTypeRadioButton.TabStop = true;
+            this._lmModelTypeRadioButton.Text = "Learning Machine";
+            this._lmModelTypeRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // _nerModelTypeRadioButton
+            // 
+            this._nerModelTypeRadioButton.AutoSize = true;
+            this._nerModelTypeRadioButton.Location = new System.Drawing.Point(8, 19);
+            this._nerModelTypeRadioButton.Name = "_nerModelTypeRadioButton";
+            this._nerModelTypeRadioButton.Size = new System.Drawing.Size(201, 17);
+            this._nerModelTypeRadioButton.TabIndex = 14;
+            this._nerModelTypeRadioButton.TabStop = true;
+            this._nerModelTypeRadioButton.Text = "Open NLP Named Entity Recognition";
+            this._nerModelTypeRadioButton.UseVisualStyleBackColor = true;
             // 
             // _scheduleTabPage
             // 
@@ -576,7 +620,7 @@ namespace Extract.UtilityApplications.NERTrainer
             this._scheduleTabPage.Location = new System.Drawing.Point(4, 22);
             this._scheduleTabPage.Name = "_scheduleTabPage";
             this._scheduleTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._scheduleTabPage.Size = new System.Drawing.Size(614, 380);
+            this._scheduleTabPage.Size = new System.Drawing.Size(614, 437);
             this._scheduleTabPage.TabIndex = 1;
             this._scheduleTabPage.Text = "Schedule";
             // 
@@ -595,24 +639,24 @@ namespace Extract.UtilityApplications.NERTrainer
             scheduledEvent2.Start = new System.DateTime(2018, 3, 23, 11, 16, 13, 0);
             this._schedulerControl.Value = scheduledEvent2;
             // 
-            // NERTrainerConfigurationDialog
+            // MLModelTrainerConfigurationDialog
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(646, 491);
+            this.ClientSize = new System.Drawing.Size(655, 554);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label13);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(632, 459);
-            this.Name = "NERTrainerConfigurationDialog";
+            this.MinimumSize = new System.Drawing.Size(671, 593);
+            this.Name = "MLModelTrainerConfigurationDialog";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "NER trainer";
+            this.Text = "ML model trainer";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._maxTestingDocsNumericUpDown)).EndInit();
@@ -627,6 +671,8 @@ namespace Extract.UtilityApplications.NERTrainer
             this.groupBox3.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this._settingsTabPage.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this._scheduleTabPage.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -676,5 +722,8 @@ namespace Extract.UtilityApplications.NERTrainer
         private System.Windows.Forms.TabPage _settingsTabPage;
         private System.Windows.Forms.TabPage _scheduleTabPage;
         private Utilities.Forms.SchedulerControl _schedulerControl;
+        private System.Windows.Forms.RadioButton _nerModelTypeRadioButton;
+        private System.Windows.Forms.RadioButton _lmModelTypeRadioButton;
+        private System.Windows.Forms.GroupBox groupBox4;
     }
 }

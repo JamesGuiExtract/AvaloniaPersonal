@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{A7FAD56F-541D-41A0-9DA7-683572F50A20}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>NERTrainer</RootNamespace>
-    <AssemblyName>NERTrainer</AssemblyName>
+    <RootNamespace>MLModelTrainer</RootNamespace>
+    <AssemblyName>MLModelTrainer</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -62,6 +62,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="YamlDotNet, Version=4.3.1.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\YamlDotNet.Signed.4.3.1\lib\net45\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_AFCORELib">
@@ -183,16 +186,20 @@
       <Project>{76781de2-21d2-470c-b41d-598dc0c2640b}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\TrainingDataCollector\Core\Code\TrainingDataCollector.csproj">
+      <Project>{020455B5-0838-4CCF-AF73-46D539FCF787}</Project>
+      <Name>TrainingDataCollector</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NERTrainerConfigurationDialog.cs">
+    <Compile Include="MLModelTrainerConfigurationDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NERTrainerConfigurationDialog.Designer.cs">
-      <DependentUpon>NERTrainerConfigurationDialog.cs</DependentUpon>
+    <Compile Include="MLModelTrainerConfigurationDialog.Designer.cs">
+      <DependentUpon>MLModelTrainerConfigurationDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="NERTrainer.cs" />
-    <Compile Include="NERTrainerApp.cs" />
+    <Compile Include="MLModelTrainer.cs" />
+    <Compile Include="MLModelTrainerApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -200,8 +207,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="NERTrainerConfigurationDialog.resx">
-      <DependentUpon>NERTrainerConfigurationDialog.cs</DependentUpon>
+    <EmbeddedResource Include="MLModelTrainerConfigurationDialog.resx">
+      <DependentUpon>MLModelTrainerConfigurationDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

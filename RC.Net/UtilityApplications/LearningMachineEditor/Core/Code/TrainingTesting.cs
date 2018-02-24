@@ -1,5 +1,6 @@
 ﻿using Extract.AttributeFinder;
 using Extract.Utilities.Forms;
+using LearningMachineTrainer;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -361,7 +362,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 if (loadDataFromCsvRadioButton.Checked)
                 {
-                    operation = (u, c) => learningMachine.TrainAndTestWithCsvData(true, u, c);
+                    operation = (u, c) => LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, true, learningMachine.CsvOutputFile, u, c);
                 }
                 else if (saveFeatureVectorsToCsvsCheckBox.Checked)
                 {
@@ -372,7 +373,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             learningMachine.ComputeEncodings(u, c);
                         }
                         learningMachine.WriteDataToCsv(u, c);
-                        return learningMachine.TrainAndTestWithCsvData(true, u, c);
+                        return LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, true, learningMachine.CsvOutputFile, u, c);
                     };
                 }
                 else
@@ -384,7 +385,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 if (loadDataFromCsvRadioButton.Checked)
                 {
-                    operation = (u, c) => learningMachine.TrainAndTestWithCsvData(false, u, c);
+                    operation = (u, c) => LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, false, learningMachine.CsvOutputFile, u, c);
                 }
                 else if (saveFeatureVectorsToCsvsCheckBox.Checked)
                 {
@@ -395,7 +396,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             learningMachine.ComputeEncodings(u, c);
                         }
                         learningMachine.WriteDataToCsv(u, c);
-                        return learningMachine.TrainAndTestWithCsvData(false, u, c);
+                        return LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, false, learningMachine.CsvOutputFile, u, c);
                     };
                 }
                 else
@@ -407,136 +408,41 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             // Train/test machine
             _mainTask = Task.Factory.StartNew(() =>
                 operation(args =>
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            return;
-                        }
-                        _statusUpdates.Enqueue(args);
-                    }, cancellationToken), cancellationToken)
-            // Handle cleanup
-            .ContinueWith(task =>
                 {
-                    sw.Stop();
-                    var elapsedTime = sw.Elapsed.ToString(@"hh\:mm\:ss", CultureInfo.CurrentCulture);
-
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        _statusUpdates.Enqueue(
-                            new StatusArgs
-                            {
-                                StatusMessage = "Canceled. Time elapsed: " + elapsedTime,
-                                ReplaceLastStatus = true
-                            });
+                        return;
                     }
-                    else if (task.Exception == null)
-                    {
-                        _editor.CurrentLearningMachine = learningMachine;
+                    _statusUpdates.Enqueue(args);
+                }, cancellationToken)
+                , cancellationToken)
+            .ContinueWith(task =>
+            {
+                Exception failed = SharedTrainingMethods.RunCleanup(task, learningMachine, testOnly, sw, _statusUpdates, cancellationToken);
 
-                        var completedMessage = testOnly ? "Testing Complete" : "Training Complete";
-                        _statusUpdates.Enqueue(
-                            new StatusArgs { StatusMessage = completedMessage + ". Time elapsed: " + elapsedTime + "\r\n" });
+                // Flush log
+                StatusArgs _;
+                while (_statusUpdates.TryPeek(out _))
+                {
+                    Application.DoEvents();
+                    Thread.Sleep(100);
+                }
+                timer.Dispose();
+                cancelButton.Enabled = false;
 
-                        void writeAccuracyData(AccuracyData accuracyData, SerializableConfusionMatrix confusionMatrix) => accuracyData.Match(
-                            gcm =>
-                            {
-                                _statusUpdates.Enqueue(new StatusArgs
-                                {
-                                    StatusMessage = "  Number of samples: {0:N0}",
-                                    Int32Value = gcm.Samples
-                                });
-                                _statusUpdates.Enqueue(new StatusArgs
-                                {
-                                    StatusMessage = "  Overall agreement: {0:N4}\r\n  Chance agreement: {1:N4}",
-                                    DoubleValues = new[] { gcm.OverallAgreement, gcm.ChanceAgreement }
-                                });
-                                if (confusionMatrix != null)
-                                {
-                                    var negativeClasses = string.Join(", ", confusionMatrix.NegativeClassIndexes().Select(i => confusionMatrix.Labels[i]));
-                                    _statusUpdates.Enqueue(new StatusArgs
-                                    {
-                                        StatusMessage = "  F1 Score (micro avg): {0:N4}" +
-                                            "\r\n  Precision (micro avg): {1:N4}" +
-                                            "\r\n  Recall (micro avg): {2:N4}" +
-                                            "\r\n  Negative class: " + negativeClasses,
-                                        DoubleValues = new[] { confusionMatrix.FScoreMicroAverage(), confusionMatrix.PrecisionMicroAverage(), confusionMatrix.RecallMicroAverage() }
-                                    });
-                                }
-                            },
-                            cm =>
-                            {
-                                var positiveCategoryCodes = learningMachine.Encoder.AnswerCodeToName.Keys
-                                    .Where(key => key != LearningMachineDataEncoder.UnknownOrNegativeCategoryCode);
-                                ExtractException.Assert("ELI41410", "Internal logic exception: There should be exactly one postive category in order to use a confusion matrix",
-                                    positiveCategoryCodes.Count() == 1);
-                                string positiveCategory = learningMachine.Encoder.AnswerCodeToName[positiveCategoryCodes.First()];
+                // Re-enable buttons
+                UpdateControlsAndFlags();
 
-                                _statusUpdates.Enqueue(new StatusArgs
-                                {
-                                    StatusMessage = "  Number of samples: {0:N0}",
-                                    Int32Value = cm.Samples
-                                });
-                                _statusUpdates.Enqueue(new StatusArgs
-                                {
-                                    StatusMessage = "  F1 Score: {0:N4}" +
-                                        "\r\n  Precision: {1:N4}" +
-                                        "\r\n  Recall: {2:N4}" +
-                                        "\r\n  Positive class: " + positiveCategory,
-                                    DoubleValues = new[] { cm.FScore, cm.Precision, cm.Recall }
-                                });
-                            });
+                if (failed is ExtractException ue)
+                {
+                    ue.Display();
+                }
+                else if(!cancellationToken.IsCancellationRequested)
+                {
+                    _editor.CurrentLearningMachine = learningMachine;
+                }
 
-                        var trainingAccuracyData = task.Result.Item1;
-                        var testingAccuracyData = task.Result.Item2;
-
-                        var trainingAccuracyData2 = learningMachine.AccuracyData?.train;
-                        var testingAccuracyData2 = learningMachine.AccuracyData?.test;
-
-                        // Training data may not be present (if training % was 0)
-                        if (trainingAccuracyData != null)
-                        {
-                            _statusUpdates.Enqueue(new StatusArgs { StatusMessage = "Training Set Accuracy:" });
-                            writeAccuracyData(trainingAccuracyData, trainingAccuracyData2);
-                        }
-
-                        _statusUpdates.Enqueue(new StatusArgs { StatusMessage = "Testing Set Accuracy:" });
-                        writeAccuracyData(testingAccuracyData, testingAccuracyData2);
-                    }
-                    else
-                    {
-                        _statusUpdates.Enqueue(new StatusArgs
-                            {
-                                StatusMessage = "Error occurred. Time elapsed: " + elapsedTime
-                            });
-
-                        // I don't think there will be more than one inner exception but just in case...
-                        foreach (var ex in task.Exception.InnerExceptions)
-                        {
-                            ex.ExtractDisplay("ELI40378");
-                        }
-                    }
-
-                    // Mark end of session
-                    _statusUpdates.Enqueue(new StatusArgs
-                        {
-                            TaskName = "__END_OF_SESSION__", // Keep from matching previous status
-                            StatusMessage = "..." // In case these logs turn into YAML files, use YAML EOF
-                        });
-
-                    // Flush log
-                    StatusArgs _;
-                    while (_statusUpdates.TryPeek(out _))
-                    {
-                        Application.DoEvents();
-                        Thread.Sleep(100);
-                    }
-                    timer.Dispose();
-                    cancelButton.Enabled = false;
-
-                    // Re-enable buttons
-                    UpdateControlsAndFlags();
-
-                }, TaskScheduler.FromCurrentSynchronizationContext()); // End of ContinueWith
+            }, TaskScheduler.FromCurrentSynchronizationContext()); // End of ContinueWith
 
             // Since computation has started, allow canceling
             cancelButton.Enabled = true;

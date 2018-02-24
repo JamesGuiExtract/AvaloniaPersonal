@@ -1,4 +1,5 @@
 ﻿using Extract.Utilities;
+using LearningMachineTrainer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -273,7 +274,7 @@ namespace Extract.AttributeFinder
     [Serializable]
     // Don't rename because it could break serialization
     [Obfuscation(Feature = "renaming", Exclude = true)]
-    public class LearningMachineDataEncoder
+    public class LearningMachineDataEncoder : ILearningMachineDataEncoderModel
     {
 
         #region Constants
@@ -282,8 +283,9 @@ namespace Extract.AttributeFinder
         /// Current version.
         /// Version 2: Add AttributesToTokenizeFilter property and backing field
         ///            Add AttributeFeatureShingleSize property and backing field
+        /// Version 3: Add more efficient saving of answer name to code map
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         // Used for document categorization.
         // Used to represent categories that are in testing data but not in training data.
@@ -349,7 +351,9 @@ namespace Extract.AttributeFinder
         private SpatialStringFeatureVectorizer _autoBagOfWords;
         private IEnumerable<AttributeFeatureVectorizer> _attributeFeatureVectorizers;
         private Dictionary<string, int> _answerNameToCode;
+        [Obsolete("Use _answerCodeToNameList instead")]
         private Dictionary<int, string> _answerCodeToName;
+
         private string _attributeFilter;
         private bool _negateFilter;
         private LearningMachineUsage _machineUsage;
@@ -365,6 +369,9 @@ namespace Extract.AttributeFinder
 
         [OptionalField(VersionAdded = 2)]
         private string _negativeClassName;
+
+        [OptionalField(VersionAdded = 3)]
+        private List<string> _answerCodeToNameList;
 
         #endregion Fields
 
@@ -409,13 +416,14 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Gets the dictionary of category names to the numeric codes assigned to them
         /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public Dictionary<string, int> AnswerNameToCode
         {
             get
             {
                 return _answerNameToCode;
             }
-            private set
+            set
             {
                 if (value != _answerNameToCode)
                 {
@@ -425,20 +433,19 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Gets the dictionary of numeric codes to category names
+        /// Gets the list of numeric codes to category names
         /// </summary>
-        public Dictionary<int, string> AnswerCodeToName
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public List<string> AnswerCodeToName
         {
             get
             {
-                return _answerCodeToName;
+                return _answerCodeToNameList;
             }
-            private set
+            set
             {
-                if (value != _answerCodeToName)
-                {
-                    _answerCodeToName = value;
-                }
+                _answerCodeToNameList = value;
             }
         }
 
@@ -637,7 +644,7 @@ namespace Extract.AttributeFinder
             AttributeFeatureVectorizers = Enumerable.Empty<AttributeFeatureVectorizer>();
             AttributeFilter = attributeFilter;
             NegateFilter = negateFilter;
-            AnswerCodeToName = new Dictionary<int, string>();
+            AnswerCodeToName = new List<string>();
             AnswerNameToCode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             AttributeVectorizerMaxDiscreteTermsFeatures = attributeVectorizerMaxFeatures;
             AttributesToTokenizeFilter = attributesToTokenize;
@@ -1254,7 +1261,7 @@ namespace Extract.AttributeFinder
             {
                 var clone = ShallowClone();
                 clone.AutoBagOfWords = AutoBagOfWords == null ? null : AutoBagOfWords.DeepClone();
-                clone.AnswerCodeToName = new Dictionary<int, string>(AnswerCodeToName);
+                clone.AnswerCodeToName = new List<string>(AnswerCodeToName);
                 clone.AnswerNameToCode = new Dictionary<string, int>(AnswerNameToCode, StringComparer.OrdinalIgnoreCase);
                 clone.AttributeFeatureVectorizers = AttributeFeatureVectorizers.Select(afv => afv.DeepClone()).ToList();
                 return clone;
@@ -1705,21 +1712,15 @@ namespace Extract.AttributeFinder
             // Add the negative category or an 'other' category
             string otherCategory = negativeCategory ?? UnknownCategoryName;
 
-            AnswerCodeToName.Add(UnknownOrNegativeCategoryCode, otherCategory);
-            AnswerNameToCode.Add(otherCategory, UnknownOrNegativeCategoryCode);
+            AnswerCodeToName.Add(otherCategory);
 
-            // Add category code for each name seen
-            int nextCategoryCode = 0;
-            foreach (var category in answers.Distinct(StringComparer.OrdinalIgnoreCase)
-                .Where(k => !k.Equals(otherCategory, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(s => s, StringComparer.OrdinalIgnoreCase))
+            AnswerCodeToName.AddRange(answers.Distinct(StringComparer.OrdinalIgnoreCase)
+                .Where(s => !s.Equals(otherCategory, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(s => s, StringComparer.OrdinalIgnoreCase));
+
+            for (int i = 0; i < AnswerCodeToName.Count; i++)
             {
-                while (AnswerCodeToName.ContainsKey(nextCategoryCode))
-                {
-                    nextCategoryCode++;
-                }
-                AnswerCodeToName.Add(nextCategoryCode, category);
-                AnswerNameToCode.Add(category, nextCategoryCode);
+                AnswerNameToCode[AnswerCodeToName[i]] = i;
             }
 
             ExtractException.Assert("ELI40251", "There must be at least two categories of input", AnswerNameToCode.Count > 1);
@@ -2063,9 +2064,10 @@ namespace Extract.AttributeFinder
             }
 
             // Add category names and codes
-            AnswerCodeToName.Add(_NOT_FIRST_PAGE_CATEGORY_CODE, NotFirstPageCategory);
+            ExtractException.Assert("ELI45689", "Internal logic error", AnswerCodeToName.Count == 0);
+            AnswerCodeToName.Add(NotFirstPageCategory);
             AnswerNameToCode.Add(NotFirstPageCategory, _NOT_FIRST_PAGE_CATEGORY_CODE);
-            AnswerCodeToName.Add(FirstPageCategoryCode, _FIRST_PAGE_CATEGORY);
+            AnswerCodeToName.Add(_FIRST_PAGE_CATEGORY);
             AnswerNameToCode.Add(_FIRST_PAGE_CATEGORY, FirstPageCategoryCode);
         }
 
@@ -2314,40 +2316,14 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Gets a value indicating whether this instance is safe (won't behave differently)
-        /// if used by software that is unaware of features added in <see cref="_version" />
-        /// </summary>
-        /// <param name="version">The version in question.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is compatible with the specified version
-        /// </returns>
-        internal bool IsCompatibleWithVersion(int version)
-        {
-            if (_version == 2 && version == 1)
-            {
-                return string.IsNullOrEmpty(AttributesToTokenizeFilter);
-            }
-            return _version <= version;
-        }
-
-        /// <summary>
         /// Called when serializing
         /// </summary>
         /// <param name="context">The context.</param>
         [OnSerializing]
         private void OnSerializing(StreamingContext context)
         {
-            if (_version == 2 && IsCompatibleWithVersion(1))
-            {
-                _version = 1;
-            }
-        }
-
-        [OnSerialized]
-        private void OnSerialized(StreamingContext context)
-        {
-            // Reset the version that may have been decremented for serialization
-            _version = _CURRENT_VERSION;
+            // Don't save redundant info (will be recreated on load)
+            _answerNameToCode = null;
         }
 
         /// <summary>
@@ -2367,6 +2343,7 @@ namespace Extract.AttributeFinder
                     : MachineUsage == LearningMachineUsage.Pagination
                         ? NotFirstPageCategory
                         : UnknownCategoryName;
+            _answerCodeToNameList = null;
         }
 
         /// <summary>
@@ -2380,6 +2357,29 @@ namespace Extract.AttributeFinder
                 _version <= _CURRENT_VERSION,
                 "Current version", _CURRENT_VERSION,
                 "Version to load", _version);
+
+            // Initialize code-to-name list for pre-version-3 encoders
+            if (_version < 3)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                _answerCodeToNameList = _answerCodeToName
+                    .OrderBy(kv => kv.Key)
+                    .Select(kv => kv.Value)
+                    .ToList();
+
+                // Don't need the source dictionary anymore
+                _answerCodeToName = null;
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+                // Else, just create the name-to-code dictionary
+                _answerNameToCode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < _answerCodeToNameList.Count; i++)
+                {
+                    _answerNameToCode[_answerCodeToNameList[i]] = i;
+                }
+            }
 
             _version = _CURRENT_VERSION;
         }
