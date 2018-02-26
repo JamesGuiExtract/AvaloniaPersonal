@@ -575,6 +575,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 pageControl.Document = this;
 
                 Invalidate();
+
+                OnDocumentStateChanged();
             }
             catch (Exception ex)
             {
@@ -619,6 +621,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 pageControl.Document = null;
 
                 Invalidate();
+
+                OnDocumentStateChanged();
             }
             catch (Exception ex)
             {

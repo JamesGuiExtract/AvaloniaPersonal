@@ -888,6 +888,11 @@ namespace Extract.FileActionManager.FileProcessors
 
                     // Without this call, after committing the top document separator bar is not updating correctly after commit.
                     _paginationPanel.Invalidate();
+
+                    if (!Focused)
+                    {
+                        FormsMethods.FlashWindow(this, true, true);
+                    }
                 }
             }
             catch (Exception ex)
@@ -1393,11 +1398,6 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 _inputEventTracker.Active = true;
 
-                if (!Focused)
-                {
-                    FormsMethods.FlashWindow(this, true, true);
-                }
-
                 if (_settings.SingleSourceDocumentMode)
                 {
                     // In discussion with Rob for the 10.6 Hurley update (10.6.1.XX), he wanted a title
@@ -1412,6 +1412,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 LoadDocumentForPagination(fileID, fileName, false);
+
                 _documentSelectionPending = true;
             }
             catch (Exception ex)

@@ -74,9 +74,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _hasAppliedStatus;
 
         /// <summary>
-        /// Indicates whether layout has been deferred because the separator is not currently visible.
+        /// Indicates whether a update of the separator controls is required to reflect a change
+        /// in document status.
         /// </summary>
-        bool _deferredLayout;
+        bool _invalidatePending;
+
+        /// <summary>
+        /// Indicates whether an update of the separator controls is pending.
+        /// </summary>
+        bool _controlUpdatePending;
 
         #endregion Fields
 
@@ -238,10 +244,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <value><c>true</c> if an update of the control is required; otherwise, <c>false</c>.
         /// </value>
-        public bool UpdateRequired
+        public bool InvalidatePending
         {
-            get;
-            set;
+            get
+            {
+                return (_invalidatePending || _controlUpdatePending);
+            }
+
+            set
+            {
+                _invalidatePending = value;
+            }
         }
 
         #endregion Properties
@@ -277,6 +290,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_outputDocument != null)
                         {
                             _outputDocument.Invalidated -= HandleDocument_Invalidated;
+                            _outputDocument.DocumentStateChanged -= HandleOutputDocument_DocumentStateChanged;
                         }
 
                         _outputDocument = document;
@@ -285,13 +299,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             _collapsed = _outputDocument.PageControls.Any(c => !c.Visible);
                             _outputDocument.Invalidated += HandleDocument_Invalidated;
+                            _outputDocument.DocumentStateChanged += HandleOutputDocument_DocumentStateChanged;
                         }
                         else
                         {
                             _collapsed = false;
+                            _hasAppliedStatus = false;
                         }
 
-                        UpdateRequired = true;
+                        InvalidatePending = true;
                     }
 
                     return document;
@@ -337,8 +353,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                             Document.Collapsed = value;
 
-                            // Invalidate so that paint occurs and new collapsed state is indicated.
-                            Invalidate();
+                            // Display the new collapsed state.
+                            _collapseDocumentButton.Image = Document.Collapsed
+                                ? Properties.Resources.Expand
+                                : Properties.Resources.Collapse;
 
                             OnDocumentCollapsedChanged();
                         }
@@ -565,12 +583,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     Height = _tableLayoutPanel.Height;
                 }
 
-                if (_deferredLayout)
+                if (_controlUpdatePending)
                 {
                     UpdateControls();
                 }
-
-                _deferredLayout = false;
 
                 base.OnLayout(e);
             }
@@ -589,8 +605,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                InvalidatePending = true;
+
                 // If the controls cannot be updated at this time, no need to invalidate (optimization).
-                if (UpdateControls())
+                if (!UpdateControls())
                 {
                     base.OnInvalidated(e);
                 }
@@ -754,7 +772,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                UpdateRequired = true;
+                InvalidatePending = true;
 
                 // https://extract.atlassian.net/browse/ISSUE-15261
                 // In some operations, the separator may be removed from the panel before the
@@ -791,6 +809,25 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="OutputDocument.DocumentStateChanged"/> event of the
+        /// <see cref="_outputDocument"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <exception cref="NotImplementedException"></exception>
+        void HandleOutputDocument_DocumentStateChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _controlUpdatePending = true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45612");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -817,33 +854,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (Parent == null || !Parent.ClientRectangle.IntersectsWith(Bounds))
             {
-                _deferredLayout = true;
                 return false;
             }
 
-            bool doLayout = false;
-            if (Document != null)
+            if (Document != null && Document.PaginationSeparator != this)
             {
-                doLayout = _deferredLayout;
-                if (Document.PaginationSeparator != this)
-                {
-                    Document.PaginationSeparator = this;
-
-                    // Force a follow-up layout to occur after assigning this separator to a new document.
-                    doLayout |= _hasAppliedStatus;
-                    UpdateRequired = true;
-                }
+                // Force a follow-up layout to occur after assigning this separator to a new document.
+                _controlUpdatePending = true;
+                Document.PaginationSeparator = this;
+                InvalidatePending = true;
             }
 
-            doLayout |= (Document?.DocumentData?.Initialized == true);
-
-            if (doLayout && (Parent as PageLayoutControl)?.UIUpdatesSuspended == true)
-            {
-                _deferredLayout = true;
-                doLayout = false;
-            }
-
-            if (doLayout)
+            if (_controlUpdatePending &&
+                (Parent as PageLayoutControl)?.UIUpdatesSuspended != true &&
+                Document?.DocumentData?.Initialized == true)
             {
                 _hasAppliedStatus = true;
                 _selectedCheckBox.Visible = _showSelectionCheckBox;
@@ -872,16 +896,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _editedDataPictureBox.Visible = Document.DataModified;
                 _dataErrorPictureBox.Visible = Document.DataError;
 
-                if (doLayout)
-                {
-                    PerformLayout();
-                }
+                _controlUpdatePending = false;
+
+                PerformLayout();
 
                 return true;
             }
             else
             {
-                if (_hasAppliedStatus)
+                if (_hasAppliedStatus && Document?.DocumentData.Initialized != true)
                 {
                     _hasAppliedStatus = false;
                     _collapseDocumentButton.Visible = false;

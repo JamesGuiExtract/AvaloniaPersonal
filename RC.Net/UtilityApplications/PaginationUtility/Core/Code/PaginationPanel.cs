@@ -3064,35 +3064,38 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _updatingCommandStates = true;
-
-                var nonEmptyDocs = _pendingDocuments.Where(doc =>
-                    doc.PageControls.Any()).ToList();
-                var docsWithNonDeletedPages = nonEmptyDocs.Where(doc =>
-                    doc.PageControls.Any(c => !c.Deleted));
-                bool isDocDataEdited = docsWithNonDeletedPages.Any(doc =>
-                    doc.DocumentData != null && doc.DocumentData.Modified);
-                bool documentCopyExists = nonEmptyDocs.Count > _originalDocuments.Count();
-
-                // Removed check of doc.PaginationSuggested here so that auto-rotated images can also
-                // register as if it is a pagination suggestion in terms of reverting.
-                RevertToSuggestedEnabled =
-                    nonEmptyDocs.Any(doc => isDocDataEdited || documentCopyExists || !doc.InOriginalForm);
-                _revertToOriginalToolStripButton.Enabled = RevertToSuggestedEnabled;
-
-                RevertToSourceEnabled = isDocDataEdited || documentCopyExists
-                    || nonEmptyDocs.Any(doc => !doc.InSourceDocForm);
-                _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
-
-                _applyToolStripButton.Enabled = CommitEnabled;
-                _collapseAllToolStripButton.Image =
-                    AllDocumentsCollapsed
-                        ? Properties.Resources.Expand
-                        : Properties.Resources.Collapse;
-                if (CommitOnlySelection)
+                if (!SuspendUIUpdates)
                 {
-                    _selectAllToCommitCheckBox.Enabled = _pendingDocuments.Any();
-                    _selectAllToCommitCheckBox.Checked = AllDocumentsSelected;
+                    _updatingCommandStates = true;
+
+                    var nonEmptyDocs = _pendingDocuments.Where(doc =>
+                        doc.PageControls.Any()).ToList();
+                    var docsWithNonDeletedPages = nonEmptyDocs.Where(doc =>
+                        doc.PageControls.Any(c => !c.Deleted));
+                    bool isDocDataEdited = docsWithNonDeletedPages.Any(doc =>
+                        doc.DocumentData != null && doc.DocumentData.Modified);
+                    bool documentCopyExists = nonEmptyDocs.Count > _originalDocuments.Count();
+
+                    // Removed check of doc.PaginationSuggested here so that auto-rotated images can also
+                    // register as if it is a pagination suggestion in terms of reverting.
+                    RevertToSuggestedEnabled =
+                        nonEmptyDocs.Any(doc => isDocDataEdited || documentCopyExists || !doc.InOriginalForm);
+                    _revertToOriginalToolStripButton.Enabled = RevertToSuggestedEnabled;
+
+                    RevertToSourceEnabled = isDocDataEdited || documentCopyExists
+                        || nonEmptyDocs.Any(doc => !doc.InSourceDocForm);
+                    _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
+
+                    _applyToolStripButton.Enabled = CommitEnabled;
+                    _collapseAllToolStripButton.Image =
+                        AllDocumentsCollapsed
+                            ? Properties.Resources.Expand
+                            : Properties.Resources.Collapse;
+                    if (CommitOnlySelection)
+                    {
+                        _selectAllToCommitCheckBox.Enabled = _pendingDocuments.Any();
+                        _selectAllToCommitCheckBox.Checked = AllDocumentsSelected;
+                    }
                 }
             }
             finally
@@ -3132,6 +3135,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _uiUpdatesSuspended = false;
                             EnablePageDisplay = true;
                             _primaryPageLayoutControl.UIUpdatesSuspended = false;
+                            UpdateCommandStates();
                             ResumeLayout(true);
                         }
                     }

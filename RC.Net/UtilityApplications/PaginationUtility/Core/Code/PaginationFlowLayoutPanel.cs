@@ -144,7 +144,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     var control = _scrollToControl;
                     _scrollToControl = null;
-                    ScrollControlIntoViewManual(control);
+                    if (control.Visible)
+                    {
+                        ScrollControlIntoViewManual(control);
+                    }
                 }
             }
             catch (Exception ex)

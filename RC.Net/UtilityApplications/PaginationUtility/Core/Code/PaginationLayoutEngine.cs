@@ -96,10 +96,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     // Manually update separators that have pending status changes.
                     foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
-                        .Where(separator => separator.UpdateRequired))
+                        .Where(separator => separator.InvalidatePending))
                     {
                         separator.Invalidate();
-                        separator.UpdateRequired = false;
+                        separator.InvalidatePending = false;
                     }
 
                     parent.ResumeLayout();
@@ -183,7 +183,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     // Separator is being removed, previousSeparator is will be associated with a
                     // new document. Ensure this new association is reflected.
-                    previousSeparator.UpdateRequired = true;
+                    previousSeparator.InvalidatePending = true;
 
                     continue;
                 }

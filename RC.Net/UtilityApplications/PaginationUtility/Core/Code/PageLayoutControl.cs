@@ -568,6 +568,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     var documents = _flowLayoutPanel.Controls
                         .OfType<PageThumbnailControl>()
+                        .Where(pageControl => pageControl.Document != null)
                         .Select(pageControl => pageControl.Document)
                         .Distinct();
 
@@ -3112,10 +3113,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         var lastSelectedPage = lastSelectedControl as PageThumbnailControl;
                         var activeSeparator = activeControl as PaginationSeparator;
-                        if (lastSelectedPage != null && activeSeparator != null)
+                        if (activeSeparator != null)
                         {
                             if (activeSeparator.Document == null
-                                || activeSeparator.Document == lastSelectedPage.Document)
+                                || activeSeparator.Document == lastSelectedPage?.Document)
                             {
                                 activeControl = lastSelectedPage;
                             }
@@ -3177,7 +3178,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 PrimarySelection = control;
 
                 // Make sure the selected control is scrolled into view.
-                if (scrollToControl && Rectangle.Intersect(ClientRectangle, control.Bounds) != control.Bounds)
+                if (scrollToControl &&
+                    control.Visible &&
+                    Rectangle.Intersect(ClientRectangle, control.Bounds) != control.Bounds)
                 {
                     _flowLayoutPanel.ScrollControlIntoViewManual(control);
                 }

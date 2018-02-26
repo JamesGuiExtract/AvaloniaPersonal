@@ -131,7 +131,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="sendForReprocessing">The value to apply.</param>
         public void SetSendForReprocessing(bool? sendForReprocessing)
         {
-            _sendForReprocessing = sendForReprocessing;
+            try
+            {
+                if (_sendForReprocessing != sendForReprocessing)
+                {
+                    _sendForReprocessing = sendForReprocessing;
+
+                    OnDocumentDataStateChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45611");
+            }
         }
 
         #endregion Methods
