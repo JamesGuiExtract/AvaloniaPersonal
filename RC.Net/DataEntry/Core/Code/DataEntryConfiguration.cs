@@ -221,7 +221,7 @@ namespace Extract.DataEntry
                 var dbConnections = GetDatabaseConnections();
 
                 // Background configurations will defer DEP creation until needed.
-                if (!_config.Settings.SupportsNoUILoad)
+                if (!_isBackgroundConfig || !_config.Settings.SupportsNoUILoad)
                 {
                     DataEntryControlHost.SetDatabaseConnections(dbConnections);
                 }

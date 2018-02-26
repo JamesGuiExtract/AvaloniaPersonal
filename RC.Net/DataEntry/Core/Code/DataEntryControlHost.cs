@@ -1646,7 +1646,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_dbConnections != dbConnections)
+                if (_dbConnections?.SequenceEqual(dbConnections ?? new Dictionary<string, DbConnection>()) != true)
                 {
                     _dbConnections = dbConnections;
 
