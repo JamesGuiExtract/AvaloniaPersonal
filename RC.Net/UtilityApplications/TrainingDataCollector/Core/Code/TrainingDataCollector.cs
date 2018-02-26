@@ -1,12 +1,13 @@
-﻿using Extract.AttributeFinder;
-using Extract.ETL;
-using Extract.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Threading;
+using Extract.AttributeFinder;
+using Extract.ETL;
+using Extract.Utilities;
 
 namespace Extract.UtilityApplications.TrainingDataCollector
 {
@@ -112,7 +113,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         /// <param name="databaseServer">The database server</param>
         /// <param name="databaseName">The name of the database</param>
-        public void Process(string databaseServer, string databaseName)
+        public void Process(string databaseServer, string databaseName, CancellationToken cancelToken)
         {
             try
             {
@@ -164,13 +165,13 @@ namespace Extract.UtilityApplications.TrainingDataCollector
 
                         if (ModelType == ModelType.NamedEntityRecognition)
                         {
-                            SystemMethods.RunExtractExecutable(_NER_ANNOTATOR_APPLICATION, arguments);
+                            SystemMethods.RunExtractExecutable(_NER_ANNOTATOR_APPLICATION, arguments, cancelToken, true);
                         }
                         else if (ModelType == ModelType.LearningMachine)
                         {
                             using (var machine = LearningMachine.Load(DataGeneratorPath))
                             {
-                                machine.WriteDataToDatabase(databaseServer, databaseName, AttributeSetName, ModelName, lowestIDToProcess, highestIDToProcess);
+                                machine.WriteDataToDatabase(cancelToken, databaseServer, databaseName, AttributeSetName, ModelName, lowestIDToProcess, highestIDToProcess);
                             }
                         }
                         else
@@ -209,9 +210,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// <summary>
         /// Processes using configured DB
         /// </summary>
-        public override void Process()
+        /// <param name="cancelToken">Token that can be used to cancel processing</param>
+        public override void Process(CancellationToken cancelToken)
         {
-            Process(DatabaseServer, DatabaseName);
+            Process(DatabaseServer, DatabaseName, cancelToken);
         }
 
         #endregion Public Methods

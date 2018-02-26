@@ -1,6 +1,4 @@
-﻿using Extract.AttributeFinder;
-using Extract.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -8,6 +6,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
+using Extract.AttributeFinder;
+using Extract.Utilities;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -166,13 +167,14 @@ namespace Extract.ETL
         /// Performs the process of expanding the VOA stored in AttributeSetForFile
         /// to the attribute tables if they are not already stored.
         /// </summary>
-        public override void Process()
+        /// <param name="cancelToken">Token that can cancel the processing</param>
+        public override void Process(CancellationToken cancelToken)
         {
             try
             {
                 _processing = true;
 
-                using (var connection = getNewSqlDbConnection())
+                using (var connection = NewSqlDBConnection())
                 {
                     connection.Open();
 
@@ -195,7 +197,7 @@ namespace Extract.ETL
                         int AttributeSetForFileIDColumn = VOAsToStore.GetOrdinal("AttributeSetForFileID");
                         int VOAColumn = VOAsToStore.GetOrdinal("VOA");
 
-                        while (VOAsToStore.Read())
+                        while (VOAsToStore.Read() && !cancelToken.IsCancellationRequested)
                         {
                             Int64 AttributeSetForFileID = VOAsToStore.GetInt64(AttributeSetForFileIDColumn);
 
@@ -207,7 +209,7 @@ namespace Extract.ETL
                                     IUnknownVector AttributesToStore = AttributeMethods.GetVectorOfAttributesFromSqlBinary(VOAStream);
 
                                     // Use separate connection so that the entire VOA can be added in a transaction
-                                    using (var saveConnection = getNewSqlDbConnection())
+                                    using (var saveConnection = NewSqlDBConnection())
                                     {
                                         saveConnection.Open();
 
@@ -348,7 +350,7 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="spatialString">SpatialString whose RasterZones are being added</param>
         /// <returns>Insert statement to add RasterZones</returns>
-        string buildRasterZoneInsert(SpatialString spatialString)
+        static string buildRasterZoneInsert(SpatialString spatialString)
         {
             if (!spatialString.HasSpatialInfo())
             {
@@ -381,7 +383,7 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="rasterZone">The RasterZone to use</param>
         /// <returns>String to be used in VALUE clause</returns>
-        string getRasterZoneValueClause(IRasterZone rasterZone)
+        static string getRasterZoneValueClause(IRasterZone rasterZone)
         {
             ILongRectangle rectangle = rasterZone.GetRectangularBounds(null);
             int top = rectangle.Top;

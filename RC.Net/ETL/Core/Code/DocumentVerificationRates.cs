@@ -1,17 +1,11 @@
-﻿using Extract.AttributeFinder;
-using Extract.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
-using UCLID_AFCORELib;
-using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
-using Newtonsoft.Json;
+using System.Threading;
+using Extract.Utilities;
 
 namespace Extract.ETL
 {
@@ -191,13 +185,13 @@ namespace Extract.ETL
 
         #region DatabaseService Methods
 
-        public override void Process()
+        public override void Process(CancellationToken cancelToken)
         {
             try
             {
                 _processing = true;
 
-                using (var connection = getNewSqlDbConnection())
+                using (var connection = NewSqlDBConnection())
                 {
                     connection.Open();
                     DocumentVerificationStatus status = GetLastStatus(connection);
@@ -210,7 +204,7 @@ namespace Extract.ETL
 
                     using (var sourceReader = sourceCmd.ExecuteReader())
                     {
-                        while (sourceReader.Read())
+                        while (sourceReader.Read() && !cancelToken.IsCancellationRequested)
                         {
                             Int32 fileTaskSessionID = sourceReader.GetInt32(sourceReader.GetOrdinal("ID"));
                             bool activeFAM = sourceReader.GetInt32(sourceReader.GetOrdinal("ActiveFAM")) != 0;
@@ -233,7 +227,7 @@ namespace Extract.ETL
                                 status.SetOfActiveFileTaskIDs.Remove(fileTaskSessionID);
                             }
 
-                            using (var saveConnection = getNewSqlDbConnection())
+                            using (var saveConnection = NewSqlDBConnection())
                             {
                                 saveConnection.Open();
                                 using (var transaction = saveConnection.BeginTransaction())

@@ -190,7 +190,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                     }
                     else
                     {
-                        collector.Process(databaseServer, databaseName);
+                        collector.Process(databaseServer, databaseName, System.Threading.CancellationToken.None);
                         File.WriteAllText(settingsFile, collector.ToJson());
                     }
                 }

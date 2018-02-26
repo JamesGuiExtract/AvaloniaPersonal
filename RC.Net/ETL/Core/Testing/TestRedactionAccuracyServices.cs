@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
@@ -11,20 +12,20 @@ using NUnit.Framework;
 namespace Extract.ETL.Test
 {
     // Define RedactionAccuracyList as a list of tuples for the data in the ReportingRedactionAccuracy table
-    using RedactionAccuracyList = 
-        List<(Int64 FoundAttributeSetForFileID, 
+    using RedactionAccuracyList =
+        List<(Int64 FoundAttributeSetForFileID,
             Int64 ExpectedAttributeSetForFileID,
             Int32 FileID,
             Int32 Page,
-            string Attribute, 
-            Int64 Expected, 
-            Int64 Found, 
+            string Attribute,
+            Int64 Expected,
+            Int64 Found,
             Int64 Correct,
             Int64 FalsePositives,
             Int64 OverRedacted,
             Int64 UnderRedacted,
             Int64 Missed)>;
-    
+
     [Category("TestRedactionAccuracyServices")]
     [TestFixture]
     public class TestRedactionAccuracyServices
@@ -43,6 +44,9 @@ namespace Extract.ETL.Test
         /// Manages test FAM DBs
         /// </summary>
         static FAMTestDBManager<TestAccuracyServices> _testDbManager;
+
+        static CancellationToken _noCancel = new CancellationToken(false);
+        static CancellationToken _cancel = new CancellationToken(true);
 
         /// <summary>
         /// List of the expected contents of the ReportingRedactionAccuracy table after the first run
@@ -150,8 +154,16 @@ namespace Extract.ETL.Test
         
                     redactionAccuracy.DatabaseServiceID = (int)cmd.ExecuteScalar();
                     //redactionAccuracy.XPathOfSensitiveAttributes = "";
+
+                    // with the _cancel token there should be no results
+                    redactionAccuracy.Process(_cancel);
+
+                    cmd.CommandText = "Select Count(ID) from ReportingRedactionAccuracy";
+
+                    Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
+
                     // Process using the settings
-                    redactionAccuracy.Process();
+                    redactionAccuracy.Process(_noCancel);
 
                     // Get the data from the database after processing
                     cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"
@@ -161,7 +173,7 @@ namespace Extract.ETL.Test
                     CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
 
                     // Run again - There should be no changes
-                    redactionAccuracy.Process();
+                    redactionAccuracy.Process(_noCancel);
 
                     CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
                 }
@@ -212,7 +224,7 @@ namespace Extract.ETL.Test
                     redactionAccuracy.DatabaseServiceID = (int)cmd.ExecuteScalar();
 
                     // Process using the settings
-                    redactionAccuracy.Process();
+                    redactionAccuracy.Process(_noCancel);
 
                     // Get the data from the database after processing
                     cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"
@@ -222,7 +234,7 @@ namespace Extract.ETL.Test
                     CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
 
                     // Run again - There should be no changes
-                    redactionAccuracy.Process();
+                    redactionAccuracy.Process(_noCancel);
 
                     CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
                 }

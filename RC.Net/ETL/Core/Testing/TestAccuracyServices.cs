@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
@@ -11,15 +12,15 @@ using NUnit.Framework;
 namespace Extract.ETL.Test
 {
     // Define DataEntryAccuracyList as a list of tuples for the data in the ReportingDataCaptureAccuracy table
-    using DataEntryAccuracyList = 
-        List<(Int64 FoundAttributeSetForFileID, 
+    using DataEntryAccuracyList =
+        List<(Int64 FoundAttributeSetForFileID,
             Int64 ExpectedAttributeSetForFileID,
-            string Attribute, 
-            Int64 Correct, 
-            Int64 Expected, 
-            Int64 Incorrect, 
+            string Attribute,
+            Int64 Correct,
+            Int64 Expected,
+            Int64 Incorrect,
             Int32 FileID)>;
-    
+
     [Category("TestAccuracyServices")]
     [TestFixture]
     public class TestAccuracyServices
@@ -63,6 +64,9 @@ namespace Extract.ETL.Test
         #endregion
 
         #region Fields
+
+        static CancellationToken _noCancel = new CancellationToken(false);
+        static CancellationToken _cancel = new CancellationToken(true);
 
         /// <summary>
         /// Manages test FAM DBs
@@ -185,8 +189,14 @@ namespace Extract.ETL.Test
         
                     dataCaptureAccuracy.DatabaseServiceID = (int)cmd.ExecuteScalar();
 
+                    // no records should be produced by this
+                    dataCaptureAccuracy.Process(_cancel);
+                    cmd.CommandText = "SELECT COUNT(ID) FROM ReportingDataCaptureAccuracy";
+
+                    Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
+
                     // Process using the settings
-                    dataCaptureAccuracy.Process();
+                    dataCaptureAccuracy.Process(_noCancel);
 
                     // Get the data from the database after processing
                     cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"
@@ -196,7 +206,7 @@ namespace Extract.ETL.Test
                     CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
 
                     // Run again - There should be no changes
-                    dataCaptureAccuracy.Process();
+                    dataCaptureAccuracy.Process(_noCancel);
 
                     CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
                 }
@@ -249,7 +259,7 @@ namespace Extract.ETL.Test
                     dataCaptureAccuracy.DatabaseServiceID = (int)cmd.ExecuteScalar();
 
                     // Process using the settings
-                    dataCaptureAccuracy.Process();
+                    dataCaptureAccuracy.Process(_noCancel);
 
                     // Get the data from the database after processing
                     cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"
@@ -259,7 +269,7 @@ namespace Extract.ETL.Test
                     CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
 
                     // Run again - There should be no changes
-                    dataCaptureAccuracy.Process();
+                    dataCaptureAccuracy.Process(_noCancel);
 
                     CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
                 }

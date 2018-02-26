@@ -964,7 +964,8 @@ namespace Extract.AttributeFinder
         /// Writes out feature vectors and answers as CSV to a database
         /// </summary>
         /// <remarks>The CSV fields are: "answer", features...</remarks>
-        public void WriteDataToDatabase(string databaseServer, string databaseName, string attributeSetName, string modelName, long lowestIDToProcess, long highestIDToProcess)
+        public void WriteDataToDatabase(CancellationToken cancelToken, string databaseServer, string databaseName, string attributeSetName, 
+            string modelName, long lowestIDToProcess, long highestIDToProcess)
         {
             try
             {
@@ -977,12 +978,12 @@ namespace Extract.AttributeFinder
                 ExtractException.Assert("ELI45438", "No inputs available to train/test machine",
                     imageFiles.Length > 0);
 
-                InputConfig.GetRelatedInputData(imageFiles, answers, out string[] ussFiles, out string[] voaFiles, out string[] answersOrAnswerFiles, CancellationToken.None);
+                InputConfig.GetRelatedInputData(imageFiles, answers, out string[] ussFiles, out string[] voaFiles, out string[] answersOrAnswerFiles, cancelToken);
 
                 var (featureVectors, answerCodes, ussPathsPerExample) = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
-                    _ => { }, CancellationToken.None, updateAnswerCodes: true);
+                    _ => { }, cancelToken, updateAnswerCodes: true);
 
-                var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, _ => { }, CancellationToken.None);
+                var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, _ => { }, cancelToken);
 
                 void WriteCsvToDB(List<List<string>> data, bool isTrainingSet)
                 {

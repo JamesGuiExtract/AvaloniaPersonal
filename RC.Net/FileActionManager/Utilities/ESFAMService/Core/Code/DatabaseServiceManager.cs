@@ -166,7 +166,7 @@ namespace Extract.FileActionManager.Utilities
                         dbService.Enabled &&
                         !dbService.Schedule.GetIsInExcludedTime())
                     {
-                        dbService.Process();
+                        dbService.Process(_canceller.Token);
                     }
                 }
             }

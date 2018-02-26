@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Extract.UtilityApplications.NERTrainer
 {
@@ -177,9 +178,9 @@ namespace Extract.UtilityApplications.NERTrainer
         /// <summary>
         /// Processes using configured DB
         /// </summary>
-        public override void Process()
+        public override void Process(CancellationToken cancelToken)
         {
-            Process(DatabaseServer, DatabaseName);
+            Process(DatabaseServer, DatabaseName, cancelToken);
         }
 
         /// <summary>
@@ -187,7 +188,7 @@ namespace Extract.UtilityApplications.NERTrainer
         /// </summary>
         /// <param name="databaseServer">The database server</param>
         /// <param name="databaseName">The name of the database</param>
-        public void Process(string databaseServer, string databaseName)
+        public void Process(string databaseServer, string databaseName, CancellationToken cancelToken = default(CancellationToken))
         {
             try
             {
@@ -205,14 +206,14 @@ namespace Extract.UtilityApplications.NERTrainer
                     // Train
                     if (!string.IsNullOrWhiteSpace(TrainingCommand))
                     {
-                        lastIDProcessed = Train(pathTags, databaseServer, databaseName, tempExceptionLog.FileName);
+                        lastIDProcessed = Train(pathTags, databaseServer, databaseName, tempExceptionLog.FileName, cancelToken);
                         copyToDestination = true;
                     }
 
                     // Test
                     if (!string.IsNullOrWhiteSpace(TestingCommand))
                     {
-                        var result = Test(pathTags, databaseServer, databaseName, tempExceptionLog.FileName);
+                        var result = Test(pathTags, databaseServer, databaseName, tempExceptionLog.FileName, cancelToken);
                         copyToDestination = result.criteriaMet;
                         lastIDProcessed = Math.Max(lastIDProcessed, result.lastIDProcessed);
                     }
@@ -227,7 +228,7 @@ namespace Extract.UtilityApplications.NERTrainer
                             int exitCode = SystemMethods.RunExecutable(
                                 _ENCRYPT_FILE_APPLICATION,
                                 new[] { tempModelFile.FileName, dest },
-                                createNoWindow: true);
+                                createNoWindow: true, cancelToken: cancelToken);
                             ExtractException.Assert("ELI45285", "Failed to create output file", exitCode == 0, "Destination file", dest);
                         }
                         else
@@ -292,7 +293,8 @@ namespace Extract.UtilityApplications.NERTrainer
 
         #region Private Methods
 
-        private int Train(SourceDocumentPathTags pathTags, string databaseServer, string databaseName, string logFileToEmail)
+        private int Train(SourceDocumentPathTags pathTags, string databaseServer, string databaseName, string logFileToEmail, 
+            CancellationToken cancelToken)
         {
             bool success = false;
             int lastIDProcessed = -1;
@@ -315,7 +317,7 @@ namespace Extract.UtilityApplications.NERTrainer
                         pathTags.AddTag(DataFilePathTag, trainingDataFile.FileName);
 
                         var command = pathTags.Expand(TrainingCommand);
-                        int exitCode = SystemMethods.RunExecutable(command, out var _, out errorMessage);
+                        int exitCode = SystemMethods.RunExecutable(command, out var _, out errorMessage, cancelToken);
 
                         if (exitCode == 0)
                         {
@@ -366,7 +368,8 @@ namespace Extract.UtilityApplications.NERTrainer
             return lastIDProcessed;
         }
 
-        private (bool criteriaMet, int lastIDProcessed) Test(SourceDocumentPathTags pathTags, string databaseServer, string databaseName, string logFileToEmail)
+        private (bool criteriaMet, int lastIDProcessed) Test(SourceDocumentPathTags pathTags, string databaseServer, 
+            string databaseName, string logFileToEmail, CancellationToken cancelToken)
         {
             bool success = false;
             bool criteriaMet = false;
@@ -391,7 +394,7 @@ namespace Extract.UtilityApplications.NERTrainer
 
                         var command = pathTags.Expand(TestingCommand);
 
-                        int exitCode = SystemMethods.RunExecutable(command, out string output, out errorMessage);
+                        int exitCode = SystemMethods.RunExecutable(command, out string output, out errorMessage, cancelToken);
                         if (exitCode == 0)
                         {
                             success = true;

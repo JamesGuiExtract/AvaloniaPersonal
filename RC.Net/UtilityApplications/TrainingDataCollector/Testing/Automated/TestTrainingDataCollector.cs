@@ -221,7 +221,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                 var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
                 collector.DataGeneratorPath = annotatorSettingsPath;
 
-                collector.Process("(local)", DBName);
+                collector.Process("(local)", DBName,System.Threading.CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -358,7 +358,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                 var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
                 collector.DataGeneratorPath = annotatorSettingsPath;
 
-                collector.Process("(local)", DBName);
+                collector.Process("(local)", DBName, System.Threading.CancellationToken.None);
 
                 // Verify empty data
                 var expected = "";
