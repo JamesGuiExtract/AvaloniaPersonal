@@ -572,6 +572,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 pageControl.AddStylist(new NewOutputPageStylist(pageControl),
                     replaceExistingTypeInstances: true);
 
+                pageControl.Visible = !_collapsed;
+
                 pageControl.Document = this;
 
                 Invalidate();

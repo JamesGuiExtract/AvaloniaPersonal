@@ -1113,11 +1113,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     Control lastPageControl = _flowLayoutPanel.Controls
-                        .OfType<PageThumbnailControl>()
-                        .LastOrDefault();
+                        .OfType<PaginationControl>()
+                        .LastOrDefault()
+                        as PageThumbnailControl;
 
-                    // If insertSeparator == true and the last control is currently a page control,
-                    // we need to add a separator.
+                    // If the last control is currently a page control, we need to add a separator.
                     if (lastPageControl != null)
                     {
                         InsertPaginationControl(
@@ -1189,9 +1189,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 DeleteControls(outputDocument.PageControls.ToArray());
                 outputDocument.DocumentOutput -= HandleOutputDocument_DocumentOutput;
 
-                // Remove association with separator when removing from layout
-                // to prevent bad selection state
+                // Delete and remove association with separator when removing from layout to ensure
+                // proper associations of separators to documents and to avoid bad selection states
                 // https://extract.atlassian.net/browse/ISSUE-13916
+                // https://extract.atlassian.net/browse/ISSUE-15293
+                DeleteControls(new[] { outputDocument.PaginationSeparator });
                 outputDocument.PaginationSeparator = null;
 
                 return docPosition;
