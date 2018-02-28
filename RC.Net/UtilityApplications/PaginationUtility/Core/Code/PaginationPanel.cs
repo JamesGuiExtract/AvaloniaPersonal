@@ -302,6 +302,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether document pages for newly loaded documents should
+        /// be collapsed by default.
+        /// </summary>
+        public bool DefaultToCollapsed
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether pages should automatically be oriented to match
         /// the orientation of the text (per OCR).
         /// </summary>
@@ -1520,6 +1530,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (targetDocument != null &&
                     targetDocument != _primaryPageLayoutControl.DocumentInDataEdit)
                 {
+                    targetDocument.Collapsed = false;
+
                     // https://extract.atlassian.net/browse/ISSUE-14886
                     // Ensure separator has been assigned to the target document
                     if (targetDocument.PaginationSeparator == null)
@@ -2870,6 +2882,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.AutoRotateImages = AutoRotateImages;
             _primaryPageLayoutControl.CommitOnlySelection = CommitOnlySelection;
             _primaryPageLayoutControl.LoadNextDocumentVisible = LoadNextDocumentVisible;
+            _primaryPageLayoutControl.DefaultToCollapsed = DefaultToCollapsed;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandlePrimaryPageLayoutControl_LoadNextDocumentRequest;
             _primaryPageLayoutControl.DocumentDataPanelRequest += HandlePrimaryPageLayoutControl_DocumentDataPanelRequest;

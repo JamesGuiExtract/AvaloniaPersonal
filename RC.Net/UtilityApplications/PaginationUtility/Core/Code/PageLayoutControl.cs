@@ -766,6 +766,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether document pages for newly loaded documents should
+        /// be collapsed by default.
+        /// </summary>
+        public bool DefaultToCollapsed
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// The <see cref="ShortcutsManager"/> managing all keyboard shortcuts for this instance.
         /// </summary>
         public ShortcutsManager Shortcuts
@@ -1050,6 +1060,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
+                if (DefaultToCollapsed)
+                {
+                    outputDocument.Collapsed = true;
+                }
+
                 // As long as we haven't appended to the end of an existing document, indicate that
                 // if the document is output in its present form, it can simply be copied to the
                 // output path rather than require it to be re-assembled.
@@ -1139,6 +1154,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
 
                         InsertPaginationControl(pageControl, index: -1);
+                    }
+
+                    if (DefaultToCollapsed)
+                    {
+                        outputDocument.Collapsed = true;
                     }
 
                     outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
