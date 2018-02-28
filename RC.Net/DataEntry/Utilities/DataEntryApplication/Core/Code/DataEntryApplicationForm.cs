@@ -917,7 +917,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (_paginationPanel != null)
                 {
-                    LoadDocumentForPagination(fileName);
+                    LoadDocumentForPagination(fileName, fileID);
 
                     if (_paginationPanel.IsPaginationSuggested(fileName))
                     {
@@ -4832,7 +4832,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// UI thread.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
-        void LoadDocumentForPagination(string fileName)
+        /// <param name="fileID">File ID</param>
+        void LoadDocumentForPagination(string fileName, int fileID)
         {
             if (_paginationPanel == null || _paginationPanel.SourceDocuments.Contains(fileName))
             {
@@ -4928,20 +4929,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         _paginationPanel.LoadFile(
-                            fileName, -1, pages, deletedPages, suggestedPagination.Value, documentData, false);
+                            fileName, fileID, -1, pages, deletedPages, suggestedPagination.Value, documentData, false);
                     }
 
                     return;
                 }
 
                 // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
-                _paginationPanel.LoadFile(fileName, -1, null, null, false, documentData, false);
+                _paginationPanel.LoadFile(fileName, fileID, - 1, null, null, false, documentData, false);
                 return;
             }
 
             // If there was no rules-suggested pagination, go ahead and load the physical document
             // into the _paginationPanel
-            _paginationPanel.LoadFile(fileName, -1, false);
+            _paginationPanel.LoadFile(fileName, fileID, -1, false);
         }
 
         /// <summary>

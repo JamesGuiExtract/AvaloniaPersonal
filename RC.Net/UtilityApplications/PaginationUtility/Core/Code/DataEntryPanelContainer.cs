@@ -4,7 +4,10 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -39,6 +42,40 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// document is to be sent for rules reprocessing.
             /// </summary>
             public Func<DataEntryPaginationDocumentData, bool?> SendForReprocessingFunc;
+
+            /// <summary>
+            /// The the data entry query text that should be used to identify any order numbers in the
+            /// file to be recorded in the LabDEOrderFile table.
+            /// </summary>
+            public string OrderNumberQuery;
+            
+            /// <summary>
+            /// The data entry query text that should be used to identify the date for each order.
+            /// Any attribute queries should be relative to an order number attribute.
+            /// </summary>
+            public string OrderDateQuery;
+
+            /// <summary>
+            /// Gets whether to prompt about order numbers for which a document has already been filed.
+            /// </summary>
+            public bool PromptForDuplicateOrders;
+
+            /// <summary>
+            /// Gets the data entry query text that should be used to identify any encounter numbers in the
+            /// file to be recorded in the LabDEOrderFile table.
+            /// </summary>
+            public string EncounterNumberQuery;
+
+            /// <summary>
+            /// Gets the data entry query text that should be used to identify the date for each encounter.
+            /// Any attribute queries should be relative to an encoutner number attribute.
+            /// </summary>
+            public string EncounterDateQuery;
+
+            /// <summary>
+            /// Gets whether to prompt about encounter numbers for which a document has already been filed.
+            /// </summary>
+            public bool PromptForDuplicateEncounters;
         }
 
         /// <summary>
@@ -68,6 +105,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// The summary text to display for the document.
             /// </summary>
             public string Summary;
+
+            /// <summary>
+            /// The order numbers for the current document along with the order collection date (if known)
+            /// </summary>
+            public ReadOnlyCollection<(string OrderNumber, DateTime? CollectionDate)> Orders;
+
+            /// <summary>
+            /// Gets whether to prompt about order numbers for which a document has already been filed.
+            /// </summary>
+            public bool PromptForDuplicateOrders;
+
+            /// <summary>
+            /// The encounter numbers for the current document along with the encounter date (if known)
+            /// </summary>
+            public ReadOnlyCollection<(string EncounterNumber, DateTime? EncounterDate)> Encounters;
+
+            /// <summary>
+            /// Gets whether to prompt about encounter numbers for which a document has already been filed.
+            /// </summary>
+            public bool PromptForDuplicateEncounters;
 
             /// <summary>
             /// A stringized representation of either the document data (when DataError = false) or 
@@ -254,7 +311,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                         config.CustomBackgroundLoadSettings = new PaginationCustomSettings
                         {
                             SummaryQuery = paginationPanel.SummaryQuery,
-                            SendForReprocessingFunc = paginationPanel.SendForReprocessingFunc
+                            SendForReprocessingFunc = paginationPanel.SendForReprocessingFunc,
+                            OrderNumberQuery = paginationPanel.OrderNumberQuery,
+                            OrderDateQuery = paginationPanel.OrderDateQuery,
+                            PromptForDuplicateOrders = paginationPanel.PromptForDuplicateOrders,
+                            EncounterNumberQuery = paginationPanel.EncounterNumberQuery,
+                            EncounterDateQuery = paginationPanel.EncounterDateQuery,
+                            PromptForDuplicateEncounters = paginationPanel.PromptForDuplicateEncounters
                         };
                     }
                 }
@@ -732,7 +795,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     e.DataEntryConfiguration.CustomBackgroundLoadSettings = new PaginationCustomSettings
                     {
                         SummaryQuery = paginationPanel.SummaryQuery,
-                        SendForReprocessingFunc = paginationPanel.SendForReprocessingFunc
+                        SendForReprocessingFunc = paginationPanel.SendForReprocessingFunc,
+                        OrderNumberQuery = paginationPanel.OrderNumberQuery,
+                        OrderDateQuery = paginationPanel.OrderDateQuery,
+                        PromptForDuplicateOrders = paginationPanel.PromptForDuplicateOrders,
+                        EncounterNumberQuery = paginationPanel.EncounterNumberQuery,
+                        EncounterDateQuery = paginationPanel.EncounterDateQuery,
+                        PromptForDuplicateEncounters = paginationPanel.PromptForDuplicateEncounters
                     };
                 }
             }
@@ -829,10 +898,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _documentData.SetModified(AttributeStatusInfo.UndoManager.UndoOperationAvailable);
                     _documentData.SetDataError(ActiveDataEntryPanel.DataValidity == DataValidity.Invalid);
                     _documentData.SetSummary(ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString());
-                    if (ActiveDataEntryPanel.SendForReprocessingFunc != null)
-                    {
-                        _documentData.SetSendForReprocessing(ActiveDataEntryPanel.SendForReprocessingFunc(_documentData));
-                    }
+                    _documentData.SetSendForReprocessing(ActiveDataEntryPanel.SendForReprocessingFunc(_documentData));
                 }
             }
             catch (Exception ex)
@@ -1188,6 +1254,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                             }
                             else
                             {
+                                documentData.Orders = documentStatus.Orders;
+                                documentData.PromptForDuplicateOrders = documentStatus.PromptForDuplicateOrders;
+                                documentData.Encounters = documentStatus.Encounters;
+                                documentData.PromptForDuplicateEncounters = documentStatus.PromptForDuplicateEncounters;
                                 documentData.Attributes =
                                     (IUnknownVector)miscUtils.GetObjectFromStringizedByteStream(documentStatus.StringizedData);
                             }
@@ -1241,6 +1311,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 documentStatus.DataError = invalidAttribute != null;
             }
 
+            var customData = backgroundConfigManager.ActiveDataEntryConfiguration.CustomBackgroundLoadSettings as PaginationCustomSettings;
+
             if (saveData)
             {
                 if (documentStatus.DataError)
@@ -1258,14 +1330,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return documentStatus;
                 }
 
+                var dbConnections = backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections();
+                documentStatus.Orders = QueryRecordNumbers(
+                    customData?.OrderNumberQuery, customData?.OrderDateQuery, dbConnections);
+                documentStatus.PromptForDuplicateOrders = customData.PromptForDuplicateOrders;
+                documentStatus.Encounters = QueryRecordNumbers(
+                    customData?.EncounterNumberQuery, customData?.EncounterDateQuery, dbConnections);
+                documentStatus.PromptForDuplicateEncounters = customData.PromptForDuplicateEncounters;
+
                 var miscUtils = new MiscUtils();
                 documentStatus.StringizedData = miscUtils.GetObjectAsStringizedByteStream(documentData.Attributes);
             }
             else
             {
                 documentStatus.DataModified = AttributeStatusInfo.UndoManager.UndoOperationAvailable;
-                var customData = backgroundConfigManager.ActiveDataEntryConfiguration.CustomBackgroundLoadSettings as PaginationCustomSettings;
-                if (customData?.SummaryQuery != null)
+                if (!string.IsNullOrWhiteSpace(customData?.SummaryQuery))
                 {
                     var query = DataEntryQuery.Create(
                         customData?.SummaryQuery,
@@ -1277,6 +1356,53 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             return documentStatus;
+        }
+
+        /// <summary>
+        /// Queries for the order/encounter number for the document data currently initialized into
+        /// AttributeStatusInfo.
+        /// </summary>
+        /// <param name="recordNumQuery">The data entry query text to select the order/encounter number</param>
+        /// <param name="dateQuery">The data entry query text to select the date associated with any order/encounter number.</param>
+        /// <param name="dbConnections">The database connections to use for the query.</param>
+        /// <returns></returns>
+        static ReadOnlyCollection<(string, DateTime?)> QueryRecordNumbers(string recordNumQuery, string dateQuery, 
+            Dictionary<string, System.Data.Common.DbConnection> dbConnections)
+        {
+            ReadOnlyCollection<(string, DateTime?)> recordCollection = null;
+
+            if (!string.IsNullOrWhiteSpace(recordNumQuery))
+            {
+                var query = DataEntryQuery.Create(recordNumQuery, null, dbConnections);
+                var recordResults = query.Evaluate();
+                // If no date query, return just the record numbers.
+                if (string.IsNullOrWhiteSpace(dateQuery))
+                {
+                    recordCollection = recordResults.ToStringArray()
+                        .Select(result => (result, new DateTime?()))
+                        .ToList()
+                        .AsReadOnly();
+                }
+                // If a date query is specified, query for the date associated with each record number.
+                else
+                {
+                    var list = new List<(string, DateTime?)>();
+                    foreach (var result in recordResults)
+                    {
+                        var date = new DateTime?();
+                        query = DataEntryQuery.Create(dateQuery, result.IsAttribute ? result.FirstAttribute : null, dbConnections);
+                        var dateResult = query.Evaluate();
+                        if (!dateResult.IsEmpty)
+                        {
+                            date = DateTime.Parse(dateResult.ToString(), CultureInfo.CurrentCulture);
+                        }
+                        list.Add((result.ToString(), date));
+                    }
+                    recordCollection = list.AsReadOnly();
+                }
+            }
+
+            return recordCollection;
         }
 
         /// <summary>
@@ -1332,6 +1458,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         return documentStatus;
                     }
+
+                    var dbConnections = tempPanel.ActiveDataEntryPanel.DatabaseConnections;
+                    documentStatus.Orders = QueryRecordNumbers(
+                        tempPanel.ActiveDataEntryPanel?.OrderNumberQuery, tempPanel.ActiveDataEntryPanel?.OrderDateQuery, dbConnections);
+                    documentStatus.PromptForDuplicateOrders = tempPanel.ActiveDataEntryPanel.PromptForDuplicateOrders;
+                    documentStatus.Encounters = QueryRecordNumbers(
+                        tempPanel.ActiveDataEntryPanel?.EncounterNumberQuery, tempPanel.ActiveDataEntryPanel?.EncounterDateQuery, dbConnections);
+                    documentStatus.PromptForDuplicateEncounters = tempPanel.ActiveDataEntryPanel.PromptForDuplicateEncounters;
 
                     tempPanel.SaveData(tempData, false);
 

@@ -40,6 +40,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _dataError;
 
         /// <summary>
+        /// If specified, the tooltip text that should be associated with the document validation error.
+        /// </summary>
+        string _dataErrorMessage;
+
+        /// <summary>
         /// An object representing the undo/redo operations that should be restored to the
         /// <see cref="UndoManager"/> when the data is loaded for editing.
         /// </summary>
@@ -209,6 +214,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets the tooltip text that should be associated with the document validation error
+        /// or <c>null</c> to use the default error text.
+        /// </summary>
+        public override string DataErrorMessage
+        {
+            get
+            {
+                return _dataErrorMessage;
+            }
+        }
+
+        /// <summary>
         /// Unused base class implementation.
         /// </summary>
         protected override Dictionary<string, PaginationDataField> Fields
@@ -343,6 +360,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (dataError != _dataError)
             {
                 _dataError = dataError;
+                if (!dataError)
+                {
+                    _dataErrorMessage = null;
+                }
+
+                OnDocumentDataStateChanged();
+            }
+        }
+
+        /// <summary>
+        /// Sets the tooltip text that should be associated with the document validation error.
+        /// </summary>
+        /// <param name="dataErrorMessage">The data error message.</param>
+        internal void SetDataErrorMessage(string dataErrorMessage)
+        {
+            if (dataErrorMessage != _dataErrorMessage)
+            {
+                _dataErrorMessage = string.IsNullOrWhiteSpace(dataErrorMessage)
+                    ? null
+                    : dataErrorMessage;
 
                 OnDocumentDataStateChanged();
             }

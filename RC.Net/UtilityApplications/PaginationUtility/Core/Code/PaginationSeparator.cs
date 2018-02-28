@@ -892,9 +892,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 _newDocumentGlyph.Visible = !Document.InSourceDocForm;
                 _editedPaginationGlyph.Visible = !Document.InOriginalForm;
-                _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing;
+                _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing && pageCount > 0;
                 _editedDataPictureBox.Visible = Document.DataModified;
                 _dataErrorPictureBox.Visible = Document.DataError;
+                _toolTip.SetToolTip(_dataErrorPictureBox,
+                    Document?.DocumentData?.DataErrorMessage ?? "The data for this document has error(s)");
 
                 _controlUpdatePending = false;
 

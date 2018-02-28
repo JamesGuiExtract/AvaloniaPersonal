@@ -2104,7 +2104,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return null;
                 }
 
-                sourceDocument = new SourceDocument(inputFileName);
+                sourceDocument = new SourceDocument(inputFileName, -1);
                 if (!sourceDocument.Pages.Any())
                 {
                     sourceDocument.Dispose();

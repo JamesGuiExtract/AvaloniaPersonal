@@ -185,32 +185,7 @@ namespace Extract.DataEntry.LabDE
                     useEncounterDateTime = true;
                 }
 
-                string query = string.Format(CultureInfo.CurrentCulture,
-                    "DECLARE @linkExists INT \r\n" +
-                    "   SELECT @linkExists = COUNT([EncounterID]) \r\n" +
-                    "       FROM [LabDEEncounterFile] WHERE [EncounterID] = {0} AND [FileID] = {1} \r\n" +
-                    "IF @linkExists = 1 \r\n" +
-                    "BEGIN \r\n" +
-                    (useEncounterDateTime
-                        ? "    UPDATE [LabDEEncounterFile] SET [DateTime] = '{2}' \r\n"
-                        : "    UPDATE [LabDEEncounterFile] SET [DateTime] = NULL \r\n") +
-                    "        WHERE [EncounterID] = {0} AND [FileID] = {1} \r\n" +
-                    "END \r\n" +
-                    "ELSE \r\n" +
-                    "BEGIN \r\n" +
-                    "    IF {0} IN (SELECT [CSN] FROM [LabDEEncounter]) \r\n" +
-                    "    BEGIN \r\n" +
-                    (useEncounterDateTime
-                        ? "        INSERT INTO [LabDEEncounterFile] ([EncounterID], [FileID], [DateTime]) \r\n" +
-                          "            VALUES ({0}, {1}, '{2}') \r\n"
-                        : "        INSERT INTO [LabDEEncounterFile] ([EncounterID], [FileID]) \r\n" +
-                          "            VALUES ({0}, {1}) \r\n") +
-                    "   END \r\n" +
-                    "END",
-                    "'" + IdField.Value + "'", fileId, "'" + encounterDateTime + "'");
-
-                // The query has no results-- immediately dispose of the DataTable returned.
-                FAMData.ExecuteDBQuery(query).Dispose();
+                FAMData.LinkFileWithEncounter(fileId, IdField.Value, useEncounterDateTime ? (DateTime?)encounterDateTime : null);
             }
             catch (Exception ex)
             {

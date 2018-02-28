@@ -1,5 +1,6 @@
 ﻿using ADODB;
 using Extract.AttributeFinder;
+using Extract.DataEntry.LabDE;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
@@ -674,15 +675,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// should expect to be able to calculate.</param>
         /// <param name="selectDocument"><see langword="true"/> to select the document; otherwise,
         /// <see langword="false"/>.</param>
-        public void LoadFile(string fileName, int position, bool selectDocument)
+        public void LoadFile(string fileName, int fileID, int position, bool selectDocument)
         {
-            LoadFile(fileName, position, null, null, false, null, selectDocument);
+            LoadFile(fileName, fileID, position, null, null, false, null, selectDocument);
         }
 
         /// <summary>
         /// Loads the specified documents pages into the pane.
         /// </summary>
         /// <param name="fileName">Name of the file to load.</param>
+        /// <param name="fileID">The file ID.</param>
         /// <param name="position">The position at which a document should be loaded. 0 = Load at
         /// the front (top), -1 = load at the end (bottom). Any other value should be a value
         /// passed via <see cref="CreatingOutputDocumentEventArgs"/> and not a value the caller
@@ -697,7 +699,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         /// <param name="selectDocument"><see langword="true"/> to select the document; otherwise,
         /// <see langword="false"/>.</param>
-        public void LoadFile(string fileName, int position, IEnumerable<int> pages,
+        public void LoadFile(string fileName, int fileID, int position, IEnumerable<int> pages,
             IEnumerable<int> deletedPages, bool paginationSuggested,
             PaginationDocumentData documentData, bool selectDocument)
         {
@@ -706,7 +708,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (InvokeRequired)
                 {
                     this.Invoke((MethodInvoker)(() => LoadFile(
-                        fileName, position, pages, deletedPages, paginationSuggested, documentData, selectDocument)));
+                        fileName, fileID, position, pages, deletedPages, paginationSuggested, documentData, selectDocument)));
                     return;
                 }
 
@@ -723,7 +725,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         paginationSuggested, documentData);
                 }
 
-                var sourceDocument = OpenDocument(fileName);
+                var sourceDocument = OpenDocument(fileName, fileID);
 
                 if (sourceDocument != null)
                 {
@@ -953,13 +955,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SuspendUIUpdates = true;
                 _committingChanges = true;
 
-                if (!CanSelectedDocumentsBeCommitted())
+                using (new TemporaryWaitCursor())
                 {
-                    return false;
+                    if (!CanSelectedDocumentsBeCommitted())
+                    {
+                        return false;
+                    }
                 }
+
+                // Don't suspend UI updates until CanSelectedDocumentsBeCommitted has been checked--
+                // there is not flickering to prevent at this point and moving windows in front of
+                // a suspended UI can cause artifacts.
+                SuspendUIUpdates = true;
 
                 // Prevent the UI from trying to load/close pages in the image viewer as the
                 // operation is taking place.
@@ -1050,6 +1059,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _pendingDocuments.Remove(outputDocument);
                 }
 
+                LinkFilesWithRecordIDs(documentsToCommit);
+
                 var disregardedPagination = documentsInSourceForm
                     .Where(doc => doc.PaginationSuggested)
                     .Select(doc => doc.PageControls
@@ -1128,6 +1139,44 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Links <see cref="documentsToCommit"/> to whatever order/encounter numbers are reported.
+        /// </summary>
+        /// <param name="documentsToCommit">The documents to commit.</param>
+        void LinkFilesWithRecordIDs(HashSet<OutputDocument> documentsToCommit)
+        {
+            using (var famData = new FAMData(FileProcessingDB))
+            {
+                foreach (var document in documentsToCommit
+                    .Where(doc => doc.DocumentData.Orders?.Any() == true))
+                {
+                    if (document.FileID == -1)
+                    {
+                        new ExtractException("ELI45615", "Failed to link record ID to document.").Display();
+                    }
+
+                    foreach (var order in document.DocumentData.Orders)
+                    {
+                        famData.LinkFileWithOrder(document.FileID, order.OrderNumber, order.OrderDate);
+                    }
+                }
+
+                foreach (var document in documentsToCommit
+                   .Where(doc => doc.DocumentData.Encounters?.Any() == true))
+                {
+                    if (document.FileID == -1)
+                    {
+                        new ExtractException("ELI45616", "Failed to link record ID to document.").Display();
+                    }
+
+                    foreach (var encounter in document.DocumentData.Encounters)
+                    {
+                        famData.LinkFileWithEncounter(document.FileID, encounter.EncounterNumber, encounter.EncounterDate);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Records pagination history for documents that contain only deleted pages
         /// </summary>
         /// <param name="documentsToCommit">The pending documents to be committed</param>
@@ -1176,23 +1225,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </returns>
         bool CanSelectedDocumentsBeCommitted()
         {
-            // If document data could not be saved, abort the commit operation.
-            if (!SaveDocumentData(selectedDocumentsOnly: CommitOnlySelection, validateData: true))
-            { 
-                return false;
-            }
-
             var affectedSourceDocuments = new HashSet<string>(
                 _pendingDocuments
                     .Where(doc => doc.Selected)
                     .SelectMany(doc => doc.PageControls
                         .Select(c => c.Page.OriginalDocumentName)));
 
-            var unIncludedPagesControls = 
+            var unIncludedPagesControls =
                 _pendingDocuments
                     .Where(doc => !doc.Selected)
                     .SelectMany(doc => doc.PageControls
-                        .Where(c => 
+                        .Where(c =>
                             affectedSourceDocuments.Contains(c.Page.OriginalDocumentName)));
 
             if (unIncludedPagesControls.Any())
@@ -1222,6 +1265,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
+                return false;
+            }
+
+            // If document data could not be saved, abort the commit operation.
+            if (!SaveDocumentData(selectedDocumentsOnly: CommitOnlySelection, validateData: true))
+            { 
                 return false;
             }
 
@@ -2323,6 +2372,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 OnCreatingOutputDocument(eventArgs);
                 string outputFileName = eventArgs.OutputFileName;
+                outputDocument.FileID = eventArgs.FileID;
 
                 ExtractException.Assert("ELI39588",
                     "No filename has been specified for pagination output.",
@@ -2895,9 +2945,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// instance.
         /// </summary>
         /// <param name="inputFileName">Name of the input file.</param>
+        /// <param name="fileID">The File ID</param>
         /// <returns>A <see cref="SourceDocument"/> representing <see paramref="inputFileName"/> or
         /// <see langword="null"/> if the file is missing or could not be opened.</returns>
-        SourceDocument OpenDocument(string inputFileName)
+        SourceDocument OpenDocument(string inputFileName, int fileID)
         {
             SourceDocument sourceDocument = null;
 
@@ -2911,7 +2962,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (sourceDocument == null)
                 {
-                    sourceDocument = new SourceDocument(inputFileName);
+                    sourceDocument = new SourceDocument(inputFileName, fileID);
                     if (!sourceDocument.Pages.Any())
                     {
                         sourceDocument.Dispose();
@@ -2992,8 +3043,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return true;
             }
 
-            var openData = IsDataPanelOpen ? _primaryPageLayoutControl.DocumentInDataEdit : null;
-            if (openData != null)
+            if (IsDataPanelOpen)
             {
                 if (!CloseDataPanel(validateData))
                 {
@@ -3004,7 +3054,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             var documentsToSave = _pendingDocuments.Where(document =>
-                document != openData &&
                 document.PageControls.Any(c => !c.Deleted) &&
                 (!selectedDocumentsOnly || document.Selected))
                 .ToArray();
@@ -3021,17 +3070,181 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (validateData)
             {
-                var erroredDocument = documentsToSave.FirstOrDefault(document => document.DocumentData.DataError);
-
-                if (erroredDocument != null)
+                try
                 {
-                    this.SafeBeginInvoke("ELI41669", () =>
-                    {
-                        _primaryPageLayoutControl.SelectDocument(erroredDocument);
-                        erroredDocument.PaginationSeparator.OpenDataPanel();
-                    });
+                    SuspendUIUpdates = false;
 
-                    return false;
+                    var erroredDocument = documentsToSave.FirstOrDefault(document => document.DocumentData.DataError);
+
+                    if (erroredDocument != null)
+                    {
+                        this.SafeBeginInvoke("ELI41669", () =>
+                        {
+                            _primaryPageLayoutControl.SelectDocument(erroredDocument);
+                            erroredDocument.PaginationSeparator.OpenDataPanel();
+                        });
+
+                        return false;
+                    }
+
+                    if (!ConfirmRecordNumberReuse(
+                            documentsToSave.Where(document => document.DocumentData.PromptForDuplicateOrders),
+                            document => document.DocumentData.Orders?.Select(order => order.OrderNumber),
+                            "LabDEOrderFile", "OrderNumber", "order number"))
+                    {
+                        return false;
+                    }
+
+                    if (!ConfirmRecordNumberReuse(
+                            documentsToSave.Where(document => document.DocumentData.PromptForDuplicateEncounters),
+                            document => document.DocumentData.Encounters?.Select(encounter => encounter.EncounterNumber),
+                            "LabDEEncounterFile", "EncounterID", "encounter number"))
+                    {
+                        return false;
+                    }
+                }
+                finally
+                {
+                    SuspendUIUpdates = true;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks for duplicate order/encounter numbers in <see cref="documents"/> and also checks
+        /// to see if any of the order/encounter numbers have been previously linked. If so, a prompt
+        /// will be displayed and if the user choses not to save, the documents with used/duplicate
+        /// numbers will be indicated.
+        /// </summary>
+        /// <returns><c>true</c> if there are no used/duplicate numbers or if the user chose to
+        /// to commit anyway; <c>false</c> if the user chose to abort the commit.</returns>
+        bool ConfirmRecordNumberReuse(IEnumerable<OutputDocument> documents,
+                    Func<OutputDocument, IEnumerable<string>> numberSelector,
+                    string tableName, string fieldName, string numberLabel)
+        {
+            var docsWithRecordNumbers = documents
+                .Where(document => numberSelector(document)
+                    ?.Any(numbers => !string.IsNullOrWhiteSpace(numbers)) == true);
+
+            if (docsWithRecordNumbers.Any())
+            {
+                var allOrderNumbers = docsWithRecordNumbers
+                    .SelectMany(document => numberSelector(document));
+
+                var docsWithDuplicateRecordNumbers = docsWithRecordNumbers
+                    .Select(document =>
+                        (Document: document,
+                         DuplicateNumbers: numberSelector(document)
+                                .Where(x => allOrderNumbers.Count(y => (x == y)) >= 2)
+                        ))
+                    .Where(item => item.DuplicateNumbers.Any());
+
+                if (docsWithDuplicateRecordNumbers.Any())
+                {
+                    var message = string.Join("\r\n",
+                    docsWithDuplicateRecordNumbers.Select(item =>
+                        Invariant($"{item.Document.Summary} ({string.Join(", ", item.DuplicateNumbers)})")));
+
+                    message =
+                        Invariant($"The following {numberLabel}(s) have been used multiple times:\r\n\r\n") +
+                        message +
+                        "\r\n\r\nSubmit documents anyway?";
+
+                    using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
+                    {
+                        messageBox.Caption = "Warning";
+                        messageBox.StandardIcon = MessageBoxIcon.Exclamation;
+                        messageBox.Text = message;
+                        messageBox.AddStandardButtons(MessageBoxButtons.YesNo);
+                        if (messageBox.Show(this) == "Yes")
+                        {
+                            foreach (var documentData in documents
+                                .Select(document => document.DocumentData as DataEntryPaginationDocumentData))
+                            {
+                                documentData.SetDataError(false);
+                            }
+                            // Clear any error icons added for duplicate record numbers.
+                            Refresh();
+                        }
+                        else
+                        {
+                            foreach (var documentData in docsWithDuplicateRecordNumbers
+                                .Select(item => item.Document.DocumentData as DataEntryPaginationDocumentData))
+                            {
+                                documentData.SetDataError(true);
+                                documentData.SetDataErrorMessage(
+                                    Invariant($"This document has a duplicate {numberLabel}."));
+                            }
+
+                            return false;
+                        }
+                    }
+                }
+
+                var quotedNumbers = allOrderNumbers.Select(n => "'" + n.Replace("'", "''") + "'");
+
+                string query = Invariant($"Select DISTINCT [{fieldName}] FROM [{tableName}] ") +
+                    Invariant($"WHERE [{fieldName}] IN ({string.Join(",", quotedNumbers)})");
+
+                HashSet<string> usedNumbers;
+                using (var usedNumberTable = GetResultsForQuery(query))
+                {
+                    usedNumbers = new HashSet<string>(
+                        usedNumberTable.Rows
+                            .OfType<DataRow>()
+                            .Select(r => (string)r[0]));
+                }
+
+                var docsWithUsedRecordNumbers = docsWithRecordNumbers
+                    .Select(document =>
+                        (Document: document,
+                         UsedNumbers: numberSelector(document)
+                            .Where(x => usedNumbers.Contains(x)))
+                        )
+                    .Where(item => item.UsedNumbers?.Any() == true);
+
+                if (docsWithUsedRecordNumbers.Any())
+                {
+                    var message = string.Join("\r\n",
+                    docsWithUsedRecordNumbers.Select(item =>
+                        Invariant($"{item.Document.Summary} ({string.Join(", ", item.UsedNumbers)})")));
+
+                    message =
+                        Invariant($"Documents have already been filed against the following {numberLabel}(s):\r\n\r\n") +
+                        message +
+                        "\r\n\r\nSubmit document(s) anyway?";
+
+                    using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
+                    {
+                        messageBox.Caption = "Warning";
+                        messageBox.StandardIcon = MessageBoxIcon.Exclamation;
+                        messageBox.Text = message;
+                        messageBox.AddStandardButtons(MessageBoxButtons.YesNo);
+                        if (messageBox.Show(this) == "Yes")
+                        {
+                            foreach (var documentData in documents
+                                .Select(document => document.DocumentData as DataEntryPaginationDocumentData))
+                            {
+                                documentData.SetDataError(false);
+                                // Clear any error icons added for duplicate record numbers.
+                                Refresh();
+                            }
+                        }
+                        else
+                        {
+                            foreach (var documentData in docsWithUsedRecordNumbers
+                                .Select(item => item.Document.DocumentData as DataEntryPaginationDocumentData))
+                            {
+                                documentData.SetDataError(true);
+                                documentData.SetDataErrorMessage(
+                                    Invariant($"This document is using an {numberLabel} that previous document(s) have been filed against."));
+                            }
+
+                            return false;
+                        }
+                    }
                 }
             }
 

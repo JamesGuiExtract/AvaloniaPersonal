@@ -1,6 +1,8 @@
 ﻿using Extract.UtilityApplications.PaginationUtility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -154,6 +156,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets the tooltip text that should be associated with the document validation error
+        /// or <c>null</c> to use the default error text.
+        /// </summary>
+        public virtual string DataErrorMessage
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// A description of the document.
         /// </summary>
         public virtual string Summary
@@ -245,6 +259,46 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 throw ex.AsExtract("ELI39772");
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the order numbers and collection dates associated with this data
+        /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public ReadOnlyCollection<(string OrderNumber, DateTime? OrderDate)> Orders
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets whether to prompt about order numbers for which a document has already been filed.
+        /// </summary>
+        public bool PromptForDuplicateOrders
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the encounter numbers and dates associated with this data
+        /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public ReadOnlyCollection<(string EncounterNumber, DateTime? EncounterDate)> Encounters
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets whether to prompt about encounter numbers for which a document has already been filed.
+        /// </summary>
+        public bool PromptForDuplicateEncounters
+        {
+            get;
+            set;
         }
 
         #endregion Public Members

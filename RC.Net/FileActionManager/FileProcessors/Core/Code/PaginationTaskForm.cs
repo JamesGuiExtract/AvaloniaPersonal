@@ -1794,7 +1794,7 @@ namespace Extract.FileActionManager.FileProcessors
                                 }
                             }
 
-                            _paginationPanel.LoadFile(fileName, -1, pages, deletedPages,
+                            _paginationPanel.LoadFile(fileName, fileId, -1, pages, deletedPages,
                                 suggestedPagination.Value, documentData, selectDocument);
                             selectDocument = false;
                         }
@@ -1805,13 +1805,13 @@ namespace Extract.FileActionManager.FileProcessors
                     // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
                     PaginationDocumentData rootDocumentData = GetAsPaginationDocumentData(attributes, fileName);
                     _paginationPanel.LoadFile(
-                        fileName, -1, null, null, false, rootDocumentData, selectDocument);
+                        fileName, fileId, -1, null, null, false, rootDocumentData, selectDocument);
                     return;
                 }
 
                 // If there was no rules-suggested pagination, go ahead and load the physical document
                 // into the _paginationPanel
-                _paginationPanel.LoadFile(fileName, -1, selectDocument);
+                _paginationPanel.LoadFile(fileName, fileId, -1, selectDocument);
             }
             finally
             {

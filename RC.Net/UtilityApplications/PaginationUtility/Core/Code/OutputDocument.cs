@@ -45,6 +45,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _collapsed;
 
+        /// <summary>
+        /// The file ID.
+        /// </summary>
+        int _fileID = -1;
+
         #endregion Fields
 
         #region Constructors
@@ -150,6 +155,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets or sets the file ID, or -1 it has both not been assigned and the document is not
+        /// currently InSourceDocForm (meaning it will need to be created).
+        /// </summary>
+        public int FileID
+        {
+            get
+            {
+                if (_fileID == -1 && InSourceDocForm)
+                {
+                    return PageControls.First().Page.SourceDocument.FileID;
+                }
+
+                return _fileID;
+            }
+
+            set
+            {
+                _fileID = value;
+            }
         }
 
         /// <summary>

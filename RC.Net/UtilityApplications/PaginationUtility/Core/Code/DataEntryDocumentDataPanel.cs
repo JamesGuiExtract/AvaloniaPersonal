@@ -71,24 +71,80 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
-        /// Gets or sets the data entry query text used to generate a summary for the document.
+        /// Gets or the data entry query text used to generate a summary for the document.
         /// </summary>
-        /// <value>
-        /// The data entry query text used to generate a summary for the document.
-        /// </value>
-        public string SummaryQuery
+        public virtual string SummaryQuery
         {
             get;
-            set;
+            protected set;
         }
 
         /// <summary>
         /// Function that when set is to be used so that the panel can specify whether a document is
         /// to be sent for rules reprocessing.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public Func<DataEntryPaginationDocumentData, bool?> SendForReprocessingFunc = null;
+        public virtual bool? SendForReprocessingFunc(DataEntryPaginationDocumentData documentData)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the data entry query text that should be used to identify any order numbers in the
+        /// file to be recorded in the LabDEOrderFile table.
+        /// </summary>
+        public virtual string OrderNumberQuery
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets the data entry query text that should be used to identify the date for each order.
+        /// Any attribute queries should be relative to an order number attribute.
+        /// </summary>
+        public virtual string OrderDateQuery
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets whether to prompt about order numbers for which a document has already been filed.
+        /// </summary>
+        public virtual bool PromptForDuplicateOrders
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets the data entry query text that should be used to identify any encounter numbers in the
+        /// file to be recorded in the LabDEOrderFile table.
+        /// </summary>
+        public virtual string EncounterNumberQuery
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets the data entry query text that should be used to identify the date for each encounter.
+        /// Any attribute queries should be relative to an encoutner number attribute.
+        /// </summary>
+        public virtual string EncounterDateQuery
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets whether to prompt about encounter numbers for which a document has already been filed.
+        /// </summary>
+        public virtual bool PromptForDuplicateEncounters
+        {
+            get;
+            protected set;
+        }
 
         #endregion Properties
 
@@ -183,10 +239,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_imageViewer.Visible)
                 {
                     _documentData.SetSummary(SummaryDataEntryQuery?.Evaluate().ToString());
-                    if (SendForReprocessingFunc != null)
-                    {
-                        _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
-                    }
+                    _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
                     _documentData.SetModified(UndoOperationAvailable);
                     if (!Config.Settings.PerformanceTesting)
                     {
@@ -611,10 +664,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentData?.SetSummary(
                     SummaryDataEntryQuery?.Evaluate().ToString());
-                if (SendForReprocessingFunc != null)
-                {
-                    _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
-                }
+                _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
             }
             catch (Exception ex)
             {
