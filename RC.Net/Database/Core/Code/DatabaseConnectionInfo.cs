@@ -492,6 +492,30 @@ namespace Extract.Database
 
         #endregion Properties
 
+        #region Static Methods
+
+        /// <summary>
+        /// Resets local database copies for the case where <see cref="ShareLocalDBCopy"/> is true
+        /// (allowing the database to be shared across threads)
+        /// </summary>
+        public static void ResetSharedConnections()
+        {
+            try
+            {
+                lock (_multiThreadedLocalDatabaseCopyManager)
+                {
+                    _multiThreadedLocalDatabaseCopyManager.Dispose();
+                    _multiThreadedLocalDatabaseCopyManager = new TemporaryFileCopyManager();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45620");
+            }
+        }
+
+        #endregion Static Methods
+
         #region Methods
 
         /// <summary>
@@ -733,16 +757,12 @@ namespace Extract.Database
                         _disposeHandler = null;
                     }
 
-                    if (_activeSqlCeDb != null)
-                    {
-                        LocalDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
-                        _activeSqlCeDb = null;
-                    }
-
-                    if (!ShareLocalDBCopy && _localDatabaseCopyManager != null)
+                    if (_localDatabaseCopyManager != null &&
+                        _localDatabaseCopyManager != _multiThreadedLocalDatabaseCopyManager)
                     {
                         _localDatabaseCopyManager.Dispose();
                         _localDatabaseCopyManager = null;
+                        _activeSqlCeDb = null;
                     }
                 }
                 catch { }

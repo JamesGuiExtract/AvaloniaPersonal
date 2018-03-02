@@ -1213,8 +1213,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // proper associations of separators to documents and to avoid bad selection states
                 // https://extract.atlassian.net/browse/ISSUE-13916
                 // https://extract.atlassian.net/browse/ISSUE-15293
-                DeleteControls(new[] { outputDocument.PaginationSeparator });
-                outputDocument.PaginationSeparator = null;
+                if (outputDocument.PaginationSeparator != null)
+                {
+                    DeleteControls(new[] { outputDocument.PaginationSeparator });
+                    outputDocument.PaginationSeparator = null;
+                }
 
                 return docPosition;
             }

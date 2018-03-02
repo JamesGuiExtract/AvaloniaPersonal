@@ -662,9 +662,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnDataChanged();
 
-                _documentData?.SetSummary(
-                    SummaryDataEntryQuery?.Evaluate().ToString());
-                _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
+                if (_documentData != null)
+                {
+                    _documentData.SetSummary(
+                        SummaryDataEntryQuery?.Evaluate().ToString());
+                    _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
+                }
             }
             catch (Exception ex)
             {
