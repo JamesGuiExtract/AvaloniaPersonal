@@ -608,6 +608,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 InvalidatePending = true;
 
                 // If the controls cannot be updated at this time, no need to invalidate (optimization).
+                // This appears to be opposite of what it should be... seems like it ought to be "if (UpdateControls)"
                 if (!UpdateControls())
                 {
                     base.OnInvalidated(e);
@@ -920,6 +921,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _editedDataPictureBox.Visible = false;
                     _dataErrorPictureBox.Visible = false;
                 }
+
+                // Fixes separator hanging around bug (not sure why)
+                PerformLayout();
 
                 return false;
             }
