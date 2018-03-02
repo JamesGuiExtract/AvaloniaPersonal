@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Utilities.Forms;
+using System;
 using System.Windows.Forms;
 
 namespace Extract.ETL.Management
@@ -23,14 +24,14 @@ namespace Extract.ETL.Management
             InitializeComponent();
             Description = description;
             _service = service;
-            JSONConfigString = service.ToJson();
-        } 
+            JsonConfigString = service.ToJson();
+        }
 
         #endregion
 
         #region Private Properties
 
-        string JSONConfigString
+        string JsonConfigString
         {
             get
             {
@@ -58,7 +59,7 @@ namespace Extract.ETL.Management
                 if (value != _service)
                 {
                     _service = value;
-                    JSONConfigString = _service.ToJson();
+                    JsonConfigString = _service.ToJson();
                 }
             }
         }
@@ -73,7 +74,7 @@ namespace Extract.ETL.Management
             {
                 _descriptionTextBox.Text = value;
             }
-        } 
+        }
 
         #endregion
 
@@ -97,7 +98,7 @@ namespace Extract.ETL.Management
                 // to validate the Database service json attempt to create the object
                 try
                 {
-                    var tmpService = DatabaseService.FromJson(JSONConfigString);
+                    var tmpService = DatabaseService.FromJson(JsonConfigString);
 
                     // if the service created ok set the tmpService value to the _service value
                     _service = tmpService;
@@ -114,19 +115,49 @@ namespace Extract.ETL.Management
                 ex.ExtractDisplay("ELI45607");
             }
             return true;
-        } 
+        }
 
         #endregion
 
         #region Event Handlers
 
+        void HandleScheduleButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (IsValidData())
+                {
+                    SelectScheduleForm dlg = new SelectScheduleForm(Service.Schedule);
+                    if (dlg.ShowDialog(this) == DialogResult.OK)
+                    {
+                        // Update the schedule for the service
+                        Service.Schedule = dlg.Schedule;
+
+                        // Update the Json string
+                        JsonConfigString = Service.ToJson();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45632");
+            }
+        }
+
         void HandleOkkButtonClick(object sender, EventArgs e)
         {
-            if (!IsValidData())
+            try
             {
-                DialogResult = DialogResult.None;
+                if (!IsValidData())
+                {
+                    DialogResult = DialogResult.None;
+                }
             }
-        } 
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45633");
+            }
+        }
 
         #endregion
     }

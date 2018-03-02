@@ -165,6 +165,12 @@
     <Compile Include="InvisibleForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="SchedulerControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SchedulerControl.Designer.cs">
+      <DependentUpon>SchedulerControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="ScrollPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -193,6 +199,12 @@
     </Compile>
     <Compile Include="SelectTypeByExtractCategoryForm.designer.cs">
       <DependentUpon>SelectTypeByExtractCategoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SelectScheduleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectScheduleForm.Designer.cs">
+      <DependentUpon>SelectScheduleForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TextBoxExtensionMethods.cs" />
     <Compile Include="ToolStripSpringTextBox.cs">
@@ -327,8 +339,14 @@
       <SubType>Designer</SubType>
       <DependentUpon>InputBoxForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="SchedulerControl.resx">
+      <DependentUpon>SchedulerControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SelectTypeByExtractCategoryForm.resx">
       <DependentUpon>SelectTypeByExtractCategoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectScheduleForm.resx">
+      <DependentUpon>SelectScheduleForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TimerBarControl.resx">
       <DependentUpon>TimerBarControl.cs</DependentUpon>

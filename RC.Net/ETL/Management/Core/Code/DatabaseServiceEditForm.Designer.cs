@@ -34,6 +34,7 @@
             this._descriptionTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.cancelButton = new System.Windows.Forms.Button();
+            this._scheduleButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // _jsonTextBox
@@ -100,11 +101,22 @@
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             // 
+            // _scheduleButton
+            // 
+            this._scheduleButton.Location = new System.Drawing.Point(12, 280);
+            this._scheduleButton.Name = "_scheduleButton";
+            this._scheduleButton.Size = new System.Drawing.Size(75, 23);
+            this._scheduleButton.TabIndex = 5;
+            this._scheduleButton.Text = "Schedule";
+            this._scheduleButton.UseVisualStyleBackColor = true;
+            this._scheduleButton.Click += new System.EventHandler(this.HandleScheduleButtonClick);
+            // 
             // DatabaseServiceEditForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(689, 311);
+            this.Controls.Add(this._scheduleButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label1);
@@ -129,5 +141,6 @@
         private System.Windows.Forms.TextBox _descriptionTextBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.Button _scheduleButton;
     }
 }
