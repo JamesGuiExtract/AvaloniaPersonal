@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Xml.XPath;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry
 {
@@ -34,6 +35,11 @@ namespace Extract.DataEntry
         /// expand path tags/functions.
         /// </summary>
         ITagUtility _tagUtility;
+
+        /// <summary>
+        /// An <see cref="IPathTags"/> interface for <see cref="_tagUtility"/>.
+        /// </summary>
+        IPathTags _pathTags;
 
         /// <summary>
         /// A map of defined document types to the configuration to be used.
@@ -114,6 +120,13 @@ namespace Extract.DataEntry
             try
             {
                 _tagUtility = tagUtility;
+                var famTagManager = tagUtility as FAMTagManager;
+                // _pathTags needed for AttributeStatusInfo.ExecuteNoUILoad so that workflow-specific
+                // tags are available
+                // https://extract.atlassian.net/browse/ISSUE-15297
+                _pathTags = (famTagManager != null)
+                    ? new FileActionManagerPathTags(famTagManager, "")
+                    : null;
                 _applicationConfig = applicationConfig;
                 _imageViewer = imageViewer;
                 _documentTypeComboBox = documentTypeComboBox;
@@ -749,7 +762,7 @@ namespace Extract.DataEntry
 
                 AttributeStatusInfo.ExecuteNoUILoad(attributes, sourceDocName,
                     ActiveDataEntryConfiguration.GetDatabaseConnections(),
-                    ActiveDataEntryConfiguration.BackgroundFieldModels);
+                    ActiveDataEntryConfiguration.BackgroundFieldModels, _pathTags);
                 DataEntryMethods.PruneNonPersistingAttributes(attributes);
 
                 return true;

@@ -1121,13 +1121,16 @@ namespace Extract.DataEntry
         /// <see langword="null"/> if not required).</param>
         /// <param name="fieldModels">The <see cref="BackgroundFieldModel"/>s that represent
         /// the controls in the DEP.</param>
+        /// <param name="tagUtility">The <see cref="IPathTags"/> instance that should be used to
+        /// expand any path tag expressions in data queries.</param>
         [ComVisible(false)]
         public static void ExecuteNoUILoad(IUnknownVector attributes, string sourceDocName,
-            Dictionary<string, DbConnection> dbConnections, IEnumerable<BackgroundFieldModel> fieldModels)
+            Dictionary<string, DbConnection> dbConnections, IEnumerable<BackgroundFieldModel> fieldModels,
+            IPathTags pathTags)
         {
             try
             {
-                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, null);
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags);
                 EnableValidationTriggers(false);
                 Initialize(attributes, fieldModels);
                 EnableValidationTriggers(true);
