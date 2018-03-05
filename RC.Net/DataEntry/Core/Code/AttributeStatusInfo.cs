@@ -449,6 +449,11 @@ namespace Extract.DataEntry
         string _lastAppliedStringValue;
 
         /// <summary>
+        /// Indicates whether this attribute has been mapped to a control.
+        /// </summary>
+        bool _isMapped;
+
+        /// <summary>
         /// Indicates whether the attribute has been initialized and has not been deleted.
         /// </summary>
         bool _initialized;
@@ -488,6 +493,17 @@ namespace Extract.DataEntry
         #region Properties
 
         /// <summary>
+        /// Gets a value indicating whether field has been mapped to a control
+        /// </summary>
+        public bool IsMapped
+        {
+            get
+            {
+                return _isMapped;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the attribute has been initialized and has not been
         /// deleted.
         /// </summary>
@@ -520,6 +536,10 @@ namespace Extract.DataEntry
             set
             {
                 _owningControl = value;
+                if (value != null)
+                {
+                    _isMapped = true;
+                }
             }
         }
 
@@ -1246,6 +1266,7 @@ namespace Extract.DataEntry
                         // Initialize the status info and validator as the corresponding DEP control
                         // would have done.
                         var statusInfo = GetStatusInfo(attribute);
+                        statusInfo._isMapped = true;
                         statusInfo._isViewable = fieldModel.IsViewable;
                         statusInfo.PersistAttribute = fieldModel.PersistAttribute;
                         var validator = (DataEntryValidator)statusInfo.Validator;
@@ -1427,6 +1448,7 @@ namespace Extract.DataEntry
                 }
 
                 statusInfo._owningControl = owningControl;
+                statusInfo._isMapped = (owningControl !=null);
 
                 if (owningControl != null && displayOrder == null)
                 {
@@ -4273,6 +4295,7 @@ namespace Extract.DataEntry
                 _hasBeenViewed = source._hasBeenViewed;
                 _dataValidity = source._dataValidity;
                 _owningControl = source._owningControl;
+                _isMapped = source._isMapped;
                 _hintType = source._hintType;
                 _hintRasterZones = source._hintRasterZones;
                 _isAccepted = source._isAccepted;

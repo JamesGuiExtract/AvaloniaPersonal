@@ -575,11 +575,13 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Removes all <see cref="IAttribute"/>s not marked as persistable from the provided
-        /// attribute hierarchy.
+        /// attribute hierarchy. This includes attributes that were not mapped at all, with the
+        /// exception of any DocumentType attribute at the root.
         /// </summary>
         /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
         /// non-persistable attributes should be removed.</param>
-        internal static void PruneNonPersistingAttributes(IUnknownVector attributes)
+        /// <param name="root"><c>true</c> if the specified attributes are at the hierarchy root.</param>
+        internal static void PruneNonPersistingAttributes(IUnknownVector attributes, bool root = true)
         {
             try
             {
@@ -587,9 +589,11 @@ namespace Extract.DataEntry
                 for (int i = 0; i < count; i++)
                 {
                     IAttribute attribute = (IAttribute)attributes.At(i);
-                    if (AttributeStatusInfo.IsAttributePersistable(attribute))
+                    var statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+                    if ((statusInfo.IsMapped && statusInfo.PersistAttribute)
+                        || (root == true && attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase)))
                     {
-                        PruneNonPersistingAttributes(attribute.SubAttributes);
+                        PruneNonPersistingAttributes(attribute.SubAttributes, false);
                     }
                     else
                     {
