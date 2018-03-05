@@ -717,6 +717,10 @@ namespace Extract.DataEntry
                 else
                 {
                     var parentModel = modelDictionary[fieldModel.ParentAttributeControl];
+
+                    // Confirm that the parent has a name since otherwise it won't be in the fieldModels collection
+                    ExtractException.Assert("ELI45636", "Logic exception", !string.IsNullOrEmpty(parentModel.Name));
+
                     parentModel.Children.Add(fieldModel);
                 }
             }
@@ -757,12 +761,7 @@ namespace Extract.DataEntry
             {
                 foreach (var fieldModel in BuildFieldModels(childControl, modelDictionary))
                 {
-                    // Don't create unnamed models
-                    // https://extract.atlassian.net/browse/ISSUE-15300
-                    if (!string.IsNullOrEmpty(fieldModel.Name))
-                    {
-                        yield return fieldModel;
-                    }
+                    yield return fieldModel;
                 }
             }
         }
