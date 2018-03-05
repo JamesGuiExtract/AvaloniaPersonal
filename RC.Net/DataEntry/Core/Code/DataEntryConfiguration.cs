@@ -744,7 +744,12 @@ namespace Extract.DataEntry
                 if (fieldModel != null)
                 {
                     modelDictionary[control] = fieldModel;
-                    yield return fieldModel;
+                    // Don't create unnamed models
+                    // https://extract.atlassian.net/browse/ISSUE-15300
+                    if (!string.IsNullOrEmpty(fieldModel.Name))
+                    {
+                        yield return fieldModel;
+                    }
                 }
             }
 
@@ -752,7 +757,12 @@ namespace Extract.DataEntry
             {
                 foreach (var fieldModel in BuildFieldModels(childControl, modelDictionary))
                 {
-                    yield return fieldModel;
+                    // Don't create unnamed models
+                    // https://extract.atlassian.net/browse/ISSUE-15300
+                    if (!string.IsNullOrEmpty(fieldModel.Name))
+                    {
+                        yield return fieldModel;
+                    }
                 }
             }
         }
