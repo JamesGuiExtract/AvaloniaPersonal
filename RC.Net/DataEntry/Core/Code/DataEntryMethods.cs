@@ -576,7 +576,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Removes all <see cref="IAttribute"/>s not marked as persistable from the provided
         /// attribute hierarchy. This includes attributes that were not mapped at all, with the
-        /// exception of any DocumentType attribute at the root.
+        /// exception of any DocumentType attribute at the root or attributes that start with an
+        /// underscore.
         /// </summary>
         /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
         /// non-persistable attributes should be removed.</param>
@@ -590,8 +591,13 @@ namespace Extract.DataEntry
                 {
                     IAttribute attribute = (IAttribute)attributes.At(i);
                     var statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+                    // Prune:
+                    // * Attributes that aren't mapped into the DEP and that also aren't a root-level
+                    //   "DocumentType" or an attribute that starts with and underscore.
+                    // * Attributes that are mapped, but have PersistAttribute set to false.
                     if ((statusInfo.IsMapped && statusInfo.PersistAttribute)
-                        || (root == true && attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase)))
+                        || (root == true && attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase))
+                        || (attribute.Name.StartsWith("_", StringComparison.OrdinalIgnoreCase)))
                     {
                         PruneNonPersistingAttributes(attribute.SubAttributes, false);
                     }

@@ -922,9 +922,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _dataErrorPictureBox.Visible = false;
                 }
 
-                //// Fixes separator hanging around bug (not sure why)
-                //PerformLayout();
-
                 return false;
             }
         }
