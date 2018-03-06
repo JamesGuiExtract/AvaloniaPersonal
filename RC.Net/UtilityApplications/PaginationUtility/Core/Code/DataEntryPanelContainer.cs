@@ -161,11 +161,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Limits the number of threads that can run concurrently for <see cref="UpdateDocumentStatus"/> calls.
-        /// (1 - 4 where the number does no exceed the num of CPUs).
+        /// I recently changed this from 4 to 10 because threads tend to get tied up in locking for cache access
+        /// in SQLQueryNodes which means it doesn't get anywhere near full CPU utilization of the threads here.
+        /// The only reason I hesitate to go higher is potential memory usage in complex DEPs (esp that use
+        /// legacy UI loading).
         /// </summary>
-        Semaphore _documentStatusUpdateSemaphore = new Semaphore(
-            Math.Max(1, Math.Min(4, Environment.ProcessorCount)),
-            Math.Max(1, Math.Min(4, Environment.ProcessorCount)));
+        Semaphore _documentStatusUpdateSemaphore = new Semaphore(10, 10);
 
         /// <summary>
         /// The <see cref="ITagUtility"/> to expand path tags/functions.

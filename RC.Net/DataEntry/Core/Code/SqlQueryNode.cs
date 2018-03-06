@@ -36,6 +36,11 @@ namespace Extract.DataEntry
         static Dictionary<string, DataCache<string, CachedQueryData<string[]>>> _processCacheManager = 
             new Dictionary<string, DataCache<string, CachedQueryData<string[]>>>(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// Synchronizes access to shared cache (_processCacheManager)
+        /// </summary>
+        static object _lock = new object();
+
         #endregion Statics
 
         #region Fields
@@ -79,7 +84,7 @@ namespace Extract.DataEntry
                             try
                             {
                                 _processCacheManager = null;
-                                DatabaseConnectionInfo.ResetSharedConnections();
+                                DatabaseConnectionInfo.ResetSharedDatabaseCopies();
                             }
                             catch (Exception ex)
                             {
@@ -158,20 +163,20 @@ namespace Extract.DataEntry
 
                 lock (_lock)
                 {
-                    var connectionInfo = AttributeStatusInfo.ProcessWideDataCache
+                    var dataCache = AttributeStatusInfo.ProcessWideDataCache
                         ? _processCacheManager ?? (_processCacheManager = new Dictionary<string, DataCache<string, CachedQueryData<string[]>>>())
                         : _threadCacheManager ?? (_threadCacheManager = new Dictionary<string, DataCache<string, CachedQueryData<string[]>>>());
 
                     _currentConnection = DatabaseConnections[connectionName];
                     string connectionString = _currentConnection.ConnectionString;
 
-                    // Look for an existing DbConnectionWrapper under this name.
-                    if (!connectionInfo.TryGetValue(connectionString, out _currentCache))
+                    // Look for an existing cache for this connectionString.
+                    if (!dataCache.TryGetValue(connectionString, out _currentCache))
                     {
-                        // A DbConnectionWrapper needs to be created for this name.
+                        // A new DataCache needs to be created for this name.
                         _currentCache = new DataCache<string, CachedQueryData<string[]>>(
                             QueryNode.QueryCacheLimit, CachedQueryData<string[]>.GetScore);
-                        connectionInfo[connectionString] = _currentCache;
+                        dataCache[connectionString] = _currentCache;
                     }
                 }
 
@@ -197,8 +202,6 @@ namespace Extract.DataEntry
                 throw ex.AsExtract("ELI37797");
             }
         }
-
-        static object _lock = new object();
 
         /// <summary>
         /// Evaluates the query by using the combined result of all child
@@ -261,15 +264,15 @@ namespace Extract.DataEntry
                 // Otherwise, execute the query and submit the results for caching.
                 else if (!string.IsNullOrWhiteSpace(sqlQuery.ToString()))
                 {
-                    lock (_lock)
+                    DateTime startTime = DateTime.Now;
+
+                    // Execute the query.
+                    queryResults = DBMethods.GetQueryResultsAsStringArray(
+                        _currentConnection, sqlQuery.ToString(), parameters, ", ");
+
+                    if (AllowCaching && !FlushCache)
                     {
-                        DateTime startTime = DateTime.Now;
-
-                        // Execute the query.
-                        queryResults = DBMethods.GetQueryResultsAsStringArray(
-                            _currentConnection, sqlQuery.ToString(), parameters, ", ");
-
-                        if (AllowCaching && !FlushCache)
+                        lock (_lock)
                         {
                             // Attempt to cache the results.
                             double executionTime = (DateTime.Now - startTime).TotalMilliseconds;

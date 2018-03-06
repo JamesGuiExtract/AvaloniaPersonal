@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Xml.XPath;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry
 {
@@ -34,6 +35,11 @@ namespace Extract.DataEntry
         /// expand path tags/functions.
         /// </summary>
         ITagUtility _tagUtility;
+
+        /// <summary>
+        /// An <see cref="IPathTags"/> interface for <see cref="_tagUtility"/>.
+        /// </summary>
+        IPathTags _pathTags;
 
         /// <summary>
         /// A map of defined document types to the configuration to be used.
@@ -421,6 +427,18 @@ namespace Extract.DataEntry
                     manager._activeDataEntryConfig = manager._defaultDataEntryConfig;
                 }
 
+                // _pathTags needed for AttributeStatusInfo.ExecuteNoUILoad so that workflow-specific
+                // tags are available
+                // https://extract.atlassian.net/browse/ISSUE-15297
+                if (_dataEntryApp.FileProcessingDB != null)
+                {
+                    var famPathTags = new FileActionManagerPathTags();
+                    famPathTags.DatabaseServer = _dataEntryApp.FileProcessingDB.DatabaseServer;
+                    famPathTags.DatabaseName = _dataEntryApp.FileProcessingDB.DatabaseName;
+                    famPathTags.Workflow = _dataEntryApp.FileProcessingDB.ActiveWorkflow;
+                    manager._pathTags = famPathTags;
+                }
+
                 return manager;
             }
             catch (Exception ex)
@@ -749,7 +767,7 @@ namespace Extract.DataEntry
 
                 AttributeStatusInfo.ExecuteNoUILoad(attributes, sourceDocName,
                     ActiveDataEntryConfiguration.GetDatabaseConnections(),
-                    ActiveDataEntryConfiguration.BackgroundFieldModels);
+                    ActiveDataEntryConfiguration.BackgroundFieldModels, _pathTags);
                 DataEntryMethods.PruneNonPersistingAttributes(attributes);
 
                 return true;
