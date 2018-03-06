@@ -498,7 +498,7 @@ namespace Extract.Database
         /// Resets local database copies for the case where <see cref="ShareLocalDBCopy"/> is true
         /// (allowing the database to be shared across threads)
         /// </summary>
-        public static void ResetSharedConnections()
+        public static void ResetSharedDatabaseCopies()
         {
             try
             {
