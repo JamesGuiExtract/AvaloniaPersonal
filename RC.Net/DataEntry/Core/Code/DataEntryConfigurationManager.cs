@@ -120,13 +120,6 @@ namespace Extract.DataEntry
             try
             {
                 _tagUtility = tagUtility;
-                var famTagManager = tagUtility as FAMTagManager;
-                // _pathTags needed for AttributeStatusInfo.ExecuteNoUILoad so that workflow-specific
-                // tags are available
-                // https://extract.atlassian.net/browse/ISSUE-15297
-                _pathTags = (famTagManager != null)
-                    ? new FileActionManagerPathTags(famTagManager, "")
-                    : null;
                 _applicationConfig = applicationConfig;
                 _imageViewer = imageViewer;
                 _documentTypeComboBox = documentTypeComboBox;
@@ -432,6 +425,18 @@ namespace Extract.DataEntry
                 {
                     manager._defaultDataEntryConfig = CreateBackgroundConfiguration(_defaultDataEntryConfig);
                     manager._activeDataEntryConfig = manager._defaultDataEntryConfig;
+                }
+
+                // _pathTags needed for AttributeStatusInfo.ExecuteNoUILoad so that workflow-specific
+                // tags are available
+                // https://extract.atlassian.net/browse/ISSUE-15297
+                if (_dataEntryApp.FileProcessingDB != null)
+                {
+                    var famPathTags = new FileActionManagerPathTags();
+                    famPathTags.DatabaseServer = _dataEntryApp.FileProcessingDB.DatabaseServer;
+                    famPathTags.DatabaseName = _dataEntryApp.FileProcessingDB.DatabaseName;
+                    famPathTags.Workflow = _dataEntryApp.FileProcessingDB.ActiveWorkflow;
+                    manager._pathTags = famPathTags;
                 }
 
                 return manager;
