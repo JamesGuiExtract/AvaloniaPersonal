@@ -870,6 +870,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 (Parent as PageLayoutControl)?.UIUpdatesSuspended != true &&
                 Document?.DocumentData?.Initialized == true)
             {
+                _controlUpdatePending = false;
+
                 _hasAppliedStatus = true;
                 _selectedCheckBox.Visible = _showSelectionCheckBox;
                 _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
@@ -898,8 +900,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _dataErrorPictureBox.Visible = Document.DataError;
                 _toolTip.SetToolTip(_dataErrorPictureBox,
                     Document?.DocumentData?.DataErrorMessage ?? "The data for this document has error(s)");
-
-                _controlUpdatePending = false;
 
                 PerformLayout();
 
