@@ -109,7 +109,7 @@ namespace Extract.DataEntry
                 if (!isBackgroundConfig)
                 {
                     // Foreground configuration; create DEP immediately.
-                    _dataEntryControlHost = CreateDataEntryControlHost();
+                    CreateDataEntryControlHost();
                 }
             }
             catch (Exception ex)
@@ -119,6 +119,15 @@ namespace Extract.DataEntry
         }
 
         #endregion Constructors
+
+        #region Events
+
+        /// <summary>
+        /// Raised when the <see cref="DataEntryControlHost"/> is created.
+        /// </summary>
+        internal event EventHandler<EventArgs> PanelCreated;
+
+        #endregion Events
 
         #region Properties
 
@@ -145,7 +154,7 @@ namespace Extract.DataEntry
                     if (_dataEntryControlHost == null &&
                                 (!_isBackgroundConfig || !_config.Settings.SupportsNoUILoad))
                     {
-                        _dataEntryControlHost = CreateDataEntryControlHost();
+                        CreateDataEntryControlHost();
                     }
 
                     return _dataEntryControlHost;
@@ -665,9 +674,7 @@ namespace Extract.DataEntry
         /// Instantiates the one and only <see cref="DataEntryControlHost"/> implemented by the
         /// configuration's specified DataEntryPanelFileName.
         /// </summary>
-        /// <returns>A <see cref="DataEntryControlHost"/> instantiated from the specified assembly.
-        /// </returns>
-        DataEntryControlHost CreateDataEntryControlHost()
+        void CreateDataEntryControlHost()
         {
             try
             {
@@ -684,7 +691,9 @@ namespace Extract.DataEntry
 
                 dataEntryControlHost.Config = Config;
 
-                return dataEntryControlHost;
+                _dataEntryControlHost = dataEntryControlHost;
+
+                PanelCreated?.Invoke(this, new EventArgs());
             }
             catch (Exception ex)
             {

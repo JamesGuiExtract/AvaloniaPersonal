@@ -98,6 +98,11 @@ namespace Extract.DataEntry
         /// </summary>
         IAttribute _documentTypeAttribute;
 
+        /// <summary>
+        /// The master configuration file name
+        /// </summary>
+        string _masterConfigFileName;
+
         #endregion Fields
 
         #region Constructors
@@ -257,6 +262,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                _masterConfigFileName = masterConfigFileName;
+
                 // Retrieve the documentTypeConfigurations XML section if it exists
                 IXPathNavigable documentTypeConfiguration =
                     _applicationConfig.GetSectionXml("documentTypeConfigurations");
@@ -271,7 +278,7 @@ namespace Extract.DataEntry
                 // use the master config file as the one and only configuration.
                 if (configurationNode == null || !configurationNode.MoveToFirstChild())
                 {
-                    _defaultDataEntryConfig = LoadDataEntryConfiguration(masterConfigFileName, null);
+                    _defaultDataEntryConfig = LoadDataEntryConfiguration(null);
                     ChangeActiveDocumentType(null, true);
                     return;
                 }
@@ -332,8 +339,7 @@ namespace Extract.DataEntry
 
                     configFileName = DataEntryMethods.ResolvePath(configFileName);
 
-                    DataEntryConfiguration config =
-                        LoadDataEntryConfiguration(configFileName, masterConfigFileName);
+                    DataEntryConfiguration config = LoadDataEntryConfiguration(configFileName);
                     if (defaultConfiguration)
                     {
                         _defaultDataEntryConfig = config;
@@ -419,12 +425,16 @@ namespace Extract.DataEntry
                         {
                             manager._defaultDataEntryConfig = backgroundConfig;
                         }
+
+                        backgroundConfig.PanelCreated += BackgroundConfig_PanelCreated;
                     }
                 }
                 else
                 {
                     manager._defaultDataEntryConfig = CreateBackgroundConfiguration(_defaultDataEntryConfig);
                     manager._activeDataEntryConfig = manager._defaultDataEntryConfig;
+
+                    manager._defaultDataEntryConfig.PanelCreated += BackgroundConfig_PanelCreated;
                 }
 
                 // _pathTags needed for AttributeStatusInfo.ExecuteNoUILoad so that workflow-specific
@@ -554,15 +564,14 @@ namespace Extract.DataEntry
         /// <param name="masterConfigFileName">If not <see langword="null"/>, the configuration that
         /// may provide defaults for DataEntry and objectSettings config file values.</param>
         /// <returns>The loaded <see cref="DataEntryConfiguration"/>.</returns>
-        DataEntryConfiguration LoadDataEntryConfiguration(string configFileName,
-            string masterConfigFileName)
+        DataEntryConfiguration LoadDataEntryConfiguration(string configFileName)
         {
             try
             {
                 // Load the configuration settings from file.
                 ConfigSettings<Extract.DataEntry.Properties.Settings> config =
                     new ConfigSettings<Extract.DataEntry.Properties.Settings>(
-                        configFileName, masterConfigFileName, false, false, _tagUtility);
+                        configFileName, _masterConfigFileName, false, false, _tagUtility);
 
                 DataEntryConfiguration configuration =
                     new DataEntryConfiguration(config, _tagUtility, _dataEntryApp.FileProcessingDB, false);
@@ -573,36 +582,7 @@ namespace Extract.DataEntry
                 configuration.DataEntryControlHost.ImageViewer = _imageViewer;
 
                 QueryNode.QueryCacheLimit = config.Settings.QueryCacheLimit;
-
-                // If HighlightConfidenceBoundary settings has been specified in the config file and
-                // the controlHost has exactly two confidence tiers, use the provided value as the
-                // minimum OCR confidence value in order to highlight text as confidently OCR'd
-                if (!string.IsNullOrEmpty(config.Settings.HighlightConfidenceBoundary)
-                    && configuration.DataEntryControlHost.HighlightColors.Length == 2)
-                {
-                    int confidenceBoundary = Convert.ToInt32(
-                        config.Settings.HighlightConfidenceBoundary,
-                        CultureInfo.CurrentCulture);
-
-                    ExtractException.Assert("ELI25684", "HighlightConfidenceBoundary settings must " +
-                        "be a value between 1 and 100",
-                        confidenceBoundary >= 1 && confidenceBoundary <= 100);
-
-                    HighlightColor[] highlightColors = configuration.DataEntryControlHost.HighlightColors;
-                    highlightColors[0].MaxOcrConfidence = confidenceBoundary - 1;
-                    configuration.DataEntryControlHost.HighlightColors = highlightColors;
-                }
-
-                configuration.DataEntryControlHost.DisabledControls = config.Settings.DisabledControls;
-                configuration.DataEntryControlHost.DisabledValidationControls =
-                    config.Settings.DisabledValidationControls;
-
-                // Apply settings from the config file that pertain to the DEP.
-                if (!string.IsNullOrEmpty(masterConfigFileName))
-                {
-                    _applicationConfig.ApplyObjectSettings(configuration.DataEntryControlHost);
-                }
-                config.ApplyObjectSettings(configuration.DataEntryControlHost);
+                InitializePanel(configuration);
 
                 if (config.Settings.SupportsNoUILoad)
                 {
@@ -619,6 +599,50 @@ namespace Extract.DataEntry
                     "Failed to load data entry configuration", ex);
                 ee.AddDebugData("Config file", configFileName, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Initializes the panel.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        void InitializePanel(DataEntryConfiguration configuration)
+        {
+            try
+            {
+                // If HighlightConfidenceBoundary settings has been specified in the config file and
+                // the controlHost has exactly two confidence tiers, use the provided value as the
+                // minimum OCR confidence value in order to highlight text as confidently OCR'd
+                if (!string.IsNullOrEmpty(configuration.Config.Settings.HighlightConfidenceBoundary)
+                    && configuration.DataEntryControlHost.HighlightColors.Length == 2)
+                {
+                    int confidenceBoundary = Convert.ToInt32(
+                        configuration.Config.Settings.HighlightConfidenceBoundary,
+                        CultureInfo.CurrentCulture);
+
+                    ExtractException.Assert("ELI25684", "HighlightConfidenceBoundary settings must " +
+                        "be a value between 1 and 100",
+                        confidenceBoundary >= 1 && confidenceBoundary <= 100);
+
+                    HighlightColor[] highlightColors = configuration.DataEntryControlHost.HighlightColors;
+                    highlightColors[0].MaxOcrConfidence = confidenceBoundary - 1;
+                    configuration.DataEntryControlHost.HighlightColors = highlightColors;
+                }
+
+                configuration.DataEntryControlHost.DisabledControls = configuration.Config.Settings.DisabledControls;
+                configuration.DataEntryControlHost.DisabledValidationControls =
+                    configuration.Config.Settings.DisabledValidationControls;
+
+                // Apply settings from the config file that pertain to the DEP.
+                if (!string.IsNullOrEmpty(_masterConfigFileName))
+                {
+                    _applicationConfig.ApplyObjectSettings(configuration.DataEntryControlHost);
+                }
+                configuration.Config.ApplyObjectSettings(configuration.DataEntryControlHost);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45637");
             }
         }
 
@@ -987,6 +1011,25 @@ namespace Extract.DataEntry
                 // document load and even it if doesn't, it could indicate that the document will
                 // not be able to be correctly saved.
                 OnConfigurationChangeError(ee);
+            }
+        }
+
+        /// <summary>
+        /// Handles the PanelCreated event for configurations in the background.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void BackgroundConfig_PanelCreated(object sender, EventArgs e)
+        {
+            try
+            {
+                var configuration = (DataEntryConfiguration)sender;
+
+                InitializePanel(configuration);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45638");
             }
         }
 
