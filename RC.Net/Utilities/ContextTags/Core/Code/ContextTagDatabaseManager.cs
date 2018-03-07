@@ -687,15 +687,22 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// Reset and dispose of the database connection and related objects.
         /// </summary>
-        void ResetDatabase()
+        public void ResetDatabase()
         {
-            _contextTagDatabase?.Dispose();
-            _contextTagDatabase = null;
-            _connection?.Dispose();
-            _connection = null;
-            _connectionInfo?.Dispose();
-            _connectionInfo = null;
-            _versionNumber = 0;
+            try
+            {
+                _contextTagDatabase?.Dispose();
+                _contextTagDatabase = null;
+                _connection?.Dispose();
+                _connection = null;
+                _connectionInfo?.Dispose();
+                _connectionInfo = null;
+                _versionNumber = 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45639");
+            }
         }
 
         #endregion Private Members

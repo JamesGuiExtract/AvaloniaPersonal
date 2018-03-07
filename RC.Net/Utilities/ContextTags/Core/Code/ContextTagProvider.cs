@@ -625,7 +625,11 @@ namespace Extract.Utilities.ContextTags
  
                 _workflowTagValues[""].Add(_EDIT_CUSTOM_TAGS_LABEL, "");
 
-                return manager.ContextTagDatabase.Context.Any() || manager.ContextTagDatabase.CustomTag.Any();
+                bool dataLoaded = manager.ContextTagDatabase.Context.Any() || manager.ContextTagDatabase.CustomTag.Any();
+
+                manager.ResetDatabase();
+
+                return dataLoaded;
             }
         }
 
