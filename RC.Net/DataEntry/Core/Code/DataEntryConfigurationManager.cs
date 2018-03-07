@@ -278,7 +278,7 @@ namespace Extract.DataEntry
                 // use the master config file as the one and only configuration.
                 if (configurationNode == null || !configurationNode.MoveToFirstChild())
                 {
-                    _defaultDataEntryConfig = LoadDataEntryConfiguration(null);
+                    _defaultDataEntryConfig = LoadDataEntryConfiguration(masterConfigFileName);
                     ChangeActiveDocumentType(null, true);
                     return;
                 }
