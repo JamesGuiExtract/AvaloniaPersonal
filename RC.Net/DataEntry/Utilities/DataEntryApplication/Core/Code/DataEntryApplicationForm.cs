@@ -877,6 +877,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 _cachedVOAData.Remove(fileName);
 
+                ExtractException.Assert("ELI29830", "Unexpected file processing database!",
+                    _fileProcessingDb == fileProcessingDB);
+                ExtractException.Assert("ELI29831", "Unexpected database action ID!",
+                    _fileProcessingDb == null || _actionId == actionID);
+
+                // These variables should be initialized here before the potential call to
+                // AbortProcessing, otherwise AbortProcessing will report a bad file ID is being
+                // aborted.
+                // https://extract.atlassian.net/browse/ISSUE-15316
+                _fileId = fileID;
+                _fileName = fileName;
+                _fileTaskSessionID = null;
+
                 // In order to keep the order documents are displayed in sync with the
                 // _paginationPanel, swap out the loading file for another if necessary.
                 if (_paginationPanel != null && ReorderAccordingToPagination(fileName))
@@ -884,15 +897,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     AbortProcessing(EFileProcessingResult.kProcessingDelayed, false);
                     return;
                 }
-
-                ExtractException.Assert("ELI29830", "Unexpected file processing database!",
-                    _fileProcessingDb == fileProcessingDB);
-                ExtractException.Assert("ELI29831", "Unexpected database action ID!",
-                    _fileProcessingDb == null || _actionId == actionID);
-
-                _fileId = fileID;
-                _fileName = fileName;
-                _fileTaskSessionID = null;
 
                 StartFileTaskSession();
 
@@ -4560,8 +4564,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
                     _fileProcessingStopwatch.Restart();
 
-                    _fileProcessingDb.UpdateFileTaskSession(
-                        _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value);
+                    // ReorderAccordingToPagination may triggered an abort of processing of a document
+                    // before a FileTaskSession was started.
+                    if (_fileTaskSessionID != null)
+                    {
+                        _fileProcessingDb.UpdateFileTaskSession(
+                            _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value);
+                    }
                 }
             }
             catch (Exception ex)
