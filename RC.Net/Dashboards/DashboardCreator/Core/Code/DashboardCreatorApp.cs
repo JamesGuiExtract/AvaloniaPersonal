@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace DashboardCreator
 {
-    static class Program
+    static class DashboardCreatorApp
     {
         /// <summary>
         /// The main entry point for the application.
