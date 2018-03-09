@@ -2077,7 +2077,8 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 	"	[ID][int] IDENTITY(1, 1) NOT NULL CONSTRAINT[PK_DatabaseService] PRIMARY KEY CLUSTERED, "
 	"	[Description] NVARCHAR(MAX) NULL, "
 	"	[Settings] NVARCHAR(MAX) NOT NULL, "
-	"   [Status] NVARCHAR(MAX) NULL) ";
+	"   [Status] NVARCHAR(MAX) NULL, "
+	"   [Enabled] BIT NOT NULL CONSTRAINT [DF_DatabaseServiceEnabled] DEFAULT 1) ";
 
 static const string gstrCREATE_REPORTING_VERIFICATION_RATES =
 	"CREATE TABLE [dbo].[ReportingVerificationRates]( "

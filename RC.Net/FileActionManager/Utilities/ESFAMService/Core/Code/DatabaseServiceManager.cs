@@ -231,7 +231,7 @@ namespace Extract.FileActionManager.Utilities
                     _running = true;
 
                     using (DataTable dbServiceDefinitions = DBMethods.ExecuteDBQuery(
-                                _oleDbConnection, "SELECT [ID], [Settings] FROM [DatabaseService]"))
+                                _oleDbConnection, "SELECT [ID], [Settings] FROM [DatabaseService] WHERE Enabled = 1"))
                     {
                         foreach (DataRow dbServiceRow in dbServiceDefinitions.Rows)
                         {

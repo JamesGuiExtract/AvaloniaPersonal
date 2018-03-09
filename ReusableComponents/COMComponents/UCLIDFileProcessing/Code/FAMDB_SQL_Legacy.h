@@ -287,5 +287,10 @@ static const string gstrCREATE_REPORTING_VERIFICATION_RATES_V160 =
 "	[ActiveMinutes][float] NOT NULL CONSTRAINT [DF_ActiveMinutes] DEFAULT(0.0) "
 "   CONSTRAINT [IX_ReportingVerificationRatesFileActionTask] UNIQUE CLUSTERED([FileID],[ActionID],[TaskClassID],[DatabaseServiceID]))";
 
-
-
+// used for schema version 159 to 162
+static const string gstrCREATE_DATABASE_SERVICE_TABLE_159 =
+"CREATE TABLE [dbo].[DatabaseService]( "
+"	[ID][int] IDENTITY(1, 1) NOT NULL CONSTRAINT[PK_DatabaseService] PRIMARY KEY CLUSTERED, "
+"	[Description] NVARCHAR(MAX) NULL, "
+"	[Settings] NVARCHAR(MAX) NOT NULL, "
+"   [Status] NVARCHAR(MAX) NULL) ";

@@ -25,6 +25,7 @@ namespace Extract.ETL.Management
             Int32 _id;
             string _description;
             DatabaseService _service;
+            bool _enabled;
 
             #endregion
 
@@ -73,6 +74,22 @@ namespace Extract.ETL.Management
                     if (value != _service)
                     {
                         _service = value;
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Indicates that the Database service is enabled
+            /// </summary>
+            public bool Enabled
+            {
+                get { return _enabled; }
+                set
+                {
+                    if (value != _enabled)
+                    {
+                        _enabled = value;
                         NotifyPropertyChanged();
                     }
                 }
@@ -149,7 +166,7 @@ namespace Extract.ETL.Management
         #endregion
 
         #region Private Properties
-        
+
         string DatabaseServer { get; set; }
 
         string DatabaseName { get; set; }
@@ -171,7 +188,7 @@ namespace Extract.ETL.Management
                     connection.Open();
 
                     var command = connection.CreateCommand();
-                    command.CommandText = "SELECT ID, Description, Settings, Status FROM dbo.DatabaseService";
+                    command.CommandText = "SELECT ID, Description, Settings, Status, Enabled FROM dbo.DatabaseService";
 
                     table.Load(command.ExecuteReader());
 
@@ -180,7 +197,8 @@ namespace Extract.ETL.Management
                         {
                             ID = r.Field<Int32>("ID"),
                             Description = r.Field<string>("Description"),
-                            Service = DatabaseService.FromJson(r.Field<string>("Settings"))
+                            Service = DatabaseService.FromJson(r.Field<string>("Settings")),
+                            Enabled = r.Field<bool>("Enabled")
                         }).ToList();
 
                     _listOfDataToDisplay = new BindingList<DatabaseServiceData>(dataToDisplay);
@@ -232,7 +250,7 @@ namespace Extract.ETL.Management
 
                 var command = connection.CreateCommand();
                 command.CommandText =
-                    "SELECT ID, Description, Settings, Status FROM dbo.DatabaseService WHERE ID = @DatabaseServiceID";
+                    "SELECT ID, Description, Settings, Status, Enabled FROM dbo.DatabaseService WHERE ID = @DatabaseServiceID";
                 command.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
 
                 var data = command.ExecuteReader();
@@ -251,6 +269,50 @@ namespace Extract.ETL.Management
         #endregion
 
         #region Event Handlers
+
+        void HandleDatabaseServicesDataGridViewCellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                var grid = (DataGridView)sender;
+
+                if (e.RowIndex >= 0 && grid.Columns[e.ColumnIndex].Name == "Enabled")
+                {
+                    // Get the current row selected
+                    var row = grid.CurrentRow;
+                    if (row is null)
+                    {
+                        return;
+                    }
+
+                    DatabaseServiceData currentData = row.DataBoundItem as DatabaseServiceData;
+                    bool newEnabledValue = !currentData.Enabled;
+
+                    // Update the value in the database
+                    using (var trans = new TransactionScope())
+                    using (var connection = NewSqlDBConnection())
+                    {
+                        connection.Open();
+                        var cmd = connection.CreateCommand();
+                        cmd.CommandText = @"
+                            UPDATE DatabaseService 
+                            SET [Enabled] = @Enabled
+                            WHERE ID = @DatabaseServiceID";
+                        cmd.Parameters.AddWithValue("@Enabled", newEnabledValue);
+                        cmd.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
+                        cmd.ExecuteNonQuery();
+                        trans.Complete();
+
+                        // update the data for the row
+                        currentData.Enabled = newEnabledValue;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45643");
+            }
+        }
 
         void HandleModifyButtonClick(object sender, EventArgs e)
         {
@@ -338,14 +400,17 @@ namespace Extract.ETL.Management
                                 INSERT INTO [dbo].[DatabaseService]
                                             ([Description]
                                             ,[Settings]
+                                            ,[Enabled]
                                             )
 	                            OUTPUT inserted.id
                                 VALUES (
                                     @Description,
-                                    @Settings)";
+                                    @Settings,
+                                    @Enabled)";
 
                             cmd.Parameters.AddWithValue("@Description", serviceEditForm.Description);
                             cmd.Parameters.AddWithValue("@Settings", service.ToJson());
+                            cmd.Parameters.AddWithValue("@Enabled", true);
                             Int32 id = (Int32)cmd.ExecuteScalar();
                             trans.Complete();
 
@@ -353,7 +418,8 @@ namespace Extract.ETL.Management
                             {
                                 ID = id,
                                 Description = serviceEditForm.Description,
-                                Service = serviceEditForm.Service
+                                Service = serviceEditForm.Service,
+                                Enabled = true
                             };
                             _listOfDataToDisplay.Add(newRcd);
                         }
@@ -386,21 +452,18 @@ namespace Extract.ETL.Management
                     Int32 ID = (Int32)row.Cells["ID"].Value;
 
                     using (var trans = new TransactionScope())
+                    using (var connection = NewSqlDBConnection())
                     {
-                        using (var connection = NewSqlDBConnection())
-                        {
-                            connection.Open();
-                            var cmd = connection.CreateCommand();
-                            cmd.CommandText = @"
-                                    DELETE FROM DatabaseService 
-                                    WHERE ID = @DatabaseServiceID";
-                            cmd.Parameters.AddWithValue("@DatabaseServiceID", ID);
-                            cmd.ExecuteNonQuery();
-                            trans.Complete();
+                        connection.Open();
+                        var cmd = connection.CreateCommand();
+                        cmd.CommandText = @"
+                                DELETE FROM DatabaseService 
+                                WHERE ID = @DatabaseServiceID";
+                        cmd.Parameters.AddWithValue("@DatabaseServiceID", ID);
+                        cmd.ExecuteNonQuery();
+                        trans.Complete();
 
-                            _listOfDataToDisplay.Remove((DatabaseServiceData)row.DataBoundItem);
-
-                        }
+                        _listOfDataToDisplay.Remove((DatabaseServiceData)row.DataBoundItem);
                     }
                 }
             }
@@ -418,10 +481,9 @@ namespace Extract.ETL.Management
             }
             catch (Exception ex)
             {
-
                 throw ex.AsExtract("ELI45609");
             }
-        } 
+        }
 
         #endregion
     }

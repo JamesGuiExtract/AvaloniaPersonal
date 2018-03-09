@@ -123,6 +123,7 @@
             this._databaseServicesDataGridView.RowsDefaultCellStyle = dataGridViewCellStyle1;
             this._databaseServicesDataGridView.Size = new System.Drawing.Size(566, 349);
             this._databaseServicesDataGridView.TabIndex = 5;
+            this._databaseServicesDataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDatabaseServicesDataGridViewCellContentClick);
             // 
             // ManageDatabaseServicesForm
             // 
