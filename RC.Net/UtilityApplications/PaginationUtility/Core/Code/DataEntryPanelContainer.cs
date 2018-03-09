@@ -833,7 +833,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     oldDatEntryControlHost.PageLoadRequest -= DataEntryControlHost_PageLoadRequest;
                     oldDatEntryControlHost.UndoAvailabilityChanged -= DataEntryControlHost_UndoAvailabilityChanged;
-                    oldDatEntryControlHost.RedoAvailabilityChanged -= NewDataEntryControlHost_RedoAvailabilityChanged;
+                    oldDatEntryControlHost.RedoAvailabilityChanged -= DataEntryControlHost_RedoAvailabilityChanged;
 
                     oldDatEntryControlHost.ClearData();
 
@@ -843,6 +843,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (!_loading)
                     {
                         _documentData.UndoState = null;
+
+                        // After switching panels, the pagination task form's _undoManager may be out of sync with
+                        // current undo availability. Force an update.
+                        // https://extract.atlassian.net/browse/ISSUE-15317
+                        OnUndoAvailabilityChanged();
+                        OnRedoAvailabilityChanged();
                     }
                 }
 
@@ -874,7 +880,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     newDataEntryControlHost.PageLoadRequest += DataEntryControlHost_PageLoadRequest;
                     newDataEntryControlHost.UndoAvailabilityChanged += DataEntryControlHost_UndoAvailabilityChanged;
-                    newDataEntryControlHost.RedoAvailabilityChanged += NewDataEntryControlHost_RedoAvailabilityChanged;
+                    newDataEntryControlHost.RedoAvailabilityChanged += DataEntryControlHost_RedoAvailabilityChanged;
 
                     // Set Active = true for the new DEP so that it tracks image viewer events.
                     newDataEntryControlHost.Active = true;
@@ -938,7 +944,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        void NewDataEntryControlHost_RedoAvailabilityChanged(object sender, EventArgs e)
+        void DataEntryControlHost_RedoAvailabilityChanged(object sender, EventArgs e)
         {
             _redoButton.Enabled = RedoOperationAvailable;
 
