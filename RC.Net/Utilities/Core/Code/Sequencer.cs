@@ -279,6 +279,25 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Returns the next value queued or the default value for <see typeref="T"/> if no value
+        /// is queued.
+        /// </summary>
+        public T Peek()
+        {
+            try
+            {
+                lock (_lock)
+                {
+                    return (_queue.Count > 0) ? _queue[0] : default(T);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45645");
+            }
+        }
+
         #endregion Methods
     }
 }

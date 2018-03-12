@@ -457,28 +457,41 @@ namespace Extract.FileActionManager.Forms
                             _waitingFileSequencer.AddToQueue(fileID);
                         }
 
-                        // Wait until the UI thread has finished loading its document before
-                        // pre-fetching. Even with multiple cores, disk I/O from the prefetch can
-                        // cause the UI thread to load slower.
-                        _fileLoadedEvent.WaitOne();
-
-                        // Need to log exception when loading prefetched file
-                        try
+                        // Beyond opening files, there are a couple of other circumstances in which the lock
+                        // may be taken (Standby, RequestFile, DelayFile). If there are no other files processing
+                        // and the current one is at the front of the queue, wait here for the lock without
+                        // first going through prefetch.
+                        // https://extract.atlassian.net/browse/ISSUE-15323
+                        if (_waitingFileSequencer.Peek() == fileID && _currentFileIDs.Count == 0)
                         {
-                            _waitingFileSequencer.WaitForTurn(fileID);
-
-                            // While waiting for the verification UI thread, prefetch data so that
-                            // MainForm.Open call on this thread will have less work to do and execute
-                            // faster.
-                            MainForm.Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB);
+                            _lock.Lock(ref haveLock, _abortedEvent, _exceptionThrownEvent);
                         }
-                        catch (Exception ex)
+
+                        if (!haveLock)
                         {
-                            // Just log this exception another exception will be thrown when the file
-                            // is loaded into the UI
-                            ExtractException ee = new ExtractException("ELI37889", "Unable to prefetch file.", ex);
-                            ee.AddDebugData("Filename", fileName, false);
-                            ee.Log();
+                            // Wait until the UI thread has finished loading its document before
+                            // pre-fetching. Even with multiple cores, disk I/O from the prefetch can
+                            // cause the UI thread to load slower.
+                            _fileLoadedEvent.WaitOne();
+
+                            // Need to log exception when loading prefetched file
+                            try
+                            {
+                                _waitingFileSequencer.WaitForTurn(fileID);
+
+                                // While waiting for the verification UI thread, prefetch data so that
+                                // MainForm.Open call on this thread will have less work to do and execute
+                                // faster.
+                                MainForm.Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Just log this exception another exception will be thrown when the file
+                                // is loaded into the UI
+                                ExtractException ee = new ExtractException("ELI37889", "Unable to prefetch file.", ex);
+                                ee.AddDebugData("Filename", fileName, false);
+                                ee.Log();
+                            }
                         }
 
                         // Loop in case we need to wait on a requested file or a request has been made
