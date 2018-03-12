@@ -1,4 +1,5 @@
-﻿using Extract.Utilities.Forms;
+﻿using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
 using System.Data;
@@ -111,7 +112,7 @@ namespace Extract.ETL.Management
             /// <param name="propertyName">Name of the property changed</param>
             protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
             {
-                PropertyChangedEventHandler handler = PropertyChanged;
+                var handler = PropertyChanged;
                 if (handler != null)
                 {
                     handler(this, new PropertyChangedEventArgs(propertyName));
@@ -124,6 +125,8 @@ namespace Extract.ETL.Management
         #endregion
 
         #region Fields
+
+        readonly string _DatabaseServiceSql = "SELECT ID, Description, Settings, Status, Enabled FROM dbo.DatabaseService";
 
         /// <summary>
         /// Binding list of data being displayed in data grid
@@ -188,7 +191,7 @@ namespace Extract.ETL.Management
                     connection.Open();
 
                     var command = connection.CreateCommand();
-                    command.CommandText = "SELECT ID, Description, Settings, Status, Enabled FROM dbo.DatabaseService";
+                    command.CommandText = _DatabaseServiceSql;
 
                     table.Load(command.ExecuteReader());
 
@@ -235,10 +238,11 @@ namespace Extract.ETL.Management
         }
 
         /// <summary>
-        /// Gets the row data from the database if there is not matching ID in the DB the row will be deleted from the bound data
+        /// Gets the row data from the database if there is no matching ID in the DB the row will be deleted from the bound data
         /// </summary>
         /// <param name="row">Row to retrieve from the database</param>
-        /// <returns></returns>
+        /// <returns><see langword="true"> if the row was found in the database, <see langword="false"/>
+        /// is returned if the row is no longer in the database</see></returns>
         bool GetCurrentRowDataFromDB(DataGridViewRow row)
         {
             DatabaseServiceData currentData = row.DataBoundItem as DatabaseServiceData;
@@ -249,8 +253,7 @@ namespace Extract.ETL.Management
                 connection.Open();
 
                 var command = connection.CreateCommand();
-                command.CommandText =
-                    "SELECT ID, Description, Settings, Status, Enabled FROM dbo.DatabaseService WHERE ID = @DatabaseServiceID";
+                command.CommandText = _DatabaseServiceSql + " WHERE ID = @DatabaseServiceID";
                 command.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
 
                 var data = command.ExecuteReader();
@@ -264,6 +267,35 @@ namespace Extract.ETL.Management
                 currentData.Service = DatabaseService.FromJson(data.GetString(data.GetOrdinal("Settings")));
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Edits the given DatabaseService 
+        /// </summary>
+        /// <param name="service">DatabaseService to be edited</param>
+        /// <param name="caption">Caption to use for editing service</param>
+        /// <returns>tuple with configured = true if changes made false otherwise. if configured is true then 
+        /// service will be the configured service if configured is false service will be null</returns>
+        (bool configured, DatabaseService service) EditService(DatabaseService service, string caption)
+        {
+            bool configured = false;
+            IConfigSettings configService = service as IConfigSettings;
+            if (configService != null)
+            {
+                configured = configService.Configure();
+            }
+            else
+            {
+                DatabaseServiceEditForm serviceEditForm =
+                    new DatabaseServiceEditForm( service);
+
+                serviceEditForm.Text = String.Format(CultureInfo.InvariantCulture,
+                    caption, service.GetType().Name);
+                configured = serviceEditForm.ShowDialog(this) == DialogResult.OK;
+                service = serviceEditForm.Service;
+
+            }
+            return (configured) ? (true, service) : (false, null);
         }
 
         #endregion
@@ -332,40 +364,30 @@ namespace Extract.ETL.Management
 
                 DatabaseServiceData currentData = row.DataBoundItem as DatabaseServiceData;
 
-                DatabaseServiceEditForm serviceEditForm =
-                    new DatabaseServiceEditForm(currentData.Description, currentData.Service);
+                var serviceEdit = EditService(currentData.Service, "Modify {0} database service.");
+                DatabaseService service = serviceEdit.service;
 
-                serviceEditForm.Text = String.Format(CultureInfo.InvariantCulture,
-                    "Modify {0} database service.", currentData.Service.GetType().Name);
-
-
-                if (serviceEditForm.ShowDialog(this) == DialogResult.OK)
+                if (serviceEdit.configured && (service.Description != currentData.Description || currentData.Service.ToJson() != service.ToJson()))
                 {
-                    string newDescription = serviceEditForm.Description;
-                    DatabaseService newService = serviceEditForm.Service;
-
-                    if (newDescription != currentData.Description || currentData.Service != newService)
+                    using (var trans = new TransactionScope())
+                    using (var connection = NewSqlDBConnection())
                     {
-                        using (var trans = new TransactionScope())
-                        using (var connection = NewSqlDBConnection())
-                        {
-                            connection.Open();
-                            var cmd = connection.CreateCommand();
-                            cmd.CommandText = @"
+                        connection.Open();
+                        var cmd = connection.CreateCommand();
+                        cmd.CommandText = @"
                                 UPDATE DatabaseService 
                                 SET [Description] = @Description,
                                     [Settings]    = @Settings
                                 WHERE ID = @DatabaseServiceID";
-                            cmd.Parameters.AddWithValue("@Description", newDescription);
-                            cmd.Parameters.AddWithValue("@Settings", newService.ToJson());
-                            cmd.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
-                            cmd.ExecuteNonQuery();
-                            trans.Complete();
+                        cmd.Parameters.AddWithValue("@Description", service.Description);
+                        cmd.Parameters.AddWithValue("@Settings", service.ToJson());
+                        cmd.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
+                        cmd.ExecuteNonQuery();
+                        trans.Complete();
 
-                            // update the data for the row
-                            currentData.Description = newDescription;
-                            currentData.Service = newService;
-                        }
+                        // update the data for the row
+                        currentData.Description = service.Description;
+                        currentData.Service = service;
                     }
                 }
             }
@@ -379,17 +401,16 @@ namespace Extract.ETL.Management
         {
             try
             {
-                SelectTypeByExtractCategoryForm typeForm = new SelectTypeByExtractCategoryForm("DatabaseService");
+                SelectTypeByExtractCategoryForm<DatabaseService> typeForm = 
+                    new SelectTypeByExtractCategoryForm<DatabaseService>("DatabaseService");
                 if (typeForm.ShowDialog() == DialogResult.OK)
                 {
-                    DatabaseService service = (DatabaseService)typeForm.TypeSelected;
-                    DatabaseServiceEditForm serviceEditForm =
-                        new DatabaseServiceEditForm(string.Empty, service);
+                    DatabaseService service = typeForm.TypeSelected;
 
-                    serviceEditForm.Text = String.Format(CultureInfo.InvariantCulture,
-                        "Add {0} database service.", service.GetType().Name);
+                    var serviceEdit = EditService(service, "Add {0} database service.");
+                    service = serviceEdit.service;
 
-                    if (serviceEditForm.ShowDialog(this) == DialogResult.OK)
+                    if (serviceEdit.configured)
                     {
                         using (var trans = new TransactionScope())
                         using (var connection = NewSqlDBConnection())
@@ -402,13 +423,13 @@ namespace Extract.ETL.Management
                                             ,[Settings]
                                             ,[Enabled]
                                             )
-	                            OUTPUT inserted.id
+                                OUTPUT inserted.id
                                 VALUES (
                                     @Description,
                                     @Settings,
                                     @Enabled)";
 
-                            cmd.Parameters.AddWithValue("@Description", serviceEditForm.Description);
+                            cmd.Parameters.AddWithValue("@Description", service.Description);
                             cmd.Parameters.AddWithValue("@Settings", service.ToJson());
                             cmd.Parameters.AddWithValue("@Enabled", true);
                             Int32 id = (Int32)cmd.ExecuteScalar();
@@ -417,8 +438,8 @@ namespace Extract.ETL.Management
                             var newRcd = new DatabaseServiceData()
                             {
                                 ID = id,
-                                Description = serviceEditForm.Description,
-                                Service = serviceEditForm.Service,
+                                Description = service.Description,
+                                Service = service,
                                 Enabled = true
                             };
                             _listOfDataToDisplay.Add(newRcd);

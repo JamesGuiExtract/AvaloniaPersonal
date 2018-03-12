@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Extract.AttributeFinder;
+using Extract.Code.Attributes;
+using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -7,12 +10,10 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
-using Extract.AttributeFinder;
-using Extract.Utilities;
+using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
-using Extract.Code.Attributes;
 
 namespace Extract.ETL
 {
@@ -22,7 +23,7 @@ namespace Extract.ETL
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
     [ExtractCategory("DatabaseService")]
-    public class ExpandAttributes : DatabaseService
+    public class ExpandAttributes : DatabaseService, IConfigSettings
     {
         #region Constants
 
@@ -54,13 +55,13 @@ namespace Extract.ETL
                     SELECT @StartPos = 1, @EndPos = CHARINDEX('+', @TypeName)
                     WHILE (@StartPos < LEN (@TypeName) + 1)
                     BEGIN
-	                    IF (@EndPos = 0)
-		                    SET @EndPos = LEN(@TypeName) + 1
-	                    INSERT INTO @TempType 
-	                    SELECT SUBSTRING(@TypeName, @StartPos, @EndPos - @StartPos)
+                        IF (@EndPos = 0)
+                            SET @EndPos = LEN(@TypeName) + 1
+                        INSERT INTO @TempType 
+                        SELECT SUBSTRING(@TypeName, @StartPos, @EndPos - @StartPos)
 
-	                    SET @StartPos = @EndPos + 1
-	                    SET @EndPos = CHARINDEX('+', @TypeName, @StartPos)
+                        SET @StartPos = @EndPos + 1
+                        SET @EndPos = CHARINDEX('+', @TypeName, @StartPos)
                     END
                 END
 
@@ -110,7 +111,7 @@ namespace Extract.ETL
 
 
         #endregion
-        
+
         #region Fields
 
         /// <summary>
@@ -145,7 +146,7 @@ namespace Extract.ETL
         #endregion
 
         #region DatabaseService implementation
- 
+
         #region DatabaseService Properties
 
         /// <summary>
@@ -186,7 +187,7 @@ namespace Extract.ETL
                     SqlCommand cmd = connection.CreateCommand();
                     cmd.CommandText = @"
                             SELECT AttributeSetForFile.ID AttributeSetForFileID
-	                            ,AttributeSetForFile.VOA
+                                ,AttributeSetForFile.VOA
                             FROM AttributeSetForFile
                             LEFT OUTER JOIN Attribute ON AttributeSetForFile.ID = Attribute.AttributeSetForFileID
                             WHERE (Attribute.AttributeSetForFileID IS NULL)";
@@ -269,6 +270,42 @@ namespace Extract.ETL
 
         #endregion
 
+        #region IConfigSettings implementation
+
+        /// <summary>
+        /// Method returns the state of the configuration
+        /// </summary>
+        /// <returns>Returns <see langword="true"/> if configuration is valid, otherwise false</returns>
+        public bool IsConfigured()
+        {
+            return !string.IsNullOrWhiteSpace(Description);   
+        }
+
+        /// <summary>
+        /// Displays a form to Configures the ExpandAttributes service
+        /// </summary>
+        /// <returns><see langword="true"/> if configuration was ok'd. if configuration was canceled returns 
+        /// <see langword="false"/></returns>
+        public bool Configure()
+        {
+            try
+            {
+                ExpandAttributesForm form = new ExpandAttributesForm(this);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45646");
+                return false;
+            }
+        }
+
+        #endregion
+
         #region Private Methods
 
         /// <summary>
@@ -296,7 +333,7 @@ namespace Extract.ETL
         /// <param name="attributes">The attributes to add</param>
         /// <param name="attributeSetForFileID">The ID of the AttributeSetForFileID record that contains the VOA being added</param>
         /// <param name="parentAttributeID">The ID of the parent Attribute record. if 0 it is a top level attribute</param>
-        void addAttributes(SqlConnection connection, SqlTransaction transaction, IUnknownVector attributes, 
+        void addAttributes(SqlConnection connection, SqlTransaction transaction, IUnknownVector attributes,
             Int64 attributeSetForFileID,
             Int64 parentAttributeID = 0)
         {
@@ -312,7 +349,7 @@ namespace Extract.ETL
 
                 insertCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
                     AddAttributeQuery,
-                    (StoreSpatialInfo) ? buildRasterZoneInsert(attribute.Value): "");
+                    (StoreSpatialInfo) ? buildRasterZoneInsert(attribute.Value) : string.Empty);
 
                 try
                 {
@@ -340,7 +377,7 @@ namespace Extract.ETL
                         addAttributes(connection, transaction, attribute.SubAttributes, attributeSetForFileID, (Int64)attributeID);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ExtractException ee = new ExtractException("ELI45433", "Unable to add Attribute", ex);
                     ee.AddDebugData("SQL", insertCmd.CommandText, false);
@@ -401,7 +438,7 @@ namespace Extract.ETL
             int pageNumber = rasterZone.PageNumber;
             int height = rasterZone.Height;
 
-            string insert =string.Format(CultureInfo.InvariantCulture,
+            string insert = string.Format(CultureInfo.InvariantCulture,
                 "(@AttributeID, {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})",
                                                top,
                                                left,
@@ -445,9 +482,8 @@ namespace Extract.ETL
                     return false;
                 }
             }
-            return true;            
+            return true;
         }
-
         #endregion
 
     }

@@ -108,6 +108,10 @@ namespace Extract.Utilities.Forms
             {
                 try
                 {
+                    if (value == null)
+                    {
+                        value = new ScheduledEvent();
+                    }
                     _startDatePicker.Value = value.Start;
                     _startTimePicker.Value = value.Start;
                     if (value.End != null)

@@ -111,6 +111,7 @@
     <Compile Include="DateTimeMethods.cs" />
     <Compile Include="ExtractFileLock.cs" />
     <Compile Include="HashCode.cs" />
+    <Compile Include="IConfigSettings.cs" />
     <Compile Include="IdentifiableObject.cs" />
     <Compile Include="LuceneBestMatchProvider.cs" />
     <Compile Include="LuceneSuggestionProvider.cs" />

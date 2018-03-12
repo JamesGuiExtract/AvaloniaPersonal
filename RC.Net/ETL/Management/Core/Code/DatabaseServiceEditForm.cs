@@ -17,19 +17,30 @@ namespace Extract.ETL.Management
         /// <summary>
         /// Initializes the DatabaseServiceEditForm
         /// </summary>
-        /// <param name="description">Description for the database service</param>
         /// <param name="service">The database service being edited</param>
-        public DatabaseServiceEditForm(string description, DatabaseService service)
+        public DatabaseServiceEditForm(DatabaseService service)
         {
             InitializeComponent();
-            Description = description;
-            _service = service;
+            Service = service;
             JsonConfigString = service.ToJson();
         }
 
         #endregion
 
         #region Private Properties
+
+        string Description
+        {
+            get
+            {
+                return _descriptionTextBox.Text;
+            }
+
+            set
+            {
+                _descriptionTextBox.Text = value;
+            }
+        }
 
         string JsonConfigString
         {
@@ -60,22 +71,10 @@ namespace Extract.ETL.Management
                 {
                     _service = value;
                     JsonConfigString = _service.ToJson();
+                    Description = Service.Description;
                 }
             }
         }
-        public string Description
-        {
-            get
-            {
-                return _descriptionTextBox.Text;
-            }
-
-            set
-            {
-                _descriptionTextBox.Text = value;
-            }
-        }
-
         #endregion
 
         #region Private methods
@@ -99,6 +98,10 @@ namespace Extract.ETL.Management
                 try
                 {
                     var tmpService = DatabaseService.FromJson(JsonConfigString);
+                    
+                    // Set the description of the service using the Description
+                    tmpService.Description = Description;
+                    JsonConfigString = tmpService.ToJson();
 
                     // if the service created ok set the tmpService value to the _service value
                     _service = tmpService;

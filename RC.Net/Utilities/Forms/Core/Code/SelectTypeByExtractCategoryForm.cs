@@ -11,7 +11,7 @@ namespace Extract.Utilities.Forms
     /// 
     /// A category is added to a class by using the ExtractCategoryAttribute defined in Extract.Code.Attributes
     /// </summary>
-    public partial class SelectTypeByExtractCategoryForm : Form
+    public partial class SelectTypeByExtractCategoryForm<T> : Form 
     {
         #region Fields
 
@@ -50,7 +50,7 @@ namespace Extract.Utilities.Forms
         /// Returns an instance of the currently selected type in the combo box
         /// if nothing is selected the return value will be null
         /// </summary>
-        public object TypeSelected
+        public T TypeSelected
         {
             get
             {
@@ -58,9 +58,18 @@ namespace Extract.Utilities.Forms
                 if (_comboBoxOfTypes.SelectedIndex >= 0)
                 {
                     var t = Type.GetType(_comboBoxOfTypes.SelectedValue as string);
-                    return Activator.CreateInstance(t);
+                    var returnObject = (T)Activator.CreateInstance(t);
+                    if (returnObject is T)
+                    {
+                        return returnObject;
+                    }
+                    ExtractException ee = new ExtractException("ELI45655", "Selected object is not the correct type.");
+
+                    ee.AddDebugData("Expected Type", typeof(T).FullName, false);
+                    ee.AddDebugData("Generated Type", typeof(T).FullName, false);
+                    throw ee;
                 }
-                return null;
+                return default(T);
             }
         }
 

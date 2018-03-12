@@ -1,6 +1,6 @@
 ﻿namespace Extract.Utilities.Forms
 {
-    partial class SelectTypeByExtractCategoryForm
+    partial class SelectTypeByExtractCategoryForm<T>
     {
         /// <summary>
         /// Required designer variable.
