@@ -385,7 +385,7 @@ namespace Extract.AttributeFinder
                     // Split data into training and validation sets by getting random subsets of each
                     // category. This is to ensure at least one example of each class exists.
                     // Compute indexes for the two sets of data
-                    // NOTE: Chnaged to be 50/50 sets because arguably this will give more accurate results (and it is faster)
+                    // NOTE: Changed to be 50/50 sets because arguably this will give more accurate results (and it is faster)
                     LearningMachine.GetIndexesOfSubsetsByCategory(outputs, 0.5, out List<int> trainIdx, out List<int> cvIdx, randomGenerator);
 
                     double[][] trainInputs = inputs.Submatrix(trainIdx);

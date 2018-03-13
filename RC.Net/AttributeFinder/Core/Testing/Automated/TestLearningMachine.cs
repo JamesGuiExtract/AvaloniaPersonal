@@ -269,6 +269,30 @@ namespace Extract.AttributeFinder.Test
         }
 
         [Test, Category("LearningMachine")]
+        public static void TrainMachineFeatureHashingDocTypesFromFolder()
+        {
+            SetDocumentCategorizationFiles();
+            var inputConfig = new InputConfiguration
+            {
+                InputPath = _inputFolder.Last(),
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm = new LearningMachine
+            {
+                InputConfig = inputConfig,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization,
+                    new SpatialStringFeatureVectorizer(null, 5, 2000) { UseFeatureHashing = true }),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var (trainingSet, testingSet) = lm.TrainMachine();
+            Assert.Greater(trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+            Assert.Greater(testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+        }
+
+        [Test, Category("LearningMachine")]
         public static void TrainMachinePaginationFromFolder()
         {
             SetPaginationFiles();
@@ -303,6 +327,30 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), testCM.FScoreMicroAverage());
             Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Recall), testCM.RecallMicroAverage());
             Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Precision), testCM.PrecisionMicroAverage());
+        }
+
+        [Test, Category("LearningMachine")]
+        public static void TrainMachineFeatureHashingPaginationFromFolder()
+        {
+            SetPaginationFiles();
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.protofeatures.voa",
+                    AnswerPath = "<SourceDocName>.eav",
+                    TrainingSetPercentage = 50
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination,
+                    new SpatialStringFeatureVectorizer(null, 2, 2000) { UseFeatureHashing = true }),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = true, HiddenLayers = new[] { 50 } },
+                RandomNumberSeed = 1
+            };
+            var results = lm.TrainMachine();
+            Assert.Greater(results.trainingSet.Match(_ => Double.NaN, cm => cm.FScore), 0.88);
+            Assert.Greater(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
         }
 
         [Test, Category("LearningMachine")]
@@ -401,6 +449,29 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), testCM.FScoreMicroAverage());
             Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Recall), testCM.RecallMicroAverage());
             Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Precision), testCM.PrecisionMicroAverage());
+        }
+
+        // This is not really a useful case but make sure it works without exception
+        [Test, Category("LearningMachine")]
+        public static void TrainMachineAttributeCategorizationFeatureHashingBagOfWords()
+        {
+            SetPaginationFiles();
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.labeled.voa",
+                    TrainingSetPercentage = 80
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization,
+                    new SpatialStringFeatureVectorizer(null, 5, 2000) { UseFeatureHashing = true }),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var results = lm.TrainMachine();
+            Assert.AreEqual(1.0, results.trainingSet.Match(_ => Double.NaN, cm => cm.FScore));
+            Assert.Greater(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), 0.85);
         }
 
         [Test, Category("LearningMachine")]

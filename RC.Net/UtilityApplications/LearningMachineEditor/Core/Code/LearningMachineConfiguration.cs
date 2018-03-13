@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -78,6 +79,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
         // The path and file name that the current machine was saved to last
         private string _fileName = _NEW_FILE_NAME;
+
+        // Reuse this dialog so that the last-used radio button remains selected
+        // after closing the dialog and changing a classifier parameter
+        private TrainingTesting _trainingTestingDialog;
 
         #endregion Fields
 
@@ -612,6 +617,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     maxFeaturesTextBox.Text = encoder.AutoBagOfWords.MaxFeatures.ToString(CultureInfo.CurrentCulture);
                     specifiedPagesTextBox.Text = encoder.AutoBagOfWords.PagesToProcess ?? "";
                     specifiedPagesCheckBox.Checked = !string.IsNullOrWhiteSpace(encoder.AutoBagOfWords.PagesToProcess);
+                    useFeatureHashingForAutoBagOfWordsCheckBox.Checked = encoder.AutoBagOfWords.UseFeatureHashing;
                 }
                 useAttributeFeatureFilterCheckBox.Checked = !string.IsNullOrWhiteSpace(encoder.AttributeFilter);
                 attributeFeatureFilterComboBox.SelectedItem = encoder.NegateFilter ? _DO_NOT_MATCH : _MATCH;
@@ -940,6 +946,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             int.TryParse(pagesToProcess, out int page) && page > 0);
                     }
                     autoBoW = new SpatialStringFeatureVectorizer(pagesToProcess, shingleSize, maxFeatures);
+                    autoBoW.UseFeatureHashing = useFeatureHashingForAutoBagOfWordsCheckBox.Checked;
                 }
                 catch (ExtractException ue)
                 {
@@ -1262,6 +1269,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             maxShingleSizeTextBox.Enabled = maxFeaturesTextBox.Enabled
                                           = maxShingleSizeLabel.Enabled
                                           = maxFeaturesLabel.Enabled
+                                          = useFeatureHashingForAutoBagOfWordsCheckBox.Enabled
                                           = useAutoBagOfWordsCheckBox.Checked;
 
             specifiedPagesCheckBox.Enabled = useAutoBagOfWordsCheckBox.Checked;
@@ -1606,10 +1614,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     return;
                 }
 
-                using (var win = new TrainingTesting(this))
+                if (_trainingTestingDialog == null)
                 {
-                    win.ShowDialog();
+                    _trainingTestingDialog = new TrainingTesting(this);
                 }
+
+                _trainingTestingDialog.ShowDialog();
             }
             catch (Exception ex)
             {

@@ -580,8 +580,13 @@ namespace Extract.AttributeFinder
         {
             get
             {
-                return AutoBagOfWords != null && AutoBagOfWords.AreEncodingsComputed
+                bool vectorizersAreComputed = AutoBagOfWords != null && AutoBagOfWords.AreEncodingsComputed
                     || AutoBagOfWords == null && AttributeFeatureVectorizers.Any();
+
+                // With the new feature hashing feature, it is possible for the vectorizers to be ready without
+                // any computing happening so check the answer mapping to ensure that this is ready for use
+                bool answersAreComputed = AnswerCodeToName.Any();
+                return vectorizersAreComputed && answersAreComputed;
             }
         }
 
@@ -1949,7 +1954,7 @@ namespace Extract.AttributeFinder
                 };
 
             // Configure SpatialStringFeatureVectorizer
-            if (AutoBagOfWords != null)
+            if (AutoBagOfWords != null && !AutoBagOfWords.UseFeatureHashing)
             {
                 updateStatus(new StatusArgs { StatusMessage = "Computing auto-bag-of-words encodings:" });
                 AutoBagOfWords.ComputeEncodingsFromDocumentTrainingData(ussFilePaths, answers, updateStatus2, cancellationToken);
@@ -2009,7 +2014,7 @@ namespace Extract.AttributeFinder
                     updateStatus(args);
                 };
             // Configure SpatialStringFeatureVectorizer
-            if (AutoBagOfWords != null)
+            if (AutoBagOfWords != null && !AutoBagOfWords.UseFeatureHashing)
             {
                 updateStatus(new StatusArgs { StatusMessage = "Computing auto-bag-of-words encodings:" });
                 AutoBagOfWords.ComputeEncodingsFromPaginationTrainingData(ussFilePaths, answerFiles, updateStatus2, cancellationToken);
@@ -2018,44 +2023,44 @@ namespace Extract.AttributeFinder
             if (inputVOAFilePaths.Length > 0)
             {
                 updateStatus(new StatusArgs { StatusMessage = "Computing attribute feature encodings:" });
-            }
 
-            // Configure AttributeFeatureVectorizer collection
-            IEnumerable<IEnumerable<NameToProtoFeaturesMap>> pagePairProtofeatureCollection =
-                inputVOAFilePaths.Select(GetPaginationProtoFeatures);
+                // Configure AttributeFeatureVectorizer collection
+                IEnumerable<IEnumerable<NameToProtoFeaturesMap>> pagePairProtofeatureCollection =
+                    inputVOAFilePaths.Select(GetPaginationProtoFeatures);
 
-            // Pass the page count of each image along so that missing pages in the answer VOA can be filled in
-            var pagePairProtofeaturesAndCategories = pagePairProtofeatureCollection.Zip(answerFiles, (pagePairs, answerFile) =>
+                // Pass the page count of each image along so that missing pages in the answer VOA can be filled in
+                var pagePairProtofeaturesAndCategories = pagePairProtofeatureCollection.Zip(answerFiles, (pagePairs, answerFile) =>
+                    {
+                        var answers = ExpandPaginationAnswerVOA(answerFile, pagePairs.Count() + 1);
+                        return pagePairs.Zip(answers, (pagePairProtofeatures, answer) =>
+                            new { answer, pagePairProtofeatures });
+                    })
+                    .SelectMany(answersForFile => answersForFile);
+
+                Dictionary<string, AttributeFeatureVectorizer> vectorizerMap
+                    = new Dictionary<string, AttributeFeatureVectorizer>(StringComparer.OrdinalIgnoreCase);
+
+                // Count each page pair as a separate document for purposes of TF*IDF score
+                int exampleNumber = 0;
+                foreach (var labeledExample in pagePairProtofeaturesAndCategories)
                 {
-                    var answers = ExpandPaginationAnswerVOA(answerFile, pagePairs.Count() + 1);
-                    return pagePairs.Zip(answers, (pagePairProtofeatures, answer) =>
-                        new { answer, pagePairProtofeatures });
-                })
-                .SelectMany(answersForFile => answersForFile);
+                    ++exampleNumber;
+                    cancellationToken.ThrowIfCancellationRequested();
 
-            Dictionary<string, AttributeFeatureVectorizer> vectorizerMap
-                = new Dictionary<string, AttributeFeatureVectorizer>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var group in labeledExample.pagePairProtofeatures)
+                    {
+                        string name = group.Key;
+                        var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
+                        vectorizer.ComputeEncodingsFromTrainingData(
+                            protoFeatures: group.Value,
+                            category: labeledExample.answer,
+                            docName: exampleNumber.ToString(CultureInfo.InvariantCulture));
+                    }
 
-            // Count each page pair as a separate document for purposes of TF*IDF score
-            int exampleNumber = 0;
-            foreach (var labeledExample in pagePairProtofeaturesAndCategories)
-            {
-                ++exampleNumber;
-                cancellationToken.ThrowIfCancellationRequested();
-
-                foreach (var group in labeledExample.pagePairProtofeatures)
-                {
-                    string name = group.Key;
-                    var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
-                    vectorizer.ComputeEncodingsFromTrainingData(
-                        protoFeatures: group.Value,
-                        category: labeledExample.answer,
-                        docName: exampleNumber.ToString(CultureInfo.InvariantCulture));
+                    updateStatus2(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
                 }
-
-                updateStatus2(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
+                AttributeFeatureVectorizers = vectorizerMap.Values;
             }
-            AttributeFeatureVectorizers = vectorizerMap.Values;
 
             // Add category names and codes
             AnswerCodeToName.Add(_NOT_FIRST_PAGE_CATEGORY_CODE, NotFirstPageCategory);
@@ -2332,14 +2337,17 @@ namespace Extract.AttributeFinder
         [OnSerializing]
         private void OnSerializing(StreamingContext context)
         {
-            if (_version == 3 && IsCompatibleWithVersion(2))
-            {
-                _version = 2;
-            }
             if (_version == 2 && IsCompatibleWithVersion(1))
             {
                 _version = 1;
             }
+        }
+
+        [OnSerialized]
+        private void OnSerialized(StreamingContext context)
+        {
+            // Reset the version that may have been decremented for serialization
+            _version = _CURRENT_VERSION;
         }
 
         /// <summary>

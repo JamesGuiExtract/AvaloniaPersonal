@@ -100,7 +100,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         {
             var cancellationToken = _cancellationTokenSource.Token;
             var statusUpdates = new ConcurrentQueue<StatusArgs>();
-            StatusArgs lastStatus = new StatusArgs { StatusMessage = "Computing features..." };
+            StatusArgs lastStatus = new StatusArgs { StatusMessage = "Computing encoder..." };
 
             // Update UI periodically
             Stopwatch sw = new Stopwatch();
@@ -151,7 +151,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     }
                     else if (task.Exception == null)
                     {
-                        statusLabel.Text = "Features successfully computed.";
+                        statusLabel.Text = "Encoder successfully computed.";
                         progressBar.Style = ProgressBarStyle.Blocks;
                         progressBar.Value = progressBar.Maximum;
                         okButton.Enabled = true;
@@ -159,7 +159,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     }
                     else
                     {
-                        statusLabel.Text = "Error occurred. features not computed.";
+                        statusLabel.Text = "Error occurred. Encoder not computed.";
                         progressBar.Value = progressBar.Minimum;
 
                         // I don't think there will be more than one inner exception but just in case...

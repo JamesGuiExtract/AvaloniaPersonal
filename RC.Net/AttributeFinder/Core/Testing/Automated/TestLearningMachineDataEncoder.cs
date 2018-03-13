@@ -366,6 +366,32 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(expectedFeatureVectorLength, featureVector.Length);
         }
 
+        // Test using auto-bag-of-words and DocumentType attributes for features
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void DocumentCategorizationWithFeatureHashing()
+        {
+            int expectedFeatureVectorLength = 8000;
+            SetDocumentCategorizationFiles();
+            var autoBoW = new SpatialStringFeatureVectorizer("", 2, 8000) { UseFeatureHashing = true };
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW);
+            encoder.ComputeEncodings(_ussFiles, null, _categories);
+
+            Assert.That(encoder.AreEncodingsComputed);
+            Assert.That(encoder.AnswerCodeToName.Any());
+            Assert.AreEqual(expectedFeatureVectorLength, encoder.FeatureVectorLength);
+
+            var t = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, null, _categories);
+            var features = t.Item1;
+            var answers = t.Item2;
+            Assert.AreEqual(features.Length, answers.Length);
+
+            var uss = new UCLID_RASTERANDOCRMGMTLib.SpatialStringClass();
+            uss.LoadFrom(_ussFiles[0], false);
+
+            var featureVector = encoder.GetFeatureVectors(uss, null).First();
+            Assert.AreEqual(expectedFeatureVectorLength, featureVector.Length);
+        }
+
         // Test using only auto-bag-of-words feature
         [Test, Category("LearningMachineDataEncoder")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "VOA")]

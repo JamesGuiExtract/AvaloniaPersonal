@@ -71,7 +71,7 @@
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(107, 13);
             this.statusLabel.TabIndex = 2;
-            this.statusLabel.Text = "Computing features...";
+            this.statusLabel.Text = "Computing encoder...";
             // 
             // okButton
             // 

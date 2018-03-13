@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -44,8 +45,9 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Version 2: Add versioning
+        /// Version 3: Add _useFeatureHashing
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         #endregion Constants
 
@@ -65,6 +67,9 @@ namespace Extract.AttributeFinder
 
         [OptionalField(VersionAdded = 2)]
         private int _version = _CURRENT_VERSION;
+
+        [OptionalField(VersionAdded = 3)]
+        private bool _useFeatureHashing;
 
         #endregion Fields
 
@@ -259,7 +264,14 @@ namespace Extract.AttributeFinder
         {
             get
             {
-                return RecognizedValues.Count();
+                if (UseFeatureHashing)
+                {
+                    return MaxFeatures;
+                }
+                else
+                {
+                    return RecognizedValues.Count();
+                }
             }
         }
 
@@ -311,7 +323,26 @@ namespace Extract.AttributeFinder
         {
             get
             {
-                return _bagOfWords != null;
+                return _bagOfWords != null || _useFeatureHashing;
+            }
+        }
+
+        /// <summary>
+        /// Whether to use feature hashing instead of a fixed vocabulary
+        /// </summary>
+        public bool UseFeatureHashing
+        {
+            get
+            {
+                return _useFeatureHashing;
+            }
+            set
+            {
+                if (_useFeatureHashing != value)
+                {
+                    _useFeatureHashing = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
 
@@ -451,7 +482,12 @@ namespace Extract.AttributeFinder
                     })
                     .SelectMany(answersForFile => answersForFile);
 
-                SetBagOfWords(textsAndCategories, updateStatus, cancellationToken);
+                // Skip processing the texts if using feature hashing since there is no need
+                // to build a vocabulary
+                if (!UseFeatureHashing)
+                {
+                    SetBagOfWords(textsAndCategories, updateStatus, cancellationToken);
+                }
 
                 return textsAndCategories
                     .Select(textAndCategory => textAndCategory.Item2)
@@ -475,12 +511,34 @@ namespace Extract.AttributeFinder
             {
                 ExtractException.Assert("ELI39529", "This object has not been fully configured.", AreEncodingsComputed);
 
-                string[] terms = GetTerms(GetDocumentText(document)).ToArray();
-                return _bagOfWords.GetFeatureVector(terms).Select(i => (double)i).ToArray();
+                return GetFeatureVector(GetDocumentText(document));
             }
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39530");
+            }
+        }
+        
+        double[] GetFeatureVector(string text)
+        {
+            if (UseFeatureHashing)
+            {
+                double[] featureVector = new double[MaxFeatures];
+                var hasher = Murmur.MurmurHash.Create32();
+                foreach(var term in GetTerms(text))
+                {
+                    var bytes = hasher.ComputeHash(Encoding.UTF8.GetBytes(term));
+                    var number = BitConverter.ToInt32(bytes, 0);
+                    var index = Math.Abs(number) % MaxFeatures;
+                    var value = number > 0 ? 1 : -1;
+                    featureVector[index] += value;
+                }
+                return featureVector;
+            }
+            else
+            {
+                string[] terms = GetTerms(text).ToArray();
+                return _bagOfWords.GetFeatureVector(terms).Select(i => (double)i).ToArray();
             }
         }
 
@@ -495,15 +553,14 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                ExtractException.Assert("ELI39531", "Bag of Words has not been computed", _bagOfWords != null);
+                ExtractException.Assert("ELI39531", "This object has not been fully configured.", AreEncodingsComputed);
 
                 int totalPagesPer = PagesPerPaginationCandidate;
                 int priorPages = totalPagesPer / 2;
                 int postPages = totalPagesPer - priorPages;
 
                 var pageFeatures = GetPaginationTexts(document, priorPages > 0)
-                    .Select(text => GetTerms(text).ToArray())
-                    .Select(_bagOfWords.GetFeatureVector)
+                    .Select(text => GetFeatureVector(text))
                     .ToList();
 
                 var firstCandidateIdx = priorPages > 0
@@ -591,6 +648,7 @@ namespace Extract.AttributeFinder
                 || other.Name != Name
                 || other.PagesToProcess != PagesToProcess
                 || other.ShingleSize != ShingleSize
+                || other.UseFeatureHashing != UseFeatureHashing
                 )
             {
                 return false;
@@ -1004,6 +1062,43 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Gets a value indicating whether this instance is safe (won't behave differently)
+        /// if used by software that is unaware of features added in <see cref="_version" />
+        /// </summary>
+        /// <param name="version">The version in question.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is compatible with the specified version
+        /// </returns>
+        internal bool IsCompatibleWithVersion(int version)
+        {
+            if (_version == 3 && version == 2)
+            {
+                return !UseFeatureHashing;
+            }
+            return _version <= version;
+        }
+
+        /// <summary>
+        /// Called when serializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnSerializing]
+        private void OnSerializing(StreamingContext context)
+        {
+            if (_version == 3 && IsCompatibleWithVersion(2))
+            {
+                _version = 2;
+            }
+        }
+
+        [OnSerialized]
+        private void OnSerialized(StreamingContext context)
+        {
+            // Reset the version that may have been decremented for serialization
+            _version = _CURRENT_VERSION;
+        }
+
+        /// <summary>
         /// Called when deserializing
         /// </summary>
         /// <param name="context">The context.</param>
@@ -1011,6 +1106,7 @@ namespace Extract.AttributeFinder
         private void OnDeserializing(StreamingContext context)
         {
             _version = 1;
+            _useFeatureHashing = false;
         }
 
         /// <summary>
