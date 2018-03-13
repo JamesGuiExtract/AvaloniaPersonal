@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Forms;
+﻿using Extract.AttributeFinder;
+using Extract.FileActionManager.Forms;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
@@ -792,6 +793,24 @@ namespace Extract.DataEntry
                 AttributeStatusInfo.ExecuteNoUILoad(attributes, sourceDocName,
                     ActiveDataEntryConfiguration.GetDatabaseConnections(),
                     ActiveDataEntryConfiguration.BackgroundFieldModels, _pathTags);
+
+                // While validation queries are executed by AttributeStatusInfo.ExecuteNoUILoad, the
+                // attributes are not explicitly validated. Validate all attributes here to ensure
+                // ValidationPatterns are considered.
+                // https://extract.atlassian.net/browse/ISSUE-15327
+                foreach (var attribute in attributes
+                    .ToIEnumerable<IAttribute>()
+                    .SelectMany(attribute => attribute.EnumerateDepthFirst()))
+                {
+                    if (AttributeStatusInfo.Validate(attribute, false) == DataValidity.Invalid)
+                    {
+                        // Don't prune attributes if there is invalid data; otherwise the invalid
+                        // attribute might be pruned such that the caller doesn't know of the error.
+                        // https://extract.atlassian.net/browse/ISSUE-15328
+                        return true;
+                    }
+                }
+
                 DataEntryMethods.PruneNonPersistingAttributes(attributes);
 
                 return true;

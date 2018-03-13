@@ -1134,6 +1134,12 @@ namespace Extract.DataEntry
         /// <summary>
         /// Loads the specified attributes in to the <see paramref="fieldModels"/> to enable the
         /// data to be transformed as they would be they UI without loading into the UI.
+        /// <para><b>Note</b></para>
+        /// While this results in all queries (both auto-update and validation) executing, it does
+        /// not explicitly validate all fields so, for example, ValidationPatterns will not have
+        /// been considered.
+        /// Also, while this call re-orders attributes, it does not prune any unmapped or
+        /// un-persistable attributes.
         /// </summary>
         /// <param name="attributes">The attributes to load.</param>
         /// <param name="sourceDocName">Name of the source document.</param>
