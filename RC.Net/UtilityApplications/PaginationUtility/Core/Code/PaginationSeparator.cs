@@ -822,6 +822,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 _controlUpdatePending = true;
+
+                // Direct calls to invalidate separators on document state changes have been removed
+                // from PaginationPanel. Instead, the separators will be responsible for ensuring
+                // UpdateControls is called at the end of the current event handler that triggered
+                // the change. Invoke to prevent multiple calls to UpdateControls as part of the
+                // same event. (UpdateControls will short-circut if an Invalidate from elsewhere has
+                // triggered UpdateControls in the interim)
+                this.SafeBeginInvoke("ELI45648", () => UpdateControls());
             }
             catch (Exception ex)
             {

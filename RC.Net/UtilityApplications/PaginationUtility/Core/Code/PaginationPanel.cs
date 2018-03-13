@@ -953,16 +953,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="false"/>.</returns>
         public bool CommitChanges()
         {
+            TemporaryWaitCursor waitCursor = new TemporaryWaitCursor();
+
             try
             {
                 _committingChanges = true;
 
-                using (new TemporaryWaitCursor())
+                if (!CanSelectedDocumentsBeCommitted())
                 {
-                    if (!CanSelectedDocumentsBeCommitted())
-                    {
-                        return false;
-                    }
+                    return false;
                 }
 
                 // Don't suspend UI updates until CanSelectedDocumentsBeCommitted has been checked--
@@ -1135,6 +1134,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     ex.ExtractLog("ELI40210");
                 }
+
+                waitCursor.Dispose();
             }
         }
 
@@ -2582,21 +2583,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_committingChanges && _pendingDocuments.Contains(document))
                 {
                     return;
-                }
-
-                if (document.PaginationSeparator != null)
-                {
-                    // This event may be raised from another thread (such as via
-                    // DataEntryPaginationDocumentData.UpdateDocumentStatus)
-                    if (document.PaginationSeparator.InvokeRequired)
-                    {
-                        document.PaginationSeparator.Invoke((MethodInvoker)(() => 
-                            document.PaginationSeparator.Invalidate()));
-                    }
-                    else
-                    {
-                        document.PaginationSeparator.Invalidate();
-                    }
                 }
 
                 UpdateCommandStates();
