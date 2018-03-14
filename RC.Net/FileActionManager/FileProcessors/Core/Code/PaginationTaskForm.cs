@@ -946,6 +946,7 @@ namespace Extract.FileActionManager.FileProcessors
                 if (fileID > 0)
                 {
                     string fileName = FileProcessingDB.GetFileNameFromFileID(fileID);
+                    _fileTaskSessionMap[fileID] = StartFileTaskSession(fileID);
                     LoadDocumentForPagination(fileID, fileName, true);
                 }
                 else

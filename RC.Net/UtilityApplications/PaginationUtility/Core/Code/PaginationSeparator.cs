@@ -248,7 +248,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return (_invalidatePending || _controlUpdatePending);
+                return Parent != null && (_invalidatePending || _controlUpdatePending);
             }
 
             set
@@ -821,19 +821,29 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _controlUpdatePending = true;
+                // The below fix (ISSUE-15320) caused and issue where a separator no longer in
+                // the PaginationPanel was trying to be refreshed.
+                // https://extract.atlassian.net/browse/ISSUE-15331
+                if (Parent != null)
+                {
+                    _controlUpdatePending = true;
 
-                // Direct calls to invalidate separators on document state changes have been removed
-                // from PaginationPanel. Instead, the separators will be responsible for ensuring
-                // UpdateControls is called at the end of the current event handler that triggered
-                // the change. Invoke to prevent multiple calls to UpdateControls as part of the
-                // same event. (UpdateControls will short-circut if an Invalidate from elsewhere has
-                // triggered UpdateControls in the interim)
-                this.SafeBeginInvoke("ELI45648", () => UpdateControls());
+                    // Direct calls to invalidate separators on document state changes have been removed
+                    // from PaginationPanel. Instead, the separators will be responsible for ensuring
+                    // UpdateControls is called at the end of the current event handler that triggered
+                    // the change. Invoke to prevent multiple calls to UpdateControls as part of the
+                    // same event. (UpdateControls will short-circut if an Invalidate from elsewhere has
+                    // triggered UpdateControls in the interim)
+                    // https://extract.atlassian.net/browse/ISSUE-15320
+                    this.SafeBeginInvoke("ELI45648", () => UpdateControls(), false);
+                }
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45612");
+                // Errors here are unlikely to be a critical issue; remove risk of displayed
+                // exceptions leaving the pagination panel in a bad state by just logging here.
+                // https://extract.atlassian.net/browse/ISSUE-15331
+                ex.AsExtract("ELI45612").Log();
             }
         }
 

@@ -85,35 +85,38 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 Control parent = container as Control;
-                if (parent.Handle == null)
+                if (parent != null)
                 {
-                    return false;
-                }
-
-                parent.SafeBeginInvoke("ELI40230", () =>
-                {
-                    DoLayout(parent, layoutEventArgs);
-
-                    // Manually update separators that have pending status changes.
-                    foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
-                        .Where(separator => separator.InvalidatePending))
+                    if (parent.Handle == null)
                     {
-                        separator.Invalidate();
-                        separator.InvalidatePending = false;
+                        return false;
                     }
 
-                    parent.ResumeLayout();
-                    _layoutInvoked = false;
-                }, 
-                true, 
-                (e) => 
+                    parent.SafeBeginInvoke("ELI40230", () =>
                     {
+                        DoLayout(parent, layoutEventArgs);
+
+                        // Manually update separators that have pending status changes.
+                        foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
+                            .Where(separator => separator.InvalidatePending))
+                        {
+                            separator.Invalidate();
+                            separator.InvalidatePending = false;
+                        }
+
                         parent.ResumeLayout();
                         _layoutInvoked = false;
-                    });
+                    },
+                    true,
+                    (e) =>
+                        {
+                            parent.ResumeLayout();
+                            _layoutInvoked = false;
+                        });
 
-                parent.SuspendLayout();
-                _layoutInvoked = true;
+                    parent.SuspendLayout();
+                    _layoutInvoked = true;
+                }
             }
             catch (Exception ex)
             {

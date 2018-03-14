@@ -46,6 +46,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// </summary>
             LockControlUpdates _controlUpdateLock;
 
+            /// <summary>
+            /// Indicates whether a full layout should be performed when this instance is disposed.
+            /// </summary>
+            bool _forceFullLayout;
+
             #endregion Fields
 
             #region Constructors
@@ -55,11 +60,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// </summary>
             /// <param name="pageLayoutControl">The <see cref="PageLayoutControl"/> for which the
             /// update is taking place.</param>
-            public PageLayoutControlUpdateLock(PageLayoutControl pageLayoutControl)
+            /// <param name="forceFullRefresh"><c>true</c> to force a full layout when layout is
+            /// resumed.</param>
+            public PageLayoutControlUpdateLock(PageLayoutControl pageLayoutControl, bool forceFullLayout = false)
             {
                 if (!pageLayoutControl._inUpdateOperation)
                 {
                     _pageLayoutControl = pageLayoutControl;
+                    _forceFullLayout = forceFullLayout;
                     pageLayoutControl._inUpdateOperation = true;
 
                     _waitCursor = new TemporaryWaitCursor();
@@ -69,6 +77,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     _controlUpdateLock =
                         new LockControlUpdates(_pageLayoutControl._flowLayoutPanel, true, true);
+
+                    
                 }
             }
 
@@ -128,6 +138,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_pageLayoutControl != null)
                         {
                             _pageLayoutControl._inUpdateOperation = false;
+                            if (_forceFullLayout)
+                            {
+                                ((PaginationLayoutEngine)_pageLayoutControl._flowLayoutPanel.LayoutEngine).ForceNextLayout = true;
+                            }
                             _pageLayoutControl._flowLayoutPanel.ResumeLayout(true);
                             _pageLayoutControl.ResumeLayout(true);
                             _pageLayoutControl.UpdateCommandStates();
@@ -2319,14 +2333,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (_dropLocationIndex >= 0)
                 {
-                    using (new PageLayoutControlUpdateLock(this))
+                    var sourceLayoutControl =
+                        e.Data.GetData(_DRAG_DROP_DATA_FORMAT) as PageLayoutControl;
+                    if (sourceLayoutControl != null)
                     {
-                        var sourceLayoutControl =
-                            e.Data.GetData(_DRAG_DROP_DATA_FORMAT) as PageLayoutControl;
-                        if (sourceLayoutControl != null)
-                        {
-                            MoveSelectedControls(sourceLayoutControl, _dropLocationIndex);
-                        }
+                        MoveSelectedControls(sourceLayoutControl, _dropLocationIndex);
                     }
                 }
             }
@@ -2897,7 +2908,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void MoveSelectedControls(PageLayoutControl sourceLayoutControl, int targetIndex)
         {
-            using (new PageLayoutControlUpdateLock(this))
+            using (new PageLayoutControlUpdateLock(this, forceFullLayout: true))
             {
                 var primarySelection = PrimarySelection;
                 var selectedControls = sourceLayoutControl.SelectedControls
