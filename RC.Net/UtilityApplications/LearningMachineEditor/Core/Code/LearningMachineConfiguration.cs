@@ -1659,9 +1659,18 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         {
             try
             {
-                using (var win = new ViewAnswers(_currentLearningMachine.Encoder, _fileName == _NEW_FILE_NAME ? null : _fileName))
+                var copy = _currentLearningMachine.Encoder.DeepClone();
+                using (var win = new ViewAnswers(copy, _fileName == _NEW_FILE_NAME ? null : _fileName))
                 {
                     win.ShowDialog();
+                }
+                if (!copy.AnswerCodeToName
+                        .OrderBy(kv => kv.Key).Select(kv => kv.Value)
+                    .SequenceEqual(_currentLearningMachine.Encoder.AnswerCodeToName
+                        .OrderBy(kv => kv.Key).Select(kv => kv.Value)))
+                {
+                    _currentLearningMachine.Encoder = copy;
+                    Dirty = true;
                 }
             }
             catch (Exception ex)
