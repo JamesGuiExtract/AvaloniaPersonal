@@ -10,6 +10,12 @@ using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.LearningMachineEditor
 {
+    public class KeyValueClass
+    {
+        public int Key { get; set; }
+        public string Value { get; set; }
+    }
+
     /// <summary>
     /// Form to view list of answers/categories that the machine can recognize
     /// </summary>
@@ -42,8 +48,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
             // Initialize the DataGridView.
             answerCategoriesDataGridView.AutoGenerateColumns = false;
-            var dataSource = new BindingList<KeyValuePair<int, string>>(
-                _encoder.AnswerCodeToName.OrderBy(kv => kv.Key).ToList());
+            var dataSource = new BindingList<KeyValueClass>(
+                _encoder.AnswerCodeToName
+                .Select(kv => new KeyValueClass{Key= kv.Key, Value= kv.Value})
+                .OrderBy(kv => kv.Key)
+                .ToList());
+            dataSource.AllowEdit = true;
             answerCategoriesDataGridView.DataSource = dataSource;
 
             // Add code column
@@ -55,7 +65,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
             // Add Name column
             column = new DataGridViewTextBoxColumn();
-            column.ReadOnly = true;
+            column.ReadOnly = false;
             column.DataPropertyName = "Value";
             column.Name = "Category Name";
             answerCategoriesDataGridView.Columns.Add(column);
@@ -166,6 +176,42 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41841");
+            }
+        }
+
+        private void HandleAnswerCategoriesDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                if (e.ColumnIndex == 1)
+                {
+                    var previousValue = _encoder.AnswerCodeToName[e.RowIndex];
+                    var newValue = (string)answerCategoriesDataGridView.Rows[e.RowIndex].Cells[1].Value;
+                    if (!string.Equals(previousValue, newValue, StringComparison.Ordinal))
+                    {
+                        // Ensure new name doesn't exist already
+                        // but allow user to change case of a name
+                        _encoder.AnswerNameToCode.Remove(previousValue);
+
+                        // Revert change if the new value already exists
+                        if (_encoder.AnswerNameToCode.ContainsKey(newValue))
+                        {
+                            _encoder.AnswerNameToCode[previousValue] = e.RowIndex;
+                            answerCategoriesDataGridView.Rows[e.RowIndex].Cells[1].Value = previousValue;
+                            UtilityMethods.ShowMessageBox(UtilityMethods.FormatInvariant($"Name, {newValue}, already exists",
+                                $"(code {_encoder.AnswerNameToCode[newValue]})"), "Answer name already exists", true);
+                        }
+                        else
+                        {
+                            _encoder.AnswerNameToCode[newValue] = e.RowIndex;
+                            _encoder.AnswerCodeToName[e.RowIndex] = newValue;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45650");
             }
         }
 

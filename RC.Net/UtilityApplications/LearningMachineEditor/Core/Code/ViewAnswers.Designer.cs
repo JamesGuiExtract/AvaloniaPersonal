@@ -88,6 +88,7 @@
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.answerCategoriesDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+            this.answerCategoriesDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.answerCategoriesDataGridView.Location = new System.Drawing.Point(12, 12);
             this.answerCategoriesDataGridView.MultiSelect = false;
             this.answerCategoriesDataGridView.Name = "answerCategoriesDataGridView";
@@ -99,9 +100,10 @@
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.answerCategoriesDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this.answerCategoriesDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.answerCategoriesDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.answerCategoriesDataGridView.Size = new System.Drawing.Size(546, 576);
             this.answerCategoriesDataGridView.TabIndex = 0;
+            this.answerCategoriesDataGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleAnswerCategoriesDataGridView_CellEndEdit);
             // 
             // exportButton
             // 
