@@ -147,6 +147,14 @@ namespace Extract.DataEntry
         static IUnknownVector _attributes;
 
         /// <summary>
+        /// The current base <see cref="ExecutionContext"/> for use in enforcing the
+        /// ExecutionExemptions attribute for <see cref="DataEntryQuery"/>s.
+        /// https://extract.atlassian.net/browse/ISSUE-15342
+        /// </summary>
+        [ThreadStatic]
+        static ExecutionContext _queryExecutionContext;
+
+        /// <summary>
         /// A database(s) available for use in validation or auto-update queries; The key is the
         /// connection name (blank for default connection).
         /// </summary>
@@ -763,6 +771,24 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets the current base <see cref="ExecutionContext"/> for use in enforcing the
+        /// ExecutionExemptions attribute for <see cref="DataEntryQuery"/>s.
+        /// https://extract.atlassian.net/browse/ISSUE-15342
+        /// </summary>
+        public static ExecutionContext QueryExecutionContext
+        {
+            get
+            {
+                return _queryExecutionContext;
+            }
+
+            set
+            {
+                _queryExecutionContext = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether auto-update queries should be disabled.
         /// The queries will not be loaded for any attributes.
         /// </summary>
@@ -1047,6 +1073,11 @@ namespace Extract.DataEntry
                 // Make sure _all_ the attributes are released
                 ReleaseAttributes(_statusInfoMap.Keys.ToIUnknownVector<IAttribute>());
 
+                // Starting now query executions should be considered to be in the context of a
+                // document load. This context will only change once the DataEntryControlHost has
+                // finished initializing the DEP, at which point the context will be changed to
+                // OnUpdate.
+                _queryExecutionContext = ExecutionContext.OnLoad;
                 _statusInfoMap.Clear();
                 _subAttributesToParentMap.Clear();
                 _attributesBeingModified.Clear();
@@ -1648,8 +1679,12 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         public static void RefreshAutoUpdateValues()
         {
+            var executionContext = QueryExecutionContext;
+
             try
             {
+                QueryExecutionContext = ExecutionContext.OnRefresh;
+
                 foreach (AutoUpdateTrigger autoUpdateTrigger in _autoUpdateTriggers.Values)
                 {
                     autoUpdateTrigger.UpdateValue();
@@ -1659,6 +1694,10 @@ namespace Extract.DataEntry
             {
                 throw ex.AsExtract("ELI41573");
             }
+            finally
+            {
+                QueryExecutionContext = executionContext;
+            }
         }
 
         /// <summary>
@@ -1667,8 +1706,12 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         public static void RefreshValidation()
         {
+            var executionContext = QueryExecutionContext;
+
             try
             {
+                QueryExecutionContext = ExecutionContext.OnRefresh;
+
                 foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
                 {
                     validationTrigger.UpdateValue();
@@ -1677,6 +1720,10 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41574");
+            }
+            finally
+            {
+                QueryExecutionContext = executionContext;
             }
         }
 

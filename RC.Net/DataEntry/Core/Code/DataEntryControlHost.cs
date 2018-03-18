@@ -7954,6 +7954,9 @@ namespace Extract.DataEntry
                 ExecuteOnIdle("ELI39651", () =>
                 {
                     _isDocumentLoaded = true;
+                    // By default, all query executions from this point forward should be considered
+                    // to be the result of a manual data update.
+                    AttributeStatusInfo.QueryExecutionContext = ExecutionContext.OnUpdate;
                     OnDocumentLoaded();
                 });
 

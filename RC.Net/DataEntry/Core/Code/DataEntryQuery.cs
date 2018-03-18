@@ -11,6 +11,52 @@ using UCLID_AFCORELib;
 namespace Extract.DataEntry
 {
     /// <summary>
+    /// Represents the context in which a <see cref="DataEntryQuery"/> is being executed.
+    /// Note: It is valid to combine "When" contexts with "On" contexts to defined a more narrow
+    /// context, however it is not valid to combine the two "When" contexts or multiple "On" contexts.
+    /// https://extract.atlassian.net/browse/ISSUE-15342
+    /// </summary>
+    [Flags]
+    [SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames")]
+    public enum ExecutionContext
+    {
+        /// <summary>
+        /// No context specified.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// When the target attribute has data
+        /// </summary>
+        WhenPopulated = 1,
+
+        /// <summary>
+        ///  When the target attribute is empty
+        /// </summary>
+        WhenEmpty = 2,
+
+        /// <summary>
+        /// As part of the initial data load.
+        /// </summary>
+        OnLoad = 4,
+
+        /// <summary>
+        /// Via use of a data refresh button.
+        /// </summary>
+        OnRefresh = 8,
+
+        /// <summary>
+        /// Via the manual creation of a new attribute (added data table row, pasted data table row or swipe)
+        /// </summary>
+        OnCreate = 16,
+
+        /// <summary>
+        /// In response to data manually modified in the DEP.
+        /// </summary>
+        OnUpdate = 32
+    }
+
+    /// <summary>
     /// The master <see cref="QueryNode"/> class used to construct queries from their XML
     /// specifications.
     /// </summary>
@@ -40,6 +86,12 @@ namespace Extract.DataEntry
         /// Indicates whether this query is a default query.
         /// </summary>
         bool _defaultQuery;
+
+        /// <summary>
+        /// Defined contexts in which execution of this query should be exempted.
+        /// https://extract.atlassian.net/browse/ISSUE-15342
+        /// </summary>
+        List<ExecutionContext> _executionExcemptions = new List<ExecutionContext>();
 
         /// <summary>
         /// Indicates whether this query is disabled and should not be evaluated.
@@ -303,6 +355,18 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets defined contexts in which execution of this query should be exempted.
+        /// https://extract.atlassian.net/browse/ISSUE-15342
+        /// </summary>
+        public IEnumerable<ExecutionContext> ExecutionExemptions
+        {
+            get
+            {
+                return _executionExcemptions;
+            }
+        }
+
+        /// <summary>
         /// Gets whether the query is disabled.
         /// </summary>
         /// <value><see langword="true"/> if the query is disabled; <see langword="false"/>
@@ -458,6 +522,28 @@ namespace Extract.DataEntry
                 if (xmlAttribute != null)
                 {
                     DefaultQuery = xmlAttribute.Value.ToBoolean();
+                }
+
+                xmlAttribute = xmlNode.Attributes["ExecutionExemptions"];
+                if (xmlAttribute != null)
+                {
+                    
+                    var exemptions = xmlAttribute.Value.Split(',', '|');
+                    foreach (var exemption in exemptions)
+                    {
+                        // Convert operators used for logical reading into bitwise operations.
+                        var parsedExemptions = exemption
+                            .Split(new[] { '+' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(e => e.Trim());
+
+                        ExecutionContext exemptionFlags = ExecutionContext.None;
+                        foreach (var parsedExemption in parsedExemptions)
+                        {
+                            exemptionFlags |= (ExecutionContext)Enum.Parse(typeof(ExecutionContext), parsedExemption);
+                        }
+
+                        _executionExcemptions.Add(exemptionFlags);
+                    }
                 }
 
                 xmlAttribute = xmlNode.Attributes["ValidValue"];
