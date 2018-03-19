@@ -278,6 +278,8 @@ namespace Extract.ETL.Management
         /// service will be the configured service if configured is false service will be null</returns>
         (bool configured, DatabaseService service) EditService(DatabaseService service, string caption)
         {
+            service.DatabaseName = DatabaseName;
+            service.DatabaseServer = DatabaseServer;
             bool configured = false;
             IConfigSettings configService = service as IConfigSettings;
             if (configService != null)
@@ -367,7 +369,7 @@ namespace Extract.ETL.Management
                 var serviceEdit = EditService(currentData.Service, "Modify {0} database service.");
                 DatabaseService service = serviceEdit.service;
 
-                if (serviceEdit.configured && (service.Description != currentData.Description || currentData.Service.ToJson() != service.ToJson()))
+                if (serviceEdit.configured)
                 {
                     using (var trans = new TransactionScope())
                     using (var connection = NewSqlDBConnection())
