@@ -985,17 +985,46 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        #endregion Event Handlers
-
-        #region Private Members
-
         /// <summary>
-        /// Gets the active data entry panel.
+        /// Handles the <see cref="Control.MouseWheel"/> event of the <see cref="_documentTypeComboBox"/>.
         /// </summary>
-        /// <value>
-        /// The active data entry panel.
-        /// </value>
-        internal DataEntryDocumentDataPanel ActiveDataEntryPanel
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
+        void HandleDocumentTypeComboBox_MouseWheel(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                // Redirect mouse-scrolling for the document type combo box so it doesn't change
+                // document type selection when the combo is collapsed.
+                // https://extract.atlassian.net/browse/ISSUE-15318
+                if (!_documentTypeComboBox.DroppedDown)
+                {
+                    // Prevent combo box selection from changing.
+                    ((HandledMouseEventArgs)e).Handled = true;
+
+                    // Redirect any scrolling to the _scrollPanel as that is what the user is
+                    // likely intending to scroll (first event will be missed, but the subsequent
+                    // scroll events will go there.
+                    _scrollPanel.Focus();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45658");
+            }
+        }
+
+    #endregion Event Handlers
+
+    #region Private Members
+
+    /// <summary>
+    /// Gets the active data entry panel.
+    /// </summary>
+    /// <value>
+    /// The active data entry panel.
+    /// </value>
+    internal DataEntryDocumentDataPanel ActiveDataEntryPanel
         {
             get
             {

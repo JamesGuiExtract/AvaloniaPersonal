@@ -91,7 +91,7 @@ namespace Extract.DataEntry
         /// Defined contexts in which execution of this query should be exempted.
         /// https://extract.atlassian.net/browse/ISSUE-15342
         /// </summary>
-        List<ExecutionContext> _executionExcemptions = new List<ExecutionContext>();
+        List<ExecutionContext> _executionExemptions = new List<ExecutionContext>();
 
         /// <summary>
         /// Indicates whether this query is disabled and should not be evaluated.
@@ -362,7 +362,7 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _executionExcemptions;
+                return _executionExemptions;
             }
         }
 
@@ -542,7 +542,7 @@ namespace Extract.DataEntry
                             exemptionFlags |= (ExecutionContext)Enum.Parse(typeof(ExecutionContext), parsedExemption);
                         }
 
-                        _executionExcemptions.Add(exemptionFlags);
+                        _executionExemptions.Add(exemptionFlags);
                     }
                 }
 
