@@ -8,7 +8,7 @@ namespace Extract.ETL
         #region Constructors
 
         /// <summary>
-        /// Form to configure ExpandAttributes database servcie
+        /// Form to configure ExpandAttributes database service
         /// </summary>
         /// <param name="service">Service to configure</param>
         public ExpandAttributesForm(ExpandAttributes service)

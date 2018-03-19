@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Extract.AttributeFinder;
+using Extract.Code.Attributes;
+using Extract.DataCaptureStats;
+using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -8,12 +12,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
-using Extract.AttributeFinder;
-using Extract.DataCaptureStats;
-using Extract.Utilities;
+using System.Windows.Forms;
 using UCLID_COMUTILSLib;
-using Extract.Code.Attributes;
-
 
 namespace Extract.ETL
 {
@@ -24,7 +24,7 @@ namespace Extract.ETL
     [KnownType(typeof(ScheduledEvent))]
     [ExtractCategory("DatabaseService")]
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
-    public class DataCaptureAccuracy : DatabaseService
+    public class DataCaptureAccuracy : DatabaseService, IConfigSettings
     {
         #region Constants
 
@@ -307,19 +307,64 @@ namespace Extract.ETL
 
         #endregion
 
+        #region IConfigSettings implementation
+
+        /// <summary>
+        /// Method returns the state of the configuration
+        /// </summary>
+        /// <returns>Returns <see langword="true"/> if configuration is valid, otherwise false</returns>
+        public bool IsConfigured()
+        {
+            try
+            {
+                bool configured = true;
+                configured = configured && !string.IsNullOrWhiteSpace(XPathOfAttributesToIgnore);
+                configured = configured && !string.IsNullOrWhiteSpace(XPathOfContainerOnlyAttributes);
+                configured = configured && !string.IsNullOrWhiteSpace(ExpectedAttributeSetName);
+                configured = configured && !string.IsNullOrWhiteSpace(FoundAttributeSetName);
+                configured = configured && (FoundAttributeSetName != ExpectedAttributeSetName);
+                return configured;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45656");
+            }
+        }
+
+        /// <summary>
+        /// Displays a form to Configures the DataCaptureAccuracy service
+        /// </summary>
+        /// <returns><see langword="true"/> if configuration was ok'd. if configuration was canceled returns 
+        /// <see langword="false"/></returns>
+        public bool Configure()
+        {
+            try
+            {
+                DataCaptureAccuracyForm captureAccuracyForm = new DataCaptureAccuracyForm(this);
+                return captureAccuracyForm.ShowDialog() == DialogResult.OK;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45657");
+            }
+            return false;
+        }
+
+        #endregion
+
         #region DataCaptureAccuracy Properties
 
         /// <summary>
         /// XPath query of attributes the be ignored when comparing attributes
         /// </summary>
         [DataMember]
-        public string XPathOfAttributesToIgnore { get; set; } = "";
+        public string XPathOfAttributesToIgnore { get; set; } = string.Empty;
 
         /// <summary>
         /// XPath of Attributes that are only considered containers when comparing attributes
         /// </summary>
         [DataMember]
-        public string XPathOfContainerOnlyAttributes { get; set; } = "";
+        public string XPathOfContainerOnlyAttributes { get; set; } = string.Empty;
 
         /// <summary>
         /// The set name of the expected attributes when doing the comparison
@@ -407,7 +452,6 @@ namespace Extract.ETL
                 throw ee;
             }
         }
-
         #endregion
 
     }
