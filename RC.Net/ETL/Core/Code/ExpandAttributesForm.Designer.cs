@@ -35,8 +35,9 @@
             this._descriptionTextBox = new System.Windows.Forms.TextBox();
             this._stroreEmptyAttributesCheckBox = new System.Windows.Forms.CheckBox();
             this._storeSpatialInfoCheckBox = new System.Windows.Forms.CheckBox();
-            this.label2 = new System.Windows.Forms.Label();
             this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // cancelButton
@@ -44,10 +45,10 @@
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.CausesValidation = false;
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(404, 276);
+            this.cancelButton.Location = new System.Drawing.Point(400, 276);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelButton.TabIndex = 5;
+            this.cancelButton.TabIndex = 6;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             // 
@@ -55,10 +56,10 @@
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(323, 276);
+            this.okButton.Location = new System.Drawing.Point(319, 276);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
-            this.okButton.TabIndex = 4;
+            this.okButton.TabIndex = 5;
             this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
             this.okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -76,7 +77,7 @@
             // 
             this._descriptionTextBox.Location = new System.Drawing.Point(80, 11);
             this._descriptionTextBox.Name = "_descriptionTextBox";
-            this._descriptionTextBox.Size = new System.Drawing.Size(400, 20);
+            this._descriptionTextBox.Size = new System.Drawing.Size(395, 20);
             this._descriptionTextBox.TabIndex = 0;
             // 
             // _stroreEmptyAttributesCheckBox
@@ -99,24 +100,14 @@
             this._storeSpatialInfoCheckBox.Text = "Store spatial information (Raster zones)";
             this._storeSpatialInfoCheckBox.UseVisualStyleBackColor = true;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(13, 90);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(52, 13);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "Schedule";
-            // 
             // _schedulerControl
             // 
             this._schedulerControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._schedulerControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this._schedulerControl.Location = new System.Drawing.Point(13, 108);
+            this._schedulerControl.Location = new System.Drawing.Point(6, 19);
             this._schedulerControl.MinimumSize = new System.Drawing.Size(351, 153);
             this._schedulerControl.Name = "_schedulerControl";
             this._schedulerControl.Size = new System.Drawing.Size(385, 157);
-            this._schedulerControl.TabIndex = 3;
+            this._schedulerControl.TabIndex = 4;
             scheduledEvent1.Duration = null;
             scheduledEvent1.Enabled = true;
             scheduledEvent1.End = null;
@@ -125,14 +116,23 @@
             scheduledEvent1.Start = new System.DateTime(2018, 3, 16, 9, 38, 23, 0);
             this._schedulerControl.Value = scheduledEvent1;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this._schedulerControl);
+            this.groupBox1.Location = new System.Drawing.Point(16, 85);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(459, 185);
+            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Schedule";
+            // 
             // ExpandAttributesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(487, 308);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this._schedulerControl);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._storeSpatialInfoCheckBox);
             this.Controls.Add(this._stroreEmptyAttributesCheckBox);
             this.Controls.Add(this._descriptionTextBox);
@@ -141,13 +141,15 @@
             this.Controls.Add(this.okButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(503, 347);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(503, 340);
+            this.MinimumSize = new System.Drawing.Size(503, 347);
             this.Name = "ExpandAttributesForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Expand attributes";
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -162,6 +164,6 @@
         private System.Windows.Forms.CheckBox _stroreEmptyAttributesCheckBox;
         private System.Windows.Forms.CheckBox _storeSpatialInfoCheckBox;
         private Utilities.Forms.SchedulerControl _schedulerControl;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }

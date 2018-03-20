@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Extract.AttributeFinder;
+using Extract.Code.Attributes;
+using Extract.DataCaptureStats;
+using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -9,11 +13,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Transactions;
-using Extract.AttributeFinder;
-using Extract.DataCaptureStats;
-using Extract.Utilities;
+using System.Windows.Forms;
 using UCLID_COMUTILSLib;
-using Extract.Code.Attributes;
 
 namespace Extract.ETL
 {
@@ -24,7 +25,7 @@ namespace Extract.ETL
     [KnownType(typeof(ScheduledEvent))]
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
     [ExtractCategory("DatabaseService", "Redaction accuracy")]
-    public class RedactionAccuracy : DatabaseService
+    public class RedactionAccuracy : DatabaseService, IConfigSettings
     {
         #region Constants
 
@@ -332,6 +333,37 @@ namespace Extract.ETL
 
         #endregion
 
+        #region IConfigSettings implementation
+        public bool IsConfigured()
+        {
+            try
+            {
+                return !string.IsNullOrWhiteSpace(Description) &&
+                    !string.IsNullOrWhiteSpace(FoundAttributeSetName) &&
+                    !string.IsNullOrWhiteSpace(ExpectedAttributeSetName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45684");
+            }
+        }
+        public bool Configure()
+        {
+            try
+            {
+                RedactionAccuracyForm form = new RedactionAccuracyForm(this);
+                return form.ShowDialog() == DialogResult.OK;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45681");
+            }
+            return false;
+        }
+
+        #endregion
+
+
         #region RedactionAccuracy Properties
 
         /// <summary>
@@ -431,7 +463,6 @@ namespace Extract.ETL
                 throw ee;
             }
         }
-
         #endregion
     }
 }
