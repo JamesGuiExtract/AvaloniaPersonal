@@ -978,9 +978,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     ClearHighlights();
 
-                    OnPageLoadRequest(pageControl.Page.OriginalDocumentName, pageControl.Page.OriginalPageNumber);
-
-                    CreateAllAttributeHighlights(Attributes, null);
+                    if (OnPageLoadRequest(pageControl.Page.OriginalDocumentName, pageControl.Page.OriginalPageNumber))
+                    {
+                        CreateAllAttributeHighlights(Attributes, null);
+                    }
                 }
             }
         }
@@ -1014,9 +1015,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         /// <param name="pageNum">The page number that needs to be loaded in <see cref="_sourceDocName"/>.
         /// </param>
-        void OnPageLoadRequest(string sourceDocName, int pageNum)
+        bool OnPageLoadRequest(string sourceDocName, int pageNum)
         {
-            PageLoadRequest?.Invoke(this, new PageLoadRequestEventArgs(sourceDocName, pageNum));
+            var args = new PageLoadRequestEventArgs(sourceDocName, pageNum);
+            PageLoadRequest?.Invoke(this, args);
+            return args.Handled;
         }
 
         /// <summary>

@@ -67,13 +67,13 @@
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 21F));
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 21F));
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 21F));
-            this._tableLayoutPanel.Controls.Add(this._reprocessDocumentPictureBox, 8, 0);
+            this._tableLayoutPanel.Controls.Add(this._reprocessDocumentPictureBox, 6, 0);
             this._tableLayoutPanel.Controls.Add(this._collapseDocumentButton, 1, 0);
             this._tableLayoutPanel.Controls.Add(this._summaryLabel, 4, 0);
             this._tableLayoutPanel.Controls.Add(this._pagesLabel, 5, 0);
-            this._tableLayoutPanel.Controls.Add(this._newDocumentGlyph, 6, 0);
+            this._tableLayoutPanel.Controls.Add(this._newDocumentGlyph, 7, 0);
             this._tableLayoutPanel.Controls.Add(this._selectedCheckBox, 2, 0);
-            this._tableLayoutPanel.Controls.Add(this._editedPaginationGlyph, 7, 0);
+            this._tableLayoutPanel.Controls.Add(this._editedPaginationGlyph, 8, 0);
             this._tableLayoutPanel.Controls.Add(this._editedDataPictureBox, 9, 0);
             this._tableLayoutPanel.Controls.Add(this._editDocumentDataButton, 3, 0);
             this._tableLayoutPanel.Controls.Add(this._dataErrorPictureBox, 10, 0);

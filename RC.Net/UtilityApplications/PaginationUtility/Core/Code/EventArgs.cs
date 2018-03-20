@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -519,7 +520,7 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// <summary>
     /// The event arguments for the <see cref="PageLayoutControl.PageDeleted"/> event.
     /// </summary>
-    public class PageLoadRequestEventArgs : EventArgs
+    public class PageLoadRequestEventArgs : HandledEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PageLoadRequestEventArgs"/> class.

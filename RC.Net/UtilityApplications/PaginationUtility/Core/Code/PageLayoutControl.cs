@@ -3168,9 +3168,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Allow _lastSelectedControl to become activeControl unless the shift modifier key
                     // is down.
                     bool resetLastSelected = ((modifierKeys & Keys.Shift) == 0);
-                    // Only ever scroll to the control if a new control as been selected.
-                    scrollToControl &= (lastSelectedControl != activeControl);
-                    SelectControl(activeControl, select, resetLastSelected, scrollToControl);
+                    if (activeControl == null)
+                    {
+                        ClearSelection();
+                    }
+                    else
+                    {
+                        // Only ever scroll to the control if a new control as been selected.
+                        scrollToControl &= (lastSelectedControl != activeControl);
+                        SelectControl(activeControl, select, resetLastSelected, scrollToControl);
+                    }
                 }
             }
             catch (Exception ex)

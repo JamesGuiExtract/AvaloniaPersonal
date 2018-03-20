@@ -716,6 +716,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 SuspendUIUpdatesForOperation();
 
+                // Selecting the new document causes unexepected UI behavior and, in some cases
+                // exceptions if new documents are being loaded collapsed or a DEP is currently
+                // open for another document.
+                // https://extract.atlassian.net/browse/ISSUE-15337
+                selectDocument &= !DefaultToCollapsed && !IsDataPanelOpen;
+
                 // The OutputDocument doesn't get created directly by this method. Use
                 // _documentData to be able to pass this info to when it is needed in
                 // IPaginationUtility.CreateOutputDocument.
@@ -749,6 +755,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 ApplyOrderOfLoadedSourceDocuments();
+
+                // https://extract.atlassian.net/browse/ISSUE-15351
+                // In the process of loading a document, controls are added and removed. In some
+                // cases, such as with the removal and re-addition of the load next document button,
+                // this seems leave focus in the DEP when it should really be with the newly loaded
+                // document. Re-evaluate current focus any time a new file has been loaded.
+                ProcessFocusChange(forceUpdate: false);
             }
             catch (Exception ex)
             {
@@ -2668,6 +2681,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // page change.
                         _primaryPageLayoutControl.SelectPage(pageToSelect, scrollToPage: false);
                     }
+
+                    e.Handled = true;
                 }
             }
             catch (Exception ex)
@@ -3068,6 +3083,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             _primaryPageLayoutControl.SelectDocument(erroredDocument);
                             erroredDocument.PaginationSeparator.OpenDataPanel();
+                            erroredDocument.Collapsed = false;
+                            ProcessFocusChange(forceUpdate: true);
                         });
 
                         return false;
@@ -3257,7 +3274,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .FirstOrDefault();
                     if (separator != null)
                     {
-                        return separator.CloseDataPanel(saveData: true, validateData: validateData);
+                        bool closed = separator.CloseDataPanel(saveData: true, validateData: validateData);
+                        ProcessFocusChange(forceUpdate: true);
+                        return closed;
                     }
                 }
             }

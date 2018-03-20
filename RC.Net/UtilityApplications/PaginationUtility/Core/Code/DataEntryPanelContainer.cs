@@ -528,15 +528,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _documentTypeComboBox.Enabled = false;
                 if (_documentData != null)
                 {
                     _documentTypeComboBox.SelectedIndexChanged -= HandleDocumentTypeComboBox_SelectedIndexChanged;
                 }
-
                 _documentData = null;
 
                 ActiveDataEntryPanel.ClearData();
+
+                // https://extract.atlassian.net/browse/ISSUE-15351
+                // Changing the enabled status triggers the DEP to gain focus and to try to display
+                // highlights. Prevent it from doing so by not changing document status until the data
+                // has been cleared.
+                _documentTypeComboBox.Enabled = false;
 
                 _undoButton.Enabled = false;
                 _redoButton.Enabled = false;
