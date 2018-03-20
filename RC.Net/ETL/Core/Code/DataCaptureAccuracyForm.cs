@@ -34,6 +34,7 @@ namespace Extract.ETL
             _xpathToIgnoreTextBox.Text = Service.XPathOfAttributesToIgnore;
             _foundAttributeSetComboBox.SelectedItem = Service.FoundAttributeSetName;
             _expectedAttributeSetComboBox.SelectedItem = Service.ExpectedAttributeSetName;
+            _schedulerControl.Value = Service.Schedule;
         }
 
         #endregion
@@ -51,6 +52,7 @@ namespace Extract.ETL
                     Service.XPathOfContainerOnlyAttributes = _xpathContainerOnlyTextBox.Text;
                     Service.FoundAttributeSetName = (string)_foundAttributeSetComboBox.SelectedItem ?? string.Empty;
                     Service.ExpectedAttributeSetName = (string)_expectedAttributeSetComboBox.SelectedItem ?? string.Empty;
+                    Service.Schedule = _schedulerControl.Value;
                     return;
                 }
                 DialogResult = DialogResult.None;

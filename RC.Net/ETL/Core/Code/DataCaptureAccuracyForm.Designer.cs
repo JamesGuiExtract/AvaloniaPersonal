@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
             this.label1 = new System.Windows.Forms.Label();
             this._expectedAttributeSetComboBox = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -40,6 +41,13 @@
             this.okButton = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this._descriptionTextBox = new System.Windows.Forms.TextBox();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -79,7 +87,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 101);
+            this.label3.Location = new System.Drawing.Point(6, 26);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(138, 13);
             this.label3.TabIndex = 2;
@@ -89,17 +97,17 @@
             // 
             this._xpathToIgnoreTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._xpathToIgnoreTextBox.Location = new System.Drawing.Point(12, 117);
+            this._xpathToIgnoreTextBox.Location = new System.Drawing.Point(6, 44);
             this._xpathToIgnoreTextBox.Multiline = true;
             this._xpathToIgnoreTextBox.Name = "_xpathToIgnoreTextBox";
             this._xpathToIgnoreTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._xpathToIgnoreTextBox.Size = new System.Drawing.Size(686, 84);
-            this._xpathToIgnoreTextBox.TabIndex = 4;
+            this._xpathToIgnoreTextBox.Size = new System.Drawing.Size(743, 84);
+            this._xpathToIgnoreTextBox.TabIndex = 5;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 211);
+            this.label4.Location = new System.Drawing.Point(6, 138);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(163, 13);
             this.label4.TabIndex = 2;
@@ -109,22 +117,22 @@
             // 
             this._xpathContainerOnlyTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._xpathContainerOnlyTextBox.Location = new System.Drawing.Point(12, 227);
+            this._xpathContainerOnlyTextBox.Location = new System.Drawing.Point(6, 154);
             this._xpathContainerOnlyTextBox.Multiline = true;
             this._xpathContainerOnlyTextBox.Name = "_xpathContainerOnlyTextBox";
             this._xpathContainerOnlyTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._xpathContainerOnlyTextBox.Size = new System.Drawing.Size(686, 84);
-            this._xpathContainerOnlyTextBox.TabIndex = 5;
+            this._xpathContainerOnlyTextBox.Size = new System.Drawing.Size(743, 84);
+            this._xpathContainerOnlyTextBox.TabIndex = 6;
             // 
             // cancelButton
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.CausesValidation = false;
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(623, 323);
+            this.cancelButton.Location = new System.Drawing.Point(700, 402);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelButton.TabIndex = 7;
+            this.cancelButton.TabIndex = 9;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             // 
@@ -132,10 +140,10 @@
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(542, 323);
+            this.okButton.Location = new System.Drawing.Point(619, 402);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
-            this.okButton.TabIndex = 6;
+            this.okButton.TabIndex = 8;
             this.okButton.Text = "Ok";
             this.okButton.UseVisualStyleBackColor = true;
             this.okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -156,19 +164,67 @@
             this._descriptionTextBox.Size = new System.Drawing.Size(319, 20);
             this._descriptionTextBox.TabIndex = 1;
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Location = new System.Drawing.Point(12, 97);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(763, 297);
+            this.tabControl1.TabIndex = 4;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage1.Controls.Add(this._xpathContainerOnlyTextBox);
+            this.tabPage1.Controls.Add(this.label3);
+            this.tabPage1.Controls.Add(this._xpathToIgnoreTextBox);
+            this.tabPage1.Controls.Add(this.label4);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(755, 271);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "XPath Settings";
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage2.Controls.Add(this._schedulerControl);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(755, 271);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Schedule";
+            // 
+            // _schedulerControl
+            // 
+            this._schedulerControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._schedulerControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this._schedulerControl.Location = new System.Drawing.Point(6, 16);
+            this._schedulerControl.Name = "_schedulerControl";
+            this._schedulerControl.Size = new System.Drawing.Size(351, 239);
+            this._schedulerControl.TabIndex = 7;
+            scheduledEvent1.Duration = null;
+            scheduledEvent1.Enabled = true;
+            scheduledEvent1.End = null;
+            scheduledEvent1.Exclusions = new Extract.Utilities.ScheduledEvent[0];
+            scheduledEvent1.RecurrenceUnit = null;
+            scheduledEvent1.Start = new System.DateTime(2018, 3, 20, 12, 45, 14, 0);
+            this._schedulerControl.Value = scheduledEvent1;
+            // 
             // DataCaptureAccuracyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(710, 358);
+            this.ClientSize = new System.Drawing.Size(787, 437);
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
-            this.Controls.Add(this._xpathContainerOnlyTextBox);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this._xpathToIgnoreTextBox);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this._foundAttributeSetComboBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this._expectedAttributeSetComboBox);
@@ -179,6 +235,10 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Data capture accuracy";
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -198,5 +258,9 @@
         private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox _descriptionTextBox;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private Utilities.Forms.SchedulerControl _schedulerControl;
     }
 }
