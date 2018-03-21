@@ -40,7 +40,7 @@
             this.schedulerControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.schedulerControl1.Location = new System.Drawing.Point(0, 0);
             this.schedulerControl1.Name = "schedulerControl1";
-            this.schedulerControl1.Size = new System.Drawing.Size(347, 268);
+            this.schedulerControl1.Size = new System.Drawing.Size(380, 184);
             this.schedulerControl1.TabIndex = 0;
             scheduledEvent1.Duration = null;
             scheduledEvent1.Enabled = true;
@@ -54,7 +54,7 @@
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(178, 233);
+            this._okButton.Location = new System.Drawing.Point(211, 149);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 1;
@@ -65,7 +65,7 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(260, 233);
+            this._cancelButton.Location = new System.Drawing.Point(293, 149);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 2;
@@ -76,13 +76,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(347, 268);
+            this.ClientSize = new System.Drawing.Size(380, 184);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this.schedulerControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximumSize = new System.Drawing.Size(363, 307);
-            this.MinimumSize = new System.Drawing.Size(363, 307);
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(396, 223);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(363, 223);
             this.Name = "SelectScheduleForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

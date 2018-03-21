@@ -23,7 +23,7 @@ namespace Extract.ETL
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
-    [ExtractCategory("DatabaseService")]
+    [ExtractCategory("DatabaseService", "Redaction accuracy")]
     public class RedactionAccuracy : DatabaseService
     {
         #region Constants

@@ -22,7 +22,7 @@ namespace Extract.ETL
     /// </summary>
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
-    [ExtractCategory("DatabaseService")]
+    [ExtractCategory("DatabaseService", "Data capture accuracy")]
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
     public class DataCaptureAccuracy : DatabaseService, IConfigSettings
     {

@@ -61,6 +61,7 @@
             // 
             // _expectedAttributeSetComboBox
             // 
+            this._expectedAttributeSetComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._expectedAttributeSetComboBox.FormattingEnabled = true;
             this._expectedAttributeSetComboBox.Location = new System.Drawing.Point(166, 41);
             this._expectedAttributeSetComboBox.Name = "_expectedAttributeSetComboBox";
@@ -78,6 +79,7 @@
             // 
             // _foundAttributeSetComboBox
             // 
+            this._foundAttributeSetComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._foundAttributeSetComboBox.FormattingEnabled = true;
             this._foundAttributeSetComboBox.Location = new System.Drawing.Point(166, 70);
             this._foundAttributeSetComboBox.Name = "_foundAttributeSetComboBox";
@@ -101,7 +103,7 @@
             this._xpathToIgnoreTextBox.Multiline = true;
             this._xpathToIgnoreTextBox.Name = "_xpathToIgnoreTextBox";
             this._xpathToIgnoreTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._xpathToIgnoreTextBox.Size = new System.Drawing.Size(743, 84);
+            this._xpathToIgnoreTextBox.Size = new System.Drawing.Size(670, 84);
             this._xpathToIgnoreTextBox.TabIndex = 5;
             // 
             // label4
@@ -121,7 +123,7 @@
             this._xpathContainerOnlyTextBox.Multiline = true;
             this._xpathContainerOnlyTextBox.Name = "_xpathContainerOnlyTextBox";
             this._xpathContainerOnlyTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._xpathContainerOnlyTextBox.Size = new System.Drawing.Size(743, 84);
+            this._xpathContainerOnlyTextBox.Size = new System.Drawing.Size(670, 84);
             this._xpathContainerOnlyTextBox.TabIndex = 6;
             // 
             // cancelButton
@@ -129,7 +131,7 @@
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.CausesValidation = false;
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(700, 402);
+            this.cancelButton.Location = new System.Drawing.Point(623, 400);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 9;
@@ -140,11 +142,11 @@
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(619, 402);
+            this.okButton.Location = new System.Drawing.Point(542, 400);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 8;
-            this.okButton.Text = "Ok";
+            this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
             this.okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
             // 
@@ -166,12 +168,15 @@
             // 
             // tabControl1
             // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(12, 97);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(763, 297);
+            this.tabControl1.Size = new System.Drawing.Size(690, 297);
             this.tabControl1.TabIndex = 4;
             // 
             // tabPage1
@@ -184,7 +189,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(755, 271);
+            this.tabPage1.Size = new System.Drawing.Size(682, 271);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "XPath Settings";
             // 
@@ -195,7 +200,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(755, 271);
+            this.tabPage2.Size = new System.Drawing.Size(682, 271);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Schedule";
             // 
@@ -205,7 +210,7 @@
             this._schedulerControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this._schedulerControl.Location = new System.Drawing.Point(6, 16);
             this._schedulerControl.Name = "_schedulerControl";
-            this._schedulerControl.Size = new System.Drawing.Size(351, 239);
+            this._schedulerControl.Size = new System.Drawing.Size(385, 163);
             this._schedulerControl.TabIndex = 7;
             scheduledEvent1.Duration = null;
             scheduledEvent1.Enabled = true;
@@ -219,7 +224,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(787, 437);
+            this.ClientSize = new System.Drawing.Size(710, 435);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label5);
@@ -229,7 +234,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this._expectedAttributeSetComboBox);
             this.Controls.Add(this.label1);
-            this.MinimumSize = new System.Drawing.Size(726, 397);
+            this.MinimumSize = new System.Drawing.Size(726, 474);
             this.Name = "DataCaptureAccuracyForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

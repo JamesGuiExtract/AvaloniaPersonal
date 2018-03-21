@@ -110,7 +110,6 @@
             this._databaseServicesDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._databaseServicesDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this._databaseServicesDataGridView.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this._databaseServicesDataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
             this._databaseServicesDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -121,9 +120,11 @@
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopLeft;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._databaseServicesDataGridView.RowsDefaultCellStyle = dataGridViewCellStyle1;
+            this._databaseServicesDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this._databaseServicesDataGridView.Size = new System.Drawing.Size(566, 349);
             this._databaseServicesDataGridView.TabIndex = 5;
             this._databaseServicesDataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDatabaseServicesDataGridViewCellContentClick);
+            this._databaseServicesDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDatabaseServicesDataGridViewCellDoubleClick);
             // 
             // ManageDatabaseServicesForm
             // 
@@ -137,6 +138,8 @@
             this.Controls.Add(this._modifyButton);
             this.Controls.Add(this._addButton);
             this.Controls.Add(this._closeButton);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(660, 214);
             this.Name = "ManageDatabaseServicesForm";
             this.ShowIcon = false;

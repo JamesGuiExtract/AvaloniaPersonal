@@ -26,7 +26,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
     /// A <see cref="DatabaseService"/> that collects training/testing data for NER or other ML
     /// </summary>
     [DataContract]
-    [ExtractCategory("DatabaseService")]
+    [ExtractCategory("DatabaseService", "Training data collector")]
     public class TrainingDataCollector : DatabaseService
     {
         #region Constants

@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace Extract.UtilityApplications.NERTrainer
 {
-    [ExtractCategory("DatabaseService")]
+    [ExtractCategory("DatabaseService", "NER trainer")]
     public class NERTrainer : DatabaseService
     {
         #region Constants

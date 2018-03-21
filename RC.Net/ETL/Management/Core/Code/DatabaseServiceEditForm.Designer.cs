@@ -58,9 +58,9 @@
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 2;
-            this.okButton.Text = "Ok";
+            this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
-            this.okButton.Click += new System.EventHandler(this.HandleOkkButtonClick);
+            this.okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
             // 
             // label1
             // 
@@ -123,6 +123,8 @@
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this._jsonTextBox);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(705, 350);
             this.Name = "DatabaseServiceEditForm";
             this.ShowIcon = false;

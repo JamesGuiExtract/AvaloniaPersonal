@@ -14,9 +14,12 @@ namespace Extract.Code.Attributes
     {
         public string Name { get; set; }
 
-        public ExtractCategoryAttribute(string name)
+        public string TypeDescription { get; set; }
+
+        public ExtractCategoryAttribute(string name, string typeDescription)
         {
             Name = name;
+            TypeDescription = typeDescription;
         }
 
     }

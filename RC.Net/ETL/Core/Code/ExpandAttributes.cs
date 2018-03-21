@@ -22,7 +22,7 @@ namespace Extract.ETL
     /// </summary>
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
-    [ExtractCategory("DatabaseService")]
+    [ExtractCategory("DatabaseService", "Expand attributes")]
     public class ExpandAttributes : DatabaseService, IConfigSettings
     {
         #region Constants

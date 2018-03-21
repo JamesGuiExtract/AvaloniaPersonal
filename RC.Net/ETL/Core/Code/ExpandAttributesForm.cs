@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Utilities;
+using System;
 using System.Windows.Forms;
 
 namespace Extract.ETL
@@ -14,22 +15,22 @@ namespace Extract.ETL
         public ExpandAttributesForm(ExpandAttributes service)
         {
             InitializeComponent();
-            Service = service;
+            ExpandAttributesService = service;
 
-            _storeSpatialInfoCheckBox.Checked = Service.StoreSpatialInfo;
+            _storeSpatialInfoCheckBox.Checked = ExpandAttributesService.StoreSpatialInfo;
             _stroreEmptyAttributesCheckBox.Checked = service.StoreEmptyAttributes;
             _descriptionTextBox.Text = service.Description;
             _schedulerControl.Value = service.Schedule;
-        } 
+        }
 
         #endregion
-        
+
         #region Public properties
 
         /// <summary>
         /// Service that was configured
         /// </summary>
-        public ExpandAttributes Service { get; }
+        public ExpandAttributes ExpandAttributesService { get; }
 
         #endregion
 
@@ -41,21 +42,21 @@ namespace Extract.ETL
             {
                 if (string.IsNullOrWhiteSpace(_descriptionTextBox.Text))
                 {
-                    MessageBox.Show("Description cannot be empty.");
+                    UtilityMethods.ShowMessageBox("Description cannot be empty.", "Invalid configuration", true);
                     _descriptionTextBox.Focus();
                     DialogResult = DialogResult.None;
                     return;
                 }
-                Service.StoreEmptyAttributes = _stroreEmptyAttributesCheckBox.Checked;
-                Service.StoreSpatialInfo = _storeSpatialInfoCheckBox.Checked;
-                Service.Description = _descriptionTextBox.Text;
-                Service.Schedule = _schedulerControl.Value;
+                ExpandAttributesService.StoreEmptyAttributes = _stroreEmptyAttributesCheckBox.Checked;
+                ExpandAttributesService.StoreSpatialInfo = _storeSpatialInfoCheckBox.Checked;
+                ExpandAttributesService.Description = _descriptionTextBox.Text;
+                ExpandAttributesService.Schedule = _schedulerControl.Value;
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45647");
             }
-        } 
+        }
 
         #endregion
     }

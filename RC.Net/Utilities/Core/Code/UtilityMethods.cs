@@ -18,6 +18,23 @@ using Newtonsoft.Json;
 namespace Extract.Utilities
 {
     /// <summary>
+    /// Class used when saving the ExtractCategoriesWithDescription.json file containing all the categories and types
+    /// that use the <see cref="ExtractCategoryAttribute"/> 
+    /// </summary>
+    public class ExtractCategoryType
+    {
+        /// <summary>
+        /// The value of the <see cref="ExtractCategoryAttribute.TypeDescription"/>
+        /// </summary>
+        public string DescriptionOfType { get; set; }
+
+        /// <summary>
+        /// The string that can be used to create the type
+        /// </summary>
+        public string CreateTypeString { get; set; }
+    }
+
+    /// <summary>
     /// A class containing utility helper methods
     /// </summary>
     public static class UtilityMethods
@@ -904,25 +921,33 @@ namespace Extract.Utilities
 
 
         /// <summary>
-        /// Returns as dictionary of the Extract categories, if the ExtractCategories.json file doesn't exist it will be created
+        /// Returns as dictionary of the Extract categories, if the ExtractCategoriesWithDescription.json file doesn't exist it will be created
         /// Categories are found by looking for types that have the ExtractCategoryAttribute applied to the class
         /// </summary>
-        /// <param name="createNew">if <see langword="false"/> any existing ExtractCategories.json file will be deleted and new one
-        /// will be created. if <see langword="false"/> then if ExtractCategories.json exists it will be used.</param>
+        /// <param name="createNew">if <see langword="false"/> any existing ExtractCategoriesWithDescription.json file will be deleted and new one
+        /// will be created. if <see langword="false"/> then if ExtractCategoriesWithDescription.json exists it will be used.</param>
         /// <returns></returns>
-        public static Dictionary<string, HashSet<string>> GetExtractCategoriesJson(bool createNew = false)
+        public static Dictionary<string, HashSet<ExtractCategoryType>> GetExtractCategoriesJson(bool createNew = false)
         {
             try
             {
-                Dictionary<string, HashSet<string>> categoriesWithTypes = new Dictionary<string, HashSet<string>>();
-                string categoriesPath = Path.Combine(FileSystemMethods.CommonApplicationDataPath, "CategoryFiles", "ExtractCategories.json");
+                Dictionary<string, HashSet<ExtractCategoryType>> categoriesWithTypes = new Dictionary<string, HashSet<ExtractCategoryType>>();
+                
+				/// Clean up the old file name
+                string oldCategoriesPath = Path.Combine(FileSystemMethods.CommonApplicationDataPath, "CategoryFiles", "ExtractCategories.json");
+                if (File.Exists(oldCategoriesPath))
+                {
+                    File.Delete(oldCategoriesPath);
+                }
+
+                string categoriesPath = Path.Combine(FileSystemMethods.CommonApplicationDataPath, "CategoryFiles", "ExtractCategoriesWithDescription.json");
                 if (File.Exists(categoriesPath))
                 {
-                    if (createNew)
+                    if (!createNew)
                     {
-                        File.Delete(categoriesPath);
+                        return JsonConvert.DeserializeObject<Dictionary<string, HashSet<ExtractCategoryType>>>(File.ReadAllText(categoriesPath));
                     }
-                    return  JsonConvert.DeserializeObject<Dictionary<string, HashSet<string>>>(File.ReadAllText(categoriesPath));
+                    File.Delete(categoriesPath);
                 }
 
                 List<string> filesToCheck = new List<string>();
@@ -953,8 +978,12 @@ namespace Extract.Utilities
                             var categoryAttributes = type.GetCustomAttributes<ExtractCategoryAttribute>(true);
                             foreach (var a in categoryAttributes)
                             {
-                                categoriesWithTypes.GetOrAdd(a.Name, () => new HashSet<string>())
-                                    .Add(type.FullName + ", " + type.Assembly.GetName().Name);
+                                categoriesWithTypes.GetOrAdd(a.Name, () => new HashSet<ExtractCategoryType>())
+                                    .Add( new ExtractCategoryType
+                                    {
+                                        DescriptionOfType = a.TypeDescription,
+                                        CreateTypeString = type.FullName + ", " + type.Assembly.GetName().Name
+                                    });
                             }
                         }
                     }
@@ -971,6 +1000,27 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45602");
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ExtractCategoryAttribute.TypeDescription"/> for the given ExtractCategory and type
+        /// </summary>
+        /// <param name="category">Name of the ExtractCategory to get the <see cref="ExtractCategoryAttribute.TypeDescription"/></param>
+        /// <param name="type">The type to get the <see cref="ExtractCategoryAttribute.TypeDescription"/> for the category</param>
+        /// <returns>If the type has a <see cref="ExtractCategoryAttribute"/> for the given category returns the 
+        /// <see cref="ExtractCategoryAttribute.TypeDescription"/> otherwise will return an empty string</returns>
+        public static string GetExtractCategoryTypeDescription(string category, Type type)
+        {
+            try
+            {
+                var categoryAttributes = type.GetCustomAttributes<ExtractCategoryAttribute>(true);
+
+                return categoryAttributes.FirstOrDefault(a => a.Name == category)?.TypeDescription ?? "";
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45665");
             }
         }
     }

@@ -25,6 +25,7 @@ namespace Extract.ETL.Management
 
             Int32 _id;
             string _description;
+            string _serviceType;
             DatabaseService _service;
             bool _enabled;
 
@@ -59,6 +60,22 @@ namespace Extract.ETL.Management
                     if (value != _description)
                     {
                         _description = value;
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Description of the Database server type
+            /// </summary>
+            public string ServiceType
+            {
+                get { return _serviceType; }
+                set
+                {
+                    if (value != _serviceType)
+                    {
+                        _serviceType = value;
                         NotifyPropertyChanged();
                     }
                 }
@@ -112,11 +129,7 @@ namespace Extract.ETL.Management
             /// <param name="propertyName">Name of the property changed</param>
             protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
             {
-                var handler = PropertyChanged;
-                if (handler != null)
-                {
-                    handler(this, new PropertyChangedEventArgs(propertyName));
-                }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
 
             #endregion
@@ -157,7 +170,7 @@ namespace Extract.ETL.Management
                 InitializeComponent();
                 DatabaseServer = serverName;
                 DatabaseName = databaseName;
-                loadDataGrid();
+                LoadDataGrid();
             }
             catch (Exception ex)
             {
@@ -181,7 +194,7 @@ namespace Extract.ETL.Management
         /// <summary>
         /// Loads the DatabaseService data into the data grid
         /// </summary>
-        void loadDataGrid()
+        void LoadDataGrid()
         {
             try
             {
@@ -196,12 +209,17 @@ namespace Extract.ETL.Management
                     table.Load(command.ExecuteReader());
 
                     var dataToDisplay = table.AsEnumerable()
-                        .Select(r => new DatabaseServiceData
+                        .Select(r =>
                         {
-                            ID = r.Field<Int32>("ID"),
-                            Description = r.Field<string>("Description"),
-                            Service = DatabaseService.FromJson(r.Field<string>("Settings")),
-                            Enabled = r.Field<bool>("Enabled")
+                            var service = DatabaseService.FromJson(r.Field<string>("Settings"));
+                            return new DatabaseServiceData
+                            {
+                                ID = r.Field<Int32>("ID"),
+                                Description = r.Field<string>("Description"),
+                                Service = service,
+                                ServiceType = service.ExtractCategoryType,
+                                Enabled = r.Field<bool>("Enabled")
+                            };
                         }).ToList();
 
                     _listOfDataToDisplay = new BindingList<DatabaseServiceData>(dataToDisplay);
@@ -212,6 +230,10 @@ namespace Extract.ETL.Management
 
                     // Hide the ID column
                     _databaseServicesDataGridView.Columns["ID"].Visible = false;
+                    _databaseServicesDataGridView.Columns["Service"].Visible = false;
+                    _databaseServicesDataGridView.Columns["Enabled"].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+                    _databaseServicesDataGridView.Columns["Description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
                 }
             }
             catch (Exception ex)
@@ -274,14 +296,15 @@ namespace Extract.ETL.Management
         /// </summary>
         /// <param name="service">DatabaseService to be edited</param>
         /// <param name="caption">Caption to use for editing service</param>
-        /// <returns>tuple with configured = true if changes made false otherwise. if configured is true then 
-        /// service will be the configured service if configured is false service will be null</returns>
-        (bool configured, DatabaseService service) EditService(DatabaseService service, string caption)
+        /// <returns>configured service or null if not configured</returns>
+        DatabaseService EditService(DatabaseService service, string caption)
         {
-            service.DatabaseName = DatabaseName;
-            service.DatabaseServer = DatabaseServer;
+            // make a clone to work with
+            var tmpService = service.Clone() as DatabaseService;
+            tmpService.DatabaseName = DatabaseName;
+            tmpService.DatabaseServer = DatabaseServer;
             bool configured = false;
-            IConfigSettings configService = service as IConfigSettings;
+            IConfigSettings configService = tmpService as IConfigSettings;
             if (configService != null)
             {
                 configured = configService.Configure();
@@ -289,15 +312,15 @@ namespace Extract.ETL.Management
             else
             {
                 DatabaseServiceEditForm serviceEditForm =
-                    new DatabaseServiceEditForm( service);
+                    new DatabaseServiceEditForm(tmpService);
 
                 serviceEditForm.Text = String.Format(CultureInfo.InvariantCulture,
-                    caption, service.GetType().Name);
+                    caption, tmpService.ExtractCategoryType);
                 configured = serviceEditForm.ShowDialog(this) == DialogResult.OK;
-                service = serviceEditForm.Service;
+                tmpService = serviceEditForm.Service;
 
             }
-            return (configured) ? (true, service) : (false, null);
+            return (configured) ? tmpService :  null;
         }
 
         #endregion
@@ -366,10 +389,9 @@ namespace Extract.ETL.Management
 
                 DatabaseServiceData currentData = row.DataBoundItem as DatabaseServiceData;
 
-                var serviceEdit = EditService(currentData.Service, "Modify {0} database service.");
-                DatabaseService service = serviceEdit.service;
-
-                if (serviceEdit.configured)
+                var service = EditService(currentData.Service, "Modify {0} database service.");
+                
+                if (service != null)
                 {
                     using (var trans = new TransactionScope())
                     using (var connection = NewSqlDBConnection())
@@ -409,10 +431,9 @@ namespace Extract.ETL.Management
                 {
                     DatabaseService service = typeForm.TypeSelected;
 
-                    var serviceEdit = EditService(service, "Add {0} database service.");
-                    service = serviceEdit.service;
-
-                    if (serviceEdit.configured)
+                    service = EditService(service, "Add {0} database service.");
+                    
+                    if (service != null)
                     {
                         using (var trans = new TransactionScope())
                         using (var connection = NewSqlDBConnection())
@@ -442,9 +463,12 @@ namespace Extract.ETL.Management
                                 ID = id,
                                 Description = service.Description,
                                 Service = service,
+                                ServiceType = service.ExtractCategoryType,
                                 Enabled = true
                             };
                             _listOfDataToDisplay.Add(newRcd);
+                            int rowAdded = _databaseServicesDataGridView.Rows.GetLastRow(DataGridViewElementStates.None);
+                            _databaseServicesDataGridView.Rows[rowAdded].Selected = true;
                         }
                     }
                 }
@@ -500,11 +524,26 @@ namespace Extract.ETL.Management
         {
             try
             {
-                loadDataGrid();
+                LoadDataGrid();
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45609");
+                ex.ExtractDisplay("ELI45609");
+            }
+        }
+
+        void HandleDatabaseServicesDataGridViewCellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                if (e.RowIndex >=0)
+                {
+                    HandleModifyButtonClick(sender, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45664");
             }
         }
 

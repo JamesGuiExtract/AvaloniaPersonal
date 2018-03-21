@@ -197,7 +197,7 @@ namespace Extract.ETL.Test
                 // Check the status
                 var status = GetStatus(rates);
                 Assert.AreEqual(status.LastFileTaskSessionIDProcessed, 2, "LastFileTaskSessionIDProcessed is 2.");
-                Assert.That(status.SetOfActiveFileTaskIDs.Count == 1 && status.SetOfActiveFileTaskIDs.Contains(2),
+                Assert.That(status.SetOfActiveFileTaskIds.Count == 1 && status.SetOfActiveFileTaskIds.Contains(2),
                     "There is one FileTaskSession pending due to Active processing");
 
                 fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 20.0, 2.0, 20.0);
@@ -205,7 +205,7 @@ namespace Extract.ETL.Test
 
                 status = GetStatus(rates);
                 Assert.AreEqual(status.LastFileTaskSessionIDProcessed, 2, "LastFileTaskSessionIDProcessed is 2.");
-                Assert.That(status.SetOfActiveFileTaskIDs.Count == 0 ,
+                Assert.That(status.SetOfActiveFileTaskIds.Count == 0 ,
                     "There are no FileTaskSession's pending due to Active processing");
 
                 CheckResults(rates, _PROCESS2_EXPECTED);

@@ -97,14 +97,8 @@ namespace Extract.ETL.Management
                 // to validate the Database service json attempt to create the object
                 try
                 {
-                    var tmpService = DatabaseService.FromJson(JsonConfigString);
-                    
-                    // Set the description of the service using the Description
-                    tmpService.Description = Description;
-                    JsonConfigString = tmpService.ToJson();
-
-                    // if the service created ok set the tmpService value to the _service value
-                    _service = tmpService;
+                    // convert the config string to validate
+                    DatabaseService.FromJson(JsonConfigString);
                 }
                 catch (Exception)
                 {
@@ -130,9 +124,16 @@ namespace Extract.ETL.Management
             {
                 if (IsValidData())
                 {
+                    var tmpService = DatabaseService.FromJson(JsonConfigString);
+
+                    // Set the description of the service using the Description
+                    tmpService.Description = Description;
+                    Service = tmpService;
+
                     SelectScheduleForm dlg = new SelectScheduleForm(Service.Schedule);
                     if (dlg.ShowDialog(this) == DialogResult.OK)
                     {
+
                         // Update the schedule for the service
                         Service.Schedule = dlg.Schedule;
 
@@ -147,13 +148,21 @@ namespace Extract.ETL.Management
             }
         }
 
-        void HandleOkkButtonClick(object sender, EventArgs e)
+        void HandleOkButtonClick(object sender, EventArgs e)
         {
             try
             {
                 if (!IsValidData())
                 {
                     DialogResult = DialogResult.None;
+                }
+                else
+                {
+                    var tmpService = DatabaseService.FromJson(JsonConfigString);
+
+                    // Set the description of the service using the Description
+                    tmpService.Description = Description;
+                    Service = tmpService;
                 }
             }
             catch (Exception ex)

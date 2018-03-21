@@ -15,7 +15,7 @@ namespace Extract.ETL
     /// </summary>
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
-    [ExtractCategory("DatabaseService")]
+    [ExtractCategory("DatabaseService", "Document verification rates" )]
     public class DocumentVerificationRates : DatabaseService
     {
         #region Internal classes
@@ -47,7 +47,7 @@ namespace Extract.ETL
             /// Set of FileTaskSession Ids that where associated with an active FAM in the last run
             /// </summary>
             [DataMember]
-            public HashSet<Int32> SetOfActiveFileTaskIDs { get; protected set; } = new HashSet<int>();
+            public HashSet<Int32> SetOfActiveFileTaskIds { get; protected set; } = new HashSet<int>();
 
             #endregion
 
@@ -201,7 +201,7 @@ namespace Extract.ETL
                     var sourceCmd = connection.CreateCommand();
                     sourceCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
                         _QUERY_FOR_SOURCE_RECORDS, 
-                        (status.SetOfActiveFileTaskIDs.Count == 0) ? "0": string.Join(",", status.SetOfActiveFileTaskIDs));
+                        (status.SetOfActiveFileTaskIds.Count == 0) ? "0": string.Join(",", status.SetOfActiveFileTaskIds));
                     sourceCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = status.LastFileTaskSessionIDProcessed;
 
                     using (var sourceReader = sourceCmd.ExecuteReader())
@@ -220,13 +220,13 @@ namespace Extract.ETL
                             status.LastFileTaskSessionIDProcessed = fileTaskSessionID;
 
                             // Update the list of active file task ids for status
-                            if (activeFAM && !status.SetOfActiveFileTaskIDs.Contains(fileTaskSessionID))
+                            if (activeFAM && !status.SetOfActiveFileTaskIds.Contains(fileTaskSessionID))
                             {
-                                status.SetOfActiveFileTaskIDs.Add(fileTaskSessionID);
+                                status.SetOfActiveFileTaskIds.Add(fileTaskSessionID);
                             }
-                            if (!activeFAM && status.SetOfActiveFileTaskIDs.Contains(fileTaskSessionID))
+                            if (!activeFAM && status.SetOfActiveFileTaskIds.Contains(fileTaskSessionID))
                             {
-                                status.SetOfActiveFileTaskIDs.Remove(fileTaskSessionID);
+                                status.SetOfActiveFileTaskIds.Remove(fileTaskSessionID);
                             }
 
                             using (var saveConnection = NewSqlDBConnection())

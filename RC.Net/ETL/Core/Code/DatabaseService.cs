@@ -17,7 +17,7 @@ namespace Extract.ETL
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
     [DatabaseService]
-    public abstract class DatabaseService : IDisposable
+    public abstract class DatabaseService : IDisposable, ICloneable
     {
         bool _enabled = true;
 
@@ -85,6 +85,17 @@ namespace Extract.ETL
         /// </summary>
         [DataMember]
         public abstract int Version { get; protected set; }
+
+        /// <summary>
+        /// The type description set for the ExtractCategory attribute for the DatabaseService category
+        /// </summary>
+        public string ExtractCategoryType
+        {
+            get
+            {
+                return UtilityMethods.GetExtractCategoryTypeDescription("DatabaseService", GetType());
+            }
+        }
 
         /// <summary>
         /// Performs the processing defined the database service record
@@ -155,6 +166,26 @@ namespace Extract.ETL
         }
 
         #endregion IDisposable Members
+
+        #region IClonable members
+
+        /// <summary>
+        /// Clones the object - only properties that are serialized are copied to the new object
+        /// </summary>
+        /// <returns>A new instance of the object with the same serializable settings</returns>
+        public virtual object Clone()
+        {
+            try
+            {
+                return FromJson(ToJson());
+            }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI45662");
+            }
+        }
+        
+        #endregion
 
         #region Helper members
 

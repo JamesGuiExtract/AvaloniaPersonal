@@ -18,7 +18,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Set of strings that are used to create the types for the given catalog
         /// </summary>
-        HashSet<string> _typesAvailable;
+        HashSet<ExtractCategoryType> _typesAvailable;
 
         #endregion
 
@@ -40,6 +40,8 @@ namespace Extract.Utilities.Forms
                 "Select type of {0}", extractCategory);
 
             _comboBoxOfTypes.DataSource = _typesAvailable?.ToList();
+            _comboBoxOfTypes.DisplayMember = "DescriptionOfType";
+            _comboBoxOfTypes.ValueMember = "CreateTypeString";
         }
 
         #endregion

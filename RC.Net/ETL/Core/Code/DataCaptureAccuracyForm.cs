@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Utilities;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Extract.ETL
         /// <summary>
         /// Service that was configured
         /// </summary>
-        public DataCaptureAccuracy Service { get; }
+        public DataCaptureAccuracy DataCaptureAccuracyService { get; }
 
         #endregion
 
@@ -27,14 +28,14 @@ namespace Extract.ETL
         public DataCaptureAccuracyForm(DataCaptureAccuracy captureAccuracy)
         {
             InitializeComponent();
-            Service = captureAccuracy;
+            DataCaptureAccuracyService = captureAccuracy;
             LoadComboBoxes();
-            _descriptionTextBox.Text = Service.Description;
-            _xpathContainerOnlyTextBox.Text = Service.XPathOfContainerOnlyAttributes;
-            _xpathToIgnoreTextBox.Text = Service.XPathOfAttributesToIgnore;
-            _foundAttributeSetComboBox.SelectedItem = Service.FoundAttributeSetName;
-            _expectedAttributeSetComboBox.SelectedItem = Service.ExpectedAttributeSetName;
-            _schedulerControl.Value = Service.Schedule;
+            _descriptionTextBox.Text = DataCaptureAccuracyService.Description;
+            _xpathContainerOnlyTextBox.Text = DataCaptureAccuracyService.XPathOfContainerOnlyAttributes;
+            _xpathToIgnoreTextBox.Text = DataCaptureAccuracyService.XPathOfAttributesToIgnore;
+            _foundAttributeSetComboBox.SelectedItem = DataCaptureAccuracyService.FoundAttributeSetName;
+            _expectedAttributeSetComboBox.SelectedItem = DataCaptureAccuracyService.ExpectedAttributeSetName;
+            _schedulerControl.Value = DataCaptureAccuracyService.Schedule;
         }
 
         #endregion
@@ -47,12 +48,12 @@ namespace Extract.ETL
             {
                 if (IsValid())
                 {
-                    Service.Description = _descriptionTextBox.Text;
-                    Service.XPathOfAttributesToIgnore = _xpathToIgnoreTextBox.Text;
-                    Service.XPathOfContainerOnlyAttributes = _xpathContainerOnlyTextBox.Text;
-                    Service.FoundAttributeSetName = (string)_foundAttributeSetComboBox.SelectedItem ?? string.Empty;
-                    Service.ExpectedAttributeSetName = (string)_expectedAttributeSetComboBox.SelectedItem ?? string.Empty;
-                    Service.Schedule = _schedulerControl.Value;
+                    DataCaptureAccuracyService.Description = _descriptionTextBox.Text;
+                    DataCaptureAccuracyService.XPathOfAttributesToIgnore = _xpathToIgnoreTextBox.Text;
+                    DataCaptureAccuracyService.XPathOfContainerOnlyAttributes = _xpathContainerOnlyTextBox.Text;
+                    DataCaptureAccuracyService.FoundAttributeSetName = (string)_foundAttributeSetComboBox.SelectedItem ?? string.Empty;
+                    DataCaptureAccuracyService.ExpectedAttributeSetName = (string)_expectedAttributeSetComboBox.SelectedItem ?? string.Empty;
+                    DataCaptureAccuracyService.Schedule = _schedulerControl.Value;
                     return;
                 }
                 DialogResult = DialogResult.None;
@@ -76,26 +77,26 @@ namespace Extract.ETL
         {
             if (string.IsNullOrWhiteSpace(_descriptionTextBox.Text))
             {
-                MessageBox.Show("Description cannot be empty.", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                UtilityMethods.ShowMessageBox("Description cannot be empty.", "Invalid configuration", true);
                 _descriptionTextBox.Focus();
-                
+
                 return false;
             }
             if (_expectedAttributeSetComboBox.SelectedIndex < 0)
             {
-                MessageBox.Show("Expected attribute set is required", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                UtilityMethods.ShowMessageBox("Expected attribute set is required", "Invalid configuration", true);
                 _expectedAttributeSetComboBox.Focus();
                 return false;
             }
             if (_foundAttributeSetComboBox.SelectedIndex < 0)
             {
-                MessageBox.Show("Found attribute set is required", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                UtilityMethods.ShowMessageBox("Found attribute set is required", "Invalid configuration", true);
                 _foundAttributeSetComboBox.Focus();
                 return false;
             }
             if (_foundAttributeSetComboBox.SelectedItem == _expectedAttributeSetComboBox.SelectedItem)
             {
-                MessageBox.Show("Expected and found attribute sets must be different", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                UtilityMethods.ShowMessageBox("Expected and found attribute sets must be different", "Invalid configuration", true);
                 _expectedAttributeSetComboBox.Focus();
                 return false;
             }
@@ -134,8 +135,8 @@ namespace Extract.ETL
         {
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = Service.DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = Service.DatabaseName;
+            sqlConnectionBuild.DataSource = DataCaptureAccuracyService.DatabaseServer;
+            sqlConnectionBuild.InitialCatalog = DataCaptureAccuracyService.DatabaseName;
             sqlConnectionBuild.IntegratedSecurity = true;
             sqlConnectionBuild.NetworkLibrary = "dbmssocn";
             sqlConnectionBuild.MultipleActiveResultSets = true;

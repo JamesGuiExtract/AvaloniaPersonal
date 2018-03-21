@@ -35,8 +35,8 @@
             this._descriptionTextBox = new System.Windows.Forms.TextBox();
             this._stroreEmptyAttributesCheckBox = new System.Windows.Forms.CheckBox();
             this._storeSpatialInfoCheckBox = new System.Windows.Forms.CheckBox();
-            this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
             this.label2 = new System.Windows.Forms.Label();
+            this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
             this.SuspendLayout();
             // 
             // cancelButton
@@ -44,10 +44,10 @@
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.CausesValidation = false;
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(404, 360);
+            this.cancelButton.Location = new System.Drawing.Point(404, 276);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelButton.TabIndex = 4;
+            this.cancelButton.TabIndex = 5;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             // 
@@ -55,11 +55,11 @@
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(323, 360);
+            this.okButton.Location = new System.Drawing.Point(323, 276);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
-            this.okButton.TabIndex = 3;
-            this.okButton.Text = "Ok";
+            this.okButton.TabIndex = 4;
+            this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
             this.okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
             // 
@@ -82,7 +82,7 @@
             // _stroreEmptyAttributesCheckBox
             // 
             this._stroreEmptyAttributesCheckBox.AutoSize = true;
-            this._stroreEmptyAttributesCheckBox.Location = new System.Drawing.Point(12, 62);
+            this._stroreEmptyAttributesCheckBox.Location = new System.Drawing.Point(13, 62);
             this._stroreEmptyAttributesCheckBox.Name = "_stroreEmptyAttributesCheckBox";
             this._stroreEmptyAttributesCheckBox.Size = new System.Drawing.Size(128, 17);
             this._stroreEmptyAttributesCheckBox.TabIndex = 2;
@@ -92,21 +92,31 @@
             // _storeSpatialInfoCheckBox
             // 
             this._storeSpatialInfoCheckBox.AutoSize = true;
-            this._storeSpatialInfoCheckBox.Location = new System.Drawing.Point(12, 38);
+            this._storeSpatialInfoCheckBox.Location = new System.Drawing.Point(13, 38);
             this._storeSpatialInfoCheckBox.Name = "_storeSpatialInfoCheckBox";
             this._storeSpatialInfoCheckBox.Size = new System.Drawing.Size(209, 17);
             this._storeSpatialInfoCheckBox.TabIndex = 1;
             this._storeSpatialInfoCheckBox.Text = "Store spatial information (Raster zones)";
             this._storeSpatialInfoCheckBox.UseVisualStyleBackColor = true;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(13, 90);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(52, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Schedule";
+            // 
             // _schedulerControl
             // 
             this._schedulerControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this._schedulerControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this._schedulerControl.Location = new System.Drawing.Point(68, 109);
+            this._schedulerControl.Location = new System.Drawing.Point(13, 108);
+            this._schedulerControl.MinimumSize = new System.Drawing.Size(351, 153);
             this._schedulerControl.Name = "_schedulerControl";
-            this._schedulerControl.Size = new System.Drawing.Size(351, 239);
-            this._schedulerControl.TabIndex = 7;
+            this._schedulerControl.Size = new System.Drawing.Size(385, 157);
+            this._schedulerControl.TabIndex = 3;
             scheduledEvent1.Duration = null;
             scheduledEvent1.Enabled = true;
             scheduledEvent1.End = null;
@@ -115,20 +125,11 @@
             scheduledEvent1.Start = new System.DateTime(2018, 3, 16, 9, 38, 23, 0);
             this._schedulerControl.Value = scheduledEvent1;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(68, 90);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(52, 13);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "Schedule";
-            // 
             // ExpandAttributesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(487, 392);
+            this.ClientSize = new System.Drawing.Size(487, 308);
             this.Controls.Add(this.label2);
             this.Controls.Add(this._schedulerControl);
             this.Controls.Add(this._storeSpatialInfoCheckBox);
@@ -140,6 +141,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(503, 340);
             this.Name = "ExpandAttributesForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

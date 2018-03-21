@@ -24,7 +24,8 @@ namespace Extract.Utilities.Forms
             { DateTimeUnit.Minute, DateTimeUnit.Minute.ToString() },
             { DateTimeUnit.Hour, DateTimeUnit.Hour.ToString() },
             { DateTimeUnit.Day, DateTimeUnit.Day.ToString() },
-            { DateTimeUnit.Week, DateTimeUnit.Week.ToString() }
+            { DateTimeUnit.Week, DateTimeUnit.Week.ToString() },
+            { DateTimeUnit.Month, DateTimeUnit.Month.ToString() }
         };
 
         #endregion Constants
@@ -92,7 +93,6 @@ namespace Extract.Utilities.Forms
                                  _endTimePicker.Value.Second
                              ) : (DateTime?)null,
                         RecurrenceUnit = _recurEveryRadioButton.Checked ? GetRecuranceUnit() : (DateTimeUnit?)null,
-                        Duration = _scheduleDurationCheckBox.Checked ? GetDuration() : (TimeSpan?)null,
                         Enabled = true,
                         Exclusions = new List<ScheduledEvent>()
                     };
@@ -121,7 +121,6 @@ namespace Extract.Utilities.Forms
                         _untilCheckBox.Checked = true;
                     }
                     SetRecurring(value);
-                    SetDuration(value);
                 }
                 catch (Exception ex)
                 {
@@ -134,22 +133,6 @@ namespace Extract.Utilities.Forms
 
         #region Helper Methods
 
-        void SetDuration(ScheduledEvent value)
-        {
-            if (value.Duration != null)
-            {
-                _scheduleDurationCheckBox.Checked = true;
-                TimeSpan ts = (TimeSpan)value.Duration;
-                _durationDaysNumericUpDown.Value = (Decimal)ts.Days;
-                _durationHoursNumericUpDown.Value = (Decimal)ts.Hours;
-                _durationMinutesNumericUpDown.Value = (Decimal)ts.Minutes;
-            }
-            else
-            {
-                _scheduleDurationCheckBox.Checked = false;
-            }
-        }
-
         void SetRecurring(ScheduledEvent value)
         {
             bool recurring = value.RecurrenceUnit != null;
@@ -160,19 +143,6 @@ namespace Extract.Utilities.Forms
             {
                 _recurrenceUnitComboBox.SelectedValue = value.RecurrenceUnit;
             }
-        }
-
-        TimeSpan? GetDuration()
-        {
-            if (_scheduleDurationCheckBox.Checked)
-            {
-                return new TimeSpan(
-                    (int)_durationDaysNumericUpDown.Value,
-                    (int)_durationHoursNumericUpDown.Value,
-                    (int)_durationMinutesNumericUpDown.Value,
-                    0);
-            }
-            return (TimeSpan?)null;
         }
 
         DateTimeUnit? GetRecuranceUnit()
@@ -205,6 +175,9 @@ namespace Extract.Utilities.Forms
             {
                 bool enable = ((RadioButton)sender).Checked;
                 _recurrenceUnitComboBox.Enabled = enable;
+                _untilCheckBox.Enabled = enable;
+                _endDatePicker.Enabled = enable && _untilCheckBox.Checked;
+                _endTimePicker.Enabled = enable && _untilCheckBox.Checked;
             }
             catch (Exception ex)
             {
@@ -213,20 +186,5 @@ namespace Extract.Utilities.Forms
         }
 
         #endregion
-
-        void HandleScheduleDurationCheckBoxCheckedChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                bool enable = ((CheckBox)sender).Checked;
-                _durationDaysNumericUpDown.Enabled = enable;
-                _durationHoursNumericUpDown.Enabled = enable;
-                _durationMinutesNumericUpDown.Enabled = enable;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI45634");
-            }
-        }
     }
 }
