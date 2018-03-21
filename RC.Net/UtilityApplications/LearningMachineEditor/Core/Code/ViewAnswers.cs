@@ -3,6 +3,7 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,12 +11,6 @@ using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.LearningMachineEditor
 {
-    public class KeyValueClass
-    {
-        public int Key { get; set; }
-        public string Value { get; set; }
-    }
-
     /// <summary>
     /// Form to view list of answers/categories that the machine can recognize
     /// </summary>
@@ -216,5 +211,17 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         }
 
         #endregion Private Methods
+
+        #region Private Classes
+
+        private class KeyValueClass
+        {
+            public int Key { get; set; }
+
+            [SuppressMessage("Microsoft.Performance", "CA1811:NoUpstreamCallers")]
+            public string Value { get; set; }
+        }
+
+        #endregion Private Classes
     }
 }
