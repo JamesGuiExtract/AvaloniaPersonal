@@ -162,14 +162,6 @@ namespace Extract.FileActionManager.Forms
         List<int> _waitingFileIDQueue = new List<int>();
 
         /// <summary>
-        /// The queue of IDs of files currently being held in the prefetch stage ("processing" in
-        /// the verification task on threads other than the thread for which the currently displayed
-        /// file is running on). The files are in order of the time that they entered the queue and,
-        /// thus, will be processed in that same order.
-        /// </summary>
-        Sequencer<int> _waitingFileSequencer = new Sequencer<int>(50);
-
-        /// <summary>
         /// The IDs of all files for which a request has been made to delay processing.
         /// </summary>
         HashSet<int> _delayedFiles = new HashSet<int>();
@@ -368,7 +360,6 @@ namespace Extract.FileActionManager.Forms
                         _requestedFileID = -1;
                         _waitRequestedFile.Set();
                         _waitingFileIDQueue.Clear();
-                        _waitingFileSequencer.Clear();
                         
                         _uiThread = CreateUserInterfaceThread(VerificationApplicationThread,
                             creator, minStackSize);
@@ -440,21 +431,17 @@ namespace Extract.FileActionManager.Forms
                 }
                 else
                 {
-                    // If currently waiting on a request file, asserts that the requested file is fileID.
-                    CheckForRequestedFile(fileID);
-
                     // Attempt to get the lock for the verification UI thread, but don't block at this
                     // point if its not available. Although unlikely, from my reading it appears the
                     // lock could attempt here could allow a new file to sneak past already waiting
                     // files. Therefore, only try for the lock if we know of no currently waiting files.
-                    haveLock = _waitingFileSequencer.Count == 0 && _lock.TryLock();
+                    haveLock = _waitingFileIDQueue.Count == 0 && _lock.TryLock();
 
                     if (!haveLock)
                     {
                         lock (_lockFileRequest)
                         {
                             _waitingFileIDQueue.Add(fileID);
-                            _waitingFileSequencer.AddToQueue(fileID);
                         }
 
                         // Beyond opening files, there are a couple of other circumstances in which the lock
@@ -462,7 +449,8 @@ namespace Extract.FileActionManager.Forms
                         // and the current one is at the front of the queue, wait here for the lock without
                         // first going through prefetch.
                         // https://extract.atlassian.net/browse/ISSUE-15323
-                        if (_waitingFileSequencer.Peek() == fileID && _currentFileIDs.Count == 0)
+                        if (_currentFileIDs.Count == 0
+                            && (_requestedFileID == -1 || _requestedFileID == fileID))
                         {
                             _lock.Lock(ref haveLock, _abortedEvent, _exceptionThrownEvent);
                         }
@@ -477,8 +465,6 @@ namespace Extract.FileActionManager.Forms
                             // Need to log exception when loading prefetched file
                             try
                             {
-                                _waitingFileSequencer.WaitForTurn(fileID);
-
                                 // While waiting for the verification UI thread, prefetch data so that
                                 // MainForm.Open call on this thread will have less work to do and execute
                                 // faster.
@@ -509,7 +495,6 @@ namespace Extract.FileActionManager.Forms
                                 if (_delayedFiles.Contains(fileID))
                                 {
                                     _waitingFileIDQueue.Remove(fileID);
-                                    _waitingFileSequencer.Remove(fileID);
                                     _delayedFiles.Remove(fileID);
 
                                     // If all files requested to be released have been released, reset
@@ -544,7 +529,7 @@ namespace Extract.FileActionManager.Forms
                                 {
                                     // In case the requested file is not already waiting, wait until it
                                     // comes in before trying to obtain the lock again.
-                                    _waitRequestedFile.WaitOne();
+                                    WaitForEvent(_waitRequestedFile);
                                 }
                                 else
                                 {
@@ -553,6 +538,12 @@ namespace Extract.FileActionManager.Forms
                                 }
                             }
                         }
+                    }
+
+                    // If currently waiting on a request file, checks that the requested file is fileID.
+                    if (!CheckForRequestedFile(fileID))
+                    {
+                        return EFileProcessingResult.kProcessingDelayed;
                     }
 
                     // Needs to be set before file is removed from _prefetchSequencer so RequestFile
@@ -570,7 +561,6 @@ namespace Extract.FileActionManager.Forms
                         }
 
                         _waitingFileIDQueue.Remove(fileID);
-                        _waitingFileSequencer.Remove(fileID);
                     }
                 }
 
@@ -635,7 +625,6 @@ namespace Extract.FileActionManager.Forms
 
                 // If the FileID for the current file is in the _waitingFileQueue - remove it
                 _waitingFileIDQueue.Remove(fileID);
-                _waitingFileSequencer.Remove(fileID);
 
                 // Always display exceptions that arise from a verification task.
                 ex.ExtractDisplay("ELI37834");
@@ -1625,12 +1614,15 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
-        /// Asserts that the specified file ID is the currently requested file ID if we are waiting
+        /// Checks that the specified file ID is the currently requested file ID if we are waiting
         /// on the requested file ID.
         /// </summary>
         /// <param name="fileID">The file ID to ensure is the file we are waiting on (if waiting on
         /// a file).</param>
-        void CheckForRequestedFile(int fileID)
+        /// <returns><c>true</c> if there is no requested file or the request file is
+        /// <see paramref="fileID"/>; <c>false</c> if there is a requested file that is not
+        /// <c>fileID</c>.</returns>
+        bool CheckForRequestedFile(int fileID)
         {
             lock (_lockFileRequest)
             {
@@ -1647,17 +1639,23 @@ namespace Extract.FileActionManager.Forms
                         ee.Display();
                     }
 
-                    if (_requestedFileID != fileID)
+                    if (_requestedFileID != fileID
+                        && !_waitingFileIDQueue.Contains(_requestedFileID)
+                        && !_currentFileIDs.ContainsKey(_requestedFileID))
                     {
-                        _requestedFileID = -1;
-                        _waitRequestedFile.Set();
-
                         var ee = new ExtractException("ELI37497", "Requested file not available");
                         ee.AddDebugData("FileID", fileID, false);
-                        ee.Display();
+                        ee.AddDebugData("RequestedID", _requestedFileID, false);
+                        ee.Log();
+
+                        _waitRequestedFile.Set();
+
+                        return false;
                     }
                 }
             }
+
+            return true;
         }
 
         #endregion Private Methods
