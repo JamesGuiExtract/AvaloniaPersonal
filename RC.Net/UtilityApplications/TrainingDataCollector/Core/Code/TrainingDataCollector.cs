@@ -27,7 +27,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
     /// </summary>
     [DataContract]
     [ExtractCategory("DatabaseService", "Training data collector")]
-    public class TrainingDataCollector : DatabaseService
+    public class TrainingDataCollector : DatabaseService, IConfigSettings
     {
         #region Constants
 
@@ -219,6 +219,51 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         }
 
         #endregion Public Methods
+
+
+        #region IConfigSettings implementation
+
+        /// <summary>
+        /// Displays configuration dialog for the TrainingDataCollector
+        /// </summary>
+        /// <returns><c>true</c> if configuration was accepted, <c>false</c> if it was not</returns>
+        public bool Configure()
+        {
+            try
+            {
+                TrainingDataCollectorConfigurationDialog trainingDataCollectorConfiguration = new TrainingDataCollectorConfigurationDialog(this, DatabaseServer, DatabaseName);
+                return trainingDataCollectorConfiguration.ShowDialog() == System.Windows.Forms.DialogResult.OK;
+
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45677");
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Method returns whether the current instance is configured
+        /// </summary>
+        /// <returns><c>true</c> if configured, <c>false</c> if not</returns>
+        public bool IsConfigured()
+        {
+            try
+            {
+                bool returnVal = !string.IsNullOrWhiteSpace(ModelName);
+
+                returnVal = returnVal && !string.IsNullOrWhiteSpace(AttributeSetName);
+                returnVal = returnVal && !string.IsNullOrWhiteSpace(Description);
+
+                return returnVal;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45679");
+            }
+        }   
+        
+        #endregion
 
         #region Private Methods
 

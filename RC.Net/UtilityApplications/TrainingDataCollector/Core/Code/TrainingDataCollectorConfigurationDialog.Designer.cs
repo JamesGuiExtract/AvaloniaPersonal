@@ -38,6 +38,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         private void InitializeComponent()
         {
+            Extract.Utilities.ScheduledEvent scheduledEvent2 = new Extract.Utilities.ScheduledEvent();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._manageMLModelsButton = new System.Windows.Forms.Button();
             this._attributeSetNameComboBox = new System.Windows.Forms.ComboBox();
@@ -54,9 +55,14 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._nerModelTypeRadioButton = new System.Windows.Forms.RadioButton();
             this._dataGeneratorPathBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._dataGeneratorPathTextBox = new System.Windows.Forms.TextBox();
+            this._descriptionTextBox = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).BeginInit();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -71,10 +77,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Location = new System.Drawing.Point(7, 12);
+            this.groupBox1.Location = new System.Drawing.Point(7, 41);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(470, 109);
-            this.groupBox1.TabIndex = 0;
+            this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             // 
             // _manageMLModelsButton
@@ -83,7 +89,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._manageMLModelsButton.Location = new System.Drawing.Point(401, 18);
             this._manageMLModelsButton.Name = "_manageMLModelsButton";
             this._manageMLModelsButton.Size = new System.Drawing.Size(63, 23);
-            this._manageMLModelsButton.TabIndex = 2;
+            this._manageMLModelsButton.TabIndex = 5;
             this._manageMLModelsButton.Text = "Manage...";
             this._manageMLModelsButton.UseVisualStyleBackColor = true;
             this._manageMLModelsButton.Click += new System.EventHandler(this.Handle_ManageMLModelsButton_Click);
@@ -96,7 +102,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._attributeSetNameComboBox.Location = new System.Drawing.Point(120, 46);
             this._attributeSetNameComboBox.Name = "_attributeSetNameComboBox";
             this._attributeSetNameComboBox.Size = new System.Drawing.Size(274, 21);
-            this._attributeSetNameComboBox.TabIndex = 3;
+            this._attributeSetNameComboBox.TabIndex = 6;
             // 
             // _addModelButton
             // 
@@ -104,7 +110,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._addModelButton.Location = new System.Drawing.Point(319, 18);
             this._addModelButton.Name = "_addModelButton";
             this._addModelButton.Size = new System.Drawing.Size(75, 23);
-            this._addModelButton.TabIndex = 1;
+            this._addModelButton.TabIndex = 4;
             this._addModelButton.Text = "Add new...";
             this._addModelButton.UseVisualStyleBackColor = true;
             this._addModelButton.Click += new System.EventHandler(this.HandleAddModelButton_Click);
@@ -117,14 +123,14 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._modelNameComboBox.Location = new System.Drawing.Point(120, 19);
             this._modelNameComboBox.Name = "_modelNameComboBox";
             this._modelNameComboBox.Size = new System.Drawing.Size(193, 21);
-            this._modelNameComboBox.TabIndex = 0;
+            this._modelNameComboBox.TabIndex = 3;
             // 
             // _lastIDProcessedNumericUpDown
             // 
             this._lastIDProcessedNumericUpDown.Location = new System.Drawing.Point(120, 74);
             this._lastIDProcessedNumericUpDown.Name = "_lastIDProcessedNumericUpDown";
             this._lastIDProcessedNumericUpDown.Size = new System.Drawing.Size(120, 20);
-            this._lastIDProcessedNumericUpDown.TabIndex = 6;
+            this._lastIDProcessedNumericUpDown.TabIndex = 7;
             this._lastIDProcessedNumericUpDown.ValueChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label3
@@ -164,10 +170,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(351, 214);
+            this._okButton.Location = new System.Drawing.Point(321, 419);
             this._okButton.Name = "_okButton";
-            this._okButton.Size = new System.Drawing.Size(60, 23);
-            this._okButton.TabIndex = 2;
+            this._okButton.Size = new System.Drawing.Size(75, 23);
+            this._okButton.TabIndex = 14;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButton_Click);
@@ -176,10 +182,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(417, 214);
+            this._cancelButton.Location = new System.Drawing.Point(402, 419);
             this._cancelButton.Name = "_cancelButton";
-            this._cancelButton.Size = new System.Drawing.Size(60, 23);
-            this._cancelButton.TabIndex = 3;
+            this._cancelButton.Size = new System.Drawing.Size(75, 23);
+            this._cancelButton.TabIndex = 15;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             this._cancelButton.Click += new System.EventHandler(this.HandleCancelButton_Click);
@@ -192,10 +198,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.groupBox2.Controls.Add(this._nerModelTypeRadioButton);
             this.groupBox2.Controls.Add(this._dataGeneratorPathBrowseButton);
             this.groupBox2.Controls.Add(this._dataGeneratorPathTextBox);
-            this.groupBox2.Location = new System.Drawing.Point(7, 127);
+            this.groupBox2.Location = new System.Drawing.Point(7, 156);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(470, 73);
-            this.groupBox2.TabIndex = 1;
+            this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             // 
             // _lmModelTypeRadioButton
@@ -204,7 +210,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._lmModelTypeRadioButton.Location = new System.Drawing.Point(218, 19);
             this._lmModelTypeRadioButton.Name = "_lmModelTypeRadioButton";
             this._lmModelTypeRadioButton.Size = new System.Drawing.Size(144, 17);
-            this._lmModelTypeRadioButton.TabIndex = 1;
+            this._lmModelTypeRadioButton.TabIndex = 9;
             this._lmModelTypeRadioButton.TabStop = true;
             this._lmModelTypeRadioButton.Text = "LM data encoder (.lm file)";
             this._lmModelTypeRadioButton.UseVisualStyleBackColor = true;
@@ -215,7 +221,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._nerModelTypeRadioButton.Location = new System.Drawing.Point(11, 19);
             this._nerModelTypeRadioButton.Name = "_nerModelTypeRadioButton";
             this._nerModelTypeRadioButton.Size = new System.Drawing.Size(173, 17);
-            this._nerModelTypeRadioButton.TabIndex = 0;
+            this._nerModelTypeRadioButton.TabIndex = 8;
             this._nerModelTypeRadioButton.TabStop = true;
             this._nerModelTypeRadioButton.Text = "NER annotator (*.annotator file)";
             this._nerModelTypeRadioButton.UseVisualStyleBackColor = true;
@@ -229,7 +235,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._dataGeneratorPathBrowseButton.Location = new System.Drawing.Point(401, 42);
             this._dataGeneratorPathBrowseButton.Name = "_dataGeneratorPathBrowseButton";
             this._dataGeneratorPathBrowseButton.Size = new System.Drawing.Size(63, 20);
-            this._dataGeneratorPathBrowseButton.TabIndex = 3;
+            this._dataGeneratorPathBrowseButton.TabIndex = 11;
             this._dataGeneratorPathBrowseButton.Text = "...";
             this._dataGeneratorPathBrowseButton.TextControl = this._dataGeneratorPathTextBox;
             this._dataGeneratorPathBrowseButton.UseVisualStyleBackColor = true;
@@ -241,7 +247,50 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._dataGeneratorPathTextBox.Location = new System.Drawing.Point(7, 42);
             this._dataGeneratorPathTextBox.Name = "_dataGeneratorPathTextBox";
             this._dataGeneratorPathTextBox.Size = new System.Drawing.Size(388, 20);
-            this._dataGeneratorPathTextBox.TabIndex = 2;
+            this._dataGeneratorPathTextBox.TabIndex = 10;
+            // 
+            // _descriptionTextBox
+            // 
+            this._descriptionTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._descriptionTextBox.Location = new System.Drawing.Point(72, 9);
+            this._descriptionTextBox.Name = "_descriptionTextBox";
+            this._descriptionTextBox.Size = new System.Drawing.Size(405, 20);
+            this._descriptionTextBox.TabIndex = 1;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(4, 9);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(60, 13);
+            this.label13.TabIndex = 7;
+            this.label13.Text = "Description";
+            // 
+            // _schedulerControl
+            // 
+            this._schedulerControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._schedulerControl.Location = new System.Drawing.Point(6, 19);
+            this._schedulerControl.Name = "_schedulerControl";
+            this._schedulerControl.Size = new System.Drawing.Size(378, 153);
+            this._schedulerControl.TabIndex = 13;
+            scheduledEvent2.Duration = null;
+            scheduledEvent2.Enabled = true;
+            scheduledEvent2.End = null;
+            scheduledEvent2.Exclusions = new Extract.Utilities.ScheduledEvent[0];
+            scheduledEvent2.RecurrenceUnit = null;
+            scheduledEvent2.Start = new System.DateTime(2018, 3, 23, 13, 37, 55, 0);
+            this._schedulerControl.Value = scheduledEvent2;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this._schedulerControl);
+            this.groupBox3.Location = new System.Drawing.Point(16, 236);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(461, 177);
+            this.groupBox3.TabIndex = 12;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Schedule";
             // 
             // TrainingDataCollectorConfigurationDialog
             // 
@@ -249,14 +298,17 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(484, 244);
+            this.ClientSize = new System.Drawing.Size(484, 448);
+            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this._descriptionTextBox);
+            this.Controls.Add(this.label13);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this.groupBox1);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(1024, 283);
-            this.MinimumSize = new System.Drawing.Size(500, 283);
+            this.MaximumSize = new System.Drawing.Size(500, 487);
+            this.MinimumSize = new System.Drawing.Size(500, 487);
             this.Name = "TrainingDataCollectorConfigurationDialog";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -266,7 +318,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -287,5 +341,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         private System.Windows.Forms.RadioButton _nerModelTypeRadioButton;
         private Utilities.Forms.BrowseButton _dataGeneratorPathBrowseButton;
         private System.Windows.Forms.TextBox _dataGeneratorPathTextBox;
+        private System.Windows.Forms.TextBox _descriptionTextBox;
+        private System.Windows.Forms.Label label13;
+        private Utilities.Forms.SchedulerControl _schedulerControl;
+        private System.Windows.Forms.GroupBox groupBox3;
     }
 }

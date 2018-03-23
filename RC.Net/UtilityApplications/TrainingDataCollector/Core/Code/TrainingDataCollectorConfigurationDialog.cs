@@ -17,15 +17,15 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         #region Fields
 
         // Flag to short-circuit value-changed handler
-        private bool _suspendUpdatesToSettingsObject;
+        bool _suspendUpdatesToSettingsObject;
 
-        private TrainingDataCollector _settings;
-        private bool _dirty;
+        TrainingDataCollector _settings;
+        bool _dirty;
 
-        private static readonly string _TITLE_TEXT = "Training data collector";
-        private static readonly string _TITLE_TEXT_DIRTY = "*" + _TITLE_TEXT;
-        private string _databaseServer;
-        private string _databaseName;
+        static readonly string _TITLE_TEXT = "Training data collector";
+        static readonly string _TITLE_TEXT_DIRTY = "*" + _TITLE_TEXT;
+        string _databaseServer;
+        string _databaseName;
         FileProcessingDB _database;
 
         #endregion Fields
@@ -35,7 +35,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// <summary>
         /// Gets or sets a value indicating whether anything has been modified since loading
         /// </summary>
-        private bool Dirty
+        bool Dirty
         {
             get
             {
@@ -55,7 +55,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         #region Constructors
 
         /// <summary>
-        /// Creates a configuration dialogue for an <see cref="TrainingDataCollector"/>
+        /// Creates a configuration dialog for an <see cref="TrainingDataCollector"/>
         /// </summary>
         /// <param name="collector">The instance to configure</param>
         /// <param name="databaseServer">The server to use to resolve MLModel.Names and AttributeSetNames</param>
@@ -145,15 +145,22 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleOkButton_Click(object sender, EventArgs e)
+        void HandleOkButton_Click(object sender, EventArgs e)
         {
             try
             {
+                _descriptionTextBox.Focus();
+                ExtractException.Assert("ELI45675", "Description cannot be empty.",
+                    !string.IsNullOrWhiteSpace(_descriptionTextBox.Text));
+                _settings.Description = _descriptionTextBox.Text;
+
                 var modelName = _modelNameComboBox.Text;
+                _modelNameComboBox.Focus();
                 ExtractException.Assert("ELI45127", "Model name is undefined", ValidateModel(), "Model name", modelName);
                 _settings.ModelName = modelName;
 
                 var attributeSet = _attributeSetNameComboBox.Text;
+                _attributeSetNameComboBox.Focus();
                 ExtractException.Assert("ELI45131", "Attribute set is undefined", ValidateAttributeSet(), "Attribute set", attributeSet);
                 _settings.AttributeSetName = attributeSet;
 
@@ -169,6 +176,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 }
                 _settings.DataGeneratorPath = _dataGeneratorPathTextBox.Text;
 
+                _settings.Schedule = _schedulerControl.Value;
+
                 Dirty = false;
                 DialogResult = DialogResult.OK;
                 Close();
@@ -176,6 +185,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45047");
+                DialogResult = DialogResult.None;
             }
         }
 
@@ -184,7 +194,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleCancelButton_Click(object sender, EventArgs e)
+        void HandleCancelButton_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
             Close();
@@ -195,7 +205,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void HandleValueChanged(object sender, EventArgs e)
+        void HandleValueChanged(object sender, EventArgs e)
         {
             try
             {
@@ -217,7 +227,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void HandleAddModelButton_Click(object sender, EventArgs e)
+        void HandleAddModelButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -244,7 +254,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void Handle_ManageMLModelsButton_Click(object sender, EventArgs e)
+        void Handle_ManageMLModelsButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -272,7 +282,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// <summary>
         /// Sets the control values from the settings object.
         /// </summary>
-        private void SetControlValues()
+        void SetControlValues()
         {
             try
             {
@@ -284,6 +294,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 _lmModelTypeRadioButton.Checked = _settings.ModelType == ModelType.LearningMachine;
                 _nerModelTypeRadioButton.Checked = _settings.ModelType == ModelType.NamedEntityRecognition;
                 _dataGeneratorPathTextBox.Text = _settings.DataGeneratorPath;
+                _descriptionTextBox.Text = _settings.Description;
+                _schedulerControl.Value = _settings.Schedule;
 
                 Dirty = false;
 

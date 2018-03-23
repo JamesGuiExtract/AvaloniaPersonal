@@ -12,7 +12,7 @@ using System.Threading;
 namespace Extract.UtilityApplications.NERTrainer
 {
     [ExtractCategory("DatabaseService", "NER trainer")]
-    public class NERTrainer : DatabaseService
+    public class NERTrainer : DatabaseService, IConfigSettings
     {
         #region Constants
 
@@ -292,6 +292,31 @@ namespace Extract.UtilityApplications.NERTrainer
         }
 
         #endregion Public Methods
+
+        #region IConfigSettings implementation
+
+        /// <summary>
+        /// Displays configuration dialog for the NERTrainer
+        /// </summary>
+        /// <returns><c>true</c> if configuration was accepted, <c>false</c> if it was not</returns>
+        public bool Configure()
+        {
+
+            NERTrainerConfigurationDialog configurationDialog = new NERTrainerConfigurationDialog(this, DatabaseServer, DatabaseName);
+            
+            return configurationDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK;
+        }
+
+        /// <summary>
+        /// Method returns whether the current instance is configured
+        /// </summary>
+        /// <returns><c>true</c> if configured, <c>false</c> if not</returns>
+        public bool IsConfigured()
+        {
+            return true;
+        }
+
+        #endregion
 
         #region Private Methods
 

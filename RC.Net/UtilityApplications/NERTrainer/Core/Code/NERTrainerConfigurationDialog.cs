@@ -35,7 +35,7 @@ namespace Extract.UtilityApplications.NERTrainer
         /// <summary>
         /// Gets or sets a value indicating whether anything has been modified since loading
         /// </summary>
-        private bool Dirty
+        bool Dirty
         {
             get
             {
@@ -55,7 +55,7 @@ namespace Extract.UtilityApplications.NERTrainer
         #region Constructors
 
         /// <summary>
-        /// Creates a configuration dialogue for an <see cref="NERTrainer"/>
+        /// Creates a configuration dialog for an <see cref="NERTrainer"/>
         /// </summary>
         /// <param name="trainer">The instance to configure</param>
         /// <param name="databaseServer">The server to use to resolve MLModel.Names and AttributeSetNames</param>
@@ -127,7 +127,7 @@ namespace Extract.UtilityApplications.NERTrainer
                 _testingCommandPathTagsButton.PathTags.AddTag(NERTrainer.DataFilePathTag, null);
                 _testingCommandPathTagsButton.PathTags.AddTag(NERTrainer.TempModelPathTag, null);
 
-                _testingCommandPathTagsButton.PathTags.BuiltInTagFilter = 
+                _testingCommandPathTagsButton.PathTags.BuiltInTagFilter =
                     _trainingCommandPathTagsButton.PathTags.BuiltInTagFilter =
                     new[] { SourceDocumentPathTags.CommonComponentsDir, NERTrainer.DataFilePathTag, NERTrainer.TempModelPathTag };
 
@@ -151,12 +151,18 @@ namespace Extract.UtilityApplications.NERTrainer
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleOkButton_Click(object sender, EventArgs e)
+        void HandleOkButton_Click(object sender, EventArgs e)
         {
             try
             {
                 var modelName = _modelNameComboBox.Text;
+                _modelNameComboBox.Focus();
                 ExtractException.Assert("ELI45127", "Model name is undefined", ValidateModel(), "Model name", modelName);
+
+                _descriptionTextBox.Focus();
+                ExtractException.Assert("ELI45673", "Description cannot be empty",
+                    !string.IsNullOrWhiteSpace(_descriptionTextBox.Text));
+
                 _settings.ModelName = modelName;
 
                 _settings.TrainingCommand = _trainingCommandTextBox.Text;
@@ -170,6 +176,8 @@ namespace Extract.UtilityApplications.NERTrainer
                 _settings.MaximumTestingDocuments = (int)_maxTestingDocsNumericUpDown.Value;
                 _settings.EmailAddressesToNotifyOnFailure = _emailAddressesTextBox.Text;
                 _settings.EmailSubject = _emailSubjectTextBox.Text;
+                _settings.Description = _descriptionTextBox.Text;
+                _settings.Schedule = _schedulerControl.Value;
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
@@ -178,6 +186,7 @@ namespace Extract.UtilityApplications.NERTrainer
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45111");
+                DialogResult = DialogResult.None;
             }
         }
 
@@ -187,7 +196,7 @@ namespace Extract.UtilityApplications.NERTrainer
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleCancelButton_Click(object sender, EventArgs e)
+        void HandleCancelButton_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
             Close();
@@ -198,7 +207,7 @@ namespace Extract.UtilityApplications.NERTrainer
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void HandleValueChanged(object sender, EventArgs e)
+        void HandleValueChanged(object sender, EventArgs e)
         {
             try
             {
@@ -221,7 +230,7 @@ namespace Extract.UtilityApplications.NERTrainer
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void HandleAddModelButton_Click(object sender, EventArgs e)
+        void HandleAddModelButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -248,7 +257,7 @@ namespace Extract.UtilityApplications.NERTrainer
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void Handle_ManageMLModelsButton_Click(object sender, EventArgs e)
+        void Handle_ManageMLModelsButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -276,7 +285,7 @@ namespace Extract.UtilityApplications.NERTrainer
         /// <summary>
         /// Sets the control values from the settings object.
         /// </summary>
-        private void SetControlValues()
+        void SetControlValues()
         {
             try
             {
@@ -294,6 +303,8 @@ namespace Extract.UtilityApplications.NERTrainer
                 _maxTestingDocsNumericUpDown.Value = _settings.MaximumTestingDocuments;
                 _emailAddressesTextBox.Text = _settings.EmailAddressesToNotifyOnFailure;
                 _emailSubjectTextBox.Text = _settings.EmailSubject;
+                _descriptionTextBox.Text = _settings.Description;
+                _schedulerControl.Value = _settings.Schedule;
 
                 Dirty = false;
             }
