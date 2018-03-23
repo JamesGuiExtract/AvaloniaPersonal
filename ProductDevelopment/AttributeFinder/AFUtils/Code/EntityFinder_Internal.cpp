@@ -26,7 +26,7 @@ const string gstrWhiteSpace = " \r\n\t";
 //-------------------------------------------------------------------------------------------------
 // private / helper methods
 //-------------------------------------------------------------------------------------------------
-void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
+void CEntityFinder::findEntities(IAFDocumentPtr ipAFDoc, const ISpatialStringPtr& ipText)
 {
 	try
 	{
@@ -64,7 +64,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		///////////////////////////////////////////////////
 		// Step 0A: Remove any embedded Address information
 		///////////////////////////////////////////////////
-		bool bFoundAddress = removeAddressText( ipText, ipParser );
+		bool bFoundAddress = removeAddressText(ipAFDoc, ipText, ipParser );
 
 		////////////////////////////////////////////////////
 		// Step 0B: Look for XXand or andXX and insert space
@@ -2043,7 +2043,7 @@ bool CEntityFinder::foundKeywordPhraseOverlap(const string& strText1, const stri
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-string CEntityFinder::getAddressSuffixPattern()
+string CEntityFinder::getAddressSuffixPattern(IAFDocumentPtr ipAFDoc)
 {
 	string strPattern;
 
@@ -2051,7 +2051,7 @@ string CEntityFinder::getAddressSuffixPattern()
 	UCLID_AFUTILSLib::IAFUtilityPtr ipAFUtils( CLSID_AFUtility );
 	ASSERT_RESOURCE_ALLOCATION( "ELI09474", ipAFUtils != __nullptr );
 
-	_bstr_t bstrFolder = ipAFUtils->GetComponentDataFolder();
+	_bstr_t bstrFolder = ipAFUtils->GetComponentDataFolder(ipAFDoc);
 	string strPatternFile = bstrFolder.operator const char *();
 	strPatternFile += "\\ReturnAddrFinder\\ReturnAddrSuffix.dat.etf";
 
@@ -2837,7 +2837,7 @@ string	CEntityFinder::trimLeadingNonsense(string strInput, IRegularExprParserPtr
 	return strInput;
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityFinder::removeAddressText(const ISpatialStringPtr& ripText,
+bool CEntityFinder::removeAddressText(IAFDocumentPtr ipAFDoc, const ISpatialStringPtr& ripText,
 									  IRegularExprParserPtr ipParser)
 {
 	bool bFound = false;
@@ -2857,7 +2857,7 @@ bool CEntityFinder::removeAddressText(const ISpatialStringPtr& ripText,
 	ASSERT_RESOURCE_ALLOCATION( "ELI09464", ipAddress != __nullptr );
 
 	// Get Address Suffix pattern
-	string strAddressSuffix = getAddressSuffixPattern();
+	string strAddressSuffix = getAddressSuffixPattern(ipAFDoc);
 
 	// Append Address Suffix pattern to each Indicators item
 	long lSize = ipAddress->Size;

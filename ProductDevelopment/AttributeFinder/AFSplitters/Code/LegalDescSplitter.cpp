@@ -1267,7 +1267,9 @@ bool CLegalDescSplitter::isRegExpInText ( string strSearchText, string strRegExp
 string CLegalDescSplitter::getRegExpForType( string strDocType, string strFileNameWOPath )
 {
 	string strFileName;
-	string strComponentDataDir = getAFUtility()->GetComponentDataFolder();
+	// This object is obsolete so don't bother updating this to correctly use the FKB
+	// https://extract.atlassian.net/browse/ISSUE-15207
+	string strComponentDataDir = getAFUtility()->GetComponentDataFolder(__nullptr);
 	strFileName =  strComponentDataDir + "\\LegalDescSplitter\\" + strDocType + "\\" + strFileNameWOPath;
 
 	// [FlexIDSCore:3643] Load the regular expression from disk if necessary.
@@ -1352,7 +1354,11 @@ void CLegalDescSplitter::setupMuniRuleSet()
 	
 	// compute the name of the file to be imported and perform
 	// any appropriate auto-encrypt actions
-	string strComponentDir = getAFUtility()->GetComponentDataFolder();
+
+	// This object is obsolete so don't bother updating this to correctly use the FKB
+	// https://extract.atlassian.net/browse/ISSUE-15207
+	string strComponentDir = getAFUtility()->GetComponentDataFolder(__nullptr);
+
 	string strRSDFile = strComponentDir + "\\LegalDescSplitter\\MuniFind.rsd.etf";
 	getMiscUtils()->AutoEncryptFile ( _bstr_t(strRSDFile.c_str()),
 		_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
@@ -1568,7 +1574,11 @@ IRuleSetPtr CLegalDescSplitter::getModifierRuleSet( string strLegalType )
 
 	// compute the name of the file to be imported and perform
 	// any appropriate auto-encrypt actions
-	string strComponentDir = getAFUtility()->GetComponentDataFolder();
+
+	// This object is obsolete so don't bother updating this to correctly use the FKB
+	// https://extract.atlassian.net/browse/ISSUE-15207
+	string strComponentDir = getAFUtility()->GetComponentDataFolder(__nullptr);
+
 	string strRSDFile = strComponentDir + "\\LegalDescSplitter\\" + strLegalType + "\\ModifierRulesSet.rsd.etf";
 	getMiscUtils()->AutoEncryptFile ( _bstr_t(strRSDFile.c_str()),
 		_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));

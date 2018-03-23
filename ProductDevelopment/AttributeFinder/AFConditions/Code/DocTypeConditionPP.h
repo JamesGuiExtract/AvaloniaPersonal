@@ -72,6 +72,9 @@ private:
 
 	IDocumentClassificationUtilsPtr m_ipDocUtils;
 
+	// Document classifiers path
+	std::string		m_strDocumentClassifiersPath;
+
 	// Industry associated with selected document types
 	std::string		m_strCategory;
 };

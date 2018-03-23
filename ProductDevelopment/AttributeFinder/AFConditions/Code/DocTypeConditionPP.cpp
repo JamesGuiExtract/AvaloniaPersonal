@@ -71,7 +71,10 @@ STDMETHODIMP CDocTypeConditionPP::Apply(void)
 			ipCondition->AllowTypes = m_cmbMatch.GetCurSel() == 0 ? VARIANT_TRUE : VARIANT_FALSE;
 
 			// Store category name
-			ipCondition->Category = _bstr_t( m_strCategory.c_str() );
+			ipCondition->Category = get_bstr_t(m_strCategory);
+
+			// Store path
+			ipCondition->DocumentClassifiersPath = get_bstr_t(m_strDocumentClassifiersPath);
 
 			// Store confidence level
 			EDocumentConfidenceLevel eConfidence = kMaybeLevel;
@@ -122,6 +125,9 @@ LRESULT CDocTypeConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 
 			// Store Category
 			m_strCategory = ipCondition->Category;
+
+			// Store path
+			m_strDocumentClassifiersPath = ipCondition->DocumentClassifiersPath;
 
 			// populate the match combo box
 			m_cmbMatch.InsertString(0, _bstr_t("match"));
@@ -194,7 +200,7 @@ LRESULT CDocTypeConditionPP::OnClickedBtnAddTypes(WORD wNotifyCode,
 		if ( m_strCategory.empty() )
 		{
 			// Default it to the first industry category in the category list
-			IVariantVectorPtr ipIndustries = m_ipDocUtils->GetDocumentIndustries();
+			IVariantVectorPtr ipIndustries = m_ipDocUtils->GetDocumentIndustries(get_bstr_t(m_strDocumentClassifiersPath));
 			ASSERT_RESOURCE_ALLOCATION("ELI15716", ipIndustries != __nullptr );
 
 			// Make sure there is at least one industry
@@ -213,24 +219,19 @@ LRESULT CDocTypeConditionPP::OnClickedBtnAddTypes(WORD wNotifyCode,
 			}
 		}
 
-		UCLID_AFCONDITIONSLib::IDocTypeConditionPtr ipCondition = m_ppUnk[0];
-		if (ipCondition != __nullptr)
-		{
-			m_ipDocUtils->DocumentClassifiersPath = ipCondition->DocumentClassifiersPath;
-		}
-
 		// Display the dialog - with variable industry, multiple selection and special types
-		_bstr_t	bstrIndustry = get_bstr_t( m_strCategory.c_str() );
-		IVariantVectorPtr ipTypes = m_ipDocUtils->GetDocTypeSelection( 
-			&(bstrIndustry.GetBSTR()), VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE);
+		_bstr_t	bstrIndustry = get_bstr_t( m_strCategory );
+		_bstr_t bstrDocumentClassifiersPath = get_bstr_t(m_strDocumentClassifiersPath);
+		IVariantVectorPtr ipTypes = m_ipDocUtils->GetDocTypeSelection(
+			&(bstrDocumentClassifiersPath.GetBSTR()),
+			&(bstrIndustry.GetBSTR()),
+			VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE);
 
 		// Store the returned industry
 		m_strCategory = asString(bstrIndustry);
 
-		if (ipCondition != __nullptr)
-		{
-			ipCondition->DocumentClassifiersPath = m_ipDocUtils->DocumentClassifiersPath;
-		}
+		// Store the returned path
+		m_strDocumentClassifiersPath = asString(bstrDocumentClassifiersPath);
 
 		// Reset the content if new items have been selected
 		long lCount = ipTypes->Size;

@@ -141,8 +141,13 @@ void CDocumentClassifierPP::populateComboBox(const string& strCurrentText)
 		ASSERT_RESOURCE_ALLOCATION("ELI07121", m_ipAFUtility != __nullptr);
 	}
 
+	// Using an empty AFDoc so that the FKB will be Latest or the one defined in the ruleset being edited
+	// (via the RuleExecutionEnv)
+	IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+	ASSERT_RESOURCE_ALLOCATION( "ELI45676", ipAFDoc != __nullptr);
+
 	// get \ComponentData\DocumentClassifiers folder
-	string strComponentDataFolder = m_ipAFUtility->GetComponentDataFolder();
+	string strComponentDataFolder = m_ipAFUtility->GetComponentDataFolder(ipAFDoc);
 	string strDocClassifiersFolder = strComponentDataFolder + "\\" + DOC_CLASSIFIERS_FOLDER;
 
 	// make sure the directory exists

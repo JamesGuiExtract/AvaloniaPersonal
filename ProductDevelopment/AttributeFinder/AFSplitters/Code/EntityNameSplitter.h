@@ -216,7 +216,7 @@ private:
 
 	// Divides text into collection of individual words and then creates 
 	// and returns a collection of names
-	IIUnknownVectorPtr	getNamesFromWords(ISpatialStringPtr ipText);
+	IIUnknownVectorPtr	getNamesFromWords(IAFDocumentPtr ipAFDoc, ISpatialStringPtr ipText);
 
 	// Trims string removing Person Trim Identifiers
 	void removePersonTrimIdentifiers(ISpatialStringPtr& ripEntity, bool bIsPerson);

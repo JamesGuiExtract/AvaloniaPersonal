@@ -54,7 +54,6 @@ m_cachedRegExLoader(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 		ASSERT_RESOURCE_ALLOCATION( "ELI09036", ma_pUserCfgMgr.get() != __nullptr );
 
 		m_bLoggingEnabled = getLoggingEnabled() == 1;
-		loadInvalidPersonVector();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI08962");
 }
@@ -108,6 +107,9 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore1(IAttribute * pAttribute, I
 
 		ASSERT_ARGUMENT("ELI08597", pScore != __nullptr );
 
+		IAFDocumentPtr ipAFDoc(pAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI45667", ipAFDoc != __nullptr );
+
 		ICopyableObjectPtr ipFrom ( pAttribute );
 		ASSERT_RESOURCE_ALLOCATION("ELI08646", ipFrom != __nullptr );
 
@@ -118,7 +120,7 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore1(IAttribute * pAttribute, I
 		IAttributePtr ipAttribute ( pAttribute );
 		ASSERT_ARGUMENT("ELI08598", ipAttribute != __nullptr );
 
-		*pScore = getAttrScore( ipAttribute );
+		*pScore = getAttrScore(ipAFDoc, ipAttribute );
 		if ( m_bLoggingEnabled )
 		{
 			ISpatialStringPtr ipValue = ipOriginal->Value;
@@ -146,6 +148,9 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore2(IIUnknownVector * pAttribu
 		IIUnknownVectorPtr ipAttributes(pAttributes);
 		ASSERT_ARGUMENT("ELI08600", ipAttributes != __nullptr );
 		
+		IAFDocumentPtr ipAFDoc(pAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI45668", ipAFDoc != __nullptr );
+
 		long nTotalScore = 0;
 		long nNumAttr = ipAttributes->Size();
 		for (int i = 0; i < nNumAttr; i++ )
@@ -161,7 +166,7 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore2(IIUnknownVector * pAttribu
 			ASSERT_RESOURCE_ALLOCATION("ELI19132", ipOriginal != __nullptr );
 			
 			// Add Attributes score to total
-			long nAttrScore = getAttrScore( ipCurrAttr );
+			long nAttrScore = getAttrScore(ipAFDoc, ipCurrAttr );
 			
 			if ( m_bLoggingEnabled )
 			{
@@ -392,7 +397,7 @@ STDMETHODIMP CEntityNameDataScorer::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 // Private / Helper methods
 //-------------------------------------------------------------------------------------------------
-long CEntityNameDataScorer::getAttrScore( IAttributePtr ipAttribute )
+long CEntityNameDataScorer::getAttrScore(IAFDocumentPtr ipAFDoc, IAttributePtr ipAttribute )
 {
 	ASSERT_ARGUMENT("ELI08603", ipAttribute != __nullptr );
 
@@ -417,31 +422,28 @@ long CEntityNameDataScorer::getAttrScore( IAttributePtr ipAttribute )
 	// if the Top level attribute name is a split subattribute name get the score of top level
 	if ( strAttrName == "Person" || strAttrName == "PersonAlias" )
 	{
-		nScore = getPersonScore( ipAttribute, strValue, ipParser );
+		nScore = getPersonScore(ipAFDoc, ipAttribute, strValue, ipParser );
 		return nScore;
 	}
 	else if ( strAttrName == "Company" || strAttrName == "CompanyAlias" ||
 			strAttrName == "RelatedCompany" || strAttrName == "Trust" )
 	{
-		nScore = getCompanyScore( strValue, strValue, ipParser );
+		nScore = getCompanyScore(ipAFDoc, strValue, strValue, ipParser );
 		return nScore;
 	}
 
 
 	// If not already Split split the attribute
 	IIUnknownVectorPtr ipSubAttr = ipAttribute->SubAttributes;
-	IEntityFinderPtr ipEntityFinder(CLSID_EntityFinder);
+	IAttributeModifyingRulePtr ipEntityFinder(CLSID_EntityFinder);
 	ASSERT_RESOURCE_ALLOCATION("ELI08648", ipEntityFinder != __nullptr );
 	
 	// Entity Splitter assumes previous call to EFA
-	ipEntityFinder->FindEntities( ipAttrValue );
+	ipEntityFinder->ModifyValue( ipAttribute, ipAFDoc, NULL );
 	
 	// Split the attribute value with Entity Splitter and score the results
 	IAttributeSplitterPtr ipEntitySplitter(CLSID_EntityNameSplitter);
 	ASSERT_RESOURCE_ALLOCATION("ELI08610", ipEntitySplitter != __nullptr );
-	IAFDocumentPtr ipAFDoc (CLSID_AFDocument );
-	ASSERT_RESOURCE_ALLOCATION("ELI08611", ipAFDoc != __nullptr );
-	ipAFDoc->Text = ipAttribute->Value;
 	ipEntitySplitter->SplitAttribute( ipAttribute, ipAFDoc, NULL );
 
 	// if no subattributes score is 0 or the size is 0
@@ -462,11 +464,11 @@ long CEntityNameDataScorer::getAttrScore( IAttributePtr ipAttribute )
 		// Score based on the company or the person
 		if (( strName == "Company" ) || ( strName == "Trust" ))
 		{
-			nScore += getCompanyScore( strSubValue, strValue, ipParser );
+			nScore += getCompanyScore(ipAFDoc, strSubValue, strValue, ipParser );
 		}
 		if ( strName == "Person")
 		{
-			nScore += getPersonScore( ipCurrAttr, strValue, ipParser );
+			nScore += getPersonScore(ipAFDoc, ipCurrAttr, strValue, ipParser );
 		}
 		if ( nScore > 100 )
 		{
@@ -483,7 +485,7 @@ long CEntityNameDataScorer::getAttrScore( IAttributePtr ipAttribute )
 	return nScore;
 }
 //-------------------------------------------------------------------------------------------------
-long CEntityNameDataScorer::getCompanyScore( string strCompanyString, string strOriginal,
+long CEntityNameDataScorer::getCompanyScore(IAFDocumentPtr ipAFDoc, string strCompanyString, string strOriginal,
 											IRegularExprParserPtr ipParser)
 {
 	// min size of a valid Company is 4 char
@@ -507,7 +509,7 @@ long CEntityNameDataScorer::getCompanyScore( string strCompanyString, string str
 
 	// Base score is 2 since this was split as company
 	long nScore = 1;
-	if ( isAllCommonWords( strCompany, ipParser ) )
+	if ( isAllCommonWords(ipAFDoc, strCompany, ipParser ) )
 	{
 		return nScore;
 	}
@@ -555,7 +557,7 @@ long CEntityNameDataScorer::getCompanyScore( string strCompanyString, string str
 	return nScore;
 }
 //-------------------------------------------------------------------------------------------------
-long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string strOriginal,
+long CEntityNameDataScorer::getPersonScore(IAFDocumentPtr ipAFDoc, IAttributePtr ipAttribute, string strOriginal,
 										   IRegularExprParserPtr ipParser)
 {
 
@@ -592,7 +594,7 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 	// if only one word score is 1
 	if (	vecWords.size() < 2 || 
 			!noInvalidChars( strPerson, "\\r\\n -,.'ABCDEFGHIJKLMNOPQRSTUVWXYZ" ) ||
-			containsInvalidPersonWords( vecWords ))
+			containsInvalidPersonWords(ipAFDoc, vecWords ))
 	{
 		return 0;
 	}
@@ -644,11 +646,11 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 		{
 			bSuffixFound = true;
 		}
-		else if (  strAttrName == "First" && !isAllCommonWords (strValue, ipParser) )
+		else if (  strAttrName == "First" && !isAllCommonWords (ipAFDoc, strValue, ipParser) )
 		{
 			bFirstNameFound = true;
 		}
-		else if ( bAboveMinSize  && strAttrName == "Last" && !isAllCommonWords (strValue, ipParser))
+		else if ( bAboveMinSize  && strAttrName == "Last" && !isAllCommonWords (ipAFDoc, strValue, ipParser))
 		{
 			bLastNameFound = true;
 		}
@@ -687,6 +689,8 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 	// Get Person Designators pattern
 	IEntityKeywordsPtr ipEntityKeywords ( CLSID_EntityKeywords );
 	ASSERT_RESOURCE_ALLOCATION("ELI08723", ipEntityKeywords != __nullptr );
+	ipEntityKeywords->Init(ipAFDoc);
+
 	IVariantVectorPtr ipPersonDesignators = ipEntityKeywords->PersonDesignators;
 	ASSERT_RESOURCE_ALLOCATION("ELI08725", ipPersonDesignators != __nullptr );
 
@@ -698,7 +702,7 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 		nScore++;
 	}
 	// Determine all common words
-	if ( !isAllCommonWords (strPerson, ipParser) )
+	if ( !isAllCommonWords (ipAFDoc, strPerson, ipParser) )
 	{
 		nScore += 2;
 	}
@@ -739,7 +743,7 @@ void CEntityNameDataScorer::validateLicense()
 	VALIDATE_LICENSE( ENTITY_NAME_DATA_SCORER_ID, "ELI08849", "Entity Data Scorer" );
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityNameDataScorer::isAllCommonWords( const string& strInput,
+bool CEntityNameDataScorer::isAllCommonWords(IAFDocumentPtr ipAFDoc, const string& strInput,
 											 IRegularExprParserPtr ipParser)
 {
 	if ( strInput.size() == 0 ) 
@@ -747,7 +751,7 @@ bool CEntityNameDataScorer::isAllCommonWords( const string& strInput,
 		return false;
 	}
 	// Load common words regular expression
-	string strPattern = getCommonWordsPattern();
+	string strPattern = getCommonWordsPattern(ipAFDoc);
 	ipParser->IgnoreCase = VARIANT_TRUE;
 	ipParser->Pattern = strPattern.c_str();
 	string strWithoutWords = asString(ipParser->ReplaceMatches(strInput.c_str(), "", VARIANT_FALSE));
@@ -767,7 +771,7 @@ bool CEntityNameDataScorer::isAllCommonWords( const string& strInput,
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-string &CEntityNameDataScorer::getCommonWordsPattern()
+string &CEntityNameDataScorer::getCommonWordsPattern(IAFDocumentPtr ipAFDoc)
 {
 	VARIANT_BOOL bLoadFilePerSession = getAFUtility()->GetLoadFilePerSession() ;
 
@@ -777,7 +781,7 @@ string &CEntityNameDataScorer::getCommonWordsPattern()
 		return m_strCommonWords;
 	}
 	// setup file name to read pattern from
-	string strComponentDataDir = getAFUtility()->GetComponentDataFolder();
+	string strComponentDataDir = getAFUtility()->GetComponentDataFolder(ipAFDoc);
 	string strFileName =  strComponentDataDir + "\\EntityNameDataScorer\\" + "\\" + "CommonWords.dat.etf";
 
 	// [FlexIDSCore:3643] Load the regular expression from disk if necessary.
@@ -886,17 +890,16 @@ bool CEntityNameDataScorer::noInvalidChars( const string& strItem, const string&
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-void CEntityNameDataScorer::loadInvalidPersonVector()
+void CEntityNameDataScorer::loadInvalidPersonVector(IAFDocumentPtr ipAFDoc)
 {
-	VARIANT_BOOL bLoadFilePerSession = getAFUtility()->GetLoadFilePerSession() ;
-
-	// Pattern is loaded and loadFilePerSession is set return member pattern
-	if ( bLoadFilePerSession && m_bIsInvalidPersonWordsLoaded )
+	// Pattern is loaded
+	if (m_bIsInvalidPersonWordsLoaded )
 	{
 		return;
 	}
+
 	// setup file name to read pattern from
-	string strComponentDataDir = getAFUtility()->GetComponentDataFolder();
+	string strComponentDataDir = getAFUtility()->GetComponentDataFolder(ipAFDoc);
 	string strFileName =  strComponentDataDir + "\\EntityNameDataScorer\\" + "\\" + "InvalidPersonWords.dat.etf";
 	
 	// make sure the encryption is current
@@ -923,11 +926,11 @@ void CEntityNameDataScorer::loadInvalidPersonVector()
 	// sort the list
 	sort(m_vecInvalidPersonWords.begin(), m_vecInvalidPersonWords.end());
 	m_bIsInvalidPersonWordsLoaded = true;
-	return;
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityNameDataScorer::containsInvalidPersonWords( const vector<string> &vecWords )
+bool CEntityNameDataScorer::containsInvalidPersonWords(IAFDocumentPtr ipAFDoc, const vector<string> &vecWords )
 {
+	loadInvalidPersonVector(ipAFDoc);
 	bool bResult = false;
 	long nNumWords = vecWords.size();
 	for ( int i = 0; !bResult && i < nNumWords; i++ )

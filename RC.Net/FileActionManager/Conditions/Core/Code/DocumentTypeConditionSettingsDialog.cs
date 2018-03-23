@@ -27,6 +27,8 @@ namespace Extract.FileActionManager.Conditions
 
         #region Fields
 
+        string _documentClassifiersPath;
+
         /// <summary>
         /// The default industry to use when displaying available document types in configuration.
         /// </summary>
@@ -98,6 +100,7 @@ namespace Extract.FileActionManager.Conditions
                     _metComboBox.Text = Settings.MetIfTrue ? "met" : "not met";
                     _voaFileTextBox.Text = Settings.VOAFileName;
                     _documentTypeListBox.Items.AddRange(Settings.DocumentTypes);
+                    _documentClassifiersPath = Settings.DocumentClassifiersPath;
                     _industry = Settings.Industry;
                 }
 
@@ -134,6 +137,7 @@ namespace Extract.FileActionManager.Conditions
                 Settings.MetIfTrue = _metComboBox.Text == "met";
                 Settings.VOAFileName = _voaFileTextBox.Text;
                 Settings.DocumentTypes = _documentTypeListBox.Items.Cast<string>().ToArray();
+                Settings.DocumentClassifiersPath = _documentClassifiersPath;
                 Settings.Industry = _industry;
 
                 DialogResult = DialogResult.OK;
@@ -179,7 +183,7 @@ namespace Extract.FileActionManager.Conditions
                     if (string.IsNullOrWhiteSpace(_industry))
                     {
                         // Default it to the first industry category in the category list
-                        VariantVector industriesVector = _documentClassifier.GetDocumentIndustries();
+                        VariantVector industriesVector = _documentClassifier.GetDocumentIndustries(_documentClassifiersPath);
 
                         // Make sure there is at least one industry
                         if (industriesVector.Size > 0)
@@ -192,29 +196,25 @@ namespace Extract.FileActionManager.Conditions
                             throw new ExtractException("ELI32754", "No industry categories defined");
                         }
                     }
-
-                    _documentClassifier.DocumentClassifiersPath = Settings.DocumentClassifiersPath;
-
-                    // Display the dialog - with variable industry, multiple selection and special types
-                    VariantVector selectedTypes =
-                        _documentClassifier.GetDocTypeSelection(ref _industry, true, true, true, true);
-
-                    if (_documentTypeListBox.Items.Count > 0 && selectedTypes.Size > 0)
-                    {
-                        _documentTypeListBox.Items.Clear();
-                    }
-
-                    // Add any selected categories that are not already in _documentTypeListBox.
-                    for (int i = 0; i < selectedTypes.Size; i++)
-                    {
-                        string documentType = selectedTypes[i].AsString();
-                        _documentTypeListBox.Items.Add(documentType);
-                    }
-
-                    Settings.DocumentClassifiersPath = _documentClassifier.DocumentClassifiersPath;
-                    Settings.Industry = _industry;
-                    UpdateButtons();
                 }
+
+                // Display the dialog - with variable industry, multiple selection and special types
+                VariantVector selectedTypes =
+                    _documentClassifier.GetDocTypeSelection(ref _documentClassifiersPath, ref _industry, true, true, true, true);
+
+                if (_documentTypeListBox.Items.Count > 0 && selectedTypes.Size > 0)
+                {
+                    _documentTypeListBox.Items.Clear();
+                }
+
+                // Add any selected categories that are not already in _documentTypeListBox.
+                for (int i = 0; i < selectedTypes.Size; i++)
+                {
+                    string documentType = selectedTypes[i].AsString();
+                    _documentTypeListBox.Items.Add(documentType);
+                }
+
+                UpdateButtons();
             }
             catch (Exception ex)
             {

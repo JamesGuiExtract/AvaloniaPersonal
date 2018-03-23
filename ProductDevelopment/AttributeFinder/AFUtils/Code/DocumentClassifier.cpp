@@ -178,7 +178,8 @@ STDMETHODIMP CDocumentClassifier::raw_Process(IAFDocument* pDocument, IProgressS
 		{
 			try
 			{
-				loadDocTypeFiles(m_strIndustryCategoryName);
+				string strDocumentClassifierFolder = GetDocumentClassifierFolder(ipDocument);
+				loadDocTypeFiles(strDocumentClassifierFolder, m_strIndustryCategoryName);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15651");
 		}
@@ -516,7 +517,7 @@ STDMETHODIMP CDocumentClassifier::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IDocumentClassificationUtils
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDocumentClassifier::GetDocumentIndustries(IVariantVector** ppIndustries)
+STDMETHODIMP CDocumentClassifier::GetDocumentIndustries(BSTR bstrDocumentClassifierFolder, IVariantVector** ppIndustries)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -532,8 +533,18 @@ STDMETHODIMP CDocumentClassifier::GetDocumentIndustries(IVariantVector** ppIndus
 		// Get a list of subfolders, and check each one for the presence of a "valid" DocType.idx file
 		// (i.e. contents contain document classifier names, not a path).
 		// If present, add the subfolder name to the list.
-		std::string documentClassifierFolder = GetDocumentClassifierFolder();
-		std::string subFolderSearch = documentClassifierFolder + "*.*";
+		std::string strDocumentClassifierFolder = asString(bstrDocumentClassifierFolder);
+
+		// If empty string was passed in, then use default (Latest FKB)
+		if (strDocumentClassifierFolder.empty())
+		{
+			IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+			ASSERT_RESOURCE_ALLOCATION("ELI45670", ipAFDoc != __nullptr);
+
+			strDocumentClassifierFolder = GetDocumentClassifierFolder(ipAFDoc);
+		}
+
+		std::string subFolderSearch = strDocumentClassifierFolder + "\\*.*";
 		FileIterator fi(subFolderSearch);
 
 		while (fi.moveNext())
@@ -541,7 +552,7 @@ STDMETHODIMP CDocumentClassifier::GetDocumentIndustries(IVariantVector** ppIndus
 			if (fi.isDirectory())
 			{
 				std::string subSubName = fi.getFileName();
-				std::string subFolderName = documentClassifierFolder + subSubName;
+				std::string subFolderName = strDocumentClassifierFolder + "\\" + subSubName;
 				if (FolderContainsValidIdxFile(subFolderName))
 				{
 					// Save only the end-leaf subfolder name, not entire path.
@@ -591,7 +602,7 @@ STDMETHODIMP CDocumentClassifier::GetSpecialDocTypeTags(VARIANT_BOOL bAllowMulti
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11919");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDocumentClassifier::GetDocumentTypes(BSTR strIndustry, IVariantVector** ppTypes)
+STDMETHODIMP CDocumentClassifier::GetDocumentTypes(BSTR bstrDocumentClassifierFolder, BSTR bstrIndustry, IVariantVector** ppTypes)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -601,18 +612,19 @@ STDMETHODIMP CDocumentClassifier::GetDocumentTypes(BSTR strIndustry, IVariantVec
 		validateLicense();
 
 		// Validate the Industry name
-		string strName = asString( strIndustry );
-		ASSERT_ARGUMENT("ELI11922", strName != "");
+		string strIndustry = asString( bstrIndustry );
+		ASSERT_ARGUMENT("ELI11922", strIndustry != "");
 
 		// Load the document types
-		loadDocTypeFiles( strName );
+		std::string strDocumentClassifierFolder = asString(bstrDocumentClassifierFolder);
+		loadDocTypeFiles(strDocumentClassifierFolder, strIndustry );
 
 		// Create the VariantVector to contain document types
 		IVariantVectorPtr ipVec( CLSID_VariantVector );
 		ASSERT_RESOURCE_ALLOCATION("ELI11920", ipVec != __nullptr);
 
 		// Retrieve the industry-specific collection of document types
-		vector<string>	vecTypes = m_mapNameToVecDocTypes[strName];
+		vector<string>	vecTypes = m_mapNameToVecDocTypes[strIndustry];
 
 		// Add each doc type name to vector
 		for (unsigned int ui = 0; ui < vecTypes.size(); ui++)
@@ -628,7 +640,8 @@ STDMETHODIMP CDocumentClassifier::GetDocumentTypes(BSTR strIndustry, IVariantVec
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11921");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry, 
+STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrDocumentClassifierFolder,
+													  BSTR* pbstrIndustry, 
 													  VARIANT_BOOL bAllowIndustryModification,
 													  VARIANT_BOOL bAllowMultipleSelection,
 													  VARIANT_BOOL bAllowSpecialTags,
@@ -642,8 +655,8 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 		// Check license state
 		validateLicense();
 
-		// Validate the Industry name
-		string strName = asString( *pbstrIndustry );
+		string strIndustry = asString( *pbstrIndustry );
+		string strDocumentClassifierFolder = asString( *pbstrDocumentClassifierFolder );
 
 		// Create the VariantVector to contain selected document type(s)
 		IVariantVectorPtr ipVec( CLSID_VariantVector );
@@ -651,21 +664,11 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 
 		// Create the selection dialog with multi-selection parameter
 		// Provide list of available types + document classifiers path
-		//
-		// Note: the final arg uses m_documentClassifiersPath directly
-		// so that if the serialized path no longer exists, the user
-		// will see in the dialog that the path is no longer valid.
-		//
-		// Note: To automatically switch to a valid path,
-		// call GetDocumentClassifierFolder() for final arg, so 
-		// that if the deserialized value of m_documentClassifiersPath
-		// is no longer valid (renamed, moved, deleted) then this will
-		// auto-correct and pass a valid path to the dialog.
-		AddDocTypesDlg dlg(strName, 
+		AddDocTypesDlg dlg(strIndustry, 
 						   asCppBool(bAllowSpecialTags), 
 						   asCppBool(bAllowMultipleSelection), 
 						   asCppBool(bAllowMultiplyClassified),
-						   m_documentClassifiersPath);
+						   strDocumentClassifierFolder);
 
 		// Disable industry selection, if desired
 		if (!asCppBool(bAllowIndustryModification))
@@ -690,12 +693,14 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 			string strReturnedIndustry = dlg.getSelectedIndustry();
 			*pbstrIndustry = get_bstr_t(strReturnedIndustry).Detach();
 
-			m_documentClassifiersPath = dlg.GetDocumentClassifiersFolder();
+			string strReturnedDocumentClassifierFolder = dlg.GetDocumentClassifiersFolder();
+			*pbstrDocumentClassifierFolder = get_bstr_t(strReturnedDocumentClassifierFolder).Detach();
 		}
 		else
 		{
 			// retain its previous value
-			*pbstrIndustry = get_bstr_t(strName).Detach();
+			*pbstrIndustry = get_bstr_t(strIndustry).Detach();
+			*pbstrDocumentClassifierFolder = get_bstr_t(strDocumentClassifierFolder).Detach();
 		}
 
 		// Provide vector to caller
@@ -704,45 +709,6 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 		return S_OK;
 	}	
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11926");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDocumentClassifier::get_DocumentClassifiersPath(BSTR* pVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		*pVal = get_bstr_t(m_documentClassifiersPath).Detach();
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40000");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDocumentClassifier::put_DocumentClassifiersPath(BSTR bstrDocumentClassifiersPath)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		std::string path = asString(bstrDocumentClassifiersPath);
-		m_documentClassifiersPath = asString(bstrDocumentClassifiersPath);
-		m_bDirty = true;
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40001");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDocumentClassifier::get_DocumentClassifiersSubfolderName(BSTR *pVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		*pVal = get_bstr_t(DOC_CLASSIFIERS_FOLDER).Detach();
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40003");
 }
 //-------------------------------------------------------------------------------------------------
 // IIdentifiableObject
@@ -909,34 +875,24 @@ void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& st
 	}
 }
 //-------------------------------------------------------------------------------------------------
-std::string CDocumentClassifier::GetDocumentClassifierFolder()
+std::string CDocumentClassifier::GetDocumentClassifierFolder(IAFDocumentPtr ipAFDoc)
 {
+	ASSERT_ARGUMENT("ELI40380", ipAFDoc);
+
 	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
 		ASSERT_RESOURCE_ALLOCATION("ELI39895", m_ipAFUtility != __nullptr);
 	}
 
-	if (!m_documentClassifiersPath.empty())
-	{
-		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI40380", ipAFDoc);
-
-		std::string path = m_ipAFUtility->ExpandTagsAndFunctions(m_documentClassifiersPath.c_str(), ipAFDoc);
-		if (isValidFolder(path))
-		{
-			return path + "\\";
-		}
-	}
-
-	string strComponentDataFolder = m_ipAFUtility->GetComponentDataFolder();
+	string strComponentDataFolder = m_ipAFUtility->GetComponentDataFolder(ipAFDoc);
 	string documentClassifierFolder = strComponentDataFolder 
-								+ "\\" + DOC_CLASSIFIERS_FOLDER + "\\";
+								+ "\\" + DOC_CLASSIFIERS_FOLDER;
 
 	return documentClassifierFolder;
 }
 //-------------------------------------------------------------------------------------------------
-void CDocumentClassifier::loadDocTypeFiles(const string& strSpecificIndustryName)
+void CDocumentClassifier::loadDocTypeFiles(const string& strDocumentClassifierFolder, const string& strSpecificIndustryName)
 {
 	if (m_ipAFUtility == __nullptr)
 	{
@@ -960,8 +916,7 @@ void CDocumentClassifier::loadDocTypeFiles(const string& strSpecificIndustryName
 	// create a new vector of doc type interpreters
 	vector<DocTypeInterpreter> vecDocTypeInterpreters;
 
-	std::string documentClassifierFolder = GetDocumentClassifierFolder();
-	string strIndustrySpecificFolder = documentClassifierFolder + strSpecificIndustryName;
+	string strIndustrySpecificFolder = strDocumentClassifierFolder + "\\" + strSpecificIndustryName;
 
 	// get doc type index file based on the industry category name
 	string strDocTypeIndexFile = strIndustrySpecificFolder + "\\" + DOC_TYPE_INDEX_FILE;

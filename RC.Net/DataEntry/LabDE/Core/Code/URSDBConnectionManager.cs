@@ -210,26 +210,14 @@ namespace Extract.DataEntry.LabDE
                 throw ee;
             }
 
-            var ruleExecutionEnv = new RuleExecutionEnv();
-            ruleExecutionEnv.PushRSDFileName("");
             try
             {
-                ruleExecutionEnv.FKBVersion = FKBVersion;
-                if (!string.IsNullOrWhiteSpace(_alternateComponentDataDir))
-                {
-                    ruleExecutionEnv.AlternateComponentDataDir = _alternateComponentDataDir;
-                }
-
                 var afUtility = new AFUtility();
-                return afUtility.GetComponentDataFolder();
+                return afUtility.GetComponentDataFolder2(FKBVersion, _alternateComponentDataDir);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39309");
-            }
-            finally
-            {
-                ruleExecutionEnv.PopRSDFileName();
             }
         }
 

@@ -352,7 +352,8 @@ void CRDTConfigDlg::addDefaultItems()
 		// Get default Component Data folder from AFUtils
 		try
 		{
-			string	strDataFolder = ipAFUtils->GetComponentDataFolder();
+			IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+			string	strDataFolder = ipAFUtils->GetComponentDataFolder(ipAFDoc);
 			m_comboData.AddString( strDataFolder.c_str() );
 			m_comboData.SetCurSel( 0 );
 		}

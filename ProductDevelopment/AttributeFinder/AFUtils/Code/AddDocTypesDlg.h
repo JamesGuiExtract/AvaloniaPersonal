@@ -64,7 +64,7 @@ protected:
 	afx_msg void OnSelchangeComboCategory();
 	afx_msg void OnButtonBrowseFile();
 	void OnClickedCustomFiltersDocTag();
-	void OnEditRootFolderLooseFocus();
+	void OnEditRootFolderLoseFocus();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 

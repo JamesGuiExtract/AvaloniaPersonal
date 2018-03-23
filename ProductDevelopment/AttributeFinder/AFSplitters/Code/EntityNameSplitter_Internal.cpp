@@ -1850,7 +1850,7 @@ int CEntityNameSplitter::getWordBreakIndex(IIUnknownVectorPtr ipMatches)
 	return iWordBreak - 1;
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipText)
+IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(IAFDocumentPtr ipAFDoc, ISpatialStringPtr ipText)
 {
 	// Define variables
 	int		iLastWordUsed = -1;

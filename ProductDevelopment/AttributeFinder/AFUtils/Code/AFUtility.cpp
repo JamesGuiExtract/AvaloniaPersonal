@@ -153,7 +153,7 @@ STDMETHODIMP CAFUtility::GetNameToAttributesMap(IIUnknownVector *pVecAttributes,
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFUtility::GetComponentDataFolder(BSTR *pstrComponentDataFolder)
+STDMETHODIMP CAFUtility::GetComponentDataFolder(IAFDocument *pAFDoc, BSTR *pstrComponentDataFolder)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -161,9 +161,12 @@ STDMETHODIMP CAFUtility::GetComponentDataFolder(BSTR *pstrComponentDataFolder)
 	{
 		validateLicense();
 
+		IAFDocumentPtr ipAFDoc(pAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI45666", ipAFDoc != __nullptr);
+
 		// get the component data folder and return it
 		string strFolder;
-		getComponentDataFolder(strFolder);
+		getComponentDataFolder(ipAFDoc, strFolder);
 
 		*pstrComponentDataFolder = _bstr_t(strFolder.c_str()).Detach();
 	}
@@ -1334,18 +1337,7 @@ void CAFUtility::expandComponentDataDirTag(string& rstrInput,
 	if (rstrInput.find(strCOMPONENT_DATA_DIR_TAG) != string::npos)
 	{
 		string strFolder;
-		// Get the Component Data Folder from the AFDoc if possible
-		IVariantVectorPtr rsdFileStack = ripDoc->RSDFileStack;
-		if (rsdFileStack != __nullptr && rsdFileStack->Size > 0)
-		{
-			strFolder = m_ipEngine->
-				GetComponentDataFolder2(ripDoc->FKBVersion, ripDoc->AlternateComponentDataDir);
-		}
-		else
-		{
-			// Else use the Rule Execution Env
-			getComponentDataFolder(strFolder);
-		}
+		getComponentDataFolder(ripDoc, strFolder);
 
 		// replace instances of the tag with the value
 		replaceVariable(rstrInput, strCOMPONENT_DATA_DIR_TAG , strFolder);
@@ -1589,7 +1581,23 @@ void CAFUtility::validateLicense()
 	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI06978", "AttributeFinder Utility");
 }
 //-------------------------------------------------------------------------------------------------
-void CAFUtility::getComponentDataFolder(string& rFolder)
+void CAFUtility::getComponentDataFolder(IAFDocumentPtr ipAFDoc, string& rFolder)
+{
+	// Get the Component Data Folder from the AFDoc if possible
+	IVariantVectorPtr rsdFileStack = ipAFDoc->RSDFileStack;
+	if (rsdFileStack != __nullptr && rsdFileStack->Size > 0)
+	{
+		rFolder = m_ipEngine->
+			GetComponentDataFolder2(ipAFDoc->FKBVersion, ipAFDoc->AlternateComponentDataDir);
+	}
+	else
+	{
+		// Else use the Rule Execution Env
+		getComponentDataFolderFromRuleExecutionEnv(rFolder);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CAFUtility::getComponentDataFolderFromRuleExecutionEnv(string& rFolder)
 {
 	rFolder = m_ipEngine->GetComponentDataFolder();
 }

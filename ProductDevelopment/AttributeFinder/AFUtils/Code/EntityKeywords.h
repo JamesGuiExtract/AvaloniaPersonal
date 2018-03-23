@@ -71,6 +71,7 @@ public:
 		/*[out, retval]*/ IVariantVector * *pVal);
 	STDMETHOD(get_KeywordPattern)(/*[in]*/ BSTR strKeyword, 
 		/*[out, retval]*/ BSTR* pstrPattern);
+	STDMETHOD(Init)(/*[in]*/ IAFDocument *pDoc);
 
 private:
 	///////////////
@@ -178,7 +179,7 @@ private:
 	void	makeRelatedCompanyList(ERelatedCompanyType eType);
 
 	// Reads Keywords DAT (or ETF) file
-	void	readKeywordsFile();
+	void	readKeywordsFile(IAFDocumentPtr ipAFDoc);
 
 	// Check license state for this component
 	void	validateLicense();

@@ -249,6 +249,8 @@ library UCLID_AFUTILSLib
 		[propget, id(22), helpstring("property RelatedCompany")] HRESULT RelatedCompany([in] ERelatedCompanyType eType, [out, retval] IVariantVector * *pVal);
 		[propget, id(23), helpstring("property KeywordCollection")] HRESULT KeywordCollection([in] BSTR strKeyword, [out, retval] IVariantVector * *pVal);
 		[propget, id(24), helpstring("property KeywordPattern")] HRESULT KeywordPattern([in] BSTR strKeyword, [out, retval] BSTR* pstrPattern);
+		// Prepare object for use by loading keyword files from the FKB
+		[id(25), helpstring("method Init")] HRESULT Init([in] IAFDocument *pDoc);
 	};
 	[
 		object,
@@ -289,7 +291,7 @@ library UCLID_AFUTILSLib
 		// Located where ComponentData folder, which is always parallel to the Bin
 		// directory if it is Release version, and always under AttributeFinder in source
 		// tree if it is Debug version.
-		[id(2), helpstring("method GetComponentDataFolder")] HRESULT GetComponentDataFolder([out, retval] BSTR* pstrComponentDataFolder);
+		[id(2), helpstring("method GetComponentDataFolder")] HRESULT GetComponentDataFolder([in] IAFDocument *pDoc, [out, retval] BSTR* pstrComponentDataFolder);
 
 		// Evaluates the Prefix registry key and the specified file.  If Prefix exists AND the 
 		// associated prefixed file exists, the prefixed file is returned.  Otherwise, the 
@@ -543,6 +545,7 @@ library UCLID_AFUTILSLib
 		// REQUIRE: NONE
 		// PROMISE: If there are no industries an empty vector (not NULL) will be returned
 		[id(1), helpstring("method GetDocumentIndustries")] HRESULT GetDocumentIndustries(
+			[in] BSTR bstrDocumentClassifierFolder, 
 			[out, retval] IVariantVector** ppIndustries);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return a list of all the special document types 
@@ -557,7 +560,9 @@ library UCLID_AFUTILSLib
 		// PURPOSE: To return a list of document types associated with the specified industry
 		// REQUIRE: NONE
 		// PROMISE: If there are no doc types an empty vector (not NULL) will be returned
-		[id(3), helpstring("method GetDocumentTypes")] HRESULT GetDocumentTypes([in] BSTR bstrIndustry, 
+		[id(3), helpstring("method GetDocumentTypes")] HRESULT GetDocumentTypes(
+			[in] BSTR bstrDocumentClassifierFolder, 
+			[in] BSTR bstrIndustry, 
 			[out, retval] IVariantVector** ppTypes);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return a subset of document types associated with the specified industry
@@ -574,18 +579,10 @@ library UCLID_AFUTILSLib
 		// PROMISE: If there are no doc types an empty vector (not NULL) will be returned.  
 		//			pbstrIndustry will always provide the selected industry.
 		[id(4), helpstring("method GetDocTypeSelection")] HRESULT GetDocTypeSelection(
+			[in, out] BSTR *pbstrDocumentClassifierFolder, 
 			[in, out] BSTR *pbstrIndustry, [in] VARIANT_BOOL bAllowIndustryModification,
 			[in] VARIANT_BOOL bAllowMultipleSelection, [in] VARIANT_BOOL bAllowSpecialTags, 
 			[in] VARIANT_BOOL bAllowMultiplyClassified, [out, retval] IVariantVector** ppTypes);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Gets/sets the DocumentClassifiers path
-		// REQUIRE: NONE
-		[propget, id(5), helpstring("property DocumentClassifiersPath")] HRESULT DocumentClassifiersPath([out, retval] BSTR *pVal);
-		[propput, id(5), helpstring("property DocumentClassifiersPath")] HRESULT DocumentClassifiersPath([in] BSTR newVal);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Gets the DocumentClassifiers path fragment - useful for UI validation.
-		// REQUIRE: NONE
-		[propget, id(6), helpstring("property DocumentClassifiersSubfolderName")] HRESULT DocumentClassifiersSubfolderName([out, retval] BSTR *pVal);
 	};
 
 	[

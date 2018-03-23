@@ -631,7 +631,8 @@ IEntityFinderPtr CGrantorGranteeFinderV2::getEntityFinder()
 string CGrantorGranteeFinderV2::getRulesFolder()
 {
 	// get component data folder
-	string strRulesFolder = getAFUtility()->GetComponentDataFolder();
+	// This object is obsolete so don't bother to update to correctly call this method
+	string strRulesFolder = getAFUtility()->GetComponentDataFolder(__nullptr);
 
 	return strRulesFolder;
 }
@@ -941,7 +942,8 @@ vector< stringCSIS > &CGrantorGranteeFinderV2::getValidDocTypes()
 		// Already loaded 
 		return m_vecValidDocTypes;
 	}
-	string strComponentDataFolder = getAFUtility()->GetComponentDataFolder();
+	// This object is obsolete so don't bother to update to correctly call this method
+	string strComponentDataFolder = getAFUtility()->GetComponentDataFolder(__nullptr);
 	string strIndustrySpecificFolder = strComponentDataFolder 
 								+ "\\" + DOC_CLASSIFIERS_FOLDER 
 								+ "\\" + "County Document";

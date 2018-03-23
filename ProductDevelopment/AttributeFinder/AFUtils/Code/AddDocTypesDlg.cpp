@@ -200,7 +200,7 @@ BEGIN_MESSAGE_MAP(AddDocTypesDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_CUSTOM_FILTERS_DOC_TAG, OnClickedCustomFiltersDocTag)
 	ON_CBN_SELCHANGE(IDC_CMB_CATEGORY, OnSelchangeComboCategory)
 	ON_BN_CLICKED(IDC_BUTTON_SELECT_FOLDER, OnButtonBrowseFile)
-	ON_EN_KILLFOCUS(IDC_EDIT_ROOT_FOLDER, OnEditRootFolderLooseFocus)
+	ON_EN_KILLFOCUS(IDC_EDIT_ROOT_FOLDER, OnEditRootFolderLoseFocus)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -485,10 +485,12 @@ void AddDocTypesDlg::OnButtonBrowseFile()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39981");
 }
 //-------------------------------------------------------------------------------------------------
-void AddDocTypesDlg::OnEditRootFolderLooseFocus()
+void AddDocTypesDlg::OnEditRootFolderLoseFocus()
 {
 	try
 	{
+		// https://extract.atlassian.net/browse/ISSUE-14285
+		m_initialFkbPath = GetRootFolderValue();
 		SetFkbVersion();
 		UpdateCategoriesAndTypes();
 	}

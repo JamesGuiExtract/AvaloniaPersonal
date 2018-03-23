@@ -74,6 +74,9 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 {
 	try
 	{
+		// Initialize the keywords object (loads lists from component data)
+		m_ipKeys->Init(pAFDoc);
+
 		// Create local copies of specified Attribute
 		// and collection of associated SubAttributes
 		IAttributePtr ipMainAttribute( pAttribute );

@@ -347,6 +347,11 @@
     <EmbeddedResource Include="Resources\FKBTest\Master.rsd" />
     <EmbeddedResource Include="Resources\FKBTest\second.rsd" />
     <EmbeddedResource Include="Resources\FKBTest\third.rsd" />
+    <EmbeddedResource Include="Resources\FKBTest\DocumentClassifier.rsd" />
+    <EmbeddedResource Include="Resources\FKBTest\EntityFinder.rsd" />
+    <EmbeddedResource Include="Resources\FKBTest\EntitySplitter.rsd" />
+    <EmbeddedResource Include="Resources\FKBTest\EntityScorer.rsd" />
+    <EmbeddedResource Include="Resources\FKBTest\PersonSplitter.rsd" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\LearningMachine\Bitmap\bubble.dat" />

@@ -275,7 +275,7 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnClickedDocType(WORD wNotifyCode, 
 		if (m_strDocCategory.empty())
 		{
 			// Default it to the first industry category in the category list
-			IVariantVectorPtr ipIndustries = ipDocUtils->GetDocumentIndustries();
+			IVariantVectorPtr ipIndustries = ipDocUtils->GetDocumentIndustries("");
 			ASSERT_RESOURCE_ALLOCATION("ELI17443", ipIndustries != __nullptr);
 
 			// Make sure there is at least one industry
@@ -295,9 +295,11 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnClickedDocType(WORD wNotifyCode, 
 		}
 
 		// Display the dialog - with variable industry, multiple selection and special types
-		_bstr_t	bstrIndustry = get_bstr_t(m_strDocCategory.c_str());
+		_bstr_t	bstrIndustry = get_bstr_t(m_strDocCategory);
+		_bstr_t bstrEmpty("");
 		IVariantVectorPtr ipTypes = ipDocUtils->GetDocTypeSelection(
-			&(bstrIndustry.GetBSTR()), VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, VARIANT_FALSE);
+			&(bstrEmpty.GetBSTR()), &(bstrIndustry.GetBSTR()),
+			VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, VARIANT_FALSE);
 
 		// if cancel or nothing selected ipTypes will be NULL or have a size of zero 
 		if (ipTypes != __nullptr && ipTypes->Size > 0)

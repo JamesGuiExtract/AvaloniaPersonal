@@ -96,11 +96,18 @@ STDMETHODIMP CEntityFinder::FindEntities(ISpatialString* pText)
 		// Check licensing
 		validateLicense();
 
+		// This is such an obscure method (only used by MERS modifier)
+		// that it doesn't seem worth it to ensure that a specific FKB is used.
+		// This will result in the use of the entity finder from the Latest FKB
+		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+		ASSERT_RESOURCE_ALLOCATION( "ELI45674", ipAFDoc != __nullptr);
+		m_ipKeys->Init(ipAFDoc);
+
 		// Copy text to local SpatialString and string
 		ISpatialStringPtr ipInputText( pText );
 		ASSERT_RESOURCE_ALLOCATION( "ELI09399", ipInputText != __nullptr );
 
-		findEntities(ipInputText);
+		findEntities(ipAFDoc, ipInputText);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05879")
 		
@@ -113,6 +120,10 @@ STDMETHODIMP CEntityFinder::FindEntitiesInAttributes(IIUnknownVector *pAttribute
 	
 	try
 	{
+		// This method is called only by the grantor grantee finder, which is obsolete
+		UCLIDException ue("ELI45671", "This method is obsolete");
+		throw ue;
+
 		// make sure the vec of attributes are not null
 		IIUnknownVectorPtr ipAttributes(pAttributes);
 		ASSERT_ARGUMENT("ELI07081", ipAttributes != __nullptr);
@@ -133,7 +144,7 @@ STDMETHODIMP CEntityFinder::FindEntitiesInAttributes(IIUnknownVector *pAttribute
 			ASSERT_RESOURCE_ALLOCATION("ELI26596", ipSpatialString != __nullptr);
 
 			// find proper entity from the string
-			findEntities(ipSpatialString);
+			findEntities(__nullptr, ipSpatialString);
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07080")
@@ -189,7 +200,12 @@ STDMETHODIMP CEntityFinder::raw_ModifyValue(IAttribute * pAttribute, IAFDocument
 		ISpatialStringPtr ipInputText = ipAttribute->Value;
 		ASSERT_RESOURCE_ALLOCATION( "ELI09298", ipInputText != __nullptr);
 
-		findEntities(ipInputText);
+		// Initialize the keywords object (loads lists from component data)
+		IAFDocumentPtr ipAFDoc(pOriginInput);
+		ASSERT_RESOURCE_ALLOCATION( "ELI45672", ipAFDoc != __nullptr);
+		m_ipKeys->Init(ipAFDoc);
+
+		findEntities(ipAFDoc, ipInputText);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07064");
 

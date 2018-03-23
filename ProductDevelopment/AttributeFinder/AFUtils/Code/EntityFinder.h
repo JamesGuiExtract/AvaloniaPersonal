@@ -120,7 +120,7 @@ private:
 	// Methods
 	//////////
 	// Performs entity finding
-	void findEntities(const ISpatialStringPtr& ipText);
+	void findEntities(IAFDocumentPtr ipAFDoc, const ISpatialStringPtr& ipText);
 	//----------------------------------------------------------------------------------------------
 	// Returns left-hand portion of string after intelligent trimming of blank lines
 	string	doBlankLineTrimming(string strInput, IRegularExprParserPtr ipParser, long lKeywordEndPos, 
@@ -168,7 +168,7 @@ private:
 		IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Provide long, involved Address pattern as string
-	string	getAddressSuffixPattern();
+	string	getAddressSuffixPattern(IAFDocumentPtr ipAFDoc);
 	//----------------------------------------------------------------------------------------------
 	// Parses strText with whitespace.  Returns number of words found
 	long	getWordCount(const string& strText);
@@ -229,7 +229,7 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// Removes any embedded Address from ripText.  Returns true if found, otherwise
 	// false.
-	bool removeAddressText(const ISpatialStringPtr& ripText, IRegularExprParserPtr ipParser);
+	bool removeAddressText(IAFDocumentPtr ipAFDoc, const ISpatialStringPtr& ripText, IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Checks license state
 	void	validateLicense();

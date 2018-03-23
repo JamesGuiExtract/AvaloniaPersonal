@@ -83,15 +83,34 @@ STDMETHODIMP CEntityKeywords::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IEntityKeywords
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CEntityKeywords::Init(IAFDocument *pDoc)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	try
+	{
+		// Check licensing
+		validateLicense();
+
+		IAFDocumentPtr ipAFDoc(pDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI45669", ipAFDoc != __nullptr );
+
+		// Check for previous reading of DAT file
+		if (!m_bReadKeywordsFromFile)
+		{
+			readKeywordsFile(ipAFDoc);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45678")
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CEntityKeywords::get_PersonTitles(IVariantVector **pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipPersonTitleList == __nullptr)
 		{
@@ -118,9 +137,6 @@ STDMETHODIMP CEntityKeywords::get_PersonSuffixes(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipPersonSuffixList == __nullptr)
 		{
@@ -173,9 +189,6 @@ STDMETHODIMP CEntityKeywords::get_CompanySuffixes(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipCompanySuffixList == __nullptr)
 		{
@@ -202,9 +215,6 @@ STDMETHODIMP CEntityKeywords::get_CompanyDesignators(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipCompanyDesignatorList == __nullptr)
 		{
@@ -231,9 +241,6 @@ STDMETHODIMP CEntityKeywords::get_CompanyAssignors(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipCompanyAssignorList == __nullptr)
 		{
@@ -260,9 +267,6 @@ STDMETHODIMP CEntityKeywords::get_PersonAlias(EPersonAliasType eType, IVariantVe
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// Declare IVariantVector smart pointer
 		IVariantVectorPtr ipShallowCopy(NULL);
 
@@ -323,9 +327,6 @@ STDMETHODIMP CEntityKeywords::get_EntityTrimTrailingPhrases(IVariantVector **pVa
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipEntityTrimTrailingPhraseList == __nullptr)
 		{
@@ -352,9 +353,6 @@ STDMETHODIMP CEntityKeywords::get_PersonTrimIdentifiers(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipPersonTrimIdentifierList == __nullptr)
 		{
@@ -381,9 +379,6 @@ STDMETHODIMP CEntityKeywords::get_StreetNames(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipStreetNameList == __nullptr)
 		{
@@ -410,9 +405,6 @@ STDMETHODIMP CEntityKeywords::get_StreetAbbreviations(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipStreetAbbreviationList == __nullptr)
 		{
@@ -439,9 +431,6 @@ STDMETHODIMP CEntityKeywords::get_BuildingNames(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipBuildingNameList == __nullptr)
 		{
@@ -468,9 +457,6 @@ STDMETHODIMP CEntityKeywords::get_BuildingAbbreviations(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipBuildingAbbreviationList == __nullptr)
 		{
@@ -497,9 +483,6 @@ STDMETHODIMP CEntityKeywords::get_DirectionIndicators(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipDirectionIndicatorList == __nullptr)
 		{
@@ -526,9 +509,6 @@ STDMETHODIMP CEntityKeywords::get_CompanyAlias(ECompanyAliasType eType, IVariant
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// Create IVariantVector smart pointer
 		IVariantVectorPtr ipShallowCopy(NULL);
 
@@ -628,9 +608,6 @@ STDMETHODIMP CEntityKeywords::get_NumberWords(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipNumberWordList == __nullptr)
 		{
@@ -657,9 +634,6 @@ STDMETHODIMP CEntityKeywords::get_MonthWords(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipMonthWordList == __nullptr)
 		{
@@ -686,9 +660,6 @@ STDMETHODIMP CEntityKeywords::get_AddressIndicators(IVariantVector **pVal)
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// If the list object has not yet been created, create it and populate it.
 		if (m_ipAddressIndicatorList == __nullptr)
 		{
@@ -715,9 +686,6 @@ STDMETHODIMP CEntityKeywords::GetPersonAliasLabel(EPersonAliasType eType, BSTR *
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// Label depends on Alias type
 		switch (eType)
 		{
@@ -755,9 +723,6 @@ STDMETHODIMP CEntityKeywords::GetCompanyAliasLabel(ECompanyAliasType eType, BSTR
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// Label depends on Alias type
 		switch (eType)
 		{
@@ -799,9 +764,6 @@ STDMETHODIMP CEntityKeywords::GetRelatedCompanyLabel(ERelatedCompanyType eType, 
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// Label depends on type
 		switch (eType)
 		{
@@ -843,9 +805,6 @@ STDMETHODIMP CEntityKeywords::get_RelatedCompany(ERelatedCompanyType eType, IVar
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// Declare an IVariantVector smart pointer
 		IVariantVectorPtr ipShallowCopy(NULL);
 
@@ -915,9 +874,6 @@ STDMETHODIMP CEntityKeywords::get_KeywordCollection(BSTR strKeyword, IVariantVec
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// Create VariantVector for collection
 		IVariantVectorPtr ipCollection( CLSID_VariantVector );
 		ASSERT_RESOURCE_ALLOCATION( "ELI10103", ipCollection != __nullptr );
@@ -946,9 +902,6 @@ STDMETHODIMP CEntityKeywords::get_KeywordPattern(BSTR strKeyword, BSTR* pstrPatt
 
 	try
 	{
-		// Check licensing
-		validateLicense();
-
 		// Create VariantVector for collection
 		IVariantVectorPtr ipCollection( CLSID_VariantVector );
 		ASSERT_RESOURCE_ALLOCATION( "ELI10106", ipCollection != __nullptr );
@@ -985,10 +938,11 @@ STDMETHODIMP CEntityKeywords::get_KeywordPattern(BSTR strKeyword, BSTR* pstrPatt
 //-------------------------------------------------------------------------------------------------
 void CEntityKeywords::buildVariantVector(IVariantVectorPtr ipList, string strKeyword)
 {
-	// Check for previous reading of DAT file
 	if (!m_bReadKeywordsFromFile)
 	{
-		readKeywordsFile();
+		// Throw exception
+		UCLIDException ue("ELI45680", "Keywords have not been loaded!" );
+		throw ue;
 	}
 
 	// Reset the VariantVector
@@ -1248,7 +1202,7 @@ void CEntityKeywords::makeRelatedCompanyList(ERelatedCompanyType eType)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CEntityKeywords::readKeywordsFile()
+void CEntityKeywords::readKeywordsFile(IAFDocumentPtr ipAFDoc)
 {
 	// Clear the vector
 	m_vecKeywords.clear();
@@ -1256,7 +1210,7 @@ void CEntityKeywords::readKeywordsFile()
 	// Determine path to DAT file
 	UCLID_AFUTILSLib::IAFUtilityPtr ipAFUtility( CLSID_AFUtility );
 	ASSERT_RESOURCE_ALLOCATION( "ELI10038", ipAFUtility != __nullptr );
-	string strComponentDataDir = ipAFUtility->GetComponentDataFolder();
+	string strComponentDataDir = ipAFUtility->GetComponentDataFolder(ipAFDoc);
 	string strFileName =  strComponentDataDir + "\\AFUtility\\" + "Keywords.dat.etf";
 
 	// Check for current encryption

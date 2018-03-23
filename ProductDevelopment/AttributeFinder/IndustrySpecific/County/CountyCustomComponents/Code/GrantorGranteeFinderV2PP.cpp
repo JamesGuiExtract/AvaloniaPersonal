@@ -188,7 +188,9 @@ void CGrantorGranteeFinderV2PP::loadDocTypeList()
 	m_listDocTypes.ResetContent();
 	m_vecDocTypes.clear();
 
-	string strComponentDataFolder = m_ipAFUtil->GetComponentDataFolder();
+	// This object is obsolete so don't bother to update to correctly call this method
+	string strComponentDataFolder = m_ipAFUtil->GetComponentDataFolder(__nullptr);
+
 	string strIndustrySpecificFolder = strComponentDataFolder 
 								+ "\\" + DOC_CLASSIFIERS_FOLDER 
 								+ "\\" + "County Document";
@@ -256,7 +258,8 @@ void CGrantorGranteeFinderV2PP::loadFindPartiesList(const string& strDocType )
 string CGrantorGranteeFinderV2PP::getRulesFolder()
 {
 	// get component data folder
-	string strRulesFolder = m_ipAFUtil->GetComponentDataFolder();
+	// This object is obsolete so don't bother to update to correctly call this method
+	string strRulesFolder = m_ipAFUtil->GetComponentDataFolder(__nullptr);
 
 	return strRulesFolder;
 }

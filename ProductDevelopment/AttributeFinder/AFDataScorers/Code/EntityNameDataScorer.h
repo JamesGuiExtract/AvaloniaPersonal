@@ -117,11 +117,11 @@ private:
 	//////////
 
 	// returns the score for a single attribute
-	long getAttrScore( IAttributePtr ipAttribute );
+	long getAttrScore(IAFDocumentPtr ipAFDoc, IAttributePtr ipAttribute );
 
-	long getCompanyScore( string strCompanyString, string strOriginal,
+	long getCompanyScore(IAFDocumentPtr ipAFDoc, string strCompanyString, string strOriginal,
 		IRegularExprParserPtr ipParser );
-	long getPersonScore( IAttributePtr ipAttribute, string strOriginal,
+	long getPersonScore(IAFDocumentPtr ipAFDoc, IAttributePtr ipAttribute, string strOriginal,
 		IRegularExprParserPtr ipParser );
 
 	// returns true if 1/2 of the words in the vector have first letter capitalized
@@ -130,11 +130,11 @@ private:
 
 	// Takes a company or person value and removes common words and gives a
 	// score of 2 if anything is left in the string and 0 if not
-	bool isAllCommonWords( const string& strInput,
+	bool isAllCommonWords(IAFDocumentPtr ipAFDoc, const string& strInput,
 		IRegularExprParserPtr ipParser);
 	
 	// Returns the pattern for testing for common words
-	string &getCommonWordsPattern();
+	string &getCommonWordsPattern(IAFDocumentPtr ipAFDoc);
 
 	// Returns m_ipAFUtility, after initializing it if necessary
 	IAFUtilityPtr getAFUtility();
@@ -152,11 +152,11 @@ private:
 	// returns true if there are only characters in strValidChars are in strItem
 	bool noInvalidChars( const string& strItem, const string& strValidChars );
 
-	void loadInvalidPersonVector();
+	void loadInvalidPersonVector(IAFDocumentPtr ipAFDoc);
 
 	// Promise:	To return true if the vector vecWords contains any word in the
 	//			vector m_vecInvalidPersonWords and false other wise
-	bool containsInvalidPersonWords( const vector<string> &vecWords );
+	bool containsInvalidPersonWords(IAFDocumentPtr ipAFDoc, const vector<string> &vecWords );
 
 	// Promise: To return the number of times the regular expressing strRegExpToFind appears in strInput
 	// Note:	Performs a case insensitive search

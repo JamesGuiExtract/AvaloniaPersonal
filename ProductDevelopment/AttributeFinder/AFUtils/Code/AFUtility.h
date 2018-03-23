@@ -70,6 +70,7 @@ public:
 		/*[in]*/ IIUnknownVector* pVecAttributes, 
 		/*[out, retval]*/ IStrToObjectMap** ppMapNameToAttributes);
 	STDMETHOD(GetComponentDataFolder)(
+		IAFDocument *pAFDoc, 
 		/*[out, retval]*/ BSTR* pstrComponentDataFolder);
 	STDMETHOD(GetComponentDataFolder2)(/*[in]*/ BSTR bstrFKBVersion,
 									   /*[in]*/ BSTR bstrAlternateComponentDataRoot,
@@ -317,7 +318,10 @@ private:
 		const IAttributeModifyingRulePtr& ipModifier, bool bRecursive);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To get the component data folder
-	void getComponentDataFolder(string& rFolder);
+	void getComponentDataFolder(IAFDocumentPtr ipAFDoc, string& rFolder);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To get the component data folder
+	void getComponentDataFolderFromRuleExecutionEnv(string& rFolder);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To load attributes from an EAV file
 	void loadAttributesFromEavFile(const IIUnknownVectorPtr& ipAttributes, unsigned long ulCurrLevel, 

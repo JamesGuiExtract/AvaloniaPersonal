@@ -28,9 +28,16 @@ namespace Extract.AttributeFinder.Test
 
         const string _A418_TIF_FILE = "Resources.A418.tif";
         const string _A418_USS_FILE = "Resources.A418.tif.uss";
+        const string _EXAMPLE02_TIF_FILE = "Resources.Example02.tif";
+        const string _EXAMPLE02_USS_FILE = "Resources.Example02.tif.uss";
         const string _TEST_01_MASTER_RSD_FILE = "Resources.FKBTest.Master.rsd";
         const string _TEST_01_HELPER_RSD_FILE1 = "Resources.FKBTest.second.rsd";
         const string _TEST_01_HELPER_RSD_FILE2 = "Resources.FKBTest.third.rsd";
+        const string _DOCCLASSIFIER_RSD_FILE = "Resources.FKBTest.DocumentClassifier.rsd";
+        const string _ENTITYFINDER_RSD_FILE = "Resources.FKBTest.EntityFinder.rsd";
+        const string _ENTITYSPLITTER_RSD_FILE = "Resources.FKBTest.EntitySplitter.rsd";
+        const string _ENTITYSCORER_RSD_FILE = "Resources.FKBTest.EntityScorer.rsd";
+        const string _PERSONSPLITTER_RSD_FILE = "Resources.FKBTest.PersonSplitter.rsd";
 
         #endregion Fields
 
@@ -104,7 +111,7 @@ namespace Extract.AttributeFinder.Test
         /// </summary>
         /// <see>https://extract.atlassian.net/browse/ISSUE-14772</see>
         [Test, Category("FKB")]
-        public static void Test01_AlternateComponentDataDir_Is_Propagated()
+        public static void Test02_AlternateComponentDataDir_Is_Propagated()
         {
             _testFiles.GetFile(_A418_TIF_FILE);
             string ussPath = _testFiles.GetFile(_A418_USS_FILE);
@@ -133,6 +140,175 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(0, attributes.Size());
         }
 
+        /// <summary>
+        /// Tests that the FKB specified in the ruleset ("Nonexistent") is 'used' by the document classifier
+        /// </summary>
+        /// <see>https://extract.atlassian.net/browse/ISSUE-15227</see>
+        [Test, Category("FKB")]
+        public static void Test03_FKB_IsUsedByDocClassifier()
+        {
+            _testFiles.GetFile(_EXAMPLE02_TIF_FILE);
+            string ussPath = _testFiles.GetFile(_EXAMPLE02_USS_FILE);
+            string rsdPath = _testFiles.GetFile(_DOCCLASSIFIER_RSD_FILE);
+
+            SpatialString ss = new SpatialString();
+            ss.LoadFrom(ussPath, false);
+
+            AFDocument doc = new AFDocument() { Text = ss };
+            RuleSet ruleSet = new RuleSet();
+            ruleSet.LoadFrom(rsdPath, false);
+
+            Assert.AreEqual("Nonexistent", ruleSet.FKBVersion);
+
+            var attributes = ruleSet.ExecuteRulesOnText(doc,
+                pvecAttributeNames: null, bstrAlternateComponentDataDir: null, pProgressStatus: null);
+
+            // Since a bogus FKB is specified, an exception will be logged and nothing found if the FKB is used.
+            // Else, if something is wrong, the latest FKB will be used and an attribute will be found.
+            Assert.AreEqual(0, attributes.Size());
+
+            // Check that using Latest FKB does result in a found attribute
+            ruleSet.FKBVersion = "Latest";
+            attributes = ruleSet.ExecuteRulesOnText(doc,
+                pvecAttributeNames: null, bstrAlternateComponentDataDir: null, pProgressStatus: null);
+            Assert.AreEqual(1, attributes.Size());
+        }
+
+        /// <summary>
+        /// Tests that the FKB specified in the ruleset ("Nonexistent") is 'used' by the entity finder
+        /// </summary>
+        /// <see>https://extract.atlassian.net/browse/ISSUE-15207</see>
+        [Test, Category("FKB")]
+        public static void Test04_FKB_IsUsedByEntityFinder()
+        {
+            _testFiles.GetFile(_EXAMPLE02_TIF_FILE);
+            string ussPath = _testFiles.GetFile(_EXAMPLE02_USS_FILE);
+            string rsdPath = _testFiles.GetFile(_ENTITYFINDER_RSD_FILE);
+
+            SpatialString ss = new SpatialString();
+            ss.LoadFrom(ussPath, false);
+
+            AFDocument doc = new AFDocument() { Text = ss };
+            RuleSet ruleSet = new RuleSet();
+            ruleSet.LoadFrom(rsdPath, false);
+
+            Assert.AreEqual("Nonexistent", ruleSet.FKBVersion);
+
+            var attributes = ruleSet.ExecuteRulesOnText(doc,
+                pvecAttributeNames: null, bstrAlternateComponentDataDir: null, pProgressStatus: null);
+
+            // Since a bogus FKB is specified, an exception will be logged and nothing found if the FKB is used.
+            // Else, if something is wrong, the latest FKB will be used and an attribute will be found.
+            Assert.AreEqual(0, attributes.Size());
+
+            // Check that using Latest FKB does result in a found attribute
+            ruleSet.FKBVersion = "Latest";
+            attributes = ruleSet.ExecuteRulesOnText(doc,
+                pvecAttributeNames: null, bstrAlternateComponentDataDir: null, pProgressStatus: null);
+            Assert.AreEqual(1, attributes.Size());
+        }
+
+        /// <summary>
+        /// Tests that the FKB specified in the ruleset ("Nonexistent") is 'used' by the entity splitter
+        /// </summary>
+        /// <see>https://extract.atlassian.net/browse/ISSUE-15207</see>
+        [Test, Category("FKB")]
+        public static void Test05_FKB_IsUsedByEntitySplitter()
+        {
+            _testFiles.GetFile(_EXAMPLE02_TIF_FILE);
+            string ussPath = _testFiles.GetFile(_EXAMPLE02_USS_FILE);
+            string rsdPath = _testFiles.GetFile(_ENTITYSPLITTER_RSD_FILE);
+
+            SpatialString ss = new SpatialString();
+            ss.LoadFrom(ussPath, false);
+
+            AFDocument doc = new AFDocument() { Text = ss };
+            RuleSet ruleSet = new RuleSet();
+            ruleSet.LoadFrom(rsdPath, false);
+
+            Assert.AreEqual("Nonexistent", ruleSet.FKBVersion);
+
+            var attributes = ruleSet.ExecuteRulesOnText(doc,
+                pvecAttributeNames: null, bstrAlternateComponentDataDir: null, pProgressStatus: null);
+
+            // Since a bogus FKB is specified, an exception will be logged and nothing found if the FKB is used.
+            // Else, if something is wrong, the latest FKB will be used and an attribute will be found.
+            Assert.AreEqual(0, attributes.Size());
+
+            // Check that using Latest FKB does result in a found attribute
+            ruleSet.FKBVersion = "Latest";
+            attributes = ruleSet.ExecuteRulesOnText(doc,
+                pvecAttributeNames: null, bstrAlternateComponentDataDir: null, pProgressStatus: null);
+            Assert.AreEqual(1, attributes.Size());
+        }
+
+        /// <summary>
+        /// Tests that the FKB specified in the ruleset ("Nonexistent") is 'used' by the entity scorer
+        /// </summary>
+        /// <see>https://extract.atlassian.net/browse/ISSUE-15207</see>
+        [Test, Category("FKB")]
+        public static void Test06_FKB_IsUsedByEntityScorer()
+        {
+            _testFiles.GetFile(_EXAMPLE02_TIF_FILE);
+            string ussPath = _testFiles.GetFile(_EXAMPLE02_USS_FILE);
+            string rsdPath = _testFiles.GetFile(_ENTITYSCORER_RSD_FILE);
+
+            SpatialString ss = new SpatialString();
+            ss.LoadFrom(ussPath, false);
+
+            AFDocument doc = new AFDocument() { Text = ss };
+            RuleSet ruleSet = new RuleSet();
+            ruleSet.LoadFrom(rsdPath, false);
+
+            Assert.AreEqual("Nonexistent", ruleSet.FKBVersion);
+
+            var attributes = ruleSet.ExecuteRulesOnText(doc,
+                pvecAttributeNames: null, bstrAlternateComponentDataDir: null, pProgressStatus: null);
+
+            // Since a bogus FKB is specified, an exception will be logged and nothing found if the FKB is used.
+            // Else, if something is wrong, the latest FKB will be used and an attribute will be found.
+            Assert.AreEqual(0, attributes.Size());
+
+            // Check that using Latest FKB does result in a found attribute
+            ruleSet.FKBVersion = "Latest";
+            attributes = ruleSet.ExecuteRulesOnText(doc,
+                pvecAttributeNames: null, bstrAlternateComponentDataDir: null, pProgressStatus: null);
+            Assert.AreEqual(1, attributes.Size());
+        }
+
+        /// <summary>
+        /// Tests that the FKB specified in the ruleset ("Nonexistent") is 'used' by the person splitter
+        /// </summary>
+        /// <see>https://extract.atlassian.net/browse/ISSUE-15207</see>
+        [Test, Category("FKB")]
+        public static void Test07_FKB_IsUsedByPersonSplitter()
+        {
+            _testFiles.GetFile(_EXAMPLE02_TIF_FILE);
+            string ussPath = _testFiles.GetFile(_EXAMPLE02_USS_FILE);
+            string rsdPath = _testFiles.GetFile(_PERSONSPLITTER_RSD_FILE);
+
+            SpatialString ss = new SpatialString();
+            ss.LoadFrom(ussPath, false);
+
+            AFDocument doc = new AFDocument() { Text = ss };
+            RuleSet ruleSet = new RuleSet();
+            ruleSet.LoadFrom(rsdPath, false);
+
+            Assert.AreEqual("Nonexistent", ruleSet.FKBVersion);
+
+            var attributes = ruleSet.ExecuteRulesOnText(doc,
+                pvecAttributeNames: null, bstrAlternateComponentDataDir: null, pProgressStatus: null);
+
+            // Since a bogus FKB is specified, an exception will be logged and nothing found if the FKB is used.
+            // Else, if something is wrong, the latest FKB will be used and an attribute will be found.
+            Assert.AreEqual(0, attributes.Size());
+
+            // Check that using Latest FKB does result in a found attribute
+            ruleSet.FKBVersion = "Latest";
+            attributes = ruleSet.ExecuteRulesOnText(doc,
+                pvecAttributeNames: null, bstrAlternateComponentDataDir: null, pProgressStatus: null);
+            Assert.AreEqual(1, attributes.Size());
+        }
         #endregion
     }
 }

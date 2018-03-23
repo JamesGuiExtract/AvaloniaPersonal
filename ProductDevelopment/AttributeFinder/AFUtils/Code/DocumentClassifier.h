@@ -103,23 +103,23 @@ public:
 
 // IDocumentClassificationUtils
 	STDMETHOD(GetDocumentIndustries)(
+		BSTR bstrDocumentClassifierFolder, 
 		/*[out, retval]*/ IVariantVector** ppIndustries);
 	STDMETHOD(GetSpecialDocTypeTags)(
 		/*[in]*/ VARIANT_BOOL bAllowMultiplyClassified,
 		/*[out, retval]*/ IVariantVector** ppTags);
 	STDMETHOD(GetDocumentTypes)(
+		BSTR bstrDocumentClassifierFolder, 
 		/*[in]*/ BSTR strIndustry, 
 		/*[out, retval]*/ IVariantVector** ppTypes);
 	STDMETHOD(GetDocTypeSelection)(
+		BSTR* bstrDocumentClassifierFolder, 
 		/*[in, out]*/ BSTR* pbstrIndustry, 
 		/*[in]*/ VARIANT_BOOL bAllowIndustryModification,
 		/*[in]*/ VARIANT_BOOL bAllowMultipleSelection,
 		/*[in]*/ VARIANT_BOOL bAllowSpecialTags,
 		/*[in]*/ VARIANT_BOOL bAllowMultiplyClassified,
 		/*[out, retval]*/ IVariantVector** ppTypes);
-	STDMETHOD(get_DocumentClassifiersPath)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(put_DocumentClassifiersPath)(/*[in]*/ BSTR newVal);
-	STDMETHOD(get_DocumentClassifiersSubfolderName)(/*[out, retval]*/ BSTR *pVal);
 
 // IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
@@ -146,8 +146,6 @@ private:
 	// Each industry name associated with a vector of DocType names
 	map<string, vector<string> > m_mapNameToVecDocTypes;
 
-	std::string m_documentClassifiersPath;
-
 	//////////
 	// Methods
 	//////////
@@ -162,14 +160,14 @@ private:
 	// find doc type file with exactly same name and load the file into each
 	// DocTypeInterpreter from m_vecDocTypeInterpreters.
 	// strSpecificIndustryName - ex, County Documents, etc.
-	void loadDocTypeFiles(const string& strSpecificIndustryName);
+	void loadDocTypeFiles(const string& strDocumentClassifierFolder, const string& strSpecificIndustryName);
 
 	// Checks for existing classification results. If there are existing classification results,
 	// it will either return immediately and use the existing results or clear them and re-run
 	// classification.
 	bool useExistingResults(IAFDocumentPtr ipAFDoc);
 
-	std::string GetDocumentClassifierFolder();
+	std::string GetDocumentClassifierFolder(IAFDocumentPtr ipAFDoc);
 
 
 	void validateLicense();

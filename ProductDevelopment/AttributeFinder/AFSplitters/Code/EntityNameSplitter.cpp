@@ -132,10 +132,11 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			}
 
 			// Wrap the AFDocument in smart pointer
-			// This does not need to be non-NULL since the Entity Name Splitter does 
-			// not use the AFDocument object
 			IAFDocumentPtr ipAFDoc(pAFDoc);
 			ASSERT_RESOURCE_ALLOCATION("ELI36249", ipAFDoc != __nullptr);
+
+			// Initialize the keywords object (loads lists from component data)
+			m_ipKeys->Init(ipAFDoc);
 
 			// Get a new parser (we will release this parser when the method exits)
 			m_ipRegExprParser = getParser(ipAFDoc);
@@ -655,7 +656,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 					ipEntity->Replace("\n", " ", VARIANT_FALSE, 0, m_ipRegExprParser);
 
 					// Get vector of names from found words
-					IIUnknownVectorPtr	ipNames = getNamesFromWords( ipEntity );
+					IIUnknownVectorPtr	ipNames = getNamesFromWords(ipAFDoc, ipEntity );
 					int iNameCount = ipNames->Size();
 
 					// Reset pointer to parent Attribute
