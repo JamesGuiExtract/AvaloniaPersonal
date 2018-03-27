@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Extract.Code.Attributes;
+using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Threading;
-using Extract.Utilities;
-using Extract.Code.Attributes;
+using System.Windows.Forms;
 
 namespace Extract.ETL
 {
@@ -16,7 +17,7 @@ namespace Extract.ETL
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
     [ExtractCategory("DatabaseService", "Document verification rates" )]
-    public class DocumentVerificationRates : DatabaseService
+    public class DocumentVerificationRates : DatabaseService, IConfigSettings
     {
         #region Internal classes
 
@@ -346,6 +347,25 @@ namespace Extract.ETL
             }
 
             Version = CURRENT_VERSION;
+        }
+
+        public bool Configure()
+        {
+            try
+            {
+                DocumentVerificationRatesForm configForm = new DocumentVerificationRatesForm(this);
+                return configForm.ShowDialog() == DialogResult.OK;
+            }
+            catch(Exception ex)
+            {
+                ex.ExtractDisplay("ELI45685");
+            }
+            return false;
+        }
+
+        public bool IsConfigured()
+        {
+            return !string.IsNullOrWhiteSpace(Description);   
         }
 
         #endregion
