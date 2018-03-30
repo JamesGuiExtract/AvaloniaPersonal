@@ -827,6 +827,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Code.Attributes", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.ETL.Management", "..\..\..\..\..\RC.Net\ETL\Management\Core\Code\Extract.ETL.Management.csproj", "{BB9BAF31-F7F7-4065-B563-77FCC6AA722B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Dashboard.Forms", "..\..\..\..\..\RC.Net\Dashboards\Forms\Core\Code\Extract.Dashboard.Forms.csproj", "{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -5464,6 +5466,36 @@ Global
 		{BB9BAF31-F7F7-4065-B563-77FCC6AA722B}.Template|x64.Build.0 = Release|Any CPU
 		{BB9BAF31-F7F7-4065-B563-77FCC6AA722B}.Template|x86.ActiveCfg = Release|Any CPU
 		{BB9BAF31-F7F7-4065-B563-77FCC6AA722B}.Template|x86.Build.0 = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Debug|Win32.Build.0 = Debug|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Debug|x64.Build.0 = Debug|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Debug|x86.Build.0 = Debug|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Release|Win32.Build.0 = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Release|x64.ActiveCfg = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Release|x64.Build.0 = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Release|x86.ActiveCfg = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Release|x86.Build.0 = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Template|Any CPU.ActiveCfg = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Template|Any CPU.Build.0 = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Template|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Template|Mixed Platforms.Build.0 = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Template|Win32.ActiveCfg = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Template|Win32.Build.0 = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Template|x64.ActiveCfg = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Template|x64.Build.0 = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Template|x86.ActiveCfg = Release|Any CPU
+		{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}.Template|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

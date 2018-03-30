@@ -30,152 +30,152 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DashboardCreatorForm));
-            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup1 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
-            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup2 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem1 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem2 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem3 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem4 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem5 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem6 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem7 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem8 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem9 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem10 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem11 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem12 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem13 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem14 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem15 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem16 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem17 = new DevExpress.XtraBars.Ribbon.GalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup3 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
-            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup4 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
-            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup5 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
-            DevExpress.Skins.SkinPaddingEdges skinPaddingEdges1 = new DevExpress.Skins.SkinPaddingEdges();
-            DevExpress.DashboardWin.Bars.ChartInsideHorizontalLegendGalleryGroup chartInsideHorizontalLegendGalleryGroup1 = new DevExpress.DashboardWin.Bars.ChartInsideHorizontalLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftHorizontalGalleryItem chartLegendInsideTopLeftHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterHorizontalGalleryItem chartLegendInsideTopCenterHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightHorizontalGalleryItem chartLegendInsideTopRightHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftHorizontalGalleryItem chartLegendInsideBottomLeftHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterHorizontalGalleryItem chartLegendInsideBottomCenterHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightHorizontalGalleryItem chartLegendInsideBottomRightHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartInsideVerticalLegendGalleryGroup chartInsideVerticalLegendGalleryGroup1 = new DevExpress.DashboardWin.Bars.ChartInsideVerticalLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftVerticalGalleryItem chartLegendInsideTopLeftVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterVerticalGalleryItem chartLegendInsideTopCenterVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightVerticalGalleryItem chartLegendInsideTopRightVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftVerticalGalleryItem chartLegendInsideBottomLeftVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterVerticalGalleryItem chartLegendInsideBottomCenterVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightVerticalGalleryItem chartLegendInsideBottomRightVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartOutsideHorizontalLegendGalleryGroup chartOutsideHorizontalLegendGalleryGroup1 = new DevExpress.DashboardWin.Bars.ChartOutsideHorizontalLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftHorizontalGalleryItem chartLegendOutsideTopLeftHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopCenterHorizontalGalleryItem chartLegendOutsideTopCenterHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopCenterHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightHorizontalGalleryItem chartLegendOutsideTopRightHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftHorizontalGalleryItem chartLegendOutsideBottomLeftHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomCenterHorizontalGalleryItem chartLegendOutsideBottomCenterHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomCenterHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightHorizontalGalleryItem chartLegendOutsideBottomRightHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartOutsideVerticalLegendGalleryGroup chartOutsideVerticalLegendGalleryGroup1 = new DevExpress.DashboardWin.Bars.ChartOutsideVerticalLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftVerticalGalleryItem chartLegendOutsideTopLeftVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightVerticalGalleryItem chartLegendOutsideTopRightVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftVerticalGalleryItem chartLegendOutsideBottomLeftVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightVerticalGalleryItem chartLegendOutsideBottomRightVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartBarSeriesGalleryGroup chartBarSeriesGalleryGroup1 = new DevExpress.DashboardWin.Bars.ChartBarSeriesGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartBarSeriesGalleryItem chartBarSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartBarSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartStackedBarSeriesGalleryItem chartStackedBarSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartStackedBarSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartFullStackedBarSeriesGalleryItem chartFullStackedBarSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartFullStackedBarSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartPointLineSeriesGalleryGroup chartPointLineSeriesGalleryGroup1 = new DevExpress.DashboardWin.Bars.ChartPointLineSeriesGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartPointSeriesGalleryItem chartPointSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartPointSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLineSeriesGalleryItem chartLineSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartLineSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartStackedLineSeriesGalleryItem chartStackedLineSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartStackedLineSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartFullStackedLineSeriesGalleryItem chartFullStackedLineSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartFullStackedLineSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartStepLineSeriesGalleryItem chartStepLineSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartStepLineSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartSplineSeriesGalleryItem chartSplineSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartSplineSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartAreaSeriesGalleryGroup chartAreaSeriesGalleryGroup1 = new DevExpress.DashboardWin.Bars.ChartAreaSeriesGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartAreaSeriesGalleryItem chartAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartStackedAreaSeriesGalleryItem chartStackedAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartStackedAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartFullStackedAreaSeriesGalleryItem chartFullStackedAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartFullStackedAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartStepAreaSeriesGalleryItem chartStepAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartStepAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartSplineAreaSeriesGalleryItem chartSplineAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartSplineAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartStackedSplineAreaSeriesGalleryItem chartStackedSplineAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartStackedSplineAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartFullStackedSplineAreaSeriesGalleryItem chartFullStackedSplineAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartFullStackedSplineAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartRangeSeriesGalleryGroup chartRangeSeriesGalleryGroup1 = new DevExpress.DashboardWin.Bars.ChartRangeSeriesGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartSideBySideRangeBarSeriesGalleryItem chartSideBySideRangeBarSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartSideBySideRangeBarSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartRangeAreaSeriesGalleryItem chartRangeAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartRangeAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartBubbleSeriesGalleryGroup chartBubbleSeriesGalleryGroup1 = new DevExpress.DashboardWin.Bars.ChartBubbleSeriesGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartWeightedSeriesGalleryItem chartWeightedSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartWeightedSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartFinancialSeriesGalleryGroup chartFinancialSeriesGalleryGroup1 = new DevExpress.DashboardWin.Bars.ChartFinancialSeriesGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartHighLowCloseSeriesGalleryItem chartHighLowCloseSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartHighLowCloseSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartCandleStickSeriesGalleryItem chartCandleStickSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartCandleStickSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartStockSeriesGalleryItem chartStockSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.ChartStockSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartInsideHorizontalLegendGalleryGroup chartInsideHorizontalLegendGalleryGroup2 = new DevExpress.DashboardWin.Bars.ChartInsideHorizontalLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftHorizontalGalleryItem chartLegendInsideTopLeftHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterHorizontalGalleryItem chartLegendInsideTopCenterHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightHorizontalGalleryItem chartLegendInsideTopRightHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftHorizontalGalleryItem chartLegendInsideBottomLeftHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterHorizontalGalleryItem chartLegendInsideBottomCenterHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightHorizontalGalleryItem chartLegendInsideBottomRightHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartInsideVerticalLegendGalleryGroup chartInsideVerticalLegendGalleryGroup2 = new DevExpress.DashboardWin.Bars.ChartInsideVerticalLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftVerticalGalleryItem chartLegendInsideTopLeftVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterVerticalGalleryItem chartLegendInsideTopCenterVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightVerticalGalleryItem chartLegendInsideTopRightVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftVerticalGalleryItem chartLegendInsideBottomLeftVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterVerticalGalleryItem chartLegendInsideBottomCenterVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightVerticalGalleryItem chartLegendInsideBottomRightVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartOutsideHorizontalLegendGalleryGroup chartOutsideHorizontalLegendGalleryGroup2 = new DevExpress.DashboardWin.Bars.ChartOutsideHorizontalLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftHorizontalGalleryItem chartLegendOutsideTopLeftHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopCenterHorizontalGalleryItem chartLegendOutsideTopCenterHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopCenterHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightHorizontalGalleryItem chartLegendOutsideTopRightHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftHorizontalGalleryItem chartLegendOutsideBottomLeftHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomCenterHorizontalGalleryItem chartLegendOutsideBottomCenterHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomCenterHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightHorizontalGalleryItem chartLegendOutsideBottomRightHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartOutsideVerticalLegendGalleryGroup chartOutsideVerticalLegendGalleryGroup2 = new DevExpress.DashboardWin.Bars.ChartOutsideVerticalLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftVerticalGalleryItem chartLegendOutsideTopLeftVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightVerticalGalleryItem chartLegendOutsideTopRightVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftVerticalGalleryItem chartLegendOutsideBottomLeftVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightVerticalGalleryItem chartLegendOutsideBottomRightVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.RangePointLineSeriesGalleryGroup rangePointLineSeriesGalleryGroup1 = new DevExpress.DashboardWin.Bars.RangePointLineSeriesGalleryGroup();
-            DevExpress.DashboardWin.Bars.RangeLineSeriesGalleryItem rangeLineSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.RangeLineSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.RangeStackedLineSeriesGalleryItem rangeStackedLineSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.RangeStackedLineSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.RangeFullStackedLineSeriesGalleryItem rangeFullStackedLineSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.RangeFullStackedLineSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.RangeAreaSeriesGalleryGroup rangeAreaSeriesGalleryGroup1 = new DevExpress.DashboardWin.Bars.RangeAreaSeriesGalleryGroup();
-            DevExpress.DashboardWin.Bars.RangeAreaSeriesGalleryItem rangeAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.RangeAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.RangeStackedAreaSeriesGalleryItem rangeStackedAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.RangeStackedAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.RangeFullStackedAreaSeriesGalleryItem rangeFullStackedAreaSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.RangeFullStackedAreaSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.RangeBarSeriesGalleryGroup rangeBarSeriesGalleryGroup1 = new DevExpress.DashboardWin.Bars.RangeBarSeriesGalleryGroup();
-            DevExpress.DashboardWin.Bars.RangeBarSeriesGalleryItem rangeBarSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.RangeBarSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.RangeStackedBarSeriesGalleryItem rangeStackedBarSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.RangeStackedBarSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.RangeFullStackedBarSeriesGalleryItem rangeFullStackedBarSeriesGalleryItem1 = new DevExpress.DashboardWin.Bars.RangeFullStackedBarSeriesGalleryItem();
-            DevExpress.DashboardWin.Bars.MapVerticalLegendGalleryGroup mapVerticalLegendGalleryGroup1 = new DevExpress.DashboardWin.Bars.MapVerticalLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.MapLegendTopLeftVerticalGalleryItem mapLegendTopLeftVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendTopLeftVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapLegendTopCenterVerticalGalleryItem mapLegendTopCenterVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendTopCenterVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapLegendTopRightVerticalGalleryItem mapLegendTopRightVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendTopRightVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapLegendBottomLeftVerticalGalleryItem mapLegendBottomLeftVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendBottomLeftVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapLegendBottomCenterVerticalGalleryItem mapLegendBottomCenterVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendBottomCenterVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapLegendBottomRightVerticalGalleryItem mapLegendBottomRightVerticalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendBottomRightVerticalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapHorizontalLegendGalleryGroup mapHorizontalLegendGalleryGroup1 = new DevExpress.DashboardWin.Bars.MapHorizontalLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.MapLegendTopLeftHorizontalGalleryItem mapLegendTopLeftHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendTopLeftHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapLegendTopCenterHorizontalGalleryItem mapLegendTopCenterHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendTopCenterHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapLegendTopRightHorizontalGalleryItem mapLegendTopRightHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendTopRightHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapLegendBottomLeftHorizontalGalleryItem mapLegendBottomLeftHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendBottomLeftHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapLegendBottomCenterHorizontalGalleryItem mapLegendBottomCenterHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendBottomCenterHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapLegendBottomRightHorizontalGalleryItem mapLegendBottomRightHorizontalGalleryItem1 = new DevExpress.DashboardWin.Bars.MapLegendBottomRightHorizontalGalleryItem();
-            DevExpress.DashboardWin.Bars.MapWeightedLegendGalleryGroup mapWeightedLegendGalleryGroup1 = new DevExpress.DashboardWin.Bars.MapWeightedLegendGalleryGroup();
-            DevExpress.DashboardWin.Bars.MapWeightedLegendTopLeftGalleryItem mapWeightedLegendTopLeftGalleryItem1 = new DevExpress.DashboardWin.Bars.MapWeightedLegendTopLeftGalleryItem();
-            DevExpress.DashboardWin.Bars.MapWeightedLegendTopCenterGalleryItem mapWeightedLegendTopCenterGalleryItem1 = new DevExpress.DashboardWin.Bars.MapWeightedLegendTopCenterGalleryItem();
-            DevExpress.DashboardWin.Bars.MapWeightedLegendTopRightGalleryItem mapWeightedLegendTopRightGalleryItem1 = new DevExpress.DashboardWin.Bars.MapWeightedLegendTopRightGalleryItem();
-            DevExpress.DashboardWin.Bars.MapWeightedLegendBottomLeftGalleryItem mapWeightedLegendBottomLeftGalleryItem1 = new DevExpress.DashboardWin.Bars.MapWeightedLegendBottomLeftGalleryItem();
-            DevExpress.DashboardWin.Bars.MapWeightedLegendBottomCenterGalleryItem mapWeightedLegendBottomCenterGalleryItem1 = new DevExpress.DashboardWin.Bars.MapWeightedLegendBottomCenterGalleryItem();
-            DevExpress.DashboardWin.Bars.MapWeightedLegendBottomRightGalleryItem mapWeightedLegendBottomRightGalleryItem1 = new DevExpress.DashboardWin.Bars.MapWeightedLegendBottomRightGalleryItem();
-            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup6 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
-            DevExpress.XtraBars.Ribbon.ReduceOperation reduceOperation1 = new DevExpress.XtraBars.Ribbon.ReduceOperation();
+            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup7 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
+            DevExpress.Utils.SuperToolTip superToolTip2 = new DevExpress.Utils.SuperToolTip();
+            DevExpress.Utils.ToolTipTitleItem toolTipTitleItem2 = new DevExpress.Utils.ToolTipTitleItem();
+            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup8 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem18 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem19 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem20 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem21 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem22 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem23 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem24 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem25 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem26 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem27 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem28 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem29 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem30 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem31 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem32 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem33 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItem galleryItem34 = new DevExpress.XtraBars.Ribbon.GalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup9 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
+            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup10 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
+            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup11 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
+            DevExpress.Skins.SkinPaddingEdges skinPaddingEdges2 = new DevExpress.Skins.SkinPaddingEdges();
+            DevExpress.DashboardWin.Bars.ChartInsideHorizontalLegendGalleryGroup chartInsideHorizontalLegendGalleryGroup3 = new DevExpress.DashboardWin.Bars.ChartInsideHorizontalLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftHorizontalGalleryItem chartLegendInsideTopLeftHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterHorizontalGalleryItem chartLegendInsideTopCenterHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightHorizontalGalleryItem chartLegendInsideTopRightHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftHorizontalGalleryItem chartLegendInsideBottomLeftHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterHorizontalGalleryItem chartLegendInsideBottomCenterHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightHorizontalGalleryItem chartLegendInsideBottomRightHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartInsideVerticalLegendGalleryGroup chartInsideVerticalLegendGalleryGroup3 = new DevExpress.DashboardWin.Bars.ChartInsideVerticalLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftVerticalGalleryItem chartLegendInsideTopLeftVerticalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterVerticalGalleryItem chartLegendInsideTopCenterVerticalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightVerticalGalleryItem chartLegendInsideTopRightVerticalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftVerticalGalleryItem chartLegendInsideBottomLeftVerticalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterVerticalGalleryItem chartLegendInsideBottomCenterVerticalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightVerticalGalleryItem chartLegendInsideBottomRightVerticalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartOutsideHorizontalLegendGalleryGroup chartOutsideHorizontalLegendGalleryGroup3 = new DevExpress.DashboardWin.Bars.ChartOutsideHorizontalLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftHorizontalGalleryItem chartLegendOutsideTopLeftHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopCenterHorizontalGalleryItem chartLegendOutsideTopCenterHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopCenterHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightHorizontalGalleryItem chartLegendOutsideTopRightHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftHorizontalGalleryItem chartLegendOutsideBottomLeftHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomCenterHorizontalGalleryItem chartLegendOutsideBottomCenterHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomCenterHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightHorizontalGalleryItem chartLegendOutsideBottomRightHorizontalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartOutsideVerticalLegendGalleryGroup chartOutsideVerticalLegendGalleryGroup3 = new DevExpress.DashboardWin.Bars.ChartOutsideVerticalLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftVerticalGalleryItem chartLegendOutsideTopLeftVerticalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightVerticalGalleryItem chartLegendOutsideTopRightVerticalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftVerticalGalleryItem chartLegendOutsideBottomLeftVerticalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightVerticalGalleryItem chartLegendOutsideBottomRightVerticalGalleryItem3 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartBarSeriesGalleryGroup chartBarSeriesGalleryGroup2 = new DevExpress.DashboardWin.Bars.ChartBarSeriesGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartBarSeriesGalleryItem chartBarSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartBarSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartStackedBarSeriesGalleryItem chartStackedBarSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartStackedBarSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartFullStackedBarSeriesGalleryItem chartFullStackedBarSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartFullStackedBarSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartPointLineSeriesGalleryGroup chartPointLineSeriesGalleryGroup2 = new DevExpress.DashboardWin.Bars.ChartPointLineSeriesGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartPointSeriesGalleryItem chartPointSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartPointSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLineSeriesGalleryItem chartLineSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartLineSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartStackedLineSeriesGalleryItem chartStackedLineSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartStackedLineSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartFullStackedLineSeriesGalleryItem chartFullStackedLineSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartFullStackedLineSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartStepLineSeriesGalleryItem chartStepLineSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartStepLineSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartSplineSeriesGalleryItem chartSplineSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartSplineSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartAreaSeriesGalleryGroup chartAreaSeriesGalleryGroup2 = new DevExpress.DashboardWin.Bars.ChartAreaSeriesGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartAreaSeriesGalleryItem chartAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartStackedAreaSeriesGalleryItem chartStackedAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartStackedAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartFullStackedAreaSeriesGalleryItem chartFullStackedAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartFullStackedAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartStepAreaSeriesGalleryItem chartStepAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartStepAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartSplineAreaSeriesGalleryItem chartSplineAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartSplineAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartStackedSplineAreaSeriesGalleryItem chartStackedSplineAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartStackedSplineAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartFullStackedSplineAreaSeriesGalleryItem chartFullStackedSplineAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartFullStackedSplineAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartRangeSeriesGalleryGroup chartRangeSeriesGalleryGroup2 = new DevExpress.DashboardWin.Bars.ChartRangeSeriesGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartSideBySideRangeBarSeriesGalleryItem chartSideBySideRangeBarSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartSideBySideRangeBarSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartRangeAreaSeriesGalleryItem chartRangeAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartRangeAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartBubbleSeriesGalleryGroup chartBubbleSeriesGalleryGroup2 = new DevExpress.DashboardWin.Bars.ChartBubbleSeriesGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartWeightedSeriesGalleryItem chartWeightedSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartWeightedSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartFinancialSeriesGalleryGroup chartFinancialSeriesGalleryGroup2 = new DevExpress.DashboardWin.Bars.ChartFinancialSeriesGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartHighLowCloseSeriesGalleryItem chartHighLowCloseSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartHighLowCloseSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartCandleStickSeriesGalleryItem chartCandleStickSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartCandleStickSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartStockSeriesGalleryItem chartStockSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.ChartStockSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartInsideHorizontalLegendGalleryGroup chartInsideHorizontalLegendGalleryGroup4 = new DevExpress.DashboardWin.Bars.ChartInsideHorizontalLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftHorizontalGalleryItem chartLegendInsideTopLeftHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterHorizontalGalleryItem chartLegendInsideTopCenterHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightHorizontalGalleryItem chartLegendInsideTopRightHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftHorizontalGalleryItem chartLegendInsideBottomLeftHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterHorizontalGalleryItem chartLegendInsideBottomCenterHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightHorizontalGalleryItem chartLegendInsideBottomRightHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartInsideVerticalLegendGalleryGroup chartInsideVerticalLegendGalleryGroup4 = new DevExpress.DashboardWin.Bars.ChartInsideVerticalLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftVerticalGalleryItem chartLegendInsideTopLeftVerticalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopLeftVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterVerticalGalleryItem chartLegendInsideTopCenterVerticalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopCenterVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightVerticalGalleryItem chartLegendInsideTopRightVerticalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideTopRightVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftVerticalGalleryItem chartLegendInsideBottomLeftVerticalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomLeftVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterVerticalGalleryItem chartLegendInsideBottomCenterVerticalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomCenterVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightVerticalGalleryItem chartLegendInsideBottomRightVerticalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendInsideBottomRightVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartOutsideHorizontalLegendGalleryGroup chartOutsideHorizontalLegendGalleryGroup4 = new DevExpress.DashboardWin.Bars.ChartOutsideHorizontalLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftHorizontalGalleryItem chartLegendOutsideTopLeftHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopCenterHorizontalGalleryItem chartLegendOutsideTopCenterHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopCenterHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightHorizontalGalleryItem chartLegendOutsideTopRightHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftHorizontalGalleryItem chartLegendOutsideBottomLeftHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomCenterHorizontalGalleryItem chartLegendOutsideBottomCenterHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomCenterHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightHorizontalGalleryItem chartLegendOutsideBottomRightHorizontalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartOutsideVerticalLegendGalleryGroup chartOutsideVerticalLegendGalleryGroup4 = new DevExpress.DashboardWin.Bars.ChartOutsideVerticalLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftVerticalGalleryItem chartLegendOutsideTopLeftVerticalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopLeftVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightVerticalGalleryItem chartLegendOutsideTopRightVerticalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideTopRightVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftVerticalGalleryItem chartLegendOutsideBottomLeftVerticalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomLeftVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightVerticalGalleryItem chartLegendOutsideBottomRightVerticalGalleryItem4 = new DevExpress.DashboardWin.Bars.ChartLegendOutsideBottomRightVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.RangePointLineSeriesGalleryGroup rangePointLineSeriesGalleryGroup2 = new DevExpress.DashboardWin.Bars.RangePointLineSeriesGalleryGroup();
+            DevExpress.DashboardWin.Bars.RangeLineSeriesGalleryItem rangeLineSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.RangeLineSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.RangeStackedLineSeriesGalleryItem rangeStackedLineSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.RangeStackedLineSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.RangeFullStackedLineSeriesGalleryItem rangeFullStackedLineSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.RangeFullStackedLineSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.RangeAreaSeriesGalleryGroup rangeAreaSeriesGalleryGroup2 = new DevExpress.DashboardWin.Bars.RangeAreaSeriesGalleryGroup();
+            DevExpress.DashboardWin.Bars.RangeAreaSeriesGalleryItem rangeAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.RangeAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.RangeStackedAreaSeriesGalleryItem rangeStackedAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.RangeStackedAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.RangeFullStackedAreaSeriesGalleryItem rangeFullStackedAreaSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.RangeFullStackedAreaSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.RangeBarSeriesGalleryGroup rangeBarSeriesGalleryGroup2 = new DevExpress.DashboardWin.Bars.RangeBarSeriesGalleryGroup();
+            DevExpress.DashboardWin.Bars.RangeBarSeriesGalleryItem rangeBarSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.RangeBarSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.RangeStackedBarSeriesGalleryItem rangeStackedBarSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.RangeStackedBarSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.RangeFullStackedBarSeriesGalleryItem rangeFullStackedBarSeriesGalleryItem2 = new DevExpress.DashboardWin.Bars.RangeFullStackedBarSeriesGalleryItem();
+            DevExpress.DashboardWin.Bars.MapVerticalLegendGalleryGroup mapVerticalLegendGalleryGroup2 = new DevExpress.DashboardWin.Bars.MapVerticalLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.MapLegendTopLeftVerticalGalleryItem mapLegendTopLeftVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendTopLeftVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapLegendTopCenterVerticalGalleryItem mapLegendTopCenterVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendTopCenterVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapLegendTopRightVerticalGalleryItem mapLegendTopRightVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendTopRightVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapLegendBottomLeftVerticalGalleryItem mapLegendBottomLeftVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendBottomLeftVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapLegendBottomCenterVerticalGalleryItem mapLegendBottomCenterVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendBottomCenterVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapLegendBottomRightVerticalGalleryItem mapLegendBottomRightVerticalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendBottomRightVerticalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapHorizontalLegendGalleryGroup mapHorizontalLegendGalleryGroup2 = new DevExpress.DashboardWin.Bars.MapHorizontalLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.MapLegendTopLeftHorizontalGalleryItem mapLegendTopLeftHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendTopLeftHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapLegendTopCenterHorizontalGalleryItem mapLegendTopCenterHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendTopCenterHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapLegendTopRightHorizontalGalleryItem mapLegendTopRightHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendTopRightHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapLegendBottomLeftHorizontalGalleryItem mapLegendBottomLeftHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendBottomLeftHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapLegendBottomCenterHorizontalGalleryItem mapLegendBottomCenterHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendBottomCenterHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapLegendBottomRightHorizontalGalleryItem mapLegendBottomRightHorizontalGalleryItem2 = new DevExpress.DashboardWin.Bars.MapLegendBottomRightHorizontalGalleryItem();
+            DevExpress.DashboardWin.Bars.MapWeightedLegendGalleryGroup mapWeightedLegendGalleryGroup2 = new DevExpress.DashboardWin.Bars.MapWeightedLegendGalleryGroup();
+            DevExpress.DashboardWin.Bars.MapWeightedLegendTopLeftGalleryItem mapWeightedLegendTopLeftGalleryItem2 = new DevExpress.DashboardWin.Bars.MapWeightedLegendTopLeftGalleryItem();
+            DevExpress.DashboardWin.Bars.MapWeightedLegendTopCenterGalleryItem mapWeightedLegendTopCenterGalleryItem2 = new DevExpress.DashboardWin.Bars.MapWeightedLegendTopCenterGalleryItem();
+            DevExpress.DashboardWin.Bars.MapWeightedLegendTopRightGalleryItem mapWeightedLegendTopRightGalleryItem2 = new DevExpress.DashboardWin.Bars.MapWeightedLegendTopRightGalleryItem();
+            DevExpress.DashboardWin.Bars.MapWeightedLegendBottomLeftGalleryItem mapWeightedLegendBottomLeftGalleryItem2 = new DevExpress.DashboardWin.Bars.MapWeightedLegendBottomLeftGalleryItem();
+            DevExpress.DashboardWin.Bars.MapWeightedLegendBottomCenterGalleryItem mapWeightedLegendBottomCenterGalleryItem2 = new DevExpress.DashboardWin.Bars.MapWeightedLegendBottomCenterGalleryItem();
+            DevExpress.DashboardWin.Bars.MapWeightedLegendBottomRightGalleryItem mapWeightedLegendBottomRightGalleryItem2 = new DevExpress.DashboardWin.Bars.MapWeightedLegendBottomRightGalleryItem();
+            DevExpress.XtraBars.Ribbon.GalleryItemGroup galleryItemGroup12 = new DevExpress.XtraBars.Ribbon.GalleryItemGroup();
+            DevExpress.XtraBars.Ribbon.ReduceOperation reduceOperation2 = new DevExpress.XtraBars.Ribbon.ReduceOperation();
             this.stylesRibbonPageGroup1 = new DevExpress.XtraRichEdit.UI.StylesRibbonPageGroup();
             this.galleryChangeStyleItem1 = new DevExpress.XtraRichEdit.UI.GalleryChangeStyleItem();
             this.ribbonControl1 = new DevExpress.XtraBars.Ribbon.RibbonControl();
-            this.dashboardBackstageViewControl1 = new DevExpress.DashboardWin.Bars.DashboardBackstageViewControl();
-            this.dashboardBarAndDockingController1 = new DevExpress.DashboardWin.Native.DashboardBarAndDockingController(this.components);
-            this.backstageViewClientControl1 = new DevExpress.XtraBars.Ribbon.BackstageViewClientControl();
             this.recentDashboardsControl1 = new DevExpress.DashboardWin.Bars.RecentDashboardsControl();
-            this.dashboardDesigner1 = new DevExpress.DashboardWin.DashboardDesigner();
+            this.dashboardDesigner = new DevExpress.DashboardWin.DashboardDesigner();
+            this.dashboardBarAndDockingController1 = new DevExpress.DashboardWin.Native.DashboardBarAndDockingController(this.components);
             this.dashboardPopupMenu1 = new DevExpress.DashboardWin.DashboardPopupMenu(this.components);
             this.showItemCaptionBarItem1 = new DevExpress.DashboardWin.Bars.ShowItemCaptionBarItem();
             this.duplicateItemBarItem1 = new DevExpress.DashboardWin.Bars.DuplicateItemBarItem();
@@ -223,14 +223,11 @@
             this.mapFullExtentBarItem1 = new DevExpress.DashboardWin.Bars.MapFullExtentBarItem();
             this.imageLoadBarItem1 = new DevExpress.DashboardWin.Bars.ImageLoadBarItem();
             this.imageImportBarItem1 = new DevExpress.DashboardWin.Bars.ImageImportBarItem();
-            this.textBoxEditTextBarItem1 = new DevExpress.DashboardWin.Bars.TextBoxEditTextBarItem();
             this.textBoxInsertFieldBarItem1 = new DevExpress.DashboardWin.Bars.TextBoxInsertFieldBarItem();
             this.rangeFilterEditDateTimePeriodsBarItem1 = new DevExpress.DashboardWin.Bars.RangeFilterEditDateTimePeriodsBarItem();
+            this.textBoxEditTextBarItem1 = new DevExpress.DashboardWin.Bars.TextBoxEditTextBarItem();
             this.pivotResetLayoutOptionsBarItem1 = new DevExpress.DashboardWin.Bars.PivotResetLayoutOptionsBarItem();
-            this.dashboardBackstageRecentTab1 = new DevExpress.DashboardWin.Bars.DashboardBackstageRecentTab();
-            this.fileOpenButtonItem = new DevExpress.XtraBars.Ribbon.BackstageViewButtonItem();
-            this.dashboardBackstageSaveButton1 = new DevExpress.DashboardWin.Bars.DashboardBackstageSaveButton();
-            this.dashboardBackstageSaveAsButton1 = new DevExpress.DashboardWin.Bars.DashboardBackstageSaveAsButton();
+            this.barConfigureExtractButtonItem2 = new DevExpress.XtraBars.BarButtonItem();
             this.fileNewBarItem1 = new DevExpress.DashboardWin.Bars.FileNewBarItem();
             this.fileSaveBarItem1 = new DevExpress.DashboardWin.Bars.FileSaveBarItem();
             this.fileSaveAsBarItem1 = new DevExpress.DashboardWin.Bars.FileSaveAsBarItem();
@@ -611,6 +608,9 @@
             this.gridStyleRibbonPageGroup1 = new DevExpress.DashboardWin.Bars.GridStyleRibbonPageGroup();
             this.gridLayoutRibbonPageGroup1 = new DevExpress.DashboardWin.Bars.GridLayoutRibbonPageGroup();
             this.gridColumnWidthModeRibbonPageGroup1 = new DevExpress.DashboardWin.Bars.GridColumnWidthModeRibbonPageGroup();
+            this.gridExtractGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
+            this.ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
+            this.ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.chartToolsRibbonPageCategory1 = new DevExpress.DashboardWin.Bars.ChartToolsRibbonPageCategory();
             this.dataRibbonPage3 = new DevExpress.DashboardWin.Bars.DataRibbonPage();
             this.filteringRibbonPageGroup3 = new DevExpress.DashboardWin.Bars.FilteringRibbonPageGroup();
@@ -646,6 +646,8 @@
             this.pieLabelsRibbonPageGroup1 = new DevExpress.DashboardWin.Bars.PieLabelsRibbonPageGroup();
             this.pieStyleRibbonPageGroup1 = new DevExpress.DashboardWin.Bars.PieStyleRibbonPageGroup();
             this.coloringOptionsRibbonPageGroup3 = new DevExpress.DashboardWin.Bars.ColoringOptionsRibbonPageGroup();
+            this.ribbonPage2 = new DevExpress.XtraBars.Ribbon.RibbonPage();
+            this.ribbonPageGroup2 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.gaugesToolsRibbonPageCategory1 = new DevExpress.DashboardWin.Bars.GaugesToolsRibbonPageCategory();
             this.dataRibbonPage6 = new DevExpress.DashboardWin.Bars.DataRibbonPage();
             this.filteringRibbonPageGroup6 = new DevExpress.DashboardWin.Bars.FilteringRibbonPageGroup();
@@ -812,14 +814,17 @@
             this.dataSourceFilteringRibbonPageGroup1 = new DevExpress.DashboardWin.Bars.DataSourceFilteringRibbonPageGroup();
             this.viewRibbonPage1 = new DevExpress.DashboardWin.Bars.ViewRibbonPage();
             this.skinsRibbonPageGroup1 = new DevExpress.DashboardWin.Bars.SkinsRibbonPageGroup();
+            this.dashboardBackstageViewControl1 = new DevExpress.DashboardWin.Bars.DashboardBackstageViewControl();
+            this.backstageViewClientControl1 = new DevExpress.XtraBars.Ribbon.BackstageViewClientControl();
+            this.dashboardBackstageRecentTab1 = new DevExpress.DashboardWin.Bars.DashboardBackstageRecentTab();
+            this.fileOpenButtonItem = new DevExpress.XtraBars.Ribbon.BackstageViewButtonItem();
+            this.dashboardBackstageSaveButton1 = new DevExpress.DashboardWin.Bars.DashboardBackstageSaveButton();
+            this.dashboardBackstageSaveAsButton1 = new DevExpress.DashboardWin.Bars.DashboardBackstageSaveAsButton();
             this.dashboardBarController1 = new DevExpress.DashboardWin.Bars.DashboardBarController(this.components);
             this.textBoxEditorBarController1 = new DevExpress.DashboardWin.Bars.TextBoxEditorBarController(this.components);
             this.dashboardBackstageNewButton1 = new DevExpress.DashboardWin.Bars.DashboardBackstageNewButton();
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dashboardBackstageViewControl1)).BeginInit();
-            this.dashboardBackstageViewControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dashboardBarAndDockingController1)).BeginInit();
-            this.backstageViewClientControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dashboardPopupMenu1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSpinEdit1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemFontEdit1)).BeginInit();
@@ -827,6 +832,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemBorderLineStyle1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemBorderLineWeight1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemFloatingObjectOutlineWeight1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dashboardBackstageViewControl1)).BeginInit();
+            this.dashboardBackstageViewControl1.SuspendLayout();
+            this.backstageViewClientControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dashboardBarController1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.textBoxEditorBarController1)).BeginInit();
             this.SuspendLayout();
@@ -845,14 +853,14 @@
             // 
             this.galleryChangeStyleItem1.Gallery.ColumnCount = 10;
             this.galleryChangeStyleItem1.Gallery.Groups.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItemGroup[] {
-            galleryItemGroup1});
+            galleryItemGroup7});
             this.galleryChangeStyleItem1.Gallery.ImageSize = new System.Drawing.Size(65, 46);
             this.galleryChangeStyleItem1.Id = 315;
             this.galleryChangeStyleItem1.Name = "galleryChangeStyleItem1";
             // 
             // ribbonControl1
             // 
-            this.ribbonControl1.ApplicationButtonDropDownControl = this.dashboardBackstageViewControl1;
+            this.ribbonControl1.ApplicationButtonDropDownControl = this.recentDashboardsControl1;
             this.ribbonControl1.Controller = this.dashboardBarAndDockingController1;
             this.ribbonControl1.ExpandCollapseItem.Id = 0;
             this.ribbonControl1.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
@@ -1263,9 +1271,10 @@
             this.floatingObjectSendBackwardItem1,
             this.floatingObjectSendToBackItem1,
             this.floatingObjectSendBehindTextItem1,
-            this.fileOpenBarButtonItem});
+            this.fileOpenBarButtonItem,
+            this.barConfigureExtractButtonItem2});
             this.ribbonControl1.Location = new System.Drawing.Point(0, 0);
-            this.ribbonControl1.MaxItemId = 2;
+            this.ribbonControl1.MaxItemId = 1;
             this.ribbonControl1.Name = "ribbonControl1";
             this.ribbonControl1.PageCategories.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageCategory[] {
             this.pivotToolsRibbonPageCategory1,
@@ -1305,37 +1314,6 @@
             this.ribbonControl1.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonControlStyle.Office2013;
             this.ribbonControl1.Size = new System.Drawing.Size(1037, 143);
             // 
-            // dashboardBackstageViewControl1
-            // 
-            this.dashboardBackstageViewControl1.Controller = this.dashboardBarAndDockingController1;
-            this.dashboardBackstageViewControl1.Controls.Add(this.backstageViewClientControl1);
-            this.dashboardBackstageViewControl1.DashboardRecentTab = this.dashboardBackstageRecentTab1;
-            this.dashboardBackstageViewControl1.Items.Add(this.fileOpenButtonItem);
-            this.dashboardBackstageViewControl1.Items.Add(this.dashboardBackstageSaveButton1);
-            this.dashboardBackstageViewControl1.Items.Add(this.dashboardBackstageSaveAsButton1);
-            this.dashboardBackstageViewControl1.Items.Add(this.dashboardBackstageRecentTab1);
-            this.dashboardBackstageViewControl1.Location = new System.Drawing.Point(0, 122);
-            this.dashboardBackstageViewControl1.Name = "dashboardBackstageViewControl1";
-            this.dashboardBackstageViewControl1.OwnerControl = this.ribbonControl1;
-            this.dashboardBackstageViewControl1.SelectedTab = this.dashboardBackstageRecentTab1;
-            this.dashboardBackstageViewControl1.SelectedTabIndex = 3;
-            this.dashboardBackstageViewControl1.Size = new System.Drawing.Size(240, 28);
-            this.dashboardBackstageViewControl1.TabIndex = 2;
-            // 
-            // dashboardBarAndDockingController1
-            // 
-            this.dashboardBarAndDockingController1.PropertiesBar.AllowLinkLighting = false;
-            this.dashboardBarAndDockingController1.PropertiesBar.DefaultGlyphSize = new System.Drawing.Size(16, 16);
-            this.dashboardBarAndDockingController1.PropertiesBar.DefaultLargeGlyphSize = new System.Drawing.Size(32, 32);
-            // 
-            // backstageViewClientControl1
-            // 
-            this.backstageViewClientControl1.Controls.Add(this.recentDashboardsControl1);
-            this.backstageViewClientControl1.Location = new System.Drawing.Point(132, 63);
-            this.backstageViewClientControl1.Name = "backstageViewClientControl1";
-            this.backstageViewClientControl1.Size = new System.Drawing.Size(90, 0);
-            this.backstageViewClientControl1.TabIndex = 1;
-            // 
             // recentDashboardsControl1
             // 
             this.recentDashboardsControl1.Appearance.ForeColor = System.Drawing.Color.Transparent;
@@ -1343,27 +1321,38 @@
             this.recentDashboardsControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.recentDashboardsControl1.Location = new System.Drawing.Point(0, 0);
             this.recentDashboardsControl1.Name = "recentDashboardsControl1";
-            this.recentDashboardsControl1.ServiceProvider = this.dashboardDesigner1;
-            this.recentDashboardsControl1.Size = new System.Drawing.Size(90, 0);
+            this.recentDashboardsControl1.ServiceProvider = this.dashboardDesigner;
+            this.recentDashboardsControl1.Size = new System.Drawing.Size(91, 28);
             this.recentDashboardsControl1.TabIndex = 0;
+            this.recentDashboardsControl1.RecentItemClick += new DevExpress.DashboardWin.RecentItemClickEventHandler(this.HandleRecentDashboardsControlRecentItemClick);
             // 
             // dashboardDesigner1
             // 
-            this.dashboardDesigner1.AllowPrintDashboard = true;
-            this.dashboardDesigner1.AllowPrintDashboardItems = true;
-            this.dashboardDesigner1.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(236)))), ((int)(((byte)(239)))));
-            this.dashboardDesigner1.Appearance.Options.UseBackColor = true;
-            this.dashboardDesigner1.BarAndDockingController = this.dashboardBarAndDockingController1;
-            this.dashboardDesigner1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dashboardDesigner1.Location = new System.Drawing.Point(0, 143);
-            this.dashboardDesigner1.MenuManager = this.ribbonControl1;
-            this.dashboardDesigner1.Name = "dashboardDesigner1";
-            this.dashboardDesigner1.PopupMenu = this.dashboardPopupMenu1;
-            this.dashboardDesigner1.Size = new System.Drawing.Size(1037, 427);
-            this.dashboardDesigner1.TabIndex = 1;
-            this.dashboardDesigner1.DashboardChanged += new System.EventHandler(this.dashboardDesigner1_DashboardChanged);
-            this.dashboardDesigner1.DashboardCreating += new DevExpress.DashboardWin.DashboardCreatingEventHandler(this.dashboardDesigner1_DashboardCreating);
-            this.dashboardDesigner1.DashboardSaving += new DevExpress.DashboardWin.DashboardSavingEventHandler(this.dashboardDesigner1_DashboardSaving);
+            this.dashboardDesigner.AllowPrintDashboard = true;
+            this.dashboardDesigner.AllowPrintDashboardItems = true;
+            this.dashboardDesigner.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(236)))), ((int)(((byte)(239)))));
+            this.dashboardDesigner.Appearance.Options.UseBackColor = true;
+            this.dashboardDesigner.BarAndDockingController = this.dashboardBarAndDockingController1;
+            this.dashboardDesigner.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dashboardDesigner.Location = new System.Drawing.Point(0, 143);
+            this.dashboardDesigner.MenuManager = this.ribbonControl1;
+            this.dashboardDesigner.Name = "dashboardDesigner1";
+            this.dashboardDesigner.PopupMenu = this.dashboardPopupMenu1;
+            this.dashboardDesigner.Size = new System.Drawing.Size(1037, 427);
+            this.dashboardDesigner.TabIndex = 1;
+            this.dashboardDesigner.DashboardChanged += new System.EventHandler(this.HandleDashboardDesignerDashboardChanged);
+            this.dashboardDesigner.DrillDownPerformed += new DevExpress.DashboardCommon.DrillActionEventHandler(this.HandleDashboardDesignerDrillDownPerformed);
+            this.dashboardDesigner.DrillUpPerformed += new DevExpress.DashboardCommon.DrillActionEventHandler(this.HandleDashboardDesignerDrillUpPerformed);
+            this.dashboardDesigner.DashboardItemDoubleClick += new DevExpress.DashboardWin.DashboardItemMouseActionEventHandler(this.HandleDashboardDesignerDashboardItemDoubleClick);
+            this.dashboardDesigner.PopupMenuShowing += new DevExpress.DashboardWin.DashboardPopupMenuShowingEventHandler(this.HandleDashboardDesignerPopupMenuShowing);
+            this.dashboardDesigner.DashboardCreating += new DevExpress.DashboardWin.DashboardCreatingEventHandler(this.HandleDashboardDesignerDashboardCreating);
+            this.dashboardDesigner.DashboardSaving += new DevExpress.DashboardWin.DashboardSavingEventHandler(this.HandleDashboardDesignerDashboardSaving);
+            // 
+            // dashboardBarAndDockingController1
+            // 
+            this.dashboardBarAndDockingController1.PropertiesBar.AllowLinkLighting = false;
+            this.dashboardBarAndDockingController1.PropertiesBar.DefaultGlyphSize = new System.Drawing.Size(16, 16);
+            this.dashboardBarAndDockingController1.PropertiesBar.DefaultLargeGlyphSize = new System.Drawing.Size(32, 32);
             // 
             // dashboardPopupMenu1
             // 
@@ -1385,10 +1374,11 @@
             this.dashboardPopupMenu1.ItemLinks.Add(this.mapFullExtentBarItem1, true);
             this.dashboardPopupMenu1.ItemLinks.Add(this.imageLoadBarItem1, true);
             this.dashboardPopupMenu1.ItemLinks.Add(this.imageImportBarItem1);
-            this.dashboardPopupMenu1.ItemLinks.Add(this.textBoxEditTextBarItem1, true);
-            this.dashboardPopupMenu1.ItemLinks.Add(this.textBoxInsertFieldBarItem1);
+            this.dashboardPopupMenu1.ItemLinks.Add(this.textBoxInsertFieldBarItem1, true);
             this.dashboardPopupMenu1.ItemLinks.Add(this.rangeFilterEditDateTimePeriodsBarItem1, true);
+            this.dashboardPopupMenu1.ItemLinks.Add(this.textBoxEditTextBarItem1);
             this.dashboardPopupMenu1.ItemLinks.Add(this.pivotResetLayoutOptionsBarItem1, true);
+            this.dashboardPopupMenu1.ItemLinks.Add(this.barConfigureExtractButtonItem2);
             this.dashboardPopupMenu1.Name = "dashboardPopupMenu1";
             this.dashboardPopupMenu1.Ribbon = this.ribbonControl1;
             // 
@@ -1655,11 +1645,6 @@
             this.imageImportBarItem1.Id = 258;
             this.imageImportBarItem1.Name = "imageImportBarItem1";
             // 
-            // textBoxEditTextBarItem1
-            // 
-            this.textBoxEditTextBarItem1.Id = 227;
-            this.textBoxEditTextBarItem1.Name = "textBoxEditTextBarItem1";
-            // 
             // textBoxInsertFieldBarItem1
             // 
             this.textBoxInsertFieldBarItem1.Id = 228;
@@ -1670,36 +1655,27 @@
             this.rangeFilterEditDateTimePeriodsBarItem1.Id = 183;
             this.rangeFilterEditDateTimePeriodsBarItem1.Name = "rangeFilterEditDateTimePeriodsBarItem1";
             // 
+            // textBoxEditTextBarItem1
+            // 
+            this.textBoxEditTextBarItem1.Id = 227;
+            this.textBoxEditTextBarItem1.Name = "textBoxEditTextBarItem1";
+            // 
             // pivotResetLayoutOptionsBarItem1
             // 
             this.pivotResetLayoutOptionsBarItem1.Id = 114;
             this.pivotResetLayoutOptionsBarItem1.Name = "pivotResetLayoutOptionsBarItem1";
             // 
-            // dashboardBackstageRecentTab1
+            // barConfigureExtractButtonItem2
             // 
-            this.dashboardBackstageRecentTab1.ContentControl = this.backstageViewClientControl1;
-            this.dashboardBackstageRecentTab1.Name = "dashboardBackstageRecentTab1";
-            this.dashboardBackstageRecentTab1.RecentDashboardsControl = this.recentDashboardsControl1;
-            this.dashboardBackstageRecentTab1.Selected = true;
-            // 
-            // fileOpenButtonItem
-            // 
-            this.fileOpenButtonItem.Caption = "Open";
-            this.fileOpenButtonItem.Glyph = ((System.Drawing.Image)(resources.GetObject("fileOpenButtonItem.Glyph")));
-            this.fileOpenButtonItem.Name = "fileOpenButtonItem";
-            this.fileOpenButtonItem.ItemClick += new DevExpress.XtraBars.Ribbon.BackstageViewItemEventHandler(this.fileOpenButtonItem_ItemClick);
-            // 
-            // dashboardBackstageSaveButton1
-            // 
-            this.dashboardBackstageSaveButton1.Glyph = ((System.Drawing.Image)(resources.GetObject("dashboardBackstageSaveButton1.Glyph")));
-            this.dashboardBackstageSaveButton1.Name = "dashboardBackstageSaveButton1";
-            this.dashboardBackstageSaveButton1.ServiceProvider = this.dashboardDesigner1;
-            // 
-            // dashboardBackstageSaveAsButton1
-            // 
-            this.dashboardBackstageSaveAsButton1.Glyph = ((System.Drawing.Image)(resources.GetObject("dashboardBackstageSaveAsButton1.Glyph")));
-            this.dashboardBackstageSaveAsButton1.Name = "dashboardBackstageSaveAsButton1";
-            this.dashboardBackstageSaveAsButton1.ServiceProvider = this.dashboardDesigner1;
+            this.barConfigureExtractButtonItem2.Caption = "Configure Extract Settings";
+            this.barConfigureExtractButtonItem2.Id = 3;
+            this.barConfigureExtractButtonItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("barConfigureExtractButtonItem2.ImageOptions.Image")));
+            this.barConfigureExtractButtonItem2.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("barConfigureExtractButtonItem2.ImageOptions.LargeImage")));
+            this.barConfigureExtractButtonItem2.Name = "barConfigureExtractButtonItem2";
+            toolTipTitleItem2.Text = "Configure Extact";
+            superToolTip2.Items.Add(toolTipTitleItem2);
+            this.barConfigureExtractButtonItem2.SuperTip = superToolTip2;
+            this.barConfigureExtractButtonItem2.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.HandleConfigureExtractItemClick);
             // 
             // fileNewBarItem1
             // 
@@ -2008,112 +1984,112 @@
             this.dashboardSkinsBarItem1.Gallery.AllowHoverImages = true;
             this.dashboardSkinsBarItem1.Gallery.ColumnCount = 4;
             this.dashboardSkinsBarItem1.Gallery.FixedHoverImageSize = false;
-            galleryItemGroup2.Caption = "Standard Skins";
-            galleryItem1.Caption = "DevExpress Style";
-            galleryItem1.Checked = true;
-            galleryItem1.Hint = "DevExpress Style";
-            galleryItem1.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage")));
-            galleryItem1.Tag = "DevExpress Style";
-            galleryItem2.Caption = "DevExpress Dark Style";
-            galleryItem2.Hint = "DevExpress Dark Style";
-            galleryItem2.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage1")));
-            galleryItem2.Tag = "DevExpress Dark Style";
-            galleryItem3.Caption = "Office 2016 Colorful";
-            galleryItem3.Hint = "Office 2016 Colorful";
-            galleryItem3.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage2")));
-            galleryItem3.Tag = "Office 2016 Colorful";
-            galleryItem4.Caption = "Office 2016 Dark";
-            galleryItem4.Hint = "Office 2016 Dark";
-            galleryItem4.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage3")));
-            galleryItem4.Tag = "Office 2016 Dark";
-            galleryItem5.Caption = "Office 2016 Black";
-            galleryItem5.Hint = "Office 2016 Black";
-            galleryItem5.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage4")));
-            galleryItem5.Tag = "Office 2016 Black";
-            galleryItem6.Caption = "The Bezier";
-            galleryItem6.Hint = "The Bezier";
-            galleryItem6.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage5")));
-            galleryItem6.Tag = "The Bezier";
-            galleryItem7.Caption = "Office 2013 White";
-            galleryItem7.Hint = "Office 2013 White";
-            galleryItem7.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage6")));
-            galleryItem7.Tag = "Office 2013";
-            galleryItem8.Caption = "Office 2013 Dark Gray";
-            galleryItem8.Hint = "Office 2013 Dark Gray";
-            galleryItem8.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage7")));
-            galleryItem8.Tag = "Office 2013 Dark Gray";
-            galleryItem9.Caption = "Office 2013 Light Gray";
-            galleryItem9.Hint = "Office 2013 Light Gray";
-            galleryItem9.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage8")));
-            galleryItem9.Tag = "Office 2013 Light Gray";
-            galleryItem10.Caption = "Office 2010 Blue";
-            galleryItem10.Hint = "Office 2010 Blue";
-            galleryItem10.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage9")));
-            galleryItem10.Tag = "Office 2010 Blue";
-            galleryItem11.Caption = "Office 2010 Black";
-            galleryItem11.Hint = "Office 2010 Black";
-            galleryItem11.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage10")));
-            galleryItem11.Tag = "Office 2010 Black";
-            galleryItem12.Caption = "Office 2010 Silver";
-            galleryItem12.Hint = "Office 2010 Silver";
-            galleryItem12.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage11")));
-            galleryItem12.Tag = "Office 2010 Silver";
-            galleryItem13.Caption = "Visual Studio 2013 Blue";
-            galleryItem13.Hint = "Visual Studio 2013 Blue";
-            galleryItem13.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage12")));
-            galleryItem13.Tag = "Visual Studio 2013 Blue";
-            galleryItem14.Caption = "Visual Studio 2013 Dark";
-            galleryItem14.Hint = "Visual Studio 2013 Dark";
-            galleryItem14.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage13")));
-            galleryItem14.Tag = "Visual Studio 2013 Dark";
-            galleryItem15.Caption = "Visual Studio 2013 Light";
-            galleryItem15.Hint = "Visual Studio 2013 Light";
-            galleryItem15.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage14")));
-            galleryItem15.Tag = "Visual Studio 2013 Light";
-            galleryItem16.Caption = "Seven Classic";
-            galleryItem16.Hint = "Seven Classic";
-            galleryItem16.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage15")));
-            galleryItem16.Tag = "Seven Classic";
-            galleryItem17.Caption = "Visual Studio 2010";
-            galleryItem17.Hint = "Visual Studio 2010";
-            galleryItem17.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage16")));
-            galleryItem17.Tag = "VS2010";
-            galleryItemGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            galleryItem1,
-            galleryItem2,
-            galleryItem3,
-            galleryItem4,
-            galleryItem5,
-            galleryItem6,
-            galleryItem7,
-            galleryItem8,
-            galleryItem9,
-            galleryItem10,
-            galleryItem11,
-            galleryItem12,
-            galleryItem13,
-            galleryItem14,
-            galleryItem15,
-            galleryItem16,
-            galleryItem17});
-            galleryItemGroup3.Caption = "Bonus Skins";
-            galleryItemGroup3.Visible = false;
-            galleryItemGroup4.Caption = "Theme Skins";
-            galleryItemGroup4.Visible = false;
-            galleryItemGroup5.Caption = "Custom Skins";
-            galleryItemGroup5.Visible = false;
+            galleryItemGroup8.Caption = "Standard Skins";
+            galleryItem18.Caption = "DevExpress Style";
+            galleryItem18.Checked = true;
+            galleryItem18.Hint = "DevExpress Style";
+            galleryItem18.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage")));
+            galleryItem18.Tag = "DevExpress Style";
+            galleryItem19.Caption = "DevExpress Dark Style";
+            galleryItem19.Hint = "DevExpress Dark Style";
+            galleryItem19.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage1")));
+            galleryItem19.Tag = "DevExpress Dark Style";
+            galleryItem20.Caption = "Office 2016 Colorful";
+            galleryItem20.Hint = "Office 2016 Colorful";
+            galleryItem20.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage2")));
+            galleryItem20.Tag = "Office 2016 Colorful";
+            galleryItem21.Caption = "Office 2016 Dark";
+            galleryItem21.Hint = "Office 2016 Dark";
+            galleryItem21.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage3")));
+            galleryItem21.Tag = "Office 2016 Dark";
+            galleryItem22.Caption = "Office 2016 Black";
+            galleryItem22.Hint = "Office 2016 Black";
+            galleryItem22.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage4")));
+            galleryItem22.Tag = "Office 2016 Black";
+            galleryItem23.Caption = "The Bezier";
+            galleryItem23.Hint = "The Bezier";
+            galleryItem23.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage5")));
+            galleryItem23.Tag = "The Bezier";
+            galleryItem24.Caption = "Office 2013 White";
+            galleryItem24.Hint = "Office 2013 White";
+            galleryItem24.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage6")));
+            galleryItem24.Tag = "Office 2013";
+            galleryItem25.Caption = "Office 2013 Dark Gray";
+            galleryItem25.Hint = "Office 2013 Dark Gray";
+            galleryItem25.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage7")));
+            galleryItem25.Tag = "Office 2013 Dark Gray";
+            galleryItem26.Caption = "Office 2013 Light Gray";
+            galleryItem26.Hint = "Office 2013 Light Gray";
+            galleryItem26.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage8")));
+            galleryItem26.Tag = "Office 2013 Light Gray";
+            galleryItem27.Caption = "Office 2010 Blue";
+            galleryItem27.Hint = "Office 2010 Blue";
+            galleryItem27.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage9")));
+            galleryItem27.Tag = "Office 2010 Blue";
+            galleryItem28.Caption = "Office 2010 Black";
+            galleryItem28.Hint = "Office 2010 Black";
+            galleryItem28.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage10")));
+            galleryItem28.Tag = "Office 2010 Black";
+            galleryItem29.Caption = "Office 2010 Silver";
+            galleryItem29.Hint = "Office 2010 Silver";
+            galleryItem29.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage11")));
+            galleryItem29.Tag = "Office 2010 Silver";
+            galleryItem30.Caption = "Visual Studio 2013 Blue";
+            galleryItem30.Hint = "Visual Studio 2013 Blue";
+            galleryItem30.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage12")));
+            galleryItem30.Tag = "Visual Studio 2013 Blue";
+            galleryItem31.Caption = "Visual Studio 2013 Dark";
+            galleryItem31.Hint = "Visual Studio 2013 Dark";
+            galleryItem31.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage13")));
+            galleryItem31.Tag = "Visual Studio 2013 Dark";
+            galleryItem32.Caption = "Visual Studio 2013 Light";
+            galleryItem32.Hint = "Visual Studio 2013 Light";
+            galleryItem32.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage14")));
+            galleryItem32.Tag = "Visual Studio 2013 Light";
+            galleryItem33.Caption = "Seven Classic";
+            galleryItem33.Hint = "Seven Classic";
+            galleryItem33.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage15")));
+            galleryItem33.Tag = "Seven Classic";
+            galleryItem34.Caption = "Visual Studio 2010";
+            galleryItem34.Hint = "Visual Studio 2010";
+            galleryItem34.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("resource.SvgImage16")));
+            galleryItem34.Tag = "VS2010";
+            galleryItemGroup8.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            galleryItem18,
+            galleryItem19,
+            galleryItem20,
+            galleryItem21,
+            galleryItem22,
+            galleryItem23,
+            galleryItem24,
+            galleryItem25,
+            galleryItem26,
+            galleryItem27,
+            galleryItem28,
+            galleryItem29,
+            galleryItem30,
+            galleryItem31,
+            galleryItem32,
+            galleryItem33,
+            galleryItem34});
+            galleryItemGroup9.Caption = "Bonus Skins";
+            galleryItemGroup9.Visible = false;
+            galleryItemGroup10.Caption = "Theme Skins";
+            galleryItemGroup10.Visible = false;
+            galleryItemGroup11.Caption = "Custom Skins";
+            galleryItemGroup11.Visible = false;
             this.dashboardSkinsBarItem1.Gallery.Groups.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItemGroup[] {
-            galleryItemGroup2,
-            galleryItemGroup3,
-            galleryItemGroup4,
-            galleryItemGroup5});
+            galleryItemGroup8,
+            galleryItemGroup9,
+            galleryItemGroup10,
+            galleryItemGroup11});
             this.dashboardSkinsBarItem1.Gallery.ImageSize = new System.Drawing.Size(16, 16);
             this.dashboardSkinsBarItem1.Gallery.ItemCheckMode = DevExpress.XtraBars.Ribbon.Gallery.ItemCheckMode.SingleRadio;
             this.dashboardSkinsBarItem1.Gallery.ItemImageLayout = DevExpress.Utils.Drawing.ImageLayoutMode.Squeeze;
             this.dashboardSkinsBarItem1.Gallery.ItemImageLocation = DevExpress.Utils.Locations.Top;
-            skinPaddingEdges1.Left = 8;
-            skinPaddingEdges1.Right = 8;
-            this.dashboardSkinsBarItem1.Gallery.ItemImagePadding = skinPaddingEdges1;
+            skinPaddingEdges2.Left = 8;
+            skinPaddingEdges2.Right = 8;
+            this.dashboardSkinsBarItem1.Gallery.ItemImagePadding = skinPaddingEdges2;
             this.dashboardSkinsBarItem1.Id = 87;
             this.dashboardSkinsBarItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("dashboardSkinsBarItem1.ImageOptions.Image")));
             this.dashboardSkinsBarItem1.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("dashboardSkinsBarItem1.ImageOptions.LargeImage")));
@@ -2364,81 +2340,81 @@
             // 
             // 
             this.galleryChartLegendPositionItem1.Gallery.ColumnCount = 3;
-            chartLegendInsideTopLeftHorizontalGalleryItem1.Caption = "";
-            chartLegendInsideTopLeftHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image")));
-            chartLegendInsideTopCenterHorizontalGalleryItem1.Caption = "";
-            chartLegendInsideTopCenterHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image1")));
-            chartLegendInsideTopRightHorizontalGalleryItem1.Caption = "";
-            chartLegendInsideTopRightHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image2")));
-            chartLegendInsideBottomLeftHorizontalGalleryItem1.Caption = "";
-            chartLegendInsideBottomLeftHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image3")));
-            chartLegendInsideBottomCenterHorizontalGalleryItem1.Caption = "";
-            chartLegendInsideBottomCenterHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image4")));
-            chartLegendInsideBottomRightHorizontalGalleryItem1.Caption = "";
-            chartLegendInsideBottomRightHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image5")));
-            chartInsideHorizontalLegendGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartLegendInsideTopLeftHorizontalGalleryItem1,
-            chartLegendInsideTopCenterHorizontalGalleryItem1,
-            chartLegendInsideTopRightHorizontalGalleryItem1,
-            chartLegendInsideBottomLeftHorizontalGalleryItem1,
-            chartLegendInsideBottomCenterHorizontalGalleryItem1,
-            chartLegendInsideBottomRightHorizontalGalleryItem1});
-            chartLegendInsideTopLeftVerticalGalleryItem1.Caption = "";
-            chartLegendInsideTopLeftVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image6")));
-            chartLegendInsideTopCenterVerticalGalleryItem1.Caption = "";
-            chartLegendInsideTopCenterVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image7")));
-            chartLegendInsideTopRightVerticalGalleryItem1.Caption = "";
-            chartLegendInsideTopRightVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image8")));
-            chartLegendInsideBottomLeftVerticalGalleryItem1.Caption = "";
-            chartLegendInsideBottomLeftVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image9")));
-            chartLegendInsideBottomCenterVerticalGalleryItem1.Caption = "";
-            chartLegendInsideBottomCenterVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image10")));
-            chartLegendInsideBottomRightVerticalGalleryItem1.Caption = "";
-            chartLegendInsideBottomRightVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image11")));
-            chartInsideVerticalLegendGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartLegendInsideTopLeftVerticalGalleryItem1,
-            chartLegendInsideTopCenterVerticalGalleryItem1,
-            chartLegendInsideTopRightVerticalGalleryItem1,
-            chartLegendInsideBottomLeftVerticalGalleryItem1,
-            chartLegendInsideBottomCenterVerticalGalleryItem1,
-            chartLegendInsideBottomRightVerticalGalleryItem1});
-            chartLegendOutsideTopLeftHorizontalGalleryItem1.Caption = "";
-            chartLegendOutsideTopLeftHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image12")));
-            chartLegendOutsideTopCenterHorizontalGalleryItem1.Caption = "";
-            chartLegendOutsideTopCenterHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image13")));
-            chartLegendOutsideTopRightHorizontalGalleryItem1.Caption = "";
-            chartLegendOutsideTopRightHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image14")));
-            chartLegendOutsideBottomLeftHorizontalGalleryItem1.Caption = "";
-            chartLegendOutsideBottomLeftHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image15")));
-            chartLegendOutsideBottomCenterHorizontalGalleryItem1.Caption = "";
-            chartLegendOutsideBottomCenterHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image16")));
-            chartLegendOutsideBottomRightHorizontalGalleryItem1.Caption = "";
-            chartLegendOutsideBottomRightHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image17")));
-            chartOutsideHorizontalLegendGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartLegendOutsideTopLeftHorizontalGalleryItem1,
-            chartLegendOutsideTopCenterHorizontalGalleryItem1,
-            chartLegendOutsideTopRightHorizontalGalleryItem1,
-            chartLegendOutsideBottomLeftHorizontalGalleryItem1,
-            chartLegendOutsideBottomCenterHorizontalGalleryItem1,
-            chartLegendOutsideBottomRightHorizontalGalleryItem1});
-            chartLegendOutsideTopLeftVerticalGalleryItem1.Caption = "";
-            chartLegendOutsideTopLeftVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image18")));
-            chartLegendOutsideTopRightVerticalGalleryItem1.Caption = "";
-            chartLegendOutsideTopRightVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image19")));
-            chartLegendOutsideBottomLeftVerticalGalleryItem1.Caption = "";
-            chartLegendOutsideBottomLeftVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image20")));
-            chartLegendOutsideBottomRightVerticalGalleryItem1.Caption = "";
-            chartLegendOutsideBottomRightVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image21")));
-            chartOutsideVerticalLegendGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartLegendOutsideTopLeftVerticalGalleryItem1,
-            chartLegendOutsideTopRightVerticalGalleryItem1,
-            chartLegendOutsideBottomLeftVerticalGalleryItem1,
-            chartLegendOutsideBottomRightVerticalGalleryItem1});
+            chartLegendInsideTopLeftHorizontalGalleryItem3.Caption = "";
+            chartLegendInsideTopLeftHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image")));
+            chartLegendInsideTopCenterHorizontalGalleryItem3.Caption = "";
+            chartLegendInsideTopCenterHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image1")));
+            chartLegendInsideTopRightHorizontalGalleryItem3.Caption = "";
+            chartLegendInsideTopRightHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image2")));
+            chartLegendInsideBottomLeftHorizontalGalleryItem3.Caption = "";
+            chartLegendInsideBottomLeftHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image3")));
+            chartLegendInsideBottomCenterHorizontalGalleryItem3.Caption = "";
+            chartLegendInsideBottomCenterHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image4")));
+            chartLegendInsideBottomRightHorizontalGalleryItem3.Caption = "";
+            chartLegendInsideBottomRightHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image5")));
+            chartInsideHorizontalLegendGalleryGroup3.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartLegendInsideTopLeftHorizontalGalleryItem3,
+            chartLegendInsideTopCenterHorizontalGalleryItem3,
+            chartLegendInsideTopRightHorizontalGalleryItem3,
+            chartLegendInsideBottomLeftHorizontalGalleryItem3,
+            chartLegendInsideBottomCenterHorizontalGalleryItem3,
+            chartLegendInsideBottomRightHorizontalGalleryItem3});
+            chartLegendInsideTopLeftVerticalGalleryItem3.Caption = "";
+            chartLegendInsideTopLeftVerticalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image6")));
+            chartLegendInsideTopCenterVerticalGalleryItem3.Caption = "";
+            chartLegendInsideTopCenterVerticalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image7")));
+            chartLegendInsideTopRightVerticalGalleryItem3.Caption = "";
+            chartLegendInsideTopRightVerticalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image8")));
+            chartLegendInsideBottomLeftVerticalGalleryItem3.Caption = "";
+            chartLegendInsideBottomLeftVerticalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image9")));
+            chartLegendInsideBottomCenterVerticalGalleryItem3.Caption = "";
+            chartLegendInsideBottomCenterVerticalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image10")));
+            chartLegendInsideBottomRightVerticalGalleryItem3.Caption = "";
+            chartLegendInsideBottomRightVerticalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image11")));
+            chartInsideVerticalLegendGalleryGroup3.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartLegendInsideTopLeftVerticalGalleryItem3,
+            chartLegendInsideTopCenterVerticalGalleryItem3,
+            chartLegendInsideTopRightVerticalGalleryItem3,
+            chartLegendInsideBottomLeftVerticalGalleryItem3,
+            chartLegendInsideBottomCenterVerticalGalleryItem3,
+            chartLegendInsideBottomRightVerticalGalleryItem3});
+            chartLegendOutsideTopLeftHorizontalGalleryItem3.Caption = "";
+            chartLegendOutsideTopLeftHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image12")));
+            chartLegendOutsideTopCenterHorizontalGalleryItem3.Caption = "";
+            chartLegendOutsideTopCenterHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image13")));
+            chartLegendOutsideTopRightHorizontalGalleryItem3.Caption = "";
+            chartLegendOutsideTopRightHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image14")));
+            chartLegendOutsideBottomLeftHorizontalGalleryItem3.Caption = "";
+            chartLegendOutsideBottomLeftHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image15")));
+            chartLegendOutsideBottomCenterHorizontalGalleryItem3.Caption = "";
+            chartLegendOutsideBottomCenterHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image16")));
+            chartLegendOutsideBottomRightHorizontalGalleryItem3.Caption = "";
+            chartLegendOutsideBottomRightHorizontalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image17")));
+            chartOutsideHorizontalLegendGalleryGroup3.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartLegendOutsideTopLeftHorizontalGalleryItem3,
+            chartLegendOutsideTopCenterHorizontalGalleryItem3,
+            chartLegendOutsideTopRightHorizontalGalleryItem3,
+            chartLegendOutsideBottomLeftHorizontalGalleryItem3,
+            chartLegendOutsideBottomCenterHorizontalGalleryItem3,
+            chartLegendOutsideBottomRightHorizontalGalleryItem3});
+            chartLegendOutsideTopLeftVerticalGalleryItem3.Caption = "";
+            chartLegendOutsideTopLeftVerticalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image18")));
+            chartLegendOutsideTopRightVerticalGalleryItem3.Caption = "";
+            chartLegendOutsideTopRightVerticalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image19")));
+            chartLegendOutsideBottomLeftVerticalGalleryItem3.Caption = "";
+            chartLegendOutsideBottomLeftVerticalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image20")));
+            chartLegendOutsideBottomRightVerticalGalleryItem3.Caption = "";
+            chartLegendOutsideBottomRightVerticalGalleryItem3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image21")));
+            chartOutsideVerticalLegendGalleryGroup3.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartLegendOutsideTopLeftVerticalGalleryItem3,
+            chartLegendOutsideTopRightVerticalGalleryItem3,
+            chartLegendOutsideBottomLeftVerticalGalleryItem3,
+            chartLegendOutsideBottomRightVerticalGalleryItem3});
             this.galleryChartLegendPositionItem1.Gallery.Groups.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItemGroup[] {
-            chartInsideHorizontalLegendGalleryGroup1,
-            chartInsideVerticalLegendGalleryGroup1,
-            chartOutsideHorizontalLegendGalleryGroup1,
-            chartOutsideVerticalLegendGalleryGroup1});
+            chartInsideHorizontalLegendGalleryGroup3,
+            chartInsideVerticalLegendGalleryGroup3,
+            chartOutsideHorizontalLegendGalleryGroup3,
+            chartOutsideVerticalLegendGalleryGroup3});
             this.galleryChartLegendPositionItem1.Gallery.ImageSize = new System.Drawing.Size(32, 32);
             this.galleryChartLegendPositionItem1.Gallery.RowCount = 8;
             this.galleryChartLegendPositionItem1.Id = 135;
@@ -2449,85 +2425,85 @@
             // 
             // 
             // 
-            chartBarSeriesGalleryItem1.Caption = "";
-            chartBarSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image22")));
-            chartStackedBarSeriesGalleryItem1.Caption = "";
-            chartStackedBarSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image23")));
-            chartFullStackedBarSeriesGalleryItem1.Caption = "";
-            chartFullStackedBarSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image24")));
-            chartBarSeriesGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartBarSeriesGalleryItem1,
-            chartStackedBarSeriesGalleryItem1,
-            chartFullStackedBarSeriesGalleryItem1});
-            chartPointSeriesGalleryItem1.Caption = "";
-            chartPointSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image25")));
-            chartLineSeriesGalleryItem1.Caption = "";
-            chartLineSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image26")));
-            chartStackedLineSeriesGalleryItem1.Caption = "";
-            chartStackedLineSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image27")));
-            chartFullStackedLineSeriesGalleryItem1.Caption = "";
-            chartFullStackedLineSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image28")));
-            chartStepLineSeriesGalleryItem1.Caption = "";
-            chartStepLineSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image29")));
-            chartSplineSeriesGalleryItem1.Caption = "";
-            chartSplineSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image30")));
-            chartPointLineSeriesGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartPointSeriesGalleryItem1,
-            chartLineSeriesGalleryItem1,
-            chartStackedLineSeriesGalleryItem1,
-            chartFullStackedLineSeriesGalleryItem1,
-            chartStepLineSeriesGalleryItem1,
-            chartSplineSeriesGalleryItem1});
-            chartAreaSeriesGalleryItem1.Caption = "";
-            chartAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image31")));
-            chartStackedAreaSeriesGalleryItem1.Caption = "";
-            chartStackedAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image32")));
-            chartFullStackedAreaSeriesGalleryItem1.Caption = "";
-            chartFullStackedAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image33")));
-            chartStepAreaSeriesGalleryItem1.Caption = "";
-            chartStepAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image34")));
-            chartSplineAreaSeriesGalleryItem1.Caption = "";
-            chartSplineAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image35")));
-            chartStackedSplineAreaSeriesGalleryItem1.Caption = "";
-            chartStackedSplineAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image36")));
-            chartFullStackedSplineAreaSeriesGalleryItem1.Caption = "";
-            chartFullStackedSplineAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image37")));
-            chartAreaSeriesGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartAreaSeriesGalleryItem1,
-            chartStackedAreaSeriesGalleryItem1,
-            chartFullStackedAreaSeriesGalleryItem1,
-            chartStepAreaSeriesGalleryItem1,
-            chartSplineAreaSeriesGalleryItem1,
-            chartStackedSplineAreaSeriesGalleryItem1,
-            chartFullStackedSplineAreaSeriesGalleryItem1});
-            chartSideBySideRangeBarSeriesGalleryItem1.Caption = "";
-            chartSideBySideRangeBarSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image38")));
-            chartRangeAreaSeriesGalleryItem1.Caption = "";
-            chartRangeAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image39")));
-            chartRangeSeriesGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartSideBySideRangeBarSeriesGalleryItem1,
-            chartRangeAreaSeriesGalleryItem1});
-            chartWeightedSeriesGalleryItem1.Caption = "";
-            chartWeightedSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image40")));
-            chartBubbleSeriesGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartWeightedSeriesGalleryItem1});
-            chartHighLowCloseSeriesGalleryItem1.Caption = "";
-            chartHighLowCloseSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image41")));
-            chartCandleStickSeriesGalleryItem1.Caption = "";
-            chartCandleStickSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image42")));
-            chartStockSeriesGalleryItem1.Caption = "";
-            chartStockSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image43")));
-            chartFinancialSeriesGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartHighLowCloseSeriesGalleryItem1,
-            chartCandleStickSeriesGalleryItem1,
-            chartStockSeriesGalleryItem1});
+            chartBarSeriesGalleryItem2.Caption = "";
+            chartBarSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image22")));
+            chartStackedBarSeriesGalleryItem2.Caption = "";
+            chartStackedBarSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image23")));
+            chartFullStackedBarSeriesGalleryItem2.Caption = "";
+            chartFullStackedBarSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image24")));
+            chartBarSeriesGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartBarSeriesGalleryItem2,
+            chartStackedBarSeriesGalleryItem2,
+            chartFullStackedBarSeriesGalleryItem2});
+            chartPointSeriesGalleryItem2.Caption = "";
+            chartPointSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image25")));
+            chartLineSeriesGalleryItem2.Caption = "";
+            chartLineSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image26")));
+            chartStackedLineSeriesGalleryItem2.Caption = "";
+            chartStackedLineSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image27")));
+            chartFullStackedLineSeriesGalleryItem2.Caption = "";
+            chartFullStackedLineSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image28")));
+            chartStepLineSeriesGalleryItem2.Caption = "";
+            chartStepLineSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image29")));
+            chartSplineSeriesGalleryItem2.Caption = "";
+            chartSplineSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image30")));
+            chartPointLineSeriesGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartPointSeriesGalleryItem2,
+            chartLineSeriesGalleryItem2,
+            chartStackedLineSeriesGalleryItem2,
+            chartFullStackedLineSeriesGalleryItem2,
+            chartStepLineSeriesGalleryItem2,
+            chartSplineSeriesGalleryItem2});
+            chartAreaSeriesGalleryItem2.Caption = "";
+            chartAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image31")));
+            chartStackedAreaSeriesGalleryItem2.Caption = "";
+            chartStackedAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image32")));
+            chartFullStackedAreaSeriesGalleryItem2.Caption = "";
+            chartFullStackedAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image33")));
+            chartStepAreaSeriesGalleryItem2.Caption = "";
+            chartStepAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image34")));
+            chartSplineAreaSeriesGalleryItem2.Caption = "";
+            chartSplineAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image35")));
+            chartStackedSplineAreaSeriesGalleryItem2.Caption = "";
+            chartStackedSplineAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image36")));
+            chartFullStackedSplineAreaSeriesGalleryItem2.Caption = "";
+            chartFullStackedSplineAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image37")));
+            chartAreaSeriesGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartAreaSeriesGalleryItem2,
+            chartStackedAreaSeriesGalleryItem2,
+            chartFullStackedAreaSeriesGalleryItem2,
+            chartStepAreaSeriesGalleryItem2,
+            chartSplineAreaSeriesGalleryItem2,
+            chartStackedSplineAreaSeriesGalleryItem2,
+            chartFullStackedSplineAreaSeriesGalleryItem2});
+            chartSideBySideRangeBarSeriesGalleryItem2.Caption = "";
+            chartSideBySideRangeBarSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image38")));
+            chartRangeAreaSeriesGalleryItem2.Caption = "";
+            chartRangeAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image39")));
+            chartRangeSeriesGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartSideBySideRangeBarSeriesGalleryItem2,
+            chartRangeAreaSeriesGalleryItem2});
+            chartWeightedSeriesGalleryItem2.Caption = "";
+            chartWeightedSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image40")));
+            chartBubbleSeriesGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartWeightedSeriesGalleryItem2});
+            chartHighLowCloseSeriesGalleryItem2.Caption = "";
+            chartHighLowCloseSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image41")));
+            chartCandleStickSeriesGalleryItem2.Caption = "";
+            chartCandleStickSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image42")));
+            chartStockSeriesGalleryItem2.Caption = "";
+            chartStockSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image43")));
+            chartFinancialSeriesGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartHighLowCloseSeriesGalleryItem2,
+            chartCandleStickSeriesGalleryItem2,
+            chartStockSeriesGalleryItem2});
             this.galleryChartSeriesTypeItem1.Gallery.Groups.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItemGroup[] {
-            chartBarSeriesGalleryGroup1,
-            chartPointLineSeriesGalleryGroup1,
-            chartAreaSeriesGalleryGroup1,
-            chartRangeSeriesGalleryGroup1,
-            chartBubbleSeriesGalleryGroup1,
-            chartFinancialSeriesGalleryGroup1});
+            chartBarSeriesGalleryGroup2,
+            chartPointLineSeriesGalleryGroup2,
+            chartAreaSeriesGalleryGroup2,
+            chartRangeSeriesGalleryGroup2,
+            chartBubbleSeriesGalleryGroup2,
+            chartFinancialSeriesGalleryGroup2});
             this.galleryChartSeriesTypeItem1.Gallery.ImageSize = new System.Drawing.Size(32, 32);
             this.galleryChartSeriesTypeItem1.Gallery.RowCount = 8;
             this.galleryChartSeriesTypeItem1.Id = 136;
@@ -2579,81 +2555,81 @@
             // 
             // 
             this.galleryScatterChartLegendPositionItem1.Gallery.ColumnCount = 3;
-            chartLegendInsideTopLeftHorizontalGalleryItem2.Caption = "";
-            chartLegendInsideTopLeftHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image44")));
-            chartLegendInsideTopCenterHorizontalGalleryItem2.Caption = "";
-            chartLegendInsideTopCenterHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image45")));
-            chartLegendInsideTopRightHorizontalGalleryItem2.Caption = "";
-            chartLegendInsideTopRightHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image46")));
-            chartLegendInsideBottomLeftHorizontalGalleryItem2.Caption = "";
-            chartLegendInsideBottomLeftHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image47")));
-            chartLegendInsideBottomCenterHorizontalGalleryItem2.Caption = "";
-            chartLegendInsideBottomCenterHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image48")));
-            chartLegendInsideBottomRightHorizontalGalleryItem2.Caption = "";
-            chartLegendInsideBottomRightHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image49")));
-            chartInsideHorizontalLegendGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartLegendInsideTopLeftHorizontalGalleryItem2,
-            chartLegendInsideTopCenterHorizontalGalleryItem2,
-            chartLegendInsideTopRightHorizontalGalleryItem2,
-            chartLegendInsideBottomLeftHorizontalGalleryItem2,
-            chartLegendInsideBottomCenterHorizontalGalleryItem2,
-            chartLegendInsideBottomRightHorizontalGalleryItem2});
-            chartLegendInsideTopLeftVerticalGalleryItem2.Caption = "";
-            chartLegendInsideTopLeftVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image50")));
-            chartLegendInsideTopCenterVerticalGalleryItem2.Caption = "";
-            chartLegendInsideTopCenterVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image51")));
-            chartLegendInsideTopRightVerticalGalleryItem2.Caption = "";
-            chartLegendInsideTopRightVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image52")));
-            chartLegendInsideBottomLeftVerticalGalleryItem2.Caption = "";
-            chartLegendInsideBottomLeftVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image53")));
-            chartLegendInsideBottomCenterVerticalGalleryItem2.Caption = "";
-            chartLegendInsideBottomCenterVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image54")));
-            chartLegendInsideBottomRightVerticalGalleryItem2.Caption = "";
-            chartLegendInsideBottomRightVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image55")));
-            chartInsideVerticalLegendGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartLegendInsideTopLeftVerticalGalleryItem2,
-            chartLegendInsideTopCenterVerticalGalleryItem2,
-            chartLegendInsideTopRightVerticalGalleryItem2,
-            chartLegendInsideBottomLeftVerticalGalleryItem2,
-            chartLegendInsideBottomCenterVerticalGalleryItem2,
-            chartLegendInsideBottomRightVerticalGalleryItem2});
-            chartLegendOutsideTopLeftHorizontalGalleryItem2.Caption = "";
-            chartLegendOutsideTopLeftHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image56")));
-            chartLegendOutsideTopCenterHorizontalGalleryItem2.Caption = "";
-            chartLegendOutsideTopCenterHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image57")));
-            chartLegendOutsideTopRightHorizontalGalleryItem2.Caption = "";
-            chartLegendOutsideTopRightHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image58")));
-            chartLegendOutsideBottomLeftHorizontalGalleryItem2.Caption = "";
-            chartLegendOutsideBottomLeftHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image59")));
-            chartLegendOutsideBottomCenterHorizontalGalleryItem2.Caption = "";
-            chartLegendOutsideBottomCenterHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image60")));
-            chartLegendOutsideBottomRightHorizontalGalleryItem2.Caption = "";
-            chartLegendOutsideBottomRightHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image61")));
-            chartOutsideHorizontalLegendGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartLegendOutsideTopLeftHorizontalGalleryItem2,
-            chartLegendOutsideTopCenterHorizontalGalleryItem2,
-            chartLegendOutsideTopRightHorizontalGalleryItem2,
-            chartLegendOutsideBottomLeftHorizontalGalleryItem2,
-            chartLegendOutsideBottomCenterHorizontalGalleryItem2,
-            chartLegendOutsideBottomRightHorizontalGalleryItem2});
-            chartLegendOutsideTopLeftVerticalGalleryItem2.Caption = "";
-            chartLegendOutsideTopLeftVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image62")));
-            chartLegendOutsideTopRightVerticalGalleryItem2.Caption = "";
-            chartLegendOutsideTopRightVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image63")));
-            chartLegendOutsideBottomLeftVerticalGalleryItem2.Caption = "";
-            chartLegendOutsideBottomLeftVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image64")));
-            chartLegendOutsideBottomRightVerticalGalleryItem2.Caption = "";
-            chartLegendOutsideBottomRightVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image65")));
-            chartOutsideVerticalLegendGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            chartLegendOutsideTopLeftVerticalGalleryItem2,
-            chartLegendOutsideTopRightVerticalGalleryItem2,
-            chartLegendOutsideBottomLeftVerticalGalleryItem2,
-            chartLegendOutsideBottomRightVerticalGalleryItem2});
+            chartLegendInsideTopLeftHorizontalGalleryItem4.Caption = "";
+            chartLegendInsideTopLeftHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image44")));
+            chartLegendInsideTopCenterHorizontalGalleryItem4.Caption = "";
+            chartLegendInsideTopCenterHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image45")));
+            chartLegendInsideTopRightHorizontalGalleryItem4.Caption = "";
+            chartLegendInsideTopRightHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image46")));
+            chartLegendInsideBottomLeftHorizontalGalleryItem4.Caption = "";
+            chartLegendInsideBottomLeftHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image47")));
+            chartLegendInsideBottomCenterHorizontalGalleryItem4.Caption = "";
+            chartLegendInsideBottomCenterHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image48")));
+            chartLegendInsideBottomRightHorizontalGalleryItem4.Caption = "";
+            chartLegendInsideBottomRightHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image49")));
+            chartInsideHorizontalLegendGalleryGroup4.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartLegendInsideTopLeftHorizontalGalleryItem4,
+            chartLegendInsideTopCenterHorizontalGalleryItem4,
+            chartLegendInsideTopRightHorizontalGalleryItem4,
+            chartLegendInsideBottomLeftHorizontalGalleryItem4,
+            chartLegendInsideBottomCenterHorizontalGalleryItem4,
+            chartLegendInsideBottomRightHorizontalGalleryItem4});
+            chartLegendInsideTopLeftVerticalGalleryItem4.Caption = "";
+            chartLegendInsideTopLeftVerticalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image50")));
+            chartLegendInsideTopCenterVerticalGalleryItem4.Caption = "";
+            chartLegendInsideTopCenterVerticalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image51")));
+            chartLegendInsideTopRightVerticalGalleryItem4.Caption = "";
+            chartLegendInsideTopRightVerticalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image52")));
+            chartLegendInsideBottomLeftVerticalGalleryItem4.Caption = "";
+            chartLegendInsideBottomLeftVerticalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image53")));
+            chartLegendInsideBottomCenterVerticalGalleryItem4.Caption = "";
+            chartLegendInsideBottomCenterVerticalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image54")));
+            chartLegendInsideBottomRightVerticalGalleryItem4.Caption = "";
+            chartLegendInsideBottomRightVerticalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image55")));
+            chartInsideVerticalLegendGalleryGroup4.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartLegendInsideTopLeftVerticalGalleryItem4,
+            chartLegendInsideTopCenterVerticalGalleryItem4,
+            chartLegendInsideTopRightVerticalGalleryItem4,
+            chartLegendInsideBottomLeftVerticalGalleryItem4,
+            chartLegendInsideBottomCenterVerticalGalleryItem4,
+            chartLegendInsideBottomRightVerticalGalleryItem4});
+            chartLegendOutsideTopLeftHorizontalGalleryItem4.Caption = "";
+            chartLegendOutsideTopLeftHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image56")));
+            chartLegendOutsideTopCenterHorizontalGalleryItem4.Caption = "";
+            chartLegendOutsideTopCenterHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image57")));
+            chartLegendOutsideTopRightHorizontalGalleryItem4.Caption = "";
+            chartLegendOutsideTopRightHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image58")));
+            chartLegendOutsideBottomLeftHorizontalGalleryItem4.Caption = "";
+            chartLegendOutsideBottomLeftHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image59")));
+            chartLegendOutsideBottomCenterHorizontalGalleryItem4.Caption = "";
+            chartLegendOutsideBottomCenterHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image60")));
+            chartLegendOutsideBottomRightHorizontalGalleryItem4.Caption = "";
+            chartLegendOutsideBottomRightHorizontalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image61")));
+            chartOutsideHorizontalLegendGalleryGroup4.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartLegendOutsideTopLeftHorizontalGalleryItem4,
+            chartLegendOutsideTopCenterHorizontalGalleryItem4,
+            chartLegendOutsideTopRightHorizontalGalleryItem4,
+            chartLegendOutsideBottomLeftHorizontalGalleryItem4,
+            chartLegendOutsideBottomCenterHorizontalGalleryItem4,
+            chartLegendOutsideBottomRightHorizontalGalleryItem4});
+            chartLegendOutsideTopLeftVerticalGalleryItem4.Caption = "";
+            chartLegendOutsideTopLeftVerticalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image62")));
+            chartLegendOutsideTopRightVerticalGalleryItem4.Caption = "";
+            chartLegendOutsideTopRightVerticalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image63")));
+            chartLegendOutsideBottomLeftVerticalGalleryItem4.Caption = "";
+            chartLegendOutsideBottomLeftVerticalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image64")));
+            chartLegendOutsideBottomRightVerticalGalleryItem4.Caption = "";
+            chartLegendOutsideBottomRightVerticalGalleryItem4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image65")));
+            chartOutsideVerticalLegendGalleryGroup4.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            chartLegendOutsideTopLeftVerticalGalleryItem4,
+            chartLegendOutsideTopRightVerticalGalleryItem4,
+            chartLegendOutsideBottomLeftVerticalGalleryItem4,
+            chartLegendOutsideBottomRightVerticalGalleryItem4});
             this.galleryScatterChartLegendPositionItem1.Gallery.Groups.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItemGroup[] {
-            chartInsideHorizontalLegendGalleryGroup2,
-            chartInsideVerticalLegendGalleryGroup2,
-            chartOutsideHorizontalLegendGalleryGroup2,
-            chartOutsideVerticalLegendGalleryGroup2});
+            chartInsideHorizontalLegendGalleryGroup4,
+            chartInsideVerticalLegendGalleryGroup4,
+            chartOutsideHorizontalLegendGalleryGroup4,
+            chartOutsideVerticalLegendGalleryGroup4});
             this.galleryScatterChartLegendPositionItem1.Gallery.ImageSize = new System.Drawing.Size(32, 32);
             this.galleryScatterChartLegendPositionItem1.Gallery.RowCount = 8;
             this.galleryScatterChartLegendPositionItem1.Id = 145;
@@ -2885,40 +2861,40 @@
             // 
             // 
             this.galleryRangeFilterSeriesTypeItem1.Gallery.ColumnCount = 3;
-            rangeLineSeriesGalleryItem1.Caption = "";
-            rangeLineSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image66")));
-            rangeStackedLineSeriesGalleryItem1.Caption = "";
-            rangeStackedLineSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image67")));
-            rangeFullStackedLineSeriesGalleryItem1.Caption = "";
-            rangeFullStackedLineSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image68")));
-            rangePointLineSeriesGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            rangeLineSeriesGalleryItem1,
-            rangeStackedLineSeriesGalleryItem1,
-            rangeFullStackedLineSeriesGalleryItem1});
-            rangeAreaSeriesGalleryItem1.Caption = "";
-            rangeAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image69")));
-            rangeStackedAreaSeriesGalleryItem1.Caption = "";
-            rangeStackedAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image70")));
-            rangeFullStackedAreaSeriesGalleryItem1.Caption = "";
-            rangeFullStackedAreaSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image71")));
-            rangeAreaSeriesGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            rangeAreaSeriesGalleryItem1,
-            rangeStackedAreaSeriesGalleryItem1,
-            rangeFullStackedAreaSeriesGalleryItem1});
-            rangeBarSeriesGalleryItem1.Caption = "";
-            rangeBarSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image72")));
-            rangeStackedBarSeriesGalleryItem1.Caption = "";
-            rangeStackedBarSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image73")));
-            rangeFullStackedBarSeriesGalleryItem1.Caption = "";
-            rangeFullStackedBarSeriesGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image74")));
-            rangeBarSeriesGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            rangeBarSeriesGalleryItem1,
-            rangeStackedBarSeriesGalleryItem1,
-            rangeFullStackedBarSeriesGalleryItem1});
+            rangeLineSeriesGalleryItem2.Caption = "";
+            rangeLineSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image66")));
+            rangeStackedLineSeriesGalleryItem2.Caption = "";
+            rangeStackedLineSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image67")));
+            rangeFullStackedLineSeriesGalleryItem2.Caption = "";
+            rangeFullStackedLineSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image68")));
+            rangePointLineSeriesGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            rangeLineSeriesGalleryItem2,
+            rangeStackedLineSeriesGalleryItem2,
+            rangeFullStackedLineSeriesGalleryItem2});
+            rangeAreaSeriesGalleryItem2.Caption = "";
+            rangeAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image69")));
+            rangeStackedAreaSeriesGalleryItem2.Caption = "";
+            rangeStackedAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image70")));
+            rangeFullStackedAreaSeriesGalleryItem2.Caption = "";
+            rangeFullStackedAreaSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image71")));
+            rangeAreaSeriesGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            rangeAreaSeriesGalleryItem2,
+            rangeStackedAreaSeriesGalleryItem2,
+            rangeFullStackedAreaSeriesGalleryItem2});
+            rangeBarSeriesGalleryItem2.Caption = "";
+            rangeBarSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image72")));
+            rangeStackedBarSeriesGalleryItem2.Caption = "";
+            rangeStackedBarSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image73")));
+            rangeFullStackedBarSeriesGalleryItem2.Caption = "";
+            rangeFullStackedBarSeriesGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image74")));
+            rangeBarSeriesGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            rangeBarSeriesGalleryItem2,
+            rangeStackedBarSeriesGalleryItem2,
+            rangeFullStackedBarSeriesGalleryItem2});
             this.galleryRangeFilterSeriesTypeItem1.Gallery.Groups.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItemGroup[] {
-            rangePointLineSeriesGalleryGroup1,
-            rangeAreaSeriesGalleryGroup1,
-            rangeBarSeriesGalleryGroup1});
+            rangePointLineSeriesGalleryGroup2,
+            rangeAreaSeriesGalleryGroup2,
+            rangeBarSeriesGalleryGroup2});
             this.galleryRangeFilterSeriesTypeItem1.Gallery.ImageSize = new System.Drawing.Size(32, 32);
             this.galleryRangeFilterSeriesTypeItem1.Id = 182;
             this.galleryRangeFilterSeriesTypeItem1.Name = "galleryRangeFilterSeriesTypeItem1";
@@ -2944,47 +2920,47 @@
             // 
             // 
             this.galleryMapLegendPositionItem1.Gallery.ColumnCount = 3;
-            mapLegendTopLeftVerticalGalleryItem1.Caption = "";
-            mapLegendTopLeftVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image75")));
-            mapLegendTopCenterVerticalGalleryItem1.Caption = "";
-            mapLegendTopCenterVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image76")));
-            mapLegendTopRightVerticalGalleryItem1.Caption = "";
-            mapLegendTopRightVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image77")));
-            mapLegendBottomLeftVerticalGalleryItem1.Caption = "";
-            mapLegendBottomLeftVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image78")));
-            mapLegendBottomCenterVerticalGalleryItem1.Caption = "";
-            mapLegendBottomCenterVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image79")));
-            mapLegendBottomRightVerticalGalleryItem1.Caption = "";
-            mapLegendBottomRightVerticalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image80")));
-            mapVerticalLegendGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            mapLegendTopLeftVerticalGalleryItem1,
-            mapLegendTopCenterVerticalGalleryItem1,
-            mapLegendTopRightVerticalGalleryItem1,
-            mapLegendBottomLeftVerticalGalleryItem1,
-            mapLegendBottomCenterVerticalGalleryItem1,
-            mapLegendBottomRightVerticalGalleryItem1});
-            mapLegendTopLeftHorizontalGalleryItem1.Caption = "";
-            mapLegendTopLeftHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image81")));
-            mapLegendTopCenterHorizontalGalleryItem1.Caption = "";
-            mapLegendTopCenterHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image82")));
-            mapLegendTopRightHorizontalGalleryItem1.Caption = "";
-            mapLegendTopRightHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image83")));
-            mapLegendBottomLeftHorizontalGalleryItem1.Caption = "";
-            mapLegendBottomLeftHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image84")));
-            mapLegendBottomCenterHorizontalGalleryItem1.Caption = "";
-            mapLegendBottomCenterHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image85")));
-            mapLegendBottomRightHorizontalGalleryItem1.Caption = "";
-            mapLegendBottomRightHorizontalGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image86")));
-            mapHorizontalLegendGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            mapLegendTopLeftHorizontalGalleryItem1,
-            mapLegendTopCenterHorizontalGalleryItem1,
-            mapLegendTopRightHorizontalGalleryItem1,
-            mapLegendBottomLeftHorizontalGalleryItem1,
-            mapLegendBottomCenterHorizontalGalleryItem1,
-            mapLegendBottomRightHorizontalGalleryItem1});
+            mapLegendTopLeftVerticalGalleryItem2.Caption = "";
+            mapLegendTopLeftVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image75")));
+            mapLegendTopCenterVerticalGalleryItem2.Caption = "";
+            mapLegendTopCenterVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image76")));
+            mapLegendTopRightVerticalGalleryItem2.Caption = "";
+            mapLegendTopRightVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image77")));
+            mapLegendBottomLeftVerticalGalleryItem2.Caption = "";
+            mapLegendBottomLeftVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image78")));
+            mapLegendBottomCenterVerticalGalleryItem2.Caption = "";
+            mapLegendBottomCenterVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image79")));
+            mapLegendBottomRightVerticalGalleryItem2.Caption = "";
+            mapLegendBottomRightVerticalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image80")));
+            mapVerticalLegendGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            mapLegendTopLeftVerticalGalleryItem2,
+            mapLegendTopCenterVerticalGalleryItem2,
+            mapLegendTopRightVerticalGalleryItem2,
+            mapLegendBottomLeftVerticalGalleryItem2,
+            mapLegendBottomCenterVerticalGalleryItem2,
+            mapLegendBottomRightVerticalGalleryItem2});
+            mapLegendTopLeftHorizontalGalleryItem2.Caption = "";
+            mapLegendTopLeftHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image81")));
+            mapLegendTopCenterHorizontalGalleryItem2.Caption = "";
+            mapLegendTopCenterHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image82")));
+            mapLegendTopRightHorizontalGalleryItem2.Caption = "";
+            mapLegendTopRightHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image83")));
+            mapLegendBottomLeftHorizontalGalleryItem2.Caption = "";
+            mapLegendBottomLeftHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image84")));
+            mapLegendBottomCenterHorizontalGalleryItem2.Caption = "";
+            mapLegendBottomCenterHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image85")));
+            mapLegendBottomRightHorizontalGalleryItem2.Caption = "";
+            mapLegendBottomRightHorizontalGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image86")));
+            mapHorizontalLegendGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            mapLegendTopLeftHorizontalGalleryItem2,
+            mapLegendTopCenterHorizontalGalleryItem2,
+            mapLegendTopRightHorizontalGalleryItem2,
+            mapLegendBottomLeftHorizontalGalleryItem2,
+            mapLegendBottomCenterHorizontalGalleryItem2,
+            mapLegendBottomRightHorizontalGalleryItem2});
             this.galleryMapLegendPositionItem1.Gallery.Groups.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItemGroup[] {
-            mapVerticalLegendGalleryGroup1,
-            mapHorizontalLegendGalleryGroup1});
+            mapVerticalLegendGalleryGroup2,
+            mapHorizontalLegendGalleryGroup2});
             this.galleryMapLegendPositionItem1.Gallery.ImageSize = new System.Drawing.Size(32, 32);
             this.galleryMapLegendPositionItem1.Gallery.RowCount = 4;
             this.galleryMapLegendPositionItem1.Id = 199;
@@ -3031,27 +3007,27 @@
             // 
             // 
             this.galleryWeightedLegendPositionItem1.Gallery.ColumnCount = 3;
-            mapWeightedLegendTopLeftGalleryItem1.Caption = "";
-            mapWeightedLegendTopLeftGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image87")));
-            mapWeightedLegendTopCenterGalleryItem1.Caption = "";
-            mapWeightedLegendTopCenterGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image88")));
-            mapWeightedLegendTopRightGalleryItem1.Caption = "";
-            mapWeightedLegendTopRightGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image89")));
-            mapWeightedLegendBottomLeftGalleryItem1.Caption = "";
-            mapWeightedLegendBottomLeftGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image90")));
-            mapWeightedLegendBottomCenterGalleryItem1.Caption = "";
-            mapWeightedLegendBottomCenterGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image91")));
-            mapWeightedLegendBottomRightGalleryItem1.Caption = "";
-            mapWeightedLegendBottomRightGalleryItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image92")));
-            mapWeightedLegendGalleryGroup1.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
-            mapWeightedLegendTopLeftGalleryItem1,
-            mapWeightedLegendTopCenterGalleryItem1,
-            mapWeightedLegendTopRightGalleryItem1,
-            mapWeightedLegendBottomLeftGalleryItem1,
-            mapWeightedLegendBottomCenterGalleryItem1,
-            mapWeightedLegendBottomRightGalleryItem1});
+            mapWeightedLegendTopLeftGalleryItem2.Caption = "";
+            mapWeightedLegendTopLeftGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image87")));
+            mapWeightedLegendTopCenterGalleryItem2.Caption = "";
+            mapWeightedLegendTopCenterGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image88")));
+            mapWeightedLegendTopRightGalleryItem2.Caption = "";
+            mapWeightedLegendTopRightGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image89")));
+            mapWeightedLegendBottomLeftGalleryItem2.Caption = "";
+            mapWeightedLegendBottomLeftGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image90")));
+            mapWeightedLegendBottomCenterGalleryItem2.Caption = "";
+            mapWeightedLegendBottomCenterGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image91")));
+            mapWeightedLegendBottomRightGalleryItem2.Caption = "";
+            mapWeightedLegendBottomRightGalleryItem2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image92")));
+            mapWeightedLegendGalleryGroup2.Items.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItem[] {
+            mapWeightedLegendTopLeftGalleryItem2,
+            mapWeightedLegendTopCenterGalleryItem2,
+            mapWeightedLegendTopRightGalleryItem2,
+            mapWeightedLegendBottomLeftGalleryItem2,
+            mapWeightedLegendBottomCenterGalleryItem2,
+            mapWeightedLegendBottomRightGalleryItem2});
             this.galleryWeightedLegendPositionItem1.Gallery.Groups.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItemGroup[] {
-            mapWeightedLegendGalleryGroup1});
+            mapWeightedLegendGalleryGroup2});
             this.galleryWeightedLegendPositionItem1.Gallery.ImageSize = new System.Drawing.Size(32, 32);
             this.galleryWeightedLegendPositionItem1.Gallery.RowCount = 2;
             this.galleryWeightedLegendPositionItem1.Id = 206;
@@ -3833,7 +3809,7 @@
             // 
             this.galleryChangeTableStyleItem1.Gallery.ColumnCount = 3;
             this.galleryChangeTableStyleItem1.Gallery.Groups.AddRange(new DevExpress.XtraBars.Ribbon.GalleryItemGroup[] {
-            galleryItemGroup6});
+            galleryItemGroup12});
             this.galleryChangeTableStyleItem1.Gallery.ImageSize = new System.Drawing.Size(65, 46);
             this.galleryChangeTableStyleItem1.Id = 331;
             this.galleryChangeTableStyleItem1.ModifyItemLink = null;
@@ -4384,11 +4360,11 @@
             this.fileOpenBarButtonItem.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("fileOpenBarButtonItem.ImageOptions.Image")));
             this.fileOpenBarButtonItem.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("fileOpenBarButtonItem.ImageOptions.LargeImage")));
             this.fileOpenBarButtonItem.Name = "fileOpenBarButtonItem";
-            this.fileOpenBarButtonItem.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.fileOpenBarButtonItem_ItemClick);
+            this.fileOpenBarButtonItem.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.HandleFileOpenBarButtonItemItemClick);
             // 
             // pivotToolsRibbonPageCategory1
             // 
-            this.pivotToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.pivotToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.pivotToolsRibbonPageCategory1.Name = "pivotToolsRibbonPageCategory1";
             this.pivotToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage1,
@@ -4447,11 +4423,12 @@
             // 
             // gridToolsRibbonPageCategory1
             // 
-            this.gridToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.gridToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.gridToolsRibbonPageCategory1.Name = "gridToolsRibbonPageCategory1";
             this.gridToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage2,
-            this.dashboardItemDesignRibbonPage2});
+            this.dashboardItemDesignRibbonPage2,
+            this.ribbonPage1});
             this.gridToolsRibbonPageCategory1.Visible = false;
             // 
             // dataRibbonPage2
@@ -4488,7 +4465,8 @@
             this.commonItemDesignRibbonPageGroup2,
             this.gridStyleRibbonPageGroup1,
             this.gridLayoutRibbonPageGroup1,
-            this.gridColumnWidthModeRibbonPageGroup1});
+            this.gridColumnWidthModeRibbonPageGroup1,
+            this.gridExtractGroup1});
             this.dashboardItemDesignRibbonPage2.Name = "dashboardItemDesignRibbonPage2";
             this.dashboardItemDesignRibbonPage2.Visible = false;
             // 
@@ -4519,9 +4497,28 @@
             this.gridColumnWidthModeRibbonPageGroup1.ItemLinks.Add(this.manualGridColumnWidthModeBarItem1);
             this.gridColumnWidthModeRibbonPageGroup1.Name = "gridColumnWidthModeRibbonPageGroup1";
             // 
+            // gridExtractGroup1
+            // 
+            this.gridExtractGroup1.ItemLinks.Add(this.barConfigureExtractButtonItem2);
+            this.gridExtractGroup1.Name = "gridExtractGroup1";
+            this.gridExtractGroup1.Text = "Extract";
+            // 
+            // ribbonPage1
+            // 
+            this.ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
+            this.ribbonPageGroup1});
+            this.ribbonPage1.Name = "ribbonPage1";
+            this.ribbonPage1.Text = "ribbonPage1";
+            this.ribbonPage1.Visible = false;
+            // 
+            // ribbonPageGroup1
+            // 
+            this.ribbonPageGroup1.Name = "ribbonPageGroup1";
+            this.ribbonPageGroup1.Text = "ribbonPageGroup1";
+            // 
             // chartToolsRibbonPageCategory1
             // 
-            this.chartToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.chartToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.chartToolsRibbonPageCategory1.Name = "chartToolsRibbonPageCategory1";
             this.chartToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage3,
@@ -4608,7 +4605,7 @@
             // 
             // scatterChartToolsRibbonPageCategory1
             // 
-            this.scatterChartToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.scatterChartToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.scatterChartToolsRibbonPageCategory1.Name = "scatterChartToolsRibbonPageCategory1";
             this.scatterChartToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage4,
@@ -4687,11 +4684,12 @@
             // 
             // piesToolsRibbonPageCategory1
             // 
-            this.piesToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.piesToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.piesToolsRibbonPageCategory1.Name = "piesToolsRibbonPageCategory1";
             this.piesToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage5,
-            this.dashboardItemDesignRibbonPage5});
+            this.dashboardItemDesignRibbonPage5,
+            this.ribbonPage2});
             this.piesToolsRibbonPageCategory1.Visible = false;
             // 
             // dataRibbonPage5
@@ -4775,9 +4773,22 @@
             this.coloringOptionsRibbonPageGroup3.ItemLinks.Add(this.editActualColorsBarItem1);
             this.coloringOptionsRibbonPageGroup3.Name = "coloringOptionsRibbonPageGroup3";
             // 
+            // ribbonPage2
+            // 
+            this.ribbonPage2.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
+            this.ribbonPageGroup2});
+            this.ribbonPage2.Name = "ribbonPage2";
+            this.ribbonPage2.Text = "ribbonPage2";
+            this.ribbonPage2.Visible = false;
+            // 
+            // ribbonPageGroup2
+            // 
+            this.ribbonPageGroup2.Name = "ribbonPageGroup2";
+            this.ribbonPageGroup2.Text = "ribbonPageGroup2";
+            // 
             // gaugesToolsRibbonPageCategory1
             // 
-            this.gaugesToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.gaugesToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.gaugesToolsRibbonPageCategory1.Name = "gaugesToolsRibbonPageCategory1";
             this.gaugesToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage6,
@@ -4854,7 +4865,7 @@
             // 
             // cardsToolsRibbonPageCategory1
             // 
-            this.cardsToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.cardsToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.cardsToolsRibbonPageCategory1.Name = "cardsToolsRibbonPageCategory1";
             this.cardsToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage7,
@@ -4913,7 +4924,7 @@
             // 
             // rangeFilterToolsRibbonPageCategory1
             // 
-            this.rangeFilterToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.rangeFilterToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.rangeFilterToolsRibbonPageCategory1.Name = "rangeFilterToolsRibbonPageCategory1";
             this.rangeFilterToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage8,
@@ -4975,7 +4986,7 @@
             // 
             // choroplethMapToolsRibbonPageCategory1
             // 
-            this.choroplethMapToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.choroplethMapToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.choroplethMapToolsRibbonPageCategory1.Name = "choroplethMapToolsRibbonPageCategory1";
             this.choroplethMapToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage9,
@@ -5052,7 +5063,7 @@
             // 
             // geoPointMapToolsRibbonPageCategory1
             // 
-            this.geoPointMapToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.geoPointMapToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.geoPointMapToolsRibbonPageCategory1.Name = "geoPointMapToolsRibbonPageCategory1";
             this.geoPointMapToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage10,
@@ -5128,7 +5139,7 @@
             // 
             // bubbleMapToolsRibbonPageCategory1
             // 
-            this.bubbleMapToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.bubbleMapToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.bubbleMapToolsRibbonPageCategory1.Name = "bubbleMapToolsRibbonPageCategory1";
             this.bubbleMapToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage11,
@@ -5218,7 +5229,7 @@
             // 
             // pieMapToolsRibbonPageCategory1
             // 
-            this.pieMapToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.pieMapToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.pieMapToolsRibbonPageCategory1.Name = "pieMapToolsRibbonPageCategory1";
             this.pieMapToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage12,
@@ -5322,7 +5333,7 @@
             // 
             // filterElementToolsRibbonPageCategory1
             // 
-            this.filterElementToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.filterElementToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.filterElementToolsRibbonPageCategory1.Name = "filterElementToolsRibbonPageCategory1";
             this.filterElementToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage13,
@@ -5388,7 +5399,7 @@
             // 
             // boundImageToolsRibbonPageCategory1
             // 
-            this.boundImageToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.boundImageToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.boundImageToolsRibbonPageCategory1.Name = "boundImageToolsRibbonPageCategory1";
             this.boundImageToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage14,
@@ -5452,7 +5463,7 @@
             // 
             // textBoxToolsRibbonPageCategory1
             // 
-            this.textBoxToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.textBoxToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.textBoxToolsRibbonPageCategory1.Name = "textBoxToolsRibbonPageCategory1";
             this.textBoxToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage15,
@@ -5500,7 +5511,7 @@
             // 
             // treemapToolsRibbonPageCategory1
             // 
-            this.treemapToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.treemapToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.treemapToolsRibbonPageCategory1.Name = "treemapToolsRibbonPageCategory1";
             this.treemapToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage16,
@@ -5581,7 +5592,7 @@
             // 
             // imageToolsRibbonPageCategory1
             // 
-            this.imageToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.imageToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.imageToolsRibbonPageCategory1.Name = "imageToolsRibbonPageCategory1";
             this.imageToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dashboardItemDesignRibbonPage17});
@@ -5632,7 +5643,7 @@
             // 
             // groupToolsRibbonPageCategory1
             // 
-            this.groupToolsRibbonPageCategory1.Control = this.dashboardDesigner1;
+            this.groupToolsRibbonPageCategory1.Control = this.dashboardDesigner;
             this.groupToolsRibbonPageCategory1.Name = "groupToolsRibbonPageCategory1";
             this.groupToolsRibbonPageCategory1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.dataRibbonPage17,
@@ -5701,12 +5712,12 @@
             this.stylesRibbonPageGroup1,
             this.editingRibbonPageGroup1});
             this.homeRibbonPage2.Name = "homeRibbonPage2";
-            reduceOperation1.Behavior = DevExpress.XtraBars.Ribbon.ReduceOperationBehavior.UntilAvailable;
-            reduceOperation1.Group = this.stylesRibbonPageGroup1;
-            reduceOperation1.ItemLinkIndex = 0;
-            reduceOperation1.ItemLinksCount = 0;
-            reduceOperation1.Operation = DevExpress.XtraBars.Ribbon.ReduceOperationType.Gallery;
-            this.homeRibbonPage2.ReduceOperations.Add(reduceOperation1);
+            reduceOperation2.Behavior = DevExpress.XtraBars.Ribbon.ReduceOperationBehavior.UntilAvailable;
+            reduceOperation2.Group = this.stylesRibbonPageGroup1;
+            reduceOperation2.ItemLinkIndex = 0;
+            reduceOperation2.ItemLinksCount = 0;
+            reduceOperation2.Operation = DevExpress.XtraBars.Ribbon.ReduceOperationType.Gallery;
+            this.homeRibbonPage2.ReduceOperations.Add(reduceOperation2);
             this.homeRibbonPage2.Visible = false;
             // 
             // clipboardRibbonPageGroup1
@@ -6038,6 +6049,56 @@
             this.skinsRibbonPageGroup1.ItemLinks.Add(this.dashboardSkinsBarItem1);
             this.skinsRibbonPageGroup1.Name = "skinsRibbonPageGroup1";
             // 
+            // dashboardBackstageViewControl1
+            // 
+            this.dashboardBackstageViewControl1.Controller = this.dashboardBarAndDockingController1;
+            this.dashboardBackstageViewControl1.Controls.Add(this.backstageViewClientControl1);
+            this.dashboardBackstageViewControl1.DashboardRecentTab = this.dashboardBackstageRecentTab1;
+            this.dashboardBackstageViewControl1.Items.Add(this.fileOpenButtonItem);
+            this.dashboardBackstageViewControl1.Items.Add(this.dashboardBackstageSaveButton1);
+            this.dashboardBackstageViewControl1.Items.Add(this.dashboardBackstageSaveAsButton1);
+            this.dashboardBackstageViewControl1.Items.Add(this.dashboardBackstageRecentTab1);
+            this.dashboardBackstageViewControl1.Location = new System.Drawing.Point(0, 143);
+            this.dashboardBackstageViewControl1.Name = "dashboardBackstageViewControl1";
+            this.dashboardBackstageViewControl1.SelectedTab = this.dashboardBackstageRecentTab1;
+            this.dashboardBackstageViewControl1.SelectedTabIndex = 3;
+            this.dashboardBackstageViewControl1.Size = new System.Drawing.Size(240, 28);
+            this.dashboardBackstageViewControl1.TabIndex = 2;
+            // 
+            // backstageViewClientControl1
+            // 
+            this.backstageViewClientControl1.Controls.Add(this.recentDashboardsControl1);
+            this.backstageViewClientControl1.Location = new System.Drawing.Point(132, 0);
+            this.backstageViewClientControl1.Name = "backstageViewClientControl1";
+            this.backstageViewClientControl1.Size = new System.Drawing.Size(91, 28);
+            this.backstageViewClientControl1.TabIndex = 1;
+            // 
+            // dashboardBackstageRecentTab1
+            // 
+            this.dashboardBackstageRecentTab1.ContentControl = this.backstageViewClientControl1;
+            this.dashboardBackstageRecentTab1.Name = "dashboardBackstageRecentTab1";
+            this.dashboardBackstageRecentTab1.RecentDashboardsControl = this.recentDashboardsControl1;
+            this.dashboardBackstageRecentTab1.Selected = true;
+            // 
+            // fileOpenButtonItem
+            // 
+            this.fileOpenButtonItem.Caption = "Open";
+            this.fileOpenButtonItem.Glyph = ((System.Drawing.Image)(resources.GetObject("fileOpenButtonItem.Glyph")));
+            this.fileOpenButtonItem.Name = "fileOpenButtonItem";
+            this.fileOpenButtonItem.ItemClick += new DevExpress.XtraBars.Ribbon.BackstageViewItemEventHandler(this.HandleFileOpenButtonItemItemClick);
+            // 
+            // dashboardBackstageSaveButton1
+            // 
+            this.dashboardBackstageSaveButton1.Glyph = ((System.Drawing.Image)(resources.GetObject("dashboardBackstageSaveButton1.Glyph")));
+            this.dashboardBackstageSaveButton1.Name = "dashboardBackstageSaveButton1";
+            this.dashboardBackstageSaveButton1.ServiceProvider = this.dashboardDesigner;
+            // 
+            // dashboardBackstageSaveAsButton1
+            // 
+            this.dashboardBackstageSaveAsButton1.Glyph = ((System.Drawing.Image)(resources.GetObject("dashboardBackstageSaveAsButton1.Glyph")));
+            this.dashboardBackstageSaveAsButton1.Name = "dashboardBackstageSaveAsButton1";
+            this.dashboardBackstageSaveAsButton1.ServiceProvider = this.dashboardDesigner;
+            // 
             // dashboardBarController1
             // 
             this.dashboardBarController1.BarItems.Add(this.fileNewBarItem1);
@@ -6299,7 +6360,7 @@
             this.dashboardBarController1.BarItems.Add(this.imageImportBarItem1);
             this.dashboardBarController1.BarItems.Add(this.groupMasterFilterBarItem1);
             this.dashboardBarController1.BarItems.Add(this.groupIgnoreMasterFilterBarItem1);
-            this.dashboardBarController1.Control = this.dashboardDesigner1;
+            this.dashboardBarController1.Control = this.dashboardDesigner;
             // 
             // textBoxEditorBarController1
             // 
@@ -6443,13 +6504,13 @@
             this.textBoxEditorBarController1.BarItems.Add(this.floatingObjectSendBackwardItem1);
             this.textBoxEditorBarController1.BarItems.Add(this.floatingObjectSendToBackItem1);
             this.textBoxEditorBarController1.BarItems.Add(this.floatingObjectSendBehindTextItem1);
-            this.textBoxEditorBarController1.Designer = this.dashboardDesigner1;
+            this.textBoxEditorBarController1.Designer = this.dashboardDesigner;
             // 
             // dashboardBackstageNewButton1
             // 
             this.dashboardBackstageNewButton1.Glyph = ((System.Drawing.Image)(resources.GetObject("dashboardBackstageNewButton1.Glyph")));
             this.dashboardBackstageNewButton1.Name = "dashboardBackstageNewButton1";
-            this.dashboardBackstageNewButton1.ServiceProvider = this.dashboardDesigner1;
+            this.dashboardBackstageNewButton1.ServiceProvider = this.dashboardDesigner;
             // 
             // DashboardCreatorForm
             // 
@@ -6457,7 +6518,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1037, 570);
-            this.Controls.Add(this.dashboardDesigner1);
+            this.Controls.Add(this.dashboardDesigner);
             this.Controls.Add(this.dashboardBackstageViewControl1);
             this.Controls.Add(this.ribbonControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -6465,10 +6526,7 @@
             this.Ribbon = this.ribbonControl1;
             this.Text = "Dashboard creator";
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dashboardBackstageViewControl1)).EndInit();
-            this.dashboardBackstageViewControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dashboardBarAndDockingController1)).EndInit();
-            this.backstageViewClientControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dashboardPopupMenu1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSpinEdit1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemFontEdit1)).EndInit();
@@ -6476,6 +6534,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemBorderLineStyle1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemBorderLineWeight1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemFloatingObjectOutlineWeight1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dashboardBackstageViewControl1)).EndInit();
+            this.dashboardBackstageViewControl1.ResumeLayout(false);
+            this.backstageViewClientControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dashboardBarController1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.textBoxEditorBarController1)).EndInit();
             this.ResumeLayout(false);
@@ -6489,7 +6550,7 @@
         private DevExpress.DashboardWin.Bars.DashboardBackstageViewControl dashboardBackstageViewControl1;
         private DevExpress.XtraBars.Ribbon.BackstageViewClientControl backstageViewClientControl1;
         private DevExpress.DashboardWin.Bars.RecentDashboardsControl recentDashboardsControl1;
-        private DevExpress.DashboardWin.DashboardDesigner dashboardDesigner1;
+        private DevExpress.DashboardWin.DashboardDesigner dashboardDesigner;
         private DevExpress.DashboardWin.Native.DashboardBarAndDockingController dashboardBarAndDockingController1;
         private DevExpress.DashboardWin.DashboardPopupMenu dashboardPopupMenu1;
         private DevExpress.DashboardWin.Bars.ShowItemCaptionBarItem showItemCaptionBarItem1;
@@ -7132,6 +7193,12 @@
         private DevExpress.XtraBars.Ribbon.BackstageViewButtonItem fileOpenButtonItem;
         private DevExpress.XtraBars.BarButtonItem fileOpenBarButtonItem;
         private DevExpress.DashboardWin.Bars.DashboardBackstageNewButton dashboardBackstageNewButton1;
+        private DevExpress.XtraBars.BarButtonItem barConfigureExtractButtonItem2;
+        private DevExpress.XtraBars.Ribbon.RibbonPageGroup gridExtractGroup1;
+        private DevExpress.XtraBars.Ribbon.RibbonPage ribbonPage1;
+        private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup1;
+        private DevExpress.XtraBars.Ribbon.RibbonPage ribbonPage2;
+        private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup2;
     }
 }
 

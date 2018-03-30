@@ -127,6 +127,10 @@
       <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ExtractCodeAttributes\Core\Code\Extract.Code.Attributes.csproj">
+      <Project>{9ca28a56-27b0-4f3a-bd61-970b3de2a793}</Project>
+      <Name>Extract.Code.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212e31d9-5f02-43aa-8625-bcb86b15cf8f}</Project>
       <Name>Extract.Licensing</Name>
@@ -134,6 +138,14 @@
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
       <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Forms\Core\Code\Extract.Dashboard.Forms.csproj">
+      <Project>{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}</Project>
+      <Name>Extract.Dashboard.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Dashboard.Utilities.csproj">
+      <Project>{A59882B1-AF28-4892-A990-BC6E6F7BC12D}</Project>
+      <Name>Extract.Dashboard.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
