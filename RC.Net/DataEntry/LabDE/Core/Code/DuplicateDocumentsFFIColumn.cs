@@ -910,6 +910,13 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
+                // https://extract.atlassian.net/browse/ISSUE-15364
+                // Prevent new files from being popped off the FPRecordManager's queue while
+                // applying the selected actions. Otherwise, for instance, we might be trying to
+                // move a file to complete at the same time the FPRecordManager is popping it off
+                // the queue.
+                DataEntryApplication.FileRequestHandler.PauseProcessingQueue();
+
                 // Return all files checked out in order to lock them from other processes to their
                 // previous status.
                 ReleaseCheckedOutFiles();
@@ -919,6 +926,11 @@ namespace Extract.DataEntry.LabDE
             catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI37567", "Error cancelling document actions.");
+            }
+            finally
+            {
+                // Allow the FPRecordManager queue to resume distribution of files.
+                DataEntryApplication.FileRequestHandler.ResumeProcessingQueue();
             }
         }
 
