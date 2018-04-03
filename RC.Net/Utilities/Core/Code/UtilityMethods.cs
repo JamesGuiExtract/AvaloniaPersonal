@@ -924,9 +924,9 @@ namespace Extract.Utilities
         /// Returns as dictionary of the Extract categories, if the ExtractCategoriesWithDescription.json file doesn't exist it will be created
         /// Categories are found by looking for types that have the ExtractCategoryAttribute applied to the class
         /// </summary>
-        /// <param name="createNew">if <see langword="false"/> any existing ExtractCategoriesWithDescription.json file will be deleted and new one
+        /// <param name="createNew">if <see langword="true"/> any existing ExtractCategoriesWithDescription.json file will be deleted and new one
         /// will be created. if <see langword="false"/> then if ExtractCategoriesWithDescription.json exists it will be used.</param>
-        /// <returns></returns>
+        /// <returns>Dictionary of Extract categories with the registered types</returns>
         public static Dictionary<string, HashSet<ExtractCategoryType>> GetExtractCategoriesJson(bool createNew = false)
         {
             try

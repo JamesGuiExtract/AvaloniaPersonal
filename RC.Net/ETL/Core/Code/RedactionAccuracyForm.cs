@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Utilities;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -39,26 +40,26 @@ namespace Extract.ETL
         {
             if (string.IsNullOrWhiteSpace(_descriptionTextBox.Text))
             {
-                MessageBox.Show("Description cannot be empty.", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                UtilityMethods.ShowMessageBox("Description cannot be empty.", "Invalid configuration", true);
                 _descriptionTextBox.Focus();
 
                 return false;
             }
             if (_expectedAttributeSetComboBox.SelectedIndex < 0)
             {
-                MessageBox.Show("Expected attribute set is required", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                UtilityMethods.ShowMessageBox("Expected attribute set is required", "Invalid configuration", true);
                 _expectedAttributeSetComboBox.Focus();
                 return false;
             }
             if (_foundAttributeSetComboBox.SelectedIndex < 0)
             {
-                MessageBox.Show("Found attribute set is required", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                UtilityMethods.ShowMessageBox("Found attribute set is required", "Invalid configuration", true);
                 _foundAttributeSetComboBox.Focus();
                 return false;
             }
             if (_foundAttributeSetComboBox.SelectedItem == _expectedAttributeSetComboBox.SelectedItem)
             {
-                MessageBox.Show("Expected and found attribute sets must be different", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                UtilityMethods.ShowMessageBox("Expected and found attribute sets must be different", "Invalid configuration", true);
                 _expectedAttributeSetComboBox.Focus();
                 return false;
             }
