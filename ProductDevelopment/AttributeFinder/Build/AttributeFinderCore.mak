@@ -120,6 +120,19 @@ BuildPDUtils: BuildAttributeFinderCore
     @TIME /T
     @ECHO.
 
+BuildLearningMachineTrainer: 
+	@ECHO Building Learning Machine Trainer...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+    @CD "$(RCNETDir)\UtilityApplications\LearningMachineTrainer\Code"
+    @devenv LearningMachineTrainer.sln /BUILD $(BuildConfig) 
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.	
+	
 CopyAPIFiles:
 	@ECHO Copying API files to Release
 	IF NOT EXIST "$(BinariesFolder)" @MKDIR "$(BinariesFolder)"
@@ -231,7 +244,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ZstdNet.dll" /mapout:"$(BinariesFolder)\Map\ZstdNet.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\NERAnnotator.exe" /mapout:"$(BinariesFolder)\Map\mapNERAnnotator.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\TrainingDataCollector.exe" /mapout:"$(BinariesFolder)\Map\mapTrainingDataCollector.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\NERTrainer.exe" /mapout:"$(BinariesFolder)\Map\mapNERTrainer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\LearningMachineTrainer.exe" /mapout:"$(BinariesFolder)\Map\mapNERTrainer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DashboardCreator.exe" /mapout:"$(BinariesFolder)\Map\mapDashboardCreator.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DashboardViewer.exe" /mapout:"$(BinariesFolder)\Map\mapDashboardViewer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.ETL.dll" /mapout:"$(BinariesFolder)\Map\mapDExtract.ETL.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
@@ -307,7 +320,7 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\DashboardViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\NERAnnotator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\TrainingDataCollector.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /v  "$(BinariesFolder)\NERTrainer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /v  "$(BinariesFolder)\LearningMachineTrainer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\RedactionPredictor.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\PredictionEvaluator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(RCNETDir)\APIs\Aspose\Aspose.Pdf for .Net 9.8\License\Aspose.Pdf.lic" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
@@ -324,6 +337,8 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY "$(RCNETDir)\APIs\DevExpress\v17.2\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY "$(RCNETDir)\APIs\zstd\1.1.0\build\VS_scripts\bin\Release\x64\zstdlib_x64.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY "$(RCNETDir)\APIs\ZstdNet\ZstdNet\bin\x64\Release\ZstdNet64.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 # This includes System.ValueTuple in the install
 	@COPY "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
@@ -577,7 +592,7 @@ BuildDataEntryMergeModule: BuildAFCoreMergeModule
 
 MakeMergeModules: CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule 
 
-DoBuilds: SetupBuildEnv SetVersions BuildPDUtils BuildFKBUpdateIfRequired
+DoBuilds: SetupBuildEnv SetVersions BuildPDUtils BuildFKBUpdateIfRequired BuildLearningMachineTrainer
 
 DoEverythingNoGet: DoBuilds MakeMergeModules RegisterClearImage_7_0 CopyCommonFiles
     @ECHO.
