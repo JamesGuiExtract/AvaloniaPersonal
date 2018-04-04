@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -16,6 +17,7 @@ namespace Extract.Utilities.Test
     class TestSystemMethods
     {
         static string pathToExe = Path.Combine(FileSystemMethods.CommonComponentsPath, "TestAppForSystemMethods.exe");
+        static string pathToUIExe = Path.Combine(FileSystemMethods.CommonComponentsPath, "LearningMachineEditor.exe");
 
         #region TestSetup
 
@@ -119,6 +121,72 @@ namespace Extract.Utilities.Test
 
             Assert.AreEqual(SystemMethods.OperationCanceledExitCode, returnValue,
                string.Format("return code was {0} expected {1}", returnValue, SystemMethods.OperationCanceledExitCode));
+        }
+
+        [Test, Category("Automated")]
+        public static void TestRunExecutableWithTimeoutAndNoWindow()
+        {
+            List<string> argList = new List<string>() { "/SleepTime", "30000" };
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            int returnValue = SystemMethods.RunExecutable(pathToExe, argList, 5000, createNoWindow: true);
+            long elapsed = sw.ElapsedMilliseconds;
+
+            Assert.AreEqual(SystemMethods.OperationTimeoutExitCode, returnValue,
+               string.Format("return code was {0} expected {1}", returnValue, SystemMethods.OperationCanceledExitCode));
+
+            // Executable should not have been allowed to finish
+            Assert.Less(elapsed, 30000);
+        }
+
+        [Test, Category("Automated")]
+        public static void TestRunExecutableWithCancelAndNoWindow()
+        {
+            string nameForTokenSource = Guid.NewGuid().AsString();
+            NamedTokenSource tokenSource = new NamedTokenSource(nameForTokenSource);
+            Thread thread = new Thread(() =>
+            {
+                Thread.Sleep(5000);
+                tokenSource.Cancel();
+            });
+
+            List<string> argList = new List<string>() { "/SleepTime", "30000" };
+            Stopwatch sw = new Stopwatch();
+            thread.Start();
+            sw.Start();
+            int returnValue = SystemMethods.RunExecutable(pathToExe, argList, int.MaxValue, createNoWindow: true, cancelToken: tokenSource.Token);
+            long elapsed = sw.ElapsedMilliseconds;
+
+            Assert.AreEqual(SystemMethods.OperationCanceledExitCode, returnValue,
+               string.Format("return code was {0} expected {1}", returnValue, SystemMethods.OperationCanceledExitCode));
+
+            // Executable should not have been allowed to finish
+            Assert.Less(elapsed, 30000);
+        }
+
+        [Test, Category("Automated")]
+        public static void TestRunExecutableWithCancelAndRedirectOutput()
+        {
+            string nameForTokenSource = Guid.NewGuid().AsString();
+            NamedTokenSource tokenSource = new NamedTokenSource(nameForTokenSource);
+            Thread thread = new Thread(() =>
+            {
+                Thread.Sleep(5000);
+                tokenSource.Cancel();
+            });
+
+            List<string> argList = new List<string>() { "/SleepTime", "30000" };
+            Stopwatch sw = new Stopwatch();
+            thread.Start();
+            sw.Start();
+            int returnValue = SystemMethods.RunExecutable(pathToExe, argList, out string _, out string _, cancelToken: tokenSource.Token);
+            long elapsed = sw.ElapsedMilliseconds;
+
+            Assert.AreEqual(SystemMethods.OperationCanceledExitCode, returnValue,
+               string.Format("return code was {0} expected {1}", returnValue, SystemMethods.OperationCanceledExitCode));
+
+            // Executable should not have been allowed to finish
+            Assert.Less(elapsed, 30000);
         }
     }
 }

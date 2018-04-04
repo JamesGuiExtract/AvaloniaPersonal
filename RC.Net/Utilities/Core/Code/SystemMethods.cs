@@ -310,7 +310,7 @@ namespace Extract.Utilities
         /// <param name="createNoWindow">Whether to eschew shell execution to avoid showing a cmd window</param>
         /// <param name="cancelToken">Used to cancel, which will kill the process</param>
         /// <returns>The exit code of the process or  
-        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         public static int RunExecutable(string exeFile, IEnumerable<string> arguments, bool createNoWindow = false,
             CancellationToken cancelToken = default(CancellationToken))
         {
@@ -328,7 +328,7 @@ namespace Extract.Utilities
         /// <param name="createNoWindow">Whether to eschew shell execution to avoid showing a cmd window</param>
         /// <returns>The exit code of the process or <see cref="OperationTimeoutExitCode"/> ("This operation returned because the
         /// timeout period expired.") if timeToWait has expired. 
-        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         public static int RunExecutable(string exeFile, IEnumerable<string> arguments,
             int timeToWait, bool createNoWindow = false, CancellationToken cancelToken = default(CancellationToken))
         {
@@ -359,7 +359,7 @@ namespace Extract.Utilities
         /// <param name="cancelToken"><see cref="CancellationToken"/> that can be used to cancel the execution</param>
         /// <returns>The exit code of the process or <see cref="OperationTimeoutExitCode"/> ("This operation returned because the
         /// timeout period expired.") if timeToWait has expired. 
-        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         public static int RunExecutable(string exeFile, string arguments, int timeToWait, bool createNoWindow = false,
             CancellationToken cancelToken = default(CancellationToken))
         {
@@ -396,9 +396,25 @@ namespace Extract.Utilities
                     {
                         case WaitHandle.WaitTimeout:
                             process.CloseMainWindow();
+
+                            // CloseMainWindow() only works if there is a UI and even then may not actually result in the process
+                            // ending so kill it if it doesn't exit by itself
+                            // https://extract.atlassian.net/browse/ISSUE-15386
+                            if (!process.WaitForExit(2000))
+                            {
+                                process.Kill();
+                            }
                             return OperationTimeoutExitCode;
                         case 1:
                             process.CloseMainWindow();
+
+                            // CloseMainWindow() only works if there is a UI and even then may not actually result in the process
+                            // ending so kill it if it doesn't exit by itself
+                            // https://extract.atlassian.net/browse/ISSUE-15386
+                            if (!process.WaitForExit(2000))
+                            {
+                                process.Kill();
+                            }
                             return OperationCanceledExitCode;
                     }
                     return process.ExitCode;
@@ -417,7 +433,7 @@ namespace Extract.Utilities
         /// <param name="standardOutput">The output of the process</param>
         /// <param name="standardError">The error message of the process</param>
         /// <returns>The exit code of the process or 
-        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public static int RunExecutable(string command, out string standardOutput,
             out string standardError, CancellationToken cancelToken = default(CancellationToken))
@@ -447,7 +463,7 @@ namespace Extract.Utilities
         /// <param name="standardOutput">The output of the process</param>
         /// <param name="standardError">The error message of the process</param>
         /// <returns>The exit code of the process or
-        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public static int RunExecutable(string exeFile, IEnumerable<string> arguments,
             out string standardOutput, out string standardError, CancellationToken cancelToken = default(CancellationToken))
@@ -476,7 +492,7 @@ namespace Extract.Utilities
         /// <param name="standardOutput">The output of the process</param>
         /// <param name="standardError">The error message of the process</param>
         /// <returns>The exit code of the process or 
-        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         static int RunExecutable(string exeFile, string argumentString,
             out string standardOutput, out string standardError, CancellationToken cancelToken = default(CancellationToken))
@@ -520,6 +536,14 @@ namespace Extract.Utilities
                     if (waitResult == 1)
                     {
                         process.CloseMainWindow();
+
+                        // CloseMainWindow() only works if there is a UI and even then may not actually result in the process
+                        // ending so kill it if it doesn't exit by itself
+                        // https://extract.atlassian.net/browse/ISSUE-15386
+                        if (!process.WaitForExit(2000))
+                        {
+                            process.Kill();
+                        }
                         standardOutputTask.Wait();
                         standardErrorTask.Wait();
                         standardOutput = standardOutputTask.Result;
@@ -557,7 +581,7 @@ namespace Extract.Utilities
         /// /CancelTokenName "eventName"
         /// if <c>false</c> there will be no changes</param>
         /// <returns>The exit code of the process or  
-        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         public static int RunExtractExecutable(string exeFile, IEnumerable<string> arguments,
             CancellationToken cancelToken = default(CancellationToken), bool addCancellableNameAsArgument = false)
         {
@@ -588,7 +612,7 @@ namespace Extract.Utilities
         /// /CancelTokenName "eventName"
         /// if <c>false</c> there will be no changes</param>
         /// <returns>The exit code of the process or 
-        /// If canceled by canceToken returns <see cref="OperationCanceledExitCode"/></returns>
+        /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         public static int RunExtractExecutable(string exeFile, string arguments,
             CancellationToken cancelToken = default(CancellationToken), bool addCancellableNameAsArgument = false)
         {
@@ -629,6 +653,108 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 var ee = ex.AsExtract("ELI31876");
+                ee.AddDebugData("Executable Name", exeFile, false);
+
+                // Encrypt the arguments as they may contain passwords or other information
+                ee.AddDebugData("Arguments", arguments, true);
+
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Runs the specified executable with the specified arguments, appends a /ef [TempFile]
+        /// to the argument list. If an exception is logged to the temp file, it will be
+        /// loaded and thrown.
+        /// </summary>
+        /// <param name="exeFile">The executable to run.</param>
+        /// <param name="arguments">The command line arguments for the executable.</param>
+        /// <param name="standardOutput">The output of the process</param>
+        /// <param name="standardError">The error message of the process</param>
+        /// <param name="cancelToken"><see cref="CancellationToken"/> that can be used to cancel the execution</param>
+        /// <param name="addCancellableNameAsArgument">If <c>true</c> another argument will be added to the argument list 
+        /// /CancelTokenName "eventName"
+        /// if <c>false</c> there will be no changes</param>
+        /// <returns>The exit code of the process or  
+        /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
+        public static int RunExtractExecutable(string exeFile, IEnumerable<string> arguments,
+            out string standardOutput, out string standardError,
+            CancellationToken cancelToken = default(CancellationToken), bool addCancellableNameAsArgument = false)
+        {
+            try
+            {
+                string argumentString = string.Join(" ", arguments
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s)
+                    .ToArray());
+
+                return RunExtractExecutable(exeFile, argumentString, out standardOutput, out standardError,
+                    cancelToken, addCancellableNameAsArgument);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45706");
+            }
+        }
+
+        /// <summary>
+        /// Runs the specified executable with the specified arguments, appends a /ef [TempFile]
+        /// to the argument list. If an exception is logged to the temp file, it will be
+        /// loaded and thrown.
+        /// </summary>
+        /// <param name="exeFile">The executable to run.</param>
+        /// <param name="arguments">The command line arguments for the executable.</param>
+        /// <param name="standardOutput">The output of the process</param>
+        /// <param name="standardError">The error message of the process</param>
+        /// <param name="cancelToken"><see cref="CancellationToken"/> that can be used to cancel the execution</param>
+        /// <param name="addCancellableNameAsArgument">If <c>true</c> another argument will be added to the argument list 
+        /// /CancelTokenName "eventName"
+        /// if <c>false</c> there will be no changes</param>
+        /// <returns>The exit code of the process or 
+        /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
+        public static int RunExtractExecutable(string exeFile, string arguments,
+            out string standardOutput, out string standardError,
+            CancellationToken cancelToken = default(CancellationToken), bool addCancellableNameAsArgument = false)
+        {
+            try
+            {
+                // use a guid as an event name
+                string cancelEventName = @"Global\" + Guid.NewGuid().ToString(); ;
+                NamedTokenSource namedTokenSource = new NamedTokenSource(cancelEventName);
+
+                // Register the Cancel method for the named token with the passed in cancel token
+                // this will cause the 
+                using (var tokenRegistration = cancelToken.Register(() => namedTokenSource.Cancel()))
+                {
+                    using (var tempFile = new TemporaryFile(".uex", false))
+                    {
+                        arguments += (addCancellableNameAsArgument) ? " /CancelTokenName " + cancelEventName.Quote() : string.Empty;
+                        arguments += " /ef " + tempFile.FileName.Quote();
+
+                        // If passing the Cancellable name as an argument it is expected that the called program will
+                        // exit when the Cancel source associated with the Name  is canceled so pass the default that 
+                        // will not cancel, otherwise pass the cancelToken argument so the executable will attempt 
+                        // to be closed if cancelToken is canceled
+                        CancellationToken cancelTokenToPass = (addCancellableNameAsArgument) ? default(CancellationToken) : cancelToken;
+
+                        // Run the executable and wait for it to exit
+                        int exitCode = RunExecutable(exeFile, arguments, out standardOutput, out standardError, cancelTokenToPass);
+
+                        var info = new FileInfo(tempFile.FileName);
+                        if (info.Length > 0)
+                        {
+                            throw ExtractException.LoadFromFile("ELI45707", tempFile.FileName);
+                        }
+
+                        return exitCode;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI45708");
                 ee.AddDebugData("Executable Name", exeFile, false);
 
                 // Encrypt the arguments as they may contain passwords or other information
