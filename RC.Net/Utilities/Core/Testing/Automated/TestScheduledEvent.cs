@@ -49,6 +49,18 @@ namespace Extract.Utilities.Test
             Assert.AreEqual(false, schedule.GetIsInScheduledEvent(new DateTime(1999, 12, 31)));
         }
 
+        /// <summary>
+        /// Database service with no future scheduled occurrence cause errors on service start
+        /// https://extract.atlassian.net/browse/ISSUE-15382
+        /// </summary>
+        [Test]
+        public static void TestNonRecurringOnStart()
+        {
+            var schedule = new ScheduledEvent();
+            schedule.Start = new DateTime(2000, 1, 1);
+            schedule.EventStarted += delegate { };
+        }
+
         [Test]
         public static void TestRecurringSecondly()
         {
@@ -228,8 +240,8 @@ namespace Extract.Utilities.Test
                     dateTime.DayOfWeek == DayOfWeek.Saturday || dateTime.DayOfWeek == DayOfWeek.Sunday,
                     schedule.GetIsInScheduledEvent(dateTime));
             }
-
-            #endregion Tests
         }
+
+        #endregion Tests
     }
 }

@@ -513,8 +513,9 @@ namespace Extract.Utilities
                 }
 
                 var now = DateTime.Now;
-                var milliseconds = (GetNextOccurrence(now) - now).Value.TotalMilliseconds;
-                if (milliseconds > 0)
+                double milliseconds = 0;
+                if (GetNextOccurrence(now) is DateTime nextOccurrence
+                    && (milliseconds = (nextOccurrence - now).TotalMilliseconds) > 0)
                 {
                     _timer = new Timer(milliseconds);
                     _timer.Elapsed += (o, e) =>
