@@ -492,7 +492,8 @@ namespace Extract.UtilityApplications.NERAnnotator
                     continue;
                 }
 
-                sb.AppendLine();
+                // If writing to the DB, don't write an extra line to separate documents
+                // (This way the ML Model Trainer can treat this data the same as the data for LMs, add a newline for each record)
                 if (_settings.UseDatabase)
                 {
                     using (var cmd = _connection.CreateCommand())
@@ -512,6 +513,8 @@ namespace Extract.UtilityApplications.NERAnnotator
                 }
                 else
                 {
+                    // Write extra line as a document separator
+                    sb.AppendLine();
                     File.AppendAllText(outputFile, sb.ToString());
                 }
             }

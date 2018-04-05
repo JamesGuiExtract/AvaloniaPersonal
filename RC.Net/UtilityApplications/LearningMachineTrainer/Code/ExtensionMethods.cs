@@ -38,5 +38,10 @@ namespace Extract
         {
             Extract64.Core.ExceptionMethods.LogException(ex);
         }
+
+        public static void Log(this Exception ex, string fileName)
+        {
+            Extract64.Core.ExceptionMethods.LogException(ex, fileName);
+        }
     }
 }

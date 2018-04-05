@@ -1010,7 +1010,7 @@ namespace Extract.Utilities
         /// <param name="type">The type to get the <see cref="ExtractCategoryAttribute.TypeDescription"/> for the category</param>
         /// <returns>If the type has a <see cref="ExtractCategoryAttribute"/> for the given category returns the 
         /// <see cref="ExtractCategoryAttribute.TypeDescription"/> otherwise will return an empty string</returns>
-        public static string GetExtractCategoryTypeDescription(string category, Type type)
+        public static string GetExtractCategoryTypeDescription(string category, MemberInfo type)
         {
             try
             {

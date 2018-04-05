@@ -430,9 +430,6 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 timer.Dispose();
                 cancelButton.Enabled = false;
 
-                // Re-enable buttons
-                UpdateControlsAndFlags();
-
                 if (failed is ExtractException ue)
                 {
                     ue.Display();
@@ -441,6 +438,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 {
                     _editor.CurrentLearningMachine = learningMachine;
                 }
+
+                // Re-enable buttons
+                UpdateControlsAndFlags();
 
             }, TaskScheduler.FromCurrentSynchronizationContext()); // End of ContinueWith
 

@@ -601,6 +601,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._lmModelTypeRadioButton.TabStop = true;
             this._lmModelTypeRadioButton.Text = "Learning Machine";
             this._lmModelTypeRadioButton.UseVisualStyleBackColor = true;
+            this._lmModelTypeRadioButton.CheckedChanged += new System.EventHandler(this.Handle_ModelTypeRadioButton_CheckedChanged);
             // 
             // _nerModelTypeRadioButton
             // 
@@ -612,6 +613,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._nerModelTypeRadioButton.TabStop = true;
             this._nerModelTypeRadioButton.Text = "Open NLP Named Entity Recognition";
             this._nerModelTypeRadioButton.UseVisualStyleBackColor = true;
+            this._nerModelTypeRadioButton.CheckedChanged += new System.EventHandler(this.Handle_ModelTypeRadioButton_CheckedChanged);
             // 
             // _scheduleTabPage
             // 
@@ -620,7 +622,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._scheduleTabPage.Location = new System.Drawing.Point(4, 22);
             this._scheduleTabPage.Name = "_scheduleTabPage";
             this._scheduleTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._scheduleTabPage.Size = new System.Drawing.Size(614, 437);
+            this._scheduleTabPage.Size = new System.Drawing.Size(622, 437);
             this._scheduleTabPage.TabIndex = 1;
             this._scheduleTabPage.Text = "Schedule";
             // 

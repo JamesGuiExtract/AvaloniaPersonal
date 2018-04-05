@@ -282,6 +282,25 @@ namespace Extract.UtilityApplications.MLModelTrainer
             }
         }
 
+        /// <summary>
+        /// Enables/disabled the training/testing command controls
+        /// </summary>
+        private void Handle_ModelTypeRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _trainingCommandTextBox.Enabled =
+                _trainingCommandPathTagsButton.Enabled =
+                _testingCommandTextBox.Enabled =
+                _testingCommandPathTagsButton.Enabled =
+                    _nerModelTypeRadioButton.Checked;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45709");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods

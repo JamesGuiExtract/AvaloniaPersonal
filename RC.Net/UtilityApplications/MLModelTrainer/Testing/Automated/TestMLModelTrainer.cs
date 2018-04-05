@@ -12,6 +12,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
@@ -106,6 +107,13 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
             var connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
             connection.Open();
 
+            // Add record for DatabaseService so that there's a valid ID
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = "INSERT DatabaseService (Settings) VALUES('')";
+                cmd.ExecuteNonQuery();
+            }
+
             var rng = new Random();
             foreach (int i in Enumerable.Range(0, 100))
             {
@@ -148,10 +156,12 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
                         TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\"",
-                        MaximumTrainingDocuments = 10000
+                        MaximumTrainingDocuments = 10000,
+                        DatabaseServer = "(local)",
+                        DatabaseName = _DB_NAME
                     };
 
-                    trainer.Process("(local)", _DB_NAME);
+                    trainer.Process(CancellationToken.None);
 
                     var expected = "Training\r\n";
                     var trainingOutput = File.ReadAllText(dest.FileName);
@@ -181,10 +191,12 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
                         TestingCommand = testingExe.Quote() + " \"<TempModelPath>\"",
-                        MaximumTestingDocuments = 10000
+                        MaximumTestingDocuments = 10000,
+                        DatabaseServer = "(local)",
+                        DatabaseName = _DB_NAME
                     };
 
-                    trainer.Process("(local)", _DB_NAME);
+                    trainer.Process(CancellationToken.None);
 
                     var expected = "Testing\r\n";
                     var testingOutput = File.ReadAllText(dest.FileName);
@@ -218,10 +230,12 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\"",
                         TestingCommand = testingExe.Quote() + " \"<TempModelPath>\"",
                         MaximumTrainingDocuments = 10000,
-                        MaximumTestingDocuments = 10000
+                        MaximumTestingDocuments = 10000,
+                        DatabaseServer = "(local)",
+                        DatabaseName = _DB_NAME
                     };
 
-                    trainer.Process("(local)", _DB_NAME);
+                    trainer.Process(CancellationToken.None);
 
                     var expected = "Training Result:\r\nTraining\r\n";
                     var testingOutput = File.ReadAllText(dest.FileName);
@@ -250,10 +264,12 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     ModelName = _MODEL_NAME,
                     ModelDestination = dest,
                     TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\"",
-                    MaximumTrainingDocuments = 10000
+                    MaximumTrainingDocuments = 10000,
+                    DatabaseServer = "(local)",
+                    DatabaseName = _DB_NAME
                 };
 
-                var ex = Assert.Throws<ExtractException>(() => trainer.Process("(local)", _DB_NAME));
+                var ex = Assert.Throws<ExtractException>(() => trainer.Process(CancellationToken.None));
                 Assert.AreEqual("Training failed", ex.Message);
                 Assert.False(File.Exists(dest));
             }
@@ -279,11 +295,12 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     ModelName = _MODEL_NAME,
                     ModelDestination = dest,
                     TestingCommand = testingExe.Quote() + " \"<TempModelPath>\"",
-                    MaximumTestingDocuments = 10000
-
+                    MaximumTestingDocuments = 10000,
+                    DatabaseServer = "(local)",
+                    DatabaseName = _DB_NAME
                 };
 
-                var ex = Assert.Throws<ExtractException>(() => trainer.Process("(local)", _DB_NAME));
+                var ex = Assert.Throws<ExtractException>(() => trainer.Process(CancellationToken.None));
                 Assert.AreEqual("Testing failed", ex.Message);
                 Assert.False(File.Exists(dest));
             }
@@ -315,11 +332,12 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
                         TrainingCommand = trainingExe.Quote() + "\"<DataFile>\" \"<TempModelPath>\"",
-                        MaximumTrainingDocuments = 10000
-
+                        MaximumTrainingDocuments = 10000,
+                        DatabaseServer = "(local)",
+                        DatabaseName = TestTrainingDataCollector.DBName
                     };
 
-                    trainer.Process("(local)", TestTrainingDataCollector.DBName);
+                    trainer.Process(CancellationToken.None);
 
                     var trainingOutput = File.ReadAllText(dest.FileName);
                     Assert.AreEqual(18346, trainingOutput.Length);
@@ -349,10 +367,12 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
                         TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\"",
-                        MaximumTrainingDocuments = 10000
+                        MaximumTrainingDocuments = 10000,
+                        DatabaseServer = "(local)",
+                        DatabaseName = _DB_NAME
                     };
 
-                    trainer.Process("(local)", _DB_NAME);
+                    trainer.Process(CancellationToken.None);
 
                     var expected = new byte [] { 134, 229, 5, 229, 22, 201, 81, 37, 94, 70, 57, 40, 127, 77, 225, 36 };
                     var trainingOutput = File.ReadAllBytes(dest.FileName);
@@ -378,10 +398,6 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                 _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
                 Directory.CreateDirectory(_inputFolder.Last());
 
-                string ccdir =
-                    new Uri( Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
-                var trainingExe = Path.Combine(ccdir, "LearningMachineTrainer.exe");
-
                 var dest = _testFiles.GetFile("Resources.docClassifier.lm");
                 LearningMachine lm = LearningMachine.Load(dest);
                 Assert.That(!lm.IsTrained);
@@ -391,13 +407,13 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     ModelType = ModelType.LearningMachine,
                     ModelName = _MODEL_NAME,
                     ModelDestination = dest,
-                    TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\" /csvName \"<DataFile>\" /s",
-                    TestingCommand = trainingExe.Quote() + " \"<TempModelPath>\" /csvName \"<DataFile>\" /testOnly /s",
                     MaximumTrainingDocuments = 10000,
-                    MaximumTestingDocuments = 10000
+                    MaximumTestingDocuments = 10000,
+                    DatabaseServer = "(local)",
+                    DatabaseName = TestTrainingDataCollector.DBName
                 };
 
-                trainer.Process("(local)", TestTrainingDataCollector.DBName);
+                trainer.Process(CancellationToken.None);
 
                 lm = LearningMachine.Load(dest);
                 Assert.That(lm.IsTrained);
@@ -417,7 +433,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
             {
                 var trainer = new MLModelTrainer
                 {
-                    ModelName = _MODEL_NAME
+                    Description = "Unit Test"
+                    , ModelName = _MODEL_NAME
                     , ModelDestination = dest.FileName
                     , TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\""
                     , TestingCommand = testingExe.FileName.Quote() + " \"<TempModelPath>\""
@@ -426,6 +443,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     , AllowableAccuracyDrop = allowableAccuracyDrop
                     , MaximumTrainingDocuments = 10000
                     , MaximumTestingDocuments = 10000
+                    , DatabaseServer = "(local)"
+                    , DatabaseName = _DB_NAME
                 };
 
                 if (interactive)
@@ -458,7 +477,7 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     ,"ECHO Execution time: 0.540 seconds"
                 });
 
-                trainer.Process("(local)", _DB_NAME);
+                trainer.Process(CancellationToken.None);
 
                 // Destination file will be empty if testing result was not acceptable
                 var expected = expectSuccess ? "Training\r\n" : "";
@@ -561,6 +580,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         , MaximumTrainingDocuments = 10000
                         , MaximumTestingDocuments = 10000
                         , LastIDProcessed = 50
+                        , DatabaseServer = "(local)"
+                        , DatabaseName = _DB_NAME
                     };
 
                     // Simulate running out of memory if number of records is greater than 30
@@ -583,7 +604,7 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     File.WriteAllLines(testingExe.FileName, lines);
                     File.AppendAllText(testingExe.FileName, "ECHO        TOTAL: precision:   73.33%%;  recall:   39.29%%; F1:   51.16%%.");
 
-                    trainer.Process("(local)", _DB_NAME);
+                    trainer.Process(CancellationToken.None);
 
                     // Destination file will be empty if testing result was not acceptable
                     var expected = "Training\r\n";

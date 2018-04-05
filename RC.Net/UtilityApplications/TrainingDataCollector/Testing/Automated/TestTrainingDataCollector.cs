@@ -157,6 +157,24 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
 
                 fileProcessingDB.RecordFAMSessionStop();
                 fileProcessingDB.CloseAllDBConnections();
+
+                // Add record for DatabaseService so that there's a valid ID
+                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                {
+                    DataSource = fileProcessingDB.DatabaseServer,
+                    InitialCatalog = fileProcessingDB.DatabaseName,
+                    IntegratedSecurity = true,
+                    NetworkLibrary = "dbmssocn"
+                };
+
+                var connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
+                connection.Open();
+
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "INSERT DatabaseService (Settings) VALUES('')";
+                    cmd.ExecuteNonQuery();
+                }
             }
             catch (Exception ex)
             {
@@ -168,8 +186,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
         /// Retrieves MLData
         /// </summary>
         /// <param name="trainingData">Whether to retrieve training data (if <c>true</c>) or testing data (if <c>false</c>)</param>
-        private static string GetDataFromDB(bool trainingData, string recordSeparator = "")
+        private static string GetDataFromDB(bool trainingData)
         {
+            string recordSeparator = "\r\n";
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
             {
@@ -223,8 +242,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                     var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
                     collector.DataGeneratorPath = learningMachinePath;
                     collector.ModelType = ModelType.LearningMachine;
+                    collector.DatabaseServer = "(local)";
+                    collector.DatabaseName = DBName;
 
-                    collector.Process("(local)", DBName, System.Threading.CancellationToken.None);
+                    collector.Process(System.Threading.CancellationToken.None);
                 }
                 else
                 {
@@ -235,8 +256,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                     _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
                     var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
                     collector.DataGeneratorPath = annotatorSettingsPath;
+                    collector.DatabaseServer = "(local)";
+                    collector.DatabaseName = DBName;
 
-                    collector.Process("(local)", DBName, System.Threading.CancellationToken.None);
+                    collector.Process(System.Threading.CancellationToken.None);
                 }
             }
             catch (Exception ex)
@@ -373,8 +396,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                 _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
                 var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
                 collector.DataGeneratorPath = annotatorSettingsPath;
+                collector.DatabaseServer = "(local)";
+                collector.DatabaseName = DBName;
 
-                collector.Process("(local)", DBName, System.Threading.CancellationToken.None);
+                collector.Process(System.Threading.CancellationToken.None);
 
                 // Verify empty data
                 var expected = "";
@@ -443,12 +468,12 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
 
                 var expectedFile = _testFiles.GetFile("Resources.learningMachine.train.txt");
                 var expected = File.ReadAllText(expectedFile);
-                string trainingOutput = GetDataFromDB(trainingData: true, recordSeparator: "\r\n");
+                string trainingOutput = GetDataFromDB(trainingData: true);
                 CollectionAssert.AreEqual(expected, trainingOutput);
 
                 expectedFile = _testFiles.GetFile("Resources.learningMachine.test.txt");
                 expected = File.ReadAllText(expectedFile);
-                string testingOutput = GetDataFromDB(trainingData: false, recordSeparator: "\r\n");
+                string testingOutput = GetDataFromDB(trainingData: false);
                 CollectionAssert.AreEqual(expected, testingOutput);
             }
             finally

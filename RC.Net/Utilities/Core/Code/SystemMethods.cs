@@ -665,7 +665,7 @@ namespace Extract.Utilities
         /// <summary>
         /// Runs the specified executable with the specified arguments, appends a /ef [TempFile]
         /// to the argument list. If an exception is logged to the temp file, it will be
-        /// loaded and thrown.
+        /// loaded and thrown or logged.
         /// </summary>
         /// <param name="exeFile">The executable to run.</param>
         /// <param name="arguments">The command line arguments for the executable.</param>
@@ -675,12 +675,14 @@ namespace Extract.Utilities
         /// <param name="addCancellableNameAsArgument">If <c>true</c> another argument will be added to the argument list 
         /// /CancelTokenName "eventName"
         /// if <c>false</c> there will be no changes</param>
+        /// <param name="onlyLogExceptionsFromExecutable">Whether to log exceptions written to the temp file rather than throwing them</param>
         /// <returns>The exit code of the process or  
         /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public static int RunExtractExecutable(string exeFile, IEnumerable<string> arguments,
             out string standardOutput, out string standardError,
-            CancellationToken cancelToken = default(CancellationToken), bool addCancellableNameAsArgument = false)
+            CancellationToken cancelToken = default(CancellationToken), bool addCancellableNameAsArgument = false,
+            bool onlyLogExceptionsFromExecutable = false)
         {
             try
             {
@@ -690,7 +692,7 @@ namespace Extract.Utilities
                     .ToArray());
 
                 return RunExtractExecutable(exeFile, argumentString, out standardOutput, out standardError,
-                    cancelToken, addCancellableNameAsArgument);
+                    cancelToken, addCancellableNameAsArgument, onlyLogExceptionsFromExecutable);
             }
             catch (Exception ex)
             {
@@ -701,7 +703,7 @@ namespace Extract.Utilities
         /// <summary>
         /// Runs the specified executable with the specified arguments, appends a /ef [TempFile]
         /// to the argument list. If an exception is logged to the temp file, it will be
-        /// loaded and thrown.
+        /// loaded and thrown or logged.
         /// </summary>
         /// <param name="exeFile">The executable to run.</param>
         /// <param name="arguments">The command line arguments for the executable.</param>
@@ -711,12 +713,14 @@ namespace Extract.Utilities
         /// <param name="addCancellableNameAsArgument">If <c>true</c> another argument will be added to the argument list 
         /// /CancelTokenName "eventName"
         /// if <c>false</c> there will be no changes</param>
+        /// <param name="onlyLogExceptionsFromExecutable">Whether to log exceptions written to the temp file rather than throwing them</param>
         /// <returns>The exit code of the process or 
         /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public static int RunExtractExecutable(string exeFile, string arguments,
             out string standardOutput, out string standardError,
-            CancellationToken cancelToken = default(CancellationToken), bool addCancellableNameAsArgument = false)
+            CancellationToken cancelToken = default(CancellationToken), bool addCancellableNameAsArgument = false,
+            bool onlyLogExceptionsFromExecutable = false)
         {
             try
             {
@@ -745,7 +749,15 @@ namespace Extract.Utilities
                         var info = new FileInfo(tempFile.FileName);
                         if (info.Length > 0)
                         {
-                            throw ExtractException.LoadFromFile("ELI45707", tempFile.FileName);
+                            var ue = ExtractException.LoadFromFile("ELI45707", tempFile.FileName);
+                            if (onlyLogExceptionsFromExecutable)
+                            {
+                                ue.Log();
+                            }
+                            else
+                            {
+                                throw ue;
+                            }
                         }
 
                         return exitCode;

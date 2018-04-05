@@ -283,7 +283,7 @@ namespace Extract.AttributeFinder
         /// Current version.
         /// Version 2: Add AttributesToTokenizeFilter property and backing field
         ///            Add AttributeFeatureShingleSize property and backing field
-        /// Version 3: Add more efficient saving of answer name to code map
+        /// Version 3: Add more space efficient saving of answer name to code map
         /// </summary>
         const int _CURRENT_VERSION = 3;
 
@@ -350,7 +350,16 @@ namespace Extract.AttributeFinder
         // Backing fields for properties
         private SpatialStringFeatureVectorizer _autoBagOfWords;
         private IEnumerable<AttributeFeatureVectorizer> _attributeFeatureVectorizers;
+
+        [Obsolete("Use _nonSerializedAnswerCodeToNameList instead")]
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+#pragma warning disable 0414
         private Dictionary<string, int> _answerNameToCode;
+#pragma warning restore 0414
+
+        [NonSerialized]
+        private Dictionary<string, int> _nonSerializedAnswerNameToCode;
+
         [Obsolete("Use _answerCodeToNameList instead")]
         private Dictionary<int, string> _answerCodeToName;
 
@@ -421,13 +430,13 @@ namespace Extract.AttributeFinder
         {
             get
             {
-                return _answerNameToCode;
+                return _nonSerializedAnswerNameToCode;
             }
             set
             {
-                if (value != _answerNameToCode)
+                if (value != _nonSerializedAnswerNameToCode)
                 {
-                    _answerNameToCode = value;
+                    _nonSerializedAnswerNameToCode = value;
                 }
             }
         }
@@ -2316,17 +2325,6 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Called when serializing
-        /// </summary>
-        /// <param name="context">The context.</param>
-        [OnSerializing]
-        private void OnSerializing(StreamingContext context)
-        {
-            // Don't save redundant info (will be recreated on load)
-            _answerNameToCode = null;
-        }
-
-        /// <summary>
         /// Called when deserializing
         /// </summary>
         /// <param name="context">The context.</param>
@@ -2369,16 +2367,18 @@ namespace Extract.AttributeFinder
 
                 // Don't need the source dictionary anymore
                 _answerCodeToName = null;
+
+                // Clear unused answer-name-to-code dictionary (can't make it nonserialized since old versions may be
+                // original values of strings referenced in other places)
+                _answerNameToCode = null;
 #pragma warning restore CS0618 // Type or member is obsolete
             }
-            else
+
+            // Create the non-serialized name-to-code dictionary
+            _nonSerializedAnswerNameToCode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < _answerCodeToNameList.Count; i++)
             {
-                // Else, just create the name-to-code dictionary
-                _answerNameToCode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                for (int i = 0; i < _answerCodeToNameList.Count; i++)
-                {
-                    _answerNameToCode[_answerCodeToNameList[i]] = i;
-                }
+                _nonSerializedAnswerNameToCode[_answerCodeToNameList[i]] = i;
             }
 
             _version = _CURRENT_VERSION;

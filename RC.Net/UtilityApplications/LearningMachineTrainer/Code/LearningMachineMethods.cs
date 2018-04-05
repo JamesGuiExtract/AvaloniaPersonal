@@ -162,7 +162,18 @@ namespace LearningMachineTrainer
                 }
 
                 var trainOutputs = trainAnswers.Select(a => model.AnswerNameToCode[a]).ToArray();
-                var testOutputs = testAnswers.Select(a => model.AnswerNameToCode[a]).ToArray();
+                var testOutputs = testAnswers.Select(a =>
+                {
+                    if (model.AnswerNameToCode.ContainsKey(a))
+                    {
+                        return model.AnswerNameToCode[a];
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                })
+                .ToArray();
 
                 // Train the classifier
                 if (!testOnly && trainInputs.Any())

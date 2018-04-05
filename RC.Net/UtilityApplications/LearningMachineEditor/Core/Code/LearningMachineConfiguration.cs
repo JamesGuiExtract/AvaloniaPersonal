@@ -444,7 +444,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
         private void AfterCurrentLearningMachineChanged()
         {
-            if (_previousLearningMachine != null)
+            if (!string.IsNullOrEmpty(_previousLearningMachine?.TrainingLog))
             {
                 // Preserve training log
                 _currentLearningMachine.TrainingLog = _previousLearningMachine.TrainingLog;

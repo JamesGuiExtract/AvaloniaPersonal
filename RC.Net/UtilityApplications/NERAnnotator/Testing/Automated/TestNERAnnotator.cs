@@ -718,7 +718,7 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
                                 lines.Add(reader.GetString(0));
                             }
 
-                            trainingOutput = string.Join("", lines);
+                            trainingOutput = string.Join("\r\n", lines) + "\r\n";
                             reader.Close();
                         }
                     }

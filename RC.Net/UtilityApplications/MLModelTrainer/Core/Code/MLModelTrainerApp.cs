@@ -29,10 +29,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
                         "\r\n    /s = silent = no progress bar or exceptions displayed" +
                         "\r\n    /ef <exceptionFile> log exceptions to file" +
                         "\r\n       (supports propagate errors to FAM option)" +
-                        "\r\n       (/ef also implies /s)" +
-                        "\r\n    /CancelTokenName <CancelTokenName> used when called from another Extract application to" +
-                        "\r\n       allow calling application to cancel using CancellationToken." +
-                        "\r\n       (/CancelTokenName implies /s)" +
+                        "\r\n       (/ef implies /s)" +
                         "\r\n  To edit a settings file:\r\n    MLModelTrainer /c <settingsFile> [/databaseServer <server>] [/databaseName <name>]", "ML Model Trainer", error);
                     return error ? -1 : 0;
                 }
@@ -46,7 +43,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     string settingsFile = null;
                     string databaseServer = null;
                     string databaseName = null;
-                    string cancelTokenName = null;
                     List<(PropertyInfo property, object value)> propertiesToSet = new List<(PropertyInfo, object)>();
                     Type trainerType = typeof(MLModelTrainer);
                     for (int argNum = 0; argNum < args.Length; argNum++)
@@ -111,26 +107,13 @@ namespace Extract.UtilityApplications.MLModelTrainer
                             else if (val.Equals("ef", StringComparison.OrdinalIgnoreCase))
                             {
                                 saveErrors = true;
-                                // /ef implies /s // (else exceptions would be displayed)
+                                // /ef implies /s
+                                // (else exceptions would be displayed)
                                 silent = true;
 
                                 if (++argNum < args.Length)
                                 {
                                     uexName = args[argNum];
-                                    continue;
-                                }
-                                else
-                                {
-                                    return usage(error: true);
-                                }
-                            }
-                            else if (val.Equals("CancelTokenName", StringComparison.OrdinalIgnoreCase))
-                            {
-                                silent = true;
-
-                                if (++argNum < args.Length)
-                                {
-                                    cancelTokenName = args[argNum];
                                     continue;
                                 }
                                 else
@@ -187,6 +170,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
                         ? MLModelTrainer.FromJson(File.ReadAllText(settingsFile))
                         : new MLModelTrainer();
 
+                    trainer.DatabaseServer = databaseServer;
+                    trainer.DatabaseName = databaseName;
+
                     foreach(var (property, value) in propertiesToSet)
                     {
                         property.SetValue(trainer, value);
@@ -210,15 +196,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     }
                     else
                     {
-                        NamedTokenSource namedTokenSource = null;
-                        CancellationToken cancelToken = CancellationToken.None;
-                        if (!string.IsNullOrWhiteSpace(cancelTokenName))
-                        {
-                            namedTokenSource = new NamedTokenSource(cancelTokenName);
-                            cancelToken = namedTokenSource.Token;
-                        }
-
-                        trainer.Process(databaseServer, databaseName, cancelToken);
+                        trainer.Process(CancellationToken.None);
                     }
                 }
                 else

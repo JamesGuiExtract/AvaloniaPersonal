@@ -106,7 +106,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                             else if (val.Equals("ef", StringComparison.OrdinalIgnoreCase))
                             {
                                 saveErrors = true;
-                                // /ef implies /s // (else exceptions would be displayed)
+                                // /ef implies /s
+                                // (else exceptions would be displayed)
                                 silent = true;
 
                                 if (++argNum < args.Length)
@@ -168,6 +169,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                         ? TrainingDataCollector.FromJson(File.ReadAllText(settingsFile))
                         : new TrainingDataCollector();
 
+                    collector.DatabaseServer = databaseServer;
+                    collector.DatabaseName = databaseName;
+
                     foreach(var (property, value) in propertiesToSet)
                     {
                         property.SetValue(collector, value);
@@ -190,7 +194,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                     }
                     else
                     {
-                        collector.Process(databaseServer, databaseName, System.Threading.CancellationToken.None);
+                        collector.Process(System.Threading.CancellationToken.None);
                         File.WriteAllText(settingsFile, collector.ToJson());
                     }
                 }

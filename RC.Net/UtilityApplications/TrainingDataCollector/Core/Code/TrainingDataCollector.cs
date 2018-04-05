@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
@@ -27,8 +26,59 @@ namespace Extract.UtilityApplications.TrainingDataCollector
     /// </summary>
     [DataContract]
     [ExtractCategory("DatabaseService", "Training data collector")]
-    public class TrainingDataCollector : DatabaseService, IConfigSettings
+    public class TrainingDataCollector : DatabaseService, IConfigSettings, IHasConfigurableDatabaseServiceStatus
     {
+        #region Internal classes
+
+        /// <summary>
+        /// Class for the TrainingDataCollectorStatus stored in the DatabaseService record
+        /// </summary>
+        [DataContract]
+        public class TrainingDataCollectorStatus : DatabaseServiceStatus
+        {
+            #region DatabaseVerificationStatus constants
+
+            const int _CURRENT_VERSION = 1;
+
+            #endregion
+
+            #region MLModelTrainerStatus Properties
+
+            [DataMember]
+            public override int Version { get; protected set; } = _CURRENT_VERSION;
+
+            /// <summary>
+            /// The ID of the last MLData record processed
+            /// </summary>
+            [DataMember]
+            public long LastIDProcessed { get; set; }
+
+            #endregion
+
+            #region MLModelTrainerStatus Serialization
+
+            /// <summary>
+            /// Called after this instance is deserialized.
+            /// </summary>
+            [OnDeserialized]
+            void OnDeserialized(StreamingContext context)
+            {
+                if (Version > CURRENT_VERSION)
+                {
+                    ExtractException ee = new ExtractException("ELI45712", "Settings were saved with a newer version.");
+                    ee.AddDebugData("SavedVersion", Version, false);
+                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                    throw ee;
+                }
+
+                Version = CURRENT_VERSION;
+            } 
+
+            #endregion
+        }
+
+        #endregion
+
         #region Constants
 
         const int CURRENT_VERSION = 1;
@@ -51,6 +101,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         #region Fields
 
         bool _processing;
+        long _lastIDProcessed;
+        TrainingDataCollectorStatus _status;
 
         #endregion Fields
 
@@ -79,7 +131,32 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// The last AttributeSetForFile.ID that was processed by this application
         /// </summary>
         [DataMember]
-        public long LastIDProcessed { get; set; }
+        public long LastIDProcessed
+        {
+            get
+            {
+                if (_status != null)
+                {
+                    return _status.LastIDProcessed;
+                }
+                else
+                {
+                    return _lastIDProcessed;
+                }
+            }
+            set
+            {
+                if (_status != null)
+                {
+                    _status.LastIDProcessed = value;
+                }
+                else
+                {
+                    _lastIDProcessed = value;
+                }
+            }
+        }
+
 
         /// <summary>
         /// Whether processing
@@ -115,70 +192,67 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         /// <param name="databaseServer">The database server</param>
         /// <param name="databaseName">The name of the database</param>
-        public void Process(string databaseServer, string databaseName, CancellationToken cancelToken)
+        public override void Process(CancellationToken cancelToken)
         {
             try
             {
                 _processing = true;
 
-                // Build the connection string from the settings
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                using (var connection = NewSqlDBConnection())
                 {
-                    DataSource = databaseServer,
-                    InitialCatalog = databaseName,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
+                    connection.Open();
 
-                var connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
-                connection.Open();
-
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = _GET_HIGHEST_ID_TO_PROCESS;
-                    cmd.Parameters.AddWithValue("@AttributeSetname", AttributeSetName);
-                    cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
-
-                    var reader = cmd.ExecuteReader();
-                    if (reader.Read() && !reader.IsDBNull(0))
+                    using (var cmd = connection.CreateCommand())
                     {
-                        long lowestIDToProcess = LastIDProcessed + 1;
-                        long highestIDToProcess = reader.GetInt64(0);
-                        LastIDProcessed = highestIDToProcess;
-                        var arguments = new List<string>
-                        {
-                            "-p",
-                            DataGeneratorPath,
-                            "--UseDatabase",
-                            "true",
-                            "--DatabaseServer",
-                            databaseServer,
-                            "--DatabaseName",
-                            databaseName,
-                            "--AttributeSetName",
-                            AttributeSetName,
-                            "--ModelName",
-                            ModelName,
-                            "--FirstIDToProcess",
-                            lowestIDToProcess.ToString(CultureInfo.InvariantCulture),
-                            "--LastIDToProcess",
-                            highestIDToProcess.ToString(CultureInfo.InvariantCulture),
-                        };
+                        cmd.CommandText = _GET_HIGHEST_ID_TO_PROCESS;
+                        cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
+                        cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
 
-                        if (ModelType == ModelType.NamedEntityRecognition)
+                        var reader = cmd.ExecuteReader();
+                        if (reader.Read() && !reader.IsDBNull(0))
                         {
-                            SystemMethods.RunExtractExecutable(_NER_ANNOTATOR_APPLICATION, arguments, cancelToken, true);
-                        }
-                        else if (ModelType == ModelType.LearningMachine)
-                        {
-                            using (var machine = LearningMachine.Load(DataGeneratorPath))
+                            long lowestIDToProcess = LastIDProcessed + 1;
+                            long highestIDToProcess = reader.GetInt64(0);
+                            LastIDProcessed = highestIDToProcess;
+                            var arguments = new List<string>
                             {
-                                machine.WriteDataToDatabase(cancelToken, databaseServer, databaseName, AttributeSetName, ModelName, lowestIDToProcess, highestIDToProcess);
+                                "-p",
+                                DataGeneratorPath,
+                                "--UseDatabase",
+                                "true",
+                                "--DatabaseServer",
+                                DatabaseServer,
+                                "--DatabaseName",
+                                DatabaseName,
+                                "--AttributeSetName",
+                                AttributeSetName,
+                                "--ModelName",
+                                ModelName,
+                                "--FirstIDToProcess",
+                                lowestIDToProcess.ToString(CultureInfo.InvariantCulture),
+                                "--LastIDToProcess",
+                                highestIDToProcess.ToString(CultureInfo.InvariantCulture),
+                            };
+
+                            if (ModelType == ModelType.NamedEntityRecognition)
+                            {
+                                SystemMethods.RunExtractExecutable(_NER_ANNOTATOR_APPLICATION, arguments, cancelToken, true);
                             }
-                        }
-                        else
-                        {
-                            throw new ExtractException("ELI45434", "Unknown model type");
+                            else if (ModelType == ModelType.LearningMachine)
+                            {
+                                using (var machine = LearningMachine.Load(DataGeneratorPath))
+                                {
+                                    machine.WriteDataToDatabase(cancelToken, DatabaseServer, DatabaseName, AttributeSetName, ModelName,
+                                        lowestIDToProcess, highestIDToProcess);
+                                }
+                            }
+                            else
+                            {
+                                throw new ExtractException("ELI45434", "Unknown model type");
+                            }
+
+                            // Save status to the DB
+                            SaveStatus();
                         }
                     }
                 }
@@ -209,17 +283,44 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             }
         }
 
-        /// <summary>
-        /// Processes using configured DB
-        /// </summary>
-        /// <param name="cancelToken">Token that can be used to cancel processing</param>
-        public override void Process(CancellationToken cancelToken)
-        {
-            Process(DatabaseServer, DatabaseName, cancelToken);
-        }
-
         #endregion Public Methods
 
+        #region IHasConfigurableDatabaseServiceStatus
+
+        /// <summary>
+        /// The <see cref="DatabaseServiceStatus"/> for this instance
+        /// </summary>
+        public DatabaseServiceStatus Status => _status ?? new TrainingDataCollectorStatus
+        {
+            LastIDProcessed = LastIDProcessed
+        };
+
+        /// <summary>
+        /// Refreshes <see cref="_status"/> by loading from the database, creating a new instance,
+        /// or setting it to null (if <see cref="DatabaseServiceID"/> is less than or equal to zero)
+        /// </summary>
+        public void RefreshStatus()
+        {
+            try
+            {
+                if (DatabaseServiceID > 0
+                    && !string.IsNullOrEmpty(DatabaseServer)
+                    && !string.IsNullOrEmpty(DatabaseName))
+                {
+                    _status = GetLastOrCreateStatus(() => new TrainingDataCollectorStatus());
+                }
+                else
+                {
+                    _status = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45724");
+            }
+        }
+
+        #endregion IHasConfigurableDatabaseServiceStatus
 
         #region IConfigSettings implementation
 
@@ -283,6 +384,14 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             }
 
             Version = CURRENT_VERSION;
+        }
+
+        /// <summary>
+        /// Saves the current <see cref="DatabaseServiceStatus"/> to the DB
+        /// </summary>
+        void SaveStatus()
+        {
+            SaveStatus(_status);
         }
 
         #endregion Private Methods

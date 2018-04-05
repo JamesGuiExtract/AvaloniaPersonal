@@ -212,7 +212,11 @@ namespace Extract.ETL.Management
                         .Select(r =>
                         {
                             var service = DatabaseService.FromJson(r.Field<string>("Settings"));
-                            return new DatabaseServiceData
+
+                            // An empty settings string results in a null service object
+                            return service == null
+                            ? null
+                            : new DatabaseServiceData
                             {
                                 ID = r.Field<Int32>("ID"),
                                 Description = r.Field<string>("Description"),
@@ -220,7 +224,9 @@ namespace Extract.ETL.Management
                                 ServiceType = service.ExtractCategoryType,
                                 Enabled = r.Field<bool>("Enabled")
                             };
-                        }).ToList();
+                        })
+                        .Where(s => s != null)
+                        .ToList();
 
                     _listOfDataToDisplay = new BindingList<DatabaseServiceData>(dataToDisplay);
                     BindingSource bindingSource = new BindingSource();
@@ -296,13 +302,16 @@ namespace Extract.ETL.Management
         /// </summary>
         /// <param name="service">DatabaseService to be edited</param>
         /// <param name="caption">Caption to use for editing service</param>
+        /// <param name="id">The DatabaseService.ID of the service
+        /// (needed to show the status fields when modifying a service)</param>
         /// <returns>configured service or null if not configured</returns>
-        DatabaseService EditService(DatabaseService service, string caption)
+        DatabaseService EditService(DatabaseService service, string caption, int id = 0)
         {
             // make a clone to work with
             var tmpService = service.Clone() as DatabaseService;
             tmpService.DatabaseName = DatabaseName;
             tmpService.DatabaseServer = DatabaseServer;
+            tmpService.DatabaseServiceID = id;
             bool configured = false;
             IConfigSettings configService = tmpService as IConfigSettings;
             if (configService != null)
@@ -389,7 +398,7 @@ namespace Extract.ETL.Management
 
                 DatabaseServiceData currentData = row.DataBoundItem as DatabaseServiceData;
 
-                var service = EditService(currentData.Service, "Modify {0} database service.");
+                var service = EditService(currentData.Service, "Modify {0} database service.", currentData.ID);
                 
                 if (service != null)
                 {
@@ -406,6 +415,28 @@ namespace Extract.ETL.Management
                         cmd.Parameters.AddWithValue("@Description", service.Description);
                         cmd.Parameters.AddWithValue("@Settings", service.ToJson());
                         cmd.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
+
+                        // Some services allow editing of initial status values so update the status column in that case
+                        if (service is IHasConfigurableDatabaseServiceStatus hasStatus)
+                        {
+                            cmd.CommandText = @"
+                                    UPDATE DatabaseService 
+                                    SET [Description] = @Description,
+                                        [Settings]    = @Settings,
+                                        [Status]      = @Status
+                                    WHERE ID = @DatabaseServiceID";
+
+                            string status = hasStatus.Status?.ToJson();
+                            if (status != null)
+                            {
+                                cmd.Parameters.AddWithValue("@Status", status);
+                            }
+                            else
+                            {
+                                cmd.Parameters.AddWithValue("@Status", DBNull.Value);
+                            }
+                        }
+
                         cmd.ExecuteNonQuery();
                         trans.Complete();
 
@@ -455,6 +486,35 @@ namespace Extract.ETL.Management
                             cmd.Parameters.AddWithValue("@Description", service.Description);
                             cmd.Parameters.AddWithValue("@Settings", service.ToJson());
                             cmd.Parameters.AddWithValue("@Enabled", true);
+
+                            // Some services allow editing of initial status values so save 
+                            if (service is IHasConfigurableDatabaseServiceStatus hasStatus)
+                            {
+                                cmd.CommandText = @"
+                                    INSERT INTO [dbo].[DatabaseService]
+                                                ([Description]
+                                                ,[Settings]
+                                                ,[Enabled]
+                                                ,[Status]
+                                                )
+                                    OUTPUT inserted.id
+                                    VALUES (
+                                        @Description,
+                                        @Settings,
+                                        @Enabled,
+                                        @Status)";
+
+                                string status = hasStatus.Status?.ToJson();
+                                if (status != null)
+                                {
+                                    cmd.Parameters.AddWithValue("@Status", status);
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("@Status", DBNull.Value);
+                                }
+                            }
+
                             Int32 id = (Int32)cmd.ExecuteScalar();
                             trans.Complete();
 

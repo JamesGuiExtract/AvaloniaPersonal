@@ -38,7 +38,12 @@ namespace Extract.ExceptionHelper
             /// <summary>
             /// Log the exception remotely
             /// </summary>
-            RemoteLog = 0x4
+            RemoteLog = 0x4,
+
+            /// <summary>
+            /// Log to specified file
+            /// </summary>
+            LogToFile = 0x8
         }
 
         // The signature of a stringized extract exception
@@ -76,6 +81,7 @@ namespace Extract.ExceptionHelper
                 string productName = null;
                 string eliCode = null;
                 bool deleteExceptionFile = false;
+                string logFileName = null;
                 for (int i = 1; i < args.Length; i++)
                 {
                     var argument = args[i];
@@ -101,6 +107,20 @@ namespace Extract.ExceptionHelper
                     else if (argument.Equals("/log", StringComparison.OrdinalIgnoreCase))
                     {
                         operation |= ExceptionOperation.Log;
+                    }
+                    else if (argument.Equals("/ef", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Check for filename
+                        if (i + 1 < args.Length)
+                        {
+                            logFileName = args[++i];
+                        }
+                        else
+                        {
+                            ShowUsage("Missing logFileName following the ef switch.");
+                            return;
+                        }
+                        operation |= ExceptionOperation.LogToFile;
                     }
                     else if (argument.Equals("/remote", StringComparison.OrdinalIgnoreCase))
                     {
@@ -191,6 +211,11 @@ namespace Extract.ExceptionHelper
                     }
                 }
 
+                if (operation.HasFlag(ExceptionOperation.LogToFile))
+                {
+                    var ee = exception.AsExtract(eliCode);
+                    ee.Log(logFileName);
+                }
                 // Get the current time (needed for both the local and remote logging)
                 var dateTimeUtc = DateTime.UtcNow;
                 if (operation.HasFlag(ExceptionOperation.Log))
@@ -291,7 +316,7 @@ namespace Extract.ExceptionHelper
             // Add the command line syntax
             usage.Append(Environment.GetCommandLineArgs()[0]);
             usage.Append(" </?>|<exceptionfile> [EliCode] [/display] [/log] [/remote <machine/ipaddress>]");
-            usage.Append(" [/pid <ProcessId>] [/product <ProductName>] /delete");
+            usage.Append(" [/ef <exceptionFile>] [/pid <ProcessId>] [/product <ProductName>] /delete");
             usage.AppendLine();
             usage.Append("The default behavior is for the exception to be logged locally.  ");
             usage.Append("If you would like to log locally and remotely you must specify both ");
@@ -310,6 +335,8 @@ namespace Extract.ExceptionHelper
             usage.AppendLine("    /remote - Log the exception to a remote machine.");
             usage.AppendLine("    <machine/ipaddress> - The name or ip address of the machine");
             usage.AppendLine("        that is running the exception service.");
+            usage.AppendLine("    /ef - Log the exception to a specified file");
+            usage.AppendLine("    <exceptionFile> - The path to log the exceptions to");
             usage.AppendLine("    /delete - Deletes the specified <exceptionfile> after logging the exception.");
 
             // Display the usage as an error or as an information box

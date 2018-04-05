@@ -17,7 +17,9 @@ namespace LearningMachineTrainer
 {
     class LearningMachineTrainerApp
     {
-        private static bool silent;
+        static bool silent;
+        static bool saveErrors;
+        static string uexName;
 
         static int Main(string[] args)
         {
@@ -26,10 +28,13 @@ namespace LearningMachineTrainer
                 int usage(bool error = false)
                 {
                     string message = "Usage:" +
-                        "\r\n  To train/test a machine:\r\n    LearningMachineTrainer <modelFile> /csvName <name> [/testOnly] [/s] [/cancelTokenName <name>]" +
+                        "\r\n  To train/test a machine:\r\n    LearningMachineTrainer <modelFile> /csvName <name> [/testOnly] [/s] [/ef <exceptionFile>] [/cancelTokenName <name>]" +
                         "\r\n    /csvName <name> path to training or testing CSV" +
                         "\r\n    /testOnly if only testing is to be performed" +
                         "\r\n    /s = silent = no exceptions displayed" +
+                        "\r\n    /ef <exceptionFile> log exceptions to file" +
+                        "\r\n       (supports propagate errors to FAM option)" +
+                        "\r\n       (/ef implies /s)" +
                         "\r\n    /cancelTokenName <name> used when called from another Extract application to" +
                         "\r\n       allow calling application to cancel using the named CancellationToken." +
                         "\r\n       (/cancelTokenName implies /s)";
@@ -63,6 +68,23 @@ namespace LearningMachineTrainer
                             else if (val.Equals("s", StringComparison.OrdinalIgnoreCase))
                             {
                                 silent = true;
+                            }
+                            else if (val.Equals("ef", StringComparison.OrdinalIgnoreCase))
+                            {
+                                saveErrors = true;
+                                // /ef implies /s
+                                // (else exceptions would be displayed)
+                                silent = true;
+
+                                if (++argNum < args.Length)
+                                {
+                                    uexName = args[argNum];
+                                    continue;
+                                }
+                                else
+                                {
+                                    return usage(error: true);
+                                }
                             }
                             else if (val.Equals("testOnly", StringComparison.OrdinalIgnoreCase))
                             {
@@ -123,28 +145,40 @@ namespace LearningMachineTrainer
                         cancelToken = namedTokenSource.Token;
                     }
 
-                    Process(modelFile, csvName, testOnly, cancelToken);
+                    return Process(modelFile, csvName, testOnly, cancelToken);
                 }
                 else
                 {
                     return usage(error: true);
                 }
-
-                return 0;
             }
             catch (Exception ex)
             {
-                ex.Log();
-                if (!silent)
+                if (saveErrors && uexName != null)
+                {
+                    try
+                    {
+                        ex.Log(uexName);
+                    }
+                    catch { }
+                }
+                else if (silent)
+                {
+                    ex.Log();
+                }
+                else
                 {
                     ex.Display();
                 }
+
                 return -1;
             }
         }
 
-        static void Process(string modelFile, string csvName, bool testOnly, CancellationToken cancelToken)
+        static int Process(string modelFile, string csvName, bool testOnly, CancellationToken cancelToken)
         {
+            int returnCode = -1;
+
             // Mark start of session
             StatusArgs lastStatus = new StatusArgs
             {
@@ -250,7 +284,7 @@ namespace LearningMachineTrainer
             // Handle cleanup
             .ContinueWith(task =>
             {
-                Exception failed = SharedTrainingMethods.RunCleanup(task, lm, false, sw, statusUpdates, CancellationToken.None);
+                Exception failed = SharedTrainingMethods.RunCleanup(task, lm, testOnly, sw, statusUpdates, CancellationToken.None);
 
                 // Flush log
                 StatusArgs _;
@@ -262,8 +296,23 @@ namespace LearningMachineTrainer
 
                 if (failed != null)
                 {
-                    failed.Log();
-                    if (!silent)
+                    if (saveErrors && uexName != null)
+                    {
+                        try
+                        {
+                            failed.Log(uexName);
+                        }
+                        catch { }
+                    }
+                    else if (silent)
+                    {
+                        try
+                        {
+                            failed.Log();
+                        }
+                        catch { }
+                    }
+                    else
                     {
                         failed.Display();
                     }
@@ -277,10 +326,14 @@ namespace LearningMachineTrainer
                     }
 
                     LearningMachineModel.SaveClassifierIntoLearningMachine(lm, modelFile);
+
+                    returnCode = 0;
                 }
             }); // End of ContinueWith
 
             maintask.Wait();
+
+            return returnCode;
         }
     }
 }

@@ -53,18 +53,16 @@ namespace Extract.ETL
         }
 
         /// <summary>
-        /// Saves the status to the given connection with the given transaction to the record with the given database servie id
+        /// Saves the status to the given connection with the given transaction to the record with the given database service id
         /// </summary>
         /// <param name="connection">An open <see cref="SqlConnection"/> to the database to save the status to</param>
-        /// <param name="transaction">A <see cref="SqlTransaction"/> to use for saving the status</param>
         /// <param name="databaseServiceId">The ID of the DatabaseService record to update</param>
-        public void SaveStatus(SqlConnection connection, SqlTransaction transaction, Int32 databaseServiceId)
+        public void SaveStatus(SqlConnection connection, Int32 databaseServiceId)
         {
             try
             {
                 using (var cmd = connection.CreateCommand())
                 {
-                    cmd.Transaction = transaction;
                     cmd.CommandText = @"
                         UPDATE [DatabaseService]
                         SET [Status] = @Status

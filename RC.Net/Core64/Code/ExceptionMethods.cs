@@ -29,9 +29,10 @@ namespace Extract64.Core
         /// Logs the specified exception to the Extract log file.
         /// </summary>
         /// <param name="ex">The exception to log.</param>
-        public static void LogException(Exception ex)
+        /// <param name="fileName">Optional path of file to save the exception to</param>
+        public static void LogException(Exception ex, string fileName = null)
         {
-            HandleException(ex, false);
+            HandleException(ex, false, fileName);
         }
 
         /// <summary>
@@ -53,7 +54,8 @@ namespace Extract64.Core
         /// <param name="ex">The exception to handle</param>
         /// <param name="display">If <see langword="true"/> then the exception will
         /// be displayed, otherwise it will be logged.</param>
-        static void HandleException(Exception ex, bool display)
+        /// <param name="fileName">Optional path of file to save the exception to</param>
+        static void HandleException(Exception ex, bool display, string fileName = null)
         {
             string tempFile = null;
             try
@@ -71,6 +73,10 @@ namespace Extract64.Core
                 if (display)
                 {
                     arguments.Append(" /display");
+                }
+                if (fileName != null)
+                {
+                    arguments.Append(" /ef \"" + fileName + "\"");
                 }
 
                 // Launch the helper app

@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Transactions;
 using System.Windows.Forms;
 
 namespace Extract.ETL
@@ -194,10 +195,11 @@ namespace Extract.ETL
             {
                 _processing = true;
 
+                var status = GetLastOrCreateStatus(() => new DocumentVerificationStatus());
+
                 using (var connection = NewSqlDBConnection())
                 {
                     connection.Open();
-                    DocumentVerificationStatus status = GetLastStatus(connection);
 
                     var sourceCmd = connection.CreateCommand();
                     sourceCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
@@ -230,45 +232,34 @@ namespace Extract.ETL
                                 status.SetOfActiveFileTaskIds.Remove(fileTaskSessionID);
                             }
 
-                            using (var saveConnection = NewSqlDBConnection())
+                            try
                             {
-                                saveConnection.Open();
-                                using (var transaction = saveConnection.BeginTransaction())
-                                using (var saveCmd = saveConnection.CreateCommand())
+                                using (var trans = new TransactionScope())
+                                using (var saveConnection = NewSqlDBConnection())
                                 {
-                                    saveCmd.Transaction = transaction;
-                                    saveCmd.CommandText = _QUERY_TO_ADD_UPDATE_REPORTING_VERIFICATION;
-                                    saveCmd.Parameters.Add("@FileID", SqlDbType.Int).Value = fileID;
-                                    saveCmd.Parameters.Add("@ActionID", SqlDbType.Int).Value = actionID;
-                                    saveCmd.Parameters.Add("@TaskClassID", SqlDbType.Int).Value = taskClassID;
-                                    saveCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = fileTaskSessionID;
-                                    saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = duration;
-                                    saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = overhead;
-                                    saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = activityTime;
-                                    saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
+                                    saveConnection.Open();
+                                    using (var saveCmd = saveConnection.CreateCommand())
+                                    {
+                                        saveCmd.CommandText = _QUERY_TO_ADD_UPDATE_REPORTING_VERIFICATION;
+                                        saveCmd.Parameters.Add("@FileID", SqlDbType.Int).Value = fileID;
+                                        saveCmd.Parameters.Add("@ActionID", SqlDbType.Int).Value = actionID;
+                                        saveCmd.Parameters.Add("@TaskClassID", SqlDbType.Int).Value = taskClassID;
+                                        saveCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = fileTaskSessionID;
+                                        saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = duration;
+                                        saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = overhead;
+                                        saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = activityTime;
+                                        saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
 
-                                    try
-                                    {
                                         saveCmd.ExecuteNonQuery();
-                                        status.SaveStatus(saveConnection, transaction, DatabaseServiceID);
-                                        transaction.Commit();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        try
-                                        {
-                                            transaction.Rollback();
-                                        }
-                                        catch (Exception rollbackException)
-                                        {
-                                            List<ExtractException> exceptionList = new List<ExtractException>();
-                                            exceptionList.Add(ex.AsExtract("ELI45472"));
-                                            exceptionList.Add(rollbackException.AsExtract("ELI45473"));
-                                            throw exceptionList.AsAggregateException();
-                                        }
-                                        throw ex.AsExtract("ELI45474");
+                                        status.SaveStatus(saveConnection, DatabaseServiceID);
+
+                                        trans.Complete();
                                     }
                                 }
+                            }
+                            catch (Exception ex)
+                            {
+                                throw ex.AsExtract("ELI45472");
                             }
                         }
                     }
@@ -283,54 +274,12 @@ namespace Extract.ETL
                 _processing = false;
             }
         }
+
         #endregion
 
         #endregion
 
         #region Private Methods
-
-        DocumentVerificationStatus GetLastStatus(SqlConnection connection)
-        {
-            DocumentVerificationStatus status;
-            // need to get the previous status
-            var statusCmd = connection.CreateCommand();
-            statusCmd.CommandText = "SELECT Status FROM DatabaseService WHERE ID = @DatabaseServiceID";
-            statusCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
-            using (var statusResult = statusCmd.ExecuteReader())
-            {
-                if (!statusResult.HasRows)
-                {
-                    ExtractException ee = new ExtractException("ELI45479", "Invalid DatabaseServiceID.");
-                    ee.AddDebugData("DatabaseServiceID", DatabaseServiceID, false);
-                    throw ee;
-                }
-
-                string jsonStatus = "";
-                if (statusResult.Read() && !statusResult.IsDBNull(statusResult.GetOrdinal("Status")))
-                {
-                    jsonStatus = statusResult.GetString(statusResult.GetOrdinal("Status"));
-                }
-
-                if (string.IsNullOrWhiteSpace(jsonStatus))
-                {
-                    status = new DocumentVerificationStatus();
-                }
-                else
-                {
-                    status = DatabaseServiceStatus.FromJson(jsonStatus) as DocumentVerificationStatus;
-                    if (status is null)
-                    {
-                        ExtractException statusException = new ExtractException("ELI45471", "DocumentVerificationTimes service could not determine previous status.");
-                        statusException.AddDebugData("DatabaseServiceID", DatabaseServiceID, false);
-                        statusException.AddDebugData("jsonStatusString", jsonStatus, false);
-                        throw statusException;
-                    }
-                }
-
-                statusResult.Close();
-            }
-            return status;
-        }
 
         /// <summary>
         /// Called after this instance is deserialized.

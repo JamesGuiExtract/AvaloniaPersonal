@@ -136,7 +136,7 @@ namespace Extract.AttributeFinder
                 statusUpdates.Enqueue(new StatusArgs
                 {
                     TaskName = "__END_OF_SESSION__", // Keep from matching previous status
-                    StatusMessage = "..." // In case these logs turn into YAML files, use YAML EOF
+                    StatusMessage = "...\r\n" // In case these logs turn into YAML files, use YAML EOF
                 });
 
                 return exception;
