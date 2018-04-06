@@ -529,6 +529,7 @@ namespace Extract.Utilities
                                     // Avoid deadlocks if an event handler were to in turn attempt
                                     // to update or dispose of this instance
                                     Task.Run(() => _eventStarted?.Invoke(this, new EventArgs()));
+                                    SetTimer();
                                 }
                             }
                         }
