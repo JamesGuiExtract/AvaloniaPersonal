@@ -1553,6 +1553,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrWORKFLOW);
 			eraseFromVector(vecTables, gstrWEB_APP_CONFIG);
 			eraseFromVector(vecTables, gstrDATABASE_SERVICE);
+			eraseFromVector(vecTables, gstrMLMODEL);
 		}
 
 		// Never drop these tables
