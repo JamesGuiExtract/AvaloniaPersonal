@@ -531,6 +531,7 @@ BEGIN
         MENUITEM "Attribute &sets...",          ID_MANAGE_ATTRIBUTESETS
         MENUITEM "Bates number &counters...",   ID_MANAGE_BATES_COUNTERS
         MENUITEM "&Metadata fields...",         ID_MANAGE_METADATA
+        MENUITEM "ML Models...",                ID_MANAGE_MLMODELS
         MENUITEM "&Tags...\tCtrl+T",            ID_MANAGE_TAGS
         MENUITEM "&Users...",                   ID_MANAGE_USERS
         MENUITEM SEPARATOR

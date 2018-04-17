@@ -35,6 +35,7 @@
 using namespace Extract::FAMDBAdmin;
 using namespace Extract::ETL::Management;
 using namespace System::Collections::Generic;
+using namespace Extract::FileActionManager::Forms;
 
 
 //-------------------------------------------------------------------------------------------------
@@ -141,6 +142,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	//}}AFX_MSG_MAP
 	ON_CBN_SELCHANGE(IDC_WORKFLOW_COMBO, &CFAMDBAdminDlg::OnCbnSelchangeWorkflowCombo)
 	ON_COMMAND(ID_TOOLS_MOVE_FILES_TO_WORKFLOW, &CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow)
+	ON_COMMAND(ID_MANAGE_MLMODELS, &CFAMDBAdminDlg::OnManageMLModels)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -1086,6 +1088,35 @@ void CFAMDBAdminDlg::OnManageDatabaseServices()
 		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI45605");
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45585");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnManageMLModels()
+{
+	try
+	{
+		EditTableData^ editMLModel =
+			gcnew EditTableData(marshal_as<String^>(m_ipFAMDB->DatabaseServer),
+				marshal_as<String^>(m_ipFAMDB->DatabaseName), "MLModel");
+
+		NativeWindow ^currentWindow = __nullptr;
+		try
+		{
+			IntPtr managedHWND(this->GetSafeHwnd());
+			currentWindow = NativeWindow::FromHandle(managedHWND);
+			editMLModel->ShowDialog(currentWindow);
+		}
+		finally
+		{
+			if (currentWindow)
+				currentWindow->ReleaseHandle();
+		}
+	}
+	// This is needed because .net exception causes crash if not handled
+	catch (Exception ^ex)
+	{
+		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI45741");
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45742");
 }
 
 //-------------------------------------------------------------------------------------------------

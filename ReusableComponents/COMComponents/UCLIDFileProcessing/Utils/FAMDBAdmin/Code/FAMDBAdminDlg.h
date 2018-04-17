@@ -69,6 +69,7 @@ protected:
 	afx_msg void OnCbnSelchangeWorkflowCombo();
 	afx_msg void OnToolsMoveFilesToWorkflow();
 	afx_msg void OnManageDatabaseServices();
+	afx_msg void OnManageMLModels();
 	DECLARE_MESSAGE_MAP()
 
 	//INotifyDBConfigChanged

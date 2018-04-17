@@ -244,6 +244,9 @@
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\ETL\Management\Core\Code\Extract.ETL.Management.csproj">
       <Project>{bb9baf31-f7f7-4065-b563-77fcc6aa722b}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
+      <Project>{05449e7c-d300-4a2a-ad14-57ce9630b49b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
     </ProjectReference>
