@@ -688,7 +688,7 @@ namespace Extract.AttributeFinder
             else
             {
                 var pages = document.GetPages(true, " ").ToIEnumerable<ISpatialString>().ToArray();
-                var pageNumbers = UtilityMethods.GetPageNumbersFromString(PagesToProcess, pages.Length, false);
+                var pageNumbers = UtilityMethods.GetSortedPageNumberFromString(PagesToProcess, pages.Length, false);
                 return String.Join("\r\n\r\n", pageNumbers.Select(i => pages[i - 1].String).ToArray());
             }
         }

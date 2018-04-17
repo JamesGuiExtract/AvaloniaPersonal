@@ -84,6 +84,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _controlUpdatePending;
 
+        /// <summary>
+        /// The current color of the separator bar.
+        /// </summary>
+        Color _currentColor;
+
         #endregion Fields
 
         #region Constructors
@@ -606,6 +611,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 InvalidatePending = true;
 
+                SetColor();
+
                 // If the controls cannot be updated at this time, no need to invalidate (optimization).
                 // If UpdateControls returns true it will have executed a full layout such that a call
                 // to Invalidate would now be superfluous.
@@ -617,6 +624,33 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40183");
+            }
+        }
+
+        /// <summary>
+        /// Updates the color of the separator bar based on the whether the current document has a
+        /// page displayed in the image viewer.
+        /// </summary>
+        void SetColor()
+        {
+            // Determine what the separator color should be base on whether the current document
+            // has a page displayed in the image viewer.
+            var newColor = (Document?.PageControls.Any(pageControl => pageControl.PageIsDisplayed) == true)
+                ? SystemColors.Highlight
+                : Color.SteelBlue;
+            
+            // Update the BackColor of the separator itself, as well as any controls except the edit button.
+            if (newColor != _currentColor)
+            {
+                BackColor = newColor;
+                _tableLayoutPanel.BackColor = newColor;
+                foreach (var control in _tableLayoutPanel.Controls.OfType<Control>()
+                    .Where(control => !(control is ButtonBase)))
+                {
+                    control.BackColor = newColor;
+                }
+
+                _currentColor = newColor;
             }
         }
 
@@ -918,6 +952,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _dataErrorPictureBox.Visible = Document.DataError;
                 _toolTip.SetToolTip(_dataErrorPictureBox,
                     Document?.DocumentData?.DataErrorMessage ?? "The data for this document has error(s)");
+
+                SetColor();
 
                 PerformLayout();
 

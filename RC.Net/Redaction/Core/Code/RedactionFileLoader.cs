@@ -1965,7 +1965,7 @@ namespace Extract.Redaction
                 }
 
                 UtilityMethods.ValidatePageNumbers(pages);
-                var pagesAsInts = UtilityMethods.GetPageNumbersFromString(pages,
+                var pagesAsInts = UtilityMethods.GetSortedPageNumberFromString(pages,
                                                                           totalPages: Int32.MaxValue,
                                                                           throwExceptionOnPageOutOfRange: false);
                 return pagesAsInts.ToList();

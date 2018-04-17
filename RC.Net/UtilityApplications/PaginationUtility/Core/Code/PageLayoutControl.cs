@@ -231,6 +231,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         PaginationControl _commandTargetControl;
 
         /// <summary>
+        /// The <see cref="PageThumbnailControl"/> whose page is current displayed in the
+        /// <see cref="ImageViewer"/>.
+        /// </summary>
+        PageThumbnailControl _displayedPage;
+
+        /// <summary>
         /// Indicates whether an operation is in progress that might otherwise cause a document to
         /// be closed and re-opened. A value of <see langword="true"/> will prevent the otherwise
         /// unnecessary close from occurring.
@@ -753,7 +759,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             var primaryPage = PrimarySelection as PageThumbnailControl;
                             if (primaryPage != null)
                             {
-                                primaryPage.DisplayPage(ImageViewer, true);
+                                DisplayPage(primaryPage, true);
                             }
                         }
                     }
@@ -1028,14 +1034,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 outputDocument = outputDocument ??
                     GetOutputDocumentFromUtility(sourceDocument.FileName);
 
-                var pagesSet = (pages == null && deletedPages == null)
+                var pagesList = (pages == null && deletedPages == null)
                     ? null
-                    : new HashSet<int>((pages ?? new int[0]).Union(deletedPages ?? new int[0]));
-                var pagesToLoad = (pagesSet == null)
+                    : new List<int>((pages ?? new int[0]).Union(deletedPages ?? new int[0]));
+                var pagesToLoad = (pagesList == null)
                     ? sourceDocument.Pages.ToArray()
                     : sourceDocument.Pages
-                        .Where(page => pagesSet
+                        .Where(page => pagesList
                             .Contains(page.OriginalPageNumber))
+                        .OrderBy(page => pagesList.IndexOf(page.OriginalPageNumber))
                         .ToArray();
 
                 if (position == -1)
@@ -1369,7 +1376,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (removedPageControl.PageIsDisplayed && dispose)
                     {
-                        removedPageControl.DisplayPage(ImageViewer, false);
+                        DisplayPage(removedPageControl, false);
                     }
 
                     if (removedPageControl == _toolTipControl)
@@ -3302,7 +3309,31 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var pageControl = control as PageThumbnailControl;
                 if (pageControl != null && (highlight || !_preventTransientDocumentClose))
                 {
-                    pageControl.DisplayPage(ImageViewer, highlight);
+                    DisplayPage(pageControl, highlight);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Displays or closes the image associated with the specified <see paramref="pageControl"/>
+        /// in the<see cref="ImageViewer"/>.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> whose page should be displayed.</param>
+        /// <param name="display"><see langword="true"/> to display the image;
+        /// <see langword="false"/> to close it.</param>
+        void DisplayPage(PageThumbnailControl pageControl, bool display)
+        {
+            bool changedPage = (display != pageControl.PageIsDisplayed);
+            pageControl.DisplayPage(ImageViewer, display);
+
+            if (changedPage)
+            {
+                pageControl.Document?.PaginationSeparator?.Invalidate();
+
+                if (pageControl != _displayedPage)
+                {
+                    _displayedPage?.Document?.PaginationSeparator?.Invalidate();
+                    _displayedPage = pageControl;
                 }
             }
         }

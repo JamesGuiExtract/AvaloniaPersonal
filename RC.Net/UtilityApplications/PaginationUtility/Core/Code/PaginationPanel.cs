@@ -16,6 +16,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -36,6 +37,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Text to use for otherwise empty Document attribute values in pagination hierarchy
         /// </summary>
         private static readonly string _DOCUMENT_PLACEHOLDER_TEXT = "N/A";
+
+        /// <summary>
+        /// A string representation of the GUID for <see cref="AttributeStorageManagerClass"/> 
+        /// </summary>
+        static readonly string _ATTRIBUTE_STORAGE_MANAGER_GUID =
+            typeof(AttributeStorageManagerClass).GUID.ToString("B");
 
         #endregion Constants
 
@@ -325,6 +332,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the select all check box should be visible.
+        /// </summary>
+        public bool SelectAllCheckBoxVisible
+        {
+            get;
+            set;
+        } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance should cache images with the
@@ -959,6 +975,90 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Saves the current state of pagination and index data for all source documents.
+        /// NOTE: And exception will be thrown if the pages from multiple source documents
+        /// are currently combined into a single proposed output document.
+        /// </summary>
+        /// <returns><c>true</c> if the data was saved; otherwise, <c>false</c>.</returns>
+        public bool Save()
+        {
+            try
+            {
+                bool result = SaveDocumentData(selectedDocumentsOnly: false, validateData: false);
+
+                var sourceToOutputMap = _pendingDocuments.ToDictionary(
+                    pendingDocument => pendingDocument
+                        .PageControls
+                        .Select(pageControl => pageControl.Page.SourceDocument)
+                        .Distinct(),
+                    pendingDocument => pendingDocument);
+
+                var mixedSourceDocuments =
+                    sourceToOutputMap.Keys.Where(key => key.Count() > 1)
+                        .SelectMany(key => key)
+                        .Distinct();
+
+                var documentsToSave = new Dictionary<SourceDocument, List<OutputDocument>>();
+                foreach (var entry in
+                    sourceToOutputMap.Where(entry => entry.Key.Count() == 1 && !mixedSourceDocuments.Contains(entry.Key.Single())))
+                {
+                    var outputDocs = documentsToSave.GetOrAdd(entry.Key.Single(), () => new List<OutputDocument>());
+                    outputDocs.Add(entry.Value);
+                }
+
+                var orderedDocuments = _primaryPageLayoutControl.Documents.ToList();
+
+                foreach (var sourceEntry in documentsToSave)
+                {
+                    var sourceDocName = sourceEntry.Key.FileName;
+                    var documentAttributes = new IUnknownVector();
+
+                    foreach (var outputDoc in sourceEntry.Value.OrderBy(doc => orderedDocuments.IndexOf(doc)))
+                    {
+                        var documentAttribute = documentAttributes.AddSubAttribute("Document");
+
+                        var pages = outputDoc.PageControls
+                            .Where(pageControl => !pageControl.Deleted)
+                            .Select(pageControl => pageControl.Page.OriginalPageNumber);
+                        if (pages.Any())
+                        {
+                            documentAttribute.AddSubAttribute("Pages",
+                                UtilityMethods.GetPageNumbersAsString(pages),
+                                sourceDocName);
+                        }
+
+                        var deletedPages = outputDoc.PageControls
+                            .Where(pageControl => pageControl.Deleted)
+                            .Select(pageControl => pageControl.Page.OriginalPageNumber);
+                        if (deletedPages.Any())
+                        {
+                            documentAttribute.AddSubAttribute("DeletedPages",
+                                UtilityMethods.GetPageNumbersAsString(deletedPages),
+                                sourceDocName);
+                        }
+
+                        var documentDataAttribute = documentAttribute.AddSubAttribute("DocumentData");
+                        documentDataAttribute.SubAttributes.Append(outputDoc.DocumentData.Attributes);
+                    }
+
+                    if (documentAttributes.Size() > 0)
+                    {
+                        IUnknownVector saveFileData = new IUnknownVector();
+                        saveFileData.Append(documentAttributes);
+                        saveFileData.SaveTo(sourceEntry.Key.FileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                        saveFileData.ReportMemoryUsage();
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45736");
+            }
+        }
+
+        /// <summary>
         /// Commits changes (either for all document or just selected documents depending on the
         /// value of <see cref="CommitOnlySelection"/>.
         /// </summary>
@@ -1341,7 +1441,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 outputDocument.DocumentData.Revert();
                                 if (_documentDataPanel != null)
                                 {
-                                    _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData, false);
+                                    _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData,
+                                        saveData: false, validateData: false);
                                 }
                             }
                             _pendingDocuments.Add(outputDocument);
@@ -1389,7 +1490,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                             outputDocument.DocumentData.Revert();
                             if (_documentDataPanel != null)
                             {
-                                _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData, false);
+                                _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData,
+                                    saveData: false, validateData: false);
                             }
                         }
                     }
@@ -2435,6 +2537,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_saveToolStripButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleSaveToolStripButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Save();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45740");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
         /// <see cref="_revertToOriginalToolStripButton"/>.
         /// </summary>
@@ -2906,7 +3025,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (_selectAllToCommitCheckBox != null)
             {
-                _selectAllToCommitCheckBox.Visible = CommitOnlySelection;
+                _selectAllToCommitCheckBox.Visible = CommitOnlySelection && SelectAllCheckBoxVisible;
             }
 
             if (_primaryPageLayoutControl != null)
@@ -3063,7 +3182,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 foreach (var document in documentsToSave)
                 {
-                    _documentDataPanel.UpdateDocumentDataStatus(document.DocumentData, true);
+                    _documentDataPanel.UpdateDocumentDataStatus(document.DocumentData, true, validateData);
                 }
 
                 _documentDataPanel.WaitForDocumentStatusUpdates();

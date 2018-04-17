@@ -106,6 +106,15 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Constructors
 
+        #region Events
+
+        /// <summary>
+        /// Occurs when the image associated with this control is closed or changed in the <see cref="ImageViewer"/>.
+        /// </summary>
+        public event EventHandler<EventArgs> ImageClosed;
+
+        #endregion Events
+
         #region Methods
 
         /// <summary>
@@ -218,6 +227,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
                 _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
                 _activeImageViewer = null;
+
+                ImageClosed?.Invoke(this, new EventArgs());
             }
         }
 

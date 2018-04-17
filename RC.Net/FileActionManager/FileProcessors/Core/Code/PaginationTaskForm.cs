@@ -268,6 +268,8 @@ namespace Extract.FileActionManager.FileProcessors
                 _paginationPanel.FileProcessingDB = FileProcessingDB;
                 _paginationPanel.DefaultToCollapsed = _settings.DefaultToCollapsed;
                 _paginationPanel.AutoRotateImages = _settings.AutoRotateImages;
+                _paginationPanel.SelectAllCheckBoxVisible = _settings.SelectAllCheckBoxVisible;
+                _paginationPanel.LoadNextDocumentVisible = _settings.LoadNextDocumentVisible;
 
                 if (!string.IsNullOrWhiteSpace(paginationDocumentDataPanelAssembly))
                 {
@@ -1962,17 +1964,23 @@ namespace Extract.FileActionManager.FileProcessors
 
             if (paginationModified || dataModified)
             {
-                if (DialogResult.No == MessageBox.Show(this,
-                "You have uncommitted changes to " +
-                    ((paginationModified && dataModified)
-                        ? "pagination and data"
-                        : paginationModified ? "pagination" : "data") +
-                " that will be lost.\r\n\r\n" +
-                "Discard changes?",
-                "Uncommitted changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question,
-                MessageBoxDefaultButton.Button2, 0))
+                var response = MessageBox.Show(this,
+                    "Changes have not been saved, would you like to save now?",
+                    "Data Not Saved", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
+                        MessageBoxDefaultButton.Button1, 0);
+
+                if (response == DialogResult.Yes)
+                {
+                    _paginationPanel.Save();
+                    return false;
+                }
+                else if (response == DialogResult.Cancel)
                 {
                     return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
 

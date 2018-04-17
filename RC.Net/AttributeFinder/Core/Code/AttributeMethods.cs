@@ -331,6 +331,61 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Creates a new non-spatial <see cref="IAttribute"/> as a child of
+        /// <see paramref="attribute"/> that has the specified <see paramref="name"/> and, optionally,
+        /// the specified <see paramref="value"/> and associated <see paramref="sourceDocName"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> the new attribute should have as a parent.</param>
+        /// <param name="name">The name of the new attribute.</param>
+        /// <param name="value">The non-spatial string value of the new attribute (can be <c>null</c> for unspecified).</param>
+        /// <param name="sourceDocName">Name of the source document the attribute is associated with
+        /// (can be <c>null</c> for unspecified).</param>
+        /// <returns>The newly created <see cref="IAttribute"/>.</returns>
+        public static IAttribute AddSubAttribute(this IAttribute attribute, string name, string value = null, string sourceDocName = null)
+        {
+            try
+            {
+                return attribute.SubAttributes.AddSubAttribute(name, value, sourceDocName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45735");
+            }
+        }
+
+        /// <summary>
+        /// Creates a new non-spatial <see cref="IAttribute"/> as a member of
+        /// <see paramref="attributes"/> that has the specified <see paramref="name"/> and, optionally,
+        /// the specified <see paramref="value"/> and associated <see paramref="sourceDocName"/>.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IIUnknownVector"/> the new attribute should be added to.</param>
+        /// <param name="name">The name of the new attribute.</param>
+        /// <param name="value">The non-spatial string value of the new attribute (can be <c>null</c> for unspecified).</param>
+        /// <param name="sourceDocName">Name of the source document the attribute is associated with
+        /// (can be <c>null</c> for unspecified).</param>
+        /// <returns>The newly created <see cref="IAttribute"/>.</returns>
+        public static IAttribute AddSubAttribute(this IIUnknownVector attributes, string name, string value = null, string sourceDocName = null)
+        {
+            try
+            {
+                var attributeValue = new SpatialString();
+                attributeValue.CreateNonSpatialString(value, sourceDocName);
+
+                var subAttribute = new UCLID_AFCORELib.Attribute();
+                subAttribute.Name = name;
+                subAttribute.Value = attributeValue;
+
+                attributes.PushBack(subAttribute);
+
+                return subAttribute;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45748");
+            }
+        }
+
         #endregion Public Methods
 
         #region Private Methods

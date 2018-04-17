@@ -507,75 +507,101 @@ namespace Extract.Utilities.Test
 
         #endregion ValidatePageNumbers
 
-        #region GetPageNumbersFromString
+        #region PagesAndStringConversions
 
         /// <summary>
         /// Tests generating page numbers from range string
         /// </summary>
-        [Test, Category("GetPageNumbersFromString")]
+        [Test, Category("PagesAndStringConversions")]
         [CLSCompliant(false)]
-        public static void GetPageRangesFromString()
+        public static void GetSortedPageNumberFromString()
         {
-            var result = UtilityMethods.GetPageNumbersFromString("1-3", 3, false);
+            var result = UtilityMethods.GetSortedPageNumberFromString("1-3", 3, false);
             CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
 
-            result = UtilityMethods.GetPageNumbersFromString("1-3", 2, false);
+            result = UtilityMethods.GetSortedPageNumberFromString("1-3", 2, false);
             CollectionAssert.AreEquivalent(new[] { 1, 2 }, result);
 
-            result = UtilityMethods.GetPageNumbersFromString("1-", 3, false);
+            result = UtilityMethods.GetSortedPageNumberFromString("1-", 3, false);
             CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
 
-            result = UtilityMethods.GetPageNumbersFromString("-1", 3, false);
+            result = UtilityMethods.GetSortedPageNumberFromString("-1", 3, false);
             CollectionAssert.AreEquivalent(new[] { 3 }, result);
 
-            result = UtilityMethods.GetPageNumbersFromString("-2", 3, false);
+            result = UtilityMethods.GetSortedPageNumberFromString("-2", 3, false);
             CollectionAssert.AreEquivalent(new[] { 2, 3 }, result);
 
-            result = UtilityMethods.GetPageNumbersFromString("-3", 3, false);
+            result = UtilityMethods.GetSortedPageNumberFromString("-3", 3, false);
             CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
 
-            result = UtilityMethods.GetPageNumbersFromString("3-", 3, false);
+            result = UtilityMethods.GetSortedPageNumberFromString("3-", 3, false);
             CollectionAssert.AreEquivalent(new[] { 3 }, result);
 
-            result = UtilityMethods.GetPageNumbersFromString("4-", 3, false);
+            result = UtilityMethods.GetSortedPageNumberFromString("4-", 3, false);
             CollectionAssert.AreEquivalent(new int[0], result);
 
-            result = UtilityMethods.GetPageNumbersFromString("-4", 3, false);
+            result = UtilityMethods.GetSortedPageNumberFromString("-4", 3, false);
             CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
 
-            result = UtilityMethods.GetPageNumbersFromString("1-1", 2, false);
+            result = UtilityMethods.GetSortedPageNumberFromString("1-1", 2, false);
             CollectionAssert.AreEquivalent(new[] { 1 }, result);
         }
 
         /// <summary>
         /// Tests generating page numbers from multiple ranges
         /// </summary>
-        [Test, Category("GetPageNumbersFromString")]
+        [Test, Category("PagesAndStringConversions")]
         [CLSCompliant(false)]
         public static void GetMultiplePageRangesFromString()
+        {
+            var result = UtilityMethods.GetSortedPageNumberFromString("1,-1", 4, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 4 }, result);
+
+            result = UtilityMethods.GetSortedPageNumberFromString("1,1-3", 4, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
+
+            result = UtilityMethods.GetSortedPageNumberFromString("1,1-3", 2, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2 }, result);
+
+            result = UtilityMethods.GetSortedPageNumberFromString("3,1-3", 4, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
+
+            result = UtilityMethods.GetSortedPageNumberFromString("-1, 3, 10", 300, false);
+            CollectionAssert.AreEquivalent(new[] { 3, 10, 300 }, result);
+
+            result = UtilityMethods.GetSortedPageNumberFromString("271-, 3, 10", 300, false);
+            CollectionAssert.AreEquivalent(new[] { 3, 10, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300 }, result);
+        }
+
+        [Test, Category("PagesAndStringConversions")]
+        [CLSCompliant(false)]
+        public static void GetPageNumbersFromString()
         {
             var result = UtilityMethods.GetPageNumbersFromString("1,-1", 4, false);
             CollectionAssert.AreEquivalent(new[] { 1, 4 }, result);
 
             result = UtilityMethods.GetPageNumbersFromString("1,1-3", 4, false);
-            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
+            CollectionAssert.AreEquivalent(new[] { 1, 1, 2, 3 }, result);
 
             result = UtilityMethods.GetPageNumbersFromString("1,1-3", 2, false);
-            CollectionAssert.AreEquivalent(new[] { 1, 2 }, result);
+            CollectionAssert.AreEquivalent(new[] { 1, 1, 2 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("3,1-3", 4, false);
+            CollectionAssert.AreEquivalent(new[] { 3, 1, 2, 3 }, result);
 
             result = UtilityMethods.GetPageNumbersFromString("-1, 3, 10", 300, false);
-            CollectionAssert.AreEquivalent(new[] { 3, 10, 300 }, result);
+            CollectionAssert.AreEquivalent(new[] { 300, 3, 10, }, result);
 
             result = UtilityMethods.GetPageNumbersFromString("271-, 3, 10", 300, false);
-            CollectionAssert.AreEquivalent(new[] { 3, 10, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300 }, result);
+            CollectionAssert.AreEquivalent(new[] { 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 3, 10 }, result);
         }
 
         /// <summary>
         /// Tests exception handling generating page numbers from formatted string
         /// </summary>
-        [Test, Category("GetPageNumbersFromString")]
+        [Test, Category("PagesAndStringConversions")]
         [CLSCompliant(false)]
-        public static void GetPageNumbersFromStringExceptions()
+        public static void GetSortedPageNumberFromStringExceptions()
         {
             var ex = Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("4-2", 3, false));
             Assert.That( ex.Message, Is.EqualTo("Start page number must be less than or equal to the end page number.") );
@@ -593,7 +619,26 @@ namespace Extract.Utilities.Test
             Assert.That( ex.Message, Is.EqualTo("Specified start page number is out of range.") );
         }
 
-        #endregion GetPageNumbersFromString
+        [Test, Category("PagesAndStringConversions")]
+        [CLSCompliant(false)]
+        public static void GetPageNumbersAsString()
+        {
+            Assert.AreEqual("", UtilityMethods.GetPageNumbersAsString(new int[0]));
+            Assert.AreEqual("1", UtilityMethods.GetPageNumbersAsString(new[] { 1 }));
+            Assert.AreEqual("1,3", UtilityMethods.GetPageNumbersAsString(new[] { 1, 3 }));
+
+            Assert.AreEqual("1-3", UtilityMethods.GetPageNumbersAsString(new[] { 1, 2, 3 }));
+            Assert.AreEqual("3,2,1", UtilityMethods.GetPageNumbersAsString(new[] { 3, 2, 1 }));
+
+            Assert.AreEqual("1-3,5", UtilityMethods.GetPageNumbersAsString(new[] { 1, 2, 3, 5 }));
+            Assert.AreEqual("5,2,1-3", UtilityMethods.GetPageNumbersAsString(new[] { 5, 2, 1, 2, 3 }));
+
+            Assert.AreEqual("1-3,5,8-11", UtilityMethods.GetPageNumbersAsString(new[] { 1, 2, 3, 5, 8, 9, 10, 11 }));
+
+            Assert.AreEqual("5,8-11", UtilityMethods.GetPageNumbersAsString(new[] { 5, 8, 9, 10, 11 }));
+        }
+
+        #endregion PagesStringConversions
 
         #endregion TestMethods
     }

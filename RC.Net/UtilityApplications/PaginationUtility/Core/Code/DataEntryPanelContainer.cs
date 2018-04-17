@@ -127,10 +127,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             public bool PromptForDuplicateEncounters;
 
             /// <summary>
-            /// A stringized representation of either the document data (when DataError = false) or 
-            /// a validation error in the document data (when DataError = true).
+            /// A stringized representation of either the document data.
             /// </summary>
             public string StringizedData;
+
+            /// <summary>
+            /// A stringized representation of a validation error in the document data (when DataError = true).
+            /// </summary>
+            public string StringizedError;
         }
 
         #region Fields
@@ -503,7 +507,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// can be saved.
         /// </summary>
         /// <param name="data">The data to save.</param>
-        /// <param name="validateData"><see langword="true" /> if the <see paramref="data" /> should
+        /// <param name="validateData"><see langword="true"/> if the <see paramref="data" /> should
         /// be validated for errors when saving; otherwise, <see langwor="false" />.</param>
         /// <returns>
         /// <see langword="true" /> if the data was saved correctly or
@@ -569,7 +573,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var documentData = ActiveDataEntryPanel.GetDocumentData(attributes, sourceDocName);
-                UpdateDocumentStatus(documentData, false);
+                UpdateDocumentStatus(documentData, saveData: false, validateData: false);
 
                 return documentData;
             }
@@ -587,12 +591,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
         /// queries that manipulate the data) should be saved or <c>false</c> to update the status
         /// bar.</param>
-        public void UpdateDocumentDataStatus(PaginationDocumentData data, bool saveData)
+        /// <param name="validateData"><c>true</c> if the data should be validated before being saved;
+        /// <c>false</c> if the data should be saved even if not valid.</param>
+        public void UpdateDocumentDataStatus(PaginationDocumentData data, bool saveData, bool validateData)
         {
             try
             {
                 var dataEntryData = data as DataEntryPaginationDocumentData;
-                UpdateDocumentStatus(dataEntryData, saveData);
+                UpdateDocumentStatus(dataEntryData, saveData, validateData);
             }
             catch (Exception ex)
             {
@@ -1114,7 +1120,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
         /// queries that manipulate the data) should be saved or <c>false</c> to update the status
         /// bar.</param>
-        void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData, bool saveData)
+        /// <param name = "validateData" >< c > true </ c > if the data should be validated before being saved;
+        /// <c>false</c> if the data should be saved even if not valid.</param>
+        void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData, bool saveData, bool validateData)
         {
             if (!_pendingDocumentStatusUpdate.TryAdd(documentData, 0))
             {
@@ -1131,7 +1139,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    UpdateDocumentStatusThread(backgroundConfigManager, documentData, serializedAttributes, saveData);
+                    UpdateDocumentStatusThread(backgroundConfigManager, documentData,
+                        serializedAttributes, saveData, validateData);
                 }
                 catch (Exception ex)
                 {
@@ -1162,16 +1171,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Code running in a background thread in support of <see cref="UpdateDocumentStatus"/>
+        /// Code running in a background thread in support of <see cref="UpdateDocumentStatus" />
         /// </summary>
         /// <param name="backgroundConfigManager">The manager to use to load the data.</param>
-        /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
+        /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData" /> for which
         /// data validity should be checked.</param>
+        /// <param name="serializedAttributes">The serialized attributes that represent the document's current data.</param>
         /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
         /// queries that manipulate the data) should be saved or <c>false</c> to update the status
         /// bar.</param>
+        /// <param name="validateData"><c>true</c> if the data should be validated before being saved;
+        /// <c>false</c> if the data should be saved even if not valid.</param>
         void UpdateDocumentStatusThread(DataEntryConfigurationManager<Properties.Settings> backgroundConfigManager,
-            DataEntryPaginationDocumentData documentData, string serializedAttributes, bool saveData)
+            DataEntryPaginationDocumentData documentData, string serializedAttributes, bool saveData, bool validateData)
         {
             bool registeredThread = false;
             bool gotSemaphore = false;
@@ -1281,7 +1293,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             var miscUtils = new MiscUtils();
 
-                            if (documentData.DataError)
+                            if (validateData && documentData.DataError)
                             {
                                 // Reset to contain only this document to prevent any subsequent document data
                                 // errors from being displayed. (If not fixed subsequent errors on the next
@@ -1289,7 +1301,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 _pendingDocumentStatusUpdate.Clear();
                                 _pendingDocumentStatusUpdate.TryAdd(documentData, 0);
 
-                                ee = ExtractException.FromStringizedByteStream("ELI45581", documentStatus.StringizedData);
+                                ee = ExtractException.FromStringizedByteStream("ELI45581", documentStatus.StringizedError);
                                 ee.Display();
                             }
                             else
@@ -1355,21 +1367,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (saveData)
             {
-                if (documentStatus.DataError)
-                {
-                    try
-                    {
-                        AttributeStatusInfo.Validate(invalidAttribute, true);
-                    }
-                    catch(Exception ex)
-                    {
-                        var ee = ex.AsExtract("ELI45580");
-                        documentStatus.StringizedData = ee.AsStringizedByteStream();
-                    }
-
-                    return documentStatus;
-                }
-
                 var dbConnections = backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections();
                 documentStatus.Orders = QueryRecordNumbers(
                     customData?.OrderNumberQuery, customData?.OrderDateQuery, dbConnections);
@@ -1380,6 +1377,21 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var miscUtils = new MiscUtils();
                 documentStatus.StringizedData = miscUtils.GetObjectAsStringizedByteStream(documentData.Attributes);
+
+                if (documentStatus.DataError)
+                {
+                    try
+                    {
+                        AttributeStatusInfo.Validate(invalidAttribute, true);
+                    }
+                    catch(Exception ex)
+                    {
+                        var ee = ex.AsExtract("ELI45580");
+                        documentStatus.StringizedError = ee.AsStringizedByteStream();
+                    }
+
+                    return documentStatus;
+                }
             }
             else
             {
@@ -1484,21 +1496,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (saveData)
                 {
-                    if (documentStatus.DataError)
-                    {
-                        try
-                        {
-                            AttributeStatusInfo.Validate(invalidAttribute, true);
-                        }
-                        catch (Exception ex)
-                        {
-                            var ee = ex.AsExtract("ELI45580");
-                            documentStatus.StringizedData = ee.AsStringizedByteStream();
-                        }
-
-                        return documentStatus;
-                    }
-
                     var dbConnections = tempPanel.ActiveDataEntryPanel.DatabaseConnections;
                     documentStatus.Orders = QueryRecordNumbers(
                         tempPanel.ActiveDataEntryPanel?.OrderNumberQuery, tempPanel.ActiveDataEntryPanel?.OrderDateQuery, dbConnections);
@@ -1511,6 +1508,21 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     var miscUtils = new MiscUtils();
                     documentStatus.StringizedData = miscUtils.GetObjectAsStringizedByteStream(tempData.Attributes);
+
+                    if (documentStatus.DataError)
+                    {
+                        try
+                        {
+                            AttributeStatusInfo.Validate(invalidAttribute, true);
+                        }
+                        catch (Exception ex)
+                        {
+                            var ee = ex.AsExtract("ELI45580");
+                            documentStatus.StringizedError = ee.AsStringizedByteStream();
+                        }
+
+                        return documentStatus;
+                    }
                 }
                 else
                 {
