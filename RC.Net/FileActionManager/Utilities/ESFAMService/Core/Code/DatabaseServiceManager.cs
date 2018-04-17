@@ -172,7 +172,11 @@ namespace Extract.FileActionManager.Utilities
             }
             catch (Exception ex)
             {
-                new ExtractException("ELI45414", "ETL process failure", ex).Log();
+                // Log exception unless the service is stopping
+                if (!_canceller.IsCancellationRequested)
+                {
+                    new ExtractException("ELI45414", "ETL process failure", ex).Log();
+                }
             }
         }
 
