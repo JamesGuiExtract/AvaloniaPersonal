@@ -17,7 +17,7 @@ using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.UtilityApplications.NERAnnotator
 {
-    public class NERAnnotator : IDisposable
+    public class NERAnnotator
     {
         #region Constants
 
@@ -58,9 +58,6 @@ namespace Extract.UtilityApplications.NERAnnotator
         string _testingOutputFile;
         Action<StatusArgs> _updateStatus;
         CancellationToken _cancellationToken;
-        SqlConnection _connection;
-
-        private bool disposedValue = false; // To detect redundant calls
 
         #endregion Fields
 
@@ -123,12 +120,12 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <param name="settings">The settings to use for annotation</param>
         /// <param name="updateStatus">Action to be used to pass status updates back to the caller</param>
         /// <param name="cancellationToken">Token to be used by the caller to cancel the processing</param>
-        public static void Process(Settings settings, Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        public static void Process(Settings settings, Action<StatusArgs> updateStatus, CancellationToken cancellationToken,
+            SqlConnection connection = null)
         {
             try
             {
-                using (var a = new NERAnnotator(settings, updateStatus, cancellationToken))
-                    a.Process();
+                (new NERAnnotator(settings, updateStatus, cancellationToken)).Process(connection);
             }
             catch (Exception ex)
             {
@@ -143,7 +140,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <summary>
         /// Processes the files-to-be-annotated
         /// </summary>
-        void Process()
+        void Process(SqlConnection connection)
         {
             string previousDirectory = Directory.GetCurrentDirectory();
             try
@@ -265,7 +262,6 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <returns>An array of filename to page number, one for each page in the specified input, if <see paramref="getPages"/>, or one per file if not <see paramref="getPages"/></returns>
         (string ussPath, int page)[] GetInputFiles(string path, bool getPages)
         {
-            SqlDataReader reader = null;
             try
             {
                 IEnumerable<string> files = null;
@@ -274,31 +270,27 @@ namespace Extract.UtilityApplications.NERAnnotator
                 {
                     try
                     {
-                        // Build the connection string from the settings
-                        SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                        using (var connection = NewSqlDBConnection(enlist: false))
                         {
-                            DataSource = _settings.DatabaseServer,
-                            InitialCatalog = _settings.DatabaseName,
-                            IntegratedSecurity = true,
-                            NetworkLibrary = "dbmssocn"
-                        };
+                            connection.Open();
 
-                        _connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
-                        _connection.Open();
+                            using (var cmd = connection.CreateCommand())
+                            {
+                                cmd.CommandText = _GET_FILE_LIST;
+                                cmd.Parameters.AddWithValue("@AttributeSetName", _settings.AttributeSetName);
+                                cmd.Parameters.AddWithValue("@FirstIDToProcess", _settings.FirstIDToProcess);
+                                cmd.Parameters.AddWithValue("@LastIDToProcess", _settings.LastIDToProcess);
 
-                        using (var cmd = _connection.CreateCommand())
-                        {
-                            cmd.CommandText = _GET_FILE_LIST;
-                            cmd.Parameters.AddWithValue("@AttributeSetName", _settings.AttributeSetName);
-                            cmd.Parameters.AddWithValue("@FirstIDToProcess", _settings.FirstIDToProcess);
-                            cmd.Parameters.AddWithValue("@LastIDToProcess", _settings.LastIDToProcess);
-
-                            // Set the timeout so that it waits indefinitely
-                            cmd.CommandTimeout = 0;
-                            reader = cmd.ExecuteReader();
-                            files = reader
-                                .Cast<IDataRecord>()
-                                .Select(record => record.GetString(0) + ".uss");
+                                // Set the timeout so that it waits indefinitely
+                                cmd.CommandTimeout = 0;
+                                using (var reader = cmd.ExecuteReader())
+                                {
+                                    files = reader
+                                        .Cast<IDataRecord>()
+                                        .Select(record => record.GetString(0) + ".uss")
+                                        .ToList();
+                                }
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -370,10 +362,6 @@ namespace Extract.UtilityApplications.NERAnnotator
             {
                 throw ex.AsExtract("ELI44870");
             }
-            finally
-            {
-                reader?.Close();
-            }
         }
 
         /// <summary>
@@ -383,20 +371,72 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <param name="appendToTrainingSet">Whether to append to the training output file (if true) or the testing output file (if false)</param>
         void ProcessInput((string ussPath, int page)[] files, bool appendToTrainingSet)
         {
-            var pathTags = new AttributeFinderPathTags();
-            var outputFile = appendToTrainingSet ? _trainingOutputFile : _testingOutputFile;
-            var uss = new SpatialStringClass();
-            IUnknownVector typesVoa = new IUnknownVectorClass();
-            foreach (var g in files.GroupBy(t => t.ussPath).OrderBy(g => g.Key))
+            try
             {
-                if (_cancellationToken.IsCancellationRequested)
-                {
-                    return;
-                }
-
+                var pathTags = new AttributeFinderPathTags();
+                var outputFile = appendToTrainingSet ? _trainingOutputFile : _testingOutputFile;
+                var uss = new SpatialStringClass();
+                IUnknownVector typesVoa = new IUnknownVectorClass();
                 var statusMessage = appendToTrainingSet
                     ? "Files processed/skipped for training set: {0:N0} / {1:N0}"
                     : "Files processed/skipped for testing set:  {0:N0} / {1:N0}";
+
+                var records = GetRecordsForInput(files, uss, typesVoa, pathTags, statusMessage);
+
+                if (_settings.UseDatabase)
+                {
+                    // Create all records in memory before writing anything
+                    // so that the transaction time is shorter
+                    var recordList = records.ToList();
+                    using (var connection = NewSqlDBConnection())
+                    {
+                        connection.Open();
+
+                        try
+                        {
+                            foreach (var (ussPath, data) in records)
+                            {
+                                using (var cmd = connection.CreateCommand())
+                                {
+                                    cmd.CommandText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
+                                    SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
+                                    FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
+                                    cmd.Parameters.AddWithValue("@IsTrainingData", appendToTrainingSet.ToString());
+                                    cmd.Parameters.AddWithValue("@Data", data);
+                                    cmd.Parameters.AddWithValue("@ModelName", _settings.ModelName);
+                                    cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new ExtractException("ELI45758", "Unable to write ml data", ex);
+                        }
+                    }
+                }
+                else
+                {
+                    // Write extra line as a document separator
+                    File.WriteAllLines(outputFile, records.Select(t => t.data + "\r\n"));
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+        }
+
+        IEnumerable<(string fileName, string data)> GetRecordsForInput(
+            (string ussPath, int page)[] files,
+            SpatialStringClass uss,
+            IUnknownVector typesVoa,
+            AttributeFinderPathTags pathTags,
+            string statusMessage)
+        {
+            foreach (var g in files.GroupBy(t => t.ussPath).OrderBy(g => g.Key))
+            {
+                _cancellationToken.ThrowIfCancellationRequested();
 
                 var ussPath = g.Key;
                 if (!File.Exists(ussPath))
@@ -424,7 +464,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                 uss.LoadFrom(ussPath, false);
                 uss.ReportMemoryUsage();
 
-                if (_settings.UseDatabase)
+                if (_settings.UseDatabase && _settings.UseAttributeSetForTypes)
                 {
                     typesVoa = GetTypesVoaFromDB(ussPath.Substring(0, ussPath.Length - 4)) ?? typesVoa;
                 }
@@ -492,31 +532,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     continue;
                 }
 
-                // If writing to the DB, don't write an extra line to separate documents
-                // (This way the ML Model Trainer can treat this data the same as the data for LMs, add a newline for each record)
-                if (_settings.UseDatabase)
-                {
-                    using (var cmd = _connection.CreateCommand())
-                    {
-                        cmd.CommandText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
-                            SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
-                            FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
-                        cmd.Parameters.AddWithValue("@IsTrainingData", appendToTrainingSet.ToString());
-                        cmd.Parameters.AddWithValue("@Data", sb.ToString());
-                        cmd.Parameters.AddWithValue("@ModelName", _settings.ModelName);
-                        cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
-
-                        // Set the timeout so that it waits indefinitely
-                        cmd.CommandTimeout = 0;
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-                else
-                {
-                    // Write extra line as a document separator
-                    sb.AppendLine();
-                    File.AppendAllText(outputFile, sb.ToString());
-                }
+                yield return (ussPath, sb.ToString());
             }
         }
 
@@ -853,16 +869,21 @@ namespace Extract.UtilityApplications.NERAnnotator
 
         IUnknownVector GetTypesVoaFromDB(string imageName)
         {
-            SqlDataReader reader = null;
-            try
+            // Because this is called via a yielding method, it gets nested into another sql connection
+            // Set enlist to false to prevent the transaction from escalating to a distributed transaction
+            // (which requires the MSDTC service to be running)
+            // (This is not an update command anyway so no need to be in the transaction...)
+            using (var connection = NewSqlDBConnection(enlist: false))
+            using (var cmd = connection.CreateCommand())
             {
-                using (var cmd = _connection.CreateCommand())
-                {
-                    cmd.CommandText = _GET_VOA_FROM_DB;
-                    cmd.Parameters.AddWithValue("@AttributeSetName", _settings.AttributeSetName);
-                    cmd.Parameters.AddWithValue("@FileName", imageName);
+                cmd.CommandText = _GET_VOA_FROM_DB;
+                cmd.Parameters.AddWithValue("@AttributeSetName", _settings.AttributeSetName);
+                cmd.Parameters.AddWithValue("@FileName", imageName);
 
-                    reader = cmd.ExecuteReader();
+                connection.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+
                     if (reader.Read() && !reader.IsDBNull(0))
                     {
                         using (var stream = reader.GetStream(0))
@@ -878,33 +899,24 @@ namespace Extract.UtilityApplications.NERAnnotator
                     }
                 }
             }
-            finally
-            {
-                reader?.Close();
-            }
         }
 
-        #region IDisposable Support
-
-        protected virtual void Dispose(bool disposing)
+        /// <summary>
+        /// Returns a connection to the configured database
+        /// </summary>
+        /// <param name="enlist">Whether to enlist in a transaction scope if there is one</param>
+        SqlConnection NewSqlDBConnection(bool enlist = true)
         {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    _connection?.Dispose();
-                }
-
-                disposedValue = true;
-            }
+            // Build the connection string from the settings
+            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
+            sqlConnectionBuild.DataSource = _settings.DatabaseServer;
+            sqlConnectionBuild.InitialCatalog = _settings.DatabaseName;
+            sqlConnectionBuild.IntegratedSecurity = true;
+            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
+            sqlConnectionBuild.MultipleActiveResultSets = true;
+            sqlConnectionBuild.Enlist = enlist;
+            return new SqlConnection( sqlConnectionBuild.ConnectionString);
         }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
 
         #endregion Private Methods
     }

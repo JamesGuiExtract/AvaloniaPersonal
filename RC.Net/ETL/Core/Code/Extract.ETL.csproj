@@ -103,6 +103,8 @@
     </Compile>
     <Compile Include="IDShieldAttributeComparer.cs" />
     <Compile Include="IHasConfigurableDatabaseServiceStatus.cs" />
+    <Compile Include="MachineLearningService.cs" />
+    <Compile Include="ITrainingCoordinator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

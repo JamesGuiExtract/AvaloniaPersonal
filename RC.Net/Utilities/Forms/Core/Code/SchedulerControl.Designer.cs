@@ -58,6 +58,7 @@
             this._startDatePicker.Name = "_startDatePicker";
             this._startDatePicker.Size = new System.Drawing.Size(129, 20);
             this._startDatePicker.TabIndex = 1;
+            this._startDatePicker.ValueChanged += new System.EventHandler(this.Handle_ValueChanged);
             // 
             // _startTimePicker
             // 
@@ -67,6 +68,7 @@
             this._startTimePicker.ShowUpDown = true;
             this._startTimePicker.Size = new System.Drawing.Size(118, 20);
             this._startTimePicker.TabIndex = 2;
+            this._startTimePicker.ValueChanged += new System.EventHandler(this.Handle_ValueChanged);
             // 
             // _endDatePicker
             // 
@@ -77,6 +79,7 @@
             this._endDatePicker.Name = "_endDatePicker";
             this._endDatePicker.Size = new System.Drawing.Size(129, 20);
             this._endDatePicker.TabIndex = 7;
+            this._endDatePicker.ValueChanged += new System.EventHandler(this.Handle_ValueChanged);
             // 
             // _endTimePicker
             // 
@@ -87,6 +90,7 @@
             this._endTimePicker.ShowUpDown = true;
             this._endTimePicker.Size = new System.Drawing.Size(118, 20);
             this._endTimePicker.TabIndex = 8;
+            this._endTimePicker.ValueChanged += new System.EventHandler(this.Handle_ValueChanged);
             // 
             // _untilCheckBox
             // 
@@ -122,6 +126,7 @@
             this._specifiedTimeRadioButton.TabStop = true;
             this._specifiedTimeRadioButton.Text = "Specified time";
             this._specifiedTimeRadioButton.UseVisualStyleBackColor = true;
+            this._specifiedTimeRadioButton.CheckedChanged += new System.EventHandler(this.Handle_ValueChanged);
             // 
             // _recurrenceUnitComboBox
             // 
@@ -132,6 +137,7 @@
             this._recurrenceUnitComboBox.Name = "_recurrenceUnitComboBox";
             this._recurrenceUnitComboBox.Size = new System.Drawing.Size(121, 21);
             this._recurrenceUnitComboBox.TabIndex = 5;
+            this._recurrenceUnitComboBox.TextChanged += new System.EventHandler(this.Handle_ValueChanged);
             // 
             // _recurGroup
             // 

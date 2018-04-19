@@ -702,7 +702,7 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(3, encoder.AnswerNameToCode.Count);
 
             // All three types (DOB, CollectionDate, and 'nothing') are represented in these VOA files
-            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles, null);
+            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles, (string[])null);
             var answers = featuresAndAnswers.Item2;
             Assert.AreEqual(3, answers.Distinct().Count());
         }
@@ -723,7 +723,7 @@ namespace Extract.AttributeFinder.Test
             // There are still three categories available because the 'nothing' category is always available
             Assert.AreEqual(3, encoder.AnswerNameToCode.Count);
 
-            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles2, null);
+            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles2, (string[])null);
             var answers = featuresAndAnswers.Item2;
             // Only two types (DOB, CollectionDate) are represented in these VOA files
             Assert.AreEqual(2, answers.Distinct().Count());
@@ -741,7 +741,7 @@ namespace Extract.AttributeFinder.Test
             // There are two categories available, DOB and 'nothing'
             Assert.AreEqual(2, encoder.AnswerNameToCode.Count);
 
-            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles2, null);
+            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles2, (string[])null);
             var answers = featuresAndAnswers.Item2;
             // Three types (DOB, CollectionDate, and 'nothing') are represented in these VOA files but since the encoder
             // does not know about CollectionDate those labels will be treated like 'nothing'
@@ -758,7 +758,7 @@ namespace Extract.AttributeFinder.Test
             LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature");
             encoder.ComputeEncodings(_ussFiles, _voaFiles2, null);
 
-            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles2, null);
+            var featuresAndAnswers = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles2, (string[])null);
             // Only a subset of attributes are considered for training because not all are labeled (not all have an AttributeType subattribute)
             Assert.AreEqual(41, featuresAndAnswers.Item1.Length);
 

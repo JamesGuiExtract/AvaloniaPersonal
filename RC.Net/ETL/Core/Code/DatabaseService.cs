@@ -2,8 +2,10 @@
 using Extract.Utilities;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
 
@@ -17,25 +19,40 @@ namespace Extract.ETL
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
     [DatabaseService]
-    public abstract class DatabaseService : IDisposable, ICloneable
+    public abstract class DatabaseService : IDisposable, ICloneable, INotifyPropertyChanged
     {
         bool _enabled = true;
         int _databaseServiceID;
         string _databaseService = "";
         string _databaseName = "";
+        string _description = "";
 
         /// <summary>
         /// Description of the database service item
         /// </summary>
         [DataMember]
-        public string Description { get; set; } = "";
+        public string Description
+        {
+            get
+            {
+                return _description;
+            }
+            set
+            {
+                if (value != _description)
+                {
+                    _description = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// Name of the database. This value is not included in the settings
         /// </summary>
         /// <remarks>If this instance is an IHasConfigurableDatabaseServiceStatus then changing this value
         /// will result in a call to <see cref="RefreshStatus"/></remarks>
-        public string DatabaseName
+        public virtual string DatabaseName
         {
             get
             {
@@ -67,7 +84,7 @@ namespace Extract.ETL
         /// </summary>
         /// <remarks>If this instance is an IHasConfigurableDatabaseServiceStatus then changing this value
         /// will result in a call to <see cref="RefreshStatus"/></remarks>
-        public string DatabaseServer
+        public virtual string DatabaseServer
         {
             get
             {
@@ -132,7 +149,7 @@ namespace Extract.ETL
         /// <summary>
         /// Whether enabled
         /// </summary>
-        public bool Enabled
+        public virtual bool Enabled
         {
             get
             {
@@ -150,6 +167,7 @@ namespace Extract.ETL
                         {
                             Schedule.Enabled = value;
                         }
+                        NotifyPropertyChanged();
                     }
                 }
                 catch (Exception ex)
@@ -226,6 +244,11 @@ namespace Extract.ETL
         /// <param name="status">The <see cref="DatabaseServiceStatus"/> instance to save</param>
         protected void SaveStatus(DatabaseServiceStatus status)
         {
+            if (DatabaseServiceID <= 0)
+            {
+                return;
+            }
+
             // Save status to the DB
             using (var connection = NewSqlDBConnection())
             {
@@ -366,6 +389,15 @@ namespace Extract.ETL
         
         #endregion
 
+        #region INotifyPropertyChanged
+
+        /// <summary>
+        /// Property changed event
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion INotifyPropertyChanged
+
         #region Helper members
 
         /// <summary>
@@ -382,6 +414,15 @@ namespace Extract.ETL
             sqlConnectionBuild.NetworkLibrary = "dbmssocn";
             sqlConnectionBuild.MultipleActiveResultSets = true;
             return new SqlConnection( sqlConnectionBuild.ConnectionString);
+        }
+
+        /// <summary>
+        /// This method is called by the Set accessor of properties that support notification
+        /// </summary>
+        /// <param name="propertyName">Optional name of property that changed</param>
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion

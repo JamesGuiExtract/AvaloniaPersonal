@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using UCLID_RASTERANDOCRMGMTLib;
+using AttributeOrAnswerCollection = Extract.Utilities.Union<string[], byte[][]>;
 
 namespace Extract.AttributeFinder
 {
@@ -32,6 +33,7 @@ namespace Extract.AttributeFinder
     [Serializable]
     // Don't rename because it could break serialization
     [Obfuscation(Feature = "renaming", Exclude = true)]
+    [CLSCompliant(false)]
     public class InputConfiguration
     {
         #region Fields
@@ -153,7 +155,8 @@ namespace Extract.AttributeFinder
         public void GetInputData(out string[] spatialStringFilePaths, out string[] attributeFilePaths,
             out string[] answersOrAnswerFilePaths)
         {
-            GetInputData(out spatialStringFilePaths, out attributeFilePaths, out answersOrAnswerFilePaths, _ => { }, CancellationToken.None);
+            GetInputData(out spatialStringFilePaths, out attributeFilePaths, out answersOrAnswerFilePaths,
+                _ => { }, CancellationToken.None, false);
         }
 
         /// <summary>
@@ -266,15 +269,18 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Builds data arrays from specification using provided uss paths
         /// </summary>
+        /// <param name="imageFiles">The imape paths to get data for</param>
+        /// <param name="maybeAnswers">Either null or a collection of answers, answer file paths or VOAs encoded as byte[]</param>
+        /// <param name="runRuleSetForFeatures">Whether or not a ruleset is to be run to get feature/candidate attributes</param>
         /// <param name="spatialStringFilePaths">The USS input files that related paths are based on</param>
         /// <param name="attributeFilePaths">Computed paths to feature VOA files</param>
-        /// <param name="answersOrAnswerFilePaths">Computed answer strings or paths to answer files</param>
+        /// <param name="answers">Computed answer strings, paths to answer files, or the answer VOAs encoded as byte arrays</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
-        public void GetRelatedInputData(string[] imageFiles, string[] maybeAnswers,
+        public void GetRelatedInputData(string[] imageFiles, AttributeOrAnswerCollection maybeAnswers, bool runRuleSetForFeatures,
             out string[] spatialStringFilePaths,
             out string[] attributeFilePaths,
-            out string[] answersOrAnswerFilePaths,
+            out AttributeOrAnswerCollection answers,
             CancellationToken cancellationToken)
         {
             try
@@ -283,22 +289,29 @@ namespace Extract.AttributeFinder
 
                 spatialStringFilePaths = new string[0];
                 attributeFilePaths = new string[0];
-                answersOrAnswerFilePaths = new string[0];
+                var answersOrAnswerFilePaths = new string[0];
 
                 bool needAnswers = maybeAnswers == null && AnswerPath != null;
                 if (needAnswers)
                 {
                     answersOrAnswerFilePaths = new string[imageFiles.Length];
+                    answers = new AttributeOrAnswerCollection(answersOrAnswerFilePaths);
                 }
                 else
                 {
-                    answersOrAnswerFilePaths = maybeAnswers;
+                    answers = maybeAnswers;
                 }
 
                 spatialStringFilePaths = new string[imageFiles.Length];
 
-                // If no attributes path given then use null for the collection
-                attributeFilePaths = string.IsNullOrWhiteSpace(AttributesPath) ? null : new string[imageFiles.Length];
+                if (runRuleSetForFeatures || string.IsNullOrWhiteSpace(AttributesPath))
+                {
+                    attributeFilePaths = null;
+                }
+                else
+                {
+                    attributeFilePaths = new string[imageFiles.Length];
+                }
 
                 var pathTags = new AttributeFinderPathTags();
                 for (int i = 0; i < imageFiles.Length; i++)
@@ -306,7 +319,8 @@ namespace Extract.AttributeFinder
                     cancellationToken.ThrowIfCancellationRequested();
 
                     string imagePath = imageFiles[i];
-                    pathTags.Document = new UCLID_AFCORELib.AFDocumentClass { Text = new SpatialStringClass { SourceDocName = imagePath } };
+                    pathTags.Document = new UCLID_AFCORELib.AFDocumentClass
+                        { Text = new SpatialStringClass { SourceDocName = imagePath } };
                     spatialStringFilePaths[i] = imagePath + ".uss";
                     if (attributeFilePaths != null)
                     {
@@ -332,18 +346,24 @@ namespace Extract.AttributeFinder
         /// <param name="answersOrAnswerFilePaths">Computed answer strings or paths to answer files</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <param name="runRuleSetForFeatures">Whether or not a ruleset is to be run to get feature/candidate attributes</param>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public void GetInputData(out string[] spatialStringFilePaths, out string[] attributeFilePaths,
             out string[] answersOrAnswerFilePaths,
-            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool runRuleSetForFeatures)
         {
             try
             {
                 ExtractException.Assert("ELI41448", "This instance has not been fully configured", IsConfigured);
 
                 var imagesAndMaybeAnswers = GetImagePaths(updateStatus, cancellationToken);
-                GetRelatedInputData(imagesAndMaybeAnswers.Item1, imagesAndMaybeAnswers.Item2, out spatialStringFilePaths,
-                    out attributeFilePaths, out answersOrAnswerFilePaths, cancellationToken);
+
+                GetRelatedInputData(imagesAndMaybeAnswers.Item1,
+                    AttributeOrAnswerCollection.Maybe(imagesAndMaybeAnswers.Item2),
+                    runRuleSetForFeatures,
+                    out spatialStringFilePaths, out attributeFilePaths, out var answers, cancellationToken);
+
+                answersOrAnswerFilePaths = answers?.Match(a => a, b => null);
             }
             catch (Exception e)
             {

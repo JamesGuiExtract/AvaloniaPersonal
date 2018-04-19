@@ -5,10 +5,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NERAnnotator")]
+[assembly: AssemblyTitle("TrainingCoordinator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("NERAnnotator")]
+[assembly: AssemblyProduct("TrainingCoordinator")]
 [assembly: AssemblyCompany("Extract Systems LLC")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2017")]
 [assembly: AssemblyTrademark("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("55284cc3-1936-4b63-a17e-167110013e22")]
+[assembly: Guid("1FE63C03-E79D-46F7-9D47-29848354FDED")]
 
 // Version information for an assembly consists of the following four values:
 //

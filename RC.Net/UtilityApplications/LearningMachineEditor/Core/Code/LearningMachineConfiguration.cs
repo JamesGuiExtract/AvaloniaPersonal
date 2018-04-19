@@ -84,6 +84,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         // after closing the dialog and changing a classifier parameter
         private TrainingTesting _trainingTestingDialog;
 
+        private bool _dangerMode = false;
+
         #endregion Fields
 
         #region Properties
@@ -459,11 +461,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 _previousLearningMachine = _currentLearningMachine;
                 if (_currentLearningMachine.IsTrained)
                 {
-                    toolStripStatusLabel1.Text = _TRAINED_STATUS;
+                    machineStateToolStripStatusLabel.Text = _TRAINED_STATUS;
                 }
                 else
                 {
-                    toolStripStatusLabel1.Text = _UNTRAINED_STATUS;
+                    machineStateToolStripStatusLabel.Text = _UNTRAINED_STATUS;
                 }
             }
             // Else, if configurations are the same, set current machine to previous machine
@@ -473,11 +475,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 _currentLearningMachine = _previousLearningMachine;
                 if (_currentLearningMachine.IsTrained)
                 {
-                    toolStripStatusLabel1.Text = _TRAINED_STATUS;
+                    machineStateToolStripStatusLabel.Text = _TRAINED_STATUS;
                 }
                 else
                 {
-                    toolStripStatusLabel1.Text = _UNTRAINED_STATUS;
+                    machineStateToolStripStatusLabel.Text = _UNTRAINED_STATUS;
                 }
             }
             // Else if encoder settings are the same, set encoder and possible classifier to match previous machine
@@ -495,34 +497,34 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         && _currentLearningMachine.Classifier.IsConfigurationEqualTo(_previousLearningMachine.Classifier))
                     {
                         _currentLearningMachine.Classifier = _previousLearningMachine.Classifier;
-                        toolStripStatusLabel1.Text = "";
+                        machineStateToolStripStatusLabel.Text = "";
                     }
                     else if (_previousLearningMachine.IsTrained)
                     {
-                        toolStripStatusLabel1.Text = _CONFIGURATION_CHANGED_SINCE_TRAINING;
+                        machineStateToolStripStatusLabel.Text = _CONFIGURATION_CHANGED_SINCE_TRAINING;
                     }
                 }
                 else
                 {
-                    toolStripStatusLabel1.Text = _CONFIGURATION_CHANGED_SINCE_FEATURES_COMPUTED;
+                    machineStateToolStripStatusLabel.Text = _CONFIGURATION_CHANGED_SINCE_FEATURES_COMPUTED;
                 }
 
                 // If no status message set, set to trained or untrained
-                if (string.IsNullOrEmpty(toolStripStatusLabel1.Text))
+                if (string.IsNullOrEmpty(machineStateToolStripStatusLabel.Text))
                 {
                     if (_currentLearningMachine.IsTrained)
                     {
-                        toolStripStatusLabel1.Text = _TRAINED_STATUS;
+                        machineStateToolStripStatusLabel.Text = _TRAINED_STATUS;
                     }
                     else
                     {
-                        toolStripStatusLabel1.Text = _UNTRAINED_STATUS;
+                        machineStateToolStripStatusLabel.Text = _UNTRAINED_STATUS;
                     }
                 }
             }
             else
             {
-                toolStripStatusLabel1.Text = _UNTRAINED_STATUS;
+                machineStateToolStripStatusLabel.Text = _UNTRAINED_STATUS;
             }
 
             // Enable/disable feature editing and answer viewing
@@ -579,9 +581,17 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         documentCategorizationFolderNegativeClassNameTextBox.Text = encoder.NegativeClassName;
                     }
                 }
-                else if (CurrentLearningMachine.Usage == LearningMachineUsage.Pagination)
+                else if (CurrentLearningMachine.Usage == LearningMachineUsage.Pagination
+                    || CurrentLearningMachine.Usage == LearningMachineUsage.Deletion)
                 {
-                    paginationRadioButton.Checked = true;
+                    if (CurrentLearningMachine.Usage == LearningMachineUsage.Pagination)
+                    {
+                        paginationRadioButton.Checked = true;
+                    }
+                    else
+                    {
+                        deletionRadioButton.Checked = true;
+                    }
                     textFileOrCsvRadioButton.Checked = inputConfig.InputPathType == InputType.TextFileOrCsv;
                     paginationFileListOrFolderTextBox.Text = inputConfig.InputPath ?? "";
                     paginationFeatureVoaTextBox.Text = inputConfig.AttributesPath ?? "";
@@ -710,11 +720,19 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// </summary>
         internal LearningMachine BuildLearningMachine()
         {
-            var learningMachine = new LearningMachine();
+            LearningMachine learningMachine = null;
+            if (_dangerMode)
+            {
+                learningMachine = CurrentLearningMachine;
+            }
+            else
+            {
+                learningMachine = new LearningMachine();
 
-            // Preserve existing label attributes settings since there are no UI controls to recreate them with
-            learningMachine.LabelAttributesSettings = CurrentLearningMachine.LabelAttributesSettings
-                ?.DeepClone();
+                // Preserve existing label attributes settings since there are no UI controls to recreate them with
+                learningMachine.LabelAttributesSettings = CurrentLearningMachine.LabelAttributesSettings
+                    ?.DeepClone();
+            }
 
             SetInputConfigValues(learningMachine, out string negativeClassName);
             SetEncoderValues(learningMachine, negativeClassName);
@@ -769,7 +787,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 if (!_valid)
                 {
-                    toolStripStatusLabel1.Text = _INVALID_STATUS;
+                    machineStateToolStripStatusLabel.Text = _INVALID_STATUS;
                 }
             }
             catch (Exception e)
@@ -791,7 +809,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// and input config settings so it is determined here rather than in <see cref="SetEncoderValues"/></param>
         private void SetInputConfigValues(LearningMachine learningMachine, out string negativeClassName)
         {
-            var inputConfig = learningMachine.InputConfig = new InputConfiguration();
+            if (!_dangerMode)
+            {
+                learningMachine.InputConfig = new InputConfiguration();
+            }
+
+            var inputConfig = learningMachine.InputConfig;
             int randomSeed;
             TextBox inputPathTextBox;
             TextBox attributesPathTextBox;
@@ -822,7 +845,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     negativeClassName = documentCategorizationFolderNegativeClassNameTextBox.Text;
                 }
             }
-            else if (paginationRadioButton.Checked)
+            else if (paginationRadioButton.Checked || deletionRadioButton.Checked)
             {
                 inputConfig.InputPathType = textFileOrCsvRadioButton.Checked
                     ? InputType.TextFileOrCsv
@@ -914,11 +937,19 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="learningMachine">The <see cref="CurrentLearningMachine"/> to be initialized</param>
         private void SetEncoderValues(LearningMachine learningMachine, string negativeClassName)
         {
-            var usage = documentCategorizationRadioButton.Checked
-                ? LearningMachineUsage.DocumentCategorization
-                : paginationRadioButton.Checked
-                    ? LearningMachineUsage.Pagination
-                    : LearningMachineUsage.AttributeCategorization;
+            var usage = LearningMachineUsage.DocumentCategorization;
+            if (paginationRadioButton.Checked)
+            {
+                usage = LearningMachineUsage.Pagination;
+            }
+            else if (deletionRadioButton.Checked)
+            {
+                usage = LearningMachineUsage.Deletion;
+            }
+            else if (attributeCategorizationRadioButton.Checked)
+            {
+                usage = LearningMachineUsage.AttributeCategorization;
+            }
 
             SpatialStringFeatureVectorizer autoBoW = null;
             if (useAutoBagOfWordsCheckBox.Checked)
@@ -945,7 +976,17 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         ExtractException.Assert("ELI45541", "Value must be a positive integer",
                             int.TryParse(pagesToProcess, out int page) && page > 0);
                     }
-                    autoBoW = new SpatialStringFeatureVectorizer(pagesToProcess, shingleSize, maxFeatures);
+                    if (_dangerMode && learningMachine.Encoder.AutoBagOfWords != null)
+                    {
+                        autoBoW = learningMachine.Encoder.AutoBagOfWords;
+                        autoBoW.PagesToProcess = pagesToProcess;
+                        autoBoW.ShingleSize = shingleSize;
+                        autoBoW.MaxFeatures = maxFeatures;
+                    }
+                    else
+                    {
+                        autoBoW = new SpatialStringFeatureVectorizer(pagesToProcess, shingleSize, maxFeatures);
+                    }
                     autoBoW.UseFeatureHashing = useFeatureHashingForAutoBagOfWordsCheckBox.Checked;
                 }
                 catch (ExtractException ue)
@@ -992,8 +1033,23 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 }
             }
 
-            learningMachine.Encoder = new LearningMachineDataEncoder(usage, autoBoW, attributeFilter,
-                negateFilter, maxAttributeVectorizerFeatures, attributesToTokenize, shingleSizeForTokens, negativeClassName);
+            if (_dangerMode)
+            {
+                var encoder = learningMachine.Encoder;
+                encoder.MachineUsage = usage;
+                encoder.AutoBagOfWords = autoBoW;
+                encoder.AttributeFilter = attributeFilter;
+                encoder.NegateFilter = negateFilter;
+                encoder.AttributeVectorizerMaxDiscreteTermsFeatures = maxAttributeVectorizerFeatures;
+                encoder.AttributesToTokenizeFilter = attributesToTokenize;
+                encoder.AttributeVectorizerShingleSize = shingleSizeForTokens;
+                encoder.NegativeClassName = negativeClassName;
+            }
+            else
+            {
+                learningMachine.Encoder = new LearningMachineDataEncoder(usage, autoBoW, attributeFilter,
+                    negateFilter, maxAttributeVectorizerFeatures, attributesToTokenize, shingleSizeForTokens, negativeClassName);
+            }
         }
 
         /// <summary>
@@ -1079,7 +1135,17 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 _valid = false;
             }
 
-            learningMachine.Classifier = new NeuralNetworkClassifier
+            if (_dangerMode && learningMachine.Classifier is NeuralNetworkClassifier nn)
+            {
+                nn.HiddenLayers = hiddenLayers;
+                nn.MaxTrainingIterations = maxTrainingIterations;
+                nn.NumberOfCandidateNetworksToBuild = numberOfCandidateNetworks;
+                nn.SigmoidAlpha = sigmoidAlpha;
+                nn.UseCrossValidationSets = useCrossValidationSetsCheckBox.Checked;
+            }
+            else
+            {
+                learningMachine.Classifier = new NeuralNetworkClassifier
                 {
                     HiddenLayers = hiddenLayers,
                     MaxTrainingIterations = maxTrainingIterations,
@@ -1087,6 +1153,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     SigmoidAlpha = sigmoidAlpha,
                     UseCrossValidationSets = useCrossValidationSetsCheckBox.Checked
                 };
+            }
         }
 
         /// <summary>
@@ -1156,9 +1223,16 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="learningMachine">The <see cref="CurrentLearningMachine"/> to be initialized</param>
         private void SetMulticlassSVMClassifierValues(LearningMachine learningMachine)
         {
-            MulticlassSupportVectorMachineClassifier classifier;
-            learningMachine.Classifier = classifier = new MulticlassSupportVectorMachineClassifier();
-            SetSVMClassifierValues(classifier);
+            if (_dangerMode && learningMachine.Classifier is MulticlassSupportVectorMachineClassifier mc)
+            {
+                SetSVMClassifierValues(mc);
+            }
+            else
+            {
+                var classifier = new MulticlassSupportVectorMachineClassifier();
+                learningMachine.Classifier = classifier;
+                SetSVMClassifierValues(classifier);
+            }
         }
 
 
@@ -1168,13 +1242,20 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="learningMachine">The <see cref="CurrentLearningMachine"/> to be initialized</param>
         private void SetMultilabelSVMClassifierValues(LearningMachine learningMachine)
         {
-            MultilabelSupportVectorMachineClassifier classifier;
-            learningMachine.Classifier = classifier = new MultilabelSupportVectorMachineClassifier
+            if (_dangerMode && learningMachine.Classifier is MultilabelSupportVectorMachineClassifier ml)
             {
-                CalibrateMachineToProduceProbabilities = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked,
-            };
-
-            SetSVMClassifierValues(classifier);
+                ml.CalibrateMachineToProduceProbabilities = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked;
+                SetSVMClassifierValues(ml);
+            }
+            else
+            {
+                var classifier = new MultilabelSupportVectorMachineClassifier()
+                {
+                    CalibrateMachineToProduceProbabilities = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked,
+                };
+                learningMachine.Classifier = classifier;
+                SetSVMClassifierValues(classifier);
+            }
 
             // Set values only associated with multilabel SVM at this time
             learningMachine.UseUnknownCategory = multilabelSvmUseUnknownCheckBox.Checked;
@@ -1236,6 +1317,32 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 if (!_textValueOrCheckStateChangedSinceCreation)
                 {
                     useAutoBagOfWordsCheckBox.Checked = false;
+                }
+            }
+            else if (deletionRadioButton.Checked)
+            {
+                paginationInputPanel.Visible = true;
+                documentCategorizationCsvInputPanel.Visible = false;
+                documentCategorizationFolderInputPanel.Visible = false;
+                attributeCategorizationInputPanel.Visible = false;
+                specifiedPagesCheckBox.Enabled = true;
+
+                // Adjust labels and browse buttons for pagination panel
+                if (textFileOrCsvRadioButton.Checked)
+                {
+                    paginationFileListOrFolderLabel.Text = "Train/testing file list";
+                    paginationFileListOrFolderBrowseButton.FolderBrowser = false;
+                }
+                else
+                {
+                    paginationFileListOrFolderLabel.Text = "Train/testing file folder";
+                    paginationFileListOrFolderBrowseButton.FolderBrowser = true;
+                }
+
+                // Set default state for auto-bow
+                if (!_textValueOrCheckStateChangedSinceCreation)
+                {
+                    useAutoBagOfWordsCheckBox.Checked = true;
                 }
             }
             else
@@ -2019,6 +2126,23 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 ex.ExtractDisplay("ELI44892");
             }
+        }
+
+        private void HandleDangerModeButton_Click(object sender, EventArgs e)
+        {
+            if (!_dangerMode)
+            {
+                _dangerMode = true;
+                dangerModeToolStripStatusLabel.Text = "[Danger mode]";
+                dangerModeButton.Text = "Safe mode";
+            }
+            else
+            {
+                _dangerMode = false;
+                dangerModeToolStripStatusLabel.Text = "[Safe mode]";
+                dangerModeButton.Text = "Danger mode";
+            }
+
         }
 
         #endregion Event Handlers

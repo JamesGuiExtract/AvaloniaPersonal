@@ -96,6 +96,32 @@ namespace Extract.Utilities
         {
             return Match(o => o.ToString(), o => o.ToString());
         }
+
+        /// <summary>
+        /// Creates an instance or returns null if <see paramref="item"/> is null
+        /// </summary>
+        /// <param name="item">The item to wrap in the union instance</param>
+        public static Union<TCase1, TCase2> Maybe(TCase1 item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+            return new Union<TCase1, TCase2>(item);
+        }
+
+        /// <summary>
+        /// Creates an instance or returns null if <see paramref="item"/> is null
+        /// </summary>
+        /// <param name="item">The item to wrap in the union instance</param>
+        public static Union<TCase1, TCase2> Maybe(TCase2 item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+            return new Union<TCase1, TCase2>(item);
+        }
     }
 
     /// <summary>
@@ -202,6 +228,45 @@ namespace Extract.Utilities
             {
                 throw e.AsExtract("ELI41845");
             }
+        }
+
+        /// <summary>
+        /// Creates an instance or returns null if <see paramref="item"/> is null
+        /// </summary>
+        /// <param name="item">The item to wrap in the union instance</param>
+        public static Union<TCase1, TCase2, TCase3> Maybe(TCase1 item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+            return new Union<TCase1, TCase2, TCase3>(item);
+        }
+
+        /// <summary>
+        /// Creates an instance or returns null if <see paramref="item"/> is null
+        /// </summary>
+        /// <param name="item">The item to wrap in the union instance</param>
+        public static Union<TCase1, TCase2, TCase3> Maybe(TCase2 item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+            return new Union<TCase1, TCase2, TCase3>(item);
+        }
+
+        /// <summary>
+        /// Creates an instance or returns null if <see paramref="item"/> is null
+        /// </summary>
+        /// <param name="item">The item to wrap in the union instance</param>
+        public static Union<TCase1, TCase2, TCase3> Maybe(TCase3 item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+            return new Union<TCase1, TCase2, TCase3>(item);
         }
 
         /// <summary>

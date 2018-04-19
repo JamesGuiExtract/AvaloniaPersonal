@@ -156,7 +156,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
                         TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\"",
-                        MaximumTrainingDocuments = 10000,
+                        TestingCommand = null,
+                        MaximumTrainingRecords = 10000,
                         DatabaseServer = "(local)",
                         DatabaseName = _DB_NAME
                     };
@@ -190,8 +191,9 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     {
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
+                        TrainingCommand = null,
                         TestingCommand = testingExe.Quote() + " \"<TempModelPath>\"",
-                        MaximumTestingDocuments = 10000,
+                        MaximumTestingRecords = 10000,
                         DatabaseServer = "(local)",
                         DatabaseName = _DB_NAME
                     };
@@ -229,8 +231,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         ModelDestination = dest.FileName,
                         TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\"",
                         TestingCommand = testingExe.Quote() + " \"<TempModelPath>\"",
-                        MaximumTrainingDocuments = 10000,
-                        MaximumTestingDocuments = 10000,
+                        MaximumTrainingRecords = 10000,
+                        MaximumTestingRecords = 10000,
                         DatabaseServer = "(local)",
                         DatabaseName = _DB_NAME
                     };
@@ -264,7 +266,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     ModelName = _MODEL_NAME,
                     ModelDestination = dest,
                     TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\"",
-                    MaximumTrainingDocuments = 10000,
+                    TestingCommand = null,
+                    MaximumTrainingRecords = 10000,
                     DatabaseServer = "(local)",
                     DatabaseName = _DB_NAME
                 };
@@ -294,8 +297,9 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                 {
                     ModelName = _MODEL_NAME,
                     ModelDestination = dest,
+                    TrainingCommand = null,
                     TestingCommand = testingExe.Quote() + " \"<TempModelPath>\"",
-                    MaximumTestingDocuments = 10000,
+                    MaximumTestingRecords = 10000,
                     DatabaseServer = "(local)",
                     DatabaseName = _DB_NAME
                 };
@@ -332,9 +336,11 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
                         TrainingCommand = trainingExe.Quote() + "\"<DataFile>\" \"<TempModelPath>\"",
-                        MaximumTrainingDocuments = 10000,
+                        TestingCommand = null,
+                        MaximumTrainingRecords = 10000,
                         DatabaseServer = "(local)",
-                        DatabaseName = TestTrainingDataCollector.DBName
+                        DatabaseName = TestTrainingDataCollector.DBName,
+                        MinimumF1Score = 0
                     };
 
                     trainer.Process(CancellationToken.None);
@@ -367,7 +373,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
                         TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\"",
-                        MaximumTrainingDocuments = 10000,
+                        TestingCommand = null,
+                        MaximumTrainingRecords = 10000,
                         DatabaseServer = "(local)",
                         DatabaseName = _DB_NAME
                     };
@@ -407,8 +414,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     ModelType = ModelType.LearningMachine,
                     ModelName = _MODEL_NAME,
                     ModelDestination = dest,
-                    MaximumTrainingDocuments = 10000,
-                    MaximumTestingDocuments = 10000,
+                    MaximumTrainingRecords = 10000,
+                    MaximumTestingRecords = 10000,
                     DatabaseServer = "(local)",
                     DatabaseName = TestTrainingDataCollector.DBName
                 };
@@ -441,8 +448,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     , MinimumF1Score = minimumF1Score
                     , LastF1Score = lastF1Score
                     , AllowableAccuracyDrop = allowableAccuracyDrop
-                    , MaximumTrainingDocuments = 10000
-                    , MaximumTestingDocuments = 10000
+                    , MaximumTrainingRecords = 10000
+                    , MaximumTestingRecords = 10000
                     , DatabaseServer = "(local)"
                     , DatabaseName = _DB_NAME
                 };
@@ -577,8 +584,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         , ModelDestination = dest.FileName
                         , TrainingCommand = trainingExe.FileName.Quote() + " \"<DataFile>\" \"<TempModelPath>\""
                         , TestingCommand = testingExe.FileName.Quote() + " \"<DataFile>\""
-                        , MaximumTrainingDocuments = 10000
-                        , MaximumTestingDocuments = 10000
+                        , MaximumTrainingRecords = 10000
+                        , MaximumTestingRecords = 10000
                         , LastIDProcessed = 50
                         , DatabaseServer = "(local)"
                         , DatabaseName = _DB_NAME
@@ -613,10 +620,10 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     Assert.AreEqual(expected, testingOutput);
 
                     // Maximum training files will have been reduced
-                    Assert.LessOrEqual(trainer.MaximumTrainingDocuments, 30);
+                    Assert.LessOrEqual(trainer.MaximumTrainingRecords, 30);
 
                     // Maximum testing files will have been reduced
-                    Assert.LessOrEqual(trainer.MaximumTestingDocuments, 30);
+                    Assert.LessOrEqual(trainer.MaximumTestingRecords, 30);
                 }
             }
             finally
@@ -649,8 +656,8 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
             Assert.AreEqual(trainer.EmailAddressesToNotifyOnFailure, updatedtrainer.EmailAddressesToNotifyOnFailure);
             Assert.AreEqual(trainer.LastF1Score, updatedtrainer.LastF1Score);
             Assert.AreEqual(trainer.LastIDProcessed, updatedtrainer.LastIDProcessed);
-            Assert.AreEqual(trainer.MaximumTestingDocuments, updatedtrainer.MaximumTestingDocuments);
-            Assert.AreEqual(trainer.MaximumTrainingDocuments, updatedtrainer.MaximumTrainingDocuments);
+            Assert.AreEqual(trainer.MaximumTestingRecords, updatedtrainer.MaximumTestingRecords);
+            Assert.AreEqual(trainer.MaximumTrainingRecords, updatedtrainer.MaximumTrainingRecords);
             Assert.AreEqual(trainer.MinimumF1Score, updatedtrainer.MinimumF1Score);
             Assert.AreEqual(trainer.ModelDestination, updatedtrainer.ModelDestination);
             Assert.AreEqual(trainer.ModelName, updatedtrainer.ModelName);

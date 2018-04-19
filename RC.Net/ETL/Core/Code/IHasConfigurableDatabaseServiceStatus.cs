@@ -1,4 +1,6 @@
-﻿namespace Extract.ETL
+﻿using System;
+
+namespace Extract.ETL
 {
     public interface IHasConfigurableDatabaseServiceStatus
     {

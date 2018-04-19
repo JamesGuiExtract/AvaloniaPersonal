@@ -919,6 +919,16 @@ namespace Extract.Utilities
             return string.Join("", strings.Select(str => FormattableString.Invariant(str)));
         }
 
+        /// <summary>
+        /// Formats one or more FormattableStrings using current culture
+        /// </summary>
+        /// <param name="strings">The strings to be formatted</param>
+        /// <returns>The string constructed by joining the results of each formatted string application</returns>
+        public static string FormatCurrent(params FormattableString[] strings)
+        {
+            return string.Join("", strings.Select(str => str.ToString(CultureInfo.CurrentCulture)));
+        }
+
 
         /// <summary>
         /// Returns as dictionary of the Extract categories, if the ExtractCategoriesWithDescription.json file doesn't exist it will be created

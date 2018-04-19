@@ -1,4 +1,5 @@
-﻿using Extract.Licensing;
+﻿using Extract.ETL;
+using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,12 @@ namespace Extract.UtilityApplications.TrainingDataCollector
     /// <summary>
     /// Application to be used to test the TrainingDataCollector, which is to be a ServiceProcess
     /// </summary>
-    public class TrainingDataCollectorApp
+    public class TrainingDataCollectorApp : ITrainingCoordinator
     {
+        public string ProjectName => "";
+
+        public string RootDir { get; set; }
+
         [STAThread]
         static int Main(string[] args)
         {
@@ -168,7 +173,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                     var collector = File.Exists(settingsFile)
                         ? TrainingDataCollector.FromJson(File.ReadAllText(settingsFile))
                         : new TrainingDataCollector();
-
+                    var coordinator = new TrainingDataCollectorApp { RootDir = Path.GetDirectoryName(Path.GetFullPath(settingsFile)) };
+                    collector.Container = coordinator;
                     collector.DatabaseServer = databaseServer;
                     collector.DatabaseName = databaseName;
 

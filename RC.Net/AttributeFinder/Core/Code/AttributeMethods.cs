@@ -269,6 +269,19 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Loads the IUnknownVector of attributes from the byte array
+        /// </summary>
+        /// <param name="value">Byte array containing the vector of attributes</param>
+        /// <returns>IUnknownVector of attributes that was in the byte array</returns>
+        public static IUnknownVector GetVectorOfAttributesFromSqlBinary(byte[] value)
+        {
+            using (var stream = new MemoryStream(value))
+            {
+                return GetVectorOfAttributesFromSqlBinary(stream);
+            }
+        }
+
+        /// <summary>
         /// Loads the IUnknownVector of attributes from the stream
         /// </summary>
         /// <param name="binaryAsStream">Stream containing the vector of attributes</param>

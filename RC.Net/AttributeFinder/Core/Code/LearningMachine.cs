@@ -19,12 +19,13 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading;
-using System.Transactions;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ZstdNet;
 using AccuracyData = Extract.Utilities.Union<Accord.Statistics.Analysis.GeneralConfusionMatrix, Accord.Statistics.Analysis.ConfusionMatrix>;
+using AttributeOrAnswerCollection = Extract.Utilities.Union<string[], byte[][]>;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder
@@ -475,7 +476,7 @@ namespace Extract.AttributeFinder
 
                 // Compute input files and answers
                 string[] ussFiles, voaFiles, answersOrAnswerFiles;
-                InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles, updateStatus, cancellationToken);
+                InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles, updateStatus, cancellationToken, false);
 
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -642,6 +643,27 @@ namespace Extract.AttributeFinder
                     foreach (var attr in resultingAttributes)
                     {
                         attributeVector.PushBack(attr);
+                    }
+                }
+                else if (Usage == LearningMachineUsage.Deletion)
+                {
+                    if (!preserveInputAttributes)
+                    {
+                        attributeVector.Clear();
+                    }
+
+                    List<bool> isDeletedPageList = outputs
+                        .Select(answerAndScore => answerAndScore.answerCode == LearningMachineDataEncoder.DeletedPageCategoryCode)
+                        .ToList();
+                    int numberOfPages = isDeletedPageList.Count;
+
+                    // - 1 because isDeletedPageList is zero-indexed
+                    Func<int, bool> isDeletedPage = sourcePage => isDeletedPageList[sourcePage - 1];
+
+                    var deletedPages = CreateDeletedPagesAttribute(document.SourceDocName, numberOfPages, isDeletedPage);
+                    if (deletedPages != null)
+                    {
+                        attributeVector.PushBack(deletedPages);
                     }
                 }
                 else if (Usage == LearningMachineUsage.AttributeCategorization)
@@ -955,13 +977,16 @@ namespace Extract.AttributeFinder
                 ExtractException.Assert("ELI44949", "Encodings are not computed", Encoder.AreEncodingsComputed);
 
                 // Compute input files and answers
-                InputConfig.GetInputData(out string[] ussFiles, out string[] voaFiles, out string[] answersOrAnswerFiles, updateStatus, cancellationToken);
+                InputConfig.GetInputData(out string[] ussFiles, out string[] voaFiles, out string[] answersOrAnswerFiles,
+                    updateStatus, cancellationToken, false);
 
                 ExtractException.Assert("ELI44891", "No inputs available to train/test machine",
                     ussFiles.Length > 0);
 
-                var (featureVectors, answerCodes, ussPathsPerExample) = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
-                    updateStatus, cancellationToken, updateAnswerCodes: false);
+                var (featureVectors, answerCodes, ussPathsPerExample) =
+                    Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles,
+                    AttributeOrAnswerCollection.Maybe(answersOrAnswerFiles),
+                        updateStatus, cancellationToken, updateAnswerCodes: false);
 
                 var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, updateStatus, cancellationToken);
 
@@ -988,7 +1013,8 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <remarks>The CSV fields are: "answer", features...</remarks>
         public void WriteDataToDatabase(CancellationToken cancelToken, string databaseServer, string databaseName, string attributeSetName, 
-            string modelName, long lowestIDToProcess, long highestIDToProcess)
+            string modelName, long lowestIDToProcess, long highestIDToProcess, bool useAttributeSetForExpected,
+            bool runRuleSetForFeatures, bool runRuleSetIfFeaturesAreMissing, string featureRuleSetName)
         {
             try
             {
@@ -996,52 +1022,52 @@ namespace Extract.AttributeFinder
                 ExtractException.Assert("ELI45437", "Encodings are not computed", Encoder.AreEncodingsComputed);
 
                 // Compute input files and answers
-                var (imageFiles, answers) = GetImageFileListFromDB(databaseServer, databaseName, attributeSetName, lowestIDToProcess, highestIDToProcess);
+                var (imageFiles, answers) = GetImageFileListFromDB(databaseServer, databaseName, attributeSetName,
+                    lowestIDToProcess, highestIDToProcess, useAttributeSetForExpected);
 
-                ExtractException.Assert("ELI45438", "No inputs available to train/test machine",
-                    imageFiles.Length > 0);
+                ExtractException.Assert("ELI45438", "No inputs available to process", imageFiles.Length > 0);
 
-                InputConfig.GetRelatedInputData(imageFiles, answers, out string[] ussFiles, out string[] voaFiles, out string[] answersOrAnswerFiles, cancelToken);
+                InputConfig.GetRelatedInputData(imageFiles, answers, runRuleSetForFeatures,
+                    out string[] ussFiles, out string[] voaFiles, out AttributeOrAnswerCollection answersOrAnswerFiles,
+                    cancelToken);
 
-                var (featureVectors, answerCodes, ussPathsPerExample) = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
+                // Get the alternate FKB dir from the DB
+                var fpdb = new FileProcessingDB { DatabaseServer = databaseServer, DatabaseName = databaseName };
+                string altCDD = fpdb.GetDBInfoSetting("AlternateComponentDataDir", false);
+                fpdb.CloseAllDBConnections();
+
+                // Compute the data
+                var (featureVectors, answerCodes, ussPathsPerExample) = Encoder.GetFeatureVectorAndAnswerCollections(
+                    ussFiles, voaFiles, answersOrAnswerFiles,
+                    runRuleSetForFeatures, runRuleSetIfFeaturesAreMissing, featureRuleSetName,
+                    LabelAttributesSettings, altCDD,
                     _ => { }, cancelToken, updateAnswerCodes: true);
+
+                ExtractException.Assert("ELI45792", "No data to write", featureVectors.Length > 0);
 
                 var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, _ => { }, cancelToken);
 
                 void WriteCsvToDB(IEnumerable<IEnumerable<string>> data, bool isTrainingSet)
                 {
-                    // Build the connection string from the settings
-                    SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                    using (var connection = NewSqlDBConnection(databaseServer, databaseName))
                     {
-                        DataSource = databaseServer,
-                        InitialCatalog = databaseName,
-                        IntegratedSecurity = true,
-                        NetworkLibrary = "dbmssocn"
-                    };
+                        connection.Open();
 
-                    using (var scope = new TransactionScope())
-                    {
-                        using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                        var cmdText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
+                        SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
+                        FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
+                        foreach (var record in data)
                         {
-                            connection.Open();
-
-                            var cmdText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
-                            SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
-                            FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
-                            foreach (var record in data)
+                            using (var cmd = new SqlCommand(cmdText, connection))
                             {
-                                using (var cmd = new SqlCommand(cmdText, connection))
-                                {
-                                    cmd.Parameters.AddWithValue("@IsTrainingData", isTrainingSet.ToString());
-                                    cmd.Parameters.AddWithValue("@ModelName", modelName);
-                                    var ussPath = record.First();
-                                    cmd.Parameters.AddWithValue("@Data", string.Join(",", record.Skip(2).Select(s => s.QuoteIfNeeded("\"", ","))));
-                                    cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
-                                    cmd.ExecuteNonQuery();
-                                }
+                                cmd.Parameters.AddWithValue("@IsTrainingData", isTrainingSet.ToString());
+                                cmd.Parameters.AddWithValue("@ModelName", modelName);
+                                var ussPath = record.First();
+                                cmd.Parameters.AddWithValue("@Data", string.Join(",", record.Skip(2).Select(s => s.QuoteIfNeeded("\"", ","))));
+                                cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
+                                cmd.ExecuteNonQuery();
                             }
                         }
-                        scope.Complete();
                     }
                 }
 
@@ -1169,7 +1195,7 @@ namespace Extract.AttributeFinder
             ExtractException.Assert("ELI39840", "Machine is not fully configured", IsConfigured);
 
             // Compute input files and answers
-            InputConfig.GetInputData(out string[] ussFiles, out string[] voaFiles, out string[] answersOrAnswerFiles, updateStatus, cancellationToken);
+            InputConfig.GetInputData(out string[] ussFiles, out string[] voaFiles, out string[] answersOrAnswerFiles, updateStatus, cancellationToken, false);
 
             ExtractException.Assert("ELI41834", "No inputs available to train/test machine",
                 ussFiles.Length > 0);
@@ -1180,7 +1206,8 @@ namespace Extract.AttributeFinder
             }
 
             var (featureVectors, answerCodes, _) =
-                Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
+                Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles,
+                    AttributeOrAnswerCollection.Maybe(answersOrAnswerFiles),
                     updateStatus, cancellationToken, updateAnswerCodes: !testOnly);
 
             // Divide data into training and testing subsets
@@ -1225,34 +1252,45 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Returns a connection to the specified database
+        /// </summary>
+        /// <param name="enlist">Whether to enlist in a transaction scope if there is one</param>
+        SqlConnection NewSqlDBConnection(string databaseServer, string databaseName, bool enlist = true)
+        {
+            // Build the connection string from the settings
+            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
+            sqlConnectionBuild.DataSource = databaseServer;
+            sqlConnectionBuild.InitialCatalog = databaseName;
+            sqlConnectionBuild.IntegratedSecurity = true;
+            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
+            sqlConnectionBuild.MultipleActiveResultSets = true;
+            sqlConnectionBuild.Enlist = enlist;
+            return new SqlConnection( sqlConnectionBuild.ConnectionString);
+        }
+
+
+        /// <summary>
         /// Gets the image file list and, if usage is doc classification, the answers from the DB
         /// </summary>
-        private (string[] imagePaths, string[] maybeAnswers) GetImageFileListFromDB(
+        private (string[] imagePaths, AttributeOrAnswerCollection maybeAnswers) GetImageFileListFromDB(
             string databaseServer,
             string databaseName,
             string attributeSetName,
             long lowestIDToProcess,
-            long highestIDToProcess)
+            long highestIDToProcess,
+            bool useAttributeSetForExpected)
         {
             try
             {
-                // Build the connection string from the settings
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-                {
-                    DataSource = databaseServer,
-                    InitialCatalog = databaseName,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
-
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                using (var connection = NewSqlDBConnection(databaseServer, databaseName, false))
                 {
                     connection.Open();
 
-                    bool getDocTypeFromVoa = Usage == LearningMachineUsage.DocumentCategorization;
+                    bool getDocTypeFromVoa = useAttributeSetForExpected
+                        && Usage == LearningMachineUsage.DocumentCategorization;
                     using (var cmd = connection.CreateCommand())
                     {
-                        cmd.CommandText = getDocTypeFromVoa
+                        cmd.CommandText = useAttributeSetForExpected
                             ? _GET_FILE_LIST_AND_VOA
                             : _GET_FILE_LIST;
                         cmd.Parameters.AddWithValue("@AttributeSetName", attributeSetName);
@@ -1266,30 +1304,51 @@ namespace Extract.AttributeFinder
                         var answers = getDocTypeFromVoa
                             ? new List<string>()
                             : null;
+                        var answerVOAs = !getDocTypeFromVoa && useAttributeSetForExpected
+                            ? new List<byte[]>()
+                            : null;
                         var afutil = new AFUtilityClass();
                         foreach (IDataRecord record in reader)
                         {
                             imagePaths.Add(record.GetString(0));
 
-                            if (getDocTypeFromVoa)
+                            if (useAttributeSetForExpected)
                             {
-                                string answer = null;
+                                object answer = null;
                                 if (!reader.IsDBNull(1))
                                 {
-                                    IUnknownVector voa = null;
                                     using (var stream = reader.GetStream(1))
                                     {
-                                        voa = AttributeMethods.GetVectorOfAttributesFromSqlBinary(stream);
-                                        voa.ReportMemoryUsage();
-                                        answer = afutil.QueryAttributes(voa, "DocumentType", false)
-                                            .ToIEnumerable<ComAttribute>()
-                                            .FirstOrDefault()?.Value.String;
+                                        if (getDocTypeFromVoa)
+                                        {
+                                            var voa = AttributeMethods.GetVectorOfAttributesFromSqlBinary(stream);
+                                            voa.ReportMemoryUsage();
+                                            answer = afutil.QueryAttributes(voa, "DocumentType", false)
+                                                .ToIEnumerable<ComAttribute>()
+                                                .FirstOrDefault()?.Value.String;
+                                        }
+                                        else
+                                        {
+                                            answer = stream.ToByteArray();
+                                        }
                                     }
                                 }
-                                answers.Add(answer ?? "");
+                                if (getDocTypeFromVoa)
+                                {
+                                    answers.Add((string)answer ?? "");
+                                }
+                                else
+                                {
+                                    answerVOAs.Add((byte[])answer);
+                                }
                             }
                         }
-                        return (imagePaths.ToArray(), answers?.ToArray());
+                        var AttributeOrAnswerCollection = getDocTypeFromVoa
+                            ? new AttributeOrAnswerCollection(answers.ToArray())
+                            : useAttributeSetForExpected
+                                ? new AttributeOrAnswerCollection(answerVOAs.ToArray())
+                                : null;
+                        return (imagePaths.ToArray(), AttributeOrAnswerCollection);
                     }
                 }
             }
@@ -1610,6 +1669,72 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI40158");
+            }
+        }
+
+        /// <summary> Creates a DeletedPages <see cref="ComAttribute"/> that represents the pages predicted to be deleted
+        /// (DeletedPages|1-2,5).
+        /// </summary>
+        /// <param name="sourceDocName">Name of the source document</param>
+        /// <param name="numberOfPages">The number of pages in the source document</param>
+        /// <param name="isDeletedPage">Function used to determine whether a source page number is
+        /// a deleted page of a document</param>
+        private static ComAttribute CreateDeletedPagesAttribute(
+            string sourceDocName,
+            int numberOfPages,
+            Func<int, bool> isDeletedPage)
+        {
+            try
+            {
+                int firstPageInRange = Enumerable.Range(1, numberOfPages)
+                    .FirstOrDefault(n => isDeletedPage(n));
+
+                if (firstPageInRange == 0)
+                {
+                    return null;
+                }
+
+                string value = null;
+                for (int nextPageNumber = firstPageInRange + 1; nextPageNumber <= numberOfPages + 1; nextPageNumber++)
+                {
+                    if (nextPageNumber > numberOfPages || !isDeletedPage(nextPageNumber))
+                    {
+                        int lastPageInRange = nextPageNumber - 1;
+                        string range = Enumerable
+                            .Range(firstPageInRange, lastPageInRange - firstPageInRange + 1)
+                            .ToRangeString();
+
+                        if (value == null)
+                        {
+                            value = range;
+                        }
+                        else
+                        {
+                            value += ("," + range);
+                        }
+
+                        // Next page is not deleted so find next deleted page to set up next page range
+                        if (nextPageNumber <= numberOfPages)
+                        {
+                            firstPageInRange = Enumerable.Range(nextPageNumber, numberOfPages - nextPageNumber)
+                                .FirstOrDefault(n => isDeletedPage(n));
+                            if (firstPageInRange == 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Add a DeletedPages attribute
+                SpatialString ss = new SpatialStringClass();
+                ss.CreateNonSpatialString(value, sourceDocName);
+
+                return new ComAttribute { Name = "DeletedPages", Value = ss };
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI45787");
             }
         }
 

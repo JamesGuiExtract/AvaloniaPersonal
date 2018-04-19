@@ -1,4 +1,5 @@
 ﻿using AttributeDbMgrComponentsLib;
+using Extract.AttributeFinder;
 using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using System;
@@ -71,6 +72,12 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 InitializeComponent();
 
                 _lastIDProcessedNumericUpDown.Maximum = long.MaxValue;
+
+                // Schedule is unused if this is a child of a training coordinator
+                if (_settings.Container != null)
+                {
+                    _schedulerControl.Enabled = false;
+                }
 
                 SetControlValues();
             }
@@ -157,7 +164,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 var modelName = _modelNameComboBox.Text;
                 _modelNameComboBox.Focus();
                 ExtractException.Assert("ELI45127", "Model name is undefined", ValidateModel(), "Model name", modelName);
-                _settings.ModelName = modelName;
+                _settings.QualifiedModelName = modelName;
 
                 var attributeSet = _attributeSetNameComboBox.Text;
                 _attributeSetNameComboBox.Focus();
@@ -177,6 +184,13 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 _settings.DataGeneratorPath = _dataGeneratorPathTextBox.Text;
 
                 _settings.Schedule = _schedulerControl.Value;
+
+                _settings.OverrideTrainingTestingSplit = _overrideTrainingTestingSplitCheckBox.Checked;
+                _settings.TrainingPercent = (int)_trainingPercentageNumericUpDown.Value;
+                _settings.UseAttributeSetForExpecteds = _useAttributeSetForExpectedsRadioButton.Checked;
+                _settings.RunRulesetForCandidateOrFeatures = _runRulesetForFeaturesRadioButton.Checked;
+                _settings.FeatureRulesetPath = _featureRulesetTextBox.Text;
+                _settings.RunRulesetIfVoaIsMissing = _runRulesetIfVoaIsMissingCheckBox.Checked;
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
@@ -201,7 +215,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         }
 
         /// <summary>
-        /// Update settings from UI controls
+        /// Set dirty flag
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
@@ -223,6 +237,29 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         }
 
         /// <summary>
+        /// Enable/disable dependant controls. Set dirty flag
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleCheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_suspendUpdatesToSettingsObject)
+                {
+                    return;
+                }
+
+                Dirty = true;
+                SetControlStates();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45770");
+            }
+        }
+
+        /// <summary>
         /// Shows an AddMLModel dialog
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -231,7 +268,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         {
             try
             {
-                using (var form = new AddMLModel(_database))
+                using (var form = new AddMLModel(_database, _settings.ModelNamePrefix))
                 {
                     var result = form.ShowDialog();
                     if (result == DialogResult.OK)
@@ -289,13 +326,37 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 _suspendUpdatesToSettingsObject = true;
 
                 _attributeSetNameComboBox.Text = _settings.AttributeSetName;
-                _modelNameComboBox.Text = _settings.ModelName;
+                _modelNameComboBox.Text = _settings.QualifiedModelName;
                 _lastIDProcessedNumericUpDown.Value = _settings.LastIDProcessed;
                 _lmModelTypeRadioButton.Checked = _settings.ModelType == ModelType.LearningMachine;
                 _nerModelTypeRadioButton.Checked = _settings.ModelType == ModelType.NamedEntityRecognition;
                 _dataGeneratorPathTextBox.Text = _settings.DataGeneratorPath;
                 _descriptionTextBox.Text = _settings.Description;
                 _schedulerControl.Value = _settings.Schedule;
+
+                _overrideTrainingTestingSplitCheckBox.Checked = _settings.OverrideTrainingTestingSplit;
+                _trainingPercentageNumericUpDown.Value = _settings.TrainingPercent;
+                if (_settings.UseAttributeSetForExpecteds)
+                {
+                    _useAttributeSetForExpectedsRadioButton.Checked = true;
+                }
+                else
+                {
+                    _useVoaFileForExpectedsRadioButton.Checked = true;
+                }
+
+                if (_settings.RunRulesetForCandidateOrFeatures)
+                {
+                    _runRulesetForFeaturesRadioButton.Checked = true;
+                }
+                else
+                {
+                    _useVoaFileForFeaturesRadioButton.Checked = true;
+                }
+                _featureRulesetTextBox.Text = _settings.FeatureRulesetPath;
+                _runRulesetIfVoaIsMissingCheckBox.Checked = _settings.RunRulesetIfVoaIsMissing;
+
+                SetControlStates();
 
                 Dirty = false;
 
@@ -304,6 +365,19 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             {
                 _suspendUpdatesToSettingsObject = false;
             }
+        }
+
+        /// <summary>
+        /// Enables/Disables controls based on configured options
+        /// </summary>
+        void SetControlStates()
+        {
+            _trainingPercentageNumericUpDown.Enabled = _overrideTrainingTestingSplitCheckBox.Checked;
+            _featuresGroupBox.Enabled = _lmModelTypeRadioButton.Checked;
+            _featureRulesetTextBox.Enabled =
+                _featureRulesetBrowseButton.Enabled =
+                _runRulesetForFeaturesRadioButton.Checked || _runRulesetIfVoaIsMissingCheckBox.Checked;
+            _runRulesetIfVoaIsMissingCheckBox.Enabled = !_runRulesetForFeaturesRadioButton.Checked;
         }
 
         /// <summary>

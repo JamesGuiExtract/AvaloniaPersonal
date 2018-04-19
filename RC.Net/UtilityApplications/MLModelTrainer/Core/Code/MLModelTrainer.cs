@@ -15,77 +15,8 @@ using YamlDotNet.RepresentationModel;
 namespace Extract.UtilityApplications.MLModelTrainer
 {
     [ExtractCategory("DatabaseService", "ML Model Trainer")]
-    public class MLModelTrainer : DatabaseService, IConfigSettings, IHasConfigurableDatabaseServiceStatus
+    public class MLModelTrainer : MachineLearningService, IConfigSettings, IHasConfigurableDatabaseServiceStatus
     {
-        #region Internal classes
-
-        /// <summary>
-        /// Class for the MLModelTrainerStatus stored in the DatabaseService record
-        /// </summary>
-        [DataContract]
-        public class MLModelTrainerStatus : DatabaseServiceStatus
-        {
-            #region DatabaseVerificationStatus constants
-
-            const int _CURRENT_VERSION = 1;
-
-            #endregion
-
-            #region MLModelTrainerStatus Properties
-
-            [DataMember]
-            public override int Version { get; protected set; } = _CURRENT_VERSION;
-
-            /// <summary>
-            /// The ID of the last MLData record processed
-            /// </summary>
-            [DataMember]
-            public int LastIDProcessed { get; set; }
-
-            /// <summary>
-            /// The average F1Score from the last time the testing command was successfully executed
-            /// </summary>
-            [DataMember]
-            public double LastF1Score { get; set; }
-
-            /// <summary>
-            /// The maximum number of MLData records that will be used for training
-            /// </summary>
-            [DataMember]
-            public int MaximumTrainingDocuments { get; set; }
-
-            /// <summary>
-            /// The maximum number of MLData records that will be used for testing
-            /// </summary>
-            [DataMember]
-            public int MaximumTestingDocuments { get; set; }
-
-            #endregion
-
-            #region MLModelTrainerStatus Serialization
-
-            /// <summary>
-            /// Called after this instance is deserialized.
-            /// </summary>
-            [OnDeserialized]
-            void OnDeserialized(StreamingContext context)
-            {
-                if (Version > CURRENT_VERSION)
-                {
-                    ExtractException ee = new ExtractException("ELI45712", "Settings were saved with a newer version.");
-                    ee.AddDebugData("SavedVersion", Version, false);
-                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
-                    throw ee;
-                }
-
-                Version = CURRENT_VERSION;
-            } 
-
-            #endregion
-        }
-
-        #endregion
-
         #region Constants
 
         const int CURRENT_VERSION = 1;
@@ -102,7 +33,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     AND IsTrainingData = @IsTrainingData
                     AND CanBeDeleted = 'False'
                     ORDER BY DateTimeStamp DESC
-                ) a ORDER BY DateTimeStamp ASC";
+                ) a ORDER BY ID ASC";
 
         /// <summary>
         /// Query to get last processed count
@@ -114,6 +45,29 @@ namespace Extract.UtilityApplications.MLModelTrainer
                 AND IsTrainingData = @IsTrainingData
                 AND CanBeDeleted = 'False'
                 AND MLData.ID <= @LastIDProcessed";
+
+        /// <summary>
+        /// Query to get new data count
+        /// </summary>
+        static readonly string _GET_NEW_DATA_COUNT =
+            @"SELECT COUNT(*) FROM MLData
+                JOIN MLModel ON MLData.MLModelID = MLModel.ID
+                WHERE Name = @Name
+                AND IsTrainingData = @IsTrainingData
+                AND CanBeDeleted = 'False'
+                AND MLData.ID > @LastIDProcessed";
+
+        static readonly string _MARK_OLD_DATA_FOR_DELETION =
+            @"UPDATE d
+                SET CanBeDeleted = 'True'
+                FROM MLData d
+                JOIN MLModel ON d.MLModelID = MLModel.ID
+                WHERE Name = @Name
+                AND CanBeDeleted = 'False'
+                AND ( 
+                      IsTrainingData = 'True' AND d.ID < @FirstIDTrained
+                   OR IsTrainingData = 'False' AND d.ID < @FirstIDTested
+                )";
 
         /// <summary>
         /// Path tag that will resolve to the temporary file containing ML training/testing data
@@ -152,6 +106,13 @@ namespace Extract.UtilityApplications.MLModelTrainer
         static readonly string _LEARNING_MACHINE_TRAINER_APPLICATION =
             Path.Combine(FileSystemMethods.CommonComponentsPath, "LearningMachineTrainer.exe");
 
+        static readonly string _DEFAULT_NER_TRAINING_COMMAND =
+            @"""<CommonComponentsDir>\opennlp.ikvm.exe"" TokenNameFinderTrainer -model ""<TempModelPath>""" +
+            @" -lang en -data ""<DataFile>"" -featuregen ""<ComponentDataDir>\NER\ExampleFeatureGen.xml""";
+
+        static readonly string _DEFAULT_NER_TESTING_COMMAND =
+            @"""<CommonComponentsDir>\opennlp.ikvm.exe"" TokenNameFinderEvaluator -model ""<TempModelPath>"" -data ""<DataFile>""";
+
         #endregion Constants
 
         #region Fields
@@ -160,8 +121,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
         TemporaryFile _tempModelFile;
         int _lastIDProcessed;
         double _lastF1Score;
-        int _maximumTrainingDocuments;
-        int _maximumTestingDocuments;
+        int _maximumTrainingRecords = 10000;
+        int _maximumTestingRecords = 10000;
         MLModelTrainerStatus _status;
 
         #endregion Fields
@@ -169,29 +130,31 @@ namespace Extract.UtilityApplications.MLModelTrainer
         #region Properties
 
         /// <summary>
-        /// The name used to group training/testing data in FAMDB (table MLModel)
-        /// </summary>
-        [DataMember]
-        public string ModelName { get; set; }
-
-        /// <summary>
         /// Training command
         /// </summary>
         [DataMember]
-        public string TrainingCommand { get; set; }
+        public string TrainingCommand { get; set; } = _DEFAULT_NER_TRAINING_COMMAND;
 
         /// <summary>
         /// The attribute set (VOAs stored in the DB) that will both determine which files get
         /// processed and be the source of annotation categories
         /// </summary>
         [DataMember]
-        public string TestingCommand { get; set; }
+        public string TestingCommand { get; set; } = _DEFAULT_NER_TESTING_COMMAND;
 
         /// <summary>
         /// The path to which to write the trained model
         /// </summary>
         [DataMember]
         public string ModelDestination { get; set; }
+
+        /// <summary>
+        /// The path to which to write the trained model, relative to the <see cref="RootDir"/>
+        /// </summary>
+        public string QualifiedModelDestination =>
+            string.IsNullOrWhiteSpace(ModelDestination) || Path.IsPathRooted(ModelDestination) || string.IsNullOrWhiteSpace(RootDir)
+            ? ModelDestination
+            : Path.Combine(RootDir, ModelDestination);
 
         /// <summary>
         /// The ID of the last MLData record processed
@@ -257,40 +220,40 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// The lowest acceptable average F1 score
         /// </summary>
         [DataMember]
-        public double MinimumF1Score { get; set; }
+        public double MinimumF1Score { get; set; } = 0.6;
 
         /// <summary>
         /// The maximum decrease in F1 score before the testing result is considered unacceptable
         /// </summary>
         [DataMember]
-        public double AllowableAccuracyDrop { get; set; }
+        public double AllowableAccuracyDrop { get; set; } = 0.05;
 
         /// <summary>
         /// The maximum number of MLData records that will be used for training
         /// </summary>
         [DataMember]
-        public int MaximumTrainingDocuments
+        public int MaximumTrainingRecords
         {
             get
             {
                 if (_status != null)
                 {
-                    return _status.MaximumTrainingDocuments;
+                    return _status.MaximumTrainingRecords;
                 }
                 else
                 {
-                    return _maximumTrainingDocuments;
+                    return _maximumTrainingRecords;
                 }
             }
             set
             {
                 if (_status != null)
                 {
-                    _status.MaximumTrainingDocuments = value;
+                    _status.MaximumTrainingRecords = value;
                 }
                 else
                 {
-                    _maximumTrainingDocuments = value;
+                    _maximumTrainingRecords = value;
                 }
             }
         }
@@ -299,28 +262,28 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// The maximum number of MLData records that will be used for testing
         /// </summary>
         [DataMember]
-        public int MaximumTestingDocuments
+        public int MaximumTestingRecords
         {
             get
             {
                 if (_status != null)
                 {
-                    return _status.MaximumTestingDocuments;
+                    return _status.MaximumTestingRecords;
                 }
                 else
                 {
-                    return _maximumTestingDocuments;
+                    return _maximumTestingRecords;
                 }
             }
             set
             {
                 if (_status != null)
                 {
-                    _status.MaximumTestingDocuments = value;
+                    _status.MaximumTestingRecords = value;
                 }
                 else
                 {
-                    _maximumTestingDocuments = value;
+                    _maximumTestingRecords = value;
                 }
             }
         }
@@ -335,7 +298,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// The subject to use for emails sent upon failure
         /// </summary>
         [DataMember]
-        public string EmailSubject { get; set; }
+        public string EmailSubject { get; set; } = "Training failure";
 
         /// <summary>
         /// The version
@@ -344,9 +307,21 @@ namespace Extract.UtilityApplications.MLModelTrainer
         public override int Version { get; protected set; } = CURRENT_VERSION;
 
 
+        /// <summary>
+        /// The type of model to be trained
+        /// </summary>
         [DataMember]
         public ModelType ModelType { get; set; }
 
+        /// <summary>
+        /// Whether to mark old, unused ML data for deletion after running
+        /// </summary>
+        [DataMember]
+        public bool MarkOldDataForDeletion { get; set; } = true;
+
+        /// <summary>
+        /// Whether processing
+        /// </summary>
         public override bool Processing => _processing;
 
         #endregion Properties
@@ -372,23 +347,27 @@ namespace Extract.UtilityApplications.MLModelTrainer
             try
             {
                 _processing = true;
+                int firstIDTrained = 0;
+                int firstIDTested = 0;
 
                 using (_tempModelFile = new TemporaryFile(true))
                 using (var tempExceptionLog = new TemporaryFile(".uex", false))
                 {
                     bool copyToDestination = false;
                     int lastIDProcessed = -1;
-                    SourceDocumentPathTags pathTags = null;
+                    AttributeFinderPathTags pathTags = null;
 
                     if (ModelType == ModelType.NamedEntityRecognition)
                     {
-                        pathTags = new SourceDocumentPathTags();
+                        pathTags = new AttributeFinderPathTags(new UCLID_AFCORELib.AFDocument());
                         pathTags.AddTag(TempModelPathTag, _tempModelFile.FileName);
 
                         // Train
                         if (!string.IsNullOrWhiteSpace(TrainingCommand))
                         {
-                            lastIDProcessed = Train(pathTags, tempExceptionLog.FileName, cancelToken);
+                            (firstIDTrained, lastIDProcessed) =
+                                Train(pathTags, tempExceptionLog.FileName, cancelToken);
+
                             copyToDestination = true;
                         }
 
@@ -397,21 +376,24 @@ namespace Extract.UtilityApplications.MLModelTrainer
                         {
                             var result = Test(pathTags, tempExceptionLog.FileName, cancelToken);
                             copyToDestination = result.criteriaMet;
+                            firstIDTested = result.firstIDProcessed;
                             lastIDProcessed = Math.Max(lastIDProcessed, result.lastIDProcessed);
                         }
                     }
                     else
                     {
                         // The LearningMachineTrainer modifies an existing .lm file
-                        File.Copy(ModelDestination, _tempModelFile.FileName, true);
+                        File.Copy(QualifiedModelDestination, _tempModelFile.FileName, true);
 
                         // Train
-                        lastIDProcessed = Train(pathTags, tempExceptionLog.FileName, cancelToken);
+                        (firstIDTrained, lastIDProcessed) =
+                            Train(pathTags, tempExceptionLog.FileName, cancelToken);
                         copyToDestination = true;
 
                         // Test
                         var result = Test(pathTags, tempExceptionLog.FileName, cancelToken);
                         copyToDestination = result.criteriaMet;
+                        firstIDTested = result.firstIDProcessed;
                         lastIDProcessed = Math.Max(lastIDProcessed, result.lastIDProcessed);
 
                         // Verify that the machine was saved correctly
@@ -419,7 +401,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
                         {
                             try
                             {
-                                var lm = LearningMachine.Load(ModelDestination);
+                                var lm = LearningMachine.Load(QualifiedModelDestination);
                             }
                             catch (Exception ex)
                             {
@@ -432,9 +414,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
                     LastIDProcessed = Math.Max(LastIDProcessed, lastIDProcessed);
 
-                    if (copyToDestination && !string.IsNullOrWhiteSpace(ModelDestination))
+                    if (copyToDestination && !string.IsNullOrWhiteSpace(QualifiedModelDestination))
                     {
-                        var dest = ModelDestination;
+                        var dest = QualifiedModelDestination;
                         if (dest.EndsWith(".etf", StringComparison.OrdinalIgnoreCase))
                         {
                             int exitCode = SystemMethods.RunExecutable(
@@ -446,10 +428,51 @@ namespace Extract.UtilityApplications.MLModelTrainer
                         else
                         {
                             FileSystemMethods.MoveFile(_tempModelFile.FileName, dest, true);
-
-                            // Save status to the DB
-                            SaveStatus();
                         }
+
+                        if (MarkOldDataForDeletion)
+                        {
+                            using (var connection = NewSqlDBConnection())
+                            {
+                                try
+                                {
+                                    connection.Open();
+                                }
+                                catch (Exception ex)
+                                {
+                                    var ue = ex.AsExtract("ELI45761");
+                                    ue.AddDebugData("Database Server", DatabaseServer, false);
+                                    ue.AddDebugData("Database Name", DatabaseName, false);
+                                    throw ue;
+                                }
+
+                                using (var cmd = connection.CreateCommand())
+                                {
+                                    cmd.CommandText = _MARK_OLD_DATA_FOR_DELETION;
+                                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
+                                    cmd.Parameters.AddWithValue("@FirstIDTrained", firstIDTrained);
+                                    cmd.Parameters.AddWithValue("@FirstIDTested", firstIDTested);
+
+                                    // Set the timeout so that it waits indefinitely
+                                    cmd.CommandTimeout = 0;
+
+                                    try
+                                    {
+                                        cmd.ExecuteNonQuery();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        var ue = new ExtractException("ELI45762", "Failed to mark data for deletion", ex);
+                                        ue.AddDebugData("Database Server", DatabaseServer, false);
+                                        ue.AddDebugData("Database Name", DatabaseName, false);
+                                        throw ue;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Save status to the DB
+                        SaveStatus();
                     }
                     else
                     {
@@ -480,6 +503,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             }
             catch (Exception ex)
             {
+                cancelToken.ThrowIfCancellationRequested();
                 throw ex.AsExtract("ELI45094");
             }
             finally
@@ -504,6 +528,45 @@ namespace Extract.UtilityApplications.MLModelTrainer
             }
         }
 
+        public override int GetUnprocessedRecordCount()
+        {
+            using (var connection = NewSqlDBConnection())
+            {
+                try
+                {
+                    connection.Open();
+                }
+                catch (Exception ex)
+                {
+                    var ue = ex.AsExtract("ELI45755");
+                    ue.AddDebugData("Database Server", DatabaseServer, false);
+                    ue.AddDebugData("Database Name", DatabaseName, false);
+                    ue.AddDebugData("MLModel", QualifiedModelName, false);
+                    throw ue;
+                }
+
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = _GET_NEW_DATA_COUNT;
+                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
+                    cmd.Parameters.AddWithValue("@IsTrainingData", true);
+                    cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+
+                    int newCount = 0;
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            newCount = reader.GetInt32(0);
+                        }
+                        reader.Close();
+                    }
+                    return newCount;
+                }
+            }
+            
+        }
+
         #endregion Public Methods
 
         #region IHasConfigurableDatabaseServiceStatus
@@ -511,13 +574,18 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// <summary>
         /// The <see cref="DatabaseServiceStatus"/> for this instance
         /// </summary>
-        public DatabaseServiceStatus Status => _status ?? new MLModelTrainerStatus
+        public override DatabaseServiceStatus Status
         {
-            LastIDProcessed = LastIDProcessed,
-            LastF1Score = LastF1Score,
-            MaximumTrainingDocuments = MaximumTrainingDocuments,
-            MaximumTestingDocuments = MaximumTestingDocuments
-        };
+            get => _status ?? new MLModelTrainerStatus
+            {
+                LastIDProcessed = LastIDProcessed,
+                LastF1Score = LastF1Score,
+                MaximumTrainingRecords = MaximumTrainingRecords,
+                MaximumTestingRecords = MaximumTestingRecords
+            };
+
+            set => _status = value as MLModelTrainerStatus;
+        }
 
         /// <summary>
         /// Refreshes the <see cref="DatabaseServiceStatus"/> by loading from the database, creating a new instance,
@@ -573,13 +641,15 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
         #region Private Methods
 
-        private int Train(SourceDocumentPathTags pathTags, string logFileToEmail, CancellationToken cancelToken)
+        private (int firstIDProcessed, int lastIDProcessed) Train
+            (AttributeFinderPathTags pathTags, string logFileToEmail, CancellationToken cancelToken)
         {
             bool success = false;
+            int firstIDProcessed = -1;
             int lastIDProcessed = -1;
             string errorMessage = null;
             string outputMessage = null;
-            int maxToProcess = MaximumTrainingDocuments;
+            int maxToProcess = MaximumTrainingRecords;
 
             while (!success)
             {
@@ -589,10 +659,11 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     IEnumerable<(string data, int id)> trainingData = GetDataFromDB(true, maxToProcess);
 
                     ExtractException.Assert("ELI45287", "No training data found",
-                        trainingData.Any(), "Model", ModelName);
+                        trainingData.Any(), "Model", QualifiedModelName);
 
                     using (var trainingDataFile = new TemporaryFile(true))
                     {
+                        int firstProcessedID = trainingData.First().id;
                         int lastProcessedID = 0;
                         int currentCount = 0;
                         File.WriteAllLines(trainingDataFile.FileName, trainingData.Select(r =>
@@ -628,8 +699,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
                         if (exitCode == 0)
                         {
                             success = true;
+                            firstIDProcessed = firstProcessedID;
                             lastIDProcessed = lastProcessedID;
-                            MaximumTrainingDocuments = maxToProcess;
+                            MaximumTrainingRecords = maxToProcess;
                         }
                         else if (errorMessage.ToLowerInvariant().Contains("memory")
                             || outputMessage.ToLowerInvariant().Contains("memory"))
@@ -672,17 +744,19 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
             ExtractException.Assert("ELI45116", "Training failed", success, "Error message", errorMessage);
 
-            return lastIDProcessed;
+            return (firstIDProcessed, lastIDProcessed);
         }
 
-        private (bool criteriaMet, int lastIDProcessed) Test(SourceDocumentPathTags pathTags, string logFileToEmail, CancellationToken cancelToken)
+        private (bool criteriaMet, int firstIDProcessed, int lastIDProcessed)
+            Test(AttributeFinderPathTags pathTags, string logFileToEmail, CancellationToken cancelToken)
         {
             bool success = false;
+            int firstIDProcessed = -1;
             int lastIDProcessed = -1;
             bool criteriaMet = false;
             string errorMessage = null;
             string outputMessage = null;
-            int maxToProcess = MaximumTestingDocuments;
+            int maxToProcess = MaximumTestingRecords;
 
             while (!success)
             {
@@ -692,10 +766,11 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     IEnumerable<(string data, int id)> testingData = GetDataFromDB(false, maxToProcess);
 
                     ExtractException.Assert("ELI45289", "No testing data found",
-                        testingData.Any(), "Model", ModelName);
+                        testingData.Any(), "Model", QualifiedModelName);
 
                     using (var testingDataFile = new TemporaryFile(true))
                     {
+                        int firstProcessedID = testingData.First().id;
                         int lastProcessedID = 0;
                         int currentCount = 0;
                         File.WriteAllLines(testingDataFile.FileName, testingData.Select(r =>
@@ -730,8 +805,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
                         if (exitCode == 0)
                         {
                             success = true;
+                            firstIDProcessed = firstProcessedID;
                             lastIDProcessed = lastProcessedID;
-                            MaximumTestingDocuments = maxToProcess;
+                            MaximumTestingRecords = maxToProcess;
 
                             var appTrace = new ExtractException("ELI45118", "Application trace: Testing complete");
 
@@ -834,7 +910,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
             ExtractException.Assert("ELI45117", "Testing failed", success, "Error message", errorMessage);
 
-            return (criteriaMet, lastIDProcessed);
+            return (criteriaMet, firstIDProcessed, lastIDProcessed);
         }
 
         int GetLastProcessedCount(bool trainingData)
@@ -850,16 +926,16 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     var ue = ex.AsExtract("ELI45093");
                     ue.AddDebugData("Database Server", DatabaseServer, false);
                     ue.AddDebugData("Database Name", DatabaseName, false);
-                    ue.AddDebugData("MLModel", ModelName, false);
+                    ue.AddDebugData("MLModel", QualifiedModelName, false);
                     throw ue;
                 }
 
                 // Get last processed count
                 using (var cmd = connection.CreateCommand())
                 {
-                    int max = trainingData ? MaximumTrainingDocuments : MaximumTestingDocuments;
+                    int max = trainingData ? MaximumTrainingRecords : MaximumTestingRecords;
                     cmd.CommandText = _GET_LAST_PROCESSED_COUNT;
-                    cmd.Parameters.AddWithValue("@Name", ModelName);
+                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
                     cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
                     cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
 
@@ -890,14 +966,14 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     var ue = ex.AsExtract("ELI45093");
                     ue.AddDebugData("Database Server", DatabaseServer, false);
                     ue.AddDebugData("Database Name", DatabaseName, false);
-                    ue.AddDebugData("MLModel", ModelName, false);
+                    ue.AddDebugData("MLModel", QualifiedModelName, false);
                     throw ue;
                 }
 
                 using (var cmd = connection.CreateCommand())
                 {
                     cmd.CommandText = _GET_MLDATA;
-                    cmd.Parameters.AddWithValue("@Name", ModelName);
+                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
                     cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
                     cmd.Parameters.AddWithValue("@Max", maxRecords);
 
@@ -905,9 +981,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     {
                         if (reader.Read())
                         {
-                            int id = reader.GetInt32(0);
                             do
                             {
+                                int id = reader.GetInt32(0);
                                 string line = reader.GetString(1);
                                 yield return (line, id);
                             }
@@ -975,5 +1051,75 @@ namespace Extract.UtilityApplications.MLModelTrainer
         }
 
         #endregion Private Methods
+
+        #region Internal classes
+
+        /// <summary>
+        /// Class for the MLModelTrainerStatus stored in the DatabaseService record
+        /// </summary>
+        [DataContract]
+        public class MLModelTrainerStatus : DatabaseServiceStatus
+        {
+            #region MLModelTrainerStatus Constants
+
+            const int _CURRENT_VERSION = 1;
+
+            #endregion
+
+            #region MLModelTrainerStatus Properties
+
+            [DataMember]
+            public override int Version { get; protected set; } = _CURRENT_VERSION;
+
+            /// <summary>
+            /// The ID of the last MLData record processed
+            /// </summary>
+            [DataMember]
+            public int LastIDProcessed { get; set; }
+
+            /// <summary>
+            /// The average F1Score from the last time the testing command was successfully executed
+            /// </summary>
+            [DataMember]
+            public double LastF1Score { get; set; }
+
+            /// <summary>
+            /// The maximum number of MLData records that will be used for training
+            /// </summary>
+            [DataMember]
+            public int MaximumTrainingRecords { get; set; }
+
+            /// <summary>
+            /// The maximum number of MLData records that will be used for testing
+            /// </summary>
+            [DataMember]
+            public int MaximumTestingRecords { get; set; }
+
+            #endregion
+
+            #region MLModelTrainerStatus Serialization
+
+            /// <summary>
+            /// Called after this instance is deserialized.
+            /// </summary>
+            [OnDeserialized]
+            void OnDeserialized(StreamingContext context)
+            {
+                if (Version > CURRENT_VERSION)
+                {
+                    ExtractException ee = new ExtractException("ELI45712", "Settings were saved with a newer version.");
+                    ee.AddDebugData("SavedVersion", Version, false);
+                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                    throw ee;
+                }
+
+                Version = CURRENT_VERSION;
+            } 
+
+            #endregion
+        }
+
+        #endregion
+
     }
 }

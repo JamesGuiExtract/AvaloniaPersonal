@@ -129,6 +129,14 @@ namespace Extract.Utilities.Forms
                 }
             }
         }
+
+        /// <summary>
+        /// Raised when a child component's value changes
+        /// </summary>
+        [Category("Action"),
+         Description("Occurs when a child component's value changes")]
+        public event EventHandler ValueChanged;
+
         #endregion
 
         #region Helper Methods
@@ -162,6 +170,8 @@ namespace Extract.Utilities.Forms
                 bool enable = ((CheckBox)sender).Checked;
                 _endDatePicker.Enabled = enable;
                 _endTimePicker.Enabled = enable;
+
+                ValueChanged?.Invoke(this, new EventArgs());
             }
             catch (Exception ex)
             {
@@ -178,10 +188,24 @@ namespace Extract.Utilities.Forms
                 _untilCheckBox.Enabled = enable;
                 _endDatePicker.Enabled = enable && _untilCheckBox.Checked;
                 _endTimePicker.Enabled = enable && _untilCheckBox.Checked;
+
+                ValueChanged?.Invoke(this, new EventArgs());
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45631");
+            }
+        }
+
+        private void Handle_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                ValueChanged?.Invoke(this, new EventArgs());
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45751");
             }
         }
 

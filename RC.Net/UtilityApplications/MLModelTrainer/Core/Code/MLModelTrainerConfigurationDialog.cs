@@ -72,6 +72,12 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
                 _lastIDProcessedNumericUpDown.Maximum = long.MaxValue;
 
+                // Schedule is unused if this is a child of a training coordinator
+                if (_settings.Container != null)
+                {
+                    tabControl1.TabPages.Remove(_scheduleTabPage);
+                }
+
                 SetControlValues();
             }
             catch (Exception ex)
@@ -129,10 +135,13 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
                 _testingCommandPathTagsButton.PathTags.BuiltInTagFilter =
                     _trainingCommandPathTagsButton.PathTags.BuiltInTagFilter =
-                    new[] { SourceDocumentPathTags.CommonComponentsDir, MLModelTrainer.DataFilePathTag, MLModelTrainer.TempModelPathTag };
-
-                _modelDestinationPathTagsButton.PathTags.BuiltInTagFilter =
-                    new[] { SourceDocumentPathTags.CommonComponentsDir };
+                    new[]
+                    {
+                        "<ComponentDataDir>",
+                        SourceDocumentPathTags.CommonComponentsDir,
+                        MLModelTrainer.DataFilePathTag,
+                        MLModelTrainer.TempModelPathTag
+                    };
             }
             catch (Exception ex)
             {
@@ -162,12 +171,12 @@ namespace Extract.UtilityApplications.MLModelTrainer
                 var modelName = _modelNameComboBox.Text;
                 _modelNameComboBox.Focus();
                 ExtractException.Assert("ELI45127", "Model name is undefined", ValidateModel(), "Model name", modelName);
+                _settings.QualifiedModelName = modelName;
 
                 _descriptionTextBox.Focus();
                 ExtractException.Assert("ELI45673", "Description cannot be empty",
                     !string.IsNullOrWhiteSpace(_descriptionTextBox.Text));
-
-                _settings.ModelName = modelName;
+                _settings.Description = _descriptionTextBox.Text;
 
                 _settings.TrainingCommand = _trainingCommandTextBox.Text;
                 _settings.TestingCommand = _testingCommandTextBox.Text;
@@ -176,11 +185,11 @@ namespace Extract.UtilityApplications.MLModelTrainer
                 _settings.LastF1Score = (double)_lastF1ScoreNumericUpDown.Value;
                 _settings.MinimumF1Score = (double)_minF1ScoreNumericUpDown.Value;
                 _settings.AllowableAccuracyDrop = (double)_allowableAccuracyDropNumericUpDown.Value;
-                _settings.MaximumTrainingDocuments = (int)_maxTrainingDocsNumericUpDown.Value;
-                _settings.MaximumTestingDocuments = (int)_maxTestingDocsNumericUpDown.Value;
+                _settings.MaximumTrainingRecords = (int)_maxTrainingRecordsNumericUpDown.Value;
+                _settings.MaximumTestingRecords = (int)_maxTestingRecordsNumericUpDown.Value;
+                _settings.MarkOldDataForDeletion = _markOldDataForDeletionCheckBox.Checked;
                 _settings.EmailAddressesToNotifyOnFailure = _emailAddressesTextBox.Text;
                 _settings.EmailSubject = _emailSubjectTextBox.Text;
-                _settings.Description = _descriptionTextBox.Text;
                 _settings.Schedule = _schedulerControl.Value;
 
                 Dirty = false;
@@ -238,7 +247,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
         {
             try
             {
-                using (var form = new AddMLModel(_database))
+                using (var form = new AddMLModel(_database, _settings.ModelNamePrefix))
                 {
                     var result = form.ShowDialog();
                     if (result == DialogResult.OK)
@@ -294,6 +303,15 @@ namespace Extract.UtilityApplications.MLModelTrainer
                 _testingCommandTextBox.Enabled =
                 _testingCommandPathTagsButton.Enabled =
                     _nerModelTypeRadioButton.Checked;
+
+                if (_lmModelTypeRadioButton.Checked)
+                {
+                    _modelPathLabel.Text = "LM file path";
+                }
+                else
+                {
+                    _modelPathLabel.Text = "Destination path";
+                }
             }
             catch (Exception ex)
             {
@@ -316,7 +334,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
                 _nerModelTypeRadioButton.Checked = _settings.ModelType == TrainingDataCollector.ModelType.NamedEntityRecognition;
                 _lmModelTypeRadioButton.Checked = _settings.ModelType == TrainingDataCollector.ModelType.LearningMachine;
-                _modelNameComboBox.Text = _settings.ModelName;
+                _modelNameComboBox.Text = _settings.QualifiedModelName;
                 _trainingCommandTextBox.Text = _settings.TrainingCommand;
                 _testingCommandTextBox.Text = _settings.TestingCommand;
                 _modelDestinationPathTextBox.Text = _settings.ModelDestination;
@@ -324,8 +342,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
                 _lastF1ScoreNumericUpDown.Value = (decimal)_settings.LastF1Score;
                 _minF1ScoreNumericUpDown.Value = (decimal)_settings.MinimumF1Score;
                 _allowableAccuracyDropNumericUpDown.Value = (decimal)_settings.AllowableAccuracyDrop;
-                _maxTrainingDocsNumericUpDown.Value = _settings.MaximumTrainingDocuments;
-                _maxTestingDocsNumericUpDown.Value = _settings.MaximumTestingDocuments;
+                _maxTrainingRecordsNumericUpDown.Value = _settings.MaximumTrainingRecords;
+                _maxTestingRecordsNumericUpDown.Value = _settings.MaximumTestingRecords;
+                _markOldDataForDeletionCheckBox.Checked = _settings.MarkOldDataForDeletion;
                 _emailAddressesTextBox.Text = _settings.EmailAddressesToNotifyOnFailure;
                 _emailSubjectTextBox.Text = _settings.EmailSubject;
                 _descriptionTextBox.Text = _settings.Description;

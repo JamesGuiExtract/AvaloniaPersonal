@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Forms;
+﻿using Extract.AttributeFinder;
+using Extract.FileActionManager.Forms;
 
 namespace Extract.UtilityApplications.MLModelTrainer
 {
@@ -39,15 +40,15 @@ namespace Extract.UtilityApplications.MLModelTrainer
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MLModelTrainerConfigurationDialog));
-            Extract.Utilities.ScheduledEvent scheduledEvent2 = new Extract.Utilities.ScheduledEvent();
+            Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this._editButton = new System.Windows.Forms.Button();
             this._manageMLModelsButton = new System.Windows.Forms.Button();
             this._addModelButton = new System.Windows.Forms.Button();
             this._modelNameComboBox = new System.Windows.Forms.ComboBox();
             this._modelDestinationPathBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._modelDestinationPathTextBox = new System.Windows.Forms.TextBox();
-            this._modelDestinationPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this.label4 = new System.Windows.Forms.Label();
+            this._modelPathLabel = new System.Windows.Forms.Label();
             this._trainingCommandPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._trainingCommandTextBox = new System.Windows.Forms.TextBox();
             this._testingCommandPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
@@ -58,11 +59,11 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this._updateCommandTextBox = new System.Windows.Forms.TextBox();
-            this._maxTestingDocsNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this._maxTestingRecordsNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.label10 = new System.Windows.Forms.Label();
             this._minF1ScoreNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.label8 = new System.Windows.Forms.Label();
-            this._maxTrainingDocsNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this._maxTrainingRecordsNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this._allowableAccuracyDropNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
@@ -72,6 +73,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this._markOldDataForDeletionCheckBox = new System.Windows.Forms.CheckBox();
             this._emailSubjectTextBox = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this._emailAddressesTextBox = new System.Windows.Forms.TextBox();
@@ -86,9 +88,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._scheduleTabPage = new System.Windows.Forms.TabPage();
             this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._maxTestingDocsNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maxTestingRecordsNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._minF1ScoreNumericUpDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this._maxTrainingDocsNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maxTrainingRecordsNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._allowableAccuracyDropNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._lastF1ScoreNumericUpDown)).BeginInit();
@@ -104,12 +106,12 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this._editButton);
             this.groupBox1.Controls.Add(this._manageMLModelsButton);
             this.groupBox1.Controls.Add(this._addModelButton);
             this.groupBox1.Controls.Add(this._modelNameComboBox);
             this.groupBox1.Controls.Add(this._modelDestinationPathBrowseButton);
-            this.groupBox1.Controls.Add(this._modelDestinationPathTagsButton);
-            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this._modelPathLabel);
             this.groupBox1.Controls.Add(this._modelDestinationPathTextBox);
             this.groupBox1.Controls.Add(this._trainingCommandPathTagsButton);
             this.groupBox1.Controls.Add(this._testingCommandPathTagsButton);
@@ -123,6 +125,16 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.groupBox1.Size = new System.Drawing.Size(608, 129);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
+            // 
+            // _editButton
+            // 
+            this._editButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._editButton.Location = new System.Drawing.Point(536, 98);
+            this._editButton.Name = "_editButton";
+            this._editButton.Size = new System.Drawing.Size(61, 20);
+            this._editButton.TabIndex = 14;
+            this._editButton.Text = "Edit...";
+            this._editButton.UseVisualStyleBackColor = true;
             // 
             // _manageMLModelsButton
             // 
@@ -161,9 +173,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._modelDestinationPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._modelDestinationPathBrowseButton.EnsureFileExists = false;
             this._modelDestinationPathBrowseButton.EnsurePathExists = false;
-            this._modelDestinationPathBrowseButton.Location = new System.Drawing.Point(570, 98);
+            this._modelDestinationPathBrowseButton.Location = new System.Drawing.Point(503, 98);
             this._modelDestinationPathBrowseButton.Name = "_modelDestinationPathBrowseButton";
-            this._modelDestinationPathBrowseButton.Size = new System.Drawing.Size(29, 20);
+            this._modelDestinationPathBrowseButton.Size = new System.Drawing.Size(27, 20);
             this._modelDestinationPathBrowseButton.TabIndex = 13;
             this._modelDestinationPathBrowseButton.Text = "...";
             this._modelDestinationPathBrowseButton.TextControl = this._modelDestinationPathTextBox;
@@ -175,39 +187,27 @@ namespace Extract.UtilityApplications.MLModelTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._modelDestinationPathTextBox.Location = new System.Drawing.Point(120, 98);
             this._modelDestinationPathTextBox.Name = "_modelDestinationPathTextBox";
-            this._modelDestinationPathTextBox.Size = new System.Drawing.Size(409, 20);
+            this._modelDestinationPathTextBox.Size = new System.Drawing.Size(377, 20);
             this._modelDestinationPathTextBox.TabIndex = 11;
             // 
-            // _modelDestinationPathTagsButton
+            // _modelPathLabel
             // 
-            this._modelDestinationPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._modelDestinationPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_modelDestinationPathTagsButton.Image")));
-            this._modelDestinationPathTagsButton.Location = new System.Drawing.Point(536, 98);
-            this._modelDestinationPathTagsButton.Name = "_modelDestinationPathTagsButton";
-            this._modelDestinationPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
-            this._modelDestinationPathTagsButton.Size = new System.Drawing.Size(28, 20);
-            this._modelDestinationPathTagsButton.TabIndex = 12;
-            this._modelDestinationPathTagsButton.TextControl = this._modelDestinationPathTextBox;
-            this._modelDestinationPathTagsButton.UseVisualStyleBackColor = true;
-            // 
-            // label4
-            // 
-            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this._modelPathLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 100);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(84, 13);
-            this.label4.TabIndex = 10;
-            this.label4.Text = "Destination path";
+            this._modelPathLabel.AutoSize = true;
+            this._modelPathLabel.Location = new System.Drawing.Point(6, 100);
+            this._modelPathLabel.Name = "_modelPathLabel";
+            this._modelPathLabel.Size = new System.Drawing.Size(84, 13);
+            this._modelPathLabel.TabIndex = 10;
+            this._modelPathLabel.Text = "Destination path";
             // 
             // _trainingCommandPathTagsButton
             // 
             this._trainingCommandPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._trainingCommandPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_trainingCommandPathTagsButton.Image")));
-            this._trainingCommandPathTagsButton.Location = new System.Drawing.Point(536, 46);
+            this._trainingCommandPathTagsButton.Location = new System.Drawing.Point(569, 46);
             this._trainingCommandPathTagsButton.Name = "_trainingCommandPathTagsButton";
-            this._trainingCommandPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
+            this._trainingCommandPathTagsButton.PathTags = new Extract.AttributeFinder.AttributeFinderPathTags();
             this._trainingCommandPathTagsButton.Size = new System.Drawing.Size(28, 20);
             this._trainingCommandPathTagsButton.TabIndex = 8;
             this._trainingCommandPathTagsButton.TextControl = this._trainingCommandTextBox;
@@ -219,7 +219,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._trainingCommandTextBox.Location = new System.Drawing.Point(120, 46);
             this._trainingCommandTextBox.Name = "_trainingCommandTextBox";
-            this._trainingCommandTextBox.Size = new System.Drawing.Size(409, 20);
+            this._trainingCommandTextBox.Size = new System.Drawing.Size(443, 20);
             this._trainingCommandTextBox.TabIndex = 7;
             this._trainingCommandTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
@@ -227,9 +227,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // 
             this._testingCommandPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._testingCommandPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_testingCommandPathTagsButton.Image")));
-            this._testingCommandPathTagsButton.Location = new System.Drawing.Point(536, 72);
+            this._testingCommandPathTagsButton.Location = new System.Drawing.Point(569, 72);
             this._testingCommandPathTagsButton.Name = "_testingCommandPathTagsButton";
-            this._testingCommandPathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
+            this._testingCommandPathTagsButton.PathTags = new Extract.AttributeFinder.AttributeFinderPathTags();
             this._testingCommandPathTagsButton.Size = new System.Drawing.Size(28, 20);
             this._testingCommandPathTagsButton.TabIndex = 10;
             this._testingCommandPathTagsButton.TextControl = this._testingCommandTextBox;
@@ -241,7 +241,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._testingCommandTextBox.Location = new System.Drawing.Point(120, 72);
             this._testingCommandTextBox.Name = "_testingCommandTextBox";
-            this._testingCommandTextBox.Size = new System.Drawing.Size(409, 20);
+            this._testingCommandTextBox.Size = new System.Drawing.Size(443, 20);
             this._testingCommandTextBox.TabIndex = 9;
             this._testingCommandTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
@@ -282,7 +282,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(487, 524);
+            this._okButton.Location = new System.Drawing.Point(487, 542);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 24;
@@ -294,7 +294,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(568, 524);
+            this._cancelButton.Location = new System.Drawing.Point(568, 542);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 25;
@@ -311,27 +311,27 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._updateCommandTextBox.Size = new System.Drawing.Size(448, 20);
             this._updateCommandTextBox.TabIndex = 7;
             // 
-            // _maxTestingDocsNumericUpDown
+            // _maxTestingRecordsNumericUpDown
             // 
-            this._maxTestingDocsNumericUpDown.Location = new System.Drawing.Point(160, 40);
-            this._maxTestingDocsNumericUpDown.Maximum = new decimal(new int[] {
+            this._maxTestingRecordsNumericUpDown.Location = new System.Drawing.Point(160, 40);
+            this._maxTestingRecordsNumericUpDown.Maximum = new decimal(new int[] {
             2147483647,
             0,
             0,
             0});
-            this._maxTestingDocsNumericUpDown.Name = "_maxTestingDocsNumericUpDown";
-            this._maxTestingDocsNumericUpDown.Size = new System.Drawing.Size(120, 20);
-            this._maxTestingDocsNumericUpDown.TabIndex = 15;
-            this._maxTestingDocsNumericUpDown.ThousandsSeparator = true;
+            this._maxTestingRecordsNumericUpDown.Name = "_maxTestingRecordsNumericUpDown";
+            this._maxTestingRecordsNumericUpDown.Size = new System.Drawing.Size(120, 20);
+            this._maxTestingRecordsNumericUpDown.TabIndex = 15;
+            this._maxTestingRecordsNumericUpDown.ThousandsSeparator = true;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(6, 42);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(140, 13);
+            this.label10.Size = new System.Drawing.Size(123, 13);
             this.label10.TabIndex = 2;
-            this.label10.Text = "Maximum testing documents";
+            this.label10.Text = "Maximum testing records";
             // 
             // _minF1ScoreNumericUpDown
             // 
@@ -362,27 +362,27 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.label8.TabIndex = 6;
             this.label8.Text = "Minimum allowable F1 score";
             // 
-            // _maxTrainingDocsNumericUpDown
+            // _maxTrainingRecordsNumericUpDown
             // 
-            this._maxTrainingDocsNumericUpDown.Location = new System.Drawing.Point(160, 14);
-            this._maxTrainingDocsNumericUpDown.Maximum = new decimal(new int[] {
+            this._maxTrainingRecordsNumericUpDown.Location = new System.Drawing.Point(160, 14);
+            this._maxTrainingRecordsNumericUpDown.Maximum = new decimal(new int[] {
             2147483647,
             0,
             0,
             0});
-            this._maxTrainingDocsNumericUpDown.Name = "_maxTrainingDocsNumericUpDown";
-            this._maxTrainingDocsNumericUpDown.Size = new System.Drawing.Size(120, 20);
-            this._maxTrainingDocsNumericUpDown.TabIndex = 14;
-            this._maxTrainingDocsNumericUpDown.ThousandsSeparator = true;
+            this._maxTrainingRecordsNumericUpDown.Name = "_maxTrainingRecordsNumericUpDown";
+            this._maxTrainingRecordsNumericUpDown.Size = new System.Drawing.Size(120, 20);
+            this._maxTrainingRecordsNumericUpDown.TabIndex = 14;
+            this._maxTrainingRecordsNumericUpDown.ThousandsSeparator = true;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(7, 16);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(143, 13);
+            this.label9.Size = new System.Drawing.Size(126, 13);
             this.label9.TabIndex = 0;
-            this.label9.Text = "Maximum training documents";
+            this.label9.Text = "Maximum training records";
             // 
             // _allowableAccuracyDropNumericUpDown
             // 
@@ -467,7 +467,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.groupBox2.Controls.Add(this._lastIDProcessedNumericUpDown);
             this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.label5);
-            this.groupBox2.Location = new System.Drawing.Point(7, 384);
+            this.groupBox2.Location = new System.Drawing.Point(7, 403);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(608, 44);
             this.groupBox2.TabIndex = 3;
@@ -477,6 +477,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this._markOldDataForDeletionCheckBox);
             this.groupBox3.Controls.Add(this._emailSubjectTextBox);
             this.groupBox3.Controls.Add(this.label12);
             this.groupBox3.Controls.Add(this._emailAddressesTextBox);
@@ -487,19 +488,29 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.groupBox3.Controls.Add(this._minF1ScoreNumericUpDown);
             this.groupBox3.Controls.Add(this.label10);
             this.groupBox3.Controls.Add(this.label8);
-            this.groupBox3.Controls.Add(this._maxTrainingDocsNumericUpDown);
-            this.groupBox3.Controls.Add(this._maxTestingDocsNumericUpDown);
+            this.groupBox3.Controls.Add(this._maxTrainingRecordsNumericUpDown);
+            this.groupBox3.Controls.Add(this._maxTestingRecordsNumericUpDown);
             this.groupBox3.Location = new System.Drawing.Point(7, 200);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(608, 178);
+            this.groupBox3.Size = new System.Drawing.Size(608, 197);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
+            // 
+            // _markOldDataForDeletionCheckBox
+            // 
+            this._markOldDataForDeletionCheckBox.AutoSize = true;
+            this._markOldDataForDeletionCheckBox.Location = new System.Drawing.Point(10, 66);
+            this._markOldDataForDeletionCheckBox.Name = "_markOldDataForDeletionCheckBox";
+            this._markOldDataForDeletionCheckBox.Size = new System.Drawing.Size(248, 17);
+            this._markOldDataForDeletionCheckBox.TabIndex = 20;
+            this._markOldDataForDeletionCheckBox.Text = "On success, mark old, unused data for deletion";
+            this._markOldDataForDeletionCheckBox.UseVisualStyleBackColor = true;
             // 
             // _emailSubjectTextBox
             // 
             this._emailSubjectTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._emailSubjectTextBox.Location = new System.Drawing.Point(9, 147);
+            this._emailSubjectTextBox.Location = new System.Drawing.Point(8, 167);
             this._emailSubjectTextBox.Name = "_emailSubjectTextBox";
             this._emailSubjectTextBox.Size = new System.Drawing.Size(591, 20);
             this._emailSubjectTextBox.TabIndex = 19;
@@ -507,7 +518,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(7, 126);
+            this.label12.Location = new System.Drawing.Point(6, 146);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(69, 13);
             this.label12.TabIndex = 10;
@@ -517,7 +528,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // 
             this._emailAddressesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._emailAddressesTextBox.Location = new System.Drawing.Point(8, 96);
+            this._emailAddressesTextBox.Location = new System.Drawing.Point(7, 116);
             this._emailAddressesTextBox.Name = "_emailAddressesTextBox";
             this._emailAddressesTextBox.Size = new System.Drawing.Size(591, 20);
             this._emailAddressesTextBox.TabIndex = 18;
@@ -525,12 +536,11 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(6, 75);
+            this.label11.Location = new System.Drawing.Point(5, 95);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(563, 13);
+            this.label11.Size = new System.Drawing.Size(289, 13);
             this.label11.TabIndex = 8;
-            this.label11.Text = "Send email to these addresses if testing result doesn\'t meet accuracy requirement" +
-    "s (separate addresses with a comma)";
+            this.label11.Text = "On failure, send email to (separate addresses with a comma)";
             // 
             // _descriptionTextBox
             // 
@@ -560,7 +570,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.tabControl1.Location = new System.Drawing.Point(15, 48);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(630, 463);
+            this.tabControl1.Size = new System.Drawing.Size(630, 481);
             this.tabControl1.TabIndex = 2;
             // 
             // _settingsTabPage
@@ -573,7 +583,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._settingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._settingsTabPage.Name = "_settingsTabPage";
             this._settingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._settingsTabPage.Size = new System.Drawing.Size(622, 437);
+            this._settingsTabPage.Size = new System.Drawing.Size(622, 455);
             this._settingsTabPage.TabIndex = 0;
             this._settingsTabPage.Text = "Settings";
             // 
@@ -586,7 +596,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.groupBox4.Controls.Add(this._nerModelTypeRadioButton);
             this.groupBox4.Location = new System.Drawing.Point(7, 12);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(608, 44);
+            this.groupBox4.Size = new System.Drawing.Size(608, 62);
             this.groupBox4.TabIndex = 0;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Model type";
@@ -622,7 +632,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._scheduleTabPage.Location = new System.Drawing.Point(4, 22);
             this._scheduleTabPage.Name = "_scheduleTabPage";
             this._scheduleTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._scheduleTabPage.Size = new System.Drawing.Size(622, 437);
+            this._scheduleTabPage.Size = new System.Drawing.Size(622, 455);
             this._scheduleTabPage.TabIndex = 1;
             this._scheduleTabPage.Text = "Schedule";
             // 
@@ -633,13 +643,13 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._schedulerControl.Name = "_schedulerControl";
             this._schedulerControl.Size = new System.Drawing.Size(383, 153);
             this._schedulerControl.TabIndex = 23;
-            scheduledEvent2.Duration = null;
-            scheduledEvent2.Enabled = true;
-            scheduledEvent2.End = null;
-            scheduledEvent2.Exclusions = new Extract.Utilities.ScheduledEvent[0];
-            scheduledEvent2.RecurrenceUnit = null;
-            scheduledEvent2.Start = new System.DateTime(2018, 3, 23, 11, 16, 13, 0);
-            this._schedulerControl.Value = scheduledEvent2;
+            scheduledEvent1.Duration = null;
+            scheduledEvent1.Enabled = true;
+            scheduledEvent1.End = null;
+            scheduledEvent1.Exclusions = new Extract.Utilities.ScheduledEvent[0];
+            scheduledEvent1.RecurrenceUnit = null;
+            scheduledEvent1.Start = new System.DateTime(2018, 3, 23, 11, 16, 13, 0);
+            this._schedulerControl.Value = scheduledEvent1;
             // 
             // MLModelTrainerConfigurationDialog
             // 
@@ -647,7 +657,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(655, 554);
+            this.ClientSize = new System.Drawing.Size(655, 572);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label13);
@@ -661,9 +671,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.Text = "ML model trainer";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._maxTestingDocsNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maxTestingRecordsNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._minF1ScoreNumericUpDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this._maxTrainingDocsNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maxTrainingRecordsNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._allowableAccuracyDropNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._lastF1ScoreNumericUpDown)).EndInit();
@@ -692,9 +702,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
         private System.Windows.Forms.TextBox _trainingCommandTextBox;
         private Utilities.Forms.PathTagsButton _trainingCommandPathTagsButton;
         private Utilities.Forms.PathTagsButton _testingCommandPathTagsButton;
-        private Utilities.Forms.PathTagsButton _modelDestinationPathTagsButton;
         private System.Windows.Forms.TextBox _modelDestinationPathTextBox;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label _modelPathLabel;
         private Utilities.Forms.BrowseButton _modelDestinationPathBrowseButton;
         private System.Windows.Forms.TextBox _updateCommandTextBox;
         private System.Windows.Forms.ComboBox _modelNameComboBox;
@@ -706,11 +715,11 @@ namespace Extract.UtilityApplications.MLModelTrainer
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown _allowableAccuracyDropNumericUpDown;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.NumericUpDown _maxTrainingDocsNumericUpDown;
+        private System.Windows.Forms.NumericUpDown _maxTrainingRecordsNumericUpDown;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.NumericUpDown _minF1ScoreNumericUpDown;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.NumericUpDown _maxTestingDocsNumericUpDown;
+        private System.Windows.Forms.NumericUpDown _maxTestingRecordsNumericUpDown;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
@@ -727,5 +736,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
         private System.Windows.Forms.RadioButton _nerModelTypeRadioButton;
         private System.Windows.Forms.RadioButton _lmModelTypeRadioButton;
         private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.Button _editButton;
+        private System.Windows.Forms.CheckBox _markOldDataForDeletionCheckBox;
     }
 }

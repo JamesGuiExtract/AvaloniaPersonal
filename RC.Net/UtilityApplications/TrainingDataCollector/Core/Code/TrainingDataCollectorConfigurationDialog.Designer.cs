@@ -38,7 +38,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         private void InitializeComponent()
         {
-            Extract.Utilities.ScheduledEvent scheduledEvent2 = new Extract.Utilities.ScheduledEvent();
+            Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._manageMLModelsButton = new System.Windows.Forms.Button();
             this._attributeSetNameComboBox = new System.Windows.Forms.ComboBox();
@@ -51,6 +51,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this._trainingPercentageNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this._overrideTrainingTestingSplitCheckBox = new System.Windows.Forms.CheckBox();
             this._lmModelTypeRadioButton = new System.Windows.Forms.RadioButton();
             this._nerModelTypeRadioButton = new System.Windows.Forms.RadioButton();
             this._dataGeneratorPathBrowseButton = new Extract.Utilities.Forms.BrowseButton();
@@ -58,11 +61,27 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._descriptionTextBox = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
             this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
+            this._tabControl = new System.Windows.Forms.TabControl();
+            this._settingsTabPage = new System.Windows.Forms.TabPage();
+            this._featuresGroupBox = new System.Windows.Forms.GroupBox();
+            this._featureRulesetBrowseButton = new Extract.Utilities.Forms.BrowseButton();
+            this._featureRulesetTextBox = new System.Windows.Forms.TextBox();
+            this._runRulesetForFeaturesRadioButton = new System.Windows.Forms.RadioButton();
+            this._runRulesetIfVoaIsMissingCheckBox = new System.Windows.Forms.CheckBox();
+            this._useVoaFileForFeaturesRadioButton = new System.Windows.Forms.RadioButton();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this._useVoaFileForExpectedsRadioButton = new System.Windows.Forms.RadioButton();
+            this._useAttributeSetForExpectedsRadioButton = new System.Windows.Forms.RadioButton();
+            this._scheduleTabPage = new System.Windows.Forms.TabPage();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).BeginInit();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._trainingPercentageNumericUpDown)).BeginInit();
+            this._tabControl.SuspendLayout();
+            this._settingsTabPage.SuspendLayout();
+            this._featuresGroupBox.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this._scheduleTabPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -77,16 +96,16 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Location = new System.Drawing.Point(7, 41);
+            this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(470, 109);
+            this.groupBox1.Size = new System.Drawing.Size(440, 109);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             // 
             // _manageMLModelsButton
             // 
             this._manageMLModelsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._manageMLModelsButton.Location = new System.Drawing.Point(401, 18);
+            this._manageMLModelsButton.Location = new System.Drawing.Point(371, 18);
             this._manageMLModelsButton.Name = "_manageMLModelsButton";
             this._manageMLModelsButton.Size = new System.Drawing.Size(63, 23);
             this._manageMLModelsButton.TabIndex = 5;
@@ -101,13 +120,14 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._attributeSetNameComboBox.FormattingEnabled = true;
             this._attributeSetNameComboBox.Location = new System.Drawing.Point(120, 46);
             this._attributeSetNameComboBox.Name = "_attributeSetNameComboBox";
-            this._attributeSetNameComboBox.Size = new System.Drawing.Size(274, 21);
+            this._attributeSetNameComboBox.Size = new System.Drawing.Size(244, 21);
             this._attributeSetNameComboBox.TabIndex = 6;
+            this._attributeSetNameComboBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _addModelButton
             // 
             this._addModelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._addModelButton.Location = new System.Drawing.Point(319, 18);
+            this._addModelButton.Location = new System.Drawing.Point(289, 18);
             this._addModelButton.Name = "_addModelButton";
             this._addModelButton.Size = new System.Drawing.Size(75, 23);
             this._addModelButton.TabIndex = 4;
@@ -122,8 +142,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._modelNameComboBox.FormattingEnabled = true;
             this._modelNameComboBox.Location = new System.Drawing.Point(120, 19);
             this._modelNameComboBox.Name = "_modelNameComboBox";
-            this._modelNameComboBox.Size = new System.Drawing.Size(193, 21);
+            this._modelNameComboBox.Size = new System.Drawing.Size(163, 21);
             this._modelNameComboBox.TabIndex = 3;
+            this._modelNameComboBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _lastIDProcessedNumericUpDown
             // 
@@ -170,10 +191,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(321, 419);
+            this._okButton.Location = new System.Drawing.Point(321, 474);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 14;
+            this._okButton.TabIndex = 2;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButton_Click);
@@ -182,10 +203,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(402, 419);
+            this._cancelButton.Location = new System.Drawing.Point(402, 474);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 15;
+            this._cancelButton.TabIndex = 3;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             this._cancelButton.Click += new System.EventHandler(this.HandleCancelButton_Click);
@@ -194,15 +215,62 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.label4);
+            this.groupBox2.Controls.Add(this._trainingPercentageNumericUpDown);
+            this.groupBox2.Controls.Add(this._overrideTrainingTestingSplitCheckBox);
             this.groupBox2.Controls.Add(this._lmModelTypeRadioButton);
             this.groupBox2.Controls.Add(this._nerModelTypeRadioButton);
             this.groupBox2.Controls.Add(this._dataGeneratorPathBrowseButton);
             this.groupBox2.Controls.Add(this._dataGeneratorPathTextBox);
-            this.groupBox2.Location = new System.Drawing.Point(7, 156);
+            this.groupBox2.Location = new System.Drawing.Point(6, 121);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(470, 73);
+            this.groupBox2.Size = new System.Drawing.Size(440, 96);
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Settings file";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(189, 69);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(56, 13);
+            this.label4.TabIndex = 14;
+            this.label4.Text = "Training %";
+            // 
+            // _trainingPercentageNumericUpDown
+            // 
+            this._trainingPercentageNumericUpDown.Location = new System.Drawing.Point(250, 66);
+            this._trainingPercentageNumericUpDown.Maximum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
+            this._trainingPercentageNumericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this._trainingPercentageNumericUpDown.Name = "_trainingPercentageNumericUpDown";
+            this._trainingPercentageNumericUpDown.Size = new System.Drawing.Size(32, 20);
+            this._trainingPercentageNumericUpDown.TabIndex = 13;
+            this._trainingPercentageNumericUpDown.Value = new decimal(new int[] {
+            80,
+            0,
+            0,
+            0});
+            this._trainingPercentageNumericUpDown.ValueChanged += new System.EventHandler(this.HandleValueChanged);
+            // 
+            // _overrideTrainingTestingSplitCheckBox
+            // 
+            this._overrideTrainingTestingSplitCheckBox.AutoSize = true;
+            this._overrideTrainingTestingSplitCheckBox.Location = new System.Drawing.Point(11, 68);
+            this._overrideTrainingTestingSplitCheckBox.Name = "_overrideTrainingTestingSplitCheckBox";
+            this._overrideTrainingTestingSplitCheckBox.Size = new System.Drawing.Size(160, 17);
+            this._overrideTrainingTestingSplitCheckBox.TabIndex = 12;
+            this._overrideTrainingTestingSplitCheckBox.Text = "Override training/testing split";
+            this._overrideTrainingTestingSplitCheckBox.UseVisualStyleBackColor = true;
+            this._overrideTrainingTestingSplitCheckBox.CheckedChanged += new System.EventHandler(this.HandleCheckedChanged);
             // 
             // _lmModelTypeRadioButton
             // 
@@ -225,14 +293,14 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._nerModelTypeRadioButton.TabStop = true;
             this._nerModelTypeRadioButton.Text = "NER annotator (*.annotator file)";
             this._nerModelTypeRadioButton.UseVisualStyleBackColor = true;
+            this._nerModelTypeRadioButton.CheckedChanged += new System.EventHandler(this.HandleCheckedChanged);
             // 
             // _dataGeneratorPathBrowseButton
             // 
             this._dataGeneratorPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._dataGeneratorPathBrowseButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this._dataGeneratorPathBrowseButton.EnsureFileExists = false;
             this._dataGeneratorPathBrowseButton.EnsurePathExists = false;
-            this._dataGeneratorPathBrowseButton.Location = new System.Drawing.Point(401, 42);
+            this._dataGeneratorPathBrowseButton.Location = new System.Drawing.Point(371, 42);
             this._dataGeneratorPathBrowseButton.Name = "_dataGeneratorPathBrowseButton";
             this._dataGeneratorPathBrowseButton.Size = new System.Drawing.Size(63, 20);
             this._dataGeneratorPathBrowseButton.TabIndex = 11;
@@ -244,24 +312,25 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this._dataGeneratorPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._dataGeneratorPathTextBox.Location = new System.Drawing.Point(7, 42);
+            this._dataGeneratorPathTextBox.Location = new System.Drawing.Point(11, 42);
             this._dataGeneratorPathTextBox.Name = "_dataGeneratorPathTextBox";
-            this._dataGeneratorPathTextBox.Size = new System.Drawing.Size(388, 20);
+            this._dataGeneratorPathTextBox.Size = new System.Drawing.Size(354, 20);
             this._dataGeneratorPathTextBox.TabIndex = 10;
+            this._dataGeneratorPathTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _descriptionTextBox
             // 
             this._descriptionTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._descriptionTextBox.Location = new System.Drawing.Point(72, 9);
+            this._descriptionTextBox.Location = new System.Drawing.Point(82, 6);
             this._descriptionTextBox.Name = "_descriptionTextBox";
-            this._descriptionTextBox.Size = new System.Drawing.Size(405, 20);
-            this._descriptionTextBox.TabIndex = 1;
+            this._descriptionTextBox.Size = new System.Drawing.Size(390, 20);
+            this._descriptionTextBox.TabIndex = 0;
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(4, 9);
+            this.label13.Location = new System.Drawing.Point(12, 9);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(60, 13);
             this.label13.TabIndex = 7;
@@ -270,27 +339,161 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // _schedulerControl
             // 
             this._schedulerControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._schedulerControl.Location = new System.Drawing.Point(6, 19);
+            this._schedulerControl.Location = new System.Drawing.Point(6, 6);
             this._schedulerControl.Name = "_schedulerControl";
             this._schedulerControl.Size = new System.Drawing.Size(378, 153);
             this._schedulerControl.TabIndex = 13;
-            scheduledEvent2.Duration = null;
-            scheduledEvent2.Enabled = true;
-            scheduledEvent2.End = null;
-            scheduledEvent2.Exclusions = new Extract.Utilities.ScheduledEvent[0];
-            scheduledEvent2.RecurrenceUnit = null;
-            scheduledEvent2.Start = new System.DateTime(2018, 3, 23, 13, 37, 55, 0);
-            this._schedulerControl.Value = scheduledEvent2;
+            scheduledEvent1.Duration = null;
+            scheduledEvent1.Enabled = true;
+            scheduledEvent1.End = null;
+            scheduledEvent1.Exclusions = new Extract.Utilities.ScheduledEvent[0];
+            scheduledEvent1.RecurrenceUnit = null;
+            scheduledEvent1.Start = new System.DateTime(2018, 3, 23, 13, 37, 55, 0);
+            this._schedulerControl.Value = scheduledEvent1;
+            // 
+            // _tabControl
+            // 
+            this._tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._tabControl.Controls.Add(this._settingsTabPage);
+            this._tabControl.Controls.Add(this._scheduleTabPage);
+            this._tabControl.Location = new System.Drawing.Point(12, 35);
+            this._tabControl.Name = "_tabControl";
+            this._tabControl.SelectedIndex = 0;
+            this._tabControl.Size = new System.Drawing.Size(460, 433);
+            this._tabControl.TabIndex = 1;
+            // 
+            // _settingsTabPage
+            // 
+            this._settingsTabPage.Controls.Add(this._featuresGroupBox);
+            this._settingsTabPage.Controls.Add(this.groupBox3);
+            this._settingsTabPage.Controls.Add(this.groupBox1);
+            this._settingsTabPage.Controls.Add(this.groupBox2);
+            this._settingsTabPage.Location = new System.Drawing.Point(4, 22);
+            this._settingsTabPage.Name = "_settingsTabPage";
+            this._settingsTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this._settingsTabPage.Size = new System.Drawing.Size(452, 407);
+            this._settingsTabPage.TabIndex = 0;
+            this._settingsTabPage.Text = "Settings";
+            this._settingsTabPage.UseVisualStyleBackColor = true;
+            // 
+            // _featuresGroupBox
+            // 
+            this._featuresGroupBox.Controls.Add(this._featureRulesetBrowseButton);
+            this._featuresGroupBox.Controls.Add(this._runRulesetForFeaturesRadioButton);
+            this._featuresGroupBox.Controls.Add(this._featureRulesetTextBox);
+            this._featuresGroupBox.Controls.Add(this._runRulesetIfVoaIsMissingCheckBox);
+            this._featuresGroupBox.Controls.Add(this._useVoaFileForFeaturesRadioButton);
+            this._featuresGroupBox.Location = new System.Drawing.Point(6, 301);
+            this._featuresGroupBox.Name = "_featuresGroupBox";
+            this._featuresGroupBox.Size = new System.Drawing.Size(440, 99);
+            this._featuresGroupBox.TabIndex = 11;
+            this._featuresGroupBox.TabStop = false;
+            this._featuresGroupBox.Text = "Candidates/proto-features";
+            // 
+            // _featureRulesetBrowseButton
+            // 
+            this._featureRulesetBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._featureRulesetBrowseButton.EnsureFileExists = false;
+            this._featureRulesetBrowseButton.EnsurePathExists = false;
+            this._featureRulesetBrowseButton.Location = new System.Drawing.Point(368, 65);
+            this._featureRulesetBrowseButton.Name = "_featureRulesetBrowseButton";
+            this._featureRulesetBrowseButton.Size = new System.Drawing.Size(63, 20);
+            this._featureRulesetBrowseButton.TabIndex = 4;
+            this._featureRulesetBrowseButton.Text = "...";
+            this._featureRulesetBrowseButton.TextControl = this._featureRulesetTextBox;
+            this._featureRulesetBrowseButton.UseVisualStyleBackColor = true;
+            // 
+            // _featureRulesetTextBox
+            // 
+            this._featureRulesetTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._featureRulesetTextBox.Location = new System.Drawing.Point(8, 65);
+            this._featureRulesetTextBox.Name = "_featureRulesetTextBox";
+            this._featureRulesetTextBox.Size = new System.Drawing.Size(354, 20);
+            this._featureRulesetTextBox.TabIndex = 3;
+            this._featureRulesetTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            // 
+            // _runRulesetForFeaturesRadioButton
+            // 
+            this._runRulesetForFeaturesRadioButton.AutoSize = true;
+            this._runRulesetForFeaturesRadioButton.Location = new System.Drawing.Point(8, 42);
+            this._runRulesetForFeaturesRadioButton.Name = "_runRulesetForFeaturesRadioButton";
+            this._runRulesetForFeaturesRadioButton.Size = new System.Drawing.Size(98, 17);
+            this._runRulesetForFeaturesRadioButton.TabIndex = 1;
+            this._runRulesetForFeaturesRadioButton.TabStop = true;
+            this._runRulesetForFeaturesRadioButton.Text = "Run this ruleset";
+            this._runRulesetForFeaturesRadioButton.UseVisualStyleBackColor = true;
+            this._runRulesetForFeaturesRadioButton.CheckedChanged += new System.EventHandler(this.HandleCheckedChanged);
+            // 
+            // _runRulesetIfVoaIsMissingCheckBox
+            // 
+            this._runRulesetIfVoaIsMissingCheckBox.AutoSize = true;
+            this._runRulesetIfVoaIsMissingCheckBox.Location = new System.Drawing.Point(132, 42);
+            this._runRulesetIfVoaIsMissingCheckBox.Name = "_runRulesetIfVoaIsMissingCheckBox";
+            this._runRulesetIfVoaIsMissingCheckBox.Size = new System.Drawing.Size(230, 17);
+            this._runRulesetIfVoaIsMissingCheckBox.TabIndex = 2;
+            this._runRulesetIfVoaIsMissingCheckBox.Text = "Run ruleset if (attribute set for) file is missing";
+            this._runRulesetIfVoaIsMissingCheckBox.UseVisualStyleBackColor = true;
+            this._runRulesetIfVoaIsMissingCheckBox.CheckedChanged += new System.EventHandler(this.HandleCheckedChanged);
+            // 
+            // _useVoaFileForFeaturesRadioButton
+            // 
+            this._useVoaFileForFeaturesRadioButton.AutoSize = true;
+            this._useVoaFileForFeaturesRadioButton.Location = new System.Drawing.Point(8, 19);
+            this._useVoaFileForFeaturesRadioButton.Name = "_useVoaFileForFeaturesRadioButton";
+            this._useVoaFileForFeaturesRadioButton.Size = new System.Drawing.Size(222, 17);
+            this._useVoaFileForFeaturesRadioButton.TabIndex = 0;
+            this._useVoaFileForFeaturesRadioButton.TabStop = true;
+            this._useVoaFileForFeaturesRadioButton.Text = "Use VOA file configured in the settings file";
+            this._useVoaFileForFeaturesRadioButton.UseVisualStyleBackColor = true;
+            this._useVoaFileForFeaturesRadioButton.CheckedChanged += new System.EventHandler(this.HandleCheckedChanged);
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this._schedulerControl);
-            this.groupBox3.Location = new System.Drawing.Point(16, 236);
+            this.groupBox3.Controls.Add(this._useVoaFileForExpectedsRadioButton);
+            this.groupBox3.Controls.Add(this._useAttributeSetForExpectedsRadioButton);
+            this.groupBox3.Location = new System.Drawing.Point(6, 223);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(461, 177);
-            this.groupBox3.TabIndex = 12;
+            this.groupBox3.Size = new System.Drawing.Size(440, 72);
+            this.groupBox3.TabIndex = 10;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Schedule";
+            this.groupBox3.Text = "Expected values";
+            // 
+            // _useVoaFileForExpectedsRadioButton
+            // 
+            this._useVoaFileForExpectedsRadioButton.AutoSize = true;
+            this._useVoaFileForExpectedsRadioButton.Location = new System.Drawing.Point(11, 42);
+            this._useVoaFileForExpectedsRadioButton.Name = "_useVoaFileForExpectedsRadioButton";
+            this._useVoaFileForExpectedsRadioButton.Size = new System.Drawing.Size(222, 17);
+            this._useVoaFileForExpectedsRadioButton.TabIndex = 12;
+            this._useVoaFileForExpectedsRadioButton.TabStop = true;
+            this._useVoaFileForExpectedsRadioButton.Text = "Use VOA file configured in the settings file";
+            this._useVoaFileForExpectedsRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // _useAttributeSetForExpectedsRadioButton
+            // 
+            this._useAttributeSetForExpectedsRadioButton.AutoSize = true;
+            this._useAttributeSetForExpectedsRadioButton.Location = new System.Drawing.Point(11, 19);
+            this._useAttributeSetForExpectedsRadioButton.Name = "_useAttributeSetForExpectedsRadioButton";
+            this._useAttributeSetForExpectedsRadioButton.Size = new System.Drawing.Size(237, 17);
+            this._useAttributeSetForExpectedsRadioButton.TabIndex = 11;
+            this._useAttributeSetForExpectedsRadioButton.TabStop = true;
+            this._useAttributeSetForExpectedsRadioButton.Text = "Use attribute set (above) for expected values";
+            this._useAttributeSetForExpectedsRadioButton.UseVisualStyleBackColor = true;
+            this._useAttributeSetForExpectedsRadioButton.CheckedChanged += new System.EventHandler(this.HandleCheckedChanged);
+            // 
+            // _scheduleTabPage
+            // 
+            this._scheduleTabPage.Controls.Add(this._schedulerControl);
+            this._scheduleTabPage.Location = new System.Drawing.Point(4, 22);
+            this._scheduleTabPage.Name = "_scheduleTabPage";
+            this._scheduleTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this._scheduleTabPage.Size = new System.Drawing.Size(452, 407);
+            this._scheduleTabPage.TabIndex = 1;
+            this._scheduleTabPage.Text = "Schedule";
+            this._scheduleTabPage.UseVisualStyleBackColor = true;
             // 
             // TrainingDataCollectorConfigurationDialog
             // 
@@ -298,16 +501,13 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(484, 448);
-            this.Controls.Add(this.groupBox3);
+            this.ClientSize = new System.Drawing.Size(484, 503);
+            this.Controls.Add(this._tabControl);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label13);
-            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
-            this.Controls.Add(this.groupBox1);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(500, 487);
             this.MinimumSize = new System.Drawing.Size(500, 487);
             this.Name = "TrainingDataCollectorConfigurationDialog";
             this.ShowIcon = false;
@@ -318,7 +518,14 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._trainingPercentageNumericUpDown)).EndInit();
+            this._tabControl.ResumeLayout(false);
+            this._settingsTabPage.ResumeLayout(false);
+            this._featuresGroupBox.ResumeLayout(false);
+            this._featuresGroupBox.PerformLayout();
             this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this._scheduleTabPage.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -344,6 +551,20 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         private System.Windows.Forms.TextBox _descriptionTextBox;
         private System.Windows.Forms.Label label13;
         private Utilities.Forms.SchedulerControl _schedulerControl;
+        private System.Windows.Forms.TabControl _tabControl;
+        private System.Windows.Forms.TabPage _settingsTabPage;
+        private System.Windows.Forms.TabPage _scheduleTabPage;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.NumericUpDown _trainingPercentageNumericUpDown;
+        private System.Windows.Forms.CheckBox _overrideTrainingTestingSplitCheckBox;
+        private System.Windows.Forms.GroupBox _featuresGroupBox;
+        private System.Windows.Forms.RadioButton _useVoaFileForFeaturesRadioButton;
         private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.RadioButton _useVoaFileForExpectedsRadioButton;
+        private System.Windows.Forms.RadioButton _useAttributeSetForExpectedsRadioButton;
+        private Utilities.Forms.BrowseButton _featureRulesetBrowseButton;
+        private System.Windows.Forms.TextBox _featureRulesetTextBox;
+        private System.Windows.Forms.RadioButton _runRulesetForFeaturesRadioButton;
+        private System.Windows.Forms.CheckBox _runRulesetIfVoaIsMissingCheckBox;
     }
 }

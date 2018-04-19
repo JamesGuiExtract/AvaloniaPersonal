@@ -837,6 +837,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         public List<EntityDefinition> EntityDefinitions { get; set; } = new List<EntityDefinition>();
         public long LastIDToProcess { get;  set; }
         public long FirstIDToProcess { get; set; }
+        public bool UseAttributeSetForTypes { get; set; }
 
         public static Settings LoadFrom(string filename)
         {

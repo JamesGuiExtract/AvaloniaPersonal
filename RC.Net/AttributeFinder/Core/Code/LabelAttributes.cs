@@ -1,11 +1,9 @@
 ﻿using Extract.Utilities;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +11,7 @@ using UCLID_AFUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 using UCLID_AFCORELib;
+using UCLID_COMUTILSLib;
 
 namespace Extract.AttributeFinder
 {
@@ -22,6 +21,7 @@ namespace Extract.AttributeFinder
     [Serializable]
     // Don't rename because it could break serialization
     [Obfuscation(Feature = "renaming", Exclude = true)]
+    [CLSCompliant(false)]
     public class LabelAttributes
     {
         #region Constants
@@ -211,33 +211,20 @@ namespace Extract.AttributeFinder
                         loopState.Stop();
                     }
 
-                    var afUtil = _aFUtility.Value;
-                    var pathTags = threadLocalPathTags.Value;
                     string imagePath = imageFiles[i];
-                    pathTags.Document = new UCLID_AFCORELib.AFDocumentClass
-                    { Text = new SpatialStringClass { SourceDocName = imagePath } };
+                    var pathTags = threadLocalPathTags.Value;
+                    pathTags.Document = new AFDocumentClass { Text = new SpatialStringClass { SourceDocName = imagePath } };
 
-                    var toLabelPath = pathTags.Expand(AttributesToLabelPath);
-                    var sourceOfLabelsPath = pathTags.Expand(SourceOfLabelsPath);
-                    var destinationPath = pathTags.Expand(DestinationPath);
-
-                    var toLabel = afUtil.GetAttributesFromFile(toLabelPath);
-                    toLabel.ReportMemoryUsage();
-                    var sourceOfLabelsVOA = afUtil.GetAttributesFromFile(sourceOfLabelsPath);
-                    sourceOfLabelsVOA.ReportMemoryUsage();
-
-                    var sourceOfLabels = new XPathContext(sourceOfLabelsVOA);
-                    var attributesToLabel = toLabel.ToIEnumerable<ComAttribute>();
-                    foreach (var attributeToLabel in attributesToLabel)
+                    try
                     {
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            loopState.Stop();
-                        }
-
-                        LabelAttribute(attributeToLabel, sourceOfLabels, imagePath, cancellationToken, loopState);
+                        var labeled = LabelAttributesVector(imagePath, pathTags, cancellationToken);
+                        var destinationPath = pathTags.Expand(DestinationPath);
+                        labeled.SaveTo(destinationPath, true, typeof(AttributeStorageManagerClass).GUID.ToString("B"));
                     }
-                    attributesToLabel.SaveToIUnknownVector(destinationPath);
+                    catch (OperationCanceledException)
+                    {
+                        loopState.Stop();
+                    }
 
                     updateStatus(new StatusArgs { StatusMessage = "Files processed: {0:N0}", Int32Value = 1 });
                 });
@@ -250,23 +237,62 @@ namespace Extract.AttributeFinder
             }
         }
 
-        #endregion Public Methods
+        /// <summary>
+        /// Labels the input <see paramref="attributesToLabel"/> attributes by creating AttributeType subattributes
+        /// based on spatial comparison against the <see paramref="sourceOfLabels"/> attributes
+        /// </summary>
+        /// <param name="imagePath">Path used for the source doc name of created label attributes</param>
+        /// <param name="attributesToLabel">The attributes to be labeled</param>
+        /// <param name="sourceOfLabels">The attributes to be used to generate the labels</param>
+        /// <param name="cancellationToken">Used to cancel processing</param>
+        public void LabelAttributesVector(string imagePath, IIUnknownVector attributesToLabel,
+            IUnknownVector sourceOfLabels, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var sourceOfLabelsContext = new XPathContext(sourceOfLabels);
+                foreach (var attributeToLabel in attributesToLabel.ToIEnumerable<ComAttribute>())
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    LabelAttribute(attributeToLabel, sourceOfLabelsContext, imagePath, cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45786");
+            }
+        }
 
+        #endregion Public Methods
 
         #region Private Methods
 
+        IUnknownVector LabelAttributesVector(string imagePath, PathTagsBase pathTags,
+            CancellationToken cancellationToken)
+        {
+            var afUtil = _aFUtility.Value;
+
+            var toLabelPath = pathTags.Expand(AttributesToLabelPath);
+            var sourceOfLabelsPath = pathTags.Expand(SourceOfLabelsPath);
+
+            var attributesToLabel = afUtil.GetAttributesFromFile(toLabelPath);
+            attributesToLabel.ReportMemoryUsage();
+            var sourceOfLabelsVOA = afUtil.GetAttributesFromFile(sourceOfLabelsPath);
+            sourceOfLabelsVOA.ReportMemoryUsage();
+
+            LabelAttributesVector(imagePath, attributesToLabel, sourceOfLabelsVOA, cancellationToken);
+            return attributesToLabel;
+        }
+
         private void LabelAttribute(ComAttribute attributeToLabel, XPathContext sourceOfLabels, string sourceDocName,
-            CancellationToken cancellationToken, ParallelLoopState loopState)
+            CancellationToken cancellationToken)
         {
             // Find first category definition where there is a spatial match
             ComAttribute sourceOfLabel = null;
             bool foundMatch = false;
             var match = CategoryQueryPairs.Find(pair =>
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        loopState.Stop();
-                    }
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     sourceOfLabel = sourceOfLabels
                         .FindAllOfType<ComAttribute>(pair.Query)
@@ -282,10 +308,7 @@ namespace Extract.AttributeFinder
                     .Where(pair => !string.IsNullOrEmpty(pair.Category))
                     .All(pair =>
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        loopState.Stop();
-                    }
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     return sourceOfLabels
                         .FindAllOfType<ComAttribute>(pair.Query)
@@ -325,6 +348,7 @@ namespace Extract.AttributeFinder
                 attributeToLabel.SubAttributes.PushBack(label);
             }
         }
+
         private static bool HasSpatialOverlap(ComAttribute a, ComAttribute b, double overlapThreshold = 0.5)
         {
             if (!(a.Value.HasSpatialInfo() && b.Value.HasSpatialInfo()))

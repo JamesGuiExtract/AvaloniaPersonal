@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using Extract.ETL;
 using Extract.Licensing;
 using Extract.Utilities;
 
@@ -12,8 +13,12 @@ namespace Extract.UtilityApplications.MLModelTrainer
     /// <summary>
     /// Application to be used to test the MLModelTrainer, which is to be a ServiceProcess
     /// </summary>
-    public class MLModelTrainerApp
+    public class MLModelTrainerApp : ITrainingCoordinator
     {
+        public string ProjectName => "";
+
+        public string RootDir { get; set; }
+
         [STAThread]
         static int Main(string[] args)
         {
@@ -169,7 +174,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     var trainer = File.Exists(settingsFile)
                         ? MLModelTrainer.FromJson(File.ReadAllText(settingsFile))
                         : new MLModelTrainer();
-
+                    var coordinator = new MLModelTrainerApp { RootDir = Path.GetDirectoryName(Path.GetFullPath(settingsFile)) };
+                    trainer.Container = coordinator;
                     trainer.DatabaseServer = databaseServer;
                     trainer.DatabaseName = databaseName;
 

@@ -31,11 +31,18 @@ namespace Extract.FileActionManager.Forms
         /// Initializes a new instance of the <see cref="AddMLModel"/> class.
         /// </summary>
         /// <param name="database">File processing DB</param>
-        public AddMLModel(FileProcessingDB database)
+        /// <param name="prefix">Optional prefix to insert into the text box</param>
+        public AddMLModel(FileProcessingDB database, string prefix = null)
         {
             InitializeComponent();
 
             _database = database;
+
+            if (!string.IsNullOrEmpty(prefix))
+            {
+                _nameTextBox.Text = prefix;
+                _nameTextBox.SelectionStart = _nameTextBox.TextLength;
+            }
         }
 
         #endregion Constructors

@@ -32,10 +32,11 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LearningMachineConfiguration));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.machineStateToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.configurationTabControl = new System.Windows.Forms.TabControl();
             this.inputConfigurationTabPage = new System.Windows.Forms.TabPage();
             this.machineUsageGroupBox = new System.Windows.Forms.GroupBox();
+            this.deletionRadioButton = new System.Windows.Forms.RadioButton();
             this.attributeCategorizationRadioButton = new System.Windows.Forms.RadioButton();
             this.paginationRadioButton = new System.Windows.Forms.RadioButton();
             this.documentCategorizationRadioButton = new System.Windows.Forms.RadioButton();
@@ -170,6 +171,8 @@
             this.openMachineButton = new System.Windows.Forms.Button();
             this.saveMachineButton = new System.Windows.Forms.Button();
             this.newMachineButton = new System.Windows.Forms.Button();
+            this.dangerModeButton = new System.Windows.Forms.Button();
+            this.dangerModeToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1.SuspendLayout();
             this.configurationTabControl.SuspendLayout();
             this.inputConfigurationTabPage.SuspendLayout();
@@ -194,16 +197,17 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1});
+            this.machineStateToolStripStatusLabel,
+            this.dangerModeToolStripStatusLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 711);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1362, 22);
             this.statusStrip1.TabIndex = 3;
             // 
-            // toolStripStatusLabel1
+            // machineStateToolStripStatusLabel
             // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
+            this.machineStateToolStripStatusLabel.Name = "machineStateToolStripStatusLabel";
+            this.machineStateToolStripStatusLabel.Size = new System.Drawing.Size(0, 17);
             // 
             // configurationTabControl
             // 
@@ -237,6 +241,7 @@
             // 
             this.machineUsageGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.machineUsageGroupBox.Controls.Add(this.deletionRadioButton);
             this.machineUsageGroupBox.Controls.Add(this.attributeCategorizationRadioButton);
             this.machineUsageGroupBox.Controls.Add(this.paginationRadioButton);
             this.machineUsageGroupBox.Controls.Add(this.documentCategorizationRadioButton);
@@ -246,6 +251,16 @@
             this.machineUsageGroupBox.TabIndex = 0;
             this.machineUsageGroupBox.TabStop = false;
             this.machineUsageGroupBox.Text = "Machine learning engine usage";
+            // 
+            // deletionRadioButton
+            // 
+            this.deletionRadioButton.AutoSize = true;
+            this.deletionRadioButton.Location = new System.Drawing.Point(97, 42);
+            this.deletionRadioButton.Name = "deletionRadioButton";
+            this.deletionRadioButton.Size = new System.Drawing.Size(64, 17);
+            this.deletionRadioButton.TabIndex = 3;
+            this.deletionRadioButton.Text = "Deletion";
+            this.deletionRadioButton.UseVisualStyleBackColor = true;
             // 
             // attributeCategorizationRadioButton
             // 
@@ -263,9 +278,9 @@
             this.paginationRadioButton.AutoSize = true;
             this.paginationRadioButton.Location = new System.Drawing.Point(16, 42);
             this.paginationRadioButton.Name = "paginationRadioButton";
-            this.paginationRadioButton.Size = new System.Drawing.Size(225, 17);
+            this.paginationRadioButton.Size = new System.Drawing.Size(75, 17);
             this.paginationRadioButton.TabIndex = 1;
-            this.paginationRadioButton.Text = "Pagination (document boundary detection)";
+            this.paginationRadioButton.Text = "Pagination";
             this.paginationRadioButton.UseVisualStyleBackColor = true;
             this.paginationRadioButton.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
@@ -1079,9 +1094,9 @@
             this.csvOutputBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.csvOutputBrowseButton.EnsureFileExists = false;
             this.csvOutputBrowseButton.EnsurePathExists = false;
-            this.csvOutputBrowseButton.Location = new System.Drawing.Point(1313, 74);
+            this.csvOutputBrowseButton.Location = new System.Drawing.Point(1313, 77);
             this.csvOutputBrowseButton.Name = "csvOutputBrowseButton";
-            this.csvOutputBrowseButton.Size = new System.Drawing.Size(24, 24);
+            this.csvOutputBrowseButton.Size = new System.Drawing.Size(24, 22);
             this.csvOutputBrowseButton.TabIndex = 11;
             this.csvOutputBrowseButton.Text = "...";
             this.csvOutputBrowseButton.TextControl = this.csvOutputTextBox;
@@ -1776,6 +1791,23 @@
             this.newMachineButton.UseVisualStyleBackColor = true;
             this.newMachineButton.Click += new System.EventHandler(this.HandleNewMachineButton_Click);
             // 
+            // dangerModeButton
+            // 
+            this.dangerModeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.dangerModeButton.Location = new System.Drawing.Point(1007, 683);
+            this.dangerModeButton.Name = "dangerModeButton";
+            this.dangerModeButton.Size = new System.Drawing.Size(86, 23);
+            this.dangerModeButton.TabIndex = 6;
+            this.dangerModeButton.Text = "Danger mode";
+            this.dangerModeButton.UseVisualStyleBackColor = true;
+            this.dangerModeButton.Click += new System.EventHandler(this.HandleDangerModeButton_Click);
+            // 
+            // dangerModeToolStripStatusLabel
+            // 
+            this.dangerModeToolStripStatusLabel.Name = "dangerModeToolStripStatusLabel";
+            this.dangerModeToolStripStatusLabel.Size = new System.Drawing.Size(71, 17);
+            this.dangerModeToolStripStatusLabel.Text = "[Safe mode]";
+            // 
             // LearningMachineConfiguration
             // 
             this.AllowDrop = true;
@@ -1783,6 +1815,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1362, 733);
+            this.Controls.Add(this.dangerModeButton);
             this.Controls.Add(this.newMachineButton);
             this.Controls.Add(this.saveMachineButton);
             this.Controls.Add(this.configurationTabControl);
@@ -1836,7 +1869,7 @@
 
         #endregion
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel machineStateToolStripStatusLabel;
         private System.Windows.Forms.TabControl configurationTabControl;
         private System.Windows.Forms.TabPage inputConfigurationTabPage;
         private System.Windows.Forms.TabPage featureConfigurationTabPage;
@@ -1974,6 +2007,9 @@
         private System.Windows.Forms.Label paginationPagesLabel;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.CheckBox useFeatureHashingForAutoBagOfWordsCheckBox;
+        private System.Windows.Forms.RadioButton deletionRadioButton;
+        private System.Windows.Forms.Button dangerModeButton;
+        private System.Windows.Forms.ToolStripStatusLabel dangerModeToolStripStatusLabel;
     }
 }
 
