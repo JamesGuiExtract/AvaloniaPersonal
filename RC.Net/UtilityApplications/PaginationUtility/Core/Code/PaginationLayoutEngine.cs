@@ -94,7 +94,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     parent.SafeBeginInvoke("ELI40230", () =>
                     {
-                        DoLayout(parent, layoutEventArgs);
+                        DoLayout(parent, layoutEventArgs, out List<PaginationControl> redundantControls);
+
+                        // Reset _layoutInvoked before OnLayoutCompleted, otherwise pending
+                        // _scrollToControl actions will be missed.
+                        _layoutInvoked = false;
+                        OnLayoutCompleted(redundantControls.ToArray());
 
                         // Manually update separators that have pending status changes.
                         foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
@@ -105,7 +110,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
 
                         parent.ResumeLayout();
-                        _layoutInvoked = false;
                     },
                     true,
                     (e) =>
@@ -134,7 +138,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Does the layout.
         /// </summary>
         /// <param name="parent">The parent.</param>
-        void DoLayout(Control parent, LayoutEventArgs layoutEventArgs)
+        /// <param name="layoutEventArgs">redundant controls that may be removed as a result of the layout.</param>
+        void DoLayout(Control parent, LayoutEventArgs layoutEventArgs, out List<PaginationControl> redundantControls)
         {
             // Use DisplayRectangle so that parent.Padding is honored.
             Rectangle parentDisplayRectangle = parent.DisplayRectangle;
@@ -143,7 +148,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             parentDisplayRectangle.Width = parent.ClientRectangle.Width;
             Point nextControlLocation = parentDisplayRectangle.Location;
 
-            List<PaginationControl> redundantControls = new List<PaginationControl>();
+            redundantControls = new List<PaginationControl>();
             PaginationSeparator lastSeparator = null;
 
             // If the affected control is not currently visible or is offscreen below the current
@@ -265,8 +270,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 redundantControls.Add(lastControl);
             }
-
-            OnLayoutCompleted(redundantControls.ToArray());
         }
 
         /// <summary>

@@ -23,9 +23,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _allowScrollToControl;
 
         /// <summary>
-        /// A control that should be scrolled to after the next _layoutEngine has executed a pending layout.
+        /// A control that should be scrolled to after the next _layoutEngine has executed a pending
+        /// layout paired with a boolean that indicates whether the scroll should be executed such
+        /// that is leaves the control flush with the top of the view (if possible).
         /// </summary>
-        Control _scrollToControl;
+        (Control control, bool flushWithTop) _scrollToControl;
 
         /// <summary>
         /// The <see cref="PaginationLayoutEngine"/> that manages the layout of the
@@ -53,7 +55,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Allows the specified <see paramref="control"/> to be manually scrolled into into view.
         /// </summary>
         /// <param name="control">The <see cref="Control"/> to be scrolled into view.</param>
-        public void ScrollControlIntoViewManual(Control control)
+        /// <param name="flushWithTop"><c>true</c> if the scroll should be executed such that is
+        /// leaves the control flush with the top of the view (if possible).</param>
+        public void ScrollControlIntoViewManual(Control control, bool flushWithTop)
         {
             try
             {
@@ -62,13 +66,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // If the scroll is commanded before a layout, the end result may not have the
                     // control in view after all. Wait until the layout has completed before
                     // executing the scroll.
-                    _scrollToControl = control;
+                    _scrollToControl = (control, flushWithTop);
                 }
                 else
                 {
                     _allowScrollToControl = true;
 
-                    base.ScrollControlIntoView(control);
+                    if (flushWithTop)
+                    {
+                        base.VerticalScroll.Value = (VerticalScroll.Value + control.Top);
+                    }
+                    else
+                    {
+                        base.ScrollControlIntoView(control);
+                    }
                 }   
             }
             catch (Exception ex)
@@ -140,13 +151,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (_scrollToControl != null)
+                if (_scrollToControl.control != null)
                 {
-                    var control = _scrollToControl;
-                    _scrollToControl = null;
+                    var control = _scrollToControl.control;
+                    bool flushWithTop = _scrollToControl.flushWithTop;
+                    _scrollToControl = (null, false);
                     if (control.Visible)
                     {
-                        ScrollControlIntoViewManual(control);
+                        ScrollControlIntoViewManual(control, flushWithTop);
                     }
                 }
             }

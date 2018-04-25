@@ -635,7 +635,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             // Determine what the separator color should be base on whether the current document
             // has a page displayed in the image viewer.
-            var newColor = (Document?.PageControls.Any(pageControl => pageControl.PageIsDisplayed) == true)
+            var newColor = (Document?.PageControls.Any(pageControl => 
+                                pageControl.PageIsDisplayed && pageControl.Highlighted) == true)
                 ? SystemColors.Highlight
                 : Color.SteelBlue;
             

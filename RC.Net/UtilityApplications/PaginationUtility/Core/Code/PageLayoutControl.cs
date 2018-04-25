@@ -411,7 +411,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Indicates whether this panel should appear as having input focus.
         /// </summary>
-        public bool _indicateFocus = true;
+        bool _indicateFocus = true;
+
+        /// <summary>
+        /// Indicates when a DEP is scheduled to be "snapped" to the top of the layout control.
+        /// </summary>
+        bool _pendingSnapDataPanelToTop;
 
         #endregion Fields
 
@@ -1827,6 +1832,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Snaps the active data panel so that it is flush with the top of the view by adjusting
+        /// scroll position.
+        /// </summary>
+        public void SnapDataPanelToTop()
+        {
+            try
+            {
+                if (DocumentInDataEdit.PaginationSeparator != null)
+                {
+                    _flowLayoutPanel.ScrollControlIntoViewManual(DocumentInDataEdit.PaginationSeparator,
+                        flushWithTop: true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45750");
+            }
+        }
+
         #endregion Methods
 
         #region Overrides
@@ -2441,6 +2466,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     RemovePaginationControl(control, true);
                 }
+
+                // https://extract.atlassian.net/browse/ISSUE-15414
+                // When a DEP has been opened, "snap" it to the top of the panel to help ensure the
+                // is clear about which data is currently being edited.
+                if (_pendingSnapDataPanelToTop)
+                {
+                    _pendingSnapDataPanelToTop = false;
+
+                    SnapDataPanelToTop();
+                }
             }
             catch (Exception ex)
             {
@@ -2705,6 +2740,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     DocumentDataPanel.PrimaryPageIsForActiveDocument =
                         (DocumentInDataEdit != null) &&
                         (DocumentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document);
+
+                    // https://extract.atlassian.net/browse/ISSUE-15414
+                    // When a DEP has been opened, "snap" it to the top of the panel to help ensure the
+                    // is clear about which data is currently being edited.
+                    _pendingSnapDataPanelToTop = true;
                 }
             }
             catch (Exception ex)
@@ -2770,7 +2810,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var separator = (PaginationSeparator)sender;
                 if (separator.Collapsed)
                 {
-                    _flowLayoutPanel.ScrollControlIntoViewManual(separator);
+                    _flowLayoutPanel.ScrollControlIntoViewManual(separator, flushWithTop: false);
                 }
             }
             catch (Exception ex)
@@ -3232,7 +3272,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     control.Visible &&
                     Rectangle.Intersect(ClientRectangle, control.Bounds) != control.Bounds)
                 {
-                    _flowLayoutPanel.ScrollControlIntoViewManual(control);
+                    _flowLayoutPanel.ScrollControlIntoViewManual(control, flushWithTop: false);
                 }
             }
             else
@@ -3323,7 +3363,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="false"/> to close it.</param>
         void DisplayPage(PageThumbnailControl pageControl, bool display)
         {
-            bool changedPage = (display != pageControl.PageIsDisplayed);
+            bool changedPage = (display != pageControl.PageIsDisplayed || pageControl != _displayedPage);
             pageControl.DisplayPage(ImageViewer, display);
 
             if (changedPage)

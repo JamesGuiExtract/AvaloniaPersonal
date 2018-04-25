@@ -2856,6 +2856,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                _primaryPageLayoutControl.SnapDataPanelToTop();
+
                 ProcessFocusChange(forceUpdate: true);
             }
             catch (Exception ex)
