@@ -976,7 +976,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Saves the current state of pagination and index data for all source documents.
-        /// NOTE: And exception will be thrown if the pages from multiple source documents
+        /// NOTE: An exception will be thrown if the pages from multiple source documents
         /// are currently combined into a single proposed output document.
         /// </summary>
         /// <returns><c>true</c> if the data was saved; otherwise, <c>false</c>.</returns>
@@ -993,14 +993,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .Distinct(),
                     pendingDocument => pendingDocument);
 
-                var mixedSourceDocuments =
-                    sourceToOutputMap.Keys.Where(key => key.Count() > 1)
-                        .SelectMany(key => key)
-                        .Distinct();
+                if (sourceToOutputMap.Keys.Any(key => key.Count() > 1))
+                {
+                    UtilityMethods.ShowMessageBox("It is not possible to save progress when multiple " +
+                        "source documents have been combined into a single output document.",
+                        "Unable to save", true);
+                    return false;
+                }
 
                 var documentsToSave = new Dictionary<SourceDocument, List<OutputDocument>>();
-                foreach (var entry in
-                    sourceToOutputMap.Where(entry => entry.Key.Count() == 1 && !mixedSourceDocuments.Contains(entry.Key.Single())))
+                foreach (var entry in sourceToOutputMap)
                 {
                     var outputDocs = documentsToSave.GetOrAdd(entry.Key.Single(), () => new List<OutputDocument>());
                     outputDocs.Add(entry.Value);
@@ -2564,7 +2566,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                RevertPendingChanges(revertToSource: false);
+                var response = MessageBox.Show(this,
+                    "This returns all pages to the document groupings and states that existed when " +
+                    "the document loaded into this application. It will also revert to the " +
+                    "extracted data that existed at that time. This state may represent the result " +
+                    "of automated processing or may be the state at which a previous user saved.",
+                    "Retore as originally loaded?", MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0);
+
+                if (response == DialogResult.Yes)
+                {
+                    RevertPendingChanges(revertToSource: false);
+                }
             }
             catch (Exception ex)
             {
@@ -2583,7 +2596,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                RevertPendingChanges(revertToSource: true);
+                var response = MessageBox.Show(this,
+                    "Discarding all changes will display all source documents as they were before " +
+                    "being processed by the software and will discard all data extracted from " +
+                    "those documents.", "Discard all changes?", MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0);
+
+                if (response == DialogResult.Yes)
+                {
+                    RevertPendingChanges(revertToSource: true);
+                }
             }
             catch (Exception ex)
             {
@@ -3438,6 +3460,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         || nonEmptyDocs.Any(doc => !doc.InSourceDocForm);
                     _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
 
+                    _saveToolStripButton.Enabled = _pendingDocuments.Any();
                     _applyToolStripButton.Enabled = CommitEnabled;
                     _collapseAllToolStripButton.Image =
                         AllDocumentsCollapsed

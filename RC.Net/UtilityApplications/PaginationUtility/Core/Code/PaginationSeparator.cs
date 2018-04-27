@@ -643,7 +643,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             // Update the BackColor of the separator itself, as well as any controls except the edit button.
             if (newColor != _currentColor)
             {
-                BackColor = newColor;
                 _tableLayoutPanel.BackColor = newColor;
                 foreach (var control in _tableLayoutPanel.Controls.OfType<Control>()
                     .Where(control => !(control is ButtonBase)))

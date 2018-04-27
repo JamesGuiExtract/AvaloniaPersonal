@@ -57,6 +57,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PaginationPanel));
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._topToolStrip = new System.Windows.Forms.ToolStrip();
@@ -157,6 +158,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._revertToSourceToolStripButton.Name = "_revertToSourceToolStripButton";
             this._revertToSourceToolStripButton.Size = new System.Drawing.Size(128, 22);
             this._revertToSourceToolStripButton.Text = "Discard all changes";
+            this._revertToSourceToolStripButton.ToolTipText = "Discarding all changes will display all source documents as they were before bein" +
+    "g processed by the software and will discard all data extracted from those docum" +
+    "ents.";
             this._revertToSourceToolStripButton.Click += new System.EventHandler(this.HandleRevertToSourceToolStripButton_Click);
             // 
             // _revertToOriginalToolStripButton
@@ -166,6 +170,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._revertToOriginalToolStripButton.Name = "_revertToOriginalToolStripButton";
             this._revertToOriginalToolStripButton.Size = new System.Drawing.Size(171, 22);
             this._revertToOriginalToolStripButton.Text = "Restore as originally loaded";
+            this._revertToOriginalToolStripButton.ToolTipText = resources.GetString("_revertToOriginalToolStripButton.ToolTipText");
             this._revertToOriginalToolStripButton.Click += new System.EventHandler(this.HandleRevertToOriginalToolStripButton_Click);
             // 
             // PaginationPanel

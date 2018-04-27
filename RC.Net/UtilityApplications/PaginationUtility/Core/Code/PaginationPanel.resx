@@ -120,4 +120,7 @@
   <metadata name="_topToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="_revertToOriginalToolStripButton.ToolTipText" xml:space="preserve">
+    <value>This returns all pages to the document groupings and states that existed when the document loaded into this application. It will also revert to the extracted data that existed at that time. This state may represent the result of automated processing or may be the state at which a previous user saved.</value>
+  </data>
 </root>

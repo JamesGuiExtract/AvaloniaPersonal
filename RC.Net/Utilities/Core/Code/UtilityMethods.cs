@@ -875,10 +875,10 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Gets a string that 
+        /// Gets a string that represents an enumerable of page numbers.
         /// </summary>
         /// <param name="pageNumbers">The page numbers.</param>
-        /// <returns></returns>
+        /// <returns>A string that represents an enumerable of page numbers.</returns>
         public static string GetPageNumbersAsString(IEnumerable<int> pageNumbers)
         {
             try
