@@ -2571,7 +2571,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     "the document loaded into this application. It will also revert to the " +
                     "extracted data that existed at that time. This state may represent the result " +
                     "of automated processing or may be the state at which a previous user saved.",
-                    "Retore as originally loaded?", MessageBoxButtons.YesNo,
+                    "Restore as originally loaded?", MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0);
 
                 if (response == DialogResult.Yes)
