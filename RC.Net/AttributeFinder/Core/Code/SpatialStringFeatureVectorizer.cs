@@ -285,7 +285,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// The numer of pages per candidate
+        /// The number of pages per candidate
         /// </summary>
         /// <remarks>This is the integer value of PagesToProcess or 1 if PagesToProcess is empty or unparseable</remarks>
         public int PagesPerPaginationCandidate
@@ -420,6 +420,39 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI40371");
+            }
+        }
+
+        /// <summary>
+        /// Configures this instance for pagination by examining all <see paramref="ussFiles"/>.
+        /// After this method has been run, this object will be ready to produce feature vectors.
+        /// </summary>
+        /// <param name="ussFiles">Paths to the spatial string files from which to collect terms for the bag-of-words
+        /// vocabulary.</param>
+        /// <param name="answerFiles">The paths to the VOA files that contain the expected pagination boundary information
+        /// for each uss file.</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        internal void ComputeEncodingsFromDeletionTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answerFiles,
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var inputTextsCollection = ussFiles.Select(file => GetPaginationTexts(file, true));
+
+                // Pass the page count of each image along so that missing pages in the answer VOA can be filled in
+                var textsAndCategories = inputTextsCollection.Zip(answerFiles, (examples, answerFile) =>
+                    {
+                        var answers = LearningMachineDataEncoder.ExpandDeletionAnswerVOA(answerFile, examples.Count() + 1);
+                        return examples.Zip(answers, (example, answer) => Tuple.Create(example, answer));
+                    })
+                    .SelectMany(answersForFile => answersForFile);
+
+                SetBagOfWords(textsAndCategories, updateStatus, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI45843");
             }
         }
 
@@ -570,6 +603,90 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39532");
+            }
+        }
+
+        /// <summary>
+        /// Get feature vectors from page text using computed <see cref="_nonSerializedBagOfWords"/>. Throws
+        /// an exception if <see cref="ComputeEncodingsFromPaginationTrainingData"/> has not been called.
+        /// </summary>
+        /// <param name="document">The <see cref="ISpatialString"/> to be used to generate the feature vectors.</param>
+        /// <returns>If <see cref="Enabled"/> then an enumeration of feature vectors that has a length of
+        /// the number of pages in <see paramref="document"/>-1. Else an empty enumeration.</returns>
+        internal IEnumerable<double[]> GetDeletionFeatureVectors(ISpatialString document)
+        {
+            try
+            {
+                ExtractException.Assert("ELI45844", "This object has not been fully configured.", AreEncodingsComputed);
+
+                int totalPagesPer = PagesPerPaginationCandidate;
+                int priorPages = totalPagesPer / 2;
+                int postPages = totalPagesPer - priorPages;
+
+                var pageFeatures = GetPaginationTexts(document, true)
+                    .Select(text => GetTerms(text).ToArray())
+                    .Select(_bagOfWords.GetFeatureVector)
+                    .ToList();
+
+                var pages = new double[pageFeatures.Count][];
+
+                // Add subvectors for preceeding pages
+                int featureVectorLength = FeatureVectorLengthForPagination;
+                for (int resultIdx = 0; resultIdx < pages.Length; resultIdx++)
+                {
+                    var featureVector = new double[featureVectorLength];
+                    pages[resultIdx] = featureVector;
+                    int featureVectorSubsetStart = 0;
+                    for (int i = priorPages; i > 0; i--)
+                    {
+                        int pageOfInterestIdx = resultIdx - i;
+                        if (pageOfInterestIdx >= 0)
+                        {
+                            // Add flag for pages that aren't always there
+                            if (i > 1)
+                            {
+                                featureVector[featureVectorSubsetStart] = 1;
+                                featureVectorSubsetStart++;
+                            }
+
+                            // Copy page feature values into larger array
+                            var pageOfinterest = pageFeatures[pageOfInterestIdx];
+                            for (int j = 0; j < pageOfinterest.Length; j++)
+                            {
+                                featureVector[featureVectorSubsetStart + j] = pageOfinterest[j];
+                            }
+                        }
+                        featureVectorSubsetStart += FeatureVectorLength;
+                    }
+
+                    // Add subvectors for following pages
+                    for (int i = 0; i < postPages; i++)
+                    {
+                        int pageOfInterestIdx = resultIdx + i;
+                        if (pageOfInterestIdx < pages.Length)
+                        {
+                            // Add flag for pages that aren't always there
+                            if (i > 0)
+                            {
+                                featureVector[featureVectorSubsetStart] = 1;
+                                featureVectorSubsetStart++;
+                            }
+
+                            // Copy page feature values into larger array
+                            var pageOfinterest = pageFeatures[pageOfInterestIdx];
+                            for (int j = 0; j < pageOfinterest.Length; j++)
+                            {
+                                featureVector[featureVectorSubsetStart + j] = pageOfinterest[j];
+                            }
+                        }
+                        featureVectorSubsetStart += FeatureVectorLength;
+                    }
+                }
+                return pages;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI45845");
             }
         }
 

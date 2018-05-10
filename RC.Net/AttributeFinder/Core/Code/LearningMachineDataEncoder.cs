@@ -42,7 +42,12 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Predicting the category of a collection of <see cref="ComAttribute"/>s
         /// </summary>
-        AttributeCategorization = 3
+        AttributeCategorization = 3,
+
+        /// <summary>
+        /// Predicting which pages should be deleted
+        /// </summary>
+        Deletion = 4
     }
 
     /// <summary>
@@ -313,6 +318,15 @@ namespace Extract.AttributeFinder
         // For pagination, the query for answer page range attributes
         static readonly string _PAGE_ATTRIBUTE_QUERY = "Document/Pages";
 
+        public static readonly int DeletedPageCategoryCode = 1;
+
+        // Private values used for deletion categories
+        static readonly string _DELETED_PAGE_CATEGORY = "DeletedPage";
+        public static readonly string NotDeletedPageCategory = "NotDeletedPage";
+        static readonly int _NOT_DELETED_PAGE_CATEGORY_CODE = 0;
+
+        static readonly string _DELETED_PAGE_ATTRIBUTE_QUERY = "Document/DeletedPages";
+
         /// <summary>
         /// The name of the flag attributes used to indicate a situation that won't work for pagination training,
         /// e.g., rearranged or duplicated pages
@@ -379,7 +393,7 @@ namespace Extract.AttributeFinder
             {
                 return _autoBagOfWords;
             }
-            private set
+            set
             {
                 if (value != _autoBagOfWords)
                 {
@@ -564,7 +578,7 @@ namespace Extract.AttributeFinder
             {
                 return _machineUsage;
             }
-            private set
+            set
             {
                 if (value != _machineUsage)
                 {
@@ -637,12 +651,27 @@ namespace Extract.AttributeFinder
             AttributeVectorizerMaxDiscreteTermsFeatures = attributeVectorizerMaxFeatures;
             AttributesToTokenizeFilter = attributesToTokenize;
             AttributeVectorizerShingleSize = attributeVectorizerShingleSize;
-            NegativeClassName = negativeClassName ??
-                (MachineUsage == LearningMachineUsage.AttributeCategorization
-                    ? ""
-                    : MachineUsage == LearningMachineUsage.Pagination
-                        ? NotFirstPageCategory
-                        : UnknownCategoryName);
+
+            if (negativeClassName != null)
+            {
+                NegativeClassName = negativeClassName;
+            }
+            else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
+            {
+                NegativeClassName = "";
+            }
+            else if (MachineUsage == LearningMachineUsage.Pagination)
+            {
+                NegativeClassName = NotFirstPageCategory;
+            }
+            else if (MachineUsage == LearningMachineUsage.Deletion)
+            {
+                NegativeClassName = NotDeletedPageCategory;
+            }
+            else
+            {
+                NegativeClassName = UnknownCategoryName;
+            }
         }
 
         #endregion Constructors
@@ -725,6 +754,58 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Gets an enumeration of predictions (category names) from a VOA file
+        /// </summary>
+        /// <param name="attributesFilePath">The path to the VOA or EAV file</param>
+        /// <param name="numberOfPages">The number of pages in the associated image</param>
+        /// <returns>An enumeration of predictions (category names) from a VOA file</returns>
+        public static IEnumerable<string> ExpandDeletionAnswerVOA(string attributesFilePath, int numberOfPages)
+        {
+            try
+            {
+                var attributes = _afUtility.Value.GetAttributesFromFile(attributesFilePath);
+                attributes.ReportMemoryUsage();
+
+                var pages = Enumerable.Repeat(NotDeletedPageCategory, numberOfPages).ToArray();
+
+                // Parse DeletedPages attributes with regex and mark any deleted pages
+                var pageRanges = _afUtility.Value.QueryAttributes(attributes, _DELETED_PAGE_ATTRIBUTE_QUERY, false)
+                    .ToIEnumerable<ComAttribute>()
+                    .SelectMany(attr => _pageRangeRegex.Value.Matches(attr.Value.String).Cast<Match>())
+                    .Select(pageRange =>
+                    {
+                        int startPage = 0;
+                        int endPage = 0;
+                        if (Int32.TryParse(pageRange.Groups["start"].Value, out startPage))
+                        {
+                            var endGroup = pageRange.Groups["end"];
+                            if (!(endGroup.Success && Int32.TryParse(endGroup.Value, out endPage)))
+                            {
+                                endPage = startPage;
+                            }
+                        }
+                        return new { startPage, endPage };
+                    });
+
+                foreach (var pageRange in pageRanges)
+                {
+                    for (int i = pageRange.startPage - 1; i < pageRange.endPage; i++)
+                    {
+                        pages[i] = _DELETED_PAGE_CATEGORY;
+                    }
+                }
+
+                return pages;
+            }
+            catch (Exception e)
+            {
+                var ue = e.AsExtract("ELI45840");
+                ue.AddDebugData("Answer file", attributesFilePath, false);
+                throw ue;
+            }
+        }
+
+        /// <summary>
         /// Gets an enumeration of feature vectors from a <see cref="ISpatialString"/> and <see cref="IUnknownVector"/> of
         /// <see cref="ComAttribute"/>s.
         /// </summary>
@@ -747,6 +828,10 @@ namespace Extract.AttributeFinder
                 else if (MachineUsage == LearningMachineUsage.Pagination)
                 {
                     return GetPaginationFeatureVectors(document, protoFeaturesOrGroupsOfProtoFeatures);
+                }
+                else if (MachineUsage == LearningMachineUsage.Deletion)
+                {
+                    return GetDeletionFeatureVectors(document, protoFeaturesOrGroupsOfProtoFeatures);
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
@@ -830,6 +915,10 @@ namespace Extract.AttributeFinder
                 else if (MachineUsage == LearningMachineUsage.Pagination)
                 {
                     ComputePaginationEncodings(ussFilePaths, inputVOAFilePaths, answersOrAnswerFiles, updateStatus, cancellationToken);
+                }
+                else if (MachineUsage == LearningMachineUsage.Deletion)
+                {
+                    ComputeDeletionEncodings(ussFilePaths, inputVOAFilePaths, answersOrAnswerFiles, updateStatus, cancellationToken);
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
@@ -1000,6 +1089,22 @@ namespace Extract.AttributeFinder
                 else if (MachineUsage == LearningMachineUsage.Pagination)
                 {
                     var results = GetPaginationFeatureVectorAndAnswerCollection(ussFilePaths, inputVOAFilePaths,
+                        answersOrAnswerFiles, updateStatus2, cancellationToken);
+
+                    double[][] featureVectors = new double[results.Length][];
+                    int[] answers = new int[results.Length];
+                    string[] ussPathsPerExample = new string[results.Length];
+                    for (int i = 0; i < results.Length; i++)
+                    {
+                        featureVectors[i] = results[i].Item1;
+                        answers[i] = results[i].Item2;
+                        ussPathsPerExample[i] = results[i].Item3;
+                    }
+                    return (featureVectors, answers, ussPathsPerExample);
+                }
+                else if (MachineUsage == LearningMachineUsage.Deletion)
+                {
+                    var results = GetDeletionFeatureVectorAndAnswerCollection(ussFilePaths, inputVOAFilePaths,
                         answersOrAnswerFiles, updateStatus2, cancellationToken);
 
                     double[][] featureVectors = new double[results.Length][];
@@ -1355,28 +1460,34 @@ namespace Extract.AttributeFinder
         /// <see cref="ComAttribute"/>s
         /// </summary>
         /// <param name="attributes">The vector of <see cref="ComAttribute"/>s from which to get protofeatures</param>
+        /// <param name="returnFirstPage">Whether to include the first page (e.g., for Deletion mode)</param>
         /// <returns>An enumeration of <see cref="NameToProtoFeaturesMap"/>s for pagination input</returns>
-        private IEnumerable<NameToProtoFeaturesMap> GetPaginationProtoFeatures(IUnknownVector attributes)
+        private IEnumerable<NameToProtoFeaturesMap> GetPaginationProtoFeatures(IUnknownVector attributes, bool returnFirstPage = false)
         {
             var pages = attributes
                 .ToIEnumerable<ComAttribute>()
                 .Where(a => a.Name.Equals(PageAttributeName, StringComparison.OrdinalIgnoreCase));
 
-            return pages.Skip(1).Select(pageAttr => GetFilteredMapOfNamesToValues(pageAttr.SubAttributes));
+            if (!returnFirstPage)
+            {
+                pages = pages.Skip(1);
+            }
+            return pages.Select(pageAttr => GetFilteredMapOfNamesToValues(pageAttr.SubAttributes));
         }
 
         /// <summary>
         /// Gets an enumeration of <see cref="NameToProtoFeaturesMap"/>s for pagination input from a VOA file
         /// </summary>
         /// <param name="attributesFilePath">The path to the VOA or EAV file</param>
+        /// <param name="returnFirstPage">Whether to include the first page (e.g., for Deletion mode)</param>
         /// <returns>An enumeration of <see cref="NameToProtoFeaturesMap"/>s for pagination input</returns>
-        private IEnumerable<NameToProtoFeaturesMap> GetPaginationProtoFeatures(string attributesFilePath)
+        private IEnumerable<NameToProtoFeaturesMap> GetPaginationProtoFeatures(string attributesFilePath, bool returnFirstPage = false)
         {
             try
             {
                 var attributes = _afUtility.Value.GetAttributesFromFile(attributesFilePath);
                 attributes.ReportMemoryUsage();
-                return GetPaginationProtoFeatures(attributes);
+                return GetPaginationProtoFeatures(attributes, returnFirstPage);
             }
             catch (Exception e)
             {
@@ -1534,6 +1645,69 @@ namespace Extract.AttributeFinder
             else
             {
                 shingleFeatures = AutoBagOfWords.GetPaginationFeatureVectors(document).ToList();
+                numberOfExamples = shingleFeatures.Count;
+                for (int i = 0; i < numberOfExamples; i++)
+                {
+                    yield return shingleFeatures[i].Concat(attributeFeatures
+                        .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
+                        .SelectMany(v => v[i]))
+                        .ToArray();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets zero or more feature vectors from a <see cref="ISpatialString"/> and vector of <see cref="ComAttribute"/>s
+        /// </summary>
+        /// <param name="document">The <see cref="ISpatialString"/> to use for auto-bag-of-words features.</param>
+        /// <param name="pagesOfProtoFeatures">The vector of <see cref="ComAttribute"/>s containing Page attributes with
+        /// sub-attributes to use for attribute features.</param>
+        /// <returns>The feature vectors computed from the input arguments.</returns>
+        private IEnumerable<double[]> GetDeletionFeatureVectors(ISpatialString document, IUnknownVector pagesOfProtoFeatures)
+        {
+            var attributeFeatures = Enumerable.Empty<List<double[]>>();
+            List<double[]> shingleFeatures = null;
+            int numberOfExamples = 0;
+
+            if (pagesOfProtoFeatures != null)
+            {
+                // At runtime (e.g., called from LearningMachineOutputHandler) handle empty VOA
+                // by creating empty feature vector for each page rather than returning an empty
+                // collection that would cause an exception
+                var protoFeatureGroups = pagesOfProtoFeatures.Size() > 0
+                    ? GetPaginationProtoFeatures(pagesOfProtoFeatures, true)
+                    : SpatialStringFeatureVectorizer.GetPaginationTexts(document, true)
+                        .Select(_ => new NameToProtoFeaturesMap());
+
+                numberOfExamples = protoFeatureGroups.Count();
+
+                // NOTE: vectorizers return an empty enumerable if not enabled
+                // TODO: pass along cancelation token!
+                attributeFeatures = AttributeFeatureVectorizers
+                    .Select(vectorizer => vectorizer.GetFeatureVectorsForEachGroup(protoFeatureGroups)
+                    .ToList());
+            }
+            else
+            {
+                var protoFeatureGroups = SpatialStringFeatureVectorizer.GetPaginationTexts(document, true).Select(_ =>
+                    Enumerable.Empty<NameToProtoFeaturesMap>()
+                );
+            }
+
+            if (AutoBagOfWords == null || !AutoBagOfWords.Enabled)
+            {
+                // Transpose from <# vectorizers> X <# page pairs> to <# page pairs> X <# vectorizers>
+                for (int i = 0; i < numberOfExamples; i++)
+                {
+                    yield return attributeFeatures
+                        .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
+                        .SelectMany(v => v[i])
+                        .ToArray();
+                }
+            }
+            else
+            {
+                shingleFeatures = AutoBagOfWords.GetDeletionFeatureVectors(document).ToList();
                 numberOfExamples = shingleFeatures.Count;
                 for (int i = 0; i < numberOfExamples; i++)
                 {
@@ -1818,6 +1992,102 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Builds a collection of feature vector and answer code tuples. Assumes that this
+        /// object has been configured with <see cref="ComputeDeletionEncodings"/>
+        /// </summary>
+        /// <param name="ussFilePaths">The uss paths of each input file</param>
+        /// <param name="inputVOAFilePaths">The input VOA paths corresponding to each uss file</param>
+        /// <param name="answerFiles">The VOAs with pagination boundary info for each input file</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <returns>An array of feature vector, answer and uss path tuples</returns>
+        private Tuple<double[], int, string>[] GetDeletionFeatureVectorAndAnswerCollection
+            (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answerFiles,
+                Action<StatusArgs> updateStatus,
+                CancellationToken cancellationToken)
+        {
+            try
+            {
+                var results = new Tuple<double[], int, string>[ussFilePaths.Length][];
+
+                // Prevent too much memory consumption when loading large documents
+                var opts = new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Environment.ProcessorCount
+                };
+                using (var spatialString = new ThreadLocal<SpatialStringClass>(() => new SpatialStringClass()))
+                using (var attributes = new ThreadLocal<IUnknownVectorClass>(() => new IUnknownVectorClass()))
+                Parallel.For(0, ussFilePaths.Length, opts, (i, loopState) =>
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        loopState.Stop();
+                    }
+
+                    string answerFile = answerFiles[i];
+
+                    if (AutoBagOfWords != null)
+                    {
+                        string uss = ussFilePaths[i];
+                        try
+                        {
+                            spatialString.Value.LoadFrom(uss, false);
+                            spatialString.Value.ReportMemoryUsage();
+                        }
+                        catch (Exception e)
+                        {
+                            var ue = e.AsExtract("ELI39689");
+                            ue.AddDebugData("USS path", uss, false);
+                            throw ue;
+                        }
+                    }
+
+                    if (AttributeFeatureVectorizers.Any() && inputVOAFilePaths != null)
+                    {
+                        string voa = inputVOAFilePaths[i];
+                        ExtractException.Assert("ELI39690", "Input VOA file doesn't exist", File.Exists(voa),
+                            "Filename", voa);
+                        attributes.Value.LoadFrom(voa, false);
+                        attributes.Value.ReportMemoryUsage();
+                    }
+
+                    List<double[]> featureVectors = GetDeletionFeatureVectors(spatialString.Value, attributes.Value).ToList();
+
+                // Get page count so that missing page numbers in the answer VOA can be filled in.
+                int pageCount = featureVectors.Count + 1;
+                    var expandedAnswers = ExpandDeletionAnswerVOA(answerFile, pageCount).ToList();
+
+                    var answerCodes = expandedAnswers.Select(answer =>
+                    {
+                        int code;
+                        if (!AnswerNameToCode.TryGetValue(answer, out code))
+                        {
+                            var ex = new ExtractException("ELI39627", "Internal logic error: unknown category");
+                            ex.AddDebugData("Category name", answer, false);
+                            throw ex;
+                        }
+                        return code;
+                    }).ToList();
+
+                    results[i] = new Tuple<double[], int, string>[featureVectors.Count];
+                    for (int j = 0; j < featureVectors.Count; j++)
+                    {
+                        results[i][j] = (Tuple.Create(featureVectors[j], answerCodes[j], ussFilePaths[i]));
+                    }
+
+                    updateStatus(new StatusArgs { StatusMessage = "Files processed: {0:N0}", Int32Value = 1 });
+                });
+
+                cancellationToken.ThrowIfCancellationRequested();
+                return results.SelectMany(a => a).ToArray();
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39713");
+            }
+        }
+
+        /// <summary>
+        /// Builds a collection of feature vector and answer code tuples. Assumes that this
         /// object has been configured with <see cref="ComputeAttributesEncodings"/>
         /// </summary>
         /// <param name="ussFilePaths">The uss paths of each input file</param>
@@ -2018,50 +2288,127 @@ namespace Extract.AttributeFinder
             if (inputVOAFilePaths.Length > 0)
             {
                 updateStatus(new StatusArgs { StatusMessage = "Computing attribute feature encodings:" });
-            }
 
-            // Configure AttributeFeatureVectorizer collection
-            IEnumerable<IEnumerable<NameToProtoFeaturesMap>> pagePairProtofeatureCollection =
-                inputVOAFilePaths.Select(GetPaginationProtoFeatures);
+                // Configure AttributeFeatureVectorizer collection
+                IEnumerable<IEnumerable<NameToProtoFeaturesMap>> pagePairProtofeatureCollection =
+                    inputVOAFilePaths.Select(p => GetPaginationProtoFeatures(p));
 
-            // Pass the page count of each image along so that missing pages in the answer VOA can be filled in
-            var pagePairProtofeaturesAndCategories = pagePairProtofeatureCollection.Zip(answerFiles, (pagePairs, answerFile) =>
+                // Pass the page count of each image along so that missing pages in the answer VOA can be filled in
+                var pagePairProtofeaturesAndCategories = pagePairProtofeatureCollection.Zip(answerFiles, (pagePairs, answerFile) =>
+                    {
+                        var answers = ExpandPaginationAnswerVOA(answerFile, pagePairs.Count() + 1);
+                        return pagePairs.Zip(answers, (pagePairProtofeatures, answer) =>
+                            new { answer, pagePairProtofeatures });
+                    })
+                    .SelectMany(answersForFile => answersForFile);
+
+                Dictionary<string, AttributeFeatureVectorizer> vectorizerMap
+                    = new Dictionary<string, AttributeFeatureVectorizer>(StringComparer.OrdinalIgnoreCase);
+
+                // Count each page pair as a separate document for purposes of TF*IDF score
+                int exampleNumber = 0;
+                foreach (var labeledExample in pagePairProtofeaturesAndCategories)
                 {
-                    var answers = ExpandPaginationAnswerVOA(answerFile, pagePairs.Count() + 1);
-                    return pagePairs.Zip(answers, (pagePairProtofeatures, answer) =>
-                        new { answer, pagePairProtofeatures });
-                })
-                .SelectMany(answersForFile => answersForFile);
+                    ++exampleNumber;
+                    cancellationToken.ThrowIfCancellationRequested();
 
-            Dictionary<string, AttributeFeatureVectorizer> vectorizerMap
-                = new Dictionary<string, AttributeFeatureVectorizer>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var group in labeledExample.pagePairProtofeatures)
+                    {
+                        string name = group.Key;
+                        var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
+                        vectorizer.ComputeEncodingsFromTrainingData(
+                            protoFeatures: group.Value,
+                            category: labeledExample.answer,
+                            docName: exampleNumber.ToString(CultureInfo.InvariantCulture));
+                    }
 
-            // Count each page pair as a separate document for purposes of TF*IDF score
-            int exampleNumber = 0;
-            foreach (var labeledExample in pagePairProtofeaturesAndCategories)
-            {
-                ++exampleNumber;
-                cancellationToken.ThrowIfCancellationRequested();
-
-                foreach (var group in labeledExample.pagePairProtofeatures)
-                {
-                    string name = group.Key;
-                    var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
-                    vectorizer.ComputeEncodingsFromTrainingData(
-                        protoFeatures: group.Value,
-                        category: labeledExample.answer,
-                        docName: exampleNumber.ToString(CultureInfo.InvariantCulture));
+                    updateStatus2(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
                 }
-
-                updateStatus2(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
-            }
-            AttributeFeatureVectorizers = vectorizerMap.Values;
+                AttributeFeatureVectorizers = vectorizerMap.Values;
+			}
 
             // Add category names and codes
             AnswerCodeToName.Add(_NOT_FIRST_PAGE_CATEGORY_CODE, NotFirstPageCategory);
             AnswerNameToCode.Add(NotFirstPageCategory, _NOT_FIRST_PAGE_CATEGORY_CODE);
             AnswerCodeToName.Add(FirstPageCategoryCode, _FIRST_PAGE_CATEGORY);
             AnswerNameToCode.Add(_FIRST_PAGE_CATEGORY, FirstPageCategoryCode);
+        }
+
+        /// <summary>
+        /// Uses the training data to automatically configure the <see cref="AutoBagOfWords"/> and
+        /// <see cref="AttributeFeatureVectorizers"/> collection so that feature vectors can be
+        /// generated with this instance.
+        /// </summary>
+        /// <param name="ussFilePaths">The paths to the USS files to be used to configure this object</param>
+        /// <param name="inputVOAFilePaths">The paths to the proto-feature VOA files to be used to
+        /// configure this object</param>
+        /// <param name="answerFiles">The paths to VOA files of predictions</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        private void ComputeDeletionEncodings(string[] ussFilePaths, string[] inputVOAFilePaths, string[] answerFiles,
+            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+        {
+            // Indent sub-status messages
+            Action<StatusArgs> updateStatus2 = args =>
+                {
+                    args.Indent++;
+                    updateStatus(args);
+                };
+            // Configure SpatialStringFeatureVectorizer
+            if (AutoBagOfWords != null)
+            {
+                updateStatus(new StatusArgs { StatusMessage = "Computing auto-bag-of-words encodings:" });
+                AutoBagOfWords.ComputeEncodingsFromDeletionTrainingData(ussFilePaths, answerFiles, updateStatus2, cancellationToken);
+            }
+
+            if (inputVOAFilePaths.Length > 0)
+            {
+                updateStatus(new StatusArgs { StatusMessage = "Computing attribute feature encodings:" });
+
+                // Configure AttributeFeatureVectorizer collection
+                IEnumerable<IEnumerable<NameToProtoFeaturesMap>> pageProtofeatureCollection =
+                    inputVOAFilePaths.Select(p => GetPaginationProtoFeatures(p, true));
+
+                // Pass the page count of each image along so that missing pages in the answer VOA can be filled in
+                var pageProtofeaturesAndCategories = pageProtofeatureCollection.Zip(answerFiles, (pages, answerFile) =>
+                    {
+                        var answers = ExpandDeletionAnswerVOA(answerFile, pages.Count() + 1);
+                        return pages.Zip(answers, (pageProtofeatures, answer) =>
+                            new { answer, pageProtofeatures });
+                    })
+                    .SelectMany(answersForFile => answersForFile);
+
+                Dictionary<string, AttributeFeatureVectorizer> vectorizerMap
+                    = new Dictionary<string, AttributeFeatureVectorizer>(StringComparer.OrdinalIgnoreCase);
+
+                // Count each page as a separate document for purposes of TF*IDF score
+                int exampleNumber = 0;
+                foreach (var labeledExample in pageProtofeaturesAndCategories)
+                {
+                    ++exampleNumber;
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    foreach (var group in labeledExample.pageProtofeatures)
+                    {
+                        string name = group.Key;
+                        var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
+                        vectorizer.ComputeEncodingsFromTrainingData(
+                            protoFeatures: group.Value,
+                            category: labeledExample.answer,
+                            docName: exampleNumber.ToString(CultureInfo.InvariantCulture));
+                    }
+
+                    updateStatus2(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
+                }
+                AttributeFeatureVectorizers = vectorizerMap.Values;
+            }
+
+            // Add category names and codes
+            ExtractException.Assert("ELI45842", "Internal logic error", AnswerCodeToName.Count == 0);
+            AnswerCodeToName.Add(_NOT_DELETED_PAGE_CATEGORY_CODE, NotDeletedPageCategory);
+            AnswerNameToCode.Add(NotDeletedPageCategory, _NOT_DELETED_PAGE_CATEGORY_CODE);
+            AnswerCodeToName.Add(DeletedPageCategoryCode, _DELETED_PAGE_CATEGORY);
+            AnswerNameToCode.Add(_DELETED_PAGE_CATEGORY, DeletedPageCategoryCode);
         }
 
         /// <summary>
@@ -2353,12 +2700,24 @@ namespace Extract.AttributeFinder
             _attributeVectorizerMaxFeatures = Int32.MaxValue;
             _attributesToTokenizeFilter = null;
             _attributeVectorizerShingleSize = 1;
-            _negativeClassName =
-                MachineUsage == LearningMachineUsage.AttributeCategorization
-                    ? ""
-                    : MachineUsage == LearningMachineUsage.Pagination
-                        ? NotFirstPageCategory
-                        : UnknownCategoryName;
+
+            if (MachineUsage == LearningMachineUsage.AttributeCategorization)
+            {
+                _negativeClassName = "";
+            }
+            else if (MachineUsage == LearningMachineUsage.Pagination)
+            {
+                _negativeClassName = NotFirstPageCategory;
+            }
+            else if (MachineUsage == LearningMachineUsage.Deletion)
+            {
+                _negativeClassName = NotDeletedPageCategory;
+            }
+            else
+            {
+                _negativeClassName = UnknownCategoryName;
+            }
+
         }
 
         /// <summary>

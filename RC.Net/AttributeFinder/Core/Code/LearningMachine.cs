@@ -604,6 +604,27 @@ namespace Extract.AttributeFinder
                         attributeVector.PushBack(attr);
                     }
                 }
+                else if (Usage == LearningMachineUsage.Deletion)
+                {
+                    if (!preserveInputAttributes)
+                    {
+                        attributeVector.Clear();
+                    }
+
+                    List<bool> isDeletedPageList = outputs
+                        .Select(answerAndScore => answerAndScore.answerCode == LearningMachineDataEncoder.DeletedPageCategoryCode)
+                        .ToList();
+                    int numberOfPages = isDeletedPageList.Count;
+
+                    // - 1 because isDeletedPageList is zero-indexed
+                    Func<int, bool> isDeletedPage = sourcePage => isDeletedPageList[sourcePage - 1];
+
+                    var deletedPages = CreateDeletedPagesAttribute(document.SourceDocName, numberOfPages, isDeletedPage);
+                    if (deletedPages != null)
+                    {
+                        attributeVector.PushBack(deletedPages);
+                    }
+                }
                 else if (Usage == LearningMachineUsage.AttributeCategorization)
                 {
                     var attributeCreator = new AttributeCreator(document.SourceDocName);
@@ -1597,6 +1618,72 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI40158");
+            }
+        }
+
+        /// <summary> Creates a DeletedPages <see cref="ComAttribute"/> that represents the pages predicted to be deleted
+        /// (DeletedPages|1-2,5).
+        /// </summary>
+        /// <param name="sourceDocName">Name of the source document</param>
+        /// <param name="numberOfPages">The number of pages in the source document</param>
+        /// <param name="isDeletedPage">Function used to determine whether a source page number is
+        /// a deleted page of a document</param>
+        private static ComAttribute CreateDeletedPagesAttribute(
+            string sourceDocName,
+            int numberOfPages,
+            Func<int, bool> isDeletedPage)
+        {
+            try
+            {
+                int firstPageInRange = Enumerable.Range(1, numberOfPages)
+                    .FirstOrDefault(n => isDeletedPage(n));
+
+                if (firstPageInRange == 0)
+                {
+                    return null;
+                }
+
+                string value = null;
+                for (int nextPageNumber = firstPageInRange + 1; nextPageNumber <= numberOfPages + 1; nextPageNumber++)
+                {
+                    if (nextPageNumber > numberOfPages || !isDeletedPage(nextPageNumber))
+                    {
+                        int lastPageInRange = nextPageNumber - 1;
+                        string range = Enumerable
+                            .Range(firstPageInRange, lastPageInRange - firstPageInRange + 1)
+                            .ToRangeString();
+
+                        if (value == null)
+                        {
+                            value = range;
+                        }
+                        else
+                        {
+                            value += ("," + range);
+                        }
+
+                        // Next page is not deleted so find next deleted page to set up next page range
+                        if (nextPageNumber <= numberOfPages)
+                        {
+                            firstPageInRange = Enumerable.Range(nextPageNumber, numberOfPages - nextPageNumber)
+                                .FirstOrDefault(n => isDeletedPage(n));
+                            if (firstPageInRange == 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Add a DeletedPages attribute
+                SpatialString ss = new SpatialStringClass();
+                ss.CreateNonSpatialString(value, sourceDocName);
+
+                return new ComAttribute { Name = "DeletedPages", Value = ss };
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI45787");
             }
         }
 
