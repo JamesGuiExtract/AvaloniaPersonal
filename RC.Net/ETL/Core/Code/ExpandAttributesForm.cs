@@ -18,7 +18,7 @@ namespace Extract.ETL
             ExpandAttributesService = service;
 
             _storeSpatialInfoCheckBox.Checked = ExpandAttributesService.StoreSpatialInfo;
-            _stroreEmptyAttributesCheckBox.Checked = service.StoreEmptyAttributes;
+            _storeEmptyAttributesCheckBox.Checked = service.StoreEmptyAttributes;
             _descriptionTextBox.Text = service.Description;
             _schedulerControl.Value = service.Schedule;
         }
@@ -47,7 +47,7 @@ namespace Extract.ETL
                     DialogResult = DialogResult.None;
                     return;
                 }
-                ExpandAttributesService.StoreEmptyAttributes = _stroreEmptyAttributesCheckBox.Checked;
+                ExpandAttributesService.StoreEmptyAttributes = _storeEmptyAttributesCheckBox.Checked;
                 ExpandAttributesService.StoreSpatialInfo = _storeSpatialInfoCheckBox.Checked;
                 ExpandAttributesService.Description = _descriptionTextBox.Text;
                 ExpandAttributesService.Schedule = _schedulerControl.Value;

@@ -36,7 +36,8 @@ using namespace Extract::FAMDBAdmin;
 using namespace Extract::ETL::Management;
 using namespace System::Collections::Generic;
 using namespace Extract::FileActionManager::Forms;
-
+using namespace Extract::Utilities;
+using namespace Extract::Dashboard::Forms;
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -138,11 +139,12 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_MANAGE_METADATA, &CFAMDBAdminDlg::OnManageMetadataFields)
 	ON_COMMAND(ID_MANAGE_ATTRIBUTESETS, &CFAMDBAdminDlg::OnManageAttributeSets)
 	ON_COMMAND(ID_MANAGE_RULE_COUNTERS, &CFAMDBAdminDlg::OnManageRuleCounters)
-	ON_COMMAND(ID_MANAGE_DATABASESERVICES,&CFAMDBAdminDlg::OnManageDatabaseServices)
+	ON_COMMAND(ID_MANAGE_DATABASESERVICES, &CFAMDBAdminDlg::OnManageDatabaseServices)
 	//}}AFX_MSG_MAP
 	ON_CBN_SELCHANGE(IDC_WORKFLOW_COMBO, &CFAMDBAdminDlg::OnCbnSelchangeWorkflowCombo)
 	ON_COMMAND(ID_TOOLS_MOVE_FILES_TO_WORKFLOW, &CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow)
 	ON_COMMAND(ID_MANAGE_MLMODELS, &CFAMDBAdminDlg::OnManageMLModels)
+	ON_COMMAND(ID_MANAGE_DASHBOARDS, &CFAMDBAdminDlg::OnManageDashboards)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -1118,6 +1120,34 @@ void CFAMDBAdminDlg::OnManageMLModels()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45742");
 }
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnManageDashboards()
+{
+	try
+	{
+		ManageDashboardsForm^ manage =
+			gcnew ManageDashboardsForm(marshal_as<String^>(m_ipFAMDB->DatabaseServer), marshal_as<String^>(m_ipFAMDB->DatabaseName));
+
+		NativeWindow ^currentWindow = __nullptr;
+		try
+		{
+			IntPtr managedHWND(this->GetSafeHwnd());
+			currentWindow = NativeWindow::FromHandle(managedHWND);
+			manage->ShowDialog(currentWindow);
+		}
+		finally
+		{
+			if (currentWindow)
+				currentWindow->ReleaseHandle();
+		}
+	}
+	// This is needed because .net exception causes crash if not handled
+	catch (Exception ^ex)
+	{
+		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI45766");
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45767");
+}
 
 //-------------------------------------------------------------------------------------------------
 //INotifyDBConfigChanged
@@ -1230,6 +1260,9 @@ void CFAMDBAdminDlg::enableMenus()
 	pMenu->EnableMenuItem(ID_MANAGE_METADATA, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_ATTRIBUTESETS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_RULE_COUNTERS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_MLMODELS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_DASHBOARDS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_DATABASESERVICES, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_MANUALLYSETACTIONSTATUS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_SETPRIORITY, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_EXPORTFILELISTS, m_bIsDBGood ? nEnable : nDisable);

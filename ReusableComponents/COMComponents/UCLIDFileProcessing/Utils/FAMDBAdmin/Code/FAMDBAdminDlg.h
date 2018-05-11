@@ -70,6 +70,7 @@ protected:
 	afx_msg void OnToolsMoveFilesToWorkflow();
 	afx_msg void OnManageDatabaseServices();
 	afx_msg void OnManageMLModels();
+	afx_msg void OnManageDashboards();
 	DECLARE_MESSAGE_MAP()
 
 	//INotifyDBConfigChanged

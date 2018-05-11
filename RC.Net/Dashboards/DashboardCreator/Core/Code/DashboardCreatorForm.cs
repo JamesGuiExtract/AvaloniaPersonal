@@ -235,7 +235,7 @@ namespace DashboardCreator
                 else
                 {
                     Text = _dashboardFileName + " - " + dashboardDesigner.Dashboard.Title.Text;
-                    _customGridValues = DashboardHelper.GridConfigurationsFromXML(dashboardDesigner.Dashboard.UserData);
+                    _customGridValues = DashboardHelper.GridConfigurationsFromXML(dashboardDesigner.Dashboard?.UserData);
                 }
             }
             catch (Exception ex)

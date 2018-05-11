@@ -17,13 +17,15 @@ namespace DashboardViewer
         [STAThread]
         static void Main(string[] args)
         {
+            string exceptionFile = string.Empty;
+
             try
             {
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI45312",
                     Application.ProductName);
 
-                if (args.Length > 5)
+                if (args.Length > 9)
                 {
                     Usage();
                     return;
@@ -31,6 +33,7 @@ namespace DashboardViewer
                 string dashboardFileName = string.Empty;
                 string serverName = string.Empty;
                 string databaseName = string.Empty;
+                string dashboardName = string.Empty;
 
                 for (int a = 0; a < args.Length; a++)
                 {
@@ -56,6 +59,27 @@ namespace DashboardViewer
                         }
                         serverName = args[a];
                     }
+                    else if (args[a].Equals("/ef", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ++a;
+                        if (a >= args.Length)
+                        {
+                            Usage();
+                            return;
+                        }
+                        exceptionFile = args[a];
+                    }
+                    else if (args[a].Equals("/b", StringComparison.OrdinalIgnoreCase) ||
+                        args[a].Equals("/Dashboard", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ++a;
+                        if (a >= args.Length)
+                        {
+                            Usage();
+                            return;
+                        }
+                        dashboardName = args[a];
+                    }
                     else if (string.IsNullOrEmpty(dashboardFileName))
                     {
                         dashboardFileName = args[a];
@@ -67,8 +91,9 @@ namespace DashboardViewer
                     }
                 }
 
-                // Either Server name and Database are both specified or neither
-                if (string.IsNullOrWhiteSpace(serverName) ^ string.IsNullOrWhiteSpace(databaseName))
+                // Either Server name and Database are both specified or neither or both dashboardFilename and DashboardName specified
+                if ((string.IsNullOrWhiteSpace(serverName) ^ string.IsNullOrWhiteSpace(databaseName)) ||
+                    (!string.IsNullOrWhiteSpace(dashboardFileName) && string.IsNullOrWhiteSpace(dashboardName)))
                 {
                     Usage();
                     return;
@@ -80,12 +105,38 @@ namespace DashboardViewer
                 BonusSkins.Register();
                 SkinManager.EnableFormSkins();
                 UserLookAndFeel.Default.SetSkinStyle("DevExpress Style");
-                Application.Run(new DashboardViewerForm(dashboardFileName, serverName, databaseName));
+
+                // if no dashboard file name is specified but there is a server and database open viewer in "database mode"
+                if (string.IsNullOrWhiteSpace(dashboardFileName)
+                        && !string.IsNullOrWhiteSpace(serverName)
+                        && !string.IsNullOrWhiteSpace(databaseName))
+                {
+                    if (string.IsNullOrWhiteSpace(dashboardName))
+                    {
+                        Application.Run(new DashboardViewerForm(serverName, databaseName));
+                    }
+                    else
+                    {
+                        Application.Run(new DashboardViewerForm(dashboardName, true, serverName, databaseName));
+                    }
+                }
+                else
+                {
+                    Application.Run(new DashboardViewerForm(dashboardFileName, false, serverName, databaseName));
+                }
 
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45314");
+                ExtractException ee = ExtractException.AsExtractException("ELI45314", ex);
+                if(string.IsNullOrWhiteSpace(exceptionFile))
+                {
+                    ee.Display();
+                }
+                else
+                {
+                    ee.Log(exceptionFile);
+                }
             }
         }
 
@@ -97,7 +148,9 @@ namespace DashboardViewer
                 "\r\n\r\n/Server or /s <ServerName> - Server name. Requires /Database." +
                 "\r\n\r\n/Database or /d <DatabaseName> - Database name. Requires /Server." +
                 "\r\n\r\nNote: When Server and database are specified on the command line any dashboard files opened will use the " +
-                 "Server and Database specified on the command line. ",
+                 "Server and Database specified on the command line. " +
+                 "\r\n\r\n/Dashboard or /b <DashboardName> - Loads named dashboard from database, must specify database " +
+                 "and server without DashboardFileName",
                  "Dashboard viewer usage", false);
         }
     }

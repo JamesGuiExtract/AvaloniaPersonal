@@ -33,7 +33,7 @@
             this.okButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this._descriptionTextBox = new System.Windows.Forms.TextBox();
-            this._stroreEmptyAttributesCheckBox = new System.Windows.Forms.CheckBox();
+            this._storeEmptyAttributesCheckBox = new System.Windows.Forms.CheckBox();
             this._storeSpatialInfoCheckBox = new System.Windows.Forms.CheckBox();
             this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -82,13 +82,13 @@
             // 
             // _stroreEmptyAttributesCheckBox
             // 
-            this._stroreEmptyAttributesCheckBox.AutoSize = true;
-            this._stroreEmptyAttributesCheckBox.Location = new System.Drawing.Point(13, 62);
-            this._stroreEmptyAttributesCheckBox.Name = "_stroreEmptyAttributesCheckBox";
-            this._stroreEmptyAttributesCheckBox.Size = new System.Drawing.Size(128, 17);
-            this._stroreEmptyAttributesCheckBox.TabIndex = 2;
-            this._stroreEmptyAttributesCheckBox.Text = "Store empty attributes";
-            this._stroreEmptyAttributesCheckBox.UseVisualStyleBackColor = true;
+            this._storeEmptyAttributesCheckBox.AutoSize = true;
+            this._storeEmptyAttributesCheckBox.Location = new System.Drawing.Point(13, 62);
+            this._storeEmptyAttributesCheckBox.Name = "_stroreEmptyAttributesCheckBox";
+            this._storeEmptyAttributesCheckBox.Size = new System.Drawing.Size(128, 17);
+            this._storeEmptyAttributesCheckBox.TabIndex = 2;
+            this._storeEmptyAttributesCheckBox.Text = "Store empty attributes";
+            this._storeEmptyAttributesCheckBox.UseVisualStyleBackColor = true;
             // 
             // _storeSpatialInfoCheckBox
             // 
@@ -134,7 +134,7 @@
             this.ClientSize = new System.Drawing.Size(487, 308);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._storeSpatialInfoCheckBox);
-            this.Controls.Add(this._stroreEmptyAttributesCheckBox);
+            this.Controls.Add(this._storeEmptyAttributesCheckBox);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cancelButton);
@@ -161,7 +161,7 @@
         private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox _descriptionTextBox;
-        private System.Windows.Forms.CheckBox _stroreEmptyAttributesCheckBox;
+        private System.Windows.Forms.CheckBox _storeEmptyAttributesCheckBox;
         private System.Windows.Forms.CheckBox _storeSpatialInfoCheckBox;
         private Utilities.Forms.SchedulerControl _schedulerControl;
         private System.Windows.Forms.GroupBox groupBox1;

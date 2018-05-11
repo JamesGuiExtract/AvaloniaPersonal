@@ -1554,6 +1554,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrWEB_APP_CONFIG);
 			eraseFromVector(vecTables, gstrDATABASE_SERVICE);
 			eraseFromVector(vecTables, gstrMLMODEL);
+			eraseFromVector(vecTables, gstrDASHBOARD);
 		}
 
 		// Never drop these tables
@@ -1853,6 +1854,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_WEB_APP_CONFIG);
 		vecQueries.push_back(gstrCREATE_DATABASE_SERVICE_TABLE);
 		vecQueries.push_back(gstrCREATE_MLMODEL);
+		vecQueries.push_back(gstrCREATE_DASHBOARD_TABLE);
 	}
 
 	// Add queries to create tables to the vector
@@ -3379,6 +3381,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrWEB_APP_CONFIG);
 	vecTables.push_back(gstrDATABASE_SERVICE);
 	vecTables.push_back(gstrREPORTING_VERIFICATION_RATES);
+	vecTables.push_back(gstrDASHBOARD);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

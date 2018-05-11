@@ -241,6 +241,9 @@
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
       <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Dashboards\Forms\Core\Code\Extract.Dashboard.Forms.csproj">
+      <Project>{d53a71cf-51a4-45f3-9644-fed8faf49d3c}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\ETL\Management\Core\Code\Extract.ETL.Management.csproj">
       <Project>{bb9baf31-f7f7-4065-b563-77fcc6aa722b}</Project>
     </ProjectReference>

@@ -464,6 +464,12 @@ static const string gstrCREATE_WEB_APP_CONFIG =
 	"	[Settings] NTEXT, "
 	"	CONSTRAINT[IX_WEB_APP_TYPE] UNIQUE NONCLUSTERED ([Type], [WorkflowID]))";
 
+static const string gstrCREATE_DASHBOARD_TABLE =
+	"CREATE TABLE [dbo].[Dashboard]( "
+	"	[DashboardName] [nvarchar](100) NOT NULL CONSTRAINT [PK_Dashboard] PRIMARY KEY CLUSTERED, "
+	"	[Definition] [xml] NOT NULL )";
+	
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
