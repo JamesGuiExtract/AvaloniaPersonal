@@ -846,7 +846,7 @@ namespace Extract.DataEntry
 
                 if (_fontStyle == FontStyle.Bold &&
                     _attribute != null && 
-                    AttributeStatusInfo.HasBeenViewed(_attribute, false))
+                    AttributeStatusInfo.HasBeenViewedOrIsNotViewable(_attribute, false))
                 {
                     SetFontStyle(FontStyle.Regular);
                 }
@@ -1162,7 +1162,7 @@ namespace Extract.DataEntry
 
                     // If the attribute has not been viewed, apply bold font. Otherwise, use
                     // regular font.
-                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
+                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewedOrIsNotViewable(_attribute, false);
                     if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
                     {
                         SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
@@ -1298,7 +1298,7 @@ namespace Extract.DataEntry
                     OnAttributesSelected();
 
                     // Update the font according to the viewed status.
-                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
+                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewedOrIsNotViewable(_attribute, false);
                     if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
                     {
                         SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);

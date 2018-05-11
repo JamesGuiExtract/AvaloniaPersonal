@@ -114,13 +114,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._topToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this._topToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._collapseAllToolStripButton,
-            this._saveToolStripButton,
             this._applyToolStripButton,
+            this._saveToolStripButton,
             this._revertToSourceToolStripButton,
             this._revertToOriginalToolStripButton});
             this._topToolStrip.Location = new System.Drawing.Point(3, 0);
             this._topToolStrip.Name = "_topToolStrip";
-            this._topToolStrip.Size = new System.Drawing.Size(465, 25);
+            this._topToolStrip.Size = new System.Drawing.Size(434, 25);
             this._topToolStrip.TabIndex = 0;
             // 
             // _collapseAllToolStripButton
@@ -139,7 +139,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._saveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._saveToolStripButton.Name = "_saveToolStripButton";
             this._saveToolStripButton.Size = new System.Drawing.Size(51, 22);
-            this._saveToolStripButton.Text = "Save";
+            this._saveToolStripButton.Text = "Save Progress";
+            this._saveToolStripButton.ToolTipText = "Use this button to save your current pagination and indexing progress.";
             this._saveToolStripButton.Click += new System.EventHandler(this.HandleSaveToolStripButton_Click);
             // 
             // _applyToolStripButton
@@ -170,7 +171,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._revertToOriginalToolStripButton.Name = "_revertToOriginalToolStripButton";
             this._revertToOriginalToolStripButton.Size = new System.Drawing.Size(171, 22);
             this._revertToOriginalToolStripButton.Text = "Restore as originally loaded";
-            this._revertToOriginalToolStripButton.ToolTipText = resources.GetString("_revertToOriginalToolStripButton.ToolTipText");
+            this._revertToOriginalToolStripButton.ToolTipText = "Restore all pages and extracted data to the state at which they existed when " +
+                    "first displayed. This may represent the original state or the state saved by a prior user.";
             this._revertToOriginalToolStripButton.Click += new System.EventHandler(this.HandleRevertToOriginalToolStripButton_Click);
             // 
             // PaginationPanel

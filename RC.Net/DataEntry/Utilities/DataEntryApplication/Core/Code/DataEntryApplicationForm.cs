@@ -1328,6 +1328,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _paginationPanel.OutputExpectedPaginationAttributesFile =
                         _settings.PaginationSettings.OutputExpectedPaginationAttributesFiles;
                     _paginationPanel.FileProcessingDB = FileProcessingDB;
+                    _paginationPanel.SaveButtonVisible = false;
 
                     ValidatePaginationActions();
 

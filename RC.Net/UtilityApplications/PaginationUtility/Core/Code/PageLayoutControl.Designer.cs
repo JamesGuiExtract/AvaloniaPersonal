@@ -15,7 +15,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this._flowLayoutPanel = new PaginationFlowLayoutPanel();
+            this._flowLayoutPanel = new Extract.UtilityApplications.PaginationUtility.PaginationFlowLayoutPanel();
             this.SuspendLayout();
             // 
             // _flowLayoutPanel
@@ -27,7 +27,7 @@
             this._flowLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this._flowLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
             this._flowLayoutPanel.Name = "_flowLayoutPanel";
-            this._flowLayoutPanel.Size = new System.Drawing.Size(459, 425);
+            this._flowLayoutPanel.Size = new System.Drawing.Size(459, 222);
             this._flowLayoutPanel.TabIndex = 0;
             this._flowLayoutPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.Handle_DragDrop);
             this._flowLayoutPanel.DragEnter += new System.Windows.Forms.DragEventHandler(this.Handle_DragEnter);
@@ -40,7 +40,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this._flowLayoutPanel);
             this.Name = "PageLayoutControl";
-            this.Size = new System.Drawing.Size(459, 425);
+            this.Size = new System.Drawing.Size(459, 222);
             this.ResumeLayout(false);
 
         }

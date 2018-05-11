@@ -584,6 +584,36 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets a <see cref="PaginationDocumentData" /> instance based on the provided
+        /// <see paramref="attributes" />.
+        /// </summary>
+        /// <param name="documentDataAttribute">The VOA data for while a <see cref="PaginationDocumentData" />
+        /// instance is needed including this top-level attribute which contains document data status info.
+        /// </param>
+        /// <param name="sourceDocName">The name of the source document for which data is being
+        /// loaded.</param>
+        /// <param name="fileProcessingDB"></param>
+        /// <param name="imageViewer"></param>
+        /// <returns>
+        /// The <see cref="PaginationDocumentData" /> instance.
+        /// </returns>
+        public PaginationDocumentData GetDocumentData(IAttribute documentDataAttribute, string sourceDocName,
+            FileProcessingDB fileProcessingDB, ImageViewer imageViewer)
+        {
+            try
+            {
+                var documentData = ActiveDataEntryPanel.GetDocumentData(documentDataAttribute, sourceDocName);
+                UpdateDocumentStatus(documentData, saveData: false, validateData: false);
+
+                return documentData;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45983");
+            }
+        }
+
+        /// <summary>
         /// Updates the document data status.
         /// </summary>
         /// <param name="data">The <see cref="PaginationDocumentData"/> whose status will be checked.
@@ -1133,6 +1163,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _documentStatusesUpdated.Reset();
 
             string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
+
             var backgroundConfigManager = _configManager.CreateBackgroundManager();
 
             var thread = new Thread(new ThreadStart(() =>

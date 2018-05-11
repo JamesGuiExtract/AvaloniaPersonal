@@ -778,7 +778,7 @@ namespace Extract.DataEntry
                 else
                 {
                     bool hasBeenViewed =
-                        AttributeStatusInfo.HasBeenViewed(dataEntryCell.Attribute, false);
+                        AttributeStatusInfo.HasBeenViewedOrIsNotViewable(dataEntryCell.Attribute, false);
 
                     if (dataEntryCell.IsBeingDragged)
                     {

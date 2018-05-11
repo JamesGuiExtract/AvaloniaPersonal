@@ -1699,7 +1699,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (position >= 0 && position < _flowLayoutPanel.Controls.Count)
+                if (position >= 0 && position < _flowLayoutPanel.Controls.OfType<PaginationControl>().Count())
                 {
                     var pageControl = _flowLayoutPanel.Controls
                         .OfType<Control>()
@@ -2475,6 +2475,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _pendingSnapDataPanelToTop = false;
 
                     SnapDataPanelToTop();
+
+                    PerformLayout();
                 }
             }
             catch (Exception ex)
@@ -2666,14 +2668,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 OnLoadNextDocumentRequest();
-
-                // I cannot, for the life of me, figure out how to scroll to the bottom of
-                // _flowLayoutPanel here; nothing seems to work.
-                //                this.SafeBeginInvoke("ELI35660", () =>
-                //                {
-                //                    _flowLayoutPanel.ScrollControlIntoViewManual(_loadNextDocumentButtonControl);
-                //                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;    
-                //                });
             }
             catch (Exception ex)
             {
@@ -2896,9 +2890,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             bool isPageControl = control is PageThumbnailControl;
+            bool areAnyPaginationControls = _flowLayoutPanel.Controls.OfType<PaginationControl>().Any();
+
+            if (!areAnyPaginationControls && _flowLayoutPanel.Controls.Count > 0)
+            {
+                _flowLayoutPanel.Controls.Clear();
+            }
 
             // Precede the first page with a separator to serve as a header for the document.
-            if (isPageControl && _flowLayoutPanel.Controls.Count == 0)
+            if (isPageControl && !areAnyPaginationControls)
             {
                 AddPaginationControl(new PaginationSeparator(CommitOnlySelection));
             }
@@ -3013,7 +3013,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 newDocument.AddPage(thumbnailControl);
 
                 index++;
-                if (index == _flowLayoutPanel.Controls.Count)
+                if (index == _flowLayoutPanel.Controls.OfType<PaginationControl>().Count())
                 {
                     break;
                 }
@@ -3579,7 +3579,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _updateCommandStatesInvoked = false;
 
             int contextMenuControlIndex = (_commandTargetControl == null)
-                ? _flowLayoutPanel.Controls.Count
+                ? _flowLayoutPanel.Controls.OfType<PaginationControl>().Count()
                 : _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
             // Commands that operate on the active selection require there to be a selection and for
@@ -3838,7 +3838,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 if (newSelectionPosition != -1 &&
-                    newSelectionPosition < _flowLayoutPanel.Controls.Count)
+                    newSelectionPosition < _flowLayoutPanel.Controls.OfType<PaginationControl>().Count())
                 {
                     PaginationControl controlToSelect =
                         _flowLayoutPanel.Controls[newSelectionPosition] as PaginationControl;

@@ -1,6 +1,7 @@
 ﻿using Extract.Imaging.Forms;
 using System;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
@@ -143,6 +144,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="imageViewer"></param>
         /// <returns>The <see cref="PaginationDocumentData"/> instance.</returns>
         PaginationDocumentData GetDocumentData(IUnknownVector attributes, string sourceDocName,
+            FileProcessingDB fileProcessingDB, ImageViewer imageViewer);
+
+        /// <summary>
+        /// Gets a <see cref="PaginationDocumentData" /> instance based on the provided
+        /// <see paramref="attributes" />.
+        /// </summary>
+        /// <param name="documentDataAttribute">The VOA data for while a <see cref="PaginationDocumentData" />
+        /// instance is needed including this top-level attribute which contains document data status info.
+        /// </param>
+        /// <param name="sourceDocName">The name of the source document for which data is being
+        /// loaded.</param>
+        /// <param name="fileProcessingDB"></param>
+        /// <param name="imageViewer"></param>
+        /// <returns>
+        /// The <see cref="PaginationDocumentData" /> instance.
+        /// </returns>
+        PaginationDocumentData GetDocumentData(IAttribute documentDataAttribute, string sourceDocName,
             FileProcessingDB fileProcessingDB, ImageViewer imageViewer);
 
         /// <summary>

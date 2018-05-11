@@ -270,6 +270,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _paginationPanel.AutoRotateImages = _settings.AutoRotateImages;
                 _paginationPanel.SelectAllCheckBoxVisible = _settings.SelectAllCheckBoxVisible;
                 _paginationPanel.LoadNextDocumentVisible = _settings.LoadNextDocumentVisible;
+                _paginationPanel.SaveButtonVisible = true;
 
                 if (!string.IsNullOrWhiteSpace(paginationDocumentDataPanelAssembly))
                 {
@@ -1774,15 +1775,14 @@ namespace Extract.FileActionManager.FileProcessors
                                     .Select(attribute => attribute.Value.String)
                                     .SingleOrDefault() ?? "", pageCount, true);
 
-                            var documentAttributes = documentAttribute.SubAttributes
+                            var documentDataAttribute = documentAttribute.SubAttributes
                                 .ToIEnumerable<IAttribute>()
                                 .Where(attribute => attribute.Name.Equals(
                                     "DocumentData", StringComparison.OrdinalIgnoreCase))
-                                .Select(data => data.SubAttributes)
-                                .SingleOrDefault() ?? new IUnknownVector();
+                                .SingleOrDefault();
 
                             PaginationDocumentData documentData =
-                                GetAsPaginationDocumentData(documentAttributes, fileName);
+                                GetAsPaginationDocumentData(documentDataAttribute, fileName);
 
                             if (!suggestedPagination.HasValue)
                             {
@@ -1844,7 +1844,26 @@ namespace Extract.FileActionManager.FileProcessors
         /// <see paramref="attributes"/> if the <see cref="_paginationDocumentDataPanel"/> is
         /// available.
         /// </summary>
-        /// <param name="attributes">The attributes.</param>
+        /// <param name="documentDataAttribute">The attributes.</param>
+        /// <param name="sourceDocName">The source document name to be associated the data is
+        /// associated with or <see langword="null"/> if the data is not associated with a
+        /// particular source document.</param>
+        /// <returns>The <see cref="PaginationDocumentData"/> instance or <see langword="null"/> if
+        /// the <see cref="_paginationDocumentDataPanel"/> is not available.</returns>
+        PaginationDocumentData GetAsPaginationDocumentData(IAttribute documentDataAttribute, string sourceDocName)
+        {
+            return (_paginationDocumentDataPanel == null)
+                ? new PaginationDocumentData(documentDataAttribute, sourceDocName)
+                : _paginationDocumentDataPanel.GetDocumentData(
+                    documentDataAttribute, sourceDocName, FileProcessingDB, _imageViewer);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="PaginationDocumentData"/> instance representing the specified
+        /// <see paramref="attributes"/> if the <see cref="_paginationDocumentDataPanel"/> is
+        /// available.
+        /// </summary>
+        /// <param name="documentDataAttribute">The attributes.</param>
         /// <param name="sourceDocName">The source document name to be associated the data is
         /// associated with or <see langword="null"/> if the data is not associated with a
         /// particular source document.</param>
@@ -1852,10 +1871,13 @@ namespace Extract.FileActionManager.FileProcessors
         /// the <see cref="_paginationDocumentDataPanel"/> is not available.</returns>
         PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes, string sourceDocName)
         {
+            var documentDataAttribute = new UCLID_AFCORELib.Attribute();
+            documentDataAttribute.SubAttributes = attributes;
+
             return (_paginationDocumentDataPanel == null)
-                ? new PaginationDocumentData(attributes, sourceDocName)
+                ? new PaginationDocumentData(documentDataAttribute, sourceDocName)
                 : _paginationDocumentDataPanel.GetDocumentData(
-                    attributes, sourceDocName, FileProcessingDB, _imageViewer);
+                    documentDataAttribute, sourceDocName, FileProcessingDB, _imageViewer);
         }
 
         /// <summary>

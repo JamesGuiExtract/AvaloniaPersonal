@@ -72,6 +72,7 @@ public:
 	STDMETHOD(put_DataObject)(/*[in]*/ IUnknown* newVal);
 	STDMETHOD(GetAttributeSize)(long* plAttributeSize);
 	STDMETHOD(SetGUID)(const GUID* pGuid);
+	STDMETHOD(StowDataObject)(IMiscUtils *pMiscUtils);
 	
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown ** pObject);
@@ -111,7 +112,11 @@ private:
 	string m_strAttributeName;
 	string m_strAttributeType;
 	IUnknownPtr m_ipDataObject;
+	// Represents the persisted stringized bytestream of an m_ipDataObject that needed to be
+	// cleared for memory managment purposes.
+	string m_strStowedDataObject;
 	IMemoryManagerPtr m_ipMemoryManager;
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	// flag to keep track of whether this object has been modified
 	// since the last save-to-stream operation
@@ -135,6 +140,8 @@ private:
 	// if bWithCloneIdentifiableObject is true and exists on the properties that need to be cloned,
 	// otherwise uses the ICopyableObject interface
 	void copyFrom(UCLID_AFCORELib::IAttributePtr ipSource, bool bWithCloneIdentifiableObject);
+	
+	IMiscUtilsPtr getMiscUtils();
 
 	void validateLicense();
 };

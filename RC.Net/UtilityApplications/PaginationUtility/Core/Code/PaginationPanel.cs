@@ -343,6 +343,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the save button visible (to save changes without committing).
+        /// </summary>
+        public bool SaveButtonVisible
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this instance should cache images with the
         /// <see cref="ImageViewer"/> when loading files or <see langword="false"/> if it should not
         /// (such as if the application is managing caching externally).
@@ -982,6 +991,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <returns><c>true</c> if the data was saved; otherwise, <c>false</c>.</returns>
         public bool Save()
         {
+            TemporaryWaitCursor waitCursor = new TemporaryWaitCursor();
+
             try
             {
                 bool result = SaveDocumentData(selectedDocumentsOnly: false, validateData: false);
@@ -1039,8 +1050,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 sourceDocName);
                         }
 
-                        var documentDataAttribute = documentAttribute.AddSubAttribute("DocumentData");
-                        documentDataAttribute.SubAttributes.Append(outputDoc.DocumentData.Attributes);
+                        documentAttribute.SubAttributes.PushBack(outputDoc.DocumentData.DocumentDataAttribute);
                     }
 
                     if (documentAttributes.Size() > 0)
@@ -1057,6 +1067,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45736");
+            }
+            finally
+            {
+                waitCursor.Dispose();
             }
         }
 
@@ -2352,6 +2366,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _selectAllToCommitCheckBox.CheckedChanged += HandleSelectAllToCommitCheckBox_CheckedChanged;
                 }
 
+                _saveToolStripButton.Visible = SaveButtonVisible;
+
                 ResetPrimaryPageLayoutControl();
             }
             catch (Exception ex)
@@ -2567,10 +2583,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var response = MessageBox.Show(this,
-                    "This returns all pages to the document groupings and states that existed when " +
-                    "the document loaded into this application. It will also revert to the " +
-                    "extracted data that existed at that time. This state may represent the result " +
-                    "of automated processing or may be the state at which a previous user saved.",
+                    "Restore all pages and extracted data to the state at which they existed when " +
+                    "first displayed. This may represent the original state or the state saved by a prior user.",
                     "Restore as originally loaded?", MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0);
 

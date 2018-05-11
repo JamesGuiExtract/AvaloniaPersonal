@@ -914,17 +914,17 @@ STDMETHODIMP CLabDEProductDBMgr::raw_ValidateSchema(IFileProcessingDB* pDB)
     {
         AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-        // Update the FAMDB pointer if it is new.
-        if (m_ipFAMDB != pDB)
-        {
-            m_ipFAMDB = pDB;
-            m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
-        
-            // Reset the database connection
-            m_ipDBConnection = __nullptr;
-        }
+        //// Update the FAMDB pointer if it is new.
+        //if (m_ipFAMDB != pDB)
+        //{
+        //    m_ipFAMDB = pDB;
+        //    m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
+        //
+        //    // Reset the database connection
+        //    m_ipDBConnection = __nullptr;
+        //}
 
-        validateLabDESchemaVersion(false);
+        //validateLabDESchemaVersion(false);
 
         return S_OK;
     }
@@ -952,7 +952,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_GetDBInfoRows(IVariantVector** ppDBInfoRows
 
         *ppDBInfoRows = ipDBInfoRows.Detach();
 
-        return S_OK;
+        return S_OK; 
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37855");
 }

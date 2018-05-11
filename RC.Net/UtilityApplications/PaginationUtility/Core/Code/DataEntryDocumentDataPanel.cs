@@ -4,10 +4,10 @@ using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -212,6 +212,29 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI44681");
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="DataEntryPaginationDocumentData" /> instance based on the provided
+        /// <see paramref="attributes" />.
+        /// </summary>
+        /// <param name="documentDataAttribute">The <see cref="IAttribute"/> hierarchy (voa data) on which this
+        /// instance is based including this top-level attribute which contains document data status info.</param>
+        /// <param name="sourceDocName">The name of the source document for which data is being
+        /// loaded.</param>
+        /// <returns>
+        /// The <see cref="DataEntryPaginationDocumentData"/> instance.
+        /// </returns>
+        public virtual DataEntryPaginationDocumentData GetDocumentData(IAttribute documentDataAttribute, string sourceDocName)
+        {
+            try
+            {
+                return new DataEntryPaginationDocumentData(documentDataAttribute, sourceDocName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45985");
             }
         }
 

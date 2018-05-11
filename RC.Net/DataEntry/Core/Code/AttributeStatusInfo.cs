@@ -607,6 +607,26 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether the attribute should be persisted in output.
+        /// NOTE: Unlike the HasBeenViewedOrIsNotViewable method, this property does not take into
+        /// account whether the attribute is viewable; the raw field value is returned here.
+        /// </summary>
+        public bool HasBeenViewed
+        {
+
+            get
+            {
+                return _hasBeenViewed;
+            }
+
+            set
+            {
+                _hasBeenViewed = value;
+            }
+        }
+
+
+        /// <summary>
         /// Gets or sets a <see langword="string"/> that allows <see cref="IAttribute"/>s to be
         /// sorted by compared to other <see cref="IAttribute"/>'s <see cref="DisplayOrder"/>values.
         /// <see cref="IAttribute"/>s will be sorted from lowest to highest using the result of
@@ -2204,7 +2224,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the <see cref="IAttribute"/> has been viewed, or
         /// <see langword="false"/> if it has not.</returns>
         [ComVisible(false)]
-        public static bool HasBeenViewed(IAttribute attribute, bool recursive)
+        public static bool HasBeenViewedOrIsNotViewable(IAttribute attribute, bool recursive)
         {
             try
             {
@@ -3593,12 +3613,20 @@ namespace Extract.DataEntry
         {
             try
             {
-                foreach (IAttribute attribute in
-                    DataEntryMethods.ToAttributeEnumerable(attributes, true))
+                if (attributes.Size() > 0)
                 {
-                    ReleaseAttributes(attribute.SubAttributes);
+                    var miscUtils = new MiscUtils();
 
-                    attribute.DataObject = null;
+                    foreach (IAttribute attribute in
+                        DataEntryMethods.ToAttributeEnumerable(attributes, true))
+                    {
+                        ReleaseAttributes(attribute.SubAttributes);
+
+                        // This will release the reference to the DataObject (thereby preventing memory
+                        // leak issues), while saving the persistable elements of the status info object
+                        // so that they are persisted with the attribute itself.
+                        attribute.StowDataObject(miscUtils);
+                    }
                 }
             }
             catch (Exception ex)

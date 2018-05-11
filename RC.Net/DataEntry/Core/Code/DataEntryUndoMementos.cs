@@ -333,7 +333,7 @@ namespace Extract.DataEntry
         public DataEntryAttributeStatusChangeMemento(IAttribute affectedAttribute)
             : base(affectedAttribute)
         {
-            _hasBeenViewed = AttributeStatusInfo.HasBeenViewed(affectedAttribute, false);
+            _hasBeenViewed = AttributeStatusInfo.HasBeenViewedOrIsNotViewable(affectedAttribute, false);
             _isAccepted = AttributeStatusInfo.IsAccepted(affectedAttribute);
             _hintEnabled = AttributeStatusInfo.HintEnabled(affectedAttribute);
             _hintType = AttributeStatusInfo.GetHintType(affectedAttribute);

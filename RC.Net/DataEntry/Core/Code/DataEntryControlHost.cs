@@ -941,7 +941,7 @@ namespace Extract.DataEntry
         {
             get;
             set;
-        } = Color.LightGreen;
+        } = ExtractColors.LightLightBlue;
 
         /// <summary>
         /// Gets or sets one or more colors to use to highlight data in the image viewer or indicate
@@ -1000,7 +1000,7 @@ namespace Extract.DataEntry
 
                     // Apply the supplied colors and initialize the default color.
                     _highlightColors = value;
-                    ActiveSelectionColor = _highlightColors[_highlightColors.Length - 1].Color;
+                    //ActiveSelectionColor = _highlightColors[_highlightColors.Length - 1].Color;
 
                     // Initialize _confidenceBoundaries
                     _confidenceBoundaries = new VariantVectorClass();
@@ -1453,7 +1453,7 @@ namespace Extract.DataEntry
                                 }
                             }
 
-                            _imageViewer.DefaultHighlightColor = ActiveSelectionColor;
+                            _imageViewer.DefaultHighlightColor = _highlightColors[_highlightColors.Length - 1].Color;
                             _imageViewer.AllowBandedSelection = false;
                             _changingData = false;
                         }
@@ -3500,7 +3500,7 @@ namespace Extract.DataEntry
                 // Blank attributes will not be counted as unviewed in terms of the value of
                 // IsDataUnviewed, but if a query applies a value while still in the unviewed state,
                 // then it should count as unviewed.
-                if (!AttributeStatusInfo.HasBeenViewed(e.Attribute, false) &&
+                if (!AttributeStatusInfo.HasBeenViewedOrIsNotViewable(e.Attribute, false) &&
                     !string.IsNullOrWhiteSpace(e.Attribute.Value.String))
                 {
                     if (_unviewedAttributes.Add(e.Attribute) && _unviewedAttributes.Count == 1)
@@ -5975,7 +5975,7 @@ namespace Extract.DataEntry
                 Dictionary<IDataEntryControl, List<IAttribute>> attributesMarkedAsViewed =
                     new Dictionary<IDataEntryControl, List<IAttribute>>();
 
-                if (!AttributeStatusInfo.HasBeenViewed(attribute, false) &&
+                if (!AttributeStatusInfo.HasBeenViewedOrIsNotViewable(attribute, false) &&
                     string.IsNullOrEmpty(attribute.Value.String))
                 {
                     AttributeStatusInfo.MarkAsViewed(attribute, true);
@@ -6839,7 +6839,15 @@ namespace Extract.DataEntry
             // https://extract.atlassian.net/browse/ISSUE-14328
             // In the PaginationPanel, the document open in the image viewer may not be the document
             // to which this highlight pertains.
-            if (!FileSystemMethods.ArePathsEqual(attribute.Value.SourceDocName, ImageViewer.ImageFile))
+            // https://extract.atlassian.net/browse/ISSUE-14901
+            // The above fix broke smart hints since the hints do not have a SourceDocName set.
+            // It appears other changes now prevent ISSUE-14328 from occurring even without this
+            // check, though it seems hard to track down exactly what changes along the way would
+            // have done so. I'm torn between the risk of re-introducing ISSUE-14328 and other
+            // as-yet undiscovered consequences of this early return. As a compromise, I'm adding a
+            // check to confirm the attribute has an SDN before allowing the early return.
+            if (!string.IsNullOrEmpty(attribute.Value.SourceDocName) &&
+                !FileSystemMethods.ArePathsEqual(attribute.Value.SourceDocName, ImageViewer.ImageFile))
             {
                 return attributeHighlights;
             }

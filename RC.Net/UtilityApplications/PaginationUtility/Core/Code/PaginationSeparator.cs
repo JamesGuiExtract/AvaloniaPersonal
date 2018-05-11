@@ -1,6 +1,6 @@
-﻿using Extract.Utilities.Forms;
+﻿using Extract.DataEntry;
+using Extract.Utilities.Forms;
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -51,6 +51,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// be committed.
         /// </summary>
         bool _documentSelectedToCommit;
+
+        /// <summary>
+        /// Indicates whether the associated <see cref="OutputDocument"/>'s has been viewed (in the
+        /// data entry panel).
+        /// </summary>
+        bool? _documentDataHasBeenViewed;
 
         /// <summary>
         /// Indicates when a click event has been handled internal to this class and should not be
@@ -222,6 +228,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _documentSelectedToCommit = value;
                         _selectedCheckBox.Checked = value;
 
+                        if (_outputDocument?.DocumentData != null)
+                        {
+                            AttributeStatusInfo.AcceptValue(_outputDocument.DocumentData.DocumentDataAttribute, value);
+                        }
+
                         OnDocumentSelectedToCommitChanged();
                     }
                 }
@@ -233,7 +244,45 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets whether the associated <see cref="OutputDocument"/>'s data has been viewed
+        /// (in the data panel).
+        /// </summary>
+        /// <value><see langword="true"/> if the document data has been viewed; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool DocumentDataHasBeenViewed
+        {
+            get
+            {
+                return _documentDataHasBeenViewed.HasValue && _documentDataHasBeenViewed.Value;
+            }
+
+            set
+            {
+                try
+                {
+                    if (!_documentDataHasBeenViewed.HasValue || value != _documentDataHasBeenViewed.Value)
+                    {
+                        _documentDataHasBeenViewed = value;
+                        _summaryLabel.Font = new Font(_summaryLabel.Font, value ? FontStyle.Regular : FontStyle.Bold);
+                        _pagesLabel.Font = new Font(_pagesLabel.Font, value ? FontStyle.Regular : FontStyle.Bold);
+
+                        if (_outputDocument?.DocumentData != null)
+                        {
+                            var statusInfo = AttributeStatusInfo.GetStatusInfo(Document.DocumentData.DocumentDataAttribute);
+                            statusInfo.HasBeenViewed = value;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45961");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IPaginationDocumentDataPanel"/> used to display the document data for editing.
         /// </summary>
         public IPaginationDocumentDataPanel DocumentDataPanel
         {
@@ -305,9 +354,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _collapsed = _outputDocument.PageControls.Any(c => !c.Visible);
                             _outputDocument.Invalidated += HandleDocument_Invalidated;
                             _outputDocument.DocumentStateChanged += HandleOutputDocument_DocumentStateChanged;
+
+                            if (_outputDocument?.DocumentData != null)
+                            {
+                                DocumentSelectedToCommit =
+                                    AttributeStatusInfo.IsAccepted(_outputDocument.DocumentData.DocumentDataAttribute);
+                                var statusInfo = AttributeStatusInfo.GetStatusInfo(Document.DocumentData.DocumentDataAttribute);
+                                DocumentDataHasBeenViewed = statusInfo.HasBeenViewed;
+                            }
                         }
                         else
                         {
+                            DocumentSelectedToCommit = false;
+                            DocumentDataHasBeenViewed = false;
                             _collapsed = false;
                         }
 
@@ -405,6 +464,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _editDocumentDataButton.Checked = true;
 
                         args.DocumentDataPanel.DataPanelChanged += DocumentDataPanel_DataPanelChanged;
+
+                        DocumentDataHasBeenViewed = true;
 
                         // Ensure this control gets sized based upon the added _documentDataPanelControl.
                         PerformLayout();
@@ -635,17 +696,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             // Determine what the separator color should be base on whether the current document
             // has a page displayed in the image viewer.
-            var newColor = (Document?.PageControls.Any(pageControl => 
+            var newColor = (Document?.PageControls.Any(pageControl =>
                                 pageControl.PageIsDisplayed && pageControl.Highlighted) == true)
-                ? SystemColors.Highlight
-                : Color.SteelBlue;
+                ? ExtractColors.LightLightBlue
+                : ExtractColors.White;
             
             // Update the BackColor of the separator itself, as well as any controls except the edit button.
             if (newColor != _currentColor)
             {
                 _tableLayoutPanel.BackColor = newColor;
                 foreach (var control in _tableLayoutPanel.Controls.OfType<Control>()
-                    .Where(control => !(control is ButtonBase)))
+                    .Except(new[] {  _editDocumentDataButton }))
                 {
                     control.BackColor = newColor;
                 }
@@ -916,6 +977,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _controlUpdatePending = true;
                 Document.PaginationSeparator = this;
                 InvalidatePending = true;
+
+                if (Document.DocumentData != null)
+                {
+                    DocumentSelectedToCommit =
+                        AttributeStatusInfo.IsAccepted(_outputDocument.DocumentData.DocumentDataAttribute);
+                    var statusInfo = AttributeStatusInfo.GetStatusInfo(Document.DocumentData.DocumentDataAttribute);
+                    DocumentDataHasBeenViewed = statusInfo.HasBeenViewed;
+                }
+                else
+                {
+                    DocumentSelectedToCommit = false;
+                    DocumentDataHasBeenViewed = false;
+                }
             }
 
             if (_controlUpdatePending &&

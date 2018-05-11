@@ -1177,7 +1177,7 @@ namespace Extract.DataEntry
                     // If the attribute has not been viewed, apply bold font.  Otherwise, use
                     // regular font. Compare against _fontStyle instead of the current font since
                     // a font change could be pending in the message queue.
-                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
+                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewedOrIsNotViewable(_attribute, false);
                     if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
                     {
                         SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
@@ -1325,7 +1325,7 @@ namespace Extract.DataEntry
                     // auto-complete lists (probably related to the window handle recreation it
                     // triggers). Compare against _fontStyle instead of the current font since
                     // a font change could be pending in the message queue.
-                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
+                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewedOrIsNotViewable(_attribute, false);
                     if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
                     {
                         SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);

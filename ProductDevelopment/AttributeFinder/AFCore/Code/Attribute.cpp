@@ -33,6 +33,7 @@ CAttribute::CAttribute()
   m_ipSubAttributes(__nullptr),
   m_ipDataObject(__nullptr),
   m_ipMemoryManager(__nullptr),
+  m_ipMiscUtils(__nullptr),
   m_bDirty(false)
 {
 	try
@@ -584,6 +585,13 @@ STDMETHODIMP CAttribute::get_DataObject(IUnknown **pVal)
 
 		validateLicense();
 
+		// If caller is accessing a DataObject that doesn't currently exist, but we have a stowed
+		// version, restore the DataObject via the stowed version.
+		if (m_ipDataObject == __nullptr && !m_strStowedDataObject.empty())
+		{
+			m_ipDataObject = getMiscUtils()->GetObjectFromStringizedByteStream(get_bstr_t(m_strStowedDataObject));
+		}
+
 		if (m_ipDataObject == __nullptr)
 		{
 			*pVal = __nullptr;
@@ -607,9 +615,13 @@ STDMETHODIMP CAttribute::put_DataObject(IUnknown *newVal)
 	{
 		validateLicense();
 
-		m_ipDataObject = newVal;
-		m_bDirty = true;
-
+		if (m_ipDataObject != newVal)
+		{
+			m_ipDataObject = newVal;
+			m_strStowedDataObject = "";
+			m_bDirty = true;
+		}
+		
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24402");
@@ -1263,7 +1275,7 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 		}
 		dataWriter << bIsObjectNull;
 
-		bool bIsDataObjectNull = (m_ipDataObject == __nullptr);
+		bool bIsDataObjectNull = (m_ipDataObject == __nullptr && m_strStowedDataObject.empty());
 		dataWriter << bIsDataObjectNull;
 
 		dataWriter.flushToByteStream();
@@ -1325,14 +1337,25 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 		// Write the data object to the stream if not __nullptr.
 		if (!bIsDataObjectNull)
 		{
-			ipPersistentObj = m_ipDataObject;
-			if (ipPersistentObj == __nullptr)
+			if (m_ipDataObject != __nullptr)
 			{
-				throw UCLIDException("ELI24405", 
-					"Attribute data object could not be saved!" );
-			}
+				ipPersistentObj = m_ipDataObject;
+				if (ipPersistentObj == __nullptr)
+				{
+					throw UCLIDException("ELI24405",
+						"Attribute data object could not be saved!");
+				}
 
-			writeObjectToStream(ipPersistentObj, pStream, "ELI24406", fClearDirty);
+				writeObjectToStream(ipPersistentObj, pStream, "ELI24406", fClearDirty);
+			}
+			else
+			{
+				ASSERT_RUNTIME_CONDITION("ELI45984", !m_strStowedDataObject.empty(),
+					"Unexpected DataObject state.");
+
+				ByteStream byteStream(m_strStowedDataObject);
+				pStream->Write(byteStream.getData(), byteStream.getLength(), __nullptr);
+			}
 		}
 
 		saveGUID(pStream);
@@ -1373,7 +1396,6 @@ STDMETHODIMP CAttribute::get_InstanceGUID(GUID *pVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38460")
 }
-
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttribute::SetGUID(const GUID* pGuid)
 {
@@ -1388,6 +1410,33 @@ STDMETHODIMP CAttribute::SetGUID(const GUID* pGuid)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40352")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttribute::StowDataObject(IMiscUtils *pMiscUtils)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (m_ipDataObject != __nullptr)
+		{
+			IMiscUtilsPtr ipMiscUtils = pMiscUtils;
+			if (ipMiscUtils == __nullptr)
+			{
+				ipMiscUtils = getMiscUtils();
+			}
+
+			m_strStowedDataObject = asString(
+				getMiscUtils()->GetObjectAsStringizedByteStream(m_ipDataObject).Detach());
+
+			m_ipDataObject = __nullptr;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45973")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1567,4 +1616,17 @@ void CAttribute::copyFrom(UCLID_AFCORELib::IAttributePtr ipSource, bool bWithClo
 			setGUID(ipIdentifiable->InstanceGUID);
 		}
 	}
+}
+//-------------------------------------------------------------------------------------------------
+IMiscUtilsPtr CAttribute::getMiscUtils()
+{
+	// check if a MiscUtils object has all ready been created
+	if (!m_ipMiscUtils)
+	{
+		// create MiscUtils object
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI45982", m_ipMiscUtils != __nullptr);
+	}
+
+	return m_ipMiscUtils;
 }

@@ -1,5 +1,4 @@
-﻿using Extract.UtilityApplications.PaginationUtility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
@@ -22,6 +21,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         IUnknownVector _attributes;
 
         /// <summary>
+        /// An attribute that sits on top of _attributes and is used to store state info for the
+        /// document data as a whole.
+        /// </summary>
+        IAttribute _documentDataAttribute;
+
+        /// <summary>
         /// Indicates whether this instance was modified as of the last time the
         /// <see cref="Modified"/> accessor was checked.
         /// </summary>
@@ -41,6 +46,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         public PaginationDocumentData(IUnknownVector attributes, string sourceDocName)
         {
             _attributes = attributes;
+            SourceDocName = sourceDocName;
+            _documentDataAttribute = new UCLID_AFCORELib.Attribute();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PaginationDocumentData"/> class.
+        /// </summary>
+        /// <param name="documentDataAttribute">The <see cref="IAttribute"/> hierarchy (voa data) on which this
+        /// instance is based including this top-level attribute which contains document data status info.</param>
+        /// <param name="sourceDocName"><param name="sourceDocName">The name of the source document
+        /// for which data is being loaded.</param></param>
+        public PaginationDocumentData(IAttribute documentDataAttribute, string sourceDocName)
+        {
+            _documentDataAttribute = documentDataAttribute ?? new UCLID_AFCORELib.Attribute();
+            _attributes = _documentDataAttribute.SubAttributes;
             SourceDocName = sourceDocName;
         }
 
@@ -107,6 +127,48 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI41342");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets an attribute that sits on top of <see cref="Attributes"/> and is used to
+        /// store state info for the document data as a whole.
+        /// </summary>
+        /// <value>
+        /// The document data attribute.
+        /// </value>
+        public IAttribute DocumentDataAttribute
+        {
+            get
+            {
+                try
+                {
+                    if (_documentDataAttribute == null)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        if (_documentDataAttribute.SubAttributes != _attributes)
+                        {
+                            _documentDataAttribute.SubAttributes = _attributes;
+                        }
+
+                        return _documentDataAttribute;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45986");
+                }
+            }
+
+            set
+            {
+                if (_documentDataAttribute != value)
+                {
+                    _documentDataAttribute = value;
                 }
             }
         }

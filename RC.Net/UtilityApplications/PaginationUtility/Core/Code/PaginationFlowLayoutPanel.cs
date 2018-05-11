@@ -64,7 +64,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_layoutEngine.LayoutPending)
                 {
                     // If the scroll is commanded before a layout, the end result may not have the
-                    // control in view after all. Wait until the layout has completed before
+                    // control in view after all. Wait the layout has completed before
                     // executing the scroll.
                     _scrollToControl = (control, flushWithTop);
                 }
@@ -74,7 +74,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (flushWithTop)
                     {
-                        base.VerticalScroll.Value = (VerticalScroll.Value + control.Top);
+                        _layoutEngine.SnapToControl = control;
+                        PerformLayout();
                     }
                     else
                     {
@@ -135,6 +136,29 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             return base.ScrollToControl(activeControl);
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="T:System.Windows.Forms.Control" /> and its child controls and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (disposing)
+            {
+                try
+                {
+                    // Dispose of managed resources
+                    if (_layoutEngine != null)
+                    {
+                        _layoutEngine.Dispose();
+                        _layoutEngine = null;
+                    }
+                }
+                catch { }
+            }
         }
 
         #endregion Overrides

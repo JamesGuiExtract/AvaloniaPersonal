@@ -1,6 +1,7 @@
 ﻿using Extract.AttributeFinder;
 using System;
 using System.Collections.Generic;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -85,6 +86,29 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41357");
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="DataEntryPaginationDocumentData"/>.
+        /// </summary>
+        /// <param name="documentDataAttribute">The <see cref="IAttribute"/> hierarchy (voa data) on which this
+        /// instance is based including this top-level attribute which contains document data status info.</param>
+        /// <param name="sourceDocName">The source document related to <see cref="_documentData"/>
+        /// if there is a singular source document; otherwise <see langword="null"/>.</param>
+        public DataEntryPaginationDocumentData(IAttribute documentDataAttribute, string sourceDocName)
+            : base(documentDataAttribute, sourceDocName)
+        {
+            try
+            {
+                WorkingAttributes = Attributes;
+
+                _originalData = (IUnknownVector)((ICopyableObject)Attributes).Clone();
+                _originalData.ReportMemoryUsage();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45952");
             }
         }
 
