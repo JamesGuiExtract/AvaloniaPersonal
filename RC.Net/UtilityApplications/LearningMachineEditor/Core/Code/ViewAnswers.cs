@@ -171,37 +171,29 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
         private void HandleAnswerCategoriesDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            string previousValue = null;
+
             try
             {
                 if (e.ColumnIndex == 1)
                 {
-                    var previousValue = _encoder.AnswerCodeToName[e.RowIndex];
+                    previousValue = _encoder.AnswerCodeToName[e.RowIndex];
                     var newValue = (string)answerCategoriesDataGridView.Rows[e.RowIndex].Cells[1].Value;
-                    if (!string.Equals(previousValue, newValue, StringComparison.Ordinal))
-                    {
-                        // Ensure new name doesn't exist already
-                        // but allow user to change case of a name
-                        _encoder.AnswerNameToCode.Remove(previousValue);
-
-                        // Revert change if the new value already exists
-                        if (_encoder.AnswerNameToCode.ContainsKey(newValue))
-                        {
-                            _encoder.AnswerNameToCode[previousValue] = e.RowIndex;
-                            answerCategoriesDataGridView.Rows[e.RowIndex].Cells[1].Value = previousValue;
-                            UtilityMethods.ShowMessageBox(UtilityMethods.FormatInvariant($"Name, {newValue}, already exists",
-                                $"(code {_encoder.AnswerNameToCode[newValue]})"), "Answer name already exists", true);
-                        }
-                        else
-                        {
-                            _encoder.AnswerNameToCode[newValue] = e.RowIndex;
-                            _encoder.AnswerCodeToName[e.RowIndex] = newValue;
-                        }
-                    }
+                    _encoder.ChangeAnswer(previousValue, newValue);
                 }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45650");
+
+                if (previousValue != null)
+                {
+                    try
+                    {
+                        answerCategoriesDataGridView.Rows[e.RowIndex].Cells[1].Value = previousValue;
+                    }
+                    catch { }
+                }
             }
         }
 

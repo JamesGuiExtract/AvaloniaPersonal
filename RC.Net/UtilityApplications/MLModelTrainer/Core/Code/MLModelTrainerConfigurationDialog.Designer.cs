@@ -87,6 +87,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._nerModelTypeRadioButton = new System.Windows.Forms.RadioButton();
             this._scheduleTabPage = new System.Windows.Forms.TabPage();
             this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
+            this._changeAnswerButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._maxTestingRecordsNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._minF1ScoreNumericUpDown)).BeginInit();
@@ -592,6 +593,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox4.Controls.Add(this._changeAnswerButton);
             this.groupBox4.Controls.Add(this._lmModelTypeRadioButton);
             this.groupBox4.Controls.Add(this._nerModelTypeRadioButton);
             this.groupBox4.Location = new System.Drawing.Point(7, 12);
@@ -650,6 +652,16 @@ namespace Extract.UtilityApplications.MLModelTrainer
             scheduledEvent1.RecurrenceUnit = null;
             scheduledEvent1.Start = new System.DateTime(2018, 3, 23, 11, 16, 13, 0);
             this._schedulerControl.Value = scheduledEvent1;
+            // 
+            // _changeAnswerButton
+            // 
+            this._changeAnswerButton.Location = new System.Drawing.Point(454, 19);
+            this._changeAnswerButton.Name = "_changeAnswerButton";
+            this._changeAnswerButton.Size = new System.Drawing.Size(144, 23);
+            this._changeAnswerButton.TabIndex = 16;
+            this._changeAnswerButton.Text = "Change an answer...";
+            this._changeAnswerButton.UseVisualStyleBackColor = true;
+            this._changeAnswerButton.Click += new System.EventHandler(this.HandleChangeAnswerButton_Click);
             // 
             // MLModelTrainerConfigurationDialog
             // 
@@ -738,5 +750,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Button _editButton;
         private System.Windows.Forms.CheckBox _markOldDataForDeletionCheckBox;
+        private System.Windows.Forms.Button _changeAnswerButton;
     }
 }

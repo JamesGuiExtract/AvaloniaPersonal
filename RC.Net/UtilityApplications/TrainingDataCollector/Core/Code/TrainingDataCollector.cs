@@ -353,6 +353,18 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             }
             
         }
+
+        /// <summary>
+        /// Changes an answer, e.g., a doctype, in the configured LearningMachine's Encoder and also
+        /// updates the MLData stored in the DB
+        /// </summary>
+        /// <param name="oldAnswer">The answer to be changed (must exist in the LearningMachine)</param>
+        /// <param name="newAnswer">The new answer to change to (must not exist in the LearningMachine)</param>
+        public override void ChangeAnswer(string oldAnswer, string newAnswer)
+        {
+            ChangeAnswer(oldAnswer, newAnswer, DataGeneratorPath);
+        }
+
         #endregion Public Methods
 
         #region IHasConfigurableDatabaseServiceStatus

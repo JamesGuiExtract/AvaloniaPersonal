@@ -1,12 +1,35 @@
-﻿using System;
+﻿using Extract.AttributeFinder;
+using Microsoft.VisualBasic.FileIO;
+using System;
+using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Extract.ETL
 {
     public abstract class MachineLearningService : DatabaseService
     {
+        #region Constants
+
+        /// <summary>
+        /// Query to get all MLData associated with a name
+        /// </summary>
+        static readonly string _GET_ALL_MLDATA_FOR_NAME =
+            @"SELECT * FROM MLData WHERE MLModelID IN
+                (SELECT ID FROM MLModel WHERE Name = @Name)";
+
+        #endregion Constants
+
+        #region Fields
+
         string _modelName;
+
+        #endregion Fields
+
+        #region Properties
 
         /// <summary>
         /// The name used to group training/testing data in FAMDB (table MLModel)
@@ -135,6 +158,10 @@ namespace Extract.ETL
             }
         }
 
+        #endregion Properties
+
+        #region Public Methods
+
         /// <summary>
         /// Clones with a new Guid
         /// </summary>
@@ -144,6 +171,10 @@ namespace Extract.ETL
             clone.Guid = Guid.NewGuid();
             return clone;
         }
+
+        #endregion Public Methods
+
+        #region Abstract Methods
 
         /// <summary>
         /// When overridden by a derived class, will return the current status
@@ -156,5 +187,74 @@ namespace Extract.ETL
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public abstract int GetUnprocessedRecordCount();
+
+        /// <summary>
+        /// When overridden by a derived class, will change an answer, e.g., a doctype, in
+        /// the configured LearningMachine's Encoder and will also update the MLData stored in
+        /// the DB
+        /// </summary>
+        /// <param name="oldAnswer">The answer to be changed (must exist in the LearningMachine)</param>
+        /// <param name="newAnswer">The new answer to change to (must not exist in the LearningMachine)</param>
+        public abstract void ChangeAnswer(string oldAnswer, string newAnswer);
+
+        #endregion Abstract Methods
+
+        #region Protected Methods
+
+        protected void ChangeAnswer(string oldAnswer, string newAnswer, string lmPath)
+        {
+            try
+            {
+                // Prevent unneeded work but allow a change in case
+                if (string.Equals(oldAnswer, newAnswer, StringComparison.Ordinal))
+                {
+                    return;
+                }
+
+                // Change in the data encoder
+                using (var lm = LearningMachine.Load(lmPath))
+                {
+                    lm.Encoder.ChangeAnswer(oldAnswer, newAnswer);
+                    lm.Save(lmPath);
+                }
+
+                // Change ML Data in the DB
+                using (var connection = NewSqlDBConnection())
+                {
+                    connection.Open();
+                    var cmd = connection.CreateCommand();
+                    cmd.CommandText = _GET_ALL_MLDATA_FOR_NAME;
+                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
+                    using (var adapter = new SqlDataAdapter(cmd))
+                    using (var dt = new DataTable())
+                    {
+                        var builder = new SqlCommandBuilder(adapter);
+                        adapter.Fill(dt);
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            string csv = row.Field<string>("Data");
+                            using (var sr = new StringReader(csv))
+                            using (var csvReader = new TextFieldParser(sr) { Delimiters = new[] { "," } })
+                            {
+                                var fields = csvReader.ReadFields();
+                                string answer = fields[0];
+                                if (string.Equals(answer, oldAnswer, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    fields[0] = newAnswer;
+                                    row["Data"] = string.Join(",", fields.Select(f => f.QuoteIfNeeded("\"", ",")));
+                                }
+                            }
+                        }
+                        adapter.Update(dt);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45846");
+            }
+        }
     }
+
+    #endregion Protected Methods
 }

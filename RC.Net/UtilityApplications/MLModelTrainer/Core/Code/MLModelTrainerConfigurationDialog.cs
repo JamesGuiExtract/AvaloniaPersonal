@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Forms;
+﻿using Extract.ETL;
+using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using System;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
         bool _dirty;
 
 
-        static readonly string _TITLE_TEXT = "NER trainer";
+        static readonly string _TITLE_TEXT = "ML Model trainer";
         static readonly string _TITLE_TEXT_DIRTY = "*" + _TITLE_TEXT;
         string _databaseServer;
         string _databaseName;
@@ -298,24 +299,48 @@ namespace Extract.UtilityApplications.MLModelTrainer
         {
             try
             {
-                _trainingCommandTextBox.Enabled =
-                _trainingCommandPathTagsButton.Enabled =
-                _testingCommandTextBox.Enabled =
-                _testingCommandPathTagsButton.Enabled =
-                    _nerModelTypeRadioButton.Checked;
-
                 if (_lmModelTypeRadioButton.Checked)
                 {
                     _modelPathLabel.Text = "LM file path";
+                    _trainingCommandTextBox.Enabled =
+                        _trainingCommandPathTagsButton.Enabled =
+                        _testingCommandTextBox.Enabled =
+                        _testingCommandPathTagsButton.Enabled = false;
+                    _changeAnswerButton.Enabled = true;
                 }
                 else
                 {
                     _modelPathLabel.Text = "Destination path";
+                    _trainingCommandTextBox.Enabled =
+                        _trainingCommandPathTagsButton.Enabled =
+                        _testingCommandTextBox.Enabled =
+                        _testingCommandPathTagsButton.Enabled = true;
+                    _changeAnswerButton.Enabled = false;
                 }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45709");
+            }
+        }
+
+        /// <summary>
+        /// Shows a ChangeAnswerDialog dialog
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleChangeAnswerButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var form = new ChangeAnswerForm(_settings))
+                {
+                    form.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45851");
             }
         }
 

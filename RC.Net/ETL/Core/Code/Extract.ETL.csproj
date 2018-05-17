@@ -47,6 +47,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\binaries\Debug\Extract.Licensing.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\APIs\WindowsAPICodePack.1.1.0\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
@@ -78,6 +79,12 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChangeAnswerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChangeAnswerForm.Designer.cs">
+      <DependentUpon>ChangeAnswerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DatabaseService.cs" />
     <Compile Include="DatabaseServiceStatus.cs" />
     <Compile Include="DataCaptureAccuracy.cs" />
@@ -226,6 +233,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ChangeAnswerForm.resx">
+      <DependentUpon>ChangeAnswerForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DataCaptureAccuracyForm.resx">
       <DependentUpon>DataCaptureAccuracyForm.cs</DependentUpon>
     </EmbeddedResource>

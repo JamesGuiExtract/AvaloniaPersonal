@@ -1,5 +1,6 @@
 ﻿using AttributeDbMgrComponentsLib;
 using Extract.AttributeFinder;
+using Extract.ETL;
 using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using System;
@@ -76,7 +77,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 // Schedule is unused if this is a child of a training coordinator
                 if (_settings.Container != null)
                 {
-                    _schedulerControl.Enabled = false;
+                    _tabControl.TabPages.Remove(_scheduleTabPage);
                 }
 
                 SetControlValues();
@@ -312,6 +313,26 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             }
         }
 
+        /// <summary>
+        /// Shows a ChangeAnswerDialog dialog
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleChangeAnswerButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var form = new ChangeAnswerForm(_settings))
+                {
+                    form.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45852");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -373,7 +394,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         void SetControlStates()
         {
             _trainingPercentageNumericUpDown.Enabled = _overrideTrainingTestingSplitCheckBox.Checked;
-            _featuresGroupBox.Enabled = _lmModelTypeRadioButton.Checked;
+            _featuresGroupBox.Enabled =
+                _changeAnswerButton.Enabled = _lmModelTypeRadioButton.Checked;
             _featureRulesetTextBox.Enabled =
                 _featureRulesetBrowseButton.Enabled =
                 _runRulesetForFeaturesRadioButton.Checked || _runRulesetIfVoaIsMissingCheckBox.Checked;

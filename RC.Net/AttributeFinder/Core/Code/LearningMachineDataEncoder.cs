@@ -622,6 +622,29 @@ namespace Extract.AttributeFinder
             }
         }
 
+        public void ChangeAnswer(string oldAnswer, string newAnswer)
+        {
+            try
+            {
+                ExtractException.Assert("ELI45848", "Answer to change doesn't exist",
+                    AnswerNameToCode.ContainsKey(oldAnswer));
+
+                // Ensure new name doesn't exist already but allow change of case (so use Ordinal comparison)
+                ExtractException.Assert("ELI45849", "New answer already exists",
+                    !AnswerNameToCode.Keys.Contains(newAnswer, StringComparer.Ordinal));
+
+                int code = AnswerNameToCode[oldAnswer];
+                AnswerNameToCode.Remove(oldAnswer);
+
+                AnswerNameToCode[newAnswer] = code;
+                AnswerCodeToName[code] = newAnswer;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45847");
+            }
+        }
+
         /// <summary>
         /// The name to use for the negative/unknown class (e.g., the document type assigned when a testing a classifier
         /// against a new set of data and the expected document type is not one that is recognized by the classifier)

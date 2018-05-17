@@ -5,6 +5,7 @@ using Extract.Utilities;
 using Extract.UtilityApplications.TrainingDataCollector;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -401,7 +402,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
                         {
                             try
                             {
-                                var lm = LearningMachine.Load(QualifiedModelDestination);
+                                using (var lm = LearningMachine.Load(QualifiedModelDestination)) { }
                             }
                             catch (Exception ex)
                             {
@@ -565,6 +566,17 @@ namespace Extract.UtilityApplications.MLModelTrainer
                 }
             }
             
+        }
+
+        /// <summary>
+        /// Changes an answer, e.g., a doctype, in the configured LearningMachine's Encoder and also
+        /// updates the MLData stored in the DB
+        /// </summary>
+        /// <param name="oldAnswer">The answer to be changed (must exist in the LearningMachine)</param>
+        /// <param name="newAnswer">The new answer to change to (must not exist in the LearningMachine)</param>
+        public override void ChangeAnswer(string oldAnswer, string newAnswer)
+        {
+            ChangeAnswer(oldAnswer, newAnswer, QualifiedModelDestination);
         }
 
         #endregion Public Methods

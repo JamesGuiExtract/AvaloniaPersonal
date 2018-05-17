@@ -38,7 +38,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         private void InitializeComponent()
         {
-            Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
+            Extract.Utilities.ScheduledEvent scheduledEvent2 = new Extract.Utilities.ScheduledEvent();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._manageMLModelsButton = new System.Windows.Forms.Button();
             this._attributeSetNameComboBox = new System.Windows.Forms.ComboBox();
@@ -73,6 +73,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._useVoaFileForExpectedsRadioButton = new System.Windows.Forms.RadioButton();
             this._useAttributeSetForExpectedsRadioButton = new System.Windows.Forms.RadioButton();
             this._scheduleTabPage = new System.Windows.Forms.TabPage();
+            this._changeAnswerButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -191,7 +192,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(321, 474);
+            this._okButton.Location = new System.Drawing.Point(321, 486);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 2;
@@ -203,7 +204,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(402, 474);
+            this._cancelButton.Location = new System.Drawing.Point(402, 486);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 3;
@@ -215,6 +216,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this._changeAnswerButton);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this._trainingPercentageNumericUpDown);
             this.groupBox2.Controls.Add(this._overrideTrainingTestingSplitCheckBox);
@@ -224,7 +226,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.groupBox2.Controls.Add(this._dataGeneratorPathTextBox);
             this.groupBox2.Location = new System.Drawing.Point(6, 121);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(440, 96);
+            this.groupBox2.Size = new System.Drawing.Size(440, 106);
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Settings file";
@@ -232,7 +234,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(189, 69);
+            this.label4.Location = new System.Drawing.Point(189, 75);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(56, 13);
             this.label4.TabIndex = 14;
@@ -240,7 +242,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             // _trainingPercentageNumericUpDown
             // 
-            this._trainingPercentageNumericUpDown.Location = new System.Drawing.Point(250, 66);
+            this._trainingPercentageNumericUpDown.Location = new System.Drawing.Point(250, 73);
             this._trainingPercentageNumericUpDown.Maximum = new decimal(new int[] {
             99,
             0,
@@ -264,7 +266,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // _overrideTrainingTestingSplitCheckBox
             // 
             this._overrideTrainingTestingSplitCheckBox.AutoSize = true;
-            this._overrideTrainingTestingSplitCheckBox.Location = new System.Drawing.Point(11, 68);
+            this._overrideTrainingTestingSplitCheckBox.Location = new System.Drawing.Point(11, 74);
             this._overrideTrainingTestingSplitCheckBox.Name = "_overrideTrainingTestingSplitCheckBox";
             this._overrideTrainingTestingSplitCheckBox.Size = new System.Drawing.Size(160, 17);
             this._overrideTrainingTestingSplitCheckBox.TabIndex = 12;
@@ -343,13 +345,13 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._schedulerControl.Name = "_schedulerControl";
             this._schedulerControl.Size = new System.Drawing.Size(378, 153);
             this._schedulerControl.TabIndex = 13;
-            scheduledEvent1.Duration = null;
-            scheduledEvent1.Enabled = true;
-            scheduledEvent1.End = null;
-            scheduledEvent1.Exclusions = new Extract.Utilities.ScheduledEvent[0];
-            scheduledEvent1.RecurrenceUnit = null;
-            scheduledEvent1.Start = new System.DateTime(2018, 3, 23, 13, 37, 55, 0);
-            this._schedulerControl.Value = scheduledEvent1;
+            scheduledEvent2.Duration = null;
+            scheduledEvent2.Enabled = true;
+            scheduledEvent2.End = null;
+            scheduledEvent2.Exclusions = new Extract.Utilities.ScheduledEvent[0];
+            scheduledEvent2.RecurrenceUnit = null;
+            scheduledEvent2.Start = new System.DateTime(2018, 3, 23, 13, 37, 55, 0);
+            this._schedulerControl.Value = scheduledEvent2;
             // 
             // _tabControl
             // 
@@ -361,7 +363,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._tabControl.Location = new System.Drawing.Point(12, 35);
             this._tabControl.Name = "_tabControl";
             this._tabControl.SelectedIndex = 0;
-            this._tabControl.Size = new System.Drawing.Size(460, 433);
+            this._tabControl.Size = new System.Drawing.Size(460, 445);
             this._tabControl.TabIndex = 1;
             // 
             // _settingsTabPage
@@ -373,7 +375,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._settingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._settingsTabPage.Name = "_settingsTabPage";
             this._settingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._settingsTabPage.Size = new System.Drawing.Size(452, 407);
+            this._settingsTabPage.Size = new System.Drawing.Size(452, 419);
             this._settingsTabPage.TabIndex = 0;
             this._settingsTabPage.Text = "Settings";
             this._settingsTabPage.UseVisualStyleBackColor = true;
@@ -385,7 +387,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._featuresGroupBox.Controls.Add(this._featureRulesetTextBox);
             this._featuresGroupBox.Controls.Add(this._runRulesetIfVoaIsMissingCheckBox);
             this._featuresGroupBox.Controls.Add(this._useVoaFileForFeaturesRadioButton);
-            this._featuresGroupBox.Location = new System.Drawing.Point(6, 301);
+            this._featuresGroupBox.Location = new System.Drawing.Point(6, 311);
             this._featuresGroupBox.Name = "_featuresGroupBox";
             this._featuresGroupBox.Size = new System.Drawing.Size(440, 99);
             this._featuresGroupBox.TabIndex = 11;
@@ -454,7 +456,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this.groupBox3.Controls.Add(this._useVoaFileForExpectedsRadioButton);
             this.groupBox3.Controls.Add(this._useAttributeSetForExpectedsRadioButton);
-            this.groupBox3.Location = new System.Drawing.Point(6, 223);
+            this.groupBox3.Location = new System.Drawing.Point(6, 233);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(440, 72);
             this.groupBox3.TabIndex = 10;
@@ -495,13 +497,23 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._scheduleTabPage.Text = "Schedule";
             this._scheduleTabPage.UseVisualStyleBackColor = true;
             // 
+            // _changeAnswerButton
+            // 
+            this._changeAnswerButton.Location = new System.Drawing.Point(299, 72);
+            this._changeAnswerButton.Name = "_changeAnswerButton";
+            this._changeAnswerButton.Size = new System.Drawing.Size(135, 23);
+            this._changeAnswerButton.TabIndex = 17;
+            this._changeAnswerButton.Text = "Change an answer...";
+            this._changeAnswerButton.UseVisualStyleBackColor = true;
+            this._changeAnswerButton.Click += new System.EventHandler(this.HandleChangeAnswerButton_Click);
+            // 
             // TrainingDataCollectorConfigurationDialog
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(484, 503);
+            this.ClientSize = new System.Drawing.Size(484, 515);
             this.Controls.Add(this._tabControl);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label13);
@@ -566,5 +578,6 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         private System.Windows.Forms.TextBox _featureRulesetTextBox;
         private System.Windows.Forms.RadioButton _runRulesetForFeaturesRadioButton;
         private System.Windows.Forms.CheckBox _runRulesetIfVoaIsMissingCheckBox;
+        private System.Windows.Forms.Button _changeAnswerButton;
     }
 }
