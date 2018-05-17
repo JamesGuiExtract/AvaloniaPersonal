@@ -93,7 +93,7 @@ namespace DashboardViewer
 
                 // Either Server name and Database are both specified or neither or both dashboardFilename and DashboardName specified
                 if ((string.IsNullOrWhiteSpace(serverName) ^ string.IsNullOrWhiteSpace(databaseName)) ||
-                    (!string.IsNullOrWhiteSpace(dashboardFileName) && string.IsNullOrWhiteSpace(dashboardName)))
+                    (!string.IsNullOrWhiteSpace(dashboardFileName) && !string.IsNullOrWhiteSpace(dashboardName)))
                 {
                     Usage();
                     return;

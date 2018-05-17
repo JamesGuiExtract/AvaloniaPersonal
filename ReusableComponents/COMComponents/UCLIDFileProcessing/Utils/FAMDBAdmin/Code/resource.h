@@ -179,7 +179,7 @@
 #define ID_TOOLS_MOVE_FILES_TO_WORKFLOW 32812
 #define ID_MANAGE_DATABASESERVICES      32813
 #define ID_MANAGE_MLMODELS              32814
-#define ID_MANAGE_DASHBOARDS            32815
+#define ID_TOOLS_DASHBOARDS             32815
 
 // Next default values for new objects
 // 

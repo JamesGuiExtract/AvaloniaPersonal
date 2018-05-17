@@ -101,7 +101,7 @@ namespace DashboardViewer
                 catch (Exception ex)
                 {
                     _databaseVersion = 0;
-                    ex.ExtractDisplay("ELI45774");
+                    throw ex.AsExtract("ELI45774");
                 }
                 return _databaseVersion >= _VersionDashboardTableAdded;
             }
@@ -135,7 +135,7 @@ namespace DashboardViewer
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45310");
+                throw ex.AsExtract("ELI45310");
             }
         }
 
@@ -171,7 +171,7 @@ namespace DashboardViewer
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45310");
+                throw ex.AsExtract("ELI45310");
             }
         }
 
@@ -196,7 +196,7 @@ namespace DashboardViewer
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45754");
+                throw ex.AsExtract("ELI45754");
             }
         }
 
@@ -320,10 +320,17 @@ namespace DashboardViewer
         {
             try
             {
-                if (sender is DevExpress.DashboardWin.DashboardViewer dashboardViewer)
+
+                if (sender is DevExpress.DashboardWin.DashboardViewer dashboardViewer 
+                    && _customGridValues.ContainsKey(e.DashboardItemName))
                 {
                     Dashboard dashboard = dashboardViewer.Dashboard;
                     GridDashboardItem gridItem = dashboard.Items[e.DashboardItemName] as GridDashboardItem;
+
+                    if (gridItem is null)
+                    {
+                        return;
+                    }
 
                     int drillLevel;
                     _drillDownLevelForItem.TryGetValue(e.DashboardItemName, out drillLevel);

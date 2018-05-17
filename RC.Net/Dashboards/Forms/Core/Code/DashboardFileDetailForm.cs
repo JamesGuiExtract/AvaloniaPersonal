@@ -143,6 +143,7 @@ namespace Extract.Dashboard.Forms
                     {
                         connection.Open();
                         var cmd = connection.CreateCommand();
+                        cmd.CommandTimeout = 60;
                         cmd.CommandText = "SELECT VOA FROM AttributeSetForFile WHERE ID = @AttributeSetForFileID";
                         cmd.Parameters.AddWithValue("@AttributeSetForFileID", attributeFileSetID);
                         using (SqlDataReader voaReader = cmd.ExecuteReader())
@@ -170,9 +171,8 @@ namespace Extract.Dashboard.Forms
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45744");
+                throw ex.AsExtract("ELI45744");
             }
-            return null;
         }
 
         /// <summary>
@@ -206,9 +206,6 @@ namespace Extract.Dashboard.Forms
             {
                 _imageViewer.LayerObjects.Add(highlight);
             }
-            
-            _imageViewer.CenterOnLayerObjects(_imageViewer.LayerObjects.ToArray());
-            _imageViewer.Invalidate();
         }
 
         /// <summary>
@@ -223,6 +220,7 @@ namespace Extract.Dashboard.Forms
                     connection.Open();
 
                     var command = connection.CreateCommand();
+                    command.CommandTimeout = 60;
                     command.CommandText = _gridDetailConfiguration.RowQuery;
 
                     // add the column values as parameters for the query
@@ -247,7 +245,7 @@ namespace Extract.Dashboard.Forms
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45705");
+                throw ex.AsExtract("ELI45705");
             }
         }
 
@@ -297,6 +295,11 @@ namespace Extract.Dashboard.Forms
                         }
                     }
                 }
+                if (_imageViewer.LayerObjects.Count() > 0)
+                {
+                    _imageViewer.CenterOnLayerObjects(_imageViewer.LayerObjects.ToArray());
+                }
+                _imageViewer.Invalidate();
             }
             catch (Exception ex)
             {

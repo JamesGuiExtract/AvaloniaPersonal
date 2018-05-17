@@ -530,7 +530,6 @@ BEGIN
         MENUITEM "&Actions/Workflows...\tCtrl+A", ID_MANAGE_ACTIONS
         MENUITEM "Attribute &sets...",          ID_MANAGE_ATTRIBUTESETS
         MENUITEM "Bates number &counters...",   ID_MANAGE_BATES_COUNTERS
-        MENUITEM "Dashboards...",               ID_MANAGE_DASHBOARDS
         MENUITEM "&Metadata fields...",         ID_MANAGE_METADATA
         MENUITEM "ML Models...",                ID_MANAGE_MLMODELS
         MENUITEM "&Tags...\tCtrl+T",            ID_MANAGE_TAGS
@@ -554,6 +553,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "E&xport file list...",        ID_TOOLS_EXPORTFILELISTS
         MENUITEM "&Inspect files...\tCtrl+I",   ID_TOOLS_INSPECT_FILES
+        MENUITEM "Dashboards...",               ID_TOOLS_DASHBOARDS
         MENUITEM "&Reports...",                 ID_TOOLS_REPORTS
     END
     POPUP "&Help"

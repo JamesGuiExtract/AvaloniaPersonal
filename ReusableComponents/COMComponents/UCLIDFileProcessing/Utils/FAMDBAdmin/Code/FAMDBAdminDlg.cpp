@@ -144,7 +144,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_WORKFLOW_COMBO, &CFAMDBAdminDlg::OnCbnSelchangeWorkflowCombo)
 	ON_COMMAND(ID_TOOLS_MOVE_FILES_TO_WORKFLOW, &CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow)
 	ON_COMMAND(ID_MANAGE_MLMODELS, &CFAMDBAdminDlg::OnManageMLModels)
-	ON_COMMAND(ID_MANAGE_DASHBOARDS, &CFAMDBAdminDlg::OnManageDashboards)
+	ON_COMMAND(ID_TOOLS_DASHBOARDS, &CFAMDBAdminDlg::OnToolsDashboards)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -1121,7 +1121,7 @@ void CFAMDBAdminDlg::OnManageMLModels()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45742");
 }
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnManageDashboards()
+void CFAMDBAdminDlg::OnToolsDashboards()
 {
 	try
 	{
@@ -1261,7 +1261,6 @@ void CFAMDBAdminDlg::enableMenus()
 	pMenu->EnableMenuItem(ID_MANAGE_ATTRIBUTESETS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_RULE_COUNTERS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_MLMODELS, m_bIsDBGood ? nEnable : nDisable);
-	pMenu->EnableMenuItem(ID_MANAGE_DASHBOARDS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_DATABASESERVICES, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_MANUALLYSETACTIONSTATUS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_SETPRIORITY, m_bIsDBGood ? nEnable : nDisable);
@@ -1269,6 +1268,7 @@ void CFAMDBAdminDlg::enableMenus()
 	pMenu->EnableMenuItem(ID_TOOLS_INSPECT_FILES, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_REPORTS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_RECALCULATE_STATS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_TOOLS_DASHBOARDS, m_bIsDBGood ? nEnable : nDisable); 
 	pMenu->EnableMenuItem(ID_TOOLS_MOVE_FILES_TO_WORKFLOW, (m_bIsDBGood || m_bUnaffiliatedFiles) ? nEnable : nDisable);
 }
 //-------------------------------------------------------------------------------------------------

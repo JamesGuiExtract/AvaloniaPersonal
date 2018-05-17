@@ -68,7 +68,7 @@ namespace Extract.Dashboard.Utilities
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45698");
+                throw ex.AsExtract("ELI45698");
             }
         }
 

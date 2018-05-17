@@ -156,7 +156,10 @@ namespace DashboardCreator
                 {
                     Dashboard dashboard = dashboardDesigner.Dashboard;
                     GridDashboardItem gridItem = dashboard.Items[e.DashboardItemName] as GridDashboardItem;
-
+                    if (gridItem is null)
+                    {
+                        return;
+                    }
                     int drillLevel;
                     _drillDownLevelForItem.TryGetValue(e.DashboardItemName, out drillLevel);
 
