@@ -39,6 +39,9 @@ public:
 	// Returns the name of the voa file to be passed to the rule object.
 	string getDataInputFileName();
 
+	void setRuleSetName(string strRuleSetName);
+	void setOCRParameters(IHasOCRParametersPtr ipOCRParameters);
+
 // Dialog Data
 	//{{AFX_DATA(TesterDlgInputPage)
 	enum { IDD = IDD_TESTERDLG_INPUT_PAGE };
@@ -106,6 +109,9 @@ private:
 	IOCREnginePtr m_ipOCREngine;
 
 	string m_strCurrentInputFile;
+
+	string m_strRuleSetName;
+	IHasOCRParametersPtr m_ipOCRParameters;
 };
 
 //{{AFX_INSERT_LOCATION}}

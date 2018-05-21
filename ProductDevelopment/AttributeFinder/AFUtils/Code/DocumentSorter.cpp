@@ -167,7 +167,7 @@ void CDocumentSorter::batchOCR(BSTR strInputFolder)
 	// process first 2 pages for each image, no recursion necessary,
 	// go ahead and overwrite any existing TXT files
 	m_ipOCRUtils->BatchOCR(strInputFolder, m_ipOCREngine, VARIANT_FALSE, 2, 
-		VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE, NULL);
+		VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE, NULL, NULL);
 }
 //-------------------------------------------------------------------------------------------------
 void CDocumentSorter::moveFile(const string& strUSSFileName, 

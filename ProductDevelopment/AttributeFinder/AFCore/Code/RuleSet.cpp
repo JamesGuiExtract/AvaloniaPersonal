@@ -21,7 +21,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 16;
+const unsigned long gnCurrentVersion = 17;
 // Version 3:
 //   Added Output Handler persistence
 // Version 7:
@@ -39,6 +39,7 @@ const unsigned long gnCurrentVersion = 16;
 // Version 14: Added m_bUsePagesIndexingCounter and m_ipCustomCounters
 // Version 15: Removed m_strKeySerialNumbers
 // Version 16: Added RunMode properties
+// Version 17: Added m_ipOCRParameters
 
 const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definition (RSD) File";
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
@@ -86,7 +87,8 @@ m_strInsertParentName(""),
 m_strInsertParentValue(""),
 m_bDeepCopyInput(false),
 m_ipParallelRuleSet(__nullptr),
-m_sProgressCounts()
+m_sProgressCounts(),
+m_ipOCRParameters(__nullptr)
 {
 	try
 	{
@@ -174,7 +176,9 @@ STDMETHODIMP CRuleSet::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ILicensedComponent,
 		&IID_ICopyableObject,
 		&IID_IPersistStream,
-		&IID_ISupportErrorInfo
+		&IID_ISupportErrorInfo,
+		&IID_IHasOCRParameters,
+		&IID_ILoadOCRParameters
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -400,6 +404,14 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				else if (nStackSize == 1)
 				{
 					ipAFDoc->FKBVersion = "";
+				}
+
+				// Set OCRParameters in the AFDoc if any are configured in this ruleset
+				if (m_ipOCRParameters != __nullptr
+					&& m_ipOCRParameters->Size > 0)
+				{
+					IHasOCRParametersPtr ipHasOCRParameters(ipAFDoc);
+					ipHasOCRParameters->OCRParameters = m_ipOCRParameters;
 				}
 
 				// If the ruleset is marked as a to-be-used-internally ruleset, then ensure 
@@ -1759,6 +1771,16 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 			loadGUID(pStream);
 		}
 
+		// Read the OCR parameters
+		if (m_nVersionNumber >= 17)
+		{
+			IPersistStreamPtr ipObj;
+
+			::readObjectFromStream(ipObj, pStream, "ELI45944");
+			ASSERT_RESOURCE_ALLOCATION("ELI45945", ipObj != __nullptr);
+			m_ipOCRParameters = ipObj;
+		}
+
 		// clear the dirty flag as we just loaded a fresh object
 		m_bDirty = false;
 
@@ -1898,6 +1920,10 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
+
+		IPersistStreamPtr ipPIObj = getOCRParameters();
+		ASSERT_RESOURCE_ALLOCATION("ELI45946", ipPIObj != __nullptr);
+		writeObjectToStream(ipPIObj, pStream, "ELI45947", fClearDirty);
 
 		// clear the flag as specified
 		if (fClearDirty)
@@ -2041,6 +2067,13 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 		m_bInsertAttributesUnderParent = asCppBool(ipRunMode->InsertAttributesUnderParent);
 		m_strInsertParentName = asString(ipRunMode->InsertParentName);
 		m_strInsertParentValue = asString(ipRunMode->InsertParentValue);
+
+		// Copy OCR parameters
+		IHasOCRParametersPtr ipOCRParams(pObject);
+		ASSERT_RESOURCE_ALLOCATION("ELI45942", ipOCRParams != __nullptr);
+		ICopyableObjectPtr ipMap = ipOCRParams->OCRParameters;
+		ASSERT_RESOURCE_ALLOCATION("ELI45943", ipMap != __nullptr);
+		m_ipOCRParameters = ipMap->Clone();
 
 		return S_OK;
 	}
@@ -2858,5 +2891,58 @@ void CRuleSet::validateRunability()
 		throw UCLIDException("ELI33506", "An FKB version must be specified for a swiping rule or a "
 			"ruleset that decrements counters.");
 	}
+}
+//-------------------------------------------------------------------------------------------------
+// IHasOCRParameters
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_OCRParameters(ILongToLongMap** ppMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		*ppMap = getOCRParameters().Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45950");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_OCRParameters(ILongToLongMap* pMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_ipOCRParameters = pMap;
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45951");
+}
+//-------------------------------------------------------------------------------------------------
+// ILoadOCRParameters
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::raw_LoadOCRParameters(BSTR strRuleSetName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		UCLID_AFCORELib::IRuleSetPtr ipRuleSet = getThisAsCOMPtr();
+		ipRuleSet->LoadFrom(strRuleSetName, VARIANT_FALSE);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45957");
+}
+//-------------------------------------------------------------------------------------------------
+ILongToLongMapPtr CRuleSet::getOCRParameters()
+{
+	if (m_ipOCRParameters == __nullptr)
+	{
+		m_ipOCRParameters.CreateInstance(CLSID_LongToLongMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI45949", m_ipOCRParameters != __nullptr);
+	}
+
+	return m_ipOCRParameters;
 }
 //-------------------------------------------------------------------------------------------------

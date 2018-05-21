@@ -101,7 +101,7 @@ STDMETHODIMP CLegalDescFinderTester::raw_RunAutomatedTests(IVariantVector* pPara
 				// process the image file
 				ISpatialStringPtr ipText;
 				ipText = ipOCREngine->RecognizeTextInImage(
-					strImageFileName.c_str(), 1, -1, kNoFilter, "", kRegistry, VARIANT_TRUE, NULL);
+					strImageFileName.c_str(), 1, -1, kNoFilter, "", kRegistry, VARIANT_TRUE, NULL, NULL);
 				ASSERT_RESOURCE_ALLOCATION("ELI06788", ipText != __nullptr);
 				_bstr_t _bstrOutput = ipText->String;
 				

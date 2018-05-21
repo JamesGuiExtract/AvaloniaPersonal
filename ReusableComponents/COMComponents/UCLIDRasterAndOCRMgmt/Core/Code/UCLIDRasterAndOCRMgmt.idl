@@ -104,6 +104,45 @@ library UCLID_RASTERANDOCRMGMTLib
 		kRegistry
 	} EOcrTradeOff;
 
+	typedef 
+	[
+		uuid(1BBF00AE-11DE-47B0-ABED-5AF897102581), 
+		helpstring("OCR parameters")
+	]
+	enum
+	{
+		kForceDespeckleMode = 0,
+		kForceDespeckleMethod = 1,
+		kForceDespeckleLevel = 2,
+		kAutoDespeckleMode = 3,
+		kZoneOrdering = 4,
+		kLimitToBasicLatinCharacters = 5,
+		kSpecifyLanguage = 100,
+		kSingleLanguageDetection = 101,
+		kLanguage1 = 110,
+		kLanguage2 = 111,
+		kLanguage3 = 112,
+		kLanguage4 = 113,
+		kLanguage5 = 114,
+		kKernel_Imf_PDF_LoadOriginalDPI = 200,
+		kKernel_Imf_PDF_Resolution = 201,
+		kKernel_OcrMgr_PreferAccurateEngine = 202,
+		kKernel_Img_Max_Pix_X = 203,
+		kKernel_Img_Max_Pix_Y = 204
+	} EOCRParameter;
+
+	typedef 
+	[
+		uuid(553DDBE5-CFC5-4D7F-B902-4F9785C2EB88), 
+		helpstring("Force despeckle mode")
+	]
+	enum
+	{
+		kNeverForce = 0,
+		kForceWhenBitonal = 1,
+		kAlwaysForce = 2
+	} EForceDespeckleMode;
+
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -1338,6 +1377,7 @@ library UCLID_RASTERANDOCRMGMTLib
 									[in] EOcrTradeOff eTradeOff,
 									[in] VARIANT_BOOL bReturnSpatialInfo, 
 									[in] IProgressStatus* pProgressStatus,
+									[in] ILongToLongMap* pOCRParameters,
 									[out, retval] ISpatialString **pstrText);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Recognize specified pages of the image and store the text in a SpatialString.
@@ -1353,6 +1393,7 @@ library UCLID_RASTERANDOCRMGMTLib
 									[in] BSTR strPageNumbers, 
 									[in] VARIANT_BOOL bReturnSpatialInfo, 
 									[in] IProgressStatus* pProgressStatus,
+									[in] ILongToLongMap* pOCRParameters,
 									[out, retval] ISpatialString **pstrText);
 		//-----------------------------------------------------------------------------------------
 		[id(5), helpstring("method SupportsTrainingFiles")] HRESULT SupportsTrainingFiles([out, retval] VARIANT_BOOL *pbValue);
@@ -1400,6 +1441,7 @@ library UCLID_RASTERANDOCRMGMTLib
 									[in] VARIANT_BOOL bReturnUnrecognized,
 									[in] VARIANT_BOOL bReturnSpatialInfo, 
 									[in] IProgressStatus* pProgressStatus, 
+									[in] ILongToLongMap* pOCRParameters,
 									[out, retval] ISpatialString **pstrText);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Will kill the OCR engine and prevent it from immediately respawning
@@ -1443,11 +1485,12 @@ library UCLID_RASTERANDOCRMGMTLib
 			[in] IOCREngine *pEngine, [in] VARIANT_BOOL bRecursive, 
 			[in] long nMaxNumOfPages, [in] VARIANT_BOOL bCreateUSSFile,
 			[in] VARIANT_BOOL bCompressUSSFile, [in] VARIANT_BOOL bSkipCreation, 
-			[in] IProgressStatus* pProgressStatus);
+			[in] IProgressStatus* pProgressStatus, [in] ILongToLongMap* pOCRParameters);
 		// This methods internally calls the method with same name on IOCREngine
 		[id(3), helpstring("method RecognizeTextInImageFile")] HRESULT RecognizeTextInImageFile(
 			[in] BSTR strImageFileName, [in] long lNumPages, 
 			[in] IOCREngine* pOCREngine, [in] IProgressStatus* pProgressStatus, 
+			[in] ILongToLongMap* pOCRParameters,
 			[out, retval] ISpatialString **pstrText);
 	};
 
@@ -1519,6 +1562,46 @@ library UCLID_RASTERANDOCRMGMTLib
 	{
 	};
 
+	[
+		object,
+		uuid(F33D5485-36B2-4666-9D30-96BEBF74F8FC),
+		dual,
+		helpstring("IHasOCRParameters Interface"),
+		pointer_default(unique)
+	]
+	interface IHasOCRParameters : IDispatch
+	{
+		[propget, id(1), helpstring("property OCRParameters")] HRESULT OCRParameters(
+			[out, retval] ILongToLongMap** ppMap);
+		[propput, id(1), helpstring("property OCRParameters")] HRESULT OCRParameters(
+			[in] ILongToLongMap* pMap);
+	};
+
+	[
+		object,
+		uuid(642405CC-0983-42C5-A50E-53DDD0B24FF1),
+		dual,
+		helpstring("ILoadOCRParameters Interface"),
+		pointer_default(unique)
+	]
+	interface ILoadOCRParameters : IDispatch
+	{
+		[id(1), helpstring("method LoadOCRParameters")] HRESULT LoadOCRParameters([in] BSTR strRuleSetName);
+	};
+
+	[
+		object,
+		uuid(390D2582-B80C-41A4-9441-6F3CEC71E588),
+		dual,
+		helpstring("IOCRParametersConfigure Interface"),
+		pointer_default(unique)
+	]
+	interface IOCRParametersConfigure : IDispatch
+	{
+		[id(1), helpstring("method ConfigureOCRParameters")] HRESULT ConfigureOCRParameters(
+			[in] IHasOCRParameters *pParams, VARIANT_BOOL vbReadOnly, long nHandle);
+	};
+
 	//----------------------------------------------------------------------------------------------
 	//-C O C L A S S E S ---------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -1555,6 +1638,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		//       information.
 		interface IComparableObject;
 		interface IManageableMemory;
+		interface IHasOCRParameters;
 	};
 	[
 		uuid(5F0EF9A8-5F4C-4256-B50F-FF16C953CD34),

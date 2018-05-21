@@ -14,7 +14,7 @@ CRuleSetPropertiesDlg::CRuleSetPropertiesDlg(UCLID_AFCORELib::IRuleSetPtr ipRule
 	CWnd* pParent /*=NULL*/)
 : CDialog(CRuleSetPropertiesDlg::IDD, pParent)
 , m_ruleSetPropertiesPage(ipRuleSet, bReadOnly)
-, m_ruleSetCommentsPage(ipRuleSet)
+, m_ruleSetCommentsPage(ipRuleSet, bReadOnly)
 , m_bReadOnly(bReadOnly)
 {
 
@@ -74,8 +74,8 @@ BOOL CRuleSetPropertiesDlg::OnInitDialog()
 			m_propSheet.SetActivePage(1);
 			m_propSheet.SetActivePage(0);
 
-			m_ruleSetPropertiesPage.EnableWindow(FALSE);
-			m_ruleSetCommentsPage.EnableWindow(FALSE);
+			//m_ruleSetPropertiesPage.EnableWindow(FALSE);
+			//m_ruleSetCommentsPage.EnableWindow(FALSE);
 
 			GetDlgItem(IDOK)->ShowWindow(SW_HIDE);
 			GetDlgItem(IDCANCEL)->ShowWindow(SW_HIDE);

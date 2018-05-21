@@ -228,17 +228,46 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 		}
 		_lastCodePos = "12";
 
+		// Create RuleSet object
+		UCLID_AFCORELib::IRuleSetPtr ipRuleSet;
+		_variant_t _varRuleSet(varRuleSet);
+		_bstr_t _bstrRSDFileName = "";
+		if (_varRuleSet.vt == VT_BSTR)
+		{
+			_lastCodePos = "13";
+
+			// create new RuleSet object
+			ipRuleSet.CreateInstance( CLSID_RuleSet );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07827", ipRuleSet != __nullptr );
+
+			// Load Rule Set from specified file
+			_bstrRSDFileName = _varRuleSet;
+			ipRuleSet->LoadFrom(_bstrRSDFileName, VARIANT_FALSE);
+		}
+		else if (_varRuleSet.vt == VT_UNKNOWN || _varRuleSet.vt == VT_DISPATCH)
+		{
+			_lastCodePos = "14";
+
+			// Use the RuleSet that was passed in
+			IUnknownPtr ipUnknown = _varRuleSet;
+			ASSERT_RESOURCE_ALLOCATION( "ELI07912", ipUnknown != __nullptr );
+			
+			ipRuleSet = ipUnknown;
+			ASSERT_RESOURCE_ALLOCATION( "ELI07910", ipRuleSet != __nullptr );
+		}
+		_lastCodePos = "15";
+
 		// OCR the source document if appropriate
 		if (bNeedToOCR)
 		{
-			_lastCodePos = "13";
+			_lastCodePos = "16";
 
 			// Update the progress status
 			if (ipProgressStatus)
 			{
 				ipProgressStatus->StartNextItemGroup("Performing OCR...", nNUM_PROGRESS_ITEMS_OCR);
 			}
-			_lastCodePos = "14";
+			_lastCodePos = "17";
 			
 			// If this is a text file, load the file as "indexed" text.
 			if (eFileType == kTXTFile || eFileType == kXMLFile || eFileType == kCSVFile)
@@ -252,41 +281,15 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 			// Assume this is an image file and attempt OCR [P16 #2813]
 			else
 			{
+				IHasOCRParametersPtr ipHasOCRParameters(ipRuleSet);
+
 				// Retrieve text from all pages of image, retaining spatial information
 				// pass in the SubProgressStatus, or __nullptr if ipProgressStatus is __nullptr
 				ipAFDoc->Text = getOCRUtils()->RecognizeTextInImageFile(strSrcDocFileName,
 					nNumOfPagesToRecognize, getOCREngine(),
-					ipProgressStatus ? ipProgressStatus->SubProgressStatus : __nullptr);
+					ipProgressStatus ? ipProgressStatus->SubProgressStatus : __nullptr,
+					ipHasOCRParameters->OCRParameters);
 			}
-		}
-		_lastCodePos = "15";
-
-		// Create RuleSet object
-		UCLID_AFCORELib::IRuleSetPtr ipRuleSet;
-		_variant_t _varRuleSet(varRuleSet);
-		_bstr_t _bstrRSDFileName = "";
-		if (_varRuleSet.vt == VT_BSTR)
-		{
-			_lastCodePos = "16";
-
-			// create new RuleSet object
-			ipRuleSet.CreateInstance( CLSID_RuleSet );
-			ASSERT_RESOURCE_ALLOCATION( "ELI07827", ipRuleSet != __nullptr );
-
-			// Load Rule Set from specified file
-			_bstrRSDFileName = _varRuleSet;
-			ipRuleSet->LoadFrom(_bstrRSDFileName, VARIANT_FALSE);
-		}
-		else if (_varRuleSet.vt == VT_UNKNOWN || _varRuleSet.vt == VT_DISPATCH)
-		{
-			_lastCodePos = "17";
-
-			// Use the RuleSet that was passed in
-			IUnknownPtr ipUnknown = _varRuleSet;
-			ASSERT_RESOURCE_ALLOCATION( "ELI07912", ipUnknown != __nullptr );
-			
-			ipRuleSet = ipUnknown;
-			ASSERT_RESOURCE_ALLOCATION( "ELI07910", ipRuleSet != __nullptr );
 		}
 		_lastCodePos = "18";
 

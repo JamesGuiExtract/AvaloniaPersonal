@@ -33,10 +33,15 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL OnInitDialog();
+
+// Windows Message Handlers
 	afx_msg void OnClickedBtnAddCounter();
 	afx_msg void OnClickedBtnEditCounter();
 	afx_msg void OnClickedBtnDeleteCounter();
 	afx_msg void OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnBnClickedCheckSpecifyOcrParameters();
+	afx_msg void OnBnClickedBtnOcrparameters();
+	afx_msg void OnBnClickedBtnImportOcrParameters();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -72,6 +77,8 @@ private:
 	// Returns true if the Rule Development Toolkit is licensed; false otherwise.
 	bool isRdtLicensed();
 
+	const std::string chooseFile();
+
 	UCLID_AFCORELib::IRuleSetPtr m_ipRuleSet;
 
 	// A map counter ID to CounterInfo for all counters that appear in the grid (standard and
@@ -85,6 +92,9 @@ private:
 	CListCtrl	m_CounterList;
 	CButton	m_checkboxForInternalUseOnly;
 	CEdit m_editFKBVersion;
+	CButton m_checkSpecifiedOCRParameters;
+	CButton m_btnEditOCRParameters;
+	CButton m_btnImportOCRParameters;
 
 	bool m_bReadOnly;
 };

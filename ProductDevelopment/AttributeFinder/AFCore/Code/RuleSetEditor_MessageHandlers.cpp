@@ -1978,10 +1978,15 @@ void CRuleSetEditor::OnFileProperties()
 
 	try
 	{	
-		CRuleSetPropertiesDlg dialog(m_ipRuleSet, false);
+		// Edit a copy of the ruleset
+		ICopyableObjectPtr ipCopyThis(m_ipRuleSet);
+		UCLID_AFCORELib::IRuleSetPtr ipCopy(ipCopyThis->Clone());
+		CRuleSetPropertiesDlg dialog(ipCopy, false);
 		
 		if (dialog.DoModal() == IDOK)
 		{
+			// Copy ruleset info back (can't copy ref because rule tester won't get updated)
+			ipCopyThis->CopyFrom(ipCopy);
 			getRuleExecutionEnv()->FKBVersion = m_ipRuleSet->FKBVersion;
 
 			// update the status bar as the user may have changed settings

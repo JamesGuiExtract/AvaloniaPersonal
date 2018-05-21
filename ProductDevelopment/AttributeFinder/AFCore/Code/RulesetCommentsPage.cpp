@@ -11,9 +11,11 @@
 //--------------------------------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC(CRuleSetCommentsPage, CPropertyPage)
 //--------------------------------------------------------------------------------------------------
-CRuleSetCommentsPage::CRuleSetCommentsPage(UCLID_AFCORELib::IRuleSetPtr ipRuleSet)
+CRuleSetCommentsPage::CRuleSetCommentsPage(UCLID_AFCORELib::IRuleSetPtr ipRuleSet,
+	bool bReadOnly)
 	: CPropertyPage(CRuleSetCommentsPage::IDD)
 , m_ipRuleSet(ipRuleSet)
+, m_bReadOnly(bReadOnly)
 {
 
 }
@@ -43,6 +45,11 @@ BOOL CRuleSetCommentsPage::OnInitDialog()
 		CPropertyPage::OnInitDialog();
 
 		m_editRulesetComments.SetWindowText(m_ipRuleSet->Comments);
+
+		if (m_bReadOnly)
+		{
+			m_editRulesetComments.SetReadOnly(TRUE);
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI34017")
 

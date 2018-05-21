@@ -84,6 +84,8 @@ RuleTesterDlg::RuleTesterDlg(FileRecoveryManager *pFRM,
 		// Use the Prog ID to avoid circular dependency
 		m_ipAttributeInfo.CreateInstance("Extract.AttributeFinder.Forms.RuleTesterAttributeInfoForm");
 		ASSERT_RESOURCE_ALLOCATION("ELI41712", m_ipAttributeInfo != __nullptr);
+
+		m_testerDlgRulesetPage.setInputPage(&m_testerDlgInputPage);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04905")
 }
@@ -240,6 +242,8 @@ BOOL RuleTesterDlg::OnInitDialog()
 			// the property pages
 			m_testerDlgInputPage.setTesterConfigMgr(ma_pCfgTesterMgr.get());
 			m_testerDlgSettingsPage.setTesterConfigMgr(ma_pCfgTesterMgr.get());
+
+			m_testerDlgInputPage.setOCRParameters(m_ipRuleSet);
 
 			// create the property sheet based on Mode
 			if (m_eMode == kWithSettingsTab)

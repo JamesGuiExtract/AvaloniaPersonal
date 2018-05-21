@@ -614,7 +614,7 @@ void CSpatialStringViewerDlg::OnFileProperties()
 			// Display the property dialog box
 			USSPropertyDlg dlg(strSourceDocName, m_strOriginalSourceDoc, 
 				m_strUSSFileName, asString(m_ipSpatialString->OCREngineVersion),
-				ipCollOfPageInfo, this);
+				ipCollOfPageInfo, m_ipSpatialString, this);
 			dlg.DoModal();
 		}
 	}

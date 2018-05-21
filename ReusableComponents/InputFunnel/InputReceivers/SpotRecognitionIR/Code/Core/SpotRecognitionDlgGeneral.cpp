@@ -2118,7 +2118,7 @@ ISpatialStringPtr SpotRecognitionDlg::recognizeParagraphTextInImage(
 		// perform recognition and get spatial information
 		ipText = m_ipOCREngine->RecognizeTextInImage(
 			get_bstr_t(strImageFileName), lStartPage, lEndPage, kNoFilter, "", 
-			UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, ipProgressStatus);
+			UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, ipProgressStatus, NULL);
 		
 	}
 	else
@@ -2129,7 +2129,7 @@ ISpatialStringPtr SpotRecognitionDlg::recognizeParagraphTextInImage(
 
 		ipText = m_ipOCREngine->RecognizeTextInImageZone(_bstr_t(strImageFileName.c_str()), 
 			lStartPage, lEndPage, ipRect, 0, kNoFilter, "", VARIANT_FALSE, VARIANT_FALSE, 
-			VARIANT_TRUE, ipProgressStatus);
+			VARIANT_TRUE, ipProgressStatus, NULL);
 	}
 	ASSERT_RESOURCE_ALLOCATION("ELI06541", ipText != __nullptr);
 

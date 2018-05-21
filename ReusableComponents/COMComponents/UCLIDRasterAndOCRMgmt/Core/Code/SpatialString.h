@@ -26,7 +26,8 @@ class ATL_NO_VTABLE CSpatialString :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IComparableObject, &IID_IComparableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ISpatialString, &IID_ISpatialString, &LIBID_UCLID_RASTERANDOCRMGMTLib>,
-	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>
+	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<IHasOCRParameters, &IID_IHasOCRParameters, &LIBID_UCLID_RASTERANDOCRMGMTLib>
 {
 public:
 	CSpatialString();
@@ -45,6 +46,7 @@ BEGIN_COM_MAP(CSpatialString)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(IComparableObject)
 	COM_INTERFACE_ENTRY(IManageableMemory)
+	COM_INTERFACE_ENTRY(IHasOCRParameters)
 END_COM_MAP()
 
 public:
@@ -200,6 +202,10 @@ public:
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
+// IHasOCRParameters
+	STDMETHOD(get_OCRParameters)(ILongToLongMap** ppMap);
+	STDMETHOD(put_OCRParameters)(ILongToLongMap* pMap);
+
 private:
 	////////////
 	// Variables
@@ -248,7 +254,9 @@ private:
 
 	// For thread protection 
 	CCriticalSection m_criticalSection;
-
+	
+	ILongToLongMapPtr m_ipOCRParameters;
+		
 	///////////
 	// Methods
 	///////////
@@ -640,5 +648,7 @@ private:
 	// Creates a blank page by going to the source document and getting the dimensions of the page
 	// and then creates a pseudo-spatial string with the given text
 	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr makeBlankPage(int nPage, string textForPage);
+	//----------------------------------------------------------------------------------------------
+	ILongToLongMapPtr getOCRParameters();
 	//----------------------------------------------------------------------------------------------
 };

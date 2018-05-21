@@ -155,7 +155,9 @@
 #define IDC_EDIT_FKB_VERSION            316
 #define IDC_CHECK_INTERNAL_USE_ONLY     317
 #define IDC_SERIAL_NUMBERS              318
+#define IDC_BTN_OCRPARAMETERS           318
 #define IDC_APPICON                     319
+#define IDC_OCR_PARAMETERS_GROUP        319
 #define IDI_FLEX_DATA_ENTRY             320
 #define IDI_ID_SHIELD                   321
 #define IDC_COMBO_IV                    322
@@ -198,6 +200,8 @@
 #define IDC_BTN_SELECT_OH               372
 #define IDC_BUTTON_MODE_SELECT          373
 #define IDC_STATIC_RUN_MODE             374
+#define IDC_CHECK_SPECIFY_OCR_PARAMETERS 375
+#define IDC_BTN_IMPORT_OCR_PARAMETERS   376
 #define ID_EDIT_DELETE                  6023
 #define ID_FILE_SAVEAS                  32768
 #define ID_FILE_EXIT                    32769
@@ -256,9 +260,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        372
+#define _APS_NEXT_RESOURCE_VALUE        373
 #define _APS_NEXT_COMMAND_VALUE         32819
-#define _APS_NEXT_CONTROL_VALUE         375
+#define _APS_NEXT_CONTROL_VALUE         377
 #define _APS_NEXT_SYMED_VALUE           134
 #endif
 #endif

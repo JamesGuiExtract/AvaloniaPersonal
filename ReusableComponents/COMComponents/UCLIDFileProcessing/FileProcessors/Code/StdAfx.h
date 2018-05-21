@@ -11,6 +11,7 @@
 
 #include <afxwin.h>
 #include <afxdisp.h>
+#include <afxcmn.h>
 #include <afxdlgs.h>
 
 #include <atlbase.h>

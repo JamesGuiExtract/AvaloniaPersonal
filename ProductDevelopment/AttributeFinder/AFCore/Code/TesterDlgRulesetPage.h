@@ -2,6 +2,7 @@
 
 #include "resource.h"
 
+#include "TesterDlgInputPage.h"
 #include <string>
 using namespace std;
 // TesterDlgRulesetPage.h : header file
@@ -21,6 +22,7 @@ public:
 	TesterDlgRulesetPage();
 	~TesterDlgRulesetPage();
 
+	void setInputPage(TesterDlgInputPage *pInputPage);
 // Dialog Data
 	//{{AFX_DATA(TesterDlgRulesetPage)
 	enum { IDD = IDD_TESTERDLG_RULESET_PAGE };
@@ -45,6 +47,9 @@ protected:
 	afx_msg void OnChangeRuleset();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+
+private:
+	TesterDlgInputPage *m_pInputPage;
 };
 
 //{{AFX_INSERT_LOCATION}}

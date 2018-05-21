@@ -37,7 +37,9 @@ TesterDlgInputPage::TesterDlgInputPage()
 : CPropertyPage(TesterDlgInputPage::IDD), 
   m_pTesterConfigMgr(NULL),
   m_ipOCREngine(NULL),
-  m_strCurrentInputFile("")
+  m_strCurrentInputFile(""),
+  m_strRuleSetName(""),
+  m_ipOCRParameters(NULL)
 {
 	try
 	{
@@ -604,9 +606,17 @@ ISpatialStringPtr TesterDlgInputPage::openFile(const string& strFileName)
 			}
 			else
 			{
+				// If ruleset tab is in use, load OCR parameters from the ruleset
+				if (!m_strRuleSetName.empty())
+				{
+					UCLID_AFCORELib::IRuleSetPtr ipRuleSet;
+					ipRuleSet->LoadFrom(get_bstr_t(m_strRuleSetName), VARIANT_FALSE);
+					m_ipOCRParameters = ipRuleSet;
+				}
+
 				ipText = getOCREngine()->RecognizeTextInImage(
 					strFileName.c_str(), 1, -1, UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
-					UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, NULL); 
+					UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, NULL, m_ipOCRParameters->OCRParameters); 
 			}
 		}
 		else
@@ -893,5 +903,15 @@ string TesterDlgInputPage::getDataInputFileName()
 	m_editDataInputFileName.GetWindowText(zDataInputFileName);
 
 	return string((LPCTSTR)zDataInputFileName);
+}
+//-------------------------------------------------------------------------------------------------
+void TesterDlgInputPage::setRuleSetName(string strRuleSetName)
+{
+	m_strRuleSetName = strRuleSetName;
+}
+//-------------------------------------------------------------------------------------------------
+void TesterDlgInputPage::setOCRParameters(IHasOCRParametersPtr ipOCRParameters)
+{
+	m_ipOCRParameters = ipOCRParameters;
 }
 //-------------------------------------------------------------------------------------------------

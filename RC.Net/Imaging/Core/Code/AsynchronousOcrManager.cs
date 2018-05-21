@@ -656,7 +656,7 @@ namespace Extract.Imaging
                                         // area each page.
                                         ocrText = _ssocr.RecognizeTextInImage(fileToOcr,
                                         startPage, endPage, EFilterCharacters.kNoFilter, "",
-                                        (EOcrTradeOff)this.Tradeoff, true, progressStatus);
+                                        (EOcrTradeOff)this.Tradeoff, true, progressStatus, null);
                                     }
                                     else
                                     {
@@ -672,7 +672,7 @@ namespace Extract.Imaging
 
                                         ocrText = _ssocr.RecognizeTextInImageZone(fileToOcr,
                                             startPage, endPage, zonalOCRRectangle, 0,
-                                            EFilterCharacters.kNoFilter, "", false, false, true, null);
+                                            EFilterCharacters.kNoFilter, "", false, false, true, null, null);
                                     }
 
                                     // OCR complete, set currently in OCR flag to false

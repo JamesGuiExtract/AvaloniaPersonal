@@ -197,7 +197,7 @@ BOOL CRunRulesApp::InitInstance()
 
 						ISpatialStringPtr ipSS = ipOCR->RecognizeTextInImage(
 							strSourceFileName.c_str(), 1, -1, UCLID_RASTERANDOCRMGMTLib::kNoFilter, 
-							"", UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, NULL);
+							"", UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, NULL, NULL);
 						ipSS->SaveTo(get_bstr_t(strUssFile), VARIANT_TRUE, VARIANT_FALSE);
 					}
 				}

@@ -260,6 +260,7 @@
   <ItemGroup>
     <ClInclude Include="CPPLetter.h" />
     <ClInclude Include="Letter.h" />
+    <ClInclude Include="LoadOCRParametersLoader.h" />
     <ClInclude Include="OCRUtils.h" />
     <ClInclude Include="RasterZone.h" />
     <ClInclude Include="Resource.h" />

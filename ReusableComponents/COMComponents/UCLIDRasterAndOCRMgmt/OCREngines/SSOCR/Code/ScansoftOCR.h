@@ -41,9 +41,11 @@ public:
 	STDMETHOD(raw_RecognizeTextInImage)(BSTR strImageFileName, long lStartPage, long lEndPage, 
 		EFilterCharacters eFilter, BSTR bstrCustomFilterCharacters, EOcrTradeOff eTradeOff, 
 		VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus, 
+		ILongToLongMap* pOCRParameters,
 		ISpatialString **pstrText);
 	STDMETHOD(raw_RecognizeTextInImage2)(BSTR strImageFileName, BSTR strPageNumbers,
 		VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus, 
+		ILongToLongMap* pOCRParameters,
 		ISpatialString* *pstrText);
 	STDMETHOD(raw_SupportsTrainingFiles)(VARIANT_BOOL *pbValue);
 	STDMETHOD(raw_LoadTrainingFile)(BSTR strTrainingFileName);
@@ -51,7 +53,8 @@ public:
 		ILongRectangle* pZone, long nRotationInDegrees, EFilterCharacters eFilter, 
 		BSTR bstrCustomFilterCharacters, VARIANT_BOOL bDetectHandwriting, 
 		VARIANT_BOOL bReturnUnrecognized, VARIANT_BOOL bReturnSpatialInfo, 
-		IProgressStatus* pProgressStatus, ISpatialString* *pstrText);
+		IProgressStatus* pProgressStatus, ILongToLongMap* pOCRParameters,
+		ISpatialString* *pstrText);
 	STDMETHOD(raw_WhackOCREngine)();
 
 // ILicensedComponent
@@ -118,7 +121,7 @@ private:
 		ILongRectangle* pZone, long nRotationInDegrees, EFilterCharacters eFilter, 
 		BSTR bstrCustomFilterCharacters, EOcrTradeOff eTradeOff, VARIANT_BOOL vbDetectHandwriting, 
 		VARIANT_BOOL vbReturnUnrecognized, VARIANT_BOOL bReturnSpatialInfo, 
-		IProgressStatus* pProgressStatus);	
+		IProgressStatus* pProgressStatus, ILongToLongMap* pOCRParameters);	
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: This method provides the same functionality as recognizeText except this method is
 	// only to be used with printed text in an image zone. Since a decomposition method is not used
@@ -126,7 +129,7 @@ private:
 	ISpatialStringPtr recognizePrintedTextInImageZone(BSTR strImageFileName, long lStartPage, 
 		long lEndPage, ILongRectangle* pZone, long nRotationInDegrees, EFilterCharacters eFilter, 
 		BSTR bstrCustomFilterCharacters, VARIANT_BOOL bReturnUnrecognized, 
-		VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus);
+		VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus, ILongToLongMap* pOCRParameters);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Returns an IVariantVector containing the numbers lStartPage to lEndPage inclusive.
 	//          If lEndPage < 1, ends on the last page of the document.

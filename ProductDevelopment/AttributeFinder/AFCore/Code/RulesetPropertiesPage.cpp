@@ -12,6 +12,8 @@
 #include <UCLIDException.h>
 #include <ComponentLicenseIDs.h>
 #include <VectorOperations.h>
+#include <LoadFileDlgThread.h>
+#include <COMUtils.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -57,6 +59,10 @@ void CRuleSetPropertiesPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_INTERNAL_USE_ONLY, m_checkboxForInternalUseOnly);
 	DDX_Control(pDX, IDC_CHECK_SWIPING_RULE, m_checkSwipingRule);
 	DDX_Control(pDX, IDC_FKB_VERSION, m_editFKBVersion);
+	DDX_Control(pDX, IDC_CHECK_SPECIFY_OCR_PARAMETERS, m_checkSpecifiedOCRParameters);
+	DDX_Control(pDX, IDC_BTN_OCRPARAMETERS, m_btnEditOCRParameters);
+	DDX_Control(pDX, IDC_BTN_IMPORT_OCR_PARAMETERS, m_btnImportOCRParameters);
+
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -65,6 +71,9 @@ BEGIN_MESSAGE_MAP(CRuleSetPropertiesPage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BTN_EDIT_COUNTER, &CRuleSetPropertiesPage::OnClickedBtnEditCounter)
 	ON_BN_CLICKED(IDC_BTN_DELETE_COUNTER, &CRuleSetPropertiesPage::OnClickedBtnDeleteCounter)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_COUNTER_LIST, &CRuleSetPropertiesPage::OnCounterListItemChanged)
+	ON_BN_CLICKED(IDC_CHECK_SPECIFY_OCR_PARAMETERS, &CRuleSetPropertiesPage::OnBnClickedCheckSpecifyOcrParameters)
+	ON_BN_CLICKED(IDC_BTN_OCRPARAMETERS, &CRuleSetPropertiesPage::OnBnClickedBtnOcrparameters)
+	ON_BN_CLICKED(IDC_BTN_IMPORT_OCR_PARAMETERS, &CRuleSetPropertiesPage::OnBnClickedBtnImportOcrParameters)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -85,10 +94,33 @@ BOOL CRuleSetPropertiesPage::OnInitDialog()
 		m_checkboxForInternalUseOnly.SetCheck( asBSTChecked(m_ipRuleSet->ForInternalUseOnly) );
 		m_checkSwipingRule.SetCheck( asBSTChecked(m_ipRuleSet->IsSwipingRule) );
 
+		IHasOCRParametersPtr ipHasParams(m_ipRuleSet);
+		if (ipHasParams->OCRParameters->Size == 0)
+		{
+			m_checkSpecifiedOCRParameters.SetCheck(BST_UNCHECKED);
+			m_btnEditOCRParameters.EnableWindow(FALSE);
+		}
+		else
+		{
+			m_checkSpecifiedOCRParameters.SetCheck(BST_CHECKED);
+			m_btnEditOCRParameters.EnableWindow(TRUE);
+		}
+
 		// Hide checkboxes without full RDT license [FIDSC #3062, #3594]
 		if (!isRdtLicensed())
 		{
 			hideCheckboxes();
+		}
+
+		if (m_bReadOnly)
+		{
+			m_CounterList.EnableWindow(FALSE);
+			m_editFKBVersion.SetReadOnly(TRUE);
+			m_checkboxForInternalUseOnly.EnableWindow(FALSE);
+			m_checkSpecifiedOCRParameters.EnableWindow(FALSE);
+			m_checkSwipingRule.EnableWindow(FALSE);
+			m_btnEditOCRParameters.SetWindowText("View...");
+			m_btnImportOCRParameters.EnableWindow(FALSE);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI11552")
@@ -138,6 +170,14 @@ void CRuleSetPropertiesPage::Apply()
 		// Store whether this is a swiping rule
 		bChecked = m_checkSwipingRule.GetCheck() == BST_CHECKED;
 		m_ipRuleSet->IsSwipingRule = asVariantBool(bChecked);
+
+		bChecked = m_checkSpecifiedOCRParameters.GetCheck() == BST_CHECKED;
+
+		if (!bChecked)
+		{
+			IHasOCRParametersPtr ipHasParams(m_ipRuleSet);
+			ipHasParams->OCRParameters = __nullptr;
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI11553")
 }
@@ -529,3 +569,105 @@ bool CRuleSetPropertiesPage::isRdtLicensed()
 	return LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS);
 }
 //-------------------------------------------------------------------------------------------------
+
+void CRuleSetPropertiesPage::OnBnClickedCheckSpecifyOcrParameters()
+{
+	try
+	{
+		bool bChecked = m_checkSpecifiedOCRParameters.GetCheck() == BST_CHECKED;
+		m_btnEditOCRParameters.EnableWindow(bChecked);
+
+		if (bChecked)
+		{
+			IHasOCRParametersPtr ipHasOCRParameters(m_ipRuleSet);
+
+			// Open edit dialog if there are no parameters set
+			if (ipHasOCRParameters->OCRParameters->Size == 0)
+			{
+				OnBnClickedBtnOcrparameters();
+			}
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45953");
+}
+
+
+void CRuleSetPropertiesPage::OnBnClickedBtnOcrparameters()
+{
+	try
+	{
+		// Create instance of the configure form using the Prog ID - to avoid circular dependency
+		UCLID_RASTERANDOCRMGMTLib::IOCRParametersConfigurePtr ipConfigure;
+		ipConfigure.CreateInstance("Extract.FileActionManager.Forms.OCRParametersConfigure");
+		ASSERT_RESOURCE_ALLOCATION("ELI45954", ipConfigure != __nullptr);
+		
+		IHasOCRParametersPtr ipHasParams(m_ipRuleSet);
+
+		// Configure the parameteres
+		ipConfigure->ConfigureOCRParameters(ipHasParams, m_bReadOnly, (long)this->m_hWnd);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45955");
+}
+
+
+void CRuleSetPropertiesPage::OnBnClickedBtnImportOcrParameters()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		string strFile = chooseFile();	
+		if (!strFile.empty())
+		{
+			// Load parameters from other file
+			ILoadOCRParametersPtr ipLoadOCRParameters;
+			ipLoadOCRParameters.CreateInstance(CLSID_RuleSet);
+			ipLoadOCRParameters->LoadOCRParameters(get_bstr_t(strFile));
+
+			// Copy them to this ruleset
+			IHasOCRParametersPtr ipOtherHasOCRParameters(ipLoadOCRParameters);
+			IHasOCRParametersPtr ipThisHasOCRParameters(m_ipRuleSet);
+
+			// Check for existence of any params
+			if (ipOtherHasOCRParameters->OCRParameters->Size == 0)
+			{
+				// Display Message Box about it
+				MessageBox("No OCR parameters found", "Failure!", MB_OK | MB_ICONWARNING);
+			}
+			else
+			{
+				ipThisHasOCRParameters->OCRParameters = ipOtherHasOCRParameters->OCRParameters;
+
+				// Enable controls
+				m_checkSpecifiedOCRParameters.SetCheck(BST_CHECKED);
+				m_btnEditOCRParameters.EnableWindow();
+
+				MessageBox("OCR parameters imported", "Success!", MB_OK | MB_ICONINFORMATION);
+			}
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45938");
+}
+
+const std::string CRuleSetPropertiesPage::chooseFile()
+{
+	const static string s_strFiles = "Ruleset definition files (*.rsd;*.etf)|*.rsd;*.etf|All Files (*.*)|*.*||";
+
+	// bring open file dialog
+	CFileDialog fileDlg(TRUE, NULL, "", 
+		OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		s_strFiles.c_str(), CWnd::FromHandle(m_hWnd));
+	
+	// Pass the pointer of dialog to create ThreadFileDlg object
+	ThreadFileDlg tfd(&fileDlg);
+
+	// If cancel button is clicked
+	if (tfd.doModal() != IDOK)
+	{
+		return "";
+	}
+	
+	string strFile = (LPCTSTR)fileDlg.GetPathName();
+
+	return strFile;
+}

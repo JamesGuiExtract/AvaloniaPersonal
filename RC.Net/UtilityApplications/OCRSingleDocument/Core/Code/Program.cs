@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
+using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using UCLID_SSOCRLib;
 
@@ -20,34 +22,56 @@ namespace Extract.OcrSingleDocument
         [STAThread]
         static void Main(string[] args)
         {
-            string fileName = "";
-            string exceptionFile = "";
+            string fileName = null;
+            string exceptionFile = null;
+            string paramsFile = null;
             try
             {
                 // Check the number of command line arguments
-                if (args.Length != 1 && args.Length != 3)
+                if (args.Length != 1 && args.Length != 3 && args.Length != 5)
                 {
                     ShowUsage();
                     return;
                 }
 
-                // Check for log exceptions argument
-                if (args.Length == 3)
+                int i = 0;
+                for (; i < args.Length - 1; i++)
                 {
-                    // Check for /ef flag
-                    if (!args[1].Equals("/ef", StringComparison.OrdinalIgnoreCase))
+                    if (exceptionFile == null
+                        &&(args[i].Equals("/ef", StringComparison.OrdinalIgnoreCase)
+                        || args[i].Equals("-ef", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        exceptionFile = Path.GetFullPath(args[++i]);
+                    }
+                    else if (paramsFile == null
+                        &&(args[i].Equals("/params", StringComparison.OrdinalIgnoreCase)
+                        || args[i].Equals("-params", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        paramsFile = Path.GetFullPath(args[++i]);
+                    }
+                    else if (fileName == null)
+                    {
+                        fileName = Path.GetFullPath(args[i]);
+                    }
+                    else
                     {
                         ShowUsage();
                         return;
                     }
-                    else
-                    {
-                        exceptionFile = Path.GetFullPath(args[2]);
-                    }
                 }
 
-                // Get the fully qualified path to the file
-                fileName = Path.GetFullPath(args[0]);
+                if (i == args.Length - 1)
+                {
+                    if (fileName == null)
+                    {
+                        fileName = Path.GetFullPath(args[i]);
+                    }
+                    else
+                    {
+                        ShowUsage();
+                        return;
+                    }
+                }
 
                 // Ensure the file exists
                 ExtractException.Assert("ELI22004", "File does not exist!",
@@ -70,10 +94,18 @@ namespace Extract.OcrSingleDocument
                 ssocr.InitPrivateLicense(
                     LicenseUtilities.GetMapLabelValue(new MapLabel()));
 
+                // Load the OCR parameters from the file
+                LongToLongMap ocrParameters = null;
+                if (!string.IsNullOrEmpty(paramsFile))
+                {
+                    ILoadOCRParameters loadOCRParameters = new RuleSetClass();
+                    loadOCRParameters.LoadOCRParameters(paramsFile);
+                    ocrParameters = ((IHasOCRParameters)loadOCRParameters).OCRParameters;
+                }
+
                 // OCR the document
                 SpatialString ocrText = ssocr.RecognizeTextInImage(fileName, 1, -1,
-                    UCLID_RASTERANDOCRMGMTLib.EFilterCharacters.kNoFilter, "", 
-                    UCLID_RASTERANDOCRMGMTLib.EOcrTradeOff.kAccurate, true, null);
+                    EFilterCharacters.kNoFilter, "", EOcrTradeOff.kAccurate, true, null, ocrParameters);
 
                 // Save the OCR output as filename.uss
                 ocrText.SaveTo(fileName + ".uss", true, true);
@@ -109,10 +141,11 @@ namespace Extract.OcrSingleDocument
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("Usage:");
             sb.AppendLine("------------");
-            sb.AppendLine("OcrSingleDocument.exe <FileName> [/ef <ExceptionFile>]");
+            sb.AppendLine("OcrSingleDocument.exe <FileName> [/ef <ExceptionFile>] [/params <RuleSetFile>]");
             sb.AppendLine("FileName: Name of file to OCR");
             sb.Append("/ef <ExceptionFile>: Log exceptions to the specified file rather than");
             sb.AppendLine(" display them");
+            sb.Append("/params <RuleSetFile>: Load OCR parameters from the specified file");
             
             MessageBox.Show(sb.ToString(), "OCRSingleDocument Usage", MessageBoxButtons.OK,
                 MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);

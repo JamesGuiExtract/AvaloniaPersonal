@@ -3628,6 +3628,13 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
             m_ipPageInfoMap = ipSource->SpatialPageInfos;
         }
 
+		// Copy OCR parameters
+		UCLID_RASTERANDOCRMGMTLib::IHasOCRParametersPtr ipOCRParams(ipSource);
+		ASSERT_RESOURCE_ALLOCATION("ELI45902", ipOCRParams != __nullptr);
+		ICopyableObjectPtr ipMap = ipOCRParams->OCRParameters;
+		ASSERT_RESOURCE_ALLOCATION("ELI45903", ipMap != __nullptr);
+		m_ipOCRParameters = ipMap->Clone();
+
         // Downgrade the spatial mode if needed
         reviewSpatialStringAndDowngradeIfNeeded();
 

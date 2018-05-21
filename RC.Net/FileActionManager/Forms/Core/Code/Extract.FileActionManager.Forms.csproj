@@ -67,12 +67,19 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CAPI_PInvoke, Version=20.20.0.0, Culture=neutral, PublicKeyToken=d277acbc760e5eaf, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_19\Bin\CAPI_PInvoke.dll</HintPath>
+    </Reference>
     <Reference Include="edtFTPnetPRO, Version=7.3.1.20, Culture=neutral, PublicKeyToken=0dce1ad63760d80b, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\EnterpriseDT\Bin\edtFTPnetPRO.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -124,6 +131,14 @@
     </Compile>
     <Compile Include="EditTableData.Designer.cs">
       <DependentUpon>EditTableData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OCRParametersConfigure.cs">
+      <SubType>Form</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="OCRParametersConfigure.Designer.cs">
+      <DependentUpon>OCRParametersConfigure.cs</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="PaginationSettings.cs" />
     <Compile Include="PaginationSettingsDialog.cs">
@@ -212,6 +227,15 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AddMLModel.resx">
@@ -230,6 +254,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EditTableData.resx">
       <DependentUpon>EditTableData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OCRParametersConfigure.resx">
+      <DependentUpon>OCRParametersConfigure.cs</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="PaginationSettingsDialog.resx">
       <DependentUpon>PaginationSettingsDialog.cs</DependentUpon>
@@ -257,6 +285,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

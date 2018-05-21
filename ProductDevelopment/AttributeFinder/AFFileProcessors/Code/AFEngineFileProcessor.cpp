@@ -69,7 +69,8 @@ STDMETHODIMP CAFEngineFileProcessor::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
 		&IID_IAccessRequired,
-		&IID_IPersistStream
+		&IID_IPersistStream,
+		&IID_IHasOCRParameters
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -249,6 +250,18 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 
 		_lastCodePos = "100";
 
+		// Make sure the rule set file exists.
+		// The rule set is saved in this object so that it can be passed in to AFEngine
+		// and so that it need not be loaded each time this method is called.
+		IRuleSetPtr ipRules = getRuleSet(strRulesFile);
+
+		_lastCodePos = "101";
+
+		IUnknownPtr ipUnknown = ipRules;
+		_variant_t _varRuleSet = (IUnknown *) ipUnknown;
+
+		_lastCodePos = "102";
+
 		// Perform OCR on the document if necessary
 		if (bNeedToRunOCR)
 		{
@@ -269,6 +282,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 				string strFileToOCR =
 					m_bUseCleanedImage ? getCleanImageNameIfExists(strInputFile) : strInputFile;
 
+				IHasOCRParametersPtr ipHasOCRParameters(ipRules);
+
 				// Perform the OCR as configured by the user
 				switch (m_eOCRPagesType)
 				{
@@ -278,7 +293,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 
 						// Recognize the image file and put the spatial string in ipAFDoc
 						ipAFDoc->Text = getOCRUtils()->RecognizeTextInImageFile( strFileToOCR.c_str(), 
-							-1, getOCREngine(), ipProgressStatusToUseForSubTasks);
+							-1, getOCREngine(), ipProgressStatusToUseForSubTasks, ipHasOCRParameters->OCRParameters);
 					}
 					break;
 				case kOCRCertainPages:
@@ -286,7 +301,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 						_lastCodePos = "122";
 
 						ipAFDoc->Text = getOCREngine()->RecognizeTextInImage2( strFileToOCR.c_str(), 
-							m_strSpecificPages.c_str(), VARIANT_TRUE, ipProgressStatusToUseForSubTasks);
+							m_strSpecificPages.c_str(), VARIANT_TRUE, ipProgressStatusToUseForSubTasks,
+							ipHasOCRParameters->OCRParameters);
 					}
 					break;
 				}
@@ -344,18 +360,6 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		{
 			ipProgressStatus->StartNextItemGroup("Executing rules...", nNUM_PROGRESS_ITEMS_EXECUTE_RULES);
 		}
-
-		// Make sure the rule set file exists.
-		// The rule set is saved in this object so that it can be passed in to AFEngine
-		// and so that it need not be loaded each time this method is called.
-		IRuleSetPtr ipRules = getRuleSet(strRulesFile);
-
-		_lastCodePos = "190";
-
-		IUnknownPtr ipUnknown = ipRules;
-		_variant_t _varRuleSet = (IUnknown *) ipUnknown;
-
-		_lastCodePos = "200";
 
 		// [FlexIDSCore:5318]
         // Assign any alternate component data directory root defined in the database to be used in
@@ -1184,4 +1188,3 @@ bool CAFEngineFileProcessor::countersDisabled()
 {
 	return LicenseManagement::isLicensed(gnIGNORE_RULE_EXECUTION_COUNTER_DECREMENTS);
 }
-//-------------------------------------------------------------------------------------------------

@@ -650,6 +650,9 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 			throw uex;
 		}
 
+		IHasOCRParametersPtr ipHasOCRParameters(ipAFDoc);
+		ILongToLongMapPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
+
 		// Create collection of Attributes to return
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI18451", ipAttributes != __nullptr);
@@ -672,7 +675,7 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 
 			// Get the appropriate content for this page
 			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipInputText, strSourceDoc,
-				bPageSpecified, bRestrictionDefined, i);
+				bPageSpecified, bRestrictionDefined, ipOCRParameters, i);
 
 			// Provide non-NULL content to an Attribute to be included in the collection
 			if (ipContentFromThisPage != __nullptr)
@@ -1401,7 +1404,7 @@ bool CSelectPageRegion::isStringFoundOnPage(string strPageText)
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,
-									const string& strSourceDoc, long nPageNum, bool bPageSpecified)
+	const string& strSourceDoc, long nPageNum, bool bPageSpecified, ILongToLongMapPtr ipOCRParameters)
 {
 	try
 	{
@@ -1530,7 +1533,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					// Get the text from entire remaining area on the page
 					ipResult = getOCREngine()->RecognizeTextInImageZone(strTempFileName2.c_str(), 1, 1, 
 						NULL, nActualRotation, kNoFilter, "", VARIANT_FALSE, VARIANT_FALSE, VARIANT_TRUE, 
-						NULL);
+						NULL, ipOCRParameters);
 					ASSERT_RESOURCE_ALLOCATION( "ELI28127", ipResult != __nullptr );
 
 					// Assign original filename to Spatial String
@@ -1553,7 +1556,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					// Get the text from specified area after rotation
 					ipResult = getOCREngine()->RecognizeTextInImageZone(strSourceDoc.c_str(), 
 						nPageNum, nPageNum, ipRect, nActualRotation, kNoFilter, "", VARIANT_FALSE, 
-						VARIANT_FALSE, VARIANT_TRUE, NULL );
+						VARIANT_FALSE, VARIANT_TRUE, NULL, ipOCRParameters);
 					ASSERT_RESOURCE_ALLOCATION( "ELI12698", ipResult != __nullptr );
 				}
 			}
@@ -1686,7 +1689,8 @@ IRegularExprParserPtr CSelectPageRegion::getParser(IAFDocumentPtr ipAFDocument)
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& ipInputText, 
-	const string& strSourceDoc, bool bPageSpecified, bool bRestrictionDefined, long nPageNum)
+	const string& strSourceDoc, bool bPageSpecified, bool bRestrictionDefined,
+	ILongToLongMapPtr ipOCRParameters, long nPageNum)
 {
 	// Get the desired Spatial String portion for this page depending on:
 	//	bRestrictionDefined - whether or not a subregion has been defined
@@ -1709,7 +1713,7 @@ ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& i
 
 		// If including and the page is specified OR excluding and the page is not
 		// specified, then return the contents of the page based on the current settings
-		ipSS = getIndividualPageContent(ipPageText, strSourceDoc, nPageNum, bPageSpecified);
+		ipSS = getIndividualPageContent(ipPageText, strSourceDoc, nPageNum, bPageSpecified, ipOCRParameters);
 	}
 
 	// Return the appropriate Spatial String
@@ -1858,3 +1862,4 @@ IIUnknownVectorPtr CSelectPageRegion::buildRasterZonesForExcludedRegion(long nLe
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28144");
 }
+//-------------------------------------------------------------------------------------------------

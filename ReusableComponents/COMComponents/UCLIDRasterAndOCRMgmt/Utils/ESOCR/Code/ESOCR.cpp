@@ -145,7 +145,7 @@ BOOL CESOCRApp::InitInstance()
 
 			// OCR the image
 			ISpatialStringPtr ipText = m_ipOCRUtils->RecognizeTextInImageFile(
-				strImagePath.c_str(), 1, m_ipOCREngine, NULL);
+				strImagePath.c_str(), 1, m_ipOCREngine, NULL, NULL);
 			ASSERT_RESOURCE_ALLOCATION("ELI16154", ipText != __nullptr);
 
 			// Write the text to the output file

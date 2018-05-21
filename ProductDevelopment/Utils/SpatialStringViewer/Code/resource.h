@@ -67,6 +67,7 @@
 #define IDC_BUTTON_GOTO_PAGE            1060
 #define IDC_BUTTON_LAST_PAGE            1061
 #define IDC_BUTTON_NEXT_PAGE            1062
+#define IDC_BTN_VIEW_OCR_PARAMETERS     1063
 #define ID_FILE_EXIT                    32773
 #define ID_HELP_ABOUTUCLIDSPATIALSTRINGVIEWER 32774
 #define ID_FILE_PROPERTIES              32775
@@ -93,9 +94,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        141
+#define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         32791
-#define _APS_NEXT_CONTROL_VALUE         1063
+#define _APS_NEXT_CONTROL_VALUE         1064
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

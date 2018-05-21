@@ -21,7 +21,8 @@ CAFDocument::CAFDocument()
   m_ipRSDFileStack(__nullptr),
   m_strFKBVersion(""),
   m_strAlternateComponentDataDir(""),
-  m_eParallelRunMode(kUnspecifiedParallelization)
+  m_eParallelRunMode(kUnspecifiedParallelization),
+  m_ipOCRParameters(__nullptr)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -64,7 +65,8 @@ STDMETHODIMP CAFDocument::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IAFDocument,
 		&IID_ILicensedComponent,
 		&IID_ICopyableObject,
-		&IID_IPersistStream
+		&IID_IPersistStream,
+		&IID_IHasOCRParameters
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -324,6 +326,15 @@ STDMETHODIMP CAFDocument::PartialClone(VARIANT_BOOL vbCloneAttributes, VARIANT_B
 		ipDocCopy->ParallelRunMode = (UCLID_AFCORELib::EParallelRunMode)m_eParallelRunMode;
 		ipDocCopy->FKBVersion = get_bstr_t(m_strFKBVersion);
 		ipDocCopy->AlternateComponentDataDir = get_bstr_t(m_strAlternateComponentDataDir);
+
+
+		// Shallow copy OCR parameters because they are not expected to be
+		// modified during rule execution
+		if (m_ipOCRParameters != __nullptr)
+		{
+			IHasOCRParametersPtr ipOCRParams(ipDocCopy);
+			ipOCRParams->OCRParameters = m_ipOCRParameters;
+		}
 
 		// Return the new object to the caller
 		*pAFDoc = (IAFDocument *)ipDocCopy.Detach();
@@ -592,6 +603,11 @@ STDMETHODIMP CAFDocument::raw_CopyFrom(IUnknown *pObject)
 		}
 		m_eParallelRunMode = (EParallelRunMode)ipSource->ParallelRunMode;
 
+		// Shallow copy OCR parameters because they are not expected to be
+		// modified during rule execution
+		IHasOCRParametersPtr ipOCRParams(pObject);
+		m_ipOCRParameters = ipOCRParams->OCRParameters;
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08202");
@@ -670,6 +686,7 @@ STDMETHODIMP CAFDocument::Load(IStream *pStream)
 		bool bHasStringTags = false;
 		bool bHasObjectTags = false;
 		bool bHasRSDFileStack = false;
+		bool bHasOCRParameters = false;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -705,6 +722,7 @@ STDMETHODIMP CAFDocument::Load(IStream *pStream)
 		dataReader >> bHasStringTags;
 		dataReader >> bHasObjectTags;
 		dataReader >> bHasRSDFileStack;
+		dataReader >> bHasOCRParameters;
 
 		// Read attribute from the stream
 		if (bHasAttribute)
@@ -754,6 +772,15 @@ STDMETHODIMP CAFDocument::Load(IStream *pStream)
 			}
 		}
 
+		// Read the OCR parameters
+		if (bHasOCRParameters)
+		{
+			IPersistStreamPtr ipObj;
+
+			::readObjectFromStream(ipObj, pStream, "ELI45906");
+			ASSERT_RESOURCE_ALLOCATION("ELI45907", ipObj != __nullptr);
+			m_ipOCRParameters = ipObj;
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41971");
 
@@ -781,10 +808,12 @@ STDMETHODIMP CAFDocument::Save(IStream *pStream, BOOL fClearDirty)
 		bool bHasStringTags = (m_ipStringTags != __nullptr);
 		bool bHasObjectTags = (m_ipObjectTags != __nullptr);
 		bool bHasRSDFileStack = (m_ipRSDFileStack != __nullptr);
+		bool bHasOCRParameters = (m_ipOCRParameters != __nullptr);
 		dataWriter << bHasAttribute;
 		dataWriter << bHasStringTags;
 		dataWriter << bHasObjectTags;
 		dataWriter << bHasRSDFileStack;
+		dataWriter << bHasOCRParameters;
 
 		dataWriter.flushToByteStream();
 
@@ -821,6 +850,14 @@ STDMETHODIMP CAFDocument::Save(IStream *pStream, BOOL fClearDirty)
 			ipPersistentObj = m_ipRSDFileStack;
 			writeObjectToStream(ipPersistentObj, pStream, "ELI41975", fClearDirty);
 		}
+
+		// Write the OCR parameters
+		if (bHasOCRParameters)
+		{
+			IPersistStreamPtr ipPIObj = m_ipOCRParameters;
+			ASSERT_RESOURCE_ALLOCATION("ELI45908", ipPIObj != __nullptr);
+			writeObjectToStream(ipPIObj, pStream, "ELI45909", fClearDirty);
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI41976");
 
@@ -850,5 +887,52 @@ UCLID_AFCORELib::IAttributePtr CAFDocument::getAttribute()
 void CAFDocument::validateLicense()
 {
 	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI05851", "AF Document" );
+}
+//-------------------------------------------------------------------------------------------------
+// IHasOCRParameters
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFDocument::get_OCRParameters(ILongToLongMap** ppMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		*ppMap = getOCRParameters().Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45911");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFDocument::put_OCRParameters(ILongToLongMap* pMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI45912", pMap != __nullptr);
+		m_ipOCRParameters = pMap;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45913");
+}
+//-------------------------------------------------------------------------------------------------
+ILongToLongMapPtr CAFDocument::getOCRParameters()
+{
+	if (m_ipOCRParameters != __nullptr)
+	{
+		return m_ipOCRParameters;
+	}
+
+	// If none specified directly, e.g., by a ruleset, then just return the parameters
+	// associated with the input value (SpatialString will create the collection if needed)
+	if (m_ipAttribute != __nullptr)
+	{
+		IHasOCRParametersPtr ipInputParams(m_ipAttribute->Value);
+		ILongToLongMapPtr ipOCRParameters = ipInputParams->OCRParameters;
+		ASSERT_RESOURCE_ALLOCATION("ELI45910", ipOCRParameters != __nullptr);
+
+		return ipOCRParameters;
+	}
 }
 //-------------------------------------------------------------------------------------------------

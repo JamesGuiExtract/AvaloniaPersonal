@@ -41,7 +41,7 @@ extern CComModule _Module;
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 4;
+const unsigned long gnCurrentVersion = 5;
 
 // string for the MessageBox that will be displayed if opening an Object from a pre 6.0
 // release of the software
@@ -85,11 +85,18 @@ COCRFileProcessor::COCRFileProcessor()
   m_ipMiscUtils(__nullptr),
   m_bSkipPageOnFailure(gstrDEFAULT_SKIP_PAGE_ON_FAILURE == "1"),
   m_uiMaxOcrPageFailureNumber(asUnsignedLong(gstrDEFAULT_MAX_OCR_PAGE_FAILURE_NUMBER)),
-  m_uiMaxOcrPageFailurePercentage(asUnsignedLong(gstrDEFAULT_MAX_OCR_PAGE_FAILURE_PERCENTAGE))
+  m_uiMaxOcrPageFailurePercentage(asUnsignedLong(gstrDEFAULT_MAX_OCR_PAGE_FAILURE_PERCENTAGE)),
+  m_ipOCRParameters(__nullptr),
+  m_bLoadOCRParametersFromRuleset(false),
+  m_strOCRParametersRulesetName("")
 {
 	try
 	{
 		m_strComputerName = getComputerName();
+
+		// Create the ruleset class using the prog id to avoid circular dependancy
+		m_ipLoadOCRParameters.m_obj.CreateInstance("UCLIDAFCore.Ruleset");
+		ASSERT_RESOURCE_ALLOCATION( "ELI45960", m_ipLoadOCRParameters.m_obj != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI11043")
 }
@@ -99,6 +106,7 @@ COCRFileProcessor::~COCRFileProcessor()
 	try
 	{
 		m_ipMiscUtils = __nullptr;
+		m_ipLoadOCRParameters.Clear();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI11044")
 }
@@ -119,7 +127,8 @@ STDMETHODIMP COCRFileProcessor::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IOCRFileProcessor,
 		&IID_IAccessRequired,
 		&IID_IParallelizableTask,
-		&IID_IIdentifiableObject
+		&IID_IIdentifiableObject,
+		&IID_IHasOCRParameters
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -233,6 +242,15 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			string strImageToOcr = m_bUseCleanedImageIfAvailable ?
 				getCleanImageNameIfExists(strInputFileName) : strInputFileName;
 
+			// get the OCR parameters from file if specified
+			if (m_bLoadOCRParametersFromRuleset)
+			{
+				IFAMTagManagerPtr ipTagMgr(pTagManager);
+				ASSERT_RESOURCE_ALLOCATION("ELI45876", ipTagMgr != __nullptr);
+
+				loadOCRParameters(ipTagMgr, strInputFileName);
+			}
+
 			// based on the type
 			switch (m_eOCRPageRangeType)
 			{
@@ -240,13 +258,13 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 				{
 					ipSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
 						1, -1, UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
-						UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
+						UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus, getOCRParameters());
 				}
 				break;
 			case UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages:
 				{
 					ipSS = getOCREngine()->RecognizeTextInImage2(strImageToOcr.c_str(), 
-						get_bstr_t(m_strSpecificPages), VARIANT_TRUE, pProgressStatus);
+						get_bstr_t(m_strSpecificPages), VARIANT_TRUE, pProgressStatus, getOCRParameters());
 				}
 				break;
 			default:
@@ -459,6 +477,16 @@ STDMETHODIMP COCRFileProcessor::raw_CopyFrom(IUnknown *pObject)
 		ASSERT_RESOURCE_ALLOCATION("ELI36852", ipCopyParallizableTask != __nullptr);
 
 		m_bParallelize = asCppBool(ipCopyParallizableTask->Parallelize);
+
+		m_bLoadOCRParametersFromRuleset = asCppBool(ipCopyThis->LoadOCRParametersFromRuleset);
+		m_strOCRParametersRulesetName = ipCopyThis->OCRParametersRulesetName;
+
+		// Copy OCR parameters
+		IHasOCRParametersPtr ipOCRParams(pObject);
+		ASSERT_RESOURCE_ALLOCATION("ELI45869", ipOCRParams != __nullptr);
+		ICopyableObjectPtr ipMap = ipOCRParams->OCRParameters;
+		ASSERT_RESOURCE_ALLOCATION("ELI45870", ipMap != __nullptr);
+		m_ipOCRParameters = ipMap->Clone();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12810");
 
@@ -570,8 +598,28 @@ STDMETHODIMP COCRFileProcessor::Load(IStream *pStream)
 		if (nDataVersion >=4 )
 		{
 			dataReader >> m_bParallelize;
+		}
 
+		// Read the OCR parameter settings
+		if (nDataVersion >= 5)
+		{
+			dataReader >> m_bLoadOCRParametersFromRuleset;
+			dataReader >> m_strOCRParametersRulesetName;
+		}
+
+		if (nDataVersion >=4 )
+		{
 			loadGUID(pStream);
+		}
+
+		// Read the OCR parameters
+		if (nDataVersion >= 5 && !m_bLoadOCRParametersFromRuleset)
+		{
+			IPersistStreamPtr ipObj;
+
+			::readObjectFromStream(ipObj, pStream, "ELI45859");
+			ASSERT_RESOURCE_ALLOCATION("ELI45860", ipObj != __nullptr);
+			m_ipOCRParameters = ipObj;
 		}
 
 		// set the dirty flag
@@ -601,6 +649,8 @@ STDMETHODIMP COCRFileProcessor::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_strSpecificPages;
 		dataWriter << m_bUseCleanedImageIfAvailable;
 		dataWriter << m_bParallelize;
+		dataWriter << m_bLoadOCRParametersFromRuleset;
+		dataWriter << m_strOCRParametersRulesetName;
 
 		dataWriter.flushToByteStream();
 
@@ -611,6 +661,13 @@ STDMETHODIMP COCRFileProcessor::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
+
+		if (!m_bLoadOCRParametersFromRuleset)
+		{
+			IPersistStreamPtr ipPIObj = getOCRParameters();
+			ASSERT_RESOURCE_ALLOCATION("ELI45884", ipPIObj != __nullptr);
+			writeObjectToStream(ipPIObj, pStream, "ELI45885", fClearDirty);
+		}
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -762,6 +819,68 @@ STDMETHODIMP COCRFileProcessor::put_UseCleanedImage(VARIANT_BOOL bUseCleaned)
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COCRFileProcessor::get_LoadOCRParametersFromRuleset(VARIANT_BOOL *pbLoadOCRParametersFromRuleset)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		*pbLoadOCRParametersFromRuleset = asVariantBool(m_bLoadOCRParametersFromRuleset);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45933");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COCRFileProcessor::put_LoadOCRParametersFromRuleset(VARIANT_BOOL bLoadOCRParametersFromRuleset)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		if (m_bLoadOCRParametersFromRuleset != asCppBool(bLoadOCRParametersFromRuleset))
+		{
+			m_bLoadOCRParametersFromRuleset = asCppBool(bLoadOCRParametersFromRuleset);
+			m_bDirty = true;
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45934");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COCRFileProcessor::get_OCRParametersRulesetName(BSTR *strOCRParametersRulesetName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		*strOCRParametersRulesetName = get_bstr_t(m_strOCRParametersRulesetName).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45935");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COCRFileProcessor::put_OCRParametersRulesetName(BSTR strOCRParametersRulesetName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		string strNewValue = asString(strOCRParametersRulesetName);
+
+		if (strNewValue != m_strOCRParametersRulesetName)
+		{
+			m_strOCRParametersRulesetName = strNewValue;
+			m_bDirty = true;
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45936");
+
+	return S_OK;
+}
 
 //-------------------------------------------------------------------------------------------------
 // IParallelizableTask Methods
@@ -790,11 +909,19 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, 
 		vector<long> vecPages;
 		parseOCRInputText(strOriginalInput, strInput, vecPages);
 
-		string strInputFileName = asString(ipFAMTM->ExpandTags(get_bstr_t(strInput), ipWorkItem->FileName));
+		// Changing this to ExpandTagsAndFunctions because it seems like the right thing to do
+		// (I don't have a specific case where this was a problem before...)
+		string strInputFileName = asString(ipFAMTM->ExpandTagsAndFunctions(get_bstr_t(strInput), ipWorkItem->FileName));
 
 		// get the image to OCR
 		string strImageToOcr = m_bUseCleanedImageIfAvailable ?
 			getCleanImageNameIfExists(strInputFileName) : strInputFileName;
+
+		// get the OCR parameters from file if specified
+		if (m_bLoadOCRParametersFromRuleset)
+		{
+			loadOCRParameters(ipFAMTM, strInputFileName);
+		}
 
 		ISpatialStringPtr ipSS;
 		
@@ -827,7 +954,8 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, 
 			// process the 2 pages in the vecpages vector as start and end
 			ipSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
 				vecPages[0], vecPages[1], UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
-				UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus->SubProgressStatus);
+				UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus->SubProgressStatus,
+				getOCRParameters());
 		}
 		else if (m_eOCRPageRangeType == UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages)
 		{
@@ -852,7 +980,8 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, 
 				pProgressStatus->StartNextItemGroup(strTaskDescription.c_str(),1);
 				ISpatialStringPtr ipTempSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
 					vecPages[i], vecPages[i], UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
-					UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus->SubProgressStatus);
+					UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus->SubProgressStatus,
+					getOCRParameters());
 				pProgressStatus->CompleteProgressItems(strTaskDescription.c_str(), 1 );
 				ipPages->PushBack(ipTempSS);
 			}
@@ -1398,3 +1527,58 @@ void COCRFileProcessor::parseOCRInputText(const string& strInputText, string& st
 		}
 	}
 }
+//-------------------------------------------------------------------------------------------------
+// IHasOCRParameters
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COCRFileProcessor::get_OCRParameters(ILongToLongMap** ppMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		*ppMap = getOCRParameters().Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45866");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COCRFileProcessor::put_OCRParameters(ILongToLongMap* pMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_ipOCRParameters = pMap;
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45868");
+}
+//-------------------------------------------------------------------------------------------------
+ILongToLongMapPtr COCRFileProcessor::getOCRParameters()
+{
+	if (m_ipOCRParameters == __nullptr)
+	{
+		m_ipOCRParameters.CreateInstance(CLSID_LongToLongMap);
+
+		ASSERT_RESOURCE_ALLOCATION("ELI45871", m_ipOCRParameters != __nullptr);
+	}
+
+	return m_ipOCRParameters;
+}
+//-------------------------------------------------------------------------------------------------
+void COCRFileProcessor::loadOCRParameters(IFAMTagManagerPtr ipTagMgr, string strSourceDocName)
+{
+	if (!m_strOCRParametersRulesetName.empty())
+	{
+		string strRulesetPath =
+			ipTagMgr->ExpandTagsAndFunctions(get_bstr_t(m_strOCRParametersRulesetName), get_bstr_t(strSourceDocName));
+		
+		ASSERT_RUNTIME_CONDITION("ELI45867", isValidFile(strRulesetPath), "Missing OCR parameters file");
+
+		m_ipLoadOCRParameters.loadObjectFromFile(strRulesetPath);
+
+		IHasOCRParametersPtr ipHasOCRParameters(m_ipLoadOCRParameters.m_obj);
+		m_ipOCRParameters = ipHasOCRParameters->OCRParameters;
+	}
+}
+//-------------------------------------------------------------------------------------------------

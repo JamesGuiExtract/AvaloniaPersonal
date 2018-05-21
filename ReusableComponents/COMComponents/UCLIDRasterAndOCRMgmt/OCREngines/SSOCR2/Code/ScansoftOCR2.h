@@ -53,7 +53,8 @@ END_COM_MAP()
 		/*[in]*/ BSTR bstrCustomFilterCharacters, /*[in]*/ EOcrTradeOff eTradeOff, 
 		/*[in]*/ VARIANT_BOOL vbDetectHandwriting, /*[in]*/ VARIANT_BOOL vbReturnUnrecognized, 
 		/*[in]*/ VARIANT_BOOL vbReturnSpatialInfo, /*[in]*/ VARIANT_BOOL vbUpdateProgressStatus, 
-		/*[in]*/ EPageDecompositionMethod eDecompMethod, /*[out, retval]*/ BSTR* pStream);
+		/*[in]*/ EPageDecompositionMethod eDecompMethod,
+		/*[in]*/ ILongToLongMap* pOCRParameters, /*[out, retval]*/ BSTR* pStream);
 	STDMETHOD(GetPID)(long* pPID);
 	STDMETHOD(SupportsTrainingFiles)(VARIANT_BOOL *pbValue);
 	STDMETHOD(LoadTrainingFile)(BSTR strTrainingFileName);
@@ -128,7 +129,7 @@ private:
 	bool m_bEnableDespeckleMode;
 
 	// Specifies whether kRecForceDespeckleImg should be called on each image page.
-	bool m_bForceDespeckle;
+	EForceDespeckleMode m_eForceDespeckle;
 
 	// When kRecForceDespeckleImg is called, the DESPECKLE_METHOD to use.
 	DESPECKLE_METHOD m_eForceDespeckleMethod;
@@ -214,6 +215,8 @@ private:
 	// lists for zones and corresponding zone layouts, used for zone ordering
 	list<ZONE> m_listZones;
 	list<ZoneLayoutType> m_listZoneLayouts;
+
+	bool m_bLimitToBasicLatinCharacters;
 
 	/////////////
 	// Methods
@@ -397,8 +400,8 @@ private:
 	//             the final output, flase if unrecognized characters should be dropped.
 	//         (7) bReturnSpatialInfo is true if m_ipSpatialString should be spatial, false if 
 	//             m_ipSpatialString should be non-spatial
-	void recognizeText(string strFileName, const vector<long> &vecPageNumbers, RECT* pZone, 
-		long nRotationInDegrees, bool bDetectHandwriting, bool bReturnUnrecognized, 
+	void recognizeText(string strFileName, const vector<long> &vecPageNumbers, RECT* pZone,
+		long nRotationInDegrees, bool bDetectHandwriting, bool bReturnUnrecognized,
 		bool bReturnSpatialInfo);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To recognize text on the specified pages using the specified parameters and store
@@ -442,9 +445,16 @@ private:
 	// PURPOSE: Frees any memory allocated by calls to kRecGetOCRZoneLayout
 	// PROMISE: Calls kRecFree for each non-NULL zone layout in m_listZoneLayouts
 	void freeZoneLayoutMemory();
+
+	void applySettingsFromParameters(ILongToLongMapPtr ipOCRParameters);
+
+	bool isRecognizedCharacter(unsigned short usLetterCode);
+
+	void convertToCodePage(unsigned short *usLetterCode);
 };
 
-// helper method
+//-------------------------------------------------------------------------------------------------
+// helper methods
 //-------------------------------------------------------------------------------------------------
 bool zoneIsLessThan(ZONE zoneLeft, ZONE zoneRight);
 //-------------------------------------------------------------------------------------------------
@@ -453,4 +463,3 @@ bool zoneIsLessThan(ZONE zoneLeft, ZONE zoneRight);
 //          basic latin character set (eg. accented characters, fractions, copyright symbol).
 // P16 #2356
 bool isBasicLatinCharacter(unsigned short usLetterCode);
-//-------------------------------------------------------------------------------------------------

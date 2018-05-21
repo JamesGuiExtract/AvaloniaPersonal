@@ -43,13 +43,14 @@ IMPLEMENT_DYNAMIC(USSPropertyDlg, CDialog)
 USSPropertyDlg::USSPropertyDlg(const string& strSrc, const string& strOrig, const string& strFile, 
 							   const string& strOCREngineVersion,
 							   const ILongToObjectMapPtr& ipISpatialPageInfoCollection,
-							   CWnd* pParent /*=NULL*/)
+							   ISpatialStringPtr ipSpatialString, CWnd* pParent /*=NULL*/)
 : CDialog(USSPropertyDlg::IDD, pParent),
 m_strMsgSrc(strSrc),
 m_strMsgOrig(strOrig),
 m_strOCREngineVersion(strOCREngineVersion),
 m_USSFileName(strFile),
-m_ipSpatialPageInfoCollection(ipISpatialPageInfoCollection)
+m_ipSpatialPageInfoCollection(ipISpatialPageInfoCollection),
+m_ipHasOCRParameters(ipSpatialString)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -58,6 +59,7 @@ USSPropertyDlg::~USSPropertyDlg()
 	try
 	{
 		m_ipSpatialPageInfoCollection = __nullptr;
+		m_ipHasOCRParameters = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16495");
 }
@@ -69,6 +71,7 @@ void USSPropertyDlg::DoDataExchange(CDataExchange* pDX)
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(USSPropertyDlg, CDialog)
+	ON_BN_CLICKED(IDC_BTN_VIEW_OCR_PARAMETERS, &USSPropertyDlg::OnBnClickedBtnViewOcrParameters)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -282,3 +285,18 @@ std::string USSPropertyDlg::getDeskew(double dDeskewInDegrees)
 	return strReturn;
 }
 //-------------------------------------------------------------------------------------------------
+
+void USSPropertyDlg::OnBnClickedBtnViewOcrParameters()
+{
+	try
+	{
+		// Create instance of the configure form using the Prog ID to avoid circular dependency
+		IOCRParametersConfigurePtr ipConfigure;
+		ipConfigure.CreateInstance("Extract.FileActionManager.Forms.OCRParametersConfigure");
+		ASSERT_RESOURCE_ALLOCATION("ELI45962", ipConfigure != __nullptr);
+
+		// Configure the parameters
+		ipConfigure->ConfigureOCRParameters(m_ipHasOCRParameters, VARIANT_TRUE, (long)this->m_hWnd);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45963");
+}

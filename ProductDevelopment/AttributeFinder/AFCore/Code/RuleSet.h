@@ -29,7 +29,9 @@ class ATL_NO_VTABLE CRuleSet :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IRunMode, &IID_IRunMode, &LIBID_UCLID_AFCORELib>,
-	public CIdentifiableObject
+	public CIdentifiableObject,
+	public IDispatchImpl<IHasOCRParameters, &IID_IHasOCRParameters, &LIBID_UCLID_RASTERANDOCRMGMTLib>,
+	public IDispatchImpl<ILoadOCRParameters, &IID_ILoadOCRParameters, &LIBID_UCLID_RASTERANDOCRMGMTLib>
 {
 public:
 	CRuleSet();
@@ -49,6 +51,8 @@ BEGIN_COM_MAP(CRuleSet)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IIdentifiableObject)
 	COM_INTERFACE_ENTRY(IRunMode)
+	COM_INTERFACE_ENTRY(IHasOCRParameters)
+	COM_INTERFACE_ENTRY(ILoadOCRParameters)
 END_COM_MAP()
 
 public:
@@ -136,6 +140,13 @@ public:
 
 // IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
+
+// IHasOCRParameters
+	STDMETHOD(get_OCRParameters)(ILongToLongMap** ppMap);
+	STDMETHOD(put_OCRParameters)(ILongToLongMap* pMap);
+
+// ILoadOCRParameters
+	STDMETHOD(raw_LoadOCRParameters)(BSTR strRuleSetName);
 
 private:
 	//////////////////////
@@ -257,6 +268,8 @@ private:
 		long nTotal;
 	} m_sProgressCounts;
 
+	ILongToLongMapPtr m_ipOCRParameters;
+
 	/////////////////
 	// Helper functions
 	/////////////////
@@ -376,4 +389,6 @@ private:
 
 	// Checks version and internal-use flags, etc
 	void validateRunability();
+
+	ILongToLongMapPtr getOCRParameters();
 };

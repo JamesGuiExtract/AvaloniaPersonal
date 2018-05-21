@@ -18,7 +18,7 @@ class USSPropertyDlg : public CDialog
 public:
 	USSPropertyDlg(const string& strSrc, const string& strOrig, const string& strFile,
 		const string& strOCREngineVersion, const ILongToObjectMapPtr& ipISpatialPageInfoCollection,
-		CWnd* pParent = NULL);
+		ISpatialStringPtr ipSpatialString, CWnd* pParent = NULL);
 	virtual ~USSPropertyDlg();
 
 // Dialog Data
@@ -45,6 +45,8 @@ private:
 	// The OCR engine version
 	string m_strOCREngineVersion;
 
+	IHasOCRParametersPtr m_ipHasOCRParameters;
+
 	// collection of SpatialPageInfo objects
 	ILongToObjectMapPtr m_ipSpatialPageInfoCollection;
 
@@ -67,5 +69,7 @@ private:
 
 	// process the orientation enum and convert it to a string
 	string getOrientationString(const EOrientation& reOrientation);
+public:
+	afx_msg void OnBnClickedBtnViewOcrParameters();
 };
 //-------------------------------------------------------------------------------------------------

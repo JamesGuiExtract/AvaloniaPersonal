@@ -133,6 +133,14 @@ library UCLID_FILEPROCESSORSLib
 			[out, retval] VARIANT_BOOL* pbUsedCleaned);
 		[propput, id(3), helpstring("property UseCleanedImage")] HRESULT UseCleanedImage(
 			[in] VARIANT_BOOL bUseCleaned);
+		[propget, id(4), helpstring("property LoadOCRParametersFromRuleset")] HRESULT LoadOCRParametersFromRuleset(
+			[out, retval] VARIANT_BOOL* pbLoadOCRParametersFromRuleset);
+		[propput, id(4), helpstring("property LoadOCRParametersFromRuleset")] HRESULT LoadOCRParametersFromRuleset(
+			[in] VARIANT_BOOL bLoadOCRParametersFromRuleset);
+		[propget, id(5), helpstring("property OCRParametersRulesetName")] HRESULT OCRParametersRulesetName(
+			[out, retval] BSTR* strOCRParametersRulesetName);
+		[propput, id(5), helpstring("property OCRParametersRulesetName")] HRESULT OCRParametersRulesetName(
+			[in] BSTR strOCRParametersRulesetName);
 	};
 
 	// ICopyMoveDeleteFileProcessor interface
@@ -465,6 +473,7 @@ library UCLID_FILEPROCESSORSLib
 		interface ICopyableObject;
 		interface IMustBeConfiguredObject;
 		interface IParallelizableTask;
+		interface IHasOCRParameters;
 	};
 	[
 		uuid(545E87D3-C76F-4098-9D36-FBF91DD39F2B),

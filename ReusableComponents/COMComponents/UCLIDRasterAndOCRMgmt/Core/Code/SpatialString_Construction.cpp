@@ -23,7 +23,8 @@ CSpatialString::CSpatialString()
   m_eMode(kNonSpatialMode), 
   m_strSourceDocName(""),
   m_strOCREngineVersion(""),
-  m_ipMemoryManager(__nullptr)
+  m_ipMemoryManager(__nullptr),
+  m_ipOCRParameters(__nullptr)
 {
 }
 //-------------------------------------------------------------------------------------------------

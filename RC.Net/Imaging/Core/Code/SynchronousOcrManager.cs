@@ -346,7 +346,7 @@ namespace Extract.Imaging
                 {
                     // If imageArea has not been specified, OCR the entire area each page.
                     ocrText = SSOCR.RecognizeTextInImage(fileName, startPage, endPage,
-                        EFilterCharacters.kNoFilter, "", (EOcrTradeOff)_tradeoff, true, null);
+                        EFilterCharacters.kNoFilter, "", (EOcrTradeOff)_tradeoff, true, null, null);
                 }
                 else
                 {
@@ -361,7 +361,7 @@ namespace Extract.Imaging
 
                     ocrText = SSOCR.RecognizeTextInImageZone(fileName, startPage, endPage,
                         zonalOcrRectangle, 0, EFilterCharacters.kNoFilter, "", false, false,
-                        true, null);
+                        true, null, null);
                 }
 
                 return ocrText;

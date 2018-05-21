@@ -40,12 +40,14 @@ public:
 		/*[in]*/ IOCREngine *pEngine, /*[in]*/ VARIANT_BOOL bRecursive, 
 		/*[in]*/ long nMaxNumOfPages, /*[in]*/ VARIANT_BOOL bCreateUSSFile,
 		/*[in]*/ VARIANT_BOOL bCompressUSSFile, /*[in]*/ VARIANT_BOOL bSkipCreation,
-		/*[in]*/ IProgressStatus* pProgressStatus);
+		/*[in]*/ IProgressStatus* pProgressStatus,
+		/*[in]*/ ILongToLongMap* pOCRParameters);
 	STDMETHOD(RecognizeTextInImageFile)(
 		/*[in]*/ BSTR strImageFileName, 
 		/*[in]*/ long lNumPages, 
 		/*[in]*/ IOCREngine* pOCREngine, 
 		/*[in]*/ IProgressStatus* pProgressStatus,
+		/*[in]*/ ILongToLongMap* pOCRParameters,
 		/*[out, retval]*/ ISpatialString* *pstrText);
 
 // ILicensedComponent
@@ -79,7 +81,8 @@ private:
 		VARIANT_BOOL bCreateUSSFile, VARIANT_BOOL bCompressUSSFile, 
 		VARIANT_BOOL bSkipCreation, 
 		UCLID_RASTERANDOCRMGMTLib::IOCREnginePtr ipOCREngine,
-		IProgressStatus* pProgressStatus);
+		IProgressStatus* pProgressStatus,
+		ILongToLongMap* pOCRParameters);
 
 	// recognize the image and save the output the specified file.
 	// strImageFileName -- the fully qualified input image file name
@@ -94,7 +97,8 @@ private:
 		const std::string& strImageFileName, int nNumOfPagesToRecognize,
 		bool bReturnSpatialInfo, 
 		UCLID_RASTERANDOCRMGMTLib::IOCREnginePtr ipOCREngine,
-		IProgressStatus* pProgressStatus);
+		IProgressStatus* pProgressStatus,
+		ILongToLongMap* pOCRParameters);
 
 	void validateLicense();
 };

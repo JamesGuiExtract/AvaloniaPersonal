@@ -2860,10 +2860,12 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 					// Load the OCR engine and OCR this image region.
 					IOCREnginePtr ipOCREngine = getOCREngine();
 
+					IHasOCRParametersPtr ipOCRParameters = ipDocText;
+
 					// Re-OCR this image region from the original image (lines included)
 					ISpatialStringPtr ipZoneText = ipOCREngine->RecognizeTextInImageZone(
 						strSourceDocName.c_str(), nPage, nPage, ipRect, 0, kNoFilter, "",
-						VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, NULL);
+						VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, NULL, ipOCRParameters->OCRParameters);
 
 					// Create a new area based on the OCR'd text to score the OCR confidence.
 					ContentAreaInfo areaReOCRd(ipZoneText, ipSpatialInfos);

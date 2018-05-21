@@ -900,6 +900,8 @@ library UCLID_AFCORELib
 		interface IRunMode;
 		interface ILicensedComponent;
 		interface ICopyableObject;
+		interface IHasOCRParameters;
+		interface ILoadOCRParameters;
 	};
 	[
 		uuid(28D7B760-37BC-43C6-9627-11E3FD2D73B9),
@@ -923,6 +925,7 @@ library UCLID_AFCORELib
 		[default] interface IAFDocument;
 		interface ILicensedComponent;
 		interface ICopyableObject;
+		interface IHasOCRParameters;
 	};
 	[
 		uuid(6C9B5C0F-D0AD-477C-82C1-44E2EDDD7C36),

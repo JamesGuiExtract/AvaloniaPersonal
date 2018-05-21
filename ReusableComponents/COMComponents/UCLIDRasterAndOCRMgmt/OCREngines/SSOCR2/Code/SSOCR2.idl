@@ -89,6 +89,7 @@ library UCLID_SSOCR2Lib
 			[in] EOcrTradeOff eTradeOff, [in] VARIANT_BOOL vbDetectHandwriting, 
 			[in] VARIANT_BOOL vbReturnUnrecognized, [in] VARIANT_BOOL vbReturnSpatialInfo, 
 			[in] VARIANT_BOOL vbUpdateProgressStatus, [in] EPageDecompositionMethod eDecompMethod, 
+			[in] ILongToLongMap* pOCRParameters,
 			[out, retval] BSTR* pStream);
 		//-----------------------------------------------------------------------------------------
 		[id(2), helpstring("method GetPID")] HRESULT GetPID([out, retval] long* pPID);

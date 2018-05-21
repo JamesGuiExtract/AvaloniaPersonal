@@ -207,7 +207,17 @@ void TesterDlgRulesetPage::OnChangeRuleset()
 
 		// update the window caption
 		GetParent()->GetParent()->SetWindowText(strResult.c_str());
+
+		// Update input page
+		if (m_pInputPage != NULL)
+		{
+			m_pInputPage->setRuleSetName(strRulesFilename);
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI34022");
 }
 //-------------------------------------------------------------------------------------------------
+void TesterDlgRulesetPage::setInputPage(TesterDlgInputPage *pInputPage)
+{
+	m_pInputPage = pInputPage;
+}

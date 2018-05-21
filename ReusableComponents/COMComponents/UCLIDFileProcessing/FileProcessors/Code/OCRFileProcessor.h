@@ -8,6 +8,8 @@
 #include "..\..\..\UCLIDFileProcessing\Code\FPCategories.h"
 #include <Win32Semaphore.h>
 #include <Win32Event.h>
+#include <CachedObjectFromFile.h>
+#include "..\..\..\UCLIDRasterAndOCRMgmt\Core\Code\LoadOCRParametersLoader.h"
 
 #include <string>
 
@@ -28,7 +30,8 @@ class ATL_NO_VTABLE COCRFileProcessor :
 	public ISpecifyPropertyPagesImpl<COCRFileProcessor>,
 	public IDispatchImpl<IParallelizableTask, &__uuidof(IParallelizableTask), &LIBID_UCLID_FILEPROCESSINGLib, /* wMajor = */ 1>,
 	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
-	public CIdentifiableObject
+	public CIdentifiableObject,
+	public IDispatchImpl<IHasOCRParameters, &IID_IHasOCRParameters, &LIBID_UCLID_RASTERANDOCRMGMTLib>
 {
 public:
 	COCRFileProcessor();
@@ -52,6 +55,7 @@ public:
 		COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 		COM_INTERFACE_ENTRY(IParallelizableTask)
 		COM_INTERFACE_ENTRY(IIdentifiableObject)
+		COM_INTERFACE_ENTRY(IHasOCRParameters)
 	END_COM_MAP()
 
 	BEGIN_PROP_MAP(COCRFileProcessor)
@@ -73,6 +77,10 @@ public:
 	STDMETHOD(put_SpecificPages)(BSTR strSpecificPages);
 	STDMETHOD(get_UseCleanedImage)(VARIANT_BOOL* pbUseCleaned);
 	STDMETHOD(put_UseCleanedImage)(VARIANT_BOOL bUseCleaned);
+	STDMETHOD(get_LoadOCRParametersFromRuleset)(VARIANT_BOOL* pbLoadOCRParametersFromRuleset);
+	STDMETHOD(put_LoadOCRParametersFromRuleset)(VARIANT_BOOL bLoadOCRParametersFromRuleset);
+	STDMETHOD(get_OCRParametersRulesetName)(BSTR* strOCRParametersRulesetName);
+	STDMETHOD(put_OCRParametersRulesetName)(BSTR strOCRParametersRulesetName);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -117,6 +125,11 @@ public:
 	
 	// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
+
+	// IHasOCRParameters
+	STDMETHOD(get_OCRParameters)(ILongToLongMap** ppMap);
+	STDMETHOD(put_OCRParameters)(ILongToLongMap* pMap);
+
 private:
 
 	//////////////
@@ -156,6 +169,12 @@ private:
 
 	// The name of the computer the task is running on.
 	string m_strComputerName;
+
+	ILongToLongMapPtr m_ipOCRParameters;
+	bool m_bLoadOCRParametersFromRuleset;
+	string m_strOCRParametersRulesetName;
+
+	CachedObjectFromFile<ILoadOCRParametersPtr, LoadOCRParametersLoader> m_ipLoadOCRParameters;
 
 	/////////////
 	// Methods
@@ -197,4 +216,7 @@ private:
 	// with the unexpanded filename first (can contain tags) followed by list of pages expected to 
 	// be in order from lowest to highest
 	void parseOCRInputText(const string& strInputText, string& strFileName, vector<long>& vecPages);
+
+	ILongToLongMapPtr getOCRParameters();
+	void loadOCRParameters(IFAMTagManagerPtr ipTagMgr, string strSourceDocName);
 };

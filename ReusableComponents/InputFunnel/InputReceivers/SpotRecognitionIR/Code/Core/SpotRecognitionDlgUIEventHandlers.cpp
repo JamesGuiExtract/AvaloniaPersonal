@@ -1356,14 +1356,14 @@ string SpotRecognitionDlg::getZoneText(IRasterZonePtr& ripZone, IProgressStatus*
 		ipText = m_ipOCREngine->RecognizeTextInImage(
 			get_bstr_t(tempOutFile.getName()), 1, -1, kCustomFilter, 
 			m_ipOCRFilter->GetValidChars( m_strInputType.c_str() ), 
-			UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
+			UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus, NULL);
 	}
 	else
 	{
 		// no filter exists
 		ipText = m_ipOCREngine->RecognizeTextInImage(
 			get_bstr_t(tempOutFile.getName()), 1, -1, kNoFilter, "", 
-			UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
+			UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus, NULL);
 	}
 	ASSERT_RESOURCE_ALLOCATION("ELI06503", ipText != __nullptr);
 

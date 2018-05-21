@@ -201,9 +201,19 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 
 		// instantiate a new OCR engine if there is at least one zone to OCR
 		long lSize = ipZones->Size();
-		IOCREnginePtr ipOCREngine(lSize > 0 ? getOCREngine() : NULL);
+		IOCREnginePtr ipOCREngine;
+		ILongToLongMapPtr ipOCRParameters;
+		if (lSize > 0)
+		{
+			ipOCREngine = getOCREngine();
+
+			// Get OCR parameters from the AFDocument
+			IHasOCRParametersPtr ipHasOCRParameters(pOriginInput);
+			ipOCRParameters = ipHasOCRParameters->OCRParameters;
+		}
 
 		map<int, ILongRectanglePtr> mapPageBounds;
+
 
 		// iterate through each zone in the attribute
 		for(long i=0; i<lSize; i++)
@@ -227,7 +237,7 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 				strSourceDocName.c_str(), nPageNumber, nPageNumber,
 				ipZone->GetRectangularBounds(mapPageBounds[nPageNumber]), 0, m_eFilter, 
 				m_strCustomFilterCharacters.c_str(), asVariantBool(m_bDetectHandwriting), 
-				asVariantBool(m_bReturnUnrecognized), VARIANT_TRUE, pProgressStatus);
+				asVariantBool(m_bReturnUnrecognized), VARIANT_TRUE, pProgressStatus, ipOCRParameters);
 			ASSERT_RESOURCE_ALLOCATION("ELI19537", ipZoneText != __nullptr);
 	
 			// if any text was found, append it
@@ -484,7 +494,7 @@ STDMETHODIMP COCRArea::Load(IStream* pStream)
 			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
-		
+
 		// clear the dirty flag since a new object was loaded
 		m_bDirty = false;
 	}
@@ -589,4 +599,3 @@ void COCRArea::validateLicense()
 {
 	VALIDATE_LICENSE(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI18482", "OCRArea");
 }
-//-------------------------------------------------------------------------------------------------

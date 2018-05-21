@@ -107,7 +107,8 @@ STDMETHODIMP CScansoftOCR::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage(BSTR strImageFileName, long lStartPage,
 	long lEndPage, EFilterCharacters eFilter, BSTR bstrCustomFilterCharacters, 
-	EOcrTradeOff eTradeOff, VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus, 
+	EOcrTradeOff eTradeOff, VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus,
+	ILongToLongMap* pOCRParameters,
 	ISpatialString** pstrText)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -147,7 +148,7 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage(BSTR strImageFileName, long 
 		ISpatialStringPtr ipRecognizedText = recognizeText(strImageFileName, 
 			createPageNumberVector(strImageFileName, lStartPage, lEndPage), NULL, 0, eFilter, 
 			bstrCustomFilterCharacters, eTradeOff, VARIANT_FALSE, VARIANT_FALSE, 
-			bReturnSpatialInfo, pProgressStatus);
+			bReturnSpatialInfo, pProgressStatus, pOCRParameters);
 		ASSERT_RESOURCE_ALLOCATION("ELI18355", ipRecognizedText != __nullptr);
 
 		// return the recognized text
@@ -162,6 +163,7 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage2(BSTR strImageFileName,
 													 BSTR strPageNumbers,
 													 VARIANT_BOOL bReturnSpatialInfo,
 													 IProgressStatus* pProgressStatus,
+													 ILongToLongMap* pOCRParameters,
 													 ISpatialString* *pstrText)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -209,7 +211,7 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage2(BSTR strImageFileName,
 		// recognize the text - with auto-rotation
 		ISpatialStringPtr ipRecognizedText = recognizeText(strImageFileName, ipvecPageNumbers, NULL, 
 			0, kNoFilter, NULL, kRegistry, VARIANT_FALSE, VARIANT_FALSE, bReturnSpatialInfo, 
-			pProgressStatus);
+			pProgressStatus, pOCRParameters);
 		ASSERT_RESOURCE_ALLOCATION("ELI18356", ipRecognizedText != __nullptr);
 
 		*pstrText = ipRecognizedText.Detach();
@@ -261,7 +263,7 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImageZone(BSTR strImageFileName, l
 	long lEndPage, ILongRectangle* pZone, long nRotationInDegrees, EFilterCharacters eFilter, 
 	BSTR bstrCustomFilterCharacters, VARIANT_BOOL bDetectHandwriting, 
 	VARIANT_BOOL bReturnUnrecognized, VARIANT_BOOL bReturnSpatialInfo, 
-	IProgressStatus* pProgressStatus, ISpatialString* *pstrText)
+	IProgressStatus* pProgressStatus, ILongToLongMap* pOCRParameters, ISpatialString* *pstrText)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -309,14 +311,14 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImageZone(BSTR strImageFileName, l
 			ipRecognizedText = recognizeText(strImageFileName, 
 				createPageNumberVector(strImageFileName, lStartPage, lEndPage), pZone, 
 				nRotationInDegrees, eFilter, bstrCustomFilterCharacters, kRegistry, 
-				bDetectHandwriting, bReturnUnrecognized, bReturnSpatialInfo, pProgressStatus);
+				bDetectHandwriting, bReturnUnrecognized, bReturnSpatialInfo, pProgressStatus, pOCRParameters);
 		}
 		else
 		{
 			// only one decomposition method is necessary
 			ipRecognizedText = recognizePrintedTextInImageZone(strImageFileName, lStartPage, 
 				lEndPage, pZone, nRotationInDegrees, eFilter, bstrCustomFilterCharacters, 
-				bReturnUnrecognized, bReturnSpatialInfo, pProgressStatus);
+				bReturnUnrecognized, bReturnSpatialInfo, pProgressStatus, pOCRParameters);
 		}
 		ASSERT_RESOURCE_ALLOCATION("ELI18354", ipRecognizedText != __nullptr);
 
@@ -546,6 +548,7 @@ IScansoftOCR2Ptr CScansoftOCR::getOCREngine()
 			}
 		}
 	}
+
 	return m_ipOCREngine;
 }
 //-------------------------------------------------------------------------------------------------
@@ -712,7 +715,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	ILongRectangle* pZone, long nRotationInDegrees, EFilterCharacters eFilter, 
 	 BSTR bstrCustomFilterCharacters, EOcrTradeOff eTradeOff, VARIANT_BOOL vbDetectHandwriting, 
 	VARIANT_BOOL vbReturnUnrecognized, VARIANT_BOOL bReturnSpatialInfo, 
-	IProgressStatus* pProgressStatus)
+	IProgressStatus* pProgressStatus, ILongToLongMap* pOCRParameters)
 {
 	// [FlexIDSCore:4906]
 	// Since we did not get a fix from Nuance to address the issue that arose in v18 of their engine
@@ -807,7 +810,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 				_bstrStream = ipOcrEngine->RecognizeText(strImageFileName, ipPageNumbers, pZone, 
 					nRotationInDegrees, eFilter, bstrCustomFilterCharacters, eTradeOff, 
 					vbDetectHandwriting, vbReturnUnrecognized, bReturnSpatialInfo, 
-					asVariantBool(pProgressStatus != __nullptr), eDecompositionMethod[i]);
+					asVariantBool(pProgressStatus != __nullptr), eDecompositionMethod[i], pOCRParameters);
 
 				// check if the progress status update thread still exists
 				if (apPSUpdateThread.get() != __nullptr)
@@ -908,7 +911,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFileName, 
 	long lStartPage, long lEndPage, ILongRectangle* pZone, long nRotationInDegrees, 
 	EFilterCharacters eFilter, BSTR bstrCustomFilterCharacters, VARIANT_BOOL bReturnUnrecognized, 
-	VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus)
+	VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus, ILongToLongMap* pOCRParameters)
 {
 	// [FlexIDSCore:4906]
 	// Since we did not get a fix from Nuance to address the issue that arose in v18 of their engine
@@ -957,7 +960,7 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 	_bstr_t _bstrStream = ipOcrEngine->RecognizeText(strImageFileName, ipPageNumbers, pZone, 
 		nRotationInDegrees, eFilter, bstrCustomFilterCharacters, kRegistry, VARIANT_FALSE, 
 		bReturnUnrecognized, bReturnSpatialInfo, asVariantBool(pProgressStatus != __nullptr), 
-		kAutoDecomposition);
+		kAutoDecomposition, pOCRParameters);
 
 	// mark the progress status as complete if the 
 	// progress status update thread still exists

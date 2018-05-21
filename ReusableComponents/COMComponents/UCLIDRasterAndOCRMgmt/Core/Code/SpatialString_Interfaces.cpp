@@ -12,7 +12,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 13;
+const unsigned long gnCurrentVersion = 14;
 
 //-------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo
@@ -26,7 +26,8 @@ STDMETHODIMP CSpatialString::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IComparableObject,
 		&IID_ICopyableObject,
 		&IID_ILicensedComponent,
-		&IID_IManageableMemory
+		&IID_IManageableMemory,
+		&IID_IHasOCRParameters
 	};
 
 	for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -812,6 +813,16 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 			autoConvertLegacyHybridString();
 		}
 
+		// Read the OCR parameters
+		if (nDataVersion >= 14)
+		{
+			IPersistStreamPtr ipObj;
+
+			::readObjectFromStream(ipObj, pStream, "ELI45857");
+			ASSERT_RESOURCE_ALLOCATION("ELI45858", ipObj != __nullptr);
+			m_ipOCRParameters = ipObj;
+		}
+
 		// clear the dirty flag as we just loaded a fresh object
 		m_bDirty = false;
 	}
@@ -915,6 +926,11 @@ STDMETHODIMP CSpatialString::Save(IStream *pStream, BOOL fClearDirty)
 			writeObjectToStream(ipPIObj, pStream, "ELI09939", fClearDirty);
 		}
 
+		IPersistStreamPtr ipPIObj = getOCRParameters();
+		ASSERT_RESOURCE_ALLOCATION("ELI45861", ipPIObj != __nullptr);
+		writeObjectToStream(ipPIObj, pStream, "ELI45862", fClearDirty);
+
+
 		// clear the flag as specified
 		if (fClearDirty)
 		{
@@ -965,5 +981,44 @@ STDMETHODIMP CSpatialString::raw_ReportMemoryUsage(void)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36029");
+}
+//-------------------------------------------------------------------------------------------------
+// IHasOCRParameters
+//-------------------------------------------------------------------------------------------------
+ILongToLongMapPtr CSpatialString::getOCRParameters()
+{
+	if (m_ipOCRParameters == __nullptr)
+	{
+		m_ipOCRParameters.CreateInstance(CLSID_LongToLongMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI45872", m_ipOCRParameters != __nullptr);
+	}
+
+	return m_ipOCRParameters;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::get_OCRParameters(ILongToLongMap** ppMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		*ppMap = getOCRParameters().Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45854");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::put_OCRParameters(ILongToLongMap* pMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI45855", pMap != __nullptr);
+		m_ipOCRParameters = pMap;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45856");
 }
 //-------------------------------------------------------------------------------------------------

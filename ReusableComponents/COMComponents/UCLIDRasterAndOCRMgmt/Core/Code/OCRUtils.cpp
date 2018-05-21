@@ -66,7 +66,8 @@ STDMETHODIMP COCRUtils::BatchOCR(BSTR strRootDirOrFile,
 								 VARIANT_BOOL bCreateUSSFile,
 								 VARIANT_BOOL bCompressUSSFile,
 								 VARIANT_BOOL bSkipCreation,
-								 IProgressStatus* pProgressStatus)
+								 IProgressStatus* pProgressStatus,
+								 ILongToLongMap* pOCRParameters)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -87,7 +88,7 @@ STDMETHODIMP COCRUtils::BatchOCR(BSTR strRootDirOrFile,
 		{
 			// strRootDirOrFile is a file, not a directory
 			processImageFile(strFile, nMaxNumOfPages, bCreateUSSFile, bCompressUSSFile, bSkipCreation, 
-				ipOCREngine, pProgressStatus);
+				ipOCREngine, pProgressStatus, pOCRParameters);
 			return S_OK;
 		}
 
@@ -123,7 +124,7 @@ STDMETHODIMP COCRUtils::BatchOCR(BSTR strRootDirOrFile,
 				try
 				{
 					processImageFile(strImageFile, nMaxNumOfPages, bCreateUSSFile, bCompressUSSFile, 
-						bSkipCreation, ipOCREngine, pProgressStatus);
+						bSkipCreation, ipOCREngine, pProgressStatus, pOCRParameters);
 				}
 				catch (...)
 				{
@@ -151,6 +152,7 @@ STDMETHODIMP COCRUtils::RecognizeTextInImageFile(BSTR strImageFileName,
 												 long lNumPages, 
 												 IOCREngine* pOCREngine,
 												 IProgressStatus* pProgressStatus,
+												 ILongToLongMap* pOCRParameters,
 												 ISpatialString **pstrText)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -163,7 +165,7 @@ STDMETHODIMP COCRUtils::RecognizeTextInImageFile(BSTR strImageFileName,
 		// Retrieve the text from the image file
 		string	strFile = asString(strImageFileName);
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipText 
-			= recognizeImage(strFile, lNumPages, true, ipOCREngine, pProgressStatus);
+			= recognizeImage(strFile, lNumPages, true, ipOCREngine, pProgressStatus, pOCRParameters);
 
 		// Provide Spatial String back to caller
 		*pstrText = (ISpatialString *)ipText.Detach();
@@ -272,7 +274,8 @@ void COCRUtils::processImageFile(const string& strImageFile, int nMaxNumOfPages,
 								 VARIANT_BOOL bCompressUSSFile, 
 								 VARIANT_BOOL bSkipCreation,
 								 UCLID_RASTERANDOCRMGMTLib::IOCREnginePtr ipOCREngine,
-								 IProgressStatus* pProgressStatus)
+								 IProgressStatus* pProgressStatus,
+								 ILongToLongMap* pOCRParameters)
 {
 	// Make sure that if the image is a pdf that PDF support is licensed
 	LicenseManagement::verifyFileTypeLicensed( strImageFile );
@@ -351,7 +354,7 @@ void COCRUtils::processImageFile(const string& strImageFile, int nMaxNumOfPages,
 	// OCR the image and store the output to a file
 	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipSpatialString = 
 		recognizeImage(strImageFile, nNumOfPagesToProcess, 
-		asCppBool(bCreateUSSFile), ipOCREngine, pProgressStatus);
+		asCppBool(bCreateUSSFile), ipOCREngine, pProgressStatus, pOCRParameters);
 	
 	// if the output should be appended, then read the spatial string
 	// in the current file
@@ -380,12 +383,13 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr COCRUtils::recognizeImage(
 								int nNumOfPagesToRecognize, 
 								bool bReturnSpatialInfo,
 								UCLID_RASTERANDOCRMGMTLib::IOCREnginePtr ipOCREngine,
-								IProgressStatus* pProgressStatus)
+								IProgressStatus* pProgressStatus,
+								ILongToLongMap* pOCRParameters)
 {
 	// Recognize the text
 	return ipOCREngine->RecognizeTextInImage(strImageFile.c_str(), 1, nNumOfPagesToRecognize,
 		UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", UCLID_RASTERANDOCRMGMTLib::kRegistry, 
-		asVariantBool(bReturnSpatialInfo), pProgressStatus);
+		asVariantBool(bReturnSpatialInfo), pProgressStatus, pOCRParameters);
 }
 //-------------------------------------------------------------------------------------------------
 void COCRUtils::validateLicense()

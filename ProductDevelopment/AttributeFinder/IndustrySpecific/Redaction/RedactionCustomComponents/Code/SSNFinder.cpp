@@ -183,6 +183,10 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 
 		map<int, ILongRectanglePtr> mapPageBounds;
 
+		// Get OCR parameters from the AFDocument
+		IHasOCRParametersPtr ipHasOCRParameters(pOriginInput);
+		ILongToLongMapPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
+
 		// iterate through each zone in the attribute
 		for(long i=0; i<lSize; i++)
 		{
@@ -204,7 +208,7 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 			ISpatialStringPtr ipZoneText = ipOCREngine->RecognizeTextInImageZone(
 				strSourceDocName.c_str(), lPage, lPage, 
 				ipZone->GetRectangularBounds(mapPageBounds[lPage]), 0, eFILTER_CHARS, "", 
-				VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, pProgressStatus);
+				VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, pProgressStatus, ipOCRParameters);
 			ASSERT_RESOURCE_ALLOCATION("ELI18063", ipZoneText != __nullptr);
 
 			// if any text was found, append it

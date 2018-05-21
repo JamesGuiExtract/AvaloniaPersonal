@@ -14,7 +14,8 @@ class ATL_NO_VTABLE CAFDocument :
 	public IDispatchImpl<IAFDocument, &IID_IAFDocument, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IPersistStream
+	public IPersistStream,
+	public IDispatchImpl<IHasOCRParameters, &IID_IHasOCRParameters, &LIBID_UCLID_RASTERANDOCRMGMTLib>
 {
 public:
 	CAFDocument();
@@ -34,6 +35,7 @@ BEGIN_COM_MAP(CAFDocument)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
+	COM_INTERFACE_ENTRY(IHasOCRParameters)
 END_COM_MAP()
 
 public:
@@ -79,6 +81,10 @@ public:
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
+// IHasOCRParameters
+	STDMETHOD(get_OCRParameters)(ILongToLongMap** ppMap);
+	STDMETHOD(put_OCRParameters)(ILongToLongMap* pMap);
+
 private:
 	//////////
 	// Variables
@@ -91,10 +97,12 @@ private:
 	std::string m_strFKBVersion;
 	std::string m_strAlternateComponentDataDir;
 	EParallelRunMode m_eParallelRunMode;
+	ILongToLongMapPtr m_ipOCRParameters;
 
 	//////////
 	// Methods
 	//////////
 	UCLID_AFCORELib::IAttributePtr getAttribute();
 	void validateLicense();
+	ILongToLongMapPtr getOCRParameters();
 };

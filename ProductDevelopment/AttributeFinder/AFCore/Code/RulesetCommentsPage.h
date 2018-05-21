@@ -13,7 +13,8 @@ class CRuleSetCommentsPage : public CPropertyPage
 	DECLARE_DYNAMIC(CRuleSetCommentsPage)
 
 public:
-	CRuleSetCommentsPage(UCLID_AFCORELib::IRuleSetPtr ipRuleSet);
+	CRuleSetCommentsPage(UCLID_AFCORELib::IRuleSetPtr ipRuleSet,
+		bool bReadOnly);
 	virtual ~CRuleSetCommentsPage();
 
 	// Applies the properties in the property page to the ruleset.
@@ -37,4 +38,5 @@ private:
 	UCLID_AFCORELib::IRuleSetPtr m_ipRuleSet;
 
 	CEdit m_editRulesetComments;
+	bool m_bReadOnly;
 };

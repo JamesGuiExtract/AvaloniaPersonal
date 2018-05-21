@@ -110,7 +110,7 @@ CScansoftOCR2::CScansoftOCR2()
   m_uiMaxOcrPageFailureNumber(10),
   m_uiDecompositionMethods(1),
   m_bEnableDespeckleMode(true),
-  m_bForceDespeckle(true),
+  m_eForceDespeckle(kNeverForce),
   m_eForceDespeckleMethod(DESPECKLE_PEPPERANDSALT),
   m_nForceDespeckleLevel(2),
   m_eFilter(kNoFilter),
@@ -122,7 +122,8 @@ CScansoftOCR2::CScansoftOCR2()
   m_eDisplayFilterCharsType(kDisplayCharsTypeNone),
   m_eventKillTimeoutThread(false),
   m_eventProgressMade(false),
-  m_nTimeoutLength(120000)
+  m_nTimeoutLength(120000),
+  m_bLimitToBasicLatinCharacters(true)
 {
 	try
 	{
@@ -200,18 +201,25 @@ STDMETHODIMP CScansoftOCR2::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IScansoftOCR2
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CScansoftOCR2::RecognizeText(BSTR bstrImageFileName, IVariantVector* pPageNumbers, 
-		ILongRectangle* pZone, long lRotationInDegrees, EFilterCharacters eFilter,	
-		BSTR bstrCustomFilterCharacters, EOcrTradeOff eTradeOff, VARIANT_BOOL vbDetectHandwriting, 
-		VARIANT_BOOL vbReturnUnrecognized, VARIANT_BOOL vbReturnSpatialInfo, 
-		VARIANT_BOOL vbUpdateProgressStatus, EPageDecompositionMethod eDecompMethod, BSTR* pStream)
+STDMETHODIMP CScansoftOCR2::RecognizeText(BSTR bstrImageFileName, IVariantVector* pPageNumbers, ILongRectangle* pZone, long lRotationInDegrees, EFilterCharacters eFilter,	BSTR bstrCustomFilterCharacters, EOcrTradeOff eTradeOff, VARIANT_BOOL vbDetectHandwriting, VARIANT_BOOL vbReturnUnrecognized, VARIANT_BOOL vbReturnSpatialInfo, 
+		VARIANT_BOOL vbUpdateProgressStatus, EPageDecompositionMethod eDecompMethod, ILongToLongMap* pOCRParameters,
+		BSTR* pStream)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 	
 	try
 	{
+		//Sleep(5000);
 		// validate the license
 		validateLicense();
+
+		// Apply parameters
+		if (pOCRParameters != NULL)
+		{
+			ILongToLongMapPtr ipOCRParameters(pOCRParameters);
+			ASSERT_RESOURCE_ALLOCATION("ELI45914", ipOCRParameters != __nullptr);
+			applySettingsFromParameters(ipOCRParameters);
+		}
 
 		// store whether to update the progress status
 		ms_bUpdateProgressStatus = asCppBool(vbUpdateProgressStatus);
@@ -582,7 +590,8 @@ void CScansoftOCR2::recognizeText(string strFileName, const vector<long>& vecPag
 
 		// recognize text on the specified pages
 		recognizeTextOnPages(strFileName, vecPageNumbers, pZone, nRotationInDegrees, 
-			bDetectHandwriting, bReturnUnrecognized, strText, pvecLetters, ipPageInfos);
+			bDetectHandwriting, bReturnUnrecognized,
+			strText, pvecLetters, ipPageInfos);
 	}
 
 #ifdef _DEBUG
@@ -596,8 +605,8 @@ void CScansoftOCR2::recognizeText(string strFileName, const vector<long>& vecPag
 //-------------------------------------------------------------------------------------------------
 void CScansoftOCR2::recognizeTextOnPages(const string& strFileName, 
 	const vector<long> vecPageNumbers, LPRECT pZone, long nRotationInDegrees, 
-	bool bDetectHandwriting, bool bReturnUnrecognized, string& rstrText, 
-	vector<CPPLetter>* pvecLetters, ILongToObjectMapPtr ipPageInfos)
+	bool bDetectHandwriting, bool bReturnUnrecognized,
+	string& rstrText, vector<CPPLetter>* pvecLetters, ILongToObjectMapPtr ipPageInfos)
 {
 	// load the specified image file
 	THROW_UE_ON_ERROR("ELI16639", "Unable to load specified image file in the OCR engine!",
@@ -980,6 +989,7 @@ void CScansoftOCR2::init()
 		// specify the code page setting of the ENGine.
 		THROW_UE_ON_ERROR("ELI03380", "Unable to set code page in the OCR engine!",
 			kRecSetCodePage(0, "Windows ANSI"));
+			//kRecSetCodePage(0, "Code Page 437"));
 		
 		// enable automatic image inversion mode
 		THROW_UE_ON_ERROR("ELI03415", "Unable to set image inversion mode in the OCR engine!",
@@ -1049,7 +1059,7 @@ void CScansoftOCR2::init()
 		m_bEnableDespeckleMode = ((ulDespeckleMode & 1) == 1);
 
 		// Bit 1
-		m_bForceDespeckle = ((ulDespeckleMode & 2) == 2);
+		m_eForceDespeckle = ((ulDespeckleMode & 2) == 2) ? kForceWhenBitonal : kNeverForce;
 
 		// Bits 2-6
 		m_eForceDespeckleMethod = (DESPECKLE_METHOD)((ulDespeckleMode >> 2) & 0x1F);
@@ -1315,8 +1325,12 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 			break;
 		}
 
-		bool bIsRecognized = isBasicLatinCharacter(pCurLetter->code);
+		bool bIsRecognized = isRecognizedCharacter(pCurLetter->code);
 
+		if (bIsRecognized)
+		{
+			convertToCodePage((unsigned short*)&pCurLetter->code);
+		}
 		// add this character to the vector if it is a positive-width, recognized character
 		// or if it is a positive-width character AND unrecognized characters should be returned.
 		// NOTE: RecAPI v15 uses a width-less dummy space to mark the end of a line.
@@ -1479,10 +1493,18 @@ void CScansoftOCR2::getRecognizedText(string& rstrText, bool bReturnUnrecognized
 	rstrText = "";
 	for (int i = 0; i < nNumLetters; i++)
 	{
-		bool bIsRecognized = isBasicLatinCharacter(pScansoftLetters[i].code);
+		bool bIsRecognized = isRecognizedCharacter(pScansoftLetters[i].code);
 		if(bReturnUnrecognized || bIsRecognized)
 		{
-			rstrText += asString(bIsRecognized ? pScansoftLetters[i].code : gcUNRECOGNIZED);
+			if (bIsRecognized)
+			{
+				convertToCodePage((unsigned short*)&pScansoftLetters[i].code);
+				rstrText += pScansoftLetters[i].code;
+			}
+			else
+			{
+				rstrText += gcUNRECOGNIZED;
+			}
 		}
 	}	
 }
@@ -1607,6 +1629,12 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	LPRECT pZone, long nRotationInDegrees, bool bDetectHandwriting, bool bReturnUnrecognized,
 	string& rstrText, vector<CPPLetter>* pvecLetters, ILongToObjectMapPtr ipPageInfos)
 {
+	// If force despeckle is called, color/grayscale images need to be binarized on load or it will fail
+	if (m_eForceDespeckle == kAlwaysForce)
+	{
+		kRecSetImgConvMode(0, CNV_SET);
+	}
+
 	// load the specified page of the image file
 	// NOTE: RecAPI uses zero-based page number indexes
 	loadPageFromImageHandle(strImageFileName, m_hImageFile, nPageNum-1, &m_hPage);
@@ -1700,7 +1728,7 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	THROW_UE_ON_ERROR("ELI12723", "Unable to rotate image.",
 		kRecRotateImg(0, m_hPage, imgRotate));
 
-	if (m_bForceDespeckle)
+	if (m_eForceDespeckle != kNeverForce)
 	{
 		THROW_UE_ON_ERROR("ELI36823", "Unable to despeckle image.",
 			kRecForceDespeckleImg(0, m_hPage, pZone, m_eForceDespeckleMethod, m_nForceDespeckleLevel));
@@ -2598,6 +2626,88 @@ CScansoftOCR2::RecMemoryReleaser<Win32Event>::~RecMemoryReleaser()
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19906");
 }
+//-------------------------------------------------------------------------------------------------
+void CScansoftOCR2::applySettingsFromParameters(ILongToLongMapPtr ipOCRParameters)
+{
+	try
+	{
+		long nCount = ipOCRParameters->Size;
+
+		for (long i = 0; i < nCount; i++)
+		{	
+			long nKey, nValue;
+			HSETTING hSetting;
+			ipOCRParameters->GetKeyValue(i, &nKey, &nValue);
+
+			switch ((EOCRParameter)nKey)
+			{
+			case kForceDespeckleMode:
+				m_eForceDespeckle = (EForceDespeckleMode)nValue;
+				break;
+			case kForceDespeckleMethod:
+				m_eForceDespeckleMethod = (DESPECKLE_METHOD)nValue;
+				break;
+			case kForceDespeckleLevel:
+				m_nForceDespeckleLevel = nValue;
+				break;
+			case kAutoDespeckleMode:
+				m_bEnableDespeckleMode = !!nValue;
+				THROW_UE_ON_ERROR("ELI45921", "Unable to set image despeckling mode in the OCR engine!",
+					kRecSetImgDespeckleMode(0, m_bEnableDespeckleMode ? TRUE : FALSE));
+				break;
+			case kZoneOrdering:
+				m_bOrderZones = !!nValue;
+				break;
+			case kLimitToBasicLatinCharacters:
+				m_bLimitToBasicLatinCharacters = !!nValue;
+				break;
+
+			case kLanguage1:
+				kRecManageLanguages(0, SET_LANG, (LANGUAGES)nValue);
+				break;
+			case kLanguage2:
+			case kLanguage3:
+			case kLanguage4:
+			case kLanguage5:
+				kRecManageLanguages(0, ADD_LANG, (LANGUAGES)nValue);
+				break;
+
+
+			case kKernel_Imf_PDF_LoadOriginalDPI:
+				THROW_UE_ON_ERROR("ELI45923", "Unable to get OCR setting.",
+					kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.LoadOriginalDPI", &hSetting, NULL) );
+				THROW_UE_ON_ERROR("ELI45924", "Unable to set Kernel.Imf.PDF.LoadOriginalDPI option",
+					kRecSettingSetInt(0, hSetting, nValue) );
+				break;
+			case kKernel_Imf_PDF_Resolution:
+				THROW_UE_ON_ERROR("ELI45925", "Unable to get OCR setting.",
+					kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.Resolution", &hSetting, NULL) );
+				THROW_UE_ON_ERROR("ELI45926", "Unable to set Kernel.Imf.PDF.Resolution option",
+					kRecSettingSetInt(0, hSetting, nValue) );
+				break;
+			case kKernel_OcrMgr_PreferAccurateEngine:
+				THROW_UE_ON_ERROR("ELI45927", "Unable to get OCR setting.",
+					kRecSettingGetHandle(NULL, "Kernel.OcrMgr.PreferAccurateEngine", &hSetting, NULL) );
+				THROW_UE_ON_ERROR("ELI45928", "Unable to set Kernel.OcrMgr.PreferAccurateEngine option",
+					kRecSettingSetInt(0, hSetting, nValue) );
+				break;
+			case kKernel_Img_Max_Pix_X:
+				THROW_UE_ON_ERROR("ELI45929", "Unable to get OCR setting.",
+					kRecSettingGetHandle(NULL, "Kernel.Img.Max.Pix.X", &hSetting, NULL) );
+				THROW_UE_ON_ERROR("ELI45930", "Unable to set Kernel.Img.Max.Pix.X option",
+					kRecSettingSetInt(0, hSetting, nValue) );
+				break;
+			case kKernel_Img_Max_Pix_Y:
+				THROW_UE_ON_ERROR("ELI45931", "Unable to get OCR setting.",
+					kRecSettingGetHandle(NULL, "Kernel.Img.Max.Pix.Y", &hSetting, NULL) );
+				THROW_UE_ON_ERROR("ELI45932", "Unable to set Kernel.Img.Max.Pix.Y option",
+					kRecSettingSetInt(0, hSetting, nValue) );
+				break;
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45922")
+}
 
 //-------------------------------------------------------------------------------------------------
 // Helper methods
@@ -2616,4 +2726,31 @@ bool isBasicLatinCharacter(unsigned short usLetterCode)
 	// https://extract.atlassian.net/browse/ISSUE-14802
 	return usLetterCode > 0 && usLetterCode <= 126 || usLetterCode == 176;
 }
+
 //-------------------------------------------------------------------------------------------------
+bool CScansoftOCR2::isRecognizedCharacter(unsigned short usLetterCode)
+{
+	return usLetterCode > 0
+		&& (!m_bLimitToBasicLatinCharacters || isBasicLatinCharacter(usLetterCode));
+}
+//-------------------------------------------------------------------------------------------------
+void CScansoftOCR2::convertToCodePage(unsigned short *usLetterCode)
+{
+	if (isBasicLatinCharacter(*usLetterCode))
+	{
+		return;
+	}
+
+	size_t buffLen;
+	BYTE buff;
+	buffLen = sizeof(buff);
+	RECERR ret = kRecConvertUnicode2CodePage(0, *usLetterCode, (LPBYTE)&buff, &buffLen);
+	if (ret != REC_OK)
+	{
+		*usLetterCode = gcUNRECOGNIZED;
+	}
+	else
+	{
+		*usLetterCode = buff;
+	}
+}

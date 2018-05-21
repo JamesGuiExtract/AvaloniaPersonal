@@ -7,6 +7,11 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 
+#include "XBrowseForFolder.h"
+#include "FileProcessorsUtils.h"
+#include <LoadFileDlgThread.h>
+#include <DocTagUtils.h>
+
 //-------------------------------------------------------------------------------------------------
 // COCRFileProcessorPP
 //-------------------------------------------------------------------------------------------------
@@ -83,6 +88,25 @@ STDMETHODIMP COCRFileProcessorPP::Apply(void)
 				{
 					return S_FALSE;
 				}
+
+				if (m_radioOCRParametersFromRuleset.GetCheck() == BST_CHECKED)
+				{
+					ipOCR->LoadOCRParametersFromRuleset = VARIANT_TRUE;
+					_bstr_t bstrRulesetName;
+					m_editOCRParametersRuleset.GetWindowText(&(bstrRulesetName.GetBSTR()));
+					ipOCR->OCRParametersRulesetName = bstrRulesetName;
+
+				}
+				else
+				{
+					ipOCR->LoadOCRParametersFromRuleset = VARIANT_FALSE;
+					if (m_radioNoOCRParameters.GetCheck() == BST_CHECKED)
+					{
+						ipOCR->LoadOCRParametersFromRuleset = VARIANT_FALSE;
+						IHasOCRParametersPtr ipHasParams(ipOCR);
+						ipHasParams->OCRParameters = __nullptr;
+					}
+				}
 			}
 		}
 
@@ -111,6 +135,16 @@ LRESULT COCRFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			m_editSpecificPages = GetDlgItem(IDC_EDIT_PAGE_NUMBERS);
 			m_checkUseCleanImage = GetDlgItem(IDC_CHECK_OCR_USE_CLEAN);
 			m_checkParallelize = GetDlgItem(IDC_CHECK_PARALLEL);
+			m_radioNoOCRParameters = GetDlgItem(IDC_RADIO_NO_OCR_PARAMS);
+			m_radioSpecifiedOCRParameters = GetDlgItem(IDC_RADIO_OCR_PARAMS_HERE);
+			m_radioOCRParametersFromRuleset = GetDlgItem(IDC_RADIO_OCR_PARAMS_FROM_RULESET);
+			m_editOCRParametersRuleset = GetDlgItem(IDC_OCR_PARAMETERS_RULESET);
+			m_btnOCRParametersRulesetSelectTag.SubclassDlgItem(IDC_BTN_OCR_PARAMETERS_RULESET_DOC_TAG,
+				CWnd::FromHandle(m_hWnd));
+			m_btnOCRParametersRulesetSelectTag.SetIcon(::LoadIcon(_Module.m_hInstResource,
+				MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
+			m_btnOCRParametersRulesetBrowse = GetDlgItem(IDC_BTN_BROWSE_OCR_PARAMETERS_RULESET);
+			m_btnEditOCRParameters = GetDlgItem(IDC_BTN_OCRPARAMETERS);
 
 			// set the status of the check box
 			m_checkUseCleanImage.SetCheck(
@@ -147,6 +181,37 @@ LRESULT COCRFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			default:
 				break;
 			}
+		}
+
+		if (ipOCR->LoadOCRParametersFromRuleset)
+		{
+			m_radioOCRParametersFromRuleset.SetCheck(BST_CHECKED);
+			string strRuleset = ipOCR->OCRParametersRulesetName;
+			if (!strRuleset.empty())
+			{
+				m_editOCRParametersRuleset.SetWindowText(strRuleset.c_str());
+			}
+			m_editOCRParametersRuleset.EnableWindow(TRUE);
+			m_btnOCRParametersRulesetBrowse.EnableWindow(TRUE);
+			m_btnOCRParametersRulesetSelectTag.EnableWindow(TRUE);
+			m_btnEditOCRParameters.EnableWindow(FALSE);
+		}
+		else
+		{
+			IHasOCRParametersPtr ipHasParams(ipOCR);
+			if (ipHasParams->OCRParameters->Size == 0)
+			{
+				m_radioNoOCRParameters.SetCheck(BST_CHECKED);
+				m_btnEditOCRParameters.EnableWindow(FALSE);
+			}
+			else
+			{
+				m_radioSpecifiedOCRParameters.SetCheck(BST_CHECKED);
+				m_btnEditOCRParameters.EnableWindow(TRUE);
+			}
+			m_editOCRParametersRuleset.EnableWindow(FALSE);
+			m_btnOCRParametersRulesetBrowse.EnableWindow(FALSE);
+			m_btnOCRParametersRulesetSelectTag.EnableWindow(FALSE);
 		}
 		
 		SetDirty(FALSE);
@@ -225,3 +290,139 @@ void COCRFileProcessorPP::validateLicense()
 	VALIDATE_LICENSE( OCRFP_PP_COMPONENT_ID, "ELI11532", "OCR File Processor PP" );
 }
 //-------------------------------------------------------------------------------------------------
+
+
+LRESULT COCRFileProcessorPP::OnBnClickedBtnOcrparameters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	try
+	{
+		// Create instance of the configure form using the Prog ID to avoid circular dependency
+		IOCRParametersConfigurePtr ipConfigure;
+		ipConfigure.CreateInstance("Extract.FileActionManager.Forms.OCRParametersConfigure");
+		ASSERT_RESOURCE_ALLOCATION("ELI45863", ipConfigure != __nullptr);
+
+		UCLID_FILEPROCESSORSLib::IOCRFileProcessorPtr ipOCR = m_ppUnk[0];
+		ASSERT_RESOURCE_ALLOCATION("ELI45864", ipOCR != __nullptr);
+
+		// Get the IHasOCRParameters interface pointer of the current instance
+		IHasOCRParametersPtr ipOCRParameters(ipOCR);
+
+		// Configure the parameters
+		ipConfigure->ConfigureOCRParameters(ipOCRParameters, VARIANT_FALSE, (long)this->m_hWnd);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45865");
+
+	return S_OK;
+}
+
+
+LRESULT COCRFileProcessorPP::OnBnClickedBtnOcrParametersRulesetDocTag(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnOCRParametersRulesetSelectTag,
+			m_editOCRParametersRuleset);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45937");
+
+	return S_OK;
+}
+
+
+LRESULT COCRFileProcessorPP::OnBnClickedBtnBrowseOcrParametersRuleset(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		string strFile = chooseFile();	
+		if (!strFile.empty())
+		{
+			m_editOCRParametersRuleset.SetWindowText(strFile.c_str());
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45938");
+
+	return S_OK;
+}
+
+
+LRESULT COCRFileProcessorPP::OnBnClickedRadioNoOcrParams(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_editOCRParametersRuleset.EnableWindow(FALSE);
+		m_btnOCRParametersRulesetBrowse.EnableWindow(FALSE);
+		m_btnOCRParametersRulesetSelectTag.EnableWindow(FALSE);
+		m_btnEditOCRParameters.EnableWindow(FALSE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45939");
+
+	return S_OK;
+}
+
+
+LRESULT COCRFileProcessorPP::OnBnClickedRadioOcrParamsHere(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_editOCRParametersRuleset.EnableWindow(FALSE);
+		m_btnOCRParametersRulesetBrowse.EnableWindow(FALSE);
+		m_btnOCRParametersRulesetSelectTag.EnableWindow(FALSE);
+		m_btnEditOCRParameters.EnableWindow(TRUE);
+
+		// If settings are empty, open edit dialog so that they get set to the defaults
+		IHasOCRParametersPtr ipOCRParameters(m_ppUnk[0]);
+		if (ipOCRParameters->OCRParameters->Size == 0)
+		{
+			return OnBnClickedBtnOcrparameters(0, 0, 0, bHandled);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45940");
+
+	return S_OK;
+}
+
+
+LRESULT COCRFileProcessorPP::OnBnClickedRadioOcrParamsFromRuleset(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	try
+	{
+		m_editOCRParametersRuleset.EnableWindow(TRUE);
+		m_btnOCRParametersRulesetBrowse.EnableWindow(TRUE);
+		m_btnOCRParametersRulesetSelectTag.EnableWindow(TRUE);
+		m_btnEditOCRParameters.EnableWindow(FALSE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45941");
+
+	return S_OK;
+}
+
+const std::string COCRFileProcessorPP::chooseFile()
+{
+	const static string s_strFiles = "Ruleset definition files (*.etf)|*.etf|All Files (*.*)|*.*||";
+
+	// bring open file dialog
+	CFileDialog fileDlg(TRUE, NULL, "", 
+		OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		s_strFiles.c_str(), CWnd::FromHandle(m_hWnd));
+	
+	// Pass the pointer of dialog to create ThreadFileDlg object
+	ThreadFileDlg tfd(&fileDlg);
+
+	// If cancel button is clicked
+	if (tfd.doModal() != IDOK)
+	{
+		return "";
+	}
+	
+	string strFile = (LPCTSTR)fileDlg.GetPathName();
+
+	return strFile;
+}

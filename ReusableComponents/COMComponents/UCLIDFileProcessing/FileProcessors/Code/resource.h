@@ -59,6 +59,7 @@
 #define IDC_RADIO_OCR_SPECIFIED         202
 #define IDC_EDIT_PAGE_NUMBERS           203
 #define IDC_CMB_DST_FILE                204
+#define IDC_OCR_PARAMETERS_RULESET      204
 #define IDC_RADIO_MOVE                  205
 #define IDC_RADIO_COPY                  206
 #define IDC_RADIO_DELETE                207
@@ -172,14 +173,21 @@
 #define IDC_RADIO_REPORT_ERROR          314
 #define IDC_COMBO_WORKFLOW              316
 #define IDC_STATIC_WORKFLOW             317
+#define IDC_BTN_OCRPARAMETERS           318
+#define IDC_OCR_PARAMETERS_GROUP        319
+#define IDC_RADIO_NO_OCR_PARAMS         320
+#define IDC_RADIO_OCR_PARAMS_FROM_RULESET 321
+#define IDC_RADIO_OCR_PARAMS_HERE       322
+#define IDC_BTN_OCR_PARAMETERS_RULESET_DOC_TAG 323
+#define IDC_BTN_BROWSE_OCR_PARAMETERS_RULESET 324
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        155
+#define _APS_NEXT_RESOURCE_VALUE        156
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         318
+#define _APS_NEXT_CONTROL_VALUE         325
 #define _APS_NEXT_SYMED_VALUE           145
 #endif
 #endif
