@@ -486,6 +486,7 @@ namespace DashboardViewer
                     command.CommandText = "SELECT DashboardName FROM Dashboard ";
 
                     DataTable dataTable = new DataTable();
+                    dataTable.Locale = CultureInfo.CurrentCulture;
                     dataTable.Load(command.ExecuteReader());
 
                     var dashboardList = dataTable.AsEnumerable().ToList().Select(dr => dr.Field<string>(0));
