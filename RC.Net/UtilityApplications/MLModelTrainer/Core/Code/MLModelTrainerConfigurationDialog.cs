@@ -1,6 +1,7 @@
 ﻿using Extract.ETL;
 using Extract.FileActionManager.Forms;
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Linq;
 using System.Windows.Forms;
@@ -165,33 +166,15 @@ namespace Extract.UtilityApplications.MLModelTrainer
         {
             try
             {
-                _settings.ModelType = _nerModelTypeRadioButton.Checked
-                    ? TrainingDataCollector.ModelType.NamedEntityRecognition
-                    : TrainingDataCollector.ModelType.LearningMachine;
-
                 var modelName = _modelNameComboBox.Text;
                 _modelNameComboBox.Focus();
                 ExtractException.Assert("ELI45127", "Model name is undefined", ValidateModel(), "Model name", modelName);
-                _settings.QualifiedModelName = modelName;
 
                 _descriptionTextBox.Focus();
                 ExtractException.Assert("ELI45673", "Description cannot be empty",
                     !string.IsNullOrWhiteSpace(_descriptionTextBox.Text));
-                _settings.Description = _descriptionTextBox.Text;
 
-                _settings.TrainingCommand = _trainingCommandTextBox.Text;
-                _settings.TestingCommand = _testingCommandTextBox.Text;
-                _settings.ModelDestination = _modelDestinationPathTextBox.Text;
-                _settings.LastIDProcessed = (int)_lastIDProcessedNumericUpDown.Value;
-                _settings.LastF1Score = (double)_lastF1ScoreNumericUpDown.Value;
-                _settings.MinimumF1Score = (double)_minF1ScoreNumericUpDown.Value;
-                _settings.AllowableAccuracyDrop = (double)_allowableAccuracyDropNumericUpDown.Value;
-                _settings.MaximumTrainingRecords = (int)_maxTrainingRecordsNumericUpDown.Value;
-                _settings.MaximumTestingRecords = (int)_maxTestingRecordsNumericUpDown.Value;
-                _settings.MarkOldDataForDeletion = _markOldDataForDeletionCheckBox.Checked;
-                _settings.EmailAddressesToNotifyOnFailure = _emailAddressesTextBox.Text;
-                _settings.EmailSubject = _emailSubjectTextBox.Text;
-                _settings.Schedule = _schedulerControl.Value;
+                ApplySettings();
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
@@ -333,6 +316,9 @@ namespace Extract.UtilityApplications.MLModelTrainer
         {
             try
             {
+                // Make sure settings are current
+                ApplySettings();
+
                 using (var form = new ChangeAnswerForm(_settings))
                 {
                     form.ShowDialog();
@@ -341,6 +327,36 @@ namespace Extract.UtilityApplications.MLModelTrainer
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45851");
+            }
+        }
+
+        /// <summary>
+        /// After confirmation, marks for deletion all data associated with this model name
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleDeleteMLDataButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var result = MessageBox.Show(UtilityMethods.FormatInvariant($"Mark all {_settings.QualifiedModelName} data for deletion?"),
+                    "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1, 0);
+                if (result == DialogResult.OK)
+                {
+                    // Make sure settings are up to date
+                    ApplySettings();
+
+                    using (new TemporaryWaitCursor())
+                    {
+                        _settings.MarkAllDataForDeletion();
+                        UtilityMethods.ShowMessageBox(UtilityMethods.FormatCurrent($"Marked all data for deletion"), "Success", false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45971");
             }
         }
 
@@ -399,6 +415,29 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
             return valid;
         }
+        private void ApplySettings()
+        {
+            _settings.ModelType = _nerModelTypeRadioButton.Checked
+                ? TrainingDataCollector.ModelType.NamedEntityRecognition
+                : TrainingDataCollector.ModelType.LearningMachine;
+
+            _settings.QualifiedModelName = _modelNameComboBox.Text;
+            _settings.Description = _descriptionTextBox.Text;
+            _settings.TrainingCommand = _trainingCommandTextBox.Text;
+            _settings.TestingCommand = _testingCommandTextBox.Text;
+            _settings.ModelDestination = _modelDestinationPathTextBox.Text;
+            _settings.LastIDProcessed = (int)_lastIDProcessedNumericUpDown.Value;
+            _settings.LastF1Score = (double)_lastF1ScoreNumericUpDown.Value;
+            _settings.MinimumF1Score = (double)_minF1ScoreNumericUpDown.Value;
+            _settings.AllowableAccuracyDrop = (double)_allowableAccuracyDropNumericUpDown.Value;
+            _settings.MaximumTrainingRecords = (int)_maxTrainingRecordsNumericUpDown.Value;
+            _settings.MaximumTestingRecords = (int)_maxTestingRecordsNumericUpDown.Value;
+            _settings.MarkOldDataForDeletion = _markOldDataForDeletionCheckBox.Checked;
+            _settings.EmailAddressesToNotifyOnFailure = _emailAddressesTextBox.Text;
+            _settings.EmailSubject = _emailSubjectTextBox.Text;
+            _settings.Schedule = _schedulerControl.Value;
+        }
+
 
         #endregion Private Methods
     }

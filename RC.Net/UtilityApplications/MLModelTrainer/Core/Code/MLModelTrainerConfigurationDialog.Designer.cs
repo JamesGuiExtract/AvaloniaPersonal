@@ -40,7 +40,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MLModelTrainerConfigurationDialog));
-            Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
+            Extract.Utilities.ScheduledEvent scheduledEvent2 = new Extract.Utilities.ScheduledEvent();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._editButton = new System.Windows.Forms.Button();
             this._manageMLModelsButton = new System.Windows.Forms.Button();
@@ -83,11 +83,12 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this._settingsTabPage = new System.Windows.Forms.TabPage();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this._changeAnswerButton = new System.Windows.Forms.Button();
             this._lmModelTypeRadioButton = new System.Windows.Forms.RadioButton();
             this._nerModelTypeRadioButton = new System.Windows.Forms.RadioButton();
             this._scheduleTabPage = new System.Windows.Forms.TabPage();
             this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
-            this._changeAnswerButton = new System.Windows.Forms.Button();
+            this._deleteMLDataButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._maxTestingRecordsNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._minF1ScoreNumericUpDown)).BeginInit();
@@ -478,6 +479,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this._deleteMLDataButton);
             this.groupBox3.Controls.Add(this._markOldDataForDeletionCheckBox);
             this.groupBox3.Controls.Add(this._emailSubjectTextBox);
             this.groupBox3.Controls.Add(this.label12);
@@ -603,6 +605,16 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Model type";
             // 
+            // _changeAnswerButton
+            // 
+            this._changeAnswerButton.Location = new System.Drawing.Point(454, 19);
+            this._changeAnswerButton.Name = "_changeAnswerButton";
+            this._changeAnswerButton.Size = new System.Drawing.Size(144, 23);
+            this._changeAnswerButton.TabIndex = 16;
+            this._changeAnswerButton.Text = "Change an answer...";
+            this._changeAnswerButton.UseVisualStyleBackColor = true;
+            this._changeAnswerButton.Click += new System.EventHandler(this.HandleChangeAnswerButton_Click);
+            // 
             // _lmModelTypeRadioButton
             // 
             this._lmModelTypeRadioButton.AutoSize = true;
@@ -645,23 +657,23 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._schedulerControl.Name = "_schedulerControl";
             this._schedulerControl.Size = new System.Drawing.Size(383, 153);
             this._schedulerControl.TabIndex = 23;
-            scheduledEvent1.Duration = null;
-            scheduledEvent1.Enabled = true;
-            scheduledEvent1.End = null;
-            scheduledEvent1.Exclusions = new Extract.Utilities.ScheduledEvent[0];
-            scheduledEvent1.RecurrenceUnit = null;
-            scheduledEvent1.Start = new System.DateTime(2018, 3, 23, 11, 16, 13, 0);
-            this._schedulerControl.Value = scheduledEvent1;
+            scheduledEvent2.Duration = null;
+            scheduledEvent2.Enabled = true;
+            scheduledEvent2.End = null;
+            scheduledEvent2.Exclusions = new Extract.Utilities.ScheduledEvent[0];
+            scheduledEvent2.RecurrenceUnit = null;
+            scheduledEvent2.Start = new System.DateTime(2018, 3, 23, 11, 16, 13, 0);
+            this._schedulerControl.Value = scheduledEvent2;
             // 
-            // _changeAnswerButton
+            // _deleteMLDataButton
             // 
-            this._changeAnswerButton.Location = new System.Drawing.Point(454, 19);
-            this._changeAnswerButton.Name = "_changeAnswerButton";
-            this._changeAnswerButton.Size = new System.Drawing.Size(144, 23);
-            this._changeAnswerButton.TabIndex = 16;
-            this._changeAnswerButton.Text = "Change an answer...";
-            this._changeAnswerButton.UseVisualStyleBackColor = true;
-            this._changeAnswerButton.Click += new System.EventHandler(this.HandleChangeAnswerButton_Click);
+            this._deleteMLDataButton.Location = new System.Drawing.Point(463, 66);
+            this._deleteMLDataButton.Name = "_deleteMLDataButton";
+            this._deleteMLDataButton.Size = new System.Drawing.Size(135, 23);
+            this._deleteMLDataButton.TabIndex = 21;
+            this._deleteMLDataButton.Text = "Delete ML data...";
+            this._deleteMLDataButton.UseVisualStyleBackColor = true;
+            this._deleteMLDataButton.Click += new System.EventHandler(this.HandleDeleteMLDataButton_Click);
             // 
             // MLModelTrainerConfigurationDialog
             // 
@@ -751,5 +763,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
         private System.Windows.Forms.Button _editButton;
         private System.Windows.Forms.CheckBox _markOldDataForDeletionCheckBox;
         private System.Windows.Forms.Button _changeAnswerButton;
+        private System.Windows.Forms.Button _deleteMLDataButton;
     }
 }

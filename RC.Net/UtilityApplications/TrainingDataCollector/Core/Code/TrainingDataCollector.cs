@@ -35,15 +35,19 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             @"SELECT AttributeSetForFile.ID
             FROM AttributeSetForFile
             JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
+            JOIN FileTaskSession ON FileTaskSessionID = FileTaskSession.ID
                 WHERE Description = @AttributeSetName
-                AND AttributeSetForFile.ID > @LastIDProcessed";
+                AND AttributeSetForFile.ID > @LastIDProcessed
+                AND FileTaskSession.DateTimeStamp >= @StartDate";
 
         static readonly string _GET_NEW_DATA_COUNT =
             @"SELECT COUNT(*)
             FROM AttributeSetForFile
             JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
+            JOIN FileTaskSession ON FileTaskSessionID = FileTaskSession.ID
                 WHERE Description = @AttributeSetName
-                AND AttributeSetForFile.ID > @LastIDProcessed";
+                AND AttributeSetForFile.ID > @LastIDProcessed
+                AND FileTaskSession.DateTimeStamp >= @StartDate";
 
         #endregion Constants
 
@@ -163,6 +167,12 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         [DataMember]
         public string FeatureRulesetPath { get; set; }
 
+        /// <summary>
+        /// Limits the attribute set for files processed to the most recent only
+        /// </summary>
+        [DataMember]
+        public TimeSpan LimitProcessingToMostRecent { get; set; }
+
         #endregion Properties
 
         #region Constructors
@@ -181,8 +191,6 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// <summary>
         /// Runs the data collection process
         /// </summary>
-        /// <param name="databaseServer">The database server</param>
-        /// <param name="databaseName">The name of the database</param>
         public override void Process(CancellationToken cancelToken)
         {
             try
@@ -199,6 +207,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                         cmd.CommandText = _GET_AVAILABLE_IDS;
                         cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
                         cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+                        cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
 
                         var reader = cmd.ExecuteReader();
                         while (reader.Read())
@@ -338,6 +347,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                     cmd.CommandText = _GET_NEW_DATA_COUNT;
                     cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
                     cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+                    cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
 
                     int newCount = 0;
                     using (var reader = cmd.ExecuteReader())
@@ -419,7 +429,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         {
             try
             {
-                TrainingDataCollectorConfigurationDialog trainingDataCollectorConfiguration = new TrainingDataCollectorConfigurationDialog(this, DatabaseServer, DatabaseName);
+                TrainingDataCollectorConfigurationDialog trainingDataCollectorConfiguration
+                    = new TrainingDataCollectorConfigurationDialog(this, DatabaseServer, DatabaseName);
                 return trainingDataCollectorConfiguration.ShowDialog() == System.Windows.Forms.DialogResult.OK;
             }
             catch (Exception ex)

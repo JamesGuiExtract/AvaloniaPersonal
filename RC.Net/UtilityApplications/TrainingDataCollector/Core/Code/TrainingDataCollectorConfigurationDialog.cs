@@ -3,6 +3,7 @@ using Extract.AttributeFinder;
 using Extract.ETL;
 using Extract.FileActionManager.Forms;
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Linq;
 using System.Windows.Forms;
@@ -73,6 +74,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 InitializeComponent();
 
                 _lastIDProcessedNumericUpDown.Maximum = long.MaxValue;
+                _limitProcessingByDateNumericUpDown.Maximum = int.MaxValue;
 
                 // Schedule is unused if this is a child of a training coordinator
                 if (_settings.Container != null)
@@ -160,38 +162,16 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 _descriptionTextBox.Focus();
                 ExtractException.Assert("ELI45675", "Description cannot be empty.",
                     !string.IsNullOrWhiteSpace(_descriptionTextBox.Text));
-                _settings.Description = _descriptionTextBox.Text;
 
                 var modelName = _modelNameComboBox.Text;
                 _modelNameComboBox.Focus();
                 ExtractException.Assert("ELI45127", "Model name is undefined", ValidateModel(), "Model name", modelName);
-                _settings.QualifiedModelName = modelName;
 
                 var attributeSet = _attributeSetNameComboBox.Text;
                 _attributeSetNameComboBox.Focus();
                 ExtractException.Assert("ELI45131", "Attribute set is undefined", ValidateAttributeSet(), "Attribute set", attributeSet);
-                _settings.AttributeSetName = attributeSet;
 
-                _settings.LastIDProcessed = (int)_lastIDProcessedNumericUpDown.Value;
-
-                if (_lmModelTypeRadioButton.Checked)
-                {
-                    _settings.ModelType = ModelType.LearningMachine;
-                }
-                else
-                {
-                    _settings.ModelType = ModelType.NamedEntityRecognition;
-                }
-                _settings.DataGeneratorPath = _dataGeneratorPathTextBox.Text;
-
-                _settings.Schedule = _schedulerControl.Value;
-
-                _settings.OverrideTrainingTestingSplit = _overrideTrainingTestingSplitCheckBox.Checked;
-                _settings.TrainingPercent = (int)_trainingPercentageNumericUpDown.Value;
-                _settings.UseAttributeSetForExpecteds = _useAttributeSetForExpectedsRadioButton.Checked;
-                _settings.RunRulesetForCandidateOrFeatures = _runRulesetForFeaturesRadioButton.Checked;
-                _settings.FeatureRulesetPath = _featureRulesetTextBox.Text;
-                _settings.RunRulesetIfVoaIsMissing = _runRulesetIfVoaIsMissingCheckBox.Checked;
+                ApplySettings();
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
@@ -322,6 +302,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         {
             try
             {
+                // Make sure settings are up to date
+                ApplySettings();
+
                 using (var form = new ChangeAnswerForm(_settings))
                 {
                     form.ShowDialog();
@@ -330,6 +313,36 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45852");
+            }
+        }
+
+        /// <summary>
+        /// After confirmation, marks for deletion all data associated with this model name
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleDeleteMLDataButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var result = MessageBox.Show(UtilityMethods.FormatInvariant($"Mark all {_settings.QualifiedModelName} data for deletion?"),
+                    "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1, 0);
+                if (result == DialogResult.OK)
+                {
+                    // Make sure settings are up to date
+                    ApplySettings();
+
+                    using (new TemporaryWaitCursor())
+                    {
+                        _settings.MarkAllDataForDeletion();
+                        UtilityMethods.ShowMessageBox(UtilityMethods.FormatCurrent($"Marked all data for deletion"), "Success", false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45965");
             }
         }
 
@@ -357,6 +370,11 @@ namespace Extract.UtilityApplications.TrainingDataCollector
 
                 _overrideTrainingTestingSplitCheckBox.Checked = _settings.OverrideTrainingTestingSplit;
                 _trainingPercentageNumericUpDown.Value = _settings.TrainingPercent;
+
+                // Use a reasonable default if zero days are specified
+                int days = _settings.LimitProcessingToMostRecent.Days;
+                _limitProcessingByDateNumericUpDown.Value = days > 0 ? days : 30;
+
                 if (_settings.UseAttributeSetForExpecteds)
                 {
                     _useAttributeSetForExpectedsRadioButton.Checked = true;
@@ -436,6 +454,34 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             }
 
             return valid;
+        }
+
+        private void ApplySettings()
+        {
+            _settings.Description = _descriptionTextBox.Text;
+            _settings.QualifiedModelName = _modelNameComboBox.Text;
+            _settings.AttributeSetName = _attributeSetNameComboBox.Text;
+            _settings.LastIDProcessed = (int)_lastIDProcessedNumericUpDown.Value;
+
+            if (_lmModelTypeRadioButton.Checked)
+            {
+                _settings.ModelType = ModelType.LearningMachine;
+            }
+            else
+            {
+                _settings.ModelType = ModelType.NamedEntityRecognition;
+            }
+            _settings.DataGeneratorPath = _dataGeneratorPathTextBox.Text;
+
+            _settings.Schedule = _schedulerControl.Value;
+
+            _settings.OverrideTrainingTestingSplit = _overrideTrainingTestingSplitCheckBox.Checked;
+            _settings.TrainingPercent = (int)_trainingPercentageNumericUpDown.Value;
+            _settings.LimitProcessingToMostRecent = TimeSpan.FromDays((double)_limitProcessingByDateNumericUpDown.Value);
+            _settings.UseAttributeSetForExpecteds = _useAttributeSetForExpectedsRadioButton.Checked;
+            _settings.RunRulesetForCandidateOrFeatures = _runRulesetForFeaturesRadioButton.Checked;
+            _settings.FeatureRulesetPath = _featureRulesetTextBox.Text;
+            _settings.RunRulesetIfVoaIsMissing = _runRulesetIfVoaIsMissingCheckBox.Checked;
         }
 
         #endregion Private Methods

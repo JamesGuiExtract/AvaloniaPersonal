@@ -21,6 +21,14 @@ namespace Extract.ETL
             @"SELECT * FROM MLData WHERE MLModelID IN
                 (SELECT ID FROM MLModel WHERE Name = @Name)";
 
+        static readonly string _MARK_ALL_DATA_FOR_DELETION =
+            @"UPDATE d
+                SET CanBeDeleted = 'True'
+                FROM MLData d
+                JOIN MLModel ON d.MLModelID = MLModel.ID
+                WHERE Name = @Name
+                AND CanBeDeleted = 'False'";
+
         #endregion Constants
 
         #region Fields
@@ -170,6 +178,48 @@ namespace Extract.ETL
             var clone = (MachineLearningService)Clone();
             clone.Guid = Guid.NewGuid();
             return clone;
+        }
+
+        /// <summary>
+        /// Sets CanBeDeleted to true for all ML Data for this model name
+        /// </summary>
+        public void MarkAllDataForDeletion()
+        {
+            using (var connection = NewSqlDBConnection())
+            {
+                try
+                {
+                    connection.Open();
+                }
+                catch (Exception ex)
+                {
+                    var ue = ex.AsExtract("ELI45969");
+                    ue.AddDebugData("Database Server", DatabaseServer, false);
+                    ue.AddDebugData("Database Name", DatabaseName, false);
+                    throw ue;
+                }
+
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = _MARK_ALL_DATA_FOR_DELETION;
+                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
+
+                    // Set the timeout so that it waits indefinitely
+                    cmd.CommandTimeout = 0;
+
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        var ue = new ExtractException("ELI45970", "Failed to mark data for deletion", ex);
+                        ue.AddDebugData("Database Server", DatabaseServer, false);
+                        ue.AddDebugData("Database Name", DatabaseName, false);
+                        throw ue;
+                    }
+                }
+            }
         }
 
         #endregion Public Methods

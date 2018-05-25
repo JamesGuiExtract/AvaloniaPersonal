@@ -38,8 +38,11 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         private void InitializeComponent()
         {
-            Extract.Utilities.ScheduledEvent scheduledEvent2 = new Extract.Utilities.ScheduledEvent();
+            Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this._limitProcessingByDateNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label5 = new System.Windows.Forms.Label();
             this._manageMLModelsButton = new System.Windows.Forms.Button();
             this._attributeSetNameComboBox = new System.Windows.Forms.ComboBox();
             this._addModelButton = new System.Windows.Forms.Button();
@@ -51,6 +54,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this._changeAnswerButton = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this._trainingPercentageNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this._overrideTrainingTestingSplitCheckBox = new System.Windows.Forms.CheckBox();
@@ -73,8 +77,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._useVoaFileForExpectedsRadioButton = new System.Windows.Forms.RadioButton();
             this._useAttributeSetForExpectedsRadioButton = new System.Windows.Forms.RadioButton();
             this._scheduleTabPage = new System.Windows.Forms.TabPage();
-            this._changeAnswerButton = new System.Windows.Forms.Button();
+            this._deleteMLDataButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._limitProcessingByDateNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).BeginInit();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._trainingPercentageNumericUpDown)).BeginInit();
@@ -89,6 +94,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this._deleteMLDataButton);
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this._limitProcessingByDateNumericUpDown);
+            this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this._manageMLModelsButton);
             this.groupBox1.Controls.Add(this._attributeSetNameComboBox);
             this.groupBox1.Controls.Add(this._addModelButton);
@@ -99,9 +108,44 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(440, 109);
+            this.groupBox1.Size = new System.Drawing.Size(440, 132);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(213, 104);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(29, 13);
+            this.label6.TabIndex = 10;
+            this.label6.Text = "days";
+            // 
+            // _limitProcessingByDateNumericUpDown
+            // 
+            this._limitProcessingByDateNumericUpDown.Location = new System.Drawing.Point(159, 101);
+            this._limitProcessingByDateNumericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this._limitProcessingByDateNumericUpDown.Name = "_limitProcessingByDateNumericUpDown";
+            this._limitProcessingByDateNumericUpDown.Size = new System.Drawing.Size(47, 20);
+            this._limitProcessingByDateNumericUpDown.TabIndex = 9;
+            this._limitProcessingByDateNumericUpDown.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 103);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(141, 13);
+            this.label5.TabIndex = 8;
+            this.label5.Text = "Limit to files stored in the last";
             // 
             // _manageMLModelsButton
             // 
@@ -192,7 +236,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(321, 486);
+            this._okButton.Location = new System.Drawing.Point(321, 511);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 2;
@@ -204,7 +248,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(402, 486);
+            this._cancelButton.Location = new System.Drawing.Point(402, 511);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 3;
@@ -224,12 +268,22 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.groupBox2.Controls.Add(this._nerModelTypeRadioButton);
             this.groupBox2.Controls.Add(this._dataGeneratorPathBrowseButton);
             this.groupBox2.Controls.Add(this._dataGeneratorPathTextBox);
-            this.groupBox2.Location = new System.Drawing.Point(6, 121);
+            this.groupBox2.Location = new System.Drawing.Point(6, 144);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(440, 106);
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Settings file";
+            // 
+            // _changeAnswerButton
+            // 
+            this._changeAnswerButton.Location = new System.Drawing.Point(299, 72);
+            this._changeAnswerButton.Name = "_changeAnswerButton";
+            this._changeAnswerButton.Size = new System.Drawing.Size(135, 23);
+            this._changeAnswerButton.TabIndex = 17;
+            this._changeAnswerButton.Text = "Change an answer...";
+            this._changeAnswerButton.UseVisualStyleBackColor = true;
+            this._changeAnswerButton.Click += new System.EventHandler(this.HandleChangeAnswerButton_Click);
             // 
             // label4
             // 
@@ -345,13 +399,13 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._schedulerControl.Name = "_schedulerControl";
             this._schedulerControl.Size = new System.Drawing.Size(378, 153);
             this._schedulerControl.TabIndex = 13;
-            scheduledEvent2.Duration = null;
-            scheduledEvent2.Enabled = true;
-            scheduledEvent2.End = null;
-            scheduledEvent2.Exclusions = new Extract.Utilities.ScheduledEvent[0];
-            scheduledEvent2.RecurrenceUnit = null;
-            scheduledEvent2.Start = new System.DateTime(2018, 3, 23, 13, 37, 55, 0);
-            this._schedulerControl.Value = scheduledEvent2;
+            scheduledEvent1.Duration = null;
+            scheduledEvent1.Enabled = true;
+            scheduledEvent1.End = null;
+            scheduledEvent1.Exclusions = new Extract.Utilities.ScheduledEvent[0];
+            scheduledEvent1.RecurrenceUnit = null;
+            scheduledEvent1.Start = new System.DateTime(2018, 3, 23, 13, 37, 55, 0);
+            this._schedulerControl.Value = scheduledEvent1;
             // 
             // _tabControl
             // 
@@ -363,7 +417,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._tabControl.Location = new System.Drawing.Point(12, 35);
             this._tabControl.Name = "_tabControl";
             this._tabControl.SelectedIndex = 0;
-            this._tabControl.Size = new System.Drawing.Size(460, 445);
+            this._tabControl.Size = new System.Drawing.Size(460, 470);
             this._tabControl.TabIndex = 1;
             // 
             // _settingsTabPage
@@ -375,7 +429,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._settingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._settingsTabPage.Name = "_settingsTabPage";
             this._settingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._settingsTabPage.Size = new System.Drawing.Size(452, 419);
+            this._settingsTabPage.Size = new System.Drawing.Size(452, 444);
             this._settingsTabPage.TabIndex = 0;
             this._settingsTabPage.Text = "Settings";
             this._settingsTabPage.UseVisualStyleBackColor = true;
@@ -387,7 +441,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._featuresGroupBox.Controls.Add(this._featureRulesetTextBox);
             this._featuresGroupBox.Controls.Add(this._runRulesetIfVoaIsMissingCheckBox);
             this._featuresGroupBox.Controls.Add(this._useVoaFileForFeaturesRadioButton);
-            this._featuresGroupBox.Location = new System.Drawing.Point(6, 311);
+            this._featuresGroupBox.Location = new System.Drawing.Point(6, 334);
             this._featuresGroupBox.Name = "_featuresGroupBox";
             this._featuresGroupBox.Size = new System.Drawing.Size(440, 99);
             this._featuresGroupBox.TabIndex = 11;
@@ -456,7 +510,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             this.groupBox3.Controls.Add(this._useVoaFileForExpectedsRadioButton);
             this.groupBox3.Controls.Add(this._useAttributeSetForExpectedsRadioButton);
-            this.groupBox3.Location = new System.Drawing.Point(6, 233);
+            this.groupBox3.Location = new System.Drawing.Point(6, 256);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(440, 72);
             this.groupBox3.TabIndex = 10;
@@ -492,20 +546,20 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._scheduleTabPage.Location = new System.Drawing.Point(4, 22);
             this._scheduleTabPage.Name = "_scheduleTabPage";
             this._scheduleTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._scheduleTabPage.Size = new System.Drawing.Size(452, 407);
+            this._scheduleTabPage.Size = new System.Drawing.Size(452, 444);
             this._scheduleTabPage.TabIndex = 1;
             this._scheduleTabPage.Text = "Schedule";
             this._scheduleTabPage.UseVisualStyleBackColor = true;
             // 
-            // _changeAnswerButton
+            // _deleteMLDataButton
             // 
-            this._changeAnswerButton.Location = new System.Drawing.Point(299, 72);
-            this._changeAnswerButton.Name = "_changeAnswerButton";
-            this._changeAnswerButton.Size = new System.Drawing.Size(135, 23);
-            this._changeAnswerButton.TabIndex = 17;
-            this._changeAnswerButton.Text = "Change an answer...";
-            this._changeAnswerButton.UseVisualStyleBackColor = true;
-            this._changeAnswerButton.Click += new System.EventHandler(this.HandleChangeAnswerButton_Click);
+            this._deleteMLDataButton.Location = new System.Drawing.Point(299, 99);
+            this._deleteMLDataButton.Name = "_deleteMLDataButton";
+            this._deleteMLDataButton.Size = new System.Drawing.Size(135, 23);
+            this._deleteMLDataButton.TabIndex = 11;
+            this._deleteMLDataButton.Text = "Delete ML data...";
+            this._deleteMLDataButton.UseVisualStyleBackColor = true;
+            this._deleteMLDataButton.Click += new System.EventHandler(this.HandleDeleteMLDataButton_Click);
             // 
             // TrainingDataCollectorConfigurationDialog
             // 
@@ -513,7 +567,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(484, 515);
+            this.ClientSize = new System.Drawing.Size(484, 540);
             this.Controls.Add(this._tabControl);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label13);
@@ -527,6 +581,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.Text = "Training data collector";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._limitProcessingByDateNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
@@ -579,5 +634,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         private System.Windows.Forms.RadioButton _runRulesetForFeaturesRadioButton;
         private System.Windows.Forms.CheckBox _runRulesetIfVoaIsMissingCheckBox;
         private System.Windows.Forms.Button _changeAnswerButton;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.NumericUpDown _limitProcessingByDateNumericUpDown;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button _deleteMLDataButton;
     }
 }
