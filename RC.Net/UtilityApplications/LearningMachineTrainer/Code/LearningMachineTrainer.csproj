@@ -56,10 +56,6 @@
     <Reference Include="Accord.Statistics, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
       <HintPath>..\..\..\APIs\Accord.Statistics.3.0.2\lib\net45\Accord.Statistics.dll</HintPath>
     </Reference>
-    <Reference Include="Extract64.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\binaries64\Debug\Extract64.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -112,6 +108,12 @@
     <Content Include="..\..\..\APIs\zstd\1.1.0\build\VS_scripts\bin\Release\x64\zstdlib_x64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core64\Code\Extract64.Core.csproj">
+      <Project>{10c5df8c-4b03-4d69-b36b-bced7994d5a3}</Project>
+      <Name>Extract64.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\..\APIs\Accord.3.0.2\build\Accord.targets" Condition="Exists('..\..\..\APIs\Accord.3.0.2\build\Accord.targets')" />
