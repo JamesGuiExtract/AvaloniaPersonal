@@ -107,7 +107,7 @@
       </EntryPointSymbol>
       <TargetMachine>MachineX86</TargetMachine>
       <AssemblyDebug>true</AssemblyDebug>
-      <CLRThreadAttribute>MTAThreadingAttribute</CLRThreadAttribute>
+      <CLRThreadAttribute>STAThreadingAttribute</CLRThreadAttribute>
       <AdditionalOptions>/Ignore:4249 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <Manifest>

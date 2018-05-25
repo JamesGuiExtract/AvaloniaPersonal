@@ -94,3 +94,38 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingUtils::createMTAFil
 	return ipDB;
 }
 //-------------------------------------------------------------------------------------------------
+UINT createMTAProgressStatusThread(void *pData)
+{
+	// This is a helper function for createMTAProgressStatus (below) used to generate a new
+	// IProgressStatus instance with a MTA COM server.
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+	IProgressStatusPtr ipProgressStatus(CLSID_ProgressStatus);
+	ASSERT_RESOURCE_ALLOCATION("ELI45966", ipProgressStatus != __nullptr);
+
+	// Pass pointer to newly created instance back to caller.
+	IProgressStatusPtr *pipProgressStatus = (IProgressStatusPtr *)pData;
+	*pipProgressStatus = ipProgressStatus;
+
+	CoUninitialize();
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+IProgressStatusPtr CFileProcessingUtils::createMTAProgressStatus()
+{
+	IProgressStatusPtr ipProgressStatus(__nullptr);
+
+	// Use a separate MTA thread to generate the new instance.
+	CWinThread *pThread = AfxBeginThread(createMTAProgressStatusThread, &ipProgressStatus);
+	DWORD dwWaitResult = WaitForSingleObject(pThread->m_hThread, 3000);
+	if (dwWaitResult != WAIT_OBJECT_0)
+	{
+		throw UCLIDException("ELI45967", "Unable to create ProgressStatus");
+	}
+
+	ASSERT_RESOURCE_ALLOCATION("ELI45968", ipProgressStatus != __nullptr);
+		
+	return ipProgressStatus;
+}
+//-------------------------------------------------------------------------------------------------

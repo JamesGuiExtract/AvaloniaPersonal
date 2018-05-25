@@ -5,6 +5,7 @@
 #include "FAMDBAdmin.h"
 #include "FAMDBAdminDlg.h"
 #include "FAMDBAdminAboutDlg.h"
+#include "FileProcessingUtils.h"
 #include "ClearWarningDlg.h"
 #include "ExportFileListDlg.h"
 #include "ManageUserCountersDlg.h"
@@ -485,7 +486,7 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 				"Extract.Utilties.Forms.ProgressStatusDialog");
 			ASSERT_RESOURCE_ALLOCATION("ELI31385", m_ipSchemaUpdateProgressStatusDialog != __nullptr);
 
-			m_ipSchemaUpdateProgressStatus.CreateInstance(CLSID_ProgressStatus);
+			m_ipSchemaUpdateProgressStatus = CFileProcessingUtils::createMTAProgressStatus();
 			ASSERT_RESOURCE_ALLOCATION("ELI31386", m_ipSchemaUpdateProgressStatus != __nullptr);
 
 			m_ipSchemaUpdateProgressStatusDialog->Initialize(get_bstr_t("Schema Update"),
