@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace Extract.Utilities
 {
@@ -72,7 +73,7 @@ namespace Extract.Utilities
                     if (existingReadableValue != readableValue)
                     {
                         ExtractException ee = new ExtractException("ELI32718",
-                            "Enum has already been assinged a different readable value.");
+                            "Enum has already been assigned a different readable value.");
                         ee.AddDebugData("Existing string", existingReadableValue, false);
                         ee.AddDebugData("New string", readableValue, false);
                         throw ee;
@@ -85,7 +86,7 @@ namespace Extract.Utilities
                     if (!existingValue.Equals(value))
                     {
                         ExtractException ee = new ExtractException("ELI32719",
-                            "String value has already been assinged to a different enum.");
+                            "String value has already been assigned to a different enum.");
                         ee.AddDebugData("Existing string", existingReadableValue, false);
                         ee.AddDebugData("New string", readableValue, false);
                         throw ee;
@@ -331,7 +332,11 @@ namespace Extract.Utilities
 
                 comboBox.Items.Clear();
 
-                foreach (T value in typeof(T).GetEnumValues())
+                // Enums can have more than one name that is the same underlying value
+                // but actually using more than one is not supported by this class
+                // so use Distinct() to eliminate the duplicates. (Else duplicate
+                // combo box entries will be added.)
+                foreach (T value in typeof(T).GetEnumValues().OfType<T>())
                 {
                     string readableValue;
                     if (ignoreUnassignedValues && !value.TryGetReadableValue(out readableValue))

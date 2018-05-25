@@ -152,6 +152,7 @@
             this._language5ComboBox.Location = new System.Drawing.Point(8, 150);
             this._language5ComboBox.Name = "_language5ComboBox";
             this._language5ComboBox.Size = new System.Drawing.Size(241, 21);
+            this._language5ComboBox.Sorted = true;
             this._language5ComboBox.TabIndex = 5;
             // 
             // _language4ComboBox
@@ -161,6 +162,7 @@
             this._language4ComboBox.Location = new System.Drawing.Point(8, 123);
             this._language4ComboBox.Name = "_language4ComboBox";
             this._language4ComboBox.Size = new System.Drawing.Size(241, 21);
+            this._language4ComboBox.Sorted = true;
             this._language4ComboBox.TabIndex = 4;
             // 
             // _language3ComboBox
@@ -170,6 +172,7 @@
             this._language3ComboBox.Location = new System.Drawing.Point(8, 96);
             this._language3ComboBox.Name = "_language3ComboBox";
             this._language3ComboBox.Size = new System.Drawing.Size(241, 21);
+            this._language3ComboBox.Sorted = true;
             this._language3ComboBox.TabIndex = 3;
             // 
             // _language2ComboBox
@@ -179,6 +182,7 @@
             this._language2ComboBox.Location = new System.Drawing.Point(8, 69);
             this._language2ComboBox.Name = "_language2ComboBox";
             this._language2ComboBox.Size = new System.Drawing.Size(241, 21);
+            this._language2ComboBox.Sorted = true;
             this._language2ComboBox.TabIndex = 2;
             // 
             // _language1ComboBox
@@ -188,6 +192,7 @@
             this._language1ComboBox.Location = new System.Drawing.Point(8, 42);
             this._language1ComboBox.Name = "_language1ComboBox";
             this._language1ComboBox.Size = new System.Drawing.Size(241, 21);
+            this._language1ComboBox.Sorted = true;
             this._language1ComboBox.TabIndex = 1;
             // 
             // _recognitionOptionsTabPage
