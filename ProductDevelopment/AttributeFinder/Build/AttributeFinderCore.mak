@@ -395,8 +395,8 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@XCOPY "$(RCNETDir)\APIs\WindowsAPICodePack.1.1.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 # Copy WindowsAPICodePack to DotNetGAC for installshield
 	@XCOPY "$(RCNETDir)\APIs\WindowsAPICodePack.1.1.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /v /s /e /y
-	@COPY /V "$(RCNETDir)\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V "$(RCNETDir)\APIs\YamlDotNet.Signed.4.2.1\lib\net35\YamlDotNet.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\OpenNLP.IKVM.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\YamlDotNet.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	
     @COPY /V "$(BinariesFolder)\ImageEdit.ocx" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @COPY /V "$(BinariesFolder)\UCLIDGenericDisplay2.ocx" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
