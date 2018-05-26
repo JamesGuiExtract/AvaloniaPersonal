@@ -318,8 +318,8 @@
 		<row><td>Binaries</td><td>{8F19E4E8-C671-43BF-A610-541055BFC7C6}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldcustomerrdt.rl</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{80F8B8EA-4FC3-4BEB-A725-3420A9439B18}</td><td>HELP</td><td>8</td><td/><td/><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISRegistryComponent</td><td>{775BB93C-F45F-4CDA-B0EF-7634480DA491}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>NonSelfRegCommon</td><td>{4CEEF54D-9017-40FC-BB20-28BA50FC1090}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NonSelfRegCommon</td><td>{4CEEF54D-9017-40FC-BB20-28BA50FC1090}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
