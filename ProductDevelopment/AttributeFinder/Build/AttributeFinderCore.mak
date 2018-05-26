@@ -252,6 +252,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Dashboard.Utilities.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Dashboard.Utilities.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Dashboard.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Dashboard.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract64.Core.dll" /mapout:"$(BinariesFolder)\Map\mapExtract64.Cores.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Code.Attributes.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Code.Attributes.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
 
 	@ECHO.
     @DATE /T
