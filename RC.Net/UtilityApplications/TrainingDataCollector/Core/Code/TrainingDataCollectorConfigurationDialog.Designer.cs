@@ -40,6 +40,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         {
             Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this._deleteMLDataButton = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this._limitProcessingByDateNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
@@ -77,7 +78,6 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._useVoaFileForExpectedsRadioButton = new System.Windows.Forms.RadioButton();
             this._useAttributeSetForExpectedsRadioButton = new System.Windows.Forms.RadioButton();
             this._scheduleTabPage = new System.Windows.Forms.TabPage();
-            this._deleteMLDataButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._limitProcessingByDateNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._lastIDProcessedNumericUpDown)).BeginInit();
@@ -111,6 +111,16 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.groupBox1.Size = new System.Drawing.Size(440, 132);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
+            // 
+            // _deleteMLDataButton
+            // 
+            this._deleteMLDataButton.Location = new System.Drawing.Point(299, 99);
+            this._deleteMLDataButton.Name = "_deleteMLDataButton";
+            this._deleteMLDataButton.Size = new System.Drawing.Size(135, 23);
+            this._deleteMLDataButton.TabIndex = 11;
+            this._deleteMLDataButton.Text = "Delete ML data...";
+            this._deleteMLDataButton.UseVisualStyleBackColor = true;
+            this._deleteMLDataButton.Click += new System.EventHandler(this.HandleDeleteMLDataButton_Click);
             // 
             // label6
             // 
@@ -522,10 +532,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._useVoaFileForExpectedsRadioButton.AutoSize = true;
             this._useVoaFileForExpectedsRadioButton.Location = new System.Drawing.Point(11, 42);
             this._useVoaFileForExpectedsRadioButton.Name = "_useVoaFileForExpectedsRadioButton";
-            this._useVoaFileForExpectedsRadioButton.Size = new System.Drawing.Size(222, 17);
+            this._useVoaFileForExpectedsRadioButton.Size = new System.Drawing.Size(307, 17);
             this._useVoaFileForExpectedsRadioButton.TabIndex = 12;
             this._useVoaFileForExpectedsRadioButton.TabStop = true;
-            this._useVoaFileForExpectedsRadioButton.Text = "Use VOA file configured in the settings file";
+            this._useVoaFileForExpectedsRadioButton.Text = "Use the configuration of the settings file for expected values";
             this._useVoaFileForExpectedsRadioButton.UseVisualStyleBackColor = true;
             // 
             // _useAttributeSetForExpectedsRadioButton
@@ -550,16 +560,6 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._scheduleTabPage.TabIndex = 1;
             this._scheduleTabPage.Text = "Schedule";
             this._scheduleTabPage.UseVisualStyleBackColor = true;
-            // 
-            // _deleteMLDataButton
-            // 
-            this._deleteMLDataButton.Location = new System.Drawing.Point(299, 99);
-            this._deleteMLDataButton.Name = "_deleteMLDataButton";
-            this._deleteMLDataButton.Size = new System.Drawing.Size(135, 23);
-            this._deleteMLDataButton.TabIndex = 11;
-            this._deleteMLDataButton.Text = "Delete ML data...";
-            this._deleteMLDataButton.UseVisualStyleBackColor = true;
-            this._deleteMLDataButton.Click += new System.EventHandler(this.HandleDeleteMLDataButton_Click);
             // 
             // TrainingDataCollectorConfigurationDialog
             // 

@@ -153,6 +153,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                     int fileTaskSessionID = fileProcessingDB.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, rec.FileID, rec.ActionID);
                     attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, _ATTRIBUTE_SET_NAME, voaData, false, true, true,
                         closeConnection: i == numFiles);
+
+                    fileProcessingDB.UpdateFileTaskSession(fileTaskSessionID, 0, 0, 0);
                 }
 
                 fileProcessingDB.RecordFAMSessionStop();

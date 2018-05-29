@@ -1025,7 +1025,11 @@ namespace Extract.AttributeFinder
                 var (imageFiles, answers) = GetImageFileListFromDB(databaseServer, databaseName, attributeSetName,
                     lowestIDToProcess, highestIDToProcess, useAttributeSetForExpected);
 
-                ExtractException.Assert("ELI45438", "No inputs available to process", imageFiles.Length > 0);
+                // It is possible that all files are missing so just return without doing anything if no images are found
+                if (imageFiles.Length == 0)
+                {
+                    return;
+                }
 
                 InputConfig.GetRelatedInputData(imageFiles, answers, runRuleSetForFeatures,
                     out string[] ussFiles, out string[] voaFiles, out AttributeOrAnswerCollection answersOrAnswerFiles,
@@ -1043,7 +1047,12 @@ namespace Extract.AttributeFinder
                     LabelAttributesSettings, altCDD,
                     _ => { }, cancelToken, updateAnswerCodes: true);
 
-                ExtractException.Assert("ELI45792", "No data to write", featureVectors.Length > 0);
+                // It is possible that no files in a batch have any candidate attributes so that even though there are images
+                // there will be no feature vectors to write
+                if (featureVectors.Length == 0)
+                {
+                    return;
+                }
 
                 var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, _ => { }, cancelToken);
 
@@ -1255,7 +1264,7 @@ namespace Extract.AttributeFinder
         /// Returns a connection to the specified database
         /// </summary>
         /// <param name="enlist">Whether to enlist in a transaction scope if there is one</param>
-        SqlConnection NewSqlDBConnection(string databaseServer, string databaseName, bool enlist = true)
+        static SqlConnection NewSqlDBConnection(string databaseServer, string databaseName, bool enlist = true)
         {
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
@@ -1288,6 +1297,14 @@ namespace Extract.AttributeFinder
 
                     bool getDocTypeFromVoa = useAttributeSetForExpected
                         && Usage == LearningMachineUsage.DocumentCategorization;
+
+                    // Check for a configuration error of using the LM specification for answers
+                    // when the LM doesn't specify a pattern
+                    ExtractException.Assert("ELI45988", "No answer source available. Try using the attribute set for expected values",
+                        Usage != LearningMachineUsage.DocumentCategorization
+                        || useAttributeSetForExpected
+                        || !string.IsNullOrEmpty(InputConfig.AnswerPath));
+
                     using (var cmd = connection.CreateCommand())
                     {
                         cmd.CommandText = useAttributeSetForExpected
@@ -1310,6 +1327,15 @@ namespace Extract.AttributeFinder
                         var afutil = new AFUtilityClass();
                         foreach (IDataRecord record in reader)
                         {
+                            // Filter out images that are missing or have missing uss files
+                            // so that this process doesn't log a ton of errors and/or fail at some later point
+                            var imagePath = record.GetString(0);
+                            var ussPath = imagePath + ".uss";
+                            if (!File.Exists(imagePath) || !File.Exists(ussPath))
+                            {
+                                continue;
+                            }
+
                             imagePaths.Add(record.GetString(0));
 
                             if (useAttributeSetForExpected)

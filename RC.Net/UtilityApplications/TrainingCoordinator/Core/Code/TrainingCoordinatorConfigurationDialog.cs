@@ -93,14 +93,13 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 InitializeDataGridView(_modelTrainersDataGridView);
 
                 SetControlValues(_settings);
-
-                _settings.PropertyChanged += HandleSettings_PropertyChanged;
             }
             catch (Exception ex)
             {
                 _settings = new TrainingCoordinator();
                 ex.ExtractDisplay("ELI45813");
             }
+            _settings.PropertyChanged += HandleSettings_PropertyChanged;
         }
 
         private void InitializeDataGridView(DataGridView dataGridView)
@@ -196,6 +195,8 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 {
                     _modelTrainersDataGridView.EndEdit();
                 }
+
+                _settings.PropertyChanged -= HandleSettings_PropertyChanged;
             }
             catch (Exception ex)
             {
@@ -765,6 +766,8 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                         string json = File.ReadAllText(openDialog.FileName);
                         var newSettings = TrainingCoordinator.FromJson(json);
 
+                        _settings.PropertyChanged -= HandleSettings_PropertyChanged;
+
                         // Apply loaded values through the UI
                         SetControlValues(newSettings);
                         ApplyControlValues();
@@ -776,6 +779,8 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                         {
                             service.Container = _settings;
                         }
+
+                        _settings.PropertyChanged += HandleSettings_PropertyChanged;
 
                         // Check for missing model names and prompt to add them
                         ValidateModelNames();

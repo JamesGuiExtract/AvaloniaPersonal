@@ -747,6 +747,9 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 
 		bool bRestrictionDefined = isRestrictionDefined();
 
+		IHasOCRParametersPtr ipHasOCRParameters(ipAFDoc);
+		ILongToLongMapPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
+
 		ISpatialStringPtr ipResult( CLSID_SpatialString );
 		ASSERT_RESOURCE_ALLOCATION("ELI18561", ipResult != __nullptr);
 
@@ -758,7 +761,7 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 				i) != vecActualPageNumbers.end();
 
 			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipInputText,
-				strSourceDoc, bPageSpecified, bRestrictionDefined, i);
+				strSourceDoc, bPageSpecified, bRestrictionDefined, ipOCRParameters, i);
 
 			// Append non-NULL content to the result string
 			if (ipContentFromThisPage != __nullptr)

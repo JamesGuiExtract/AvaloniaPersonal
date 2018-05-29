@@ -1281,6 +1281,9 @@ namespace Extract.AttributeFinder
 
                     if (MachineUsage == LearningMachineUsage.DocumentCategorization)
                     {
+                        ExtractException.Assert("ELI45987", "No answers specified",
+                            answersOrAnswerFiles != null);
+
                         string[] answers = answersOrAnswerFiles.Match(s => s,
                             _ => throw new ExtractException("ELI45782", "Internal logic error"));
 
@@ -1323,9 +1326,6 @@ namespace Extract.AttributeFinder
                     {
                         var results = GetAttributesFeatureVectorAndAnswerCollection(ussFilePaths, inputVOAs,
                             updateStatus2, cancellationToken);
-
-                        ExtractException.Assert("ELI41417", "No labeled candidate attributes found",
-                           results.Length > 0);
 
                         double[][] featureVectors = new double[results.Length][];
                         int[] answers = new int[results.Length];

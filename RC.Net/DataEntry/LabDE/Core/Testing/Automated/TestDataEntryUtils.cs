@@ -51,7 +51,7 @@ namespace Extract.DataEntry.Test
             CheckResult(expected: "02/14/2004", converted: Util.FormatDate("2/14/2004"));
 
             // single digit month and day, 2 digit year
-            CheckResult(expected: "02/04/1918", converted: Util.FormatDate("2/4/18"));
+            CheckResult(expected: "02/04/1919", converted: Util.FormatDate("2/4/19"));
 
             CheckResult(expected: "12/15/1958", converted: Util.FormatDate("12/15/58"));
             CheckResult(expected: "02/01/2012", converted: Util.FormatDate("2/1/2012"));
@@ -68,7 +68,7 @@ namespace Extract.DataEntry.Test
             CheckResult(expected: "12/15/1958", converted: Util.FormatDate("12151958"));
 
             // hyphen separators
-            CheckResult(expected: "02/04/1918", converted: Util.FormatDate("2-4-18"));
+            CheckResult(expected: "02/04/1919", converted: Util.FormatDate("2-4-19"));
             CheckResult(expected: "02/14/2004", converted: Util.FormatDate("2-14-2004"));
 
             // dot separators

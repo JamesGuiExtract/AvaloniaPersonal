@@ -587,6 +587,7 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                         , MaximumTrainingRecords = 10000
                         , MaximumTestingRecords = 10000
                         , LastIDProcessed = 50
+                        , MinimumF1Score = 0.5
                         , DatabaseServer = "(local)"
                         , DatabaseName = _DB_NAME
                     };

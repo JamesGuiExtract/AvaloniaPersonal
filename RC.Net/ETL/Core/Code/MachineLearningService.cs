@@ -4,6 +4,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -251,6 +252,7 @@ namespace Extract.ETL
 
         #region Protected Methods
 
+        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "builder")]
         protected void ChangeAnswer(string oldAnswer, string newAnswer, string lmPath)
         {
             try
@@ -276,7 +278,7 @@ namespace Extract.ETL
                     cmd.CommandText = _GET_ALL_MLDATA_FOR_NAME;
                     cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
                     using (var adapter = new SqlDataAdapter(cmd))
-                    using (var dt = new DataTable())
+                    using (var dt = new DataTable { Locale = CultureInfo.CurrentCulture })
                     {
                         var builder = new SqlCommandBuilder(adapter);
                         adapter.Fill(dt);

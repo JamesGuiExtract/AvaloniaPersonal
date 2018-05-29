@@ -242,7 +242,7 @@ namespace Extract.ETL
         /// Saves <see paramref="status"/> to the DB for this <see cref="DatabaseServiceID"/>
         /// </summary>
         /// <param name="status">The <see cref="DatabaseServiceStatus"/> instance to save</param>
-        protected void SaveStatus(DatabaseServiceStatus status)
+        public void SaveStatus(DatabaseServiceStatus status)
         {
             if (DatabaseServiceID <= 0)
             {
@@ -289,13 +289,14 @@ namespace Extract.ETL
         /// <param name="creator">The function used to create a new instance, if needed</param>
         protected T GetLastOrCreateStatus<T>(Func<T> creator) where T : DatabaseServiceStatus
         {
-            using (var connection = NewSqlDBConnection())
+            if (DatabaseServiceID <= 0)
+            {
+                return creator();
+            }
+
+            using (var connection = NewSqlDBConnection(enlist: false))
             {
                 connection.Open();
-                if (DatabaseServiceID <= 0)
-                {
-                    return creator();
-                }
 
                 // need to get the previous status
                 var statusCmd = connection.CreateCommand();
@@ -401,10 +402,11 @@ namespace Extract.ETL
         #region Helper members
 
         /// <summary>
-        /// Returns a connection to the configured database. Can be overridden if needed
+        /// Returns a connection to the configured database
         /// </summary>
+        /// <param name="enlist">Whether to enlist in a transaction scope if there is one</param>
         /// <returns>SqlConnection that connects to the <see cref="DatabaseServer"/> and <see cref="DatabaseName"/></returns>
-        protected virtual SqlConnection NewSqlDBConnection()
+        protected virtual SqlConnection NewSqlDBConnection(bool enlist = true)
         {
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
@@ -413,6 +415,7 @@ namespace Extract.ETL
             sqlConnectionBuild.IntegratedSecurity = true;
             sqlConnectionBuild.NetworkLibrary = "dbmssocn";
             sqlConnectionBuild.MultipleActiveResultSets = true;
+            sqlConnectionBuild.Enlist = enlist;
             return new SqlConnection( sqlConnectionBuild.ConnectionString);
         }
 

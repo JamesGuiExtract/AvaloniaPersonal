@@ -8,6 +8,7 @@ using Extract.ETL;
 using Extract.Utilities;
 using Extract.Code.Attributes;
 using System.Transactions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Extract.UtilityApplications.TrainingDataCollector
 {
@@ -146,7 +147,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// for expected values rather than the configured VOA file path in the settings file
         /// </summary>
         [DataMember]
-        public bool UseAttributeSetForExpecteds { get; set; }
+        public bool UseAttributeSetForExpecteds { get; set; } = true;
 
         /// <summary>
         /// Whether to run a ruleset for candidate attributes or protofeature attributes rather than using
@@ -168,10 +169,18 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         public string FeatureRulesetPath { get; set; }
 
         /// <summary>
+        /// The path to a ruleset to use for generating candidate or protofeature attributes, based on the <see cref="RootDir"/>
+        /// </summary>
+        public string QualifiedFeatureRulesetPath =>
+            string.IsNullOrWhiteSpace(FeatureRulesetPath) || Path.IsPathRooted(FeatureRulesetPath) || string.IsNullOrWhiteSpace(RootDir)
+            ? FeatureRulesetPath
+            : Path.Combine(RootDir, FeatureRulesetPath);
+
+        /// <summary>
         /// Limits the attribute set for files processed to the most recent only
         /// </summary>
         [DataMember]
-        public TimeSpan LimitProcessingToMostRecent { get; set; }
+        public TimeSpan LimitProcessingToMostRecent { get; set; } = TimeSpan.FromDays(30);
 
         #endregion Properties
 
@@ -252,8 +261,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                             { IsolationLevel = IsolationLevel.ReadCommitted,
                               Timeout = TransactionManager.MaximumTimeout }))
                         {
-                            var connection = NewSqlDBConnection();
-                            NERAnnotator.NERAnnotator.Process(settings, _ => { }, cancelToken, connection);
+                            NERAnnotator.NERAnnotator.Process(settings, _ => { }, cancelToken);
 
                             // Save status to the DB each loop
                             SaveStatus();
@@ -281,7 +289,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                                 long highestIDToProcess = availableIDs[Math.Min(i + 499, availableIDs.Count - 1)];
                                 machine.WriteDataToDatabase(cancelToken, DatabaseServer, DatabaseName, AttributeSetName, QualifiedModelName,
                                         lowestIDToProcess, highestIDToProcess, UseAttributeSetForExpecteds,
-                                        RunRulesetForCandidateOrFeatures, RunRulesetIfVoaIsMissing, FeatureRulesetPath);
+                                        RunRulesetForCandidateOrFeatures, RunRulesetIfVoaIsMissing, QualifiedFeatureRulesetPath);
 
                                 LastIDProcessed = highestIDToProcess;
 
@@ -325,6 +333,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public override int GetUnprocessedRecordCount()
         {
             using (var connection = NewSqlDBConnection())
@@ -466,6 +475,18 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         #region Private Methods
 
         /// <summary>
+        /// Called when this instance is being deserialized.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserializing]
+        void OnDeserializing(StreamingContext context)
+        {
+            // Set default for new settings
+            LimitProcessingToMostRecent = TimeSpan.FromDays(30);
+            UseAttributeSetForExpecteds = true;
+        }
+
+        /// <summary>
         /// Called after this instance is deserialized.
         /// </summary>
         /// <param name="context">The context.</param>
@@ -488,7 +509,15 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         void SaveStatus()
         {
-            SaveStatus(_status);
+            if (Container is DatabaseService hasStatusRecord
+                && Container is IHasConfigurableDatabaseServiceStatus hasStatus)
+            {
+                hasStatusRecord.SaveStatus(hasStatus.Status);
+            }
+            else
+            {
+                SaveStatus(_status);
+            }
         }
 
         #endregion Private Methods

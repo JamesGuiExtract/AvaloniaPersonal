@@ -120,12 +120,11 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <param name="settings">The settings to use for annotation</param>
         /// <param name="updateStatus">Action to be used to pass status updates back to the caller</param>
         /// <param name="cancellationToken">Token to be used by the caller to cancel the processing</param>
-        public static void Process(Settings settings, Action<StatusArgs> updateStatus, CancellationToken cancellationToken,
-            SqlConnection connection = null)
+        public static void Process(Settings settings, Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             try
             {
-                (new NERAnnotator(settings, updateStatus, cancellationToken)).Process(connection);
+                (new NERAnnotator(settings, updateStatus, cancellationToken)).Process();
             }
             catch (Exception ex)
             {
@@ -140,7 +139,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <summary>
         /// Processes the files-to-be-annotated
         /// </summary>
-        void Process(SqlConnection connection)
+        void Process()
         {
             string previousDirectory = Directory.GetCurrentDirectory();
             try
@@ -168,17 +167,21 @@ namespace Extract.UtilityApplications.NERAnnotator
                         ? null
                         : _settings.TrainingInput, getPages: true);
 
-                    // Make a separate random generator for splitting the input
-                    var rng = _settings.RandomSeedForSetDivision.HasValue
-                        ? new Random(_settings.RandomSeedForSetDivision.Value)
-                        : new Random();
-                    CollectionMethods.Shuffle(trainingFiles, rng);
-                    var temp = trainingFiles;
-                    int testingSetSize = temp.Length * _settings.PercentToUseForTestingSet / 100;
-                    testingFiles = new(string ussPath, int page)[testingSetSize];
-                    trainingFiles = new(string ussPath, int page)[temp.Length - testingSetSize];
-                    Array.Copy(temp, testingFiles, testingSetSize);
-                    Array.Copy(temp, testingSetSize, trainingFiles, 0, trainingFiles.Length);
+                    int testingSetSize = trainingFiles.Length * _settings.PercentToUseForTestingSet / 100;
+
+                    if (testingSetSize > 0)
+                    {
+                        // Make a separate random generator for splitting the input
+                        var rng = _settings.RandomSeedForSetDivision.HasValue
+                            ? new Random(_settings.RandomSeedForSetDivision.Value)
+                            : new Random();
+                        CollectionMethods.Shuffle(trainingFiles, rng);
+                        var temp = trainingFiles;
+                        testingFiles = new(string ussPath, int page)[testingSetSize];
+                        trainingFiles = new(string ussPath, int page)[temp.Length - testingSetSize];
+                        Array.Copy(temp, testingFiles, testingSetSize);
+                        Array.Copy(temp, testingSetSize, trainingFiles, 0, trainingFiles.Length);
+                    }
                 }
                 else
                 {
@@ -418,7 +421,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                 else
                 {
                     // Write extra line as a document separator
-                    File.WriteAllLines(outputFile, records.Select(t => t.data + "\r\n"));
+                    File.AppendAllLines(outputFile, records.Select(t => t.data));
                 }
             }
             catch (OperationCanceledException)

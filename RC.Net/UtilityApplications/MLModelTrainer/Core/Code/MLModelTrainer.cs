@@ -6,6 +6,7 @@ using Extract.UtilityApplications.TrainingDataCollector;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -529,6 +530,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public override int GetUnprocessedRecordCount()
         {
             using (var connection = NewSqlDBConnection())
@@ -1059,7 +1061,19 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// </summary>
         void SaveStatus()
         {
-            SaveStatus(_status);
+            using (var connection = NewSqlDBConnection())
+            {
+                connection.Open();
+                if (Container is DatabaseService hasStatusRecord
+                    && Container is IHasConfigurableDatabaseServiceStatus hasStatus)
+                {
+                    hasStatusRecord.SaveStatus(hasStatus.Status);
+                }
+                else
+                {
+                    SaveStatus(_status);
+                }
+            }
         }
 
         #endregion Private Methods
