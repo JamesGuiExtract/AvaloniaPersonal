@@ -204,7 +204,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                         continue;
                     }
 
-                    int newDataCount = service.GetUnprocessedRecordCount();
+                    int newDataCount = service.CalculateUnprocessedRecordCount();
                     if (newDataCount == 0
                         && service is TrainingDataCollector.TrainingDataCollector
                         || newDataCount < MinimumNewRecordsRequiredForTraining

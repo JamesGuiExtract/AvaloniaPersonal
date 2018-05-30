@@ -333,8 +333,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             }
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public override int GetUnprocessedRecordCount()
+        public override int CalculateUnprocessedRecordCount()
         {
             using (var connection = NewSqlDBConnection())
             {
@@ -379,9 +378,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         /// <param name="oldAnswer">The answer to be changed (must exist in the LearningMachine)</param>
         /// <param name="newAnswer">The new answer to change to (must not exist in the LearningMachine)</param>
-        public override void ChangeAnswer(string oldAnswer, string newAnswer)
+        public override bool ChangeAnswer(string oldAnswer, string newAnswer)
         {
-            ChangeAnswer(oldAnswer, newAnswer, DataGeneratorPath);
+            return ChangeAnswer(oldAnswer, newAnswer, QualifiedDataGeneratorPath);
         }
 
         #endregion Public Methods

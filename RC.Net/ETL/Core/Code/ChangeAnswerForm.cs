@@ -24,8 +24,12 @@ namespace Extract.ETL
                 {
                     string oldAnswer = _oldAnswerTextBox.Text;
                     string newAnswer = _newAnswerTextBox.Text;
-                    _service.ChangeAnswer(oldAnswer, newAnswer);
-                    UtilityMethods.ShowMessageBox(UtilityMethods.FormatCurrent($"Changed {oldAnswer} to {newAnswer}"), "Success", false);
+                    bool changedAnything = _service.ChangeAnswer(oldAnswer, newAnswer);
+
+                    if (!changedAnything)
+                    {
+                        DialogResult = DialogResult.None;
+                    }
                 }
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
 ﻿using Extract.AttributeFinder;
+using Extract.Utilities;
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Data;
@@ -236,8 +237,7 @@ namespace Extract.ETL
         /// When overridden by a derived class, will return the count of new MLData records
         /// since last processing occurred
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public abstract int GetUnprocessedRecordCount();
+        public abstract int CalculateUnprocessedRecordCount();
 
         /// <summary>
         /// When overridden by a derived class, will change an answer, e.g., a doctype, in
@@ -246,31 +246,51 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="oldAnswer">The answer to be changed (must exist in the LearningMachine)</param>
         /// <param name="newAnswer">The new answer to change to (must not exist in the LearningMachine)</param>
-        public abstract void ChangeAnswer(string oldAnswer, string newAnswer);
+        public abstract bool ChangeAnswer(string oldAnswer, string newAnswer);
 
         #endregion Abstract Methods
 
         #region Protected Methods
 
-        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "builder")]
-        protected void ChangeAnswer(string oldAnswer, string newAnswer, string lmPath)
+        protected bool ChangeAnswer(string oldAnswer, string newAnswer, string lmPath)
         {
             try
             {
                 // Prevent unneeded work but allow a change in case
                 if (string.Equals(oldAnswer, newAnswer, StringComparison.Ordinal))
                 {
-                    return;
+                    (new ExtractException("ELI45991", "Both values are the same")).Display();
+                    return false;
                 }
 
                 // Change in the data encoder
-                using (var lm = LearningMachine.Load(lmPath))
+                bool encoderUpdated = false;
+                try
                 {
-                    lm.Encoder.ChangeAnswer(oldAnswer, newAnswer);
-                    lm.Save(lmPath);
+                    using (var lm = LearningMachine.Load(lmPath))
+                    {
+                        if (lm.Encoder.AnswerNameToCode.ContainsKey(oldAnswer))
+                        {
+                            lm.Encoder.ChangeAnswer(oldAnswer, newAnswer);
+                            lm.Save(lmPath);
+                            encoderUpdated = true;
+                        }
+                        else
+                        {
+                            string message = UtilityMethods.FormatCurrent($"Answer \"{oldAnswer}\" doesn't exist in",
+                                $" \"{lmPath}\"");
+                            UtilityMethods.ShowMessageBox(message, "Nothing to change", false);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI45990");
+                    return false;
                 }
 
                 // Change ML Data in the DB
+                int rowsChanged = 0;
                 using (var connection = NewSqlDBConnection())
                 {
                     connection.Open();
@@ -280,7 +300,8 @@ namespace Extract.ETL
                     using (var adapter = new SqlDataAdapter(cmd))
                     using (var dt = new DataTable { Locale = CultureInfo.CurrentCulture })
                     {
-                        var builder = new SqlCommandBuilder(adapter);
+                        var builder = new SqlCommandBuilder();
+                        builder.DataAdapter = adapter;
                         adapter.Fill(dt);
                         foreach (DataRow row in dt.Rows)
                         {
@@ -297,9 +318,34 @@ namespace Extract.ETL
                                 }
                             }
                         }
-                        adapter.Update(dt);
+                        rowsChanged = adapter.Update(dt);
                     }
                 }
+
+                bool changedAnything = encoderUpdated || rowsChanged > 0;
+
+                if (!changedAnything)
+                {
+                    string message = UtilityMethods.FormatCurrent($"Attempted to change \"{oldAnswer}\" to \"{newAnswer}\"",
+                        $" but nothing was changed");
+                    UtilityMethods.ShowMessageBox(message, "Failure", true);
+                }
+                else
+                {
+                    string message = UtilityMethods.FormatCurrent($"Changed \"{oldAnswer}\" to \"{newAnswer}\"");
+                    if (encoderUpdated)
+                    {
+                        message += UtilityMethods.FormatCurrent($"\r\n\r\nUpdated \"{lmPath}\"");
+                    }
+                    else
+                    {
+                        message += UtilityMethods.FormatCurrent($"\r\n\r\nDid not update \"{lmPath}\"");
+                    }
+                    message += UtilityMethods.FormatCurrent($"\r\n\r\nUpdated {rowsChanged} DB records");
+                    UtilityMethods.ShowMessageBox(message, "Success", false);
+                }
+
+                return changedAnything;
             }
             catch (Exception ex)
             {

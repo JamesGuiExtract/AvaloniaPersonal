@@ -622,15 +622,21 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Change an answer (e.g., document type)
+        /// </summary>
+        /// <param name="oldAnswer">The name to change from</param>
+        /// <param name="newAnswer">The name to change to</param>
+        /// <remarks>Throws an exception if the <see paramref="oldAnswer"/> doesn't exist</remarks>
         public void ChangeAnswer(string oldAnswer, string newAnswer)
         {
             try
             {
-                ExtractException.Assert("ELI45848", "Answer to change doesn't exist",
+                ExtractException.Assert("ELI45848", "Answer to change doesn't exist in the encoder",
                     AnswerNameToCode.ContainsKey(oldAnswer));
 
                 // Ensure new name doesn't exist already but allow change of case (so use Ordinal comparison)
-                ExtractException.Assert("ELI45849", "New answer already exists",
+                ExtractException.Assert("ELI45849", "New answer already exists in the encoder",
                     !AnswerNameToCode.Keys.Contains(newAnswer, StringComparer.Ordinal));
 
                 int code = AnswerNameToCode[oldAnswer];
