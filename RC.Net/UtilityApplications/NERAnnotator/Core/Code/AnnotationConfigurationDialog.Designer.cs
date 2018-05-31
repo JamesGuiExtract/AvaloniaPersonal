@@ -46,9 +46,6 @@
             this._testingInputTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this._trainingInputTextBox = new System.Windows.Forms.TextBox();
-            this._toolKitGroupBox = new System.Windows.Forms.GroupBox();
-            this._stanfordNerRadioButton = new System.Windows.Forms.RadioButton();
-            this._openNlpRadioButton = new System.Windows.Forms.RadioButton();
             this._sentenceDetectorGroupBox = new System.Windows.Forms.GroupBox();
             this._sentenceDetectorPathBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._sentenceDetectorPathTextBox = new System.Windows.Forms.TextBox();
@@ -80,12 +77,14 @@
             this.label1 = new System.Windows.Forms.Label();
             this._workingDirTextBox = new System.Windows.Forms.TextBox();
             this._failIfOutputFileExistsCheckBox = new System.Windows.Forms.CheckBox();
+            this._fkbVersionGroupBox = new System.Windows.Forms.GroupBox();
+            this._fkbVersionTextBox = new System.Windows.Forms.TextBox();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._entityDefinitionDataGridView)).BeginInit();
             this.groupBox1.SuspendLayout();
-            this._toolKitGroupBox.SuspendLayout();
             this._sentenceDetectorGroupBox.SuspendLayout();
             this._tokenizerGroupBox.SuspendLayout();
+            this._fkbVersionGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // _processButton
@@ -294,42 +293,6 @@
             this._trainingInputTextBox.TabIndex = 1;
             this._trainingInputTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
-            // _toolKitGroupBox
-            // 
-            this._toolKitGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._toolKitGroupBox.Controls.Add(this._stanfordNerRadioButton);
-            this._toolKitGroupBox.Controls.Add(this._openNlpRadioButton);
-            this._toolKitGroupBox.Location = new System.Drawing.Point(7, 263);
-            this._toolKitGroupBox.Name = "_toolKitGroupBox";
-            this._toolKitGroupBox.Size = new System.Drawing.Size(602, 45);
-            this._toolKitGroupBox.TabIndex = 14;
-            this._toolKitGroupBox.TabStop = false;
-            this._toolKitGroupBox.Text = "Format";
-            // 
-            // _stanfordNerRadioButton
-            // 
-            this._stanfordNerRadioButton.AutoSize = true;
-            this._stanfordNerRadioButton.Location = new System.Drawing.Point(84, 18);
-            this._stanfordNerRadioButton.Name = "_stanfordNerRadioButton";
-            this._stanfordNerRadioButton.Size = new System.Drawing.Size(91, 17);
-            this._stanfordNerRadioButton.TabIndex = 1;
-            this._stanfordNerRadioButton.TabStop = true;
-            this._stanfordNerRadioButton.Text = "Stanford NER";
-            this._stanfordNerRadioButton.UseVisualStyleBackColor = true;
-            this._stanfordNerRadioButton.CheckedChanged += new System.EventHandler(this.HandleValueChanged);
-            // 
-            // _openNlpRadioButton
-            // 
-            this._openNlpRadioButton.AutoSize = true;
-            this._openNlpRadioButton.Location = new System.Drawing.Point(6, 19);
-            this._openNlpRadioButton.Name = "_openNlpRadioButton";
-            this._openNlpRadioButton.Size = new System.Drawing.Size(72, 17);
-            this._openNlpRadioButton.TabIndex = 0;
-            this._openNlpRadioButton.Text = "OpenNLP";
-            this._openNlpRadioButton.UseVisualStyleBackColor = true;
-            this._openNlpRadioButton.CheckedChanged += new System.EventHandler(this.HandleValueChanged);
-            // 
             // _sentenceDetectorGroupBox
             // 
             this._sentenceDetectorGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -349,6 +312,8 @@
             // _sentenceDetectorPathBrowseButton
             // 
             this._sentenceDetectorPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._sentenceDetectorPathBrowseButton.EnsureFileExists = false;
+            this._sentenceDetectorPathBrowseButton.EnsurePathExists = false;
             this._sentenceDetectorPathBrowseButton.Location = new System.Drawing.Point(571, 39);
             this._sentenceDetectorPathBrowseButton.Name = "_sentenceDetectorPathBrowseButton";
             this._sentenceDetectorPathBrowseButton.Size = new System.Drawing.Size(24, 22);
@@ -466,6 +431,8 @@
             // _tokenizerPathBrowseButton
             // 
             this._tokenizerPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._tokenizerPathBrowseButton.EnsureFileExists = false;
+            this._tokenizerPathBrowseButton.EnsurePathExists = false;
             this._tokenizerPathBrowseButton.Location = new System.Drawing.Point(572, 46);
             this._tokenizerPathBrowseButton.Name = "_tokenizerPathBrowseButton";
             this._tokenizerPathBrowseButton.Size = new System.Drawing.Size(24, 22);
@@ -666,6 +633,26 @@
             this._failIfOutputFileExistsCheckBox.UseVisualStyleBackColor = true;
             this._failIfOutputFileExistsCheckBox.CheckedChanged += new System.EventHandler(this.HandleValueChanged);
             // 
+            // _fkbVersionGroupBox
+            // 
+            this._fkbVersionGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._fkbVersionGroupBox.Controls.Add(this._fkbVersionTextBox);
+            this._fkbVersionGroupBox.Location = new System.Drawing.Point(7, 263);
+            this._fkbVersionGroupBox.Name = "_fkbVersionGroupBox";
+            this._fkbVersionGroupBox.Size = new System.Drawing.Size(602, 45);
+            this._fkbVersionGroupBox.TabIndex = 14;
+            this._fkbVersionGroupBox.TabStop = false;
+            this._fkbVersionGroupBox.Text = "FKB Version";
+            // 
+            // _fkbVersionTextBox
+            // 
+            this._fkbVersionTextBox.Location = new System.Drawing.Point(6, 19);
+            this._fkbVersionTextBox.Name = "_fkbVersionTextBox";
+            this._fkbVersionTextBox.Size = new System.Drawing.Size(144, 20);
+            this._fkbVersionTextBox.TabIndex = 0;
+            this._fkbVersionTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            // 
             // AnnotationConfigurationDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -688,7 +675,7 @@
             this.Controls.Add(this.saveMachineButton);
             this.Controls.Add(this.saveMachineAsButton);
             this.Controls.Add(this.openMachineButton);
-            this.Controls.Add(this._toolKitGroupBox);
+            this.Controls.Add(this._fkbVersionGroupBox);
             this.Controls.Add(this._sentenceDetectorGroupBox);
             this.Controls.Add(this._tokenizerGroupBox);
             this.Controls.Add(this.groupBox1);
@@ -704,12 +691,12 @@
             ((System.ComponentModel.ISupportInitialize)(this._entityDefinitionDataGridView)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this._toolKitGroupBox.ResumeLayout(false);
-            this._toolKitGroupBox.PerformLayout();
             this._sentenceDetectorGroupBox.ResumeLayout(false);
             this._sentenceDetectorGroupBox.PerformLayout();
             this._tokenizerGroupBox.ResumeLayout(false);
             this._tokenizerGroupBox.PerformLayout();
+            this._fkbVersionGroupBox.ResumeLayout(false);
+            this._fkbVersionGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -732,9 +719,6 @@
         private System.Windows.Forms.TextBox _randomSeedForSetDivisionTextBox;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox _percentToUseForTestingSetTextBox;
-        private System.Windows.Forms.GroupBox _toolKitGroupBox;
-        private System.Windows.Forms.RadioButton _stanfordNerRadioButton;
-        private System.Windows.Forms.RadioButton _openNlpRadioButton;
         private System.Windows.Forms.GroupBox _sentenceDetectorGroupBox;
         private Utilities.Forms.BrowseButton _sentenceDetectorPathBrowseButton;
         private System.Windows.Forms.TextBox _tokenizerPathTextBox;
@@ -768,5 +752,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox _workingDirTextBox;
         private System.Windows.Forms.CheckBox _failIfOutputFileExistsCheckBox;
+        private System.Windows.Forms.GroupBox _fkbVersionGroupBox;
+        private System.Windows.Forms.TextBox _fkbVersionTextBox;
     }
 }

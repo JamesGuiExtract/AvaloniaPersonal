@@ -584,14 +584,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     _settings.PercentUninterestingPagesToInclude = val;
                 }
 
-                if (_openNlpRadioButton.Checked)
-                {
-                    _settings.Format = NamedEntityRecognizer.OpenNLP;
-                }
-                else
-                {
-                    _settings.Format = NamedEntityRecognizer.Stanford;
-                }
+                _settings.Format = NamedEntityRecognizer.OpenNLP;
 
                 _settings.SplitIntoSentences = _splitIntoSentencesCheckBox.Checked;
                 _settings.SentenceDetectionModelPath = _sentenceDetectorPathTextBox.Text;
@@ -609,6 +602,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                 }
 
                 _settings.TokenizerModelPath = _tokenizerPathTextBox.Text;
+                _settings.FKBVersion = _fkbVersionTextBox.Text;
 
                 UpdateButtonStates();
             }
@@ -635,8 +629,6 @@ namespace Extract.UtilityApplications.NERAnnotator
                     _randomSeedForSetDivisionTextBox.Enabled = _randomlyTakeFromTrainingSetRadioButton.Checked;
 
                 _testingInputTextBox.Enabled = _useSpecifiedTestingSetRadioButton.Checked;
-                _sentenceDetectorGroupBox.Enabled =
-                    _tokenizerGroupBox.Enabled = _openNlpRadioButton.Checked;
                 _sentenceDetectorPathTextBox.Enabled =
                     _sentenceDetectorPathBrowseButton.Enabled =
                     _sentenceDetectorPathTagsButton.Enabled = _splitIntoSentencesCheckBox.Checked;
@@ -700,15 +692,6 @@ namespace Extract.UtilityApplications.NERAnnotator
             _failIfOutputFileExistsCheckBox.Checked = _settings.FailIfOutputFileExists;
             _percentNonInterestingPagesToIncludeTextBox.Text = _settings.PercentUninterestingPagesToInclude.ToString(CultureInfo.CurrentCulture);
             _randomSeedForPageInclusionTextBox.Text = _settings.RandomSeedForPageInclusion?.ToString(CultureInfo.CurrentCulture) ?? "";
-            if (_settings.Format == NamedEntityRecognizer.OpenNLP)
-            {
-                _openNlpRadioButton.Checked = true;
-            }
-            else if (_settings.Format == NamedEntityRecognizer.Stanford)
-            {
-                _stanfordNerRadioButton.Checked = true;
-            }
-
             _splitIntoSentencesCheckBox.Checked = _settings.SplitIntoSentences;
             _sentenceDetectorPathTextBox.Text = _settings.SentenceDetectionModelPath;
             if (_settings.TokenizerType == OpenNlpTokenizer.WhiteSpaceTokenizer)
@@ -724,6 +707,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                 _learnableTokenizerRadioButton.Checked = true;
             }
             _tokenizerPathTextBox.Text = _settings.TokenizerModelPath;
+            _fkbVersionTextBox.Text = _settings.FKBVersion;
 
             Dirty = false;
 
@@ -838,6 +822,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         public long LastIDToProcess { get;  set; }
         public long FirstIDToProcess { get; set; }
         public bool UseAttributeSetForTypes { get; set; }
+        public string FKBVersion { get; set; }
 
         public static Settings LoadFrom(string filename)
         {

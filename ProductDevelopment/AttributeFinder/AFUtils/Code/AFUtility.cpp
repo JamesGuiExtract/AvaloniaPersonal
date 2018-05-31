@@ -1584,11 +1584,15 @@ void CAFUtility::validateLicense()
 void CAFUtility::getComponentDataFolder(IAFDocumentPtr ipAFDoc, string& rFolder)
 {
 	// Get the Component Data Folder from the AFDoc if possible
-	IVariantVectorPtr rsdFileStack = ipAFDoc->RSDFileStack;
-	if (rsdFileStack != __nullptr && rsdFileStack->Size > 0)
+	// Changed this to not check the rsd stack so that I could use an AFDoc to pass along an FKB
+	// without using a dummy RSD file
+	// https://extract.atlassian.net/browse/ISSUE-15466
+	_bstr_t bstrFKB = ipAFDoc->FKBVersion;
+	_bstr_t bstrAltCCDir = ipAFDoc->AlternateComponentDataDir;
+	if (SysStringLen(bstrFKB) != 0 || SysStringLen(bstrAltCCDir) != 0)
 	{
 		rFolder = m_ipEngine->
-			GetComponentDataFolder2(ipAFDoc->FKBVersion, ipAFDoc->AlternateComponentDataDir);
+			GetComponentDataFolder2(bstrFKB, bstrAltCCDir);
 	}
 	else
 	{

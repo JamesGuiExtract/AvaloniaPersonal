@@ -40,9 +40,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MLModelTrainerConfigurationDialog));
-            Extract.Utilities.ScheduledEvent scheduledEvent2 = new Extract.Utilities.ScheduledEvent();
+            Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this._editButton = new System.Windows.Forms.Button();
             this._manageMLModelsButton = new System.Windows.Forms.Button();
             this._addModelButton = new System.Windows.Forms.Button();
             this._modelNameComboBox = new System.Windows.Forms.ComboBox();
@@ -73,6 +72,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this._deleteMLDataButton = new System.Windows.Forms.Button();
             this._markOldDataForDeletionCheckBox = new System.Windows.Forms.CheckBox();
             this._emailSubjectTextBox = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
@@ -88,7 +88,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._nerModelTypeRadioButton = new System.Windows.Forms.RadioButton();
             this._scheduleTabPage = new System.Windows.Forms.TabPage();
             this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
-            this._deleteMLDataButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._maxTestingRecordsNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._minF1ScoreNumericUpDown)).BeginInit();
@@ -108,7 +107,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this._editButton);
             this.groupBox1.Controls.Add(this._manageMLModelsButton);
             this.groupBox1.Controls.Add(this._addModelButton);
             this.groupBox1.Controls.Add(this._modelNameComboBox);
@@ -127,16 +125,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.groupBox1.Size = new System.Drawing.Size(608, 129);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
-            // 
-            // _editButton
-            // 
-            this._editButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._editButton.Location = new System.Drawing.Point(536, 98);
-            this._editButton.Name = "_editButton";
-            this._editButton.Size = new System.Drawing.Size(61, 20);
-            this._editButton.TabIndex = 14;
-            this._editButton.Text = "Edit...";
-            this._editButton.UseVisualStyleBackColor = true;
             // 
             // _manageMLModelsButton
             // 
@@ -175,7 +163,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._modelDestinationPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._modelDestinationPathBrowseButton.EnsureFileExists = false;
             this._modelDestinationPathBrowseButton.EnsurePathExists = false;
-            this._modelDestinationPathBrowseButton.Location = new System.Drawing.Point(503, 98);
+            this._modelDestinationPathBrowseButton.Location = new System.Drawing.Point(570, 98);
             this._modelDestinationPathBrowseButton.Name = "_modelDestinationPathBrowseButton";
             this._modelDestinationPathBrowseButton.Size = new System.Drawing.Size(27, 20);
             this._modelDestinationPathBrowseButton.TabIndex = 13;
@@ -189,7 +177,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             | System.Windows.Forms.AnchorStyles.Right)));
             this._modelDestinationPathTextBox.Location = new System.Drawing.Point(120, 98);
             this._modelDestinationPathTextBox.Name = "_modelDestinationPathTextBox";
-            this._modelDestinationPathTextBox.Size = new System.Drawing.Size(377, 20);
+            this._modelDestinationPathTextBox.Size = new System.Drawing.Size(443, 20);
             this._modelDestinationPathTextBox.TabIndex = 11;
             // 
             // _modelPathLabel
@@ -499,6 +487,16 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             // 
+            // _deleteMLDataButton
+            // 
+            this._deleteMLDataButton.Location = new System.Drawing.Point(463, 66);
+            this._deleteMLDataButton.Name = "_deleteMLDataButton";
+            this._deleteMLDataButton.Size = new System.Drawing.Size(135, 23);
+            this._deleteMLDataButton.TabIndex = 21;
+            this._deleteMLDataButton.Text = "Delete ML data...";
+            this._deleteMLDataButton.UseVisualStyleBackColor = true;
+            this._deleteMLDataButton.Click += new System.EventHandler(this.HandleDeleteMLDataButton_Click);
+            // 
             // _markOldDataForDeletionCheckBox
             // 
             this._markOldDataForDeletionCheckBox.AutoSize = true;
@@ -657,23 +655,13 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._schedulerControl.Name = "_schedulerControl";
             this._schedulerControl.Size = new System.Drawing.Size(383, 153);
             this._schedulerControl.TabIndex = 23;
-            scheduledEvent2.Duration = null;
-            scheduledEvent2.Enabled = true;
-            scheduledEvent2.End = null;
-            scheduledEvent2.Exclusions = new Extract.Utilities.ScheduledEvent[0];
-            scheduledEvent2.RecurrenceUnit = null;
-            scheduledEvent2.Start = new System.DateTime(2018, 3, 23, 11, 16, 13, 0);
-            this._schedulerControl.Value = scheduledEvent2;
-            // 
-            // _deleteMLDataButton
-            // 
-            this._deleteMLDataButton.Location = new System.Drawing.Point(463, 66);
-            this._deleteMLDataButton.Name = "_deleteMLDataButton";
-            this._deleteMLDataButton.Size = new System.Drawing.Size(135, 23);
-            this._deleteMLDataButton.TabIndex = 21;
-            this._deleteMLDataButton.Text = "Delete ML data...";
-            this._deleteMLDataButton.UseVisualStyleBackColor = true;
-            this._deleteMLDataButton.Click += new System.EventHandler(this.HandleDeleteMLDataButton_Click);
+            scheduledEvent1.Duration = null;
+            scheduledEvent1.Enabled = true;
+            scheduledEvent1.End = null;
+            scheduledEvent1.Exclusions = new Extract.Utilities.ScheduledEvent[0];
+            scheduledEvent1.RecurrenceUnit = null;
+            scheduledEvent1.Start = new System.DateTime(2018, 3, 23, 11, 16, 13, 0);
+            this._schedulerControl.Value = scheduledEvent1;
             // 
             // MLModelTrainerConfigurationDialog
             // 
@@ -760,7 +748,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
         private System.Windows.Forms.RadioButton _nerModelTypeRadioButton;
         private System.Windows.Forms.RadioButton _lmModelTypeRadioButton;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.Button _editButton;
         private System.Windows.Forms.CheckBox _markOldDataForDeletionCheckBox;
         private System.Windows.Forms.Button _changeAnswerButton;
         private System.Windows.Forms.Button _deleteMLDataButton;

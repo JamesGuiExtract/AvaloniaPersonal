@@ -429,7 +429,8 @@ STDMETHODIMP CAFDocument::put_FKBVersion(BSTR newVal)
 
 		// If this is a nested ruleset, ensure it is not a different FKB version than that which
 		// has already been specified.
-		if (m_ipRSDFileStack->Size > 1 &&
+		if (m_ipRSDFileStack != __nullptr &&
+			m_ipRSDFileStack->Size > 1 &&
 			!m_strFKBVersion.empty() &&
 			 _strcmpi(newFKBVersion.c_str(), m_strFKBVersion.c_str()) != 0)
 		{

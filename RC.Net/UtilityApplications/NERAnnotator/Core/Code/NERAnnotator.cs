@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.UtilityApplications.NERAnnotator
@@ -144,7 +145,24 @@ namespace Extract.UtilityApplications.NERAnnotator
             string previousDirectory = Directory.GetCurrentDirectory();
             try
             {
-                var pathTags = new AttributeFinderPathTags { Document = new AFDocument() };
+                var afdoc = new AFDocument();
+                if (!string.IsNullOrWhiteSpace(_settings.FKBVersion))
+                {
+                    afdoc.FKBVersion = _settings.FKBVersion;
+                }
+                if (_settings.UseDatabase)
+                {
+                    // Get the alternate FKB dir from the DB
+                    var fpdb = new FileProcessingDB
+                    {
+                        DatabaseServer = _settings.DatabaseServer,
+                        DatabaseName = _settings.DatabaseName
+                    };
+                    afdoc.AlternateComponentDataDir =
+                        fpdb.GetDBInfoSetting("AlternateComponentDataDir", false);
+                    fpdb.CloseAllDBConnections();
+                }
+                var pathTags = new AttributeFinderPathTags { Document = afdoc };
 
                 // Update working dir to match the setting location
                 Directory.SetCurrentDirectory(_settings.WorkingDir);

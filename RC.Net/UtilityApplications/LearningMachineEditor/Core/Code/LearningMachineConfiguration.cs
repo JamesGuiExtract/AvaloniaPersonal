@@ -33,7 +33,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         private static readonly string _NEW_FILE_NAME = "[Unsaved file]";
         private static readonly string _MATCH = "match";
         private static readonly string _DO_NOT_MATCH = "don't match";
-        private static readonly string _DEFAULT_INPUT_LOCATION = @"K:\Common\Engineering\SecureSamples\";
+        private static readonly string _DEFAULT_INPUT_LOCATION = @"K:\SecureSamples\";
         private static readonly string _DRAG_FILE_EXT = ".lm";
 
         #endregion Constants
