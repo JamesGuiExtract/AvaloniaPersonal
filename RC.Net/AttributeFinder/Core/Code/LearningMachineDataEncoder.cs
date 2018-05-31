@@ -2767,6 +2767,10 @@ namespace Extract.AttributeFinder
             }
             AttributeFeatureVectorizers = vectorizerMap.Values;
 
+            // Give helpful exception as to why this this process will fail rather than
+            // wait for generic "Unable to successfully compute encodings" exception to be thrown
+            ExtractException.Assert("ELI45994", "No features found", AutoBagOfWords != null || vectorizerMap.Any());
+
             // Add category names and codes
             InitializeAnswerCodeMappings(answers, NegativeClassName);
         }

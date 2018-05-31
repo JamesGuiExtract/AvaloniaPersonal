@@ -8,7 +8,6 @@ using Extract.ETL;
 using Extract.Utilities;
 using Extract.Code.Attributes;
 using System.Transactions;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Extract.UtilityApplications.TrainingDataCollector
 {
@@ -87,7 +86,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// The last AttributeSetForFile.ID that was processed by this application
         /// </summary>
         [DataMember]
-        public long LastIDProcessed
+        public override long LastIDProcessed
         {
             get
             {

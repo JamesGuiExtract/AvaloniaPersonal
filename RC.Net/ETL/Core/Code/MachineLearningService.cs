@@ -170,6 +170,15 @@ namespace Extract.ETL
 
         #endregion Properties
 
+        #region Abstract Properties
+
+        /// <summary>
+        /// The last AttributeSetForFile.ID or MLData.ID record processed by the service
+        /// </summary>
+        public abstract long LastIDProcessed { get; set; }
+
+        #endregion Abstract Properties
+
         #region Public Methods
 
         /// <summary>

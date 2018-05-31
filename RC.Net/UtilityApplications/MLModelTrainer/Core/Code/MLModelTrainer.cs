@@ -6,7 +6,6 @@ using Extract.UtilityApplications.TrainingDataCollector;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -121,7 +120,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
         bool _processing;
         TemporaryFile _tempModelFile;
-        int _lastIDProcessed;
+        long _lastIDProcessed;
         double _lastF1Score;
         int _maximumTrainingRecords = 10000;
         int _maximumTestingRecords = 10000;
@@ -162,7 +161,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// The ID of the last MLData record processed
         /// </summary>
         [DataMember]
-        public int LastIDProcessed
+        public override long LastIDProcessed
         {
             get
             {
@@ -479,26 +478,33 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     else
                     {
                         var warning = new ExtractException("ELI45293", "Training/testing failed to produce an adequate model");
-                        warning.Log(tempExceptionLog.FileName);
-                        warning.Log();
-
-                        // Send email
-                        if (!string.IsNullOrWhiteSpace(EmailAddressesToNotifyOnFailure))
+                        try
                         {
-                            using (var body = new TemporaryFile(".txt", false))
+                            warning.AddDebugData("Model file", QualifiedModelDestination, false);
+                            warning.Log(tempExceptionLog.FileName);
+
+                            // Send email
+                            if (!string.IsNullOrWhiteSpace(EmailAddressesToNotifyOnFailure))
                             {
-                                File.WriteAllText(body.FileName, "Exception(s) logged while training/testing an LM model. Top-level exception message: " + warning.Message);
-                                SystemMethods.RunExtractExecutable(_EMAIL_FILE_APPLICATION,
-                                    new[]
-                                    {
+                                using (var body = new TemporaryFile(".txt", false))
+                                {
+                                    File.WriteAllText(body.FileName, "Exception(s) logged while training/testing an LM model. Top-level exception message: " + warning.Message);
+                                    SystemMethods.RunExtractExecutable(_EMAIL_FILE_APPLICATION,
+                                        new[]
+                                        {
                                     EmailAddressesToNotifyOnFailure
                                     ,tempExceptionLog.FileName
                                     ,"/subject"
                                     ,string.IsNullOrWhiteSpace(EmailSubject) ? "LM Model Training failure" : EmailSubject
                                     ,"/body"
                                     ,body.FileName
-                                    });
+                                        });
+                                }
                             }
+                        }
+                        finally
+                        {
+                            throw warning;
                         }
                     }
                 }
@@ -602,7 +608,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
         /// <summary>
         /// Refreshes the <see cref="DatabaseServiceStatus"/> by loading from the database, creating a new instance,
-        /// or setting it to null (if <see cref="DatabaseServiceID"/> is less than or equal to zero)
+        /// or setting it to null (if <see cref="DatabaseServiceID"/>, <see cref="DatabaseServer"/> and
+        /// <see cref="DatabaseName"/> are not configured)
         /// </summary>
         public void RefreshStatus()
         {
@@ -823,6 +830,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
                             MaximumTestingRecords = maxToProcess;
 
                             var appTrace = new ExtractException("ELI45118", "Application trace: Testing complete");
+                            appTrace.AddDebugData("Model file", QualifiedModelDestination, false);
 
                             if (ModelType == ModelType.NamedEntityRecognition)
                             {
@@ -1100,7 +1108,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             /// The ID of the last MLData record processed
             /// </summary>
             [DataMember]
-            public int LastIDProcessed { get; set; }
+            public long LastIDProcessed { get; set; }
 
             /// <summary>
             /// The average F1Score from the last time the testing command was successfully executed

@@ -396,7 +396,16 @@ namespace Extract.AttributeFinder
             }
             set
             {
-                _csvOutputFile = value ?? "";
+                // Make this property use null for empty value, vs empty string
+                // used elsewhere so that the serializer doesn't share refs (causes error with trainer application)
+                if (string.IsNullOrEmpty(value))
+                {
+                    _csvOutputFile = null;
+                }
+                else
+                {
+                    _csvOutputFile = value;
+                }
             }
         }
 

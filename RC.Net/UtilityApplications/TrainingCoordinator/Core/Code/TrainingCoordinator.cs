@@ -302,6 +302,24 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             }
         }
 
+        /// <summary>
+        /// Sets the LastIDProcessed value to zero for every <see cref="MachineLearningService"/>
+        /// </summary>
+        public void ResetProcessedStatus()
+        {
+            try
+            {
+                foreach (var service in Services)
+                {
+                    service.LastIDProcessed = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45992");
+            }
+        }
+
         #endregion Public Methods
 
         #region IHasConfigurableDatabaseServiceStatus
@@ -343,11 +361,9 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                     // Refresh each service's status
                     if (ServiceStatuses != null)
                     {
-                        // Cache statuses to prevent rebuilding during each loop
-                        var statuses = ServiceStatuses;
                         foreach (var service in Services)
                         {
-                            if (statuses.TryGetValue(service.Guid, out var status))
+                            if (ServiceStatuses.TryGetValue(service.Guid, out var status))
                             {
                                 service.Status = status;
                             }
@@ -357,6 +373,11 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                             }
                         }
                     }
+
+                    // Set the status to be null so that it gets rebuilt out of the individual
+                    // service statuses on save. Otherwise UI edits may not be persisted
+                    _log = _status.Log;
+                    _status = null;
                 }
                 else
                 {

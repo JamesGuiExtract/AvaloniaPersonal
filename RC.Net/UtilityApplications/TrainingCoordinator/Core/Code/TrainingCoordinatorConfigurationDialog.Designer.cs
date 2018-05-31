@@ -41,6 +41,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TrainingCoordinatorConfigurationDialog));
             this._globalSettingsGroupBox = new System.Windows.Forms.GroupBox();
+            this._resetProcessedStatusButton = new System.Windows.Forms.Button();
             this._descriptionTextBox = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -96,6 +97,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             // 
             this._globalSettingsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this._globalSettingsGroupBox.Controls.Add(this._resetProcessedStatusButton);
             this._globalSettingsGroupBox.Controls.Add(this._descriptionTextBox);
             this._globalSettingsGroupBox.Controls.Add(this.label13);
             this._globalSettingsGroupBox.Controls.Add(this.groupBox3);
@@ -115,6 +117,16 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this._globalSettingsGroupBox.TabIndex = 0;
             this._globalSettingsGroupBox.TabStop = false;
             // 
+            // _resetProcessedStatusButton
+            // 
+            this._resetProcessedStatusButton.Location = new System.Drawing.Point(207, 238);
+            this._resetProcessedStatusButton.Name = "_resetProcessedStatusButton";
+            this._resetProcessedStatusButton.Size = new System.Drawing.Size(132, 23);
+            this._resetProcessedStatusButton.TabIndex = 12;
+            this._resetProcessedStatusButton.Text = "Reset processed status";
+            this._resetProcessedStatusButton.UseVisualStyleBackColor = true;
+            this._resetProcessedStatusButton.Click += new System.EventHandler(this.HandleResetProcessedStatusButton_Click);
+            // 
             // _descriptionTextBox
             // 
             this._descriptionTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -123,7 +135,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this._descriptionTextBox.Location = new System.Drawing.Point(10, 78);
             this._descriptionTextBox.Name = "_descriptionTextBox";
             this._descriptionTextBox.Size = new System.Drawing.Size(329, 20);
-            this._descriptionTextBox.TabIndex = 2;
+            this._descriptionTextBox.TabIndex = 4;
             this._descriptionTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label13
@@ -135,7 +147,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this.label13.Location = new System.Drawing.Point(7, 62);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(60, 13);
-            this.label13.TabIndex = 19;
+            this.label13.TabIndex = 3;
             this.label13.Text = "Description";
             // 
             // groupBox3
@@ -145,7 +157,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this.groupBox3.Location = new System.Drawing.Point(354, 62);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(398, 198);
-            this.groupBox3.TabIndex = 17;
+            this.groupBox3.TabIndex = 13;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Schedule";
             // 
@@ -183,7 +195,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             0});
             this._minimumRecordsRequiredNumericUpDown.Name = "_minimumRecordsRequiredNumericUpDown";
             this._minimumRecordsRequiredNumericUpDown.Size = new System.Drawing.Size(330, 20);
-            this._minimumRecordsRequiredNumericUpDown.TabIndex = 4;
+            this._minimumRecordsRequiredNumericUpDown.TabIndex = 8;
             this._minimumRecordsRequiredNumericUpDown.ThousandsSeparator = true;
             this._minimumRecordsRequiredNumericUpDown.Value = new decimal(new int[] {
             100,
@@ -201,7 +213,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this._rootDirectoryBrowseButton.Location = new System.Drawing.Point(703, 32);
             this._rootDirectoryBrowseButton.Name = "_rootDirectoryBrowseButton";
             this._rootDirectoryBrowseButton.Size = new System.Drawing.Size(49, 21);
-            this._rootDirectoryBrowseButton.TabIndex = 1;
+            this._rootDirectoryBrowseButton.TabIndex = 2;
             this._rootDirectoryBrowseButton.Text = "...";
             this._rootDirectoryBrowseButton.TextControl = this._rootDirectoryTextBox;
             this._rootDirectoryBrowseButton.UseVisualStyleBackColor = true;
@@ -214,7 +226,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this._rootDirectoryTextBox.Location = new System.Drawing.Point(9, 32);
             this._rootDirectoryTextBox.Name = "_rootDirectoryTextBox";
             this._rootDirectoryTextBox.Size = new System.Drawing.Size(688, 20);
-            this._rootDirectoryTextBox.TabIndex = 0;
+            this._rootDirectoryTextBox.TabIndex = 1;
             this._rootDirectoryTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _deleteDataCheckBox
@@ -223,7 +235,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this._deleteDataCheckBox.Location = new System.Drawing.Point(10, 206);
             this._deleteDataCheckBox.Name = "_deleteDataCheckBox";
             this._deleteDataCheckBox.Size = new System.Drawing.Size(289, 17);
-            this._deleteDataCheckBox.TabIndex = 5;
+            this._deleteDataCheckBox.TabIndex = 9;
             this._deleteDataCheckBox.Text = "Delete ML data marked for deletion after training models";
             this._deleteDataCheckBox.UseVisualStyleBackColor = true;
             this._deleteDataCheckBox.CheckedChanged += new System.EventHandler(this.HandleValueChanged);
@@ -237,7 +249,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this.label3.Location = new System.Drawing.Point(6, 155);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(202, 13);
-            this.label3.TabIndex = 13;
+            this.label3.TabIndex = 7;
             this.label3.Text = "Minimum new records required for training";
             // 
             // label1
@@ -249,7 +261,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this.label1.Location = new System.Drawing.Point(6, 16);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(73, 13);
-            this.label1.TabIndex = 11;
+            this.label1.TabIndex = 0;
             this.label1.Text = "Root directory";
             // 
             // _exportButton
@@ -258,7 +270,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this._exportButton.Location = new System.Drawing.Point(90, 238);
             this._exportButton.Name = "_exportButton";
             this._exportButton.Size = new System.Drawing.Size(75, 23);
-            this._exportButton.TabIndex = 7;
+            this._exportButton.TabIndex = 11;
             this._exportButton.Text = "Export...";
             this._exportButton.UseVisualStyleBackColor = true;
             this._exportButton.Click += new System.EventHandler(this.HandleExportButton_Click);
@@ -269,7 +281,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this._importButton.Location = new System.Drawing.Point(9, 238);
             this._importButton.Name = "_importButton";
             this._importButton.Size = new System.Drawing.Size(75, 23);
-            this._importButton.TabIndex = 6;
+            this._importButton.TabIndex = 10;
             this._importButton.Text = "Import...";
             this._importButton.UseVisualStyleBackColor = true;
             this._importButton.Click += new System.EventHandler(this.HandleImportButton_Click);
@@ -282,7 +294,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this._projectNameTextBox.Location = new System.Drawing.Point(9, 124);
             this._projectNameTextBox.Name = "_projectNameTextBox";
             this._projectNameTextBox.Size = new System.Drawing.Size(330, 20);
-            this._projectNameTextBox.TabIndex = 3;
+            this._projectNameTextBox.TabIndex = 6;
             this._projectNameTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label2
@@ -294,7 +306,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this.label2.Location = new System.Drawing.Point(6, 108);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(239, 13);
-            this.label2.TabIndex = 0;
+            this.label2.TabIndex = 5;
             this.label2.Text = "Project name (used as prefix for MLModel names)";
             // 
             // _okButton
@@ -687,5 +699,6 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         private System.Windows.Forms.TextBox _descriptionTextBox;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.TextBox _logTextBox;
+        private System.Windows.Forms.Button _resetProcessedStatusButton;
     }
 }
