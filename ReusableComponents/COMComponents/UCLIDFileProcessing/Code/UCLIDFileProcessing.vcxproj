@@ -79,7 +79,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_17\Include;..\..\..\VendorSpecificUtils\UltimateGrid\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;UCLIDFILEPROCESSING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -131,7 +131,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_17\Include;..\..\..\VendorSpecificUtils\UltimateGrid\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;UCLIDFILEPROCESSING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

@@ -1,3 +1,11 @@
+#pragma once
+
+#ifdef UCLIDFILEPROCESSING_EXPORTS
+#define UCLIDFILEPROCESSING_API __declspec(dllexport)
+#else
+#define UCLIDFILEPROCESSING_API __declspec(dllimport)
+#endif
+
 #include <string>
 
 using namespace std;
@@ -17,9 +25,9 @@ public:
 
 	// Creates an IFileProcessingDB instance in a MTA COM server. Having a MTA instance is important
 	// to avoiding deadlocks: https://extract.atlassian.net/browse/ISSUE-12328
-	__declspec(dllexport) static UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr createMTAFileProcessingDB();
+	UCLIDFILEPROCESSING_API static UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr createMTAFileProcessingDB();
 
 	// Creates an IProgressStatus instance in a MTA COM server. Having an MTA instance is necessary
 	// to allow schema updates from the FAMDBAdmin https://extract.atlassian.net/browse/ISSUE-15385
-	__declspec(dllexport) static IProgressStatusPtr createMTAProgressStatus();
+	UCLIDFILEPROCESSING_API static IProgressStatusPtr createMTAProgressStatus();
 };
