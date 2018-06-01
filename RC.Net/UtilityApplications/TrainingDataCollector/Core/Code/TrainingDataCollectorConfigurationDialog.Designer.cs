@@ -147,6 +147,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             0,
             0,
             0});
+            this._limitProcessingByDateNumericUpDown.ValueChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label5
             // 
@@ -348,6 +349,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._lmModelTypeRadioButton.TabStop = true;
             this._lmModelTypeRadioButton.Text = "LM data encoder (.lm file)";
             this._lmModelTypeRadioButton.UseVisualStyleBackColor = true;
+            this._lmModelTypeRadioButton.CheckedChanged += new System.EventHandler(this.HandleCheckedChanged);
             // 
             // _nerModelTypeRadioButton
             // 
@@ -392,6 +394,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._descriptionTextBox.Name = "_descriptionTextBox";
             this._descriptionTextBox.Size = new System.Drawing.Size(390, 20);
             this._descriptionTextBox.TabIndex = 0;
+            this._descriptionTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label13
             // 
@@ -416,6 +419,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             scheduledEvent1.RecurrenceUnit = null;
             scheduledEvent1.Start = new System.DateTime(2018, 3, 23, 13, 37, 55, 0);
             this._schedulerControl.Value = scheduledEvent1;
+            this._schedulerControl.ValueChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _tabControl
             // 
@@ -537,6 +541,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this._useVoaFileForExpectedsRadioButton.TabStop = true;
             this._useVoaFileForExpectedsRadioButton.Text = "Use the configuration of the settings file for expected values";
             this._useVoaFileForExpectedsRadioButton.UseVisualStyleBackColor = true;
+            this._useVoaFileForExpectedsRadioButton.CheckedChanged += new System.EventHandler(this.HandleCheckedChanged);
             // 
             // _useAttributeSetForExpectedsRadioButton
             // 

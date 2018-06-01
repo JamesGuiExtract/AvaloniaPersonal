@@ -623,6 +623,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             this._logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this._logTextBox.Size = new System.Drawing.Size(750, 216);
             this._logTextBox.TabIndex = 0;
+            this._logTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // TrainingCoordinatorConfigurationDialog
             // 

@@ -157,6 +157,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._modelNameComboBox.Name = "_modelNameComboBox";
             this._modelNameComboBox.Size = new System.Drawing.Size(328, 21);
             this._modelNameComboBox.TabIndex = 4;
+            this._modelNameComboBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _modelDestinationPathBrowseButton
             // 
@@ -179,6 +180,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._modelDestinationPathTextBox.Name = "_modelDestinationPathTextBox";
             this._modelDestinationPathTextBox.Size = new System.Drawing.Size(443, 20);
             this._modelDestinationPathTextBox.TabIndex = 11;
+            this._modelDestinationPathTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _modelPathLabel
             // 
@@ -313,6 +315,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._maxTestingRecordsNumericUpDown.Size = new System.Drawing.Size(120, 20);
             this._maxTestingRecordsNumericUpDown.TabIndex = 15;
             this._maxTestingRecordsNumericUpDown.ThousandsSeparator = true;
+            this._maxTestingRecordsNumericUpDown.ValueChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label10
             // 
@@ -341,6 +344,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._minF1ScoreNumericUpDown.Name = "_minF1ScoreNumericUpDown";
             this._minF1ScoreNumericUpDown.Size = new System.Drawing.Size(69, 20);
             this._minF1ScoreNumericUpDown.TabIndex = 17;
+            this._minF1ScoreNumericUpDown.ValueChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label8
             // 
@@ -364,6 +368,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._maxTrainingRecordsNumericUpDown.Size = new System.Drawing.Size(120, 20);
             this._maxTrainingRecordsNumericUpDown.TabIndex = 14;
             this._maxTrainingRecordsNumericUpDown.ThousandsSeparator = true;
+            this._maxTrainingRecordsNumericUpDown.ValueChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label9
             // 
@@ -392,6 +397,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._allowableAccuracyDropNumericUpDown.Name = "_allowableAccuracyDropNumericUpDown";
             this._allowableAccuracyDropNumericUpDown.Size = new System.Drawing.Size(69, 20);
             this._allowableAccuracyDropNumericUpDown.TabIndex = 16;
+            this._allowableAccuracyDropNumericUpDown.ValueChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label7
             // 
@@ -410,6 +416,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._lastIDProcessedNumericUpDown.Size = new System.Drawing.Size(120, 20);
             this._lastIDProcessedNumericUpDown.TabIndex = 21;
             this._lastIDProcessedNumericUpDown.ThousandsSeparator = true;
+            this._lastIDProcessedNumericUpDown.ValueChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label5
             // 
@@ -438,6 +445,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._lastF1ScoreNumericUpDown.Name = "_lastF1ScoreNumericUpDown";
             this._lastF1ScoreNumericUpDown.Size = new System.Drawing.Size(69, 20);
             this._lastF1ScoreNumericUpDown.TabIndex = 22;
+            this._lastF1ScoreNumericUpDown.ValueChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label6
             // 
@@ -506,6 +514,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._markOldDataForDeletionCheckBox.TabIndex = 20;
             this._markOldDataForDeletionCheckBox.Text = "On success, mark old, unused data for deletion";
             this._markOldDataForDeletionCheckBox.UseVisualStyleBackColor = true;
+            this._markOldDataForDeletionCheckBox.CheckedChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _emailSubjectTextBox
             // 
@@ -515,6 +524,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._emailSubjectTextBox.Name = "_emailSubjectTextBox";
             this._emailSubjectTextBox.Size = new System.Drawing.Size(591, 20);
             this._emailSubjectTextBox.TabIndex = 19;
+            this._emailSubjectTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label12
             // 
@@ -533,6 +543,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._emailAddressesTextBox.Name = "_emailAddressesTextBox";
             this._emailAddressesTextBox.Size = new System.Drawing.Size(591, 20);
             this._emailAddressesTextBox.TabIndex = 18;
+            this._emailAddressesTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label11
             // 
@@ -551,6 +562,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this._descriptionTextBox.Name = "_descriptionTextBox";
             this._descriptionTextBox.Size = new System.Drawing.Size(563, 20);
             this._descriptionTextBox.TabIndex = 1;
+            this._descriptionTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label13
             // 
@@ -662,6 +674,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             scheduledEvent1.RecurrenceUnit = null;
             scheduledEvent1.Start = new System.DateTime(2018, 3, 23, 11, 16, 13, 0);
             this._schedulerControl.Value = scheduledEvent1;
+            this._schedulerControl.ValueChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // MLModelTrainerConfigurationDialog
             // 

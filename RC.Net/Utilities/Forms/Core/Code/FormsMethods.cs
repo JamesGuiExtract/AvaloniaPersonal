@@ -1436,6 +1436,34 @@ namespace Extract.Utilities.Forms
                 }
             }
         }
+
+        /// <summary>
+        /// Prompts for save
+        /// </summary>
+        /// <param name="owner">An <see cref="Win32Window"/> that will own the modal dialog box</param>
+        /// <param name="dirty">Whether there are any changes to prompt about</param>
+        /// <returns>Returns <see cref="DialogResult.Yes"/> if changes are to be saved,
+        /// <see cref="DialogResult.No"/> if changes are not to be saved,
+        /// and <see cref="DialogResult.Cancel"/> to abort and remain in the configuration dialog</returns>
+        public static DialogResult PromptForSaveChanges(this IWin32Window owner, bool dirty)
+        {
+            try
+            {
+                if (dirty)
+                {
+                    return MessageBox.Show(owner,
+                        "Changes have not been saved, would you like to save now?",
+                        "Unsaved changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
+                        MessageBoxDefaultButton.Button3, 0);
+                }
+
+                return DialogResult.No;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45998");
+            }
+        }
     }
 
     /// <summary>

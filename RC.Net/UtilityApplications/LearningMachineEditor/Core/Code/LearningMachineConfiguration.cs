@@ -8,7 +8,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -322,7 +321,6 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Forms.Form.Closing" /> event.
         /// </summary>
-        /// <remarks>Cancels computation before closing the dialog</remarks>
         /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs" /> that contains the event data.</param>
         protected override void OnClosing(CancelEventArgs e)
         {

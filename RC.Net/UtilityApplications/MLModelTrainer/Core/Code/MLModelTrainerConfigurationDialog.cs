@@ -3,6 +3,7 @@ using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
@@ -152,6 +153,37 @@ namespace Extract.UtilityApplications.MLModelTrainer
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Closing" /> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.FormClosingEventArgs" /> that contains the event data.</param>
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            try
+            {
+                if (DialogResult != DialogResult.OK)
+                {
+                    switch (this.PromptForSaveChanges(Dirty))
+                    {
+                        case DialogResult.Yes:
+                            HandleOkButton_Click(this, e);
+                            break;
+                        case DialogResult.No:
+                            HandleCancelButton_Click(this, e);
+                            break;
+                        case DialogResult.Cancel:
+                            e.Cancel = true;
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45995");
+            }
+            
+            base.OnClosing(e);
+        }
         #endregion Overrides
 
         #region Event Handlers
@@ -178,7 +210,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
-                Close();
             }
             catch (Exception ex)
             {
@@ -196,7 +227,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
         void HandleCancelButton_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
-            Close();
         }
 
         /// <summary>
@@ -282,6 +312,13 @@ namespace Extract.UtilityApplications.MLModelTrainer
         {
             try
             {
+                if (_suspendUpdatesToSettingsObject)
+                {
+                    return;
+                }
+
+                Dirty = true;
+
                 if (_lmModelTypeRadioButton.Checked)
                 {
                     _modelPathLabel.Text = "LM file path";
@@ -437,7 +474,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
             _settings.EmailSubject = _emailSubjectTextBox.Text;
             _settings.Schedule = _schedulerControl.Value;
         }
-
 
         #endregion Private Methods
     }

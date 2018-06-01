@@ -181,8 +181,6 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// <param name="e">A <see cref="T:System.Windows.Forms.FormClosingEventArgs" /> that contains the event data.</param>
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            base.OnFormClosing(e);
-
             try
             {
                 // End edit so that no changes are lost
@@ -196,12 +194,30 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                     _modelTrainersDataGridView.EndEdit();
                 }
 
-                _settings.PropertyChanged -= HandleSettings_PropertyChanged;
+                if (DialogResult != DialogResult.OK)
+                {
+                    switch (this.PromptForSaveChanges(Dirty))
+                    {
+                        case DialogResult.Yes:
+                            _settings.PropertyChanged -= HandleSettings_PropertyChanged;
+                            HandleOkButton_Click(this, e);
+                            break;
+                        case DialogResult.No:
+                            _settings.PropertyChanged -= HandleSettings_PropertyChanged;
+                            HandleCancelButton_Click(this, e);
+                            break;
+                        case DialogResult.Cancel:
+                            e.Cancel = true;
+                            break;
+                    }
+                }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45816");
             }
+
+            base.OnFormClosing(e);
         }
 
         #endregion Overrides
@@ -250,9 +266,11 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                         UtilityMethods.FormatCurrent($"Model trainer at index {idx} is not configured"));
                 }
 
+                // Save any status modifications to the status column
+                _settings.SaveStatus(_settings.Status);
+
                 Dirty = false;
                 DialogResult = DialogResult.OK;
-                Close();
             }
             catch (Exception ex)
             {
@@ -271,7 +289,6 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             try
             {
                 DialogResult = DialogResult.Cancel;
-                Close();
             }
             catch (Exception ex)
             {
@@ -845,7 +862,6 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                     {
                         string json = _settings.ToJson();
                         File.WriteAllText(saveDialog.FileName, json);
-                        Dirty = false;
                     }
                 }
             }
@@ -924,8 +940,6 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 trainers.RaiseListChangedEvents = true;
                 trainers.ListChanged += HandleValueChanged;
                 _modelTrainersDataGridView.DataSource = trainers;
-
-                Dirty = false;
             }
             finally
             {
