@@ -48,6 +48,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _attributes = attributes;
             SourceDocName = sourceDocName;
             _documentDataAttribute = new UCLID_AFCORELib.Attribute();
+            _documentDataAttribute.Name = "DocumentData";
         }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// for which data is being loaded.</param></param>
         public PaginationDocumentData(IAttribute documentDataAttribute, string sourceDocName)
         {
-            _documentDataAttribute = documentDataAttribute ?? new UCLID_AFCORELib.Attribute();
+            _documentDataAttribute = documentDataAttribute ?? new UCLID_AFCORELib.Attribute() { Name = "DocumentData" } ;
             _attributes = _documentDataAttribute.SubAttributes;
             SourceDocName = sourceDocName;
         }

@@ -1871,13 +1871,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// the <see cref="_paginationDocumentDataPanel"/> is not available.</returns>
         PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes, string sourceDocName)
         {
-            var documentDataAttribute = new UCLID_AFCORELib.Attribute();
-            documentDataAttribute.SubAttributes = attributes;
-
             return (_paginationDocumentDataPanel == null)
-                ? new PaginationDocumentData(documentDataAttribute, sourceDocName)
+                ? new PaginationDocumentData(attributes, sourceDocName)
                 : _paginationDocumentDataPanel.GetDocumentData(
-                    documentDataAttribute, sourceDocName, FileProcessingDB, _imageViewer);
+                    attributes, sourceDocName, FileProcessingDB, _imageViewer);
         }
 
         /// <summary>
