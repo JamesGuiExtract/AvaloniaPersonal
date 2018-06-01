@@ -484,7 +484,13 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     ,"ECHO Execution time: 0.540 seconds"
                 });
 
-                trainer.Process(CancellationToken.None);
+                try
+                {
+                    trainer.Process(CancellationToken.None);
+                }
+                catch (Exception ex)
+                when (expectSuccess == false && ex.Message.Contains("failed to produce an adequate model"))
+                { }
 
                 // Destination file will be empty if testing result was not acceptable
                 var expected = expectSuccess ? "Training\r\n" : "";
