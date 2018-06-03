@@ -5897,9 +5897,6 @@ namespace Extract.DataEntry
                 return;
             }
 
-            // [DataEntry:269] Swipes should trigger document to be marked as dirty.
-            OnDataChanged();
-
             try
             {
                 // Delay calls to DrawHighlights until processing of the swipe is
@@ -5938,6 +5935,14 @@ namespace Extract.DataEntry
             {
                 ControlUpdateReferenceCount--;
             }
+
+            // [DataEntry:269] Swipes should trigger document to be marked as dirty.
+            // Ensure the change
+            // https://extract.atlassian.net/browse/ISSUE-15472
+            // Make sure this is called after the swipe has been processed, otherwise affected
+            // entities that use data queries in response to changed data may not have the
+            // swipe result available.
+            OnDataChanged();
 
             try
             {

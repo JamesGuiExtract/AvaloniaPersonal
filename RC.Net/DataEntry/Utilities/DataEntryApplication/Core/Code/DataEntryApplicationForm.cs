@@ -642,17 +642,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             get
             {
-                // [DataEntry:614]
-                // Don't use the Window's theme for Windows Vista or later since the Aero theme
-                // hides the color applied to the active control when the active control is a
-                // drop-list combo box.
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
-                    Environment.OSVersion.Version.Major >= 6)
-                {
-                    return false;
-                }
-
-                // The Windows XP theme doesn't cause any problems
+                // https://extract.atlassian.net/browse/ISSUE-15445
+                // Removed code that disabled visual styles in order to allow active control
+                // selection for combo boxes be indicated (ISSUE-473). This fix is suspected of
+                // causing a crash. Also, this setting is inconsistent with the pagination task
+                // that does use visual styles.
                 return true;
             }
         }

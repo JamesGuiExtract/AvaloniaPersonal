@@ -17,7 +17,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// A copy of the original data loaded (to implement revert functionality)
         /// </summary>
-        IUnknownVector _originalData;
+        IAttribute _originalData;
 
         /// <summary>
         /// Indicates whether the data has been modified.
@@ -80,7 +80,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 WorkingAttributes = attributes;
-                _originalData = (IUnknownVector)((ICopyableObject)attributes).Clone();
+                _originalData = (IAttribute)((ICopyableObject)DocumentDataAttribute).Clone();
                 _originalData.ReportMemoryUsage();
             }
             catch (Exception ex)
@@ -103,7 +103,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 WorkingAttributes = Attributes;
 
-                _originalData = (IUnknownVector)((ICopyableObject)Attributes).Clone();
+                _originalData = (IAttribute)((ICopyableObject)DocumentDataAttribute).Clone();
                 _originalData.ReportMemoryUsage();
             }
             catch (Exception ex)
@@ -268,8 +268,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 UndoState = null;
-                base.Attributes = (IUnknownVector)_originalData.Clone();
-                base.Attributes.ReportMemoryUsage();
+                DocumentDataAttribute = (IAttribute)((ICopyableObject)_originalData).Clone();
+                DocumentDataAttribute.ReportMemoryUsage();
                 WorkingAttributes = base.Attributes;
                 _permanentlyModified = false;
                 SetModified(false);

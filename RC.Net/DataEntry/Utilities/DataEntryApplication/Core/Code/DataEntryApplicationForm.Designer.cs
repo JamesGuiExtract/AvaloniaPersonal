@@ -325,10 +325,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationTab.Size = new System.Drawing.Size(176, 484);
             this._paginationTab.TabIndex = 1;
             this._paginationTab.Text = "Pagination";
-            this._paginationTab.UseVisualStyleBackColor = true;
+            this._paginationTab.UseVisualStyleBackColor = false;
             // 
             // _paginationPanel
             // 
+            this._paginationPanel.BackColor = System.Drawing.Color.Transparent;
             this._paginationPanel.CacheImages = false;
             this._paginationPanel.CommitOnlySelection = false;
             this._paginationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
