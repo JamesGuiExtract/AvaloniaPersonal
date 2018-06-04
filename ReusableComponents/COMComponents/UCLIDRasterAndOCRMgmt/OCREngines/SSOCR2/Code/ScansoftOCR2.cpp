@@ -209,7 +209,6 @@ STDMETHODIMP CScansoftOCR2::RecognizeText(BSTR bstrImageFileName, IVariantVector
 	
 	try
 	{
-		//Sleep(5000);
 		// validate the license
 		validateLicense();
 
@@ -989,7 +988,6 @@ void CScansoftOCR2::init()
 		// specify the code page setting of the ENGine.
 		THROW_UE_ON_ERROR("ELI03380", "Unable to set code page in the OCR engine!",
 			kRecSetCodePage(0, "Windows ANSI"));
-			//kRecSetCodePage(0, "Code Page 437"));
 		
 		// enable automatic image inversion mode
 		THROW_UE_ON_ERROR("ELI03415", "Unable to set image inversion mode in the OCR engine!",

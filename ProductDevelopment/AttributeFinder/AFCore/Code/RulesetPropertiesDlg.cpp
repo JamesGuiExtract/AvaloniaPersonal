@@ -74,9 +74,6 @@ BOOL CRuleSetPropertiesDlg::OnInitDialog()
 			m_propSheet.SetActivePage(1);
 			m_propSheet.SetActivePage(0);
 
-			//m_ruleSetPropertiesPage.EnableWindow(FALSE);
-			//m_ruleSetCommentsPage.EnableWindow(FALSE);
-
 			GetDlgItem(IDOK)->ShowWindow(SW_HIDE);
 			GetDlgItem(IDCANCEL)->ShowWindow(SW_HIDE);
 

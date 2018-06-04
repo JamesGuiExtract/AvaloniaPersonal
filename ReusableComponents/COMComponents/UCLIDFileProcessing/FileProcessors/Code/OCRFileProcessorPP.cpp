@@ -94,6 +94,16 @@ STDMETHODIMP COCRFileProcessorPP::Apply(void)
 					ipOCR->LoadOCRParametersFromRuleset = VARIANT_TRUE;
 					_bstr_t bstrRulesetName;
 					m_editOCRParametersRuleset.GetWindowText(&(bstrRulesetName.GetBSTR()));
+
+					if (SysStringLen(bstrRulesetName) == 0)
+					{
+						MessageBox("RuleSet path for OCR parameters is missing.", "No RSD path set",
+							MB_OK | MB_ICONERROR);
+						m_editOCRParametersRuleset.SetFocus();
+
+						return S_FALSE;
+					}
+
 					ipOCR->OCRParametersRulesetName = bstrRulesetName;
 
 				}
@@ -248,6 +258,113 @@ LRESULT COCRFileProcessorPP::OnClickedRadioSpecificPages(WORD wNotifyCode, WORD 
 
 	return 0;
 }
+//-------------------------------------------------------------------------------------------------
+LRESULT COCRFileProcessorPP::OnBnClickedBtnOcrparameters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	try
+	{
+		// Create instance of the configure form using the Prog ID to avoid circular dependency
+		IOCRParametersConfigurePtr ipConfigure;
+		ipConfigure.CreateInstance("Extract.FileActionManager.Forms.OCRParametersConfigure");
+		ASSERT_RESOURCE_ALLOCATION("ELI45863", ipConfigure != __nullptr);
+
+		UCLID_FILEPROCESSORSLib::IOCRFileProcessorPtr ipOCR = m_ppUnk[0];
+		ASSERT_RESOURCE_ALLOCATION("ELI45864", ipOCR != __nullptr);
+
+		// Get the IHasOCRParameters interface pointer of the current instance
+		IHasOCRParametersPtr ipOCRParameters(ipOCR);
+
+		// Configure the parameters
+		ipConfigure->ConfigureOCRParameters(ipOCRParameters, VARIANT_FALSE, (long)this->m_hWnd);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45865");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT COCRFileProcessorPP::OnBnClickedBtnOcrParametersRulesetDocTag(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnOCRParametersRulesetSelectTag,
+			m_editOCRParametersRuleset);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45937");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT COCRFileProcessorPP::OnBnClickedBtnBrowseOcrParametersRuleset(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		string strFile = chooseFile();	
+		if (!strFile.empty())
+		{
+			m_editOCRParametersRuleset.SetWindowText(strFile.c_str());
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45938");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT COCRFileProcessorPP::OnBnClickedRadioNoOcrParams(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_editOCRParametersRuleset.EnableWindow(FALSE);
+		m_btnOCRParametersRulesetBrowse.EnableWindow(FALSE);
+		m_btnOCRParametersRulesetSelectTag.EnableWindow(FALSE);
+		m_btnEditOCRParameters.EnableWindow(FALSE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45939");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT COCRFileProcessorPP::OnBnClickedRadioOcrParamsHere(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_editOCRParametersRuleset.EnableWindow(FALSE);
+		m_btnOCRParametersRulesetBrowse.EnableWindow(FALSE);
+		m_btnOCRParametersRulesetSelectTag.EnableWindow(FALSE);
+		m_btnEditOCRParameters.EnableWindow(TRUE);
+
+		// If settings are empty, open edit dialog so that they get set to the defaults
+		IHasOCRParametersPtr ipOCRParameters(m_ppUnk[0]);
+		if (ipOCRParameters->OCRParameters->Size == 0)
+		{
+			return OnBnClickedBtnOcrparameters(0, 0, 0, bHandled);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45940");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT COCRFileProcessorPP::OnBnClickedRadioOcrParamsFromRuleset(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	try
+	{
+		m_editOCRParametersRuleset.EnableWindow(TRUE);
+		m_btnOCRParametersRulesetBrowse.EnableWindow(TRUE);
+		m_btnOCRParametersRulesetSelectTag.EnableWindow(TRUE);
+		m_btnEditOCRParameters.EnableWindow(FALSE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45941");
+
+	return S_OK;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods
@@ -290,120 +407,6 @@ void COCRFileProcessorPP::validateLicense()
 	VALIDATE_LICENSE( OCRFP_PP_COMPONENT_ID, "ELI11532", "OCR File Processor PP" );
 }
 //-------------------------------------------------------------------------------------------------
-
-
-LRESULT COCRFileProcessorPP::OnBnClickedBtnOcrparameters(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	try
-	{
-		// Create instance of the configure form using the Prog ID to avoid circular dependency
-		IOCRParametersConfigurePtr ipConfigure;
-		ipConfigure.CreateInstance("Extract.FileActionManager.Forms.OCRParametersConfigure");
-		ASSERT_RESOURCE_ALLOCATION("ELI45863", ipConfigure != __nullptr);
-
-		UCLID_FILEPROCESSORSLib::IOCRFileProcessorPtr ipOCR = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI45864", ipOCR != __nullptr);
-
-		// Get the IHasOCRParameters interface pointer of the current instance
-		IHasOCRParametersPtr ipOCRParameters(ipOCR);
-
-		// Configure the parameters
-		ipConfigure->ConfigureOCRParameters(ipOCRParameters, VARIANT_FALSE, (long)this->m_hWnd);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45865");
-
-	return S_OK;
-}
-
-
-LRESULT COCRFileProcessorPP::OnBnClickedBtnOcrParametersRulesetDocTag(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnOCRParametersRulesetSelectTag,
-			m_editOCRParametersRuleset);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45937");
-
-	return S_OK;
-}
-
-
-LRESULT COCRFileProcessorPP::OnBnClickedBtnBrowseOcrParametersRuleset(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		string strFile = chooseFile();	
-		if (!strFile.empty())
-		{
-			m_editOCRParametersRuleset.SetWindowText(strFile.c_str());
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45938");
-
-	return S_OK;
-}
-
-
-LRESULT COCRFileProcessorPP::OnBnClickedRadioNoOcrParams(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		m_editOCRParametersRuleset.EnableWindow(FALSE);
-		m_btnOCRParametersRulesetBrowse.EnableWindow(FALSE);
-		m_btnOCRParametersRulesetSelectTag.EnableWindow(FALSE);
-		m_btnEditOCRParameters.EnableWindow(FALSE);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45939");
-
-	return S_OK;
-}
-
-
-LRESULT COCRFileProcessorPP::OnBnClickedRadioOcrParamsHere(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& bHandled)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		m_editOCRParametersRuleset.EnableWindow(FALSE);
-		m_btnOCRParametersRulesetBrowse.EnableWindow(FALSE);
-		m_btnOCRParametersRulesetSelectTag.EnableWindow(FALSE);
-		m_btnEditOCRParameters.EnableWindow(TRUE);
-
-		// If settings are empty, open edit dialog so that they get set to the defaults
-		IHasOCRParametersPtr ipOCRParameters(m_ppUnk[0]);
-		if (ipOCRParameters->OCRParameters->Size == 0)
-		{
-			return OnBnClickedBtnOcrparameters(0, 0, 0, bHandled);
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45940");
-
-	return S_OK;
-}
-
-
-LRESULT COCRFileProcessorPP::OnBnClickedRadioOcrParamsFromRuleset(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	try
-	{
-		m_editOCRParametersRuleset.EnableWindow(TRUE);
-		m_btnOCRParametersRulesetBrowse.EnableWindow(TRUE);
-		m_btnOCRParametersRulesetSelectTag.EnableWindow(TRUE);
-		m_btnEditOCRParameters.EnableWindow(FALSE);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45941");
-
-	return S_OK;
-}
-
 const std::string COCRFileProcessorPP::chooseFile()
 {
 	const static string s_strFiles = "Ruleset definition files (*.etf)|*.etf|All Files (*.*)|*.*||";
@@ -426,3 +429,4 @@ const std::string COCRFileProcessorPP::chooseFile()
 
 	return strFile;
 }
+//-------------------------------------------------------------------------------------------------

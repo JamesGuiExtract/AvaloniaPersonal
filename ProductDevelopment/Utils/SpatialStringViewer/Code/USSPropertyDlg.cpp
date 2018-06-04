@@ -98,6 +98,21 @@ BOOL USSPropertyDlg::OnInitDialog()
 
 	return FALSE;
 }
+//-------------------------------------------------------------------------------------------------
+void USSPropertyDlg::OnBnClickedBtnViewOcrParameters()
+{
+	try
+	{
+		// Create instance of the configure form using the Prog ID to avoid circular dependency
+		IOCRParametersConfigurePtr ipConfigure;
+		ipConfigure.CreateInstance("Extract.FileActionManager.Forms.OCRParametersConfigure");
+		ASSERT_RESOURCE_ALLOCATION("ELI45962", ipConfigure != __nullptr);
+
+		// Configure the parameters
+		ipConfigure->ConfigureOCRParameters(m_ipHasOCRParameters, VARIANT_TRUE, (long)this->m_hWnd);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45963");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods
@@ -283,20 +298,4 @@ std::string USSPropertyDlg::getDeskew(double dDeskewInDegrees)
 	strReturn.append("°");
 
 	return strReturn;
-}
-//-------------------------------------------------------------------------------------------------
-
-void USSPropertyDlg::OnBnClickedBtnViewOcrParameters()
-{
-	try
-	{
-		// Create instance of the configure form using the Prog ID to avoid circular dependency
-		IOCRParametersConfigurePtr ipConfigure;
-		ipConfigure.CreateInstance("Extract.FileActionManager.Forms.OCRParametersConfigure");
-		ASSERT_RESOURCE_ALLOCATION("ELI45962", ipConfigure != __nullptr);
-
-		// Configure the parameters
-		ipConfigure->ConfigureOCRParameters(m_ipHasOCRParameters, VARIANT_TRUE, (long)this->m_hWnd);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45963");
 }

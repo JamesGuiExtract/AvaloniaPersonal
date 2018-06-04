@@ -301,6 +301,83 @@ void CRuleSetPropertiesPage::OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pR
 
 	*pResult = 0;
 }
+//-------------------------------------------------------------------------------------------------
+void CRuleSetPropertiesPage::OnBnClickedCheckSpecifyOcrParameters()
+{
+	try
+	{
+		bool bChecked = m_checkSpecifiedOCRParameters.GetCheck() == BST_CHECKED;
+		m_btnEditOCRParameters.EnableWindow(bChecked);
+
+		if (bChecked)
+		{
+			IHasOCRParametersPtr ipHasOCRParameters(m_ipRuleSet);
+
+			// Open edit dialog if there are no parameters set
+			if (ipHasOCRParameters->OCRParameters->Size == 0)
+			{
+				OnBnClickedBtnOcrparameters();
+			}
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45953");
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSetPropertiesPage::OnBnClickedBtnOcrparameters()
+{
+	try
+	{
+		// Create instance of the configure form using the Prog ID - to avoid circular dependency
+		UCLID_RASTERANDOCRMGMTLib::IOCRParametersConfigurePtr ipConfigure;
+		ipConfigure.CreateInstance("Extract.FileActionManager.Forms.OCRParametersConfigure");
+		ASSERT_RESOURCE_ALLOCATION("ELI45954", ipConfigure != __nullptr);
+		
+		IHasOCRParametersPtr ipHasParams(m_ipRuleSet);
+
+		// Configure the parameteres
+		ipConfigure->ConfigureOCRParameters(ipHasParams, m_bReadOnly, (long)this->m_hWnd);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45955");
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSetPropertiesPage::OnBnClickedBtnImportOcrParameters()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		string strFile = chooseFile();	
+		if (!strFile.empty())
+		{
+			// Load parameters from other file
+			ILoadOCRParametersPtr ipLoadOCRParameters;
+			ipLoadOCRParameters.CreateInstance(CLSID_RuleSet);
+			ipLoadOCRParameters->LoadOCRParameters(get_bstr_t(strFile));
+
+			// Copy them to this ruleset
+			IHasOCRParametersPtr ipOtherHasOCRParameters(ipLoadOCRParameters);
+			IHasOCRParametersPtr ipThisHasOCRParameters(m_ipRuleSet);
+
+			// Check for existence of any params
+			if (ipOtherHasOCRParameters->OCRParameters->Size == 0)
+			{
+				// Display Message Box about it
+				MessageBox("No OCR parameters found", "Failure!", MB_OK | MB_ICONWARNING);
+			}
+			else
+			{
+				ipThisHasOCRParameters->OCRParameters = ipOtherHasOCRParameters->OCRParameters;
+
+				// Enable controls
+				m_checkSpecifiedOCRParameters.SetCheck(BST_CHECKED);
+				m_btnEditOCRParameters.EnableWindow();
+
+				MessageBox("OCR parameters imported", "Success!", MB_OK | MB_ICONINFORMATION);
+			}
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45938");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods
@@ -569,86 +646,6 @@ bool CRuleSetPropertiesPage::isRdtLicensed()
 	return LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS);
 }
 //-------------------------------------------------------------------------------------------------
-
-void CRuleSetPropertiesPage::OnBnClickedCheckSpecifyOcrParameters()
-{
-	try
-	{
-		bool bChecked = m_checkSpecifiedOCRParameters.GetCheck() == BST_CHECKED;
-		m_btnEditOCRParameters.EnableWindow(bChecked);
-
-		if (bChecked)
-		{
-			IHasOCRParametersPtr ipHasOCRParameters(m_ipRuleSet);
-
-			// Open edit dialog if there are no parameters set
-			if (ipHasOCRParameters->OCRParameters->Size == 0)
-			{
-				OnBnClickedBtnOcrparameters();
-			}
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45953");
-}
-
-
-void CRuleSetPropertiesPage::OnBnClickedBtnOcrparameters()
-{
-	try
-	{
-		// Create instance of the configure form using the Prog ID - to avoid circular dependency
-		UCLID_RASTERANDOCRMGMTLib::IOCRParametersConfigurePtr ipConfigure;
-		ipConfigure.CreateInstance("Extract.FileActionManager.Forms.OCRParametersConfigure");
-		ASSERT_RESOURCE_ALLOCATION("ELI45954", ipConfigure != __nullptr);
-		
-		IHasOCRParametersPtr ipHasParams(m_ipRuleSet);
-
-		// Configure the parameteres
-		ipConfigure->ConfigureOCRParameters(ipHasParams, m_bReadOnly, (long)this->m_hWnd);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45955");
-}
-
-
-void CRuleSetPropertiesPage::OnBnClickedBtnImportOcrParameters()
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		string strFile = chooseFile();	
-		if (!strFile.empty())
-		{
-			// Load parameters from other file
-			ILoadOCRParametersPtr ipLoadOCRParameters;
-			ipLoadOCRParameters.CreateInstance(CLSID_RuleSet);
-			ipLoadOCRParameters->LoadOCRParameters(get_bstr_t(strFile));
-
-			// Copy them to this ruleset
-			IHasOCRParametersPtr ipOtherHasOCRParameters(ipLoadOCRParameters);
-			IHasOCRParametersPtr ipThisHasOCRParameters(m_ipRuleSet);
-
-			// Check for existence of any params
-			if (ipOtherHasOCRParameters->OCRParameters->Size == 0)
-			{
-				// Display Message Box about it
-				MessageBox("No OCR parameters found", "Failure!", MB_OK | MB_ICONWARNING);
-			}
-			else
-			{
-				ipThisHasOCRParameters->OCRParameters = ipOtherHasOCRParameters->OCRParameters;
-
-				// Enable controls
-				m_checkSpecifiedOCRParameters.SetCheck(BST_CHECKED);
-				m_btnEditOCRParameters.EnableWindow();
-
-				MessageBox("OCR parameters imported", "Success!", MB_OK | MB_ICONINFORMATION);
-			}
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45938");
-}
-
 const std::string CRuleSetPropertiesPage::chooseFile()
 {
 	const static string s_strFiles = "Ruleset definition files (*.rsd;*.etf)|*.rsd;*.etf|All Files (*.*)|*.*||";
