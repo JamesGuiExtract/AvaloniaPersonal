@@ -1737,8 +1737,8 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 		// Keep track of all found redactions which overlap and expected redaction
 		set<unsigned long> setOverlappingFounds;
 
-		// Keep track of all redactions which are over redactions to at least one expected redaction.
-		set<unsigned long> setOverRedactions;
+		// Keep track of all redactions which have been tested to be an overredaction
+		set<unsigned long> setCheckedForOverRedaction;
 
 		//--------------------------------------------------------
 		// Compute data from the expected attribute perspective
@@ -1788,25 +1788,25 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 						}
 
 						// Look to see if we have already determined the found attribute to be an
-						// over-redaction.
-						bool bOverRedaction =
-							setOverRedactions.find(ulFoundIndex) != setOverRedactions.end();
+						// over-redaction or not.
+						bool bCheckedForOverRedaction =
+							setCheckedForOverRedaction.find(ulFoundIndex) != setCheckedForOverRedaction.end();
 
 						// If not, calculate whether it is an over-redaction.
-						if (!bOverRedaction)
+						if (!bCheckedForOverRedaction)
 						{
-							bOverRedaction = getIsOverredaction(s2dMatchInfos, ulFoundIndex,
+							bool bOverRedaction = getIsOverredaction(s2dMatchInfos, ulFoundIndex,
 								testCaseStatistics.m_ulTotalExpectedRedactions);
-						}
 
-						if (bOverRedaction)
-						{
-							// Record an over-redaction.
-							setOverRedactions.insert(ulFoundIndex);
+							if (bOverRedaction)
+							{
+								RecordStatistic(gstrTEST_OVER_REDACTED,
+									s2dMatchInfos(0, ulFoundIndex).m_ipFoundAttribute, "Found",
+									testCaseStatistics.m_ulNumOverRedactions);
+							}
 
-							RecordStatistic(gstrTEST_OVER_REDACTED,
-								s2dMatchInfos(0, ulFoundIndex).m_ipFoundAttribute, "Found",
-								testCaseStatistics.m_ulNumOverRedactions);
+							// Update set of checked attributes
+							setCheckedForOverRedaction.insert(ulFoundIndex);
 						}
 					}
 				}
@@ -1966,8 +1966,10 @@ bool CIDShieldTester::getIsOverredaction(const SafeTwoDimensionalArray<MatchInfo
 			dAreaOfFoundRedaction;
 		dERAP *= 100.0;
 
-		// get absolute value
-		dERAP = fabs(dERAP);
+		// Don't get the absolute value
+		// https://extract.atlassian.net/browse/ISSUE-12617
+		//    // get absolute value
+		//    dERAP = fabs(dERAP);
 
 		if (dERAP >= m_dOverRedactionERAP)
 		{

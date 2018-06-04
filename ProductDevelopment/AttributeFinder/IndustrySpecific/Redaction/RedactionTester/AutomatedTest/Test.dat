@@ -1,0 +1,14 @@
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;AutomatedCondition=HCData|MCData|LCData
+
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+
+<SETTING>;OutputHybridStats=0
+<SETTING>;OutputFinalStatsOnly=0
+<SETTING>;OutputAttributeNamesFileLists=0
+<SETTING>;OutputAutomatedStatsOnly=0
+<SETTING>;CreateTestOutputVOAFiles=0
+
+<TESTFOLDER>;;Images;<SourceDocName>.voa;<SourceDocName>.evoa

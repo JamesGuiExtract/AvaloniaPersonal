@@ -154,7 +154,7 @@ namespace Extract.ETL
                     }
 
                     HashSet<int> OverlappingFounds = new HashSet<int>();
-                    HashSet<int> OverRedactions = new HashSet<int>();
+                    HashSet<int> CheckedForOverRedactions = new HashSet<int>();
 
                     for (expectedIndex = 0; expectedIndex < expectedCount; expectedIndex++)
                     {
@@ -200,23 +200,22 @@ namespace Extract.ETL
                                     }
 
                                     // Look to see if we have already determined the found attribute to be an
-                                    // over-redaction.
-                                    bool bOverRedaction = OverRedactions.Contains(foundIndex);
+                                    // over-redaction or not.
+                                    bool checkedForOverRedaction = CheckedForOverRedactions.Contains(foundIndex);
 
                                     // If not, calculate whether it is an over-redaction.
-                                    if (!bOverRedaction)
+                                    if (!checkedForOverRedaction)
                                     {
-                                        bOverRedaction = IsOverredaction(matchInfos, foundIndex, expectedCount);
-                                    }
+                                        if (IsOverredaction(matchInfos, foundIndex, expectedCount))
+                                        {
+                                            // Record an over-redaction.
+                                            pageAccuracy[GetAttributePage(matchInfos[0, foundIndex].FoundAttribute)]
+                                                .Add(new AccuracyDetail(AccuracyDetailLabel.OverRedacted,
+                                                    matchInfos[0, foundIndex].FoundAttribute.Type, 1));
+                                        }
 
-                                    if (bOverRedaction)
-                                    {
-                                        // Record an over-redaction.
-                                        OverRedactions.Add(foundIndex);
-
-                                        pageAccuracy[GetAttributePage(matchInfos[0, foundIndex].FoundAttribute)]
-                                            .Add(new AccuracyDetail(AccuracyDetailLabel.OverRedacted,
-                                                matchInfos[0, foundIndex].FoundAttribute.Type, 1));
+                                        // Update the set of checked attributes
+                                        CheckedForOverRedactions.Add(foundIndex);
                                     }
                                 }
                             }
@@ -451,8 +450,10 @@ namespace Extract.ETL
                     areaOfFoundRedaction;
                 dERAP *= 100.0;
 
-                // get absolute value
-                dERAP = Math.Abs(dERAP);
+                // Don't get the absolute value
+                // https://extract.atlassian.net/browse/ISSUE-12617
+                //    // get absolute value
+                //    dERAP = Math.Abs(dERAP);
 
                 if (dERAP >= OverRedactionERAP)
                 {
