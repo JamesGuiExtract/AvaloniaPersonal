@@ -320,6 +320,12 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="VariantPair.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="VariantVector.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -377,6 +383,7 @@
     <None Include="StrToObjectMap.rgs" />
     <None Include="StrToStrMap.rgs" />
     <None Include="Token.rgs" />
+    <None Include="VariantPair.rgs" />
     <None Include="VariantVector.rgs" />
   </ItemGroup>
   <ItemGroup>
@@ -429,6 +436,7 @@
     <ClInclude Include="StrToStrMap.h" />
     <ClInclude Include="TextFunctionExpander.h" />
     <ClInclude Include="Token.h" />
+    <ClInclude Include="VariantPair.h" />
     <ClInclude Include="VariantVector.h" />
     <ClInclude Include="SPMBinData.h" />
     <ClInclude Include="SPMLiteralSearchData.h" />

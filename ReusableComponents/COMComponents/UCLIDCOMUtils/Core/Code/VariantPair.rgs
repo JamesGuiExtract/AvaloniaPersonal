@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.VariantPair.1 = s 'VariantPair Class'
+	{
+		CLSID = s '{62218BA1-DAA8-420A-BEEA-3AC427EEDB9A}'
+	}
+	UCLIDCOMUtils.VariantPair = s 'VariantPair Class'
+	{
+		CLSID = s '{62218BA1-DAA8-420A-BEEA-3AC427EEDB9A}'
+		CurVer = s 'UCLIDCOMUtils.VariantPair.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {62218BA1-DAA8-420A-BEEA-3AC427EEDB9A} = s 'VariantPair Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.VariantPair.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.VariantPair'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

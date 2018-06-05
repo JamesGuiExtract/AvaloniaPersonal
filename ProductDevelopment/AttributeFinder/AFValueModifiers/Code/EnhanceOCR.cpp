@@ -450,7 +450,7 @@ STDMETHODIMP CEnhanceOCR::EnhanceDocument(IAFDocument* pDocument, ITagUtility* p
 		ASSERT_RESOURCE_ALLOCATION("ELI36666", ipAFDoc != __nullptr);
 
 		IHasOCRParametersPtr ipHasOCRParameters(ipAFDoc);
-		ILongToLongMapPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
+		IOCRParametersPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
 
 		m_ipTagUtility = pTagUtility;
 		ASSERT_RESOURCE_ALLOCATION("ELI36721", m_ipTagUtility != __nullptr);
@@ -603,7 +603,7 @@ STDMETHODIMP CEnhanceOCR::raw_Process(IAFDocument* pDocument, IProgressStatus *p
 		ASSERT_RESOURCE_ALLOCATION("ELI36481", ipAFDoc != __nullptr);
 
 		IHasOCRParametersPtr ipHasOCRParameters(ipAFDoc);
-		ILongToLongMapPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
+		IOCRParametersPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
 
 		m_ipProgressStatus = pProgressStatus;
 
@@ -932,7 +932,7 @@ STDMETHODIMP CEnhanceOCR::get_InstanceGUID(GUID *pVal)
 //--------------------------------------------------------------------------------------------------
 // Private Methods
 //--------------------------------------------------------------------------------------------------
-void CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, ILongToLongMapPtr ipOCRParameters)
+void CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, IOCRParametersPtr ipOCRParameters)
 {
 	try
 	{
@@ -1053,7 +1053,7 @@ void CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, ILongToLongMapPtr ipOCRPara
 	}
 }
 //--------------------------------------------------------------------------------------------------
-ISpatialStringPtr CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage, ILongToLongMapPtr ipOCRParameters)
+ISpatialStringPtr CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage, IOCRParametersPtr ipOCRParameters)
 {
 	try
 	{
@@ -1161,7 +1161,7 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 	ASSERT_ARGUMENT("ELI36511", ipDocument != __nullptr);
 
 	IHasOCRParametersPtr ipHasOCRParameters(ipDocument);
-	ILongToLongMapPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
+	IOCRParametersPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
 
 	IIUnknownVectorPtr ipAttributes(pAttributes);
 	ASSERT_RESOURCE_ALLOCATION("ELI36512", ipAttributes != __nullptr);
@@ -1281,7 +1281,7 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void CEnhanceOCR::enhanceOCR(vector<ZoneData> &zones, ILongToLongMapPtr ipOCRParameters)
+void CEnhanceOCR::enhanceOCR(vector<ZoneData> &zones, IOCRParametersPtr ipOCRParameters)
 {
 	// Initialize a set of rects that are still actively being enhanced. Rects may be removed from
 	// this set as their corresponding results meet m_nConfidenceCriteria.
@@ -2371,7 +2371,7 @@ vector<CEnhanceOCR::ZoneData> CEnhanceOCR::createZonesFromRects(vector<ILongRect
 	return vecZonesToEnhance;
 }
 //--------------------------------------------------------------------------------------------------
-ISpatialStringSearcherPtr CEnhanceOCR::OCRFilteredImage(ILongToLongMapPtr ipOCRParameters)
+ISpatialStringSearcherPtr CEnhanceOCR::OCRFilteredImage(IOCRParametersPtr ipOCRParameters)
 {
 	if (m_apFilteredBitmapFileName.get() == __nullptr)
 	{

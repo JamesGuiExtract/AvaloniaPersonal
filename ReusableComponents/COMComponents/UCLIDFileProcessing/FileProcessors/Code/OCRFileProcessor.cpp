@@ -1530,35 +1530,35 @@ void COCRFileProcessor::parseOCRInputText(const string& strInputText, string& st
 //-------------------------------------------------------------------------------------------------
 // IHasOCRParameters
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP COCRFileProcessor::get_OCRParameters(ILongToLongMap** ppMap)
+STDMETHODIMP COCRFileProcessor::get_OCRParameters(IOCRParameters** ppOCRParameters)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		*ppMap = getOCRParameters().Detach();
+		*ppOCRParameters = getOCRParameters().Detach();
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45866");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP COCRFileProcessor::put_OCRParameters(ILongToLongMap* pMap)
+STDMETHODIMP COCRFileProcessor::put_OCRParameters(IOCRParameters* pOCRParameters)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		m_ipOCRParameters = pMap;
+		m_ipOCRParameters = pOCRParameters;
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45868");
 }
 //-------------------------------------------------------------------------------------------------
-ILongToLongMapPtr COCRFileProcessor::getOCRParameters()
+IOCRParametersPtr COCRFileProcessor::getOCRParameters()
 {
 	if (m_ipOCRParameters == __nullptr)
 	{
-		m_ipOCRParameters.CreateInstance(CLSID_LongToLongMap);
+		m_ipOCRParameters.CreateInstance(CLSID_VariantVector);
 
 		ASSERT_RESOURCE_ALLOCATION("ELI45871", m_ipOCRParameters != __nullptr);
 	}

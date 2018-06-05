@@ -218,7 +218,7 @@ private:
 
 	// return actual page content based on the restriction defined
 	ISpatialStringPtr getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,
-		const string& strSourceDoc, long nPageNum, bool bPageSpecified, ILongToLongMapPtr ipOCRParameters);
+		const string& strSourceDoc, long nPageNum, bool bPageSpecified, IOCRParametersPtr ipOCRParameters);
 
 	IOCREnginePtr getOCREngine();
 
@@ -227,7 +227,7 @@ private:
 
 	// based on the specific page and selection, get the actual string out
 	ISpatialStringPtr getRegionContent(const ISpatialStringPtr& ipInputText, const string& strSourceDoc,
-		bool bPageSpecified, bool bRestrictionDefined, ILongToLongMapPtr ipOCRParameters, long nPageNum = 0);
+		bool bPageSpecified, bool bRestrictionDefined, IOCRParametersPtr ipOCRParameters, long nPageNum = 0);
 
 	// check the horizontal and vertical restrictions to see if at least one
 	// of them is defined.

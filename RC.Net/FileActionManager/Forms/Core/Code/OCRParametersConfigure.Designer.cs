@@ -33,13 +33,16 @@
             this._languagesTabPage = new System.Windows.Forms.TabPage();
             this._specifyRecognitionLanguagesCheckBox = new System.Windows.Forms.CheckBox();
             this._recognitionLanguagesGroupBox = new System.Windows.Forms.GroupBox();
+            this._languagesDataGridView = new System.Windows.Forms.DataGridView();
             this._singleLanguageDetectionCheckBox = new System.Windows.Forms.CheckBox();
-            this._language5ComboBox = new System.Windows.Forms.ComboBox();
-            this._language4ComboBox = new System.Windows.Forms.ComboBox();
-            this._language3ComboBox = new System.Windows.Forms.ComboBox();
-            this._language2ComboBox = new System.Windows.Forms.ComboBox();
-            this._language1ComboBox = new System.Windows.Forms.ComboBox();
             this._recognitionOptionsTabPage = new System.Windows.Forms.TabPage();
+            this._pageFailureOptionsGroupBox = new System.Windows.Forms.GroupBox();
+            this._requireOnePageSuccessCheckBox = new System.Windows.Forms.CheckBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this._skipPageOnFailureCheckBox = new System.Windows.Forms.CheckBox();
+            this._maxPageFailurePercentNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label9 = new System.Windows.Forms.Label();
+            this._maxPageFailureNumberNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this._zoneOrderingCheckBox = new System.Windows.Forms.CheckBox();
             this._limitToBasicLatinCharactersCheckBox = new System.Windows.Forms.CheckBox();
             this._imageOptionsTabPage = new System.Windows.Forms.TabPage();
@@ -60,9 +63,28 @@
             this._maxYNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this._maxXNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this._tabControl = new System.Windows.Forms.TabControl();
+            this._advancedTabPage = new System.Windows.Forms.TabPage();
+            this._advancedSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.label7 = new System.Windows.Forms.Label();
+            this._enumSettingsDataGridView = new System.Windows.Forms.DataGridView();
+            this.label8 = new System.Windows.Forms.Label();
+            this._stringSettingsDataGridView = new System.Windows.Forms.DataGridView();
+            this._defaultDecompositionMethodComboBox = new System.Windows.Forms.ComboBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this._timeoutNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label13 = new System.Windows.Forms.Label();
+            this._accuracyTradeoffComboBox = new System.Windows.Forms.ComboBox();
+            this._preferAccuracteEngineCheckBox = new System.Windows.Forms.CheckBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this._defaultFillingMethodComboBox = new System.Windows.Forms.ComboBox();
             this._languagesTabPage.SuspendLayout();
             this._recognitionLanguagesGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._languagesDataGridView)).BeginInit();
             this._recognitionOptionsTabPage.SuspendLayout();
+            this._pageFailureOptionsGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._maxPageFailurePercentNumericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maxPageFailureNumberNumericUpDown)).BeginInit();
             this._imageOptionsTabPage.SuspendLayout();
             this._forceDespeckleGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._forceDespeckleLevelNumericUpDown)).BeginInit();
@@ -70,6 +92,14 @@
             ((System.ComponentModel.ISupportInitialize)(this._maxYNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._maxXNumericUpDown)).BeginInit();
             this._tabControl.SuspendLayout();
+            this._advancedTabPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._advancedSplitContainer)).BeginInit();
+            this._advancedSplitContainer.Panel1.SuspendLayout();
+            this._advancedSplitContainer.Panel2.SuspendLayout();
+            this._advancedSplitContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._enumSettingsDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._stringSettingsDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._timeoutNumericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // _cancelButton
@@ -77,7 +107,7 @@
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.CausesValidation = false;
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(224, 437);
+            this._cancelButton.Location = new System.Drawing.Point(242, 509);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 2;
@@ -88,7 +118,7 @@
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(143, 437);
+            this._okButton.Location = new System.Drawing.Point(161, 509);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 1;
@@ -102,7 +132,7 @@
             this._languagesTabPage.Location = new System.Drawing.Point(4, 22);
             this._languagesTabPage.Name = "_languagesTabPage";
             this._languagesTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._languagesTabPage.Size = new System.Drawing.Size(279, 388);
+            this._languagesTabPage.Size = new System.Drawing.Size(297, 460);
             this._languagesTabPage.TabIndex = 2;
             this._languagesTabPage.Text = "Languages";
             this._languagesTabPage.UseVisualStyleBackColor = true;
@@ -120,20 +150,31 @@
             // 
             // _recognitionLanguagesGroupBox
             // 
-            this._recognitionLanguagesGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this._recognitionLanguagesGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this._recognitionLanguagesGroupBox.Controls.Add(this._languagesDataGridView);
             this._recognitionLanguagesGroupBox.Controls.Add(this._singleLanguageDetectionCheckBox);
-            this._recognitionLanguagesGroupBox.Controls.Add(this._language5ComboBox);
-            this._recognitionLanguagesGroupBox.Controls.Add(this._language4ComboBox);
-            this._recognitionLanguagesGroupBox.Controls.Add(this._language3ComboBox);
-            this._recognitionLanguagesGroupBox.Controls.Add(this._language2ComboBox);
-            this._recognitionLanguagesGroupBox.Controls.Add(this._language1ComboBox);
             this._recognitionLanguagesGroupBox.Location = new System.Drawing.Point(6, 29);
             this._recognitionLanguagesGroupBox.Name = "_recognitionLanguagesGroupBox";
-            this._recognitionLanguagesGroupBox.Size = new System.Drawing.Size(255, 184);
+            this._recognitionLanguagesGroupBox.Size = new System.Drawing.Size(285, 425);
             this._recognitionLanguagesGroupBox.TabIndex = 1;
             this._recognitionLanguagesGroupBox.TabStop = false;
             this._recognitionLanguagesGroupBox.Text = "Recognition languages";
+            // 
+            // _languagesDataGridView
+            // 
+            this._languagesDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._languagesDataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
+            this._languagesDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._languagesDataGridView.Location = new System.Drawing.Point(8, 42);
+            this._languagesDataGridView.Name = "_languagesDataGridView";
+            this._languagesDataGridView.Size = new System.Drawing.Size(271, 377);
+            this._languagesDataGridView.TabIndex = 1;
+            this._languagesDataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.Handle_DataGridView_DataError);
+            this._languagesDataGridView.EnabledChanged += new System.EventHandler(this.Handle_DataGridView_EnabledChanged);
             // 
             // _singleLanguageDetectionCheckBox
             // 
@@ -145,67 +186,112 @@
             this._singleLanguageDetectionCheckBox.Text = "Enable single language detection";
             this._singleLanguageDetectionCheckBox.UseVisualStyleBackColor = true;
             // 
-            // _language5ComboBox
-            // 
-            this._language5ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._language5ComboBox.FormattingEnabled = true;
-            this._language5ComboBox.Location = new System.Drawing.Point(8, 150);
-            this._language5ComboBox.Name = "_language5ComboBox";
-            this._language5ComboBox.Size = new System.Drawing.Size(241, 21);
-            this._language5ComboBox.Sorted = true;
-            this._language5ComboBox.TabIndex = 5;
-            // 
-            // _language4ComboBox
-            // 
-            this._language4ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._language4ComboBox.FormattingEnabled = true;
-            this._language4ComboBox.Location = new System.Drawing.Point(8, 123);
-            this._language4ComboBox.Name = "_language4ComboBox";
-            this._language4ComboBox.Size = new System.Drawing.Size(241, 21);
-            this._language4ComboBox.Sorted = true;
-            this._language4ComboBox.TabIndex = 4;
-            // 
-            // _language3ComboBox
-            // 
-            this._language3ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._language3ComboBox.FormattingEnabled = true;
-            this._language3ComboBox.Location = new System.Drawing.Point(8, 96);
-            this._language3ComboBox.Name = "_language3ComboBox";
-            this._language3ComboBox.Size = new System.Drawing.Size(241, 21);
-            this._language3ComboBox.Sorted = true;
-            this._language3ComboBox.TabIndex = 3;
-            // 
-            // _language2ComboBox
-            // 
-            this._language2ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._language2ComboBox.FormattingEnabled = true;
-            this._language2ComboBox.Location = new System.Drawing.Point(8, 69);
-            this._language2ComboBox.Name = "_language2ComboBox";
-            this._language2ComboBox.Size = new System.Drawing.Size(241, 21);
-            this._language2ComboBox.Sorted = true;
-            this._language2ComboBox.TabIndex = 2;
-            // 
-            // _language1ComboBox
-            // 
-            this._language1ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._language1ComboBox.FormattingEnabled = true;
-            this._language1ComboBox.Location = new System.Drawing.Point(8, 42);
-            this._language1ComboBox.Name = "_language1ComboBox";
-            this._language1ComboBox.Size = new System.Drawing.Size(241, 21);
-            this._language1ComboBox.Sorted = true;
-            this._language1ComboBox.TabIndex = 1;
-            // 
             // _recognitionOptionsTabPage
             // 
+            this._recognitionOptionsTabPage.Controls.Add(this.label14);
+            this._recognitionOptionsTabPage.Controls.Add(this._defaultFillingMethodComboBox);
+            this._recognitionOptionsTabPage.Controls.Add(this._preferAccuracteEngineCheckBox);
+            this._recognitionOptionsTabPage.Controls.Add(this.label13);
+            this._recognitionOptionsTabPage.Controls.Add(this._accuracyTradeoffComboBox);
+            this._recognitionOptionsTabPage.Controls.Add(this._timeoutNumericUpDown);
+            this._recognitionOptionsTabPage.Controls.Add(this.label12);
+            this._recognitionOptionsTabPage.Controls.Add(this.label11);
+            this._recognitionOptionsTabPage.Controls.Add(this._defaultDecompositionMethodComboBox);
+            this._recognitionOptionsTabPage.Controls.Add(this._pageFailureOptionsGroupBox);
             this._recognitionOptionsTabPage.Controls.Add(this._zoneOrderingCheckBox);
             this._recognitionOptionsTabPage.Controls.Add(this._limitToBasicLatinCharactersCheckBox);
             this._recognitionOptionsTabPage.Location = new System.Drawing.Point(4, 22);
             this._recognitionOptionsTabPage.Name = "_recognitionOptionsTabPage";
             this._recognitionOptionsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._recognitionOptionsTabPage.Size = new System.Drawing.Size(279, 388);
+            this._recognitionOptionsTabPage.Size = new System.Drawing.Size(297, 460);
             this._recognitionOptionsTabPage.TabIndex = 1;
-            this._recognitionOptionsTabPage.Text = "Recognition options";
+            this._recognitionOptionsTabPage.Text = "Recognition";
             this._recognitionOptionsTabPage.UseVisualStyleBackColor = true;
+            // 
+            // _pageFailureOptionsGroupBox
+            // 
+            this._pageFailureOptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._pageFailureOptionsGroupBox.Controls.Add(this._requireOnePageSuccessCheckBox);
+            this._pageFailureOptionsGroupBox.Controls.Add(this.label10);
+            this._pageFailureOptionsGroupBox.Controls.Add(this._skipPageOnFailureCheckBox);
+            this._pageFailureOptionsGroupBox.Controls.Add(this._maxPageFailurePercentNumericUpDown);
+            this._pageFailureOptionsGroupBox.Controls.Add(this.label9);
+            this._pageFailureOptionsGroupBox.Controls.Add(this._maxPageFailureNumberNumericUpDown);
+            this._pageFailureOptionsGroupBox.Location = new System.Drawing.Point(6, 52);
+            this._pageFailureOptionsGroupBox.Name = "_pageFailureOptionsGroupBox";
+            this._pageFailureOptionsGroupBox.Size = new System.Drawing.Size(284, 122);
+            this._pageFailureOptionsGroupBox.TabIndex = 2;
+            this._pageFailureOptionsGroupBox.TabStop = false;
+            this._pageFailureOptionsGroupBox.Text = "Page failure options";
+            // 
+            // _requireOnePageSuccessCheckBox
+            // 
+            this._requireOnePageSuccessCheckBox.AutoSize = true;
+            this._requireOnePageSuccessCheckBox.Location = new System.Drawing.Point(9, 42);
+            this._requireOnePageSuccessCheckBox.Name = "_requireOnePageSuccessCheckBox";
+            this._requireOnePageSuccessCheckBox.Size = new System.Drawing.Size(204, 17);
+            this._requireOnePageSuccessCheckBox.TabIndex = 1;
+            this._requireOnePageSuccessCheckBox.Text = "Require at least one page to succeed";
+            this._requireOnePageSuccessCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(6, 94);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(117, 13);
+            this.label10.TabIndex = 4;
+            this.label10.Text = "Maximum failed page %";
+            // 
+            // _skipPageOnFailureCheckBox
+            // 
+            this._skipPageOnFailureCheckBox.AutoSize = true;
+            this._skipPageOnFailureCheckBox.Location = new System.Drawing.Point(9, 19);
+            this._skipPageOnFailureCheckBox.Name = "_skipPageOnFailureCheckBox";
+            this._skipPageOnFailureCheckBox.Size = new System.Drawing.Size(120, 17);
+            this._skipPageOnFailureCheckBox.TabIndex = 0;
+            this._skipPageOnFailureCheckBox.Text = "Skip page on failure";
+            this._skipPageOnFailureCheckBox.UseVisualStyleBackColor = true;
+            this._skipPageOnFailureCheckBox.CheckedChanged += new System.EventHandler(this.Handle_ValueChanged);
+            // 
+            // _maxPageFailurePercentNumericUpDown
+            // 
+            this._maxPageFailurePercentNumericUpDown.Location = new System.Drawing.Point(139, 92);
+            this._maxPageFailurePercentNumericUpDown.Name = "_maxPageFailurePercentNumericUpDown";
+            this._maxPageFailurePercentNumericUpDown.Size = new System.Drawing.Size(82, 20);
+            this._maxPageFailurePercentNumericUpDown.TabIndex = 5;
+            this._maxPageFailurePercentNumericUpDown.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(6, 68);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(111, 13);
+            this.label9.TabIndex = 2;
+            this.label9.Text = "Maximum failed pages";
+            // 
+            // _maxPageFailureNumberNumericUpDown
+            // 
+            this._maxPageFailureNumberNumericUpDown.Location = new System.Drawing.Point(139, 66);
+            this._maxPageFailureNumberNumericUpDown.Maximum = new decimal(new int[] {
+            -1,
+            0,
+            0,
+            0});
+            this._maxPageFailureNumberNumericUpDown.Name = "_maxPageFailureNumberNumericUpDown";
+            this._maxPageFailureNumberNumericUpDown.Size = new System.Drawing.Size(82, 20);
+            this._maxPageFailureNumberNumericUpDown.TabIndex = 3;
+            this._maxPageFailureNumberNumericUpDown.Value = new decimal(new int[] {
+            -1,
+            0,
+            0,
+            0});
             // 
             // _zoneOrderingCheckBox
             // 
@@ -234,7 +320,7 @@
             this._imageOptionsTabPage.Location = new System.Drawing.Point(4, 22);
             this._imageOptionsTabPage.Name = "_imageOptionsTabPage";
             this._imageOptionsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._imageOptionsTabPage.Size = new System.Drawing.Size(279, 388);
+            this._imageOptionsTabPage.Size = new System.Drawing.Size(297, 460);
             this._imageOptionsTabPage.TabIndex = 0;
             this._imageOptionsTabPage.Text = "Image options";
             this._imageOptionsTabPage.UseVisualStyleBackColor = true;
@@ -253,7 +339,7 @@
             this._forceDespeckleGroupBox.Controls.Add(this._alwaysForceDespeckleRadioButton);
             this._forceDespeckleGroupBox.Location = new System.Drawing.Point(6, 91);
             this._forceDespeckleGroupBox.Name = "_forceDespeckleGroupBox";
-            this._forceDespeckleGroupBox.Size = new System.Drawing.Size(267, 224);
+            this._forceDespeckleGroupBox.Size = new System.Drawing.Size(285, 224);
             this._forceDespeckleGroupBox.TabIndex = 1;
             this._forceDespeckleGroupBox.TabStop = false;
             this._forceDespeckleGroupBox.Text = "Despeckle";
@@ -357,7 +443,7 @@
             this.groupBox1.Controls.Add(this._maxXNumericUpDown);
             this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(267, 79);
+            this.groupBox1.Size = new System.Drawing.Size(285, 79);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Maximum image size";
@@ -434,14 +520,182 @@
             // 
             // _tabControl
             // 
+            this._tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._tabControl.Controls.Add(this._imageOptionsTabPage);
             this._tabControl.Controls.Add(this._recognitionOptionsTabPage);
             this._tabControl.Controls.Add(this._languagesTabPage);
+            this._tabControl.Controls.Add(this._advancedTabPage);
             this._tabControl.Location = new System.Drawing.Point(12, 12);
             this._tabControl.Name = "_tabControl";
             this._tabControl.SelectedIndex = 0;
-            this._tabControl.Size = new System.Drawing.Size(287, 414);
+            this._tabControl.Size = new System.Drawing.Size(305, 486);
             this._tabControl.TabIndex = 0;
+            // 
+            // _advancedTabPage
+            // 
+            this._advancedTabPage.Controls.Add(this._advancedSplitContainer);
+            this._advancedTabPage.Location = new System.Drawing.Point(4, 22);
+            this._advancedTabPage.Name = "_advancedTabPage";
+            this._advancedTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this._advancedTabPage.Size = new System.Drawing.Size(297, 460);
+            this._advancedTabPage.TabIndex = 3;
+            this._advancedTabPage.Text = "Advanced";
+            this._advancedTabPage.UseVisualStyleBackColor = true;
+            // 
+            // _advancedSplitContainer
+            // 
+            this._advancedSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._advancedSplitContainer.Location = new System.Drawing.Point(3, 3);
+            this._advancedSplitContainer.Name = "_advancedSplitContainer";
+            this._advancedSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // _advancedSplitContainer.Panel1
+            // 
+            this._advancedSplitContainer.Panel1.Controls.Add(this.label7);
+            this._advancedSplitContainer.Panel1.Controls.Add(this._enumSettingsDataGridView);
+            // 
+            // _advancedSplitContainer.Panel2
+            // 
+            this._advancedSplitContainer.Panel2.Controls.Add(this.label8);
+            this._advancedSplitContainer.Panel2.Controls.Add(this._stringSettingsDataGridView);
+            this._advancedSplitContainer.Size = new System.Drawing.Size(291, 454);
+            this._advancedSplitContainer.SplitterDistance = 223;
+            this._advancedSplitContainer.TabIndex = 0;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(3, 5);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(191, 13);
+            this.label7.TabIndex = 1;
+            this.label7.Text = "Unrecognized enum-to-number settings";
+            // 
+            // _enumSettingsDataGridView
+            // 
+            this._enumSettingsDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._enumSettingsDataGridView.BackgroundColor = System.Drawing.SystemColors.Window;
+            this._enumSettingsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._enumSettingsDataGridView.Location = new System.Drawing.Point(3, 23);
+            this._enumSettingsDataGridView.Name = "_enumSettingsDataGridView";
+            this._enumSettingsDataGridView.Size = new System.Drawing.Size(285, 197);
+            this._enumSettingsDataGridView.TabIndex = 0;
+            this._enumSettingsDataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.Handle_DataGridView_DataError);
+            this._enumSettingsDataGridView.EnabledChanged += new System.EventHandler(this.Handle_DataGridView_EnabledChanged);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(3, 6);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(145, 13);
+            this.label8.TabIndex = 2;
+            this.label8.Text = "Nuance OCR engine settings";
+            // 
+            // _stringSettingsDataGridView
+            // 
+            this._stringSettingsDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._stringSettingsDataGridView.BackgroundColor = System.Drawing.SystemColors.Window;
+            this._stringSettingsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._stringSettingsDataGridView.Location = new System.Drawing.Point(3, 25);
+            this._stringSettingsDataGridView.Name = "_stringSettingsDataGridView";
+            this._stringSettingsDataGridView.Size = new System.Drawing.Size(285, 197);
+            this._stringSettingsDataGridView.TabIndex = 1;
+            this._stringSettingsDataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.Handle_DataGridView_DataError);
+            this._stringSettingsDataGridView.EnabledChanged += new System.EventHandler(this.Handle_DataGridView_EnabledChanged);
+            // 
+            // _defaultDecompositionMethodComboBox
+            // 
+            this._defaultDecompositionMethodComboBox.FormattingEnabled = true;
+            this._defaultDecompositionMethodComboBox.Location = new System.Drawing.Point(165, 180);
+            this._defaultDecompositionMethodComboBox.Name = "_defaultDecompositionMethodComboBox";
+            this._defaultDecompositionMethodComboBox.Size = new System.Drawing.Size(125, 21);
+            this._defaultDecompositionMethodComboBox.TabIndex = 4;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 183);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(150, 13);
+            this.label11.TabIndex = 3;
+            this.label11.Text = "Default decomposition method";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 263);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(169, 13);
+            this.label12.TabIndex = 9;
+            this.label12.Text = "Timeout (max ms without progress)";
+            // 
+            // _timeoutNumericUpDown
+            // 
+            this._timeoutNumericUpDown.Location = new System.Drawing.Point(202, 261);
+            this._timeoutNumericUpDown.Maximum = new decimal(new int[] {
+            2147483647,
+            0,
+            0,
+            0});
+            this._timeoutNumericUpDown.Name = "_timeoutNumericUpDown";
+            this._timeoutNumericUpDown.Size = new System.Drawing.Size(88, 20);
+            this._timeoutNumericUpDown.TabIndex = 10;
+            this._timeoutNumericUpDown.Value = new decimal(new int[] {
+            12000,
+            0,
+            0,
+            0});
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(6, 210);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(125, 13);
+            this.label13.TabIndex = 5;
+            this.label13.Text = "Accuracy/speed tradeoff";
+            // 
+            // _accuracyTradeoffComboBox
+            // 
+            this._accuracyTradeoffComboBox.FormattingEnabled = true;
+            this._accuracyTradeoffComboBox.Location = new System.Drawing.Point(165, 207);
+            this._accuracyTradeoffComboBox.Name = "_accuracyTradeoffComboBox";
+            this._accuracyTradeoffComboBox.Size = new System.Drawing.Size(125, 21);
+            this._accuracyTradeoffComboBox.TabIndex = 6;
+            // 
+            // _preferAccuracteEngineCheckBox
+            // 
+            this._preferAccuracteEngineCheckBox.AutoSize = true;
+            this._preferAccuracteEngineCheckBox.Location = new System.Drawing.Point(7, 287);
+            this._preferAccuracteEngineCheckBox.Name = "_preferAccuracteEngineCheckBox";
+            this._preferAccuracteEngineCheckBox.Size = new System.Drawing.Size(281, 17);
+            this._preferAccuracteEngineCheckBox.TabIndex = 11;
+            this._preferAccuracteEngineCheckBox.Text = "Prefer accurate engine (perform third recognition pass)";
+            this._preferAccuracteEngineCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(6, 237);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(105, 13);
+            this.label14.TabIndex = 7;
+            this.label14.Text = "Default filling method";
+            // 
+            // _defaultFillingMethodComboBox
+            // 
+            this._defaultFillingMethodComboBox.FormattingEnabled = true;
+            this._defaultFillingMethodComboBox.Location = new System.Drawing.Point(165, 234);
+            this._defaultFillingMethodComboBox.Name = "_defaultFillingMethodComboBox";
+            this._defaultFillingMethodComboBox.Size = new System.Drawing.Size(125, 21);
+            this._defaultFillingMethodComboBox.TabIndex = 8;
             // 
             // OCRParametersConfigure
             // 
@@ -450,13 +704,14 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(311, 472);
+            this.ClientSize = new System.Drawing.Size(329, 544);
             this.Controls.Add(this._tabControl);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(345, 0);
             this.Name = "OCRParametersConfigure";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure OCR properties";
@@ -464,8 +719,13 @@
             this._languagesTabPage.PerformLayout();
             this._recognitionLanguagesGroupBox.ResumeLayout(false);
             this._recognitionLanguagesGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._languagesDataGridView)).EndInit();
             this._recognitionOptionsTabPage.ResumeLayout(false);
             this._recognitionOptionsTabPage.PerformLayout();
+            this._pageFailureOptionsGroupBox.ResumeLayout(false);
+            this._pageFailureOptionsGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._maxPageFailurePercentNumericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maxPageFailureNumberNumericUpDown)).EndInit();
             this._imageOptionsTabPage.ResumeLayout(false);
             this._forceDespeckleGroupBox.ResumeLayout(false);
             this._forceDespeckleGroupBox.PerformLayout();
@@ -475,6 +735,16 @@
             ((System.ComponentModel.ISupportInitialize)(this._maxYNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._maxXNumericUpDown)).EndInit();
             this._tabControl.ResumeLayout(false);
+            this._advancedTabPage.ResumeLayout(false);
+            this._advancedSplitContainer.Panel1.ResumeLayout(false);
+            this._advancedSplitContainer.Panel1.PerformLayout();
+            this._advancedSplitContainer.Panel2.ResumeLayout(false);
+            this._advancedSplitContainer.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._advancedSplitContainer)).EndInit();
+            this._advancedSplitContainer.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this._enumSettingsDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._stringSettingsDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._timeoutNumericUpDown)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -486,11 +756,6 @@
         private System.Windows.Forms.CheckBox _specifyRecognitionLanguagesCheckBox;
         private System.Windows.Forms.GroupBox _recognitionLanguagesGroupBox;
         private System.Windows.Forms.CheckBox _singleLanguageDetectionCheckBox;
-        private System.Windows.Forms.ComboBox _language5ComboBox;
-        private System.Windows.Forms.ComboBox _language4ComboBox;
-        private System.Windows.Forms.ComboBox _language3ComboBox;
-        private System.Windows.Forms.ComboBox _language2ComboBox;
-        private System.Windows.Forms.ComboBox _language1ComboBox;
         private System.Windows.Forms.TabPage _recognitionOptionsTabPage;
         private System.Windows.Forms.CheckBox _zoneOrderingCheckBox;
         private System.Windows.Forms.CheckBox _limitToBasicLatinCharactersCheckBox;
@@ -512,5 +777,28 @@
         private System.Windows.Forms.NumericUpDown _maxYNumericUpDown;
         private System.Windows.Forms.NumericUpDown _maxXNumericUpDown;
         private System.Windows.Forms.TabControl _tabControl;
+        private System.Windows.Forms.DataGridView _languagesDataGridView;
+        private System.Windows.Forms.TabPage _advancedTabPage;
+        private System.Windows.Forms.SplitContainer _advancedSplitContainer;
+        private System.Windows.Forms.DataGridView _enumSettingsDataGridView;
+        private System.Windows.Forms.DataGridView _stringSettingsDataGridView;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.CheckBox _skipPageOnFailureCheckBox;
+        private System.Windows.Forms.GroupBox _pageFailureOptionsGroupBox;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.NumericUpDown _maxPageFailureNumberNumericUpDown;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.NumericUpDown _maxPageFailurePercentNumericUpDown;
+        private System.Windows.Forms.CheckBox _requireOnePageSuccessCheckBox;
+        private System.Windows.Forms.NumericUpDown _timeoutNumericUpDown;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.ComboBox _defaultDecompositionMethodComboBox;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.ComboBox _accuracyTradeoffComboBox;
+        private System.Windows.Forms.CheckBox _preferAccuracteEngineCheckBox;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.ComboBox _defaultFillingMethodComboBox;
     }
 }

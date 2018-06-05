@@ -697,6 +697,22 @@ library UCLID_COMUTILSLib
 	};
 	[
 		object,
+		uuid(220D6517-1CD8-4256-9E57-3FC040DBBFDB),
+		dual,
+		helpstring("IVariantPair Interface"),
+		pointer_default(unique)
+	]
+	interface IVariantPair : IDispatch
+	{
+		[propget, id(1), helpstring("property VariantKey")] HRESULT VariantKey([out, retval] VARIANT *pvtVal);
+		[propput, id(1), helpstring("property VariantKey")] HRESULT VariantKey([in] VARIANT vtVal);
+		[propget, id(2), helpstring("property VariantValue")] HRESULT VariantValue([out, retval] VARIANT *pvtVal);
+		[propput, id(2), helpstring("property VariantValue")] HRESULT VariantValue([in] VARIANT vtVal);
+		[id(3), helpstring("method SetKeyValuePair")] HRESULT SetKeyValuePair([in] VARIANT vtKey, [in] VARIANT vtVal);
+		[id(4), helpstring("method GetKeyValuePair")] HRESULT GetKeyValuePair([out] VARIANT* pvtKey, [out] VARIANT* vtVal);
+	};
+	[
+		object,
 		uuid(4A81559E-AB57-456F-AB3F-E00738F01DF5),
 		dual,
 		helpstring("IClipboardObjectManager Interface"),
@@ -1844,7 +1860,20 @@ library UCLID_COMUTILSLib
 
 		// PURPOSE: To Copy all properties from pObject to this object, including the GUID for an IIdentifiableObject
 		[id(2), helpstring("method CopyFromIdentifiableObject")] HRESULT CopyFromIdentifiableObject([in] IUnknown *pObject);
-	}
+	};
+
+	[
+		object,
+		uuid(E9E14464-A4BF-4EDB-BC07-BD0B9C5E800E),
+		dual,
+		helpstring("IOCRParameters Interface"),
+		pointer_default(unique)
+	]
+	interface IOCRParameters : IDispatch
+	{
+		[propget, id(1), helpstring("property Size")] HRESULT Size([out, retval] long *pVal);
+	};
+
 
 	//---------------------------------------------------------------------------------------------
 	//-C O C L A S S E S --------------------------------------------------------------------------
@@ -1880,6 +1909,7 @@ library UCLID_COMUTILSLib
 		interface ICopyableObject;
 		interface IShallowCopyable;
 		interface ILicensedComponent;
+		interface IOCRParameters;
 	};
 	[
 		uuid(E00B3EAE-264B-451C-82DF-1704196AB53A),
@@ -1954,6 +1984,16 @@ library UCLID_COMUTILSLib
 	coclass ObjectPair
 	{
 		[default] interface IObjectPair;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(62218BA1-DAA8-420A-BEEA-3AC427EEDB9A),
+		helpstring("VariantPair Class")
+	]
+	coclass VariantPair
+	{
+		[default] interface IVariantPair;
+		interface ICopyableObject;
 		interface ILicensedComponent;
 	};
 	[

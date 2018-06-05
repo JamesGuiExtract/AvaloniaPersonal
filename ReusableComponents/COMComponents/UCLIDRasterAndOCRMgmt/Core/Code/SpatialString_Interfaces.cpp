@@ -985,37 +985,37 @@ STDMETHODIMP CSpatialString::raw_ReportMemoryUsage(void)
 //-------------------------------------------------------------------------------------------------
 // IHasOCRParameters
 //-------------------------------------------------------------------------------------------------
-ILongToLongMapPtr CSpatialString::getOCRParameters()
+IOCRParametersPtr CSpatialString::getOCRParameters()
 {
 	if (m_ipOCRParameters == __nullptr)
 	{
-		m_ipOCRParameters.CreateInstance(CLSID_LongToLongMap);
+		m_ipOCRParameters.CreateInstance(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI45872", m_ipOCRParameters != __nullptr);
 	}
 
 	return m_ipOCRParameters;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialString::get_OCRParameters(ILongToLongMap** ppMap)
+STDMETHODIMP CSpatialString::get_OCRParameters(IOCRParameters** ppOCRParameters)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		*ppMap = getOCRParameters().Detach();
+		*ppOCRParameters = getOCRParameters().Detach();
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45854");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialString::put_OCRParameters(ILongToLongMap* pMap)
+STDMETHODIMP CSpatialString::put_OCRParameters(IOCRParameters* pOCRParameters)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI45855", pMap != __nullptr);
-		m_ipOCRParameters = pMap;
+		ASSERT_ARGUMENT("ELI45855", pOCRParameters != __nullptr);
+		m_ipOCRParameters = pOCRParameters;
 
 		return S_OK;
 	}

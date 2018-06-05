@@ -29,6 +29,7 @@
 #include "LongPoint.h"
 #include "LongToLongMap.h"
 #include "DoublePoint.h"
+#include "VariantPair.h"
 
 #include <initguid.h>
 
@@ -55,6 +56,7 @@ OBJECT_ENTRY(CLSID_LongToObjectMap, CLongToObjectMap)
 OBJECT_ENTRY(CLSID_LongPoint, CLongPoint)
 OBJECT_ENTRY(CLSID_LongToLongMap, CLongToLongMap)
 OBJECT_ENTRY(CLSID_DoublePoint, CDoublePoint)
+OBJECT_ENTRY(CLSID_VariantPair, CVariantPair)
 END_OBJECT_MAP()
 
 class CUCLIDCOMUtilsApp : public CWinApp

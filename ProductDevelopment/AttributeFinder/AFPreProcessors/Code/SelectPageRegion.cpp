@@ -651,7 +651,7 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 		}
 
 		IHasOCRParametersPtr ipHasOCRParameters(ipAFDoc);
-		ILongToLongMapPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
+		IOCRParametersPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
 
 		// Create collection of Attributes to return
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
@@ -748,7 +748,7 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 		bool bRestrictionDefined = isRestrictionDefined();
 
 		IHasOCRParametersPtr ipHasOCRParameters(ipAFDoc);
-		ILongToLongMapPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
+		IOCRParametersPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
 
 		ISpatialStringPtr ipResult( CLSID_SpatialString );
 		ASSERT_RESOURCE_ALLOCATION("ELI18561", ipResult != __nullptr);
@@ -1407,7 +1407,7 @@ bool CSelectPageRegion::isStringFoundOnPage(string strPageText)
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,
-	const string& strSourceDoc, long nPageNum, bool bPageSpecified, ILongToLongMapPtr ipOCRParameters)
+	const string& strSourceDoc, long nPageNum, bool bPageSpecified, IOCRParametersPtr ipOCRParameters)
 {
 	try
 	{
@@ -1693,7 +1693,7 @@ IRegularExprParserPtr CSelectPageRegion::getParser(IAFDocumentPtr ipAFDocument)
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& ipInputText, 
 	const string& strSourceDoc, bool bPageSpecified, bool bRestrictionDefined,
-	ILongToLongMapPtr ipOCRParameters, long nPageNum)
+	IOCRParametersPtr ipOCRParameters, long nPageNum)
 {
 	// Get the desired Spatial String portion for this page depending on:
 	//	bRestrictionDefined - whether or not a subregion has been defined

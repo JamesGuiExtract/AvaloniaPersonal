@@ -67,7 +67,7 @@ STDMETHODIMP COCRUtils::BatchOCR(BSTR strRootDirOrFile,
 								 VARIANT_BOOL bCompressUSSFile,
 								 VARIANT_BOOL bSkipCreation,
 								 IProgressStatus* pProgressStatus,
-								 ILongToLongMap* pOCRParameters)
+								 IOCRParameters* pOCRParameters)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -152,7 +152,7 @@ STDMETHODIMP COCRUtils::RecognizeTextInImageFile(BSTR strImageFileName,
 												 long lNumPages, 
 												 IOCREngine* pOCREngine,
 												 IProgressStatus* pProgressStatus,
-												 ILongToLongMap* pOCRParameters,
+												 IOCRParameters* pOCRParameters,
 												 ISpatialString **pstrText)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -275,7 +275,7 @@ void COCRUtils::processImageFile(const string& strImageFile, int nMaxNumOfPages,
 								 VARIANT_BOOL bSkipCreation,
 								 UCLID_RASTERANDOCRMGMTLib::IOCREnginePtr ipOCREngine,
 								 IProgressStatus* pProgressStatus,
-								 ILongToLongMap* pOCRParameters)
+								 IOCRParameters* pOCRParameters)
 {
 	// Make sure that if the image is a pdf that PDF support is licensed
 	LicenseManagement::verifyFileTypeLicensed( strImageFile );
@@ -384,7 +384,7 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr COCRUtils::recognizeImage(
 								bool bReturnSpatialInfo,
 								UCLID_RASTERANDOCRMGMTLib::IOCREnginePtr ipOCREngine,
 								IProgressStatus* pProgressStatus,
-								ILongToLongMap* pOCRParameters)
+								IOCRParameters* pOCRParameters)
 {
 	// Recognize the text
 	return ipOCREngine->RecognizeTextInImage(strImageFile.c_str(), 1, nNumOfPagesToRecognize,

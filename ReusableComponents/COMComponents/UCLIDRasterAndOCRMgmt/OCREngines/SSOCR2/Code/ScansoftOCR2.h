@@ -54,7 +54,7 @@ END_COM_MAP()
 		/*[in]*/ VARIANT_BOOL vbDetectHandwriting, /*[in]*/ VARIANT_BOOL vbReturnUnrecognized, 
 		/*[in]*/ VARIANT_BOOL vbReturnSpatialInfo, /*[in]*/ VARIANT_BOOL vbUpdateProgressStatus, 
 		/*[in]*/ EPageDecompositionMethod eDecompMethod,
-		/*[in]*/ ILongToLongMap* pOCRParameters, /*[out, retval]*/ BSTR* pStream);
+		/*[out, retval]*/ BSTR* pStream);
 	STDMETHOD(GetPID)(long* pPID);
 	STDMETHOD(SupportsTrainingFiles)(VARIANT_BOOL *pbValue);
 	STDMETHOD(LoadTrainingFile)(BSTR strTrainingFileName);
@@ -62,6 +62,7 @@ END_COM_MAP()
 	STDMETHOD(GetProgress)(long* plProcessID, long* plPercentComplete, 
 		long* plPageIndex, long* plPageNumber);
 	STDMETHOD(GetPrimaryDecompositionMethod)(EPageDecompositionMethod *ePrimaryDecompositionMethod);
+	STDMETHOD(SetOCRParameters)(IOCRParameters* pOCRParameters, VARIANT_BOOL vbReApply);
 
 // IPrivateLicensedComponent
 	STDMETHOD(raw_InitPrivateLicense)(/*[in]*/ BSTR strPrivateLicenseKey);
@@ -139,6 +140,9 @@ private:
 	
 	// true if failed pages should be skipped; false if failed pages should fail the document.
 	bool m_bSkipPageOnFailure;
+
+	// true if at least one page must successfully OCR; false if all pages failing will fail the document
+	bool m_bRequireOnePageSuccess;
 
 	// The maximum percentage of pages that can fail without failing the document.
 	unsigned long m_uiMaxOcrPageFailurePercentage;
@@ -218,11 +222,18 @@ private:
 
 	bool m_bLimitToBasicLatinCharacters;
 
+	bool m_bSettingsApplied;
+	bool m_bOCRParamertersApplied;
+
+	EPageDecompositionMethod m_ePrimaryDecompositionMethod;
+
+	FILLINGMETHOD m_eDefaultFillingMethod;
+
+
 	/////////////
 	// Methods
 	/////////////
 	void validateLicense();
-
 
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Sets the decomposition method to use based on the specified index.
@@ -446,20 +457,19 @@ private:
 	// PROMISE: Calls kRecFree for each non-NULL zone layout in m_listZoneLayouts
 	void freeZoneLayoutMemory();
 
-	void applySettingsFromParameters(ILongToLongMapPtr ipOCRParameters);
+	void applySettingsFromParameters(IOCRParametersPtr ipOCRParameters);
+	void applySettingsFromRegistry();
+	void applyCommonSettings();
 
 	bool isRecognizedCharacter(unsigned short usLetterCode);
 
 	void convertToCodePage(unsigned short *usLetterCode);
-};
 
-//-------------------------------------------------------------------------------------------------
-// helper methods
-//-------------------------------------------------------------------------------------------------
-bool zoneIsLessThan(ZONE zoneLeft, ZONE zoneRight);
-//-------------------------------------------------------------------------------------------------
-// PURPOSE: Returns true if usLetterCode is a basic latin character (ie. alphabetic, numeric, or 
-//          punctuation) or if it is the degree symbol. Returns false if usLetterCode is not in
-//          basic latin character set (eg. accented characters, fractions, copyright symbol).
-// P16 #2356
-bool isBasicLatinCharacter(unsigned short usLetterCode);
+	bool zoneIsLessThan(ZONE zoneLeft, ZONE zoneRight);
+	//-------------------------------------------------------------------------------------------------
+	// PURPOSE: Returns true if usLetterCode is a basic latin character (ie. alphabetic, numeric, or 
+	//          punctuation) or if it is the degree symbol. Returns false if usLetterCode is not in
+	//          basic latin character set (eg. accented characters, fractions, copyright symbol).
+	// P16 #2356
+	bool isBasicLatinCharacter(unsigned short usLetterCode);
+};

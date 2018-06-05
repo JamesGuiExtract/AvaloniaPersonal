@@ -106,6 +106,7 @@ CScansoftOCR2::CScansoftOCR2()
   m_bOrderZones(true),
   m_eTradeoff(TO_ACCURATE),
   m_bSkipPageOnFailure(false),
+  m_bRequireOnePageSuccess(false),
   m_uiMaxOcrPageFailurePercentage(25),
   m_uiMaxOcrPageFailureNumber(10),
   m_uiDecompositionMethods(1),
@@ -123,7 +124,11 @@ CScansoftOCR2::CScansoftOCR2()
   m_eventKillTimeoutThread(false),
   m_eventProgressMade(false),
   m_nTimeoutLength(120000),
-  m_bLimitToBasicLatinCharacters(true)
+  m_bLimitToBasicLatinCharacters(true),
+  m_bSettingsApplied(false),
+  m_bOCRParamertersApplied(false),
+  m_ePrimaryDecompositionMethod(kAutoDecomposition),
+  m_eDefaultFillingMethod(FM_OMNIFONT)
 {
 	try
 	{
@@ -201,9 +206,11 @@ STDMETHODIMP CScansoftOCR2::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IScansoftOCR2
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CScansoftOCR2::RecognizeText(BSTR bstrImageFileName, IVariantVector* pPageNumbers, ILongRectangle* pZone, long lRotationInDegrees, EFilterCharacters eFilter,	BSTR bstrCustomFilterCharacters, EOcrTradeOff eTradeOff, VARIANT_BOOL vbDetectHandwriting, VARIANT_BOOL vbReturnUnrecognized, VARIANT_BOOL vbReturnSpatialInfo, 
-		VARIANT_BOOL vbUpdateProgressStatus, EPageDecompositionMethod eDecompMethod, ILongToLongMap* pOCRParameters,
-		BSTR* pStream)
+STDMETHODIMP CScansoftOCR2::RecognizeText(BSTR bstrImageFileName, IVariantVector* pPageNumbers, ILongRectangle* pZone,
+	long lRotationInDegrees, EFilterCharacters eFilter,	BSTR bstrCustomFilterCharacters, EOcrTradeOff eTradeOff,
+	VARIANT_BOOL vbDetectHandwriting, VARIANT_BOOL vbReturnUnrecognized, VARIANT_BOOL vbReturnSpatialInfo, 
+	VARIANT_BOOL vbUpdateProgressStatus, EPageDecompositionMethod eDecompMethod,
+	BSTR* pStream)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 	
@@ -211,14 +218,6 @@ STDMETHODIMP CScansoftOCR2::RecognizeText(BSTR bstrImageFileName, IVariantVector
 	{
 		// validate the license
 		validateLicense();
-
-		// Apply parameters
-		if (pOCRParameters != NULL)
-		{
-			ILongToLongMapPtr ipOCRParameters(pOCRParameters);
-			ASSERT_RESOURCE_ALLOCATION("ELI45914", ipOCRParameters != __nullptr);
-			applySettingsFromParameters(ipOCRParameters);
-		}
 
 		// store whether to update the progress status
 		ms_bUpdateProgressStatus = asCppBool(vbUpdateProgressStatus);
@@ -378,12 +377,62 @@ STDMETHODIMP CScansoftOCR2::GetPrimaryDecompositionMethod(
 
 	try
 	{
-		*ePrimaryDecompositionMethod = 
-			(EPageDecompositionMethod) m_apCfg->getPrimaryDecompositionMethod();
+		*ePrimaryDecompositionMethod = m_ePrimaryDecompositionMethod;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16762");
 
 	return S_OK;	
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR2::SetOCRParameters(IOCRParameters* pOCRParameters, VARIANT_BOOL vbReApply)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		if (!m_bSettingsApplied || asCppBool(vbReApply))
+		{
+			IOCRParametersPtr ipOCRParameters;
+			if (pOCRParameters != __nullptr)
+			{
+				ipOCRParameters = pOCRParameters;
+				ASSERT_RESOURCE_ALLOCATION("ELI46009", ipOCRParameters != __nullptr);
+			}
+			
+			if (ipOCRParameters != __nullptr && ipOCRParameters->Size > 0)
+			{
+				applySettingsFromParameters(ipOCRParameters);
+				m_bOCRParamertersApplied = true;
+			}
+			else
+			{
+				// If settings were previously applied using an IOCRParameters collection
+				// then set everything back to the default values so that none of those settings
+				// values remain
+				if (m_bOCRParamertersApplied)
+				{
+					// Set everything to default values
+					HSETTING hSetting;
+					THROW_UE_ON_ERROR("ELI45929", "Unable to get OCR setting.",
+						kRecSettingGetHandle(NULL, "Kernel", &hSetting, NULL));
+					THROW_UE_ON_ERROR("ELI45930", "Unable to set default options",
+						kRecSettingSetToDefault(0, hSetting, TRUE));
+
+					// Set Extract-specific default settings
+					applyCommonSettings();
+
+					m_bOCRParamertersApplied = false;
+				}
+
+				applySettingsFromRegistry();
+			}
+
+			m_bSettingsApplied = true;
+		}
+
+		return S_OK;	
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16762");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -689,6 +738,15 @@ void CScansoftOCR2::recognizeTextOnPages(const string& strFileName,
 					// Add as debug info all history entries from ue
 					apAggregateException->addDebugInfo("Exception History", ue);
 
+					// Check if all pages failed
+					if (m_bRequireOnePageSuccess && m_vecFailedPages.size() == vecPageNumbers.size())
+					{
+						apAggregateException.reset(new UCLIDException("ELI46008", 
+							"Failure to OCR image. All pages failed.", *apAggregateException));
+
+						throw *apAggregateException;
+					}
+
 					// Check if max failures reached
 					if (m_vecFailedPages.size() > m_uiMaxOcrPageFailureNumber || 
 						m_vecFailedPages.size() * 100.0 / uiCount > (double)m_uiMaxOcrPageFailurePercentage)
@@ -972,102 +1030,11 @@ void CScansoftOCR2::init()
 		// Initialize our registry settings manager
 		m_apCfg = unique_ptr<ScansoftOCRCfg>(new ScansoftOCRCfg());
 
-		// Set the speed-accuracy trade off
-		setTradeOff(kRegistry);
-
-		// NOTE: Turning on the CNV_NO mode makes OCR output sometimes very bad!
-		// keep color/greyscale images in memory as color/greyscale images
-		// NOTE: the RecAPI documentation recommends this step to improve accruacy
-		//THROW_UE_ON_ERROR("ELI03413", "Unable to set image conversion options in the OCR engine!",
-		//	RecSetImgConvMode(CNV_NO));
-
-		// specify the default symbol for rejected chars
-		THROW_UE_ON_ERROR("ELI03766", "Unable to set default rejection symbol in the OCR engine!",
-			kRecSetRejectionSymbol(0, gwcUNRECOGNIZED));
-
-		// specify the code page setting of the ENGine.
-		THROW_UE_ON_ERROR("ELI03380", "Unable to set code page in the OCR engine!",
-			kRecSetCodePage(0, "Windows ANSI"));
-		
-		// enable automatic image inversion mode
-		THROW_UE_ON_ERROR("ELI03415", "Unable to set image inversion mode in the OCR engine!",
-			kRecSetImgInvert(0, INV_AUTO));
-
-		// enable automatic image deskewing mode
-		THROW_UE_ON_ERROR("ELI03414", "Unable to set image deskewing mode in the OCR engine!",
-			kRecSetImgDeskew(0, DSK_AUTO));
-
-		// enable automatic image rotation mode
-		THROW_UE_ON_ERROR("ELI03416", "Unable to set image rotation mode in the OCR engine!",
-			kRecSetImgRotation(0, ROT_AUTO));
-
-		// enable to the progress monitor for progress status updates and monitoring timeout status
-		THROW_UE_ON_ERROR("ELI09029", "Unable to set the Progress Monitor Callback!",
-			kRecSetCBProgMon(0, ProgressMon, NULL));
-
-		// get settings manager
-		HSETTING hSetting;
-		THROW_UE_ON_ERROR("ELI16766", "Unable to get OCR setting.",
-			kRecSettingGetHandle(NULL, "Kernel.OcrMgr.PreferAccurateEngine", &hSetting, NULL) );
-
-		// enable or disable third recognition pass
-		m_bRunThirdRecPass = m_apCfg->getPerformThirdRecognitionPass();
-		THROW_UE_ON_ERROR("ELI16767", "Unable to set third recognition pass option",
-			kRecSettingSetInt(0, hSetting, m_bRunThirdRecPass) );
-
-		// https://extract.atlassian.net/browse/ISSUE-12265
-		// It appears up thru Nuance v18, either the LoadOriginalDPI must not have been available, 
-		// must have defaulted to false, or must not have worked. Previous versions of Nuance appear
-		// to have always assumed DPI of 300x300 (which matches LeadTools code that is forcing a DPI
-		// of 300x300). But starting with version 19, the DPI was being set by the image file which
-		// can mean it conflicts with how LeadTools loads, displays and saves these images.
-		// For the time being, force to 300 DPI to maintain consistency with previous versions.
-		THROW_UE_ON_ERROR("ELI37096", "Unable to get OCR setting.",
-			kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.LoadOriginalDPI", &hSetting, NULL) );
-		THROW_UE_ON_ERROR("ELI37097", "", kRecSettingSetInt(0, hSetting, FALSE));
-
-		THROW_UE_ON_ERROR("ELI37098", "Unable to get OCR setting.",
-			kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.Resolution", &hSetting, NULL) );
-		THROW_UE_ON_ERROR("ELI37099", "", kRecSettingSetInt(0, hSetting, 300));
-
-		// get the timeout length
-		m_nTimeoutLength = m_apCfg->getTimeoutLength();
+		applyCommonSettings();
 
 		// load the filter chars display related settings from our
 		// persistence settings store
 		m_eDisplayFilterCharsType = m_apCfg->getDisplayFilterChars();
-
-		// get whether or not to order zones
-		m_bOrderZones = m_apCfg->getZoneOrdering();
-
-		// Get whether pages should be skipped when they fail ocr.
-		m_bSkipPageOnFailure = m_apCfg->getSkipPageOnFailure();
-
-		// Get the maximum percentage of pages that can fail without failing the document
-		m_uiMaxOcrPageFailurePercentage = m_apCfg->getMaxOcrPageFailurePercentage();
-
-		// Get the maximum number of pages that can fail without failing the document
-		m_uiMaxOcrPageFailureNumber = m_apCfg->getMaxOcrPageFailureNumber();
-
-		// https://extract.atlassian.net/browse/ISSUE-12160
-		// Get the despeckling options to use.
-		unsigned long ulDespeckleMode = m_apCfg->getDespeckleMode();
-
-		// Bit 0
-		m_bEnableDespeckleMode = ((ulDespeckleMode & 1) == 1);
-
-		// Bit 1
-		m_eForceDespeckle = ((ulDespeckleMode & 2) == 2) ? kForceWhenBitonal : kNeverForce;
-
-		// Bits 2-6
-		m_eForceDespeckleMethod = (DESPECKLE_METHOD)((ulDespeckleMode >> 2) & 0x1F);
-
-		// Bits 7+
-		m_nForceDespeckleLevel = (long)(ulDespeckleMode >> 7);
-
-		// Enable automatic image-despeckling mode per the low-bit of m_apCfg->getDespeckleMode().
-		THROW_UE_ON_ERROR("ELI03417", "Unable to set image despeckling mode in the OCR engine!",
-			kRecSetImgDespeckleMode(0, m_bEnableDespeckleMode ? TRUE : FALSE));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26100")
 }
@@ -1497,7 +1464,7 @@ void CScansoftOCR2::getRecognizedText(string& rstrText, bool bReturnUnrecognized
 			if (bIsRecognized)
 			{
 				convertToCodePage((unsigned short*)&pScansoftLetters[i].code);
-				rstrText += pScansoftLetters[i].code;
+				rstrText += (char)pScansoftLetters[i].code;
 			}
 			else
 			{
@@ -2526,6 +2493,254 @@ void CScansoftOCR2::setTradeOff(EOcrTradeOff eTradeOff)
 	THROW_UE_ON_ERROR("ELI03412", "Unable to set tradeoff option in the OCR engine.",
 		kRecSetRMTradeoff(0, m_eTradeoff));
 }
+//-------------------------------------------------------------------------------------------------
+void CScansoftOCR2::applyCommonSettings()
+{
+	try
+	{
+		// NOTE: Turning on the CNV_NO mode makes OCR output sometimes very bad!
+		// keep color/greyscale images in memory as color/greyscale images
+		// NOTE: the RecAPI documentation recommends this step to improve accruacy
+		//THROW_UE_ON_ERROR("ELI03413", "Unable to set image conversion options in the OCR engine!",
+		//	RecSetImgConvMode(CNV_NO));
+
+		// specify the default symbol for rejected chars
+		THROW_UE_ON_ERROR("ELI03766", "Unable to set default rejection symbol in the OCR engine!",
+			kRecSetRejectionSymbol(0, gwcUNRECOGNIZED));
+
+		// specify the code page setting of the ENGine.
+		THROW_UE_ON_ERROR("ELI03380", "Unable to set code page in the OCR engine!",
+			kRecSetCodePage(0, "Windows ANSI"));
+		
+		// enable automatic image inversion mode
+		THROW_UE_ON_ERROR("ELI03415", "Unable to set image inversion mode in the OCR engine!",
+			kRecSetImgInvert(0, INV_AUTO));
+
+		// enable automatic image deskewing mode
+		THROW_UE_ON_ERROR("ELI03414", "Unable to set image deskewing mode in the OCR engine!",
+			kRecSetImgDeskew(0, DSK_AUTO));
+
+		// enable automatic image rotation mode
+		THROW_UE_ON_ERROR("ELI03416", "Unable to set image rotation mode in the OCR engine!",
+			kRecSetImgRotation(0, ROT_AUTO));
+
+		// enable to the progress monitor for progress status updates and monitoring timeout status
+		THROW_UE_ON_ERROR("ELI09029", "Unable to set the Progress Monitor Callback!",
+			kRecSetCBProgMon(0, ProgressMon, NULL));
+
+		HSETTING hSetting;
+		// https://extract.atlassian.net/browse/ISSUE-12265
+		// It appears up thru Nuance v18, either the LoadOriginalDPI must not have been available, 
+		// must have defaulted to false, or must not have worked. Previous versions of Nuance appear
+		// to have always assumed DPI of 300x300 (which matches LeadTools code that is forcing a DPI
+		// of 300x300). But starting with version 19, the DPI was being set by the image file which
+		// can mean it conflicts with how LeadTools loads, displays and saves these images.
+		// For the time being, force to 300 DPI to maintain consistency with previous versions.
+		THROW_UE_ON_ERROR("ELI37096", "Unable to get OCR setting.",
+			kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.LoadOriginalDPI", &hSetting, NULL) );
+		THROW_UE_ON_ERROR("ELI37097", "", kRecSettingSetInt(0, hSetting, FALSE));
+
+		THROW_UE_ON_ERROR("ELI37098", "Unable to get OCR setting.",
+			kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.Resolution", &hSetting, NULL) );
+		THROW_UE_ON_ERROR("ELI37099", "", kRecSettingSetInt(0, hSetting, 300));
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45914")
+}
+//-------------------------------------------------------------------------------------------------
+void CScansoftOCR2::applySettingsFromRegistry()
+{
+	try
+	{
+		// Set primary decomposition method
+		m_ePrimaryDecompositionMethod = (EPageDecompositionMethod)m_apCfg->getPrimaryDecompositionMethod();
+		// Set the speed-accuracy trade off
+		setTradeOff(kRegistry);
+		// get settings manager
+		HSETTING hSetting;
+		THROW_UE_ON_ERROR("ELI16766", "Unable to get OCR setting.",
+			kRecSettingGetHandle(NULL, "Kernel.OcrMgr.PreferAccurateEngine", &hSetting, NULL) );
+		// enable or disable third recognition pass
+		m_bRunThirdRecPass = m_apCfg->getPerformThirdRecognitionPass();
+		THROW_UE_ON_ERROR("ELI16767", "Unable to set third recognition pass option",
+			kRecSettingSetInt(0, hSetting, m_bRunThirdRecPass) );
+		// get the timeout length
+		m_nTimeoutLength = m_apCfg->getTimeoutLength();
+		// get whether or not to order zones
+		m_bOrderZones = m_apCfg->getZoneOrdering();
+		// Get whether pages should be skipped when they fail ocr.
+		m_bSkipPageOnFailure = m_apCfg->getSkipPageOnFailure();
+		// Get the maximum percentage of pages that can fail without failing the document
+		m_uiMaxOcrPageFailurePercentage = m_apCfg->getMaxOcrPageFailurePercentage();
+		// Get the maximum number of pages that can fail without failing the document
+		m_uiMaxOcrPageFailureNumber = m_apCfg->getMaxOcrPageFailureNumber();
+
+		// https://extract.atlassian.net/browse/ISSUE-12160
+		// Get the despeckling options to use.
+		unsigned long ulDespeckleMode = m_apCfg->getDespeckleMode();
+		// Bit 0
+		m_bEnableDespeckleMode = ((ulDespeckleMode & 1) == 1);
+		// Bit 1
+		m_eForceDespeckle = ((ulDespeckleMode & 2) == 2) ? kForceWhenBitonal : kNeverForce;
+		// Bits 2-6
+		m_eForceDespeckleMethod = (DESPECKLE_METHOD)((ulDespeckleMode >> 2) & 0x1F);
+		// Bits 7+
+		m_nForceDespeckleLevel = (long)(ulDespeckleMode >> 7);
+		// Enable automatic image-despeckling mode per the low-bit of m_apCfg->getDespeckleMode().
+		THROW_UE_ON_ERROR("ELI03417", "Unable to set image despeckling mode in the OCR engine!",
+			kRecSetImgDespeckleMode(0, m_bEnableDespeckleMode ? TRUE : FALSE));
+
+		// Extract-implemented settings that don't exist in the registry should be set to legacy values in case there were previously applied parameters
+		m_bLimitToBasicLatinCharacters = true;
+		m_bRequireOnePageSuccess = false;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45914")
+}
+//-------------------------------------------------------------------------------------------------
+void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameters)
+{
+	try
+	{
+		long nCount = ipOCRParameters->Size;
+
+		if (nCount == 0)
+		{
+			return;
+		}
+
+		IVariantVectorPtr ipPairs = ipOCRParameters;
+		ASSERT_RESOURCE_ALLOCATION("ELI46003", ipPairs != __nullptr);
+
+		bool bFirstLanguage = true;
+
+		for (long i = 0; i < nCount; i++)
+		{	
+			_variant_t vtKey, vtValue;
+			HSETTING hSetting;
+			IVariantPairPtr ipPair = ipPairs->Item[i];
+			ipPair->GetKeyValuePair(&vtKey, &vtValue);
+
+			if (vtKey.vt == VT_I4 && vtValue.vt == VT_I4)
+			{
+				long nKey = vtKey.lVal;
+				long nValue = vtValue.lVal;
+
+				switch ((EOCRParameter)nKey)
+				{
+				case kForceDespeckleMode:
+					m_eForceDespeckle = (EForceDespeckleMode)nValue;
+					break;
+				case kForceDespeckleMethod:
+					m_eForceDespeckleMethod = (DESPECKLE_METHOD)nValue;
+					break;
+				case kForceDespeckleLevel:
+					m_nForceDespeckleLevel = nValue;
+					break;
+				case kAutoDespeckleMode:
+					m_bEnableDespeckleMode = !!nValue;
+					THROW_UE_ON_ERROR("ELI45921", "Unable to set image despeckling mode in the OCR engine!",
+						kRecSetImgDespeckleMode(0, m_bEnableDespeckleMode ? TRUE : FALSE));
+					break;
+				case kZoneOrdering:
+					m_bOrderZones = !!nValue;
+					break;
+				case kLimitToBasicLatinCharacters:
+					m_bLimitToBasicLatinCharacters = !!nValue;
+					break;
+				case kLanguage:
+					if (bFirstLanguage)
+					{
+						kRecManageLanguages(0, SET_LANG, (LANGUAGES)nValue);
+						bFirstLanguage = false;
+					}
+					else
+					{
+						kRecManageLanguages(0, ADD_LANG, (LANGUAGES)nValue);
+					}
+					break;
+				case kSkipPageOnFailure:
+					m_bSkipPageOnFailure = !!nValue;
+					break;
+				case kRequireOnePageSuccess:
+					m_bRequireOnePageSuccess = !!nValue;
+					break;
+				case kMaxPageFailureNumber:
+					m_uiMaxOcrPageFailureNumber = (unsigned long)nValue;
+					break;
+				case kMaxPageFailurePercent:
+					m_uiMaxOcrPageFailurePercentage = (unsigned long)nValue;
+					break;
+				case kDefaultDecompositionMethod:
+					m_ePrimaryDecompositionMethod = (EPageDecompositionMethod)nValue;
+					break;
+				case kTradeoff:
+					setTradeOff((EOcrTradeOff)nValue);
+					break;
+				case kDefaultFillingMethod:
+					THROW_UE_ON_ERROR("ELI46010", "Unable to set default filling method in the OCR engine!",
+						kRecSetDefaultFillingMethod(0, (FILLINGMETHOD)nValue));
+					break;
+				case kTimeout:
+					m_nTimeoutLength = nValue;
+					break;
+				}
+			}
+			// Interpret string-int pair values as RecSettings
+			else if (vtKey.vt == VT_BSTR && vtValue.vt == VT_I4)
+			{
+				string strKey = asString(vtKey.bstrVal);
+				long nValue = vtValue.intVal;
+
+				THROW_UE_ON_ERROR("ELI45929", "Unable to get OCR setting.",
+					kRecSettingGetHandle(NULL, strKey.c_str(), &hSetting, NULL));
+				THROW_UE_ON_ERROR("ELI45930", "Unable to set " + strKey + " option",
+					kRecSettingSetInt(0, hSetting, nValue));
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45922")
+}
+//-------------------------------------------------------------------------------------------------
+bool CScansoftOCR2::zoneIsLessThan(ZONE zoneLeft, ZONE zoneRight)
+{
+	return zoneLeft.rectBBox.top < zoneRight.rectBBox.top ||
+		(zoneLeft.rectBBox.top == zoneRight.rectBBox.top &&
+		zoneLeft.rectBBox.left < zoneRight.rectBBox.left);
+}
+//-------------------------------------------------------------------------------------------------
+bool CScansoftOCR2::isBasicLatinCharacter(unsigned short usLetterCode)
+{
+	// NOTE: 176 is the degree symbol.
+	// Don't allow 0 as a letter code
+	// https://extract.atlassian.net/browse/ISSUE-14802
+	return usLetterCode > 0 && usLetterCode <= 126 || usLetterCode == 176;
+}
+//-------------------------------------------------------------------------------------------------
+bool CScansoftOCR2::isRecognizedCharacter(unsigned short usLetterCode)
+{
+	return usLetterCode > 0
+		&& (!m_bLimitToBasicLatinCharacters || isBasicLatinCharacter(usLetterCode));
+}
+//-------------------------------------------------------------------------------------------------
+void CScansoftOCR2::convertToCodePage(unsigned short *usLetterCode)
+{
+	if (isBasicLatinCharacter(*usLetterCode))
+	{
+		return;
+	}
+
+	size_t buffLen;
+	BYTE buff;
+	buffLen = sizeof(buff);
+	RECERR ret = kRecConvertUnicode2CodePage(0, *usLetterCode, (LPBYTE)&buff, &buffLen);
+	if (ret != REC_OK)
+	{
+		*usLetterCode = gcUNRECOGNIZED;
+	}
+	else
+	{
+		*usLetterCode = buff;
+	}
+}
 
 //-------------------------------------------------------------------------------------------------
 // RecMemoryReleaser
@@ -2623,132 +2838,4 @@ CScansoftOCR2::RecMemoryReleaser<Win32Event>::~RecMemoryReleaser()
 		m_pMemoryType->signal();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19906");
-}
-//-------------------------------------------------------------------------------------------------
-void CScansoftOCR2::applySettingsFromParameters(ILongToLongMapPtr ipOCRParameters)
-{
-	try
-	{
-		long nCount = ipOCRParameters->Size;
-
-		for (long i = 0; i < nCount; i++)
-		{	
-			long nKey, nValue;
-			HSETTING hSetting;
-			ipOCRParameters->GetKeyValue(i, &nKey, &nValue);
-
-			switch ((EOCRParameter)nKey)
-			{
-			case kForceDespeckleMode:
-				m_eForceDespeckle = (EForceDespeckleMode)nValue;
-				break;
-			case kForceDespeckleMethod:
-				m_eForceDespeckleMethod = (DESPECKLE_METHOD)nValue;
-				break;
-			case kForceDespeckleLevel:
-				m_nForceDespeckleLevel = nValue;
-				break;
-			case kAutoDespeckleMode:
-				m_bEnableDespeckleMode = !!nValue;
-				THROW_UE_ON_ERROR("ELI45921", "Unable to set image despeckling mode in the OCR engine!",
-					kRecSetImgDespeckleMode(0, m_bEnableDespeckleMode ? TRUE : FALSE));
-				break;
-			case kZoneOrdering:
-				m_bOrderZones = !!nValue;
-				break;
-			case kLimitToBasicLatinCharacters:
-				m_bLimitToBasicLatinCharacters = !!nValue;
-				break;
-
-			case kLanguage1:
-				kRecManageLanguages(0, SET_LANG, (LANGUAGES)nValue);
-				break;
-			case kLanguage2:
-			case kLanguage3:
-			case kLanguage4:
-			case kLanguage5:
-				kRecManageLanguages(0, ADD_LANG, (LANGUAGES)nValue);
-				break;
-
-
-			case kKernel_Imf_PDF_LoadOriginalDPI:
-				THROW_UE_ON_ERROR("ELI45923", "Unable to get OCR setting.",
-					kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.LoadOriginalDPI", &hSetting, NULL) );
-				THROW_UE_ON_ERROR("ELI45924", "Unable to set Kernel.Imf.PDF.LoadOriginalDPI option",
-					kRecSettingSetInt(0, hSetting, nValue) );
-				break;
-			case kKernel_Imf_PDF_Resolution:
-				THROW_UE_ON_ERROR("ELI45925", "Unable to get OCR setting.",
-					kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.Resolution", &hSetting, NULL) );
-				THROW_UE_ON_ERROR("ELI45926", "Unable to set Kernel.Imf.PDF.Resolution option",
-					kRecSettingSetInt(0, hSetting, nValue) );
-				break;
-			case kKernel_OcrMgr_PreferAccurateEngine:
-				THROW_UE_ON_ERROR("ELI45927", "Unable to get OCR setting.",
-					kRecSettingGetHandle(NULL, "Kernel.OcrMgr.PreferAccurateEngine", &hSetting, NULL) );
-				THROW_UE_ON_ERROR("ELI45928", "Unable to set Kernel.OcrMgr.PreferAccurateEngine option",
-					kRecSettingSetInt(0, hSetting, nValue) );
-				break;
-			case kKernel_Img_Max_Pix_X:
-				THROW_UE_ON_ERROR("ELI45929", "Unable to get OCR setting.",
-					kRecSettingGetHandle(NULL, "Kernel.Img.Max.Pix.X", &hSetting, NULL) );
-				THROW_UE_ON_ERROR("ELI45930", "Unable to set Kernel.Img.Max.Pix.X option",
-					kRecSettingSetInt(0, hSetting, nValue) );
-				break;
-			case kKernel_Img_Max_Pix_Y:
-				THROW_UE_ON_ERROR("ELI45931", "Unable to get OCR setting.",
-					kRecSettingGetHandle(NULL, "Kernel.Img.Max.Pix.Y", &hSetting, NULL) );
-				THROW_UE_ON_ERROR("ELI45932", "Unable to set Kernel.Img.Max.Pix.Y option",
-					kRecSettingSetInt(0, hSetting, nValue) );
-				break;
-			}
-		}
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45922")
-}
-
-//-------------------------------------------------------------------------------------------------
-// Helper methods
-//-------------------------------------------------------------------------------------------------
-bool zoneIsLessThan(ZONE zoneLeft, ZONE zoneRight)
-{
-	return zoneLeft.rectBBox.top < zoneRight.rectBBox.top ||
-		(zoneLeft.rectBBox.top == zoneRight.rectBBox.top &&
-		zoneLeft.rectBBox.left < zoneRight.rectBBox.left);
-}
-//-------------------------------------------------------------------------------------------------
-bool isBasicLatinCharacter(unsigned short usLetterCode)
-{
-	// NOTE: 176 is the degree symbol.
-	// Don't allow 0 as a letter code
-	// https://extract.atlassian.net/browse/ISSUE-14802
-	return usLetterCode > 0 && usLetterCode <= 126 || usLetterCode == 176;
-}
-
-//-------------------------------------------------------------------------------------------------
-bool CScansoftOCR2::isRecognizedCharacter(unsigned short usLetterCode)
-{
-	return usLetterCode > 0
-		&& (!m_bLimitToBasicLatinCharacters || isBasicLatinCharacter(usLetterCode));
-}
-//-------------------------------------------------------------------------------------------------
-void CScansoftOCR2::convertToCodePage(unsigned short *usLetterCode)
-{
-	if (isBasicLatinCharacter(*usLetterCode))
-	{
-		return;
-	}
-
-	size_t buffLen;
-	BYTE buff;
-	buffLen = sizeof(buff);
-	RECERR ret = kRecConvertUnicode2CodePage(0, *usLetterCode, (LPBYTE)&buff, &buffLen);
-	if (ret != REC_OK)
-	{
-		*usLetterCode = gcUNRECOGNIZED;
-	}
-	else
-	{
-		*usLetterCode = buff;
-	}
 }

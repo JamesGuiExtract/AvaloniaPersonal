@@ -142,8 +142,8 @@ public:
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 // IHasOCRParameters
-	STDMETHOD(get_OCRParameters)(ILongToLongMap** ppMap);
-	STDMETHOD(put_OCRParameters)(ILongToLongMap* pMap);
+	STDMETHOD(get_OCRParameters)(IOCRParameters** ppOCRParameters);
+	STDMETHOD(put_OCRParameters)(IOCRParameters* pOCRParameters);
 
 // ILoadOCRParameters
 	STDMETHOD(raw_LoadOCRParameters)(BSTR strRuleSetName);
@@ -268,7 +268,7 @@ private:
 		long nTotal;
 	} m_sProgressCounts;
 
-	ILongToLongMapPtr m_ipOCRParameters;
+	IOCRParametersPtr m_ipOCRParameters;
 
 	/////////////////
 	// Helper functions
@@ -390,5 +390,5 @@ private:
 	// Checks version and internal-use flags, etc
 	void validateRunability();
 
-	ILongToLongMapPtr getOCRParameters();
+	IOCRParametersPtr getOCRParameters();
 };

@@ -892,33 +892,33 @@ void CAFDocument::validateLicense()
 //-------------------------------------------------------------------------------------------------
 // IHasOCRParameters
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFDocument::get_OCRParameters(ILongToLongMap** ppMap)
+STDMETHODIMP CAFDocument::get_OCRParameters(IOCRParameters** ppOCRParameters)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		*ppMap = getOCRParameters().Detach();
+		*ppOCRParameters = getOCRParameters().Detach();
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45911");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFDocument::put_OCRParameters(ILongToLongMap* pMap)
+STDMETHODIMP CAFDocument::put_OCRParameters(IOCRParameters* pOCRParameters)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI45912", pMap != __nullptr);
-		m_ipOCRParameters = pMap;
+		ASSERT_ARGUMENT("ELI45912", pOCRParameters != __nullptr);
+		m_ipOCRParameters = pOCRParameters;
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45913");
 }
 //-------------------------------------------------------------------------------------------------
-ILongToLongMapPtr CAFDocument::getOCRParameters()
+IOCRParametersPtr CAFDocument::getOCRParameters()
 {
 	if (m_ipOCRParameters != __nullptr)
 	{
@@ -930,7 +930,7 @@ ILongToLongMapPtr CAFDocument::getOCRParameters()
 	if (m_ipAttribute != __nullptr)
 	{
 		IHasOCRParametersPtr ipInputParams(m_ipAttribute->Value);
-		ILongToLongMapPtr ipOCRParameters = ipInputParams->OCRParameters;
+		IOCRParametersPtr ipOCRParameters = ipInputParams->OCRParameters;
 		ASSERT_RESOURCE_ALLOCATION("ELI45910", ipOCRParameters != __nullptr);
 
 		return ipOCRParameters;

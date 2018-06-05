@@ -41,13 +41,13 @@ public:
 		/*[in]*/ long nMaxNumOfPages, /*[in]*/ VARIANT_BOOL bCreateUSSFile,
 		/*[in]*/ VARIANT_BOOL bCompressUSSFile, /*[in]*/ VARIANT_BOOL bSkipCreation,
 		/*[in]*/ IProgressStatus* pProgressStatus,
-		/*[in]*/ ILongToLongMap* pOCRParameters);
+		/*[in]*/ IOCRParameters* pOCRParameters);
 	STDMETHOD(RecognizeTextInImageFile)(
 		/*[in]*/ BSTR strImageFileName, 
 		/*[in]*/ long lNumPages, 
 		/*[in]*/ IOCREngine* pOCREngine, 
 		/*[in]*/ IProgressStatus* pProgressStatus,
-		/*[in]*/ ILongToLongMap* pOCRParameters,
+		/*[in]*/ IOCRParameters* pOCRParameters,
 		/*[out, retval]*/ ISpatialString* *pstrText);
 
 // ILicensedComponent
@@ -82,7 +82,7 @@ private:
 		VARIANT_BOOL bSkipCreation, 
 		UCLID_RASTERANDOCRMGMTLib::IOCREnginePtr ipOCREngine,
 		IProgressStatus* pProgressStatus,
-		ILongToLongMap* pOCRParameters);
+		IOCRParameters* pOCRParameters);
 
 	// recognize the image and save the output the specified file.
 	// strImageFileName -- the fully qualified input image file name
@@ -98,7 +98,7 @@ private:
 		bool bReturnSpatialInfo, 
 		UCLID_RASTERANDOCRMGMTLib::IOCREnginePtr ipOCREngine,
 		IProgressStatus* pProgressStatus,
-		ILongToLongMap* pOCRParameters);
+		IOCRParameters* pOCRParameters);
 
 	void validateLicense();
 };

@@ -185,7 +185,7 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 
 		// Get OCR parameters from the AFDocument
 		IHasOCRParametersPtr ipHasOCRParameters(pOriginInput);
-		ILongToLongMapPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
+		IOCRParametersPtr ipOCRParameters = ipHasOCRParameters->OCRParameters;
 
 		// iterate through each zone in the attribute
 		for(long i=0; i<lSize; i++)

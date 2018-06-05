@@ -33,6 +33,7 @@
 #define IDR_COMMUTEX                    129
 #define IDR_DOUBLEPOINT                 131
 #define IDR_PROGRESSSTATUS              132
+#define IDR_VARIANTPAIR                 133
 #define IDC_STATIC_PROPERTIES           201
 #define IDD_DLG_OBJ_PROPERTIES          202
 #define IDD_DLG_OBJ_SELECT              203

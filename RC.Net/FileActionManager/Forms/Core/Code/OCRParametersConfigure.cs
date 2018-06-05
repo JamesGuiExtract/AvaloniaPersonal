@@ -1,12 +1,16 @@
 ﻿using Extract.Utilities;
 using Nuance.OmniPage.CSDK;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using UCLID_SSOCR2Lib;
 
 namespace Extract.FileActionManager.Forms
 {
@@ -18,10 +22,13 @@ namespace Extract.FileActionManager.Forms
     [CLSCompliant(false)]
     public partial class OCRParametersConfigure : Form, IOCRParametersConfigure
     {
-        private LongToLongMap _parameterMap;
-        private bool _readOnly;
-        private bool _settingValues;
-
+        VariantVector _parameterMap;
+        BindingList<Language> _languages = new BindingList<Language>();
+        BindingList<KeyValueClass<int, int>> _enumSettings = new BindingList<KeyValueClass<int, int>>();
+        BindingList<KeyValueClass<string, int>> _stringSettings = new BindingList<KeyValueClass<string, int>>();
+        bool _readOnly;
+        bool _settingValues;
+        
         #region Constructors 
 
         /// <summary>
@@ -42,7 +49,34 @@ namespace Extract.FileActionManager.Forms
                 DESPECKLE_METHOD.DESPECKLE_SALT.SetReadableValue("Salt");
                 DESPECKLE_METHOD.DESPECKLE_SMOOTHEDGE.SetReadableValue("Smooth edge");
 
-                LANGUAGES.LANG_NO.SetReadableValue("[None]");
+                EPageDecompositionMethod.kAutoDecomposition.SetReadableValue("Auto");
+                EPageDecompositionMethod.kLegacyDecomposition.SetReadableValue("Legacy");
+                EPageDecompositionMethod.kStandardDecomposition.SetReadableValue("Standard");
+
+                EOcrTradeOff.kAccurate.SetReadableValue("Accurate");
+                EOcrTradeOff.kBalanced.SetReadableValue("Balanced");
+                EOcrTradeOff.kFast.SetReadableValue("Fast");
+                EOcrTradeOff.kRegistry.SetReadableValue("Registry");
+
+                FILLINGMETHOD.FM_DEFAULT.SetReadableValue("DEFAULT");
+                FILLINGMETHOD.FM_OMNIFONT.SetReadableValue("OMNIFONT");
+                FILLINGMETHOD.FM_DRAFTDOT9.SetReadableValue("DRAFTDOT9");
+                FILLINGMETHOD.FM_BARCODE.SetReadableValue("BARCODE");
+                FILLINGMETHOD.FM_OMR.SetReadableValue("OMR");
+                FILLINGMETHOD.FM_HANDPRINT.SetReadableValue("HANDPRINT");
+                FILLINGMETHOD.FM_BRAILLE.SetReadableValue("BRAILLE");
+                FILLINGMETHOD.FM_DRAFTDOT24.SetReadableValue("DRAFTDOT24");
+                FILLINGMETHOD.FM_OCRA.SetReadableValue("OCRA");
+                FILLINGMETHOD.FM_OCRB.SetReadableValue("OCRB");
+                FILLINGMETHOD.FM_MICR.SetReadableValue("MICR");
+                FILLINGMETHOD.FM_BARCODE2D.SetReadableValue("BARCODE2D");
+                FILLINGMETHOD.FM_DOTDIGIT.SetReadableValue("DOTDIGIT");
+                FILLINGMETHOD.FM_DASHDIGIT.SetReadableValue("DASHDIGIT");
+                FILLINGMETHOD.FM_ASIAN.SetReadableValue("ASIAN");
+                FILLINGMETHOD.FM_CMC7.SetReadableValue("CMC7");
+                FILLINGMETHOD.FM_NO_OCR.SetReadableValue("NO_OCR");
+
+                LANGUAGES.LANG_NO.SetReadableValue("");
                 LANGUAGES.LANG_ALL.SetReadableValue("All");
                 LANGUAGES.LANG_ALL_LATIN.SetReadableValue("All Latin");
                 LANGUAGES.LANG_ALL_ASIAN.SetReadableValue("All Asian");
@@ -99,7 +133,7 @@ namespace Extract.FileActionManager.Forms
                 LANGUAGES.LANG_CHU.SetReadableValue("Chuana or Tswana");
                 LANGUAGES.LANG_COR.SetReadableValue("Corsican");
                 LANGUAGES.LANG_CRW.SetReadableValue("Crow");
-                LANGUAGES.LANG_ESK.SetReadableValue("Eskimo language selection. This");
+                LANGUAGES.LANG_ESK.SetReadableValue("Eskimo");
                 LANGUAGES.LANG_FAR.SetReadableValue("Faroese");
                 LANGUAGES.LANG_FIJ.SetReadableValue("Fijian");
                 LANGUAGES.LANG_FRI.SetReadableValue("Frisian");
@@ -187,6 +221,77 @@ namespace Extract.FileActionManager.Forms
             try
             {
                 InitializeComponent();
+
+                // Initialize the languages DataGridView
+                _languagesDataGridView.AutoGenerateColumns = false;
+                _languagesDataGridView.ColumnHeadersVisible = false;
+                _languagesDataGridView.DataSource = _languages;
+
+                // Add language column
+                var combo = new DataGridViewComboBoxColumn();
+                combo.ValueType = typeof(LANGUAGES);
+                combo.ValueMember = "Value";
+                combo.DisplayMember = "DisplayName";
+                combo.DataSource = Enum.GetValues(typeof(LANGUAGES))
+                    .OfType<LANGUAGES>()
+                    .Select(lang =>
+                        lang.TryGetReadableValue(out string readableValue)
+                        ? new Language { Value = lang, DisplayName = readableValue }
+                        : null
+                    )
+                    .Where(pair => pair != null)
+                    .OrderBy(pair => pair.DisplayName)
+                    .ToList();
+                combo.DataPropertyName = "Value";
+                combo.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                _languagesDataGridView.Columns.Add(combo);
+
+
+                // Initialize the enum settings DataGridView
+                _enumSettingsDataGridView.AutoGenerateColumns = false;
+                _enumSettingsDataGridView.DataSource = _enumSettings;
+
+                // Add setting key column
+                var col = new DataGridViewTextBoxColumn();
+                col.ValueType = typeof(int);
+                col.DataPropertyName = "Key";
+                col.Name = "EOCRParameter";
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                _enumSettingsDataGridView.Columns.Add(col);
+
+                // Add setting value column
+                col = new DataGridViewTextBoxColumn();
+                col.ValueType = typeof(int);
+                col.DataPropertyName = "Value";
+                col.Name = "Value";
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                _enumSettingsDataGridView.Columns.Add(col);
+
+
+                // Initialize the string settings DataGridView
+                _stringSettingsDataGridView.AutoGenerateColumns = false;
+                _stringSettingsDataGridView.DataSource = _stringSettings;
+
+                // Add setting key column
+                col = new DataGridViewTextBoxColumn();
+                col.ValueType = typeof(string);
+                col.DataPropertyName = "Key";
+                col.Name = "Nuance setting path";
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                _stringSettingsDataGridView.Columns.Add(col);
+
+                // Add setting value column
+                col = new DataGridViewTextBoxColumn();
+                col.ValueType = typeof(int);
+                col.DataPropertyName = "Value";
+                col.Name = "Value";
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                _stringSettingsDataGridView.Columns.Add(col);
+
+
+                _defaultDecompositionMethodComboBox.InitializeWithReadableEnum<EPageDecompositionMethod>(true);
+                _accuracyTradeoffComboBox.InitializeWithReadableEnum<EOcrTradeOff>(true);
+                _defaultFillingMethodComboBox.InitializeWithReadableEnum<FILLINGMETHOD>(true);
             }
             catch (Exception ex)
             {
@@ -209,12 +314,7 @@ namespace Extract.FileActionManager.Forms
                 base.OnLoad(e);
 
                 _forceDespeckleMethodComboBox.InitializeWithReadableEnum<DESPECKLE_METHOD>(true);
-                _language1ComboBox.InitializeWithReadableEnum<LANGUAGES>(true);
-                _language2ComboBox.InitializeWithReadableEnum<LANGUAGES>(true);
-                _language3ComboBox.InitializeWithReadableEnum<LANGUAGES>(true);
-                _language4ComboBox.InitializeWithReadableEnum<LANGUAGES>(true);
-                _language5ComboBox.InitializeWithReadableEnum<LANGUAGES>(true);
-                SetValues();
+                SetControlValues();
                 SetControlStates();
 
                 if (_readOnly)
@@ -247,7 +347,7 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
-                _parameterMap = pParams.OCRParameters;
+                _parameterMap = (VariantVector)pParams.OCRParameters;
                 _readOnly = vbReadOnly;
 
                 // Display the dialog centered on the parent
@@ -255,7 +355,7 @@ namespace Extract.FileActionManager.Forms
                 parentWindow.AssignHandle((IntPtr)nHandle);
                 if (ShowDialog(parentWindow) == DialogResult.OK)
                 {
-                    ApplyValues();
+                    ApplyControlValuesToSettings();
                 }
             }
             catch (Exception ex)
@@ -289,8 +389,61 @@ namespace Extract.FileActionManager.Forms
                 ExtractException.Display("ELI45877", ex);
             }
         }
-        
-        #endregion
+
+        /// <summary>
+        /// Handles the EnabledChanged event of a data grid view to make it actually look disabled
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        void Handle_DataGridView_EnabledChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                DataGridView dgv = sender as DataGridView;
+                if (!dgv.Enabled)
+                {
+                    dgv.DefaultCellStyle.BackColor = SystemColors.Control;
+                    dgv.DefaultCellStyle.ForeColor = SystemColors.GrayText;
+                    dgv.ColumnHeadersDefaultCellStyle.BackColor = SystemColors.Control;
+                    dgv.ColumnHeadersDefaultCellStyle.ForeColor = SystemColors.GrayText;
+                    dgv.CurrentCell = null;
+                    dgv.ReadOnly = true;
+                    dgv.EnableHeadersVisualStyles = false;
+                }
+                else
+                {
+                    dgv.DefaultCellStyle.BackColor = SystemColors.Window;
+                    dgv.DefaultCellStyle.ForeColor = SystemColors.ControlText;
+                    dgv.ColumnHeadersDefaultCellStyle.BackColor = SystemColors.Window;
+                    dgv.ColumnHeadersDefaultCellStyle.ForeColor = SystemColors.ControlText;
+                    dgv.ReadOnly = false;
+                    dgv.EnableHeadersVisualStyles = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46005");
+            }
+        } 
+
+        /// <summary>
+        /// Handles the DataError event of a data grid view in order to display the exception
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        void Handle_DataGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            try
+            {
+                e.Exception.ExtractDisplay("ELI46006");
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46007");
+            }
+        }
+
+        #endregion Event Handlers
 
         #region Methods
 
@@ -331,6 +484,19 @@ namespace Extract.FileActionManager.Forms
                 }
             }
 
+            if (_skipPageOnFailureCheckBox.Checked)
+            {
+                _requireOnePageSuccessCheckBox.Enabled =
+                    _maxPageFailureNumberNumericUpDown.Enabled =
+                    _maxPageFailurePercentNumericUpDown.Enabled = true;
+            }
+            else
+            {
+                _requireOnePageSuccessCheckBox.Enabled =
+                    _maxPageFailureNumberNumericUpDown.Enabled =
+                    _maxPageFailurePercentNumericUpDown.Enabled = false;
+            }
+
             if (_specifyRecognitionLanguagesCheckBox.Checked)
             {
                 _recognitionLanguagesGroupBox.Enabled = true;
@@ -341,98 +507,123 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
-        private void SetValues()
+        private void SetControlValues()
         {
             _settingValues = true;
+
             try
             {
+                // Clear values for the data grid views
+                _languages.Clear();
+                _enumSettings.Clear();
+                _stringSettings.Clear();
+
+                // Set defaults
                 _forceDespeckleMethodComboBox.SelectEnumValue(DESPECKLE_METHOD.DESPECKLE_AUTO);
-                _language1ComboBox.SelectEnumValue(LANGUAGES.LANG_NO);
-                _language2ComboBox.SelectEnumValue(LANGUAGES.LANG_NO);
-                _language3ComboBox.SelectEnumValue(LANGUAGES.LANG_NO);
-                _language4ComboBox.SelectEnumValue(LANGUAGES.LANG_NO);
-                _language5ComboBox.SelectEnumValue(LANGUAGES.LANG_NO);
+                _defaultDecompositionMethodComboBox.SelectEnumValue(EPageDecompositionMethod.kAutoDecomposition);
+                _accuracyTradeoffComboBox.SelectEnumValue(EOcrTradeOff.kAccurate);
+                _defaultFillingMethodComboBox.SelectEnumValue(FILLINGMETHOD.FM_OMNIFONT);
+                _preferAccuracteEngineCheckBox.Checked = true;
+                _skipPageOnFailureCheckBox.Checked = true;
+                _requireOnePageSuccessCheckBox.Checked = true;
 
                 for (int i = 0; i < _parameterMap.Size; i++)
                 {
-                    _parameterMap.GetKeyValue(i, out int key, out int value);
-                    EOCRParameter parameter = (EOCRParameter)key;
+                    VariantPair keyValue = (VariantPair)_parameterMap[i];
+                    keyValue.GetKeyValuePair(out object key, out object variantValue);
 
-                    switch (parameter)
+                    if (key is int parameter && variantValue is int value)
                     {
-                        case EOCRParameter.kForceDespeckleMode:
-                            switch ((EForceDespeckleMode)value)
-                            {
-                                case EForceDespeckleMode.kNeverForce:
-                                    _neverForceDespeckleRadioButton.Checked = true;
-                                    break;
-                                case EForceDespeckleMode.kForceWhenBitonal:
-                                    _forceDespeckleWhenBitonalRadioButton.Checked = true;
-                                    break;
-                                case EForceDespeckleMode.kAlwaysForce:
-                                    _alwaysForceDespeckleRadioButton.Checked = true;
-                                    break;
-                            }
-                            break;
-                        case EOCRParameter.kForceDespeckleMethod:
-                            _forceDespeckleMethodComboBox.SelectEnumValue((DESPECKLE_METHOD)value);
-                            break;
-                        case EOCRParameter.kForceDespeckleLevel:
-                            _forceDespeckleLevelNumericUpDown.Minimum = 0;
-                            _forceDespeckleLevelNumericUpDown.Maximum = int.MaxValue;
-                            _forceDespeckleLevelNumericUpDown.Value = value;
-                            break;
-                        case EOCRParameter.kAutoDespeckleMode:
-                            _autoDespeckleCheckBox.Checked = value != 0;
-                            break;
-                        case EOCRParameter.kKernel_Img_Max_Pix_X:
-                            _maxXNumericUpDown.Value = value;
-                            break;
-                        case EOCRParameter.kKernel_Img_Max_Pix_Y:
-                            _maxYNumericUpDown.Value = value;
-                            break;
-                        case EOCRParameter.kZoneOrdering:
-                            _zoneOrderingCheckBox.Checked = value != 0;
-                            break;
-                        case EOCRParameter.kLimitToBasicLatinCharacters:
-                            _limitToBasicLatinCharactersCheckBox.Checked = value != 0;
-                            break;
-                        case EOCRParameter.kSpecifyLanguage:
-                            _specifyRecognitionLanguagesCheckBox.Checked = value != 0;
-                            break;
-                        case EOCRParameter.kSingleLanguageDetection:
-                            _singleLanguageDetectionCheckBox.Checked = value != 0;
-                            break;
-                        case EOCRParameter.kLanguage1:
-                            _language1ComboBox.SelectEnumValue((LANGUAGES)value);
-                            break;
-                        case EOCRParameter.kLanguage2:
-                            _language2ComboBox.SelectEnumValue((LANGUAGES)value);
-                            break;
-                        case EOCRParameter.kLanguage3:
-                            _language3ComboBox.SelectEnumValue((LANGUAGES)value);
-                            break;
-                        case EOCRParameter.kLanguage4:
-                            _language4ComboBox.SelectEnumValue((LANGUAGES)value);
-                            break;
-                        case EOCRParameter.kLanguage5:
-                            _language5ComboBox.SelectEnumValue((LANGUAGES)value);
-                            break;
+                        switch ((EOCRParameter)parameter)
+                        {
+                            case EOCRParameter.kForceDespeckleMode:
+                                switch ((EForceDespeckleMode)value)
+                                {
+                                    case EForceDespeckleMode.kNeverForce:
+                                        _neverForceDespeckleRadioButton.Checked = true;
+                                        break;
+                                    case EForceDespeckleMode.kForceWhenBitonal:
+                                        _forceDespeckleWhenBitonalRadioButton.Checked = true;
+                                        break;
+                                    case EForceDespeckleMode.kAlwaysForce:
+                                        _alwaysForceDespeckleRadioButton.Checked = true;
+                                        break;
+                                }
+                                break;
+                            case EOCRParameter.kForceDespeckleMethod:
+                                _forceDespeckleMethodComboBox.SelectEnumValue((DESPECKLE_METHOD)value);
+                                break;
+                            case EOCRParameter.kForceDespeckleLevel:
+                                _forceDespeckleLevelNumericUpDown.Minimum = 0;
+                                _forceDespeckleLevelNumericUpDown.Maximum = int.MaxValue;
+                                _forceDespeckleLevelNumericUpDown.Value = value;
+                                break;
+                            case EOCRParameter.kAutoDespeckleMode:
+                                _autoDespeckleCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kZoneOrdering:
+                                _zoneOrderingCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kLimitToBasicLatinCharacters:
+                                _limitToBasicLatinCharactersCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kSkipPageOnFailure:
+                                _skipPageOnFailureCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kMaxPageFailureNumber:
+                                _maxPageFailureNumberNumericUpDown.Value = (uint)value;
+                                break;
+                            case EOCRParameter.kMaxPageFailurePercent:
+                                _maxPageFailurePercentNumericUpDown.Value = value;
+                                break;
+                            case EOCRParameter.kDefaultDecompositionMethod:
+                                _defaultFillingMethodComboBox.SelectEnumValue((EPageDecompositionMethod)value);
+                                break;
+                            case EOCRParameter.kTradeoff:
+                                _accuracyTradeoffComboBox.SelectEnumValue((EOcrTradeOff)value);
+                                break;
+                            case EOCRParameter.kDefaultFillingMethod:
+                                _defaultFillingMethodComboBox.SelectEnumValue((FILLINGMETHOD)value);
+                                break;
+                            case EOCRParameter.kTimeout:
+                                _timeoutNumericUpDown.Value = value;
+                                break;
+                            case EOCRParameter.kThirdRecognitionPass:
+                                _preferAccuracteEngineCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kSpecifyLanguage:
+                                _specifyRecognitionLanguagesCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kSingleLanguageDetection:
+                                _singleLanguageDetectionCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kLanguage:
+                                var lang = (LANGUAGES)value;
+                                if (lang.TryGetReadableValue(out var description))
+                                {
+                                    _languages.Add(new Language { Value = lang, DisplayName = description });
+                                }
+                                break;
+                            default:
+                                _enumSettings.Add(new KeyValueClass<int, int> { Key = parameter, Value = value });
+                                break;
+                        }
                     }
-
-                    //RecAPI.kRecSetLicense(null, "9d478fe171d5");
-                    //RecAPI.kRecInit(null, null);
-                    //RecAPI.kRecLoadSettings(0, @"D:\OCRSettings.txt");
-
-                    //RecAPI.kRecSettingGetHandle(IntPtr.Zero, "Kernel.Img.Max.Pix.X", out var hSetting);
-                    //RecAPI.kRecSettingGetInt(0, hSetting, out value);
-                    //_maxXNumericUpDown.Value = value;
-
-                    //RecAPI.kRecSettingGetHandle(IntPtr.Zero, "Kernel.Img.Max.Pix.Y", out hSetting);
-                    //RecAPI.kRecSettingGetInt(0, hSetting, out value);
-                    //_maxYNumericUpDown.Value = value;
-
-                    //RecAPI.kRecQuit();
+                    else if (key is string namedSetting && variantValue is int namedSettingValue)
+                    {
+                        switch (namedSetting)
+                        {
+                            case "Kernel.Img.Max.Pix.X":
+                                _maxXNumericUpDown.Value = (uint)namedSettingValue;
+                                break;
+                            case "Kernel.Img.Max.Pix.Y":
+                                _maxYNumericUpDown.Value = (uint)namedSettingValue;
+                                break;
+                            default:
+                                _stringSettings.Add(new KeyValueClass<string, int> { Key = namedSetting, Value = namedSettingValue });
+                                break;
+                        }
+                    }
                 }
             }
             finally
@@ -441,31 +632,29 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
-        private void ApplyValues()
+        private void ApplyControlValuesToSettings()
         {
+            // Clear parameter vector so that only appropriate settings remain
             _parameterMap.Clear();
 
+            // Image options
             if (_neverForceDespeckleRadioButton.Checked)
             {
-                _parameterMap.Set((int)EOCRParameter.kForceDespeckleMode, (int)EForceDespeckleMode.kNeverForce);
-
-                // Remove N/A values from the map
-                _parameterMap.RemoveItem((int)EOCRParameter.kForceDespeckleMethod);
-                _parameterMap.RemoveItem((int)EOCRParameter.kForceDespeckleLevel);
+                _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kForceDespeckleMode, VariantValue = EForceDespeckleMode.kNeverForce });
             }
             else
             {
                 if (_alwaysForceDespeckleRadioButton.Checked)
                 {
-                    _parameterMap.Set((int)EOCRParameter.kForceDespeckleMode, (int)EForceDespeckleMode.kAlwaysForce);
+                    _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kForceDespeckleMode, VariantValue = EForceDespeckleMode.kAlwaysForce });
                 }
                 else
                 {
-                    _parameterMap.Set((int)EOCRParameter.kForceDespeckleMode, (int)EForceDespeckleMode.kForceWhenBitonal);
+                    _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kForceDespeckleMode, VariantValue = EForceDespeckleMode.kForceWhenBitonal });
                 }
 
                 var method = _forceDespeckleMethodComboBox.ToEnumValue<DESPECKLE_METHOD>();
-                _parameterMap.Set((int)EOCRParameter.kForceDespeckleMethod, (int)method);
+                _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kForceDespeckleMethod, VariantValue = method });
                 switch (method)
                 {
                     case DESPECKLE_METHOD.DESPECKLE_NORMAL:
@@ -474,44 +663,88 @@ namespace Extract.FileActionManager.Forms
                     case DESPECKLE_METHOD.DESPECKLE_PEPPER:
                     case DESPECKLE_METHOD.DESPECKLE_SALT:
                     case DESPECKLE_METHOD.DESPECKLE_PEPPERANDSALT:
-                        _parameterMap.Set((int)EOCRParameter.kForceDespeckleLevel, (int)_forceDespeckleLevelNumericUpDown.Value);
+                        _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kForceDespeckleLevel, VariantValue = (int)_forceDespeckleLevelNumericUpDown.Value });
                         break;
                     default:
-                        _parameterMap.RemoveItem((int)EOCRParameter.kForceDespeckleLevel);
                         break;
                 }
             }
 
-            _parameterMap.Set((int)EOCRParameter.kAutoDespeckleMode, _autoDespeckleCheckBox.Checked ? 1 : 0);
-            _parameterMap.Set((int)EOCRParameter.kKernel_Img_Max_Pix_X, (int)_maxXNumericUpDown.Value);
-            _parameterMap.Set((int)EOCRParameter.kKernel_Img_Max_Pix_Y, (int)_maxYNumericUpDown.Value);
-            _parameterMap.Set((int)EOCRParameter.kZoneOrdering, _zoneOrderingCheckBox.Checked ? 1 : 0);
-            _parameterMap.Set((int)EOCRParameter.kLimitToBasicLatinCharacters, _limitToBasicLatinCharactersCheckBox.Checked ? 1 : 0);
-            _parameterMap.Set((int)EOCRParameter.kSpecifyLanguage, _specifyRecognitionLanguagesCheckBox.Checked ? 1 : 0);
-            _parameterMap.Set((int)EOCRParameter.kSingleLanguageDetection, _singleLanguageDetectionCheckBox.Checked ? 1 : 0);
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kAutoDespeckleMode, VariantValue = _autoDespeckleCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = "Kernel.Img.Max.Pix.X", VariantValue = (int)_maxXNumericUpDown.Value });
+            _parameterMap.PushBack(new VariantPair { VariantKey = "Kernel.Img.Max.Pix.Y", VariantValue = (int)_maxYNumericUpDown.Value });
+
+            // Recognition settings
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kZoneOrdering, VariantValue = _zoneOrderingCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kLimitToBasicLatinCharacters, VariantValue = _limitToBasicLatinCharactersCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kSkipPageOnFailure, VariantValue = _skipPageOnFailureCheckBox.Checked ? 1 : 0 });
+            if (_skipPageOnFailureCheckBox.Checked)
+            {
+                _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kRequireOnePageSuccess, VariantValue = _requireOnePageSuccessCheckBox.Checked ? 1 : 0 });
+                // Use int value even though these will be translated to uint by the OCR engine.
+                // This is to be an example of how this ought to be done to allow for simpler future settings
+                // (all enum settings should be able to be translated to and from the _enumSettings list without a change in type. Having a separate list for unsigned ints seems unnecessary since the list
+                // isn't going to be very readable anyway)
+                int maxPageFailureNumber = unchecked((int)Decimal.ToUInt32(_maxPageFailureNumberNumericUpDown.Value));
+                _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kMaxPageFailureNumber, VariantValue = maxPageFailureNumber });
+                _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kMaxPageFailurePercent, VariantValue = (int)_maxPageFailurePercentNumericUpDown.Value });
+            }
+            _parameterMap.PushBack(new VariantPair {
+                VariantKey = EOCRParameter.kDefaultDecompositionMethod,
+                VariantValue = _defaultDecompositionMethodComboBox.ToEnumValue<EPageDecompositionMethod>() });
+            _parameterMap.PushBack(new VariantPair {
+                VariantKey = EOCRParameter.kTradeoff,
+                VariantValue = _accuracyTradeoffComboBox.ToEnumValue<EOcrTradeOff>() });
+            _parameterMap.PushBack(new VariantPair {
+                VariantKey = EOCRParameter.kDefaultFillingMethod,
+                VariantValue = _defaultFillingMethodComboBox.ToEnumValue<FILLINGMETHOD>() });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kTimeout, VariantValue = (int)_timeoutNumericUpDown.Value });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kThirdRecognitionPass, VariantValue = _preferAccuracteEngineCheckBox.Checked ? 1 : 0 });
+
+
+            // Language settings
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kSpecifyLanguage, VariantValue = _specifyRecognitionLanguagesCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kSingleLanguageDetection, VariantValue = _singleLanguageDetectionCheckBox.Checked ? 1 : 0 });
 
             if (_specifyRecognitionLanguagesCheckBox.Checked)
             {
-                var languages = new[]
+                foreach (var lang in _languages)
                 {
-                _language1ComboBox.ToEnumValue<LANGUAGES>(),
-                _language2ComboBox.ToEnumValue<LANGUAGES>(),
-                _language3ComboBox.ToEnumValue<LANGUAGES>(),
-                _language4ComboBox.ToEnumValue<LANGUAGES>(),
-                _language5ComboBox.ToEnumValue<LANGUAGES>()
-            }
-                .Distinct()
-                .OrderBy(l => l)
-                .Where(l => l != LANGUAGES.LANG_NO)
-                .Select((l, i) => ((int)l, i));
-                foreach (var (language, index) in languages)
-                {
-                    var key = (int)EOCRParameter.kLanguage1 + index;
-                    _parameterMap.Set(key, language);
+                    _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kLanguage, VariantValue = lang.Value });
                 }
+            }
+
+            // Set advanced/unrecognized settings (ignored by this version of the software but may be used by a newer version)
+            foreach (var kv in _enumSettings)
+            {
+                _parameterMap.PushBack(new VariantPair { VariantKey = kv.Key, VariantValue = kv.Value });
+            }
+
+            // Set advanced string settings (directly applied to OCR engine)
+            foreach (var kv in _stringSettings)
+            {
+                _parameterMap.PushBack(new VariantPair { VariantKey = kv.Key, VariantValue = kv.Value });
             }
         }
 
         #endregion
+
+        #region Private Classes
+
+        private class Language
+        {
+            public LANGUAGES Value { get; set; } = LANGUAGES.LANG_NO;
+
+            public string DisplayName { get; set; }
+        }
+
+        private class KeyValueClass<TKey, TValue>
+        {
+            public TKey Key { get; set; }
+
+            public TValue Value { get; set; }
+        }
+
+        #endregion Private Classes
     }
 }

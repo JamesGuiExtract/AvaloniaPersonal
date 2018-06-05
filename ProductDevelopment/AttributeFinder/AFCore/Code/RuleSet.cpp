@@ -2895,25 +2895,25 @@ void CRuleSet::validateRunability()
 //-------------------------------------------------------------------------------------------------
 // IHasOCRParameters
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRuleSet::get_OCRParameters(ILongToLongMap** ppMap)
+STDMETHODIMP CRuleSet::get_OCRParameters(IOCRParameters** ppOCRParameters)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		*ppMap = getOCRParameters().Detach();
+		*ppOCRParameters = getOCRParameters().Detach();
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45950");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRuleSet::put_OCRParameters(ILongToLongMap* pMap)
+STDMETHODIMP CRuleSet::put_OCRParameters(IOCRParameters* pOCRParameters)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		m_ipOCRParameters = pMap;
+		m_ipOCRParameters = pOCRParameters;
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45951");
@@ -2935,11 +2935,11 @@ STDMETHODIMP CRuleSet::raw_LoadOCRParameters(BSTR strRuleSetName)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45957");
 }
 //-------------------------------------------------------------------------------------------------
-ILongToLongMapPtr CRuleSet::getOCRParameters()
+IOCRParametersPtr CRuleSet::getOCRParameters()
 {
 	if (m_ipOCRParameters == __nullptr)
 	{
-		m_ipOCRParameters.CreateInstance(CLSID_LongToLongMap);
+		m_ipOCRParameters.CreateInstance(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI45949", m_ipOCRParameters != __nullptr);
 	}
 

@@ -82,8 +82,8 @@ public:
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
 // IHasOCRParameters
-	STDMETHOD(get_OCRParameters)(ILongToLongMap** ppMap);
-	STDMETHOD(put_OCRParameters)(ILongToLongMap* pMap);
+	STDMETHOD(get_OCRParameters)(IOCRParameters** ppOCRParameters);
+	STDMETHOD(put_OCRParameters)(IOCRParameters* pOCRParameters);
 
 private:
 	//////////
@@ -97,12 +97,12 @@ private:
 	std::string m_strFKBVersion;
 	std::string m_strAlternateComponentDataDir;
 	EParallelRunMode m_eParallelRunMode;
-	ILongToLongMapPtr m_ipOCRParameters;
+	IOCRParametersPtr m_ipOCRParameters;
 
 	//////////
 	// Methods
 	//////////
 	UCLID_AFCORELib::IAttributePtr getAttribute();
 	void validateLicense();
-	ILongToLongMapPtr getOCRParameters();
+	IOCRParametersPtr getOCRParameters();
 };

@@ -127,8 +127,8 @@ public:
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 	// IHasOCRParameters
-	STDMETHOD(get_OCRParameters)(ILongToLongMap** ppMap);
-	STDMETHOD(put_OCRParameters)(ILongToLongMap* pMap);
+	STDMETHOD(get_OCRParameters)(IOCRParameters** ppMap);
+	STDMETHOD(put_OCRParameters)(IOCRParameters* pMap);
 
 private:
 
@@ -170,7 +170,7 @@ private:
 	// The name of the computer the task is running on.
 	string m_strComputerName;
 
-	ILongToLongMapPtr m_ipOCRParameters;
+	IOCRParametersPtr m_ipOCRParameters;
 	bool m_bLoadOCRParametersFromRuleset;
 	string m_strOCRParametersRulesetName;
 
@@ -217,6 +217,6 @@ private:
 	// be in order from lowest to highest
 	void parseOCRInputText(const string& strInputText, string& strFileName, vector<long>& vecPages);
 
-	ILongToLongMapPtr getOCRParameters();
+	IOCRParametersPtr getOCRParameters();
 	void loadOCRParameters(IFAMTagManagerPtr ipTagMgr, string strSourceDocName);
 };

@@ -89,7 +89,6 @@ library UCLID_SSOCR2Lib
 			[in] EOcrTradeOff eTradeOff, [in] VARIANT_BOOL vbDetectHandwriting, 
 			[in] VARIANT_BOOL vbReturnUnrecognized, [in] VARIANT_BOOL vbReturnSpatialInfo, 
 			[in] VARIANT_BOOL vbUpdateProgressStatus, [in] EPageDecompositionMethod eDecompMethod, 
-			[in] ILongToLongMap* pOCRParameters,
 			[out, retval] BSTR* pStream);
 		//-----------------------------------------------------------------------------------------
 		[id(2), helpstring("method GetPID")] HRESULT GetPID([out, retval] long* pPID);
@@ -127,6 +126,14 @@ library UCLID_SSOCR2Lib
 		// PROMISE: Calls the ScansoftOCRCfg object to return the corresponding registry key value.
 		[id(9), helpstring("method GetPrimaryDecompositionMethod")] HRESULT GetPrimaryDecompositionMethod(
 			[out, retval] EPageDecompositionMethod *ePrimaryDecompositionMethod);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set OCR parameters from the supplied IOCRParameters or from the registry if
+		//			pOCRParameters is null
+		//			If bReApply = VARIANT_TRUE then the settings will be applied even if settings have
+		//			previously been applied. If VARIANT_FALSE and settings have already been applied
+		//			to this instance then this method will do nothing
+		[id(10), helpstring("method SetOCRParameters")] HRESULT SetOCRParameters(
+			[in] IOCRParameters* pOCRParameters, VARIANT_BOOL vbReApply);
 	};
 
 	//----------------------------------------------------------------------------------------------

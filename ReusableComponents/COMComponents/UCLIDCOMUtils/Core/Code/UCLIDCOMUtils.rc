@@ -111,6 +111,7 @@ IDR_LONGTOLONGMAP       REGISTRY                "LongToLongMap.rgs"
 IDR_COMMUTEX            REGISTRY                "COMMutex.rgs"
 IDR_DOUBLEPOINT         REGISTRY                "DoublePoint.rgs"
 IDR_PROGRESSSTATUS      REGISTRY                "ProgressStatus.rgs"
+IDR_VARIANTPAIR         REGISTRY                "VariantPair.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -95,7 +95,7 @@ namespace Extract.OcrSingleDocument
                     LicenseUtilities.GetMapLabelValue(new MapLabel()));
 
                 // Load the OCR parameters from the file
-                LongToLongMap ocrParameters = null;
+                IOCRParameters ocrParameters = null;
                 if (!string.IsNullOrEmpty(paramsFile))
                 {
                     ILoadOCRParameters loadOCRParameters = new RuleSetClass();

@@ -29,7 +29,8 @@ STDMETHODIMP CVariantVector::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IShallowCopyable,
 		&IID_IPersistStream,
-		&IID_ILicensedComponent
+		&IID_ILicensedComponent,
+		&IID_IOCRParameters
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{

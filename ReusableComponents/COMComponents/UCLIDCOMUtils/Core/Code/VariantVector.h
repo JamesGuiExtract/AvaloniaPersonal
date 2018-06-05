@@ -14,7 +14,8 @@ class ATL_NO_VTABLE CVariantVector :
 	public ISupportErrorInfo,
 	public IDispatchImpl<IVariantVector, &IID_IVariantVector, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<IShallowCopyable, &IID_IShallowCopyable, &LIBID_UCLID_COMUTILSLib>
+	public IDispatchImpl<IShallowCopyable, &IID_IShallowCopyable, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<IOCRParameters, &IID_IOCRParameters, &LIBID_UCLID_COMUTILSLib>
 {
 public:
 	CVariantVector();
@@ -32,6 +33,7 @@ BEGIN_COM_MAP(CVariantVector)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IShallowCopyable)
+	COM_INTERFACE_ENTRY(IOCRParameters)
 END_COM_MAP()
 
 public:

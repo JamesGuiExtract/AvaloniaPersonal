@@ -428,16 +428,16 @@ private:
 	/////////////////
 
 	// Enhances the OCR text on the specified document.
-	void enhanceOCR(IAFDocumentPtr ipAFDoc, ILongToLongMapPtr ipOCRParameters);
+	void enhanceOCR(IAFDocumentPtr ipAFDoc, IOCRParametersPtr ipOCRParameters);
 
 	// Returns the enhanced OCR text on the specified document page.
-	ISpatialStringPtr enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage, ILongToLongMapPtr ipOCRParameters);
+	ISpatialStringPtr enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage, IOCRParametersPtr ipOCRParameters);
 
 	// Enhances OCR text in the specified attributes' spatial area.
 	void enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc);
 
 	// Enhances the OCR text in the specified zones.
-	void enhanceOCR(vector<ZoneData> &zones, ILongToLongMapPtr ipOCRParameters);
+	void enhanceOCR(vector<ZoneData> &zones, IOCRParametersPtr ipOCRParameters);
 
 	// Initializes the filters per the object settings.
 	void initializeFilters();
@@ -510,7 +510,7 @@ private:
 
 	// OCRs the current filtered image and returns a spatial string searcher that can be used to
 	// retrieve the text found in a particular image area.
-	ISpatialStringSearcherPtr OCRFilteredImage(ILongToLongMapPtr ipOCRParameters);
+	ISpatialStringSearcherPtr OCRFilteredImage(IOCRParametersPtr ipOCRParameters);
 
 	// OCR's the specified rect on the current page.
 	ISpatialStringPtr OCRRegion(ILongRectanglePtr ipRect);

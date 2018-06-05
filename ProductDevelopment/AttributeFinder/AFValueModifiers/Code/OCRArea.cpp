@@ -202,7 +202,7 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 		// instantiate a new OCR engine if there is at least one zone to OCR
 		long lSize = ipZones->Size();
 		IOCREnginePtr ipOCREngine;
-		ILongToLongMapPtr ipOCRParameters;
+		IOCRParametersPtr ipOCRParameters;
 		if (lSize > 0)
 		{
 			ipOCREngine = getOCREngine();

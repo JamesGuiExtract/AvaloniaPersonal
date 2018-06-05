@@ -108,7 +108,7 @@ STDMETHODIMP CScansoftOCR::InterfaceSupportsErrorInfo(REFIID riid)
 STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage(BSTR strImageFileName, long lStartPage,
 	long lEndPage, EFilterCharacters eFilter, BSTR bstrCustomFilterCharacters, 
 	EOcrTradeOff eTradeOff, VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus,
-	ILongToLongMap* pOCRParameters,
+	IOCRParameters* pOCRParameters,
 	ISpatialString** pstrText)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -163,7 +163,7 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage2(BSTR strImageFileName,
 													 BSTR strPageNumbers,
 													 VARIANT_BOOL bReturnSpatialInfo,
 													 IProgressStatus* pProgressStatus,
-													 ILongToLongMap* pOCRParameters,
+													 IOCRParameters* pOCRParameters,
 													 ISpatialString* *pstrText)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -263,7 +263,7 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImageZone(BSTR strImageFileName, l
 	long lEndPage, ILongRectangle* pZone, long nRotationInDegrees, EFilterCharacters eFilter, 
 	BSTR bstrCustomFilterCharacters, VARIANT_BOOL bDetectHandwriting, 
 	VARIANT_BOOL bReturnUnrecognized, VARIANT_BOOL bReturnSpatialInfo, 
-	IProgressStatus* pProgressStatus, ILongToLongMap* pOCRParameters, ISpatialString* *pstrText)
+	IProgressStatus* pProgressStatus, IOCRParameters* pOCRParameters, ISpatialString* *pstrText)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -715,7 +715,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	ILongRectangle* pZone, long nRotationInDegrees, EFilterCharacters eFilter, 
 	 BSTR bstrCustomFilterCharacters, EOcrTradeOff eTradeOff, VARIANT_BOOL vbDetectHandwriting, 
 	VARIANT_BOOL vbReturnUnrecognized, VARIANT_BOOL bReturnSpatialInfo, 
-	IProgressStatus* pProgressStatus, ILongToLongMap* pOCRParameters)
+	IProgressStatus* pProgressStatus, IOCRParameters* pOCRParameters)
 {
 	// [FlexIDSCore:4906]
 	// Since we did not get a fix from Nuance to address the issue that arose in v18 of their engine
@@ -750,8 +750,15 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	// prepare decomposition methods for OCR loop
 	EPageDecompositionMethod eDecompositionMethod[3];
 
+	IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
+	ASSERT_RESOURCE_ALLOCATION("ELI25216", ipOcrEngine != __nullptr);
+
+	// Set the parameters (either from registry or parameters object)
+	// Re-apply the settings in case they have changed since the engine was created
+	ipOcrEngine->SetOCRParameters(pOCRParameters, VARIANT_TRUE);
+
 	// get the primary decomposition method from the OCR engine
-	eDecompositionMethod[0] = getOCREngine()->GetPrimaryDecompositionMethod();
+	eDecompositionMethod[0] = ipOcrEngine->GetPrimaryDecompositionMethod();
 
 	// set the secondary decomposition method to legacy, 
 	// unless legacy was the primary decomposition method
@@ -791,8 +798,11 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 			try
 			{
 				// Get the OCR engine
-				IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
+				ipOcrEngine = getOCREngine();
 				ASSERT_RESOURCE_ALLOCATION("ELI25216", ipOcrEngine != __nullptr);
+
+				// Set the parameters if needed (either from registry or parameters object)
+				ipOcrEngine->SetOCRParameters(pOCRParameters, VARIANT_FALSE);
 
 				// check if the progress status object should be updated
 				if (pProgressStatus)
@@ -810,7 +820,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 				_bstrStream = ipOcrEngine->RecognizeText(strImageFileName, ipPageNumbers, pZone, 
 					nRotationInDegrees, eFilter, bstrCustomFilterCharacters, eTradeOff, 
 					vbDetectHandwriting, vbReturnUnrecognized, bReturnSpatialInfo, 
-					asVariantBool(pProgressStatus != __nullptr), eDecompositionMethod[i], pOCRParameters);
+					asVariantBool(pProgressStatus != __nullptr), eDecompositionMethod[i]);
 
 				// check if the progress status update thread still exists
 				if (apPSUpdateThread.get() != __nullptr)
@@ -911,7 +921,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFileName, 
 	long lStartPage, long lEndPage, ILongRectangle* pZone, long nRotationInDegrees, 
 	EFilterCharacters eFilter, BSTR bstrCustomFilterCharacters, VARIANT_BOOL bReturnUnrecognized, 
-	VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus, ILongToLongMap* pOCRParameters)
+	VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus, IOCRParameters* pOCRParameters)
 {
 	// [FlexIDSCore:4906]
 	// Since we did not get a fix from Nuance to address the issue that arose in v18 of their engine
@@ -943,6 +953,8 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 	IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
 	ASSERT_RESOURCE_ALLOCATION("ELI25217", ipOcrEngine != __nullptr);
 
+	ipOcrEngine->SetOCRParameters(pOCRParameters, VARIANT_TRUE);
+
 	// create thread to handle progress status updates
 	// if progress status updates were requested
 	unique_ptr<PSUpdateThreadManager> apPSUpdateThread;
@@ -960,7 +972,7 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 	_bstr_t _bstrStream = ipOcrEngine->RecognizeText(strImageFileName, ipPageNumbers, pZone, 
 		nRotationInDegrees, eFilter, bstrCustomFilterCharacters, kRegistry, VARIANT_FALSE, 
 		bReturnUnrecognized, bReturnSpatialInfo, asVariantBool(pProgressStatus != __nullptr), 
-		kAutoDecomposition, pOCRParameters);
+		kAutoDecomposition);
 
 	// mark the progress status as complete if the 
 	// progress status update thread still exists

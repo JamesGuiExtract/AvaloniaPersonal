@@ -203,8 +203,8 @@ public:
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
 // IHasOCRParameters
-	STDMETHOD(get_OCRParameters)(ILongToLongMap** ppMap);
-	STDMETHOD(put_OCRParameters)(ILongToLongMap* pMap);
+	STDMETHOD(get_OCRParameters)(IOCRParameters** ppMap);
+	STDMETHOD(put_OCRParameters)(IOCRParameters* pMap);
 
 private:
 	////////////
@@ -255,7 +255,7 @@ private:
 	// For thread protection 
 	CCriticalSection m_criticalSection;
 	
-	ILongToLongMapPtr m_ipOCRParameters;
+	IOCRParametersPtr m_ipOCRParameters;
 		
 	///////////
 	// Methods
@@ -649,6 +649,6 @@ private:
 	// and then creates a pseudo-spatial string with the given text
 	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr makeBlankPage(int nPage, string textForPage);
 	//----------------------------------------------------------------------------------------------
-	ILongToLongMapPtr getOCRParameters();
+	IOCRParametersPtr getOCRParameters();
 	//----------------------------------------------------------------------------------------------
 };
