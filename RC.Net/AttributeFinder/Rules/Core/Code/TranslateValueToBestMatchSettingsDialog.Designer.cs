@@ -37,7 +37,7 @@
             this._sourceListPathBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._sourceListPathTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this._sourceListPathTagButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._sourceListPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._synonymMapPathBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._synonymMapPathTextBox = new System.Windows.Forms.TextBox();
             this._synonymMapPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
@@ -140,16 +140,17 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "List of translation targets:";
             // 
-            // _sourceListPathTagButton
+            // _sourceListPathTagsButton
             // 
-            this._sourceListPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._sourceListPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_sourceListPathTagButton.Image")));
-            this._sourceListPathTagButton.Location = new System.Drawing.Point(417, 119);
-            this._sourceListPathTagButton.Name = "_sourceListPathTagButton";
-            this._sourceListPathTagButton.Size = new System.Drawing.Size(24, 22);
-            this._sourceListPathTagButton.TabIndex = 4;
-            this._sourceListPathTagButton.TextControl = this._sourceListPathTextBox;
-            this._sourceListPathTagButton.UseVisualStyleBackColor = true;
+            this._sourceListPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._sourceListPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_sourceListPathTagsButton.Image")));
+            this._sourceListPathTagsButton.Location = new System.Drawing.Point(417, 119);
+            this._sourceListPathTagsButton.Name = "_sourceListPathTagsButton";
+            this._sourceListPathTagsButton.PathTags = new Extract.AttributeFinder.AttributeFinderPathTags();
+            this._sourceListPathTagsButton.Size = new System.Drawing.Size(24, 22);
+            this._sourceListPathTagsButton.TabIndex = 4;
+            this._sourceListPathTagsButton.TextControl = this._sourceListPathTextBox;
+            this._sourceListPathTagsButton.UseVisualStyleBackColor = true;
             // 
             // _synonymMapPathBrowseButton
             // 
@@ -179,6 +180,7 @@
             this._synonymMapPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_synonymMapPathTagsButton.Image")));
             this._synonymMapPathTagsButton.Location = new System.Drawing.Point(417, 162);
             this._synonymMapPathTagsButton.Name = "_synonymMapPathTagsButton";
+            this._synonymMapPathTagsButton.PathTags = new Extract.AttributeFinder.AttributeFinderPathTags();
             this._synonymMapPathTagsButton.Size = new System.Drawing.Size(24, 22);
             this._synonymMapPathTagsButton.TabIndex = 8;
             this._synonymMapPathTagsButton.TextControl = this._synonymMapPathTextBox;
@@ -297,7 +299,7 @@
             this.Controls.Add(this._synonymMapPathTextBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this._sourceListPathBrowseButton);
-            this.Controls.Add(this._sourceListPathTagButton);
+            this.Controls.Add(this._sourceListPathTagsButton);
             this.Controls.Add(this._sourceListPathTextBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.groupBox1);
@@ -332,7 +334,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private Utilities.Forms.BrowseButton _sourceListPathBrowseButton;
         private System.Windows.Forms.TextBox _sourceListPathTextBox;
-        private Utilities.Forms.PathTagsButton _sourceListPathTagButton;
+        private Utilities.Forms.PathTagsButton _sourceListPathTagsButton;
         private System.Windows.Forms.Label label2;
         private Utilities.Forms.BrowseButton _synonymMapPathBrowseButton;
         private System.Windows.Forms.TextBox _synonymMapPathTextBox;
