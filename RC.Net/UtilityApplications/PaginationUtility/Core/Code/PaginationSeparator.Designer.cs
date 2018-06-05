@@ -202,7 +202,7 @@
             this._editDocumentDataButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this._editDocumentDataButton.Appearance = System.Windows.Forms.Appearance.Button;
             this._editDocumentDataButton.AutoSize = true;
-            this._editDocumentDataButton.BackColor = System.Drawing.Color.Transparent;
+            this._editDocumentDataButton.BackColor = System.Drawing.SystemColors.ButtonFace;
             this._editDocumentDataButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this._editDocumentDataButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this._editDocumentDataButton.FlatAppearance.BorderSize = 0;
