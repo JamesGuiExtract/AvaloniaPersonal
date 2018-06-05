@@ -594,28 +594,41 @@ namespace Extract.DataEntry
                 {
                     IAttribute attribute = (IAttribute)attributes.At(i);
                     var statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
-                    // Prune:
-                    // * When pruneUnmappedAttributes = false, attributes that aren't mapped into
-                    //   the DEP and that also aren't a root-level "DocumentType" or an attribute
-                    //   that starts with and underscore.
-                    // * Attributes that are mapped, but have PersistAttribute set to false.
-                    if ((statusInfo.IsMapped && statusInfo.PersistAttribute)
-                        || !pruneUnmappedAttributes
-                        || (root == true && attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase))
-                        || (attribute.Name.StartsWith("_", StringComparison.OrdinalIgnoreCase)))
+
+                    bool pruneThis = false;
+                    if (pruneUnmappedAttributes)
                     {
-                        PruneNonPersistingAttributes(attribute.SubAttributes, false);
+                        // Prune unmapped
+                        // Prune non-persisted
+                        pruneThis = !statusInfo.IsMapped || !statusInfo.PersistAttribute;
+ 
+                        // Except doc type or _ prefixed
+                        if (pruneThis &&
+                            (root == true && attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase)
+                            || attribute.Name.StartsWith("_", StringComparison.OrdinalIgnoreCase)))
+                        {
+                            pruneThis = false;
+                        }
                     }
                     else
+                    {
+                        pruneThis = !statusInfo.PersistAttribute;
+                    }
+ 
+                    if (pruneThis)
                     {
                         attributes.Remove(i);
                         count--;
                         i--;
-
+ 
                         // [DataEntry:693]
                         // Since these attributes will no longer be accessed by the DataEntry,
                         // the DataObject needs to be set to null to prevent handle leaks.
                         attribute.DataObject = null;
+                    }
+                    else
+                    {
+                        PruneNonPersistingAttributes(attribute.SubAttributes, pruneUnmappedAttributes, false);
                     }
                 }
             }
