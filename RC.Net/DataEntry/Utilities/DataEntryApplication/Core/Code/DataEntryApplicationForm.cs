@@ -1827,7 +1827,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // host will have an empty attribute vector initially)
                         if (oldDataEntryControlHost.IsDocumentLoaded)
                         {
-                            _configManager.Attributes = oldDataEntryControlHost.GetData(validateData: false);
+                            _configManager.Attributes = oldDataEntryControlHost.GetData(
+                                validateData: false, pruneUnmappedAttributes: false);
                         }
 
                         // Set Active = false for the old DEP so that it no longer tracks image

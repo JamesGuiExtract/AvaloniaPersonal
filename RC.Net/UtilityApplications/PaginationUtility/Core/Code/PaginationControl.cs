@@ -117,7 +117,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         index >= 0);
 
                     PaginationControl previousControl = null;
-                    for (index = index - 1; previousControl == null && index >= 0; index++)
+                    for (index = index - 1; previousControl == null && index >= 0; index--)
                     {
                         previousControl = Parent.Controls[index] as PaginationControl;
                     }

@@ -1000,7 +1000,6 @@ namespace Extract.DataEntry
 
                     // Apply the supplied colors and initialize the default color.
                     _highlightColors = value;
-                    //ActiveSelectionColor = _highlightColors[_highlightColors.Length - 1].Color;
 
                     // Initialize _confidenceBoundaries
                     _confidenceBoundaries = new VariantVectorClass();
@@ -1910,12 +1909,14 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="validateData"><c>true</c> if the data should be validated; otherwise, 
         /// <c>false</c>.</param>
+        /// <param name="pruneUnmappedAttributes"><c>true</c> if unmapped attributes should be
+        /// pruned from the returned hierarchy; <c>false</c> to keep them in the hierarchy.</param>
         /// <returns>An <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s representing the
         /// current data.
         /// </returns>
         // Since this method has side-effects, it should not be a property.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public virtual IUnknownVector GetData(bool validateData)
+        public virtual IUnknownVector GetData(bool validateData, bool pruneUnmappedAttributes = true)
         {
             try
             {
@@ -1938,7 +1939,7 @@ namespace Extract.DataEntry
                     _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
                     _mostRecentlySaveAttributes.ReportMemoryUsage();
 
-                    DataEntryMethods.PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
+                    DataEntryMethods.PruneNonPersistingAttributes(_mostRecentlySaveAttributes, pruneUnmappedAttributes);
 
                     return _mostRecentlySaveAttributes;
                 }

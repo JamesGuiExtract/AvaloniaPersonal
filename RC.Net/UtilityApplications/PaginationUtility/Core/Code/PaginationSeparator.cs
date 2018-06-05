@@ -269,7 +269,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         if (_outputDocument?.DocumentData != null)
                         {
-                            var statusInfo = AttributeStatusInfo.GetStatusInfo(Document.DocumentData.DocumentDataAttribute);
+                            var statusInfo = AttributeStatusInfo.GetStatusInfo(_outputDocument.DocumentData.DocumentDataAttribute);
                             statusInfo.HasBeenViewed = value;
                         }
                     }

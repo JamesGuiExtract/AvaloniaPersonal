@@ -150,7 +150,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets a <see cref="PaginationDocumentData" /> instance based on the provided
         /// <see paramref="attributes" />.
         /// </summary>
-        /// <param name="documentDataAttribute">The VOA data for while a <see cref="PaginationDocumentData" />
+        /// <param name="documentDataAttribute">The VOA data for which a <see cref="PaginationDocumentData" />
         /// instance is needed including this top-level attribute which contains document data status info.
         /// </param>
         /// <param name="sourceDocName">The name of the source document for which data is being

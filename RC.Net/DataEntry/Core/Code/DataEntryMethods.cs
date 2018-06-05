@@ -581,8 +581,11 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
         /// non-persistable attributes should be removed.</param>
+        /// <param name="pruneUnmappedAttributes"><c>true</c> if unmapped attributes should be
+        /// pruned from the returned hierarchy; <c>false</c> to keep them in the hierarchy.</param>
         /// <param name="root"><c>true</c> if the specified attributes are at the hierarchy root.</param>
-        internal static void PruneNonPersistingAttributes(IUnknownVector attributes, bool root = true)
+        internal static void PruneNonPersistingAttributes(IUnknownVector attributes,
+            bool pruneUnmappedAttributes = true, bool root = true)
         {
             try
             {
@@ -592,10 +595,12 @@ namespace Extract.DataEntry
                     IAttribute attribute = (IAttribute)attributes.At(i);
                     var statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
                     // Prune:
-                    // * Attributes that aren't mapped into the DEP and that also aren't a root-level
-                    //   "DocumentType" or an attribute that starts with and underscore.
+                    // * When pruneUnmappedAttributes = false, attributes that aren't mapped into
+                    //   the DEP and that also aren't a root-level "DocumentType" or an attribute
+                    //   that starts with and underscore.
                     // * Attributes that are mapped, but have PersistAttribute set to false.
                     if ((statusInfo.IsMapped && statusInfo.PersistAttribute)
+                        || !pruneUnmappedAttributes
                         || (root == true && attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase))
                         || (attribute.Name.StartsWith("_", StringComparison.OrdinalIgnoreCase)))
                     {

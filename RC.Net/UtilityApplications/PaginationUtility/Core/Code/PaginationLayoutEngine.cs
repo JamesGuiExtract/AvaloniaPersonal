@@ -37,6 +37,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         Panel _bottomMarginControl = null;
 
+        /// <summary>
+        /// Recursion protection for UpdateBottomMargin.
+        /// </summary>
+        bool _updatingMargin;
+
         #endregion Fields
 
         #region Properties
@@ -338,65 +343,87 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="layoutEventArgs">The <see cref="LayoutEventArgs"/> instance containing the event data.</param>
         void UpdateBottomMargin(FlowLayoutPanel flowLayoutPanel, LayoutEventArgs layoutEventArgs)
         {
-            if (_bottomMarginControl?.Parent == flowLayoutPanel)
+            if (_updatingMargin)
             {
-                if (flowLayoutPanel.Controls.IndexOf(_bottomMarginControl) != flowLayoutPanel.Controls.Count - 1)
-                {
-                    flowLayoutPanel.Controls.SetChildIndex(_bottomMarginControl, flowLayoutPanel.Controls.Count - 1);
-                }
-            }
-            else
-            {
-                if (_bottomMarginControl == null)
-                {
-                    _bottomMarginControl = new Panel();
-                    _bottomMarginControl.Margin = new Padding();
-                }
-
-                flowLayoutPanel.Controls.Add(_bottomMarginControl);
+                return;
             }
 
-            var lastVisibleControlBottom = flowLayoutPanel.Controls
-                .OfType<PaginationControl>()
-                .LastOrDefault(control => control.Visible)?.Bottom ?? flowLayoutPanel.Top;
-
-            if (SnapToControl == null)
+            try
             {
-                if (_bottomMarginControl != null)
-                {
-                    _bottomMarginControl.Location = new Point(0, lastVisibleControlBottom);
-                    _bottomMarginControl.Width = flowLayoutPanel.Width - SystemInformation.VerticalScrollBarWidth;
-                }
-            }
-            else
-            {
-                bool newlyVisible = !flowLayoutPanel.VerticalScroll.Visible;
+                _updatingMargin = true;
 
-                var bottomMargin = Math.Max(0,
-                    SnapToControl.Top -
-                        ((flowLayoutPanel.VerticalScroll.Visible ? flowLayoutPanel.VerticalScroll.Maximum : flowLayoutPanel.Height)
-                            - flowLayoutPanel.Height
-                            - (flowLayoutPanel.VerticalScroll.Visible ? flowLayoutPanel.VerticalScroll.Value : 0)
-                            - (_bottomMarginControl?.Height ?? 0)));
-
-                if (bottomMargin != _bottomMarginControl.Height)
+                if (_bottomMarginControl?.Parent == flowLayoutPanel)
                 {
-                    _bottomMarginControl.Width = flowLayoutPanel.Width - SystemInformation.VerticalScrollBarWidth;
-                    _bottomMarginControl.Height = bottomMargin;
-                    _bottomMarginControl.Location = new Point(0, lastVisibleControlBottom);
-                }
-
-                if (bottomMargin > 0 && newlyVisible)
-                {
-                    DoLayout(flowLayoutPanel, layoutEventArgs, out List<PaginationControl> _);
+                    if (flowLayoutPanel.Controls.IndexOf(_bottomMarginControl) != flowLayoutPanel.Controls.Count - 1)
+                    {
+                        flowLayoutPanel.Controls.SetChildIndex(_bottomMarginControl, flowLayoutPanel.Controls.Count - 1);
+                    }
                 }
                 else
                 {
-                    flowLayoutPanel.VerticalScroll.Value =
-                        flowLayoutPanel.VerticalScroll.Value + SnapToControl.Top;
+                    if (_bottomMarginControl == null)
+                    {
+                        _bottomMarginControl = new Panel();
+                        _bottomMarginControl.Margin = new Padding();
+                    }
 
-                    SnapToControl = null;
+                    flowLayoutPanel.Controls.Add(_bottomMarginControl);
                 }
+
+                var lastVisibleControlBottom = flowLayoutPanel.Controls
+                    .OfType<PaginationControl>()
+                    .LastOrDefault(control => control.Visible)?.Bottom ?? flowLayoutPanel.Top;
+
+                if (SnapToControl == null)
+                {
+                    if (_bottomMarginControl != null)
+                    {
+                        _bottomMarginControl.Location = new Point(0, lastVisibleControlBottom);
+                        _bottomMarginControl.Width = flowLayoutPanel.Width - SystemInformation.VerticalScrollBarWidth;
+                    }
+                }
+                else
+                {
+                    bool newlyVisible = !flowLayoutPanel.VerticalScroll.Visible;
+
+                    var currentHeight = flowLayoutPanel.VerticalScroll.Visible 
+                        ? flowLayoutPanel.VerticalScroll.Maximum
+                        : flowLayoutPanel.Height;
+                    var scrollPosition = flowLayoutPanel.VerticalScroll.Visible
+                        ? flowLayoutPanel.VerticalScroll.Value
+                        : 0;
+                    var currentMargin = _bottomMarginControl?.Height ?? 0;
+
+                    var bottomMargin = Math.Max(0,
+                        SnapToControl.Top -
+                            (currentHeight
+                                - flowLayoutPanel.Height
+                                - scrollPosition
+                                - currentMargin));
+
+                    if (bottomMargin != _bottomMarginControl.Height)
+                    {
+                        _bottomMarginControl.Width = flowLayoutPanel.Width - SystemInformation.VerticalScrollBarWidth;
+                        _bottomMarginControl.Height = bottomMargin;
+                        _bottomMarginControl.Location = new Point(0, lastVisibleControlBottom);
+                    }
+
+                    if (bottomMargin > 0 && newlyVisible)
+                    {
+                        DoLayout(flowLayoutPanel, layoutEventArgs, out List<PaginationControl> _);
+                    }
+                    else
+                    {
+                        flowLayoutPanel.VerticalScroll.Value =
+                            flowLayoutPanel.VerticalScroll.Value + SnapToControl.Top;
+
+                        SnapToControl = null;
+                    }
+                }
+            }
+            finally
+            {
+                _updatingMargin = false;
             }
         }
 

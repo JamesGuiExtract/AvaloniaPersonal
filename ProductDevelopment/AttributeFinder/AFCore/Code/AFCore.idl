@@ -117,8 +117,8 @@ library UCLID_AFCORELib
 			HRESULT GetAttributeSize([out, retval] long* plAttributeSize);
 		[id(12), helpstring("method SetGUID")] HRESULT SetGUID( const GUID* pGuid );
 		// For cases where the DataObjectInstance needs to be cleared for memory management sake, but
-		// should be persisted with the none-the-less, this call will convert the object into a
-		// byte string for storage. The DataObject will be set to null, at least until the getter is called.
+		// should be persisted nonetheless, this call will convert the object into a byte string for
+		// storage. The DataObject will be set to null, at least until the getter is called.
 		// pMiscUtils is not required, but can be provided to prevent unnecessary instantiations of new MiscUtils
 		// instances.
 		[id(13), helpstring("method StowDataObject")] HRESULT StowDataObject([in] IMiscUtils *pMiscUtils);
