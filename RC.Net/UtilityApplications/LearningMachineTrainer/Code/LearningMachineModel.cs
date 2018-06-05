@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
@@ -31,6 +32,7 @@ namespace LearningMachineTrainer
         Recall = 2,
     }
 
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Extract.AttributeFinder")]
     public class LearningMachineDataEncoderModel : ILearningMachineDataEncoderModel
     {
@@ -57,6 +59,7 @@ namespace LearningMachineTrainer
         }
     }
 
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Extract.AttributeFinder")]
     public class LearningMachineModel : ILearningMachineModel
     {
@@ -361,6 +364,7 @@ namespace LearningMachineTrainer
         }
     }
 
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Extract.AttributeFinder")]
     public class NeuralNetModel : INeuralNetModel
     {
@@ -407,6 +411,7 @@ namespace LearningMachineTrainer
         public ActivationNetwork Classifier { get; set; }
     }
 
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Extract.AttributeFinder")]
     class SupportVectorMachineModel : ISupportVectorMachineModel
     {
@@ -453,11 +458,13 @@ namespace LearningMachineTrainer
         public int Version { get; set; }
     }
 
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Extract.AttributeFinder")]
     class MulticlassSupportVectorMachineModel : SupportVectorMachineModel, IMulticlassSupportVectorMachineModel
     {
     }
 
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Extract.AttributeFinder")]
     class MultilabelSupportVectorMachineModel : SupportVectorMachineModel, IMultilabelSupportVectorMachineModel
     {
