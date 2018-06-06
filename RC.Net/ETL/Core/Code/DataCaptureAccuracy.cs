@@ -109,10 +109,24 @@ namespace Extract.ETL
 	                  ,ExpectedAttributeSet.ID AS ExpectedAttributeSetFileID
 	                  ,ExpectedAttributeSet.VOA AS ExpectedVOA
 	                  ,found.FileID
+                      ,foundFTS.DateTimeStamp FoundDateTimeStamp
+                      ,foundFTS.ActionID FoundActionID
+                      ,foundFS.FAMUserID FoundFAMUserID
+                      ,expectedFTS.DateTimeStamp ExpectedDateTimeStamp
+                      ,expectedFTS.ActionID ExpectedActionID
+                      ,expectedFS.FAMUserID ExpectedFAMUserID
                 FROM MostRecent found 
 	                INNER JOIN MostRecent expected 
 		                ON found.Description = @FoundSetName AND Expected.Description = @ExpectedSetName 
 			                AND found.FileID = expected.FileID
+                    INNER JOIN FileTaskSession foundFTS 
+                            ON found.MostRecentFileTaskSession = foundFTS.ID
+                    INNER JOIN FAMSession foundFS 
+                        ON foundFTS.FAMSessionID = foundFS.ID
+                    INNER JOIN FileTaskSession expectedFTS 
+                            ON expected.MostRecentFileTaskSession = expectedFTS.ID
+                    INNER JOIN FAMSession expectedFS 
+                        ON expectedFTS.FAMSessionID = expectedFS.ID
 	                INNER JOIN AttributeSetForFile FoundAttributeSet 
 		                ON FoundAttributeSet.FileTaskSessionID = found.MostRecentFileTaskSession 
 			                AND FoundAttributeSet.AttributeSetNameID = found.AttributeSetNameID
@@ -205,6 +219,12 @@ namespace Extract.ETL
                         int foundAttributeForFileSetColumn = ExpectedAndFoundReader.GetOrdinal("FoundAttributeSetFileID");
                         int expectedAttributeForFileSetColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedAttributeSetFileID");
                         int fileIDColumn = ExpectedAndFoundReader.GetOrdinal("FileID");
+                        int foundDateTimeStampColumn = ExpectedAndFoundReader.GetOrdinal("FoundDateTimeStamp");
+                        int foundActionIDColumn = ExpectedAndFoundReader.GetOrdinal("FoundActionID");
+                        int foundFAMUserIDColumn = ExpectedAndFoundReader.GetOrdinal("FoundFAMUserID");
+                        int expectedDateTimeStampColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedDateTimeStamp");
+                        int expectedActionIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedActionID");
+                        int expectedFAMUserIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedFAMUserID");
 
                         // Process the found records
                         while (ExpectedAndFoundReader.Read() && !cancelToken.IsCancellationRequested)
@@ -215,6 +235,12 @@ namespace Extract.ETL
                             Int64 foundID = ExpectedAndFoundReader.GetInt64(foundAttributeForFileSetColumn);
                             Int64 expectedID = ExpectedAndFoundReader.GetInt64(expectedAttributeForFileSetColumn);
                             Int32 fileID = ExpectedAndFoundReader.GetInt32(fileIDColumn);
+                            DateTime foundDateTime = ExpectedAndFoundReader.GetDateTime(foundDateTimeStampColumn);
+                            Int32 foundActionID = ExpectedAndFoundReader.GetInt32(foundActionIDColumn);
+                            Int32 foundFAMUserID = ExpectedAndFoundReader.GetInt32(foundFAMUserIDColumn);
+                            DateTime expectedDateTime = ExpectedAndFoundReader.GetDateTime(expectedDateTimeStampColumn);
+                            Int32 expectedActionID = ExpectedAndFoundReader.GetInt32(expectedActionIDColumn);
+                            Int32 expectedFAMUserID = ExpectedAndFoundReader.GetInt32(expectedFAMUserIDColumn);
 
                             try
                             {
@@ -252,7 +278,7 @@ namespace Extract.ETL
                                             if (correct != 0 || incorrect != 0 || expected != 0)
                                             {
                                                 valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
-                                                    @"({0}, {1}, {2}, {3}, '{4}', {5}, {6}, {7})"
+                                                    @"({0}, {1}, {2}, {3}, '{4}', {5}, {6}, {7}, '{8:s}', {9}, {10}, '{11:s}', {12}, {13})"
                                                     , DatabaseServiceID
                                                     , foundID
                                                     , expectedID
@@ -261,6 +287,12 @@ namespace Extract.ETL
                                                     , correct
                                                     , expected
                                                     , incorrect
+                                                    , foundDateTime
+                                                    , foundActionID
+                                                    , foundFAMUserID
+                                                    , expectedDateTime
+                                                    , expectedActionID
+                                                    , expectedFAMUserID
                                                     ));
                                             }
                                         }
@@ -278,6 +310,12 @@ namespace Extract.ETL
                                                            ,[Correct]
                                                            ,[Expected]
                                                            ,[Incorrect]
+                                                           ,[FoundDateTimeStamp]
+                                                           ,[FoundActionID]
+                                                           ,[FoundFAMUserID]
+                                                           ,[ExpectedDateTimeStamp]
+                                                           ,[ExpectedActionID]
+                                                           ,[ExpectedFAMUserID]
                                                            )
                                                      VALUES
                                                            {0};", string.Join(",\r\n", valuesToAdd));

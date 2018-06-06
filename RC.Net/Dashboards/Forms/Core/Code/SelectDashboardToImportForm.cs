@@ -65,30 +65,13 @@ namespace Extract.Dashboard.Forms
         {
             try
             {
-                // The dialog is opened in a thread to avoid hang when the dialog is being used in a thread / process that 
-                // uses MTA threading 
-                // https://extract.atlassian.net/browse/ISSUE-15385
-                string fileName = _dashboardFileTextBox.Text; 
-                DialogResult dlgResult = DialogResult.Cancel;
-                Thread dialogThread = new Thread ((ThreadStart) delegate
-                {
                     OpenFileDialog openDialog = new OpenFileDialog();
-                    openDialog.FileName = fileName;
+                    openDialog.FileName = _dashboardFileTextBox.Text;
                     openDialog.Filter = "ESDX|*.esdx|XML|*.xml|All|*.*";
                     if (openDialog.ShowDialog() == DialogResult.OK)
                     {
-                        fileName = openDialog.FileName;
-                        dlgResult = DialogResult.OK;
+                        _dashboardFileTextBox.Text = openDialog.FileName;
                     }
-                });
-
-                dialogThread.TrySetApartmentState(ApartmentState.STA);
-                dialogThread.Start();
-                dialogThread.Join();
-                if (dlgResult == DialogResult.OK)
-                {
-                    _dashboardFileTextBox.Text = fileName;
-                }
             }
             catch (Exception ex)
             {

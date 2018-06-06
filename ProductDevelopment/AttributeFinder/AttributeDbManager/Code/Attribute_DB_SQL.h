@@ -144,7 +144,7 @@ static const std::string gstrADD_ATTRIBUTE_SET_FOR_FILE_VOA_COLUMN =
 static const std::string gstrREPORTING_REDACTION_ACCURACY_TABLE = "ReportingRedactionAccuracy";
 static const std::string gstrREPORTING_DATA_CAPTURE_ACCURACY_TABLE = "ReportingDataCaptureAccuracy";
 
-static const std::string gstrCREATE_REPORTING_REDACTION_ACCURACY_TABLE =
+static const std::string gstrCREATE_REPORTING_REDACTION_ACCURACY_TABLE_V4 =
 	"CREATE TABLE [dbo].[ReportingRedactionAccuracy]( "
 	"	[ID][bigint] IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_ReportingRedactionAccuracy] PRIMARY KEY CLUSTERED, "
 	"   [DatabaseServiceID] [INT] NOT NULL, "
@@ -161,6 +161,31 @@ static const std::string gstrCREATE_REPORTING_REDACTION_ACCURACY_TABLE =
 	"	[UnderRedacted][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyUnderRedacted DEFAULT(0), "
 	"	[Missed][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyMissed DEFAULT(0) "
 	") ";
+
+static const std::string gstrCREATE_REPORTING_REDACTION_ACCURACY_TABLE =
+	"CREATE TABLE [dbo].[ReportingRedactionAccuracy]( "
+	"	[ID][bigint] IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_ReportingRedactionAccuracy] PRIMARY KEY CLUSTERED, "
+	"   [DatabaseServiceID] [INT] NOT NULL, "
+	"	[FoundAttributeSetForFileID][BIGINT] NOT NULL, "
+	"   [FoundDateTimeStamp] [DATETIME] NOT NULL, "
+	"   [FoundFAMUserID] INT NOT NULL, "
+	"   [FoundActionID] INT NULL, "
+	"	[ExpectedAttributeSetForFileID][BIGINT] NOT NULL, "
+	"   [ExpectedDateTimeStamp] [DATETIME] NOT NULL, "
+	"   [ExpectedFAMUserID] INT NOT NULL, "
+	"   [ExpectedActionID] INT NULL, "
+	"	[FileID][INT] NOT NULL, "
+	"   [Page][INT] NOT NULL, "
+	"	[Attribute][nvarchar](MAX) NOT NULL, "
+	"	[Expected][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyExpected DEFAULT(0), "
+	"	[Found][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyFound DEFAULT(0), "
+	"	[Correct][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyCorrect DEFAULT(0), "
+	"	[FalsePositives][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyFalsePositives DEFAULT(0), "
+	"	[OverRedacted][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyOverRedacted DEFAULT(0), "
+	"	[UnderRedacted][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyUnderRedacted DEFAULT(0), "
+	"	[Missed][bigint] NOT NULL CONSTRAINT DF_ReportingRedactionAccuracyMissed DEFAULT(0) "
+	") ";
+
 
 static const std::string gstrADD_REPORTING_REDACTION_ACCURACY_ATTRIBUTE_SET_FOR_FILE_EXPECTED_FK =
 	"ALTER TABLE[dbo].[ReportingRedactionAccuracy]  "
@@ -197,7 +222,7 @@ static const std::string gstrCREATE_REPORTING_REDACTION_FILEID_DATABASE_SERVICE_
 	"	[DatabaseServiceID] ASC "
 	") ";
 	
-static const std::string gstrCREATE_REPORTING_DATA_CAPTURE_ACCURACY_TABLE =
+static const std::string gstrCREATE_REPORTING_DATA_CAPTURE_ACCURACY_TABLE_V4 =
 "CREATE TABLE [dbo].[ReportingDataCaptureAccuracy]( "
 "	[ID][bigint] IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_ReportingDataCaptureAccuracy] PRIMARY KEY CLUSTERED, "
 "   [DatabaseServiceID] [INT] NOT NULL, "
@@ -209,6 +234,26 @@ static const std::string gstrCREATE_REPORTING_DATA_CAPTURE_ACCURACY_TABLE =
 "	[Expected][bigint] NOT NULL CONSTRAINT DF_ReportingDataCaptureAccuracyExpected DEFAULT(0), "
 "	[Incorrect][bigint] NOT NULL CONSTRAINT DF_ReportingDataCaptureAccuracyIncorrect DEFAULT(0) "
 ") ";
+
+static const std::string gstrCREATE_REPORTING_DATA_CAPTURE_ACCURACY_TABLE =
+"CREATE TABLE [dbo].[ReportingDataCaptureAccuracy]( "
+"	[ID][bigint] IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_ReportingDataCaptureAccuracy] PRIMARY KEY CLUSTERED, "
+"   [DatabaseServiceID] [INT] NOT NULL, "
+"	[FoundAttributeSetForFileID][BIGINT] NOT NULL, "
+"   [FoundDateTimeStamp] [DATETIME] NOT NULL, "
+"   [FoundFAMUserID] INT NOT NULL, "
+"   [FoundActionID] INT NULL, "
+"	[ExpectedAttributeSetForFileID][BIGINT] NOT NULL, "
+"   [ExpectedDateTimeStamp] [DATETIME] NOT NULL, "
+"   [ExpectedFAMUserID] INT NOT NULL, "
+"   [ExpectedActionID] INT NULL, "
+"	[FileID][INT] NOT NULL, "
+"	[Attribute][nvarchar](MAX) NOT NULL, "
+"	[Correct][bigint] NOT NULL CONSTRAINT DF_ReportingDataCaptureAccuracyCorrect DEFAULT(0), "
+"	[Expected][bigint] NOT NULL CONSTRAINT DF_ReportingDataCaptureAccuracyExpected DEFAULT(0), "
+"	[Incorrect][bigint] NOT NULL CONSTRAINT DF_ReportingDataCaptureAccuracyIncorrect DEFAULT(0) "
+") ";
+
 
 static const std::string gstrADD_REPORTING_DATA_CAPTURE_ACCURACY_ATTRIBUTE_SET_FOR_FILE_EXPECTED_FK =
 "ALTER TABLE[dbo].[ReportingDataCaptureAccuracy]  "
@@ -244,3 +289,46 @@ static const std::string gstrCREATE_REPORTING_DATA_CAPTURE_FILEID_DATABASE_SERVI
 "	[FileID] ASC, "
 "	[DatabaseServiceID] ASC "
 ") ";
+
+static const string gstrDASHBOARD_ATTRIBUTE_FIELDS_TABLE = "DashboardAttributeFields";
+
+static const string gstrCREATE_DASHBOARD_ATTRIBUTE_FIELDS =
+"CREATE TABLE[dbo].[DashboardAttributeFields]( "
+"	[AttributeSetForFileID] BIGINT         NOT NULL, "
+"	[Name]                  NVARCHAR(255) NOT NULL, "
+"	[Value]                 NVARCHAR(MAX) NOT NULL, "
+"	CONSTRAINT[PK_DashboardAttributeFields] PRIMARY KEY CLUSTERED([AttributeSetForFileID] ASC, [Name] ASC)) ";
+
+static const string gstrADD_DASHBOARD_ATTRIBUTE_FIELDS_ATTRIBUTESETFORFILE_FK =
+"ALTER TABLE[dbo].[DashboardAttributeFields] WITH CHECK "
+"ADD CONSTRAINT[FK_DashboardAttributeFields_AttributeSetForFileID] "
+"FOREIGN KEY([AttributeSetForFileID]) "
+"REFERENCES[dbo].[AttributeSetForFile]([ID]) "
+"ON DELETE CASCADE "
+"ON UPDATE CASCADE ";
+
+static const std::string gstrCREATE_REPORTING_DATA_CAPTURE_EXPECTED_FAMUSERID_WITH_INCLUDES =
+"CREATE NONCLUSTERED INDEX[IX_ReportingDataCaptureAccuracy_ExpectedFAMUserIDWithIncludes] "
+"ON[dbo].[ReportingDataCaptureAccuracy]([ExpectedFAMUserID]) "
+"INCLUDE([DatabaseServiceID], [ExpectedAttributeSetForFileID], [FileID], [Attribute], [Correct], [Expected], [ExpectedDateTimeStamp]) "; 
+
+static const std::string gstrCREATE_REPORTING_DATA_CAPTURE_FOUND_FAMUSERID_WITH_INCLUDES =
+"CREATE NONCLUSTERED INDEX[IX_ReportingDataCaptureAccuracy_FoundFAMUserIDWithIncludes] "
+"ON[dbo].[ReportingDataCaptureAccuracy]([FoundFAMUserID]) "
+"INCLUDE([DatabaseServiceID], [FoundAttributeSetForFileID], [FileID], [Attribute], [Correct], [Expected], [FoundDateTimeStamp]) ";
+
+static const std::string gstrCREATE_ATTRIBUTESETFORFILE_ATTRIBUTESETID_WITH_NAMEID_VALUE_IX =
+"CREATE NONCLUSTERED INDEX[IX_AttributeSetForFile_ID_Value] "
+"ON[dbo].[Attribute]([AttributeSetForFileID] ASC) "
+"INCLUDE([AttributeNameID], [Value])";
+
+
+static const std::string gstrCREATE_REPORTING_REDACTION_ACCURACY_EXPECTED_FAMUSERID_WITH_INCLUDES =
+"CREATE NONCLUSTERED INDEX[IX_ReportingRedactionAccuracy_ExpectedFAMUserIDWithIncludes] "
+"ON[dbo].[ReportingRedactionAccuracy]([ExpectedFAMUserID]) "
+"INCLUDE([DatabaseServiceID], [ExpectedAttributeSetForFileID], [FileID], [Attribute], [Correct], [Expected], [ExpectedDateTimeStamp]) ";
+
+static const std::string gstrCREATE_REPORTING_REDACTION_ACCURACY_FOUND_FAMUSERID_WITH_INCLUDES =
+"CREATE NONCLUSTERED INDEX[IX_ReportingRedactionAccuracy_FoundFAMUserIDWithIncludes] "
+"ON[dbo].[ReportingRedactionAccuracy]([FoundFAMUserID]) "
+"INCLUDE([DatabaseServiceID], [FoundAttributeSetForFileID], [FileID], [Attribute], [Correct], [Expected], [FoundDateTimeStamp]) ";

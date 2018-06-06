@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 164;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 165;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2221,6 +2221,37 @@ int UpdateToSchemaVersion164(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45760");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion165(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 165;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE [dbo].[FAMUser] ADD [FullUserName][nvarchar](128) NULL");
+		vecQueries.push_back(gstrCREATE_PAGINATION_DESTFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_PAGINATION_SOURCEFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_PAGINATED_DEST_FILES_VIEW);
+		vecQueries.push_back(gstrCREATE_USERS_WITH_ACTIVE_VIEW);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45989");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6344,7 +6375,8 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 				long nFPSFileID = getKeyID(ipConnection, gstrFPS_FILE, "FPSFileName",
 					m_strFPSFileName.empty() ? "<Unsaved FPS File>" : m_strFPSFileName);
 				long nMachineID = getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName);
-				long nUserID = getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName);
+				long nUserID = addOrUpdateFAMUser(ipConnection);
+
 				string strQueuing = (asCppBool(vbQueuing) ? "1" : "0");
 				string strProcessing = (asCppBool(vbProcessing) ? "1" : "0");
 
@@ -7268,7 +7300,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 161:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion162);
 				case 162:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion163);
 				case 163:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion164);
-				case 164:
+				case 164:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion165);
+				case 165:
 					break;
 
 				default:

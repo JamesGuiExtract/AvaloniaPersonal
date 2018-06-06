@@ -1628,6 +1628,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_PAGINATION_ORIGINALFILE_INDEX);
 		vecQueries.push_back(gstrCREATE_PAGINATION_FILETASKSESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_ACTION_INDEX);
+		vecQueries.push_back(gstrCREATE_PAGINATION_DESTFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_PAGINATION_SOURCEFILE_INDEX);
 		
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
@@ -1747,6 +1749,10 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		}
 
 		vecQueries.push_back(gstrADD_DB_PROCEXECUTOR_ROLE);
+
+		// Add Views
+		vecQueries.push_back(gstrCREATE_PAGINATED_DEST_FILES_VIEW);
+		vecQueries.push_back(gstrCREATE_USERS_WITH_ACTIVE_VIEW);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -3423,6 +3429,30 @@ long CFileProcessingDB::getFAMUserID(_ConnectionPtr ipConnection)
 		m_lFAMUserID = getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName);
 	}
 	return m_lFAMUserID;
+}
+//--------------------------------------------------------------------------------------------------
+long CFileProcessingDB::addOrUpdateFAMUser(_ConnectionPtr ipConnection)
+{
+	try
+	{
+		string strUserName = getCurrentUserName();
+		string strFullUserName = getFullUserName();
+		long lFAMUserID = getKeyID(ipConnection, "FAMUser", "UserName", strUserName);
+
+		string strQuery =
+			"UPDATE FAMUser SET FullUserName = '<FullUserName>' "
+			" WHERE ID = <FAMUserID> "
+			"		AND(FullUserName IS NULL OR FullUserName <> '<FullUserName>')";
+
+		replaceVariable(strFullUserName, "'", "''");
+		replaceVariable(strQuery, "<FAMUserID>", asString(lFAMUserID));
+		replaceVariable(strQuery, "<FullUserName>", strFullUserName);
+
+		executeCmdQuery(ipConnection, strQuery, false, __nullptr);
+		
+		return lFAMUserID;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45997");
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)

@@ -19,7 +19,13 @@ namespace Extract.ETL.Test
             Int64 Correct,
             Int64 Expected,
             Int64 Incorrect,
-            Int32 FileID)>;
+            Int32 FileID,
+            DateTime FoundDateTimeStamp,
+            Int32 FoundFAMUserID,
+            Int32 FoundActionID,
+            DateTime ExpectedDateTimeStamp,
+            Int32 ExpectedFAMUserID,
+            Int32 ExpectedActionID)>;
 
     [Category("TestAccuracyServices")]
     [TestFixture]
@@ -79,20 +85,20 @@ namespace Extract.ETL.Test
         static DataEntryAccuracyList _FIRST_RUN_EXPECTED_RESULTS = new DataEntryAccuracyList
         {
 
-            (2, 4, "PatientInfo/DOB",                            1, 1, 0,  1),
-            (2, 4, "PatientInfo/Name/First",                     1, 1, 0,  1),
-            (2, 4, "PatientInfo/Name/Last",                      1, 1, 0,  1),
-            (2, 4, "PhysicianInfo/OrderingPhysicianName/Code",   0, 1, 0,  1),
-            (2, 4, "PhysicianInfo/OrderingPhysicianName/First",  1, 1, 0,  1),
-            (2, 4, "PhysicianInfo/OrderingPhysicianName/Last",   1, 1, 0,  1),
-            (2, 4, "PhysicianInfo/OrderingPhysicianName/Middle", 1, 1, 0,  1),
-            (2, 4, "Test/CollectionDate",                        1, 1, 0,  1),
-            (2, 4, "Test/CollectionTime",                        0, 1, 0,  1),
-            (2, 4, "Test/Component",                             3, 3, 0,  1),
-            (2, 4, "Test/Component/Range",                       1, 1, 0,  1),
-            (2, 4, "Test/Component/Units",                       3, 3, 0,  1),
-            (2, 4, "Test/Component/Value",                       3, 3, 0,  1),
-            (2, 4, "Test/Name",                                  1, 1, 0,  1)
+            (2, 4, "PatientInfo/DOB",                            1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "PatientInfo/Name/First",                     1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "PatientInfo/Name/Last",                      1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "PhysicianInfo/OrderingPhysicianName/Code",   0, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "PhysicianInfo/OrderingPhysicianName/First",  1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "PhysicianInfo/OrderingPhysicianName/Last",   1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "PhysicianInfo/OrderingPhysicianName/Middle", 1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "Test/CollectionDate",                        1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "Test/CollectionTime",                        0, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "Test/Component",                             3, 3, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "Test/Component/Range",                       1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "Test/Component/Units",                       3, 3, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "Test/Component/Value",                       3, 3, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
+            (2, 4, "Test/Name",                                  1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4)
         };
 
         /// <summary>
@@ -100,20 +106,20 @@ namespace Extract.ETL.Test
         /// </summary>
         static DataEntryAccuracyList _RERUN_FILE_EXPECTED_RESULTS = new DataEntryAccuracyList
         {
-            (2, 5, "PatientInfo/DOB",                            1, 1, 0,  1),
-            (2, 5, "PatientInfo/Name/First",                     1, 1, 0,  1),
-            (2, 5, "PatientInfo/Name/Last",                      1, 1, 0,  1),
-            (2, 5, "PhysicianInfo/OrderingPhysicianName/Code",   0, 1, 0,  1),
-            (2, 5, "PhysicianInfo/OrderingPhysicianName/First",  1, 1, 0,  1),
-            (2, 5, "PhysicianInfo/OrderingPhysicianName/Last",   1, 1, 0,  1),
-            (2, 5, "PhysicianInfo/OrderingPhysicianName/Middle", 1, 1, 0,  1),
-            (2, 5, "Test/CollectionDate",                        1, 1, 0,  1),
-            (2, 5, "Test/CollectionTime",                        0, 1, 0,  1),
-            (2, 5, "Test/Component",                             1, 1, 2,  1),
-            (2, 5, "Test/Component/Range",                       1, 1, 0,  1),
-            (2, 5, "Test/Component/Units",                       1, 1, 2,  1),
-            (2, 5, "Test/Component/Value",                       0, 1, 3,  1),
-            (2, 5, "Test/Name",                                  1, 1, 0,  1)
+            (2, 5, "PatientInfo/DOB",                            1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "PatientInfo/Name/First",                     1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "PatientInfo/Name/Last",                      1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "PhysicianInfo/OrderingPhysicianName/Code",   0, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "PhysicianInfo/OrderingPhysicianName/First",  1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "PhysicianInfo/OrderingPhysicianName/Last",   1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "PhysicianInfo/OrderingPhysicianName/Middle", 1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "Test/CollectionDate",                        1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "Test/CollectionTime",                        0, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "Test/Component",                             1, 1, 2, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "Test/Component/Range",                       1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "Test/Component/Units",                       1, 1, 2, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "Test/Component/Value",                       0, 1, 3, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
+            (2, 5, "Test/Name",                                  1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4)
         }
         ;
         #endregion
@@ -336,7 +342,13 @@ namespace Extract.ETL.Test
                    Correct: r.GetInt64(r.GetOrdinal("Correct")),
                    Expected: r.GetInt64(r.GetOrdinal("Expected")),
                    Incorrect: r.GetInt64(r.GetOrdinal("Incorrect")),
-                   FileID: r.GetInt32(r.GetOrdinal("FileID")))).ToList();
+                   FileID: r.GetInt32(r.GetOrdinal("FileID")),
+                   FoundDateTimeStamp: r.GetDateTime(r.GetOrdinal("FoundDateTimeStamp")),
+                   FoundFAMUserID: r.GetInt32(r.GetOrdinal("FoundFAMUserID")),
+                   FoundActionID: r.GetInt32(r.GetOrdinal("FoundActionID")),
+                   ExpectedDateTimeStamp: r.GetDateTime(r.GetOrdinal("ExpectedDateTimeStamp")),
+                   ExpectedFAMUserID: r.GetInt32(r.GetOrdinal("ExpectedFAMUserID")),
+                   ExpectedActionID: r.GetInt32(r.GetOrdinal("ExpectedActionID")))).ToList();
 
             Assert.That(formatedResults.Count() == expected.Count, 
                 string.Format(CultureInfo.InvariantCulture, "Found {0} and expected {1} ", 

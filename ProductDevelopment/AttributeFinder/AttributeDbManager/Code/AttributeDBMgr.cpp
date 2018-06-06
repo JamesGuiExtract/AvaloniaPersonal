@@ -37,7 +37,7 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 4;
+	const long glSCHEMA_VERSION = 6;
 	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
@@ -58,6 +58,7 @@ namespace
 		names.push_back( gstrRASTER_ZONE );
 		names.push_back( gstrREPORTING_REDACTION_ACCURACY_TABLE );
 		names.push_back( gstrREPORTING_DATA_CAPTURE_ACCURACY_TABLE );
+		names.push_back(gstrDASHBOARD_ATTRIBUTE_FIELDS_TABLE);
 
 		return names;
 	}
@@ -183,9 +184,31 @@ namespace
 		return queries;
 	}
 
+	VectorOfString GetSchema_v5(bool bAddUserTables)
+	{
+		VectorOfString queries = GetSchema_v4(bAddUserTables);
+		queries.push_back(gstrCREATE_DASHBOARD_ATTRIBUTE_FIELDS);
+		queries.push_back(gstrADD_DASHBOARD_ATTRIBUTE_FIELDS_ATTRIBUTESETFORFILE_FK);
+		queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_EXPECTED_FAMUSERID_WITH_INCLUDES);
+		queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_FOUND_FAMUSERID_WITH_INCLUDES);
+		queries.push_back(gstrCREATE_ATTRIBUTESETFORFILE_ATTRIBUTESETID_WITH_NAMEID_VALUE_IX);
+
+		return queries;
+	}
+
+
+	VectorOfString GetSchema_v6(bool bAddUserTables)
+	{
+		VectorOfString queries = GetSchema_v5(bAddUserTables);
+		queries.push_back(gstrCREATE_REPORTING_REDACTION_ACCURACY_EXPECTED_FAMUSERID_WITH_INCLUDES);
+		queries.push_back(gstrCREATE_REPORTING_REDACTION_ACCURACY_FOUND_FAMUSERID_WITH_INCLUDES);
+
+		return queries;
+	}
+
 	VectorOfString GetCurrentSchema( bool bAddUserTables = true )
 	{
-		return GetSchema_v4( bAddUserTables );
+		return GetSchema_v6( bAddUserTables );
 	}
 
 
@@ -270,14 +293,14 @@ namespace
 			}
 
 			vector<string> queries;
-			queries.push_back(gstrCREATE_REPORTING_REDACTION_ACCURACY_TABLE);
+			queries.push_back(gstrCREATE_REPORTING_REDACTION_ACCURACY_TABLE_V4);
 			queries.push_back(gstrADD_REPORTING_REDACTION_ACCURACY_ATTRIBUTE_SET_FOR_FILE_EXPECTED_FK);
 			queries.push_back(gstrADD_REPORTING_REDACTION_ATTRIBUTE_SET_FOR_FILE_FOUND_FK);
 			queries.push_back(gstrADD_REPORTING_REDACTION_FAMFILE_FK);
 			queries.push_back(gstrADD_REPORTING_REDACTION_DATABASE_SERVICE_FK);
 			queries.push_back(gstrCREATE_REPORTING_REDACTION_FILEID_DATABASE_SERVICE_IX);
 
-			queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_ACCURACY_TABLE);
+			queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_ACCURACY_TABLE_V4);
 			queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_ACCURACY_ATTRIBUTE_SET_FOR_FILE_EXPECTED_FK);
 			queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_ATTRIBUTE_SET_FOR_FILE_FOUND_FK);
 			queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_FAMFILE_FK);
@@ -292,7 +315,126 @@ namespace
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45336");
 	}
+	//-------------------------------------------------------------------------------------------------
+	int UpdateToSchemaVersion5(_ConnectionPtr ipConnection, long* pnNumSteps)
+	{
+		try
+		{
+			const int nNewSchemaVersion = 5;
+
+			if (pnNumSteps != __nullptr)
+			{
+				*pnNumSteps += 10;
+				return nNewSchemaVersion;
+			}
+
+			vector<string> queries;
+			
+			queries.push_back("ALTER TABLE [dbo].[ReportingDataCaptureAccuracy] ADD [FoundDateTimeStamp] [DATETIME] NULL");
+			queries.push_back("ALTER TABLE [dbo].[ReportingDataCaptureAccuracy] ADD [FoundFAMUserID] INT  NULL");
+			queries.push_back("ALTER TABLE [dbo].[ReportingDataCaptureAccuracy] ADD [FoundActionID] INT NULL");
+
+			queries.push_back("ALTER TABLE [dbo].[ReportingDataCaptureAccuracy] ADD [ExpectedDateTimeStamp] [DATETIME] NULL");
+			queries.push_back("ALTER TABLE [dbo].[ReportingDataCaptureAccuracy] ADD [ExpectedFAMUserID] INT  NULL");
+			queries.push_back("ALTER TABLE [dbo].[ReportingDataCaptureAccuracy] ADD [ExpectedActionID] INT NULL");
+
+			queries.push_back(
+				"UPDATE[dbo].[ReportingDataCaptureAccuracy] "
+				"SET[FoundDateTimeStamp] = FoundFileSession.DateTimeStamp "
+				", [FoundFAMUserID] = FoundFAMSession.FAMUserID "
+				", [FoundActionID] = FoundFileSession.ActionID "
+				", [ExpectedDateTimeStamp] = ExpectedFileSession.DateTimeStamp "
+				", [ExpectedFAMUserID] = ExpectedFAMSession.FAMUserID "
+				", [ExpectedActionID] = ExpectedFileSession.ActionID "
+				"FROM[dbo].[ReportingDataCaptureAccuracy] "
+				"INNER JOIN AttributeSetForFile FoundSet ON ReportingDataCaptureAccuracy.FoundAttributeSetForFileID = FoundSet.ID "
+				"INNER JOIN FileTaskSession FoundFileSession ON FoundSet.FileTaskSessionID = FoundFileSession.ID "
+				"INNER JOIN FAMSession FoundFAMSession ON FoundFileSession.FAMSessionID = FoundFAMSession.ID "
+				"INNER JOIN AttributeSetForFile ExpectedSet ON ReportingDataCaptureAccuracy.ExpectedAttributeSetForFileID = ExpectedSet.ID "
+				"INNER JOIN FileTaskSession ExpectedFileSession ON ExpectedSet.FileTaskSessionID = ExpectedFileSession.ID "
+				"INNER JOIN FAMSession ExpectedFAMSession ON ExpectedFileSession.FAMSessionID = ExpectedFAMSession.ID "
+			);
+			
+			queries.push_back("ALTER TABLE[dbo].[ReportingDataCaptureAccuracy] ALTER COLUMN [FoundDateTimeStamp] [DATETIME] NOT NULL");
+			queries.push_back("ALTER TABLE[dbo].[ReportingDataCaptureAccuracy] ALTER COLUMN [FoundFAMUserID] INT NOT NULL");
+			queries.push_back("ALTER TABLE[dbo].[ReportingDataCaptureAccuracy] ALTER COLUMN [ExpectedDateTimeStamp] [DATETIME] NOT NULL");
+			queries.push_back("ALTER TABLE[dbo].[ReportingDataCaptureAccuracy] ALTER COLUMN [ExpectedFAMUserID] INT NOT NULL");
+			queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_EXPECTED_FAMUSERID_WITH_INCLUDES);
+			queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_FOUND_FAMUSERID_WITH_INCLUDES);
+			queries.push_back(gstrCREATE_DASHBOARD_ATTRIBUTE_FIELDS);
+			queries.push_back(gstrADD_DASHBOARD_ATTRIBUTE_FIELDS_ATTRIBUTESETFORFILE_FK);
+			queries.push_back(gstrCREATE_ATTRIBUTESETFORFILE_ATTRIBUTESETID_WITH_NAMEID_VALUE_IX);
+
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
+			long saveCommandTimeout = ipConnection->CommandTimeout;
+			ipConnection->CommandTimeout = 0;
+			executeVectorOfSQL(ipConnection, queries);
+			ipConnection->CommandTimeout = saveCommandTimeout;
+
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45972");
+	}
+
+	//-------------------------------------------------------------------------------------------------
+	int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps)
+	{
+		try
+		{
+			const int nNewSchemaVersion = 6;
+
+			if (pnNumSteps != __nullptr)
+			{
+				*pnNumSteps += 10;
+				return nNewSchemaVersion;
+			}
+
+			vector<string> queries;
+			
+			queries.push_back("ALTER TABLE [dbo].[ReportingRedactionAccuracy] ADD [FoundDateTimeStamp] [DATETIME] NULL");
+			queries.push_back("ALTER TABLE [dbo].[ReportingRedactionAccuracy] ADD [FoundFAMUserID] INT  NULL");
+			queries.push_back("ALTER TABLE [dbo].[ReportingRedactionAccuracy] ADD [FoundActionID] INT NULL");
+
+			queries.push_back("ALTER TABLE [dbo].[ReportingRedactionAccuracy] ADD [ExpectedDateTimeStamp] [DATETIME] NULL");
+			queries.push_back("ALTER TABLE [dbo].[ReportingRedactionAccuracy] ADD [ExpectedFAMUserID] INT  NULL");
+			queries.push_back("ALTER TABLE [dbo].[ReportingRedactionAccuracy] ADD [ExpectedActionID] INT NULL");
+
+			queries.push_back(
+				"UPDATE[dbo].[ReportingRedactionAccuracy] "
+				"SET[FoundDateTimeStamp] = FoundFileSession.DateTimeStamp "
+				", [FoundFAMUserID] = FoundFAMSession.FAMUserID "
+				", [FoundActionID] = FoundFileSession.ActionID "
+				", [ExpectedDateTimeStamp] = ExpectedFileSession.DateTimeStamp "
+				", [ExpectedFAMUserID] = ExpectedFAMSession.FAMUserID "
+				", [ExpectedActionID] = ExpectedFileSession.ActionID "
+				"FROM[dbo].[ReportingRedactionAccuracy] "
+				"INNER JOIN AttributeSetForFile FoundSet ON ReportingRedactionAccuracy.FoundAttributeSetForFileID = FoundSet.ID "
+				"INNER JOIN FileTaskSession FoundFileSession ON FoundSet.FileTaskSessionID = FoundFileSession.ID "
+				"INNER JOIN FAMSession FoundFAMSession ON FoundFileSession.FAMSessionID = FoundFAMSession.ID "
+				"INNER JOIN AttributeSetForFile ExpectedSet ON ReportingRedactionAccuracy.ExpectedAttributeSetForFileID = ExpectedSet.ID "
+				"INNER JOIN FileTaskSession ExpectedFileSession ON ExpectedSet.FileTaskSessionID = ExpectedFileSession.ID "
+				"INNER JOIN FAMSession ExpectedFAMSession ON ExpectedFileSession.FAMSessionID = ExpectedFAMSession.ID "
+			);
+			
+			queries.push_back("ALTER TABLE[dbo].[ReportingRedactionAccuracy] ALTER COLUMN [FoundDateTimeStamp] [DATETIME] NOT NULL");
+			queries.push_back("ALTER TABLE[dbo].[ReportingRedactionAccuracy] ALTER COLUMN [FoundFAMUserID] INT NOT NULL");
+			queries.push_back("ALTER TABLE[dbo].[ReportingRedactionAccuracy] ALTER COLUMN [ExpectedDateTimeStamp] [DATETIME] NOT NULL");
+			queries.push_back("ALTER TABLE[dbo].[ReportingRedactionAccuracy] ALTER COLUMN [ExpectedFAMUserID] INT NOT NULL");
+			queries.push_back(gstrCREATE_REPORTING_REDACTION_ACCURACY_EXPECTED_FAMUSERID_WITH_INCLUDES);
+			queries.push_back(gstrCREATE_REPORTING_REDACTION_ACCURACY_FOUND_FAMUSERID_WITH_INCLUDES);
+
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
+			long saveCommandTimeout = ipConnection->CommandTimeout;
+			ipConnection->CommandTimeout = 0;
+			executeVectorOfSQL(ipConnection, queries);
+			ipConnection->CommandTimeout = saveCommandTimeout;
+
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46004");
+	}
 }
+
 
 //-------------------------------------------------------------------------------------------------
 // CAttributeDBMgr
@@ -640,7 +782,20 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				}
 				break;
 
-			case 4:
+			case 4: 
+				if (nFAMDBSchemaVersion == 165)
+				{
+					*pnProdSchemaVersion = UpdateToSchemaVersion5(ipConnection, pnNumSteps);
+				}
+				
+			case 5:
+				if (nFAMDBSchemaVersion == 165)
+				{
+					*pnProdSchemaVersion = UpdateToSchemaVersion6(ipConnection, pnNumSteps);
+				}
+				break;
+
+			case 6:
 				break;
 
 			default:

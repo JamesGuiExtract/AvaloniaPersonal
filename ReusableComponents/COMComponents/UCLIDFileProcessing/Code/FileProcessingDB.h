@@ -985,6 +985,11 @@ private:
 	// If m_lFAMUserID != 0 will return the value of m_lFAMUserID;
 	long getFAMUserID(_ConnectionPtr ipConnection);
 
+	// if the m_strFAMUserName is the same as the current user and the FullUserName is null in the FAMUserTable
+	// or there is no record for the username the FAMUser will be created or updated to the proper values
+	// return value will be the FAMUserID
+	long addOrUpdateFAMUser(_ConnectionPtr ipConnection);
+
 	// Loads settings from the DBInfo table if any exceptions are thrown while
 	// obtaining the settings the exception will be logged. 
 	// so that this function will always return	
@@ -1225,7 +1230,7 @@ private:
 	// only the CounterID portion will be checked against the record's ID
 	void getCounterInfo(map<long, CounterOperation> &mapOfCounterOps, bool bCheckCounterHash = true);
 	
-	// Creates counter update queries for all existing counters. The querys make the counteres valid for the 
+	// Creates counter update queries for all existing counters. The queries make the counters valid for the 
 	// given databaseIDValues
 	void createCounterUpdateQueries(const DatabaseIDValues &databaseIDValues, vector<string> &vecCounterUpdates, 
 		map<long, CounterOperation> &mapCounters );

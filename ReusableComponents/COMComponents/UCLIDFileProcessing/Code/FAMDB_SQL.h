@@ -121,6 +121,7 @@ static const string gstrCREATE_MACHINE_TABLE = "CREATE TABLE [dbo].[Machine]("
 static const string gstrCREATE_FAM_USER_TABLE = "CREATE TABLE [dbo].[FAMUser]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NULL, "
+	"[FullUserName] [nvarchar](128) NULL,"
 	"CONSTRAINT [PK_FAMUser] PRIMARY KEY CLUSTERED ([ID] ASC), "
 	"CONSTRAINT [IX_UserName] UNIQUE NONCLUSTERED ([UserName] ASC))";
 
@@ -567,6 +568,14 @@ static const string gstrCREATE_PAGINATION_ORIGINALFILE_INDEX =
 static const string gstrCREATE_PAGINATION_FILETASKSESSION_INDEX = 
 	"CREATE NONCLUSTERED INDEX [IX_Pagination_FileTaskSession] ON "
 	"	[dbo].[Pagination] ([FileTaskSessionID])";
+
+static const string gstrCREATE_PAGINATION_DESTFILE_INDEX =
+	"CREATE NONCLUSTERED INDEX[IX_Pagination_DestFileID] "
+	"ON[dbo].[Pagination]([DestFileID] ASC) "; 
+
+static const string gstrCREATE_PAGINATION_SOURCEFILE_INDEX = 
+	"CREATE NONCLUSTERED INDEX[IX_Pagination_SourceFileID] "
+	"ON[dbo].[Pagination]([SourceFileID] ASC) ";
 
 static const string gstrCREATE_FILE_TASK_SESSION_ACTION_INDEX =
 	"CREATE NONCLUSTERED INDEX IX_FileTaskSession_Action \r\n"
@@ -2133,3 +2142,34 @@ static const std::string gstrADD_REPORTING_VERIFICATION_RATES_FILE_TASK_SESSION_
 	"	REFERENCES[dbo].[FileTaskSession]([ID]) "
 	"	ON UPDATE CASCADE "
 	"	ON DELETE CASCADE";
+
+static const std::string gstrCREATE_PAGINATED_DEST_FILES_VIEW =
+	"IF OBJECT_ID('[dbo].[vPaginatedDestFiles]', 'V') IS NULL "
+	"	EXECUTE('CREATE VIEW [dbo].[vPaginatedDestFiles] "
+	"		AS "
+	"		SELECT DISTINCT DestFileID "
+	"		FROM            dbo.Pagination "
+	"		WHERE(DestFileID NOT IN "
+	"		(SELECT        SourceFileID "
+	"			FROM            dbo.Pagination "
+	"			WHERE(SourceFileID <> DestFileID)))'"
+	"	)";
+
+static const std::string gstrCREATE_USERS_WITH_ACTIVE_VIEW =
+	"IF OBJECT_ID('[dbo].[vUsersWithActive]', 'V') IS NULL "
+	"	EXECUTE('CREATE VIEW [dbo].[vUsersWithActive] "
+	"		AS "
+	"		SELECT dbo.FAMUser.ID AS FAMUserID "
+	"		, dbo.FAMUser.UserName "
+	"       , dbo.FAMUser.FullUserName "
+	"		, dbo.ActiveFAM.LastPingTime "
+	"		, CASE "
+	"				WHEN LastPingTime IS NULL THEN 0 "
+	"               WHEN DATEDIFF(mi, LastPingTime, GETDATE()) > 5 THEN 0 "
+	"				ELSE 1 "
+	"			END AS CurrentlyActive "
+	"		FROM dbo.ActiveFAM "
+	"			INNER JOIN dbo.FAMSession ON dbo.ActiveFAM.FAMSessionID = dbo.FAMSession.ID "
+	"			RIGHT OUTER JOIN dbo.FAMUser ON dbo.FAMSession.FAMUserID = dbo.FAMUser.ID '"
+	"	)";
+
