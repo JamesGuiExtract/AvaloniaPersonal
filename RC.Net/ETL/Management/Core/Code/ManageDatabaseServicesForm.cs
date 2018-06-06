@@ -528,7 +528,7 @@ namespace Extract.ETL.Management
                             };
                             _listOfDataToDisplay.Add(newRcd);
                             int rowAdded = _databaseServicesDataGridView.Rows.GetLastRow(DataGridViewElementStates.None);
-                            _databaseServicesDataGridView.Rows[rowAdded].Selected = true;
+                            _databaseServicesDataGridView.CurrentCell = _databaseServicesDataGridView.Rows[rowAdded].Cells["Enabled"];
                         }
                     }
                 }
