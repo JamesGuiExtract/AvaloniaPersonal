@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("ExpressionAndQueryTester")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2017")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
