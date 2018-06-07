@@ -1988,6 +1988,10 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 				"VALUES('C', 'Classification')");
 		}
 
+		// Clear status in DatabaseService Table
+		// https://extract.atlassian.net/browse/ISSUE-15465
+		vecQueries.push_back("UPDATE DatabaseService SET Status = NULL");
+
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
 	}
