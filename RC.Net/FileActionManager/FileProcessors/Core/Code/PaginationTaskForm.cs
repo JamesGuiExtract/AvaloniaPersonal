@@ -1109,7 +1109,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // source documents
                 int pageCounter = 1;
                 var pageMap = new Dictionary<Tuple<string, int>, List<int>>();
-                foreach (var pageInfo in e.SourcePageInfo)
+                foreach (var pageInfo in e.SourcePageInfo.Where(info => !info.Deleted))
                 {
                     var sourcePage = new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page);
                     var destPages = new List<int>();
@@ -1868,7 +1868,8 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 string outputDocPath = _settings.OutputPath;
-                string sourceDocName = e.SourcePageInfo.First().DocumentName;
+                var sourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
+                string sourceDocName = sourcePageInfo.First().DocumentName;
                 var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagUtility, sourceDocName);
                 if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
                 {
@@ -1888,7 +1889,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 if (outputDocPath.Contains(PaginationSettings.FirstPageTag))
                 {
-                    int firstPageNum = e.SourcePageInfo
+                    int firstPageNum = sourcePageInfo
                         .Where(page => page.DocumentName == sourceDocName)
                         .Min(page => page.Page);
 
@@ -1897,7 +1898,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 if (outputDocPath.Contains(PaginationSettings.LastPageTag))
                 {
-                    int lastPageNum = e.SourcePageInfo
+                    int lastPageNum = sourcePageInfo
                         .Where(page => page.DocumentName == sourceDocName)
                         .Max(page => page.Page);
 
@@ -1923,8 +1924,9 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                var sourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
                 var sourceDocNames = string.Join(", ",
-                        e.SourcePageInfo
+                        sourcePageInfo
                             .Select(page => "'" + page.DocumentName.Replace("'", "''") + "'")
                             .Distinct());
 

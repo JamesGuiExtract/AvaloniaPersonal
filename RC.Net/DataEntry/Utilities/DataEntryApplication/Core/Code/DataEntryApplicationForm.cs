@@ -3140,7 +3140,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // source documents
                 int pageCounter = 1;
                 var pageMap = new Dictionary<Tuple<string, int>, List<int>>();
-                foreach (var pageInfo in e.SourcePageInfo)
+                var nonDeletedSourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
+                foreach (var pageInfo in nonDeletedSourcePageInfo)
                 {
                     var sourcePage = new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page);
                     var destPages = new List<int>();
@@ -3170,7 +3171,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         var attributesCopy = (IUnknownVector)copyThis.Clone();
                         attributesCopy.ReportMemoryUsage();
 
-                        if (e.SourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
+                        if (nonDeletedSourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
                         {
                             DataEntryMethods.PruneNonPersistingAttributes(attributesCopy);
                         }
@@ -5009,7 +5010,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 string outputDocPath = _settings.PaginationSettings.PaginationOutputPath;
-                string sourceDocName = e.SourcePageInfo.First().DocumentName;
+                var sourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
+                string sourceDocName = sourcePageInfo.First().DocumentName;
                 var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagUtility, sourceDocName);
                 if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
                 {
@@ -5029,7 +5031,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 if (outputDocPath.Contains(PaginationSettings.FirstPageTag))
                 {
-                    int firstPageNum = e.SourcePageInfo
+                    int firstPageNum = sourcePageInfo
                         .Where(page => page.DocumentName == sourceDocName)
                         .Min(page => page.Page);
 
@@ -5038,7 +5040,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 if (outputDocPath.Contains(PaginationSettings.LastPageTag))
                 {
-                    int lastPageNum = e.SourcePageInfo
+                    int lastPageNum = sourcePageInfo
                         .Where(page => page.DocumentName == sourceDocName)
                         .Max(page => page.Page);
 
@@ -5065,8 +5067,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
+                var sourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
                 var sourceDocNames = string.Join(", ",
-                        e.SourcePageInfo
+                        sourcePageInfo
                             .Select(page => "'" + page.DocumentName.Replace("'", "''") + "'")
                             .Distinct());
 
