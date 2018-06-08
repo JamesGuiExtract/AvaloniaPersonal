@@ -455,9 +455,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         locked = true;
                         _documentDataPanelControl = (Control)args.DocumentDataPanel;
                         _documentDataPanelControl.Width = _tableLayoutPanel.Width;
-                        _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 1);
+                        _documentDataPanelControl.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+                        _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 3);
                         _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
-                        _documentDataPanelControl.Dock = DockStyle.Fill;
 
                         args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, forDisplay: true);
 
@@ -633,13 +633,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     var parentPanel = (ScrollableControl)Parent;
 
-                    int rightPadding = parentPanel.VerticalScroll.Visible
+                    // Set margin when scroll bar is not visible such that when it does become visible,
+                    // it doesn't force a shift of separator icons/controls to the left.
+                    int scrollMargin = parentPanel.VerticalScroll.Visible
                         ? 0
                         : SystemInformation.VerticalScrollBarWidth;
 
-                    if (Padding.Right != rightPadding)
+                    var marginColumnStyle = _tableLayoutPanel.ColumnStyles.OfType<ColumnStyle>().Last();
+                    if (marginColumnStyle.Width != scrollMargin)
                     {
-                        Padding = new Padding(0, 0, rightPadding, 0);
+                        _tableLayoutPanel.SuspendLayout();
+                        marginColumnStyle.Width = scrollMargin;
+
+                        _tableLayoutPanel.ResumeLayout();
                     }
                 }
 
@@ -698,7 +704,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // has a page displayed in the image viewer.
             var newColor = (Document?.PageControls.Any(pageControl =>
                                 pageControl.PageIsDisplayed && pageControl.Highlighted) == true)
-                ? ExtractColors.LightLightBlue
+                ? ExtractColors.LightOrange
                 : ExtractColors.White;
             
             // Update the BackColor of the separator itself, as well as any controls except the edit button.
@@ -706,7 +712,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 _tableLayoutPanel.BackColor = newColor;
                 foreach (var control in _tableLayoutPanel.Controls.OfType<Control>()
-                    .Except(new[] {  _editDocumentDataButton }))
+                    .Except(new Control[] {
+                        _topDividingLinePanel,
+                        _bottomDividingLinePanel,
+                        _documentDataPanelControl,
+                        _editDocumentDataButton }))
                 {
                     control.BackColor = newColor;
                 }

@@ -39,6 +39,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this._flowLayoutPanel);
+            this.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.Name = "PageLayoutControl";
             this.Size = new System.Drawing.Size(459, 222);
             this.ResumeLayout(false);

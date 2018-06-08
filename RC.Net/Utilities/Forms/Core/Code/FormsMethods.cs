@@ -24,6 +24,10 @@ namespace Extract.Utilities.Forms
 
         public static Color Orange = Color.FromArgb(249, 133, 0);
 
+        public static Color LightOrange = ControlPaint.LightLight(ExtractColors.Orange);
+
+        public static Color LightLightOrange = ControlPaint.LightLight(ExtractColors.LightOrange);
+
         public static Color Gray = Color.FromArgb(216, 216, 216);
 
         public static Color White = Color.White;
