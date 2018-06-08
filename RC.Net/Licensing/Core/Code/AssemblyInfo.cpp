@@ -11,7 +11,7 @@ using namespace System::Runtime::InteropServices;
 // associated with an assembly.
 //
 [assembly: CLSCompliant(true)];
-[assembly: AssemblyVersion("1.0.0.0")];
+[assembly: AssemblyVersion("10.6.5.148")]
 [assembly: ComVisible(false)];
 [assembly: RuntimeCompatibility(WrapNonExceptionThrows=true)]; // Wraps C++ exceptions as .NET
 

@@ -1394,7 +1394,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
 		<col def="s32">Version</col>
-		<row><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td><td>1.0.0.0</td></row>
+		<row><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td><td>10.6.5.148</td></row>
 	</table>
 
 	<table name="ModuleSubstitution">

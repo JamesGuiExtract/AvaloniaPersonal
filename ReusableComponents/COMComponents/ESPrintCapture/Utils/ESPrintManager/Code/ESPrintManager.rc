@@ -76,8 +76,8 @@ IDR_MAINFRAME           ICON                    "res\\ESPrintManager.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 10,6,5,148
+ PRODUCTVERSION 10,6,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -94,12 +94,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "Extract Systems Print Manager"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "FileVersion", "10, 6, 5, 148\0"
             VALUE "InternalName", "ESPrintManager.exe"
             VALUE "LegalCopyright", "2008 (c) Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename", "ESPrintManager.exe"
             VALUE "ProductName", "Extract Systems Print Manager"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductVersion", "10, 6, 0, 0\0"
         END
     END
     BLOCK "VarFileInfo"

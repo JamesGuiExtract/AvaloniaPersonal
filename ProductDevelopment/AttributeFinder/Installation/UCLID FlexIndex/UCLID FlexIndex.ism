@@ -1872,7 +1872,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
 		<col def="s32">Version</col>
-		<row><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td><td>8.1.0.45</td></row>
+		<row><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td><td>10.6.5.148</td></row>
 	</table>
 
 	<table name="ModuleSubstitution">
