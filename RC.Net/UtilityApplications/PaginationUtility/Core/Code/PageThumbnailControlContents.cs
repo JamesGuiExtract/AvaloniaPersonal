@@ -344,7 +344,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_pageControl != null && _pageControl.Highlighted)
                 {
                     var highlightColor = _pageControl.PageLayoutControl.IndicateFocus
-                        ? ExtractColors.LightLightBlue
+                        ? ExtractColors.LightBlue
                         : SystemColors.ControlDark;
                     var highlightBrush = ExtractBrushes.GetSolidBrush(highlightColor);
                     e.Graphics.FillRectangle(highlightBrush, e.ClipRectangle);

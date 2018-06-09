@@ -116,22 +116,27 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     parent.SafeBeginInvoke("ELI40230", () =>
                     {
-                        DoLayout(parent, layoutEventArgs, out List<PaginationControl> redundantControls);
-
-                        // Reset _layoutInvoked before OnLayoutCompleted, otherwise pending
-                        // _scrollToControl actions will be missed.
-                        _layoutInvoked = false;
-                        OnLayoutCompleted(redundantControls.ToArray());
-
-                        // Manually update separators that have pending status changes.
-                        foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
-                            .Where(separator => separator.InvalidatePending))
+                        // Locking control update here prevents flicker in document headers as the
+                        // layout occurs.
+                        using (new LockControlUpdates(parent, initiallyLock: true, invalidateOnUnlock: true))
                         {
-                            separator.Invalidate();
-                            separator.InvalidatePending = false;
-                        }
+                            DoLayout(parent, layoutEventArgs, out List<PaginationControl> redundantControls);
 
-                        parent.ResumeLayout();
+                            // Reset _layoutInvoked before OnLayoutCompleted, otherwise pending
+                            // _scrollToControl actions will be missed.
+                            _layoutInvoked = false;
+                            OnLayoutCompleted(redundantControls.ToArray());
+
+                            // Manually update separators that have pending status changes.
+                            foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
+                                .Where(separator => separator.InvalidatePending))
+                            {
+                                separator.Invalidate();
+                                separator.InvalidatePending = false;
+                            }
+
+                            parent.ResumeLayout();
+                        }
                     },
                     true,
                     (e) =>

@@ -57,7 +57,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PaginationPanel));
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._topToolStrip = new System.Windows.Forms.ToolStrip();
