@@ -707,12 +707,6 @@ void CSpatialString::performReplace(const string& stdstrToFind, const string& st
                             letter.m_usGuess1 = letter.m_usGuess2 = letter.m_usGuess3 =
                                 (unsigned short) strActualReplacement[i];
 
-                            // whitespace chars may not have spatial information
-                            if (isWhitespaceChar(strActualReplacement[i]))
-                            {
-                                letter.m_bIsSpatial = false;
-                            }
-
                             // push the letter into the vector of letters which will later be used to build
                             // a spatial replacement string
                             vecLetters.push_back(letter);

@@ -1,17 +1,13 @@
-using Extract;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using Extract.FileActionManager.Forms;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.FileActionManager.Form.Test
+namespace Extract.FileActionManager.Forms.Test
 {
     /// <summary>
     /// Class for testing <see cref="FileActionManagerPathTags"/>

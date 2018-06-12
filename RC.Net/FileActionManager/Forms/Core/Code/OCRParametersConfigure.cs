@@ -1,10 +1,10 @@
 ﻿using Extract.Utilities;
 using Nuance.OmniPage.CSDK;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -24,8 +24,8 @@ namespace Extract.FileActionManager.Forms
     {
         VariantVector _parameterMap;
         BindingList<Language> _languages = new BindingList<Language>();
-        BindingList<KeyValueClass<int, int>> _enumSettings = new BindingList<KeyValueClass<int, int>>();
-        BindingList<KeyValueClass<string, int>> _stringSettings = new BindingList<KeyValueClass<string, int>>();
+        BindingList<KeyValueClass<int, string>> _enumSettings = new BindingList<KeyValueClass<int, string>>();
+        BindingList<KeyValueClass<string, string>> _stringSettings = new BindingList<KeyValueClass<string, string>>();
         bool _readOnly;
         bool _settingValues;
         
@@ -261,7 +261,7 @@ namespace Extract.FileActionManager.Forms
 
                 // Add setting value column
                 col = new DataGridViewTextBoxColumn();
-                col.ValueType = typeof(int);
+                col.ValueType = typeof(double);
                 col.DataPropertyName = "Value";
                 col.Name = "Value";
                 col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -282,7 +282,7 @@ namespace Extract.FileActionManager.Forms
 
                 // Add setting value column
                 col = new DataGridViewTextBoxColumn();
-                col.ValueType = typeof(int);
+                col.ValueType = typeof(string);
                 col.DataPropertyName = "Value";
                 col.Name = "Value";
                 col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -325,6 +325,11 @@ namespace Extract.FileActionManager.Forms
                     }
                     Controls.Remove(_okButton);
                     _cancelButton.Text = "Close";
+                }
+                else
+                {
+                    // Switch to the page with the most options to set
+                    _tabControl.SelectedTab = _recognitionOptionsTabPage;
                 }
             }
             catch (Exception ex)
@@ -443,6 +448,40 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
+        /// <summary>
+        /// Handles the click event of the _setDefaultsButton
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        private void Handle_SetDefaultsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SetDefaultRecognitionOptions();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46036");
+            }
+        }
+
+        /// <summary>
+        /// Handles the click event of the _setClassicButton
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        private void Handle_SetClassicButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SetClassicRecognitionOptions();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46037");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Methods
@@ -505,6 +544,15 @@ namespace Extract.FileActionManager.Forms
             {
                 _recognitionLanguagesGroupBox.Enabled = false;
             }
+
+            if (_ignoreParagraphFlagCheckBox.Checked)
+            {
+                _treatZonesAsParagraphsCheckBox.Enabled = true;
+            }
+            else
+            {
+                _treatZonesAsParagraphsCheckBox.Enabled = false;
+            }
         }
 
         private void SetControlValues()
@@ -520,12 +568,8 @@ namespace Extract.FileActionManager.Forms
 
                 // Set defaults
                 _forceDespeckleMethodComboBox.SelectEnumValue(DESPECKLE_METHOD.DESPECKLE_AUTO);
-                _defaultDecompositionMethodComboBox.SelectEnumValue(EPageDecompositionMethod.kAutoDecomposition);
-                _accuracyTradeoffComboBox.SelectEnumValue(EOcrTradeOff.kAccurate);
-                _defaultFillingMethodComboBox.SelectEnumValue(FILLINGMETHOD.FM_OMNIFONT);
-                _preferAccuracteEngineCheckBox.Checked = true;
-                _skipPageOnFailureCheckBox.Checked = true;
-                _requireOnePageSuccessCheckBox.Checked = true;
+
+                SetDefaultRecognitionOptions();
 
                 for (int i = 0; i < _parameterMap.Size; i++)
                 {
@@ -570,6 +614,9 @@ namespace Extract.FileActionManager.Forms
                             case EOCRParameter.kSkipPageOnFailure:
                                 _skipPageOnFailureCheckBox.Checked = value != 0;
                                 break;
+                            case EOCRParameter.kRequireOnePageSuccess:
+                                _requireOnePageSuccessCheckBox.Checked = value != 0;
+                                break;
                             case EOCRParameter.kMaxPageFailureNumber:
                                 _maxPageFailureNumberNumericUpDown.Value = (uint)value;
                                 break;
@@ -588,8 +635,23 @@ namespace Extract.FileActionManager.Forms
                             case EOCRParameter.kTimeout:
                                 _timeoutNumericUpDown.Value = value;
                                 break;
-                            case EOCRParameter.kThirdRecognitionPass:
-                                _preferAccuracteEngineCheckBox.Checked = value != 0;
+                            case EOCRParameter.kOutputMultipleSpaceCharacterSequences:
+                                _outputMultipleSpaceCharacterSequencesCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kOutputOneSpaceCharacterPerCount:
+                                _outputOneSpaceCharPerCountCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kOutputTabCharactersForTabSpaceType:
+                                _outputTabCharactersCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kAssignSpatialInfoToSpaceCharacters:
+                                _assignSpatialInfoToSpaceCharsCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kIgnoreParagraphFlag:
+                                _ignoreParagraphFlagCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kTreatZonesAsParagraphs:
+                                _treatZonesAsParagraphsCheckBox.Checked = value != 0;
                                 break;
                             case EOCRParameter.kSpecifyLanguage:
                                 _specifyRecognitionLanguagesCheckBox.Checked = value != 0;
@@ -605,24 +667,62 @@ namespace Extract.FileActionManager.Forms
                                 }
                                 break;
                             default:
-                                _enumSettings.Add(new KeyValueClass<int, int> { Key = parameter, Value = value });
+                                _enumSettings.Add(new KeyValueClass<int, string>
+                                    { Key = parameter, Value = value.ToString(CultureInfo.InvariantCulture) });
                                 break;
                         }
                     }
-                    else if (key is string namedSetting && variantValue is int namedSettingValue)
+                    else if (key is int unknownParameter && variantValue is double unknownValue)
                     {
-                        switch (namedSetting)
+                        _enumSettings.Add(new KeyValueClass<int, string>
+                            { Key = unknownParameter, Value = unknownValue.ToString("F1",CultureInfo.InvariantCulture) });
+                    }
+                    else if (key is string namedSetting)
+                    {
+                        if (variantValue is int namedSettingIntValue)
                         {
-                            case "Kernel.Img.Max.Pix.X":
-                                _maxXNumericUpDown.Value = (uint)namedSettingValue;
-                                break;
-                            case "Kernel.Img.Max.Pix.Y":
-                                _maxYNumericUpDown.Value = (uint)namedSettingValue;
-                                break;
-                            default:
-                                _stringSettings.Add(new KeyValueClass<string, int> { Key = namedSetting, Value = namedSettingValue });
-                                break;
+                            switch (namedSetting)
+                            {
+                                case "Kernel.Img.Max.Pix.X":
+                                    _maxXNumericUpDown.Value = (uint)namedSettingIntValue;
+                                    break;
+                                case "Kernel.Img.Max.Pix.Y":
+                                    _maxYNumericUpDown.Value = (uint)namedSettingIntValue;
+                                    break;
+                                case "Kernel.OcrMgr.PreferAccurateEngine":
+                                    _preferAccuracteEngineCheckBox.Checked = namedSettingIntValue != 0;
+                                    break;
+                                default:
+                                    _stringSettings.Add(new KeyValueClass<string, string>
+                                    {
+                                        Key = namedSetting,
+                                        Value = namedSettingIntValue.ToString(CultureInfo.InvariantCulture)
+                                    });
+                                    break;
+                            }
                         }
+                        if (variantValue is double namedSettingDoubleValue)
+                        {
+                            _stringSettings.Add(new KeyValueClass<string, string>
+                            {
+                                Key = namedSetting,
+                                Value = namedSettingDoubleValue.ToString("F1", CultureInfo.InvariantCulture)
+                            });
+                        }
+                        else if (variantValue is string namedSettingStringValue)
+                        {
+                            _stringSettings.Add(new KeyValueClass<string, string>
+                            {
+                                Key = namedSetting,
+                                Value = namedSettingStringValue
+                            });
+                        }
+                    }
+                    else
+                    {
+                        var ue = new ExtractException("ELI46040", "Unsupported parameter");
+                        ue.AddDebugData("Key type", key.GetType().FullName, false);
+                        ue.AddDebugData("Value type", variantValue.GetType().FullName, false);
                     }
                 }
             }
@@ -699,8 +799,14 @@ namespace Extract.FileActionManager.Forms
                 VariantKey = EOCRParameter.kDefaultFillingMethod,
                 VariantValue = _defaultFillingMethodComboBox.ToEnumValue<FILLINGMETHOD>() });
             _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kTimeout, VariantValue = (int)_timeoutNumericUpDown.Value });
-            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kThirdRecognitionPass, VariantValue = _preferAccuracteEngineCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = "Kernel.OcrMgr.PreferAccurateEngine", VariantValue = _preferAccuracteEngineCheckBox.Checked ? 1 : 0 });
 
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kOutputMultipleSpaceCharacterSequences, VariantValue = _outputMultipleSpaceCharacterSequencesCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kOutputOneSpaceCharacterPerCount, VariantValue = _outputOneSpaceCharPerCountCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kOutputTabCharactersForTabSpaceType, VariantValue = _outputTabCharactersCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kAssignSpatialInfoToSpaceCharacters, VariantValue = _assignSpatialInfoToSpaceCharsCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kIgnoreParagraphFlag, VariantValue = _ignoreParagraphFlagCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kTreatZonesAsParagraphs, VariantValue = _treatZonesAsParagraphsCheckBox.Checked ? 1 : 0 });
 
             // Language settings
             _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kSpecifyLanguage, VariantValue = _specifyRecognitionLanguagesCheckBox.Checked ? 1 : 0 });
@@ -717,13 +823,31 @@ namespace Extract.FileActionManager.Forms
             // Set advanced/unrecognized settings (ignored by this version of the software but may be used by a newer version)
             foreach (var kv in _enumSettings)
             {
-                _parameterMap.PushBack(new VariantPair { VariantKey = kv.Key, VariantValue = kv.Value });
+                if (Int32.TryParse(kv.Value, out int iValue))
+                {
+                    _parameterMap.PushBack(new VariantPair { VariantKey = kv.Key, VariantValue = iValue });
+                }
+                else if (Double.TryParse(kv.Value, out double dValue))
+                {
+                    _parameterMap.PushBack(new VariantPair { VariantKey = kv.Key, VariantValue = dValue });
+                }
             }
 
             // Set advanced string settings (directly applied to OCR engine)
             foreach (var kv in _stringSettings)
             {
-                _parameterMap.PushBack(new VariantPair { VariantKey = kv.Key, VariantValue = kv.Value });
+                if (Int32.TryParse(kv.Value, out int iValue))
+                {
+                    _parameterMap.PushBack(new VariantPair { VariantKey = kv.Key, VariantValue = iValue });
+                }
+                else if (Double.TryParse(kv.Value, out double dValue))
+                {
+                    _parameterMap.PushBack(new VariantPair { VariantKey = kv.Key, VariantValue = dValue });
+                }
+                else
+                {
+                    _parameterMap.PushBack(new VariantPair { VariantKey = kv.Key, VariantValue = kv.Value });
+                }
             }
         }
 
@@ -746,5 +870,51 @@ namespace Extract.FileActionManager.Forms
         }
 
         #endregion Private Classes
+
+        private void SetDefaultRecognitionOptions()
+        {
+            _defaultDecompositionMethodComboBox.SelectEnumValue(EPageDecompositionMethod.kAutoDecomposition);
+            _accuracyTradeoffComboBox.SelectEnumValue(EOcrTradeOff.kAccurate);
+            _defaultFillingMethodComboBox.SelectEnumValue(FILLINGMETHOD.FM_OMNIFONT);
+            _timeoutNumericUpDown.Value = 120000;
+            _preferAccuracteEngineCheckBox.Checked = true;
+            _zoneOrderingCheckBox.Checked = false;
+
+            _skipPageOnFailureCheckBox.Checked = true;
+            _requireOnePageSuccessCheckBox.Checked = true;
+            _maxPageFailureNumberNumericUpDown.Value = uint.MaxValue;
+            _maxPageFailurePercentNumericUpDown.Value = 100;
+
+            _limitToBasicLatinCharactersCheckBox.Checked = false;
+            _outputMultipleSpaceCharacterSequencesCheckBox.Checked = true;
+            _outputOneSpaceCharPerCountCheckBox.Checked = true;
+            _outputTabCharactersCheckBox.Checked = false;
+            _assignSpatialInfoToSpaceCharsCheckBox.Checked = true;
+            _ignoreParagraphFlagCheckBox.Checked = true;
+            _treatZonesAsParagraphsCheckBox.Checked = true;
+        }
+
+        private void SetClassicRecognitionOptions()
+        {
+            _defaultDecompositionMethodComboBox.SelectEnumValue(EPageDecompositionMethod.kAutoDecomposition);
+            _accuracyTradeoffComboBox.SelectEnumValue(EOcrTradeOff.kAccurate);
+            _defaultFillingMethodComboBox.SelectEnumValue(FILLINGMETHOD.FM_OMNIFONT);
+            _timeoutNumericUpDown.Value = 120000;
+            _preferAccuracteEngineCheckBox.Checked = true;
+            _zoneOrderingCheckBox.Checked = true;
+
+            _skipPageOnFailureCheckBox.Checked = false;
+            _requireOnePageSuccessCheckBox.Checked = false;
+            _maxPageFailureNumberNumericUpDown.Value = 10;
+            _maxPageFailurePercentNumericUpDown.Value = 25;
+
+            _limitToBasicLatinCharactersCheckBox.Checked = true;
+            _outputMultipleSpaceCharacterSequencesCheckBox.Checked = false;
+            _outputOneSpaceCharPerCountCheckBox.Checked = false;
+            _outputTabCharactersCheckBox.Checked = false;
+            _assignSpatialInfoToSpaceCharsCheckBox.Checked = false;
+            _ignoreParagraphFlagCheckBox.Checked = false;
+            _treatZonesAsParagraphsCheckBox.Checked = false;
+        }
     }
 }

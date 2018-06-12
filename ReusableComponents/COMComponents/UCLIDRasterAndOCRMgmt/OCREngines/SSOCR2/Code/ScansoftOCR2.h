@@ -63,6 +63,8 @@ END_COM_MAP()
 		long* plPageIndex, long* plPageNumber);
 	STDMETHOD(GetPrimaryDecompositionMethod)(EPageDecompositionMethod *ePrimaryDecompositionMethod);
 	STDMETHOD(SetOCRParameters)(IOCRParameters* pOCRParameters, VARIANT_BOOL vbReApply);
+	STDMETHOD(WriteOCRSettingsToFile)(BSTR bstrFileName, VARIANT_BOOL vbWriteDefaults,
+		VARIANT_BOOL vbWriteExtractImplementedSettings);
 
 // IPrivateLicensedComponent
 	STDMETHOD(raw_InitPrivateLicense)(/*[in]*/ BSTR strPrivateLicenseKey);
@@ -229,6 +231,12 @@ private:
 
 	FILLINGMETHOD m_eDefaultFillingMethod;
 
+	bool m_bOutputMultipleSpaceCharacterSequences;
+	bool m_bOutputOneSpaceCharacterPerCount;
+	bool m_bOutputTabCharactersForTabSpaceType;
+	bool m_bAssignSpatialInfoToSpaceCharacters;
+	bool m_bIgnoreParagraphFlag;
+	bool m_bTreatZonesAsParagraphs;
 
 	/////////////
 	// Methods

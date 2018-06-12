@@ -114,6 +114,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             // _deleteMLDataButton
             // 
+            this._deleteMLDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._deleteMLDataButton.Location = new System.Drawing.Point(299, 99);
             this._deleteMLDataButton.Name = "_deleteMLDataButton";
             this._deleteMLDataButton.Size = new System.Drawing.Size(135, 23);
@@ -288,6 +289,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             // _changeAnswerButton
             // 
+            this._changeAnswerButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._changeAnswerButton.Location = new System.Drawing.Point(299, 72);
             this._changeAnswerButton.Name = "_changeAnswerButton";
             this._changeAnswerButton.Size = new System.Drawing.Size(135, 23);
@@ -450,6 +452,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             // _featuresGroupBox
             // 
+            this._featuresGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._featuresGroupBox.Controls.Add(this._featureRulesetBrowseButton);
             this._featuresGroupBox.Controls.Add(this._runRulesetForFeaturesRadioButton);
             this._featuresGroupBox.Controls.Add(this._featureRulesetTextBox);
@@ -522,6 +526,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             // groupBox3
             // 
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox3.Controls.Add(this._useVoaFileForExpectedsRadioButton);
             this.groupBox3.Controls.Add(this._useAttributeSetForExpectedsRadioButton);
             this.groupBox3.Location = new System.Drawing.Point(6, 256);
@@ -579,7 +585,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(500, 487);
+            this.MinimumSize = new System.Drawing.Size(500, 579);
             this.Name = "TrainingDataCollectorConfigurationDialog";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

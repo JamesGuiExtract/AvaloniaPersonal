@@ -19,6 +19,7 @@
 #include <cmath>
 #include <memory>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -54,6 +55,7 @@ const WORD gwEND_OF_LINE_PARA_OR_ZONE = gwEND_OF_LINE_OR_ZONE | R_ENDOFPARA;
 const CPPLetter gletterSLASH_R('\r','\r','\r',-1,-1,-1,-1,-1,false,false,false,0,100,0);
 const CPPLetter gletterSLASH_N('\n','\n','\n',-1,-1,-1,-1,-1,false,false,false,0,100,0);
 const CPPLetter gletterSPACE(' ',' ',' ',-1,-1,-1,-1,-1,false,false,false,0,100,0);
+const CPPLetter gletterTAB('\t','\t','\t',-1,-1,-1,-1,-1,false,false,false,0,100,0);
 
 // ScanSoft Deskew Limitation.
 // Minimum angle in degrees that the RecAPI engine is able to deskew
@@ -101,34 +103,40 @@ const int giMAX_ZONE_OVERLAP = 8;
 // CScansoftOCR2
 //-------------------------------------------------------------------------------------------------
 CScansoftOCR2::CScansoftOCR2()
-: m_bPrivateLicenseInitialized(false),
-  m_bRunThirdRecPass(true),
-  m_bOrderZones(true),
-  m_eTradeoff(TO_ACCURATE),
-  m_bSkipPageOnFailure(false),
-  m_bRequireOnePageSuccess(false),
-  m_uiMaxOcrPageFailurePercentage(25),
-  m_uiMaxOcrPageFailureNumber(10),
-  m_uiDecompositionMethods(1),
-  m_bEnableDespeckleMode(true),
-  m_eForceDespeckle(kNeverForce),
-  m_eForceDespeckleMethod(DESPECKLE_PEPPERANDSALT),
-  m_nForceDespeckleLevel(2),
-  m_eFilter(kNoFilter),
-  m_bFilterContainsAlpha(true),
-  m_bFilterContainsNumeral(true),
-  m_ipSpatialString(CLSID_SpatialString),
-  m_hImageFile(NULL),
-  m_hPage(NULL),
-  m_eDisplayFilterCharsType(kDisplayCharsTypeNone),
-  m_eventKillTimeoutThread(false),
-  m_eventProgressMade(false),
-  m_nTimeoutLength(120000),
-  m_bLimitToBasicLatinCharacters(true),
-  m_bSettingsApplied(false),
-  m_bOCRParamertersApplied(false),
-  m_ePrimaryDecompositionMethod(kAutoDecomposition),
-  m_eDefaultFillingMethod(FM_OMNIFONT)
+	: m_bPrivateLicenseInitialized(false),
+	m_bRunThirdRecPass(true),
+	m_bOrderZones(true),
+	m_eTradeoff(TO_ACCURATE),
+	m_bSkipPageOnFailure(false),
+	m_bRequireOnePageSuccess(false),
+	m_uiMaxOcrPageFailurePercentage(25),
+	m_uiMaxOcrPageFailureNumber(10),
+	m_uiDecompositionMethods(1),
+	m_bEnableDespeckleMode(true),
+	m_eForceDespeckle(kNeverForce),
+	m_eForceDespeckleMethod(DESPECKLE_PEPPERANDSALT),
+	m_nForceDespeckleLevel(2),
+	m_eFilter(kNoFilter),
+	m_bFilterContainsAlpha(true),
+	m_bFilterContainsNumeral(true),
+	m_ipSpatialString(CLSID_SpatialString),
+	m_hImageFile(NULL),
+	m_hPage(NULL),
+	m_eDisplayFilterCharsType(kDisplayCharsTypeNone),
+	m_eventKillTimeoutThread(false),
+	m_eventProgressMade(false),
+	m_nTimeoutLength(120000),
+	m_bLimitToBasicLatinCharacters(true),
+	m_bSettingsApplied(false),
+	m_bOCRParamertersApplied(false),
+	m_ePrimaryDecompositionMethod(kAutoDecomposition),
+	m_eDefaultFillingMethod(FM_OMNIFONT),
+	m_bOutputMultipleSpaceCharacterSequences(false),
+	m_bOutputOneSpaceCharacterPerCount(false),
+	m_bOutputTabCharactersForTabSpaceType(false),
+	m_bAssignSpatialInfoToSpaceCharacters(false),
+	m_bIgnoreParagraphFlag(false),
+	m_bTreatZonesAsParagraphs(false)
 {
 	try
 	{
@@ -428,6 +436,45 @@ STDMETHODIMP CScansoftOCR2::SetOCRParameters(IOCRParameters* pOCRParameters, VAR
 			}
 
 			m_bSettingsApplied = true;
+		}
+
+		return S_OK;	
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16762");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR2::WriteOCRSettingsToFile(BSTR bstrFileName, VARIANT_BOOL vbWriteDefaults,
+	VARIANT_BOOL vbWriteExtractImplementedSettings)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		string strFileName = asString(bstrFileName);
+		kRecSettingSave(0, NULL, strFileName.c_str(), asCppBool(vbWriteDefaults), FALSE);
+
+		if (asCppBool(vbWriteExtractImplementedSettings))
+		{
+			ofstream outfile(strFileName, std::ofstream::out | std::ofstream::app);
+
+			outfile << "\nAssignSpatialInfoToSpaceCharacters = " << m_bAssignSpatialInfoToSpaceCharacters;
+			outfile << "\nEnableDespeckleMode = " << m_bEnableDespeckleMode;
+			outfile << "\nForceDespeckle = " << m_eForceDespeckle;
+			outfile << "\nIgnoreParagraphFlag = " << m_bIgnoreParagraphFlag;
+			outfile << "\nLimitToBasicLatinCharacters = " << m_bLimitToBasicLatinCharacters;
+			outfile << "\nMaxOcrPageFailureNumber = " << m_uiMaxOcrPageFailureNumber;
+			outfile << "\nMaxOcrPageFailurePercentage = " << m_uiMaxOcrPageFailurePercentage;
+			outfile << "\nOrderZones = " << m_bOrderZones;
+			outfile << "\nOutputMultipleSpaceCharacterSequences = " << m_bOutputMultipleSpaceCharacterSequences;
+			outfile << "\nOutputOneSpaceCharacterPerCount = " << m_bOutputOneSpaceCharacterPerCount;
+			outfile << "\nOutputTabCharactersForTabSpaceType = " << m_bOutputTabCharactersForTabSpaceType;
+			outfile << "\nPrimaryDecompositionMethod = " << m_ePrimaryDecompositionMethod;
+			outfile << "\nRequireOnePageSuccess = " << m_bRequireOnePageSuccess;
+			outfile << "\nSkipPageOnFailure = " << m_bSkipPageOnFailure;
+			outfile << "\nTimeoutLength = " << m_nTimeoutLength;
+			outfile << "\nTreatZonesAsParagraphs = " << m_bTreatZonesAsParagraphs;
+
+			outfile.close();
 		}
 
 		return S_OK;	
@@ -1296,6 +1343,7 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 		{
 			convertToCodePage((unsigned short*)&pCurLetter->code);
 		}
+
 		// add this character to the vector if it is a positive-width, recognized character
 		// or if it is a positive-width character AND unrecognized characters should be returned.
 		// NOTE: RecAPI v15 uses a width-less dummy space to mark the end of a line.
@@ -1303,19 +1351,11 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 		if(pCurLetter->width > 0 && (bIsRecognized || bReturnUnrecognized) )
 		{
 			// check if this character is a space
-			if(pCurLetter->code == ' ')
-			{
-				// append this space if and only if the preceding character is spatial [P13 #4868]
-				if(!pvecLetters->empty() && pvecLetters->back().m_bIsSpatial)
-				{
-					// append this space as a non-spatial character [P13 #4772]
-					pvecLetters->push_back(gletterSPACE);
-				}
-			}
-			else
-			{
-				// this is a non-space letter
+			bool bIsSpace = pCurLetter->code == ' ';
+			bool bIsTabSpace = bIsSpace && pCurLetter->spcInfo.spcType == SPC_TAB;
 
+			if (!bIsSpace || m_bAssignSpatialInfoToSpaceCharacters)
+			{
 				// store the position of the current letter
 				letter.m_ulTop = pCurLetter->top;
 				letter.m_ulLeft = pCurLetter->left;
@@ -1334,8 +1374,57 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 				//       (1) Store and use all possible guesses for the character.
 				//       (2) Only store the first guess.
 				letter.m_usGuess1 = letter.m_usGuess2 = letter.m_usGuess3 = 
-					(bIsRecognized ? pCurLetter->code : gcUNRECOGNIZED);
+					(bIsTabSpace && m_bOutputTabCharactersForTabSpaceType
+						? '\t'
+						: bIsRecognized ? pCurLetter->code : gcUNRECOGNIZED);
+			}
 
+			if(bIsSpace)
+			{
+				// Unless m_bOutputMultipleSpaceCharacterSequences = true, append this space if and only if the preceding character is not a space [P13 #4868]
+				if(m_bOutputMultipleSpaceCharacterSequences || !pvecLetters->empty() && !isWhitespaceChar(pvecLetters->back().m_usGuess1))
+				{
+					int nSpaceCount = m_bOutputOneSpaceCharacterPerCount
+						? pCurLetter->spcInfo.spcCount
+						: 1;
+
+					if (m_bAssignSpatialInfoToSpaceCharacters)
+					{
+						if (nSpaceCount == 1)
+						{
+							pvecLetters->push_back(letter);
+						}
+						else
+						{
+							// Divide the space character into multiple characters, if required,
+							// spreading the spatial info among them
+							double dWidth = ((double)pCurLetter->width) / nSpaceCount;
+							unsigned long ulStart = pCurLetter->left;
+							unsigned long ulLastRight = ulStart;
+
+							for (int i = 1; i <= nSpaceCount; ++i)
+							{
+								letter.m_ulLeft = ulLastRight;
+								letter.m_ulRight = ulStart + round(i * dWidth);
+								ulLastRight = letter.m_ulRight;
+								pvecLetters->push_back(letter);
+							}
+						}
+					}
+					else
+					{
+						// append this space as a non-spatial character [P13 #4772]
+						for (int i = 0; i < nSpaceCount; ++i)
+						{
+							pvecLetters->push_back(bIsTabSpace && m_bOutputTabCharactersForTabSpaceType
+								? gletterTAB
+								: gletterSPACE);
+						}
+					}
+				}
+			}
+			else // this is a non-space letter
+			{
 				// get the font size
 				// NOTE: RecAPI v15 no longer provides fontSize information. [P13 #4469]
 				// This is the formula that RecAPI v12.7 used internally to determine fontSize.
@@ -1423,7 +1512,9 @@ void CScansoftOCR2::setLastPageLetterBoundary(vector<CPPLetter>* pvecPageLetters
 	rletterCPP.m_bIsEndOfZone = (pletterScanSoft->makeup & R_ENDOFZONE) != 0;
 
 	// insert a blank line if this is the end of a paragraph
-	if (rletterCPP.m_bIsEndOfParagraph)
+	// or zone, depending on the values of m_bIgnoreParagraphFlag and m_bTreatZonesAsParagraphs
+	if (rletterCPP.m_bIsEndOfParagraph && !m_bIgnoreParagraphFlag
+		|| rletterCPP.m_bIsEndOfZone && m_bTreatZonesAsParagraphs)
 	{
 		// append \r\n\r\n
 		appendSlashRSlashN(pvecPageLetters, 2);
@@ -2592,6 +2683,12 @@ void CScansoftOCR2::applySettingsFromRegistry()
 		// Extract-implemented settings that don't exist in the registry should be set to legacy values in case there were previously applied parameters
 		m_bLimitToBasicLatinCharacters = true;
 		m_bRequireOnePageSuccess = false;
+		m_bOutputMultipleSpaceCharacterSequences = false;
+		m_bOutputOneSpaceCharacterPerCount = false;
+		m_bOutputTabCharactersForTabSpaceType = false;
+		m_bAssignSpatialInfoToSpaceCharacters = false;
+		m_bIgnoreParagraphFlag = false;
+		m_bTreatZonesAsParagraphs = false;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45914")
 }
@@ -2682,18 +2779,51 @@ void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameter
 				case kTimeout:
 					m_nTimeoutLength = nValue;
 					break;
+				case kOutputMultipleSpaceCharacterSequences:
+					m_bOutputMultipleSpaceCharacterSequences = !!nValue;
+					break;
+				case kOutputOneSpaceCharacterPerCount:
+					m_bOutputOneSpaceCharacterPerCount = !!nValue;
+					break;
+				case kOutputTabCharactersForTabSpaceType:
+					m_bOutputTabCharactersForTabSpaceType = !!nValue;
+					break;
+				case kAssignSpatialInfoToSpaceCharacters:
+					m_bAssignSpatialInfoToSpaceCharacters = !!nValue;
+					break;
+				case kIgnoreParagraphFlag:
+					m_bIgnoreParagraphFlag = !!nValue;
+					break;
+				case kTreatZonesAsParagraphs:
+					m_bTreatZonesAsParagraphs = !!nValue;
+					break;
 				}
 			}
-			// Interpret string-int pair values as RecSettings
-			else if (vtKey.vt == VT_BSTR && vtValue.vt == VT_I4)
+			// Interpret string-int/double/string pair values as RecSettings
+			else if (vtKey.vt == VT_BSTR)
 			{
 				string strKey = asString(vtKey.bstrVal);
-				long nValue = vtValue.intVal;
-
 				THROW_UE_ON_ERROR("ELI45929", "Unable to get OCR setting.",
 					kRecSettingGetHandle(NULL, strKey.c_str(), &hSetting, NULL));
-				THROW_UE_ON_ERROR("ELI45930", "Unable to set " + strKey + " option",
-					kRecSettingSetInt(0, hSetting, nValue));
+
+				if (vtValue.vt == VT_I4)
+				{
+					long nValue = vtValue;
+					THROW_UE_ON_ERROR("ELI45930", "Unable to set " + strKey + " option",
+						kRecSettingSetInt(0, hSetting, nValue));
+				}
+				else if (vtValue.vt == VT_R8)
+				{
+					double dValue = vtValue;
+					THROW_UE_ON_ERROR("ELI46038", "Unable to set " + strKey + " option",
+						kRecSettingSetDouble(0, hSetting, dValue));
+				}
+				else if (vtValue.vt == VT_BSTR)
+				{
+					_bstr_t bstrValue = vtValue;
+					THROW_UE_ON_ERROR("ELI46039", "Unable to set " + strKey + " option",
+						kRecSettingSetString(0, hSetting, bstrValue));
+				}
 			}
 		}
 	}

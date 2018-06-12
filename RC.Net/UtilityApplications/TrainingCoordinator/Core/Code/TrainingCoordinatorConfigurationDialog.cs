@@ -899,6 +899,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             try
             {
                 _settings.ResetProcessedStatus();
+                Dirty = true;
             }
             catch (Exception ex)
             {

@@ -497,6 +497,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // 
             // _deleteMLDataButton
             // 
+            this._deleteMLDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._deleteMLDataButton.Location = new System.Drawing.Point(463, 66);
             this._deleteMLDataButton.Name = "_deleteMLDataButton";
             this._deleteMLDataButton.Size = new System.Drawing.Size(135, 23);
@@ -617,6 +618,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             // 
             // _changeAnswerButton
             // 
+            this._changeAnswerButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._changeAnswerButton.Location = new System.Drawing.Point(454, 19);
             this._changeAnswerButton.Name = "_changeAnswerButton";
             this._changeAnswerButton.Size = new System.Drawing.Size(144, 23);
@@ -689,7 +691,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(671, 593);
+            this.MinimumSize = new System.Drawing.Size(671, 611);
             this.Name = "MLModelTrainerConfigurationDialog";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

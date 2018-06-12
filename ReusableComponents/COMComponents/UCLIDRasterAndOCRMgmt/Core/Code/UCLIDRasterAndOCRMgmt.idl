@@ -128,7 +128,12 @@ library UCLID_RASTERANDOCRMGMTLib
 		kTradeoff = 14,
 		kDefaultFillingMethod = 15,
 		kTimeout = 16,
-		kThirdRecognitionPass = 17,
+		kOutputMultipleSpaceCharacterSequences = 17,
+		kOutputOneSpaceCharacterPerCount = 18,
+		kOutputTabCharactersForTabSpaceType = 19,
+		kAssignSpatialInfoToSpaceCharacters = 20,
+		kIgnoreParagraphFlag = 21,
+		kTreatZonesAsParagraphs = 22,
 	} EOCRParameter;
 
 	typedef 

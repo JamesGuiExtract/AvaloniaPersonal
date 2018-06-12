@@ -134,6 +134,10 @@ library UCLID_SSOCR2Lib
 		//			to this instance then this method will do nothing
 		[id(10), helpstring("method SetOCRParameters")] HRESULT SetOCRParameters(
 			[in] IOCRParameters* pOCRParameters, VARIANT_BOOL vbReApply);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To write OCR parameters to a file in order to verify which settings have been set
+		[id(11), helpstring("method WriteOCRSettingsToFile")] HRESULT WriteOCRSettingsToFile(
+			[in] BSTR bstrFileName, VARIANT_BOOL vbWriteDefaults, VARIANT_BOOL vbWriteExtractImplementedSettings);
 	};
 
 	//----------------------------------------------------------------------------------------------
