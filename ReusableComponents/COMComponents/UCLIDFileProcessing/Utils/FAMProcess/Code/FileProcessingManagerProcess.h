@@ -65,6 +65,7 @@ END_COM_MAP()
 	STDMETHOD(AuthenticateService)(BSTR bstrValue);
 	STDMETHOD(get_KeepProcessingAsFilesAdded)(VARIANT_BOOL *pbValue);
 	STDMETHOD(get_ConnectionString)(BSTR* pbstrConnectionString);
+	STDMETHOD(get_IsProcessingEnabled)(VARIANT_BOOL *pbValue);
 
 private:
 	//----------------------------------------------------------------------------------------------

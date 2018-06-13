@@ -60,6 +60,10 @@ interface IFileProcessingManagerProcess : IDispatch
 	// name and advanced connection string properties.
 	[propget, id(11), helpstring("property ConnectionString")] HRESULT ConnectionString(
 		[out, retval]  BSTR *pbstrConnectionString);
+	//----------------------------------------------------------------------------------------------
+	// Gets whether the FAMProcess is configured to process files
+	[propget, id(12), helpstring("property IsProcessingEnabled")] HRESULT IsProcessingEnabled(
+		[out, retval]  VARIANT_BOOL *pbValue);
 };
 
 [

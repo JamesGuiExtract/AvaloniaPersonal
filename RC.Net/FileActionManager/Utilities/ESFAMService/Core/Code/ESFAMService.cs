@@ -515,6 +515,7 @@ namespace Extract.FileActionManager.Utilities
                         // it is done with this batch of files, when it is not at risk of having been
                         // shut down unexpectedly.
                         keepProcessing = famProcess.KeepProcessingAsFilesAdded;
+                        bool isProcessingEnabled = famProcess.IsProcessingEnabled;
                         
                         // Everything should be initialized now
                         processInitialized = true;
@@ -522,7 +523,7 @@ namespace Extract.FileActionManager.Utilities
                         // Log an exception if keepProcessing is not enabled since it is not a 
                         // recommended setting when running fps file in a service
                         // https://extract.atlassian.net/browse/ISSUE-2039
-                        if (!keepProcessing)
+                        if (isProcessingEnabled && !keepProcessing)
                         {
                             ExtractException keepProcessingEx = new ExtractException("ELI38370",
                                 "Application Trace: Inadvisable configuration -- It is not recommended to " +
