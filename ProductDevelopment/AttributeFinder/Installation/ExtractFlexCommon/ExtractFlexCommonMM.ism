@@ -1412,7 +1412,7 @@ QwBEAFIATwBNAAEATQBlAGQAaQBhAA==
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
 		<col def="s32">Version</col>
-		<row><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td><td>10.6.5.148</td></row>
+		<row><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td><td>1.0.0.0</td></row>
 	</table>
 
 	<table name="ModuleSubstitution">

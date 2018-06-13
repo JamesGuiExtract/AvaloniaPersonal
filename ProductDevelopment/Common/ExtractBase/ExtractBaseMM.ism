@@ -1375,7 +1375,7 @@ QwBEAFIATwBNAAEATQBlAGQAaQBhAA==
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
 		<col def="s32">Version</col>
-		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>10.6.5.148</td></row>
+		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>1.0.0.0</td></row>
 	</table>
 
 	<table name="ModuleSubstitution">

@@ -90,8 +90,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 10,6,5,148
- PRODUCTVERSION 10,6,0,0
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -107,12 +107,12 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "FileDescription", "GetNextELICode MFC Application"
-            VALUE "FileVersion", "10, 6, 5, 148\0"
+            VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "GetNextELICode"
             VALUE "LegalCopyright", "Copyright (C) 2017"
             VALUE "OriginalFilename", "GetNextELICode.EXE"
             VALUE "ProductName", "GetNextELICode Application"
-            VALUE "ProductVersion", "10, 6, 0, 0\0"
+            VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
     BLOCK "VarFileInfo"

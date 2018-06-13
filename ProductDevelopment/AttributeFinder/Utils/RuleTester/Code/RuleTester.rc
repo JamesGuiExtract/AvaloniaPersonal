@@ -72,8 +72,8 @@ IDR_MAINFRAME           ICON                    "res\\RuleTester.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 10,6,5,148
- PRODUCTVERSION 10,6,0,0
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -90,12 +90,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "RuleTester MFC Application"
-            VALUE "FileVersion", "10, 6, 5, 148\0"
+            VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "RuleTester"
             VALUE "LegalCopyright", "Copyright (C) 2017 Extract Systems, LLC"
             VALUE "OriginalFilename", "RuleTester.EXE"
             VALUE "ProductName", "RuleTester Application"
-            VALUE "ProductVersion", "10, 6, 0, 0\0"
+            VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
     BLOCK "VarFileInfo"
