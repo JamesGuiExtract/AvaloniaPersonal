@@ -155,7 +155,7 @@
       <EnableCOMDATFolding>
       </EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
-      <CLRThreadAttribute>MTAThreadingAttribute</CLRThreadAttribute>
+      <CLRThreadAttribute>STAThreadingAttribute</CLRThreadAttribute>
       <AdditionalOptions>/Ignore:4249 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <Manifest>
