@@ -301,7 +301,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(189, 75);
+            this.label4.Location = new System.Drawing.Point(179, 75);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(56, 13);
             this.label4.TabIndex = 14;
@@ -309,7 +309,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // 
             // _trainingPercentageNumericUpDown
             // 
-            this._trainingPercentageNumericUpDown.Location = new System.Drawing.Point(250, 73);
+            this._trainingPercentageNumericUpDown.Location = new System.Drawing.Point(240, 73);
             this._trainingPercentageNumericUpDown.Maximum = new decimal(new int[] {
             99,
             0,
@@ -321,7 +321,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             0,
             0});
             this._trainingPercentageNumericUpDown.Name = "_trainingPercentageNumericUpDown";
-            this._trainingPercentageNumericUpDown.Size = new System.Drawing.Size(32, 20);
+            this._trainingPercentageNumericUpDown.Size = new System.Drawing.Size(42, 20);
             this._trainingPercentageNumericUpDown.TabIndex = 13;
             this._trainingPercentageNumericUpDown.Value = new decimal(new int[] {
             80,
