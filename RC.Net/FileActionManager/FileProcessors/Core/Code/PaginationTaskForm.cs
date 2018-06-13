@@ -1978,17 +1978,14 @@ namespace Extract.FileActionManager.FileProcessors
         /// changes or the user is okay losing them.</returns>
         bool PreventClose()
         {
-            bool paginationModified = false;
-            bool dataModified = false;
-
-            _paginationPanel.CheckForChanges(out paginationModified, out dataModified);
-
-            if (paginationModified || dataModified)
+            if (FileIds.Any())
             {
-                var response = MessageBox.Show(this,
-                    "Changes have not been saved, would you like to save now?",
-                    "Data Not Saved", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
-                        MessageBoxDefaultButton.Button1, 0);
+                // Because PaginationPanel.CheckForChanges is not very robust a determining when there
+                // are actually changes to save, always prompt for save on close without also trying to
+                // state whether changes have been correctly saved.
+                var response = MessageBox.Show(this, "Would you like to save your work?",
+                "Save progress?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1, 0);
 
                 if (response == DialogResult.Yes)
                 {
@@ -1998,10 +1995,6 @@ namespace Extract.FileActionManager.FileProcessors
                 else if (response == DialogResult.Cancel)
                 {
                     return true;
-                }
-                else
-                {
-                    return false;
                 }
             }
 

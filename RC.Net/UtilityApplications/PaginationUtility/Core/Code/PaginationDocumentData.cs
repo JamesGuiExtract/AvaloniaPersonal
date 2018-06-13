@@ -45,10 +45,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// for which data is being loaded.</param></param>
         public PaginationDocumentData(IUnknownVector attributes, string sourceDocName)
         {
-            _attributes = attributes;
-            SourceDocName = sourceDocName;
-            _documentDataAttribute = new UCLID_AFCORELib.Attribute();
-            _documentDataAttribute.Name = "DocumentData";
+            try
+            {
+                _attributes = attributes;
+                SourceDocName = sourceDocName;
+                _documentDataAttribute = new UCLID_AFCORELib.Attribute();
+                _documentDataAttribute.Name = "DocumentData";
+                _documentDataAttribute.SubAttributes = _attributes;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46047");
+            }
         }
 
         /// <summary>
@@ -60,9 +68,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// for which data is being loaded.</param></param>
         public PaginationDocumentData(IAttribute documentDataAttribute, string sourceDocName)
         {
-            _documentDataAttribute = documentDataAttribute ?? new UCLID_AFCORELib.Attribute() { Name = "DocumentData" } ;
-            _attributes = _documentDataAttribute.SubAttributes;
-            SourceDocName = sourceDocName;
+            try
+            {
+                _documentDataAttribute = documentDataAttribute ?? new UCLID_AFCORELib.Attribute() { Name = "DocumentData" };
+                _attributes = _documentDataAttribute.SubAttributes;
+                SourceDocName = sourceDocName;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46048");
+            }
         }
 
         #endregion Constructors
@@ -123,6 +138,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (_attributes != value)
                     {
                         _attributes = value;
+                        _documentDataAttribute.SubAttributes = _attributes;
                     }
                 }
                 catch (Exception ex)
@@ -151,10 +167,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     else
                     {
-                        if (_documentDataAttribute.SubAttributes != _attributes)
-                        {
-                            _documentDataAttribute.SubAttributes = _attributes;
-                        }
+                        ExtractException.Assert("ELI46046",
+                            "Data inconsistency",
+                            _attributes == _documentDataAttribute.SubAttributes);
 
                         return _documentDataAttribute;
                     }
@@ -170,6 +185,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_documentDataAttribute != value)
                 {
                     _documentDataAttribute = value;
+                    _attributes = value.SubAttributes;
                 }
             }
         }
