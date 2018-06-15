@@ -386,8 +386,8 @@ long EXPORT_BaseUtils asLong(BSTR strValue)
 _bstr_t EXPORT_BaseUtils writeObjectToBSTR(IPersistStreamPtr& ipObj, BOOL bClearDirty)
 {
 	// Create a stream
-	IStreamPtr ipStream = __nullptr;
-	CreateStreamOnHGlobal(NULL, TRUE, &ipStream);
+	IStreamPtr ipStream;
+	ipStream.Attach(SHCreateMemStream(__nullptr, 0));
 	if (ipStream == __nullptr)
 	{
 		throw UCLIDException("ELI06691", "Unable to create stream object!");
@@ -470,9 +470,8 @@ _bstr_t EXPORT_BaseUtils writeObjectToBSTR(IPersistStreamPtr& ipObj, BOOL bClear
 //-------------------------------------------------------------------------------------------------
 void EXPORT_BaseUtils readObjectFromBSTR(IPersistStreamPtr& ipObj, _bstr_t _bstr)
 {
-	IStreamPtr ipStream = __nullptr;
-	CreateStreamOnHGlobal(NULL, TRUE, &ipStream);
-
+	IStreamPtr ipStream;
+	ipStream.Attach(SHCreateMemStream(__nullptr, 0));
 	if (ipStream == __nullptr)
 	{
 		throw UCLIDException("ELI19322", "Unable to create stream object!");
@@ -515,7 +514,7 @@ void EXPORT_BaseUtils clearDirtyFlag(IPersistStreamPtr& ipObj)
 
 	// create a stream object
 	IStreamPtr ipStream;
-	CreateStreamOnHGlobal(NULL, TRUE, &ipStream);
+	ipStream.Attach(SHCreateMemStream(__nullptr, 0));
 	ASSERT_RESOURCE_ALLOCATION("ELI20262", ipStream != __nullptr);
 
 	// clear the dirty flag by saving the object to the stream

@@ -1429,7 +1429,7 @@ STDMETHODIMP CAttribute::StowDataObject(IMiscUtils *pMiscUtils)
 			}
 
 			m_strStowedDataObject = asString(
-				getMiscUtils()->GetObjectAsStringizedByteStream(m_ipDataObject).Detach());
+				getMiscUtils()->GetObjectAsStringizedByteStream(m_ipDataObject));
 
 			m_ipDataObject = __nullptr;
 		}

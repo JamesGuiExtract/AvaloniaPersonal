@@ -3607,20 +3607,25 @@ namespace Extract.DataEntry
         /// <param name="attributes">The <see cref="IUnknownVector"/> containing the
         /// <see cref="IAttribute"/>s that need to be freed.
         /// </param>
+        /// <param name="miscUtils">Pass any existing instance of to avoid another having to be
+        /// created or <c>null</c> if no such instance currently exists.</param>
         [ComVisible(false)]
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
-        public static void ReleaseAttributes(IUnknownVector attributes)
+        public static void ReleaseAttributes(IUnknownVector attributes, MiscUtils miscUtils = null)
         {
             try
             {
                 if (attributes.Size() > 0)
                 {
-                    var miscUtils = new MiscUtils();
+                    if (miscUtils == null)
+                    {
+                        miscUtils = new MiscUtils();
+                    }
 
                     foreach (IAttribute attribute in
                         DataEntryMethods.ToAttributeEnumerable(attributes, true))
                     {
-                        ReleaseAttributes(attribute.SubAttributes);
+                        ReleaseAttributes(attribute.SubAttributes, miscUtils);
 
                         // This will release the reference to the DataObject (thereby preventing memory
                         // leak issues), while saving the persistable elements of the status info object

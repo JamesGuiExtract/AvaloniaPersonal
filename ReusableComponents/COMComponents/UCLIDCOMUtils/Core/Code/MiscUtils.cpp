@@ -980,8 +980,11 @@ STDMETHODIMP CMiscUtils::GetObjectAsStringizedByteStream(IUnknown *pObject, BSTR
 
 		// create a temporary IStream object
 		IStreamPtr ipStream;
-		HANDLE_HRESULT(CreateStreamOnHGlobal(NULL, TRUE, &ipStream),
-			"ELI22018", "Unable to create stream object!", ipStream, IID_IStream);
+		ipStream.Attach(SHCreateMemStream(__nullptr, 0));
+		if (ipStream == __nullptr)
+		{
+			throw UCLIDException("ELI22018", "Unable to create stream object!");
+		}
 
 		// stream the object into the IStream
 		writeObjectToStream(ipPersistObj, ipStream, "ELI22019", FALSE);
@@ -1025,8 +1028,11 @@ STDMETHODIMP CMiscUtils::GetObjectFromStringizedByteStream(BSTR bstrByteStream, 
 
 		// create a temporary IStream object
 		IStreamPtr ipStream;
-		HANDLE_HRESULT(CreateStreamOnHGlobal(NULL, TRUE, &ipStream),
-			"ELI22025", "Unable to create stream object!", ipStream, IID_IStream);
+		ipStream.Attach(SHCreateMemStream(__nullptr, 0));
+		if (ipStream == __nullptr)
+		{
+			throw UCLIDException("ELI22025", "Unable to create stream object!");
+		}
 
 		// Write the buffer to the stream
 		ipStream->Write(byteStream.getData(), byteStream.getLength(), NULL);
