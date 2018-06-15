@@ -823,7 +823,8 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 					asVariantBool(pProgressStatus != __nullptr), eDecompositionMethod[i]);
 
 				// check if the progress status update thread still exists
-				if (apPSUpdateThread.get() != __nullptr)
+				if (!killer.killedProcess() && apPSUpdateThread.get() != __nullptr)
+				//if (apPSUpdateThread.get() != __nullptr)
 				{
 					// mark the progress status as complete
 					apPSUpdateThread->notifyOCRComplete();

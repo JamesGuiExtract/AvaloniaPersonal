@@ -1903,6 +1903,26 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 		// log error
 		ue.log();
 	}
+	else if (rc == API_TIMEOUT_ERR)
+	{
+		UCLIDException ue("ELI46052", "Recognition timeout");
+		loadScansoftRecErrInfo(ue, rc);
+		ue.addDebugInfo("Image Name", strImageFileName);
+		ue.addDebugInfo("Page Number", nPageNum);
+		throw ue;
+	}
+	else if (rc == API_HARDTIMEOUT_ERR)
+	{
+		UCLIDException ue("ELI46053", "Recognition hard timeout");
+		loadScansoftRecErrInfo(ue, rc);
+		ue.addDebugInfo("Image Name", strImageFileName);
+		ue.addDebugInfo("Page Number", nPageNum);
+		ue.log();
+
+		// Nuance recommends terminating the process and starting clean if there is a hard timeout
+		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, GetCurrentProcessId());
+		TerminateProcess(hProcess, 0);
+	}
 	else if(rc != NO_TXT_WARN)
 	{
 		// we have come across an unexpected return code

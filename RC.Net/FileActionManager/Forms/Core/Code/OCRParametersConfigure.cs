@@ -624,7 +624,7 @@ namespace Extract.FileActionManager.Forms
                                 _maxPageFailurePercentNumericUpDown.Value = value;
                                 break;
                             case EOCRParameter.kDefaultDecompositionMethod:
-                                _defaultFillingMethodComboBox.SelectEnumValue((EPageDecompositionMethod)value);
+                                _defaultDecompositionMethodComboBox.SelectEnumValue((EPageDecompositionMethod)value);
                                 break;
                             case EOCRParameter.kTradeoff:
                                 _accuracyTradeoffComboBox.SelectEnumValue((EOcrTradeOff)value);
