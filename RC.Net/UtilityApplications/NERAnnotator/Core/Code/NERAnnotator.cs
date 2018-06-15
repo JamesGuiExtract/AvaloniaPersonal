@@ -664,7 +664,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     {
                         if (openTags.Any())
                         {
-                            var (matched, value) = FindMatchesForToken(page, tokenSpans, i, entities, false);
+                            var (matched, value) = FindMatchesForToken(page, tokenSpans, i, entities, false, onGoing: true);
                             var matchedEntities = matched.Select(t => t.entityZones);
                             var openAttributes = openTags.Keys.Select(t => t.entityZones);
                             var intersection = matchedEntities.Intersect(openAttributes);
@@ -700,7 +700,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                         {
                             // Since there is not an ongoing match, use the midpoints of zones to determine overlap. This gives better results for attributes
                             // that slightly overlap tokens. E.g., if an expected redaction includes the top of a number that is on the next line.
-                            var (matched, value) = FindMatchesForToken(page, tokenSpans, i, entities, useMidpointToDetermineOverlap: true);
+                            var (matched, value) = FindMatchesForToken(page, tokenSpans, i, entities, useMidpointToDetermineOverlap: true, onGoing: false);
 
                             if (matched.Any())
                             {
@@ -812,7 +812,8 @@ namespace Extract.UtilityApplications.NERAnnotator
                     List<(int tokenStart, int tokenEndExclusive, string value)> tokensSpans,
                     int i,
                     List<(IEnumerable<RasterZone> entityZones, string category)> attributes,
-                    bool useMidpointToDetermineOverlap)
+                    bool useMidpointToDetermineOverlap,
+                    bool onGoing)
         {
             var matched = Enumerable.Empty<(IEnumerable<RasterZone> entityZones, string category)>();
             string value = null;
@@ -823,6 +824,17 @@ namespace Extract.UtilityApplications.NERAnnotator
                 matched = attributes.FindAll(pair =>
                 {
                     var indexes = _getCharIndexesMemoized(pair.entityZones, page, useMidpointToDetermineOverlap);
+
+                    if (indexes.Any() && onGoing)
+                    {
+                        int min = indexes.Min();
+                        int max = indexes.Max();
+                        if (t.tokenStart >= min && (t.tokenEndExclusive - 1) <= max)
+                        {
+                            return true;
+                        }
+                    }
+
                     for (int j = t.tokenStart; j < t.tokenEndExclusive; j++)
                     {
                         if (indexes.Contains(j))

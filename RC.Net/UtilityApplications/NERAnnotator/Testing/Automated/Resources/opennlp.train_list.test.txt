@@ -28,7 +28,7 @@ Demand for payment of this liability has been made , but it remains unpaid .
 Therefore , there is a lien in favor of the United States on all property and rights fo property belonging to this taxpayer for the amount of these taxes , and additional penalties , interest , and costs that may accrue .
 Name of Taxpayer <START:Name> John <END> & <START:Name> Jane D. Doe <END> Residence <START:Address> 123 Bake Rd , Apt . 1 Lansing , NI 48910 <END> Kind of Tax ( a ) Tax Period Ended ( b ) Data of Assessment ( e ) identifying Number ( r0 Unpaid Balance of Assessment ( a ) 1040 1040 , ... ) ) 7 12-31-78 12-31-79 8-27-79 6-2-80 123-12-1234 123-12-1234 FILED Am 21 9 so MI '80 REGISTER OF DEEDS C;4-2.....e . ,..9.. INGHAM COUNTY,MICH.
 671.10 359.02
-Place of Filing -- - -, , Register of Deeds <START:Address> Ingham County <END> Total <START:Address> Mason , MI 48854 <END> $ 1030.12
+Place of Filing -- - -, , Register of Deeds <START:Address> Ingham County Total Mason , MI 48854 <END> $ 1030.12
 This notice was prepared and signed at <START:Address> 229 Federal Building . <END>
 <START:Address> Lansing . <END>
 <START:Address> MI 48933 <END> , on this , the 14.5th day of August ,19 _AG Title Signature ( <START:Name> Z-?t <END> , <START:Name> William R. Fleck <END> Revenue Officer ( Nets Certificate of officer authorized by law to take acknowledgments Is not essential to the validity of Notice of Federal Tax Lion O.C.M. 28419.1950-1 ,

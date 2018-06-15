@@ -556,7 +556,7 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
             var trainingOutput = File.ReadAllText(trainingOutputFile);
             Assert.Greater(trainingOutput.Length, expected.Length);
-            Assert.AreEqual(114005, trainingOutput.Length);
+            Assert.AreEqual(113920, trainingOutput.Length);
         }
 
         // Verify that output changes for different page-inclusion random seed values
