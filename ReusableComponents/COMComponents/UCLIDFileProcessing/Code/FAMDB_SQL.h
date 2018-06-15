@@ -1822,6 +1822,7 @@ const string gstrGET_FAILED_WORK_ITEM_FOR_GROUP =
 	"  ,[FileID] "
 	"  ,[WorkItemGroup].[FAMSessionID] as WorkGroupFAMSessionID "
 	"  ,[Priority] "
+	"  ,[RunningTaskDescription] "
 	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
 	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
 	"WHERE WorkItemGroupID = <WorkItemGroupID> "
