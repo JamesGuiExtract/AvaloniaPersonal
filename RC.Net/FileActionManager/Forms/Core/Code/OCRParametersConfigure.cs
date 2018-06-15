@@ -876,7 +876,7 @@ namespace Extract.FileActionManager.Forms
             _defaultDecompositionMethodComboBox.SelectEnumValue(EPageDecompositionMethod.kAutoDecomposition);
             _accuracyTradeoffComboBox.SelectEnumValue(EOcrTradeOff.kAccurate);
             _defaultFillingMethodComboBox.SelectEnumValue(FILLINGMETHOD.FM_OMNIFONT);
-            _timeoutNumericUpDown.Value = 120000;
+            _timeoutNumericUpDown.Value = 240000;
             _preferAccuracteEngineCheckBox.Checked = true;
             _zoneOrderingCheckBox.Checked = false;
 

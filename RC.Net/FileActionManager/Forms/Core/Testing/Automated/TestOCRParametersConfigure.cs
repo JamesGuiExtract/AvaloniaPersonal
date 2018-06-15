@@ -179,7 +179,7 @@ namespace Extract.FileActionManager.Forms.Test
                     PrimaryDecompositionMethod = 0
                     RequireOnePageSuccess = 1
                     SkipPageOnFailure = 1
-                    TimeoutLength = 120000
+                    TimeoutLength = 240000
                     TreatZonesAsParagraphs = 1", @"(?m)^ +", "");
 
             // Set default settings by opening and closing the dialog with the OK button
@@ -243,7 +243,7 @@ namespace Extract.FileActionManager.Forms.Test
                     PrimaryDecompositionMethod = 0
                     RequireOnePageSuccess = 1
                     SkipPageOnFailure = 1
-                    TimeoutLength = 120000
+                    TimeoutLength = 240000
                     TreatZonesAsParagraphs = 1", @"(?m)^ +", "");
 
             // Set default settings by opening and closing the dialog with the OK button
@@ -303,7 +303,7 @@ namespace Extract.FileActionManager.Forms.Test
                     PrimaryDecompositionMethod = 0
                     RequireOnePageSuccess = 1
                     SkipPageOnFailure = 1
-                    TimeoutLength = 120000
+                    TimeoutLength = 240000
                     TreatZonesAsParagraphs = 1", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
@@ -398,7 +398,7 @@ namespace Extract.FileActionManager.Forms.Test
                     PrimaryDecompositionMethod = 0
                     RequireOnePageSuccess = 1
                     SkipPageOnFailure = 1
-                    TimeoutLength = 120000
+                    TimeoutLength = 240000
                     TreatZonesAsParagraphs = 1", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
@@ -467,7 +467,7 @@ namespace Extract.FileActionManager.Forms.Test
                     PrimaryDecompositionMethod = 0
                     RequireOnePageSuccess = 1
                     SkipPageOnFailure = 1
-                    TimeoutLength = 120000
+                    TimeoutLength = 240000
                     TreatZonesAsParagraphs = 1", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
