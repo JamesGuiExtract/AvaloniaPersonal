@@ -37,37 +37,37 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 6;
+	const long glSCHEMA_VERSION = 7;
 	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
-	VectorOfString GetCurrentTableNames( bool excludeUserTables = false )
+	VectorOfString GetCurrentTableNames(bool excludeUserTables = false)
 	{
 		VectorOfString names;
 
-		if ( !excludeUserTables )
+		if (!excludeUserTables)
 		{
-			names.push_back( gstrATTRIBUTE_SET_NAME );
+			names.push_back(gstrATTRIBUTE_SET_NAME);
 		}
 
-		names.push_back( gstrATTRIBUTE_SET_FOR_FILE );
-		names.push_back( gstrATTRIBUTE_NAME );
-		names.push_back( gstrATTRIBUTE_TYPE );
-		names.push_back( gstrATTRIBUTE_INSTANCE_TYPE );
-		names.push_back( gstrATTRIBUTE );
-		names.push_back( gstrRASTER_ZONE );
-		names.push_back( gstrREPORTING_REDACTION_ACCURACY_TABLE );
-		names.push_back( gstrREPORTING_DATA_CAPTURE_ACCURACY_TABLE );
+		names.push_back(gstrATTRIBUTE_SET_FOR_FILE);
+		names.push_back(gstrATTRIBUTE_NAME);
+		names.push_back(gstrATTRIBUTE_TYPE);
+		names.push_back(gstrATTRIBUTE_INSTANCE_TYPE);
+		names.push_back(gstrATTRIBUTE);
+		names.push_back(gstrRASTER_ZONE);
+		names.push_back(gstrREPORTING_REDACTION_ACCURACY_TABLE);
+		names.push_back(gstrREPORTING_DATA_CAPTURE_ACCURACY_TABLE);
 		names.push_back(gstrDASHBOARD_ATTRIBUTE_FIELDS_TABLE);
 
 		return names;
 	}
 
-	VectorOfString GetTables_v1( bool bAddUserTables )
+	VectorOfString GetTables_v1(bool bAddUserTables)
 	{
 		VectorOfString tables;
 
-		if ( bAddUserTables )
+		if (bAddUserTables)
 		{
 			tables.push_back(gstrCREATE_ATTRIBUTE_SET_NAME_TABLE_v1);
 		}
@@ -109,44 +109,44 @@ namespace
 	}
 
 
-	std::string GetVersionInsertStatement( long schemaVersion )
+	std::string GetVersionInsertStatement(long schemaVersion)
 	{
 		return "INSERT INTO [DBInfo] ([Name], [Value]) VALUES ('" +
-				gstrSCHEMA_VERSION_NAME + "', '" + asString(schemaVersion) + "' )";
+			gstrSCHEMA_VERSION_NAME + "', '" + asString(schemaVersion) + "' )";
 	}
 
-	std::string GetVersionUpdateStatement(long schemaVersion )
+	std::string GetVersionUpdateStatement(long schemaVersion)
 	{
 		char buffer[255];
-		_snprintf_s( buffer,
-					 sizeof(buffer),
-					 sizeof(buffer) - 1,
-					 "UPDATE [DBInfo] SET Value='%d' where Name='AttributeCollectionSchemaVersion';",
-					 schemaVersion );
+		_snprintf_s(buffer,
+			sizeof(buffer),
+			sizeof(buffer) - 1,
+			"UPDATE [DBInfo] SET Value='%d' where Name='AttributeCollectionSchemaVersion';",
+			schemaVersion);
 
 		return buffer;
 	}
 
 	template <typename T>
-	void AppendToVector( T& dest, const T& source )
+	void AppendToVector(T& dest, const T& source)
 	{
-		dest.insert( dest.end(), source.begin(), source.end() );
+		dest.insert(dest.end(), source.begin(), source.end());
 	}
 
 
-	VectorOfString GetSchema_v1( bool bAddUserTables )
+	VectorOfString GetSchema_v1(bool bAddUserTables)
 	{
-		VectorOfString queries = GetTables_v1( bAddUserTables );
-		AppendToVector( queries, GetIndexes_v1() );
-		AppendToVector( queries, GetForeignKeys_v1() );
+		VectorOfString queries = GetTables_v1(bAddUserTables);
+		AppendToVector(queries, GetIndexes_v1());
+		AppendToVector(queries, GetForeignKeys_v1());
 
 		return queries;
 	}
 
-	VectorOfString GetSchema_v2( bool bAddUserTables )
+	VectorOfString GetSchema_v2(bool bAddUserTables)
 	{
-		VectorOfString queries = GetSchema_v1( bAddUserTables );
-		queries.push_back( gstrADD_ATTRIBUTE_SET_FOR_FILE_VOA_COLUMN );
+		VectorOfString queries = GetSchema_v1(bAddUserTables);
+		queries.push_back(gstrADD_ATTRIBUTE_SET_FOR_FILE_VOA_COLUMN);
 
 		return queries;
 	}
@@ -206,16 +206,25 @@ namespace
 		return queries;
 	}
 
-	VectorOfString GetCurrentSchema( bool bAddUserTables = true )
+	VectorOfString GetSchema_v7(bool bAddUserTables)
 	{
-		return GetSchema_v6( bAddUserTables );
+		VectorOfString queries = GetSchema_v6(bAddUserTables);
+		queries.push_back(gstrCREATE_REPORTING_HIM_STATS);
+		queries.push_back(gstrCREATE_FAMUSERID_WITH_INCLUDES_INDEX);
+
+		return queries;
+	}
+
+	VectorOfString GetCurrentSchema(bool bAddUserTables = true)
+	{
+		return GetSchema_v7(bAddUserTables);
 	}
 
 
 	//-------------------------------------------------------------------------------------------------
 	// Schema update functions
 	//-------------------------------------------------------------------------------------------------
-	int UpdateToSchemaVersion1( _ConnectionPtr ipConnection, long* pnNumSteps )
+	int UpdateToSchemaVersion1(_ConnectionPtr ipConnection, long* pnNumSteps)
 	{
 		try
 		{
@@ -227,8 +236,8 @@ namespace
 				return nNewSchemaVersion;
 			}
 
-			vector<string> queries = GetSchema_v1( true );
-			queries.emplace_back( GetVersionInsertStatement( nNewSchemaVersion ) );
+			vector<string> queries = GetSchema_v1(true);
+			queries.emplace_back(GetVersionInsertStatement(nNewSchemaVersion));
 			executeVectorOfSQL(ipConnection, queries);
 
 			return nNewSchemaVersion;
@@ -236,7 +245,7 @@ namespace
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38511");
 	}
 	//-------------------------------------------------------------------------------------------------
-	int UpdateToSchemaVersion2( _ConnectionPtr ipConnection, long* pnNumSteps )
+	int UpdateToSchemaVersion2(_ConnectionPtr ipConnection, long* pnNumSteps)
 	{
 		try
 		{
@@ -249,8 +258,8 @@ namespace
 			}
 
 			vector<string> queries;
-			queries.push_back( gstrADD_ATTRIBUTE_SET_FOR_FILE_VOA_COLUMN );
-			queries.emplace_back( GetVersionUpdateStatement( nNewSchemaVersion ) );
+			queries.push_back(gstrADD_ATTRIBUTE_SET_FOR_FILE_VOA_COLUMN);
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
 			executeVectorOfSQL(ipConnection, queries);
 
 			return nNewSchemaVersion;
@@ -306,7 +315,7 @@ namespace
 			queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_FAMFILE_FK);
 			queries.push_back(gstrADD_REPORTING_DATA_CAPTURE_DATABASE_SERVICE_FK);
 			queries.push_back(gstrCREATE_REPORTING_DATA_CAPTURE_FILEID_DATABASE_SERVICE_IX);
-			
+
 			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
 
 			executeVectorOfSQL(ipConnection, queries);
@@ -329,7 +338,7 @@ namespace
 			}
 
 			vector<string> queries;
-			
+
 			queries.push_back("ALTER TABLE [dbo].[ReportingDataCaptureAccuracy] ADD [FoundDateTimeStamp] [DATETIME] NULL");
 			queries.push_back("ALTER TABLE [dbo].[ReportingDataCaptureAccuracy] ADD [FoundFAMUserID] INT  NULL");
 			queries.push_back("ALTER TABLE [dbo].[ReportingDataCaptureAccuracy] ADD [FoundActionID] INT NULL");
@@ -354,7 +363,7 @@ namespace
 				"INNER JOIN FileTaskSession ExpectedFileSession ON ExpectedSet.FileTaskSessionID = ExpectedFileSession.ID "
 				"INNER JOIN FAMSession ExpectedFAMSession ON ExpectedFileSession.FAMSessionID = ExpectedFAMSession.ID "
 			);
-			
+
 			queries.push_back("ALTER TABLE[dbo].[ReportingDataCaptureAccuracy] ALTER COLUMN [FoundDateTimeStamp] [DATETIME] NOT NULL");
 			queries.push_back("ALTER TABLE[dbo].[ReportingDataCaptureAccuracy] ALTER COLUMN [FoundFAMUserID] INT NOT NULL");
 			queries.push_back("ALTER TABLE[dbo].[ReportingDataCaptureAccuracy] ALTER COLUMN [ExpectedDateTimeStamp] [DATETIME] NOT NULL");
@@ -390,7 +399,7 @@ namespace
 			}
 
 			vector<string> queries;
-			
+
 			queries.push_back("ALTER TABLE [dbo].[ReportingRedactionAccuracy] ADD [FoundDateTimeStamp] [DATETIME] NULL");
 			queries.push_back("ALTER TABLE [dbo].[ReportingRedactionAccuracy] ADD [FoundFAMUserID] INT  NULL");
 			queries.push_back("ALTER TABLE [dbo].[ReportingRedactionAccuracy] ADD [FoundActionID] INT NULL");
@@ -415,7 +424,7 @@ namespace
 				"INNER JOIN FileTaskSession ExpectedFileSession ON ExpectedSet.FileTaskSessionID = ExpectedFileSession.ID "
 				"INNER JOIN FAMSession ExpectedFAMSession ON ExpectedFileSession.FAMSessionID = ExpectedFAMSession.ID "
 			);
-			
+
 			queries.push_back("ALTER TABLE[dbo].[ReportingRedactionAccuracy] ALTER COLUMN [FoundDateTimeStamp] [DATETIME] NOT NULL");
 			queries.push_back("ALTER TABLE[dbo].[ReportingRedactionAccuracy] ALTER COLUMN [FoundFAMUserID] INT NOT NULL");
 			queries.push_back("ALTER TABLE[dbo].[ReportingRedactionAccuracy] ALTER COLUMN [ExpectedDateTimeStamp] [DATETIME] NOT NULL");
@@ -432,6 +441,34 @@ namespace
 			return nNewSchemaVersion;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46004");
+	}
+	//-------------------------------------------------------------------------------------------------
+	int UpdateToSchemaVersion7(_ConnectionPtr ipConnection, long* pnNumSteps)
+	{
+		try
+		{
+			const int nNewSchemaVersion = 7;
+
+			if (pnNumSteps != __nullptr)
+			{
+				*pnNumSteps += 1;
+				return nNewSchemaVersion;
+			}
+
+			vector<string> queries;
+			queries.push_back(gstrCREATE_REPORTING_HIM_STATS);
+			queries.push_back(gstrCREATE_FAMUSERID_WITH_INCLUDES_INDEX);
+
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
+			long saveCommandTimeout = ipConnection->CommandTimeout;
+			ipConnection->CommandTimeout = 0;
+			executeVectorOfSQL(ipConnection, queries);
+			ipConnection->CommandTimeout = saveCommandTimeout;
+
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46055");
+
 	}
 }
 
@@ -796,6 +833,13 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				break;
 
 			case 6:
+				if (nFAMDBSchemaVersion == 166)
+				{
+					*pnProdSchemaVersion = UpdateToSchemaVersion7(ipConnection, pnNumSteps);
+				}
+				break;
+
+			case 7:
 				break;
 
 			default:

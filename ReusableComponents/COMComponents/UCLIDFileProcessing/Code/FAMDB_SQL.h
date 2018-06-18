@@ -505,6 +505,9 @@ static const string gstrCREATE_FPS_FILE_NAME_INDEX = "CREATE NONCLUSTERED INDEX 
 static const string gstrCREATE_INPUT_EVENT_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_Input_Event] ON [InputEvent]([TimeStamp], [ActionID], [MachineID], [FAMUserID], [PID])";
 
+static const string gstrCREATE_INPUT_EVENT_FAMUSER_WITH_TIMESTAMP_INDEX = "CREATE NONCLUSTERED INDEX "
+	"IX_InputEvent_FAMUser_With_TimeStamp ON [dbo].[InputEvent]([FAMUserID]) INCLUDE([TimeStamp])";
+
 static const string gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX = 
 	"CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_FileActionStatus_All] ON [dbo].[FileActionStatus] "
@@ -2174,3 +2177,35 @@ static const std::string gstrCREATE_USERS_WITH_ACTIVE_VIEW =
 	"			RIGHT OUTER JOIN dbo.FAMUser ON dbo.FAMSession.FAMUserID = dbo.FAMUser.ID '"
 	"	)";
 
+static const std::string gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW = 
+	"IF OBJECT_ID('[dbo].[vFAMUserInputEventsTime]', 'V') IS NULL "
+	"	EXECUTE('CREATE VIEW[dbo].[vFAMUserInputEventsTime] "
+	"		AS "
+	"		SELECT        FAMUserID, CAST(TimeStamp AS DATE) AS InputDate, COUNT(ID) AS TotalMinutes "
+	"		FROM            dbo.InputEvent "
+	"		GROUP BY FAMUserID, CAST(TimeStamp AS DATE)'"
+	"	)";
+
+static const std::string gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW =
+	"IF OBJECT_ID('[dbo].[vPaginationDataWithRank]', 'V') IS NULL \r\n"
+	"		EXECUTE('CREATE VIEW[dbo].[vPaginationDataWithRank] AS SELECT Pagination.ID PaginationID, \r\n"
+	"			FAMSession.FAMUserID, \r\n"
+	"			SourceFileID, \r\n"
+	"			DestFileID, \r\n"
+	"			OriginalFileID, \r\n"
+	"			FileTaskSession.DateTimeStamp, \r\n"
+	"			FileTaskSession.ActionID, \r\n"
+	"			Action.ASCName, \r\n"
+	"			Pagination.FileTaskSessionID, \r\n"
+	"			RANK() \r\n"
+	"			OVER(PARTITION BY SourceFileID, Action.ASCName, Pagination.FileTaskSessionID \r\n"
+	"				ORDER BY  FileTaskSession.DateTimeStamp DESC) RankDesc \r\n"
+	"				FROM[dbo].[Pagination] \r\n"
+	"				INNER JOIN FileTaskSession \r\n"
+	"				ON FileTaskSession.ID = Pagination.FileTaskSessionID \r\n"
+	"				INNER JOIN Action \r\n"
+	"				ON FileTaskSession.ActionID = Action.ID \r\n"
+	"				INNER JOIN FAMSession \r\n"
+	"				ON FAMSession.ID = FileTaskSession.FAMSessionID \r\n"
+	"				WHERE FileTaskSession.ActionID IS NOT NULL \r\n"
+	"				AND FileTaskSession.DateTimeStamp IS NOT NULL') \r\n";

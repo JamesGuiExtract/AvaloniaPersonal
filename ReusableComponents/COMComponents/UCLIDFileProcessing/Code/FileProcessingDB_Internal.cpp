@@ -1612,6 +1612,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
+		vecQueries.push_back(gstrCREATE_INPUT_EVENT_FAMUSER_WITH_TIMESTAMP_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
 		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX);
@@ -1753,6 +1754,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		// Add Views
 		vecQueries.push_back(gstrCREATE_PAGINATED_DEST_FILES_VIEW);
 		vecQueries.push_back(gstrCREATE_USERS_WITH_ACTIVE_VIEW);
+		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW);
+		vecQueries.push_back(gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);

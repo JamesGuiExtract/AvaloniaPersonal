@@ -332,3 +332,22 @@ static const std::string gstrCREATE_REPORTING_REDACTION_ACCURACY_FOUND_FAMUSERID
 "CREATE NONCLUSTERED INDEX[IX_ReportingRedactionAccuracy_FoundFAMUserIDWithIncludes] "
 "ON[dbo].[ReportingRedactionAccuracy]([FoundFAMUserID]) "
 "INCLUDE([DatabaseServiceID], [FoundAttributeSetForFileID], [FileID], [Attribute], [Correct], [Expected], [FoundDateTimeStamp]) ";
+
+static const std::string gstrCREATE_REPORTING_HIM_STATS =
+"CREATE TABLE[dbo].[ReportingHIMStats]( "
+"	[PaginationID][int] NOT NULL CONSTRAINT [PK_ReportingHIMStats] PRIMARY KEY CLUSTERED, "
+"	[FAMUserID][int] NOT NULL, "
+"	[SourceFileID][int] NOT NULL, "
+"	[DestFileID][int] NULL, "
+"	[OriginalFileID][int] NOT NULL, "
+"	[DateProcessed][date] NULL, "
+"	[ActionID][int] NULL, "
+"	[FileTaskSessionID][int] NOT NULL, "
+"	[ActionName][nvarchar](50) NOT NULL "
+"	)";
+
+static const std::string gstrCREATE_FAMUSERID_WITH_INCLUDES_INDEX =
+"CREATE NONCLUSTERED INDEX [IX_ReportingHIMStats_FAMUserID_With_Includes] "
+"ON[dbo].[ReportingHIMStats]([FAMUserID], [DateProcessed]) "
+"INCLUDE([SourceFileID], [DestFileID], [OriginalFileID], [ActionName]) ";
+
