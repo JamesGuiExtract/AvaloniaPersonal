@@ -805,6 +805,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_editDocumentDataButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleEditDocumentDataButton_Click(object sender, EventArgs e)
+        {
+            _clickEventHandledInternally = true;
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_selectedCheckBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSelectedCheckBox_Click(object sender, EventArgs e)
+        {
+            _clickEventHandledInternally = true;
+        }
+
+        /// <summary>
         /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
         /// <see cref="_selectedCheckBox"/>.
         /// </summary>
@@ -815,8 +837,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _clickEventHandledInternally = true;
-
                 if (DocumentSelectedToCommit != _selectedCheckBox.Checked)
                 {
                     DocumentSelectedToCommit = _selectedCheckBox.Checked;
@@ -849,8 +869,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             try
             {
-                _clickEventHandledInternally = true;
-
                 if (_editDocumentDataButton.Checked)
                 {
                     OpenDataPanel();

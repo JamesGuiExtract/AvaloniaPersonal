@@ -186,6 +186,7 @@
             this._selectedCheckBox.UseVisualStyleBackColor = true;
             this._selectedCheckBox.Visible = false;
             this._selectedCheckBox.CheckedChanged += new System.EventHandler(this.HandleSelectedCheckBox_CheckedChanged);
+            this._selectedCheckBox.Click += new System.EventHandler(this.HandleSelectedCheckBox_Click);
             // 
             // _editedPaginationGlyph
             // 
@@ -239,6 +240,7 @@
             this._editDocumentDataButton.UseVisualStyleBackColor = true;
             this._editDocumentDataButton.Visible = false;
             this._editDocumentDataButton.CheckedChanged += new System.EventHandler(this.HandleEditDocumentDataButton_CheckedChanged);
+            this._editDocumentDataButton.Click += new System.EventHandler(this.HandleEditDocumentDataButton_Click);
             // 
             // _dataErrorPictureBox
             // 
