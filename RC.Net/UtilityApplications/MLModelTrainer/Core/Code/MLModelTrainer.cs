@@ -6,6 +6,7 @@ using Extract.UtilityApplications.TrainingDataCollector;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -675,6 +676,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
             {
                 try
                 {
+                    AppendToLog("Training...");
+
                     int lastCount = GetLastProcessedCount(true);
                     IEnumerable<(string data, int id)> trainingData = GetDataFromDB(true, maxToProcess);
 
@@ -699,6 +702,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
                                 return r.data;
                             }
                         }));
+
+                        AppendToLog(UtilityMethods.FormatCurrent($"{currentCount} records to process"));
 
                         int exitCode = 0;
                         if (ModelType == ModelType.NamedEntityRecognition)
@@ -782,8 +787,17 @@ namespace Extract.UtilityApplications.MLModelTrainer
             {
                 try
                 {
+                    AppendToLog("Testing...");
+
                     int lastCount = GetLastProcessedCount(false);
                     IEnumerable<(string data, int id)> testingData = GetDataFromDB(false, maxToProcess);
+
+                    // If no testing data, test on training data
+                    if (!testingData.Any())
+                    {
+                        AppendToLog("No testing data found. Using training data for test.");
+                        testingData = GetDataFromDB(true, maxToProcess);
+                    }
 
                     ExtractException.Assert("ELI45289", "No testing data found",
                         testingData.Any(), "Model", QualifiedModelName);
@@ -806,6 +820,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
                                 return r.data;
                             }
                         }));
+
+                        AppendToLog(UtilityMethods.FormatCurrent($"{currentCount} records to process"));
 
                         int exitCode = 0;
                         if (ModelType == ModelType.NamedEntityRecognition)
@@ -838,14 +854,24 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
                                 if (match.Success && double.TryParse(match.Groups["f1"].Value, out var f1Percent))
                                 {
-                                    var f1 = f1Percent / 100;
-                                    var h = ULP(f1) / 2;
+                                    double f1 = f1Percent / 100.0;
+                                    double h = ULP(f1) / 2;
                                     appTrace.AddDebugData("F1", f1, false);
                                     criteriaMet = (f1 + h) >= MinimumF1Score && (f1 + h + AllowableAccuracyDrop) >= LastF1Score;
                                     if (criteriaMet)
                                     {
                                         LastF1Score = f1;
                                     }
+
+                                    if (double.TryParse(match.Groups["precision"].Value, out var precisionPercent))
+                                    {
+                                        AppendToLog("Precision: " + (precisionPercent / 100.0).ToString("N4", CultureInfo.CurrentCulture));
+                                    }
+                                    if (double.TryParse(match.Groups["recall"].Value, out var recallPercent))
+                                    {
+                                        AppendToLog("Precision: " + (recallPercent / 100.0).ToString("N4", CultureInfo.CurrentCulture));
+                                    }
+                                    AppendToLog("F1 Score: " + f1.ToString("N4", CultureInfo.CurrentCulture));
                                 }
                                 else
                                 {
@@ -857,25 +883,48 @@ namespace Extract.UtilityApplications.MLModelTrainer
                                 var yaml = new YamlStream();
                                 yaml.Load(new StringReader(outputMessage));
                                 var mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
-
                                 if (mapping
                                     .FirstOrDefault(node => ((YamlScalarNode)node.Key).Value.Equals("Testing Set Accuracy",
                                         StringComparison.OrdinalIgnoreCase))
-                                    .Value is YamlMappingNode testingSetAccuracy
-                                    &&
-                                    testingSetAccuracy
-                                    .FirstOrDefault(node => ((YamlScalarNode)node.Key).Value.StartsWith("F1 Score",
-                                        StringComparison.OrdinalIgnoreCase))
-                                    .Value is YamlScalarNode f1Node
-                                    &&
-                                    double.TryParse(f1Node.Value, out var f1))
+                                    .Value is YamlMappingNode testingSetAccuracy)
                                 {
-                                    var h = ULP(f1) / 2;
-                                    appTrace.AddDebugData("F1", f1, false);
-                                    criteriaMet = (f1 + h) >= MinimumF1Score && (f1 + h + AllowableAccuracyDrop) >= LastF1Score;
-                                    if (criteriaMet)
+                                    var precisionNode = testingSetAccuracy
+                                        .FirstOrDefault(node => ((YamlScalarNode)node.Key).Value.StartsWith("Precision",
+                                            StringComparison.OrdinalIgnoreCase));
+                                    var recallNode = testingSetAccuracy
+                                        .FirstOrDefault(node => ((YamlScalarNode)node.Key).Value.StartsWith("Recall",
+                                            StringComparison.OrdinalIgnoreCase));
+                                    var f1Node = testingSetAccuracy
+                                        .FirstOrDefault(node => ((YamlScalarNode)node.Key).Value.StartsWith("F1 Score",
+                                            StringComparison.OrdinalIgnoreCase));
+
+                                    if (!precisionNode.Equals(default(KeyValuePair<YamlNode, YamlNode>)))
                                     {
-                                        LastF1Score = f1;
+                                        AppendToLog(((YamlScalarNode)precisionNode.Key).Value + ": " +
+                                                    ((YamlScalarNode)precisionNode.Value).Value);
+                                    }
+                                    if (!recallNode.Equals(default(KeyValuePair<YamlNode, YamlNode>)))
+                                    {
+                                        AppendToLog(((YamlScalarNode)recallNode.Key).Value + ": " +
+                                                    ((YamlScalarNode)recallNode.Value).Value);
+                                    }
+                                    if (!f1Node.Equals(default(KeyValuePair<YamlNode, YamlNode>)))
+                                    {
+                                        var f1String = ((YamlScalarNode)f1Node.Value).Value;
+                                        AppendToLog(((YamlScalarNode)f1Node.Key).Value + ": " + f1String);
+
+                                        double.TryParse(f1String, out double f1);
+                                        double h = ULP(f1) / 2;
+                                        appTrace.AddDebugData("F1", f1, false);
+                                        criteriaMet = (f1 + h) >= MinimumF1Score && (f1 + h + AllowableAccuracyDrop) >= LastF1Score;
+                                        if (criteriaMet)
+                                        {
+                                            LastF1Score = f1;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        criteriaMet = false;
                                     }
                                 }
                                 else
@@ -1120,13 +1169,13 @@ namespace Extract.UtilityApplications.MLModelTrainer
             /// The maximum number of MLData records that will be used for training
             /// </summary>
             [DataMember]
-            public int MaximumTrainingRecords { get; set; }
+            public int MaximumTrainingRecords { get; set; } = 10000;
 
             /// <summary>
             /// The maximum number of MLData records that will be used for testing
             /// </summary>
             [DataMember]
-            public int MaximumTestingRecords { get; set; }
+            public int MaximumTestingRecords { get; set; } = 10000;
 
             #endregion
 

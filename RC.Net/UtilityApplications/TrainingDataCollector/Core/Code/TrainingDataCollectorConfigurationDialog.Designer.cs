@@ -310,11 +310,6 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             // _trainingPercentageNumericUpDown
             // 
             this._trainingPercentageNumericUpDown.Location = new System.Drawing.Point(240, 73);
-            this._trainingPercentageNumericUpDown.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
             this._trainingPercentageNumericUpDown.Minimum = new decimal(new int[] {
             1,
             0,

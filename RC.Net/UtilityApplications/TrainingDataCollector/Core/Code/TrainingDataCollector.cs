@@ -225,6 +225,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                     }
                 }
 
+                AppendToLog(UtilityMethods.FormatCurrent($"{availableIDs.Count} records to process"));
+
                 // If no new data since last processed, return
                 if (availableIDs.Count == 0)
                 {

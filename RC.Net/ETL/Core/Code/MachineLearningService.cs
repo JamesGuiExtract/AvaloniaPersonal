@@ -168,6 +168,11 @@ namespace Extract.ETL
             }
         }
 
+        /// <summary>
+        /// Action for the service to use to append text to a log
+        /// </summary>
+        public Action<string> Log { get; set; }
+
         #endregion Properties
 
         #region Abstract Properties
@@ -361,7 +366,16 @@ namespace Extract.ETL
                 throw ex.AsExtract("ELI45846");
             }
         }
-    }
 
-    #endregion Protected Methods
+        /// <summary>
+        /// Invokes the <see cref="Log"/> action if one is defined
+        /// </summary>
+        /// <param name="value">The string parameter for the <see cref="Log"/> action</param>
+        protected void AppendToLog(string value)
+        {
+            Log?.Invoke(value);
+        }
+
+        #endregion Protected Methods
+    }
 }

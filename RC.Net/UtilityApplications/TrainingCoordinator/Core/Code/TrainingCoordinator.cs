@@ -224,6 +224,17 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                     try
                     {
                         service.Container = this;
+                        service.Log = entry =>
+                        {
+                            if (string.IsNullOrEmpty(Log))
+                            {
+                                Log = "  " + entry + "\r\n";
+                            }
+                            else
+                            {
+                                Log += ("  " + entry + "\r\n");
+                            }
+                        };
                         service.Process(cancelToken);
 
                         Log += UtilityMethods.FormatCurrent($"{DateTime.Now}\r\n",
