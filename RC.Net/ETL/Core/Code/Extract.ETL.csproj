@@ -108,6 +108,13 @@
     <Compile Include="ExpandAttributesForm.Designer.cs">
       <DependentUpon>ExpandAttributesForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="HIMStatsService.cs" />
+    <Compile Include="HIMStatsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HIMStatsForm.Designer.cs">
+      <DependentUpon>HIMStatsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="IDShieldAttributeComparer.cs" />
     <Compile Include="IHasConfigurableDatabaseServiceStatus.cs" />
     <Compile Include="MachineLearningService.cs" />
@@ -244,6 +251,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ExpandAttributesForm.resx">
       <DependentUpon>ExpandAttributesForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HIMStatsForm.resx">
+      <DependentUpon>HIMStatsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RedactionAccuracyForm.resx">
       <DependentUpon>RedactionAccuracyForm.cs</DependentUpon>
