@@ -22,12 +22,12 @@ namespace RedactionPredictor
                 "        <imagePath>\r\n" +
                 "        <pageNum>\r\n" +
                 "        <voaPath>\r\n" +
-                "        <outputDir>\r\n" +
+                "        <templateLibrary>\r\n" +
                 "        [/ef <exceptionFile>]\r\n\r\n" +
                 "  To apply a template/templates:\r\n" +
                 "    RedactionPredictor\r\n" +
                 "        <--apply-template|-a|/a>\r\n" +
-                "        <templateDir>\r\n" +
+                "        <templateLibrary>\r\n" +
                 "        <imagePath>\r\n" +
                 "        <outputVoaPath>\r\n" +
                 "        [--pages <pageRange>]\r\n" +
@@ -120,8 +120,8 @@ namespace RedactionPredictor
                         {
                             var imagePath = Path.GetFullPath(args[1]);
                             var voaPath = Path.GetFullPath(args[3]);
-                            var outputDir = Path.GetFullPath(args[4]);
-                            CreateTemplate(imagePath, pageNum, voaPath, outputDir);
+                            var templateLibrary = Path.GetFullPath(args[4]);
+                            CreateTemplate(imagePath, pageNum, voaPath, templateLibrary);
                             break;
                         }
                         else
@@ -135,10 +135,10 @@ namespace RedactionPredictor
                         {
                             if (args.Count == 4)
                             {
-                                var templateDir = Path.GetFullPath(args[1]);
+                                var templateLibrary = Path.GetFullPath(args[1]);
                                 var imagePath = Path.GetFullPath(args[2]);
                                 var voaPath = Path.GetFullPath(args[3]);
-                                ApplyTemplate(templateDir, imagePath, pageRange, voaPath, classifyAttributes, outputAllFormFields);
+                                ApplyTemplate(templateLibrary, imagePath, pageRange, voaPath, classifyAttributes, outputAllFormFields);
                                 break;
                             }
                             else

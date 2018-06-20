@@ -79,7 +79,7 @@ namespace Extract.AttributeFinder.Rules
                 // Apply Settings values to the UI.
                 if (Settings != null)
                 {
-                    _templatesDirTextBox.Text = Settings.TemplatesDir ?? "";
+                    _templateLibraryTextBox.Text = Settings.TemplateLibrary ?? "";
                     _redactionPredictorOptionsTextBox.Text = Settings.RedactionPredictorOptions ?? "";
                 }
             }
@@ -110,7 +110,7 @@ namespace Extract.AttributeFinder.Rules
                     return;
                 }
 
-                Settings.TemplatesDir = _templatesDirTextBox.Text;
+                Settings.TemplateLibrary = _templateLibraryTextBox.Text;
                 Settings.RedactionPredictorOptions = _redactionPredictorOptionsTextBox.Text;
 
                 DialogResult = DialogResult.OK;
@@ -132,9 +132,9 @@ namespace Extract.AttributeFinder.Rules
         /// the settings are valid.</returns>
         bool WarnIfInvalid()
         {
-            if (string.IsNullOrWhiteSpace(_templatesDirTextBox.Text))
+            if (string.IsNullOrWhiteSpace(_templateLibraryTextBox.Text))
             {
-                _templatesDirTextBox.Focus();
+                _templateLibraryTextBox.Focus();
                 UtilityMethods.ShowMessageBox("Please specify a directory of templates (*.tpt files).",
                     "Specify templates dir", false);
                 return true;

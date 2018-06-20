@@ -4,6 +4,8 @@ using Nuance.OmniPage.CSDK;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -12,6 +14,12 @@ namespace RedactionPredictor
 {
     public partial class Templates
     {
+        /// <summary>
+        /// The path to the EncryptFile application
+        /// </summary>
+        static readonly string _ENCRYPT_FILE_APPLICATION =
+            Path.Combine(FileSystemMethods.CommonComponentsPath, "EncryptFile.exe");
+
         static void CreateTemplate(string imagePath, int pageNum, string voaPath, string outputDir)
         {
             var voa = new IUnknownVectorClass();
@@ -22,13 +30,11 @@ namespace RedactionPredictor
             CreateTemplate(imagePath, pageNum, voa, outputDir);
         }
 
-        public static void CreateTemplate(string imagePath, int pageNum, IUnknownVector voa, string outputDir)
+        public static void CreateTemplate(string imagePath, int pageNum, IUnknownVector voa, string templateLibrary)
         {
             IntPtr pageHandle = IntPtr.Zero;
             try
             {
-                Directory.CreateDirectory(outputDir);
-
                 ThrowIfFails(() => RecAPI.kRecSetLicense(null, "9d478fe171d5"), "ELI44687", "Unable to license Nuance API");
                 ThrowIfFails(() => RecAPI.kRecInit(null, null), "ELI44688", "Unable to initialize Nuance engine");
                 ThrowIfFails(() => RecAPI.kRecLoadImgF(0, imagePath, out pageHandle, pageNum - 1), "ELI44689", "Unable to load image",
@@ -38,19 +44,9 @@ namespace RedactionPredictor
                 ThrowIfFails(() => RecAPI.kRecCreateFormTemplate(0, pageHandle), "ELI44690", "Unable to create template",
                     new KeyValuePair<string, string>("Image path", imagePath));
 
-                var outputName = Guid.NewGuid().ToString("D") + ".tpt";
-                var templatePath = Path.Combine(outputDir, outputName);
-                while (File.Exists(templatePath))
-                {
-                    outputName = Guid.NewGuid().ToString("D") + ".tpt";
-                    templatePath = Path.Combine(outputDir, outputName);
-                }
-                var templateVoaPath = Path.ChangeExtension(templatePath, ".voa");
-
                 if (voa.Size() > 0)
                 {
                     RecAPI.kRecGetZoneCount(pageHandle, out int numZones);
-                    //RecAPI.kRecGetOCRZoneCount(pageHandle, out int numOCRZones);
                     int zoneIndex = numZones;
                     int voaIndex = 0; // For use as a feature
                     foreach (var a in voa.ToIEnumerable<IAttribute>())
@@ -103,10 +99,61 @@ namespace RedactionPredictor
                     }
                 }
 
-                ThrowIfFails(() => RecAPI.kRecSaveFormTemplate(0, pageHandle, templatePath), "ELI44691", "Unable to save template",
-                    new KeyValuePair<string, string>("Image path", imagePath));
+                using (var zoneFile = new TemporaryFile(true))
+                {
+                    ThrowIfFails(() => RecAPI.kRecSaveFormTemplate(0, pageHandle, zoneFile.FileName), "ELI44691", "Unable to save template",
+                        new KeyValuePair<string, string>("Image path", imagePath));
 
-                voa.SaveTo(templateVoaPath, true, typeof(AttributeStorageManagerClass).GUID.ToString("B"));
+                    // Load template library
+                    TemporaryFile zipFile = null;
+                    string zipFileName = templateLibrary;
+                    try
+                    {
+                        if (string.Equals(Path.GetExtension(templateLibrary), ".etf", StringComparison.OrdinalIgnoreCase))
+                        {
+                            zipFile = new TemporaryFile(true);
+                            zipFileName = zipFile.FileName;
+
+                            _miscUtils.Value.AutoEncryptFile(templateLibrary, _AUTO_ENCRYPT_KEY);
+                            if (File.Exists(templateLibrary))
+                            {
+                                var str = _miscUtils.Value.GetBase64StringFromFile(templateLibrary);
+                                var bytes = Convert.FromBase64String(str);
+                                File.WriteAllBytes(zipFileName, bytes);
+                            }
+                        }
+
+                        // If library file doesn't exist, ensure that the folder exists
+                        if (!File.Exists(templateLibrary))
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(templateLibrary));
+                        }
+
+                        using (var zipArchive = ZipFile.Open(zipFileName, ZipArchiveMode.Update))
+                        {
+                            var prefix = Path.GetFileName(imagePath) + "." + pageNum.ToString("D3");
+                            var rank = 1;
+                            var entryName = prefix + "." + rank.ToString("D8") + ".zon";
+                            while (zipArchive.GetEntry(entryName) != null)
+                            {
+                                entryName = prefix + "." + (++rank).ToString("D8") + ".zon";
+                            }
+                            zipArchive.CreateEntryFromFile(zoneFile.FileName, entryName);
+                        }
+                    }
+                    finally
+                    {
+                        if (zipFile != null)
+                        {
+                            int exitCode = SystemMethods.RunExecutable(
+                                _ENCRYPT_FILE_APPLICATION,
+                                new[] { zipFile.FileName, templateLibrary }, createNoWindow: true);
+                            ExtractException.Assert("ELI46061", "Failed to create output file", exitCode == 0,
+                                "Destination file", templateLibrary);
+                            zipFile.Dispose();
+                        }
+                    }
+                }
             }
             finally
             {

@@ -31,13 +31,13 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TemplateFinderSettingsDialog));
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this._templatesDirBrowseButton = new Extract.Utilities.Forms.BrowseButton();
-            this._templatesDirTextBox = new System.Windows.Forms.TextBox();
-            this._templatesDirTagButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._cancelButton = new System.Windows.Forms.Button();
-            this._okButton = new System.Windows.Forms.Button();
             this._redactionPredictorOptionsTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this._templateLibraryBrowseButton = new Extract.Utilities.Forms.BrowseButton();
+            this._templateLibraryTextBox = new System.Windows.Forms.TextBox();
+            this._templateLibraryTagButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._cancelButton = new System.Windows.Forms.Button();
+            this._okButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -46,9 +46,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(10, 16);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(73, 13);
+            this.label1.Size = new System.Drawing.Size(84, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Templates dir:";
+            this.label1.Text = "Template library:";
             // 
             // groupBox1
             // 
@@ -57,9 +57,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this._redactionPredictorOptionsTextBox);
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this._templatesDirBrowseButton);
-            this.groupBox1.Controls.Add(this._templatesDirTagButton);
-            this.groupBox1.Controls.Add(this._templatesDirTextBox);
+            this.groupBox1.Controls.Add(this._templateLibraryBrowseButton);
+            this.groupBox1.Controls.Add(this._templateLibraryTagButton);
+            this.groupBox1.Controls.Add(this._templateLibraryTextBox);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
@@ -67,40 +67,58 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             // 
-            // _templatesDirBrowseButton
+            // _redactionPredictorOptionsTextBox
             // 
-            this._templatesDirBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._templatesDirBrowseButton.EnsureFileExists = false;
-            this._templatesDirBrowseButton.EnsurePathExists = false;
-            this._templatesDirBrowseButton.FolderBrowser = true;
-            this._templatesDirBrowseButton.Location = new System.Drawing.Point(483, 31);
-            this._templatesDirBrowseButton.Name = "_templatesDirBrowseButton";
-            this._templatesDirBrowseButton.Size = new System.Drawing.Size(24, 22);
-            this._templatesDirBrowseButton.TabIndex = 8;
-            this._templatesDirBrowseButton.Text = "...";
-            this._templatesDirBrowseButton.TextControl = this._templatesDirTextBox;
-            this._templatesDirBrowseButton.UseVisualStyleBackColor = true;
-            // 
-            // _templatesDirTextBox
-            // 
-            this._templatesDirTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this._redactionPredictorOptionsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._templatesDirTextBox.Location = new System.Drawing.Point(13, 32);
-            this._templatesDirTextBox.Name = "_templatesDirTextBox";
-            this._templatesDirTextBox.Size = new System.Drawing.Size(434, 20);
-            this._templatesDirTextBox.TabIndex = 6;
+            this._redactionPredictorOptionsTextBox.Location = new System.Drawing.Point(13, 71);
+            this._redactionPredictorOptionsTextBox.Name = "_redactionPredictorOptionsTextBox";
+            this._redactionPredictorOptionsTextBox.Size = new System.Drawing.Size(494, 20);
+            this._redactionPredictorOptionsTextBox.TabIndex = 10;
             // 
-            // _templatesDirTagButton
+            // label2
             // 
-            this._templatesDirTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._templatesDirTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_templatesDirTagButton.Image")));
-            this._templatesDirTagButton.Location = new System.Drawing.Point(453, 31);
-            this._templatesDirTagButton.Name = "_templatesDirTagButton";
-            this._templatesDirTagButton.PathTags = new Extract.AttributeFinder.AttributeFinderPathTags();
-            this._templatesDirTagButton.Size = new System.Drawing.Size(24, 22);
-            this._templatesDirTagButton.TabIndex = 7;
-            this._templatesDirTagButton.TextControl = this._templatesDirTextBox;
-            this._templatesDirTagButton.UseVisualStyleBackColor = true;
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(10, 55);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(208, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "Redaction predictor command-line options:";
+            // 
+            // _templateLibraryBrowseButton
+            // 
+            this._templateLibraryBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._templateLibraryBrowseButton.EnsureFileExists = false;
+            this._templateLibraryBrowseButton.EnsurePathExists = false;
+            this._templateLibraryBrowseButton.FolderBrowser = true;
+            this._templateLibraryBrowseButton.Location = new System.Drawing.Point(483, 31);
+            this._templateLibraryBrowseButton.Name = "_templateLibraryBrowseButton";
+            this._templateLibraryBrowseButton.Size = new System.Drawing.Size(24, 22);
+            this._templateLibraryBrowseButton.TabIndex = 8;
+            this._templateLibraryBrowseButton.Text = "...";
+            this._templateLibraryBrowseButton.TextControl = this._templateLibraryTextBox;
+            this._templateLibraryBrowseButton.UseVisualStyleBackColor = true;
+            // 
+            // _templateLibraryTextBox
+            // 
+            this._templateLibraryTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._templateLibraryTextBox.Location = new System.Drawing.Point(13, 32);
+            this._templateLibraryTextBox.Name = "_templateLibraryTextBox";
+            this._templateLibraryTextBox.Size = new System.Drawing.Size(434, 20);
+            this._templateLibraryTextBox.TabIndex = 6;
+            // 
+            // _templateLibraryTagButton
+            // 
+            this._templateLibraryTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._templateLibraryTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_templateLibraryTagButton.Image")));
+            this._templateLibraryTagButton.Location = new System.Drawing.Point(453, 31);
+            this._templateLibraryTagButton.Name = "_templateLibraryTagButton";
+            this._templateLibraryTagButton.PathTags = new Extract.AttributeFinder.AttributeFinderPathTags();
+            this._templateLibraryTagButton.Size = new System.Drawing.Size(24, 22);
+            this._templateLibraryTagButton.TabIndex = 7;
+            this._templateLibraryTagButton.TextControl = this._templateLibraryTextBox;
+            this._templateLibraryTagButton.UseVisualStyleBackColor = true;
             // 
             // _cancelButton
             // 
@@ -123,24 +141,6 @@
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
-            // 
-            // _redactionPredictorOptionsTextBox
-            // 
-            this._redactionPredictorOptionsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._redactionPredictorOptionsTextBox.Location = new System.Drawing.Point(13, 71);
-            this._redactionPredictorOptionsTextBox.Name = "_redactionPredictorOptionsTextBox";
-            this._redactionPredictorOptionsTextBox.Size = new System.Drawing.Size(494, 20);
-            this._redactionPredictorOptionsTextBox.TabIndex = 10;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 55);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(208, 13);
-            this.label2.TabIndex = 9;
-            this.label2.Text = "Redaction predictor command-line options:";
             // 
             // TemplateFinderSettingsDialog
             // 
@@ -174,9 +174,9 @@
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox1;
-        private Utilities.Forms.PathTagsButton _templatesDirTagButton;
-        private System.Windows.Forms.TextBox _templatesDirTextBox;
-        private Utilities.Forms.BrowseButton _templatesDirBrowseButton;
+        private Utilities.Forms.PathTagsButton _templateLibraryTagButton;
+        private System.Windows.Forms.TextBox _templateLibraryTextBox;
+        private Utilities.Forms.BrowseButton _templateLibraryBrowseButton;
         private System.Windows.Forms.TextBox _redactionPredictorOptionsTextBox;
         private System.Windows.Forms.Label label2;
     }

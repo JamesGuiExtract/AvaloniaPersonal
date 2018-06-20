@@ -17,7 +17,7 @@ namespace PredictionEvaluator
 {
     partial class Program
     {
-        static int Main(string[] args)
+        static int Main(string[] argv)
         {
             int usage(bool error = false)
             {
@@ -26,7 +26,13 @@ namespace PredictionEvaluator
                 "Runs training on the attribute categorizer associated with the templates.\r\n" +
                 "Creates or updates a template if needed.\r\n" +
                 "Usage:\r\n" +
-                "  PredictionEvaluator <templatesDir> <imagePath> <predictionsVoaPath> <postVerificationVoaPath>";
+                "  PredictionEvaluator <templateLibrary> <imagePath> <predictionsVoaPath> <postVerificationVoaPath> [-x] [-t]" +
+                "    templateLibrary is a zip or .etf file (created if missing) that holds the template zone files" +
+                "    imagePath is the image to evaluate" +
+                "    predictionsVoa is the post-rules VOA file" +
+                "    postVerificationVoaPath is the expected data VOA file" +
+                "    -x means to only consider expected attributes that have an exemption code applied to them" +
+                "    -t means to train an attributeClassifier.lm file in the same dir as the templateLibrary for spatially correct attributes";
                 UtilityMethods.ShowMessageBox(message, "PredictionEvaluator Usage", error);
 
                 return error ? -1 : 0;
@@ -36,13 +42,34 @@ namespace PredictionEvaluator
             {
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
-                if (args.Length < 4)
+                List<string> args = new List<string>(argv.Length);
+                bool requireExemptionCodeSubattribute = false;
+                bool trainAttributeClassifier = false;
+                for (int i = 0; i < argv.Length; i++)
+                {
+                    if (string.Equals(argv[i], "-x", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(argv[i], "/x", StringComparison.OrdinalIgnoreCase))
+                    {
+                        requireExemptionCodeSubattribute = true;
+                    }
+                    else if (string.Equals(argv[i], "-t", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(argv[i], "/t", StringComparison.OrdinalIgnoreCase))
+                    {
+                        trainAttributeClassifier = true;
+                    }
+                    else
+                    {
+                        args.Add(argv[i]);
+                    }
+                }
+
+                if (args.Count < 4)
                 {
                     Console.Error.WriteLine("Not enough args");
                     return usage(error: true);
                 }
 
-                var templateDir = Path.GetFullPath(args[0]);
+                var templateLibrary = Path.GetFullPath(args[0]);
                 var imagePath = Path.GetFullPath(args[1]);
                 var predictionsVoaPath = Path.GetFullPath(args[2]);
                 var postVerificationVoaPath = Path.GetFullPath(args[3]);
@@ -57,14 +84,22 @@ namespace PredictionEvaluator
                 }
 
                 var filteredPredictions = predictionsAttributes.Where(a => a.Value.HasSpatialInfo() && !a.Name.StartsWith("_")).ToList();
-                var filteredPostVerification = postVerificationAttributes.Where(a => a.Value.HasSpatialInfo() && !a.Name.StartsWith("_")).ToList();
+                var filteredPostVerification = postVerificationAttributes
+                    .Where(a => a.Value.HasSpatialInfo()
+                        && !a.Name.StartsWith("_")
+                        && (!requireExemptionCodeSubattribute || afutil.QueryAttributes(a.SubAttributes, "ExemptionCodes", false).Size() > 0))
+                    .ToList();
 
                 var misses = Subtract(filteredPostVerification, filteredPredictions, overlapThreshold: 0.1);
-                var extras = Subtract(filteredPredictions, filteredPostVerification, overlapThreshold: 0.1);
+                // Don't use filtered list for extras calculation because there are more than just template finder attributes present in the predictions list
+                var extras = Subtract(filteredPredictions, postVerificationAttributes, overlapThreshold: 0.1);
                 var spatiallyCorrect = filteredPredictions.Where(a => !(misses.Contains(a) || extras.Contains(a))).ToList();
 
                 // Train machine
-                TrainMachine(filteredPostVerification, spatiallyCorrect, extras, imagePath, afutil, templateDir);
+                if (trainAttributeClassifier)
+                {
+                    TrainMachine(filteredPostVerification, spatiallyCorrect, extras, imagePath, afutil, Path.GetDirectoryName(templateLibrary));
+                }
 
                 var potentialPredictions = predictionsAttributes.Where(a => a.Value.HasSpatialInfo() && a.Name == "_FormField");
                 var missesThatExistOnForm = Intersect(misses, potentialPredictions, 0.1);
@@ -79,7 +114,7 @@ namespace PredictionEvaluator
                     {
                         var pageNum = group.Key;
                         var expectedRedactions = allExpectedRedactionsLookupByPage[pageNum].ToIUnknownVector();
-                        Templates.CreateTemplate(imagePath, pageNum, expectedRedactions, templateDir);
+                        Templates.CreateTemplate(imagePath, pageNum, expectedRedactions, templateLibrary);
                     }
                 }
                 // Update existing template

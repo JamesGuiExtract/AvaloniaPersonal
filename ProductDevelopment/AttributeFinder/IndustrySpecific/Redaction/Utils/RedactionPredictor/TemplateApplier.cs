@@ -6,8 +6,8 @@ using Nuance.OmniPage.CSDK;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
+using System.IO.Compression;
+using System.Threading;
 using UCLID_AFCORELib;
 using UCLID_AFOUTPUTHANDLERSLib;
 using UCLID_AFSELECTORSLib;
@@ -19,27 +19,37 @@ namespace RedactionPredictor
 {
     public partial class Templates
     {
-        static void ApplyTemplate(string templateDir, string imagePath, string pageRange, string voaPath, bool classifyAttributes, bool outputAllFormFields)
+        const string _AUTO_ENCRYPT_KEY = @"Software\Extract Systems\AttributeFinder\Settings\AutoEncrypt";
+        static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtilsClass());
+
+        static void ApplyTemplate(string templateLibrary, string imagePath, string pageRange, string voaPath, bool classifyAttributes, bool outputAllFormFields)
         {
             IntPtr[] templates = null;
             IntPtr fileHandle = IntPtr.Zero;
             try
             {
-                var voa = new IUnknownVectorClass();
-                if (Directory.Exists(templateDir))
+                ThrowIfFails(() => RecAPI.kRecSetLicense(null, "9d478fe171d5"), "ELI44697", "Unable to license Nuance API");
+                ThrowIfFails(() => RecAPI.kRecInit(null, null), "ELI44692", "Unable to initialize Nuance engine");
+
+                // Load template library
+                if (string.Equals(Path.GetExtension(templateLibrary), ".etf", StringComparison.OrdinalIgnoreCase))
                 {
-                    ThrowIfFails(() => RecAPI.kRecSetLicense(null, "9d478fe171d5"), "ELI44697", "Unable to license Nuance API");
-                    ThrowIfFails(() => RecAPI.kRecInit(null, null), "ELI44692", "Unable to initialize Nuance engine");
-                    var templateFiles = Directory.GetFiles(templateDir, "*.tpt");
-                    templates = templateFiles.Select(templatePath =>
-                        {
-                            IntPtr templateHandle = IntPtr.Zero;
-                            ThrowIfFails(() => RecAPI.kRecLoadFormTemplate(0, out templateHandle, templatePath), "ELI44693", "Unable to load template",
-                                new KeyValuePair<string, string>("Path", templatePath));
-                            return templateHandle;
-                        }).ToArray();
+                    _miscUtils.Value.AutoEncryptFile(templateLibrary, _AUTO_ENCRYPT_KEY);
+                    var str = _miscUtils.Value.GetBase64StringFromFile(templateLibrary);
+                    var bytes = Convert.FromBase64String(str);
+                    using (var zipFile = new TemporaryFile(true))
+                    {
+                        File.WriteAllBytes(zipFile.FileName, bytes);
+                        ThrowIfFails(() => RecAPI.kRecLoadFormTemplateLibrary(0, zipFile.FileName, true, out templates), "ELI44692", "Unable to initialize Nuance engine");
+                    }
+                }
+                else
+                {
+                    ThrowIfFails(() => RecAPI.kRecLoadFormTemplateLibrary(0, templateLibrary, true, out templates), "ELI46060", "Unable to initialize Nuance engine");
                 }
 
+                // Use templates
+                var voa = new IUnknownVectorClass();
                 if (templates != null)
                 {
                     int pageCount = 0;
@@ -70,7 +80,7 @@ namespace RedactionPredictor
 
                     if (classifyAttributes)
                     {
-                        voa = ClassifyAttributes(imagePath, voa, templateDir);
+                        voa = ClassifyAttributes(imagePath, voa, Path.GetDirectoryName(templateLibrary));
                     }
                 }
 

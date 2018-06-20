@@ -1,7 +1,6 @@
 ﻿using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
-using Nuance.OmniPage.CSDK;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,10 +25,10 @@ namespace Extract.AttributeFinder.Rules
         IMustBeConfiguredObject, IIdentifiableObject
     {
         /// <summary>
-        /// The location of predefined template files (*.tpt)
+        /// The (encrypted) template library file
         /// </summary>
         /// <remarks>Can contain path tags/functions</remarks>
-        string TemplatesDir { get; set; }
+        string TemplateLibrary { get; set; }
 
         /// <summary>
         /// Additional CLI options to pass to the RedactionPredictor
@@ -83,7 +82,7 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         bool _dirty;
 
-        string _templatesDir;
+        string _templateLibrary;
 
         string _redactionPredictorOptions;
 
@@ -131,17 +130,17 @@ namespace Extract.AttributeFinder.Rules
         /// The location of predefined template files (*.tpt)
         /// </summary>
         /// <remarks>Can contain path tags/functions</remarks>
-        public string TemplatesDir
+        public string TemplateLibrary
         {
             get
             {
-                return _templatesDir;
+                return _templateLibrary;
             }
             set
             {
-                if (string.CompareOrdinal(value, _templatesDir) != 0)
+                if (string.CompareOrdinal(value, _templateLibrary) != 0)
                 {
-                    _templatesDir = value;
+                    _templateLibrary = value;
                     _dirty = true;
                 }
             }
@@ -191,11 +190,11 @@ namespace Extract.AttributeFinder.Rules
                 // Initialize for use in any embedded path tags/functions.
                 _pathTags.Document = pDocument;
 
-                var templatesDir = _pathTags.Expand(TemplatesDir);
+                var templateLibrary = _pathTags.Expand(TemplateLibrary);
 
                 var input = pDocument.Text;
 
-                var returnValue = ApplyTemplate(templatesDir, input, RedactionPredictorOptions);
+                var returnValue = ApplyTemplate(templateLibrary, input, RedactionPredictorOptions);
 
                 // So that the garbage collector knows of and properly manages the associated
                 // memory from the created return value.
@@ -262,7 +261,7 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
-                return !string.IsNullOrWhiteSpace(TemplatesDir);
+                return !string.IsNullOrWhiteSpace(TemplateLibrary);
             }
             catch (Exception ex)
             {
@@ -380,7 +379,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    TemplatesDir = reader.ReadString();
+                    TemplateLibrary = reader.ReadString();
 
                     if (reader.Version >= 2)
                     {
@@ -415,7 +414,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    writer.Write(TemplatesDir);
+                    writer.Write(TemplateLibrary);
                     writer.Write(RedactionPredictorOptions);
 
                     // Write to the provided IStream.
@@ -481,7 +480,7 @@ namespace Extract.AttributeFinder.Rules
         /// </param>
         void CopyFrom(TemplateFinder source)
         {
-            TemplatesDir = source.TemplatesDir;
+            TemplateLibrary = source.TemplateLibrary;
             RedactionPredictorOptions = source.RedactionPredictorOptions;
 
             _dirty = true;
@@ -490,10 +489,10 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Searches for matching templates and creates the attributes associated with the best match
         /// </summary>
-        /// <param name="templateDir">The directory where the template files are located</param>
+        /// <param name="templateLibrary">The (encrypted) template library file</param>
         /// <param name="imagePath">The path to the source document</param>
         /// <param name="pageInfoMap">The map of page numbers to page info of the source document</param>
-        private static IUnknownVector ApplyTemplate(string templateDir, SpatialString input, string options)
+        private static IUnknownVector ApplyTemplate(string templateLibrary, SpatialString input, string options)
         {
             var pages = input.GetPages(false, "")
                 .ToIEnumerable<SpatialString>()
@@ -507,7 +506,7 @@ namespace Extract.AttributeFinder.Rules
                     "--pages",
                     pages,
                     "--apply-template",
-                    templateDir,
+                    templateLibrary,
                     input.SourceDocName,
                     outputFile.FileName
                 };
